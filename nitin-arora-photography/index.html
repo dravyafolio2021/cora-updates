@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meet the Team • Nitin Arora Photography</title>
+    <!-- Outfit and Inter Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-display: 'Outfit', sans-serif;
+            --bg-dark: #09090b;
+            --card-bg: #18181b;
+            --zinc-800: #27272a;
+            --zinc-700: #3f3f46;
+            --zinc-400: #a1a1aa;
+            --zinc-100: #f4f4f5;
+            --text-light: #fafafa;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Subtle mesh background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(39, 39, 42, 0.25) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(39, 39, 42, 0.2) 0%, transparent 50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        header {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 80px 24px 40px 24px;
+            text-align: center;
+        }
+
+        .header-tag {
+            font-family: var(--font-sans);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--zinc-400);
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .header-title {
+            font-family: var(--font-display);
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: #ffffff;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+
+        .header-subtitle {
+            font-size: 15px;
+            color: var(--zinc-400);
+            max-width: 540px;
+            margin: 0 auto;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        /* Filters Bar */
+        .filters-container {
+            max-width: 1200px;
+            margin: 0 auto 48px auto;
+            width: 100%;
+            padding: 0 24px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            font-family: var(--font-sans);
+            background: transparent;
+            color: var(--zinc-400);
+            border: 1px solid var(--zinc-800);
+            padding: 8px 18px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--zinc-700);
+            color: #ffffff;
+        }
+
+        .filter-btn.active {
+            background-color: var(--text-light);
+            color: var(--bg-dark);
+            border-color: var(--text-light);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Portfolio Grid */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 0 24px 80px 24px;
+            flex: 1;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-cols: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 28px;
+        }
+
+        /* Crew Card */
+        .crew-card {
+            background-color: var(--card-bg);
+            border: 1px solid rgba(39, 39, 42, 0.4);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .crew-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--zinc-700);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 1px rgba(255, 255, 255, 0.1) inset;
+        }
+
+        /* Card Image Container */
+        .card-image-wrap {
+            position: relative;
+            padding-top: 105%; /* Slightly tall aspect ratio */
+            background-color: #121214;
+            overflow: hidden;
+        }
+
+        .card-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-cover: cover;
+            object-position: center;
+            transition: transform 0.5s ease;
+        }
+
+        .crew-card:hover .card-image {
+            transform: scale(1.05);
+        }
+
+        /* Image Placeholder Initials */
+        .card-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1f1f23 0%, #111113 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--zinc-400);
+        }
+
+        .placeholder-icon {
+            opacity: 0.25;
+            margin-bottom: 8px;
+            transition: opacity 0.3s ease;
+        }
+
+        .crew-card:hover .placeholder-icon {
+            opacity: 0.45;
+        }
+
+        /* Card details */
+        .card-details {
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .crew-name {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+
+        .crew-role {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: var(--zinc-400);
+            display: inline-flex;
+            align-self: flex-start;
+        }
+
+        /* Shimmer Skeletons loading */
+        .skeleton-card {
+            background-color: var(--card-bg);
+            border: 1px solid rgba(39, 39, 42, 0.4);
+            border-radius: 16px;
+            height: 380px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .skeleton-image {
+            flex: 1;
+            background: linear-gradient(90deg, #18181b 25%, #27272a 50%, #18181b 75%);
+            background-size: 200% 100%;
+            animation: loading-shimmer 1.5s infinite;
+        }
+
+        .skeleton-details {
+            padding: 22px;
+            height: 90px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .skeleton-line {
+            height: 12px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #27272a 25%, #3f3f46 50%, #27272a 75%);
+            background-size: 200% 100%;
+            animation: loading-shimmer 1.5s infinite;
+        }
+
+        .skeleton-line.short {
+            width: 50%;
+        }
+
+        @keyframes loading-shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Error/Sync Status Bar */
+        .sync-status {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 0 24px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .sync-message {
+            background: rgba(39, 39, 42, 0.4);
+            border: 1px solid var(--zinc-800);
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 11px;
+            color: var(--zinc-400);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sync-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 9999px;
+            background-color: #a1a1aa;
+        }
+
+        .sync-dot.active {
+            background-color: #10b981;
+            box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--zinc-800);
+            padding: 32px 24px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--zinc-700);
+            margin-top: auto;
+            background-color: #050507;
+        }
+
+        footer a {
+            color: var(--zinc-400);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        footer a:hover {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <span class="header-tag">Our Creative Elite</span>
+        <h1 class="header-title">The Storytellers Behind the Lens</h1>
+        <p class="header-subtitle">Nitin Arora Photography elite creators capture fine-art weddings and luxury commercial campaigns worldwide.</p>
+    </header>
+
+    <div class="sync-status" id="cora-sync-bar">
+        <div class="sync-message">
+            <span class="sync-dot active" id="cora-sync-dot"></span>
+            <span id="cora-sync-text">Connected to live Cora Studio AI roster</span>
+        </div>
+    </div>
+
+    <div class="filters-container">
+        <button class="filter-btn active" data-filter="all">All Roster</button>
+        <button class="filter-btn" data-filter="photographer">Photographers</button>
+        <button class="filter-btn" data-filter="videographer">Videographers</button>
+        <button class="filter-btn" data-filter="drone pilot">Drone Pilots</button>
+        <button class="filter-btn" data-filter="editor">Editors</button>
+    </div>
+
+    <main>
+        <div class="team-grid" id="team-grid-container">
+            <!-- Skeleton cards initially loaded -->
+            <div class="skeleton-card">
+                <div class="skeleton-image"></div>
+                <div class="skeleton-details">
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line short"></div>
+                </div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-image"></div>
+                <div class="skeleton-details">
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line short"></div>
+                </div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-image"></div>
+                <div class="skeleton-details">
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line short"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 Nitin Arora Photography. All Rights Reserved. • Powered by <a href="../workspace" target="_blank">Cora Studio AI</a></p>
+    </footer>
+
+    <script>
+        (function() {
+            // Seed fallback local roster in case REST endpoint is unreachable (offline/LocalWP offline)
+            const fallbackTeam = [
+                {
+                    id: 'fb1',
+                    name: 'Nitin Arora',
+                    role: 'Super Admin',
+                    avatar_url: ''
+                },
+                {
+                    id: 'fb2',
+                    name: 'Amit Kumar',
+                    role: 'Photographer',
+                    avatar_url: ''
+                },
+                {
+                    id: 'fb3',
+                    name: 'Rahul Sen',
+                    role: 'Videographer',
+                    avatar_url: ''
+                },
+                {
+                    id: 'fb4',
+                    name: 'Vikas Singh',
+                    role: 'Drone Pilot',
+                    avatar_url: ''
+                },
+                {
+                    id: 'fb5',
+                    name: 'Priya Sharma',
+                    role: 'Editor',
+                    avatar_url: ''
+                }
+            ];
+
+            let activeRoster = [];
+
+            // Filters logic
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderGrid(btn.getAttribute('data-filter'));
+                });
+            });
+
+            function renderGrid(filterRole = 'all') {
+                const container = document.getElementById('team-grid-container');
+                container.innerHTML = '';
+
+                let filtered = activeRoster;
+                if (filterRole !== 'all') {
+                    filtered = activeRoster.filter(member => {
+                        const r = member.role.toLowerCase();
+                        // Support match for sub strings, e.g. "super admin" matches admin, or manager etc.
+                        return r.includes(filterRole);
+                    });
+                }
+
+                if (filtered.length === 0) {
+                    container.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--zinc-700); font-size: 13px;">
+                            No crew members found under the selected category.
+                        </div>
+                    `;
+                    return;
+                }
+
+                filtered.forEach(member => {
+                    const initials = member.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                    
+                    const avatarHtml = member.avatar_url 
+                        ? `<img src="${member.avatar_url}" class="card-image" alt="${member.name}" />`
+                        : `<div class="card-placeholder">
+                            <svg class="placeholder-icon" viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                            <span style="font-family: var(--font-display); font-size: 20px; font-weight: 700; opacity: 0.85;">${initials}</span>
+                           </div>`;
+
+                    const card = document.createElement('div');
+                    card.className = 'crew-card';
+                    card.innerHTML = `
+                        <div class="card-image-wrap">
+                            ${avatarHtml}
+                        </div>
+                        <div class="card-details">
+                            <h3 class="crew-name">${member.name}</h3>
+                            <span class="crew-role">${member.role}</span>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            // Syncing data via API
+            function fetchTeamRoster() {
+                const endpoints = [
+                    '../wp-json/cora/v1/team',
+                    window.location.origin + '/wp-json/cora/v1/team',
+                    'http://cora.local/wp-json/cora/v1/team'
+                ];
+
+                let successfulFetch = false;
+
+                function tryFetch(index) {
+                    if (index >= endpoints.length) {
+                        // All endpoints failed, trigger fallback local seed
+                        const syncBar = document.getElementById('cora-sync-bar');
+                        const syncDot = document.getElementById('cora-sync-dot');
+                        const syncText = document.getElementById('cora-sync-text');
+                        
+                        syncBar.style.display = 'block';
+                        syncDot.style.backgroundColor = '#f59e0b';
+                        syncDot.style.boxShadow = '0 0 6px rgba(245, 158, 11, 0.4)';
+                        syncText.innerText = 'Roster loaded from offline catalog';
+                        
+                        activeRoster = fallbackTeam;
+                        renderGrid();
+                        return;
+                    }
+
+                    fetch(endpoints[index])
+                        .then(response => {
+                            if (!response.ok) throw new Error("HTTP error");
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (Array.isArray(data) && data.length > 0) {
+                                const syncBar = document.getElementById('cora-sync-bar');
+                                syncBar.style.display = 'block';
+                                
+                                activeRoster = data;
+                                renderGrid();
+                                successfulFetch = true;
+                            } else {
+                                throw new Error("Empty data");
+                            }
+                        })
+                        .catch(err => {
+                            // Try next endpoint
+                            tryFetch(index + 1);
+                        });
+                }
+
+                tryFetch(0);
+            }
+
+            // Trigger fetch after short delay for loading effect
+            setTimeout(fetchTeamRoster, 600);
+        })();
+    </script>
+</body>
+</html>
