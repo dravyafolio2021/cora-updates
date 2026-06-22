@@ -1242,18 +1242,18 @@ jQuery(document).ready(function($) {
         // Update logo header
         const headerPreview = $('#cora-paper-header-preview');
         if (logoUrl) {
-            headerPreview.html(`<img src="${logoUrl}" style="max-height: 50px; max-width: 180px; object-fit: contain;" alt="Branding Logo" />`).removeClass('hidden');
+            headerPreview.html(`<img src="${logoUrl}" style="max-height: 50px; max-width: 180px; object-fit: contain;" alt="Branding Logo" />`).removeClass('border border-dashed border-zinc-200 p-4 justify-center bg-zinc-50/30 rounded');
+            $('#cora-logo-upload-preview').html(`<img src="${logoUrl}" class="w-full h-full object-contain" />`);
+            $('#cora-doc-logo-remove-btn').removeClass('hidden');
         } else {
-            headerPreview.html('').addClass('hidden');
+            headerPreview.html(`<div class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5 py-2 px-3 border border-dashed border-zinc-200 rounded hover:border-zinc-400 hover:text-zinc-650 transition-all select-none"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>Add Logo</div>`).addClass('border border-dashed border-zinc-200 p-4 justify-center bg-zinc-50/30 rounded');
+            $('#cora-logo-upload-preview').html('<span class="text-[9px] text-zinc-400 text-center px-1">No Logo</span>');
+            $('#cora-doc-logo-remove-btn').addClass('hidden');
         }
 
         // Update footer text
         const footerPreview = $('#cora-paper-footer-preview');
-        if (footerText) {
-            footerPreview.text(footerText).removeClass('hidden');
-        } else {
-            footerPreview.text('').addClass('hidden');
-        }
+        footerPreview.text(footerText);
     };
 
     window.coraOpenDocDrawer = function() {
@@ -1265,6 +1265,11 @@ jQuery(document).ready(function($) {
         $('#cora-doc-logo-url').val('');
         $('#cora-doc-footer-text').val('');
         $('#cora-doc-paper').html('<p>Start typing your document content here...</p>');
+
+        // Clear custom inputs
+        $('#cora-custom-type-input-group').addClass('hidden');
+        $('#cora-custom-type-input').val('');
+        $('#cora-doc-gdoc-url').val('');
 
         coraEditorUpdateBranding();
 
@@ -1283,11 +1288,28 @@ jQuery(document).ready(function($) {
         // Set inputs
         $('#cora-doc-id-hidden').val(doc.id);
         $('#cora-doc-title-input').val(doc.title);
+        
+        // Ensure the select dropdown has this document type if it is a custom type
+        let typeExists = false;
+        $('#cora-doc-type-select option').each(function() {
+            if ($(this).val() === doc.type) {
+                typeExists = true;
+            }
+        });
+        if (!typeExists && doc.type) {
+            $(`<option value="${doc.type}">${doc.type}</option>`).insertBefore('#cora-doc-type-select option[value="__add_custom_type__"]');
+        }
+
         $('#cora-doc-type-select').val(doc.type);
         $('#cora-doc-amount-input').val(doc.amount || '');
         $('#cora-doc-logo-url').val(doc.logo_url || '');
         $('#cora-doc-footer-text').val(doc.footer_text || '');
         $('#cora-doc-paper').html(doc.content || '<p></p>');
+
+        // Clear custom inputs
+        $('#cora-custom-type-input-group').addClass('hidden');
+        $('#cora-custom-type-input').val('');
+        $('#cora-doc-gdoc-url').val('');
 
         coraEditorUpdateBranding();
 
@@ -1303,6 +1325,156 @@ jQuery(document).ready(function($) {
         $('#cora-vault-editor-view').addClass('hidden');
         $('#cora-vault-list-view').removeClass('hidden');
     };
+
+    // Indian Currency Auto-Formatter
+    function formatIndianCurrency(val) {
+        if (!val) return '';
+        let clean = val.toString().replace(/[^0-9]/g, '');
+        if (clean === '') return '';
+        let lastThree = clean.substring(clean.length - 3);
+        let otherNumbers = clean.substring(0, clean.length - 3);
+        if (otherNumbers !== '') {
+            lastThree = ',' + lastThree;
+        }
+        return '₹' + otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+    }
+
+    $('#cora-doc-amount-input').on('blur', function() {
+        let val = $(this).val();
+        $(this).val(formatIndianCurrency(val));
+    }).on('input', function() {
+        let val = $(this).val();
+        if (val === '₹' || val === '') {
+            $(this).val('');
+            return;
+        }
+        let clean = val.replace(/[^0-9]/g, '');
+        if (clean === '') {
+            $(this).val('');
+            return;
+        }
+        $(this).val(formatIndianCurrency(clean));
+    });
+
+    // Custom Document Type Select Handler
+    let prevDocType = 'Proposal';
+    $('#cora-doc-type-select').on('focus', function() {
+        prevDocType = $(this).val();
+    }).on('change', function() {
+        const val = $(this).val();
+        if (val === '__add_custom_type__') {
+            $('#cora-custom-type-input-group').removeClass('hidden');
+            $('#cora-custom-type-input').focus();
+        } else {
+            $('#cora-custom-type-input-group').addClass('hidden');
+            prevDocType = val;
+        }
+    });
+
+    $('#cora-custom-type-save').on('click', function(e) {
+        e.preventDefault();
+        const customVal = $('#cora-custom-type-input').val().trim();
+        if (!customVal) {
+            window.coraShowToast("Please enter a custom document type.");
+            return;
+        }
+
+        let exists = false;
+        $('#cora-doc-type-select option').each(function() {
+            if ($(this).val().toLowerCase() === customVal.toLowerCase()) {
+                exists = true;
+                $(this).prop('selected', true);
+            }
+        });
+
+        if (!exists) {
+            $(`<option value="${customVal}">${customVal}</option>`).insertBefore('#cora-doc-type-select option[value="__add_custom_type__"]');
+            $('#cora-doc-type-select').val(customVal);
+        }
+
+        $('#cora-custom-type-input').val('');
+        $('#cora-custom-type-input-group').addClass('hidden');
+        prevDocType = customVal;
+    });
+
+    $('#cora-custom-type-cancel').on('click', function(e) {
+        e.preventDefault();
+        $('#cora-doc-type-select').val(prevDocType);
+        $('#cora-custom-type-input').val('');
+        $('#cora-custom-type-input-group').addClass('hidden');
+    });
+
+    // WordPress Media Uploader Click Binds
+    $(document).on('click', '#cora-doc-logo-upload-btn, #cora-paper-header-preview', function(e) {
+        e.preventDefault();
+        var mediaUploader = wp.media({
+            title: 'Select Branding Logo',
+            button: {
+                text: 'Use Logo'
+            },
+            multiple: false
+        });
+
+        mediaUploader.on('select', function() {
+            var attachment = mediaUploader.state().get('selection').first().toJSON();
+            $('#cora-doc-logo-url').val(attachment.url);
+            coraEditorUpdateBranding();
+        });
+
+        mediaUploader.open();
+    });
+
+    $(document).on('click', '#cora-doc-logo-remove-btn', function(e) {
+        e.preventDefault();
+        $('#cora-doc-logo-url').val('');
+        coraEditorUpdateBranding();
+    });
+
+    // Bi-directional footer synchronization
+    $('#cora-doc-footer-text').on('input', function() {
+        $('#cora-paper-footer-preview').text($(this).val());
+    });
+
+    $('#cora-paper-footer-preview').on('input', function() {
+        $('#cora-doc-footer-text').val($(this).text());
+    });
+
+    // Google Docs Sync Handler
+    $(document).on('click', '#cora-doc-gdoc-sync-btn', function(e) {
+        e.preventDefault();
+        const url = $('#cora-doc-gdoc-url').val().trim();
+        if (!url) {
+            window.coraShowToast("Please enter a Google Doc URL.");
+            return;
+        }
+
+        const btn = $(this);
+        const originalText = btn.text();
+        btn.text('Syncing...').prop('disabled', true);
+
+        $.post(coraData.ajaxUrl, {
+            action: 'cora_sync_google_doc',
+            security: coraData.ajaxNonce,
+            url: url
+        }, function(response) {
+            btn.text(originalText).prop('disabled', false);
+            if (response.success) {
+                window.coraShowToast("Google Doc synced successfully.");
+                if (response.data.title) {
+                    $('#cora-doc-title-input').val(response.data.title);
+                }
+                if (response.data.content) {
+                    $('#cora-doc-paper').html(response.data.content);
+                }
+                $('#cora-doc-gdoc-url').val('');
+            } else {
+                window.coraShowToast("Error: " + response.data);
+            }
+        }).fail(function() {
+            btn.text(originalText).prop('disabled', false);
+            window.coraShowToast("Failed to sync Google Doc. Please verify network or public sharing permissions.");
+        });
+    });
 
     // Save action from editor
     $('#cora-save-doc-editor-btn').on('click', function(e) {

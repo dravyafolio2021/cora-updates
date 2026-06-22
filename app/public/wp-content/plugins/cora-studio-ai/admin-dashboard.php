@@ -706,6 +706,18 @@ $s2_assignments = isset($cora_shoot_assignments['shoot2']) ? $cora_shoot_assignm
             padding: 20mm !important;
             margin: 0 !important;
         }
+        #cora-paper-header-preview {
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+        #cora-paper-header-preview:hover {
+            opacity: 0.8;
+        }
+        #cora-paper-footer-preview[placeholder]:empty::before {
+            content: attr(placeholder);
+            color: #a1a1aa;
+            font-style: italic;
+        }
     </style>
     
     <!-- Load WordPress core jQuery -->
@@ -2412,10 +2424,15 @@ $s2_assignments = isset($cora_shoot_assignments['shoot2']) ? $cora_shoot_assignm
                         $proposal_count = 0;
                         $invoice_count = 0;
                         $contract_count = 0;
+                        $all_doc_types = array( 'Proposal', 'Invoice', 'Contract' );
                         foreach ($cora_documents as $doc) {
                             if ($doc['type'] === 'Proposal') $proposal_count++;
                             elseif ($doc['type'] === 'Invoice') $invoice_count++;
                             elseif ($doc['type'] === 'Contract') $contract_count++;
+
+                            if ( ! in_array( $doc['type'], $all_doc_types ) ) {
+                                $all_doc_types[] = $doc['type'];
+                            }
                         }
                         ?>
                         <div class="cora-stat-card bg-white border border-zinc-200/80 rounded-xl p-4 shadow-sm flex flex-col justify-between">
@@ -2439,11 +2456,16 @@ $s2_assignments = isset($cora_shoot_assignments['shoot2']) ? $cora_shoot_assignm
                     <!-- Document filters & layout -->
                     <div class="cora-card bg-white border border-zinc-200/85 rounded-xl p-5 shadow-sm space-y-4">
                         <div class="flex items-center justify-between border-b border-zinc-100 pb-3 flex-wrap gap-3">
-                            <div class="flex gap-2" id="cora-vault-filters">
+                            <div class="flex gap-2 flex-wrap" id="cora-vault-filters">
                                 <button class="cora-filter-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-zinc-950 text-white cursor-pointer" data-filter="all">All Documents</button>
-                                <button class="cora-filter-btn px-3 py-1.5 rounded-md text-xs font-semibold border border-zinc-200 text-zinc-650 bg-white hover:bg-zinc-50 cursor-pointer" data-filter="Proposal">Proposals</button>
-                                <button class="cora-filter-btn px-3 py-1.5 rounded-md text-xs font-semibold border border-zinc-200 text-zinc-650 bg-white hover:bg-zinc-50 cursor-pointer" data-filter="Invoice">Invoices</button>
-                                <button class="cora-filter-btn px-3 py-1.5 rounded-md text-xs font-semibold border border-zinc-200 text-zinc-650 bg-white hover:bg-zinc-50 cursor-pointer" data-filter="Contract">Contracts</button>
+                                <?php foreach ( $all_doc_types as $type ) : 
+                                    $label = $type . 's';
+                                    if ( substr( $type, -1 ) === 's' ) {
+                                        $label = $type;
+                                    }
+                                ?>
+                                <button class="cora-filter-btn px-3 py-1.5 rounded-md text-xs font-semibold border border-zinc-200 text-zinc-650 bg-white hover:bg-zinc-50 cursor-pointer" data-filter="<?php echo esc_attr( $type ); ?>"><?php echo esc_html( $label ); ?></button>
+                                <?php endforeach; ?>
                             </div>
                         </div>
 
@@ -2461,7 +2483,7 @@ $s2_assignments = isset($cora_shoot_assignments['shoot2']) ? $cora_shoot_assignm
                                 </thead>
                                 <tbody class="divide-y divide-zinc-150" id="cora-vault-table-body">
                                     <?php foreach ($cora_documents as $doc): 
-                                        $type_badge = '';
+                                        $type_badge = 'bg-zinc-100 text-zinc-700 border border-zinc-200';
                                         if ($doc['type'] === 'Proposal') $type_badge = 'cora-badge-soon';
                                         elseif ($doc['type'] === 'Invoice') $type_badge = 'cora-badge-green';
                                         elseif ($doc['type'] === 'Contract') $type_badge = 'cora-badge-locked';
@@ -2665,15 +2687,13 @@ $s2_assignments = isset($cora_shoot_assignments['shoot2']) ? $cora_shoot_assignm
                                     </div>
                                     
                                     <!-- Paper Footer (Footer Text Preview) -->
-                                    <div id="cora-paper-footer-preview" class="border-t border-zinc-100 pt-4 mt-8 text-center text-xs text-zinc-400 hidden">
-                                        <!-- Footer text will render here dynamically -->
-                                    </div>
+                                    <div id="cora-paper-footer-preview" contenteditable="true" class="border-t border-zinc-200 pt-4 mt-8 text-center text-xs text-zinc-400 focus:outline-none focus:ring-0" placeholder="Enter footer branding text..."></div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Sidebar Settings (Branding & metadata) -->
-                        <aside class="w-full lg:w-85 bg-white border border-zinc-200 rounded-xl p-5 shadow-sm space-y-4 shrink-0">
+                        <aside class="w-full lg:w-80 bg-white border border-zinc-200 rounded-xl p-5 shadow-sm space-y-4 shrink-0">
                             <input type="hidden" id="cora-doc-id-hidden" value="">
                             
                             <h2 class="text-xs font-bold text-zinc-800 uppercase tracking-wider border-b border-zinc-100 pb-2">Document Settings</h2>
@@ -2681,10 +2701,18 @@ $s2_assignments = isset($cora_shoot_assignments['shoot2']) ? $cora_shoot_assignm
                             <div class="cora-form-group flex flex-col gap-1.5">
                                 <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Document Type</label>
                                 <select id="cora-doc-type-select" class="w-full border border-zinc-200 rounded-md p-2 text-sm bg-white focus:border-zinc-400 focus:outline-none transition-colors">
-                                    <option value="Proposal">Proposal</option>
-                                    <option value="Invoice">Invoice</option>
-                                    <option value="Contract">Contract</option>
+                                    <?php foreach ( $all_doc_types as $type ) : ?>
+                                        <option value="<?php echo esc_attr( $type ); ?>"><?php echo esc_html( $type ); ?></option>
+                                    <?php endforeach; ?>
+                                    <option value="__add_custom_type__" class="font-bold text-zinc-500">+ Add Custom Type...</option>
                                 </select>
+                            </div>
+                            
+                            <!-- Inline Custom Type Input (Hidden by default) -->
+                            <div id="cora-custom-type-input-group" class="hidden flex items-center gap-2 mt-1">
+                                <input type="text" id="cora-custom-type-input" class="flex-1 border border-zinc-200 rounded-md p-2 text-xs bg-white focus:border-zinc-400 focus:outline-none" placeholder="e.g. Quote">
+                                <button type="button" id="cora-custom-type-save" class="px-2.5 py-1.5 bg-zinc-950 text-white text-[10px] font-semibold rounded hover:bg-zinc-800 transition-colors cursor-pointer">Add</button>
+                                <button type="button" id="cora-custom-type-cancel" class="px-2 py-1.5 border border-zinc-200 text-zinc-655 text-[10px] font-semibold rounded hover:bg-zinc-50 transition-colors cursor-pointer">Cancel</button>
                             </div>
                             
                             <div class="cora-form-group flex flex-col gap-1.5">
@@ -2695,15 +2723,38 @@ $s2_assignments = isset($cora_shoot_assignments['shoot2']) ? $cora_shoot_assignm
                             <h2 class="text-xs font-bold text-zinc-800 uppercase tracking-wider border-b border-zinc-100 pt-2 pb-2">Branding Elements</h2>
                             
                             <div class="cora-form-group flex flex-col gap-1.5">
-                                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Branding Logo URL</label>
-                                <input type="url" id="cora-doc-logo-url" class="w-full border border-zinc-200 rounded-md p-2 text-sm bg-white focus:border-zinc-400 focus:outline-none transition-colors" placeholder="https://example.com/logo.png" oninput="coraEditorUpdateBranding()">
-                                <span class="text-[9px] text-zinc-400">Specify an image URL to place your business logo in the document header.</span>
+                                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Branding Logo</label>
+                                <div class="flex items-center gap-3">
+                                    <div id="cora-logo-upload-preview" class="w-16 h-16 border border-zinc-200 rounded-md flex items-center justify-center bg-zinc-50 overflow-hidden shrink-0">
+                                        <span class="text-[9px] text-zinc-400 text-center px-1">No Logo</span>
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <button type="button" id="cora-doc-logo-upload-btn" class="px-2.5 py-1.5 border border-zinc-200 rounded text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 transition-colors cursor-pointer">
+                                            Choose Image
+                                        </button>
+                                        <button type="button" id="cora-doc-logo-remove-btn" class="text-[10px] text-red-500 hover:text-red-700 font-semibold text-left hidden">
+                                            Remove Logo
+                                        </button>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="cora-doc-logo-url" value="">
                             </div>
                             
                             <div class="cora-form-group flex flex-col gap-1.5">
                                 <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Footer Text</label>
                                 <textarea id="cora-doc-footer-text" rows="3" class="w-full border border-zinc-200 rounded-md p-2 text-sm bg-white focus:border-zinc-400 focus:outline-none transition-colors" placeholder="e.g. © 2026 Nitin Arora Photography. All rights reserved. • Contact: hello@nitinarora.com" oninput="coraEditorUpdateBranding()"></textarea>
-                                <span class="text-[9px] text-zinc-400">This text appears centered at the bottom of each page.</span>
+                                <span class="text-[9px] text-zinc-400">This text appears centered at the bottom of the page.</span>
+                            </div>
+
+                            <h2 class="text-xs font-bold text-zinc-800 uppercase tracking-wider border-b border-zinc-100 pt-2 pb-2">Sync Document</h2>
+                            
+                            <div class="cora-form-group flex flex-col gap-1.5">
+                                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Sync from Google Doc</label>
+                                <div class="flex gap-1.5">
+                                    <input type="url" id="cora-doc-gdoc-url" class="flex-1 border border-zinc-200 rounded-md p-2 text-xs bg-white focus:border-zinc-400 focus:outline-none" placeholder="Paste Google Doc sharing link">
+                                    <button type="button" id="cora-doc-gdoc-sync-btn" class="px-3 py-2 bg-zinc-950 hover:bg-zinc-800 text-white text-[10px] font-bold rounded transition-colors cursor-pointer shrink-0">Sync</button>
+                                </div>
+                                <span class="text-[9px] text-zinc-400">Ensure the Google Doc is shared publicly ("Anyone with the link can view").</span>
                             </div>
                         </aside>
                     </div>

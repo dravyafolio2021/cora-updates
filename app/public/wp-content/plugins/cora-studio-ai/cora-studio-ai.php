@@ -176,6 +176,9 @@ function cora_studio_ai_admin_assets( $hook ) {
         true // Load in footer
     );
 
+    // Enqueue WordPress media libraries for logo upload
+    wp_enqueue_media();
+
     // Localize script to pass server variables if needed (e.g. site URL, ajaxurl)
     wp_localize_script( 'cora-admin-script', 'coraData', array(
         'ajaxUrl' => admin_url( 'admin-ajax.php' ),
@@ -1002,5 +1005,92 @@ function cora_get_team_members_rest() {
     }
     return rest_ensure_response( $team );
 }
+
+/**
+ * AJAX Handler: Sync Document Content from Google Doc URL
+ */
+function cora_ajax_sync_google_doc() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    
+    $user = wp_get_current_user();
+    if ( ! current_user_can( 'manage_options' ) && ! in_array( 'cora_manager', (array) $user->roles ) ) {
+        wp_send_json_error( 'Unauthorized access.' );
+    }
+
+    $url = isset( $_POST['url'] ) ? esc_url_raw( wp_unslash( $_POST['url'] ) ) : '';
+    if ( empty( $url ) ) {
+        wp_send_json_error( 'Please provide a valid Google Doc URL.' );
+    }
+
+    // Extract document ID from Google Doc URL
+    $doc_id = '';
+    if ( preg_match( '/\/document\/d\/([a-zA-Z0-9-_]+)/', $url, $matches ) ) {
+        $doc_id = $matches[1];
+    }
+
+    if ( empty( $doc_id ) ) {
+        wp_send_json_error( 'Could not extract Google Document ID from the URL. Please verify the URL format.' );
+    }
+
+    // Build public export URL
+    // If it's a published web doc (contains /d/e/), it can be fetched directly
+    if ( strpos( $url, '/document/d/e/' ) !== false ) {
+        $fetch_url = $url;
+    } else {
+        $fetch_url = "https://docs.google.com/document/d/{$doc_id}/export?format=html";
+    }
+
+    $response = wp_safe_remote_get( $fetch_url, array( 'timeout' => 15 ) );
+
+    if ( is_wp_error( $response ) ) {
+        wp_send_json_error( 'Failed to fetch the document. Please ensure it is shared publicly.' );
+    }
+
+    $html = wp_remote_retrieve_body( $response );
+    if ( empty( $html ) ) {
+        wp_send_json_error( 'Document body is empty or private.' );
+    }
+
+    // Parse the HTML using DOMDocument
+    $dom = new DOMDocument();
+    libxml_use_internal_errors( true );
+    $dom->loadHTML( '<?xml encoding="utf-8" ?>' . $html );
+    libxml_clear_errors();
+
+    // Extract title from <title> tag
+    $title_tag = $dom->getElementsByTagName( 'title' );
+    $doc_title = '';
+    if ( $title_tag->length > 0 ) {
+        $doc_title = sanitize_text_field( $title_tag->item( 0 )->nodeValue );
+        $doc_title = preg_replace( '/ - Google Docs$/i', '', $doc_title );
+    }
+
+    $body_content = '';
+    $body = $dom->getElementsByTagName( 'body' );
+    if ( $body->length > 0 ) {
+        $body_node = $body->item( 0 );
+        // Extract inner HTML of body
+        foreach ( $body_node->childNodes as $child ) {
+            $body_content .= $dom->saveHTML( $child );
+        }
+    } else {
+        $body_content = $html;
+    }
+
+    // Clean up Google Docs inline styling to let it inherit dashboard styles
+    $body_content = preg_replace( '/<style\b[^>]*>(.*?)<\/style>/is', '', $body_content );
+    $body_content = preg_replace( '/<script\b[^>]*>(.*?)<\/script>/is', '', $body_content );
+    $body_content = preg_replace( '/class="[^"]*"/', '', $body_content );
+    $body_content = preg_replace( '/style="[^"]*"/', '', $body_content );
+    
+    // Keep only clean semantic tags (p, h1, h2, h3, ul, ol, li, strong, em, u, blockquote)
+    $body_content = strip_tags( $body_content, '<p><h1><h2><h3><h4><h5><h6><ul><ol><li><strong><em><u><blockquote><br><b><i>' );
+
+    wp_send_json_success( array(
+        'title'   => trim( $doc_title ),
+        'content' => trim( $body_content )
+    ) );
+}
+add_action( 'wp_ajax_cora_sync_google_doc', 'cora_ajax_sync_google_doc' );
 
 
