@@ -1,4 +1,4 @@
-# Cora Studio AI - Workspace Rules
+# Cora for Studio - Workspace Rules
 
 This file outlines workspace rules and style guides that apply across this project.
 
