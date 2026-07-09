@@ -11,12 +11,12 @@ $current_branch = cora_get_current_user_branch_id();
 // Build custom user roles labels
 $role_labels = array(
     'administrator' => 'Super Admin',
-    'cora_manager' => 'Agency Owner',
+    'cora_manager' => 'Broker Owner',
     'cora_branch_manager' => 'Branch Manager',
-    'cora_photographer' => 'Senior Agent',
-    'cora_videographer' => 'Agent',
-    'cora_drone_pilot' => 'Telecaller',
-    'cora_editor' => 'Back Office',
+    'cora_photographer' => 'Managing Agent',
+    'cora_videographer' => 'Showing Assistant',
+    'cora_drone_pilot' => 'Property Valuer',
+    'cora_editor' => 'Listing Coordinator',
     'cora_viewer' => 'Viewer'
 );
 
@@ -319,10 +319,10 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         $target_roles = array(
                             'cora_manager' => 'Broker Owner',
                             'cora_branch_manager' => 'Branch Manager',
-                            'cora_photographer' => 'Senior Agent',
-                            'cora_videographer' => 'Agent',
-                            'cora_drone_pilot' => 'Telecaller',
-                            'cora_editor' => 'Back Office',
+                            'cora_photographer' => 'Managing Agent',
+                            'cora_videographer' => 'Showing Assistant',
+                            'cora_drone_pilot' => 'Property Valuer',
+                            'cora_editor' => 'Listing Coordinator',
                             'cora_viewer' => 'Viewer'
                         );
                         $features = array('dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings');
@@ -377,10 +377,10 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     <?php if ( $current_role === 'administrator' || $current_role === 'cora_manager' ) : ?>
                         <option value="cora_branch_manager">Branch Manager</option>
                     <?php endif; ?>
-                    <option value="cora_photographer">Senior Agent</option>
-                    <option value="cora_videographer">Agent</option>
-                    <option value="cora_drone_pilot">Telecaller</option>
-                    <option value="cora_editor">Back Office</option>
+                    <option value="cora_photographer">Managing Agent</option>
+                    <option value="cora_videographer">Showing Assistant</option>
+                    <option value="cora_drone_pilot">Property Valuer</option>
+                    <option value="cora_editor">Listing Coordinator</option>
                     <option value="cora_viewer">Viewer</option>
                 </select>
             </div>
@@ -424,10 +424,10 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     <?php if ( $current_role === 'administrator' || $current_role === 'cora_manager' ) : ?>
                         <option value="cora_branch_manager">Branch Manager</option>
                     <?php endif; ?>
-                    <option value="cora_photographer">Senior Agent</option>
-                    <option value="cora_videographer">Agent</option>
-                    <option value="cora_drone_pilot">Telecaller</option>
-                    <option value="cora_editor">Back Office</option>
+                    <option value="cora_photographer">Managing Agent</option>
+                    <option value="cora_videographer">Showing Assistant</option>
+                    <option value="cora_drone_pilot">Property Valuer</option>
+                    <option value="cora_editor">Listing Coordinator</option>
                     <option value="cora_viewer">Viewer</option>
                 </select>
             </div>
@@ -521,6 +521,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
     // Invite user drawer
     function openInviteDrawer() {
+        $('#drawer-invite-user').removeClass('opacity-0 pointer-events-none');
         $('#drawer-invite-user').css({'opacity': '1', 'pointer-events': 'auto'});
         $('#drawer-invite-card').css('transform', 'translateX(0)');
     }
@@ -528,6 +529,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     function closeInviteDrawer() {
         $('#drawer-invite-card').css('transform', 'translateX(100%)');
         setTimeout(function() {
+            $('#drawer-invite-user').addClass('opacity-0 pointer-events-none');
             $('#drawer-invite-user').css({'opacity': '0', 'pointer-events': 'none'});
         }, 300);
         $('#invite-first-name').val('');
@@ -591,6 +593,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             $('#edit-status-toggle').prop('disabled', false);
         }
 
+        $('#drawer-edit-user').removeClass('opacity-0 pointer-events-none');
         $('#drawer-edit-user').css({'opacity': '1', 'pointer-events': 'auto'});
         $('#drawer-edit-card').css('transform', 'translateX(0)');
     }
@@ -598,6 +601,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     function closeEditUserDrawer() {
         $('#drawer-edit-card').css('transform', 'translateX(100%)');
         setTimeout(function() {
+            $('#drawer-edit-user').addClass('opacity-0 pointer-events-none');
             $('#drawer-edit-user').css({'opacity': '0', 'pointer-events': 'none'});
         }, 300);
     }
