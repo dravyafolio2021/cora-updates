@@ -523,11 +523,11 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     function openInviteDrawer() {
         $('#drawer-invite-user').removeClass('opacity-0 pointer-events-none');
         $('#drawer-invite-user').css({'opacity': '1', 'pointer-events': 'auto'});
-        $('#drawer-invite-card').css('transform', 'translateX(0)');
+        $('#drawer-invite-card').removeClass('translate-x-full').addClass('translate-x-0');
     }
 
     function closeInviteDrawer() {
-        $('#drawer-invite-card').css('transform', 'translateX(100%)');
+        $('#drawer-invite-card').removeClass('translate-x-0').addClass('translate-x-full');
         setTimeout(function() {
             $('#drawer-invite-user').addClass('opacity-0 pointer-events-none');
             $('#drawer-invite-user').css({'opacity': '0', 'pointer-events': 'none'});
@@ -595,11 +595,11 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
         $('#drawer-edit-user').removeClass('opacity-0 pointer-events-none');
         $('#drawer-edit-user').css({'opacity': '1', 'pointer-events': 'auto'});
-        $('#drawer-edit-card').css('transform', 'translateX(0)');
+        $('#drawer-edit-card').removeClass('translate-x-full').addClass('translate-x-0');
     }
 
     function closeEditUserDrawer() {
-        $('#drawer-edit-card').css('transform', 'translateX(100%)');
+        $('#drawer-edit-card').removeClass('translate-x-0').addClass('translate-x-full');
         setTimeout(function() {
             $('#drawer-edit-user').addClass('opacity-0 pointer-events-none');
             $('#drawer-edit-user').css({'opacity': '0', 'pointer-events': 'none'});
