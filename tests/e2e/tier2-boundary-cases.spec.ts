@@ -208,7 +208,7 @@ test.describe('Tier 2: Boundary Cases', () => {
     await page.fill('#cora-new-menu-name', menuName);
     await page.click('#cora-drawer-new-menu button:has-text("Create Menu")');
     await expect(page.locator('#cora-toast-container')).toContainText('Menu created successfully.');
-    await page.waitForLoadState('networkidle');
+    await page.waitForURL(/menu_id=\d+/);
 
     // Try duplicate
     await page.click('button[onclick="coraOpenNewMenuDrawer()"]');

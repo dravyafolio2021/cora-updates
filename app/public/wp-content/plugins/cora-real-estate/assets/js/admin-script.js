@@ -99,7 +99,7 @@ jQuery(document).ready(function($) {
             allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'visual-builder', 'audit-panel', 'media'];
         }
 
-        if (targetPageId !== 'feature-hub' && !allowed.includes(targetPageId)) {
+        if (targetPageId !== 'profile' && targetPageId !== 'feature-hub' && !allowed.includes(targetPageId)) {
             window.coraShowToast("Access denied: your role does not have permission for this section.");
             return;
         }

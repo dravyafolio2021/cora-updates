@@ -39,13 +39,15 @@ $roles      = wp_roles()->get_names();
 <div class="flex items-center gap-2 border-b border-zinc-200/80 pb-3 overflow-x-auto">
     <?php
     $tabs = array(
-        'general'   => 'General Settings',
-        'brand'     => 'Branding & API Keys',
-        'reading'   => 'Reading & SEO Indexing',
-        'writing'   => 'Writing Defaults',
-        'discussion'=> 'Discussion & Moderation',
-        'permalinks'=> 'SEO Permalinks',
-        'privacy'   => 'Privacy Policy',
+        'general'    => 'General Workspace Settings',
+        'pwd-policy' => 'Password Policy Settings',
+        'branches'   => 'Branch Management',
+        'brand'      => 'Branding & API Keys',
+        'reading'    => 'Reading & SEO Indexing',
+        'writing'    => 'Writing Defaults',
+        'discussion' => 'Discussion & Moderation',
+        'permalinks' => 'SEO Permalinks',
+        'privacy'    => 'Privacy Policy',
     );
     foreach ( $tabs as $tab_key => $tab_label ) :
         $is_active = ( $active_tab === $tab_key );
@@ -95,7 +97,381 @@ $roles      = wp_roles()->get_names();
                     <span>Membership: Anyone can register for an account</span>
                 </label>
             </div>
+
+            <!-- Workspace Details Section -->
+            <div class="border-t border-zinc-150 pt-5 space-y-4">
+                <div class="border-b border-zinc-100 pb-3">
+                    <h3 class="text-sm font-bold text-zinc-900">General Workspace Settings</h3>
+                    <p class="text-xs text-zinc-500">Corporate identity, localized workspace address, and billing tax descriptors.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-800 mb-1">Workspace Name</label>
+                        <input type="text" name="cora_workspace_name" value="<?php echo esc_attr( get_option('cora_workspace_name', 'Cora Studio') ); ?>" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900" placeholder="e.g. Mumbai Main Office">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-800 mb-1">Tax Registration Details</label>
+                        <input type="text" name="cora_workspace_tax_details" value="<?php echo esc_attr( get_option('cora_workspace_tax_details', 'GSTIN: 27AAAAA1111A1Z1') ); ?>" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900" placeholder="e.g. VAT / GSTIN / PAN details">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-bold text-zinc-800 mb-1">Workspace Address</label>
+                        <input type="text" name="cora_workspace_address" value="<?php echo esc_attr( get_option('cora_workspace_address', '101, BKC Road, Bandra East, Mumbai') ); ?>" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900" placeholder="Full physical office location">
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <?php elseif ( $active_tab === 'pwd-policy' ) : ?>
+        <!-- TAB: PASSWORD POLICY SETTINGS -->
+        <div class="space-y-6 max-w-2xl">
+            <div class="border-b border-zinc-100 pb-3">
+                <h3 class="text-sm font-bold text-zinc-900">Workspace Password Policy</h3>
+                <p class="text-xs text-zinc-500">Enforce minimum complexity guidelines for passwords across logins, setups, and resets.</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="w-48">
+                    <label class="block text-xs font-bold text-zinc-800 mb-1.5">Minimum Password Length</label>
+                    <input type="number" min="6" max="32" name="cora_pwd_policy_min_len" value="<?php echo esc_attr( get_option('cora_pwd_policy_min_len', 8) ); ?>" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900">
+                </div>
+
+                <div class="pt-2 space-y-3">
+                    <label class="flex items-center gap-2.5 text-xs text-zinc-850 font-semibold cursor-pointer">
+                        <input type="checkbox" name="cora_pwd_policy_numbers" value="1" <?php checked( get_option('cora_pwd_policy_numbers', 0), 1 ); ?> class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900">
+                        <span>Require at least one number (0-9)</span>
+                    </label>
+
+                    <label class="flex items-center gap-2.5 text-xs text-zinc-850 font-semibold cursor-pointer">
+                        <input type="checkbox" name="cora_pwd_policy_uppercase" value="1" <?php checked( get_option('cora_pwd_policy_uppercase', 0), 1 ); ?> class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900">
+                        <span>Require at least one uppercase letter (A-Z)</span>
+                    </label>
+
+                    <label class="flex items-center gap-2.5 text-xs text-zinc-850 font-semibold cursor-pointer">
+                        <input type="checkbox" name="cora_pwd_policy_special" value="1" <?php checked( get_option('cora_pwd_policy_special', 0), 1 ); ?> class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900">
+                        <span>Require at least one special character (e.g. !, @, #, $, %, etc.)</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <?php elseif ( $active_tab === 'branches' ) : 
+            $agency_id = cora_get_current_user_agency_id();
+            $branches  = get_option( 'cora_branches', array() );
+            
+            // Filter branches
+            $filtered_branches = array();
+            foreach ( $branches as $b_id => $b ) {
+                if ( $agency_id === 'super' || $b['agency_id'] === $agency_id ) {
+                    $filtered_branches[$b_id] = $b;
+                }
+            }
+
+            // Count active agents per branch
+            $all_wp_users = get_users();
+            $branch_agent_counts = array();
+            foreach ( $all_wp_users as $u ) {
+                $u_branch = get_user_meta( $u->ID, 'cora_branch_id', true );
+                if ( ! empty( $u_branch ) ) {
+                    if ( ! isset( $branch_agent_counts[$u_branch] ) ) {
+                        $branch_agent_counts[$u_branch] = 0;
+                    }
+                    $branch_agent_counts[$u_branch]++;
+                }
+            }
+
+            // Find all potential branch managers in this agency
+            $manager_query_args = array(
+                'role__in' => array( 'cora_branch_manager', 'cora_manager', 'administrator' )
+            );
+            if ( $agency_id !== 'super' ) {
+                $manager_query_args['meta_query'] = array(
+                    array(
+                        'key'     => 'cora_agency_id',
+                        'value'   => $agency_id,
+                        'compare' => '='
+                    )
+                );
+            }
+            $potential_managers = get_users( $manager_query_args );
+
+            // Find currently assigned managers for 1:1 check
+            $assigned_managers = array();
+            foreach ( $filtered_branches as $b_id => $b ) {
+                if ( ! empty( $b['manager_id'] ) ) {
+                    $assigned_managers[ intval( $b['manager_id'] ) ] = $b_id;
+                }
+            }
+        ?>
+        <!-- TAB: BRANCH MANAGEMENT -->
+        <div class="space-y-6">
+            <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
+                <div>
+                    <h3 class="text-sm font-bold text-zinc-900">Brokerage Branches</h3>
+                    <p class="text-xs text-zinc-500">Manage multiple physical offices, assign localized managers, and monitor regional agent counts.</p>
+                </div>
+                <button type="button" onclick="openCreateBranchDrawer()" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    New Branch
+                </button>
+            </div>
+
+            <div class="bg-white border border-zinc-200/85 rounded-xl shadow-sm overflow-hidden">
+                <table class="min-w-full divide-y divide-zinc-200 text-xs text-left">
+                    <thead class="bg-zinc-50/50">
+                        <tr>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Branch Name</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Location / Address</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Branch Manager</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Active Crew</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-100">
+                        <?php if ( empty( $filtered_branches ) ) : ?>
+                            <tr>
+                                <td colspan="5" class="px-5 py-8 text-center text-zinc-400 font-medium">No branches configured.</td>
+                            </tr>
+                        <?php else : ?>
+                            <?php foreach ( $filtered_branches as $b_id => $b ) :
+                                $mgr = ! empty( $b['manager_id'] ) ? get_userdata( $b['manager_id'] ) : null;
+                                $mgr_name = $mgr ? $mgr->display_name : 'Unassigned';
+                                $crew_count = $branch_agent_counts[$b_id] ?? 0;
+                            ?>
+                                <tr class="hover:bg-zinc-50/10">
+                                    <td class="px-5 py-3.5 font-bold text-zinc-900"><?php echo esc_html( $b['name'] ); ?></td>
+                                    <td class="px-5 py-3.5 text-zinc-500 font-semibold"><?php echo esc_html( $b['city'] . ' / ' . $b['address'] ); ?></td>
+                                    <td class="px-5 py-3.5 font-semibold text-zinc-700">
+                                        <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-800 text-[9px] font-bold">
+                                            <?php echo esc_html( $mgr_name ); ?>
+                                        </span>
+                                    </td>
+                                    <td class="px-5 py-3.5 font-bold text-zinc-900"><?php echo esc_html( $crew_count ); ?> Agents</td>
+                                    <td class="px-5 py-3.5 text-right">
+                                        <div class="flex items-center justify-end gap-2">
+                                            <button type="button" onclick="openEditBranchDrawer('<?php echo esc_attr($b_id); ?>', '<?php echo esc_attr($b['name']); ?>', '<?php echo esc_attr($b['city']); ?>', '<?php echo esc_attr($b['address']); ?>', '<?php echo esc_attr($b['manager_id'] ?? ''); ?>')" class="px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-sm transition-colors">Edit</button>
+                                            <button type="button" onclick="deleteBranch('<?php echo esc_attr($b_id); ?>', <?php echo $crew_count; ?>)" class="px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-red-600 bg-white hover:bg-red-50 hover:border-red-200 cursor-pointer shadow-sm transition-colors">Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ═══ CREATE BRANCH DRAWER SHEET ══════════════════════════════════════════ -->
+        <div id="drawer-create-branch" class="fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
+            <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-create-branch-card">
+                <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+                    <h3 class="text-sm font-bold text-zinc-900">Configure New Branch</h3>
+                    <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeCreateBranchDrawer()">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                
+                <form onsubmit="handleCreateBranch(event)" class="flex-1 overflow-y-auto p-6 space-y-5">
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-800 mb-1.5">Branch Office Name</label>
+                        <input type="text" id="new-branch-name" required placeholder="e.g. Westside HQ" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-800 mb-1.5">City</label>
+                        <input type="text" id="new-branch-city" required placeholder="e.g. Mumbai" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-800 mb-1.5">Office Address</label>
+                        <input type="text" id="new-branch-address" required placeholder="e.g. 402, Bandra Kurla Complex" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-800 mb-1.5">Assign Branch Manager</label>
+                        <select id="new-branch-manager" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
+                            <option value="">— Unassigned —</option>
+                            <?php foreach ( $potential_managers as $pm ) :
+                                $already_assigned = isset($assigned_managers[$pm->ID]);
+                                $label_suffix = $already_assigned ? ' (Already managing another branch)' : '';
+                            ?>
+                                <option value="<?php echo esc_attr( $pm->ID ); ?>" <?php if ($already_assigned) echo 'disabled style="color:#a1a1aa;"'; ?>><?php echo esc_html( $pm->display_name . $label_suffix ); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
+                    <div class="pt-4">
+                        <button type="submit" id="create-branch-btn" class="w-full py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm">Initialize Branch</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ═══ EDIT BRANCH DRAWER SHEET ════════════════════════════════════════════ -->
+        <div id="drawer-edit-branch" class="fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
+            <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-edit-branch-card">
+                <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+                    <h3 class="text-sm font-bold text-zinc-900">Modify Branch Details</h3>
+                    <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeEditBranchDrawer()">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                
+                <form onsubmit="handleEditBranch(event)" class="flex-1 overflow-y-auto p-6 space-y-5">
+                    <input type="hidden" id="edit-branch-id">
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-800 mb-1.5">Branch Office Name</label>
+                        <input type="text" id="edit-branch-name" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-955">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-800 mb-1.5">City</label>
+                        <input type="text" id="edit-branch-city" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-955">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-800 mb-1.5">Office Address</label>
+                        <input type="text" id="edit-branch-address" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-955">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-800 mb-1.5">Assign Branch Manager</label>
+                        <select id="edit-branch-manager" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
+                            <option value="">— Unassigned —</option>
+                            <?php foreach ( $potential_managers as $pm ) :
+                                $already_assigned = isset($assigned_managers[$pm->ID]);
+                                $current_assigned_to_this = ($already_assigned && $assigned_managers[$pm->ID] === 'this_placeholder'); // Will be updated dynamically in JS
+                            ?>
+                                <option value="<?php echo esc_attr( $pm->ID ); ?>" data-assigned-to="<?php echo esc_attr( $assigned_managers[$pm->ID] ?? '' ); ?>"><?php echo esc_html( $pm->display_name ); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
+                    <div class="pt-4">
+                        <button type="submit" id="edit-branch-btn" class="w-full py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm">Save Shifts</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            function openCreateBranchDrawer() {
+                $('#drawer-create-branch').css({'opacity': '1', 'pointer-events': 'auto'});
+                $('#drawer-create-branch-card').css('transform', 'translateX(0)');
+            }
+            function closeCreateBranchDrawer() {
+                $('#drawer-create-branch-card').css('transform', 'translateX(100%)');
+                setTimeout(function() {
+                    $('#drawer-create-branch').css({'opacity': '0', 'pointer-events': 'none'});
+                }, 300);
+                $('#new-branch-name').val('');
+                $('#new-branch-city').val('');
+                $('#new-branch-address').val('');
+                $('#new-branch-manager').val('');
+            }
+
+            function openEditBranchDrawer(id, name, city, address, managerId) {
+                $('#edit-branch-id').val(id);
+                $('#edit-branch-name').val(name);
+                $('#edit-branch-city').val(city);
+                $('#edit-branch-address').val(address);
+                
+                // Set manager dropdown options and disable managers assigned to OTHER branches
+                $('#edit-branch-manager option').each(function() {
+                    var assignedBranch = $(this).data('assigned-to') || '';
+                    if (assignedBranch !== '' && assignedBranch !== id) {
+                        $(this).prop('disabled', true).text($(this).text().split(' (Already')[0] + ' (Already managing another branch)').css('color', '#a1a1aa');
+                    } else {
+                        $(this).prop('disabled', false).text($(this).text().split(' (Already')[0]).css('color', '');
+                    }
+                });
+
+                $('#edit-branch-manager').val(managerId);
+
+                $('#drawer-edit-branch').css({'opacity': '1', 'pointer-events': 'auto'});
+                $('#drawer-edit-branch-card').css('transform', 'translateX(0)');
+            }
+
+            function closeEditBranchDrawer() {
+                $('#drawer-edit-branch-card').css('transform', 'translateX(100%)');
+                setTimeout(function() {
+                    $('#drawer-edit-branch').css({'opacity': '0', 'pointer-events': 'none'});
+                }, 300);
+            }
+
+            function handleCreateBranch(e) {
+                e.preventDefault();
+                var name = $('#new-branch-name').val().trim();
+                var city = $('#new-branch-city').val().trim();
+                var address = $('#new-branch-address').val().trim();
+                var manager = $('#new-branch-manager').val();
+
+                $('#create-branch-btn').prop('disabled', true).text('Initializing branch...');
+
+                $.post(coraREData.ajaxUrl, {
+                    action: 'cora_ajax_save_branch',
+                    branch_name: name,
+                    city: city,
+                    address: address,
+                    manager_id: manager,
+                    nonce: coraREData.ajaxNonce
+                }, function(res) {
+                    if (res.success) {
+                        window.coraShowToast('Branch initialized successfully.');
+                        closeCreateBranchDrawer();
+                        setTimeout(function() { window.location.reload(); }, 1000);
+                    } else {
+                        window.coraShowToast(res.data.message || 'Failed to initialize branch.');
+                        $('#create-branch-btn').prop('disabled', false).text('Initialize Branch');
+                    }
+                });
+            }
+
+            function handleEditBranch(e) {
+                e.preventDefault();
+                var id = $('#edit-branch-id').val();
+                var name = $('#edit-branch-name').val().trim();
+                var city = $('#edit-branch-city').val().trim();
+                var address = $('#edit-branch-address').val().trim();
+                var manager = $('#edit-branch-manager').val();
+
+                $('#edit-branch-btn').prop('disabled', true).text('Saving shifts...');
+
+                $.post(coraREData.ajaxUrl, {
+                    action: 'cora_ajax_save_branch',
+                    branch_id: id,
+                    branch_name: name,
+                    city: city,
+                    address: address,
+                    manager_id: manager,
+                    nonce: coraREData.ajaxNonce
+                }, function(res) {
+                    if (res.success) {
+                        window.coraShowToast('Branch saved successfully.');
+                        closeEditBranchDrawer();
+                        setTimeout(function() { window.location.reload(); }, 1000);
+                    } else {
+                        window.coraShowToast(res.data.message || 'Failed to save branch.');
+                        $('#edit-branch-btn').prop('disabled', false).text('Save Shifts');
+                    }
+                });
+            }
+
+            function deleteBranch(id, crewCount) {
+                if (crewCount > 0) {
+                    alert('You cannot delete a branch with active team members. Reassign all members first.');
+                    return;
+                }
+
+                if (!confirm('Are you sure you want to delete this branch?')) return;
+                
+                window.coraShowToast('Deleting branch...');
+                $.post(coraREData.ajaxUrl, {
+                    action: 'cora_ajax_delete_branch',
+                    branch_id: id,
+                    nonce: coraREData.ajaxNonce
+                }, function(res) {
+                    if (res.success) {
+                        window.coraShowToast('Branch deleted successfully.');
+                        setTimeout(function() { window.location.reload(); }, 800);
+                    }
+                });
+            }
+        </script>
 
         <?php elseif ( $active_tab === 'brand' ) : ?>
         <!-- TAB 7: BRANDING & API KEYS -->

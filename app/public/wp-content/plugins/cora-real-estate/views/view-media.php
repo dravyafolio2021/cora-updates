@@ -201,10 +201,16 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 #cm-confirm-card p { margin:0 0 20px; font-size:12px; color:#71717a; }
 #cm-confirm-card .btns { display:flex; gap:8px; justify-content:flex-end; }
 
-/* ─── New folder dialog ──────────────────────────────────────────────────── */
-#cm-folder-dlg { position:fixed; inset:0; z-index:10000; background:rgba(9,9,11,.5); backdrop-filter:blur(3px); display:none; align-items:center; justify-content:center; padding:16px; }
-#cm-folder-dlg.open { display:flex; }
-#cm-folder-card { background:#fff; border:1px solid #e4e4e7; border-radius:14px; padding:24px; max-width:380px; width:100%; box-shadow:0 20px 40px rgba(0,0,0,.15); }
+/* ─── New folder drawer ──────────────────────────────────────────────────── */
+#cm-folder-dlg { position:fixed; inset:0; z-index:99999; background:rgba(9,9,11,.4); backdrop-filter:blur(2px); display:flex; justify-content:flex-end; opacity:0; pointer-events:none; transition:opacity .25s ease; }
+#cm-folder-dlg.open { opacity:1; pointer-events:auto; }
+#cm-folder-card { background:#fff; border-left:1px solid #e4e4e7; height:100%; width:100%; max-width:420px; box-shadow:-10px 0 30px rgba(0,0,0,.15); display:flex; flex-direction:column; transform:translateX(100%); transition:transform .25s ease; }
+#cm-folder-dlg.open #cm-folder-card { transform:translateX(0); }
+.cm-drawer-header { padding:20px; border-bottom:1px solid #e4e4e7; display:flex; align-items:center; justify-content:space-between; background:#fafafa; }
+.cora-dark-theme .cm-drawer-header { border-color:#27272a; background:#1c1c1e; }
+.cm-drawer-body { flex:1; overflow-y:auto; padding:24px; }
+.cm-drawer-footer { padding:20px; border-top:1px solid #e4e4e7; display:flex; align-items:center; justify-content:flex-end; gap:12px; background:#fafafa; }
+.cora-dark-theme .cm-drawer-footer { border-color:#27272a; background:#1c1c1e; }
 
 /* ─── Dark mode ──────────────────────────────────────────────────────────── */
 .cora-dark-theme #cm-root,
@@ -230,6 +236,9 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 .cora-dark-theme .cm-ebtn { background:#27272a; border-color:#3f3f46; color:#d4d4d8; }
 .cora-dark-theme #cm-confirm-card,
 .cora-dark-theme #cm-folder-card { background:#111113; border-color:#27272a; }
+.cora-dark-theme #cm-folder-card input { background:#1c1c1e; border-color:#27272a; color:#fafafa; }
+.cora-dark-theme #cm-folder-card h3 { color:#fafafa; }
+.cora-dark-theme #cm-folder-card label { color:#d4d4d8; }
 .cora-dark-theme .cm-h-title { color:#fafafa; }
 .cora-dark-theme .cm-ltable thead th { background:#1c1c1e; }
 .cora-dark-theme .cm-ltable tbody tr:hover { background:#1c1c1e; }
@@ -289,7 +298,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
                 All Media <span class="ct" id="cm-ftab-all-ct">—</span>
             </div>
             <div class="cm-ftab" id="cm-ftab-none" onclick="cmSelectFolder(-1,this)" data-folder-id="-1">
-                Unorganised
+                Unorganised <span class="ct" id="cm-ftab-none-ct">—</span>
             </div>
             <!-- Dynamic folder tabs injected by JS -->
             <div id="cm-folder-tabs"></div>
@@ -533,13 +542,23 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
     </div>
 </div>
 
-<!-- ═══ NEW FOLDER DIALOG ════════════════════════════════════════════════════ -->
-<div id="cm-folder-dlg">
+<!-- ═══ NEW FOLDER DRAWER ════════════════════════════════════════════════════ -->
+<div id="cm-folder-dlg" onclick="if(event.target===this)document.getElementById('cm-folder-dlg').classList.remove('open')">
     <div id="cm-folder-card">
-        <h4 style="margin:0 0 14px;font-size:14px;font-weight:700">Create New Folder</h4>
-        <input type="text" id="cm-folder-name" placeholder="Folder name…" maxlength="60" style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 11px;font-size:13px;outline:none;box-sizing:border-box;margin-bottom:14px">
-        <input type="hidden" id="cm-folder-parent" value="0">
-        <div style="display:flex;gap:8px;justify-content:flex-end">
+        <div class="cm-drawer-header">
+            <h3 style="margin:0;font-size:15px;font-weight:800;letter-spacing:-.02em">Create New Folder</h3>
+            <button class="text-zinc-400 hover:text-zinc-900 transition-colors cursor-pointer p-1" style="background:none;border:none;color:#a1a1aa;cursor:pointer" onclick="document.getElementById('cm-folder-dlg').classList.remove('open')">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="cm-drawer-body">
+            <div style="margin-bottom:18px">
+                <label style="display:block;font-size:11px;font-weight:700;color:#27272a;margin-bottom:6px">Folder Name</label>
+                <input type="text" id="cm-folder-name" placeholder="e.g. Exterior & Façade" maxlength="60" style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;box-sizing:border-box">
+                <input type="hidden" id="cm-folder-parent" value="0">
+            </div>
+        </div>
+        <div class="cm-drawer-footer">
             <button onclick="document.getElementById('cm-folder-dlg').classList.remove('open')" class="cm-hbtn">Cancel</button>
             <button onclick="cmCreateFolder()" class="cm-hbtn primary">Create Folder</button>
         </div>
@@ -842,12 +861,27 @@ window.cmSetupDrop = function() {
 // ── FOLDERS ───────────────────────────────────────────────────────────────────
 window.cmLoadFolders = function() {
     $.ajax({ url:coraREData.ajaxUrl, type:'POST', data:{action:'cora_media_library_get_folders',nonce:coraREData.ajaxNonce},
-    success:function(r) { if(!r.success) return; CM.folders = r.data.folders||[]; cmRenderFolderTabs(); cmPopulateBulkFolderSelect(); }});
+    success:function(r) { 
+        if(!r.success) return; 
+        CM.folders = r.data.folders||[]; 
+        CM.total_count = r.data.total_count || 0;
+        CM.unorganised_count = r.data.unorganised_count || 0;
+        cmRenderFolderTabs(); 
+        cmPopulateBulkFolderSelect(); 
+    }});
 };
 window.cmRenderFolderTabs = function() {
     var container = document.getElementById('cm-folder-tabs'); container.innerHTML = '';
-    var total = 0; CM.folders.forEach(function(f){total+=f.count||0;});
-    document.getElementById('cm-ftab-all-ct').textContent = total;
+    
+    // Set All Media count badge from backend data
+    document.getElementById('cm-ftab-all-ct').textContent = CM.total_count || 0;
+    
+    // Set Unorganised count badge from backend data
+    var unorgCt = document.getElementById('cm-ftab-none-ct');
+    if (unorgCt) {
+        unorgCt.textContent = CM.unorganised_count || 0;
+    }
+
     CM.folders.forEach(function(folder) {
         var tab = document.createElement('div'); tab.className = 'cm-ftab' + (CM.folder == folder.id ? ' active' : '');
         tab.dataset.folderId = folder.id;

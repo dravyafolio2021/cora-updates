@@ -2589,6 +2589,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                 <!-- Menu Items List -->
                 <div class="flex flex-col gap-1">
+                    <button class="w-full text-left px-2 py-2 text-xs text-zinc-700 rounded-lg hover:bg-zinc-50 hover:text-zinc-955 font-medium flex items-center gap-3 cursor-pointer transition-colors" onclick="coraNavigateTo('profile'); $('#cora-profile-popover').addClass('hidden');">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500 shrink-0">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        My Profile
+                    </button>
                     <button class="w-full text-left px-2 py-2 text-xs text-zinc-700 rounded-lg hover:bg-zinc-50 hover:text-zinc-955 font-medium flex items-center gap-3 cursor-pointer transition-colors" onclick="coraNavigateTo('settings'); $('#cora-profile-popover').addClass('hidden');">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500 shrink-0">
                             <circle cx="12" cy="12" r="3"></circle>
@@ -2726,6 +2733,51 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         </svg>
                     </span> Workspace Tour
                 </button>
+                <!-- In-App Notifications Bell & Dropdown -->
+                <?php
+                $cora_current_user_id = get_current_user_id();
+                $cora_all_notifications = get_option( 'cora_notifications', array() );
+                $cora_user_notifications = array();
+                $cora_unread_count = 0;
+                if ( is_array( $cora_all_notifications ) ) {
+                    foreach ( $cora_all_notifications as $notif ) {
+                        if ( isset( $notif['user_id'] ) && intval( $notif['user_id'] ) === $cora_current_user_id ) {
+                            $cora_user_notifications[] = $notif;
+                            if ( empty( $notif['read'] ) ) {
+                                $cora_unread_count++;
+                            }
+                        }
+                    }
+                    usort( $cora_user_notifications, function( $a, $b ) {
+                        return ($b['timestamp'] ?? 0) - ($a['timestamp'] ?? 0);
+                    } );
+                }
+                ?>
+                <div class="relative">
+                    <button id="cora-notif-bell-btn" class="p-2 text-zinc-550 hover:text-zinc-900 bg-white border border-zinc-200 rounded-md hover:bg-zinc-50 transition-all cursor-pointer shadow-sm flex items-center justify-center shrink-0" title="Notifications">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span id="cora-notif-badge" class="<?php echo $cora_unread_count > 0 ? '' : 'hidden'; ?> absolute -top-1 -right-1 min-w-[16px] h-4 px-1 flex items-center justify-center bg-red-600 text-[9px] font-bold text-white rounded-full leading-none border border-white">
+                            <?php echo $cora_unread_count; ?>
+                        </span>
+                    </button>
+                    <!-- Notification Popover Panel -->
+                    <div id="cora-notif-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white border border-zinc-200 rounded-xl shadow-xl z-50 flex flex-col overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                        <div class="px-4 py-3 border-b border-zinc-150 flex items-center justify-between bg-zinc-50/50 select-none">
+                            <span class="text-xs font-bold text-zinc-900">Notifications</span>
+                            <button id="cora-notif-mark-all-btn" class="text-[10px] font-semibold text-zinc-500 hover:text-zinc-800 transition-colors cursor-pointer">Mark all as read</button>
+                        </div>
+                        <div id="cora-notif-list" class="max-h-[320px] overflow-y-auto divide-y divide-zinc-100">
+                            <!-- Injected by JS -->
+                        </div>
+                        <div id="cora-notif-empty" class="hidden p-8 text-center text-xs text-zinc-400 select-none">
+                            No notifications yet.
+                        </div>
+                    </div>
+                </div>
+
                 <button id="cora-quick-ai-btn" class="cora-btn-secondary px-3 py-1.5 text-xs font-bold border border-zinc-200 rounded-md hover:bg-zinc-50 hover:text-zinc-900 transition-all active:scale-[0.98] inline-flex items-center gap-1.5 text-zinc-700 bg-white shadow-sm cursor-pointer" title="Ask Cora AI (Press ⌘J)">
                     <span class="cora-btn-icon text-zinc-550 flex shrink-0">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -4745,256 +4797,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
             <?php if ( $sub_page === 'team-roles' ) : ?>
             <section id="cora-page-team-roles" class="cora-page-section cora-active space-y-6">
-                <div class="flex items-center justify-between">
-                    <div class="cora-page-header flex items-center gap-3">
-                        <span class="cora-page-emoji text-zinc-900 flex shrink-0">
-                            <svg viewBox="0 0 24 24" width="30" height="30" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="9" cy="7" r="4"></circle>
-                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                            </svg>
-                        </span>
-                        <div>
-                            <h1 class="cora-page-title text-2xl font-bold tracking-tight text-zinc-900">Team & Role Permissions</h1>
-                            <p class="cora-section-desc text-xs text-zinc-500 mt-1">Manage brokerage team members, assign custom roles, and configure feature access permissions.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sub-Navigation for Team Section -->
-                <div class="cora-sub-tabs border-b border-zinc-200 flex gap-4 text-xs font-bold text-zinc-550 select-none pb-0.5">
-                    <button class="cora-sub-tab active pb-2 border-b-2 border-zinc-950 text-zinc-950 cursor-pointer" data-sub-target="team-directory">Crew Directory</button>
-                    <button class="cora-sub-tab pb-2 border-b-2 border-transparent hover:text-zinc-900 cursor-pointer" id="cora-sub-tab-team-form" data-sub-target="team-form">Add Member</button>
-                    <button class="cora-sub-tab pb-2 border-b-2 border-transparent hover:text-zinc-900 cursor-pointer" data-sub-target="team-matrix">Permissions Matrix</button>
-                </div>
-
-                <!-- SUB-SECTION 1: CREW DIRECTORY -->
-                <div id="cora-sub-page-team-directory" class="cora-sub-section active space-y-4">
-                    <div class="cora-card bg-white border border-zinc-200/85 rounded-xl p-5 shadow-sm space-y-4">
-                        <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
-                            <div class="relative w-full max-w-xs">
-                                <input type="text" id="cora-team-search" class="w-full border border-zinc-200 rounded-md py-1.5 pl-8 pr-3 text-xs bg-white focus:border-zinc-400 focus:outline-none transition-colors" placeholder="Search members by name or email...">
-                                <span class="absolute left-2.5 top-2.5 text-zinc-400">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                                </span>
-                            </div>
-                            <span class="text-xs bg-zinc-100 text-zinc-655 px-2.5 py-0.5 rounded-full font-medium" id="cora-crew-count-badge"><?php echo count($cora_users); ?> Members</span>
-                        </div>
-
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-zinc-200 text-xs text-left" id="cora-team-table">
-                                <thead>
-                                    <tr class="bg-zinc-50/50">
-                                        <th class="px-4 py-3 font-bold text-zinc-500 uppercase tracking-wider text-[10px]">Avatar</th>
-                                        <th class="px-4 py-3 font-bold text-zinc-500 uppercase tracking-wider text-[10px]">Display Name</th>
-                                        <th class="px-4 py-3 font-bold text-zinc-500 uppercase tracking-wider text-[10px]">Username</th>
-                                        <th class="px-4 py-3 font-bold text-zinc-500 uppercase tracking-wider text-[10px]">Email Address</th>
-                                        <th class="px-4 py-3 font-bold text-zinc-500 uppercase tracking-wider text-[10px]">Agent Role</th>
-                                        <th class="px-4 py-3 font-bold text-zinc-500 uppercase tracking-wider text-[10px] text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-zinc-150" id="cora-team-list-container">
-                                    <?php foreach ($cora_users as $user): 
-                                        $roles = $user->roles;
-                                        $role_key = !empty($roles) ? $roles[0] : 'subscriber';
-                                        $role_label = isset($cora_role_labels[$role_key]) ? $cora_role_labels[$role_key] : ucfirst($role_key);
-                                        $avatar_url = get_user_meta( $user->ID, 'cora_avatar_url', true );
-                                    ?>
-                                    <tr class="hover:bg-zinc-50/30 cora-member-row" data-id="<?php echo esc_attr($user->ID); ?>" data-username="<?php echo esc_attr($user->user_login); ?>" data-email="<?php echo esc_attr($user->user_email); ?>" data-display-name="<?php echo esc_attr($user->display_name); ?>" data-role="<?php echo esc_attr($role_key); ?>" data-avatar-url="<?php echo esc_attr($avatar_url); ?>">
-                                         <td class="px-4 py-3">
-                                             <?php if ( $avatar_url ) : ?>
-                                                 <img src="<?php echo esc_url($avatar_url); ?>" class="w-7 h-7 rounded-full object-cover select-none border border-zinc-250/80" alt="<?php echo esc_attr($user->display_name); ?>">
-                                             <?php else : ?>
-                                                 <div class="w-7 h-7 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 flex items-center justify-center font-bold text-[10px] uppercase cora-member-avatar-initials">
-                                                     <?php echo esc_html(substr($user->display_name, 0, 2)); ?>
-                                                 </div>
-                                             <?php endif; ?>
-                                         </td>
-                                        <td class="px-4 py-3 font-bold text-zinc-900"><?php echo esc_html($user->display_name); ?></td>
-                                        <td class="px-4 py-3 text-zinc-500 font-mono text-[10px]"><?php echo esc_html($user->user_login); ?></td>
-                                        <td class="px-4 py-3 text-zinc-550"><?php echo esc_html($user->user_email); ?></td>
-                                        <td class="px-4 py-3">
-                                            <span class="cora-badge px-2 py-0.5 text-[9px] font-bold rounded-md select-none <?php echo $role_key === 'administrator' ? 'cora-badge-green' : 'cora-badge-sidebar'; ?>">
-                                                <?php echo esc_html($role_label); ?>
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-right">
-                                            <div class="flex items-center justify-end gap-2">
-                                                <button class="px-2 py-1 border border-zinc-200 rounded text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 transition-all cursor-pointer cora-edit-user-btn" onclick="coraInitEditUser(<?php echo esc_attr($user->ID); ?>)">
-                                                    Edit
-                                                </button>
-                                                <?php if (get_current_user_id() !== $user->ID) : ?>
-                                                <button class="px-2 py-1 border border-zinc-200 rounded text-[10px] font-bold text-red-600 bg-white hover:bg-red-50 hover:border-red-200 transition-all cursor-pointer cora-delete-user-btn" onclick="coraDeleteUser(<?php echo esc_attr($user->ID); ?>)">
-                                                    Delete
-                                                </button>
-                                                <?php endif; ?>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SUB-SECTION 2: ADD / EDIT MEMBER FORM -->
-                <div id="cora-sub-page-team-form" class="cora-sub-section hidden space-y-4">
-                    <div class="cora-card bg-white border border-zinc-200/85 rounded-xl p-5 shadow-sm max-w-xl space-y-4">
-                        <h3 class="text-sm font-bold text-zinc-900 border-b border-zinc-100 pb-2 flex items-center gap-1.5" id="cora-team-form-title">
-                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-555">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="9" cy="7" r="4"></circle>
-                                <line x1="19" y1="8" x2="19" y2="14"></line>
-                                <line x1="16" y1="11" x2="22" y2="11"></line>
-                            </svg>
-                            Add Brokerage Member
-                        </h3>
-                        <p class="text-xs text-zinc-500 leading-normal" id="cora-team-form-desc">Create a new WordPress user profile mapped to your agency's brokerage operational roles.</p>
-                        
-                        <input type="hidden" id="cora-form-user-id">
-
-                        <div class="cora-form-group flex flex-col gap-1.5">
-                            <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Display Name</label>
-                            <input type="text" id="cora-user-display-name" class="w-full border border-zinc-200 rounded-md p-2 text-sm bg-white focus:border-zinc-400 focus:outline-none transition-colors" placeholder="e.g. Vikas Mehta">
-                        </div>
-
-                        <div class="cora-form-group flex flex-col gap-1.5">
-                            <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Profile Picture</label>
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 rounded-full overflow-hidden border border-zinc-200 bg-zinc-50 flex items-center justify-center shrink-0" id="cora-user-avatar-preview">
-                                    <span class="text-zinc-400 text-xs font-bold" id="cora-avatar-initials">--</span>
-                                </div>
-                                <div class="flex flex-col gap-1">
-                                    <input type="file" id="cora-user-avatar-file" accept="image/*" class="hidden">
-                                    <button type="button" class="cora-btn-secondary px-3 py-1.5 text-xs font-bold border border-zinc-250 rounded bg-white text-zinc-700 hover:bg-zinc-50 active:scale-95 transition-all cursor-pointer" onclick="$('#cora-user-avatar-file').click()">
-                                        Choose Image
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="cora-form-group flex flex-col gap-1.5" id="cora-username-form-group">
-                            <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Username</label>
-                            <input type="text" id="cora-user-username" class="w-full border border-zinc-200 rounded-md p-2 text-sm bg-white focus:border-zinc-400 focus:outline-none transition-colors disabled:bg-zinc-100 disabled:text-zinc-400 disabled:cursor-not-allowed" placeholder="e.g. vikas_photo">
-                        </div>
-
-                        <div class="cora-form-group flex flex-col gap-1.5">
-                            <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Email Address</label>
-                            <input type="email" id="cora-user-email" class="w-full border border-zinc-200 rounded-md p-2 text-sm bg-white focus:border-zinc-400 focus:outline-none transition-colors disabled:bg-zinc-100 disabled:text-zinc-400 disabled:cursor-not-allowed" placeholder="e.g. vikas@cora.ai">
-                        </div>
-
-                        <div class="cora-form-group flex flex-col gap-1.5">
-                            <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Password</label>
-                            <div class="relative">
-                                <input type="password" id="cora-user-password" class="w-full border border-zinc-200 rounded-md p-2 pr-10 text-sm bg-white focus:border-zinc-400 focus:outline-none transition-colors" placeholder="Leave blank to keep current password when editing">
-                                <button type="button" id="cora-toggle-password-visibility" class="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-650 cursor-pointer" style="background: none; border: none; outline: none;">
-                                    <!-- Eye Icon (Show) -->
-                                    <svg id="cora-eye-show-icon" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                        <circle cx="12" cy="12" r="3"></circle>
-                                    </svg>
-                                    <!-- Eye Off Icon (Hide) -->
-                                    <svg id="cora-eye-hide-icon" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="hidden">
-                                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                                        <line x1="1" y1="1" x2="23" y2="23"></line>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="cora-form-group flex flex-col gap-1.5">
-                            <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Operational Role</label>
-                            <select id="cora-user-role" class="w-full border border-zinc-200 rounded-md p-2 text-sm bg-white focus:border-zinc-400 focus:outline-none transition-colors">
-                                <option value="cora_photographer">Managing Agent</option>
-                                <option value="cora_videographer">Showing Assistant</option>
-                                <option value="cora_drone_pilot">Property Valuer</option>
-                                <option value="cora_editor">ListingCoordinator</option>
-                                <option value="cora_manager">Broker Owner</option>
-                                <option value="administrator">Super Admin</option>
-                            </select>
-                        </div>
-
-                        <div class="flex items-center gap-2.5 pt-3">
-                            <button id="cora-save-user-btn" class="px-5 py-2 bg-zinc-950 text-white font-semibold rounded-md hover:bg-zinc-800 transition-all active:scale-[0.98] cursor-pointer text-xs">
-                                Add Member
-                            </button>
-                            <button id="cora-cancel-user-btn" class="px-4 py-2 border border-zinc-250 rounded-md text-zinc-700 bg-white font-semibold hover:bg-zinc-50 transition-all active:scale-[0.98] cursor-pointer text-xs hidden">
-                                Cancel Edit
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SUB-SECTION 3: PERMISSIONS MATRIX -->
-                <div id="cora-sub-page-team-matrix" class="cora-sub-section hidden space-y-4">
-                    <div class="cora-card bg-white border border-zinc-200/85 rounded-xl p-5 shadow-sm space-y-4">
-                        <div class="flex items-center justify-between border-b border-zinc-100 pb-2">
-                            <h3 class="text-sm font-bold text-zinc-900">Granular Role Permissions Matrix</h3>
-                            <div class="flex items-center gap-1.5 text-[10px] font-bold text-zinc-550 select-none">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                Live Sync Active
-                            </div>
-                        </div>
-                        <p class="text-[11px] text-zinc-400 -mt-2 leading-relaxed">Determine dashboard screen visibilities for each brokerage role. Super Admin permissions are locked globally.</p>
-                        
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-zinc-200 text-xs text-left" id="cora-permissions-matrix-table">
-                                <thead>
-                                    <tr class="bg-zinc-50/50">
-                                        <th class="px-4 py-2.5 font-bold text-zinc-550 uppercase tracking-wider text-[10px]">Agent Role</th>
-                                        <th class="px-3 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px] text-center">Dashboard</th>
-                                        <th class="px-3 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px] text-center">Showings CRM</th>
-                                        <th class="px-3 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px] text-center">Feature Hub</th>
-                                        <th class="px-3 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px] text-center">Team & Roles</th>
-                                        <th class="px-3 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px] text-center">Equipment</th>
-                                        <th class="px-3 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px] text-center">Financials</th>
-                                        <th class="px-3 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px] text-center">Settings</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-zinc-150">
-                                    <!-- Super Admin row (Locked) -->
-                                    <tr class="hover:bg-zinc-50/30">
-                                        <td class="px-4 py-3 font-semibold text-zinc-900">Super Admin</td>
-                                        <td class="text-center"><input type="checkbox" checked disabled class="accent-zinc-950"></td>
-                                        <td class="text-center"><input type="checkbox" checked disabled class="accent-zinc-950"></td>
-                                        <td class="text-center"><input type="checkbox" checked disabled class="accent-zinc-950"></td>
-                                        <td class="text-center"><input type="checkbox" checked disabled class="accent-zinc-950"></td>
-                                        <td class="text-center"><input type="checkbox" checked disabled class="accent-zinc-950"></td>
-                                        <td class="text-center"><input type="checkbox" checked disabled class="accent-zinc-950"></td>
-                                        <td class="text-center"><input type="checkbox" checked disabled class="accent-zinc-950"></td>
-                                    </tr>
-                                    <!-- Custom roles -->
-                                    <?php 
-                                    $target_roles = array(
-                                        'cora_manager' => 'Broker Owner',
-                                        'cora_photographer' => 'Managing Agent',
-                                        'cora_videographer' => 'Showing Assistant',
-                                        'cora_drone_pilot' => 'Property Valuer',
-                                        'cora_editor' => 'ListingCoordinator'
-                                    );
-                                    $features = array('dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings');
-                                    
-                                    foreach ($target_roles as $role_key => $role_name): 
-                                        $allowed_features = isset($cora_permissions[$role_key]) ? $cora_permissions[$role_key] : array();
-                                    ?>
-                                    <tr class="hover:bg-zinc-50/30 cora-matrix-row" data-role="<?php echo esc_attr($role_key); ?>">
-                                        <td class="px-4 py-3 font-semibold text-zinc-800"><?php echo esc_html($role_name); ?></td>
-                                        <?php foreach ($features as $feature): 
-                                            $checked = in_array($feature, $allowed_features) ? 'checked' : '';
-                                        ?>
-                                        <td class="text-center">
-                                            <input type="checkbox" <?php echo $checked; ?> data-feature="<?php echo esc_attr($feature); ?>" class="cora-permission-checkbox accent-zinc-950 cursor-pointer">
-                                        </td>
-                                        <?php endforeach; ?>
-                                    </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                <?php include CORA_REAL_ESTATE_AI_PATH . 'views/view-users.php'; ?>
             </section>
             <?php endif; ?>
 
@@ -6236,6 +6039,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             <?php if ( $sub_page === 'settings-suite' ) : ?>
             <section id="cora-page-settings-suite" class="cora-page-section cora-active space-y-6">
                 <?php include CORA_REAL_ESTATE_AI_PATH . 'views/view-settings-suite.php'; ?>
+            </section>
+            <?php endif; ?>
+
+            <!-- SECTION: USER PROFILE -->
+            <?php if ( $sub_page === 'profile' ) : ?>
+            <section id="cora-page-profile" class="cora-page-section cora-active space-y-6">
+                <?php include CORA_REAL_ESTATE_AI_PATH . 'views/view-profile.php'; ?>
             </section>
             <?php endif; ?>
 
@@ -7851,6 +7661,167 @@ wp_print_footer_scripts();
 <!-- Workspace Script (Inlined for bulletproof execution) -->
 <script>
     <?php include CORA_REAL_ESTATE_AI_PATH . 'assets/js/admin-script.js'; ?>
+</script>
+
+<script>
+(function() {
+    let coraNotifications = <?php echo json_encode( $cora_user_notifications ); ?> || [];
+
+    // Helper for HTML escaping
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g, "&amp;")
+                  .replace(/</g, "&lt;")
+                  .replace(/>/g, "&gt;")
+                  .replace(/"/g, "&quot;")
+                  .replace(/'/g, "&#039;");
+    }
+
+    // Helper for relative timestamps
+    function getRelativeTimeString(timestamp) {
+        const diff = Math.floor(Date.now() / 1000) - parseInt(timestamp);
+        if (diff < 60) return 'Just now';
+        if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+        if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+        return `${Math.floor(diff / 86400)}d ago`;
+    }
+
+    // Render list and update badge
+    function renderCoraNotifications() {
+        const listContainer = document.getElementById('cora-notif-list');
+        const emptyState = document.getElementById('cora-notif-empty');
+        const badge = document.getElementById('cora-notif-badge');
+        if (!listContainer) return;
+
+        const displayList = coraNotifications.slice(0, 10);
+        const unreadCount = coraNotifications.filter(n => !n.read).length;
+
+        if (unreadCount > 0) {
+            badge.textContent = unreadCount;
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
+
+        if (displayList.length === 0) {
+            listContainer.innerHTML = '';
+            emptyState.classList.remove('hidden');
+            return;
+        }
+
+        emptyState.classList.add('hidden');
+        let html = '';
+
+        displayList.forEach(notif => {
+            const itemClass = notif.read 
+                ? "p-4 text-xs text-zinc-500 bg-white hover:bg-zinc-50/50 opacity-60 transition-all cursor-pointer block select-none"
+                : "p-4 text-xs font-semibold text-zinc-900 bg-zinc-50/50 hover:bg-zinc-50 border-l-[3px] border-zinc-900 transition-all cursor-pointer block select-none";
+
+            const relativeTime = getRelativeTimeString(notif.timestamp);
+
+            html += `
+                <div class="${itemClass}" data-id="${notif.id}" data-url="${notif.action_url || ''}">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="font-bold text-zinc-950">${escapeHtml(notif.title)}</div>
+                        <span class="text-[9px] text-zinc-400 font-normal shrink-0 font-mono">${relativeTime}</span>
+                    </div>
+                    <p class="text-zinc-650 mt-1 font-normal leading-relaxed">${escapeHtml(notif.description)}</p>
+                </div>
+            `;
+        });
+
+        listContainer.innerHTML = html;
+
+        // Wire click handler on rendered items
+        listContainer.querySelectorAll('[data-id]').forEach(el => {
+            el.addEventListener('click', function(e) {
+                const notifId = this.getAttribute('data-id');
+                const actionUrl = this.getAttribute('data-url');
+                handleCoraNotifClick(e, notifId, actionUrl);
+            });
+        });
+    }
+
+    // Toggle popover dropdown
+    function toggleNotificationDropdown(e) {
+        if (e) e.stopPropagation();
+        const dropdown = document.getElementById('cora-notif-dropdown');
+        if (dropdown) {
+            dropdown.classList.toggle('hidden');
+        }
+    }
+
+    // Handle single notification click
+    function handleCoraNotifClick(event, notifId, actionUrl) {
+        event.stopPropagation();
+        
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_mark_notif_read',
+            nonce: coraREData.ajaxNonce,
+            notif_id: notifId
+        }, function(res) {
+            if (res.success) {
+                coraNotifications = coraNotifications.map(n => {
+                    if (n.id === notifId) n.read = true;
+                    return n;
+                });
+                renderCoraNotifications();
+
+                if (actionUrl) {
+                    window.location.href = actionUrl;
+                }
+            } else {
+                console.error(res.data ? res.data.message : 'Error marking read');
+            }
+        });
+    }
+
+    // Mark all as read
+    function markAllNotificationsRead(e) {
+        if (e) e.stopPropagation();
+        
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_mark_all_notifs_read',
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                coraNotifications = coraNotifications.map(n => {
+                    n.read = true;
+                    return n;
+                });
+                renderCoraNotifications();
+                if (window.coraShowToast) {
+                    window.coraShowToast("All notifications marked as read.");
+                }
+            } else {
+                console.error(res.data ? res.data.message : 'Error marking all read');
+            }
+        });
+    }
+
+    // Initialize listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        const bellBtn = document.getElementById('cora-notif-bell-btn');
+        const markAllBtn = document.getElementById('cora-notif-mark-all-btn');
+
+        if (bellBtn) {
+            bellBtn.addEventListener('click', toggleNotificationDropdown);
+        }
+        if (markAllBtn) {
+            markAllBtn.addEventListener('click', markAllNotificationsRead);
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('cora-notif-dropdown');
+            if (dropdown && !dropdown.classList.contains('hidden') && !e.target.closest('#cora-notif-bell-btn') && !e.target.closest('#cora-notif-dropdown')) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        renderCoraNotifications();
+    });
+})();
 </script>
 
 </body>
