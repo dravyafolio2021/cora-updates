@@ -350,12 +350,14 @@ $roles      = wp_roles()->get_names();
 
         <script>
             function openCreateBranchDrawer() {
+                $('#drawer-create-branch').removeClass('opacity-0 pointer-events-none');
                 $('#drawer-create-branch').css({'opacity': '1', 'pointer-events': 'auto'});
                 $('#drawer-create-branch-card').css('transform', 'translateX(0)');
             }
             function closeCreateBranchDrawer() {
                 $('#drawer-create-branch-card').css('transform', 'translateX(100%)');
                 setTimeout(function() {
+                    $('#drawer-create-branch').addClass('opacity-0 pointer-events-none');
                     $('#drawer-create-branch').css({'opacity': '0', 'pointer-events': 'none'});
                 }, 300);
                 $('#new-branch-name').val('');
@@ -382,6 +384,7 @@ $roles      = wp_roles()->get_names();
 
                 $('#edit-branch-manager').val(managerId);
 
+                $('#drawer-edit-branch').removeClass('opacity-0 pointer-events-none');
                 $('#drawer-edit-branch').css({'opacity': '1', 'pointer-events': 'auto'});
                 $('#drawer-edit-branch-card').css('transform', 'translateX(0)');
             }
@@ -389,6 +392,7 @@ $roles      = wp_roles()->get_names();
             function closeEditBranchDrawer() {
                 $('#drawer-edit-branch-card').css('transform', 'translateX(100%)');
                 setTimeout(function() {
+                    $('#drawer-edit-branch').addClass('opacity-0 pointer-events-none');
                     $('#drawer-edit-branch').css({'opacity': '0', 'pointer-events': 'none'});
                 }, 300);
             }

@@ -6078,6 +6078,13 @@ function cora_filter_tenancy_data( $items, $option_name = '' ) {
     if ( ! is_array( $items ) ) {
         return $items;
     }
+
+    // Bypass tenancy filtering for public secure share pages
+    $request_uri = $_SERVER['REQUEST_URI'] ?? '';
+    if ( false !== strpos( $request_uri, 'shared-doc' ) || false !== strpos( $request_uri, 'shared-portfolio' ) ) {
+        return $items;
+    }
+
     $agency_id = cora_get_current_user_agency_id();
     if ( $agency_id === 'super' ) {
         return $items;

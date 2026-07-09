@@ -200,7 +200,7 @@ test.describe('Tier 2: Boundary Cases', () => {
 
   test('Appearance - Boundary - 3. Create Menu Duplicate Name', async ({ page }) => {
     await page.goto('/workspace/appearance');
-    const menuName = `Duplicate_${Math.floor(Math.random() * 1000)}`;
+    const menuName = `Dup_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
 
     // Create 1st
     await page.click('button[onclick="coraOpenNewMenuDrawer()"]');
