@@ -1,18 +1,18 @@
 {
-  "name": "Cora Admin Portal",
+  "name": "Cora Workspace",
   "short_name": "Cora Admin",
-  "start_url": "/wp-admin/admin.php?page=cora-real-estate",
+  "start_url": "/workspace/dashboard",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "theme_color": "#18181b",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "icon_192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "icon_512.png",
       "sizes": "512x512",
       "type": "image/png"
     }

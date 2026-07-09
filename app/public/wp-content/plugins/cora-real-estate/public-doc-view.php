@@ -8,6 +8,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <?php
+    $favicon_url = get_option( 'cora_brand_favicon_url', '' );
+    if ( empty( $favicon_url ) ) {
+        $favicon_url = CORA_REAL_ESTATE_AI_URL . 'assets/images/cora-favicon.png';
+    }
+    ?>
+    <link rel="icon" type="image/png" href="<?php echo esc_url( $favicon_url ); ?>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo esc_html( $found_doc['title'] ); ?> • Secure Preview</title>
     <!-- Outfit and Inter Fonts -->

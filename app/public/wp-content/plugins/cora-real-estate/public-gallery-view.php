@@ -49,6 +49,13 @@ $template = isset( $found_portfolio['template'] ) ? $found_portfolio['template']
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <?php
+    $favicon_url = get_option( 'cora_brand_favicon_url', '' );
+    if ( empty( $favicon_url ) ) {
+        $favicon_url = CORA_REAL_ESTATE_AI_URL . 'assets/images/cora-favicon.png';
+    }
+    ?>
+    <link rel="icon" type="image/png" href="<?php echo esc_url( $favicon_url ); ?>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo esc_html( $found_portfolio['title'] ); ?> • Property Portfolio</title>
     <!-- Premium Fonts -->
@@ -489,6 +496,7 @@ $template = isset( $found_portfolio['template'] ) ? $found_portfolio['template']
         .layout-toggle-btn.active {
             background: rgba(255,255,255,0.08);
             color: #ffffff;
+        }
         /* Premium Monochromatic Lightbox */
         .cora-public-lightbox-overlay {
             position: fixed;

@@ -1,0 +1,96 @@
+/* 
+ * Cora Elementor Reskin Module - Aggressive Overrides
+ * Completely transforms the UI/UX to match Studio Minimalist.
+ */
+
+/* 1. Global CSS Variables (Forces everything to Monochromatic) */
+:root, body, .elementor-editor-active {
+    --e-a-accent-color: #18181b !important;
+    --e-a-accent-color-hover: #09090b !important;
+    --e-a-primary-color: #18181b !important;
+    --e-a-primary-color-hover: #09090b !important;
+    --e-a-primary-tint: #f4f4f5 !important;
+    --e-a-primary-tint-hover: #e4e4e7 !important;
+    
+    /* Top Bar Vars */
+    --e-top-bar-background: #ffffff !important;
+    --e-top-bar-border-color: #e4e4e7 !important;
+    --e-top-bar-text-color: #18181b !important;
+    --e-top-bar-button-publish-background: #18181b !important;
+    
+    /* Panel Vars */
+    --e-panel-background: #ffffff !important;
+    --e-panel-border: 1px solid #e4e4e7 !important;
+    --e-panel-header-background: #fafafa !important;
+    
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
+}
+
+/* 2. Top Bar & Header Overrides */
+.e-top-bar, #e-top-bar, .e-route-panel, #elementor-editor-wrapper-v2, .elementor-panel-header {
+    display: none !important;
+}
+
+/* 3. Aggressively Hide All "Pro" Upsells and Banners */
+#elementor-panel-elements-promotion,
+.elementor-panel-elements-promotion,
+.elementor-nerd-box,
+.elementor-panel-nerd-box,
+.elementor-pro-badge,
+.e-promotion-badge,
+.elementor-button-go-pro,
+.elementor-element-pro,
+.e-pro-badge,
+i[class*="eicon-pro-icon"],
+.elementor-element-title-wrapper .eicon-pro-icon,
+.elementor-panel-footer-tools .elementor-button-go-pro,
+#e-top-bar-right .elementor-button-go-pro {
+    display: none !important;
+}
+
+/* 4. Panel Completely Hidden for Custom React Shell */
+#elementor-panel, .elementor-panel {
+    display: none !important;
+}
+
+/* 5. Buttons & Controls */
+.elementor-button, .elementor-button-success, .e-btn, .e-button {
+    background-color: #18181b !important;
+    color: #ffffff !important;
+    border-radius: 6px !important;
+    text-transform: capitalize !important;
+}
+.elementor-button:hover, .elementor-button-success:hover, .e-btn:hover, .e-button:hover {
+    background-color: #09090b !important;
+}
+
+/* Fix generic pink/purple elements hardcoded */
+[style*="background-color: #b91c1c"], 
+[style*="background-color: rgb(185, 28, 28)"],
+[style*="background-color: #e62359"], /* Elementor pink */
+[style*="color: #e62359"] {
+    background-color: #18181b !important;
+    color: #ffffff !important;
+}
+
+/* 6. Preview Iframe Canvas Overrides */
+.elementor-add-section-area,
+.elementor-add-section,
+.elementor-add-section-inner,
+.elementor-add-new-section {
+    background-color: transparent !important;
+}
+.elementor-add-section-button, 
+.elementor-add-template-button {
+    background-color: #18181b !important;
+    color: #fff !important;
+}
+.elementor-add-section-button:hover, 
+.elementor-add-template-button:hover {
+    background-color: #09090b !important;
+}
+
+/* 7. Hide AI / Copilot buttons */
+.e-copilot-badge, .e-ai-button, .elementor-ai-button, .e-ai-container {
+    display: none !important;
+}

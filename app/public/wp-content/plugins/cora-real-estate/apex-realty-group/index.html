@@ -28,54 +28,8 @@
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Tailwind CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
-                        display: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            gold: '#B89A74',
-                            bronze: '#8A6D4B',
-                            cream: '#FAF9F6',
-                            bgsecondary: '#F4F3EB',
-                            card: '#FFFFFF',
-                            dark: '#1A1A1A',
-                        }
-                    },
-                    animation: {
-                        'fade-up': 'fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                        'fade-in': 'fadeIn 1s ease forwards',
-                        'pulse-glow': 'pulseGlow 2s infinite alternate',
-                        'marquee': 'marquee 25s linear infinite',
-                    },
-                    keyframes: {
-                        fadeUp: {
-                            '0%': { opacity: '0', transform: 'translateY(24px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        },
-                        pulseGlow: {
-                            '0%': { transform: 'scale(1)', opacity: '0.8', filter: 'drop-shadow(0 0 4px rgba(184, 154, 116, 0.4))' },
-                            '100%': { transform: 'scale(1.05)', opacity: '1', filter: 'drop-shadow(0 0 12px rgba(184, 154, 116, 0.8))' },
-                        },
-                        marquee: {
-                            '0%': { transform: 'translateX(0)' },
-                            '100%': { transform: 'translateX(-100%)' }
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Compiled Tailwind CSS -->
+    <link rel="stylesheet" href="../assets/css/tailwind-built.css" />
 
     <style>
         /* Absolute Font Override to enforce clean Sans-Serif (Inter / System Fonts) */

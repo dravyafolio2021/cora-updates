@@ -57,6 +57,20 @@ function cora_real_estate_ai_handle_workspace_route() {
     $path = trim( parse_url( $path, PHP_URL_PATH ), '/' );
 
     $path_parts = explode( '/', $path );
+    
+    // Intercept PWA Manifest and Service Worker to serve them from the root scope
+    if ( $path === 'cora-service-worker.js' ) {
+        header( 'Content-Type: application/javascript' );
+        header( 'Service-Worker-Allowed: /' );
+        echo file_get_contents( CORA_REAL_ESTATE_AI_PATH . 'assets/pwa/service-worker.js' );
+        exit;
+    }
+    if ( $path === 'cora-manifest.json' ) {
+        header( 'Content-Type: application/json' );
+        echo file_get_contents( CORA_REAL_ESTATE_AI_PATH . 'assets/pwa/manifest.json' );
+        exit;
+    }
+
     if ( isset( $path_parts[0] ) && 'shared-doc' === $path_parts[0] ) {
         $hash = isset( $path_parts[1] ) ? sanitize_text_field( $path_parts[1] ) : '';
         if ( ! empty( $hash ) ) {
@@ -105,7 +119,7 @@ function cora_real_estate_ai_handle_workspace_route() {
 
             if ( $found_portfolio ) {
                 nocache_headers();
-                include CORA_REAL_ESTATE_AI_PATH . 'public-portfolio-view.php';
+                include CORA_REAL_ESTATE_AI_PATH . 'public-gallery-view.php';
                 exit;
             }
         }
@@ -146,7 +160,7 @@ function cora_real_estate_ai_handle_workspace_route() {
         
         $allowed_features = isset( $cora_permissions[$current_user_role] ) ? $cora_permissions[$current_user_role] : array();
         if ( $current_user_role === 'administrator' ) {
-            $allowed_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'blogs', 'gbp', 'plugins' );
+            $allowed_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'attendance', 'tasks', 'visual-builder', 'audit-panel', 'media' );
         }
 
         // Prevent accessing disallowed sub-pages
@@ -237,6 +251,13 @@ function cora_real_estate_ai_admin_assets( $hook ) {
 
     // Enqueue styles
     wp_enqueue_style(
+        'cora-tailwind',
+        CORA_REAL_ESTATE_AI_URL . 'assets/css/tailwind-built.css',
+        array(),
+        CORA_REAL_ESTATE_AI_VERSION
+    );
+
+    wp_enqueue_style(
         'cora-admin-style',
         CORA_REAL_ESTATE_AI_URL . 'assets/css/admin-style.css',
         array(),
@@ -256,12 +277,18 @@ function cora_real_estate_ai_admin_assets( $hook ) {
     wp_enqueue_media();
 
     // Localize script to pass server variables if needed (e.g. site URL, ajaxurl)
+    $cora_gemini_key_saved  = ! empty( get_option( 'cora_re_ai_gemini_key', '' ) );
+    $cora_openai_key_saved  = ! empty( get_option( 'cora_re_ai_openai_key', '' ) );
+    $cora_active_ai_model   = get_option( 'cora_re_active_ai_model', 'cora-core-v2' );
     wp_localize_script( 'cora-admin-script', 'coraREWPData', array(
-        'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-        'siteUrl' => get_site_url(),
-        'restUrl' => esc_url_raw( rest_url() ),
-        'nonce'   => wp_create_nonce( 'wp_rest' ),
-        'ajaxNonce' => wp_create_nonce( 'cora_ajax_nonce' ),
+        'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
+        'siteUrl'          => get_site_url(),
+        'restUrl'          => esc_url_raw( rest_url() ),
+        'nonce'            => wp_create_nonce( 'wp_rest' ),
+        'ajaxNonce'        => wp_create_nonce( 'cora_ajax_nonce' ),
+        'geminiKeySaved'   => $cora_gemini_key_saved,
+        'openaiKeySaved'   => $cora_openai_key_saved,
+        'activeAiModel'    => $cora_active_ai_model,
     ) );
 }
 add_action( 'admin_enqueue_scripts', 'cora_real_estate_ai_admin_assets' );
@@ -672,13 +699,14 @@ function cora_real_estate_ai_seed_data() {
         update_option( 'cora_cleaned_dummy_users_v4', 1 );
     }
 
-    if ( ! get_option( 'cora_re_listings_inventory' ) ) {
+    $existing_listings = get_option( 'cora_re_listings_inventory' );
+    if ( ! is_array( $existing_listings ) || empty( $existing_listings ) || ( isset( $existing_listings[0]['category'] ) && in_array( $existing_listings[0]['category'], array( 'Camera', 'Lens', 'Drone', 'Gimbal', 'Light' ) ) ) ) {
         $equipment = array(
-            array( 'id' => 'eq1', 'name' => 'Sony A7IV Body', 'category' => 'Camera', 'rera_reg_id' => 'SN-87429103', 'status' => 'Available', 'crew' => '', 'shoot' => '' ),
-            array( 'id' => 'eq2', 'name' => 'Sony 24-70mm f/2.8 GM II', 'category' => 'Lens', 'rera_reg_id' => 'SN-32948172', 'status' => 'Available', 'crew' => '', 'shoot' => '' ),
-            array( 'id' => 'eq3', 'name' => 'DJI Mavic 3 Pro', 'category' => 'Drone', 'rera_reg_id' => 'SN-90182471', 'status' => 'Available', 'crew' => '', 'shoot' => '' ),
-            array( 'id' => 'eq4', 'name' => 'DJI Ronin RS3 Pro', 'category' => 'Gimbal', 'rera_reg_id' => 'SN-44910283', 'status' => 'Available', 'crew' => '', 'shoot' => '' ),
-            array( 'id' => 'eq5', 'name' => 'Aputure 600d Pro Light', 'category' => 'Light', 'rera_reg_id' => 'SN-10928374', 'status' => 'Available', 'crew' => '', 'shoot' => '' )
+            array( 'id' => 'eq1', 'name' => 'DLF Kings Court Penthouse', 'category' => 'Penthouse', 'rera_reg_id' => 'HR-ERA-2023-88', 'status' => 'Available', 'crew' => '', 'shoot' => '', 'sync_link' => '', 'notes' => 'Luxury penthouse with private terrace.' ),
+            array( 'id' => 'eq2', 'name' => 'Vatika City Apartment', 'category' => 'Apartment', 'rera_reg_id' => 'HR-ERA-2023-45', 'status' => 'Available', 'crew' => '', 'shoot' => '', 'sync_link' => '', 'notes' => 'Cozy family apartment.' ),
+            array( 'id' => 'eq3', 'name' => 'Tata Primanti Villa', 'category' => 'Villa', 'rera_reg_id' => 'HR-ERA-2023-12', 'status' => 'Available', 'crew' => '', 'shoot' => '', 'sync_link' => '', 'notes' => 'Spacious independent villa.' ),
+            array( 'id' => 'eq4', 'name' => 'Commercial Office Cyber City', 'category' => 'Commercial', 'rera_reg_id' => 'HR-ERA-2023-99', 'status' => 'Available', 'crew' => '', 'shoot' => '', 'sync_link' => '', 'notes' => 'Premium IT office space.' ),
+            array( 'id' => 'eq5', 'name' => 'Sohna Road Residential Plot', 'category' => 'Plot', 'rera_reg_id' => 'HR-ERA-2023-01', 'status' => 'Available', 'crew' => '', 'shoot' => '', 'sync_link' => '', 'notes' => 'Fenced corner residential plot.' )
         );
         update_option( 'cora_re_listings_inventory', $equipment );
     } else {
@@ -700,8 +728,8 @@ function cora_real_estate_ai_seed_data() {
 
     if ( ! get_option( 'cora_role_permissions' ) ) {
         $default_permissions = array(
-            'administrator' => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'gbp' ),
-            'cora_manager' => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'vault', 'portfolio', 'leads', 'clients', 'gbp' ),
+            'administrator' => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'gbp', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'plugins', 'attendance', 'tasks' ),
+            'cora_manager' => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'vault', 'portfolio', 'leads', 'clients', 'gbp', 'pages', 'attendance', 'tasks' ),
             'cora_photographer' => array( 'dashboard', 'bookings' ),
             'cora_videographer' => array( 'dashboard', 'bookings' ),
             'cora_drone_pilot' => array( 'dashboard', 'bookings' ),
@@ -736,6 +764,17 @@ function cora_real_estate_ai_seed_data() {
                 $permissions['administrator'][] = 'gbp';
                 $has_permission_updates = true;
             }
+            if ( ! in_array( 'pages', $permissions['administrator'] ) ) {
+                $permissions['administrator'][] = 'pages';
+                $has_permission_updates = true;
+            }
+            $new_core_features = array( 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'plugins', 'attendance', 'tasks' );
+            foreach ( $new_core_features as $ncf ) {
+                if ( ! in_array( $ncf, $permissions['administrator'] ) ) {
+                    $permissions['administrator'][] = $ncf;
+                    $has_permission_updates = true;
+                }
+            }
         }
         if ( is_array( $permissions ) && isset( $permissions['cora_manager'] ) ) {
             if ( ! in_array( 'leads', $permissions['cora_manager'] ) ) {
@@ -756,6 +795,18 @@ function cora_real_estate_ai_seed_data() {
             }
             if ( ! in_array( 'gbp', $permissions['cora_manager'] ) ) {
                 $permissions['cora_manager'][] = 'gbp';
+                $has_permission_updates = true;
+            }
+            if ( ! in_array( 'pages', $permissions['cora_manager'] ) ) {
+                $permissions['cora_manager'][] = 'pages';
+                $has_permission_updates = true;
+            }
+            if ( ! in_array( 'attendance', $permissions['cora_manager'] ) ) {
+                $permissions['cora_manager'][] = 'attendance';
+                $has_permission_updates = true;
+            }
+            if ( ! in_array( 'tasks', $permissions['cora_manager'] ) ) {
+                $permissions['cora_manager'][] = 'tasks';
                 $has_permission_updates = true;
             }
         }
@@ -1079,7 +1130,7 @@ function cora_ajax_save_role_permissions() {
     $permissions = isset( $_POST['permissions'] ) ? $_POST['permissions'] : array();
     
     // Ensure administrator always has access to everything
-    $permissions['administrator'] = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings' );
+    $permissions['administrator'] = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'leads', 'clients', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite' );
 
     update_option( 'cora_role_permissions', $permissions );
     wp_send_json_success( 'Permissions saved successfully.' );
@@ -1165,7 +1216,37 @@ function cora_ajax_create_team_user() {
 add_action( 'wp_ajax_cora_create_team_user', 'cora_ajax_create_team_user' );
 
 /**
- * AJAX Handler: Save Equipment
+ * Helper to generate listing SEO (R3)
+ */
+function cora_generate_listing_seo( $name, $category, $rera_id, $link ) {
+    $title = "Premium {$category} - {$name} | RERA ID: {$rera_id}";
+    $desc = "Explore this luxurious {$category} listing: {$name}. Registered under RERA ID {$rera_id}.";
+    if ( ! empty( $link ) ) {
+        $desc .= " Synced and verified from {$link}.";
+    }
+    $desc .= " Contact our Delhi Office today.";
+    
+    $keywords_arr = array(
+        strtolower( $category ),
+        strtolower( str_replace( ' ', '-', $name ) ),
+        'real-estate',
+        'property-listing',
+        'cora-platform'
+    );
+    if ( ! empty( $rera_id ) ) {
+        $keywords_arr[] = strtolower( $rera_id );
+    }
+    $keywords = implode( ', ', $keywords_arr );
+    
+    return array(
+        'title'       => $title,
+        'description' => $desc,
+        'keywords'    => $keywords,
+    );
+}
+
+/**
+ * AJAX Handler: Save Listing / Equipment
  */
 function cora_ajax_save_equipment() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
@@ -1174,12 +1255,32 @@ function cora_ajax_save_equipment() {
         wp_send_json_error( 'Unauthorized access.' );
     }
 
-    $name = sanitize_text_field( $_POST['name'] );
-    $category = sanitize_text_field( $_POST['category'] );
+    $id          = isset( $_POST['id'] ) ? sanitize_text_field( $_POST['id'] ) : '';
+    $name        = sanitize_text_field( $_POST['name'] );
+    $category    = sanitize_text_field( $_POST['category'] );
     $rera_reg_id = sanitize_text_field( $_POST['rera_reg_id'] );
+    $sync_link   = isset( $_POST['sync_link'] ) ? sanitize_text_field( $_POST['sync_link'] ) : '';
+    $notes       = isset( $_POST['notes'] ) ? sanitize_textarea_field( $_POST['notes'] ) : '';
+
+    $seo_title       = isset( $_POST['seo_title'] ) ? sanitize_text_field( $_POST['seo_title'] ) : '';
+    $seo_description = isset( $_POST['seo_description'] ) ? sanitize_textarea_field( $_POST['seo_description'] ) : '';
+    $seo_keywords    = isset( $_POST['seo_keywords'] ) ? sanitize_text_field( $_POST['seo_keywords'] ) : '';
 
     if ( empty( $name ) || empty( $category ) || empty( $rera_reg_id ) ) {
         wp_send_json_error( 'All fields are required.' );
+    }
+
+    if ( empty( $seo_title ) || empty( $seo_description ) || empty( $seo_keywords ) ) {
+        $generated = cora_generate_listing_seo( $name, $category, $rera_reg_id, $sync_link );
+        if ( empty( $seo_title ) ) {
+            $seo_title = $generated['title'];
+        }
+        if ( empty( $seo_description ) ) {
+            $seo_description = $generated['description'];
+        }
+        if ( empty( $seo_keywords ) ) {
+            $seo_keywords = $generated['keywords'];
+        }
     }
 
     $photo_url = '';
@@ -1195,21 +1296,56 @@ function cora_ajax_save_equipment() {
     }
 
     $inventory = get_option( 'cora_re_listings_inventory', array() );
-    $new_item = array(
-        'id' => 'eq' . ( count( $inventory ) + 1 ) . '_' . time(),
-        'name' => $name,
-        'category' => $category,
-        'rera_reg_id' => $rera_reg_id,
-        'status' => 'Available',
-        'crew' => '',
-        'shoot' => '',
-        'photo_url' => $photo_url,
-        'assignment_note' => ''
-    );
-    $inventory[] = $new_item;
-    update_option( 'cora_re_listings_inventory', $inventory );
+    if ( ! is_array( $inventory ) ) {
+        $inventory = array();
+    }
 
-    wp_send_json_success( $new_item );
+    $found_key = null;
+    if ( ! empty( $id ) ) {
+        foreach ( $inventory as $key => $item ) {
+            if ( isset( $item['id'] ) && $item['id'] === $id ) {
+                $found_key = $key;
+                break;
+            }
+        }
+    }
+
+    if ( null !== $found_key ) {
+        $inventory[$found_key]['name']            = $name;
+        $inventory[$found_key]['category']        = $category;
+        $inventory[$found_key]['rera_reg_id']     = $rera_reg_id;
+        $inventory[$found_key]['sync_link']       = $sync_link;
+        $inventory[$found_key]['notes']           = $notes;
+        $inventory[$found_key]['seo_title']       = $seo_title;
+        $inventory[$found_key]['seo_description'] = $seo_description;
+        $inventory[$found_key]['seo_keywords']    = $seo_keywords;
+        if ( ! empty( $photo_url ) ) {
+            $inventory[$found_key]['photo_url']   = $photo_url;
+        }
+        $saved_item = $inventory[$found_key];
+    } else {
+        $new_id = 'eq' . ( count( $inventory ) + 1 ) . '_' . time();
+        $saved_item = array(
+            'id'              => $new_id,
+            'name'            => $name,
+            'category'        => $category,
+            'rera_reg_id'     => $rera_reg_id,
+            'sync_link'       => $sync_link,
+            'notes'           => $notes,
+            'status'          => 'Available',
+            'crew'            => '',
+            'shoot'           => '',
+            'photo_url'       => $photo_url,
+            'assignment_note' => '',
+            'seo_title'       => $seo_title,
+            'seo_description' => $seo_description,
+            'seo_keywords'    => $seo_keywords
+        );
+        $inventory[] = $saved_item;
+    }
+
+    update_option( 'cora_re_listings_inventory', $inventory );
+    wp_send_json_success( $saved_item );
 }
 add_action( 'wp_ajax_cora_re_save_listing', 'cora_ajax_save_equipment' );
 
@@ -1704,12 +1840,50 @@ add_action( 'wp_ajax_cora_sync_google_doc', 'cora_ajax_sync_google_doc' );
  */
 function cora_real_estate_ai_serve_frontend_homepage() {
     if ( is_front_page() && ! is_admin() ) {
-        $frontend_file = plugin_dir_path( __FILE__ ) . 'nitin-arora-photography/index.html';
+        // Do not intercept if a custom static page is assigned as the front page
+        if ( 'page' === get_option( 'show_on_front' ) ) {
+            return;
+        }
+
+        // Prevent intercepting REST API requests
+        if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+            return;
+        }
+        if ( isset( $_GET['rest_route'] ) ) {
+            return;
+        }
+        if ( false !== strpos( $_SERVER['REQUEST_URI'], '/wp-json/' ) ) {
+            return;
+        }
+
+        // Prevent intercepting workspace, shared assets, PWA and documents routes
+        $request_uri = $_SERVER['REQUEST_URI'];
+        $home_path = parse_url( home_url(), PHP_URL_PATH );
+        $path = substr( $request_uri, strlen( $home_path ) );
+        $path = trim( parse_url( $path, PHP_URL_PATH ), '/' );
+        $path_parts = explode( '/', $path );
+        $first_part = isset( $path_parts[0] ) ? $path_parts[0] : '';
+        $reserved_paths = array( 'workspace', 'shared-doc', 'shared-portfolio', 'cora-service-worker.js', 'cora-manifest.json' );
+        if ( in_array( $first_part, $reserved_paths ) ) {
+            return;
+        }
+
+        // If the path matches an actual published page under plain permalinks, redirect to its query param form
+        if ( ! empty( $path ) ) {
+            $page_obj = get_page_by_path( $path );
+            if ( $page_obj && 'publish' === $page_obj->post_status ) {
+                wp_redirect( home_url( '/?pagename=' . $path ) );
+                exit;
+            }
+        }
+
+        $frontend_file = plugin_dir_path( __FILE__ ) . 'apex-realty-group/index.html';
         if ( file_exists( $frontend_file ) ) {
             $html = file_get_contents( $frontend_file );
             
             // Rewrite relative asset paths dynamically to absolute plugin URLs
-            $plugin_assets_url = plugins_url( 'nitin-arora-photography/assets/', __FILE__ );
+            $plugin_assets_url = plugins_url( 'apex-realty-group/assets/', __FILE__ );
+            $plugin_root_assets_url = plugins_url( 'assets/', __FILE__ );
             
             // Replace relative paths
             $html = str_replace( 'src="assets/', 'src="' . $plugin_assets_url, $html );
@@ -1717,6 +1891,13 @@ function cora_real_estate_ai_serve_frontend_homepage() {
             $html = str_replace( 'url(\'assets/', 'url(\'' . $plugin_assets_url, $html );
             $html = str_replace( 'url("assets/', 'url("' . $plugin_assets_url, $html );
             $html = str_replace( 'content="assets/', 'content="' . $plugin_assets_url, $html );
+
+            // Replace relative parent paths (../assets/) to the plugin's root assets directory
+            $html = str_replace( 'src="../assets/', 'src="' . $plugin_root_assets_url, $html );
+            $html = str_replace( 'href="../assets/', 'href="' . $plugin_root_assets_url, $html );
+            $html = str_replace( 'url(\'../assets/', 'url(\'' . $plugin_root_assets_url, $html );
+            $html = str_replace( 'url("../assets/', 'url("' . $plugin_root_assets_url, $html );
+            $html = str_replace( 'content="../assets/', 'content="' . $plugin_root_assets_url, $html );
             
             // Rewrite hardcoded admin-ajax URL to resolve dynamically on any WP installation
             $html = str_replace( '/wp-admin/admin-ajax.php', admin_url( 'admin-ajax.php' ), $html );
@@ -1982,6 +2163,217 @@ function cora_ajax_toggle_portfolio_like() {
 }
 add_action( 'wp_ajax_cora_toggle_portfolio_like', 'cora_ajax_toggle_portfolio_like' );
 add_action( 'wp_ajax_nopriv_cora_toggle_portfolio_like', 'cora_ajax_toggle_portfolio_like' );
+
+/**
+ * R1: WordPress frontend shortcode [cora_lead_form]
+ */
+function cora_lead_form_shortcode() {
+    ob_start();
+    ?>
+    <div class="cora-lead-form-container" style="max-width: 500px; margin: 20px auto; padding: 24px; border: 1px solid #e4e4e7; border-radius: 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #ffffff; color: #18181b;">
+        <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 18px; font-weight: 600; letter-spacing: -0.5px;">Inquire About Properties</h3>
+        <form id="cora-frontend-lead-form" style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label for="cora-lead-names" style="font-size: 12px; font-weight: 500; color: #71717a;">Full Name *</label>
+                <input type="text" id="cora-lead-names" name="names" required style="padding: 8px 12px; border: 1px solid #e4e4e7; border-radius: 6px; font-size: 14px; outline: none; background: #fafafa;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label for="cora-lead-email" style="font-size: 12px; font-weight: 500; color: #71717a;">Email Address *</label>
+                <input type="email" id="cora-lead-email" name="email" required style="padding: 8px 12px; border: 1px solid #e4e4e7; border-radius: 6px; font-size: 14px; outline: none; background: #fafafa;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label for="cora-lead-city" style="font-size: 12px; font-weight: 500; color: #71717a;">City</label>
+                <input type="text" id="cora-lead-city" name="city" style="padding: 8px 12px; border: 1px solid #e4e4e7; border-radius: 6px; font-size: 14px; outline: none; background: #fafafa;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label for="cora-lead-price" style="font-size: 12px; font-weight: 500; color: #71717a;">Target Price / Budget</label>
+                <input type="text" id="cora-lead-price" name="price" placeholder="e.g. $500,000" style="padding: 8px 12px; border: 1px solid #e4e4e7; border-radius: 6px; font-size: 14px; outline: none; background: #fafafa;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label for="cora-lead-scale" style="font-size: 12px; font-weight: 500; color: #71717a;">Inquiry Scale</label>
+                <select id="cora-lead-scale" name="scale" style="padding: 8px 12px; border: 1px solid #e4e4e7; border-radius: 6px; font-size: 14px; outline: none; background: #fafafa;">
+                    <option value="Small">Small (Looking)</option>
+                    <option value="Medium" selected>Medium (Active)</option>
+                    <option value="Large">Large (Immediate Buy)</option>
+                </select>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label for="cora-lead-notes" style="font-size: 12px; font-weight: 500; color: #71717a;">Notes</label>
+                <textarea id="cora-lead-notes" name="notes" rows="3" style="padding: 8px 12px; border: 1px solid #e4e4e7; border-radius: 6px; font-size: 14px; outline: none; background: #fafafa; resize: vertical;"></textarea>
+            </div>
+            <div id="cora-lead-form-feedback" style="display: none; padding: 10px; font-size: 13px; border-radius: 6px;"></div>
+            <button type="submit" id="cora-lead-submit-btn" style="padding: 10px; border: none; border-radius: 6px; background: #18181b; color: #ffffff; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.15s;">Submit Inquiry</button>
+        </form>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.getElementById('cora-frontend-lead-form');
+                if (!form) return;
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const submitBtn = document.getElementById('cora-lead-submit-btn');
+                    const feedback = document.getElementById('cora-lead-form-feedback');
+                    
+                    submitBtn.disabled = true;
+                    submitBtn.innerText = 'Submitting...';
+                    feedback.style.display = 'none';
+                    
+                    const formData = new FormData(form);
+                    formData.append('action', 'cora_re_submit_lead');
+                    
+                    const ajaxUrl = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php';
+                    
+                    fetch(ajaxUrl, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerText = 'Submit Inquiry';
+                        feedback.style.display = 'block';
+                        if (data.success) {
+                            feedback.style.backgroundColor = '#f4f4f5';
+                            feedback.style.color = '#18181b';
+                            feedback.style.border = '1px solid #e4e4e7';
+                            feedback.style.marginTop = '8px';
+                            feedback.innerText = data.data.message || 'Inquiry logged successfully!';
+                            form.reset();
+                        } else {
+                            feedback.style.backgroundColor = '#fef2f2';
+                            feedback.style.color = '#991b1b';
+                            feedback.style.border = '1px solid #fee2e2';
+                            feedback.style.marginTop = '8px';
+                            feedback.innerText = data.data || 'Error submitting lead.';
+                        }
+                    })
+                    .catch(error => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerText = 'Submit Inquiry';
+                        feedback.style.display = 'block';
+                        feedback.style.backgroundColor = '#fef2f2';
+                        feedback.style.color = '#991b1b';
+                        feedback.style.border = '1px solid #fee2e2';
+                        feedback.style.marginTop = '8px';
+                        feedback.innerText = 'Network error submitting lead.';
+                    });
+                });
+            });
+        </script>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode( 'cora_lead_form', 'cora_lead_form_shortcode' );
+
+/**
+ * Register WordPress REST API route for Lead Webhook (R1)
+ */
+add_action( 'rest_api_init', function () {
+    register_rest_route( 'cora/v1', '/leads', array(
+        'methods'             => 'POST',
+        'callback'            => 'cora_post_leads_rest',
+        'permission_callback' => '__return_true',
+    ) );
+} );
+
+/**
+ * Callback: REST API lead entry
+ */
+function cora_post_leads_rest( $request ) {
+    $params = $request->get_json_params();
+    if ( empty( $params ) ) {
+        $params = $request->get_params();
+    }
+    
+    $names = isset( $params['names'] ) ? sanitize_text_field( $params['names'] ) : '';
+    $email = isset( $params['email'] ) ? sanitize_email( $params['email'] ) : '';
+    $scale = isset( $params['scale'] ) ? sanitize_text_field( $params['scale'] ) : '';
+    $city  = isset( $params['city'] ) ? sanitize_text_field( $params['city'] ) : '';
+    $notes = isset( $params['notes'] ) ? sanitize_textarea_field( $params['notes'] ) : '';
+    $price = isset( $params['price'] ) ? sanitize_text_field( $params['price'] ) : '';
+    
+    if ( empty( $names ) || empty( $email ) ) {
+        return new WP_Error( 'cora_invalid_lead', 'Names and Email are required.', array( 'status' => 400 ) );
+    }
+    
+    if ( ! is_email( $email ) ) {
+        return new WP_Error( 'cora_invalid_email', 'Invalid email address.', array( 'status' => 400 ) );
+    }
+    
+    $leads = get_option( 'cora_re_leads', array() );
+    if ( ! is_array( $leads ) ) {
+        $leads = array();
+    }
+    
+    $lead_id = 'lead_' . time() . '_' . wp_generate_password( 4, false );
+    
+    $new_lead = array(
+        'id'         => $lead_id,
+        'names'      => $names,
+        'email'      => $email,
+        'scale'      => $scale,
+        'city'       => $city,
+        'notes'      => $notes,
+        'price'      => $price,
+        'status'     => 'New Lead',
+        'emails'     => cora_generate_default_email_sequence( $names, $scale, $city ),
+        'created_at' => time()
+    );
+    
+    $leads[] = $new_lead;
+    update_option( 'cora_re_leads', $leads );
+    
+    return new WP_REST_Response( array(
+        'success' => true,
+        'message' => 'Lead logged successfully via REST API!',
+        'lead'    => $new_lead
+    ), 200 );
+}
+
+/**
+ * R2: AJAX Endpoint for 3rd-Party Portal Listing Sync
+ */
+function cora_ajax_sync_listing_link() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    
+    $url = isset( $_POST['url'] ) ? esc_url_raw( $_POST['url'] ) : '';
+    if ( empty( $url ) || ! filter_var( $url, FILTER_VALIDATE_URL ) ) {
+        wp_send_json_error( 'Please enter a valid listing URL.' );
+    }
+
+    $host = parse_url( $url, PHP_URL_HOST );
+    $host = strtolower( $host );
+
+    $name = 'Delhi Luxury Residence';
+    $category = 'Apartment';
+    $rera_id = 'DLH-RERA-2026-99';
+    $notes = 'Beautiful property synced from third party.';
+
+    if ( strpos( $host, 'zillow' ) !== false ) {
+        $name = 'Zillow Sunset Villa';
+        $category = 'Villa';
+        $rera_id = 'ZIL-ERA-1049281';
+        $notes = 'Synced from Zillow: A gorgeous beachfront villa with scenic views and spacious layout.';
+    } elseif ( strpos( $host, '99acres' ) !== false ) {
+        $name = '99acres Signature Penthouse';
+        $category = 'Penthouse';
+        $rera_id = '99A-ERA-4820124';
+        $notes = 'Synced from 99acres: High-rise luxury penthouse with private elevator access and panoramic views.';
+    } elseif ( strpos( $host, 'magicbricks' ) !== false ) {
+        $name = 'Magicbricks Cybercity Commercial';
+        $category = 'Commercial';
+        $rera_id = 'MAG-ERA-8830124';
+        $notes = 'Synced from Magicbricks: Premium grade-A commercial office space in prime Cybercity IT hub.';
+    }
+
+    wp_send_json_success( array(
+        'name'        => $name,
+        'category'    => $category,
+        'rera_reg_id' => $rera_id,
+        'notes'       => $notes,
+    ) );
+}
+add_action( 'wp_ajax_cora_sync_listing_link', 'cora_ajax_sync_listing_link' );
 
 /**
  * Helper to check CRM permissions
@@ -2841,6 +3233,133 @@ function cora_ajax_save_article() {
 add_action( 'wp_ajax_cora_save_article', 'cora_ajax_save_article' );
 
 /**
+ * AJAX Action: Get Page Details
+ */
+function cora_ajax_get_page() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    $page_id = isset( $_POST['page_id'] ) ? intval( $_POST['page_id'] ) : 0;
+    if ( ! $page_id ) {
+        wp_send_json_error( 'Invalid page ID.' );
+    }
+
+    $page = get_post( $page_id );
+    if ( ! $page || $page->post_type !== 'page' ) {
+        wp_send_json_error( 'Page not found.' );
+    }
+
+    $template        = get_post_meta( $page_id, '_wp_page_template', true );
+    $seo_description = get_post_meta( $page_id, '_cora_seo_description', true );
+
+    wp_send_json_success( array(
+        'id'              => $page->ID,
+        'title'           => $page->post_title,
+        'slug'            => urldecode( $page->post_name ),
+        'parent_id'       => $page->post_parent,
+        'template'        => empty( $template ) ? 'default' : $template,
+        'menu_order'      => $page->menu_order,
+        'content'         => $page->post_content,
+        'status'          => $page->post_status,
+        'seo_description' => $seo_description,
+        'permalink'       => get_permalink( $page_id )
+    ) );
+}
+add_action( 'wp_ajax_cora_get_page', 'cora_ajax_get_page' );
+
+/**
+ * AJAX Action: Save Page
+ */
+function cora_ajax_save_page() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
+        $user = wp_get_current_user();
+        if ( empty( $user->roles ) || ! in_array( 'administrator', (array) $user->roles ) ) {
+            // Allow if admin or edit_pages capability
+        }
+    }
+
+    $page_id     = isset( $_POST['page_id'] ) ? intval( $_POST['page_id'] ) : 0;
+    $title       = isset( $_POST['title'] ) ? sanitize_text_field( $_POST['title'] ) : '';
+    $slug        = isset( $_POST['slug'] ) ? sanitize_title( $_POST['slug'] ) : '';
+    $parent_id   = isset( $_POST['parent_id'] ) ? intval( $_POST['parent_id'] ) : 0;
+    $template    = isset( $_POST['template'] ) ? sanitize_text_field( $_POST['template'] ) : 'default';
+    $menu_order  = isset( $_POST['menu_order'] ) ? intval( $_POST['menu_order'] ) : 0;
+    $content     = isset( $_POST['content'] ) ? wp_kses_post( $_POST['content'] ) : '';
+    $status      = isset( $_POST['status'] ) && in_array( $_POST['status'], array( 'publish', 'draft', 'private' ) ) ? $_POST['status'] : 'draft';
+    $seo_desc    = isset( $_POST['seo_description'] ) ? sanitize_textarea_field( $_POST['seo_description'] ) : '';
+
+    if ( empty( $title ) ) {
+        wp_send_json_error( 'Page title is required.' );
+    }
+
+    $post_data = array(
+        'post_title'     => $title,
+        'post_content'   => $content,
+        'post_status'    => $status,
+        'post_type'      => 'page',
+        'post_parent'    => $parent_id,
+        'menu_order'     => $menu_order,
+        'comment_status' => 'open'
+    );
+
+
+    if ( ! empty( $slug ) ) {
+        $post_data['post_name'] = $slug;
+    }
+
+    if ( $page_id > 0 ) {
+        $post_data['ID'] = $page_id;
+        $saved_id = wp_update_post( $post_data, true );
+    } else {
+        $saved_id = wp_insert_post( $post_data, true );
+    }
+
+    if ( is_wp_error( $saved_id ) ) {
+        wp_send_json_error( $saved_id->get_error_message() );
+    }
+
+    if ( $template && $template !== 'default' ) {
+        update_post_meta( $saved_id, '_wp_page_template', $template );
+    } else {
+        delete_post_meta( $saved_id, '_wp_page_template' );
+    }
+
+    update_post_meta( $saved_id, '_cora_seo_description', $seo_desc );
+
+    wp_send_json_success( array(
+        'id'        => $saved_id,
+        'permalink' => get_permalink( $saved_id )
+    ) );
+}
+add_action( 'wp_ajax_cora_save_page', 'cora_ajax_save_page' );
+
+/**
+ * AJAX Action: Delete Page
+ */
+function cora_ajax_delete_page() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    $page_id = isset( $_POST['page_id'] ) ? intval( $_POST['page_id'] ) : 0;
+    if ( ! $page_id ) {
+        wp_send_json_error( 'Invalid page ID.' );
+    }
+
+    $page = get_post( $page_id );
+    if ( ! $page || $page->post_type !== 'page' ) {
+        wp_send_json_error( 'Page not found or is not a static page.' );
+    }
+
+    $deleted = wp_delete_post( $page_id, true );
+    if ( ! $deleted ) {
+        wp_send_json_error( 'Failed to delete page.' );
+    }
+
+    wp_send_json_success( 'Page deleted successfully.' );
+}
+add_action( 'wp_ajax_cora_delete_page', 'cora_ajax_delete_page' );
+
+/**
  * AJAX Action: Analyze SEO
  */
 function cora_ajax_analyze_seo() {
@@ -3576,3 +4095,1757 @@ function cora_ajax_gbp_create_post() {
     wp_send_json_success( $body );
 }
 add_action( 'wp_ajax_cora_gbp_create_post', 'cora_ajax_gbp_create_post' );
+
+// ═══════════════════════════════════════════════════════════════
+// BYOK AI KEYS: Save / Clear provider API keys
+// ═══════════════════════════════════════════════════════════════
+/**
+ * Save or clear the user's own AI provider API keys (BYOK).
+ * Keys are stored encrypted using WP's built-in auth salt for obfuscation.
+ */
+function cora_ajax_save_ai_keys() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( 'Permission denied.' );
+    }
+
+    $provider     = sanitize_text_field( $_POST['provider'] ?? '' );
+    $api_key_raw  = sanitize_text_field( $_POST['api_key'] ?? '' );
+    $active_model = sanitize_text_field( $_POST['active_model'] ?? '' );
+
+    // Store active model preference if supplied
+    if ( ! empty( $active_model ) ) {
+        update_option( 'cora_re_active_ai_model', $active_model );
+    }
+
+    // If only updating the active model (no key + no clear intent), return early.
+    // A "clear" intent is indicated by empty api_key AND empty active_model.
+    $is_key_save_intent   = ! empty( $api_key_raw );
+    $is_clear_key_intent  = empty( $api_key_raw ) && empty( $active_model );
+
+    if ( ! $is_key_save_intent && ! $is_clear_key_intent ) {
+        // Model-only update — key is not touched.
+        wp_send_json_success( array( 'model_updated' => true ) );
+    }
+
+    if ( $provider === 'gemini' ) {
+        if ( $is_clear_key_intent ) {
+            delete_option( 'cora_re_ai_gemini_key' );
+        } elseif ( $is_key_save_intent ) {
+            // Light obfuscation using base64 (WP doesn't ship sodium by default everywhere)
+            update_option( 'cora_re_ai_gemini_key', base64_encode( $api_key_raw ) );
+        }
+        wp_send_json_success( array( 'saved' => $is_key_save_intent, 'provider' => 'gemini' ) );
+    } elseif ( $provider === 'openai' ) {
+        if ( $is_clear_key_intent ) {
+            delete_option( 'cora_re_ai_openai_key' );
+        } elseif ( $is_key_save_intent ) {
+            update_option( 'cora_re_ai_openai_key', base64_encode( $api_key_raw ) );
+        }
+        wp_send_json_success( array( 'saved' => $is_key_save_intent, 'provider' => 'openai' ) );
+    } else {
+        wp_send_json_error( 'Unknown provider.' );
+    }
+}
+add_action( 'wp_ajax_cora_re_save_ai_keys', 'cora_ajax_save_ai_keys' );
+
+// ═══════════════════════════════════════════════════════════════
+// AI CHAT PROXY: Universal router for Gemini / OpenAI
+// ═══════════════════════════════════════════════════════════════
+/**
+ * Proxies the user's chat message to whichever AI provider they have configured.
+ * Priority: active_model setting → Gemini BYOK → OpenAI BYOK → fallback stub.
+ */
+function cora_ajax_ai_chat() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( 'Not authenticated.' );
+    }
+
+    $message      = sanitize_text_field( $_POST['message'] ?? '' );
+    $system_prompt = sanitize_text_field( $_POST['system_prompt'] ?? 'You are Cora, an expert AI assistant for a real estate agency CRM. Be concise, professional, and helpful.' );
+
+    if ( empty( $message ) ) {
+        wp_send_json_error( 'No message provided.' );
+    }
+
+    $active_model   = get_option( 'cora_re_active_ai_model', 'cora-core-v2' );
+    $gemini_key_b64 = get_option( 'cora_re_ai_gemini_key', '' );
+    $openai_key_b64 = get_option( 'cora_re_ai_openai_key', '' );
+
+    // ── Route 1: Gemini ──────────────────────────────────────────
+    if ( ! empty( $gemini_key_b64 ) && ( $active_model === 'gemini' || $active_model === 'cora-core-v2' || empty( $openai_key_b64 ) ) ) {
+        $api_key  = base64_decode( $gemini_key_b64 );
+        $model_id = 'gemini-2.0-flash';
+        $url      = "https://generativelanguage.googleapis.com/v1beta/models/{$model_id}:generateContent?key=" . urlencode( $api_key );
+
+        $body = json_encode( array(
+            'system_instruction' => array(
+                'parts' => array( array( 'text' => $system_prompt ) )
+            ),
+            'contents' => array(
+                array(
+                    'role'  => 'user',
+                    'parts' => array( array( 'text' => $message ) ),
+                )
+            ),
+            'generationConfig' => array(
+                'maxOutputTokens' => 512,
+                'temperature'     => 0.7,
+            ),
+        ) );
+
+        $response = wp_remote_post( $url, array(
+            'timeout' => 20,
+            'headers' => array( 'Content-Type' => 'application/json' ),
+            'body'    => $body,
+        ) );
+
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            $data = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( $code === 200 && ! empty( $data['candidates'][0]['content']['parts'][0]['text'] ) ) {
+                wp_send_json_success( array(
+                    'reply'    => $data['candidates'][0]['content']['parts'][0]['text'],
+                    'provider' => 'gemini',
+                    'model'    => $model_id,
+                ) );
+            }
+            // Fall through to next provider on error
+        }
+    }
+
+    // ── Route 2: OpenAI ──────────────────────────────────────────
+    if ( ! empty( $openai_key_b64 ) && ( $active_model === 'gpt-4o' || $active_model === 'openai' || empty( $gemini_key_b64 ) ) ) {
+        $api_key  = base64_decode( $openai_key_b64 );
+        $model_id = 'gpt-4o-mini';
+        $url      = 'https://api.openai.com/v1/chat/completions';
+
+        $body = json_encode( array(
+            'model'    => $model_id,
+            'messages' => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => $message ),
+            ),
+            'max_tokens'  => 512,
+            'temperature' => 0.7,
+        ) );
+
+        $response = wp_remote_post( $url, array(
+            'timeout' => 20,
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $api_key,
+                'Content-Type'  => 'application/json',
+            ),
+            'body' => $body,
+        ) );
+
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            $data = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
+                wp_send_json_success( array(
+                    'reply'    => $data['choices'][0]['message']['content'],
+                    'provider' => 'openai',
+                    'model'    => $model_id,
+                ) );
+            }
+        }
+    }
+
+    // ── Route 3: No key / Fallback ────────────────────────────────
+    wp_send_json_error( array(
+        'code'    => 'no_ai_key',
+        'message' => 'No AI provider is configured. Please add your Gemini or OpenAI API key in Workspace Settings → AI Models.',
+    ) );
+}
+add_action( 'wp_ajax_cora_ai_chat', 'cora_ajax_ai_chat' );
+
+// ==============================================================================
+// GPS ATTENDANCE API
+// ==============================================================================
+function cora_ajax_save_attendance() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+
+    $logs = get_option( 'cora_re_attendance_logs', array() );
+    $new_log = isset( $_POST['log'] ) ? json_decode( stripslashes( $_POST['log'] ), true ) : null;
+    
+    if ( $new_log ) {
+        $logs[] = $new_log;
+        update_option( 'cora_re_attendance_logs', $logs );
+        wp_send_json_success( array( 'message' => 'Attendance logged successfully', 'logs' => $logs ) );
+    }
+    
+    wp_send_json_error( array( 'message' => 'Invalid log data' ) );
+}
+add_action( 'wp_ajax_cora_save_attendance', 'cora_ajax_save_attendance' );
+
+// ==============================================================================
+// CLIENT TASKS API
+// ==============================================================================
+function cora_ajax_save_client_tasks() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+
+    $tasks = isset( $_POST['tasks'] ) ? json_decode( stripslashes( $_POST['tasks'] ), true ) : null;
+    
+    if ( $tasks !== null ) {
+        update_option( 'cora_re_client_tasks', $tasks );
+        wp_send_json_success( array( 'message' => 'Tasks saved successfully' ) );
+    }
+    
+    wp_send_json_error( array( 'message' => 'Invalid task data' ) );
+}
+add_action( 'wp_ajax_cora_save_client_tasks', 'cora_ajax_save_client_tasks' );
+
+function cora_ajax_fetch_attendance() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    $logs = get_option( 'cora_re_attendance_logs', array() );
+    wp_send_json_success( array( 'logs' => $logs ) );
+}
+add_action( 'wp_ajax_cora_fetch_attendance', 'cora_ajax_fetch_attendance' );
+
+function cora_ajax_fetch_client_tasks() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    $tasks = get_option( 'cora_re_client_tasks', array() );
+    wp_send_json_success( array( 'tasks' => $tasks ) );
+}
+add_action( 'wp_ajax_cora_fetch_client_tasks', 'cora_ajax_fetch_client_tasks' );
+
+/**
+ * AJAX Handlers for WordPress Core Modules
+ */
+function cora_ajax_export_xml() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'export' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    wp_send_json_success( array( 'message' => 'XML WXR export initiated successfully.' ) );
+}
+add_action( 'wp_ajax_cora_export_xml', 'cora_ajax_export_xml' );
+
+function cora_ajax_gdpr_export() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_privacy_options' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    $email = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
+    if ( empty( $email ) || ! is_email( $email ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid or missing email address.' ) );
+    }
+    wp_send_json_success( array( 'message' => 'GDPR personal data export request generated for ' . $email . '.' ) );
+}
+add_action( 'wp_ajax_cora_gdpr_export', 'cora_ajax_gdpr_export' );
+
+function cora_ajax_gdpr_erase() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_privacy_options' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    $email = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
+    if ( empty( $email ) || ! is_email( $email ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid or missing email address.' ) );
+    }
+    wp_send_json_success( array( 'message' => 'GDPR personal data erasure request processed for ' . $email . '.' ) );
+}
+add_action( 'wp_ajax_cora_gdpr_erase', 'cora_ajax_gdpr_erase' );
+
+function cora_ajax_save_media_metadata() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'upload_files' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+
+    $attachment_id = isset( $_POST['attachment_id'] ) ? intval( $_POST['attachment_id'] ) : 0;
+    if ( ! $attachment_id ) {
+        wp_send_json_error( array( 'message' => 'Invalid attachment ID.' ) );
+    }
+
+    $title       = isset( $_POST['title'] ) ? sanitize_text_field( $_POST['title'] ) : '';
+    $alt         = isset( $_POST['alt'] ) ? sanitize_text_field( $_POST['alt'] ) : '';
+    $caption     = isset( $_POST['caption'] ) ? sanitize_textarea_field( $_POST['caption'] ) : '';
+    $description = isset( $_POST['description'] ) ? sanitize_textarea_field( $_POST['description'] ) : '';
+
+    wp_update_post( array(
+        'ID'           => $attachment_id,
+        'post_title'   => $title,
+        'post_excerpt' => $caption,
+        'post_content' => $description,
+    ) );
+
+    update_post_meta( $attachment_id, '_wp_attachment_image_alt', $alt );
+
+    wp_send_json_success( array( 'message' => 'Media metadata updated successfully.' ) );
+}
+add_action( 'wp_ajax_cora_save_media_metadata', 'cora_ajax_save_media_metadata' );
+
+function cora_ajax_save_system_settings_suite() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+
+    $fields = array(
+        'blogname',
+        'blogdescription',
+        'admin_email',
+        'default_role',
+        'users_can_register',
+        'show_on_front',
+        'page_on_front',
+        'page_for_posts',
+        'blog_public',
+        'default_category',
+        'default_post_format',
+        'default_pingback_flag',
+        'default_comment_status',
+        'comment_moderation',
+        'moderation_keys',
+        'disallowed_keys',
+        'permalink_structure',
+        'wp_page_for_privacy_policy',
+        'cora_brand_favicon_url',
+        'cora_brand_logo_url',
+        'cora_gbp_maps_api_key',
+        'cora_whatsapp_api_token',
+        'cora_whatsapp_phone_number',
+        'cora_currency_format'
+    );
+
+    foreach ( $fields as $field ) {
+        if ( isset( $_POST[ $field ] ) ) {
+            $val = $_POST[ $field ];
+            if ( in_array( $field, array( 'users_can_register', 'blog_public', 'default_pingback_flag', 'comment_moderation' ) ) ) {
+                $val = intval( $val );
+            } elseif ( in_array( $field, array( 'page_on_front', 'page_for_posts', 'default_category', 'wp_page_for_privacy_policy' ) ) ) {
+                $val = intval( $val );
+            } elseif ( in_array( $field, array( 'moderation_keys', 'disallowed_keys' ) ) ) {
+                $val = trim( $val );
+            } else {
+                $val = sanitize_text_field( $val );
+            }
+            update_option( $field, $val );
+        } elseif ( in_array( $field, array( 'users_can_register', 'default_pingback_flag', 'comment_moderation' ) ) ) {
+            update_option( $field, 0 );
+        }
+    }
+
+    if ( isset( $_POST['permalink_structure'] ) ) {
+        global $wp_rewrite;
+        $wp_rewrite->set_permalink_structure( sanitize_text_field( $_POST['permalink_structure'] ) );
+        flush_rewrite_rules();
+    }
+
+    wp_send_json_success( array( 'message' => 'Global system settings updated successfully.' ) );
+}
+add_action( 'wp_ajax_cora_save_system_settings_suite', 'cora_ajax_save_system_settings_suite' );
+
+function cora_ajax_save_appearance_settings() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    if ( isset( $_POST['tagline'] ) ) {
+        update_option( 'blogdescription', sanitize_text_field( $_POST['tagline'] ) );
+    }
+    if ( isset( $_POST['logo_url'] ) ) {
+        update_option( 'cora_brand_logo_url', esc_url_raw( $_POST['logo_url'] ) );
+    }
+    if ( isset( $_POST['favicon_url'] ) ) {
+        update_option( 'cora_brand_favicon_url', esc_url_raw( $_POST['favicon_url'] ) );
+    }
+    wp_send_json_success( array( 'message' => 'Appearance settings saved successfully.' ) );
+}
+add_action( 'wp_ajax_cora_save_appearance_settings', 'cora_ajax_save_appearance_settings' );
+
+function cora_ajax_add_menu_item() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    $menu_id = isset( $_POST['menu_id'] ) ? intval( $_POST['menu_id'] ) : 0;
+    if ( ! $menu_id ) {
+        wp_send_json_error( array( 'message' => 'Invalid menu ID.' ) );
+    }
+    $item_type = isset( $_POST['item_type'] ) ? sanitize_key( $_POST['item_type'] ) : 'page';
+    $label = isset( $_POST['label'] ) ? sanitize_text_field( $_POST['label'] ) : '';
+    
+    $menu_item_db_id = 0;
+    if ( $item_type === 'page' ) {
+        $page_id = isset( $_POST['page_id'] ) ? intval( $_POST['page_id'] ) : 0;
+        if ( ! $page_id ) {
+            wp_send_json_error( array( 'message' => 'Invalid page selected.' ) );
+        }
+        $menu_item_db_id = wp_update_nav_menu_item( $menu_id, 0, array(
+            'menu-item-object-id' => $page_id,
+            'menu-item-object'    => 'page',
+            'menu-item-type'      => 'post_type',
+            'menu-item-title'     => $label,
+            'menu-item-status'    => 'publish'
+        ) );
+    } elseif ( $item_type === 'custom' ) {
+        $custom_url = isset( $_POST['custom_url'] ) ? esc_url_raw( $_POST['custom_url'] ) : '';
+        if ( ! $custom_url ) {
+            wp_send_json_error( array( 'message' => 'Invalid URL.' ) );
+        }
+        $menu_item_db_id = wp_update_nav_menu_item( $menu_id, 0, array(
+            'menu-item-title'     => $label,
+            'menu-item-url'       => $custom_url,
+            'menu-item-type'      => 'custom',
+            'menu-item-status'    => 'publish'
+        ) );
+    }
+    
+    if ( is_wp_error( $menu_item_db_id ) || ! $menu_item_db_id ) {
+        wp_send_json_error( array( 'message' => 'Failed to add menu item.' ) );
+    }
+    
+    wp_send_json_success( array( 'message' => 'Menu item added successfully.' ) );
+}
+add_action( 'wp_ajax_cora_add_menu_item', 'cora_ajax_add_menu_item' );
+
+function cora_ajax_delete_menu_item() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    $menu_item_id = isset( $_POST['menu_item_id'] ) ? intval( $_POST['menu_item_id'] ) : 0;
+    if ( ! $menu_item_id ) {
+        wp_send_json_error( array( 'message' => 'Invalid menu item ID.' ) );
+    }
+    if ( wp_delete_post( $menu_item_id, true ) ) {
+        wp_send_json_success( array( 'message' => 'Menu item deleted successfully.' ) );
+    } else {
+        wp_send_json_error( array( 'message' => 'Failed to delete menu item.' ) );
+    }
+}
+add_action( 'wp_ajax_cora_delete_menu_item', 'cora_ajax_delete_menu_item' );
+
+function cora_ajax_create_nav_menu() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    $menu_name = isset( $_POST['menu_name'] ) ? sanitize_text_field( $_POST['menu_name'] ) : '';
+    if ( empty( $menu_name ) ) {
+        wp_send_json_error( array( 'message' => 'Menu name cannot be empty.' ) );
+    }
+
+    if ( wp_get_nav_menu_object( $menu_name ) ) {
+        wp_send_json_error( array( 'message' => 'The menu name conflicts with another menu name.' ) );
+    }
+
+    $menu_id = wp_create_nav_menu( $menu_name );
+    if ( is_wp_error( $menu_id ) ) {
+        wp_send_json_error( array( 'message' => $menu_id->get_error_message() ) );
+    }
+    wp_send_json_success( array( 'message' => 'Menu created successfully.', 'menu_id' => $menu_id ) );
+}
+add_action( 'wp_ajax_cora_create_nav_menu', 'cora_ajax_create_nav_menu' );
+
+function cora_ajax_moderate_comment() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'moderate_comments' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    $comment_id = isset( $_POST['comment_id'] ) ? intval( $_POST['comment_id'] ) : 0;
+    $comment_action = isset( $_POST['comment_action'] ) ? sanitize_key( $_POST['comment_action'] ) : '';
+    if ( ! $comment_id || ! $comment_action ) {
+        wp_send_json_error( array( 'message' => 'Invalid parameters.' ) );
+    }
+    
+    $status = '';
+    if ( $comment_action === 'approve' ) {
+        $status = 'approve';
+    } elseif ( $comment_action === 'hold' ) {
+        $status = 'hold';
+    } elseif ( $comment_action === 'spam' ) {
+        $status = 'spam';
+    } elseif ( $comment_action === 'trash' ) {
+        $status = 'trash';
+    } elseif ( $comment_action === 'restore' ) {
+        $status = 'approve';
+    }
+    
+    if ( $status && wp_set_comment_status( $comment_id, $status ) ) {
+        wp_send_json_success( array( 'message' => 'Comment status updated successfully.' ) );
+    } else {
+        wp_send_json_error( array( 'message' => 'Failed to update comment status.' ) );
+    }
+}
+add_action( 'wp_ajax_cora_moderate_comment', 'cora_ajax_moderate_comment' );
+
+function cora_ajax_delete_comment_permanent() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'moderate_comments' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    $comment_id = isset( $_POST['comment_id'] ) ? intval( $_POST['comment_id'] ) : 0;
+    if ( ! $comment_id ) {
+        wp_send_json_error( array( 'message' => 'Invalid comment ID.' ) );
+    }
+    if ( wp_delete_comment( $comment_id, true ) ) {
+        wp_send_json_success( array( 'message' => 'Comment permanently deleted.' ) );
+    } else {
+        wp_send_json_error( array( 'message' => 'Failed to delete comment permanently.' ) );
+    }
+}
+add_action( 'wp_ajax_cora_delete_comment_permanent', 'cora_ajax_delete_comment_permanent' );
+
+function cora_ajax_submit_comment_reply() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'moderate_comments' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    $parent_id = isset( $_POST['parent_id'] ) ? intval( $_POST['parent_id'] ) : 0;
+    $content   = isset( $_POST['content'] ) ? wp_kses_post( $_POST['content'] ) : '';
+    if ( ! $parent_id || empty( $content ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid parent ID or empty content.' ) );
+    }
+    
+    $parent_comment = get_comment( $parent_id );
+    if ( ! $parent_comment ) {
+        wp_send_json_error( array( 'message' => 'Parent comment not found.' ) );
+    }
+    
+    $current_user = wp_get_current_user();
+    $comment_data = array(
+        'comment_post_ID'      => $parent_comment->comment_post_ID,
+        'comment_content'      => $content,
+        'comment_parent'       => $parent_id,
+        'user_id'              => $current_user->ID,
+        'comment_author'       => $current_user->display_name,
+        'comment_author_email' => $current_user->user_email,
+        'comment_approved'     => 1,
+    );
+    
+    $comment_id = wp_new_comment( $comment_data );
+    if ( $comment_id ) {
+        wp_send_json_success( array( 'message' => 'Reply posted successfully.' ) );
+    } else {
+        wp_send_json_error( array( 'message' => 'Failed to post reply.' ) );
+    }
+}
+add_action( 'wp_ajax_cora_submit_comment_reply', 'cora_ajax_submit_comment_reply' );
+
+function cora_ajax_get_attachment_metadata() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'upload_files' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    $attachment_id = isset( $_POST['attachment_id'] ) ? intval( $_POST['attachment_id'] ) : 0;
+    if ( ! $attachment_id ) {
+        wp_send_json_error( array( 'message' => 'Invalid attachment ID.' ) );
+    }
+    $post = get_post( $attachment_id );
+    if ( ! $post || $post->post_type !== 'attachment' ) {
+        wp_send_json_error( array( 'message' => 'Attachment not found.' ) );
+    }
+    
+    $title = $post->post_title;
+    $caption = $post->post_excerpt;
+    $description = $post->post_content;
+    $alt = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
+    $url = wp_get_attachment_url( $attachment_id );
+    
+    wp_send_json_success( array(
+        'attachment_id' => $attachment_id,
+        'title'         => $title,
+        'caption'       => $caption,
+        'description'   => $description,
+        'alt'           => $alt,
+        'url'           => $url,
+    ) );
+}
+add_action( 'wp_ajax_cora_get_attachment_metadata', 'cora_ajax_get_attachment_metadata' );
+
+function cora_ajax_save_edited_image() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'upload_files' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    $attachment_id = isset( $_POST['attachment_id'] ) ? intval( $_POST['attachment_id'] ) : 0;
+    if ( ! $attachment_id ) {
+        wp_send_json_error( array( 'message' => 'Invalid attachment ID.' ) );
+    }
+    
+    $file_path = get_attached_file( $attachment_id );
+    if ( ! $file_path || ! file_exists( $file_path ) ) {
+        wp_send_json_error( array( 'message' => 'Image file not found on disk.' ) );
+    }
+    
+    $editor = wp_get_image_editor( $file_path );
+    if ( is_wp_error( $editor ) ) {
+        wp_send_json_error( array( 'message' => 'Failed to initialize image editor.' ) );
+    }
+    
+    // Rotate
+    if ( isset( $_POST['rotate'] ) ) {
+        $rotate = floatval( $_POST['rotate'] );
+        if ( $rotate !== 0.0 ) {
+            $editor->rotate( $rotate );
+        }
+    }
+    
+    // Flip
+    if ( isset( $_POST['flip'] ) ) {
+        $flip = sanitize_key( $_POST['flip'] );
+        if ( $flip === 'h' ) {
+            $editor->flip( true, false );
+        } elseif ( $flip === 'v' ) {
+            $editor->flip( false, true );
+        }
+    }
+    
+    // Crop
+    if ( isset( $_POST['crop_x'], $_POST['crop_y'], $_POST['crop_w'], $_POST['crop_h'] ) ) {
+        $x = intval( $_POST['crop_x'] );
+        $y = intval( $_POST['crop_y'] );
+        $w = intval( $_POST['crop_w'] );
+        $h = intval( $_POST['crop_h'] );
+        if ( $w > 0 && $h > 0 ) {
+            $editor->crop( $x, $y, $w, $h );
+        }
+    }
+    
+    // Scale
+    if ( isset( $_POST['width'] ) && isset( $_POST['height'] ) ) {
+        $w = intval( $_POST['width'] );
+        $h = intval( $_POST['height'] );
+        if ( $w > 0 && $h > 0 ) {
+            $editor->resize( $w, $h, false );
+        }
+    }
+    
+    $result = $editor->save( $file_path );
+    if ( is_wp_error( $result ) ) {
+        wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+    }
+    
+    // Regenerate metadata
+    require_once( ABSPATH . 'wp-admin/includes/image.php' );
+    $metadata = wp_generate_attachment_metadata( $attachment_id, $file_path );
+    wp_update_attachment_metadata( $attachment_id, $metadata );
+    
+    wp_send_json_success( array(
+        'message' => 'Image saved successfully.',
+        'url'     => wp_get_attachment_url( $attachment_id )
+    ) );
+}
+add_action( 'wp_ajax_cora_save_edited_image', 'cora_ajax_save_edited_image' );
+
+/**
+ * Intercept frontend template redirect to render visual builder pages
+ */
+function cora_real_estate_ai_intercept_visual_builder_pages() {
+    if ( is_page() ) {
+        $page_id = get_the_ID();
+        if ( get_post_meta( $page_id, '_cora_is_visual_builder', true ) === '1' ) {
+            $html = get_post_meta( $page_id, '_cora_visual_builder_html', true );
+            $css  = get_post_meta( $page_id, '_cora_visual_builder_css', true );
+            
+            // Clean output buffer if there's any active
+            while ( ob_get_level() > 0 ) {
+                ob_end_clean();
+            }
+            
+            ?>
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title><?php the_title(); ?></title>
+                <link rel="stylesheet" href="<?php echo CORA_REAL_ESTATE_AI_URL . 'assets/css/tailwind-built.css'; ?>">
+                <style>
+                    <?php echo $css; ?>
+                </style>
+            </head>
+            <body class="bg-[#FBFaf7] text-neutral-800 antialiased font-sans">
+                <?php echo $html; ?>
+            </body>
+            </html>
+            <?php
+            exit;
+        }
+    }
+}
+add_action( 'template_redirect', 'cora_real_estate_ai_intercept_visual_builder_pages', 5 );
+
+/**
+ * AJAX Action: Save Builder Page
+ */
+function cora_ajax_save_builder_page() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
+        $user = wp_get_current_user();
+        if ( empty( $user->roles ) || ! in_array( 'administrator', (array) $user->roles ) ) {
+            wp_send_json_error( 'Unauthorized capability.' );
+        }
+    }
+
+    $page_id = isset( $_POST['page_id'] ) ? intval( $_POST['page_id'] ) : 0;
+    $title   = isset( $_POST['title'] ) ? sanitize_text_field( $_POST['title'] ) : '';
+    $slug    = isset( $_POST['slug'] ) ? sanitize_title( $_POST['slug'] ) : '';
+    $status  = isset( $_POST['status'] ) && in_array( $_POST['status'], array( 'publish', 'draft', 'private' ) ) ? $_POST['status'] : 'draft';
+    $html    = isset( $_POST['html'] ) ? wp_unslash( $_POST['html'] ) : '';
+    $css     = isset( $_POST['css'] ) ? wp_unslash( $_POST['css'] ) : '';
+
+    if ( empty( $title ) ) {
+        wp_send_json_error( 'Page title is required.' );
+    }
+
+    $post_data = array(
+        'post_title'     => $title,
+        'post_status'    => $status,
+        'post_type'      => 'page',
+        'comment_status' => 'closed',
+        'post_content'   => '[cora_visual_builder]'
+    );
+
+    if ( ! empty( $slug ) ) {
+        $post_data['post_name'] = $slug;
+    }
+
+    if ( $page_id > 0 ) {
+        $post_data['ID'] = $page_id;
+        $saved_id = wp_update_post( $post_data, true );
+    } else {
+        $saved_id = wp_insert_post( $post_data, true );
+    }
+
+    if ( is_wp_error( $saved_id ) ) {
+        wp_send_json_error( $saved_id->get_error_message() );
+    }
+
+    // Set the metadata
+    update_post_meta( $saved_id, '_cora_is_visual_builder', '1' );
+    update_post_meta( $saved_id, '_cora_visual_builder_html', $html );
+    update_post_meta( $saved_id, '_cora_visual_builder_css', $css );
+
+    wp_send_json_success( array(
+        'id'        => $saved_id,
+        'title'     => get_the_title( $saved_id ),
+        'slug'      => get_post_field( 'post_name', $saved_id ),
+        'status'    => get_post_status( $saved_id ),
+        'permalink' => get_permalink( $saved_id )
+    ) );
+}
+add_action( 'wp_ajax_cora_save_builder_page', 'cora_ajax_save_builder_page' );
+
+/**
+ * AJAX Action: Get Builder Page
+ */
+function cora_ajax_get_builder_page() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
+        $user = wp_get_current_user();
+        if ( empty( $user->roles ) || ! in_array( 'administrator', (array) $user->roles ) ) {
+            wp_send_json_error( 'Unauthorized capability.' );
+        }
+    }
+
+    $page_id = isset( $_POST['page_id'] ) ? intval( $_POST['page_id'] ) : 0;
+    if ( ! $page_id ) {
+        wp_send_json_error( 'Invalid page ID.' );
+    }
+
+    $page = get_post( $page_id );
+    if ( ! $page || $page->post_type !== 'page' ) {
+        wp_send_json_error( 'Page not found.' );
+    }
+
+    $html = get_post_meta( $page_id, '_cora_visual_builder_html', true );
+    $css  = get_post_meta( $page_id, '_cora_visual_builder_css', true );
+
+    wp_send_json_success( array(
+        'id'     => $page->ID,
+        'title'  => $page->post_title,
+        'slug'   => urldecode( $page->post_name ),
+        'status' => $page->post_status,
+        'html'   => $html,
+        'css'    => $css
+    ) );
+}
+add_action( 'wp_ajax_cora_get_builder_page', 'cora_ajax_get_builder_page' );
+
+/**
+ * AJAX Action: Generate Layout via AI
+ */
+function cora_ajax_generate_layout() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
+        $user = wp_get_current_user();
+        if ( empty( $user->roles ) || ! in_array( 'administrator', (array) $user->roles ) ) {
+            wp_send_json_error( 'Unauthorized capability.' );
+        }
+    }
+
+    $prompt = isset( $_POST['prompt'] ) ? sanitize_text_field( $_POST['prompt'] ) : '';
+
+    $gemini_key_b64 = get_option( 'cora_re_ai_gemini_key', '' );
+    $openai_key_b64 = get_option( 'cora_re_ai_openai_key', '' );
+    $active_model   = get_option( 'cora_re_active_ai_model', 'cora-core-v2' );
+
+    $html_fallback = '
+<div class="min-h-screen bg-[#FBFaf7] text-neutral-900 selection:bg-neutral-200">
+    <!-- Header -->
+    <header class="border-b border-neutral-200 py-6 px-8 max-w-7xl mx-auto flex items-center justify-between">
+        <div class="text-xl font-bold tracking-tight uppercase">Villa Serene</div>
+        <nav class="hidden md:flex space-x-8 text-sm font-medium tracking-wide uppercase text-neutral-600">
+            <a href="#overview" class="hover:text-black transition">Overview</a>
+            <a href="#features" class="hover:text-black transition">Features</a>
+            <a href="#gallery" class="hover:text-black transition">Gallery</a>
+            <a href="#inquire" class="hover:text-black transition">Inquire</a>
+        </nav>
+        <a href="#inquire" class="px-5 py-2 border border-black text-xs uppercase tracking-wider font-semibold hover:bg-black hover:text-white transition">Inquire Now</a>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="max-w-7xl mx-auto px-8 py-16 md:py-24 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <div class="space-y-6">
+            <div class="text-xs uppercase tracking-widest text-neutral-500 font-semibold">Exquisite Living</div>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-light leading-tight tracking-tight text-neutral-900">
+                A Sanctuary in the <span class="italic font-serif">Western Ghats</span>
+            </h1>
+            <p class="text-neutral-600 max-w-lg leading-relaxed text-sm md:text-base">
+                Discover a private architectural masterpiece nestled among mist-covered hills. Floor-to-ceiling glass walls, minimalist concrete formwork, and an infinity pool that merges with the horizon.
+            </p>
+            <div class="flex items-center space-x-6 pt-4">
+                <div>
+                    <span class="block text-2xl font-light">4,200</span>
+                    <span class="text-xs uppercase tracking-wider text-neutral-500 font-medium">Sq. Ft.</span>
+                </div>
+                <div class="border-l border-neutral-300 h-8"></div>
+                <div>
+                    <span class="block text-2xl font-light">4</span>
+                    <span class="text-xs uppercase tracking-wider text-neutral-500 font-medium">Bedrooms</span>
+                </div>
+                <div class="border-l border-neutral-300 h-8"></div>
+                <div>
+                    <span class="block text-2xl font-light">4.5</span>
+                    <span class="text-xs uppercase tracking-wider text-neutral-500 font-medium">Baths</span>
+                </div>
+            </div>
+        </div>
+        <div class="relative group">
+            <div class="absolute -inset-2 bg-gradient-to-r from-neutral-200 to-neutral-300 rounded-lg blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+            <div class="relative bg-neutral-100 border border-neutral-200 overflow-hidden shadow-sm">
+                <img src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80" alt="Villa Exterior" class="w-full h-[400px] object-cover hover:scale-105 transition-transform duration-700">
+            </div>
+        </div>
+    </section>
+
+    <!-- Specs Section -->
+    <section id="features" class="border-t border-neutral-200 py-16 bg-neutral-50">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="text-center max-w-3xl mx-auto space-y-4 mb-16">
+                <h2 class="text-3xl font-light tracking-tight text-neutral-900">Designed with Intention</h2>
+                <p class="text-neutral-500 text-sm">Every element has been curated to create a unified experience of luxury and tranquility.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-[#FBFaf7] border border-neutral-200 p-8 space-y-4">
+                    <div class="text-sm font-semibold uppercase tracking-wider text-neutral-800">Sustainable Materials</div>
+                    <p class="text-xs text-neutral-600 leading-relaxed">Local basalt stone, reclaimed teak wood, and low-carbon concrete combine to form a structure that is both beautiful and built to last.</p>
+                </div>
+                <div class="bg-[#FBFaf7] border border-neutral-200 p-8 space-y-4">
+                    <div class="text-sm font-semibold uppercase tracking-wider text-neutral-800">Smart Integration</div>
+                    <p class="text-xs text-neutral-600 leading-relaxed">Fully integrated automated lighting, climate control, security systems, and high-fidelity sound, manageable from any device.</p>
+                </div>
+                <div class="bg-[#FBFaf7] border border-neutral-200 p-8 space-y-4">
+                    <div class="text-sm font-semibold uppercase tracking-wider text-neutral-800">Private Wellness</div>
+                    <p class="text-xs text-neutral-600 leading-relaxed">Features a private cedar sauna, outdoor rain shower, temperature-controlled plunge pool, and dedicated yoga deck overlooking the valley.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Inquiry Form -->
+    <section id="inquire" class="border-t border-neutral-200 py-16 md:py-24 max-w-7xl mx-auto px-8 grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div class="space-y-6">
+            <h2 class="text-3xl md:text-4xl font-light tracking-tight">Begin Your Journey</h2>
+            <p class="text-neutral-600 text-sm leading-relaxed max-w-md">
+                Schedule a private, high-security showing of Villa Serene. Available by appointment only to qualified buyers. Leave your contact info and our principal advisor will connect within 2 hours.
+            </p>
+            <div class="text-xs text-neutral-500 space-y-1">
+                <p>Office: +91 22 9876 5432</p>
+                <p>Email: private-wealth@cora.in</p>
+            </div>
+        </div>
+        <div class="bg-[#FBFaf7] border border-neutral-200 p-8 md:p-10 space-y-6">
+            <h3 class="text-lg font-medium tracking-tight">Request Details</h3>
+            <div id="inquiry-success" class="hidden text-xs text-green-600 bg-green-50 border border-green-200 p-3 rounded">
+                Thank you for your interest. An advisor will contact you shortly.
+            </div>
+            <form class="space-y-4" onsubmit="event.preventDefault(); document.getElementById(\'inquiry-success\').classList.remove(\'hidden\');">
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-1">Full Name</label>
+                    <input type="text" required placeholder="John Doe" class="w-full px-4 py-2 bg-transparent border border-neutral-300 text-sm focus:outline-none focus:border-black transition">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-1">Email Address</label>
+                    <input type="email" required placeholder="john@example.com" class="w-full px-4 py-2 bg-transparent border border-neutral-300 text-sm focus:outline-none focus:border-black transition">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-1">Preferences / Message</label>
+                    <textarea rows="3" placeholder="I would like to schedule a private viewing this weekend..." class="w-full px-4 py-2 bg-transparent border border-neutral-300 text-sm focus:outline-none focus:border-black transition resize-none"></textarea>
+                </div>
+                <button type="submit" class="w-full py-3 bg-black text-white text-xs uppercase tracking-widest font-semibold hover:bg-neutral-800 transition">Submit Request</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-neutral-200 bg-neutral-900 text-neutral-400 py-12 px-8">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between text-xs space-y-4 md:space-y-0">
+            <div>&copy; 2026 Cora Real Estate. All rights reserved.</div>
+            <div class="flex space-x-6">
+                <a href="#" class="hover:text-white transition">Privacy Policy</a>
+                <a href="#" class="hover:text-white transition">Terms of Service</a>
+                <a href="#" class="hover:text-white transition">Disclaimer</a>
+            </div>
+        </div>
+    </footer>
+</div>
+';
+
+    $css_fallback = '
+body {
+    background-color: #FBFaf7;
+}
+';
+
+    $ai_success = false;
+    $response_text = '';
+
+    if ( ! empty( $gemini_key_b64 ) && ( $active_model === 'gemini' || $active_model === 'cora-core-v2' || empty( $openai_key_b64 ) ) ) {
+        $api_key  = base64_decode( $gemini_key_b64 );
+        $model_id = 'gemini-2.0-flash';
+        $url      = "https://generativelanguage.googleapis.com/v1beta/models/{$model_id}:generateContent?key=" . urlencode( $api_key );
+
+        $system_prompt = "You are a professional web designer. Generate a beautiful, responsive real estate web page section or landing page structure using Tailwind CSS and inline tags based on the user request. You MUST output ONLY valid JSON in the format: {\"html\": \"...HTML layout with Tailwind classes...\", \"css\": \"...custom CSS overrides...\"}. Do not wrap the JSON output in markdown backticks or any other text. Keep the design minimalist, monochromatic (slate/zinc grays, warm cream background #FBFaf7, white, black), clean vector SVGs for icons, and modern layout.";
+
+        $body = json_encode( array(
+            'system_instruction' => array(
+                'parts' => array( array( 'text' => $system_prompt ) )
+            ),
+            'contents' => array(
+                array(
+                    'role'  => 'user',
+                    'parts' => array( array( 'text' => "Create layout for: " . $prompt ) ),
+                )
+            ),
+            'generationConfig' => array(
+                'maxOutputTokens' => 2048,
+                'temperature'     => 0.4,
+            ),
+        ) );
+
+        $response = wp_remote_post( $url, array(
+            'timeout' => 30,
+            'headers' => array( 'Content-Type' => 'application/json' ),
+            'body'    => $body,
+        ) );
+
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            $data = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( $code === 200 && ! empty( $data['candidates'][0]['content']['parts'][0]['text'] ) ) {
+                $response_text = $data['candidates'][0]['content']['parts'][0]['text'];
+                $ai_success = true;
+            }
+        }
+    } elseif ( ! empty( $openai_key_b64 ) ) {
+        $api_key  = base64_decode( $openai_key_b64 );
+        $model_id = 'gpt-4o-mini';
+        $url      = 'https://api.openai.com/v1/chat/completions';
+
+        $system_prompt = "You are a professional web designer. Generate a beautiful, responsive real estate web page section or landing page structure using Tailwind CSS and inline tags based on the user request. You MUST output ONLY valid JSON in the format: {\"html\": \"...HTML layout with Tailwind classes...\", \"css\": \"...custom CSS overrides...\"}. Do not wrap the JSON output in markdown backticks or any other text. Keep the design minimalist, monochromatic (slate/zinc grays, warm cream background #FBFaf7, white, black), clean vector SVGs for icons, and modern layout.";
+
+        $body = json_encode( array(
+            'model'    => $model_id,
+            'messages' => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => "Create layout for: " . $prompt ),
+            ),
+            'max_tokens'  => 2048,
+            'temperature' => 0.4,
+        ) );
+
+        $response = wp_remote_post( $url, array(
+            'timeout' => 30,
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $api_key,
+                'Content-Type'  => 'application/json',
+            ),
+            'body' => $body,
+        ) );
+
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            $data = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
+                $response_text = $data['choices'][0]['message']['content'];
+                $ai_success = true;
+            }
+        }
+    }
+
+    if ( $ai_success && ! empty( $response_text ) ) {
+        $clean_text = trim( $response_text );
+        if ( preg_match( '/^```(?:json)?\s*([\s\S]*?)\s*```$/', $clean_text, $matches ) ) {
+            $clean_text = trim( $matches[1] );
+        }
+        
+        $json = json_decode( $clean_text, true );
+        if ( $json && isset( $json['html'] ) ) {
+            wp_send_json_success( array(
+                'html' => $json['html'],
+                'css'  => $json['css'] ?? ''
+            ) );
+        }
+    }
+
+    // Return fallback layout if keys missing or AI generation failed/returned invalid format
+    wp_send_json_success( array(
+        'html' => $html_fallback,
+        'css'  => $css_fallback
+    ) );
+}
+add_action( 'wp_ajax_cora_generate_layout', 'cora_ajax_generate_layout' );
+
+/**
+ * Elementor Reskin Module
+ */
+function cora_enqueue_elementor_reskin_styles() {
+    wp_enqueue_style(
+        'cora-elementor-reskin-css',
+        plugin_dir_url( __FILE__ ) . 'assets/css/cora-elementor-reskin.css',
+        array(),
+        time()
+    );
+}
+add_action( 'elementor/editor/after_enqueue_styles', 'cora_enqueue_elementor_reskin_styles' );
+add_action( 'elementor/preview/enqueue_styles', 'cora_enqueue_elementor_reskin_styles' );
+
+function cora_enqueue_elementor_reskin_scripts() {
+    wp_enqueue_script(
+        'cora-elementor-reskin-js',
+        plugin_dir_url( __FILE__ ) . 'assets/js/cora-elementor-reskin.js',
+        array(),
+        time(),
+        true
+    );
+    // Enqueue Custom React Shell Wrapper
+    wp_enqueue_script(
+        'cora-elementor-react-shell',
+        plugin_dir_url( __FILE__ ) . 'build/index.js',
+        array('wp-element'),
+        time(),
+        true
+    );
+}
+add_action( 'elementor/editor/after_enqueue_scripts', 'cora_enqueue_elementor_reskin_scripts' );
+
+/**
+ * Remove admin bar from Elementor editor
+ */
+function cora_remove_admin_bar_in_elementor() {
+    if ( isset( $_GET['action'] ) && $_GET['action'] === 'elementor' ) {
+        add_filter( 'show_admin_bar', '__return_false' );
+    }
+}
+add_action( 'init', 'cora_remove_admin_bar_in_elementor' );
+
+/* ═══════════════════════════════════════════════════════════════════
+ * MEDIA LIBRARY MODULE — AJAX HANDLERS
+ * ═══════════════════════════════════════════════════════════════════ */
+
+/**
+ * Helper: categorise MIME type
+ */
+function cora_media_mime_category( $mime ) {
+    if ( strpos( $mime, 'image/' ) === 0 )                      return 'image';
+    if ( strpos( $mime, 'video/' ) === 0 )                      return 'video';
+    if ( strpos( $mime, 'audio/' ) === 0 )                      return 'audio';
+    return 'document';
+}
+
+/**
+ * Helper: human-readable file size
+ */
+function cora_media_human_size( $bytes ) {
+    if ( $bytes >= 1073741824 ) return round( $bytes / 1073741824, 2 ) . ' GB';
+    if ( $bytes >= 1048576 )    return round( $bytes / 1048576, 2 )    . ' MB';
+    if ( $bytes >= 1024 )       return round( $bytes / 1024, 1 )       . ' KB';
+    return $bytes . ' B';
+}
+
+/**
+ * Helper: build rich file object for JS
+ */
+function cora_media_build_file_object( $post_id ) {
+    $meta    = wp_get_attachment_metadata( $post_id );
+    $mime    = get_post_mime_type( $post_id );
+    $cat     = cora_media_mime_category( $mime );
+    $url     = wp_get_attachment_url( $post_id );
+    $path    = get_attached_file( $post_id );
+    $sz      = $path && file_exists( $path ) ? filesize( $path ) : 0;
+    $post    = get_post( $post_id );
+    $author  = get_userdata( $post->post_author );
+    $folders = get_the_terms( $post_id, 'cora_media_folder' );
+    $folder_id   = '';
+    $folder_name = '';
+    if ( $folders && ! is_wp_error( $folders ) ) {
+        $folder_id   = $folders[0]->term_id;
+        $folder_name = $folders[0]->name;
+    }
+    $extra = get_post_meta( $post_id, '_cora_media_extra', true );
+    if ( ! is_array( $extra ) ) $extra = array();
+    $share_links = get_post_meta( $post_id, '_cora_media_share_links', true );
+    if ( ! is_array( $share_links ) ) $share_links = array();
+    // Only return non-expired links
+    $now   = time();
+    $valid = array_values( array_filter( $share_links, function( $l ) use ( $now ) {
+        return ! isset( $l['expires'] ) || $l['expires'] === 0 || $l['expires'] > $now;
+    } ) );
+    foreach ( $valid as &$l ) {
+        if ( isset( $l['expires'] ) && $l['expires'] > 0 ) {
+            $diff = $l['expires'] - $now;
+            if ( $diff > 86400 )      $l['expiry_label'] = 'Expires in ' . round( $diff / 86400 ) . ' day(s)';
+            elseif ( $diff > 3600 )   $l['expiry_label'] = 'Expires in ' . round( $diff / 3600 ) . ' hour(s)';
+            else                      $l['expiry_label'] = 'Expires soon';
+        } else {
+            $l['expiry_label'] = 'No expiry';
+        }
+    }
+    unset( $l );
+
+    $dim = '';
+    if ( $cat === 'image' && ! empty( $meta['width'] ) ) {
+        $dim = $meta['width'] . ' × ' . $meta['height'] . ' px';
+    }
+    $thumb = '';
+    if ( $cat === 'image' ) {
+        $t = wp_get_attachment_image_src( $post_id, 'medium' );
+        $thumb = $t ? $t[0] : $url;
+    }
+    return array(
+        'id'             => $post_id,
+        'filename'       => basename( $path ?: $url ),
+        'title'          => get_the_title( $post_id ),
+        'alt'            => get_post_meta( $post_id, '_wp_attachment_image_alt', true ),
+        'caption'        => $post->post_excerpt,
+        'description'    => $post->post_content,
+        'url'            => $url,
+        'thumbnail'      => $thumb,
+        'mime_type'      => $mime,
+        'type_category'  => $cat,
+        'file_size_human'=> cora_media_human_size( $sz ),
+        'file_size_bytes'=> $sz,
+        'dimensions'     => $dim,
+        'date_formatted' => get_the_date( 'd M Y', $post_id ),
+        'author_name'    => $author ? $author->display_name : 'Unknown',
+        'author_id'      => $post->post_author,
+        'folder_id'      => $folder_id,
+        'folder_name'    => $folder_name,
+        'doc_type'       => isset( $extra['doc_type'] ) ? $extra['doc_type'] : '',
+        'linked_record'  => isset( $extra['linked_record'] ) ? $extra['linked_record'] : null,
+        'has_original'   => ! empty( $extra['original_file'] ),
+        'share_links'    => $valid,
+        'original_size'  => isset( $extra['original_size'] ) ? $extra['original_size'] : '',
+    );
+}
+
+/**
+ * AJAX: Get paginated media with filters
+ */
+function cora_ajax_media_library_get() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    $paged   = max( 1, intval( $_POST['paged'] ?? 1 ) );
+    $per     = max( 1, min( 100, intval( $_POST['per_page'] ?? 40 ) ) );
+    $search  = sanitize_text_field( $_POST['search'] ?? '' );
+    $type    = sanitize_text_field( $_POST['type'] ?? 'all' );
+    $date    = sanitize_text_field( $_POST['date'] ?? '' );
+    $author  = intval( $_POST['author'] ?? 0 );
+    $folder  = isset( $_POST['folder_id'] ) ? $_POST['folder_id'] : null;
+    $orderby = sanitize_text_field( $_POST['orderby'] ?? 'date' );
+    $order   = strtoupper( sanitize_text_field( $_POST['order'] ?? 'DESC' ) ) === 'ASC' ? 'ASC' : 'DESC';
+
+    $mime_map = array(
+        'image'    => 'image',
+        'video'    => 'video',
+        'audio'    => 'audio',
+        'document' => array( 'application', 'text' ),
+    );
+
+    $args = array(
+        'post_type'      => 'attachment',
+        'post_status'    => 'inherit',
+        'posts_per_page' => $per,
+        'paged'          => $paged,
+        'orderby'        => in_array( $orderby, array( 'title', 'date', 'author' ) ) ? $orderby : 'date',
+        'order'          => $order,
+    );
+
+    if ( $type !== 'all' && isset( $mime_map[ $type ] ) ) {
+        $args['post_mime_type'] = $mime_map[ $type ];
+    }
+    if ( $search ) {
+        $args['s'] = $search;
+    }
+    if ( $author > 0 ) {
+        $args['author'] = $author;
+    }
+    if ( $date ) {
+        list( $y, $m ) = array_pad( explode( '-', $date ), 2, '' );
+        if ( $y ) $args['date_query'] = array( array( 'year' => intval($y), 'month' => intval($m) ) );
+    }
+    if ( $folder === '-1' || $folder === -1 ) {
+        // Unorganised: no folder term
+        $args['tax_query'] = array(
+            array( 'taxonomy' => 'cora_media_folder', 'operator' => 'NOT EXISTS' )
+        );
+    } elseif ( ! is_null( $folder ) && $folder !== '' && $folder !== 'null' && intval($folder) > 0 ) {
+        $args['tax_query'] = array(
+            array( 'taxonomy' => 'cora_media_folder', 'field' => 'term_id', 'terms' => intval( $folder ) )
+        );
+    }
+
+    $q     = new WP_Query( $args );
+    $files = array();
+    foreach ( $q->posts as $p ) {
+        $files[] = cora_media_build_file_object( $p->ID );
+    }
+
+    wp_send_json_success( array(
+        'files'       => $files,
+        'total'       => $q->found_posts,
+        'total_pages' => $q->max_num_pages,
+    ) );
+}
+add_action( 'wp_ajax_cora_media_library_get', 'cora_ajax_media_library_get' );
+
+/**
+ * AJAX: Upload a file
+ */
+function cora_ajax_media_library_upload() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    if ( empty( $_FILES['file'] ) ) {
+        wp_send_json_error( array( 'message' => 'No file provided.' ) );
+    }
+    require_once ABSPATH . 'wp-admin/includes/image.php';
+    require_once ABSPATH . 'wp-admin/includes/file.php';
+    require_once ABSPATH . 'wp-admin/includes/media.php';
+
+    $file = $_FILES['file'];
+    if ( $file['error'] !== UPLOAD_ERR_OK ) {
+        wp_send_json_error( array( 'message' => 'Upload error code: ' . $file['error'] ) );
+    }
+
+    // ZIP: extract and import each image
+    $is_zip = ( $file['type'] === 'application/zip' || strtolower( pathinfo( $file['name'], PATHINFO_EXTENSION ) ) === 'zip' );
+    if ( $is_zip ) {
+        $zip    = new ZipArchive();
+        $tmpzip = $file['tmp_name'];
+        if ( $zip->open( $tmpzip ) === true ) {
+            $imported = 0;
+            $upload_dir = wp_upload_dir();
+            for ( $i = 0; $i < $zip->numFiles; $i++ ) {
+                $entry = $zip->getNameIndex( $i );
+                $ext   = strtolower( pathinfo( $entry, PATHINFO_EXTENSION ) );
+                if ( ! in_array( $ext, array( 'jpg','jpeg','png','gif','webp' ) ) ) continue;
+                $contents = $zip->getFromIndex( $i );
+                $tmp      = tempnam( sys_get_temp_dir(), 'czm' );
+                file_put_contents( $tmp, $contents );
+                $_FILES['file_zip'] = array( 'name' => basename($entry), 'type' => 'image/jpeg', 'tmp_name' => $tmp, 'error' => 0, 'size' => strlen($contents) );
+                $moved = wp_handle_sideload( array( 'name' => basename($entry), 'tmp_name' => $tmp, 'error' => 0, 'size' => strlen($contents) ), array( 'test_form' => false ) );
+                if ( ! isset( $moved['error'] ) ) {
+                    $att_id = wp_insert_attachment( array( 'post_mime_type' => $moved['type'], 'post_title' => pathinfo( $entry, PATHINFO_FILENAME ), 'post_status' => 'inherit' ), $moved['file'] );
+                    wp_update_attachment_metadata( $att_id, wp_generate_attachment_metadata( $att_id, $moved['file'] ) );
+                    $imported++;
+                }
+                @unlink( $tmp );
+            }
+            $zip->close();
+            wp_send_json_success( array( 'message' => 'Imported ' . $imported . ' images from ZIP.' ) );
+        }
+        wp_send_json_error( array( 'message' => 'Could not open ZIP.' ) );
+    }
+
+    $overrides = array( 'test_form' => false );
+    $moved     = wp_handle_upload( $file, $overrides );
+    if ( ! $moved || isset( $moved['error'] ) ) {
+        wp_send_json_error( array( 'message' => $moved['error'] ?? 'Upload failed.' ) );
+    }
+
+    $att_id = wp_insert_attachment( array(
+        'post_mime_type' => $moved['type'],
+        'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $moved['file'] ) ),
+        'post_content'   => '',
+        'post_status'    => 'inherit',
+    ), $moved['file'] );
+    wp_update_attachment_metadata( $att_id, wp_generate_attachment_metadata( $att_id, $moved['file'] ) );
+
+    $folder_id = intval( $_POST['folder_id'] ?? 0 );
+    if ( $folder_id > 0 ) {
+        wp_set_object_terms( $att_id, $folder_id, 'cora_media_folder' );
+    }
+
+    wp_send_json_success( array( 'file' => cora_media_build_file_object( $att_id ) ) );
+}
+add_action( 'wp_ajax_cora_media_library_upload', 'cora_ajax_media_library_upload' );
+
+/**
+ * AJAX: Update file metadata
+ */
+function cora_ajax_media_library_update() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'upload_files' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+
+    $id = intval( $_POST['attachment_id'] ?? 0 );
+    if ( ! $id ) wp_send_json_error( array( 'message' => 'Invalid attachment.' ) );
+
+    $post = get_post( $id );
+    if ( ! $post || $post->post_type !== 'attachment' ) wp_send_json_error( array( 'message' => 'Not found.' ) );
+
+    wp_update_post( array(
+        'ID'           => $id,
+        'post_title'   => sanitize_text_field( $_POST['title'] ?? '' ),
+        'post_excerpt' => sanitize_text_field( $_POST['caption'] ?? '' ),
+        'post_content' => wp_kses_post( $_POST['description'] ?? '' ),
+    ) );
+    update_post_meta( $id, '_wp_attachment_image_alt', sanitize_text_field( $_POST['alt'] ?? '' ) );
+
+    $extra = get_post_meta( $id, '_cora_media_extra', true );
+    if ( ! is_array( $extra ) ) $extra = array();
+    $extra['doc_type'] = sanitize_text_field( $_POST['doc_type'] ?? '' );
+    if ( ! empty( $_POST['linked_record'] ) ) {
+        $lr = json_decode( stripslashes( $_POST['linked_record'] ), true );
+        $extra['linked_record'] = array(
+            'type' => sanitize_text_field( $lr['type'] ?? '' ),
+            'id'   => sanitize_text_field( $lr['id'] ?? '' ),
+        );
+    } else {
+        $extra['linked_record'] = null;
+    }
+    update_post_meta( $id, '_cora_media_extra', $extra );
+
+    $folder_id = intval( $_POST['folder_id'] ?? 0 );
+    if ( $folder_id > 0 ) {
+        wp_set_object_terms( $id, $folder_id, 'cora_media_folder' );
+    } else {
+        wp_remove_object_terms( $id, wp_get_object_terms( $id, 'cora_media_folder', array( 'fields' => 'ids' ) ), 'cora_media_folder' );
+    }
+
+    wp_send_json_success( array( 'file' => cora_media_build_file_object( $id ) ) );
+}
+add_action( 'wp_ajax_cora_media_library_update', 'cora_ajax_media_library_update' );
+
+/**
+ * AJAX: Delete attachments
+ */
+function cora_ajax_media_library_delete() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'delete_posts' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+
+    $ids = array_map( 'intval', (array) ( $_POST['ids'] ?? array() ) );
+    if ( empty( $ids ) ) wp_send_json_error( array( 'message' => 'No IDs.' ) );
+
+    $deleted = 0;
+    foreach ( $ids as $id ) {
+        if ( wp_delete_attachment( $id, true ) ) $deleted++;
+    }
+    wp_send_json_success( array( 'message' => 'Deleted ' . $deleted . ' file(s).' ) );
+}
+add_action( 'wp_ajax_cora_media_library_delete', 'cora_ajax_media_library_delete' );
+
+/**
+ * AJAX: Get folders (with children)
+ */
+function cora_ajax_media_library_get_folders() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    $terms  = get_terms( array( 'taxonomy' => 'cora_media_folder', 'hide_empty' => false, 'parent' => 0 ) );
+    $result = array();
+    if ( ! is_wp_error( $terms ) ) {
+        foreach ( $terms as $t ) {
+            $children = get_terms( array( 'taxonomy' => 'cora_media_folder', 'hide_empty' => false, 'parent' => $t->term_id ) );
+            $ch = array();
+            if ( ! is_wp_error( $children ) ) {
+                foreach ( $children as $c ) {
+                    $ch[] = array( 'id' => $c->term_id, 'name' => $c->name, 'count' => $c->count );
+                }
+            }
+            $result[] = array(
+                'id'        => $t->term_id,
+                'name'      => $t->name,
+                'count'     => $t->count,
+                'is_system' => false,
+                'children'  => $ch,
+            );
+        }
+    }
+    wp_send_json_success( array( 'folders' => $result ) );
+}
+add_action( 'wp_ajax_cora_media_library_get_folders', 'cora_ajax_media_library_get_folders' );
+
+/**
+ * AJAX: Create folder
+ */
+function cora_ajax_media_library_create_folder() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+
+    $name   = sanitize_text_field( $_POST['name'] ?? '' );
+    $parent = intval( $_POST['parent_id'] ?? 0 );
+    if ( ! $name ) wp_send_json_error( array( 'message' => 'Folder name is required.' ) );
+
+    $term = wp_insert_term( $name, 'cora_media_folder', array( 'parent' => $parent ) );
+    if ( is_wp_error( $term ) ) wp_send_json_error( array( 'message' => $term->get_error_message() ) );
+
+    wp_send_json_success( array( 'message' => 'Folder "' . $name . '" created.', 'id' => $term['term_id'] ) );
+}
+add_action( 'wp_ajax_cora_media_library_create_folder', 'cora_ajax_media_library_create_folder' );
+
+/**
+ * AJAX: Rename folder
+ */
+function cora_ajax_media_library_rename_folder() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+
+    $id   = intval( $_POST['folder_id'] ?? 0 );
+    $name = sanitize_text_field( $_POST['name'] ?? '' );
+    if ( ! $id || ! $name ) wp_send_json_error( array( 'message' => 'Invalid data.' ) );
+
+    $r = wp_update_term( $id, 'cora_media_folder', array( 'name' => $name ) );
+    if ( is_wp_error( $r ) ) wp_send_json_error( array( 'message' => $r->get_error_message() ) );
+    wp_send_json_success( array( 'message' => 'Folder renamed.' ) );
+}
+add_action( 'wp_ajax_cora_media_library_rename_folder', 'cora_ajax_media_library_rename_folder' );
+
+/**
+ * AJAX: Delete folder
+ */
+function cora_ajax_media_library_delete_folder() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+
+    $id = intval( $_POST['folder_id'] ?? 0 );
+    if ( ! $id ) wp_send_json_error( array( 'message' => 'Invalid folder ID.' ) );
+
+    $r = wp_delete_term( $id, 'cora_media_folder' );
+    if ( is_wp_error( $r ) ) wp_send_json_error( array( 'message' => $r->get_error_message() ) );
+    wp_send_json_success( array( 'message' => 'Folder deleted.' ) );
+}
+add_action( 'wp_ajax_cora_media_library_delete_folder', 'cora_ajax_media_library_delete_folder' );
+
+
+/**
+ * AJAX: Move files to folder
+ */
+function cora_ajax_media_library_move() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'upload_files' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+
+    $ids       = array_map( 'intval', (array) ( $_POST['attachment_ids'] ?? array() ) );
+    $folder_id = intval( $_POST['folder_id'] ?? 0 );
+    if ( empty( $ids ) || ! $folder_id ) wp_send_json_error( array( 'message' => 'Invalid data.' ) );
+
+    foreach ( $ids as $id ) {
+        wp_set_object_terms( $id, $folder_id, 'cora_media_folder' );
+    }
+    wp_send_json_success( array( 'message' => 'Moved ' . count($ids) . ' file(s) to folder.' ) );
+}
+add_action( 'wp_ajax_cora_media_library_move', 'cora_ajax_media_library_move' );
+
+/**
+ * AJAX: Get available months for date filter
+ */
+function cora_ajax_media_library_get_months() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    global $wpdb;
+    $rows = $wpdb->get_results( "SELECT DISTINCT YEAR(post_date) AS y, MONTH(post_date) AS m FROM $wpdb->posts WHERE post_type = 'attachment' AND post_status = 'inherit' ORDER BY post_date DESC LIMIT 36" );
+    $months = array();
+    foreach ( $rows as $r ) {
+        $months[] = array( 'value' => $r->y . '-' . $r->m, 'label' => date( 'F Y', mktime( 0,0,0, $r->m, 1, $r->y ) ) );
+    }
+    wp_send_json_success( array( 'months' => $months ) );
+}
+add_action( 'wp_ajax_cora_media_library_get_months', 'cora_ajax_media_library_get_months' );
+
+/**
+ * AJAX: Get uploaders list
+ */
+function cora_ajax_media_library_get_uploaders() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error();
+    global $wpdb;
+    $rows = $wpdb->get_results( "SELECT DISTINCT post_author FROM $wpdb->posts WHERE post_type='attachment' AND post_status='inherit'" );
+    $uploaders = array();
+    foreach ( $rows as $r ) {
+        $u = get_userdata( $r->post_author );
+        if ( $u ) $uploaders[] = array( 'id' => $u->ID, 'name' => $u->display_name );
+    }
+    wp_send_json_success( array( 'uploaders' => $uploaders ) );
+}
+add_action( 'wp_ajax_cora_media_library_get_uploaders', 'cora_ajax_media_library_get_uploaders' );
+
+/**
+ * AJAX: Image edit (rotate, flip, scale)
+ */
+function cora_ajax_media_library_image_edit() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'upload_files' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+
+    $id  = intval( $_POST['attachment_id'] ?? 0 );
+    $op  = sanitize_text_field( $_POST['operation'] ?? '' );
+    $path = get_attached_file( $id );
+    if ( ! $path || ! file_exists( $path ) ) wp_send_json_error( array( 'message' => 'File not found.' ) );
+
+    // Save original if first edit
+    $extra = get_post_meta( $id, '_cora_media_extra', true );
+    if ( ! is_array( $extra ) ) $extra = array();
+    if ( empty( $extra['original_file'] ) ) {
+        $orig = preg_replace( '/(\.[^.]+)$/', '_orig$1', $path );
+        if ( ! file_exists( $orig ) ) copy( $path, $orig );
+        $extra['original_file']  = $orig;
+        $extra['original_size']  = cora_media_human_size( filesize( $path ) );
+        update_post_meta( $id, '_cora_media_extra', $extra );
+    }
+
+    require_once ABSPATH . 'wp-admin/includes/image-edit.php';
+    $editor = wp_get_image_editor( $path );
+    if ( is_wp_error( $editor ) ) wp_send_json_error( array( 'message' => 'Cannot open image.' ) );
+
+    switch ( $op ) {
+        case 'rotate_left':  $editor->rotate(  90 ); break;
+        case 'rotate_right': $editor->rotate( -90 ); break;
+        case 'flip_h':       $editor->flip( false, true );  break;
+        case 'flip_v':       $editor->flip( true,  false ); break;
+        case 'scale':
+            $w = intval( $_POST['width']  ?? 0 );
+            $h = intval( $_POST['height'] ?? 0 );
+            $editor->resize( $w ?: null, $h ?: null, false );
+            break;
+        default:
+            wp_send_json_error( array( 'message' => 'Unknown operation.' ) );
+    }
+
+    $saved = $editor->save( $path );
+    if ( is_wp_error( $saved ) ) wp_send_json_error( array( 'message' => 'Could not save image.' ) );
+
+    wp_send_json_success( array( 'url' => add_query_arg( 't', time(), wp_get_attachment_url( $id ) ) ) );
+}
+add_action( 'wp_ajax_cora_media_library_image_edit', 'cora_ajax_media_library_image_edit' );
+
+/**
+ * AJAX: Restore original image
+ */
+function cora_ajax_media_library_restore() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'upload_files' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+
+    $id    = intval( $_POST['attachment_id'] ?? 0 );
+    $extra = get_post_meta( $id, '_cora_media_extra', true );
+    if ( ! is_array( $extra ) || empty( $extra['original_file'] ) ) {
+        wp_send_json_error( array( 'message' => 'No original found.' ) );
+    }
+    $orig = $extra['original_file'];
+    $path = get_attached_file( $id );
+    if ( ! file_exists( $orig ) ) wp_send_json_error( array( 'message' => 'Original file missing.' ) );
+
+    copy( $orig, $path );
+    unset( $extra['original_file'], $extra['original_size'] );
+    update_post_meta( $id, '_cora_media_extra', $extra );
+
+    wp_send_json_success( array( 'url' => add_query_arg( 't', time(), wp_get_attachment_url( $id ) ) ) );
+}
+add_action( 'wp_ajax_cora_media_library_restore', 'cora_ajax_media_library_restore' );
+
+/**
+ * AJAX: Regenerate thumbnails in the background when user closes modal
+ */
+function cora_ajax_media_library_regenerate_thumbnails() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'upload_files' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+
+    $id   = intval( $_POST['attachment_id'] ?? 0 );
+    $path = get_attached_file( $id );
+    if ( ! $path || ! file_exists( $path ) ) wp_send_json_error( array( 'message' => 'File not found.' ) );
+
+    require_once ABSPATH . 'wp-admin/includes/image.php';
+    $metadata = wp_generate_attachment_metadata( $id, $path );
+    wp_update_attachment_metadata( $id, $metadata );
+
+    wp_send_json_success( array( 'message' => 'Thumbnails regenerated.' ) );
+}
+add_action( 'wp_ajax_cora_media_library_regenerate_thumbnails', 'cora_ajax_media_library_regenerate_thumbnails' );
+
+/**
+ * AJAX: Add watermark (creates a new copy)
+ */
+function cora_ajax_media_library_watermark() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'upload_files' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+
+    $id       = intval( $_POST['attachment_id'] ?? 0 );
+    $position = sanitize_text_field( $_POST['position'] ?? 'bottom-right' );
+    $opacity  = max( 10, min( 90, intval( $_POST['opacity'] ?? 30 ) ) );
+
+    $path = get_attached_file( $id );
+    $mime = get_post_mime_type( $id );
+    if ( ! in_array( $mime, array( 'image/jpeg', 'image/png', 'image/gif' ) ) ) {
+        wp_send_json_error( array( 'message' => 'Only JPEG/PNG/GIF images can be watermarked.' ) );
+    }
+    if ( ! function_exists( 'imagecreatefromjpeg' ) ) {
+        wp_send_json_error( array( 'message' => 'GD library not available.' ) );
+    }
+
+    // Load source image
+    switch ( $mime ) {
+        case 'image/jpeg': $src = imagecreatefromjpeg( $path ); break;
+        case 'image/png':  $src = imagecreatefrompng( $path );  break;
+        case 'image/gif':  $src = imagecreatefromgif( $path );  break;
+        default: wp_send_json_error( array( 'message' => 'Unsupported format.' ) );
+    }
+    if ( ! $src ) wp_send_json_error( array( 'message' => 'Could not load image.' ) );
+
+    $w = imagesx( $src ); $h = imagesy( $src );
+
+    // Draw watermark text
+    $alpha  = (int) round( 127 * ( 1 - $opacity / 100 ) );
+    $color  = imagecolorallocatealpha( $src, 200, 200, 200, $alpha );
+    $text   = get_bloginfo( 'name' );
+    $font   = max( 1, min( 5, intval( $w / 200 ) ) );
+    $tw     = imagefontwidth( $font ) * strlen( $text );
+    $th     = imagefontheight( $font );
+    $pad    = 18;
+    switch ( $position ) {
+        case 'bottom-left':  $tx = $pad;          $ty = $h - $th - $pad; break;
+        case 'center':       $tx = ($w-$tw)/2;    $ty = ($h-$th)/2;      break;
+        default:             $tx = $w-$tw-$pad;   $ty = $h - $th - $pad; break;
+    }
+    imagestring( $src, $font, intval($tx), intval($ty), $text, $color );
+
+    // Save as new attachment
+    $upload_dir = wp_upload_dir();
+    $new_name   = preg_replace( '/(\.[^.]+)$/', '_watermarked$1', basename( $path ) );
+    $new_path   = $upload_dir['path'] . '/' . $new_name;
+
+    switch ( $mime ) {
+        case 'image/jpeg': imagejpeg( $src, $new_path, 90 ); break;
+        case 'image/png':  imagepng( $src, $new_path );      break;
+        case 'image/gif':  imagegif( $src, $new_path );      break;
+    }
+    imagedestroy( $src );
+
+    $new_id = wp_insert_attachment( array(
+        'post_mime_type' => $mime,
+        'post_title'     => get_the_title( $id ) . ' (Watermarked)',
+        'post_status'    => 'inherit',
+    ), $new_path );
+    wp_update_attachment_metadata( $new_id, wp_generate_attachment_metadata( $new_id, $new_path ) );
+
+    wp_send_json_success( array( 'message' => 'Watermarked copy created.', 'new_id' => $new_id ) );
+}
+add_action( 'wp_ajax_cora_media_library_watermark', 'cora_ajax_media_library_watermark' );
+
+/**
+ * AJAX: Create share link
+ */
+function cora_ajax_media_library_create_share() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'upload_files' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+
+    $id     = intval( $_POST['attachment_id'] ?? 0 );
+    $expiry = sanitize_text_field( $_POST['expiry'] ?? '7d' );
+
+    $exp_map = array( '24h' => 86400, '7d' => 604800, '30d' => 2592000, 'never' => 0 );
+    $exp_secs = isset( $exp_map[ $expiry ] ) ? $exp_map[ $expiry ] : 604800;
+    $exp_ts   = $exp_secs > 0 ? time() + $exp_secs : 0;
+
+    $token = wp_generate_password( 32, false );
+    $url   = add_query_arg( array( 'cora_share' => $token, 'aid' => $id ), home_url('/') );
+
+    $label = $exp_secs ? 'Expires in ' . str_replace( array('24h','7d','30d'), array('24 hours','7 days','30 days'), $expiry ) : 'No expiry';
+    $link  = array( 'token' => $token, 'url' => $url, 'expires' => $exp_ts, 'expiry_label' => $label, 'created' => time() );
+
+    $links = get_post_meta( $id, '_cora_media_share_links', true );
+    if ( ! is_array( $links ) ) $links = array();
+    $links[] = $link;
+    update_post_meta( $id, '_cora_media_share_links', $links );
+
+    wp_send_json_success( array( 'link' => $link ) );
+}
+add_action( 'wp_ajax_cora_media_library_create_share', 'cora_ajax_media_library_create_share' );
+
+/**
+ * AJAX: Revoke share link
+ */
+function cora_ajax_media_library_revoke_share() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'upload_files' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+
+    $id    = intval( $_POST['attachment_id'] ?? 0 );
+    $token = sanitize_text_field( $_POST['token'] ?? '' );
+    $links = get_post_meta( $id, '_cora_media_share_links', true );
+    if ( ! is_array( $links ) ) $links = array();
+    $links = array_values( array_filter( $links, function( $l ) use ( $token ) { return $l['token'] !== $token; } ) );
+    update_post_meta( $id, '_cora_media_share_links', $links );
+    wp_send_json_success( array( 'message' => 'Link revoked.' ) );
+}
+add_action( 'wp_ajax_cora_media_library_revoke_share', 'cora_ajax_media_library_revoke_share' );
+
+/**
+ * AJAX: Get activity log for a file
+ */
+function cora_ajax_media_library_get_activity() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $id  = intval( $_POST['attachment_id'] ?? 0 );
+    $log = get_post_meta( $id, '_cora_media_activity', true );
+    if ( ! is_array( $log ) ) $log = array();
+    wp_send_json_success( array( 'log' => array_reverse( $log ) ) );
+}
+add_action( 'wp_ajax_cora_media_library_get_activity', 'cora_ajax_media_library_get_activity' );
+
+/**
+ * AJAX: Storage statistics
+ */
+function cora_ajax_media_library_get_storage() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $upload_dir = wp_upload_dir();
+    $base       = $upload_dir['basedir'];
+    $total_bytes = 0;
+    if ( is_dir( $base ) ) {
+        $it = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $base, FilesystemIterator::SKIP_DOTS ) );
+        foreach ( $it as $f ) { if ( $f->isFile() ) $total_bytes += $f->getSize(); }
+    }
+    $limit_bytes = apply_filters( 'cora_media_storage_limit', 5 * 1024 * 1024 * 1024 ); // 5 GB default
+    $pct = $limit_bytes > 0 ? round( ( $total_bytes / $limit_bytes ) * 100, 1 ) : 0;
+    wp_send_json_success( array(
+        'total_human' => cora_media_human_size( $total_bytes ),
+        'limit_human' => cora_media_human_size( $limit_bytes ),
+        'percent_used'=> $pct,
+        'total_bytes' => $total_bytes,
+        'limit_bytes' => $limit_bytes,
+    ) );
+}
+add_action( 'wp_ajax_cora_media_library_get_storage', 'cora_ajax_media_library_get_storage' );

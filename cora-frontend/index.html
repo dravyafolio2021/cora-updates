@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cora — AI-Powered Real Estate Business Suite</title>
+    <meta name="description" content="The complete AI-powered business suite for modern real estate agencies. Automate listings, client management, marketing, and closings with intelligent automation.">
+    <meta property="og:title" content="Cora — AI-Powered Real Estate Business Suite">
+    <meta property="og:description" content="The complete AI-powered business suite for modern real estate agencies. Automate listings, client management, marketing, and closings.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Tailwind CSS v3 CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    },
+                    colors: {
+                        cora: {
+                            50: '#fafafa',
+                            100: '#f4f4f5',
+                            200: '#e4e4e7',
+                            300: '#d4d4d8',
+                            400: '#a1a1aa',
+                            500: '#71717a',
+                            600: '#52525b',
+                            700: '#3f3f46',
+                            800: '#27272a',
+                            900: '#18181b',
+                            950: '#09090b',
+                        }
+                    },
+                    animation: {
+                        'scroll-left': 'scrollLeft 40s linear infinite',
+                        'scroll-right': 'scrollRight 40s linear infinite',
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'pulse-soft': 'pulseSoft 3s ease-in-out infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        scrollLeft: {
+                            '0%': { transform: 'translateX(0)' },
+                            '100%': { transform: 'translateX(-50%)' },
+                        },
+                        scrollRight: {
+                            '0%': { transform: 'translateX(-50%)' },
+                            '100%': { transform: 'translateX(0)' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(24px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        pulseSoft: {
+                            '0%, 100%': { opacity: '0.5' },
+                            '50%': { opacity: '1' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { overscroll-behavior: none; }
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #ffffff;
+            color: #09090b;
+        }
+
+        /* Hero soft gradient orbs */
+        .hero-orb-1 {
+            position: absolute;
+            width: 700px; height: 700px;
+            background: radial-gradient(circle, rgba(228,228,231,0.5) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -300px; right: -200px;
+            animation: float 10s ease-in-out infinite;
+        }
+        .hero-orb-2 {
+            position: absolute;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(244,244,245,0.6) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: -150px; left: -100px;
+            animation: float 12s ease-in-out infinite reverse;
+        }
+
+        /* Scrolling ticker */
+        .ticker-track { display: flex; width: max-content; }
+
+        /* Feature card hover */
+        .feature-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px -15px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+        }
+
+        /* Gradient text on light bg */
+        .gradient-text {
+            background: linear-gradient(135deg, #18181b 0%, #71717a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Subtle dot grid background */
+        .grid-bg {
+            background-image: radial-gradient(circle, #e4e4e7 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* Scroll-triggered animation */
+        .reveal { opacity: 0; transform: translateY(24px); transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* Button hover */
+        .btn-primary {
+            position: relative; overflow: hidden; transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 30px -8px rgba(0,0,0,0.2);
+        }
+        .btn-secondary:hover {
+            border-color: #71717a;
+            color: #18181b;
+        }
+
+        /* Mobile nav */
+        .mobile-menu { transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+        .mobile-menu.open { transform: translateX(0); }
+
+        /* Stats counter */
+        .stat-number { font-variant-numeric: tabular-nums; }
+
+        /* Pricing popular */
+        .pricing-popular {
+            background: #09090b;
+            color: #ffffff;
+            border: 1px solid #27272a;
+        }
+
+        /* Platform preview mockup */
+        .mockup-glow {
+            box-shadow:
+                0 0 0 1px rgba(0,0,0,0.06),
+                0 25px 80px -20px rgba(0,0,0,0.12),
+                0 0 60px -20px rgba(0,0,0,0.05);
+        }
+
+        /* Section divider */
+        .section-divider { border-color: #f4f4f5; }
+
+        section { position: relative; }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- NAVIGATION -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="fixed top-0 left-0 right-0 z-[100]">
+        <header class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="flex items-center justify-between h-16 sm:h-20">
+                <!-- Logo -->
+                <a href="#" id="nav-logo" class="flex items-center gap-2.5 group">
+                    <div class="w-8 h-8 rounded-lg bg-cora-950 flex items-center justify-center group-hover:scale-105 transition-transform">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="#ffffff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                    </div>
+                    <span class="text-lg font-bold tracking-tight text-cora-950">Cora</span>
+                </a>
+
+                <!-- Desktop Nav Links -->
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="#features" id="nav-features" class="px-4 py-2 text-sm text-cora-600 hover:text-cora-950 transition-colors rounded-lg hover:bg-cora-100">Features</a>
+                    <a href="#platform" id="nav-platform" class="px-4 py-2 text-sm text-cora-600 hover:text-cora-950 transition-colors rounded-lg hover:bg-cora-100">Platform</a>
+                    <a href="#pricing" id="nav-pricing" class="px-4 py-2 text-sm text-cora-600 hover:text-cora-950 transition-colors rounded-lg hover:bg-cora-100">Pricing</a>
+                    <a href="#testimonials" id="nav-testimonials" class="px-4 py-2 text-sm text-cora-600 hover:text-cora-950 transition-colors rounded-lg hover:bg-cora-100">Testimonials</a>
+                </div>
+
+                <!-- Desktop CTA -->
+                <div class="hidden md:flex items-center gap-3">
+                    <a href="#" id="nav-login" class="px-4 py-2 text-sm text-cora-600 hover:text-cora-950 transition-colors">Log in</a>
+                    <a href="#" id="nav-cta" class="btn-primary px-5 py-2.5 bg-cora-950 text-white text-sm font-semibold rounded-full inline-flex items-center gap-2">
+                        Start Free Trial
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-toggle" class="md:hidden p-2 text-cora-600 hover:text-cora-950 transition-colors" aria-label="Toggle menu">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="1.8" fill="none">
+                        <path d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </nav>
+        </header>
+        <!-- Nav blur background -->
+        <div class="absolute inset-0 bg-white/80 backdrop-blur-xl border-b border-cora-200/60 -z-10"></div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="mobile-menu fixed inset-0 z-[200] bg-white/98 backdrop-blur-2xl">
+        <div class="flex flex-col h-full px-6 pt-6">
+            <div class="flex items-center justify-between mb-12">
+                <a href="#" class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-cora-950 flex items-center justify-center">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="#ffffff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                    </div>
+                    <span class="text-lg font-bold tracking-tight text-cora-950">Cora</span>
+                </a>
+                <button id="mobile-menu-close" class="p-2 text-cora-500 hover:text-cora-950" aria-label="Close menu">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="1.8" fill="none">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <nav class="flex flex-col gap-2">
+                <a href="#features" class="mobile-nav-link text-2xl font-medium text-cora-700 hover:text-cora-950 py-3 transition-colors">Features</a>
+                <a href="#platform" class="mobile-nav-link text-2xl font-medium text-cora-700 hover:text-cora-950 py-3 transition-colors">Platform</a>
+                <a href="#pricing" class="mobile-nav-link text-2xl font-medium text-cora-700 hover:text-cora-950 py-3 transition-colors">Pricing</a>
+                <a href="#testimonials" class="mobile-nav-link text-2xl font-medium text-cora-700 hover:text-cora-950 py-3 transition-colors">Testimonials</a>
+            </nav>
+            <div class="mt-auto pb-10 flex flex-col gap-3">
+                <a href="#" class="w-full py-3.5 text-center text-sm text-cora-600 border border-cora-200 rounded-full hover:border-cora-400 transition-colors">Log in</a>
+                <a href="#" class="w-full py-3.5 text-center text-sm font-semibold bg-cora-950 text-white rounded-full">Start Free Trial</a>
+            </div>
+        </div>
+    </div>
+
+
+    <main>
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- HERO SECTION -->
+        <!-- ═══════════════════════════════════════════ -->
+        <section id="hero" class="relative min-h-[100vh] flex items-center justify-center overflow-hidden pt-20 pb-12 sm:pb-20 bg-white">
+            <div class="hero-orb-1"></div>
+            <div class="hero-orb-2"></div>
+
+            <div class="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                <div class="flex flex-col items-center text-center max-w-4xl mx-auto">
+                    <!-- Badge -->
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-cora-200 bg-cora-50 mb-8" style="animation: fadeInUp 0.8s ease-out 0s both">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse-soft"></span>
+                        <span class="text-xs font-medium text-cora-600 tracking-wide">Now in Public Beta — v0.1</span>
+                    </div>
+
+                    <!-- Headline -->
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] mb-6 text-cora-950" style="animation: fadeInUp 0.8s ease-out 0.1s both">
+                        The AI-powered suite for
+                        <span class="gradient-text"> modern real estate</span>
+                    </h1>
+
+                    <!-- Subtitle -->
+                    <p class="text-base sm:text-lg md:text-xl text-cora-500 max-w-2xl leading-relaxed mb-10" style="animation: fadeInUp 0.8s ease-out 0.3s both">
+                        Listings, client pipelines, marketing automation, document generation, and intelligent closings — all unified in one platform built for agencies that move fast.
+                    </p>
+
+                    <!-- CTA Buttons -->
+                    <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto" style="animation: fadeInUp 0.8s ease-out 0.5s both">
+                        <a href="#" id="hero-cta-primary" class="btn-primary w-full sm:w-auto px-8 py-3.5 bg-cora-950 text-white text-sm font-semibold rounded-full inline-flex items-center justify-center gap-2.5">
+                            Start Your Free Trial
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                        <a href="#platform" id="hero-cta-secondary" class="btn-secondary w-full sm:w-auto px-8 py-3.5 text-sm font-medium text-cora-600 border border-cora-200 rounded-full inline-flex items-center justify-center gap-2.5 transition-all">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>
+                            Watch Demo
+                        </a>
+                    </div>
+
+                    <!-- Social Proof Mini -->
+                    <div class="mt-12 flex flex-col sm:flex-row items-center gap-4 sm:gap-8" style="animation: fadeInUp 0.8s ease-out 0.7s both">
+                        <div class="flex -space-x-2">
+                            <div class="w-8 h-8 rounded-full bg-cora-200 border-2 border-white flex items-center justify-center text-[10px] font-bold text-cora-700">A</div>
+                            <div class="w-8 h-8 rounded-full bg-cora-300 border-2 border-white flex items-center justify-center text-[10px] font-bold text-cora-700">R</div>
+                            <div class="w-8 h-8 rounded-full bg-cora-400 border-2 border-white flex items-center justify-center text-[10px] font-bold text-white">S</div>
+                            <div class="w-8 h-8 rounded-full bg-cora-200 border-2 border-white flex items-center justify-center text-[10px] font-bold text-cora-700">K</div>
+                            <div class="w-8 h-8 rounded-full bg-cora-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-cora-400">+</div>
+                        </div>
+                        <div class="flex items-center gap-6 text-xs text-cora-500">
+                            <span><strong class="text-cora-800">50+</strong> agencies onboarded</span>
+                            <span class="hidden sm:inline">•</span>
+                            <span><strong class="text-cora-800">12,000+</strong> listings managed</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Platform Preview Mockup -->
+                <div class="mt-16 sm:mt-20 relative reveal" data-delay="300">
+                    <div class="mockup-glow rounded-xl sm:rounded-2xl overflow-hidden border border-cora-200/80 bg-white">
+                        <!-- Browser Chrome -->
+                        <div class="flex items-center gap-2 px-4 py-3 bg-cora-50 border-b border-cora-200/60">
+                            <div class="flex gap-1.5">
+                                <div class="w-3 h-3 rounded-full bg-cora-200"></div>
+                                <div class="w-3 h-3 rounded-full bg-cora-200"></div>
+                                <div class="w-3 h-3 rounded-full bg-cora-200"></div>
+                            </div>
+                            <div class="flex-1 flex justify-center">
+                                <div class="px-4 py-1 rounded-md bg-white border border-cora-200/60 text-[11px] text-cora-400 font-mono">app.coraplatform.com/dashboard</div>
+                            </div>
+                        </div>
+                        <!-- Dashboard Content -->
+                        <div class="p-4 sm:p-6 lg:p-8 min-h-[300px] sm:min-h-[400px] lg:min-h-[500px]">
+                            <div class="flex gap-4 lg:gap-6">
+                                <!-- Sidebar -->
+                                <div class="hidden lg:flex flex-col w-56 shrink-0 border-r border-cora-100 pr-6">
+                                    <div class="flex items-center gap-2.5 mb-8">
+                                        <div class="w-7 h-7 rounded-lg bg-cora-950 flex items-center justify-center">
+                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="#fff" stroke-width="2.2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                        </div>
+                                        <span class="text-sm font-semibold text-cora-950">Cora Studio</span>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <div class="px-3 py-2 rounded-lg bg-cora-100 text-sm text-cora-950 font-medium flex items-center gap-2.5">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                                            Dashboard
+                                        </div>
+                                        <div class="px-3 py-2 rounded-lg text-sm text-cora-500 flex items-center gap-2.5 hover:bg-cora-50 transition-colors">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                            Listings
+                                        </div>
+                                        <div class="px-3 py-2 rounded-lg text-sm text-cora-500 flex items-center gap-2.5 hover:bg-cora-50 transition-colors">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                            Clients
+                                        </div>
+                                        <div class="px-3 py-2 rounded-lg text-sm text-cora-500 flex items-center gap-2.5 hover:bg-cora-50 transition-colors">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                            AI Tools
+                                        </div>
+                                        <div class="px-3 py-2 rounded-lg text-sm text-cora-500 flex items-center gap-2.5 hover:bg-cora-50 transition-colors">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                                            Settings
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Main Content -->
+                                <div class="flex-1 space-y-4 sm:space-y-5">
+                                    <!-- Stats Row -->
+                                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                                        <div class="p-3 sm:p-4 rounded-xl bg-cora-50 border border-cora-100">
+                                            <div class="text-[10px] sm:text-xs text-cora-500 mb-1">Active Listings</div>
+                                            <div class="text-xl sm:text-2xl font-bold stat-number text-cora-950">247</div>
+                                            <div class="text-[10px] text-emerald-600 mt-1">↑ 12% this month</div>
+                                        </div>
+                                        <div class="p-3 sm:p-4 rounded-xl bg-cora-50 border border-cora-100">
+                                            <div class="text-[10px] sm:text-xs text-cora-500 mb-1">Pipeline Value</div>
+                                            <div class="text-xl sm:text-2xl font-bold stat-number text-cora-950">$14.2M</div>
+                                            <div class="text-[10px] text-emerald-600 mt-1">↑ 8% this week</div>
+                                        </div>
+                                        <div class="p-3 sm:p-4 rounded-xl bg-cora-50 border border-cora-100">
+                                            <div class="text-[10px] sm:text-xs text-cora-500 mb-1">Leads Today</div>
+                                            <div class="text-xl sm:text-2xl font-bold stat-number text-cora-950">38</div>
+                                            <div class="text-[10px] text-cora-400 mt-1">AI-qualified: 24</div>
+                                        </div>
+                                        <div class="p-3 sm:p-4 rounded-xl bg-cora-50 border border-cora-100">
+                                            <div class="text-[10px] sm:text-xs text-cora-500 mb-1">Closings (MTD)</div>
+                                            <div class="text-xl sm:text-2xl font-bold stat-number text-cora-950">16</div>
+                                            <div class="text-[10px] text-emerald-600 mt-1">↑ 22% vs last month</div>
+                                        </div>
+                                    </div>
+                                    <!-- Chart + Activity -->
+                                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
+                                        <div class="lg:col-span-2 p-4 sm:p-5 rounded-xl bg-cora-50 border border-cora-100 min-h-[160px] sm:min-h-[200px]">
+                                            <div class="text-xs text-cora-500 mb-4">Revenue Trend — Last 6 Months</div>
+                                            <div class="flex items-end gap-2 h-28 sm:h-36">
+                                                <div class="flex-1 bg-cora-200 rounded-t-md" style="height:40%"></div>
+                                                <div class="flex-1 bg-cora-200 rounded-t-md" style="height:55%"></div>
+                                                <div class="flex-1 bg-cora-200 rounded-t-md" style="height:48%"></div>
+                                                <div class="flex-1 bg-cora-300 rounded-t-md" style="height:72%"></div>
+                                                <div class="flex-1 bg-cora-300 rounded-t-md" style="height:65%"></div>
+                                                <div class="flex-1 bg-cora-950 rounded-t-md" style="height:88%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="p-4 sm:p-5 rounded-xl bg-cora-50 border border-cora-100">
+                                            <div class="text-xs text-cora-500 mb-4">AI Insights</div>
+                                            <div class="space-y-3">
+                                                <div class="flex items-start gap-2">
+                                                    <div class="w-5 h-5 rounded-md bg-cora-100 flex items-center justify-center shrink-0 mt-0.5">
+                                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-cora-600"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                                    </div>
+                                                    <p class="text-[11px] text-cora-600 leading-relaxed">3 listings predicted to close within 14 days</p>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <div class="w-5 h-5 rounded-md bg-cora-100 flex items-center justify-center shrink-0 mt-0.5">
+                                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-cora-600"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                                                    </div>
+                                                    <p class="text-[11px] text-cora-600 leading-relaxed">5 cold leads re-engaged via AI follow-up</p>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <div class="w-5 h-5 rounded-md bg-cora-100 flex items-center justify-center shrink-0 mt-0.5">
+                                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-cora-600"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                                                    </div>
+                                                    <p class="text-[11px] text-cora-600 leading-relaxed">Market analysis: Avg. price up 4.2% in zone</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Reflection -->
+                    <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 w-3/4 h-20 bg-gradient-to-b from-cora-100/30 to-transparent blur-2xl"></div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- FEATURE TICKER -->
+        <!-- ═══════════════════════════════════════════ -->
+        <section class="py-5 overflow-hidden border-y border-cora-100 bg-cora-50">
+            <div class="ticker-track animate-scroll-left">
+                <div class="flex items-center gap-8 px-4 whitespace-nowrap">
+                    <span class="flex items-center gap-2 text-sm text-cora-500"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> AI Listing Generator</span>
+                    <span class="text-cora-300">•</span>
+                    <span class="flex items-center gap-2 text-sm text-cora-500"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Client Pipeline CRM</span>
+                    <span class="text-cora-300">•</span>
+                    <span class="flex items-center gap-2 text-sm text-cora-500"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Smart Scheduling</span>
+                    <span class="text-cora-300">•</span>
+                    <span class="flex items-center gap-2 text-sm text-cora-500"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Document AI</span>
+                    <span class="text-cora-300">•</span>
+                    <span class="flex items-center gap-2 text-sm text-cora-500"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Market Intelligence</span>
+                    <span class="text-cora-300">•</span>
+                    <span class="flex items-center gap-2 text-sm text-cora-500"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Photo Enhancement</span>
+                    <span class="text-cora-300">•</span>
+                    <span class="flex items-center gap-2 text-sm text-cora-500"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> AI Chat Assistant</span>
+                    <span class="text-cora-300">•</span>
+                    <span class="flex items-center gap-2 text-sm text-cora-500"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Analytics & Reports</span>
+                    <span class="text-cora-300">•</span>
+                </div>
+                <!-- Duplicate for seamless loop -->
+                <div class="flex items-center gap-8 px-4 whitespace-nowrap">
+                    <span class="flex items-center gap-2 text-sm text-cora-500"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> AI Listing Generator</span>
+                    <span class="text-cora-300">•</span>
+                    <span class="flex items-center gap-2 text-sm text-cora-500"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Client Pipeline CRM</span>
+                    <span class="text-cora-300">•</span>
+                    <span class="flex items-center gap-2 text-sm text-cora-500"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Smart Scheduling</span>
+                    <span class="text-cora-300">•</span>
+                    <span class="flex items-center gap-2 text-sm text-cora-500"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Document AI</span>
+                    <span class="text-cora-300">•</span>
+                    <span class="flex items-center gap-2 text-sm text-cora-500"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Market Intelligence</span>
+                    <span class="text-cora-300">•</span>
+                    <span class="flex items-center gap-2 text-sm text-cora-500"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Photo Enhancement</span>
+                    <span class="text-cora-300">•</span>
+                    <span class="flex items-center gap-2 text-sm text-cora-500"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> AI Chat Assistant</span>
+                    <span class="text-cora-300">•</span>
+                    <span class="flex items-center gap-2 text-sm text-cora-500"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Analytics & Reports</span>
+                    <span class="text-cora-300">•</span>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- FEATURES SECTION -->
+        <!-- ═══════════════════════════════════════════ -->
+        <section id="features" class="py-20 sm:py-28 lg:py-36 bg-white">
+            <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-2xl mx-auto mb-16 sm:mb-20 reveal">
+                    <div class="text-xs font-semibold tracking-widest text-cora-500 uppercase mb-4">Powered by AI</div>
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-5 text-cora-950">Every tool your agency <span class="gradient-text">needs to scale</span></h2>
+                    <p class="text-base sm:text-lg text-cora-500 leading-relaxed">From lead capture to closing day — Cora automates the workflows that drain your team's time, while surfacing the insights that close more deals.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                    <!-- Feature 1 -->
+                    <div class="feature-card p-6 sm:p-7 rounded-2xl bg-white border border-cora-100 reveal" data-delay="100">
+                        <div class="w-10 h-10 rounded-xl bg-cora-100 flex items-center justify-center mb-5">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" class="text-cora-700"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2 text-cora-950">AI Listing Generator</h3>
+                        <p class="text-sm text-cora-500 leading-relaxed">Generate compelling property descriptions, SEO-optimized titles, and social media copy from a few bullet points. Supports 12+ languages.</p>
+                    </div>
+                    <!-- Feature 2 -->
+                    <div class="feature-card p-6 sm:p-7 rounded-2xl bg-white border border-cora-100 reveal" data-delay="200">
+                        <div class="w-10 h-10 rounded-xl bg-cora-100 flex items-center justify-center mb-5">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" class="text-cora-700"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2 text-cora-950">Smart CRM Pipeline</h3>
+                        <p class="text-sm text-cora-500 leading-relaxed">AI-scored leads, automated follow-ups, and visual deal pipelines. Know exactly which clients need attention and when to reach out.</p>
+                    </div>
+                    <!-- Feature 3 -->
+                    <div class="feature-card p-6 sm:p-7 rounded-2xl bg-white border border-cora-100 reveal" data-delay="300">
+                        <div class="w-10 h-10 rounded-xl bg-cora-100 flex items-center justify-center mb-5">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" class="text-cora-700"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2 text-cora-950">Document Intelligence</h3>
+                        <p class="text-sm text-cora-500 leading-relaxed">Auto-generate contracts, disclosures, and offer letters. AI reviews clauses for risks and ensures compliance with local regulations.</p>
+                    </div>
+                    <!-- Feature 4 -->
+                    <div class="feature-card p-6 sm:p-7 rounded-2xl bg-white border border-cora-100 reveal" data-delay="100">
+                        <div class="w-10 h-10 rounded-xl bg-cora-100 flex items-center justify-center mb-5">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" class="text-cora-700"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2 text-cora-950">Market Intelligence</h3>
+                        <p class="text-sm text-cora-500 leading-relaxed">Real-time comparable analysis, price prediction models, and neighborhood trend reports. Make data-driven pricing decisions instantly.</p>
+                    </div>
+                    <!-- Feature 5 -->
+                    <div class="feature-card p-6 sm:p-7 rounded-2xl bg-white border border-cora-100 reveal" data-delay="200">
+                        <div class="w-10 h-10 rounded-xl bg-cora-100 flex items-center justify-center mb-5">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" class="text-cora-700"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2 text-cora-950">Marketing Autopilot</h3>
+                        <p class="text-sm text-cora-500 leading-relaxed">AI-crafted email drips, social media content calendars, and automated ad copy. Your listings get maximum exposure with zero manual effort.</p>
+                    </div>
+                    <!-- Feature 6 -->
+                    <div class="feature-card p-6 sm:p-7 rounded-2xl bg-white border border-cora-100 reveal" data-delay="300">
+                        <div class="w-10 h-10 rounded-xl bg-cora-100 flex items-center justify-center mb-5">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" class="text-cora-700"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2 text-cora-950">Closing Command Center</h3>
+                        <p class="text-sm text-cora-500 leading-relaxed">Track every deal from offer to keys. Automated milestone checklists, deadline alerts, and coordination between all parties involved.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- HOW IT WORKS -->
+        <!-- ═══════════════════════════════════════════ -->
+        <section id="platform" class="py-20 sm:py-28 lg:py-36 bg-cora-50 border-y border-cora-100">
+            <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-2xl mx-auto mb-16 sm:mb-20 reveal">
+                    <div class="text-xs font-semibold tracking-widest text-cora-500 uppercase mb-4">How it works</div>
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-5 text-cora-950">From onboarding to <span class="gradient-text">first closing in days</span></h2>
+                    <p class="text-base sm:text-lg text-cora-500 leading-relaxed">Three steps to transform how your agency operates.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+                    <div class="reveal" data-delay="100">
+                        <div class="relative p-6 sm:p-8 rounded-2xl bg-white border border-cora-100 h-full">
+                            <div class="text-6xl sm:text-7xl font-black text-cora-100 absolute top-4 right-6">01</div>
+                            <div class="w-10 h-10 rounded-xl bg-cora-950 flex items-center justify-center mb-6">
+                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="#fff" stroke-width="1.8" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                            </div>
+                            <h3 class="text-lg font-semibold mb-3 text-cora-950">Connect Your Agency</h3>
+                            <p class="text-sm text-cora-500 leading-relaxed">Import your existing listings, client database, and team members. Cora syncs with your MLS, email, and calendar in minutes.</p>
+                        </div>
+                    </div>
+                    <div class="reveal" data-delay="200">
+                        <div class="relative p-6 sm:p-8 rounded-2xl bg-white border border-cora-100 h-full">
+                            <div class="text-6xl sm:text-7xl font-black text-cora-100 absolute top-4 right-6">02</div>
+                            <div class="w-10 h-10 rounded-xl bg-cora-950 flex items-center justify-center mb-6">
+                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="#fff" stroke-width="1.8" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                            </div>
+                            <h3 class="text-lg font-semibold mb-3 text-cora-950">AI Activates Workflows</h3>
+                            <p class="text-sm text-cora-500 leading-relaxed">Cora's AI engine automatically scores leads, drafts follow-ups, generates listing content, and surfaces actionable insights for your team.</p>
+                        </div>
+                    </div>
+                    <div class="reveal" data-delay="300">
+                        <div class="relative p-6 sm:p-8 rounded-2xl bg-white border border-cora-100 h-full">
+                            <div class="text-6xl sm:text-7xl font-black text-cora-100 absolute top-4 right-6">03</div>
+                            <div class="w-10 h-10 rounded-xl bg-cora-950 flex items-center justify-center mb-6">
+                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="#fff" stroke-width="1.8" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            </div>
+                            <h3 class="text-lg font-semibold mb-3 text-cora-950">Close More Deals</h3>
+                            <p class="text-sm text-cora-500 leading-relaxed">Track every deal through the closing pipeline. Automated document generation, deadline alerts, and coordination keep everything on schedule.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- STATS -->
+        <!-- ═══════════════════════════════════════════ -->
+        <section class="py-16 sm:py-20 bg-cora-950 text-white">
+            <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 text-center reveal">
+                    <div>
+                        <div class="text-3xl sm:text-4xl lg:text-5xl font-bold stat-number mb-2">3x</div>
+                        <div class="text-sm text-cora-400">Faster lead response</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl sm:text-4xl lg:text-5xl font-bold stat-number mb-2">47%</div>
+                        <div class="text-sm text-cora-400">More closings per agent</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl sm:text-4xl lg:text-5xl font-bold stat-number mb-2">12hrs</div>
+                        <div class="text-sm text-cora-400">Saved per week per agent</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl sm:text-4xl lg:text-5xl font-bold stat-number mb-2">99.9%</div>
+                        <div class="text-sm text-cora-400">Uptime SLA</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- TESTIMONIALS -->
+        <!-- ═══════════════════════════════════════════ -->
+        <section id="testimonials" class="py-20 sm:py-28 lg:py-36 bg-white">
+            <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-2xl mx-auto mb-16 sm:mb-20 reveal">
+                    <div class="text-xs font-semibold tracking-widest text-cora-500 uppercase mb-4">Testimonials</div>
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-5 text-cora-950">Trusted by agencies <span class="gradient-text">that lead markets</span></h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+                    <div class="p-6 sm:p-7 rounded-2xl bg-white border border-cora-100 reveal" data-delay="100">
+                        <div class="flex items-center gap-0.5 mb-4">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="#18181b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="#18181b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="#18181b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="#18181b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="#18181b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </div>
+                        <p class="text-sm text-cora-600 leading-relaxed mb-6">"Cora replaced 4 separate tools we were paying for. The AI listing generator alone saves us 3 hours per property. Our agents can focus on what matters — building relationships."</p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full bg-cora-200 flex items-center justify-center text-xs font-bold text-cora-700">RA</div>
+                            <div>
+                                <div class="text-sm font-medium text-cora-950">Rahul Arora</div>
+                                <div class="text-xs text-cora-500">Founder, Arora Realty Group</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6 sm:p-7 rounded-2xl bg-white border border-cora-100 reveal" data-delay="200">
+                        <div class="flex items-center gap-0.5 mb-4">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="#18181b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="#18181b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="#18181b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="#18181b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="#18181b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </div>
+                        <p class="text-sm text-cora-600 leading-relaxed mb-6">"The market intelligence feature is a game-changer. We went from guessing on pricing to data-driven confidence. Our clients notice the difference — and trust us more for it."</p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full bg-cora-200 flex items-center justify-center text-xs font-bold text-cora-700">SP</div>
+                            <div>
+                                <div class="text-sm font-medium text-cora-950">Sarah Patel</div>
+                                <div class="text-xs text-cora-500">Managing Director, Luxe Properties</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6 sm:p-7 rounded-2xl bg-white border border-cora-100 reveal" data-delay="300">
+                        <div class="flex items-center gap-0.5 mb-4">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="#18181b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="#18181b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="#18181b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="#18181b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="#18181b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </div>
+                        <p class="text-sm text-cora-600 leading-relaxed mb-6">"We onboarded 15 agents in one afternoon. The AI assistant handles client inquiries 24/7, which means we never miss a hot lead. Closings are up 47% quarter-over-quarter."</p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full bg-cora-200 flex items-center justify-center text-xs font-bold text-cora-700">MK</div>
+                            <div>
+                                <div class="text-sm font-medium text-cora-950">Michael Kim</div>
+                                <div class="text-xs text-cora-500">CEO, Pacific Coast Realty</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- PRICING -->
+        <!-- ═══════════════════════════════════════════ -->
+        <section id="pricing" class="py-20 sm:py-28 lg:py-36 bg-cora-50 border-y border-cora-100">
+            <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-2xl mx-auto mb-16 sm:mb-20 reveal">
+                    <div class="text-xs font-semibold tracking-widest text-cora-500 uppercase mb-4">Pricing</div>
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-5 text-cora-950">Simple plans, <span class="gradient-text">powerful results</span></h2>
+                    <p class="text-base sm:text-lg text-cora-500 leading-relaxed">Start free. Scale as you grow. No hidden fees, no long-term contracts.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 max-w-5xl mx-auto">
+                    <!-- Starter -->
+                    <div class="p-6 sm:p-8 rounded-2xl bg-white border border-cora-100 reveal" data-delay="100">
+                        <div class="text-sm font-medium text-cora-500 mb-2">Starter</div>
+                        <div class="flex items-baseline gap-1 mb-1">
+                            <span class="text-3xl sm:text-4xl font-bold text-cora-950">$0</span>
+                            <span class="text-sm text-cora-500">/month</span>
+                        </div>
+                        <p class="text-xs text-cora-500 mb-6">Perfect for solo agents getting started</p>
+                        <a href="#" class="block w-full py-3 text-center text-sm font-medium border border-cora-200 rounded-full hover:border-cora-400 transition-colors text-cora-700 mb-8">Get Started Free</a>
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-2.5 text-sm text-cora-600"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-cora-400 shrink-0"><polyline points="20 6 9 17 4 12"/></svg>Up to 25 listings</li>
+                            <li class="flex items-center gap-2.5 text-sm text-cora-600"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-cora-400 shrink-0"><polyline points="20 6 9 17 4 12"/></svg>Basic CRM pipeline</li>
+                            <li class="flex items-center gap-2.5 text-sm text-cora-600"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-cora-400 shrink-0"><polyline points="20 6 9 17 4 12"/></svg>AI listing descriptions</li>
+                            <li class="flex items-center gap-2.5 text-sm text-cora-600"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-cora-400 shrink-0"><polyline points="20 6 9 17 4 12"/></svg>Email support</li>
+                        </ul>
+                    </div>
+                    <!-- Pro (Popular) -->
+                    <div class="pricing-popular p-6 sm:p-8 rounded-2xl relative reveal" data-delay="200">
+                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-white text-cora-950 text-[10px] font-bold rounded-full uppercase tracking-wider border border-cora-200">Most Popular</div>
+                        <div class="text-sm font-medium text-cora-400 mb-2">Professional</div>
+                        <div class="flex items-baseline gap-1 mb-1">
+                            <span class="text-3xl sm:text-4xl font-bold">$79</span>
+                            <span class="text-sm text-cora-400">/agent/month</span>
+                        </div>
+                        <p class="text-xs text-cora-400 mb-6">For growing teams ready to scale</p>
+                        <a href="#" class="btn-primary block w-full py-3 text-center text-sm font-semibold bg-white text-cora-950 rounded-full mb-8">Start 14-Day Free Trial</a>
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-2.5 text-sm text-cora-300"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-white shrink-0"><polyline points="20 6 9 17 4 12"/></svg>Unlimited listings</li>
+                            <li class="flex items-center gap-2.5 text-sm text-cora-300"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-white shrink-0"><polyline points="20 6 9 17 4 12"/></svg>Full AI suite (all tools)</li>
+                            <li class="flex items-center gap-2.5 text-sm text-cora-300"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-white shrink-0"><polyline points="20 6 9 17 4 12"/></svg>Market intelligence</li>
+                            <li class="flex items-center gap-2.5 text-sm text-cora-300"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-white shrink-0"><polyline points="20 6 9 17 4 12"/></svg>Document generation</li>
+                            <li class="flex items-center gap-2.5 text-sm text-cora-300"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-white shrink-0"><polyline points="20 6 9 17 4 12"/></svg>Priority support</li>
+                        </ul>
+                    </div>
+                    <!-- Enterprise -->
+                    <div class="p-6 sm:p-8 rounded-2xl bg-white border border-cora-100 reveal" data-delay="300">
+                        <div class="text-sm font-medium text-cora-500 mb-2">Enterprise</div>
+                        <div class="flex items-baseline gap-1 mb-1">
+                            <span class="text-3xl sm:text-4xl font-bold text-cora-950">Custom</span>
+                        </div>
+                        <p class="text-xs text-cora-500 mb-6">For large brokerages and franchises</p>
+                        <a href="#" class="block w-full py-3 text-center text-sm font-medium border border-cora-200 rounded-full hover:border-cora-400 transition-colors text-cora-700 mb-8">Contact Sales</a>
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-2.5 text-sm text-cora-600"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-cora-400 shrink-0"><polyline points="20 6 9 17 4 12"/></svg>Everything in Pro</li>
+                            <li class="flex items-center gap-2.5 text-sm text-cora-600"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-cora-400 shrink-0"><polyline points="20 6 9 17 4 12"/></svg>White-label branding</li>
+                            <li class="flex items-center gap-2.5 text-sm text-cora-600"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-cora-400 shrink-0"><polyline points="20 6 9 17 4 12"/></svg>Custom AI model training</li>
+                            <li class="flex items-center gap-2.5 text-sm text-cora-600"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-cora-400 shrink-0"><polyline points="20 6 9 17 4 12"/></svg>Dedicated account manager</li>
+                            <li class="flex items-center gap-2.5 text-sm text-cora-600"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-cora-400 shrink-0"><polyline points="20 6 9 17 4 12"/></svg>SLA & SSO</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- FINAL CTA -->
+        <!-- ═══════════════════════════════════════════ -->
+        <section class="py-20 sm:py-28 lg:py-36 bg-white relative overflow-hidden">
+            <div class="absolute inset-0 grid-bg opacity-40"></div>
+            <div class="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center reveal">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-cora-950">Ready to transform your <span class="gradient-text">real estate business?</span></h2>
+                <p class="text-base sm:text-lg text-cora-500 leading-relaxed mb-10 max-w-xl mx-auto">Join 50+ agencies already using Cora to close more deals, save time, and deliver exceptional client experiences.</p>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+                    <a href="#" id="cta-final-primary" class="btn-primary w-full sm:w-auto px-8 py-3.5 bg-cora-950 text-white text-sm font-semibold rounded-full inline-flex items-center justify-center gap-2.5">
+                        Start Your Free Trial
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                    <a href="#" id="cta-final-secondary" class="btn-secondary w-full sm:w-auto px-8 py-3.5 text-sm font-medium text-cora-600 border border-cora-200 rounded-full inline-flex items-center justify-center gap-2.5 transition-all">
+                        Schedule a Demo
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- FOOTER -->
+    <!-- ═══════════════════════════════════════════ -->
+    <footer class="border-t border-cora-100 py-12 sm:py-16 bg-cora-50">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-12 sm:mb-16">
+                <div class="col-span-2 md:col-span-1">
+                    <a href="#" class="flex items-center gap-2.5 mb-4">
+                        <div class="w-7 h-7 rounded-lg bg-cora-950 flex items-center justify-center">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                        </div>
+                        <span class="text-sm font-bold tracking-tight text-cora-950">Cora</span>
+                    </a>
+                    <p class="text-xs text-cora-500 leading-relaxed max-w-[200px]">The AI-powered business suite for modern real estate agencies.</p>
+                </div>
+                <div>
+                    <div class="text-xs font-semibold text-cora-500 uppercase tracking-wider mb-4">Product</div>
+                    <ul class="space-y-2.5">
+                        <li><a href="#features" class="text-sm text-cora-500 hover:text-cora-800 transition-colors">Features</a></li>
+                        <li><a href="#pricing" class="text-sm text-cora-500 hover:text-cora-800 transition-colors">Pricing</a></li>
+                        <li><a href="#" class="text-sm text-cora-500 hover:text-cora-800 transition-colors">Integrations</a></li>
+                        <li><a href="#" class="text-sm text-cora-500 hover:text-cora-800 transition-colors">Changelog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="text-xs font-semibold text-cora-500 uppercase tracking-wider mb-4">Company</div>
+                    <ul class="space-y-2.5">
+                        <li><a href="#" class="text-sm text-cora-500 hover:text-cora-800 transition-colors">About</a></li>
+                        <li><a href="#" class="text-sm text-cora-500 hover:text-cora-800 transition-colors">Blog</a></li>
+                        <li><a href="#" class="text-sm text-cora-500 hover:text-cora-800 transition-colors">Careers</a></li>
+                        <li><a href="#" class="text-sm text-cora-500 hover:text-cora-800 transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="text-xs font-semibold text-cora-500 uppercase tracking-wider mb-4">Legal</div>
+                    <ul class="space-y-2.5">
+                        <li><a href="#" class="text-sm text-cora-500 hover:text-cora-800 transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-sm text-cora-500 hover:text-cora-800 transition-colors">Terms of Service</a></li>
+                        <li><a href="#" class="text-sm text-cora-500 hover:text-cora-800 transition-colors">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-cora-200/60">
+                <p class="text-xs text-cora-400">&copy; 2026 Cora Platform. All rights reserved.</p>
+                <div class="flex items-center gap-4">
+                    <a href="#" class="text-cora-400 hover:text-cora-700 transition-colors" aria-label="Twitter/X">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M4 4l11.733 16h4.267l-11.733 -16z"/><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"/></svg>
+                    </a>
+                    <a href="#" class="text-cora-400 hover:text-cora-700 transition-colors" aria-label="LinkedIn">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                    </a>
+                    <a href="#" class="text-cora-400 hover:text-cora-700 transition-colors" aria-label="GitHub">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SCRIPTS -->
+    <!-- ═══════════════════════════════════════════ -->
+    <script>
+        // Mobile menu toggle
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuClose = document.getElementById('mobile-menu-close');
+
+        mobileMenuToggle?.addEventListener('click', () => mobileMenu?.classList.add('open'));
+        mobileMenuClose?.addEventListener('click', () => mobileMenu?.classList.remove('open'));
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', () => mobileMenu?.classList.remove('open'));
+        });
+
+        // Scroll-triggered reveal animations
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const delay = entry.target.dataset.delay || 0;
+                    setTimeout(() => entry.target.classList.add('visible'), parseInt(delay));
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navBg = document.querySelector('.fixed .absolute');
+            if (window.scrollY > 50) {
+                navBg?.classList.add('shadow-sm');
+            } else {
+                navBg?.classList.remove('shadow-sm');
+            }
+        });
+    </script>
+</body>
+</html>

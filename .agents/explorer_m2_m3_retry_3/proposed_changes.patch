@@ -1,0 +1,260 @@
+diff --git a/app/public/wp-content/plugins/cora-real-estate/cora-real-estate.php b/app/public/wp-content/plugins/cora-real-estate/cora-real-estate.php
+index f293a38..a12d8a4 100645
+--- a/app/public/wp-content/plugins/cora-real-estate/cora-real-estate.php
++++ b/app/public/wp-content/plugins/cora-real-estate/cora-real-estate.php
+@@ -3979,18 +3979,24 @@
+ function cora_ajax_gdpr_export() {
+     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+     if ( ! current_user_can( 'manage_privacy_options' ) && ! current_user_can( 'manage_options' ) ) {
+         wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+     }
+     $email = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
++    if ( empty( $email ) || ! is_email( $email ) ) {
++        wp_send_json_error( array( 'message' => 'Invalid or missing email address.' ) );
++    }
+     wp_send_json_success( array( 'message' => 'GDPR personal data export request generated for ' . $email . '.' ) );
+ }
+ add_action( 'wp_ajax_cora_gdpr_export', 'cora_ajax_gdpr_export' );
+ 
+ function cora_ajax_gdpr_erase() {
+     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+     if ( ! current_user_can( 'manage_privacy_options' ) && ! current_user_can( 'manage_options' ) ) {
+         wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+     }
+     $email = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
++    if ( empty( $email ) || ! is_email( $email ) ) {
++        wp_send_json_error( array( 'message' => 'Invalid or missing email address.' ) );
++    }
+     wp_send_json_success( array( 'message' => 'GDPR personal data erasure request processed for ' . $email . '.' ) );
+ }
+ add_action( 'wp_ajax_cora_gdpr_erase', 'cora_ajax_gdpr_erase' );
+
+diff --git a/app/public/wp-content/plugins/cora-real-estate/admin-dashboard.php b/app/public/wp-content/plugins/cora-real-estate/admin-dashboard.php
+index b1112b3..918c5e3 100645
+--- a/app/public/wp-content/plugins/cora-real-estate/admin-dashboard.php
++++ b/app/public/wp-content/plugins/cora-real-estate/admin-dashboard.php
+@@ -2614,17 +2614,30 @@
+             <div id="cora-profile-popover" class="hidden absolute bottom-20 left-4 right-4 bg-white border border-zinc-200 rounded-2xl shadow-xl p-4 z-30 flex flex-col gap-2.5 animate-in fade-in slide-in-from-bottom-2 duration-150">
+-                <!-- UID Display -->
+-                <div class="px-1 flex flex-col select-none">
+-                    <span class="text-[9px] text-zinc-400 font-semibold tracking-wide">UID : <?php echo esc_html( $current_wp_user->ID ); ?></span>
+-                </div>
++                <!-- UID Display & Connection Status -->
++                <div class="px-1 flex items-center justify-between select-none border-b border-zinc-100 pb-2">
++                    <span class="text-[9px] text-zinc-400 font-semibold tracking-wide">UID : <?php echo esc_html( $current_wp_user->ID ); ?></span>
++                    <div class="flex items-center gap-1.5 text-[9px] font-semibold">
++                        <div class="cora-status-indicator w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)] shrink-0 animate-pulse"></div>
++                        <span class="cora-status-text text-zinc-550">Connected</span>
++                    </div>
++                </div>
+                                <!-- Upgrade Container block -->
+                 <div class="bg-[#fafaf9] border border-zinc-200/50 rounded-xl p-3 flex justify-between items-center select-none">
+                     <div class="flex flex-col">
+                         <span class="text-xs font-bold text-zinc-900"><?php echo esc_html( $current_user_role_label ); ?></span>
+                     </div>
+                     <button class="bg-[#18181b] hover:bg-zinc-800 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg transition-colors cursor-pointer active:scale-95 shadow-sm" onclick="window.coraShowToast('Upgrade flow is loading... Upgrade to Premium to unlock full AI capabilities!')">
+                         Upgrade
+                     </button>
+                 </div>
++
++                <!-- Workspace Quota Metrics Block -->
++                <div class="bg-[#fafaf9] border border-zinc-200/50 rounded-xl p-3 flex flex-col gap-1.5 select-none">
++                    <div class="flex items-center justify-between text-[9px] font-bold text-zinc-400 uppercase tracking-wider">
++                        <span>Workspace Storage</span>
++                        <span class="text-zinc-900 font-bold">42%</span>
++                    </div>
++                    <div class="w-full h-1 bg-zinc-200 rounded-full overflow-hidden">
++                        <div class="h-full bg-zinc-900 rounded-full" style="width: 42%;"></div>
++                    </div>
++                    <div class="flex justify-between text-[9px] text-zinc-550 font-bold">
++                        <span>4.2 GB of 10 GB</span>
++                        <span>840 / 1,000 AI Credits</span>
++                    </div>
++                </div>
+
+diff --git a/app/public/wp-content/plugins/cora-real-estate/assets/js/admin-script.js b/app/public/wp-content/plugins/cora-real-estate/assets/js/admin-script.js
+index c8d8d7b..a12d8a4 100645
+--- a/app/public/wp-content/plugins/cora-real-estate/assets/js/admin-script.js
++++ b/app/public/wp-content/plugins/cora-real-estate/assets/js/admin-script.js
+@@ -7406,62 +7406,86 @@
+     window.coraRunGDPRExport = function() {
+         const email = $('#cora-gdpr-export-email').val().trim();
+         if (!email) {
+             window.coraShowToast("Please enter a valid email address.");
+             return;
+         }
+         if (!coraREData.ajaxNonce) {
+-            window.coraShowToast("GDPR personal data export request generated for " + email + ".");
++            window.coraShowToast("Security token missing. Cannot perform export.");
+             return;
+         }
+         $.post(coraREData.ajaxUrl, {
+             action: 'cora_gdpr_export',
+             nonce: coraREData.ajaxNonce,
+             email: email
+         }, function(res) {
+             if (res && res.success) {
+                 window.coraShowToast(res.data.message || "GDPR personal data export request generated for " + email + ".");
+             } else {
+-                window.coraShowToast("GDPR personal data export request generated for " + email + ".");
++                window.coraShowToast("Error: " + (res.data && res.data.message ? res.data.message : "Failed to generate GDPR export."));
+             }
+         }).fail(function() {
+-            window.coraShowToast("GDPR personal data export request generated for " + email + ".");
++            window.coraShowToast("Server error occurred while requesting GDPR export.");
+         });
+     };
+ 
+     window.coraRunGDPRErase = function() {
+         const email = $('#cora-gdpr-erase-email').val().trim();
+         if (!email) {
+             window.coraShowToast("Please enter a valid email address.");
+             return;
+         }
+         window.coraConfirmAction('GDPR Erasure Request', 'Are you sure you want to permanently erase personal data for ' + email + '?', function() {
+             if (!coraREData.ajaxNonce) {
+-                window.coraShowToast("GDPR personal data erasure request processed for " + email + ".");
++                window.coraShowToast("Security token missing. Cannot perform erasure.");
+                 return;
+             }
+             $.post(coraREData.ajaxUrl, {
+                 action: 'cora_gdpr_erase',
+                 nonce: coraREData.ajaxNonce,
+                 email: email
+             }, function(res) {
+                 if (res && res.success) {
+                     window.coraShowToast(res.data.message || "GDPR personal data erasure request processed for " + email + ".");
+                 } else {
+-                    window.coraShowToast("GDPR personal data erasure request processed for " + email + ".");
++                    window.coraShowToast("Error: " + (res.data && res.data.message ? res.data.message : "Failed to process erasure."));
+                 }
+             }).fail(function() {
+-                window.coraShowToast("GDPR personal data erasure request processed for " + email + ".");
++                window.coraShowToast("Server error occurred while requesting GDPR erasure.");
+             });
+         });
+     };
+ 
+     window.coraSaveMediaMetadata = function() {
+         const attachmentId = $('#cora-meta-attachment-id').val() || 0;
+         const title = $('#cora-meta-title').val() || '';
+         const alt = $('#cora-meta-alt').val() || '';
+         const caption = $('#cora-meta-caption').val() || '';
+         const description = $('#cora-meta-description').val() || '';
+ 
+         if (!coraREData.ajaxNonce || !attachmentId) {
+-            window.coraShowToast("Media updated successfully.");
++            window.coraShowToast("Invalid configuration or missing security token.");
+             return;
+         }
+ 
+         $.post(coraREData.ajaxUrl, {
+             action: 'cora_save_media_metadata',
+             nonce: coraREData.ajaxNonce,
+             attachment_id: attachmentId,
+             title: title,
+             alt: alt,
+             caption: caption,
+             description: description
+         }, function(res) {
+-            window.coraShowToast("Media updated successfully.");
++            if (res && res.success) {
++                window.coraShowToast(res.data.message || "Media metadata updated successfully.");
++            } else {
++                window.coraShowToast("Error: " + (res.data && res.data.message ? res.data.message : "Failed to update media."));
++            }
+         }).fail(function() {
+-            window.coraShowToast("Media updated successfully.");
++            window.coraShowToast("Server error occurred while updating media metadata.");
+         });
+     };
+ 
+     window.coraSaveEditedImage = function() {
+-        window.coraShowToast("Media updated successfully.");
++        const attachmentId = $('#cora-meta-attachment-id').val() || 0;
++        const img = $('#cora-editor-preview-img');
++        if (!attachmentId || img.length === 0) {
++            window.coraShowToast("No media selected to apply transformations.");
++            return;
++        }
++        if (!coraREData.ajaxNonce) {
++            window.coraShowToast("Security token missing. Cannot save transformations.");
++            return;
++        }
++
++        const rotate = img.data('rotate') || 0;
++        const scaleX = img.data('scalex') || 1;
++        const scaleY = img.data('scaley') || 1;
++        let flip = '';
++        if (scaleX === -1) {
++            flip = 'h';
++        } else if (scaleY === -1) {
++            flip = 'v';
++        }
++
++        const width = $('#cora-scale-width').val() || '';
++        const height = $('#cora-scale-height').val() || '';
++
++        window.coraShowToast("Saving image transformations...");
++
++        $.post(coraREData.ajaxUrl, {
++            action: 'cora_save_edited_image',
++            nonce: coraREData.ajaxNonce,
++            attachment_id: attachmentId,
++            rotate: rotate,
++            flip: flip,
++            width: width,
++            height: height
++        }, function(res) {
++            if (res && res.success) {
++                window.coraShowToast(res.data.message || "Media updated successfully.");
++                if (res.data.url) {
++                    img.attr('src', res.data.url + '?ver=' + new Date().getTime());
++                }
++            } else {
++                window.coraShowToast("Error: " + (res.data && res.data.message ? res.data.message : "Failed to update media."));
++            }
++        }).fail(function() {
++            window.coraShowToast("Server error occurred while saving transformations.");
++        });
+     };
+ 
+     window.coraSaveSystemSettingsSuite = function() {
+         const form = $('#cora-settings-suite-form');
+         if (!form.length || !coraREData.ajaxNonce) {
+-            window.coraShowToast("Global system settings updated successfully.");
++            window.coraShowToast("Configuration form or security token missing.");
+             return;
+         }
+ 
+@@ -7496,25 +7520,29 @@
+         const formData = form.serializeArray();
+         const data = {
+             action: 'cora_save_system_settings_suite',
+             nonce: coraREData.ajaxNonce
+         };
+ 
+         $.each(formData, function(i, field) {
+             data[field.name] = field.value;
+         });
+ 
+         const checkboxes = ['users_can_register', 'blog_public', 'default_pingback_flag', 'default_comment_status', 'comment_moderation'];
+         checkboxes.forEach(function(cbName) {
+             const cb = form.find('input[name="' + cbName + '"]');
+             if (cb.length > 0 && !cb.is(':checked')) {
+                 data[cbName] = 0;
+             }
+         });
+ 
+         $.post(coraREData.ajaxUrl, data, function(res) {
+-            window.coraShowToast("Global system settings updated successfully.");
++            if (res && res.success) {
++                window.coraShowToast(res.data.message || "Global system settings updated successfully.");
++            } else {
++                window.coraShowToast("Error: " + (res.data && res.data.message ? res.data.message : "Failed to update settings."));
++            }
+         }).fail(function() {
+-            window.coraShowToast("Global system settings updated successfully.");
++            window.coraShowToast("Server error occurred while updating settings.");
+         });
+     };

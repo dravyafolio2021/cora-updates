@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WVIN Wealth Infra — Premium Real Estate · Gurgaon</title>
+<meta name="description" content="Gurgaon's most trusted premium real estate consultancy. Luxury residential and commercial properties from DLF, Godrej, Emaar, M3M.">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script>tailwind.config={theme:{extend:{fontFamily:{sans:['"Plus Jakarta Sans"','system-ui','sans-serif'],body:['Inter','system-ui','sans-serif']}}}}</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:#000;color:#fff;-webkit-font-smoothing:antialiased;overflow-x:hidden;cursor:none}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-track{background:#000}::-webkit-scrollbar-thumb{background:#fff}
+
+/* Custom cursor */
+.cursor{position:fixed;width:7px;height:7px;background:#fff;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .15s,height .15s,opacity .2s;mix-blend-mode:difference}
+.cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(255,255,255,.35);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s}
+.cursor.hover{width:14px;height:14px}
+.cursor-ring.hover{width:52px;height:52px;border-color:rgba(255,255,255,.6)}
+@media(hover:none){.cursor,.cursor-ring{display:none}body{cursor:auto}}
+
+/* Progress */
+.progress{position:fixed;top:0;left:0;height:2px;background:#fff;z-index:9000;width:0%;transition:width .05s linear}
+
+/* Nav */
+.nav-solid{background:rgba(0,0,0,.92)!important;backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06)}
+.nav-light{background:rgba(255,255,255,.92)!important;backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,.06)}
+
+/* Reveal animations */
+.reveal{opacity:0;transform:translateY(36px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+.reveal.fl{transform:translateX(-36px)}
+.reveal.fr{transform:translateX(36px)}
+.reveal.sc{transform:scale(.9)}
+.reveal.active{opacity:1;transform:none}
+.d1{transition-delay:.12s!important}.d2{transition-delay:.22s!important}.d3{transition-delay:.32s!important}
+.d4{transition-delay:.42s!important}.d5{transition-delay:.52s!important}.d6{transition-delay:.62s!important}
+
+/* Word mask reveal */
+.wm{display:inline-block;overflow:hidden;vertical-align:bottom}
+.wi{display:inline-block;transform:translateY(108%);opacity:0;transition:transform .95s cubic-bezier(.16,1,.3,1),opacity .6s ease}
+.wi.on{transform:translateY(0);opacity:1}
+
+/* Buttons */
+.btn-w{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.2);color:#fff;display:inline-flex;align-items:center;justify-content:center;transition:color .35s}
+.btn-w::before{content:'';position:absolute;inset:0;background:#fff;transform:scaleX(0);transform-origin:left;transition:transform .45s cubic-bezier(.16,1,.3,1);z-index:0}
+.btn-w:hover::before{transform:scaleX(1)}
+.btn-w:hover{color:#000}
+.btn-w>span{position:relative;z-index:1}
+.btn-b{position:relative;overflow:hidden;border:1px solid rgba(0,0,0,.15);color:#000;display:inline-flex;align-items:center;justify-content:center;transition:color .35s}
+.btn-b::before{content:'';position:absolute;inset:0;background:#000;transform:scaleX(0);transform-origin:left;transition:transform .45s cubic-bezier(.16,1,.3,1);z-index:0}
+.btn-b:hover::before{transform:scaleX(1)}
+.btn-b:hover{color:#fff}
+.btn-b>span{position:relative;z-index:1}
+
+/* Nav underline hover */
+.nav-link{position:relative}
+.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:currentColor;transition:width .3s ease}
+.nav-link:hover::after{width:100%}
+
+/* Property cards */
+.prop-card{transition:transform .5s cubic-bezier(.16,1,.3,1),box-shadow .5s}
+.prop-card:hover{transform:translateY(-8px);box-shadow:0 30px 60px rgba(0,0,0,.5)}
+.prop-img{filter:grayscale(100%);transition:filter .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+.prop-card:hover .prop-img{filter:grayscale(0%);transform:scale(1.04)}
+
+/* Amenity cards */
+.am-card{transition:border-color .3s,background .3s,transform .3s}
+.am-card:hover{border-color:rgba(255,255,255,.25)!important;background:rgba(255,255,255,.03)!important;transform:translateY(-4px)}
+
+/* Team cards */
+.team-card{transition:border-color .3s,transform .3s}
+.team-card:hover{border-color:rgba(0,0,0,.2)!important;transform:translateY(-4px)}
+
+/* 3D card */
+.card3d{transition:transform .5s cubic-bezier(.16,1,.3,1);transform-style:preserve-3d}
+
+/* Marquee */
+.mq-track{display:flex;width:max-content;animation:mq 30s linear infinite}
+@keyframes mq{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* Line reveal */
+.lr{transform:scaleX(0);transform-origin:left;transition:transform .9s cubic-bezier(.16,1,.3,1)}
+.lr.on{transform:scaleX(1)}
+
+/* Float */
+@keyframes flt{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.float{animation:flt 5s ease-in-out infinite}
+
+/* Scroll hint */
+@keyframes spulse{0%,100%{opacity:.2;transform:scaleY(1) translateX(-50%)}50%{opacity:.8;transform:scaleY(1.15) translateX(-50%)}}
+#scrollHint{animation:spulse 2.5s ease-in-out infinite;transform-origin:top center}
+
+/* Mobile menu */
+.mob-menu{transform:translateX(100%);transition:transform .4s cubic-bezier(.16,1,.3,1)}
+.mob-menu.open{transform:translateX(0)}
+
+/* FAQ */
+.faq-body{max-height:0;overflow:hidden;transition:max-height .42s cubic-bezier(.16,1,.3,1)}
+.faq-body.open{max-height:240px}
+.faq-icon{transition:transform .35s cubic-bezier(.16,1,.3,1)}
+
+/* Section label */
+.lbl{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;font-family:'Inter',sans-serif}
+</style>
+</head>
+<body class="bg-black text-white">
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="progress" id="progress"></div>
+
+<!-- NAV -->
+<nav id="nav" class="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-5 transition-all duration-500">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <a href="#" class="flex flex-col group">
+      <span class="font-sans text-lg font-extrabold tracking-[.2em] text-white group-hover:opacity-70 transition-opacity">WVIN</span>
+      <span class="lbl text-neutral-600" style="letter-spacing:.18em">Wealth Infra</span>
+    </a>
+    <div class="hidden lg:flex items-center gap-8">
+      <a href="#properties" class="lbl text-neutral-500 hover:text-white transition-colors nav-link">Properties</a>
+      <a href="#amenities" class="lbl text-neutral-500 hover:text-white transition-colors nav-link">Amenities</a>
+      <a href="#team" class="lbl text-neutral-500 hover:text-white transition-colors nav-link">Team</a>
+      <a href="#ai" class="lbl text-neutral-500 hover:text-white transition-colors nav-link">AI</a>
+      <a href="#faq" class="lbl text-neutral-500 hover:text-white transition-colors nav-link">FAQ</a>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="wvin-admin.html" class="hidden md:flex lbl text-neutral-500 hover:text-white transition-colors nav-link mr-2">CRM Admin</a>
+      <a href="#contact" class="hidden md:flex btn-w lbl px-5 py-2.5 magnetic"><span>Contact Us</span></a>
+      <button id="menuBtn" class="lg:hidden p-2 flex flex-col gap-1.5 magnetic">
+        <span class="w-5 h-px bg-white block transition-all" id="hb1"></span>
+        <span class="w-3 h-px bg-neutral-600 block transition-all" id="hb2"></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div id="mobileMenu" class="mob-menu fixed inset-0 z-40 bg-black flex flex-col px-6 pt-24 pb-10 lg:hidden">
+  <nav class="flex flex-col flex-1">
+    <a href="#properties" onclick="closeMenu()" class="font-sans text-5xl font-extrabold py-5 border-b border-white/6 text-white hover:text-neutral-400 transition-colors">Properties</a>
+    <a href="#amenities" onclick="closeMenu()" class="font-sans text-5xl font-extrabold py-5 border-b border-white/6 text-white hover:text-neutral-400 transition-colors">Amenities</a>
+    <a href="#team" onclick="closeMenu()" class="font-sans text-5xl font-extrabold py-5 border-b border-white/6 text-white hover:text-neutral-400 transition-colors">Team</a>
+    <a href="#ai" onclick="closeMenu()" class="font-sans text-5xl font-extrabold py-5 border-b border-white/6 text-white hover:text-neutral-400 transition-colors">AI</a>
+    <a href="#contact" onclick="closeMenu()" class="font-sans text-5xl font-extrabold py-5 border-b border-white/6 text-neutral-600">Contact</a>
+    <a href="wvin-admin.html" onclick="closeMenu()" class="font-sans text-5xl font-extrabold py-5 text-neutral-600">CRM Admin</a>
+  </nav>
+  <div class="lbl text-neutral-700">Gurgaon · Delhi NCR · India</div>
+</div>
+
+<!-- HERO -->
+<section class="relative min-h-screen flex flex-col justify-end overflow-hidden bg-black">
+  <div class="absolute inset-0 overflow-hidden">
+    <img id="heroImg" src="https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1800&q=85&auto=format&fit=crop" alt="" class="w-full object-cover grayscale opacity-20" style="height:130%;will-change:transform">
+  </div>
+  <div class="absolute inset-0 bg-gradient-to-t from-black via-black/65 to-transparent"></div>
+  <div class="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent"></div>
+
+  <div class="relative z-10 px-6 md:px-12 pb-20 md:pb-28 max-w-7xl mx-auto w-full">
+    <div class="flex items-center gap-3 mb-10 reveal">
+      <div class="w-10 h-px bg-white/30"></div>
+      <span class="lbl text-neutral-500">Premium Real Estate · Gurgaon, India</span>
+    </div>
+    <h1 id="heroTitle" class="font-sans font-extrabold leading-[.94] tracking-tight mb-8" style="font-size:clamp(52px,10vw,136px)">
+      Gurgaon's Most Trusted Real Estate Partner.
+    </h1>
+    <p class="text-neutral-400 text-base md:text-lg max-w-md mb-12 reveal d3" style="line-height:1.75;font-family:'Inter',sans-serif">Curating India's finest residential and commercial properties for discerning investors across Delhi-NCR.</p>
+    <div class="flex flex-col md:flex-row border border-white/10 bg-white/4 backdrop-blur-sm reveal d4" style="max-width:640px">
+      <select class="flex-1 bg-transparent text-neutral-300 text-sm px-4 py-4 border-b md:border-b-0 md:border-r border-white/10 appearance-none cursor-pointer focus:outline-none" style="font-family:'Inter',sans-serif">
+        <option value="" disabled selected>Property Type</option>
+        <option class="bg-black">Luxury Apartment</option><option class="bg-black">Penthouse</option><option class="bg-black">Villa / Farmhouse</option><option class="bg-black">Commercial Space</option>
+      </select>
+      <select class="flex-1 bg-transparent text-neutral-300 text-sm px-4 py-4 border-b md:border-b-0 md:border-r border-white/10 appearance-none cursor-pointer focus:outline-none" style="font-family:'Inter',sans-serif">
+        <option value="" disabled selected>Budget</option>
+        <option class="bg-black">₹1Cr – ₹3Cr</option><option class="bg-black">₹3Cr – ₹5Cr</option><option class="bg-black">₹5Cr – ₹10Cr</option><option class="bg-black">₹10Cr+</option>
+      </select>
+      <select class="flex-1 bg-transparent text-neutral-300 text-sm px-4 py-4 border-b md:border-b-0 md:border-r border-white/10 appearance-none cursor-pointer focus:outline-none" style="font-family:'Inter',sans-serif">
+        <option value="" disabled selected>Location</option>
+        <option class="bg-black">Golf Course Road</option><option class="bg-black">DLF Phase 1–5</option><option class="bg-black">Dwarka Expressway</option>
+      </select>
+      <button class="bg-white text-black lbl px-8 py-4 hover:bg-neutral-200 transition-colors whitespace-nowrap magnetic">Search</button>
+    </div>
+    <div class="absolute right-6 md:right-12 bottom-20 hidden md:flex items-center gap-8 reveal d5">
+      <div class="text-right"><div class="font-sans text-3xl font-extrabold" data-count="500" data-prefix="₹" data-suffix="Cr+">₹0</div><div class="lbl text-neutral-600 mt-1">Properties Sold</div></div>
+      <div class="w-px h-8 bg-white/10"></div>
+      <div class="text-right"><div class="font-sans text-3xl font-extrabold" data-count="800" data-suffix="+">0</div><div class="lbl text-neutral-600 mt-1">Happy Clients</div></div>
+    </div>
+  </div>
+  <div id="scrollHint" class="absolute bottom-8 left-1/2" style="transform:translateX(-50%)">
+    <div class="w-px h-10 bg-gradient-to-b from-white/50 to-transparent mx-auto"></div>
+    <div class="lbl text-neutral-700 mt-2" style="text-align:center">Scroll</div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<section class="border-y border-white/6 py-5 overflow-hidden bg-neutral-950">
+  <div class="mq-track">
+    <div class="flex items-center gap-12 px-8 whitespace-nowrap">
+      <span class="font-sans font-bold text-xs tracking-[.2em] text-neutral-700 uppercase">DLF</span><div class="w-6 h-px bg-neutral-800"></div>
+      <span class="font-sans font-bold text-xs tracking-[.2em] text-neutral-700 uppercase">Godrej Properties</span><div class="w-6 h-px bg-neutral-800"></div>
+      <span class="font-sans font-bold text-xs tracking-[.2em] text-neutral-700 uppercase">Emaar</span><div class="w-6 h-px bg-neutral-800"></div>
+      <span class="font-sans font-bold text-xs tracking-[.2em] text-neutral-700 uppercase">M3M India</span><div class="w-6 h-px bg-neutral-800"></div>
+      <span class="font-sans font-bold text-xs tracking-[.2em] text-neutral-700 uppercase">Sobha</span><div class="w-6 h-px bg-neutral-800"></div>
+      <span class="font-sans font-bold text-xs tracking-[.2em] text-neutral-700 uppercase">Signature Global</span><div class="w-6 h-px bg-neutral-800"></div>
+      <span class="font-sans font-bold text-xs tracking-[.2em] text-neutral-700 uppercase">Tata Housing</span><div class="w-6 h-px bg-neutral-800"></div>
+      <span class="font-sans font-bold text-xs tracking-[.2em] text-neutral-700 uppercase">Birla Estates</span><div class="w-6 h-px bg-neutral-800"></div>
+      <span class="font-sans font-bold text-xs tracking-[.2em] text-neutral-700 uppercase">Mahindra Lifespaces</span><div class="w-6 h-px bg-neutral-800"></div>
+    </div>
+    <div class="flex items-center gap-12 px-8 whitespace-nowrap">
+      <span class="font-sans font-bold text-xs tracking-[.2em] text-neutral-700 uppercase">DLF</span><div class="w-6 h-px bg-neutral-800"></div>
+      <span class="font-sans font-bold text-xs tracking-[.2em] text-neutral-700 uppercase">Godrej Properties</span><div class="w-6 h-px bg-neutral-800"></div>
+      <span class="font-sans font-bold text-xs tracking-[.2em] text-neutral-700 uppercase">Emaar</span><div class="w-6 h-px bg-neutral-800"></div>
+      <span class="font-sans font-bold text-xs tracking-[.2em] text-neutral-700 uppercase">M3M India</span><div class="w-6 h-px bg-neutral-800"></div>
+      <span class="font-sans font-bold text-xs tracking-[.2em] text-neutral-700 uppercase">Sobha</span><div class="w-6 h-px bg-neutral-800"></div>
+      <span class="font-sans font-bold text-xs tracking-[.2em] text-neutral-700 uppercase">Signature Global</span><div class="w-6 h-px bg-neutral-800"></div>
+      <span class="font-sans font-bold text-xs tracking-[.2em] text-neutral-700 uppercase">Tata Housing</span><div class="w-6 h-px bg-neutral-800"></div>
+      <span class="font-sans font-bold text-xs tracking-[.2em] text-neutral-700 uppercase">Birla Estates</span><div class="w-6 h-px bg-neutral-800"></div>
+      <span class="font-sans font-bold text-xs tracking-[.2em] text-neutral-700 uppercase">Mahindra Lifespaces</span><div class="w-6 h-px bg-neutral-800"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT (LIGHT) -->
+<section id="about" class="py-24 md:py-32 px-6 md:px-12 bg-white text-black" data-theme="light">
+  <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+    <div>
+      <div class="flex items-center gap-3 mb-10"><div class="lr h-px bg-black/25 w-8"></div><span class="lbl text-neutral-400 reveal">Our Story</span></div>
+      <h2 class="font-sans font-extrabold tracking-tight leading-[1.02] mb-8 reveal" style="font-size:clamp(34px,5vw,58px)">Gurgaon's Most Trusted Premium Property Consultancy.</h2>
+      <p class="text-neutral-600 text-base leading-relaxed mb-5 reveal d1" style="max-width:44ch;font-family:'Inter',sans-serif">Founded by Saurabh Bansal with a singular vision — to bring transparency, trust, and precision to India's premium real estate market.</p>
+      <p class="text-neutral-600 text-base leading-relaxed mb-12 reveal d2" style="max-width:44ch;font-family:'Inter',sans-serif">With exclusive partnerships with DLF, Godrej, Emaar, M3M and 20+ premier developers, WVIN offers privileged access to the finest inventory across Delhi-NCR.</p>
+      <div class="grid grid-cols-3 gap-4 pt-8 border-t border-black/8">
+        <div class="reveal"><div class="font-sans font-extrabold text-[40px] mb-1 leading-none counter-el" data-count="500" data-suffix="+">500+</div><div class="lbl text-neutral-400">Transactions</div></div>
+        <div class="reveal d1"><div class="font-sans font-extrabold text-[40px] mb-1 leading-none counter-el" data-count="5" data-suffix="+">5+</div><div class="lbl text-neutral-400">Years</div></div>
+        <div class="reveal d2"><div class="font-sans font-extrabold text-[40px] mb-1 leading-none counter-el" data-count="20" data-suffix="+">20+</div><div class="lbl text-neutral-400">Developers</div></div>
+      </div>
+    </div>
+    <div class="reveal sc">
+      <div class="bg-neutral-50 border border-black/6 p-8 md:p-10 hover:border-black/15 transition-all duration-500">
+        <div class="flex items-center gap-5 mb-7">
+          <div class="w-16 h-16 rounded-full bg-black flex items-center justify-center flex-shrink-0">
+            <span class="font-sans text-xl font-bold text-white">SB</span>
+          </div>
+          <div>
+            <h3 class="font-sans text-xl font-bold">Saurabh Bansal</h3>
+            <p class="lbl text-neutral-400 mt-1">Founder & Managing Director</p>
+          </div>
+        </div>
+        <blockquote class="text-xl text-neutral-600 leading-relaxed mb-7 border-l-2 border-black pl-5" style="font-family:'Inter',sans-serif">"Every property I present has been personally vetted. I don't offer investment options — I offer conviction."</blockquote>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-white border border-black/8 p-4 hover:border-black/20 transition-colors"><div class="font-sans text-2xl font-extrabold mb-1">₹10Cr+</div><div class="text-xs text-neutral-500" style="font-family:'Inter',sans-serif">Annual Revenue</div></div>
+          <div class="bg-white border border-black/8 p-4 hover:border-black/20 transition-colors"><div class="font-sans text-2xl font-extrabold mb-1">800+</div><div class="text-xs text-neutral-500" style="font-family:'Inter',sans-serif">Clients Served</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROPERTIES (DARK) -->
+<section id="properties" class="py-24 md:py-28 bg-black">
+  <div class="px-6 md:px-12 max-w-7xl mx-auto">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
+      <div>
+        <div class="flex items-center gap-3 mb-5"><div class="lr h-px bg-white/20 w-8"></div><span class="lbl text-neutral-600 reveal">Curated Listings</span></div>
+        <h2 class="font-sans font-extrabold tracking-tight leading-tight reveal" style="font-size:clamp(32px,5vw,56px)">Featured Properties</h2>
+      </div>
+      <div class="flex flex-col gap-2 reveal">
+        <div class="lbl text-neutral-700 mb-1">Live Synced From</div>
+        <div class="flex gap-2 flex-wrap">
+          <div class="flex items-center gap-2 border border-white/8 px-3 py-1.5"><div class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div><span class="text-xs text-neutral-500" style="font-family:'Inter',sans-serif">99acres</span></div>
+          <div class="flex items-center gap-2 border border-white/8 px-3 py-1.5"><div class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div><span class="text-xs text-neutral-500" style="font-family:'Inter',sans-serif">MagicBricks</span></div>
+          <div class="flex items-center gap-2 border border-white/8 px-3 py-1.5"><div class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div><span class="text-xs text-neutral-500" style="font-family:'Inter',sans-serif">Housing.com</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="prop-card border border-white/8 overflow-hidden reveal">
+        <div class="h-52 overflow-hidden relative"><img src="https://images.unsplash.com/photo-1613977257363-707ba9348227?w=600&q=80" class="prop-img w-full h-full object-cover" alt=""><div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div><div class="absolute top-3 left-3"><span class="bg-white text-black lbl px-2 py-1">Premium</span></div><div class="absolute bottom-3 left-4"><div class="font-sans text-2xl font-extrabold">₹4.8 Cr</div></div></div>
+        <div class="p-5 bg-neutral-950"><h3 class="font-sans font-bold text-sm mb-1">DLF The Crest</h3><p class="lbl text-neutral-600 mb-3">Golf Course Road, Sector 54</p><div class="flex gap-4 text-xs text-neutral-600 mb-4" style="font-family:'Inter',sans-serif"><span>4 BHK</span><span>·</span><span>3,200 sq.ft</span></div><div class="flex justify-between pt-4 border-t border-white/6"><span class="lbl text-neutral-700">DLF</span><button class="text-white text-xs tracking-widest uppercase nav-link">View →</button></div></div>
+      </div>
+      <div class="prop-card border border-white/8 overflow-hidden reveal d1">
+        <div class="h-52 overflow-hidden relative"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=80" class="prop-img w-full h-full object-cover" alt=""><div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div><div class="absolute top-3 left-3"><span class="bg-emerald-500 text-white lbl px-2 py-1">New Launch</span></div><div class="absolute bottom-3 left-4"><div class="font-sans text-2xl font-extrabold">₹2.4 Cr</div></div></div>
+        <div class="p-5 bg-neutral-950"><h3 class="font-sans font-bold text-sm mb-1">Godrej Meridien</h3><p class="lbl text-neutral-600 mb-3">Sector 106, Dwarka Expressway</p><div class="flex gap-4 text-xs text-neutral-600 mb-4" style="font-family:'Inter',sans-serif"><span>3 BHK</span><span>·</span><span>1,850 sq.ft</span></div><div class="flex justify-between pt-4 border-t border-white/6"><span class="lbl text-neutral-700">Godrej</span><button class="text-white text-xs tracking-widest uppercase nav-link">View →</button></div></div>
+      </div>
+      <div class="prop-card border border-white/8 overflow-hidden reveal d2">
+        <div class="h-52 overflow-hidden relative"><img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=80" class="prop-img w-full h-full object-cover" alt=""><div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div><div class="absolute top-3 left-3"><span class="bg-white text-black lbl px-2 py-1">Featured</span></div><div class="absolute bottom-3 left-4"><div class="font-sans text-2xl font-extrabold">₹7.2 Cr</div></div></div>
+        <div class="p-5 bg-neutral-950"><h3 class="font-sans font-bold text-sm mb-1">Emaar Palm Heights</h3><p class="lbl text-neutral-600 mb-3">Sector 77, Golf Course Ext.</p><div class="flex gap-4 text-xs text-neutral-600 mb-4" style="font-family:'Inter',sans-serif"><span>4 BHK</span><span>·</span><span>4,800 sq.ft</span></div><div class="flex justify-between pt-4 border-t border-white/6"><span class="lbl text-neutral-700">Emaar</span><button class="text-white text-xs tracking-widest uppercase nav-link">View →</button></div></div>
+      </div>
+      <div class="prop-card border border-white/8 overflow-hidden reveal d1">
+        <div class="h-52 overflow-hidden relative"><img src="https://images.unsplash.com/photo-1582407947304-fd86f28f9ada?w=600&q=80" class="prop-img w-full h-full object-cover" alt=""><div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div><div class="absolute top-3 left-3"><span class="bg-neutral-900 text-neutral-400 lbl px-2 py-1">Penthouse</span></div><div class="absolute bottom-3 left-4"><div class="font-sans text-2xl font-extrabold">₹12.5 Cr</div></div></div>
+        <div class="p-5 bg-neutral-950"><h3 class="font-sans font-bold text-sm mb-1">M3M Golf Estate Penthouse</h3><p class="lbl text-neutral-600 mb-3">Sector 65, Golf Course Ext.</p><div class="flex gap-4 text-xs text-neutral-600 mb-4" style="font-family:'Inter',sans-serif"><span>5 BHK</span><span>·</span><span>6,200 sq.ft</span></div><div class="flex justify-between pt-4 border-t border-white/6"><span class="lbl text-neutral-700">M3M</span><button class="text-white text-xs tracking-widest uppercase nav-link">View →</button></div></div>
+      </div>
+      <div class="prop-card border border-white/8 overflow-hidden reveal d2">
+        <div class="h-52 overflow-hidden relative"><img src="https://images.unsplash.com/photo-1560184897-ae75f418493e?w=600&q=80" class="prop-img w-full h-full object-cover" alt=""><div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div><div class="absolute top-3 left-3"><span class="bg-blue-700 text-white lbl px-2 py-1">Under Construction</span></div><div class="absolute bottom-3 left-4"><div class="font-sans text-2xl font-extrabold">₹1.8 Cr</div></div></div>
+        <div class="p-5 bg-neutral-950"><h3 class="font-sans font-bold text-sm mb-1">Sobha City Tower C</h3><p class="lbl text-neutral-600 mb-3">Sector 108, Dwarka Expressway</p><div class="flex gap-4 text-xs text-neutral-600 mb-4" style="font-family:'Inter',sans-serif"><span>2 BHK</span><span>·</span><span>1,200 sq.ft</span></div><div class="flex justify-between pt-4 border-t border-white/6"><span class="lbl text-neutral-700">Sobha</span><button class="text-white text-xs tracking-widest uppercase nav-link">View →</button></div></div>
+      </div>
+      <div class="prop-card border border-white/8 overflow-hidden reveal d3">
+        <div class="h-52 overflow-hidden relative"><img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80" class="prop-img w-full h-full object-cover" alt=""><div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div><div class="absolute top-3 left-3"><span class="bg-purple-700 text-white lbl px-2 py-1">Commercial</span></div><div class="absolute bottom-3 left-4"><div class="font-sans text-2xl font-extrabold">₹3.2 Cr</div></div></div>
+        <div class="p-5 bg-neutral-950"><h3 class="font-sans font-bold text-sm mb-1">Cybercity Tower B Office</h3><p class="lbl text-neutral-600 mb-3">DLF Cyber City, Sector 24</p><div class="flex gap-4 text-xs text-neutral-600 mb-4" style="font-family:'Inter',sans-serif"><span>2,400 sq.ft</span><span>·</span><span>Grade A</span></div><div class="flex justify-between pt-4 border-t border-white/6"><span class="lbl text-neutral-700">DLF Commercial</span><button class="text-white text-xs tracking-widest uppercase nav-link">View →</button></div></div>
+      </div>
+    </div>
+    <div class="text-center mt-10 reveal"><a href="#contact" class="btn-w lbl px-8 py-4 magnetic"><span>View All Properties →</span></a></div>
+  </div>
+</section>
+
+<!-- 3D VIEW (LIGHT) -->
+<section class="py-24 md:py-28 px-6 md:px-12 bg-neutral-50 text-black" data-theme="light">
+  <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+    <div id="c3dWrap" class="reveal sc">
+      <div id="card3d" class="card3d bg-white border border-black/8 overflow-hidden" style="box-shadow:0 20px 60px rgba(0,0,0,.1)">
+        <div class="relative h-72 overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80" class="w-full h-full object-cover grayscale" alt="">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div class="w-16 h-16 rounded-full border-2 border-white flex items-center justify-center bg-black/40 backdrop-blur hover:bg-black/60 transition-all cursor-pointer"><svg width="18" height="18" viewBox="0 0 18 18" fill="white"><path d="M4 3l11 6-11 6V3z"/></svg></div>
+          </div>
+          <div class="absolute top-4 right-4 bg-black text-white lbl px-3 py-1.5">360° Tour</div>
+        </div>
+        <div class="p-6">
+          <div class="flex justify-between items-start mb-4"><div><h3 class="font-sans font-bold text-lg">DLF The Magnolias</h3><p class="lbl text-neutral-400 mt-1">Golf Course Road · 5 BHK · 8,000 sq.ft</p></div><div class="font-sans text-xl font-extrabold">₹22 Cr</div></div>
+          <div class="grid grid-cols-4 gap-1 h-10">
+            <div class="bg-neutral-100 flex items-center justify-center text-[8px] text-neutral-400 col-span-2" style="font-family:'Inter',sans-serif">Living Room</div>
+            <div class="bg-neutral-100 flex items-center justify-center text-[8px] text-neutral-400" style="font-family:'Inter',sans-serif">MBR</div>
+            <div class="bg-neutral-100 flex items-center justify-center text-[8px] text-neutral-400" style="font-family:'Inter',sans-serif">BR 2</div>
+            <div class="bg-black text-white flex items-center justify-center text-[8px]" style="font-family:'Inter',sans-serif">Kitchen</div>
+            <div class="bg-neutral-100 flex items-center justify-center text-[8px] text-neutral-400" style="font-family:'Inter',sans-serif">BR 3</div>
+            <div class="bg-neutral-100 flex items-center justify-center text-[8px] text-neutral-400" style="font-family:'Inter',sans-serif">Study</div>
+            <div class="bg-neutral-100 flex items-center justify-center text-[8px] text-neutral-400" style="font-family:'Inter',sans-serif">BR 4</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="flex items-center gap-3 mb-8"><div class="lr h-px bg-black/20 w-8"></div><span class="lbl text-neutral-400 reveal">Immersive Experience</span></div>
+      <h2 class="font-sans font-extrabold tracking-tight leading-tight mb-6 reveal" style="font-size:clamp(32px,4.5vw,52px)">Tour Every Property Before You Visit.</h2>
+      <p class="text-neutral-600 text-base leading-relaxed mb-8 reveal d1" style="max-width:42ch;font-family:'Inter',sans-serif">Our 360° virtual tours and interactive floor plans let you explore every corner from your phone — before stepping out the door.</p>
+      <div class="flex flex-col gap-4">
+        <div class="flex items-start gap-4 reveal d1 p-4 border border-black/6 hover:border-black/20 transition-colors"><div class="w-8 h-8 border border-black/10 flex items-center justify-center flex-shrink-0"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="6" stroke="black" stroke-width="1"/><path d="M4 6.5l2 2 3.5-3.5" stroke="black" stroke-width="1.2" stroke-linecap="round"/></svg></div><div><div class="font-sans font-semibold text-sm mb-1">360° Virtual Walkthrough</div><div class="text-xs text-neutral-500" style="font-family:'Inter',sans-serif">Full property tour from any device</div></div></div>
+        <div class="flex items-start gap-4 reveal d2 p-4 border border-black/6 hover:border-black/20 transition-colors"><div class="w-8 h-8 border border-black/10 flex items-center justify-center flex-shrink-0"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="6" stroke="black" stroke-width="1"/><path d="M4 6.5l2 2 3.5-3.5" stroke="black" stroke-width="1.2" stroke-linecap="round"/></svg></div><div><div class="font-sans font-semibold text-sm mb-1">Interactive Floor Plans</div><div class="text-xs text-neutral-500" style="font-family:'Inter',sans-serif">Understand layout before visiting</div></div></div>
+        <div class="flex items-start gap-4 reveal d3 p-4 border border-black/6 hover:border-black/20 transition-colors"><div class="w-8 h-8 border border-black/10 flex items-center justify-center flex-shrink-0"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="6" stroke="black" stroke-width="1"/><path d="M4 6.5l2 2 3.5-3.5" stroke="black" stroke-width="1.2" stroke-linecap="round"/></svg></div><div><div class="font-sans font-semibold text-sm mb-1">AI Property Matching</div><div class="text-xs text-neutral-500" style="font-family:'Inter',sans-serif">Recommended based on your investment profile</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AMENITIES (DARK) -->
+<section id="amenities" class="py-24 md:py-28 bg-neutral-950">
+  <div class="px-6 md:px-12 max-w-7xl mx-auto">
+    <div class="text-center mb-16">
+      <div class="flex items-center justify-center gap-3 mb-5"><div class="lr h-px bg-white/15 w-8"></div><span class="lbl text-neutral-600 reveal">World-Class Living</span><div class="lr h-px bg-white/15 w-8"></div></div>
+      <h2 class="font-sans font-extrabold tracking-tight leading-tight mb-4 reveal" style="font-size:clamp(32px,5vw,58px)">Every Amenity.<br>Without Compromise.</h2>
+      <p class="text-neutral-500 text-sm max-w-md mx-auto reveal d1" style="font-family:'Inter',sans-serif">Properties we represent come with amenities that redefine the standard for premium living in India.</p>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="am-card border border-white/8 p-6 text-center reveal"><div class="w-10 h-10 border border-white/10 mx-auto mb-4 flex items-center justify-center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></div><div class="font-sans font-semibold text-sm mb-1">Concierge Lobby</div><div class="text-xs text-neutral-600" style="font-family:'Inter',sans-serif">24/7 staffed with valet</div></div>
+      <div class="am-card border border-white/8 p-6 text-center reveal d1"><div class="w-10 h-10 border border-white/10 mx-auto mb-4 flex items-center justify-center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 12a4 4 0 0 0 8 0"/></svg></div><div class="font-sans font-semibold text-sm mb-1">Infinity Pool</div><div class="text-xs text-neutral-600" style="font-family:'Inter',sans-serif">Temperature-controlled</div></div>
+      <div class="am-card border border-white/8 p-6 text-center reveal d2"><div class="w-10 h-10 border border-white/10 mx-auto mb-4 flex items-center justify-center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div><div class="font-sans font-semibold text-sm mb-1">Smart Home</div><div class="text-xs text-neutral-600" style="font-family:'Inter',sans-serif">Voice & app-controlled</div></div>
+      <div class="am-card border border-white/8 p-6 text-center reveal d3"><div class="w-10 h-10 border border-white/10 mx-auto mb-4 flex items-center justify-center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="font-sans font-semibold text-sm mb-1">EV Charging</div><div class="text-xs text-neutral-600" style="font-family:'Inter',sans-serif">Dedicated EV bays</div></div>
+      <div class="am-card border border-white/8 p-6 text-center reveal"><div class="w-10 h-10 border border-white/10 mx-auto mb-4 flex items-center justify-center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div class="font-sans font-semibold text-sm mb-1">Wellness Club</div><div class="text-xs text-neutral-600" style="font-family:'Inter',sans-serif">Spa, gym, yoga</div></div>
+      <div class="am-card border border-white/8 p-6 text-center reveal d1"><div class="w-10 h-10 border border-white/10 mx-auto mb-4 flex items-center justify-center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="font-sans font-semibold text-sm mb-1">Rooftop Lounge</div><div class="text-xs text-neutral-600" style="font-family:'Inter',sans-serif">Sky deck with city views</div></div>
+      <div class="am-card border border-white/8 p-6 text-center reveal d2"><div class="w-10 h-10 border border-white/10 mx-auto mb-4 flex items-center justify-center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="font-sans font-semibold text-sm mb-1">Gated Security</div><div class="text-xs text-neutral-600" style="font-family:'Inter',sans-serif">3-tier, 24/7 CCTV</div></div>
+      <div class="am-card border border-white/8 p-6 text-center reveal d3"><div class="w-10 h-10 border border-white/10 mx-auto mb-4 flex items-center justify-center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16M16 6v16"/></svg></div><div class="font-sans font-semibold text-sm mb-1">Landscaped Gardens</div><div class="text-xs text-neutral-600" style="font-family:'Inter',sans-serif">Japanese & Mughal styles</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM (LIGHT) -->
+<section id="team" class="py-24 md:py-28 px-6 md:px-12 bg-white text-black" data-theme="light">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-16">
+      <div class="flex items-center justify-center gap-3 mb-5"><div class="lr h-px bg-black/15 w-8"></div><span class="lbl text-neutral-400 reveal">The People</span><div class="lr h-px bg-black/15 w-8"></div></div>
+      <h2 class="font-sans font-extrabold tracking-tight leading-tight reveal" style="font-size:clamp(32px,5vw,58px)">Experts You Can Actually Trust.</h2>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div class="group reveal">
+        <div class="team-card h-56 bg-neutral-100 border border-black/6 overflow-hidden mb-4 relative">
+          <div class="absolute bottom-5 left-5"><div class="w-14 h-14 rounded-full bg-black flex items-center justify-center"><span class="font-sans text-xl font-bold text-white">SB</span></div></div>
+        </div>
+        <h3 class="font-sans font-bold text-base mb-1">Saurabh Bansal</h3>
+        <p class="lbl text-neutral-400 mb-2">Founder & MD</p>
+        <p class="text-xs text-neutral-500 leading-relaxed" style="font-family:'Inter',sans-serif">15+ years. ₹500Cr+ in transactions. Expert in luxury residential and commercial real estate across NCR.</p>
+      </div>
+      <div class="group reveal d1">
+        <div class="team-card h-56 bg-neutral-100 border border-black/6 overflow-hidden mb-4 relative">
+          <div class="absolute bottom-5 left-5"><div class="w-14 h-14 rounded-full bg-neutral-300 border border-black/10 flex items-center justify-center"><span class="font-sans text-xl font-bold">RK</span></div></div>
+        </div>
+        <h3 class="font-sans font-bold text-base mb-1">Rahul Khanna</h3>
+        <p class="lbl text-neutral-400 mb-2">Senior Advisor</p>
+        <p class="text-xs text-neutral-500 leading-relaxed" style="font-family:'Inter',sans-serif">DLF & Emaar specialist. Helps HNW investors structure portfolio acquisitions for maximum appreciation.</p>
+      </div>
+      <div class="group reveal d2">
+        <div class="team-card h-56 bg-neutral-100 border border-black/6 overflow-hidden mb-4 relative">
+          <div class="absolute bottom-5 left-5"><div class="w-14 h-14 rounded-full bg-neutral-300 border border-black/10 flex items-center justify-center"><span class="font-sans text-xl font-bold">PS</span></div></div>
+        </div>
+        <h3 class="font-sans font-bold text-base mb-1">Priya Sharma</h3>
+        <p class="lbl text-neutral-400 mb-2">Client Relations</p>
+        <p class="text-xs text-neutral-500 leading-relaxed" style="font-family:'Inter',sans-serif">RERA certified. Post-purchase documentation, compliance, and home loan facilitation specialist.</p>
+      </div>
+      <div class="group reveal d3">
+        <div class="team-card h-56 bg-neutral-100 border border-black/6 overflow-hidden mb-4 relative">
+          <div class="absolute bottom-5 left-5"><div class="w-14 h-14 rounded-full bg-neutral-300 border border-black/10 flex items-center justify-center"><span class="font-sans text-xl font-bold">AM</span></div></div>
+        </div>
+        <h3 class="font-sans font-bold text-base mb-1">Arjun Mehta</h3>
+        <p class="lbl text-neutral-400 mb-2">Investment Analyst</p>
+        <p class="text-xs text-neutral-500 leading-relaxed" style="font-family:'Inter',sans-serif">Tracks Gurgaon ROI data, rental yield trends, and new-launch pricing across all micro-markets.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI (DARK) -->
+<section id="ai" class="py-24 md:py-28 bg-black">
+  <div class="px-6 md:px-12 max-w-7xl mx-auto">
+    <div class="grid lg:grid-cols-2 gap-16 items-center mb-20 md:mb-28">
+      <div>
+        <div class="flex items-center gap-3 mb-8"><div class="lr h-px bg-white/15 w-8"></div><span class="lbl text-neutral-600 reveal">AI-Powered Discovery</span></div>
+        <h2 class="font-sans font-extrabold tracking-tight leading-tight mb-6 reveal" style="font-size:clamp(32px,4.5vw,52px)">When Buyers Search, They Find Us First.</h2>
+        <p class="text-neutral-500 text-base leading-relaxed mb-8 reveal d1" style="max-width:42ch;font-family:'Inter',sans-serif">Built for Google SEO and the new era of AI search — ChatGPT, Perplexity, Google AI Overviews. When buyers ask, WVIN surfaces first.</p>
+        <div class="grid grid-cols-2 gap-3 reveal d2">
+          <div class="border border-white/8 p-4 hover:border-white/20 transition-all"><div class="lbl text-neutral-600 mb-2">Traditional SEO</div><div class="font-sans font-semibold text-sm mb-1">Top 3 Rankings</div><div class="text-xs text-neutral-600" style="font-family:'Inter',sans-serif">40+ Gurgaon keywords</div></div>
+          <div class="border border-white/20 p-4 hover:border-white/40 transition-all"><div class="lbl text-neutral-400 mb-2">AI SEO</div><div class="font-sans font-semibold text-sm mb-1">Featured in AI Answers</div><div class="text-xs text-neutral-600" style="font-family:'Inter',sans-serif">ChatGPT, Perplexity, Google</div></div>
+          <div class="border border-white/8 p-4 hover:border-white/20 transition-all"><div class="lbl text-neutral-600 mb-2">Local SEO</div><div class="font-sans font-semibold text-sm mb-1">Google Maps #1</div><div class="text-xs text-neutral-600" style="font-family:'Inter',sans-serif">"Real estate Gurgaon"</div></div>
+          <div class="border border-white/8 p-4 hover:border-white/20 transition-all"><div class="lbl text-neutral-600 mb-2">Content AI</div><div class="font-sans font-semibold text-sm mb-1">AI Listing Descriptions</div><div class="text-xs text-neutral-600" style="font-family:'Inter',sans-serif">Auto-generated, SEO-optimised</div></div>
+        </div>
+      </div>
+      <div class="reveal sc">
+        <div class="border border-white/8 p-6 bg-neutral-950">
+          <div class="lbl text-neutral-600 mb-4">AI Search Preview</div>
+          <div class="bg-black border border-white/6 p-4 mb-3">
+            <div class="flex items-center gap-2 mb-3"><div class="w-3 h-3 rounded-full bg-neutral-800"></div><span class="lbl text-neutral-600">User prompt</span></div>
+            <p class="text-sm text-white" style="font-family:'Inter',sans-serif">"Best luxury real estate consultant in Gurgaon?"</p>
+          </div>
+          <div class="bg-black border border-white/20 p-4">
+            <div class="flex items-center gap-2 mb-3"><div class="w-3 h-3 rounded-full bg-white"></div><span class="lbl text-neutral-400">AI Answer</span></div>
+            <p class="text-sm text-neutral-400 leading-relaxed" style="font-family:'Inter',sans-serif"><span class="text-white font-semibold">WVIN Wealth Infra</span>, led by Saurabh Bansal, is widely regarded as Gurgaon's most trusted premium real estate consultancy, specialising in DLF, Godrej, Emaar and M3M properties...</p>
+            <div class="mt-3 pt-3 border-t border-white/6 flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-white"></div><span class="lbl text-neutral-700">Source: wvinwealthinfra.com</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+      <div class="flex justify-center reveal sc order-2 lg:order-1">
+        <div class="relative">
+          <div class="absolute inset-0 rounded-full bg-white/4 blur-3xl scale-125 animate-pulse pointer-events-none"></div>
+          <div class="relative w-64 h-64 rounded-full border border-white/12 overflow-hidden bg-neutral-950 flex items-center justify-center">
+            <svg viewBox="0 0 200 200" width="180" height="180" fill="none">
+              <ellipse cx="100" cy="95" rx="52" ry="62" fill="#1a1a1a" stroke="rgba(255,255,255,.15)" stroke-width=".8"/>
+              <path d="M48 88C48 42 152 42 152 88" fill="#111" stroke="rgba(255,255,255,.1)"/>
+              <ellipse cx="80" cy="90" rx="7" ry="9" fill="white" opacity=".9"/>
+              <ellipse cx="120" cy="90" rx="7" ry="9" fill="white" opacity=".9"/>
+              <ellipse cx="80" cy="90" rx="3.5" ry="4.5" fill="#0a0a0a"/>
+              <ellipse cx="120" cy="90" rx="3.5" ry="4.5" fill="#0a0a0a"/>
+              <circle cx="81" cy="88" r="1.5" fill="white"/>
+              <circle cx="121" cy="88" r="1.5" fill="white"/>
+              <path d="M87 122Q100 130 113 122" stroke="rgba(255,255,255,.4)" stroke-width="1" fill="none"/>
+              <path d="M28 185C28 148 68 136 100 136C132 136 172 148 172 185" fill="#1a1a1a" stroke="rgba(255,255,255,.1)"/>
+            </svg>
+            <div class="absolute bottom-8 left-1/2 -translate-x-1/2 bg-white text-black lbl px-3 py-1 whitespace-nowrap">AI Generated</div>
+          </div>
+          <div class="absolute -right-3 top-6 bg-neutral-900 border border-white/8 p-3 w-36 float"><div class="lbl text-neutral-600 mb-1">Latest Reel</div><div class="font-sans text-xs font-bold text-white">"DLF Camellias Walk"</div><div class="lbl text-neutral-700 mt-1.5">2.4K views</div></div>
+          <div class="absolute -left-3 bottom-10 bg-neutral-900 border border-white/8 p-3 w-36"><div class="lbl text-neutral-600 mb-1">Market Report</div><div class="font-sans text-xs font-bold text-white">Golf Course ↑18% YoY</div></div>
+        </div>
+      </div>
+      <div class="order-1 lg:order-2">
+        <div class="flex items-center gap-3 mb-6"><div class="lr h-px bg-white/15 w-8"></div><span class="lbl text-neutral-600 reveal">AI Marketing</span></div>
+        <h2 class="font-sans font-extrabold tracking-tight leading-tight mb-5 reveal" style="font-size:clamp(28px,4vw,44px)">Meet Aria — Our AI Property Presenter.</h2>
+        <p class="text-neutral-500 text-sm leading-relaxed mb-7 reveal d1" style="max-width:42ch;font-family:'Inter',sans-serif">An AI-powered virtual influencer creating engaging property content, market insights, and buyer guides — 24/7, at scale.</p>
+        <div class="flex flex-col gap-3">
+          <div class="border border-white/8 p-5 hover:border-white/20 transition-all reveal d1"><div class="font-sans font-semibold text-sm mb-1">Property Video Tours</div><p class="text-xs text-neutral-600 leading-relaxed" style="font-family:'Inter',sans-serif">Scripted walkthroughs for Instagram, YouTube, WhatsApp — auto-generated from listing data.</p></div>
+          <div class="border border-white/8 p-5 hover:border-white/20 transition-all reveal d2"><div class="font-sans font-semibold text-sm mb-1">Market Intelligence Reports</div><p class="text-xs text-neutral-600 leading-relaxed" style="font-family:'Inter',sans-serif">Weekly AI-authored reports on Gurgaon price trends and investment hotspots.</p></div>
+          <div class="border border-white/8 p-5 hover:border-white/20 transition-all reveal d3"><div class="font-sans font-semibold text-sm mb-1">Lead Nurturing Content</div><p class="text-xs text-neutral-600 leading-relaxed" style="font-family:'Inter',sans-serif">Keeps leads warm via WhatsApp until they're ready to meet the team.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT (DARK) -->
+<section id="contact" class="py-24 md:py-28 bg-neutral-950">
+  <div class="px-6 md:px-12 max-w-5xl mx-auto">
+    <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+      <div>
+        <div class="flex items-center gap-3 mb-8"><div class="lr h-px bg-white/15 w-8"></div><span class="lbl text-neutral-600 reveal">Get In Touch</span></div>
+        <h2 class="font-sans font-extrabold tracking-tight leading-tight mb-6 reveal" style="font-size:clamp(30px,4.5vw,50px)">Your Property Journey Starts With a Conversation.</h2>
+        <p class="text-neutral-500 text-sm leading-relaxed mb-8 reveal d1" style="font-family:'Inter',sans-serif">Tell us what you're looking for and our team curates a shortlist within 24 hours. No pressure. Just expertise.</p>
+        <div class="flex flex-col gap-4 reveal d2">
+          <div class="flex items-center gap-3 text-sm text-neutral-500" style="font-family:'Inter',sans-serif"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5"><path d="M7 13s-5.5-3.5-5.5-8A5.5 5.5 0 0 1 7 1a5.5 5.5 0 0 1 5.5 4c0 4.5-5.5 8-5.5 8z"/><circle cx="7" cy="5.5" r="1.5"/></svg>Gurgaon, Haryana · Delhi NCR</div>
+          <div class="flex items-center gap-3 text-sm text-neutral-500" style="font-family:'Inter',sans-serif"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5"><rect x="1" y="2.5" width="12" height="9" rx="1"/><path d="M1 2.5l6 5 6-5"/></svg>connect@wvinwealthinfra.com</div>
+          <div class="flex items-center gap-3 text-sm text-neutral-500" style="font-family:'Inter',sans-serif"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5"><path d="M2 3a1 1 0 011-1h2.5l1 3-1.5 1.5a9 9 0 004.5 4.5L11 9.5l3 1v2.5a1 1 0 01-1 1C5.3 14 0 8.7 0 2a1 1 0 011-1h1z"/></svg>+91 98xxx xxxxx</div>
+        </div>
+      </div>
+      <div class="bg-black border border-white/8 p-7 md:p-9 reveal sc">
+        <form class="flex flex-col gap-4" onsubmit="handleSubmit(event)">
+          <div><label class="lbl text-neutral-600 block mb-2">Full Name</label><input type="text" placeholder="Rohit Agarwal" required class="w-full bg-neutral-950 border border-white/8 text-white text-sm px-4 py-3 placeholder-neutral-700 focus:border-white/35 outline-none transition-colors" style="font-family:'Inter',sans-serif"></div>
+          <div><label class="lbl text-neutral-600 block mb-2">Phone</label><input type="tel" placeholder="+91 9876543210" required class="w-full bg-neutral-950 border border-white/8 text-white text-sm px-4 py-3 placeholder-neutral-700 focus:border-white/35 outline-none transition-colors" style="font-family:'Inter',sans-serif"></div>
+          <div><label class="lbl text-neutral-600 block mb-2">Looking For</label><select class="w-full bg-neutral-950 border border-white/8 text-neutral-400 text-sm px-4 py-3 appearance-none focus:border-white/35 outline-none transition-colors" style="font-family:'Inter',sans-serif"><option value="" disabled selected>Select type</option><option class="bg-black">Luxury Apartment</option><option class="bg-black">Penthouse</option><option class="bg-black">Villa</option><option class="bg-black">Commercial</option></select></div>
+          <div><label class="lbl text-neutral-600 block mb-2">Budget</label><select class="w-full bg-neutral-950 border border-white/8 text-neutral-400 text-sm px-4 py-3 appearance-none focus:border-white/35 outline-none transition-colors" style="font-family:'Inter',sans-serif"><option value="" disabled selected>Select budget</option><option class="bg-black">₹1Cr – ₹3Cr</option><option class="bg-black">₹3Cr – ₹5Cr</option><option class="bg-black">₹5Cr – ₹10Cr</option><option class="bg-black">₹10Cr+</option></select></div>
+          <div><label class="lbl text-neutral-600 block mb-2">Message</label><textarea rows="3" placeholder="Tell us more..." class="w-full bg-neutral-950 border border-white/8 text-white text-sm px-4 py-3 placeholder-neutral-700 focus:border-white/35 outline-none transition-colors resize-none" style="font-family:'Inter',sans-serif"></textarea></div>
+          <button type="submit" class="btn-w lbl px-6 py-4 mt-1 w-full magnetic"><span>Request a Consultation</span></button>
+          <p class="lbl text-neutral-700 text-center">We respond within 2 hours · RERA compliant</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ (LIGHT) -->
+<section id="faq" class="py-24 md:py-28 px-6 md:px-12 bg-neutral-50 text-black" data-theme="light">
+  <div class="max-w-3xl mx-auto">
+    <div class="text-center mb-14">
+      <div class="flex items-center justify-center gap-3 mb-5"><div class="lr h-px bg-black/15 w-8"></div><span class="lbl text-neutral-400 reveal">FAQ</span><div class="lr h-px bg-black/15 w-8"></div></div>
+      <h2 class="font-sans font-extrabold tracking-tight reveal" style="font-size:clamp(32px,5vw,58px)">Frequently Asked.</h2>
+    </div>
+    <div class="border-t border-black/8 reveal">
+      <div class="border-b border-black/8"><button onclick="toggleFaq(this)" class="w-full flex justify-between items-center py-5 text-left gap-4 group"><span class="font-sans font-semibold text-base md:text-lg group-hover:opacity-60 transition-opacity">What does WVIN charge for its services?</span><svg class="faq-icon flex-shrink-0 w-4 h-4" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="black" stroke-width="1.5" stroke-linecap="round"/></svg></button><div class="faq-body"><p class="text-sm text-neutral-500 leading-relaxed pb-5" style="font-family:'Inter',sans-serif">Our advisory services are completely free for buyers. We are compensated by the developer through brokerage. You receive expert guidance and end-to-end support at zero additional cost.</p></div></div>
+      <div class="border-b border-black/8"><button onclick="toggleFaq(this)" class="w-full flex justify-between items-center py-5 text-left gap-4 group"><span class="font-sans font-semibold text-base md:text-lg group-hover:opacity-60 transition-opacity">Are you RERA registered?</span><svg class="faq-icon flex-shrink-0 w-4 h-4" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="black" stroke-width="1.5" stroke-linecap="round"/></svg></button><div class="faq-body"><p class="text-sm text-neutral-500 leading-relaxed pb-5" style="font-family:'Inter',sans-serif">Yes. WVIN Wealth Infra & Ventures LLP is fully RERA registered. All transactions comply with the Real Estate (Regulation and Development) Act, 2016.</p></div></div>
+      <div class="border-b border-black/8"><button onclick="toggleFaq(this)" class="w-full flex justify-between items-center py-5 text-left gap-4 group"><span class="font-sans font-semibold text-base md:text-lg group-hover:opacity-60 transition-opacity">Can I get exclusive pre-launch pricing?</span><svg class="faq-icon flex-shrink-0 w-4 h-4" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="black" stroke-width="1.5" stroke-linecap="round"/></svg></button><div class="faq-body"><p class="text-sm text-neutral-500 leading-relaxed pb-5" style="font-family:'Inter',sans-serif">Yes. As a preferred partner of DLF, Godrej, Emaar, and M3M, WVIN receives early access to new launches with pre-launch pricing typically 10–15% below public launch price.</p></div></div>
+      <div class="border-b border-black/8"><button onclick="toggleFaq(this)" class="w-full flex justify-between items-center py-5 text-left gap-4 group"><span class="font-sans font-semibold text-base md:text-lg group-hover:opacity-60 transition-opacity">Do you handle home loan facilitation?</span><svg class="faq-icon flex-shrink-0 w-4 h-4" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="black" stroke-width="1.5" stroke-linecap="round"/></svg></button><div class="faq-body"><p class="text-sm text-neutral-500 leading-relaxed pb-5" style="font-family:'Inter',sans-serif">Yes. We have partnerships with HDFC, SBI, ICICI, and Axis Bank. Our team manages the entire documentation process and ensures the fastest possible approval.</p></div></div>
+      <div class="border-b border-black/8"><button onclick="toggleFaq(this)" class="w-full flex justify-between items-center py-5 text-left gap-4 group"><span class="font-sans font-semibold text-base md:text-lg group-hover:opacity-60 transition-opacity">What areas do you cover?</span><svg class="faq-icon flex-shrink-0 w-4 h-4" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="black" stroke-width="1.5" stroke-linecap="round"/></svg></button><div class="faq-body"><p class="text-sm text-neutral-500 leading-relaxed pb-5" style="font-family:'Inter',sans-serif">Golf Course Road, DLF Phase 1–5, Dwarka Expressway, Sohna Road, Golf Course Extension, Sectors 50–115, and MG Road. Also select properties in Delhi and Noida.</p></div></div>
+      <div><button onclick="toggleFaq(this)" class="w-full flex justify-between items-center py-5 text-left gap-4 group"><span class="font-sans font-semibold text-base md:text-lg group-hover:opacity-60 transition-opacity">How quickly will you respond?</span><svg class="faq-icon flex-shrink-0 w-4 h-4" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="black" stroke-width="1.5" stroke-linecap="round"/></svg></button><div class="faq-body"><p class="text-sm text-neutral-500 leading-relaxed pb-5" style="font-family:'Inter',sans-serif">Within 2 hours on business days. Mon–Sat, 9AM–7PM IST. For urgent enquiries, WhatsApp is fastest — typically 30 minutes.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRE-FOOTER -->
+<section class="py-28 md:py-36 px-6 md:px-12 bg-black text-center">
+  <div class="max-w-5xl mx-auto">
+    <div class="flex items-center justify-center gap-3 mb-10"><div class="lr h-px bg-white/12 w-8"></div><span class="lbl text-neutral-700 reveal">Get Started</span><div class="lr h-px bg-white/12 w-8"></div></div>
+    <h2 class="font-sans font-extrabold tracking-tight leading-tight mb-6 reveal" style="font-size:clamp(40px,8vw,96px)">Ready to Find Your Perfect Property?</h2>
+    <p class="text-neutral-500 text-base mb-10 max-w-lg mx-auto reveal d1" style="font-family:'Inter',sans-serif">Join 800+ clients who found their dream home or investment through WVIN. First consultation is complimentary.</p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center reveal d2">
+      <a href="#contact" class="btn-w lbl px-8 py-4 magnetic"><span>Schedule a Consultation</span></a>
+      <a href="tel:+919876543210" class="lbl px-8 py-4 border border-white/8 text-neutral-500 hover:text-white hover:border-white/25 transition-all magnetic">Call: +91 98xxx xxxxx</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-neutral-950 border-t border-white/5 pt-16 pb-8 px-6 md:px-12">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
+      <div>
+        <div class="mb-5"><div class="font-sans font-extrabold text-xl tracking-[.2em]">WVIN</div><div class="lbl text-neutral-700 mt-0.5" style="letter-spacing:.18em">Wealth Infra & Ventures</div></div>
+        <p class="text-xs text-neutral-600 leading-relaxed mb-6" style="font-family:'Inter',sans-serif;max-width:200px">Gurgaon's most trusted premium real estate consultancy since 2019.</p>
+        <div class="flex gap-3">
+          <a href="#" class="w-8 h-8 border border-white/6 hover:border-white/20 flex items-center justify-center transition-colors"><svg width="10" height="10" viewBox="0 0 24 24" fill="#555"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+          <a href="#" class="w-8 h-8 border border-white/6 hover:border-white/20 flex items-center justify-center transition-colors"><svg width="10" height="10" viewBox="0 0 24 24" fill="#555"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+          <a href="#" class="w-8 h-8 border border-white/6 hover:border-white/20 flex items-center justify-center transition-colors"><svg width="10" height="10" viewBox="0 0 24 24" fill="#555"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg></a>
+        </div>
+      </div>
+      <div><div class="lbl text-neutral-600 mb-5">Properties</div><ul class="flex flex-col gap-3"><li><a href="#" class="text-xs text-neutral-600 hover:text-white transition-colors nav-link" style="font-family:'Inter',sans-serif">Luxury Apartments</a></li><li><a href="#" class="text-xs text-neutral-600 hover:text-white transition-colors nav-link" style="font-family:'Inter',sans-serif">Penthouses</a></li><li><a href="#" class="text-xs text-neutral-600 hover:text-white transition-colors nav-link" style="font-family:'Inter',sans-serif">Villas & Farmhouses</a></li><li><a href="#" class="text-xs text-neutral-600 hover:text-white transition-colors nav-link" style="font-family:'Inter',sans-serif">Commercial Spaces</a></li><li><a href="#" class="text-xs text-neutral-600 hover:text-white transition-colors nav-link" style="font-family:'Inter',sans-serif">New Launches</a></li></ul></div>
+      <div><div class="lbl text-neutral-600 mb-5">Developers</div><ul class="flex flex-col gap-3"><li><a href="#" class="text-xs text-neutral-600 hover:text-white transition-colors nav-link" style="font-family:'Inter',sans-serif">DLF Properties</a></li><li><a href="#" class="text-xs text-neutral-600 hover:text-white transition-colors nav-link" style="font-family:'Inter',sans-serif">Godrej Properties</a></li><li><a href="#" class="text-xs text-neutral-600 hover:text-white transition-colors nav-link" style="font-family:'Inter',sans-serif">Emaar India</a></li><li><a href="#" class="text-xs text-neutral-600 hover:text-white transition-colors nav-link" style="font-family:'Inter',sans-serif">M3M Group</a></li><li><a href="#" class="text-xs text-neutral-600 hover:text-white transition-colors nav-link" style="font-family:'Inter',sans-serif">Sobha Developers</a></li></ul></div>
+      <div><div class="lbl text-neutral-600 mb-5">Contact</div><div class="flex flex-col gap-4 text-xs text-neutral-600" style="font-family:'Inter',sans-serif"><div><div class="text-neutral-500 mb-1" style="font-family:'Inter',sans-serif">Address</div>Sector 43, Gurgaon<br>Haryana 122009</div><div><div class="text-neutral-500 mb-1">Hours</div>Mon – Sat · 9AM – 7PM</div><div><div class="text-neutral-500 mb-1">RERA</div>HRERA-PKL-XXXX-2019</div></div></div>
+    </div>
+    <div class="pt-6 border-t border-white/5 flex flex-col md:flex-row justify-between gap-4 text-[10px] text-neutral-700" style="font-family:'Inter',sans-serif">
+      <div>© 2025 WVIN Wealth Infra & Ventures LLP. All rights reserved.</div>
+      <div class="flex gap-5"><a href="#" class="hover:text-neutral-400 transition-colors">Privacy</a><a href="#" class="hover:text-neutral-400 transition-colors">Terms</a><a href="#" class="hover:text-neutral-400 transition-colors">RERA Disclosure</a></div>
+    </div>
+  </div>
+</footer>
+
+<div id="toast" class="fixed bottom-6 right-6 z-50 bg-white text-black px-6 py-4 text-sm flex items-center gap-3 translate-y-16 opacity-0 transition-all duration-300" style="font-family:'Inter',sans-serif">
+  <div class="w-2 h-2 rounded-full bg-black flex-shrink-0"></div>
+  <span>Request received. We'll call within 2 hours.</span>
+</div>
+
+<script>
+// === CURSOR ===
+const cur=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+if(window.matchMedia('(hover:hover)').matches){
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+  document.querySelectorAll('a,button,.magnetic').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{cur.classList.add('hover');ring.classList.add('hover')});
+    el.addEventListener('mouseleave',()=>{cur.classList.remove('hover');ring.classList.remove('hover')});
+  });
+  (function animRing(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing)})();
+}
+
+// === PROGRESS ===
+const prog=document.getElementById('progress');
+window.addEventListener('scroll',()=>{const h=document.body.scrollHeight-window.innerHeight;prog.style.width=(window.scrollY/h*100)+'%'},{ passive:true });
+
+// === NAV ===
+const nav=document.getElementById('nav');
+const lightSections=document.querySelectorAll('[data-theme="light"]');
+function updateNav(){
+  const scrollY=window.scrollY;
+  let isLight=false;
+  lightSections.forEach(s=>{const r=s.getBoundingClientRect();if(r.top<=60&&r.bottom>=60)isLight=true});
+  if(scrollY>80){
+    nav.className=nav.className.replace(/nav-solid|nav-light/g,'').trim();
+    nav.classList.add(isLight?'nav-light':'nav-solid');
+    if(isLight){nav.querySelectorAll('a,span').forEach(el=>{if(!el.closest('button'))el.style.color='';});nav.style.setProperty('--nav-color','#000')}
+    else nav.style.setProperty('--nav-color','#fff');
+  } else {
+    nav.classList.remove('nav-solid','nav-light');
+  }
+}
+window.addEventListener('scroll',updateNav,{passive:true});
+
+// === PARALLAX ===
+const heroImg=document.getElementById('heroImg');
+window.addEventListener('scroll',()=>{if(heroImg)heroImg.style.transform='translateY('+(window.scrollY*.35)+'px)'},{ passive:true });
+
+// === HERO TEXT SPLIT ===
+(function(){
+  const el=document.getElementById('heroTitle');
+  if(!el)return;
+  const words=el.textContent.trim().split(' ');
+  el.innerHTML=words.map((w,i)=>`<span class="wm"><span class="wi" style="transition-delay:${.08+i*.06}s">${w}</span></span>${i<words.length-1?' ':''}`).join('');
+  setTimeout(()=>el.querySelectorAll('.wi').forEach(w=>w.classList.add('on')),100);
+})();
+
+// === INTERSECTION OBSERVER ===
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('active');
+      // Line reveals
+      e.target.querySelectorAll&&e.target.querySelectorAll('.lr').forEach(l=>l.classList.add('on'));
+      // Counters
+      e.target.querySelectorAll&&e.target.querySelectorAll('.counter-el').forEach(countUp);
+    }
+  });
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// Separate observer for lines and counters in sections
+const io2=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('.lr').forEach(l=>l.classList.add('on'));
+      e.target.querySelectorAll('.counter-el').forEach(countUp);
+    }
+  });
+},{threshold:.1});
+document.querySelectorAll('section').forEach(s=>io2.observe(s));
+
+// === COUNTER ===
+function countUp(el){
+  if(el.dataset.counted)return;
+  el.dataset.counted='1';
+  const target=+el.dataset.count,suffix=el.dataset.suffix||'',prefix=el.dataset.prefix||'';
+  let start=0,dur=1400,step=dur/60;
+  const inc=target/60;
+  const t=setInterval(()=>{
+    start=Math.min(start+inc,target);
+    el.textContent=prefix+Math.floor(start)+suffix;
+    if(start>=target)clearInterval(t);
+  },step);
+}
+
+// === HERO STATS COUNTER ===
+const io3=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('[data-count]').forEach(el=>{
+        if(el.dataset.counted)return;
+        el.dataset.counted='1';
+        const t=+el.dataset.count,s=el.dataset.suffix||'',p=el.dataset.prefix||'';
+        let v=0;const inc=t/70;
+        const timer=setInterval(()=>{v=Math.min(v+inc,t);el.textContent=p+Math.floor(v)+s;if(v>=t)clearInterval(timer);},20);
+      });
+    }
+  });
+},{threshold:.3});
+document.querySelectorAll('.reveal').forEach(el=>io3.observe(el));
+
+// === MAGNETIC ===
+document.querySelectorAll('.magnetic').forEach(el=>{
+  el.addEventListener('mousemove',e=>{
+    const r=el.getBoundingClientRect(),x=(e.clientX-r.left-r.width/2)*.22,y=(e.clientY-r.top-r.height/2)*.22;
+    el.style.transform=`translate(${x}px,${y}px)`;
+  });
+  el.addEventListener('mouseleave',()=>{el.style.transform='';});
+});
+
+// === 3D CARD TILT ===
+const c3d=document.getElementById('card3d'),c3dW=document.getElementById('c3dWrap');
+if(c3d&&c3dW){
+  c3dW.addEventListener('mousemove',e=>{
+    const r=c3d.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+    c3d.style.transform=`perspective(1000px) rotateY(${x*14}deg) rotateX(${-y*10}deg) translateZ(20px)`;
+  });
+  c3dW.addEventListener('mouseleave',()=>{c3d.style.transform='';});
+}
+
+// === FAQ ===
+function toggleFaq(btn){
+  const body=btn.nextElementSibling,icon=btn.querySelector('.faq-icon'),open=body.classList.contains('open');
+  document.querySelectorAll('.faq-body').forEach(b=>b.classList.remove('open'));
+  document.querySelectorAll('.faq-icon').forEach(i=>i.style.transform='');
+  if(!open){body.classList.add('open');icon.style.transform='rotate(180deg)';}
+}
+
+// === MOBILE MENU ===
+const menuBtn=document.getElementById('menuBtn'),mob=document.getElementById('mobileMenu');
+let mOpen=false;
+menuBtn.addEventListener('click',()=>{
+  mOpen=!mOpen;mob.classList.toggle('open',mOpen);document.body.style.overflow=mOpen?'hidden':'';
+  document.getElementById('hb1').style.transform=mOpen?'rotate(45deg) translateY(4px)':'';
+  document.getElementById('hb2').style.transform=mOpen?'rotate(-45deg) translateY(-4px)':'';
+  document.getElementById('hb2').style.width=mOpen?'20px':'12px';
+});
+function closeMenu(){mOpen=false;mob.classList.remove('open');document.body.style.overflow='';document.getElementById('hb1').style.transform='';document.getElementById('hb2').style.transform='';document.getElementById('hb2').style.width='12px';}
+
+// === FORM ===
+function handleSubmit(e){
+  e.preventDefault();
+  const t=document.getElementById('toast');
+  t.style.transform='translateY(0)';t.style.opacity='1';
+  setTimeout(()=>{t.style.transform='translateY(64px)';t.style.opacity='0';},4000);
+  e.target.reset();
+}
+
+// === SMOOTH NAV CLICK ===
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const target=document.querySelector(a.getAttribute('href'));
+    if(target){e.preventDefault();target.scrollIntoView({behavior:'smooth',block:'start'});const off=80;window.scrollBy(0,-off);}
+  });
+});
+
+// Trigger initial updateNav
+updateNav();
+</script>
+</body>
+</html>

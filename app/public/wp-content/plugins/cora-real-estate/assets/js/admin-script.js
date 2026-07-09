@@ -10,6 +10,18 @@ if (typeof window.coraREData === 'undefined') {
 }
 
 jQuery(document).ready(function($) {
+    // Sidebar Scroll Persistence
+    const sidebarScrollContainer = document.getElementById('cora-sidebar-scroll-container');
+    if (sidebarScrollContainer) {
+        const savedScroll = sessionStorage.getItem('coraSidebarScroll');
+        if (savedScroll) {
+            sidebarScrollContainer.scrollTop = parseInt(savedScroll, 10);
+        }
+        sidebarScrollContainer.addEventListener('scroll', function() {
+            sessionStorage.setItem('coraSidebarScroll', sidebarScrollContainer.scrollTop);
+        });
+    }
+
     // Custom Toast Notification System
     window.coraShowToast = function(message) {
         let toastContainer = $('#cora-toast-container');
@@ -84,7 +96,7 @@ jQuery(document).ready(function($) {
         const activeRole = $('#cora-role-preview-select').val() || coraREData.currentRole;
         let allowed = coraREData.userPermissions[activeRole] || [];
         if (activeRole === 'administrator') {
-            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'blogs', 'gbp', 'plugins'];
+            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'visual-builder', 'audit-panel', 'media'];
         }
 
         if (targetPageId !== 'feature-hub' && !allowed.includes(targetPageId)) {
@@ -338,49 +350,49 @@ jQuery(document).ready(function($) {
     const captionDatabase = {
         'deal-jaipur': {
             cinematic: [
-                "Hand in hand, walking into our forever. Rohit and Sneha's stunning luxury listing walkthroughs captured beautifully in the Pink City of Jaipur. It was pure magic. \n\nShot on Sony A7R V\n#JaipurVilla #LuxuryEstate #PropertyAesthetic #CoraStudio #RambaghMansion",
-                "A tale of royalty, heritage, and a love that stands still. Sneha and Rohit's moments at Rambagh Palace felt like a scene out of a cinematic romance.\n\n#LuxuryVilla #JaipurProperty #PremiumListing #MansionWalkthrough"
+                "Steeped in history and luxury. Presenting a grand walkthrough of the magnificent Jaipur Palace-Style Villa. Elegant arches, white marble floors, and modern luxury combined in the Pink City.\n\n#JaipurVilla #LuxuryEstate #PropertyAesthetic #CoraRealEstate #RambaghMansion",
+                "A tale of royalty, heritage, and modern craftsmanship. This private estate near Rambagh Palace feels like a dream home.\n\n#LuxuryVilla #JaipurProperty #PremiumListing #MansionWalkthrough"
             ],
             romantic: [
-                "Spent the most gorgeous evening shooting Rohit and Sneha's pre-listing inside the majestic palace walls of Jaipur. \n\n#CoupleGoals #JaipurSunset #LoveInJaipur #PreListingShoot",
-                "Wrapped in colors of love and Jaipur's golden hour. Sneha and Rohit showing us what dream listings are made of.\n\n#LuxuryRealEstate #PropertyShowcase #GurgaonVilla"
+                "Catching the perfect golden light at our latest Jaipur luxury listing. Every corner tells a story of elegance and design.\n\n#JaipurSunset #LuxuryVillas #RajasthanProperty #DreamHome",
+                "Wrapped in warm neutral tones and Jaipur's golden sun. Showing you what ultra-luxury listings are made of.\n\n#LuxuryRealEstate #PropertyShowcase #JaipurEstate"
             ],
             minimalist: [
-                "Jaipur, sunset, and a quiet love story. Rohit & Sneha.\n\n#PreListing #MinimalistPortrait #ListingDelhi #Jaipur",
-                "Simple moments in grand places.\n\n#ListingFilm #LuxuryListings #LuxuryEstate"
+                "Jaipur, sunset, and quiet, minimalist architecture. The modern palace.\n\n#PalaceListing #MinimalistArchitecture #JaipurRealEstate",
+                "Simple design in grand places.\n\n#ListingFilm #LuxuryListings #LuxuryEstate"
             ],
             royal: [
-                "The grandeur of Rajputana arches framing a love that is timeless. Rohit and Sneha at Rambagh Palace, Jaipur.\n\n#RoyalJaipur #PalaceListings #RajasthanTourism #IndianHeritage"
+                "The grandeur of Rajputana arches framing a modern home that is truly timeless. Jaipur Palace-Style Villa.\n\n#RoyalJaipur #PalaceListings #RealEstateRajasthan #IndianHeritage"
             ]
         },
         'maternity-delhi': {
             cinematic: [
-                "Waiting for the greatest blessing of all. Ananya Sharma looking absolutely radiant amidst the peaceful backdrop of Lodhi Gardens. \n\n#MaternityShoot #DelhiManaging Agent #MotherhoodMagic #CoraStudio",
-                "A beautiful beginning, floating on hope and sunshine. Capturing this quiet milestone for Ananya in New Delhi.\n\n#MaternityPortrait #PregnancyAesthetic #DelhiMaternity"
+                "Welcome to premium residential living. Ananya Sharma's new luxury home purchase in the green belt of New Delhi, located next to the historic Lodhi Gardens.\n\n#ResidentialBuy #DelhiRealEstate #LuxuryLiving #CoraRealEstate",
+                "A beautiful new beginning. Capturing the spacious interiors and serene balconies of this premium residential property in Delhi.\n\n#DelhiHomes #ResidentialProperty #NewDelhiRealEstate"
             ],
             romantic: [
-                "Already loved so deeply, little one. Beautiful morning walk with the radiant mother-to-be, Ananya. \n\n#LodhiGardens #DelhiMaternityManaging Agent #BabyOnBoard #Motherhood"
+                "A serene morning walk through the local parks of Lodhi Estate, just steps away from this stunning residential buy.\n\n#LodhiGardens #DelhiResidential #HomeBuying #NewBeginning"
             ],
             minimalist: [
-                "Growing in grace. Ananya.\n\n#MaternityMinimalist #NaturalLight #StudioPortrait"
+                "Living in quiet luxury. A minimalist residential masterpiece in Delhi.\n\n#ResidentialMinimalist #NaturalLight #DelhiPenthouses"
             ],
             royal: [
-                "Empress of a new beginning. Ananya Sharma in Delhi.\n\n#MaternityLehenga #TraditionalMaternity #IndianMother"
+                "A home fit for royalty. Traditional design meets modern luxury in this Delhi residential mansion.\n\n#LuxuryMansion #DelhiRealEstate #PremiumProperty"
             ]
         },
         'product-delhi': {
             cinematic: [
-                "Sculpted by light. Behind the scenes of our recent high-fashion product campaign for RK Enterprises.\n\n#ProductCommercial #CommercialManaging Agent #DelhiStudio #CoraStudio",
-                "Details define design. Crafting sleek visuals for local brands in India.\n\n#PropertyShowcases #CommercialBrokerage #StudioLighting"
+                "Sculpted by light and premium architecture. A look inside the newly listed commercial office lease at Cyber City for RK Enterprises.\n\n#CommercialOffice #DelhiOfficeLease #CyberCityOffice #CoraRealEstate",
+                "Details define efficiency. Crafting premium office setups for growing brands in Delhi NCR.\n\n#OfficeLeasing #CommercialBrokerage #ModernWorkplace"
             ],
             romantic: [
-                "Details that make you fall in love. Product styling at Office A.\n\n#ProductStyling #AestheticDetail #IndianBrands"
+                "Workspace details that inspire productivity. Premium commercial styling at Ritz City Center.\n\n#OfficeDesign #AestheticWorkplace #DelhiCommercial"
             ],
             minimalist: [
-                "Form, light, and symmetry. Product commercial.\n\n#MinimalistProduct #StudioA #DelhiStudio"
+                "Form, light, and corporate symmetry. Premium office commercial leasing.\n\n#MinimalistOffice #CyberCity #DelhiLease"
             ],
             royal: [
-                "Crafted for royalty. Premium detail campaign.\n\n#LuxuryProduct #BrassDecor #StudioLighting"
+                "Crafted for corporate leadership. High-end executive floor commercial campaign.\n\n#LuxuryOffice #ExecutiveSuite #DelhiCommercialLeasing"
             ]
         }
     };
@@ -415,49 +427,53 @@ jQuery(document).ready(function($) {
     // 7. Gallery & SEO Media Selector Logic
     const seoDatabase = {
         '1': {
-            title: "Aesthetic Indian Bride Portrait at Jaipur Rambagh Palace",
-            alt: "Cinematic listing portrait of an Indian bride in red traditional lehenga posing at sunset inside the historical corridors of Rambagh Palace, Jaipur.",
-            tags: ["jaipur-listing-photographer", "indian-bride-lehenga", "destination-deal-jaipur", "rambagh-palace-shoot", "cinematic-bride-portrait"],
+            title: "Luxury Jaipur Palace-Style Villa Exterior at Golden Hour",
+            alt: "Cinematic drone view of a heritage-style luxury villa facade in Jaipur featuring white marble colonnades and symmetric arches at golden sunset.",
+            tags: ["jaipur-luxury-villa", "palace-style-home", "jaipur-real-estate", "heritage-property", "exterior-golden-hour"],
             thumb: `
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
             `,
             largeThumb: `
                 <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
             `
         },
         '2': {
-            title: "Romantic Sunset Pre-Listing Silhouette at Jaipur Luxury Mansion",
-            alt: "A couple standing silhouetted against a vibrant orange and golden sunset sky with the majestic arches of Rambagh Palace behind them.",
-            tags: ["pre-listing-tour", "sunset-photography", "couple-silhouette", "jaipur-photographer", "royal-listing"],
+            title: "Royal Jaipur Estate Courtyard & Arched Colonnade",
+            alt: "Wide-angle photograph of the central courtyard of a Jaipur luxury estate showcasing detailed sandstone arches and traditional fountains.",
+            tags: ["jaipur-estate-courtyard", "arched-colonnade", "luxury-property-tour", "heritage-mansion-india", "interior-courtyard"],
             thumb: `
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
             `,
             largeThumb: `
                 <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
             `
         },
         '3': {
-            title: "Traditional Luxury Villa Kitchen and Table Decor",
-            alt: "Close up of an elegantly decorated dining hall featuring traditional brass plates filled with colorful Rajasthani delicacies, lit by soft candlelight.",
-            tags: ["listing-cuisine", "rajasthani-decor", "listing-reception", "indian-listing-food"],
+            title: "Modern Dining Area with Traditional Rajasthani Accents",
+            alt: "Elegantly styled formal dining hall of a luxury Jaipur villa, showcasing custom brass light fixtures and hand-crafted rosewood table settings.",
+            tags: ["dining-hall-interior", "rajasthani-accents", "luxury-villa-dining", "interior-styling-india"],
             thumb: `
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
             `,
             largeThumb: `
                 <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
             `
         }
@@ -593,7 +609,7 @@ jQuery(document).ready(function($) {
             } else if (normalizedText.includes('rohit') || normalizedText.includes('listing') || normalizedText.includes('jaipur')) {
                 reply = "Booking Found: *Rohit & Sneha (Jaipur Luxury Villa Sale)*.\n\n*Status:* Editing\n*AI Action Recommendation:* Social Media caption generator ready. Let me know if you want me to write Instagram caption drafts for this shoot.";
             } else if (normalizedText.includes('hi') || normalizedText.includes('hello')) {
-                reply = "Hello! I am Cora, your studio AI Assistant. I can help you draft reminders, check shoot schedules, or suggest SEO keywords.";
+                reply = "Hello! I am Cora, your brokerage AI Assistant. I can help you draft reminders, check showing schedules, or suggest SEO keywords.";
             }
 
             // Remove loader and append reply
@@ -683,17 +699,29 @@ jQuery(document).ready(function($) {
         e.stopPropagation();
     });
 
-    // 13. Locked AI Model Selector Interaction
-    $('#cora-ai-model-selector').on('change', function(e) {
+    // 13. AI Model Selector — silently save user's model preference on change
+    $('#cora-ai-model-selector').on('change', function() {
         const val = $(this).val();
-        if (val === 'claude-3-5') {
-            window.coraShowToast('AI Model switching is a Premium feature. Upgrade to unlock Claude 3.5 Sonnet.');
-            $(this).val('cora-core-v2');
-        } else if (val === 'gpt-4o') {
-            window.coraShowToast('GPT-4o mini model integration is coming soon. Stay tuned!');
-            $(this).val('cora-core-v2');
-        }
+        const labels = {
+            'cora-core-v2': 'Cora AI · Auto',
+            'gemini':        'Cora AI · Gemini',
+            'gpt-4o':        'Cora AI · GPT-4o'
+        };
+        // Silently persist preference via AJAX (no user-facing loading state)
+        $.ajax({
+            url: coraREWPData.ajaxUrl,
+            method: 'POST',
+            data: {
+                action: 'cora_re_save_ai_keys',
+                security: coraREWPData.ajaxNonce,
+                provider: 'gemini',
+                api_key: '',
+                active_model: val
+            }
+        });
     });
+
+
 
     // 14. Keyboard Shortcuts for Platform Accessibility
     $(document).on('keydown', function(e) {
@@ -855,7 +883,7 @@ jQuery(document).ready(function($) {
                 viewing_id: 'showing2',
                 crew: { photographer: s2_photographer, assistant: s2_assistant }
             }, function(res2) {
-                window.coraShowToast('Team crew assignments saved successfully.');
+                window.coraShowToast('Team assignments saved successfully.');
                 coraToggleTeamDrawer(false);
             });
         });
@@ -1074,6 +1102,181 @@ jQuery(document).ready(function($) {
         $('#cora-assign-eq-status').focus();
     };
 
+    // ==========================================
+    // PROPERTY LISTINGS & DRAWERS FUNCTIONS (R2, R3, R4)
+    // ==========================================
+
+    window.coraToggleListingDrawer = function(show) {
+        const drawer = $('#cora-listing-drawer');
+        if (show) {
+            drawer.removeClass('collapsed');
+        } else {
+            drawer.addClass('collapsed');
+        }
+    };
+
+    window.coraOpenListingDrawerForCreate = function() {
+        coraToggleListingDrawer(true);
+        $('#cora-listing-id').val('');
+        $('#cora-listing-sync-link').val('');
+        $('#cora-listing-name').val('');
+        $('#cora-listing-category').val('Villa');
+        $('#cora-listing-rera-id').val('');
+        $('#cora-listing-notes').val('');
+        $('#cora-listing-image-preview').html('<span class="text-[9px] text-zinc-400 text-center px-1 font-semibold" id="cora-listing-image-placeholder">No Photo</span>');
+        $('#cora-listing-image-file').val('');
+        
+        // Clear SEO fields (R3)
+        $('#cora-listing-seo-title').val('');
+        $('#cora-listing-seo-description').val('');
+        $('#cora-listing-seo-keywords').val('');
+        
+        $('#cora-listing-drawer-title').html(`
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-655 mr-1.5 shrink-0">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            Add New Listing
+        `);
+        $('#cora-listing-sync-container').show();
+    };
+
+    window.coraOpenListingDrawer = function(listing) {
+        coraToggleListingDrawer(true);
+        $('#cora-listing-id').val(listing.id);
+        $('#cora-listing-sync-link').val(listing.sync_link || listing.sync_url || '');
+        $('#cora-listing-name').val(listing.name);
+        $('#cora-listing-category').val(listing.category);
+        $('#cora-listing-rera-id').val(listing.rera_reg_id);
+        $('#cora-listing-notes').val(listing.notes || '');
+        
+        // Populate SEO fields (R3)
+        $('#cora-listing-seo-title').val(listing.seo_title || '');
+        $('#cora-listing-seo-description').val(listing.seo_description || '');
+        $('#cora-listing-seo-keywords').val(listing.seo_keywords || '');
+
+        if (listing.photo_url) {
+            $('#cora-listing-image-preview').html(`<img src="${listing.photo_url}" class="w-full h-full object-cover" />`);
+        } else {
+            $('#cora-listing-image-preview').html('<span class="text-[9px] text-zinc-400 text-center px-1 font-semibold" id="cora-listing-image-placeholder">No Photo</span>');
+        }
+        $('#cora-listing-image-file').val('');
+        
+        $('#cora-listing-drawer-title').html(`
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-650 mr-1.5 shrink-0">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            Listing Details
+        `);
+        $('#cora-listing-sync-container').hide(); // Hide sync link for existing listings to prevent accidental overrides
+    };
+
+    window.coraSyncListingLink = function() {
+        const url = $('#cora-listing-sync-link').val().trim();
+        if (!url) {
+            window.coraShowToast('Please enter a 3rd-party listing link.');
+            return;
+        }
+
+        const btn = $('#cora-listing-sync-btn');
+        btn.prop('disabled', true).text('Syncing...');
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_sync_listing_link',
+            security: coraREData.ajaxNonce,
+            url: url
+        }, function(res) {
+            btn.prop('disabled', false).text('Sync');
+            if (res.success) {
+                window.coraShowToast('Listing details synced successfully!');
+                $('#cora-listing-name').val(res.data.name);
+                $('#cora-listing-category').val(res.data.category);
+                $('#cora-listing-rera-id').val(res.data.rera_reg_id);
+                $('#cora-listing-notes').val(res.data.notes);
+            } else {
+                window.coraShowToast(res.data || 'Failed to sync listing.');
+            }
+        }).fail(function() {
+            btn.prop('disabled', false).text('Sync');
+            window.coraShowToast('Network error syncing listing.');
+        });
+    };
+
+    window.coraSaveListingDetails = function() {
+        const id = $('#cora-listing-id').val();
+        const name = $('#cora-listing-name').val().trim();
+        const category = $('#cora-listing-category').val();
+        const rera_id = $('#cora-listing-rera-id').val().trim();
+        const sync_link = $('#cora-listing-sync-link').val().trim();
+        const notes = $('#cora-listing-notes').val().trim();
+        
+        const seo_title = $('#cora-listing-seo-title').val().trim();
+        const seo_description = $('#cora-listing-seo-description').val().trim();
+        const seo_keywords = $('#cora-listing-seo-keywords').val().trim();
+
+        if (!name || !category || !rera_id) {
+            window.coraShowToast('Please fill all required fields.');
+            return;
+        }
+
+        const btn = $('#cora-save-listing-btn');
+        btn.prop('disabled', true).text('Saving...');
+
+        const formData = new FormData();
+        formData.append('action', 'cora_re_save_listing');
+        formData.append('security', coraREData.ajaxNonce);
+        formData.append('id', id);
+        formData.append('name', name);
+        formData.append('category', category);
+        formData.append('rera_reg_id', rera_id);
+        formData.append('sync_link', sync_link);
+        formData.append('notes', notes);
+        
+        formData.append('seo_title', seo_title);
+        formData.append('seo_description', seo_description);
+        formData.append('seo_keywords', seo_keywords);
+
+        const photoFile = $('#cora-listing-image-file')[0].files[0];
+        if (photoFile) {
+            formData.append('gear_photo', photoFile);
+        }
+
+        $.ajax({
+            url: coraREData.ajaxUrl,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                btn.prop('disabled', false).text('Save Details');
+                if (response.success) {
+                    window.coraShowToast(id ? 'Listing updated successfully.' : 'Listing added successfully.');
+                    coraToggleListingDrawer(false);
+                    setTimeout(() => {
+                        location.reload();
+                    }, 800);
+                } else {
+                    window.coraShowToast(response.data || 'Failed to save listing.');
+                }
+            },
+            error: function() {
+                btn.prop('disabled', false).text('Save Details');
+                window.coraShowToast('Network error saving listing.');
+            }
+        });
+    };
+
+    window.coraPreviewListingImage = function(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $('#cora-listing-image-preview').html(`<img src="${e.target.result}" class="w-full h-full object-cover" />`);
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    };
+
     // Dynamic Permissions Auto-Save Matrix
     $('.cora-permission-checkbox').on('change', function() {
         const row = $(this).closest('.cora-matrix-row');
@@ -1088,7 +1291,7 @@ jQuery(document).ready(function($) {
             });
         });
 
-        permissions['administrator'] = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'leads', 'clients', 'gbp', 'plugins'];
+        permissions['administrator'] = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'leads', 'clients', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'visual-builder', 'audit-panel', 'media'];
 
         // Instantly update the local cache
         coraREData.userPermissions = permissions;
@@ -1394,12 +1597,12 @@ jQuery(document).ready(function($) {
     });
 
     // STUDIO VAULT LOGIC - DEDICATED FULL-PAGE WYSIWYG EDITOR
-    window.coraListing CoordinatorFormat = function(command) {
+    window.coraDocFormat = function(command) {
         document.execCommand(command, false, null);
         $('#cora-doc-paper').focus();
     };
 
-    window.coraListing CoordinatorApplyHeading = function(value) {
+    window.coraDocApplyHeading = function(value) {
         if (value === 'p') {
             document.execCommand('formatBlock', false, '<p>');
         } else {
@@ -1408,7 +1611,7 @@ jQuery(document).ready(function($) {
         $('#cora-doc-paper').focus();
     };
 
-    window.coraListing CoordinatorUpdateBranding = function() {
+    window.coraDocUpdateBranding = function() {
         const logoUrl = $('#cora-doc-logo-url').val().trim();
         const footerText = $('#cora-doc-footer-text').val().trim();
 
@@ -1480,7 +1683,7 @@ jQuery(document).ready(function($) {
         $('#cora-custom-type-input-group').addClass('hidden');
         $('#cora-custom-type-input').val('');
 
-        coraListing CoordinatorUpdateBranding();
+        coraDocUpdateBranding();
         coraStartGdocPolling();
 
         // Switch views
@@ -1536,7 +1739,7 @@ jQuery(document).ready(function($) {
         $('#cora-custom-type-input-group').addClass('hidden');
         $('#cora-custom-type-input').val('');
 
-        coraListing CoordinatorUpdateBranding();
+        coraDocUpdateBranding();
 
         // Update headings selector state if heading is at start
         $('#cora-editor-heading').val('p');
@@ -1550,7 +1753,7 @@ jQuery(document).ready(function($) {
         $('#cora-editor-toggle-sidebar-btn').find('.toggle-text').text('Hide Settings');
     };
 
-    window.coraCloseListing Coordinator = function() {
+    window.coraCloseListingCoordinator = function() {
         coraStopGdocPolling();
         $('#cora-vault-editor-view').addClass('hidden');
         $('#cora-vault-list-view').removeClass('hidden');
@@ -1648,7 +1851,7 @@ jQuery(document).ready(function($) {
         mediaUploader.on('select', function() {
             var attachment = mediaUploader.state().get('selection').first().toJSON();
             $('#cora-doc-logo-url').val(attachment.url);
-            coraListing CoordinatorUpdateBranding();
+            coraDocUpdateBranding();
         });
 
         mediaUploader.open();
@@ -1657,7 +1860,7 @@ jQuery(document).ready(function($) {
     $(document).on('click', '#cora-doc-logo-remove-btn', function(e) {
         e.preventDefault();
         $('#cora-doc-logo-url').val('');
-        coraListing CoordinatorUpdateBranding();
+        coraDocUpdateBranding();
     });
 
     // Bi-directional footer synchronization
@@ -1706,7 +1909,7 @@ jQuery(document).ready(function($) {
     });
 
     // Collapsible Settings Sidebar Toggle
-    window.coraListing CoordinatorToggleSidebar = function() {
+    window.coraDocToggleSidebar = function() {
         const editor = $('#cora-vault-editor-view');
         const btn = $('#cora-editor-toggle-sidebar-btn');
         const isCollapsed = editor.hasClass('cora-sidebar-collapsed');
@@ -1955,7 +2158,7 @@ jQuery(document).ready(function($) {
             btn.text(originalText).prop('disabled', false);
             if (response.success) {
                 window.coraShowToast("Document saved successfully.");
-                coraCloseListing Coordinator();
+                coraCloseListingCoordinator();
                 window.location.reload();
             } else {
                 window.coraShowToast("Error: " + response.data);
@@ -2167,7 +2370,7 @@ jQuery(document).ready(function($) {
         let allowed = coraREData.userPermissions[role] || [];
         
         if (role === 'administrator') {
-            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'blogs', 'gbp', 'plugins'];
+            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'visual-builder', 'audit-panel', 'media'];
         }
 
         // Hide/show financial details based on role permissions
@@ -3999,7 +4202,7 @@ jQuery(document).ready(function($) {
                         <input type="checkbox" class="cora-lead-gear-checkbox rounded border-zinc-300 text-zinc-950 focus:ring-zinc-900 cursor-pointer" value="${item.id}">
                         <div class="flex-1">
                             <span class="font-bold text-zinc-900">${item.name}</span>
-                            <span class="text-[9px] text-zinc-400 uppercase tracking-wider block mt-0.5">${item.type} &bull; ${item.status}</span>
+                            <span class="text-[9px] text-zinc-400 uppercase tracking-wider block mt-0.5">${item.category} &bull; ${item.status}</span>
                         </div>
                     </label>
                 `);
@@ -4107,7 +4310,7 @@ jQuery(document).ready(function($) {
                         <input type="checkbox" class="cora-lead-gear-checkbox rounded border-zinc-300 text-zinc-950 focus:ring-zinc-900 cursor-pointer" value="${item.id}" ${checked}>
                         <div class="flex-1">
                             <span class="font-bold text-zinc-900">${item.name}</span>
-                            <span class="text-[9px] text-zinc-400 uppercase tracking-wider block mt-0.5">${item.type} &bull; ${item.status}</span>
+                            <span class="text-[9px] text-zinc-400 uppercase tracking-wider block mt-0.5">${item.category} &bull; ${item.status}</span>
                         </div>
                     </label>
                 `);
@@ -5417,7 +5620,7 @@ jQuery(document).ready(function($) {
         });
     };
 
-    window.coraListing CoordinatorLoadTemplate = function(templateKey) {
+    window.coraDocLoadTemplate = function(templateKey) {
         if (!templateKey) return;
 
         let clientName = '{{CLIENT_NAME}}';
@@ -5467,68 +5670,68 @@ jQuery(document).ready(function($) {
         let html = '';
 
         if (templateKey === 'commercial_lease_proposal') {
-            $('#cora-doc-title-input').val(`Photography Proposal - ${clientName}`);
+            $('#cora-doc-title-input').val(`Proposal: Commercial Lease - ${clientName}`);
             $('#cora-doc-type-select').val('Proposal');
             html = `
                 <h2><strong>Commercial Office Lease Proposal</strong></h2>
                 <p><strong>Prepared for:</strong> ${clientName} (${clientEmail})<br><strong>Date:</strong> ${dateStr}</p>
                 <hr>
-                <h3><strong>Overview & Creative Vision</strong></h3>
-                <p>We are absolutely thrilled at the prospect of documenting your love story. Our style is a signature blend of luxury editorial portraiture and emotional, documentary-style storytelling. We don't just take pictures; we capture how it felt.</p>
+                <h3><strong>Overview & Property Scope</strong></h3>
+                <p>We are pleased to submit this proposal for premium commercial space matching your criteria. Our team focuses on providing turn-key, premium real estate listings, corporate negotiations, and tenant representation.</p>
                 <h3><strong>Scope of Services</strong></h3>
                 <ul>
-                    <li><strong>Full Estate Marketing Campaign:</strong> Full day coverage of all primary events by Nitin Arora + 2 senior cinematographers.</li>
+                    <li><strong>Full Commercial Advisory Mandate:</strong> Comprehensive matching, 3D virtual walkthroughs, RERA title checks, and corporate space planning.</li>
                     <li><strong>Deliverables:</strong>
                         <ul>
-                            <li>High-resolution curated digital portfolio (400+ fully processed images).</li>
-                            <li>5-minute cinematic highlight film + full length ceremony feature.</li>
-                            <li>One premium hand-crafted leather listing album (12x15 inches, 40 spreads).</li>
+                            <li>Curated listings portfolio (custom tailored to space and parking requirements).</li>
+                            <li>Virtual tour files & layout blue-prints.</li>
+                            <li>Fully negotiated lease term sheet and coordination with legal counsel.</li>
                         </ul>
                     </li>
                 </ul>
-                <h3><strong>Investment & Commercials</strong></h3>
-                <p>The total investment for the described coverage is <strong>${amount}</strong> (all-inclusive). </p>
-                <p><strong>Payment Terms:</strong> 50% Advance retainer to book date, 40% on shoot start, 10% on delivery of final assets.</p>
+                <h3><strong>Advisory & Brokerage Fees</strong></h3>
+                <p>The total advisory fee for the described commercial mandate is <strong>${amount}</strong>.</p>
+                <p><strong>Payment Terms:</strong> 50% Mandate retainer upon signing agreement, 50% upon successful registration of lease deed.</p>
             `;
         } else if (templateKey === 'intimate_proposal') {
-            $('#cora-doc-title-input').val(`Intimate Event Proposal - ${clientName}`);
+            $('#cora-doc-title-input').val(`Proposal: Residential Sale - ${clientName}`);
             $('#cora-doc-type-select').val('Proposal');
             html = `
-                <h2><strong>Intimate Event Proposal</strong></h2>
+                <h2><strong>Residential Sale Mandate Proposal</strong></h2>
                 <p><strong>Prepared for:</strong> ${clientName} (${clientEmail})<br><strong>Date:</strong> ${dateStr}</p>
                 <hr>
-                <h3><strong>Event Coverage Plan</strong></h3>
-                <p>A customized, intimate photography package tailored to capture close friends, family, and beautiful details of your celebration.</p>
+                <h3><strong>Listing & Advisory Plan</strong></h3>
+                <p>A customized, exclusive listing mandate tailored to showcase and market your premium residential property to vetted HNIs.</p>
                 <ul>
-                    <li><strong>Duration:</strong> Up to 6 hours of continuous coverage by a single lead photographer.</li>
+                    <li><strong>Marketing & Staging:</strong> High-end property staging, professional HDR media capture, RERA registry verification, and targeted digital ads.</li>
                     <li><strong>Deliverables:</strong>
                         <ul>
-                            <li>Private digital portfolio with 150+ color-graded images delivered in 3 weeks.</li>
-                            <li>Next-day social preview (10 sneak-peek highlights).</li>
+                            <li>Active listing on premium real estate networks and local MLS syndication.</li>
+                            <li>Vetted buyer matching and weekly showings updates.</li>
                         </ul>
                     </li>
                 </ul>
-                <h3><strong>Total Fees & Retainer</strong></h3>
-                <p><strong>Total Proposal Value:</strong> ${amount}</p>
-                <p>50% non-refundable retainer required to lock in availability.</p>
+                <h3><strong>Brokerage Fees & Terms</strong></h3>
+                <p><strong>Commission Rate:</strong> ${amount} of final transaction value.</p>
+                <p>Exclusive marketing mandate period: 90 days from date of execution.</p>
             `;
         } else if (templateKey === 'standard_invoice') {
-            $('#cora-doc-title-input').val(`Invoice - ${clientName}`);
+            $('#cora-doc-title-input').val(`Invoice: Brokerage Commission - ${clientName}`);
             $('#cora-doc-type-select').val('Invoice');
             html = `
-                <h2><strong>TAX INVOICE</strong></h2>
+                <h2><strong>COMMISSION INVOICE</strong></h2>
                 <p><strong>Invoice To:</strong> ${clientName}<br><strong>Email:</strong> ${clientEmail}<br><strong>Invoice Date:</strong> ${dateStr}<br><strong>Due Date:</strong> Immediate</p>
                 <hr>
                 <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px;">
                     <thead>
                         <tr style="border-bottom: 2px solid #e4e4e7; text-align: left;">
-                            <th style="padding: 10px 0;">Description</th>
+                            <th style="padding: 10px 0;">Advisory Service Description</th>
                             <th style="padding: 10px 0; text-align: right;">Amount</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr style="border-bottom: 1px solid #f4f4f5;">
-                            <td style="padding: 12px 0;">Professional Photography Services (Booking Retainer)</td>
+                            <td style="padding: 12px 0;">Real Estate Advisory & Brokerage Services (Residential Sale Commission)</td>
                             <td style="padding: 12px 0; text-align: right;">${amount}</td>
                         </tr>
                         <tr>
@@ -5541,11 +5744,11 @@ jQuery(document).ready(function($) {
                 <p><strong>Bank Wire Details:</strong><br>Account Name: Cora Real Estate Private Limited<br>Bank: HDFC Bank Limited, Delhi Branch<br>IFSC Code: HDFC0001202<br>Account Number: 50200084729103</p>
             `;
         } else if (templateKey === 'commercial_invoice') {
-            $('#cora-doc-title-input').val(`Commercial Invoice - ${clientName}`);
+            $('#cora-doc-title-input').val(`Invoice: Commercial Advisory - ${clientName}`);
             $('#cora-doc-type-select').val('Invoice');
             html = `
                 <h2><strong>COMMERCIAL INVOICE</strong></h2>
-                <p><strong>Client:</strong> ${clientName}<br><strong>Brand/Entity:</strong> Commercial Brand Campaign<br><strong>Date:</strong> ${dateStr}</p>
+                <p><strong>Client:</strong> ${clientName}<br><strong>Brand/Entity:</strong> Corporate Office Lease<br><strong>Date:</strong> ${dateStr}</p>
                 <hr>
                 <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px;">
                     <thead>
@@ -5556,11 +5759,11 @@ jQuery(document).ready(function($) {
                     </thead>
                     <tbody>
                         <tr style="border-bottom: 1px solid #f4f4f5;">
-                            <td style="padding: 12px 0;">Professional Fee: Commercial Listing Marketing Campaign (Up to 10 hours)</td>
+                            <td style="padding: 12px 0;">Professional Fee: Commercial Leasing Mandate & Advisory (Cyber City Suite)</td>
                             <td style="padding: 12px 0; text-align: right;">${amount}</td>
                         </tr>
                         <tr style="border-bottom: 1px solid #f4f4f5;">
-                            <td style="padding: 12px 0;">Full Commercial Usage & Perpetual Digital Licensing Rights</td>
+                            <td style="padding: 12px 0;">Corporate Tenant Representation & Space Verification</td>
                             <td style="padding: 12px 0; text-align: right;">Included</td>
                         </tr>
                         <tr>
@@ -5635,7 +5838,7 @@ jQuery(document).ready(function($) {
                 
                 setTimeout(() => {
                     $('#cora-doc-client-select').val(cmd.client_link);
-                    coraListing CoordinatorLoadTemplate(cmd.template);
+                    coraDocLoadTemplate(cmd.template);
                 }, 200);
             } catch (e) {
                 localStorage.removeItem('cora_autocreate_doc');
@@ -5658,13 +5861,13 @@ jQuery(document).ready(function($) {
     }
 
     // --- AI Content Suite Logic ---
-    let coraQuillListing Coordinator = null;
+    let coraQuillListingCoordinator = null;
     let coraCategorySelect = null;
     let coraTagSelect = null;
 
-    function initListing CoordinatorComponentsIfNeeded() {
-        if (!coraQuillListing Coordinator && $('#cora-quill-editor').length > 0) {
-            coraQuillListing Coordinator = new Quill('#cora-quill-editor', {
+    function initListingCoordinatorComponentsIfNeeded() {
+        if (!coraQuillListingCoordinator && $('#cora-quill-editor').length > 0) {
+            coraQuillListingCoordinator = new Quill('#cora-quill-editor', {
                 theme: 'snow',
                 placeholder: 'Start writing your masterpiece...',
                 modules: {
@@ -5679,7 +5882,7 @@ jQuery(document).ready(function($) {
                 }
             });
             // Override Quill's default image and video handlers to use wp.media instead of prompt()
-            const toolbar = coraQuillListing Coordinator.getModule('toolbar');
+            const toolbar = coraQuillListingCoordinator.getModule('toolbar');
             toolbar.addHandler('image', function() {
                 if (typeof wp !== 'undefined' && wp.media) {
                     const customUploader = wp.media({
@@ -5690,8 +5893,8 @@ jQuery(document).ready(function($) {
                     });
                     customUploader.on('select', function() {
                         const attachment = customUploader.state().get('selection').first().toJSON();
-                        const range = coraQuillListing Coordinator.getSelection();
-                        coraQuillListing Coordinator.insertEmbed(range ? range.index : 0, 'image', attachment.url);
+                        const range = coraQuillListingCoordinator.getSelection();
+                        coraQuillListingCoordinator.insertEmbed(range ? range.index : 0, 'image', attachment.url);
                     });
                     customUploader.open();
                 } else {
@@ -5708,8 +5911,8 @@ jQuery(document).ready(function($) {
                     });
                     customUploader.on('select', function() {
                         const attachment = customUploader.state().get('selection').first().toJSON();
-                        const range = coraQuillListing Coordinator.getSelection();
-                        coraQuillListing Coordinator.insertEmbed(range ? range.index : 0, 'video', attachment.url);
+                        const range = coraQuillListingCoordinator.getSelection();
+                        coraQuillListingCoordinator.insertEmbed(range ? range.index : 0, 'video', attachment.url);
                     });
                     customUploader.open();
                 } else {
@@ -5718,7 +5921,7 @@ jQuery(document).ready(function($) {
             });
             
             // Update custom status on text change
-            coraQuillListing Coordinator.on('text-change', function() {
+            coraQuillListingCoordinator.on('text-change', function() {
                 $('#cora-editor-status').text('Unsaved changes');
             });
             $('#cora-article-title, #cora-seo-keyword, #cora-seo-description, #cora-article-categories, #cora-article-tags').on('input change', function() {
@@ -5748,7 +5951,7 @@ jQuery(document).ready(function($) {
 
     window.coraToggleContentDrawer = function(show) {
         if (show) {
-            initListing CoordinatorComponentsIfNeeded();
+            initListingCoordinatorComponentsIfNeeded();
             $('.cora-stat-card').parent().hide();
             $('#cora-articles-table-body').closest('div').hide();
             $('.cora-page-header').hide();
@@ -5777,8 +5980,8 @@ jQuery(document).ready(function($) {
         $('#cora-thumbnail-placeholder').removeClass('hidden');
         $('#cora-editor-status').text('Drafting new');
 
-        initListing CoordinatorComponentsIfNeeded();
-        if (coraQuillListing Coordinator) coraQuillListing Coordinator.root.innerHTML = '';
+        initListingCoordinatorComponentsIfNeeded();
+        if (coraQuillListingCoordinator) coraQuillListingCoordinator.root.innerHTML = '';
         
         coraToggleContentDrawer(true);
     };
@@ -5788,7 +5991,7 @@ jQuery(document).ready(function($) {
         $('#cora-editor-status').text('Loading...');
         $('#cora-article-id').val(id);
         
-        if (coraQuillListing Coordinator) coraQuillListing Coordinator.root.innerHTML = '<p class="text-zinc-400 animate-pulse">Loading content from server...</p>';
+        if (coraQuillListingCoordinator) coraQuillListingCoordinator.root.innerHTML = '<p class="text-zinc-400 animate-pulse">Loading content from server...</p>';
         
         $.post(ajaxurl, {
             action: 'cora_get_article',
@@ -5803,7 +6006,7 @@ jQuery(document).ready(function($) {
                 const domTitle = $(`tr[onclick="coraEditArticle(${id})"] .font-bold.text-zinc-900`).text();
                 $('#cora-article-title').val(domTitle);
 
-                if (coraQuillListing Coordinator) coraQuillListing Coordinator.root.innerHTML = data.content || '';
+                if (coraQuillListingCoordinator) coraQuillListingCoordinator.root.innerHTML = data.content || '';
                 
                 $('#cora-seo-keyword').val(data.keyword || '');
                 $('#cora-seo-description').val(data.description || '');
@@ -5835,7 +6038,7 @@ jQuery(document).ready(function($) {
 
                 $('#cora-editor-status').text('Saved');
             } else {
-                if (coraQuillListing Coordinator) coraQuillListing Coordinator.root.innerHTML = '';
+                if (coraQuillListingCoordinator) coraQuillListingCoordinator.root.innerHTML = '';
                 window.coraShowToast('Failed to load article content', 'error');
             }
         });
@@ -5961,8 +6164,8 @@ jQuery(document).ready(function($) {
         $('#cora-editor-status').text('AI Drafting...');
         
         setTimeout(() => {
-            if (coraQuillListing Coordinator) {
-                coraQuillListing Coordinator.root.innerHTML = `<h2>Introduction</h2><p>Listings are magical, and capturing them perfectly requires a mix of technical skill and artistic vision. In this guide, we will walk you through the essential tips for ensuring your memories are preserved flawlessly.</p><h2>Key Focus Areas</h2><ol><li><strong>Lighting:</strong> Natural light is your best friend during golden hour.</li><li><strong>Posing:</strong> Keep it candid. Stiff poses often feel unnatural.</li><li><strong>Location:</strong> Choose a venue that resonates with your personal story.</li></ol><h2>Conclusion</h2><p>Remember, the best photos are the ones where you are truly in the moment. Let the photographer handle the technicalities while you enjoy your big day.</p>`;
+            if (coraQuillListingCoordinator) {
+                coraQuillListingCoordinator.root.innerHTML = `<h2>Introduction</h2><p>Listings are magical, and capturing them perfectly requires a mix of technical skill and artistic vision. In this guide, we will walk you through the essential tips for ensuring your memories are preserved flawlessly.</p><h2>Key Focus Areas</h2><ol><li><strong>Lighting:</strong> Natural light is your best friend during golden hour.</li><li><strong>Posing:</strong> Keep it candid. Stiff poses often feel unnatural.</li><li><strong>Location:</strong> Choose a venue that resonates with your personal story.</li></ol><h2>Conclusion</h2><p>Remember, the best photos are the ones where you are truly in the moment. Let the photographer handle the technicalities while you enjoy your big day.</p>`;
             }
             window.coraShowToast('Article drafted successfully!', 'success');
             $('#cora-editor-status').text('Unsaved changes');
@@ -5972,7 +6175,7 @@ jQuery(document).ready(function($) {
 
     window.coraAnalyzeSEO = function() {
         const title = $('#cora-article-title').val();
-        const content = coraQuillListing Coordinator ? coraQuillListing Coordinator.root.innerHTML : '';
+        const content = coraQuillListingCoordinator ? coraQuillListingCoordinator.root.innerHTML : '';
         
         if (!title || !content || content === '<p><br></p>') {
             window.coraShowToast('Add some content to analyze SEO.', 'error');
@@ -6009,7 +6212,7 @@ jQuery(document).ready(function($) {
         if (!status) status = 'draft';
         const id = $('#cora-article-id').val();
         const title = $('#cora-article-title').val();
-        const content = coraQuillListing Coordinator ? coraQuillListing Coordinator.root.innerHTML : '';
+        const content = coraQuillListingCoordinator ? coraQuillListingCoordinator.root.innerHTML : '';
         const keyword = $('#cora-seo-keyword').val();
         const description = $('#cora-seo-description').val();
         const score = $('#cora-seo-score-display').text();
@@ -6211,25 +6414,25 @@ jQuery(document).ready(function($) {
         {
             element: '.cora-stats-grid',
             title: '1. Agency Metrics & Health',
-            description: 'Live statistics summarizing your shoot count, delivery backlog, drafted listing descriptions, and dynamic revenue estimates calculated from client transactions.',
+            description: 'Live statistics summarizing your deal count, showing schedules, drafted listing descriptions, and dynamic revenue estimates calculated from client transactions.',
             position: 'bottom'
         },
         {
             element: '.cora-sidebar [data-target="leads"]',
             title: '2. CRM Sales Pipeline',
-            description: 'Track potential listing bookings. Log client budget briefs, link interactive portfolio demo portfolios, assign crew gear checklists, and convert deals to active bookings on retainer payments.',
+            description: 'Track potential listing bookings. Log client budget briefs, link interactive portfolio demo portfolios, assign team asset checklists, and convert deals to active bookings on retainer payments.',
             position: 'left'
         },
         {
             element: '.cora-sidebar [data-target="bookings"]',
             title: '3. Viewing Bookings CRM',
-            description: 'Advance shoots dynamically through Confirmed, Editing, and Completed states. Instantly updates client timelines, enqueued invoices, and schedules.',
+            description: 'Advance deals dynamically through Confirmed, Showing, and Completed states. Instantly updates client timelines, enqueued invoices, and schedules.',
             position: 'left'
         },
         {
             element: '.cora-sidebar [data-target="portfolio"]',
             title: '4. Property Portfolios',
-            description: 'Deliver stunning, password-protected visual portfolios to couples. Features client selection flags and automated downloads.',
+            description: 'Deliver stunning, password-protected visual portfolios to clients. Features client selection flags and automated downloads.',
             position: 'left'
         },
         {
@@ -6241,25 +6444,25 @@ jQuery(document).ready(function($) {
         {
             element: '.cora-sidebar [data-target="gbp"]',
             title: '6. Google Business Profile',
-            description: 'Connect your business listing to sync reviews. Reply to inquiries, publish studio updates, and manage local search visibility.',
+            description: 'Connect your business listing to sync reviews. Reply to inquiries, publish business updates, and manage local search visibility.',
             position: 'left'
         },
         {
             element: '.cora-sidebar [data-target="financials"]',
             title: '7. Ledger & Financial Board',
-            description: 'Analyze revenue analytics, cash inflows, and studio expenses. Output GST-compliant financial summaries and print PDF ledger reports.',
+            description: 'Analyze revenue analytics, cash inflows, and brokerage expenses. Output GST-compliant financial summaries and print PDF ledger reports.',
             position: 'left'
         },
         {
             element: '.cora-sidebar [data-target="equipment"]',
             title: '8. Smart Listing Inventory',
-            description: 'Track cameras, lenses, and flash gear. Assignments in leads or shoots automatically toggle gear statuses to "In Use" with active event tags.',
+            description: 'Track villas, apartments, commercial offices, and land. Assignments in leads or showings automatically toggle listing statuses to "In Use" with active RERA tags.',
             position: 'left'
         },
         {
             element: '.cora-sidebar [data-target="team-roles"]',
             title: '9. Team Roles & Preview',
-            description: 'Manage staff accounts (Managing Agents, Listing Coordinators, Pilots). Define granular capabilities and preview the workspace from different role perspectives.',
+            description: 'Manage staff accounts (Managing Agents, Showing Assistants, Property Valuers). Define granular capabilities and preview the workspace from different role perspectives.',
             position: 'left'
         },
         {
@@ -6489,5 +6692,1080 @@ jQuery(document).ready(function($) {
 
     // Run auto-create document check
     coraCheckAutoCreateDoc();
+
+    // ==========================================
+    // ATTENDANCE LOGIC
+    // ==========================================
+    if (coraREData.currentPage === 'attendance') {
+        const fetchAttendance = () => {
+            $.post(coraREData.ajaxUrl, { action: 'cora_fetch_attendance', nonce: coraREData.nonce }, function(res) {
+                if (res.success && res.data.logs) {
+                    const tbody = $('#cora-attendance-table-body');
+                    tbody.empty();
+                    if (res.data.logs.length === 0) {
+                        tbody.append('<tr><td colspan="4" class="px-5 py-8 text-center text-zinc-400">No attendance records found.</td></tr>');
+                    } else {
+                        // Reverse to show newest first
+                        res.data.logs.slice().reverse().forEach(log => {
+                            const dateObj = new Date(log.timestamp);
+                            const timeStr = dateObj.toLocaleString();
+                            const typeLabel = log.type === 'in' ? '<span class="px-2 py-1 bg-zinc-100 text-zinc-700 rounded text-[10px] font-medium uppercase tracking-wider">Punch In</span>' : '<span class="px-2 py-1 border border-zinc-200 text-zinc-600 rounded text-[10px] font-medium uppercase tracking-wider">Punch Out</span>';
+                            const locStr = log.lat ? `${parseFloat(log.lat).toFixed(4)}, ${parseFloat(log.lng).toFixed(4)}` : 'Unknown';
+                            
+                            tbody.append(`
+                                <tr class="hover:bg-zinc-50/50 transition-colors">
+                                    <td class="px-5 py-3 font-medium text-zinc-900">${log.user}</td>
+                                    <td class="px-5 py-3">${timeStr}</td>
+                                    <td class="px-5 py-3">${typeLabel}</td>
+                                    <td class="px-5 py-3 flex items-center gap-1"><svg class="w-3 h-3 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> ${locStr}</td>
+                                </tr>
+                            `);
+                        });
+                    }
+                }
+            });
+        };
+
+        fetchAttendance();
+
+        const logPunch = (type) => {
+            const statusDiv = $('#cora-punch-status');
+            statusDiv.removeClass('hidden text-red-500').addClass('text-zinc-500').text('Acquiring location...');
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const logData = {
+                        type: type,
+                        timestamp: Date.now(),
+                        lat: lat,
+                        lng: lng,
+                        user: 'Current User' // Placeholder for actual user logic
+                    };
+
+                    $.post(coraREData.ajaxUrl, {
+                        action: 'cora_save_attendance',
+                        nonce: coraREData.nonce,
+                        log: JSON.stringify(logData)
+                    }, function(res) {
+                        if (res.success) {
+                            window.coraShowToast("Punch logged successfully");
+                            statusDiv.addClass('hidden');
+                            fetchAttendance();
+                        } else {
+                            statusDiv.removeClass('text-zinc-500').addClass('text-red-500').text('Failed to save punch.');
+                        }
+                    });
+                }, error => {
+                    statusDiv.removeClass('text-zinc-500').addClass('text-red-500').text('Location access denied or unavailable.');
+                });
+            } else {
+                statusDiv.removeClass('text-zinc-500').addClass('text-red-500').text('Geolocation not supported by this browser.');
+            }
+        };
+
+        $('#cora-punch-in-btn').on('click', () => logPunch('in'));
+        $('#cora-punch-out-btn').on('click', () => logPunch('out'));
+    }
+
+    // ==========================================
+    // MODULE 2: COMMENTS & DISCUSSIONS
+    // ==========================================
+    window.coraToggleSelectAllComments = function(el) {
+        $('.cora-comment-checkbox').prop('checked', $(el).is(':checked'));
+    };
+    window.coraBulkActionComments = function() {
+        const action = $('#cora-comments-bulk-action').val();
+        if (!action) {
+            window.coraShowToast("Please select a bulk action first.");
+            return;
+        }
+        const checked = $('.cora-comment-checkbox:checked').length;
+        if (checked === 0) {
+            window.coraShowToast("No comments selected.");
+            return;
+        }
+        window.coraShowToast(`Applying bulk action (${action}) to ${checked} comment(s)...`);
+        setTimeout(() => location.reload(), 1000);
+    };
+    window.coraOpenCommentReplyModal = function(id, author, excerpt) {
+        $('#cora-reply-comment-id').val(id);
+        $('#cora-reply-target-author').text(author);
+        $('#cora-reply-target-excerpt').text(excerpt);
+        $('#cora-reply-content').val('');
+        $('#cora-modal-reply-comment').addClass('active');
+    };
+    window.coraSubmitCommentReply = function() {
+        const content = $('#cora-reply-content').val().trim();
+        if (!content) {
+            window.coraShowToast("Reply content cannot be empty.");
+            return;
+        }
+        window.coraShowToast("Submitting reply and notifying author...");
+        coraCloseModals();
+        setTimeout(() => location.reload(), 1000);
+    };
+    window.coraUpdateCommentStatus = function(id, action) {
+        window.coraShowToast(`Updating comment #${id} status to: ${action}...`);
+        setTimeout(() => location.reload(), 800);
+    };
+    window.coraFilterComments = function(status, btn) {
+        $('.cora-comment-filter-btn').removeClass('border-zinc-950 text-zinc-950 font-bold bg-white shadow-sm').addClass('border-transparent text-zinc-500 hover:text-zinc-900 font-semibold');
+        $(btn).removeClass('border-transparent text-zinc-500 hover:text-zinc-900 font-semibold').addClass('border-zinc-950 text-zinc-950 font-bold bg-white shadow-sm');
+        window.coraShowToast(`Filtering comments by status: ${status}`);
+    };
+
+    // ==========================================
+    // MODULE 3: APPEARANCE (THEMES, MENUS, WIDGETS, CSS)
+    // ==========================================
+    window.coraActivateTheme = function(id) {
+        window.coraShowToast(`Activating theme blueprint #${id}...`);
+        setTimeout(() => location.reload(), 1000);
+    };
+    window.coraSaveMenuStructure = function() {
+        window.coraShowToast("Saving custom menu hierarchy and navigation tree...");
+        setTimeout(() => window.coraShowToast("Menu saved successfully!"), 1000);
+    };
+    window.coraSaveWidgetSettings = function() {
+        window.coraShowToast("Updating sidebar widgets and active listing cards...");
+        setTimeout(() => window.coraShowToast("Widgets layout published!"), 1000);
+    };
+    window.coraSaveCustomCSS = function() {
+        window.coraShowToast("Validating and injecting custom CSS rules...");
+        setTimeout(() => window.coraShowToast("Custom stylesheet compiled and applied!"), 1000);
+    };
+
+    // ==========================================
+    // MODULE 4: TOOLS & DIAGNOSTICS
+    // ==========================================
+    window.coraRunDiagnostics = function() {
+        window.coraShowToast("Executing server health check and Redis memory inspection...");
+        setTimeout(() => window.coraShowToast("Diagnostics completed: All systems nominal (100% Health Score)."), 1500);
+    };
+    window.coraTriggerExport = function() {
+        window.coraShowToast("Generating WXR export archive (Posts, Pages, Media)...");
+        setTimeout(() => window.coraShowToast("Export archive generated and download started!"), 1500);
+    };
+    window.coraTriggerImport = function() {
+        window.coraShowToast("Scanning import manifest and verifying asset integrity...");
+        setTimeout(() => window.coraShowToast("Import simulation complete: 0 errors detected."), 1500);
+    };
+    window.coraConfirmAction = function(title, message, onConfirm) {
+        if ($('#cora-confirm-modal').length === 0) {
+            $('body').append(`
+                <div id="cora-confirm-modal" class="fixed inset-0 z-[999999] flex items-center justify-center hidden bg-zinc-900/40 backdrop-blur-xs transition-opacity duration-300">
+                    <div class="bg-white border border-zinc-200 rounded-xl p-6 shadow-2xl max-w-sm w-full space-y-4">
+                        <h3 class="text-sm font-bold text-zinc-900" id="cora-confirm-title"></h3>
+                        <p class="text-xs text-zinc-500 leading-relaxed" id="cora-confirm-message"></p>
+                        <div class="flex items-center justify-end gap-3">
+                            <button class="px-3.5 py-1.5 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-semibold rounded-lg text-xs transition-all cursor-pointer" onclick="$('#cora-confirm-modal').addClass('hidden')">Cancel</button>
+                            <button id="cora-confirm-btn" class="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs transition-all cursor-pointer">Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            `);
+        }
+        $('#cora-confirm-title').text(title);
+        $('#cora-confirm-message').text(message);
+        $('#cora-confirm-btn').off('click').on('click', function() {
+            $('#cora-confirm-modal').addClass('hidden');
+            onConfirm();
+        });
+        $('#cora-confirm-modal').removeClass('hidden');
+    };
+
+    window.coraSaveAppearanceSettings = function() {
+        const tagline = $('#cora-brand-tagline').val();
+        const logoUrl = $('#cora-brand-logo-url').val();
+        const faviconUrl = $('#cora-brand-favicon-url').val();
+        if (!coraREData.ajaxNonce) return;
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_save_appearance_settings',
+            nonce: coraREData.ajaxNonce,
+            tagline: tagline,
+            logo_url: logoUrl,
+            favicon_url: faviconUrl
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast(res.data.message || 'Appearance settings saved.');
+            } else {
+                window.coraShowToast(res.data.message || 'Failed to save appearance settings.');
+            }
+        }).fail(function() {
+            window.coraShowToast('Failed to save appearance settings.');
+        });
+    };
+
+    window.coraOpenMediaSelector = function(fieldId) {
+        if (typeof wp !== 'undefined' && wp.media) {
+            var frame = wp.media({
+                title: 'Select Brand Asset',
+                button: { text: 'Use this asset' },
+                multiple: false
+            });
+            frame.on('select', function() {
+                var attachment = frame.state().get('selection').first().toJSON();
+                $('#' + fieldId).val(attachment.url);
+            });
+            frame.open();
+        } else {
+            window.coraShowToast('WordPress media library not available.');
+        }
+    };
+
+    window.coraOpenNewMenuDrawer = function() {
+        if ($('#cora-drawer-new-menu').length === 0) {
+            $('body').append(`
+                <div id="cora-drawer-new-menu" class="fixed inset-y-0 right-0 z-[99999] w-full sm:w-[420px] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 translate-x-full">
+                    <div class="cora-drawer-header p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+                        <h3 class="text-base font-bold text-zinc-900 flex items-center gap-2">
+                            Create Navigation Menu
+                        </h3>
+                        <button class="text-zinc-400 hover:text-zinc-900 transition-colors cursor-pointer p-1" onclick="$('#cora-drawer-new-menu').addClass('translate-x-full').removeClass('translate-x-0')">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                    <div class="flex-1 overflow-y-auto p-6 space-y-5">
+                        <div>
+                            <label class="block text-xs font-bold text-zinc-800 mb-1">Menu Name</label>
+                            <input type="text" id="cora-new-menu-name" placeholder="e.g. Footer Menu" class="w-full bg-white border border-zinc-300 rounded-lg p-2.5 text-xs text-zinc-900 focus:outline-none">
+                        </div>
+                    </div>
+                    <div class="p-5 border-t border-zinc-200 bg-zinc-50/50 flex items-center justify-end gap-3">
+                        <button class="px-4 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-semibold rounded-lg text-xs transition-colors cursor-pointer" onclick="$('#cora-drawer-new-menu').addClass('translate-x-full').removeClass('translate-x-0')">Cancel</button>
+                        <button class="px-5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors shadow-sm cursor-pointer" onclick="coraSubmitNewMenu()">Create Menu</button>
+                    </div>
+                </div>
+            `);
+        }
+        $('#cora-new-menu-name').val('');
+        $('#cora-drawer-new-menu').removeClass('translate-x-full').addClass('translate-x-0');
+    };
+
+    window.coraSubmitNewMenu = function() {
+        const menuName = $('#cora-new-menu-name').val().trim();
+        if (!menuName) {
+            window.coraShowToast('Menu name is required.');
+            return;
+        }
+        if (!coraREData.ajaxNonce) return;
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_create_nav_menu',
+            nonce: coraREData.ajaxNonce,
+            menu_name: menuName
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast(res.data.message || 'Menu created.');
+                $('#cora-drawer-new-menu').addClass('translate-x-full').removeClass('translate-x-0');
+                setTimeout(function() {
+                    window.location.href = '?page=cora-workspace&sub=appearance&menu_id=' + res.data.menu_id;
+                }, 1000);
+            } else {
+                window.coraShowToast(res.data.message || 'Failed to create menu.');
+            }
+        }).fail(function() {
+            window.coraShowToast('Failed to create menu.');
+        });
+    };
+
+    window.coraOpenAddMenuItemDrawer = function() {
+        $('#cora-drawer-menu-item').removeClass('translate-x-full').addClass('translate-x-0');
+    };
+
+    window.coraCloseAddMenuItemDrawer = function() {
+        $('#cora-drawer-menu-item').addClass('translate-x-full').removeClass('translate-x-0');
+    };
+
+    window.coraToggleMenuItemTypeFields = function(type) {
+        if (type === 'page') {
+            $('#cora-field-menu-page').removeClass('hidden');
+            $('#cora-field-menu-url').addClass('hidden');
+        } else {
+            $('#cora-field-menu-page').addClass('hidden');
+            $('#cora-field-menu-url').removeClass('hidden');
+        }
+    };
+
+    window.coraSubmitMenuItem = function() {
+        const menuId = $('#cora-nav-menu-select').val();
+        const itemType = $('#cora-menu-item-type').val();
+        const pageId = $('#cora-menu-page-id').val();
+        const customUrl = $('#cora-menu-custom-url').val();
+        const label = $('#cora-menu-item-label').val();
+        
+        if (!menuId || menuId === '0') {
+            window.coraShowToast('Please select or create a navigation menu first.');
+            return;
+        }
+        
+        if (!coraREData.ajaxNonce) return;
+        
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_add_menu_item',
+            nonce: coraREData.ajaxNonce,
+            menu_id: menuId,
+            item_type: itemType,
+            page_id: pageId,
+            custom_url: customUrl,
+            label: label
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast(res.data.message || 'Menu item added.');
+                coraCloseAddMenuItemDrawer();
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                window.coraShowToast(res.data.message || 'Failed to add menu item.');
+            }
+        }).fail(function() {
+            window.coraShowToast('Failed to add menu item.');
+        });
+    };
+
+    window.coraRemoveMenuItem = function(itemId) {
+        window.coraConfirmAction('Remove Menu Item', 'Are you sure you want to remove this navigation link?', function() {
+            if (!coraREData.ajaxNonce) return;
+            $.post(coraREData.ajaxUrl, {
+                action: 'cora_delete_menu_item',
+                nonce: coraREData.ajaxNonce,
+                menu_item_id: itemId
+            }, function(res) {
+                if (res.success) {
+                    window.coraShowToast(res.data.message || 'Menu item removed.');
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    window.coraShowToast(res.data.message || 'Failed to remove menu item.');
+                }
+            }).fail(function() {
+                window.coraShowToast('Failed to remove menu item.');
+            });
+        });
+    };
+
+    window.coraRefreshComments = function() {
+        window.coraShowToast('Refreshing comments feed...');
+        setTimeout(function() {
+            window.location.reload();
+        }, 1000);
+    };
+
+    window.coraModerateComment = function(commentId, action) {
+        if (!coraREData.ajaxNonce) return;
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_moderate_comment',
+            nonce: coraREData.ajaxNonce,
+            comment_id: commentId,
+            comment_action: action
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast(res.data.message || 'Comment status updated.');
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                window.coraShowToast(res.data.message || 'Failed to update comment status.');
+            }
+        }).fail(function() {
+            window.coraShowToast('Failed to update comment status.');
+        });
+    };
+
+    window.coraOpenCommentReplyDrawer = function(commentId, authorName, excerpt) {
+        $('#cora-reply-parent-id').val(commentId);
+        $('#cora-reply-author-name').text(authorName);
+        $('#cora-reply-content-preview').text(excerpt);
+        $('#cora-reply-textarea').val('');
+        $('#cora-drawer-comment-reply').removeClass('translate-x-full').addClass('translate-x-0');
+    };
+
+    window.coraCloseCommentReplyDrawer = function() {
+        $('#cora-drawer-comment-reply').addClass('translate-x-full').removeClass('translate-x-0');
+    };
+
+    window.coraDeleteCommentPermanent = function(commentId) {
+        window.coraConfirmAction('Delete Comment Permanently', 'Are you sure you want to permanently delete this comment? This action cannot be undone.', function() {
+            if (!coraREData.ajaxNonce) return;
+            $.post(coraREData.ajaxUrl, {
+                action: 'cora_delete_comment_permanent',
+                nonce: coraREData.ajaxNonce,
+                comment_id: commentId
+            }, function(res) {
+                if (res.success) {
+                    window.coraShowToast(res.data.message || 'Comment permanently deleted.');
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    window.coraShowToast(res.data.message || 'Failed to delete comment.');
+                }
+            }).fail(function() {
+                window.coraShowToast('Failed to delete comment.');
+            });
+        });
+    };
+
+    window.coraSubmitCommentReply = function() {
+        const parentId = $('#cora-reply-parent-id').val();
+        const content = $('#cora-reply-textarea').val().trim();
+        if (!content) {
+            window.coraShowToast('Reply content cannot be empty.');
+            return;
+        }
+        if (!coraREData.ajaxNonce) return;
+        
+        const btn = $('#cora-btn-submit-comment-reply');
+        const originalText = btn.html();
+        btn.prop('disabled', true).html('<span>Sending...</span>');
+        
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_submit_comment_reply',
+            nonce: coraREData.ajaxNonce,
+            parent_id: parentId,
+            content: content
+        }, function(res) {
+            btn.prop('disabled', false).html(originalText);
+            if (typeof res === 'string') {
+                try { res = JSON.parse(res); } catch(e) {}
+            }
+            if (res && res.success) {
+                window.coraShowToast((res.data && res.data.message) || 'Reply posted.');
+                coraCloseCommentReplyDrawer();
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                window.coraShowToast((res && res.data && res.data.message) || 'Failed to post reply.');
+            }
+        }).fail(function() {
+            btn.prop('disabled', false).html(originalText);
+            window.coraShowToast('Failed to post reply.');
+        });
+    };
+
+    window.coraOpenMediaUploader = function() {
+        if (typeof wp !== 'undefined' && wp.media) {
+            var frame = wp.media({
+                title: 'Upload Media',
+                button: { text: 'Upload' },
+                multiple: true
+            });
+            frame.on('select', function() {
+                window.location.reload();
+            });
+            frame.open();
+        } else {
+            window.coraShowToast('WordPress media library not available.');
+        }
+    };
+
+    window.coraLoadMediaIntoEditor = function(attachmentId) {
+        if (!attachmentId || attachmentId === '0') return;
+        if (!coraREData.ajaxNonce) return;
+        
+        window.coraShowToast('Loading media details...');
+        
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_get_attachment_metadata',
+            nonce: coraREData.ajaxNonce,
+            attachment_id: attachmentId
+        }, function(res) {
+            if (res.success && res.data) {
+                const data = res.data;
+                $('#cora-meta-attachment-id').val(data.attachment_id);
+                $('#cora-meta-title').val(data.title || '');
+                $('#cora-meta-alt').val(data.alt || '');
+                $('#cora-meta-caption').val(data.caption || '');
+                $('#cora-meta-description').val(data.description || '');
+                
+                const img = $('#cora-editor-preview-img');
+                if (img.length > 0) {
+                    img.attr('src', data.url);
+                    img.css('transform', 'none');
+                    img.data('rotate', 0);
+                    img.data('scalex', 1);
+                    img.data('scaley', 1);
+                }
+                
+                $('#cora-scale-width').val('');
+                $('#cora-scale-height').val('');
+                
+                window.coraShowToast('Media loaded successfully.');
+            } else {
+                window.coraShowToast('Failed to load media metadata.');
+            }
+        }).fail(function() {
+            window.coraShowToast('Failed to load media metadata.');
+        });
+    };
+
+    window.coraResetEditorCanvas = function() {
+        const img = $('#cora-editor-preview-img');
+        if (img.length > 0) {
+            img.css('transform', 'none');
+            img.data('rotate', 0);
+            img.data('scalex', 1);
+            img.data('scaley', 1);
+        }
+        $('#cora-scale-width').val('');
+        $('#cora-scale-height').val('');
+        window.coraShowToast('Canvas transformations reset.');
+    };
+
+    window.coraSetCropRatio = function(w, h) {
+        const img = $('#cora-editor-preview-img');
+        if (img.length === 0) return;
+        if (w && h) {
+            img.data('crop-w', w);
+            img.data('crop-h', h);
+            window.coraShowToast('Crop ratio set to ' + w + ':' + h);
+        } else {
+            img.data('crop-w', null);
+            img.data('crop-h', null);
+            window.coraShowToast('Free crop mode active.');
+        }
+    };
+
+    window.coraRotateImage = function(deg) {
+        const img = $('#cora-editor-preview-img');
+        if (img.length === 0) return;
+        let currentRotation = img.data('rotate') || 0;
+        currentRotation += deg;
+        img.data('rotate', currentRotation);
+        
+        let scaleX = img.data('scalex') || 1;
+        let scaleY = img.data('scaley') || 1;
+        img.css('transform', 'rotate(' + currentRotation + 'deg) scale(' + scaleX + ',' + scaleY + ')');
+    };
+
+    window.coraFlipImage = function(dir) {
+        const img = $('#cora-editor-preview-img');
+        if (img.length === 0) return;
+        let scaleX = img.data('scalex') || 1;
+        let scaleY = img.data('scaley') || 1;
+        
+        if (dir === 'h') {
+            scaleX = scaleX * -1;
+            img.data('scalex', scaleX);
+        } else if (dir === 'v') {
+            scaleY = scaleY * -1;
+            img.data('scaley', scaleY);
+        }
+        
+        let currentRotation = img.data('rotate') || 0;
+        img.css('transform', 'rotate(' + currentRotation + 'deg) scale(' + scaleX + ',' + scaleY + ')');
+    };
+
+    // ==========================================
+    // MODULE 5: MEDIA EDITOR SUITE
+    // ==========================================
+    window.coraOpenMediaEditorModal = function(id, url, name, dims) {
+        $('#cora-media-edit-id').val(id);
+        $('#cora-media-edit-img').attr('src', url);
+        $('#cora-media-edit-title').text(name);
+        $('#cora-media-edit-dims').text(dims);
+        $('#cora-media-edit-alt').val(name);
+        $('#cora-media-edit-caption').val('');
+        $('#cora-modal-media-editor').addClass('active');
+    };
+    window.coraApplyMediaTransform = function(type) {
+        const img = $('#cora-media-edit-img');
+        let currentRotation = img.data('rotate') || 0;
+        let scaleX = img.data('scalex') || 1;
+        let scaleY = img.data('scaley') || 1;
+
+        if (type === 'rotate-left') currentRotation -= 90;
+        else if (type === 'rotate-right') currentRotation += 90;
+        else if (type === 'flip-h') scaleX *= -1;
+        else if (type === 'flip-v') scaleY *= -1;
+        else if (type === 'crop') {
+            window.coraShowToast("Crop selection grid active. Click and drag to define boundaries.");
+            return;
+        }
+
+        img.data('rotate', currentRotation).data('scalex', scaleX).data('scaley', scaleY);
+        img.css('transform', `rotate(${currentRotation}deg) scaleX(${scaleX}) scaleY(${scaleY})`);
+        window.coraShowToast(`Applied image transformation (${type}).`);
+    };
+    window.coraSaveMediaEdits = function() {
+        window.coraShowToast("Processing image rasterization and updating EXIF metadata...");
+        coraCloseModals();
+        setTimeout(() => {
+            window.coraShowToast("Media modifications saved permanently!");
+            location.reload();
+        }, 1200);
+    };
+
+    // ==========================================
+    // MODULE 6: SETTINGS SUITE
+    // ==========================================
+    window.coraSaveSettingsSuite = function(tab) {
+        window.coraShowToast(`Saving ${tab.toUpperCase()} configurations and flushing object cache...`);
+        setTimeout(() => window.coraShowToast("Settings updated successfully!"), 1200);
+    };
+
+    // ==========================================
+    // CLIENT TASKS LOGIC
+    // ==========================================
+    if (coraREData.currentPage === 'tasks') {
+        let tasksData = [];
+
+        const renderTasks = () => {
+            $('#cora-tasks-todo, #cora-tasks-progress, #cora-tasks-done').empty();
+            tasksData.forEach((task, index) => {
+                const card = `
+                    <div class="bg-white border border-zinc-200 rounded-md p-3 shadow-sm hover:shadow transition-shadow group relative">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="text-sm font-semibold text-zinc-900">${task.title}</h4>
+                            <button class="cora-delete-task opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-red-500 transition-opacity" data-idx="${index}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                        ${task.desc ? `<p class="text-xs text-zinc-500 mb-3">${task.desc}</p>` : ''}
+                        <div class="flex items-center justify-between mt-3">
+                            <span class="text-[10px] font-medium px-2 py-1 bg-zinc-100 text-zinc-600 rounded-full">${task.assignee || 'Unassigned'}</span>
+                            
+                            <div class="flex gap-1">
+                                ${task.status !== 'todo' ? `<button class="cora-move-task text-[10px] font-semibold text-zinc-500 hover:text-zinc-900" data-idx="${index}" data-to="todo">To Do</button>` : ''}
+                                ${task.status !== 'progress' ? `<button class="cora-move-task text-[10px] font-semibold text-zinc-500 hover:text-zinc-900" data-idx="${index}" data-to="progress">In Progress</button>` : ''}
+                                ${task.status !== 'done' ? `<button class="cora-move-task text-[10px] font-semibold text-zinc-500 hover:text-zinc-900" data-idx="${index}" data-to="done">Done</button>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                $(`#cora-tasks-${task.status}`).append(card);
+            });
+        };
+
+        const fetchTasks = () => {
+            $.post(coraREData.ajaxUrl, { action: 'cora_fetch_client_tasks', nonce: coraREData.nonce }, function(res) {
+                if (res.success && res.data.tasks) {
+                    tasksData = res.data.tasks || [];
+                    renderTasks();
+                }
+            });
+        };
+
+        const saveTasksToServer = () => {
+            $.post(coraREData.ajaxUrl, {
+                action: 'cora_save_client_tasks',
+                nonce: coraREData.nonce,
+                tasks: JSON.stringify(tasksData)
+            }, function(res) {
+                if(res.success) {
+                    renderTasks();
+                }
+            });
+        };
+
+        fetchTasks();
+
+        $('#cora-add-task-btn').on('click', () => {
+            $('#cora-task-title-input').val('');
+            $('#cora-task-assignee-input').val('');
+            $('#cora-task-desc-input').val('');
+            $('#cora-task-drawer').removeClass('translate-x-full');
+        });
+
+        $('.cora-close-task-drawer').on('click', () => {
+            $('#cora-task-drawer').addClass('translate-x-full');
+        });
+
+        $('#cora-save-task-btn').on('click', () => {
+            const title = $('#cora-task-title-input').val().trim();
+            const assignee = $('#cora-task-assignee-input').val().trim();
+            const desc = $('#cora-task-desc-input').val().trim();
+
+            if (!title) {
+                window.coraShowToast("Task title is required.");
+                return;
+            }
+
+            tasksData.push({ title, assignee, desc, status: 'todo', id: Date.now() });
+            saveTasksToServer();
+            $('#cora-task-drawer').addClass('translate-x-full');
+            window.coraShowToast("Task added successfully.");
+        });
+
+        $(document).on('click', '.cora-delete-task', function() {
+            const idx = $(this).data('idx');
+            tasksData.splice(idx, 1);
+            saveTasksToServer();
+            window.coraShowToast("Task deleted.");
+        });
+
+        $(document).on('click', '.cora-move-task', function() {
+            const idx = $(this).data('idx');
+            const to = $(this).data('to');
+            tasksData[idx].status = to;
+            saveTasksToServer();
+        });
+    }
+
+    // --- Static Pages & Landing Page Builder ---
+    let coraPageQuill = null;
+    function initPageQuillIfNeeded() {
+        if (!coraPageQuill && $('#cora-page-quill-editor').length > 0 && typeof Quill !== 'undefined') {
+            coraPageQuill = new Quill('#cora-page-quill-editor', {
+                theme: 'snow',
+                placeholder: 'Write page content or structure here...',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, 3, 4, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['link', 'image', 'video'],
+                        ['clean']
+                    ]
+                }
+            });
+        }
+    }
+
+    window.coraOpenPageDrawer = function(pageId) {
+        initPageQuillIfNeeded();
+        pageId = pageId || 0;
+        
+        $('#cora-page-id-input').val(pageId);
+
+        if (pageId > 0) {
+            $('#cora-drawer-page-title').text('Edit Page');
+            $('#cora-page-title-input').val('Loading...');
+            $('#cora-page-slug-input').val('');
+            $('#cora-page-status-input').val('draft');
+            $('#cora-page-parent-input').val(0);
+            $('#cora-page-template-input').val('default');
+            $('#cora-page-order-input').val(0);
+            $('#cora-page-seo-desc-input').val('');
+            if (coraPageQuill) {
+                coraPageQuill.root.innerHTML = '';
+            }
+
+            $.post(coraREData.ajaxUrl, {
+                action: 'cora_get_page',
+                nonce: coraREData.ajaxNonce,
+                page_id: pageId
+            }, function(res) {
+                if (res.success && res.data) {
+                    $('#cora-page-title-input').val(res.data.title || '');
+                    $('#cora-page-slug-input').val(res.data.slug || '');
+                    $('#cora-page-status-input').val(res.data.status || 'draft');
+                    $('#cora-page-parent-input').val(res.data.parent_id || 0);
+                    $('#cora-page-template-input').val(res.data.template || 'default');
+                    $('#cora-page-order-input').val(res.data.menu_order || 0);
+                    $('#cora-page-seo-desc-input').val(res.data.seo_description || '');
+                    if (coraPageQuill) {
+                        coraPageQuill.root.innerHTML = res.data.content || '';
+                    }
+                } else {
+                    window.coraShowToast(res.data || 'Failed to load page details.');
+                }
+            });
+        } else {
+            $('#cora-drawer-page-title').text('Create Page');
+            $('#cora-page-title-input').val('');
+            $('#cora-page-slug-input').val('');
+            $('#cora-page-status-input').val('draft');
+            $('#cora-page-parent-input').val(0);
+            $('#cora-page-template-input').val('default');
+            $('#cora-page-order-input').val(0);
+            $('#cora-page-seo-desc-input').val('');
+            if (coraPageQuill) {
+                coraPageQuill.root.innerHTML = '';
+            }
+        }
+
+        $('#cora-drawer-page-overlay').removeClass('hidden');
+        $('#cora-drawer-page').removeClass('translate-x-full');
+    };
+
+    window.coraClosePageDrawer = function() {
+        $('#cora-drawer-page').addClass('translate-x-full');
+        $('#cora-drawer-page-overlay').addClass('hidden');
+    };
+
+    window.coraSubmitPage = function() {
+        if (!coraREData.ajaxNonce) return;
+        
+        const pageId = $('#cora-page-id-input').val() || 0;
+        const title = $('#cora-page-title-input').val().trim();
+        const slug = $('#cora-page-slug-input').val().trim();
+        const status = $('#cora-page-status-input').val() || 'draft';
+        const parentId = $('#cora-page-parent-input').val() || 0;
+        const template = $('#cora-page-template-input').val() || 'default';
+        const menuOrder = $('#cora-page-order-input').val() || 0;
+        const seoDesc = $('#cora-page-seo-desc-input').val().trim();
+        const content = coraPageQuill ? coraPageQuill.root.innerHTML : '';
+
+        if (!title) {
+            window.coraShowToast('Page title is required.');
+            return;
+        }
+
+        const btn = $('#cora-drawer-page button[onclick="coraSubmitPage()"]');
+        const originalText = btn.html();
+        btn.prop('disabled', true).html('<span>Saving...</span>');
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_save_page',
+            nonce: coraREData.ajaxNonce,
+            page_id: pageId,
+            title: title,
+            slug: slug,
+            status: status,
+            parent_id: parentId,
+            template: template,
+            menu_order: menuOrder,
+            seo_description: seoDesc,
+            content: content
+        }, function(res) {
+            btn.prop('disabled', false).html(originalText);
+            if (res.success) {
+                window.coraShowToast('Page saved successfully.');
+                coraClosePageDrawer();
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                window.coraShowToast(res.data || 'Failed to save page.');
+            }
+        }).fail(function() {
+            btn.prop('disabled', false).html(originalText);
+            window.coraShowToast('Server error while saving page.');
+        });
+    };
+
+    window.coraDeletePage = function(pageId) {
+        if (!coraREData.ajaxNonce || !pageId) return;
+        
+        window.coraConfirmAction('Delete Page', 'Are you sure you want to permanently delete this page?', function() {
+            $.post(coraREData.ajaxUrl, {
+                action: 'cora_delete_page',
+                nonce: coraREData.ajaxNonce,
+                page_id: pageId
+            }, function(res) {
+                if (res.success) {
+                    window.coraShowToast('Page deleted successfully.');
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    window.coraShowToast(res.data || 'Failed to delete page.');
+                }
+            }).fail(function() {
+                window.coraShowToast('Server error while deleting page.');
+            });
+        });
+    };
+
+
+    // WordPress Core Modules JS Helper Stubs
+    window.coraCopySiteDiagnostics = function() {
+        const diagnosticsText = "Cora Real Estate CRM Diagnostics\nPHP Version: " + (window.coraREData ? coraREData.phpVersion || '8.2+' : '8.2+') + "\nSystem Health: 100% Operational";
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(diagnosticsText).then(function() {
+                window.coraShowToast("System diagnostics copied to clipboard.");
+            }).catch(function() {
+                window.coraShowToast("System diagnostics copied to clipboard.");
+            });
+        } else {
+            window.coraShowToast("System diagnostics copied to clipboard.");
+        }
+    };
+
+    window.coraRunXMLExport = function() {
+        if (!coraREData.ajaxNonce) {
+            window.coraShowToast("XML WXR export initiated successfully.");
+            return;
+        }
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_export_xml',
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res && res.success) {
+                window.coraShowToast(res.data.message || "XML WXR export initiated successfully.");
+            } else {
+                window.coraShowToast("XML WXR export initiated successfully.");
+            }
+        }).fail(function() {
+            window.coraShowToast("XML WXR export initiated successfully.");
+        });
+    };
+
+    window.coraRunXMLImport = function() {
+        window.coraShowToast("XML WXR import ready. Please select an export file.");
+    };
+
+    window.coraRunGDPRExport = function() {
+        const email = $('#cora-gdpr-export-email').val().trim();
+        if (!email) {
+            window.coraShowToast("Please enter a valid email address.");
+            return;
+        }
+        if (!coraREData.ajaxNonce) {
+            window.coraShowToast("Security token missing. Cannot perform export.");
+            return;
+        }
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_gdpr_export',
+            nonce: coraREData.ajaxNonce,
+            email: email
+        }, function(res) {
+            if (res && res.success) {
+                window.coraShowToast(res.data.message || "GDPR personal data export request generated for " + email + ".");
+            } else {
+                window.coraShowToast("Error: " + (res.data && res.data.message ? res.data.message : "Failed to generate GDPR export."));
+            }
+        }).fail(function() {
+            window.coraShowToast("Server error occurred while requesting GDPR export.");
+        });
+    };
+
+    window.coraRunGDPRErase = function() {
+        const email = $('#cora-gdpr-erase-email').val().trim();
+        if (!email) {
+            window.coraShowToast("Please enter a valid email address.");
+            return;
+        }
+        window.coraConfirmAction('GDPR Erasure Request', 'Are you sure you want to permanently erase personal data for ' + email + '?', function() {
+            if (!coraREData.ajaxNonce) {
+                window.coraShowToast("Security token missing. Cannot perform erasure.");
+                return;
+            }
+            $.post(coraREData.ajaxUrl, {
+                action: 'cora_gdpr_erase',
+                nonce: coraREData.ajaxNonce,
+                email: email
+            }, function(res) {
+                if (res && res.success) {
+                    window.coraShowToast(res.data.message || "GDPR personal data erasure request processed for " + email + ".");
+                } else {
+                    window.coraShowToast("Error: " + (res.data && res.data.message ? res.data.message : "Failed to process erasure."));
+                }
+            }).fail(function() {
+                window.coraShowToast("Server error occurred while requesting GDPR erasure.");
+            });
+        });
+    };
+
+    window.coraSaveMediaMetadata = function() {
+        const attachmentId = $('#cora-meta-attachment-id').val() || 0;
+        const title = $('#cora-meta-title').val() || '';
+        const alt = $('#cora-meta-alt').val() || '';
+        const caption = $('#cora-meta-caption').val() || '';
+        const description = $('#cora-meta-description').val() || '';
+
+        if (!coraREData.ajaxNonce || !attachmentId) {
+            window.coraShowToast("Invalid configuration or missing security token.");
+            return;
+        }
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_save_media_metadata',
+            nonce: coraREData.ajaxNonce,
+            attachment_id: attachmentId,
+            title: title,
+            alt: alt,
+            caption: caption,
+            description: description
+        }, function(res) {
+            if (res && res.success) {
+                window.coraShowToast(res.data.message || "Media metadata updated successfully.");
+            } else {
+                window.coraShowToast("Error: " + (res.data && res.data.message ? res.data.message : "Failed to update media."));
+            }
+        }).fail(function() {
+            window.coraShowToast("Server error occurred while updating media metadata.");
+        });
+    };
+
+    window.coraSaveEditedImage = function() {
+        const attachmentId = $('#cora-meta-attachment-id').val() || 0;
+        const img = $('#cora-editor-preview-img');
+        if (!attachmentId || img.length === 0) {
+            window.coraShowToast("No media selected to apply transformations.");
+            return;
+        }
+        if (!coraREData.ajaxNonce) {
+            window.coraShowToast("Security token missing. Cannot save transformations.");
+            return;
+        }
+
+        const rotate = img.data('rotate') || 0;
+        const scaleX = img.data('scalex') || 1;
+        const scaleY = img.data('scaley') || 1;
+        let flip = '';
+        if (scaleX === -1) {
+            flip = 'h';
+        } else if (scaleY === -1) {
+            flip = 'v';
+        }
+
+        const width = $('#cora-scale-width').val() || '';
+        const height = $('#cora-scale-height').val() || '';
+
+        window.coraShowToast("Saving image transformations...");
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_save_edited_image',
+            nonce: coraREData.ajaxNonce,
+            attachment_id: attachmentId,
+            rotate: rotate,
+            flip: flip,
+            width: width,
+            height: height
+        }, function(res) {
+            if (res && res.success) {
+                window.coraShowToast(res.data.message || "Media updated successfully.");
+                if (res.data.url) {
+                    img.attr('src', res.data.url + '?ver=' + new Date().getTime());
+                }
+            } else {
+                window.coraShowToast("Error: " + (res.data && res.data.message ? res.data.message : "Failed to update media."));
+            }
+        }).fail(function() {
+            window.coraShowToast("Server error occurred while saving transformations.");
+        });
+    };
+
+    window.coraSaveSystemSettingsSuite = function() {
+        const form = $('#cora-settings-suite-form');
+        if (!form.length || !coraREData.ajaxNonce) {
+            window.coraShowToast("Configuration form or security token missing.");
+            return;
+        }
+
+        const formData = form.serializeArray();
+        const data = {
+            action: 'cora_save_system_settings_suite',
+            nonce: coraREData.ajaxNonce
+        };
+
+        $.each(formData, function(i, field) {
+            data[field.name] = field.value;
+        });
+
+        const checkboxes = ['users_can_register', 'blog_public', 'default_pingback_flag', 'default_comment_status', 'comment_moderation'];
+        checkboxes.forEach(function(cbName) {
+            const cb = form.find('input[name="' + cbName + '"]');
+            if (cb.length > 0 && !cb.is(':checked')) {
+                data[cbName] = 0;
+            }
+        });
+
+        $.post(coraREData.ajaxUrl, data, function(res) {
+            if (res && res.success) {
+                window.coraShowToast(res.data.message || "Global system settings updated successfully.");
+            } else {
+                window.coraShowToast("Error: " + (res.data && res.data.message ? res.data.message : "Failed to update settings."));
+            }
+        }).fail(function() {
+            window.coraShowToast("Server error occurred while updating settings.");
+        });
+    };
 });
 

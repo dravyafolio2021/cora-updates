@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cora Video Planner — Minimal Workspace</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #0a0a0a;
+      --border: #e5e5e5;
+      --border-strong: #0a0a0a;
+      --subtle: #737373;
+      --hover: #f5f5f5;
+      --badge-draft: #f4f4f5;
+      --badge-scheduled: #eff6ff;
+      --badge-shot: #f0fdf4;
+      --badge-published: #faf5ff;
+      --text-draft: #71717a;
+      --text-scheduled: #1d4ed8;
+      --text-shot: #15803d;
+      --text-published: #6b21a8;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    /* Left Sidebar: Video List */
+    .sidebar {
+      width: 320px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+    
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .sidebar-header h1 {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .btn-new {
+      background: var(--fg);
+      color: var(--bg);
+      border: none;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    
+    .btn-new:hover {
+      opacity: 0.9;
+    }
+    
+    .video-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+    }
+    
+    .video-item {
+      padding: 15px;
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+    
+    .video-item:hover {
+      background: var(--hover);
+      border-color: var(--subtle);
+    }
+    
+    .video-item.active {
+      background: var(--hover);
+      border-color: var(--border-strong);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    
+    .video-item-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      line-height: 1.4;
+      color: var(--fg);
+    }
+    
+    .video-item-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--subtle);
+      font-family: monospace;
+    }
+    
+    .meta-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    
+    .badge-draft { background: var(--badge-draft); color: var(--text-draft); }
+    .badge-scheduled { background: var(--badge-scheduled); color: var(--text-scheduled); }
+    .badge-shot { background: var(--badge-shot); color: var(--text-shot); }
+    .badge-published { background: var(--badge-published); color: var(--text-published); }
+
+    .countdown-tag {
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--subtle);
+    }
+    
+    /* Right Pane: Video Editor */
+    .editor {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: var(--bg);
+    }
+    
+    .editor-empty {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--subtle);
+      font-size: 13px;
+    }
+    
+    .editor-header {
+      padding: 20px 30px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .editor-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .editor-title-input {
+      font-size: 20px;
+      font-weight: 700;
+      border: none;
+      outline: none;
+      width: 100%;
+      color: var(--fg);
+      padding: 4px 0;
+    }
+    
+    .btn-delete {
+      background: transparent;
+      color: #dc2626;
+      border: 1px solid #fca5a5;
+      padding: 5px 12px;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    
+    .btn-delete:hover {
+      background: #fef2f2;
+    }
+    
+    .editor-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      font-size: 12px;
+      color: var(--subtle);
+      padding-top: 5px;
+    }
+    
+    .meta-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .meta-group label {
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 9px;
+      letter-spacing: 0.05em;
+      color: var(--subtle);
+    }
+    
+    .meta-input, .meta-select {
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--fg);
+      padding: 4px 8px;
+      font-size: 11px;
+      outline: none;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+    
+    .meta-input:focus, .meta-select:focus {
+      border-color: var(--border-strong);
+    }
+    
+    .script-area-container {
+      flex: 1;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .script-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .script-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--subtle);
+    }
+    
+    .word-count {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-size: 10px;
+      font-family: monospace;
+      color: var(--subtle);
+    }
+
+    .btn-reset-template {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--subtle);
+      padding: 2px 8px;
+      cursor: pointer;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 600;
+    }
+
+    .btn-reset-template:hover {
+      background: var(--hover);
+      color: var(--fg);
+    }
+    
+    /* Rich Text Toolbar */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px;
+      border: 1px solid var(--border);
+      border-bottom: none;
+      background: #fafafa;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+    }
+    
+    .btn-tool {
+      background: transparent;
+      border: none;
+      color: var(--fg);
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .btn-tool:hover {
+      background: #eaeaea;
+    }
+    
+    .btn-tool.active {
+      background: var(--fg);
+      color: var(--bg);
+    }
+    
+    .toolbar-divider {
+      width: 1px;
+      height: 14px;
+      background: var(--border);
+      margin: 0 4px;
+    }
+    
+    .script-textarea {
+      flex: 1;
+      border: 1px solid var(--border);
+      outline: none;
+      padding: 20px;
+      font-size: 14px;
+      line-height: 1.75;
+      font-family: inherit;
+      color: var(--fg);
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 4px;
+      overflow-y: auto;
+      background: var(--bg);
+    }
+    
+    .script-textarea:focus {
+      border-color: var(--border-strong);
+    }
+    
+    /* Rich text styling rules inside editor */
+    .script-textarea h2 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 4px;
+    }
+
+    .script-textarea h3 {
+      font-size: 13px;
+      font-weight: 750;
+      margin-top: 20px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: #262626;
+      border-left: 2px solid #000;
+      padding-left: 8px;
+    }
+    
+    .script-textarea p {
+      margin-bottom: 14px;
+    }
+    
+    .script-textarea blockquote {
+      border-left: 3px solid var(--border-strong);
+      padding: 8px 0 8px 15px;
+      margin: 15px 0;
+      color: #404040;
+      font-style: italic;
+      background: #fafafa;
+    }
+    
+    .script-textarea ul {
+      margin-left: 24px;
+      margin-bottom: 14px;
+    }
+    
+    .script-textarea li {
+      margin-bottom: 6px;
+    }
+    
+    /* Responsive layout */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: 40%;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .editor {
+        height: 60%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LEFT SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h1>Content Planner</h1>
+      <button class="btn-new" onclick="createNewVideo()">+ Video</button>
+    </div>
+    <div class="video-list" id="video-list-container">
+      <!-- Dynamic list populated via JS -->
+    </div>
+  </div>
+
+  <!-- RIGHT EDITOR PANEL -->
+  <div class="editor" id="editor-container">
+    <div class="editor-empty" id="editor-empty-state">
+      Select a video from the sidebar or click "+ Video" to plan a new episode.
+    </div>
+    
+    <div class="editor-content" id="editor-content-state" style="display: none; flex-direction: column; height: 100%;">
+      <div class="editor-header">
+        <div class="editor-title-row">
+          <input type="text" id="edit-title" class="editor-title-input" oninput="saveCurrentVideo()" placeholder="Video Topic / Title...">
+          <button class="btn-delete" onclick="deleteCurrentVideo()">Delete</button>
+        </div>
+        
+        <div class="editor-meta-row">
+          <div class="meta-group">
+            <label for="edit-status">Status</label>
+            <select id="edit-status" class="meta-select" onchange="saveCurrentVideo()">
+              <option value="draft">Draft</option>
+              <option value="scheduled">Scheduled</option>
+              <option value="shot">Shot</option>
+              <option value="published">Published</option>
+            </select>
+          </div>
+          <div class="meta-group">
+            <label for="edit-shoot">Shoot Date</label>
+            <input type="date" id="edit-shoot" class="meta-input" onchange="saveCurrentVideo()">
+            <span id="shoot-countdown" class="countdown-tag"></span>
+          </div>
+          <div class="meta-group">
+            <label for="edit-publish">Publish Date</label>
+            <input type="date" id="edit-publish" class="meta-input" onchange="saveCurrentVideo()">
+            <span id="publish-countdown" class="countdown-tag"></span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="script-area-container">
+        <div class="script-header-bar">
+          <div class="script-label">Script Content & Segments</div>
+          <div class="word-count">
+            <button class="btn-reset-template" onclick="resetToTemplate()" title="Reset script structure back to Episode 1 template">Reset to Template</button>
+            <span id="words-indicator">0 words</span>
+          </div>
+        </div>
+        
+        <!-- Rich Text Editor Toolbar -->
+        <div class="toolbar">
+          <button class="btn-tool" title="Bold (Ctrl+B)" onclick="formatText('bold')"><b>B</b></button>
+          <button class="btn-tool" title="Italic (Ctrl+I)" onclick="formatText('italic')"><i>I</i></button>
+          <button class="btn-tool" title="Underline (Ctrl+U)" onclick="formatText('underline')"><u>U</u></button>
+          <div class="toolbar-divider"></div>
+          <button class="btn-tool" title="Heading 1" onclick="formatText('formatBlock', '<h2>')">H1</button>
+          <button class="btn-tool" title="Heading 2" onclick="formatText('formatBlock', '<h3>')">H2</button>
+          <button class="btn-tool" title="Quote" onclick="formatText('formatBlock', '<blockquote>')">Quote</button>
+          <div class="toolbar-divider"></div>
+          <button class="btn-tool" title="Bullet List" onclick="formatText('insertUnorderedList')">List</button>
+          <button class="btn-tool" title="Clear Formatting" onclick="formatText('removeFormat')">Clear</button>
+        </div>
+        
+        <!-- Rich Writing Area -->
+        <div id="edit-script" class="script-textarea" contenteditable="true" oninput="saveCurrentVideo()" placeholder="Start writing script here..."></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Correctly structured clean HTML script template
+    const templateScript = `<h2>Video Script: Building Cora — Episode 1</h2>
+<p><strong>Duration:</strong> ~10 Minutes (approx. 1200 words)<br>
+<strong>Format:</strong> Video Essay / Dev Vlog hybrid (No coding shown, only database logic, wireframes, and business math).</p>
+
+<h3>Segment 1: The Hook (0:00 - 1:30)</h3>
+<p><strong>Visual:</strong> Camera starts on you (talking head) in a clean, quiet setup. You hold up a smartphone showing 100+ unread WhatsApp chats.<br>
+<strong>Audio SFX:</strong> WhatsApp notification ping repeating rapidly.</p>
+
+<blockquote>"India mein agar aap ek Real Estate Agency chala rahe ho, toh aapka aadha din sirf is WhatsApp screen par nikal jata hai. 'Bhaiya property ki photos bhejna,' 'Bhaiya wo listing ka link do,' 'Bhaiya client coordinates share karo.'</p>
+<p>Har real estate agency owner ko lagta hai ki unka business client deals se chalta hai. But the truth is, aapka business ek bohot bade operational mess aur copy-paste ke sahare chal raha hai. Aaj is video mein hum dekhenge ki ek typical Indian broker daily 4 ghante kis tarah waste karta hai, usse har mahine lakhs ka nuksaan kaise hota hai, aur main ise solve karne ke liye ek custom platform kaise build kar raha hoon bina aapka WhatsApp ya Google Drive band kiye."</blockquote>
+
+<h3>Segment 2: The Typical Day (1:30 - 4:00)</h3>
+<p><strong>Visual:</strong> Screen recording of a desktop browser switching rapidly between Canva, Google Sheets (with messy buyer lists), Google Drive (with long, unnamed folders), and WhatsApp Web.<br>
+<strong>Overlay:</strong> Red Pen labels pointing to the friction points.</p>
+
+<blockquote>"Aaiye reality check karte hain. Ek client aata hai jo ₹2 Crore ki commercial property dekhna chahta hai. Aapka step-by-step workflow kya hota hai?</blockquote>
+<ul>
+  <li>Aap unke specifications Excel sheet ya diary mein likhte hain.</li>
+  <li>Apne agent ko WhatsApp par details bhejte hain ki 'Bhaiya site visit karwa do.'</li>
+  <li>Site visit ke baad, photos aur videos Google Drive par aate hain.</li>
+  <li>Aapka designer Canva par us property ka flyer banata hai.</li>
+  <li>Aur final detail aap client ko WhatsApp par copy-paste karke bhejte ho.</li>
+</ul>
+<p>Google Drive, WhatsApp, Canva, Excel—yeh sab akele mein bohot achhe tools hain. Lekin jab aap in chaaron ko aapas mein manual copy-paste se jodte ho, toh operations slow ho jaate hain. Client ko time par detail nahi milti, agents verify nahi hote, aur lead dead ho jaati hai."</p>
+
+<h3>Segment 3: The Cost of Mess (4:00 - 6:30)</h3>
+<p><strong>Visual:</strong> Whiteboard or screen sketch drawing out the math using the Red Pen.<br>
+<strong>On-Screen Math:</strong><br>
+1 lead lost/mo = ₹25,000 minimum commission loss.<br>
+4 hours/day copy-paste = ₹15,000/mo management cost.<br>
+<strong>Total Loss = ₹40,000/month.</strong></p>
+
+<blockquote>"Humein lagta hai ki ₹500 ya ₹1000 ke software subscriptions bachana paise bachana hai. Par chaliye is operational mess ka real math calculate karte hain:</p>
+<p>Ek typical broker monthly minimum 40 se 50 hot leads handle karta hai. Is disjointed system ki wajah se coordination delay hota hai, aur follow-up miss ho jata hai. Agar aap mahine mein sirf ek deal bhi is delay ki wajah se loose karte ho, toh standard Indian market commission ke hisab se aapka direct loss ₹25,000 se ₹1,00,000 tak ka hota hai.</p>
+<p>Upar se, team ki management aur manual data entry mein daily jo 4 ghante jaa rahe hain, agar uski cost calculate karein, toh aap direct ₹15,000 monthly apne time ki value waste kar rahe ho. Total loss? Minimum ₹40,000 per month. Yeh hai is 'deshi jugad' system ki asali cost."</blockquote>
+
+<h3>Segment 4: The Vision — Cora (6:30 - 8:30)</h3>
+<p><strong>Visual:</strong> Show a clean mockup of Cora dashboard. Zoom in on the "Integrations" page showing Google Drive and WhatsApp API toggle switches.</p>
+<blockquote>"Mujhe market mein existing CRM tools jaise Zoho ya ClickUp pasand nahi hain real estate ke liye. Kyun? Kyun ki wo aapse bolte hain ki WhatsApp aur Google Drive chhod kar unka system use karo. Jo ki impossible hai.</p>
+<p>Isliye main build kar raha hoon Cora. Hum aapke existing tools ko replace nahi karenge, hum unhe connect karenge:</p>
+<ul>
+  <li>Aapke agent ne site visit ki photo Google Drive par daali, Cora backend par use listing ke saath match karke verify kar lega.</li>
+  <li>Cora direct WhatsApp API se link hokar status update automatically client ke chat par bhej dega bina aapke ek word copy-paste kiye.</li>
+  <li>Aapka client portal seedhe properties se connected rahega, taaki client ko standard professional presentation dikhe, na ki cluttered Drive links."</li>
+</ul>
+
+<h3>Segment 5: The Build in Public Promise & CTA (8:30 - 10:00)</h3>
+<p><strong>Visual:</strong> Camera back on you. You write "Ep 1: Setup Completed" on a physical notebook. Show a QR code/link on screen.</p>
+<blockquote>"Main is pure platform ki development journey live YouTube par share karunga. Koi fake code nahi, koi corporate jargon nahi. Hum step-by-step har hafte ek naya connector aur feature build karenge aur use real-world agencies par test karke uski value prove karenge.</p>
+<p>Agar aap India mein ek Real Estate Agency chala rahe ho, aur aap apne is chaos ko systemize karna chahte ho, toh main is series mein sirf 5 agencies ko as a 'Beta Partner' on-board kar raha hoon.</p>
+<p>Aapko koi software use karna nahi seekhna. Main khud aapke system ke Google Drive aur WhatsApp ko Cora ke saath configure karke dunga. Cost? Just ₹2,00,000/month. Agar aap interested hain, toh description mein diye link par click karke form fill kijiye ya niche comment kijiye. Milte hain agle episode mein jab hum Google Drive connector build karenge."</blockquote>
+
+<hr style="border:0; border-top:1px solid var(--border); margin:20px 0;">
+
+<h3>Key Recording Tips for You:</h3>
+<ul>
+  <li><strong>Be Raw and Authentic:</strong> Studio mic aur DSLR ki zaroorat nahi hai. Apne normal phone se record karein. Agar background noise thodi aati bhi hai toh wo video ko aur authentic banati hai.</li>
+  <li><strong>Show, Don't Just Tell:</strong> Jab aap Excel aur Google Drive ka workflow batate hain, toh screen recorder open karke click karke dikhayein ki kitna friction hota hai.</li>
+  <li><strong>Keep the Script on Laptop:</strong> Ise ratne (memorize karne) ki zaroorat nahi hai. Teleprompter app use karein ya voiceover read karein.</li>
+</ul>`;
+
+    // Plain text to Rich Text HTML parser to automatically format collapsed paragraphs
+    function parsePlainTextToHTML(rawText) {
+      if (!rawText) return "";
+      
+      // If already contains paragraph or heading tags, return as is
+      if (rawText.includes('<p>') || rawText.includes('<h3>') || rawText.includes('<h2>') || rawText.includes('<blockquote>')) {
+        return rawText;
+      }
+      
+      // Clean up string
+      let cleanText = rawText.trim();
+      
+      // Split by double newlines or single newline clusters
+      const blocks = cleanText.split(/\n\s*\n/);
+      
+      return blocks.map(block => {
+        let text = block.trim();
+        if (!text) return '';
+        
+        // H2 Title
+        if (text.startsWith('Video Script:') || text.startsWith('Key Recording Tips:')) {
+          return `<h2>${text}</h2>`;
+        }
+        // H3 Segment Header
+        if (text.startsWith('Segment ') || text.startsWith('Duration:') || text.startsWith('Format:')) {
+          return `<h3>${text}</h3>`;
+        }
+        // Blockquote dialogue
+        if (text.startsWith('"') && text.endsWith('"')) {
+          return `<blockquote>${text}</blockquote>`;
+        }
+        
+        // Bold headers inside paragraphs
+        text = text.replace(/(Visual:|Audio SFX:|On-Screen Math:|Total Loss =)/g, '<strong>$1</strong>');
+        
+        // Lists
+        if (text.includes('\n- ') || text.includes('\n* ')) {
+          const lines = text.split('\n');
+          const firstLine = lines.shift();
+          const listItems = lines.map(line => {
+            const cleanLine = line.replace(/^[-*\s]+/, '');
+            return `<li>${cleanLine}</li>`;
+          }).join('');
+          return `<p>${firstLine}</p><ul>${listItems}</ul>`;
+        }
+        
+        return `<p>${text.replace(/\n/g, '<br>')}</p>`;
+      }).join('');
+    }
+
+    let videos = JSON.parse(localStorage.getItem('cora_videos')) || [
+      {
+        id: "v-1",
+        title: "Building Cora — Episode 1",
+        status: "scheduled",
+        shootDate: "2026-07-10",
+        publishDate: "2026-07-15",
+        script: templateScript
+      }
+    ];
+    
+    // Automatically migrate old plain text structures to HTML layout on boot
+    videos = videos.map(video => {
+      video.script = parsePlainTextToHTML(video.script);
+      return video;
+    });
+    localStorage.setItem('cora_videos', JSON.stringify(videos));
+
+    let selectedVideoId = localStorage.getItem('cora_selected_id') || "";
+
+    function saveToStorage() {
+      localStorage.setItem('cora_videos', JSON.stringify(videos));
+      localStorage.setItem('cora_selected_id', selectedVideoId);
+    }
+
+    function getDaysLeft(dateStr) {
+      if (!dateStr) return "";
+      const now = new Date();
+      now.setHours(0,0,0,0);
+      const target = new Date(dateStr);
+      target.setHours(0,0,0,0);
+      const diffTime = target - now;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 0) return "(Today)";
+      if (diffDays === 1) return "(Tomorrow)";
+      if (diffDays === -1) return "(Yesterday)";
+      if (diffDays < -1) return `(${Math.abs(diffDays)} days ago)`;
+      return `(In ${diffDays} days)`;
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return "Not Scheduled";
+      const options = { day: '2-digit', month: 'short' };
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', options);
+    }
+
+    function renderList() {
+      const container = document.getElementById('video-list-container');
+      container.innerHTML = '';
+      
+      videos.forEach(v => {
+        const div = document.createElement('div');
+        div.className = `video-item ${v.id === selectedVideoId ? 'active' : ''}`;
+        div.onclick = () => selectVideo(v.id);
+        
+        const showTitle = v.title || 'Untitled Video';
+        const shootText = v.shootDate ? `Shoot: ${formatDate(v.shootDate)}` : 'Shoot: --';
+        const pubText = v.publishDate ? `Publish: ${formatDate(v.publishDate)}` : 'Publish: --';
+        
+        const shootCountdown = v.shootDate ? getDaysLeft(v.shootDate) : "";
+        
+        div.innerHTML = `
+          <div class="video-item-title">${showTitle}</div>
+          <div class="video-item-meta">
+            <div class="meta-line">
+              <span>${shootText} <span style="font-weight:bold; color:var(--fg);">${shootCountdown}</span></span>
+              <span class="status-badge badge-${v.status || 'draft'}">${v.status || 'draft'}</span>
+            </div>
+            <div class="meta-line" style="margin-top: 2px;">
+              <span>${pubText}</span>
+            </div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function selectVideo(id) {
+      selectedVideoId = id;
+      saveToStorage();
+      renderList();
+      
+      const video = videos.find(v => v.id === id);
+      if (video) {
+        document.getElementById('editor-empty-state').style.display = 'none';
+        document.getElementById('editor-content-state').style.display = 'flex';
+        
+        document.getElementById('edit-title').value = video.title || '';
+        document.getElementById('edit-status').value = video.status || 'draft';
+        document.getElementById('edit-shoot').value = video.shootDate || '';
+        document.getElementById('edit-publish').value = video.publishDate || '';
+        
+        // Load HTML script representation
+        document.getElementById('edit-script').innerHTML = video.script || '';
+        
+        updateCountdownLabels(video.shootDate, video.publishDate);
+        updateWordCount();
+      } else {
+        clearEditor();
+      }
+    }
+
+    function updateCountdownLabels(shoot, publish) {
+      document.getElementById('shoot-countdown').textContent = shoot ? getDaysLeft(shoot) : "";
+      document.getElementById('publish-countdown').textContent = publish ? getDaysLeft(publish) : "";
+    }
+
+    function updateWordCount() {
+      const editor = document.getElementById('edit-script');
+      const text = editor.innerText || editor.textContent;
+      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+      document.getElementById('words-indicator').textContent = `${words} words`;
+    }
+
+    function clearEditor() {
+      document.getElementById('editor-empty-state').style.display = 'flex';
+      document.getElementById('editor-content-state').style.display = 'none';
+    }
+
+    function createNewVideo() {
+      const newId = 'v-' + Date.now();
+      const newVideo = {
+        id: newId,
+        title: "New Episode Video Topic",
+        status: "draft",
+        shootDate: "",
+        publishDate: "",
+        script: "<h2>Write script heading...</h2><p>Start writing details...</p>"
+      };
+      
+      videos.unshift(newVideo);
+      selectedVideoId = newId;
+      saveToStorage();
+      renderList();
+      selectVideo(newId);
+    }
+
+    function saveCurrentVideo() {
+      const idx = videos.findIndex(v => v.id === selectedVideoId);
+      if (idx !== -1) {
+        const title = document.getElementById('edit-title').value;
+        const status = document.getElementById('edit-status').value;
+        const shootDate = document.getElementById('edit-shoot').value;
+        const publishDate = document.getElementById('edit-publish').value;
+        const script = document.getElementById('edit-script').innerHTML;
+        
+        videos[idx].title = title;
+        videos[idx].status = status;
+        videos[idx].shootDate = shootDate;
+        videos[idx].publishDate = publishDate;
+        videos[idx].script = script;
+        
+        saveToStorage();
+        updateCountdownLabels(shootDate, publishDate);
+        updateWordCount();
+        renderList();
+      }
+    }
+
+    function deleteCurrentVideo() {
+      if (confirm("Are you sure you want to delete this video plan?")) {
+        videos = videos.filter(v => v.id !== selectedVideoId);
+        selectedVideoId = videos.length > 0 ? videos[0].id : "";
+        saveToStorage();
+        renderList();
+        if (selectedVideoId) {
+          selectVideo(selectedVideoId);
+        } else {
+          clearEditor();
+        }
+      }
+    }
+
+    // Force Reset current video to templated structure
+    function resetToTemplate() {
+      if (confirm("Are you sure you want to overwrite this script with the formatted Episode 1 template?")) {
+        const idx = videos.findIndex(v => v.id === selectedVideoId);
+        if (idx !== -1) {
+          videos[idx].script = templateScript;
+          document.getElementById('edit-script').innerHTML = templateScript;
+          saveCurrentVideo();
+          window.coraShowToast("Script template restored successfully.");
+        }
+      }
+    }
+
+    // Rich Text Format API wrapper
+    function formatText(command, value = null) {
+      document.execCommand(command, false, value);
+      saveCurrentVideo();
+    }
+
+    // Initialize
+    renderList();
+    if (selectedVideoId && videos.find(v => v.id === selectedVideoId)) {
+      selectVideo(selectedVideoId);
+    } else if (videos.length > 0) {
+      selectVideo(videos[0].id);
+    }
+  </script>
+</body>
+</html>

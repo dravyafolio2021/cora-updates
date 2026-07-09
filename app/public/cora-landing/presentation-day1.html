@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cora · Day 1 · The Fragmentation Problem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Inter+Tight:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F9F9FB;--sf:#FFF;--st:#F2F2F4;--sd:#E4E4E7;
+  --ink:#09090B;--soft:#52525B;--faint:#A1A1AA;
+  --bdr:#E4E4E7;--bds:#F4F4F5;--bdh:#D4D4D8;
+  --r:16px;--rsm:10px;--rp:999px;
+  --T:'Inter Tight',sans-serif;--S:'Inter',sans-serif;
+}
+[data-theme=dark]{
+  --bg:#09090B;--sf:#18181B;--st:#27272A;--sd:#3F3F46;
+  --ink:#FAFAFA;--soft:#A1A1AA;--faint:#52525B;
+  --bdr:#27272A;--bds:#1C1C1E;--bdh:#3F3F46;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--S);-webkit-font-smoothing:antialiased;overflow:hidden;transition:background .2s,color .2s}
+
+/* ── TOPBAR ── */
+.bar{position:fixed;top:0;left:0;right:0;z-index:99;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:var(--bg);border-bottom:1px solid var(--bds)}
+.bl{display:flex;align-items:center;gap:9px}
+.bm{width:20px;height:20px;border-radius:5px;background:var(--ink);color:var(--bg);font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.bn{font-size:13px;font-weight:700;letter-spacing:-.02em}
+.bs{width:1px;height:12px;background:var(--bdh)}
+.bt{font-size:11px;color:var(--faint)}
+.br{display:flex;align-items:center;gap:10px}
+.bc{font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
+.bc strong{color:var(--ink);font-weight:700}
+.bb{background:none;border:1px solid var(--bdr);border-radius:6px;padding:4px;cursor:pointer;color:var(--soft);display:flex;line-height:0}
+
+/* ── PROGRESS ── */
+.pb{position:fixed;top:46px;left:0;right:0;z-index:98;height:2px;background:var(--bds)}
+.pf{height:100%;background:var(--ink);transition:width .3s ease}
+
+/* ── DECK ── */
+.deck{height:100vh;width:100vw;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;padding:70px 48px 40px;display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none;transition:opacity .35s ease}
+.slide.on{opacity:1;pointer-events:auto}
+.nz{position:absolute;top:46px;bottom:0;width:64px;z-index:5;cursor:pointer}
+.nz.p{left:0}.nz.n{right:0}
+
+/* ── TYPE ── */
+.eye{display:inline-flex;align-items:center;gap:7px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:16px;flex-shrink:0}
+.eye::before{content:'';width:12px;height:1px;background:var(--faint)}
+h1{font-family:var(--T);font-size:clamp(40px,5.5vw,68px);font-weight:900;letter-spacing:-.05em;line-height:.97}
+h2{font-family:var(--T);font-size:clamp(28px,3.8vw,46px);font-weight:800;letter-spacing:-.04em;line-height:1.03}
+h3{font-family:var(--T);font-size:clamp(18px,2.2vw,26px);font-weight:700;letter-spacing:-.03em;line-height:1.15}
+.sub{font-size:15px;color:var(--soft);line-height:1.6;max-width:56ch;margin-top:12px}
+.tag{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:var(--st);border-radius:var(--rp);padding:3px 10px;color:var(--faint);width:fit-content;flex-shrink:0}
+.tagi{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:rgba(255,255,255,.1);border-radius:var(--rp);padding:3px 10px;color:rgba(255,255,255,.45);width:fit-content;flex-shrink:0}
+
+/* ── LOGO BADGES ── */
+.lbadge{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lbadge img{display:block}
+.lbadge-sm{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lbadge-sm img{display:block}
+.l-wa{background:#25D366}.l-meta{background:#0866FF}.l-gs{background:#0F9D58}
+.l-canva{background:#00C4CC}.l-xl{background:#217346}.l-drive{background:#4285F4}
+.l-ig{background:linear-gradient(135deg,#f09433,#dc2743,#bc1888)}
+.l-yt{background:#FF0000}.l-notion{background:#18181B}.l-slack{background:#4A154B}
+.l-tg{background:#26A5E4}.l-figma{background:#F24E1E}.l-adobe{background:#FF0000}
+.l-asana{background:#F06A6A}.l-jira{background:#0052CC}.l-portals{background:#E14D2A}
+.l-email{background:#EA4335}.l-zoho{background:#E2574C}
+.l-text{font-size:9px;font-weight:800;color:#fff}
+
+/* ════════════ SLIDE 1 — TITLE ════════════ */
+.s1{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}
+.s1l{display:flex;flex-direction:column;gap:18px}
+.s1-kicker{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--bdr);border-radius:var(--rp);padding:5px 14px 5px 8px;font-size:12px;font-weight:600;color:var(--soft);background:var(--sf);width:fit-content}
+.s1-kdot{width:18px;height:18px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:8px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.s1r{display:flex;flex-direction:column;gap:10px}
+.s1-card{background:var(--sf);border:1px solid var(--bdr);border-radius:var(--r);padding:18px 20px;display:flex;gap:14px;align-items:center}
+.s1-card.dk{background:var(--ink);border-color:transparent}
+.s1-card.dk .sv{color:var(--bg)}.s1-card.dk .sl{color:rgba(255,255,255,.5)}
+.sv{font-family:var(--T);font-size:28px;font-weight:900;letter-spacing:-.04em;line-height:1;white-space:nowrap}
+.sl{font-size:12px;color:var(--soft);margin-top:3px;line-height:1.35}
+
+/* ════════════ SLIDE 2 — BIG NUMBER ════════════ */
+.s2{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.s2-hero{background:var(--ink);border-radius:var(--r);display:flex;flex-direction:column;justify-content:flex-end;padding:36px}
+.s2-n{font-family:var(--T);font-size:clamp(100px,18vw,180px);font-weight:900;letter-spacing:-.07em;color:var(--bg);line-height:.85}
+.s2-l{font-size:16px;color:rgba(255,255,255,.5);margin-top:18px;line-height:1.4;max-width:28ch}
+.s2r{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.s2s{background:var(--sf);border:1px solid var(--bdr);border-radius:var(--r);padding:22px;display:flex;flex-direction:column;gap:6px}
+.s2s .n{font-family:var(--T);font-size:clamp(32px,4.5vw,52px);font-weight:900;letter-spacing:-.05em;line-height:1}
+.s2s .l{font-size:12px;color:var(--soft);line-height:1.4}
+
+/* ════════════ SLIDE 3 — 6 CATEGORIES ════════════ */
+.s3{flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:10px}
+.s3c{background:var(--sf);border:1px solid var(--bdr);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:10px}
+.s3c.dark{background:var(--ink);border-color:transparent}
+.s3c.dark h3{color:var(--bg)}
+.s3c.dark .s3-line{color:rgba(255,255,255,.55)}
+.s3-line{font-size:13px;color:var(--soft);line-height:1.45;margin-top:auto}
+.s3-logos{display:flex;gap:7px;flex-wrap:wrap;margin-top:auto}
+
+/* ════════════ SLIDE 4 — WVIN AUDIT ════════════ */
+.s4{flex:1;display:flex;flex-direction:column;gap:7px}
+.tr{display:grid;grid-template-columns:36px 1fr 2fr 90px;gap:14px;align-items:center;padding:11px 16px;background:var(--sf);border:1px solid var(--bdr);border-radius:var(--rsm)}
+.tr.hdr{background:var(--st);border-color:var(--bds)}
+.tr.hdr *{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.tr.tot{background:var(--ink);border-color:transparent}
+.tr.tot .tn{color:rgba(255,255,255,.5)}.tr.tot .tt{color:var(--bg)}.tr.tot .tc{color:rgba(255,255,255,.5)}.tr.tot .tp{color:var(--bg)}
+.tn{font-size:10px;font-weight:700;color:var(--faint);text-align:center}
+.tt{font-size:13px;font-weight:650}
+.tc{font-size:12px;color:var(--soft)}
+.tp{font-family:var(--T);font-size:14px;font-weight:700;text-align:right}
+
+/* ════════════ SLIDE 5 — THE COST ════════════ */
+.s5{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.s5l{background:var(--ink);border-radius:var(--r);padding:36px;display:flex;flex-direction:column;justify-content:flex-end;gap:12px}
+.s5-n{font-family:var(--T);font-size:clamp(60px,10vw,100px);font-weight:900;letter-spacing:-.06em;color:var(--bg);line-height:.9}
+.s5-l{font-size:15px;color:rgba(255,255,255,.5);margin-top:10px}
+.s5r{display:flex;flex-direction:column;gap:10px}
+.s5-row{padding:14px 18px;background:var(--sf);border:1px solid var(--bdr);border-radius:var(--rsm);display:flex;justify-content:space-between;align-items:baseline}
+.s5-row .n{font-size:13px;color:var(--soft)}
+.s5-row .v{font-family:var(--T);font-size:18px;font-weight:800;letter-spacing:-.03em}
+.s5-note{padding:16px 18px;background:var(--st);border-radius:var(--rsm);font-size:13px;color:var(--soft);line-height:1.6}
+.s5-note strong{color:var(--ink)}
+
+/* ════════════ SLIDE 6 — WVIN PROFILE ════════════ */
+.s6{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.s6l{background:var(--sf);border:1px solid var(--bdr);border-radius:var(--r);padding:28px;display:flex;flex-direction:column;gap:16px}
+.s6-av{width:54px;height:54px;border-radius:50%;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center;font-family:var(--T);font-size:20px;font-weight:900}
+.s6-facts{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.s6-fact{display:flex;gap:9px;font-size:13px;color:var(--soft);line-height:1.45}
+.s6-fact::before{content:'—';color:var(--faint);flex-shrink:0}
+.s6-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto}
+.s6-st{background:var(--st);border-radius:var(--rsm);padding:11px 14px}
+.s6-st .n{font-family:var(--T);font-size:22px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.s6-st .l{font-size:10px;color:var(--faint);margin-top:3px}
+.s6r{background:var(--ink);border-radius:var(--r);padding:32px;display:flex;flex-direction:column;gap:16px;justify-content:center}
+.s6-ql{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3)}
+.s6-q{font-family:var(--T);font-size:clamp(17px,2.4vw,24px);font-weight:700;color:var(--bg);line-height:1.35;letter-spacing:-.025em;font-style:italic}
+.s6-att{font-size:12px;color:rgba(255,255,255,.4);padding-top:12px;border-top:1px solid rgba(255,255,255,.08)}
+.s6-att strong{color:rgba(255,255,255,.7)}
+
+/* ════════════ SLIDE 7 — MONDAY ════════════ */
+.s7{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.tline{display:flex;flex-direction:column}
+.tli{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--bds);align-items:flex-start}
+.tli:last-child{border:none}
+.tli-t{font-size:11px;font-weight:700;color:var(--faint);min-width:42px;flex-shrink:0;padding-top:1px;font-variant-numeric:tabular-nums}
+.tli-d{width:8px;height:8px;border-radius:50%;background:var(--bdr);flex-shrink:0;margin-top:4px}
+.tli.x .tli-d{background:var(--ink)}
+.tli-a{font-size:12.5px;color:var(--soft);line-height:1.4}
+.tli-a strong{color:var(--ink);font-weight:650}
+.s7r{display:flex;flex-direction:column;gap:10px}
+.s7-box{background:var(--ink);border-radius:var(--r);padding:22px;display:flex;flex-direction:column;gap:10px;flex:1}
+.s7-box h3{color:var(--bg)}
+.s7-items{display:flex;flex-direction:column;gap:7px}
+.s7-item{display:flex;gap:8px;font-size:12.5px;color:rgba(255,255,255,.6);line-height:1.4}
+.s7-item::before{content:'→';color:rgba(255,255,255,.25);flex-shrink:0}
+.s7-note{background:var(--sf);border:1px solid var(--bdr);border-radius:var(--rsm);padding:14px 16px;font-size:13px;color:var(--soft);line-height:1.55}
+.s7-note strong{color:var(--ink)}
+
+/* ════════════ SLIDE 8 — SILOS ════════════ */
+.s8{flex:1;display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch}
+.s8-col{display:flex;flex-direction:column;gap:8px}
+.s8-hdr{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);padding:8px 12px;background:var(--st);border-radius:var(--rsm);text-align:center;flex-shrink:0}
+.s8-tool{background:var(--sf);border:1px solid var(--bdr);border-radius:var(--rsm);padding:11px 14px;display:flex;gap:10px;align-items:center}
+.s8-tool h4{font-size:13px;font-weight:650;margin-bottom:2px}
+.s8-tool p{font-size:11px;color:var(--faint);line-height:1.3}
+.s8-crack{background:var(--bds);border:1px dashed var(--bdh);border-radius:var(--rsm);padding:8px 12px;font-size:11px;color:var(--faint);text-align:center}
+.s8-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;width:120px}
+.s8-void{background:var(--ink);border-radius:var(--r);padding:20px 14px;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center;width:100%}
+.s8-void h3{font-size:15px;color:var(--bg)}
+.s8-void p{font-size:11px;color:rgba(255,255,255,.45);line-height:1.4}
+.s8-person{background:var(--sf);border:1px solid var(--bdr);border-radius:var(--rsm);padding:10px 12px;text-align:center;width:100%}
+.s8-person .n{font-family:var(--T);font-size:16px;font-weight:800}
+.s8-person .l{font-size:10px;color:var(--faint);margin-top:2px}
+.s8-arr{color:var(--faint);font-size:16px;line-height:1}
+
+/* ════════════ SLIDE 9 — WVIN COST ════════════ */
+.s9{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.s9c{background:var(--sf);border:1px solid var(--bdr);border-radius:var(--r);padding:24px;display:flex;flex-direction:column;gap:10px}
+.s9-n{font-family:var(--T);font-size:clamp(38px,5.5vw,58px);font-weight:900;letter-spacing:-.05em;line-height:.95}
+.s9-l{font-size:14px;font-weight:650;color:var(--ink)}
+.s9-d{font-size:12.5px;color:var(--soft);line-height:1.5;flex:1}
+.s9-src{font-size:10px;color:var(--faint);padding-top:10px;border-top:1px solid var(--bds);margin-top:auto}
+.s9-total{background:var(--ink);border-radius:var(--rsm);padding:15px 22px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.s9-total .l{font-size:13px;color:rgba(255,255,255,.6)}
+.s9-total .r{font-family:var(--T);font-size:24px;font-weight:800;color:var(--bg);letter-spacing:-.03em}
+
+/* ════════════ SLIDE 10 — DECISION GAP ════════════ */
+.s10{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.s10l{display:flex;flex-direction:column;gap:10px}
+.s10-sc{background:var(--sf);border:1px solid var(--bdr);border-radius:var(--rsm);padding:16px;display:flex;flex-direction:column;gap:6px}
+.s10-sc .lbl{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.s10-sc h4{font-size:13px;font-weight:650}
+.s10-sc .cost{font-size:12px;font-weight:700;color:var(--ink);margin-top:4px;padding-top:8px;border-top:1px solid var(--bds)}
+.s10r{background:var(--ink);border-radius:var(--r);padding:28px;display:flex;flex-direction:column;gap:14px}
+.s10r h3{color:var(--bg)}
+.s10r p{font-size:13px;color:rgba(255,255,255,.6);line-height:1.6}
+.s10-qs{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.s10-q{display:flex;gap:9px;font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.35}
+.s10-q::before{content:'?';color:rgba(255,255,255,.25);flex-shrink:0;font-weight:700}
+
+/* ════════════ SLIDE 11 — BEFORE AFTER ════════════ */
+.s11{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.s11l{background:var(--sf);border:1px solid var(--bdr);border-radius:var(--r);padding:24px;display:flex;flex-direction:column;gap:8px}
+.s11r{background:var(--ink);border-radius:var(--r);padding:24px;display:flex;flex-direction:column;gap:8px}
+.col-lbl{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);padding-bottom:8px;border-bottom:1px solid var(--bds);flex-shrink:0}
+.s11r .col-lbl{color:rgba(255,255,255,.35);border-color:rgba(255,255,255,.08)}
+.bi{display:flex;gap:8px;font-size:12.5px;color:var(--soft);line-height:1.35;padding:7px 0;border-bottom:1px solid var(--bds)}
+.bi:last-child{border:none}
+.bi::before{flex-shrink:0;font-size:11px;font-weight:800;margin-top:1px}
+.bi.bad::before{content:'✕';color:var(--faint)}
+.ai{display:flex;gap:8px;font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.35;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.ai:last-child{border:none}
+.ai::before{content:'✓';color:rgba(255,255,255,.3);flex-shrink:0;font-size:11px;font-weight:800;margin-top:1px}
+
+/* ════════════ SLIDE 12 — WHO ════════════ */
+.s12{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.s12c{background:var(--sf);border:1px solid var(--bdr);border-radius:var(--r);padding:22px;display:flex;flex-direction:column;gap:12px}
+.s12c.feat{background:var(--ink);border-color:transparent}
+.s12c.feat h3{color:var(--bg)}.s12c.feat li{color:rgba(255,255,255,.65)}.s12c.feat li::before{color:rgba(255,255,255,.25)}
+.s12c h3{font-family:var(--T);font-size:20px;font-weight:700;letter-spacing:-.025em}
+.s12c ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.s12c li{font-size:12.5px;color:var(--soft);display:flex;gap:8px;line-height:1.35}
+.s12c li::before{content:'—';color:var(--faint);flex-shrink:0}
+.s12-cta{background:var(--st);border-radius:var(--rsm);padding:13px 18px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.s12-cta span{font-size:13px;color:var(--soft)}
+.s12-cta strong{color:var(--ink)}
+.s12-url{font-size:12px;font-weight:700;background:var(--ink);color:var(--bg);border-radius:var(--rp);padding:7px 18px;text-decoration:none;white-space:nowrap}
+
+/* ════════════ SLIDE 13 — ROADMAP ════════════ */
+.s13{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center}
+.s13 h2{max-width:24ch}
+.s13 .sub{text-align:center;margin:0 auto;max-width:52ch}
+.srow{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;max-width:920px;width:100%}
+.sday{background:var(--sf);border:1px solid var(--bdr);border-radius:var(--rsm);padding:14px 8px;display:flex;flex-direction:column;gap:8px;align-items:center}
+.sday.now{background:var(--ink);border-color:transparent}
+.sday.now .sd-n{color:var(--bg)}.sday.now .sd-t{color:rgba(255,255,255,.9)}.sday.now .sd-s{color:rgba(255,255,255,.4)}
+.sd-n{font-family:var(--T);font-size:20px;font-weight:900;color:var(--faint)}
+.sd-t{font-size:11px;font-weight:700;line-height:1.3}
+.sd-s{font-size:10px;color:var(--faint);line-height:1.3}
+.rpill{display:flex;gap:20px;padding:12px 24px;background:var(--st);border-radius:var(--rp);font-size:12.5px;color:var(--soft)}
+.rpill strong{color:var(--ink)}
+.rsep{color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="deck">
+
+  <div class="bar">
+    <div class="bl">
+      <div class="bm">C</div><span class="bn">Cora</span>
+      <div class="bs"></div>
+      <span class="bt">Day 1 · The Fragmentation Problem</span>
+    </div>
+    <div class="br">
+      <div class="bc"><strong id="cur">01</strong> / <span id="tot">13</span></div>
+      <button class="bb" id="tbtn">
+        <svg id="isun" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13" style="display:none"><circle cx="10" cy="10" r="4"/><path d="M10 2v1M10 17v1M2 10h1M17 10h1M4.22 4.22l.71.71M14.36 14.36l.71.71M4.22 15.78l.71-.71M14.36 5.64l.71-.71"/></svg>
+        <svg id="imoon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><path d="M17.5 12A7.5 7.5 0 0 1 8 2.5a7.5 7.5 0 1 0 9.5 9.5z"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="pb"><div class="pf" id="pf" style="width:7.7%"></div></div>
+
+  <!-- ═══ 01 TITLE ═══ -->
+  <section class="slide on" data-slide="1">
+    <div class="eye">Day 1 of 7 · Build in Public · Problem Series</div>
+    <div class="s1">
+      <div class="s1l">
+        <div class="s1-kicker"><div class="s1-kdot">1</div> Video 1 · "The Tool Trap"</div>
+        <h1>You're paying<br>for 10 tools.<br>None of them<br>talk to each other.</h1>
+        <p class="sub">This is not a software pitch. This is a problem statement — documented with a real agency, real rupees, and a real founder.</p>
+      </div>
+      <div class="s1r">
+        <div class="s1-card dk">
+          <div style="width:42px;height:42px;border-radius:10px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2" width="20" height="20"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          </div>
+          <div><div class="sv">11 tools</div><div class="sl">used by avg 10-person team in 2025</div></div>
+        </div>
+        <div class="s1-card">
+          <div style="width:42px;height:42px;border-radius:10px;background:var(--st);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <div><div class="sv">₹15L+</div><div class="sl">annual fragmentation cost for WVIN</div></div>
+        </div>
+        <div class="s1-card">
+          <div style="width:42px;height:42px;border-radius:10px;background:var(--st);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2" width="20" height="20"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          </div>
+          <div><div class="sv">3 hrs/day</div><div class="sl">lost to tool-switching per person</div></div>
+        </div>
+        <div class="s1-card">
+          <div style="width:42px;height:42px;border-radius:10px;background:var(--st);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2" width="20" height="20"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div><div class="sv">40% lost</div><div class="sl">Meta leads never receive a follow-up</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 02 BIG NUMBER ═══ -->
+  <section class="slide" data-slide="2">
+    <div class="eye">01 · How Bad Is It?</div>
+    <h2 style="margin-bottom:14px">The average business uses more software<br>than NASA used to reach the moon.</h2>
+    <div class="s2">
+      <div class="s2-hero">
+        <div class="s2-n">11</div>
+        <div class="s2-l">tools used by the average 10-person business — up from <strong style="color:rgba(255,255,255,.8)">4 in 2015.</strong> Tripled in under a decade.</div>
+      </div>
+      <div class="s2r">
+        <div class="s2s"><div class="n">60%</div><div class="l">of those tools are <strong>paid subscriptions</strong> — not free tiers</div></div>
+        <div class="s2s"><div class="n">$20</div><div class="l"><strong>average monthly cost</strong> per paid tool, per seat</div></div>
+        <div class="s2s"><div class="n">3 hrs</div><div class="l"><strong>lost daily</strong> to switching tools and re-entering data</div></div>
+        <div class="s2s" style="background:var(--st)"><div class="n" style="color:var(--faint)">0</div><div class="l">of those tools were <strong>designed to work together</strong></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 03 6 CATEGORIES ═══ -->
+  <section class="slide" data-slide="3">
+    <div class="eye">02 · The 6 Categories of Chaos</div>
+    <h2 style="margin-bottom:14px">Six types of tools. Zero integration between them.</h2>
+    <div class="s3">
+      <div class="s3c dark">
+        <div class="tagi">01 · Biggest Offender</div>
+        <h3>Communication</h3>
+        <div class="s3-line">Every decision made here. Everything gets lost here.</div>
+        <div class="s3-logos">
+          <div class="lbadge-sm l-wa"><img src="https://cdn.simpleicons.org/whatsapp/ffffff" width="15" height="15" alt="WhatsApp"></div>
+          <div class="lbadge-sm l-email"><img src="https://cdn.simpleicons.org/gmail/ffffff" width="15" height="15" alt="Gmail"></div>
+          <div class="lbadge-sm l-slack"><img src="https://cdn.simpleicons.org/slack/ffffff" width="15" height="15" alt="Slack"></div>
+          <div class="lbadge-sm l-tg"><img src="https://cdn.simpleicons.org/telegram/ffffff" width="15" height="15" alt="Telegram"></div>
+        </div>
+      </div>
+      <div class="s3c">
+        <div class="tag">02 · Operations</div>
+        <h3>Project Management</h3>
+        <div class="s3-line">Tasks without context. No revenue linkage. No ownership.</div>
+        <div class="s3-logos">
+          <div class="lbadge-sm l-notion"><img src="https://cdn.simpleicons.org/notion/ffffff" width="15" height="15" alt="Notion"></div>
+          <div class="lbadge-sm l-jira"><img src="https://cdn.simpleicons.org/jira/ffffff" width="15" height="15" alt="Jira"></div>
+          <div class="lbadge-sm l-asana"><img src="https://cdn.simpleicons.org/asana/ffffff" width="15" height="15" alt="Asana"></div>
+          <div class="lbadge-sm l-gs"><img src="https://cdn.simpleicons.org/googlesheets/ffffff" width="15" height="15" alt="Google Sheets"></div>
+        </div>
+      </div>
+      <div class="s3c">
+        <div class="tag">03 · Marketing</div>
+        <h3>Lead Generation</h3>
+        <div class="s3-line">Leads come in here — and disappear into WhatsApp.</div>
+        <div class="s3-logos">
+          <div class="lbadge-sm l-meta"><img src="https://cdn.simpleicons.org/meta/ffffff" width="15" height="15" alt="Meta"></div>
+          <div class="lbadge-sm l-ig"><img src="https://cdn.simpleicons.org/instagram/ffffff" width="15" height="15" alt="Instagram"></div>
+          <div class="lbadge-sm l-yt"><img src="https://cdn.simpleicons.org/youtube/ffffff" width="15" height="15" alt="YouTube"></div>
+          <div class="lbadge-sm l-portals" style="font-size:8px;font-weight:800;color:#fff">99A</div>
+        </div>
+      </div>
+      <div class="s3c">
+        <div class="tag">04 · Design</div>
+        <h3>Creative Studio</h3>
+        <div class="s3-line">Brief in email. Feedback in WhatsApp. File in Downloads.</div>
+        <div class="s3-logos">
+          <div class="lbadge-sm l-canva"><img src="https://cdn.simpleicons.org/canva/ffffff" width="15" height="15" alt="Canva"></div>
+          <div class="lbadge-sm l-figma"><img src="https://cdn.simpleicons.org/figma/ffffff" width="15" height="15" alt="Figma"></div>
+          <div class="lbadge-sm l-adobe"><img src="https://cdn.simpleicons.org/adobe/ffffff" width="15" height="15" alt="Adobe"></div>
+          <div class="lbadge-sm l-drive"><img src="https://cdn.simpleicons.org/googledrive/ffffff" width="15" height="15" alt="Google Drive"></div>
+        </div>
+      </div>
+      <div class="s3c">
+        <div class="tag">05 · Finance</div>
+        <h3>Accounts</h3>
+        <div class="s3-line">Manual Excel. Commission disputes. No real-time P&amp;L.</div>
+        <div class="s3-logos">
+          <div class="lbadge-sm l-xl"><img src="https://cdn.simpleicons.org/microsoftexcel/ffffff" width="15" height="15" alt="Excel"></div>
+          <div class="lbadge-sm l-zoho"><img src="https://cdn.simpleicons.org/zoho/ffffff" width="15" height="15" alt="Zoho"></div>
+          <div class="lbadge-sm" style="background:#1B3FA0;font-size:8px;font-weight:800;color:#fff;width:28px;height:28px;padding:0 5px">Tally</div>
+        </div>
+      </div>
+      <div class="s3c">
+        <div class="tag">06 · HR</div>
+        <h3>Team Management</h3>
+        <div class="s3-line">Attendance on paper. Leave via message. No performance data.</div>
+        <div class="s3-logos">
+          <div class="lbadge-sm l-wa"><img src="https://cdn.simpleicons.org/whatsapp/ffffff" width="15" height="15" alt="WhatsApp"></div>
+          <div class="lbadge-sm l-xl"><img src="https://cdn.simpleicons.org/microsoftexcel/ffffff" width="15" height="15" alt="Excel"></div>
+          <div class="lbadge-sm" style="background:var(--sd);font-size:12px;color:var(--faint)">?</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 04 WVIN TOOL AUDIT ═══ -->
+  <section class="slide" data-slide="4">
+    <div class="eye">03 · Live Case Study · WVIN Wealth Infra</div>
+    <h2 style="margin-bottom:14px">We audited every tool Saurabh uses.</h2>
+    <div class="s4">
+      <div class="tr hdr"><div></div><div>Tool</div><div>What they use it for</div><div>Cost</div></div>
+      <div class="tr">
+        <div class="lbadge l-wa"><img src="https://cdn.simpleicons.org/whatsapp/ffffff" width="19" height="19" alt="WhatsApp"></div>
+        <div class="tt">WhatsApp</div>
+        <div class="tc">Leads, client comms, team updates, design feedback, deal confirmations</div>
+        <div class="tp" style="color:var(--faint)">Free</div>
+      </div>
+      <div class="tr">
+        <div class="lbadge l-gs"><img src="https://cdn.simpleicons.org/googlesheets/ffffff" width="19" height="19" alt="Google Sheets"></div>
+        <div class="tt">Google Sheets</div>
+        <div class="tc">Property inventory, lead tracking, pricing — shared and always outdated</div>
+        <div class="tp" style="color:var(--faint)">Free</div>
+      </div>
+      <div class="tr">
+        <div class="lbadge l-meta"><img src="https://cdn.simpleicons.org/meta/ffffff" width="19" height="19" alt="Meta"></div>
+        <div class="tt">Meta Ads</div>
+        <div class="tc">Facebook + Instagram campaigns — primary paid lead acquisition</div>
+        <div class="tp">₹40K+/mo</div>
+      </div>
+      <div class="tr">
+        <div class="lbadge l-canva"><img src="https://cdn.simpleicons.org/canva/ffffff" width="19" height="19" alt="Canva"></div>
+        <div class="tt">Canva</div>
+        <div class="tc">Brochures, social posts, project cards — no approval workflow</div>
+        <div class="tp">₹4K/mo</div>
+      </div>
+      <div class="tr">
+        <div class="lbadge l-xl"><img src="https://cdn.simpleicons.org/microsoftexcel/ffffff" width="19" height="19" alt="Excel"></div>
+        <div class="tt">Excel / Tally</div>
+        <div class="tc">Commission calculations, accounts — manual, error-prone every month</div>
+        <div class="tp">₹800/mo</div>
+      </div>
+      <div class="tr">
+        <div class="lbadge l-drive"><img src="https://cdn.simpleicons.org/googledrive/ffffff" width="19" height="19" alt="Google Drive"></div>
+        <div class="tt">Google Drive</div>
+        <div class="tc">Documents, property files, assets — no structure, nothing findable</div>
+        <div class="tp">₹650/mo</div>
+      </div>
+      <div class="tr">
+        <div class="lbadge l-ig"><img src="https://cdn.simpleicons.org/instagram/ffffff" width="19" height="19" alt="Instagram"></div>
+        <div class="tt">Instagram / YouTube</div>
+        <div class="tc">Organic content — property showcases, market updates. Zero lead capture.</div>
+        <div class="tp" style="color:var(--faint)">Free</div>
+      </div>
+      <div class="tr">
+        <div class="lbadge l-portals" style="font-size:9px;font-weight:800;color:#fff">99A</div>
+        <div class="tt">99acres / MagicBricks</div>
+        <div class="tc">Portal listings for active buyers — leads go straight to WhatsApp</div>
+        <div class="tp">₹8K/mo</div>
+      </div>
+      <div class="tr tot">
+        <div></div>
+        <div class="tt">9 Tools · Zero Integration</div>
+        <div class="tc">Every tool creating data no other tool can access</div>
+        <div class="tp">₹53K+/mo</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 05 THE REAL COST ═══ -->
+  <section class="slide" data-slide="5">
+    <div class="eye">04 · The Real Price Tag</div>
+    <h2 style="margin-bottom:14px">The SaaS bill is the <em style="font-style:normal;border-bottom:3px solid var(--ink)">smallest</em> part.</h2>
+    <div class="s5">
+      <div class="s5l">
+        <div class="tagi" style="margin-bottom:0">Minimum annual cost · WVIN</div>
+        <div class="s5-n">₹15L+</div>
+        <div class="s5-l">fragmentation tax — every year</div>
+      </div>
+      <div class="s5r">
+        <div class="s5-row"><span class="n">SaaS subscriptions (7 paid tools × ₹1,600/mo)</span><span class="v">₹1.3L</span></div>
+        <div class="s5-row"><span class="n">Time lost to tool-switching (3 hrs/day × 10 staff)</span><span class="v">₹3.6L</span></div>
+        <div class="s5-row"><span class="n">Leads lost with no follow-up (40% of Meta leads)</span><span class="v">₹9.6L</span></div>
+        <div class="s5-row"><span class="n">Commission disputes &amp; billing errors</span><span class="v">₹60K</span></div>
+        <div class="s5-row"><span class="n">Developer cost to partially connect tools</span><span class="v">₹1.2L</span></div>
+        <div class="s5-note">
+          <strong>The tool bill shows up on the credit card.</strong> The time, lead loss, and opportunity cost don't. They're 10× larger — and entirely invisible.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 06 MEET WVIN ═══ -->
+  <section class="slide" data-slide="6">
+    <div class="eye">05 · The Live Case Study</div>
+    <h2 style="margin-bottom:14px">We found a real business living this problem.</h2>
+    <div class="s6">
+      <div class="s6l">
+        <div style="display:flex;gap:14px;align-items:center">
+          <div class="s6-av">W</div>
+          <div>
+            <h3>WVIN Wealth Infra &amp; Ventures</h3>
+            <p style="font-size:12px;color:var(--faint);margin-top:3px">Gurgaon · Founded 2019 · 8–12 person team</p>
+          </div>
+        </div>
+        <div class="s6-facts">
+          <div class="s6-fact">Premium real estate consultancy — DLF, Godrej, Emaar, M3M projects across Delhi-NCR</div>
+          <div class="s6-fact">Average deal ticket: <strong>₹80L to ₹3 crore</strong> — one missed follow-up is one crore gone</div>
+          <div class="s6-fact">Founder calls the agency <strong>"built like a tech company."</strong> In ambition — yes. In tools — not yet.</div>
+          <div class="s6-fact">We approached them. We saw their operation and knew it was the most honest case study we could find.</div>
+        </div>
+        <div class="s6-stats">
+          <div class="s6-st"><div class="n">₹10Cr+</div><div class="l">Annual revenue (est.)</div></div>
+          <div class="s6-st"><div class="n">9 tools</div><div class="l">To run one business</div></div>
+          <div class="s6-st"><div class="n">₹15L</div><div class="l">Annual fragmentation cost</div></div>
+          <div class="s6-st"><div class="n">0</div><div class="l">Real-time visibility</div></div>
+        </div>
+      </div>
+      <div class="s6r">
+        <div class="s6-ql">Direct Quote · Saurabh Bansal · Founder, WVIN</div>
+        <div class="s6-q">"I don't know right now — in this moment — how many active leads we have, who is following up with which client, or what our pipeline looks like for the next 30 days."</div>
+        <div class="s6-att">Said during our first meeting. <strong>He runs a ₹10+ crore business</strong> — and cannot see inside it in real time. This is a structural failure of available tools. Not a failure of the founder.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 07 MONDAY MORNING ═══ -->
+  <section class="slide" data-slide="7">
+    <div class="eye">06 · A Founder's Monday</div>
+    <h2 style="margin-bottom:14px">3 hours of work. Zero revenue-generating activity.</h2>
+    <div class="s7">
+      <div class="tline">
+        <div class="tli x"><div class="tli-t">9:00</div><div class="tli-d"></div><div class="tli-a"><strong>Opens WhatsApp — 47 unread.</strong> A Meta lead, a client question, an agent update. No priority. No context. Just noise.</div></div>
+        <div class="tli x"><div class="tli-t">9:40</div><div class="tli-d"></div><div class="tli-a"><strong>Opens Google Sheets.</strong> Rates changed. Someone edited overnight. Conflicts everywhere. He texts the agent instead.</div></div>
+        <div class="tli x"><div class="tli-t">10:15</div><div class="tli-d"></div><div class="tli-a"><strong>Checks Meta Ads — 23 new leads since Friday.</strong> Downloads CSV. Forwards names on WhatsApp. Nobody knows who owns which lead.</div></div>
+        <div class="tli x"><div class="tli-t">10:50</div><div class="tli-d"></div><div class="tli-a"><strong>Reviews the Canva brochure.</strong> Feedback was in a WhatsApp thread 4 days ago. Designer never saw it. Client is waiting. Launch is tomorrow.</div></div>
+        <div class="tli x"><div class="tli-t">11:30</div><div class="tli-d"></div><div class="tli-a"><strong>Opens Excel for commissions.</strong> Two agents' payouts pending. He scrolls 200 WhatsApp messages to find which deals closed when.</div></div>
+        <div class="tli"><div class="tli-t">12:00</div><div class="tli-d"></div><div class="tli-a" style="font-weight:700;color:var(--ink)">3 hours in. Nothing sold. This is every Monday.</div></div>
+      </div>
+      <div class="s7r">
+        <div class="s7-box">
+          <h3>Saurabh isn't doing anything wrong.</h3>
+          <div class="s7-items">
+            <div class="s7-item">He is the connective tissue between 9 tools that don't talk to each other</div>
+            <div class="s7-item">Only he has the full picture — so every decision needs him personally</div>
+            <div class="s7-item">While he manages tools, his team operates in the dark</div>
+            <div class="s7-item">The business can't scale beyond what he can hold in his head</div>
+          </div>
+        </div>
+        <div class="s7-note">This is not a management problem. This is an <strong>infrastructure problem</strong> — and it is 100% fixable.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 08 DATA SILOS ═══ -->
+  <section class="slide" data-slide="8">
+    <div class="eye">07 · The Root Cause</div>
+    <h2 style="margin-bottom:14px">Data lives in silos. Human beings become the connective tissue.</h2>
+    <div class="s8">
+      <div class="s8-col">
+        <div class="s8-hdr">Data Created Here</div>
+        <div class="s8-tool">
+          <div class="lbadge l-meta"><img src="https://cdn.simpleicons.org/meta/ffffff" width="19" height="19" alt="Meta"></div>
+          <div><h4>Meta Ads</h4><p>Lead fills a form. Data stays in Meta.</p></div>
+        </div>
+        <div class="s8-tool">
+          <div class="lbadge l-ig"><img src="https://cdn.simpleicons.org/instagram/ffffff" width="19" height="19" alt="Instagram"></div>
+          <div><h4>Instagram DM</h4><p>Viewer enquires. Sits in DMs.</p></div>
+        </div>
+        <div class="s8-tool">
+          <div class="lbadge l-portals" style="font-size:9px;font-weight:800;color:#fff">99A</div>
+          <div><h4>99acres</h4><p>Buyer enquiry. Goes to email.</p></div>
+        </div>
+        <div class="s8-crack">No system receives all of this ↓</div>
+      </div>
+
+      <div class="s8-mid">
+        <div class="s8-arr">↓</div>
+        <div class="s8-void">
+          <svg viewBox="0 0 32 32" fill="none" width="28" height="28"><circle cx="16" cy="16" r="14" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/><path d="M10 16h12M16 10v12" stroke="rgba(255,255,255,.25)" stroke-width="2" stroke-linecap="round"/></svg>
+          <h3>No Bridge</h3>
+          <p>No system connects all the data sources</p>
+        </div>
+        <div class="s8-person">
+          <div class="n">Saurabh</div>
+          <div class="l">manually carries data between all 9 tools</div>
+        </div>
+        <div class="s8-arr">↑</div>
+      </div>
+
+      <div class="s8-col">
+        <div class="s8-hdr">What Should Happen Automatically</div>
+        <div class="s8-tool">
+          <div class="lbadge" style="background:var(--ink)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="2" width="18" height="18"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          </div>
+          <div><h4>Lead in pipeline</h4><p>Auto-captured, scored, assigned</p></div>
+        </div>
+        <div class="s8-tool">
+          <div class="lbadge" style="background:var(--ink)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="2" width="18" height="18"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <div><h4>Agent notified instantly</h4><p>Right person, right context, right time</p></div>
+        </div>
+        <div class="s8-tool">
+          <div class="lbadge l-xl"><img src="https://cdn.simpleicons.org/microsoftexcel/ffffff" width="19" height="19" alt="Excel"></div>
+          <div><h4>Deal closes → commission auto-calculated</h4><p>Zero manual steps</p></div>
+        </div>
+        <div class="s8-crack" style="background:var(--ink);color:rgba(255,255,255,.5);border:none">Cora makes all of this real ↑</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 09 WVIN COST ═══ -->
+  <section class="slide" data-slide="9">
+    <div class="eye">08 · The Numbers · WVIN Wealth Infra</div>
+    <h2 style="margin-bottom:14px">What fragmentation costs WVIN — in real rupees, every year.</h2>
+    <div class="s9">
+      <div class="s9c">
+        <div class="s9-n">₹9.6L</div>
+        <div class="s9-l">Lost in untracked Meta leads</div>
+        <div class="s9-d">80 leads/month. 40% get zero follow-up within 72 hrs. At avg ₹1L commission — that's ₹9.6L in paid-for leads that never converted.</div>
+        <div class="s9-src">Derived from WVIN Meta lead volume &amp; industry conversion data</div>
+      </div>
+      <div class="s9c">
+        <div class="s9-n">₹3.6L</div>
+        <div class="s9-l">Lost to tool-switching time</div>
+        <div class="s9-d">10 staff × 2.5 hrs/day × 250 working days × ₹800/person cost. That's payroll spent on friction — not on closing deals or serving clients.</div>
+        <div class="s9-src">Based on 10 staff, 250 days, effective daily cost of ₹800/person</div>
+      </div>
+      <div class="s9c">
+        <div class="s9-n">₹1.8L</div>
+        <div class="s9-l">In finance errors &amp; delays</div>
+        <div class="s9-d">Two commission disputes. Three late payouts. One billing error. All from manual Excel calculations cross-referenced with WhatsApp deal threads.</div>
+        <div class="s9-src">Based on WVIN's reported commission structure and dispute history</div>
+      </div>
+    </div>
+    <div class="s9-total">
+      <div class="l">Total annual fragmentation cost — WVIN Wealth Infra (excluding opportunity cost)</div>
+      <div class="r">₹15L+ per year</div>
+    </div>
+  </section>
+
+  <!-- ═══ 10 DECISION GAP ═══ -->
+  <section class="slide" data-slide="10">
+    <div class="eye">09 · The Invisible Consequence</div>
+    <h2 style="margin-bottom:14px">When you can't see your business, every decision is a guess.</h2>
+    <div class="s10">
+      <div class="s10l">
+        <div class="s10-sc">
+          <div class="lbl">Scenario 01 · Hiring</div>
+          <h4>"We need another agent."</h4>
+          <p style="font-size:12.5px;color:var(--soft);line-height:1.5;margin-top:4px">Two existing agents have 15 leads each sitting untouched. The problem was workflow visibility — not headcount.</p>
+          <div class="cost">Hidden cost: ₹4.8L/year salary for the wrong solution</div>
+        </div>
+        <div class="s10-sc">
+          <div class="lbl">Scenario 02 · Ad Spend</div>
+          <h4>"Let's increase Meta budget."</h4>
+          <p style="font-size:12.5px;color:var(--soft);line-height:1.5;margin-top:4px">Extra ₹30K/month goes to the same underperforming campaigns — because there's no data on what actually converts.</p>
+          <div class="cost">Hidden cost: ₹3.6L annually in misdirected spend</div>
+        </div>
+        <div class="s10-sc">
+          <div class="lbl">Scenario 03 · Lost Deal</div>
+          <h4>"Who is calling this lead?"</h4>
+          <p style="font-size:12.5px;color:var(--soft);line-height:1.5;margin-top:4px">A ₹2.5Cr investor filled a Meta form 4 days ago. No one called. They signed with a competitor yesterday.</p>
+          <div class="cost">Hidden cost: ₹2.5L commission — one missed deal</div>
+        </div>
+      </div>
+      <div class="s10r">
+        <div class="tagi">Questions Saurabh can't answer without making calls</div>
+        <h3>He should know all of this in 60 seconds.</h3>
+        <div class="s10-qs">
+          <div class="s10-q">How many active leads do we have right now — and at what stage?</div>
+          <div class="s10-q">Which leads haven't been contacted in over 3 days?</div>
+          <div class="s10-q">What's our expected pipeline revenue for the next 30 days?</div>
+          <div class="s10-q">Which agent has bandwidth for new leads?</div>
+          <div class="s10-q">What design assets are in progress — and what's blocking them?</div>
+          <div class="s10-q">How much commission is owed this month and to whom?</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 11 BEFORE AFTER ═══ -->
+  <section class="slide" data-slide="11">
+    <div class="eye">10 · The Transformation</div>
+    <h2 style="margin-bottom:14px">WVIN — before Cora and after Cora.</h2>
+    <div class="s11">
+      <div class="s11l">
+        <div class="col-lbl">Before · Running on friction today</div>
+        <div class="bi bad">40% of Meta leads expire in WhatsApp threads with zero follow-up</div>
+        <div class="bi bad">Property inventory in Sheets — outdated rates, conflicting edits</div>
+        <div class="bi bad">Design requests lost in WhatsApp — no brief, no deadline, always late</div>
+        <div class="bi bad">Team attendance tracked informally — no capacity visibility</div>
+        <div class="bi bad">Commission calculated manually in Excel every month — errors and disputes</div>
+        <div class="bi bad">No content calendar — posts go out whenever someone remembers</div>
+        <div class="bi bad">Saurabh spends 3 hrs daily piecing together what's happening in his own business</div>
+        <div class="bi bad">Check 9 tools to get a partial picture. Still incomplete.</div>
+      </div>
+      <div class="s11r">
+        <div class="col-lbl">After Cora · One screen. Everything visible.</div>
+        <div class="ai">Every Meta lead auto-captured, scored, assigned, and followed up in minutes</div>
+        <div class="ai">Live inventory with real-time pricing, availability, and AI property matching</div>
+        <div class="ai">Design Studio: brief → design → approve → publish, fully tracked</div>
+        <div class="ai">Team dashboard — attendance, capacity, leave visible without a single call</div>
+        <div class="ai">Commission auto-calculated the moment a deal closes</div>
+        <div class="ai">AI-generated content calendar from inventory data — 30 min for the full month</div>
+        <div class="ai">Full picture of the business in 60 seconds every morning</div>
+        <div class="ai">One login. One source of truth. Every function connected.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 12 WHO IT'S FOR ═══ -->
+  <section class="slide" data-slide="12">
+    <div class="eye">11 · Who Needs This</div>
+    <h2 style="margin-bottom:14px">Every service business with 5–50 people has this problem.</h2>
+    <div class="s12">
+      <div class="s12c feat">
+        <div class="tagi">Live Case Study</div>
+        <h3>Real Estate Agencies</h3>
+        <ul>
+          <li>Meta leads auto-captured into pipeline</li>
+          <li>Live property inventory with AI matching</li>
+          <li>AI follow-ups in Hindi and English</li>
+          <li>Commission auto-calculated on close</li>
+          <li>Full agency dashboard — no status calls</li>
+        </ul>
+      </div>
+      <div class="s12c">
+        <div class="tag">Phase 2</div>
+        <h3>Creative &amp; Digital Agencies</h3>
+        <ul>
+          <li>Brief → design → approval → delivery</li>
+          <li>Resource allocation across the team</li>
+          <li>Project pipeline with revenue forecasting</li>
+          <li>Retainer billing and invoice automation</li>
+        </ul>
+      </div>
+      <div class="s12c">
+        <div class="tag">Phase 3</div>
+        <h3>Consulting &amp; Professional Services</h3>
+        <ul>
+          <li>Client engagement from prospect to retainer</li>
+          <li>Document management and knowledge base</li>
+          <li>Time tracking linked directly to billing</li>
+          <li>AI-generated client reports</li>
+        </ul>
+      </div>
+    </div>
+    <div class="s12-cta">
+      <span>Spending more than 2 hours a day <strong>managing tools instead of your business?</strong> Cora is for you.</span>
+      <a class="s12-url" href="https://cora-real-estate.vercel.app" target="_blank">cora-real-estate.vercel.app</a>
+    </div>
+  </section>
+
+  <!-- ═══ 13 SERIES ROADMAP ═══ -->
+  <section class="slide" data-slide="13">
+    <div class="s13">
+      <div class="eye">12 · The Road Ahead</div>
+      <h2>7 videos. 60 days to build the solution.</h2>
+      <p class="sub">Days 1–3 are entirely about the problem. Design starts Day 4. MVP in 2 weeks. Full product in 60 days.</p>
+      <div class="srow">
+        <div class="sday now"><div class="sd-n">1</div><div class="sd-t">The Tool Trap</div><div class="sd-s">Why businesses feel stuck</div></div>
+        <div class="sday"><div class="sd-n">2</div><div class="sd-t">Inside WVIN</div><div class="sd-s">Real agency chaos documented</div></div>
+        <div class="sday"><div class="sd-n">3</div><div class="sd-t">The Cost</div><div class="sd-s">₹15L/year — real numbers</div></div>
+        <div class="sday"><div class="sd-n">4</div><div class="sd-t">The Vision</div><div class="sd-s">What unified looks like</div></div>
+        <div class="sday"><div class="sd-n">5</div><div class="sd-t">Design Live</div><div class="sd-s">UX decisions on camera</div></div>
+        <div class="sday"><div class="sd-n">6</div><div class="sd-t">Experience</div><div class="sd-s">A day in WVIN with Cora</div></div>
+        <div class="sday"><div class="sd-n">7</div><div class="sd-t">Early Access</div><div class="sd-s">Doors open for agencies</div></div>
+      </div>
+      <div class="rpill">
+        <span><strong>MVP</strong> · 2 weeks</span><span class="rsep">·</span>
+        <span><strong>Full Product V1</strong> · 60 days</span><span class="rsep">·</span>
+        <span><strong>Scale</strong> · 80–90 days</span><span class="rsep">·</span>
+        <span>7 days = <strong>content series,</strong> not a dev sprint</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="nz p" id="prev"></div>
+  <div class="nz n" id="next"></div>
+</div>
+
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide[data-slide]')];
+  const tot=document.getElementById('tot'),cur=document.getElementById('cur'),pf=document.getElementById('pf');
+  const tbtn=document.getElementById('tbtn'),isun=document.getElementById('isun'),imoon=document.getElementById('imoon');
+  tot.textContent=String(slides.length).padStart(2,'0');
+  let dark=window.matchMedia('(prefers-color-scheme: dark)').matches,c=0;
+  const theme=()=>{document.documentElement.setAttribute('data-theme',dark?'dark':'light');isun.style.display=dark?'block':'none';imoon.style.display=dark?'none':'block'};
+  theme();tbtn.addEventListener('click',()=>{dark=!dark;theme()});
+  const go=i=>{if(i<0||i>=slides.length)return;slides[c].classList.remove('on');c=i;slides[c].classList.add('on');cur.textContent=String(c+1).padStart(2,'0');pf.style.width=((c+1)/slides.length*100)+'%'};
+  const nx=()=>go(Math.min(c+1,slides.length-1)),pv=()=>go(Math.max(c-1,0));
+  document.getElementById('next').addEventListener('click',nx);
+  document.getElementById('prev').addEventListener('click',pv);
+  document.addEventListener('keydown',e=>{
+    if(['ArrowRight',' ','PageDown'].includes(e.key)){e.preventDefault();nx()}
+    if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();pv()}
+    if(e.key==='Home'){e.preventDefault();go(0)}if(e.key==='End'){e.preventDefault();go(slides.length-1)}
+    if(e.key==='f'||e.key==='F'){!document.fullscreenElement?document.querySelector('.deck').requestFullscreen().catch(()=>{}):document.exitFullscreen()}
+  });
+  let tx=0;
+  document.addEventListener('touchstart',e=>{tx=e.changedTouches[0].screenX},{passive:true});
+  document.addEventListener('touchend',e=>{const d=e.changedTouches[0].screenX-tx;if(Math.abs(d)>50)d<0?nx():pv()});
+  go(0);
+})();
+</script>
+</body>
+</html>

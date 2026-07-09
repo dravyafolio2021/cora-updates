@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WVIN Wealth Infra — Real Estate CRM Suite</title>
+<meta name="description" content="Operational dashboard for premium real estate management, lead tracking, and automation.">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+      },
+      colors: {
+        neutral: {
+          50: '#fafafa',
+          100: '#f4f4f5',
+          200: '#e4e4e7',
+          300: '#d4d4d8',
+          400: '#a1a1aa',
+          500: '#71717a',
+          600: '#52525b',
+          700: '#3f3f46',
+          800: '#27272a',
+          900: '#18181b',
+          950: '#09090b',
+        }
+      }
+    }
+  }
+}
+</script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 2px; }
+.dark ::-webkit-scrollbar-thumb { background: #3f3f46; }
+
+/* Right drawer transition */
+.drawer {
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.drawer.open {
+  transform: translateX(0);
+}
+
+/* Tab contents */
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: flex;
+}
+
+/* Print Invoice styling */
+@media print {
+  body * { visibility: hidden; }
+  #print-area, #print-area * { visibility: visible; }
+  #print-area { position: absolute; left: 0; top: 0; width: 100%; }
+}
+</style>
+</head>
+<body class="bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 min-h-screen flex flex-col font-sans transition-colors duration-200">
+
+<!-- MAIN LAYOUT -->
+<div class="flex-1 flex overflow-hidden h-screen">
+
+  <!-- SIDEBAR -->
+  <aside class="w-64 bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 flex flex-col shrink-0 relative z-20">
+    
+    <!-- Branding Header -->
+    <div class="px-5 py-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-neutral-900 dark:bg-neutral-100 flex items-center justify-center text-white dark:text-black font-extrabold text-sm">
+          WV
+        </div>
+        <div>
+          <span class="text-[9px] font-mono text-neutral-400 dark:text-neutral-500 uppercase tracking-widest font-semibold block leading-none">CRM Suite v3.1</span>
+          <h1 class="text-xs font-extrabold text-neutral-900 dark:text-neutral-50 tracking-wide uppercase mt-1">WVIN Wealth</h1>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Scroll -->
+    <div class="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+      
+      <!-- WORKSPACE -->
+      <div>
+        <span class="block text-[9px] font-mono uppercase text-neutral-400 dark:text-neutral-500 tracking-widest px-3 mb-2 font-bold">Workspace</span>
+        <div class="space-y-1">
+          <button onclick="switchTab('analytics')" id="nav-btn-analytics" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold tracking-wide flex items-center gap-3 transition-colors text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+            Dashboard
+          </button>
+          <button onclick="switchTab('feature-hub')" id="nav-btn-feature-hub" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold tracking-wide flex items-center gap-3 transition-colors bg-neutral-900 text-white dark:bg-neutral-100 dark:text-black">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+            Feature Hub
+          </button>
+          <button onclick="switchTab('overview')" id="nav-btn-overview" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold tracking-wide flex items-center gap-3 transition-colors text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            System Settings
+          </button>
+        </div>
+      </div>
+
+      <!-- CRM & BOOKING -->
+      <div>
+        <span class="block text-[9px] font-mono uppercase text-neutral-400 dark:text-neutral-500 tracking-widest px-3 mb-2 font-bold">CRM & Booking</span>
+        <div class="space-y-1">
+          <button onclick="switchTab('kanban')" id="nav-btn-kanban" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold tracking-wide flex items-center gap-3 transition-colors text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+            Leads (CRM)
+          </button>
+          <button onclick="switchTab('calendar')" id="nav-btn-calendar" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold tracking-wide flex items-center justify-between transition-colors text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              <span>Viewing Bookings</span>
+            </div>
+            <span class="bg-neutral-100 dark:bg-neutral-800 text-[9px] font-bold px-1.5 py-0.5 rounded-md text-neutral-500">2</span>
+          </button>
+          <button onclick="switchTab('financials')" id="nav-btn-financials" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold tracking-wide flex items-center gap-3 transition-colors text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            Financial Board
+          </button>
+        </div>
+      </div>
+
+      <!-- OPERATIONS -->
+      <div>
+        <span class="block text-[9px] font-mono uppercase text-neutral-400 dark:text-neutral-500 tracking-widest px-3 mb-2 font-bold">Operations</span>
+        <div class="space-y-1">
+          <button onclick="switchTab('routing')" id="nav-btn-routing" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold tracking-wide flex items-center gap-3 transition-colors text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+            Team & Roles
+          </button>
+          <button onclick="switchTab('inventory')" id="nav-btn-inventory" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold tracking-wide flex items-center gap-3 transition-colors text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+            Equipment
+          </button>
+          <button onclick="switchTab('vault')" id="nav-btn-vault" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold tracking-wide flex items-center gap-3 transition-colors text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20" /></svg>
+            Document Vault
+          </button>
+        </div>
+      </div>
+
+      <!-- AI & CONTENT -->
+      <div>
+        <span class="block text-[9px] font-mono uppercase text-neutral-400 dark:text-neutral-500 tracking-widest px-3 mb-2 font-bold">AI & Content</span>
+        <div class="space-y-1">
+          <button onclick="switchTab('automations')" id="nav-btn-automations" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold tracking-wide flex items-center justify-between transition-colors text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+              <span>AI Connected</span>
+            </div>
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- STICKY ADMIN USER PANEL (RULE 2) -->
+    <div class="border-t border-neutral-200 dark:border-neutral-800 p-4 bg-neutral-50 dark:bg-neutral-900/50">
+      
+      <!-- Trigger Widget -->
+      <button onclick="toggleAdminPopover(event)" class="w-full flex items-center gap-3 text-left hover:bg-neutral-100 dark:hover:bg-neutral-800 p-1.5 rounded-xl transition-all">
+        <div class="w-8 h-8 rounded-full bg-neutral-900 dark:bg-neutral-100 text-white dark:text-black font-extrabold flex items-center justify-center text-xs">
+          SB
+        </div>
+        <div class="flex-1 min-w-0">
+          <span class="text-xs font-extrabold block text-neutral-800 dark:text-neutral-200 truncate">Saurabh Bansal</span>
+          <span class="text-[9px] font-mono text-neutral-400 dark:text-neutral-500 uppercase tracking-widest block truncate">Managing Director</span>
+        </div>
+        <svg class="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+      </button>
+
+      <!-- FLOATING OPTIONS POP-OVER (RULE 2) -->
+      <div id="adminPopover" class="hidden absolute bottom-16 left-4 right-4 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-4 rounded-xl shadow-xl space-y-4">
+        
+        <!-- Status indicator -->
+        <div class="flex items-center justify-between text-xs pb-2 border-b border-neutral-100 dark:border-neutral-800">
+          <span class="text-neutral-500">Connection Status</span>
+          <div class="flex items-center gap-1.5 font-bold">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-neutral-900 dark:text-neutral-100">Live API Connected</span>
+          </div>
+        </div>
+
+        <!-- AI Model Selector -->
+        <div class="space-y-1">
+          <label class="text-[9px] font-bold text-neutral-400 uppercase tracking-wider block">Active AI Model</label>
+          <select onchange="window.coraShowToast('AI Model updated successfully.')" class="w-full bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 text-xs px-2.5 py-1.5 rounded-lg focus:outline-none">
+            <option>Gemini 3.5 Flash (Medium)</option>
+            <option>Claude 3.5 Sonnet (Thinking)</option>
+            <option>GPT-4o Omnipresent</option>
+          </select>
+        </div>
+
+        <!-- Quota indicator -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[9px] font-bold text-neutral-400 uppercase tracking-wider">
+            <span>Quota Metric</span>
+            <span class="text-neutral-900 dark:text-neutral-100 font-mono">84.2K / 100K API calls</span>
+          </div>
+          <div class="w-full bg-neutral-100 dark:bg-neutral-800 h-1.5 rounded-full overflow-hidden">
+            <div class="bg-neutral-900 dark:bg-neutral-200 h-full" style="width: 84.2%;"></div>
+          </div>
+        </div>
+
+        <!-- System options -->
+        <div class="grid grid-cols-2 gap-2 text-[10px] font-bold pt-2">
+          <button onclick="toggleDarkMode()" class="p-2 border border-neutral-200 dark:border-neutral-800 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-850 flex items-center justify-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+            Theme Toggle
+          </button>
+          <a href="wvin-website.html" class="p-2 border border-neutral-200 dark:border-neutral-800 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-850 flex items-center justify-center gap-1.5 text-center">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+            Website View
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+
+  </aside>
+
+  <!-- CONTENT CONTAINER -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    
+    <!-- Top Shared Header -->
+    <header class="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 z-10 shrink-0">
+      <div>
+        <h2 id="page-title" class="text-sm font-extrabold tracking-tight uppercase text-neutral-900 dark:text-neutral-50">Feature Hub & Platform Roadmap</h2>
+        <p id="page-desc" class="text-[10px] text-neutral-400 dark:text-neutral-500 font-mono tracking-wider mt-0.5">Track active tools, in-progress integration</p>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center gap-2 text-xs">
+        <button id="viewToggle" onclick="toggleKanbanView()" class="hidden border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 px-3 py-1.5 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-850 font-bold transition-all flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" /></svg>
+          <span id="viewToggleText">Switch to Table</span>
+        </button>
+        <button onclick="openLeadDrawer()" class="bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-neutral-50 dark:text-black dark:hover:bg-neutral-200 px-4 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+          Add Custom Lead
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT SECTIONS PORT -->
+    <main class="flex-1 overflow-y-auto bg-neutral-100 dark:bg-neutral-950 p-6 space-y-6">
+
+      <!-- TAB 0: FEATURE HUB (ACTIVE BY DEFAULT) -->
+      <div id="tab-feature-hub" class="tab-content active flex-col space-y-6">
+        
+        <!-- Welcome Banner -->
+        <div class="bg-neutral-900 dark:bg-neutral-900 text-neutral-100 border border-neutral-800 p-6 rounded-2xl relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div class="z-10">
+            <span class="text-[9px] font-mono text-neutral-450 uppercase tracking-widest block font-bold mb-1">Cora Operations Suite</span>
+            <h2 class="text-xl font-bold tracking-tight text-white uppercase">Feature Hub & Platform Roadmap</h2>
+            <p class="text-[11px] text-neutral-400 font-light mt-1">Track active tools, in-progress integrations, and operational modules tailored for WVIN Wealth Infra.</p>
+          </div>
+          <button onclick="switchTab('kanban')" class="z-10 bg-white hover:bg-neutral-200 text-neutral-900 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all flex items-center gap-1.5">
+            Manage Leads <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+          </button>
+        </div>
+
+        <!-- 12-Item Feature Hub Grid (Real Estate Tailored) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 mb-16">
+          
+          <!-- Item 1 -->
+          <div class="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-56">
+            <div>
+              <div class="flex justify-between items-start mb-4">
+                <div class="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-900 dark:text-white">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Active</span>
+              </div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-white mb-2">Beautiful Property Portfolios</h3>
+              <p class="text-[11px] text-neutral-500 dark:text-neutral-450 leading-relaxed">Send password-protected property listings, custom videos, and project walkthroughs to HNI clients, replacing messy folders.</p>
+            </div>
+            <div class="pt-3 border-t border-neutral-100 dark:border-neutral-800 flex justify-between items-center text-[10px]">
+              <button onclick="switchTab('inventory')" class="font-bold text-neutral-800 dark:text-neutral-200 hover:opacity-70 transition-opacity">Open Property Portfolios →</button>
+            </div>
+          </div>
+
+          <!-- Item 2 -->
+          <div class="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-56">
+            <div>
+              <div class="flex justify-between items-start mb-4">
+                <div class="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-900 dark:text-white">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Active</span>
+              </div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-white mb-2">Easy Property Shortlisting</h3>
+              <p class="text-[11px] text-neutral-500 dark:text-neutral-450 leading-relaxed">Buyers can tap the heart icon on their phone to shortlist properties they want to tour, synced live with the agent's CRM panel.</p>
+            </div>
+            <div class="pt-3 border-t border-neutral-100 dark:border-neutral-800 flex justify-between items-center text-[10px]">
+              <button onclick="switchTab('kanban')" class="font-bold text-neutral-800 dark:text-neutral-200 hover:opacity-70 transition-opacity">Active in Property Portfolios →</button>
+            </div>
+          </div>
+
+          <!-- Item 3 -->
+          <div class="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-56">
+            <div>
+              <div class="flex justify-between items-start mb-4">
+                <div class="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-900 dark:text-white">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase bg-blue-105 text-blue-800 dark:bg-blue-950 dark:text-blue-300">Soon</span>
+              </div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-white mb-2">Physical Pitch Books Storefront</h3>
+              <p class="text-[11px] text-neutral-500 dark:text-neutral-450 leading-relaxed">Send premium printed brochures, site maps, and locality booklets directly to clients with automated print lab fulfillment.</p>
+            </div>
+            <div class="pt-3 border-t border-neutral-100 dark:border-neutral-800 flex justify-between items-center text-[10px]">
+              <button onclick="window.coraShowToast('Branded Storefront module releasing soon.')" class="font-bold text-neutral-500 dark:text-neutral-400 hover:opacity-70 transition-opacity">Preview Storefront →</button>
+            </div>
+          </div>
+
+          <!-- Item 4 -->
+          <div class="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-56">
+            <div>
+              <div class="flex justify-between items-start mb-4">
+                <div class="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-900 dark:text-white">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Active</span>
+              </div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-white mb-2">Instant Quotation Builder</h3>
+              <p class="text-[11px] text-neutral-500 dark:text-neutral-450 leading-relaxed">Generate professional PDFs with customized payment plans, RERA specs, and broker commissions in just 1 click.</p>
+            </div>
+            <div class="pt-3 border-t border-neutral-100 dark:border-neutral-800 flex justify-between items-center text-[10px]">
+              <button onclick="switchTab('financials')" class="font-bold text-neutral-800 dark:text-neutral-200 hover:opacity-70 transition-opacity">Open Document Vault →</button>
+            </div>
+          </div>
+
+          <!-- Item 5 -->
+          <div class="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-56">
+            <div>
+              <div class="flex justify-between items-start mb-4">
+                <div class="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-900 dark:text-white">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Active</span>
+              </div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-white mb-2">Automated Invoicing & Receipts</h3>
+              <p class="text-[11px] text-neutral-500 dark:text-neutral-450 leading-relaxed">Automatically generate listing agreements, booking receipts, and tax-compliant developer brokerage invoices.</p>
+            </div>
+            <div class="pt-3 border-t border-neutral-100 dark:border-neutral-800 flex justify-between items-center text-[10px]">
+              <button onclick="switchTab('financials')" class="font-bold text-neutral-800 dark:text-neutral-200 hover:opacity-70 transition-opacity">Open Document Vault →</button>
+            </div>
+          </div>
+
+          <!-- Item 6 -->
+          <div class="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-56">
+            <div>
+              <div class="flex justify-between items-start mb-4">
+                <div class="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-900 dark:text-white">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Active</span>
+              </div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-white mb-2">Contracts & E-Signatures</h3>
+              <p class="text-[11px] text-neutral-500 dark:text-neutral-450 leading-relaxed">Legally binding online booking forms and buyer agreements with digital signatures and instant PDF copy delivery.</p>
+            </div>
+            <div class="pt-3 border-t border-neutral-100 dark:border-neutral-800 flex justify-between items-center text-[10px]">
+              <button onclick="switchTab('vault')" class="font-bold text-neutral-800 dark:text-neutral-200 hover:opacity-70 transition-opacity">Open Document Vault →</button>
+            </div>
+          </div>
+
+          <!-- Item 7 -->
+          <div class="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-56">
+            <div>
+              <div class="flex justify-between items-start mb-4">
+                <div class="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-850 flex items-center justify-center text-neutral-900 dark:text-white">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">Soon</span>
+              </div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-white mb-2">Private Client Portal</h3>
+              <p class="text-[11px] text-neutral-500 dark:text-neutral-450 leading-relaxed">A secure dashboard for buyers to check document vault status, RERA approvals, construction milestones, and payment receipts.</p>
+            </div>
+            <div class="pt-3 border-t border-neutral-100 dark:border-neutral-800 flex justify-between items-center text-[10px]">
+              <button onclick="window.coraShowToast('Private Client Portal module releasing soon.')" class="font-bold text-neutral-500 dark:text-neutral-400 hover:opacity-70 transition-opacity">Configure Client Portal →</button>
+            </div>
+          </div>
+
+          <!-- Item 8 -->
+          <div class="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-56">
+            <div>
+              <div class="flex justify-between items-start mb-4">
+                <div class="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-900 dark:text-white">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20h-1.28a3 3 0 00-2.827 2M5 20h1.28a3 3 0 012.827 2m0 0V8.25m0 13.75h6.44m0 0V8.25m-8.94 0h11.44M7 8.25V5.5a2.5 2.5 0 015 0v2.75m-5 0h5m-7.5 0h10" /></svg>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">Soon</span>
+              </div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-white mb-2">Universal Lead Capture Form</h3>
+              <p class="text-[11px] text-neutral-500 dark:text-neutral-450 leading-relaxed">Create and embed custom lead generation forms on your website, Google Business profile, or Instagram bio. Captured leads flow directly to CRM.</p>
+            </div>
+            <div class="pt-3 border-t border-neutral-100 dark:border-neutral-800 flex justify-between items-center text-[10px]">
+              <button onclick="window.coraShowToast('Form Embed integration launching soon.')" class="font-bold text-neutral-500 dark:text-neutral-400 hover:opacity-70 transition-opacity">Build Custom Lead Form →</button>
+            </div>
+          </div>
+
+          <!-- Item 9 -->
+          <div class="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-56">
+            <div>
+              <div class="flex justify-between items-start mb-4">
+                <div class="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-900 dark:text-white">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Active</span>
+              </div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-white mb-2">Google Maps SEO Booster</h3>
+              <p class="text-[11px] text-neutral-500 dark:text-neutral-450 leading-relaxed">Manage your Google Business Profile, track search maps rankings, reply to reviews, and post geo-tagged project updates.</p>
+            </div>
+            <div class="pt-3 border-t border-neutral-100 dark:border-neutral-800 flex justify-between items-center text-[10px]">
+              <button onclick="switchTab('analytics')" class="font-bold text-neutral-800 dark:text-neutral-200 hover:opacity-70 transition-opacity">Open Maps Engine →</button>
+            </div>
+          </div>
+
+          <!-- Item 10 -->
+          <div class="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-56">
+            <div>
+              <div class="flex justify-between items-start mb-4">
+                <div class="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-900 dark:text-white">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">Soon</span>
+              </div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-white mb-2">Client Notifications</h3>
+              <p class="text-[11px] text-neutral-500 dark:text-neutral-450 leading-relaxed">Automatically send booking confirmations, contract signature reminders, and advance deposit due date alerts via WhatsApp/SMS.</p>
+            </div>
+            <div class="pt-3 border-t border-neutral-100 dark:border-neutral-800 flex justify-between items-center text-[10px]">
+              <button onclick="window.coraShowToast('Notification service setup active in beta.')" class="font-bold text-neutral-500 dark:text-neutral-400 hover:opacity-70 transition-opacity">Manage Alerts →</button>
+            </div>
+          </div>
+
+          <!-- Item 11 -->
+          <div class="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-56">
+            <div>
+              <div class="flex justify-between items-start mb-4">
+                <div class="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-850 flex items-center justify-center text-neutral-900 dark:text-white">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.907c.961 0 1.36 1.246.588 1.81l-3.97 2.883a1 1 0 00-.364 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.971-2.883a1 1 0 00-1.177 0l-3.97 2.883c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118L2.98 8.72c-.773-.564-.373-1.81.588-1.81h4.906a1 1 0 00.95-.69l1.52-4.674z" /></svg>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">Soon</span>
+              </div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-white mb-2">Smart Review Acquisition</h3>
+              <p class="text-[11px] text-neutral-500 dark:text-neutral-450 leading-relaxed">Auto-send review requests via WhatsApp after property handover to collect 5-star Google Business ratings from happy buyers.</p>
+            </div>
+            <div class="pt-3 border-t border-neutral-100 dark:border-neutral-800 flex justify-between items-center text-[10px]">
+              <button onclick="window.coraShowToast('Smart Reviews module releasing in next patch.')" class="font-bold text-neutral-500 dark:text-neutral-400 hover:opacity-70 transition-opacity">Build Review Campaigns →</button>
+            </div>
+          </div>
+
+          <!-- Item 12 -->
+          <div class="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-56">
+            <div>
+              <div class="flex justify-between items-start mb-4">
+                <div class="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-850 flex items-center justify-center text-neutral-900 dark:text-white">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5a2 2 0 10-2 2h2zm0 0H4m8 0h8" /></svg>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">Soon</span>
+              </div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-white mb-2">Referral Rewards Engine</h3>
+              <p class="text-[11px] text-neutral-500 dark:text-neutral-450 leading-relaxed">Create automated referral links for existing clients. Reward them with fee cashbacks when their friends book a property tour.</p>
+            </div>
+            <div class="pt-3 border-t border-neutral-100 dark:border-neutral-800 flex justify-between items-center text-[10px]">
+              <button onclick="window.coraShowToast('Referrals module is currently locked.')" class="font-bold text-neutral-500 dark:text-neutral-400 hover:opacity-70 transition-opacity">Configure Referral Rewards →</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- TAB 1: PLATFORM OVERVIEW -->
+      <div id="tab-overview" class="tab-content flex-col space-y-6">
+        
+        <!-- Welcome Banner -->
+        <div class="bg-neutral-900 dark:bg-neutral-900 text-neutral-100 border border-neutral-800 p-6 rounded-2xl relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div class="z-10">
+            <span class="text-[9px] font-mono text-neutral-450 uppercase tracking-widest block font-bold mb-1">Cora Operations Suite</span>
+            <h2 class="text-xl font-bold tracking-tight text-white uppercase">WVIN Lead Engine & CRM</h2>
+            <p class="text-[11px] text-neutral-400 font-light mt-1">Directly sync all properties, leads, itineraries, and automated WhatsApp replies in a single hub.</p>
+          </div>
+          <button onclick="switchTab('kanban')" class="z-10 bg-white hover:bg-neutral-200 text-neutral-900 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all flex items-center gap-1.5">
+            Open Pipeline <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+          </button>
+        </div>
+
+        <!-- 12-Item Layman Feature Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <!-- Card 1 -->
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl flex flex-col justify-between hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors">
+            <div class="w-9 h-9 rounded-lg bg-neutral-100 dark:bg-neutral-850 flex items-center justify-center text-neutral-900 dark:text-neutral-100 mb-4">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </div>
+            <div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider mb-2">Google Local Search Rank #1</h3>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">Guaranteed local map visibility in Gurgaon for queries like "premium DLF consultant".</p>
+            </div>
+          </div>
+          <!-- Card 2 -->
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl flex flex-col justify-between hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors">
+            <div class="w-9 h-9 rounded-lg bg-neutral-100 dark:bg-neutral-850 flex items-center justify-center text-neutral-900 dark:text-neutral-100 mb-4">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+            </div>
+            <div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider mb-2">Multi-Portal Live Sync</h3>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">Auto-ingest leads dynamically from 99acres, MagicBricks, Housing.com API endpoints.</p>
+            </div>
+          </div>
+          <!-- Card 3 -->
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl flex flex-col justify-between hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors">
+            <div class="w-9 h-9 rounded-lg bg-neutral-100 dark:bg-neutral-850 flex items-center justify-center text-neutral-900 dark:text-neutral-100 mb-4">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>
+            </div>
+            <div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider mb-2">Automated WhatsApp Replies</h3>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">Instantly send property brochures, location links, and pricing details via WhatsApp.</p>
+            </div>
+          </div>
+          <!-- Card 4 -->
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl flex flex-col justify-between hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors">
+            <div class="w-9 h-9 rounded-lg bg-neutral-100 dark:bg-neutral-850 flex items-center justify-center text-neutral-900 dark:text-neutral-100 mb-4">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 00-2 2z" /></svg>
+            </div>
+            <div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider mb-2">Dynamic 3D Virtual Tours</h3>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">Integrated Matterport viewer for digital property walk-throughs in HD.</p>
+            </div>
+          </div>
+          <!-- Card 5 -->
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl flex flex-col justify-between hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors">
+            <div class="w-9 h-9 rounded-lg bg-neutral-100 dark:bg-neutral-850 flex items-center justify-center text-neutral-900 dark:text-neutral-100 mb-4">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+            </div>
+            <div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider mb-2">Automated Google Reviews</h3>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">System-generated WhatsApp review requests auto-sent post transaction closure.</p>
+            </div>
+          </div>
+          <!-- Card 6 -->
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl flex flex-col justify-between hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors">
+            <div class="w-9 h-9 rounded-lg bg-neutral-100 dark:bg-neutral-850 flex items-center justify-center text-neutral-900 dark:text-neutral-100 mb-4">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </div>
+            <div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider mb-2">Commissions & Ledger</h3>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">Complete transparent accounting of brokerage splits, token advances, and receivables.</p>
+            </div>
+          </div>
+          <!-- Card 7 -->
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl flex flex-col justify-between hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors">
+            <div class="w-9 h-9 rounded-lg bg-neutral-100 dark:bg-neutral-850 flex items-center justify-center text-neutral-900 dark:text-neutral-100 mb-4">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+            </div>
+            <div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider mb-2">SMS & Email Campaigns</h3>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">Broadcast matching luxury listings to warm HNIs dynamically when inventory changes.</p>
+            </div>
+          </div>
+          <!-- Card 8 -->
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl flex flex-col justify-between hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors">
+            <div class="w-9 h-9 rounded-lg bg-neutral-100 dark:bg-neutral-850 flex items-center justify-center text-neutral-900 dark:text-neutral-100 mb-4">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
+            </div>
+            <div>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider mb-2">Field Agent Operations</h3>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">Track site-visit operations, client transport logistics, and team routing rosters.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAB 2: AGENCY ANALYTICS -->
+      <div id="tab-analytics" class="tab-content flex-col space-y-6">
+        
+        <!-- Stats summary -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl">
+            <span class="text-[9px] font-mono text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">Booked Commission</span>
+            <div class="flex items-baseline gap-2 mt-1">
+              <h4 class="text-xl font-extrabold text-neutral-900 dark:text-neutral-100">₹45.5 Cr</h4>
+              <span class="text-[9px] font-bold text-emerald-600 font-mono">+12%</span>
+            </div>
+            <p class="text-[10px] text-neutral-400 dark:text-neutral-500 mt-1">From closed developer commissions</p>
+          </div>
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl">
+            <span class="text-[9px] font-mono text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">Active Inventory</span>
+            <div class="flex items-baseline gap-2 mt-1">
+              <h4 class="text-xl font-extrabold text-neutral-900 dark:text-neutral-100">24 Units</h4>
+              <span class="text-[9px] font-bold text-neutral-400 font-mono">Synced</span>
+            </div>
+            <p class="text-[10px] text-neutral-400 dark:text-neutral-500 mt-1">Live listings across 99acres & MB</p>
+          </div>
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl">
+            <span class="text-[9px] font-mono text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">Leads Pipeline</span>
+            <div class="flex items-baseline gap-2 mt-1">
+              <h4 class="text-xl font-extrabold text-neutral-900 dark:text-neutral-100">42 Active</h4>
+              <span class="text-[9px] font-bold text-blue-600 font-mono">12 Pending Visits</span>
+            </div>
+            <p class="text-[10px] text-neutral-400 dark:text-neutral-500 mt-1">Inbound from website & maps</p>
+          </div>
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl">
+            <span class="text-[9px] font-mono text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">GBP Local Maps Views</span>
+            <div class="flex items-baseline gap-2 mt-1">
+              <h4 class="text-xl font-extrabold text-neutral-900 dark:text-neutral-100">145K views</h4>
+              <span class="text-[9px] font-bold text-emerald-600 font-mono">+18%</span>
+            </div>
+            <p class="text-[10px] text-neutral-400 dark:text-neutral-500 mt-1">Organic local discovery monthly</p>
+          </div>
+        </div>
+
+        <!-- Google maps insight block -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <div class="lg:col-span-8 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl space-y-4">
+            <div class="flex justify-between items-center pb-2 border-b border-neutral-100 dark:border-neutral-800">
+              <div>
+                <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-neutral-100">Google Business Profile Metrics</h3>
+                <p class="text-[10px] text-neutral-400 dark:text-neutral-500 font-mono mt-0.5">Organic impressions and click-through tracking</p>
+              </div>
+              <span class="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-[8.5px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                Active Sync
+              </span>
+            </div>
+            <div class="grid grid-cols-3 gap-4 text-center">
+              <div class="p-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl">
+                <span class="text-[9px] font-mono text-neutral-400 dark:text-neutral-500 uppercase">Search Views</span>
+                <p class="text-base font-extrabold text-neutral-900 dark:text-neutral-100 mt-0.5">48,290</p>
+              </div>
+              <div class="p-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl">
+                <span class="text-[9px] font-mono text-neutral-400 dark:text-neutral-500 uppercase">Map Clicks</span>
+                <p class="text-base font-extrabold text-neutral-900 dark:text-neutral-100 mt-0.5">3,120</p>
+              </div>
+              <div class="p-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl">
+                <span class="text-[9px] font-mono text-neutral-400 dark:text-neutral-500 uppercase">Direct Calls</span>
+                <p class="text-base font-extrabold text-neutral-900 dark:text-neutral-100 mt-0.5">142</p>
+              </div>
+            </div>
+
+            <!-- SVG graph visual -->
+            <div class="h-28 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 flex flex-col justify-between relative overflow-hidden">
+              <div class="flex justify-between text-[9px] font-mono text-neutral-400 dark:text-neutral-500 z-10">
+                <span>Monthly Organic Map Impressions</span>
+                <span class="text-emerald-600 font-bold">+24% vs last month</span>
+              </div>
+              <svg class="absolute bottom-0 left-0 right-0 h-16 w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M 0 90 Q 20 85, 40 60 T 80 25 T 100 10 L 100 100 L 0 100 Z" fill="rgba(24, 24, 27, 0.03)" class="dark:fill-white/5"></path>
+                <path d="M 0 90 Q 20 85, 40 60 T 80 25 T 100 10" fill="none" stroke="#27272a" stroke-width="2" class="dark:stroke-neutral-300"></path>
+              </svg>
+              <div class="flex justify-between text-[8px] font-mono text-neutral-400 dark:text-neutral-500 mt-auto z-10">
+                <span>Week 1</span><span>Week 2</span><span>Week 3</span><span>Week 4 (Peak)</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Conversion pipeline -->
+          <div class="lg:col-span-4 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl space-y-4">
+            <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-neutral-100 border-b border-neutral-100 dark:border-neutral-800 pb-2">Deal Pipeline Funnel</h3>
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="font-semibold text-neutral-700 dark:text-neutral-300">1. Inbound Inquiries</span>
+                  <span class="font-mono text-neutral-400">142 (100%)</span>
+                </div>
+                <div class="w-full bg-neutral-100 dark:bg-neutral-800 h-2 rounded-full overflow-hidden">
+                  <div class="bg-neutral-900 dark:bg-neutral-200 h-full" style="width: 100%;"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="font-semibold text-neutral-700 dark:text-neutral-300">2. Scheduled Site Visits</span>
+                  <span class="font-mono text-neutral-400">64 (45%)</span>
+                </div>
+                <div class="w-full bg-neutral-100 dark:bg-neutral-800 h-2 rounded-full overflow-hidden">
+                  <div class="bg-neutral-850 dark:bg-neutral-300 h-full" style="width: 45%;"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="font-semibold text-neutral-700 dark:text-neutral-300">3. Negotiation / Token Paid</span>
+                  <span class="font-mono text-neutral-400">18 (12%)</span>
+                </div>
+                <div class="w-full bg-neutral-100 dark:bg-neutral-800 h-2 rounded-full overflow-hidden">
+                  <div class="bg-neutral-950 dark:bg-white h-full" style="width: 12%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- TAB 3: KANBAN BOARD / OPEN LEADS -->
+      <div id="tab-kanban" class="tab-content flex-col space-y-4">
+        
+        <!-- Filter Row -->
+        <div class="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-3 rounded-xl shrink-0">
+          <div class="flex items-center gap-1.5 text-[10.5px]">
+            <button class="border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-850 px-3 py-1.5 rounded-full font-bold">All Sources</button>
+            <button class="border border-neutral-200 dark:border-neutral-800 px-3 py-1.5 rounded-full text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300 transition-colors">99acres</button>
+            <button class="border border-neutral-200 dark:border-neutral-800 px-3 py-1.5 rounded-full text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300 transition-colors">MagicBricks</button>
+            <button class="border border-neutral-200 dark:border-neutral-800 px-3 py-1.5 rounded-full text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300 transition-colors">Direct Search</button>
+          </div>
+          <div class="relative text-[10.5px]">
+            <input type="text" id="leadSearchInput" oninput="filterLeadsBySearch()" placeholder="Search client name..." class="pl-7 pr-3 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 focus:border-neutral-400 outline-none rounded-lg w-48 text-[11px]">
+            <svg class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          </div>
+        </div>
+
+        <!-- Kanban Board View -->
+        <div id="boardView" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
+          
+          <!-- New Inbound -->
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-4 rounded-xl space-y-3">
+            <div class="flex justify-between items-center pb-2 border-b border-neutral-100 dark:border-neutral-800">
+              <span class="text-xs font-extrabold uppercase tracking-wider">New Inbound</span>
+              <span id="col-count-inbound" class="bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full font-mono text-[10px] font-bold">2</span>
+            </div>
+            <div id="col-inbound" class="space-y-3 min-h-[300px]">
+              <!-- dynamic lead card -->
+            </div>
+          </div>
+
+          <!-- Contacted / Callback -->
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-4 rounded-xl space-y-3">
+            <div class="flex justify-between items-center pb-2 border-b border-neutral-100 dark:border-neutral-800">
+              <span class="text-xs font-extrabold uppercase tracking-wider">Follow-Up scheduled</span>
+              <span id="col-count-contacted" class="bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full font-mono text-[10px] font-bold">1</span>
+            </div>
+            <div id="col-contacted" class="space-y-3 min-h-[300px]">
+              <!-- dynamic -->
+            </div>
+          </div>
+
+          <!-- Site Visit Scheduled -->
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-4 rounded-xl space-y-3">
+            <div class="flex justify-between items-center pb-2 border-b border-neutral-100 dark:border-neutral-800">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-blue-600 dark:text-blue-400">Site Visit Booked</span>
+              <span id="col-count-visit" class="bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full font-mono text-[10px] font-bold">1</span>
+            </div>
+            <div id="col-visit" class="space-y-3 min-h-[300px]">
+              <!-- dynamic -->
+            </div>
+          </div>
+
+          <!-- Closed Deal / Token Paid -->
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-4 rounded-xl space-y-3">
+            <div class="flex justify-between items-center pb-2 border-b border-neutral-100 dark:border-neutral-800">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Deal Closed</span>
+              <span id="col-count-closed" class="bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full font-mono text-[10px] font-bold">1</span>
+            </div>
+            <div id="col-closed" class="space-y-3 min-h-[300px]">
+              <!-- dynamic -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Table Grid View (Alternative Toggle) -->
+        <div id="tableView" class="hidden bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-neutral-50 dark:bg-neutral-850 text-neutral-500 uppercase tracking-wider border-b border-neutral-200 dark:border-neutral-800">
+                <th class="p-4 font-bold">Lead Name</th>
+                <th class="p-4 font-bold">Phone Number</th>
+                <th class="p-4 font-bold">Property Request</th>
+                <th class="p-4 font-bold">Budget Tier</th>
+                <th class="p-4 font-bold">Source</th>
+                <th class="p-4 font-bold">Funnel Status</th>
+                <th class="p-4 font-bold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="table-leads-body" class="divide-y divide-neutral-200 dark:divide-neutral-800">
+              <!-- dynamic rows -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- TAB 4: CALENDAR SCHEDULE -->
+      <div id="tab-calendar" class="tab-content flex-col space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Month View -->
+          <div class="lg:col-span-8 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl space-y-4">
+            <div class="flex justify-between items-center pb-2 border-b border-neutral-100 dark:border-neutral-800">
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-neutral-100">July 2026</h3>
+              <div class="flex items-center gap-1">
+                <button class="p-1 border border-neutral-200 dark:border-neutral-800 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-850"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg></button>
+                <button class="p-1 border border-neutral-200 dark:border-neutral-800 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-850"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg></button>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-7 gap-2 text-center text-[10px] font-bold text-neutral-400">
+              <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+            </div>
+            
+            <div class="grid grid-cols-7 gap-2 h-72" id="calendar-days-grid">
+              <!-- Calendar dates automatically rendered in JS -->
+            </div>
+          </div>
+
+          <!-- Schedule detail list -->
+          <div class="lg:col-span-4 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl space-y-4">
+            <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-neutral-100 border-b border-neutral-100 dark:border-neutral-800 pb-2">Visit Details</h3>
+            <div class="space-y-4" id="calendar-visit-list">
+              <!-- Rendered items -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB 5: PROPERTY INVENTORY -->
+      <div id="tab-inventory" class="tab-content flex-col space-y-4">
+        
+        <!-- Filter bar -->
+        <div class="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-3 rounded-xl">
+          <div class="flex items-center gap-1">
+            <button class="border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-850 px-3 py-1.5 rounded-lg text-xs font-bold" onclick="filterProperties('All')">All Projects</button>
+            <button class="border border-neutral-200 dark:border-neutral-800 px-3 py-1.5 rounded-lg text-xs text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300" onclick="filterProperties('DLF')">DLF</button>
+            <button class="border border-neutral-200 dark:border-neutral-800 px-3 py-1.5 rounded-lg text-xs text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300" onclick="filterProperties('Emaar')">Emaar</button>
+            <button class="border border-neutral-200 dark:border-neutral-800 px-3 py-1.5 rounded-lg text-xs text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300" onclick="filterProperties('Godrej')">Godrej</button>
+          </div>
+          <span class="text-[10px] text-neutral-400 font-mono">Live HRERA API verified</span>
+        </div>
+
+        <!-- Inventory List Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="properties-grid">
+          <!-- dynamic items -->
+        </div>
+
+      </div>
+
+      <!-- TAB 6: AGENT ROUTING -->
+      <div id="tab-routing" class="tab-content flex-col space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Gurgaon Map SVG Mockup -->
+          <div class="lg:col-span-8 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl space-y-4">
+            <div class="flex justify-between items-center pb-2 border-b border-neutral-100 dark:border-neutral-800">
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-neutral-100">Live Agent Locations</h3>
+              <div class="flex items-center gap-2 text-[10px]">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-neutral-500">Live GPS Tracking</span>
+              </div>
+            </div>
+            
+            <div class="h-80 border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 rounded-xl relative overflow-hidden">
+              <!-- SVG map -->
+              <svg class="absolute inset-0 w-full h-full opacity-30 dark:opacity-20" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M 10 20 Q 30 15, 60 40 T 90 80" fill="none" stroke="#a1a1aa" stroke-width="0.8" stroke-dasharray="2,2"></path>
+                <path d="M 0 80 Q 40 60, 80 90" fill="none" stroke="#a1a1aa" stroke-width="0.8"></path>
+                <path d="M 50 0 Q 30 50, 70 100" fill="none" stroke="#a1a1aa" stroke-width="0.8"></path>
+              </svg>
+
+              <!-- Map Hotspots -->
+              <div class="absolute left-[30%] top-[40%] bg-neutral-900 text-white dark:bg-white dark:text-black px-2 py-1 rounded text-[8px] font-bold">Golf Course Rd</div>
+              <div class="absolute left-[65%] top-[70%] bg-neutral-900 text-white dark:bg-white dark:text-black px-2 py-1 rounded text-[8px] font-bold">Dwarka Exp</div>
+              <div class="absolute left-[50%] top-[20%] bg-neutral-900 text-white dark:bg-white dark:text-black px-2 py-1 rounded text-[8px] font-bold">Cybercity</div>
+
+              <!-- Agents Markers -->
+              <div class="absolute left-[33%] top-[45%] group cursor-pointer" onclick="window.coraShowToast('Rahul Khanna: Currently conducting site visit at DLF Crest.')">
+                <div class="w-6 h-6 rounded-full bg-neutral-900 dark:bg-neutral-100 border border-neutral-200 flex items-center justify-center font-bold text-[9px] text-white dark:text-black">RK</div>
+                <div class="w-2 h-2 bg-emerald-500 rounded-full absolute -top-0.5 -right-0.5 border border-white animate-ping"></div>
+              </div>
+              <div class="absolute left-[63%] top-[65%] group cursor-pointer" onclick="window.coraShowToast('Priya Sharma: Navigating to Sector 106, Godrej Meridien.')">
+                <div class="w-6 h-6 rounded-full bg-neutral-900 dark:bg-neutral-100 border border-neutral-200 flex items-center justify-center font-bold text-[9px] text-white dark:text-black">PS</div>
+                <div class="w-2 h-2 bg-emerald-500 rounded-full absolute -top-0.5 -right-0.5 border border-white animate-ping"></div>
+              </div>
+              <div class="absolute left-[52%] top-[25%] group cursor-pointer" onclick="window.coraShowToast('Arjun Mehta: At WVIN Head Office analyzing sector reports.')">
+                <div class="w-6 h-6 rounded-full bg-neutral-900 dark:bg-neutral-100 border border-neutral-200 flex items-center justify-center font-bold text-[9px] text-white dark:text-black">AM</div>
+                <div class="w-2 h-2 bg-neutral-400 rounded-full absolute -top-0.5 -right-0.5 border border-white"></div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Roster list -->
+          <div class="lg:col-span-4 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl space-y-4">
+            <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-neutral-100 border-b border-neutral-100 dark:border-neutral-800 pb-2">Active Field Roster</h3>
+            <div class="space-y-3">
+              <div class="p-3 border border-neutral-200 dark:border-neutral-800 rounded-xl space-y-2">
+                <div class="flex justify-between items-center"><span class="font-bold text-xs">Rahul Khanna</span><span class="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-[8px] font-bold px-2 py-0.5 rounded-full">On Site Visit</span></div>
+                <p class="text-[10px] text-neutral-500">Destination: DLF The Crest, 4BHK (Sector 54)</p>
+                <p class="text-[9px] text-neutral-400 font-mono">Client: Rohit Agarwal</p>
+              </div>
+              <div class="p-3 border border-neutral-200 dark:border-neutral-800 rounded-xl space-y-2">
+                <div class="flex justify-between items-center"><span class="font-bold text-xs">Priya Sharma</span><span class="bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 text-[8px] font-bold px-2 py-0.5 rounded-full">In Transit</span></div>
+                <p class="text-[10px] text-neutral-500">Destination: Godrej Meridien (Sector 106)</p>
+                <p class="text-[9px] text-neutral-400 font-mono">Client: Sameer Mehta</p>
+              </div>
+              <div class="p-3 border border-neutral-200 dark:border-neutral-800 rounded-xl space-y-2">
+                <div class="flex justify-between items-center"><span class="font-bold text-xs">Arjun Mehta</span><span class="bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 text-[8px] font-bold px-2 py-0.5 rounded-full">Office Desk</span></div>
+                <p class="text-[10px] text-neutral-500">Analyzing Gurgaon ROI data trends</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB 7: ARIA AI AUTOMATIONS -->
+      <div id="tab-automations" class="tab-content flex-col space-y-6">
+        
+        <!-- Toggle options card -->
+        <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-6 rounded-2xl space-y-4">
+          <div class="flex justify-between items-center pb-2 border-b border-neutral-100 dark:border-neutral-800">
+            <div>
+              <h3 class="font-bold text-xs uppercase tracking-wider text-neutral-900 dark:text-neutral-100">Aria Auto-Response Settings</h3>
+              <p class="text-[10px] text-neutral-400 dark:text-neutral-500 font-mono mt-0.5">Toggle Aria AI actions on incoming leads</p>
+            </div>
+            <div class="w-3.5 h-3.5 bg-emerald-500 rounded-full animate-pulse"></div>
+          </div>
+          
+          <div class="divide-y divide-neutral-100 dark:divide-neutral-800 space-y-4">
+            
+            <div class="flex justify-between items-center pt-4">
+              <div>
+                <span class="text-xs font-extrabold block">Instant WhatsApp Brochure Delivery</span>
+                <span class="text-[11px] text-neutral-400">Triggered immediately when a lead specifies project interest</span>
+              </div>
+              <input type="checkbox" checked onchange="window.coraShowToast('WhatsApp automation toggled.')" class="w-9 h-5 bg-neutral-200 dark:bg-neutral-850 rounded-full appearance-none checked:bg-neutral-900 dark:checked:bg-white relative cursor-pointer before:content-[''] before:absolute before:left-0.5 before:top-0.5 before:w-4 before:h-4 before:bg-white dark:before:bg-neutral-950 before:rounded-full before:transition-all checked:before:left-4.5">
+            </div>
+
+            <div class="flex justify-between items-center pt-4">
+              <div>
+                <span class="text-xs font-extrabold block">Instagram DM Auto-Reply</span>
+                <span class="text-[11px] text-neutral-400">Auto-reply to property specs and launch queries on WVIN profile DMs</span>
+              </div>
+              <input type="checkbox" checked onchange="window.coraShowToast('Instagram auto-replies updated.')" class="w-9 h-5 bg-neutral-200 dark:bg-neutral-850 rounded-full appearance-none checked:bg-neutral-900 dark:checked:bg-white relative cursor-pointer before:content-[''] before:absolute before:left-0.5 before:top-0.5 before:w-4 before:h-4 before:bg-white dark:before:bg-neutral-950 before:rounded-full before:transition-all checked:before:left-4.5">
+            </div>
+
+            <div class="flex justify-between items-center pt-4">
+              <div>
+                <span class="text-xs font-extrabold block">Site Visit 24h Reminder</span>
+                <span class="text-[11px] text-neutral-400">Send map coordinate links and coordinator contacts prior to appointment</span>
+              </div>
+              <input type="checkbox" checked onchange="window.coraShowToast('Reminders schedule persistent.')" class="w-9 h-5 bg-neutral-200 dark:bg-neutral-850 rounded-full appearance-none checked:bg-neutral-900 dark:checked:bg-white relative cursor-pointer before:content-[''] before:absolute before:left-0.5 before:top-0.5 before:w-4 before:h-4 before:bg-white dark:before:bg-neutral-950 before:rounded-full before:transition-all checked:before:left-4.5">
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Automation action log -->
+        <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl">
+          <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-neutral-100 mb-4 pb-2 border-b border-neutral-100 dark:border-neutral-800">Aria Automated Action Log</h3>
+          <div class="space-y-3" id="aria-log-container">
+            <!-- Dynamic logs -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAB 8: BROKERAGE & LEDGER -->
+      <div id="tab-financials" class="tab-content flex-col space-y-6">
+        
+        <!-- Summary split -->
+        <div class="grid grid-cols-3 gap-4">
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-4 rounded-xl">
+            <span class="text-[9px] font-mono text-neutral-400 dark:text-neutral-500 uppercase block">Total Commission Earned</span>
+            <span class="text-lg font-extrabold block mt-1">₹45,50,000</span>
+          </div>
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-4 rounded-xl">
+            <span class="text-[9px] font-mono text-neutral-400 dark:text-neutral-500 uppercase block">Pending Brokerage Split</span>
+            <span class="text-lg font-extrabold block mt-1">₹12,40,000</span>
+          </div>
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-4 rounded-xl">
+            <span class="text-[9px] font-mono text-neutral-400 dark:text-neutral-500 uppercase block">Token Advance Received</span>
+            <span class="text-lg font-extrabold block mt-1">₹5,00,000</span>
+          </div>
+        </div>
+
+        <!-- Ledger list / Invoice creator -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <div class="lg:col-span-8 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl">
+            <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-neutral-100 mb-4 pb-2 border-b border-neutral-100 dark:border-neutral-800">Invoice Ledger</h3>
+            <div class="space-y-3">
+              <div class="flex justify-between items-center p-3 border border-neutral-200 dark:border-neutral-800 rounded-xl">
+                <div>
+                  <span class="font-bold text-xs">DLF Crest Commission (4BHK)</span>
+                  <span class="text-[10px] text-neutral-400 font-mono block mt-1">Invoice ID: #WVIN-2026-004 · July 01</span>
+                </div>
+                <div class="text-right">
+                  <span class="font-extrabold text-xs block">₹9,60,000</span>
+                  <button onclick="previewInvoice('DLF Ltd', 'DLF The Crest Commission', '960000')" class="text-[10px] text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300 font-bold underline mt-1">Generate Copy</button>
+                </div>
+              </div>
+              <div class="flex justify-between items-center p-3 border border-neutral-200 dark:border-neutral-800 rounded-xl">
+                <div>
+                  <span class="font-bold text-xs">Godrej Meridien Commission (3BHK)</span>
+                  <span class="text-[10px] text-neutral-400 font-mono block mt-1">Invoice ID: #WVIN-2026-003 · June 24</span>
+                </div>
+                <div class="text-right">
+                  <span class="font-extrabold text-xs block">₹4,80,000</span>
+                  <button onclick="previewInvoice('Godrej Properties', 'Godrej Meridien Brokerage Split', '480000')" class="text-[10px] text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300 font-bold underline mt-1">Generate Copy</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-4 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl space-y-4">
+            <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-neutral-100 border-b border-neutral-100 dark:border-neutral-800 pb-2">Custom Invoice</h3>
+            <div class="space-y-3">
+              <div>
+                <label class="text-[9px] font-bold text-neutral-400 uppercase tracking-wider block mb-1">Developer</label>
+                <input type="text" id="inv-dev" placeholder="e.g. DLF Ltd" class="w-full bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 px-3 py-2 rounded-lg text-xs outline-none focus:border-neutral-400">
+              </div>
+              <div>
+                <label class="text-[9px] font-bold text-neutral-400 uppercase tracking-wider block mb-1">Description</label>
+                <input type="text" id="inv-desc" placeholder="e.g. The Crest Unit 402 Commission" class="w-full bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 px-3 py-2 rounded-lg text-xs outline-none focus:border-neutral-400">
+              </div>
+              <div>
+                <label class="text-[9px] font-bold text-neutral-400 uppercase tracking-wider block mb-1">Amount (INR)</label>
+                <input type="number" id="inv-amt" placeholder="Amount in INR" class="w-full bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 px-3 py-2 rounded-lg text-xs outline-none focus:border-neutral-400">
+              </div>
+              <button onclick="createInvoiceFromForm()" class="w-full bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-neutral-50 dark:text-black dark:hover:bg-neutral-200 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider mt-2">
+                Generate Invoice
+              </button>
+            </div>
+          </div>
+
+      </div>
+
+      <!-- TAB 9: DOCUMENT VAULT -->
+      <div id="tab-vault" class="tab-content flex-col space-y-6">
+        
+        <!-- Summary header -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-4 rounded-xl">
+            <span class="text-[9px] font-mono text-neutral-450 dark:text-neutral-500 uppercase block">Total Vault Documents</span>
+            <span class="text-lg font-extrabold block mt-1">18 Verified Files</span>
+          </div>
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-4 rounded-xl">
+            <span class="text-[9px] font-mono text-neutral-450 dark:text-neutral-500 uppercase block">HRERA Registrations</span>
+            <span class="text-lg font-extrabold block mt-1">5 Synced Databases</span>
+          </div>
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-4 rounded-xl">
+            <span class="text-[9px] font-mono text-neutral-450 dark:text-neutral-500 uppercase block">Signed Agreements</span>
+            <span class="text-lg font-extrabold block mt-1">4 Active Contracts</span>
+          </div>
+        </div>
+
+        <!-- Documents list -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-8 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl space-y-4">
+            <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-neutral-100 border-b border-neutral-100 dark:border-neutral-800 pb-2">Client Document Ledger</h3>
+            <div class="space-y-3">
+              <div class="flex justify-between items-center p-3 border border-neutral-200 dark:border-neutral-800 rounded-xl">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-900 dark:text-white">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  </div>
+                  <div>
+                    <span class="font-bold text-xs">DLF Crest 4BHK Token Agreement</span>
+                    <span class="text-[9px] text-neutral-400 font-mono block mt-0.5">Signed by: Rohit Agarwal · HRERA-54-C</span>
+                  </div>
+                </div>
+                <button onclick="window.coraShowToast('Downloading document copy.')" class="text-xs text-neutral-800 dark:text-neutral-200 hover:opacity-75 transition-opacity font-bold underline">Download PDF</button>
+              </div>
+              <div class="flex justify-between items-center p-3 border border-neutral-200 dark:border-neutral-800 rounded-xl">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-900 dark:text-white">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  </div>
+                  <div>
+                    <span class="font-bold text-xs">Godrej Meridien Plot Booking Form</span>
+                    <span class="text-[9px] text-neutral-400 font-mono block mt-0.5">Signed by: Sameer Mehta · HRERA-106-M</span>
+                  </div>
+                </div>
+                <button onclick="window.coraShowToast('Downloading document copy.')" class="text-xs text-neutral-800 dark:text-neutral-200 hover:opacity-75 transition-opacity font-bold underline">Download PDF</button>
+              </div>
+              <div class="flex justify-between items-center p-3 border border-neutral-200 dark:border-neutral-800 rounded-xl">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-850 flex items-center justify-center text-neutral-900 dark:text-white">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  </div>
+                  <div>
+                    <span class="font-bold text-xs">WVIN Corporate Brokerage Agreement</span>
+                    <span class="text-[9px] text-neutral-400 font-mono block mt-0.5">Counterparty: Emaar India Group</span>
+                  </div>
+                </div>
+                <button onclick="window.coraShowToast('Downloading document copy.')" class="text-xs text-neutral-800 dark:text-neutral-200 hover:opacity-75 transition-opacity font-bold underline">Download PDF</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-4 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl space-y-4">
+            <h3 class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-neutral-100 border-b border-neutral-100 dark:border-neutral-800 pb-2">Upload Files</h3>
+            <div class="border-2 border-dashed border-neutral-200 dark:border-neutral-800 p-6 rounded-xl text-center space-y-2 hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors cursor-pointer" onclick="window.coraShowToast('Choose file trigger active.')">
+              <svg class="w-8 h-8 text-neutral-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+              <div class="font-bold text-xs">Click to browse or drop files here</div>
+              <p class="text-[10px] text-neutral-400">PDF, PNG, JPG, or DOCX (max 20MB)</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+</div>
+
+<!-- RIGHT-SLIDING SHEET DRAWER FOR ADDING LEADS (RULE 1 & 3) -->
+<div id="drawerOverlay" onclick="closeLeadDrawer()" class="hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-xs transition-opacity duration-300"></div>
+<div id="leadDrawer" class="drawer fixed right-0 top-0 bottom-0 z-50 w-full sm:w-96 bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800 shadow-2xl flex flex-col">
+  
+  <!-- Header -->
+  <div class="px-5 py-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
+    <h3 class="font-extrabold text-sm uppercase tracking-wider text-neutral-900 dark:text-neutral-50">Create New Lead</h3>
+    <button onclick="closeLeadDrawer()" class="p-1 rounded-lg hover:bg-neutral-150 dark:hover:bg-neutral-800">
+      <svg class="w-5 h-5 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+    </button>
+  </div>
+
+  <!-- Form content -->
+  <form id="newLeadForm" onsubmit="createLead(event)" class="flex-1 overflow-y-auto p-5 space-y-4">
+    <div>
+      <label class="text-[9px] font-bold text-neutral-400 uppercase tracking-wider block mb-1">Client Full Name</label>
+      <input type="text" id="lead-name" required placeholder="e.g. Ramesh Kumar" class="w-full bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 px-3 py-2 rounded-lg text-xs outline-none focus:border-neutral-400">
+    </div>
+    <div>
+      <label class="text-[9px] font-bold text-neutral-400 uppercase tracking-wider block mb-1">Phone Number</label>
+      <input type="tel" id="lead-phone" required placeholder="e.g. +91 99999 88888" class="w-full bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 px-3 py-2 rounded-lg text-xs outline-none focus:border-neutral-400">
+    </div>
+    <div>
+      <label class="text-[9px] font-bold text-neutral-400 uppercase tracking-wider block mb-1">Project Interest</label>
+      <select id="lead-project" class="w-full bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 px-3 py-2 rounded-lg text-xs outline-none focus:border-neutral-400">
+        <option>DLF The Crest</option>
+        <option>Godrej Meridien</option>
+        <option>Emaar Palm Heights</option>
+        <option>M3M Golf Estate</option>
+        <option>Sobha City Tower C</option>
+      </select>
+    </div>
+    <div>
+      <label class="text-[9px] font-bold text-neutral-400 uppercase tracking-wider block mb-1">Investment Budget</label>
+      <select id="lead-budget" class="w-full bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 px-3 py-2 rounded-lg text-xs outline-none focus:border-neutral-400">
+        <option>₹1Cr – ₹3Cr</option>
+        <option>₹3Cr – ₹5Cr</option>
+        <option>₹5Cr – ₹10Cr</option>
+        <option>₹10Cr+</option>
+      </select>
+    </div>
+    <div>
+      <label class="text-[9px] font-bold text-neutral-400 uppercase tracking-wider block mb-1">Lead Traffic Source</label>
+      <select id="lead-source" class="w-full bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 px-3 py-2 rounded-lg text-xs outline-none focus:border-neutral-400">
+        <option>MagicBricks API</option>
+        <option>99acres portal</option>
+        <option>Google Maps Search</option>
+        <option>WVIN Website Direct</option>
+      </select>
+    </div>
+    <div>
+      <label class="text-[9px] font-bold text-neutral-400 uppercase tracking-wider block mb-1">Initial Status</label>
+      <select id="lead-status" class="w-full bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 px-3 py-2 rounded-lg text-xs outline-none focus:border-neutral-400">
+        <option value="inbound">New Inbound</option>
+        <option value="contacted">Follow-Up scheduled</option>
+        <option value="visit">Site Visit Booked</option>
+        <option value="closed">Deal Closed</option>
+      </select>
+    </div>
+    <button type="submit" class="w-full bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-neutral-50 dark:text-black dark:hover:bg-neutral-200 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider mt-4">
+      Save Lead Profile
+    </button>
+  </form>
+
+</div>
+
+<!-- DYNAMIC INVOICE PREVIEW MODAL (PRINT-READY) -->
+<div id="invoiceModal" class="hidden fixed inset-0 z-50 bg-black/45 backdrop-blur-xs flex items-center justify-center p-4">
+  <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+    
+    <div class="px-5 py-4 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center print:hidden">
+      <h3 class="font-extrabold text-sm uppercase tracking-wider">Brokerage Invoice</h3>
+      <div class="flex items-center gap-2">
+        <button onclick="window.print()" class="bg-neutral-900 text-white dark:bg-neutral-50 dark:text-black hover:opacity-85 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+          Print Copy
+        </button>
+        <button onclick="closeInvoiceModal()" class="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg">
+          <svg class="w-5 h-5 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Print area -->
+    <div class="p-8 overflow-y-auto flex-1 text-black dark:text-neutral-100 bg-white dark:bg-neutral-900 font-mono text-xs space-y-6" id="print-area">
+      <div class="flex justify-between items-start">
+        <div>
+          <h2 class="font-extrabold text-base tracking-widest text-black dark:text-white uppercase">WVIN WEALTH INFRA</h2>
+          <p class="text-neutral-500 mt-1">Sector 43, Golf Course Road, Gurgaon</p>
+          <p class="text-neutral-500">RERA: HRERA-PKL-REA-2019-042</p>
+        </div>
+        <div class="text-right">
+          <h3 class="font-extrabold text-sm uppercase text-neutral-900 dark:text-white">INVOICE</h3>
+          <p class="text-neutral-500 mt-1" id="inv-num-preview">Invoice: #WVIN-2026-004</p>
+          <p class="text-neutral-500" id="inv-date-preview">Date: July 04, 2026</p>
+        </div>
+      </div>
+
+      <div class="border-t border-b border-neutral-200 dark:border-neutral-800 py-4 grid grid-cols-2 gap-4">
+        <div>
+          <span class="text-[9px] font-bold text-neutral-400 uppercase tracking-wider block mb-1">BILLED TO:</span>
+          <p id="inv-dev-preview" class="font-bold text-neutral-800 dark:text-white">DLF Ltd</p>
+          <p class="text-neutral-500 mt-1">Gurgaon Corporate Office, Phase 3</p>
+        </div>
+        <div>
+          <span class="text-[9px] font-bold text-neutral-400 uppercase tracking-wider block mb-1">DETAILS:</span>
+          <p class="text-neutral-500">Payment Term: Net 30</p>
+          <p class="text-neutral-500">Brokerage split: 2.0%</p>
+        </div>
+      </div>
+
+      <table class="w-full text-left">
+        <thead>
+          <tr class="border-b border-neutral-200 dark:border-neutral-800 text-neutral-400 font-bold uppercase tracking-wider">
+            <th class="py-2">Description</th>
+            <th class="py-2 text-right">Rate</th>
+            <th class="py-2 text-right">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-neutral-100 dark:border-neutral-850">
+            <td class="py-3" id="inv-desc-preview">DLF The Crest Unit 402 Commission</td>
+            <td class="py-3 text-right">2.0%</td>
+            <td class="py-3 text-right" id="inv-amt-preview">₹9,60,000</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="flex justify-end pt-4">
+        <div class="w-48 text-right space-y-1.5">
+          <div class="flex justify-between">
+            <span class="text-neutral-500">Subtotal:</span>
+            <span id="inv-subtotal">₹9,60,000</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-neutral-500">GST (18%):</span>
+            <span id="inv-gst">₹1,72,800</span>
+          </div>
+          <div class="flex justify-between border-t border-neutral-300 dark:border-neutral-700 pt-1.5 font-bold text-neutral-800 dark:text-white">
+            <span>Total:</span>
+            <span id="inv-total">₹11,32,800</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST ALERT SYSTEM (RULE 1 & 2) -->
+<div id="toast" class="fixed bottom-6 right-6 z-[120] bg-neutral-900 text-white dark:bg-white dark:text-black px-6 py-4 text-xs font-bold tracking-wider uppercase border border-neutral-800 dark:border-neutral-200 flex items-center gap-3 translate-y-16 opacity-0 transition-all duration-300">
+  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+  <span id="toast-text">Success message</span>
+</div>
+
+<script>
+// === DATA CONFIGURATION ===
+let leads = [
+  { id: 1, name: "Rohit Agarwal", phone: "+91 98765 43210", project: "DLF The Crest", budget: "₹3Cr – ₹5Cr", source: "99acres portal", status: "inbound" },
+  { id: 2, name: "Sameer Mehta", phone: "+91 99888 77777", project: "Godrej Meridien", budget: "₹1Cr – ₹3Cr", source: "MagicBricks API", status: "contacted" },
+  { id: 3, name: "Anita Singhal", phone: "+91 98111 22222", project: "DLF The Crest", budget: "₹5Cr – ₹10Cr", source: "Google Maps Search", status: "visit" },
+  { id: 4, name: "Karan Johar", phone: "+91 90000 11111", project: "M3M Golf Estate", budget: "₹10Cr+", source: "WVIN Website Direct", status: "closed" }
+];
+
+const properties = [
+  { id: 1, name: "DLF The Crest", sector: "Sector 54, Golf Course Road", price: "₹4.8 Cr", bhk: "4 BHK", size: "3,200 sq.ft", dev: "DLF" },
+  { id: 2, name: "Godrej Meridien", sector: "Sector 106, Dwarka Expressway", price: "₹2.4 Cr", bhk: "3 BHK", size: "1,850 sq.ft", dev: "Godrej" },
+  { id: 3, name: "Emaar Palm Heights", sector: "Sector 77, Golf Course Ext.", price: "₹7.2 Cr", bhk: "4 BHK", size: "4,800 sq.ft", dev: "Emaar" },
+  { id: 4, name: "M3M Golf Estate", sector: "Sector 65, Golf Course Ext.", price: "₹12.5 Cr", bhk: "5 BHK", size: "6,200 sq.ft", dev: "M3M" },
+  { id: 5, name: "Sobha City Tower C", sector: "Sector 108, Dwarka Expressway", price: "₹1.8 Cr", bhk: "2 BHK", size: "1,200 sq.ft", dev: "Sobha" }
+];
+
+const ariaLogs = [
+  { time: "18:42", action: "WhatsApp brochure delivered", details: "Sent DLF Crest PDF to Rohit Agarwal (+91 98765 43210)" },
+  { time: "16:15", action: "Google Review request sent", details: "WhatsApp automation triggered for Karan Johar post-transaction" },
+  { time: "14:02", action: "Instagram DM auto-reply", details: "Sent Godrej pricing brochure to lead @sameer_m" }
+];
+
+const visits = [
+  { date: 15, name: "Anita Singhal", time: "15:00", project: "DLF The Crest", status: "Scheduled" },
+  { date: 18, name: "Rakesh Gupta", time: "11:30", project: "Godrej Meridien", status: "Draft" },
+  { date: 24, name: "Karan Johar", time: "16:00", project: "M3M Golf Estate", status: "Completed" }
+];
+
+// === CUSTOM TOAST SYSTEM ===
+window.coraShowToast = function(msg) {
+  const toast = document.getElementById('toast');
+  const toastText = document.getElementById('toast-text');
+  toastText.textContent = msg;
+  toast.style.transform = 'translateY(0)';
+  toast.style.opacity = '1';
+  setTimeout(() => {
+    toast.style.transform = 'translateY(64px)';
+    toast.style.opacity = '0';
+  }, 4000);
+};
+
+// === DARK MODE SUPPORT (RULE 5) ===
+function toggleDarkMode() {
+  const html = document.documentElement;
+  const isDark = html.classList.contains('dark');
+  if (isDark) {
+    html.classList.remove('dark');
+    localStorage.setItem('theme', 'light');
+    window.coraShowToast("Light mode enabled.");
+  } else {
+    html.classList.add('dark');
+    localStorage.setItem('theme', 'dark');
+    window.coraShowToast("Dark mode enabled.");
+  }
+}
+// Load persistent theme preference
+if (localStorage.getItem('theme') === 'dark') {
+  document.documentElement.classList.add('dark');
+} else {
+  document.documentElement.classList.remove('dark');
+}
+
+// === TAB SWITCH SYSTEM ===
+function switchTab(tabId) {
+  // Update nav buttons
+  const buttons = document.querySelectorAll('aside button');
+  buttons.forEach(btn => {
+    if (btn.id === `nav-btn-${tabId}`) {
+      btn.className = "w-full text-left px-3 py-2 rounded-lg text-xs font-semibold tracking-wide flex items-center gap-3 transition-colors bg-neutral-900 text-white dark:bg-neutral-100 dark:text-black";
+    } else {
+      btn.className = "w-full text-left px-3 py-2 rounded-lg text-xs font-semibold tracking-wide flex items-center gap-3 transition-colors text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800";
+    }
+  });
+
+  // Update tabs
+  const contents = document.querySelectorAll('.tab-content');
+  contents.forEach(c => {
+    c.classList.remove('active');
+    if (c.id === `tab-${tabId}`) c.classList.add('active');
+  });
+
+  // Update header text
+  const title = document.getElementById('page-title');
+  const desc = document.getElementById('page-desc');
+  const viewBtn = document.getElementById('viewToggle');
+
+  viewBtn.classList.add('hidden');
+
+  if (tabId === 'overview') {
+    title.textContent = "System Settings";
+    desc.textContent = "Manage company profile, HRERA registrations, and agent permissions";
+  } else if (tabId === 'analytics') {
+    title.textContent = "Agency Dashboard";
+    desc.textContent = "Conversion metrics, micro-market trends & GBP insights";
+  } else if (tabId === 'feature-hub') {
+    title.textContent = "Feature Hub & Platform Roadmap";
+    desc.textContent = "Track active tools, in-progress integration";
+  } else if (tabId === 'kanban') {
+    title.textContent = "Leads (CRM)";
+    desc.textContent = "Drag & drop status board of active real estate inquiries";
+    viewBtn.classList.remove('hidden');
+  } else if (tabId === 'calendar') {
+    title.textContent = "Viewing Bookings";
+    desc.textContent = "Calendar mapping of physical property visit appointments";
+  } else if (tabId === 'inventory') {
+    title.textContent = "Equipment Inventory";
+    desc.textContent = "Developer properties and listings synced with HRERA and portals";
+  } else if (tabId === 'routing') {
+    title.textContent = "Team & Roles";
+    desc.textContent = "Real-time location, dispatch mapping, and task tracking";
+  } else if (tabId === 'vault') {
+    title.textContent = "Document Vault";
+    desc.textContent = "Brokerage Invoices, booking records, and contracts ledger";
+  } else if (tabId === 'automations') {
+    title.textContent = "Aria AI Automation";
+    desc.textContent = "Configure automated response criteria for incoming inquiries";
+  } else if (tabId === 'financials') {
+    title.textContent = "Financial Board";
+    desc.textContent = "Brokerage Splits, Token advances, and ledger statistics";
+  }
+
+  // Close admin popover on transition
+  document.getElementById('adminPopover').classList.add('hidden');
+}
+
+// === LEADS PIPELINE LOGIC ===
+let currentView = 'kanban';
+function toggleKanbanView() {
+  const board = document.getElementById('boardView');
+  const table = document.getElementById('tableView');
+  const toggleBtnText = document.getElementById('viewToggleText');
+  if (currentView === 'kanban') {
+    currentView = 'table';
+    board.classList.add('hidden');
+    table.classList.remove('hidden');
+    toggleBtnText.textContent = "Switch to Board";
+  } else {
+    currentView = 'kanban';
+    board.classList.remove('hidden');
+    table.classList.add('hidden');
+    toggleBtnText.textContent = "Switch to Table";
+  }
+  renderLeads();
+}
+
+function renderLeads() {
+  // Clear columns
+  document.getElementById('col-inbound').innerHTML = '';
+  document.getElementById('col-contacted').innerHTML = '';
+  document.getElementById('col-visit').innerHTML = '';
+  document.getElementById('col-closed').innerHTML = '';
+
+  let cInbound = 0, cContacted = 0, cVisit = 0, cClosed = 0;
+  const tableBody = document.getElementById('table-leads-body');
+  tableBody.innerHTML = '';
+
+  leads.forEach(lead => {
+    // Render Board Card
+    const card = document.createElement('div');
+    card.className = "bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 p-3 rounded-lg space-y-2 hover:border-neutral-400 transition-colors";
+    card.innerHTML = `
+      <div class="flex justify-between items-start">
+        <span class="font-bold text-xs">${lead.name}</span>
+        <span class="text-[9px] font-mono text-neutral-400">${lead.source}</span>
+      </div>
+      <p class="text-[10px] text-neutral-500">${lead.project} · ${lead.budget}</p>
+      <div class="flex justify-between items-center pt-2 border-t border-neutral-100 dark:border-neutral-800">
+        <span class="text-[9px] text-neutral-400 font-mono">${lead.phone}</span>
+        <div class="flex gap-1">
+          ${lead.status !== 'closed' ? `<button onclick="advanceLead(${lead.id})" class="text-[9px] font-bold text-neutral-800 dark:text-white border border-neutral-300 dark:border-neutral-700 px-2 py-0.5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800">Advance</button>` : ''}
+        </div>
+      </div>
+    `;
+
+    if (lead.status === 'inbound') {
+      document.getElementById('col-inbound').appendChild(card);
+      cInbound++;
+    } else if (lead.status === 'contacted') {
+      document.getElementById('col-contacted').appendChild(card);
+      cContacted++;
+    } else if (lead.status === 'visit') {
+      document.getElementById('col-visit').appendChild(card);
+      cVisit++;
+    } else if (lead.status === 'closed') {
+      document.getElementById('col-closed').appendChild(card);
+      cClosed++;
+    }
+
+    // Render Table Row
+    const row = document.createElement('tr');
+    row.className = "hover:bg-neutral-50 dark:hover:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800";
+    row.innerHTML = `
+      <td class="p-4 font-bold">${lead.name}</td>
+      <td class="p-4 text-neutral-500 font-mono">${lead.phone}</td>
+      <td class="p-4 text-neutral-600 dark:text-neutral-400">${lead.project}</td>
+      <td class="p-4 text-neutral-600 dark:text-neutral-400">${lead.budget}</td>
+      <td class="p-4 text-neutral-400 font-mono">${lead.source}</td>
+      <td class="p-4">
+        <span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${
+          lead.status === 'closed' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' :
+          lead.status === 'visit' ? 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300' :
+          'bg-neutral-100 text-neutral-750 dark:bg-neutral-800 dark:text-neutral-300'
+        }">${lead.status.toUpperCase()}</span>
+      </td>
+      <td class="p-4 text-right">
+        <button onclick="advanceLead(${lead.id})" class="text-[10px] font-bold text-neutral-900 dark:text-white underline">Advance</button>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+
+  // Update counts
+  document.getElementById('col-count-inbound').textContent = cInbound;
+  document.getElementById('col-count-contacted').textContent = cContacted;
+  document.getElementById('col-count-visit').textContent = cVisit;
+  document.getElementById('col-count-closed').textContent = cClosed;
+}
+
+function advanceLead(id) {
+  const lead = leads.find(l => l.id === id);
+  if (lead) {
+    if (lead.status === 'inbound') lead.status = 'contacted';
+    else if (lead.status === 'contacted') lead.status = 'visit';
+    else if (lead.status === 'visit') lead.status = 'closed';
+    renderLeads();
+    window.coraShowToast(`${lead.name} status advanced to ${lead.status.toUpperCase()}.`);
+  }
+}
+
+// Search filtration
+function filterLeadsBySearch() {
+  const q = document.getElementById('leadSearchInput').value.toLowerCase();
+  const allCards = document.querySelectorAll('#boardView > div > div[id^="col-"] > div');
+  allCards.forEach(c => {
+    const text = c.textContent.toLowerCase();
+    c.style.display = text.includes(q) ? '' : 'none';
+  });
+}
+
+// === LEAD DRAWER SYSTEM (RULE 3) ===
+function openLeadDrawer() {
+  document.getElementById('drawerOverlay').classList.remove('hidden');
+  document.getElementById('leadDrawer').classList.add('open');
+}
+function closeLeadDrawer() {
+  document.getElementById('drawerOverlay').classList.add('hidden');
+  document.getElementById('leadDrawer').classList.remove('open');
+}
+function createLead(e) {
+  e.preventDefault();
+  const name = document.getElementById('lead-name').value;
+  const phone = document.getElementById('lead-phone').value;
+  const project = document.getElementById('lead-project').value;
+  const budget = document.getElementById('lead-budget').value;
+  const source = document.getElementById('lead-source').value;
+  const status = document.getElementById('lead-status').value;
+
+  const newId = leads.length + 1;
+  leads.push({ id: newId, name, phone, project, budget, source, status });
+  renderLeads();
+  closeLeadDrawer();
+  document.getElementById('newLeadForm').reset();
+  window.coraShowToast(`New Lead ${name} registered successfully.`);
+}
+
+// === PROPERTY INVENTORY VIEW ===
+function renderProperties(list = properties) {
+  const grid = document.getElementById('properties-grid');
+  grid.innerHTML = '';
+  list.forEach(p => {
+    const card = document.createElement('div');
+    card.className = "bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-5 rounded-2xl space-y-3 hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors";
+    card.innerHTML = `
+      <div class="flex justify-between items-start">
+        <span class="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-white">${p.name}</span>
+        <span class="bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 text-[8px] font-bold px-2 py-0.5 rounded-full">${p.dev} Sync</span>
+      </div>
+      <p class="text-[10px] text-neutral-400">${p.sector}</p>
+      <div class="flex justify-between items-center pt-3 border-t border-neutral-100 dark:border-neutral-800 text-[10px]">
+        <span class="font-bold">${p.bhk} · ${p.size}</span>
+        <span class="font-extrabold text-neutral-900 dark:text-white">${p.price}</span>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function filterProperties(dev) {
+  if (dev === 'All') {
+    renderProperties(properties);
+  } else {
+    const filtered = properties.filter(p => p.dev === dev);
+    renderProperties(filtered);
+  }
+}
+
+// === CALENDAR BUILDER ===
+function renderCalendar() {
+  const grid = document.getElementById('calendar-days-grid');
+  grid.innerHTML = '';
+  // July 2026 starts on Wednesday (offset 2 days)
+  for (let i = 0; i < 2; i++) {
+    const cell = document.createElement('div');
+    cell.className = "bg-neutral-50/50 dark:bg-neutral-900/20 rounded-lg";
+    grid.appendChild(cell);
+  }
+
+  for (let day = 1; day <= 31; day++) {
+    const cell = document.createElement('div');
+    cell.className = "bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-lg p-2 flex flex-col justify-between hover:border-neutral-400 transition-colors cursor-pointer relative";
+    cell.innerHTML = `<span class="font-bold text-[10px] text-neutral-400">${day}</span>`;
+    
+    // Check if there is site visit on this date
+    const dayVisits = visits.filter(v => v.date === day);
+    if (dayVisits.length > 0) {
+      cell.classList.add('border-neutral-900', 'dark:border-white');
+      const dot = document.createElement('span');
+      dot.className = "w-1.5 h-1.5 bg-neutral-900 dark:bg-white rounded-full mx-auto mb-1.5";
+      cell.appendChild(dot);
+      cell.onclick = () => showVisitDetails(dayVisits[0]);
+    }
+    grid.appendChild(cell);
+  }
+}
+
+function showVisitDetails(visit) {
+  const pane = document.getElementById('calendar-visit-list');
+  pane.innerHTML = `
+    <div class="p-4 border border-neutral-200 dark:border-neutral-800 rounded-xl space-y-3">
+      <div class="flex justify-between items-center pb-2 border-b border-neutral-100 dark:border-neutral-800">
+        <span class="font-bold text-xs">${visit.name}</span>
+        <span class="bg-neutral-900 text-white dark:bg-white dark:text-black text-[9px] font-bold px-2 py-0.5 rounded-full">${visit.status}</span>
+      </div>
+      <p class="text-[11px] text-neutral-500">Property: <span class="font-bold">${visit.project}</span></p>
+      <p class="text-[11px] text-neutral-500">Time: <span class="font-bold">${visit.time} IST</span></p>
+      <button onclick="window.coraShowToast('Directions link sent via SMS/WhatsApp.')" class="w-full bg-neutral-50 dark:bg-neutral-800 text-[10px] font-bold py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-750">
+        Dispatch Directions
+      </button>
+    </div>
+  `;
+}
+
+// === ARIA LOG SYSTEM ===
+function renderAriaLogs() {
+  const container = document.getElementById('aria-log-container');
+  container.innerHTML = '';
+  ariaLogs.forEach(l => {
+    const item = document.createElement('div');
+    item.className = "flex justify-between items-start p-3 border border-neutral-200 dark:border-neutral-800 rounded-xl text-xs";
+    item.innerHTML = `
+      <div class="space-y-1">
+        <span class="font-bold text-neutral-900 dark:text-white block">${l.action}</span>
+        <span class="text-neutral-500 block">${l.details}</span>
+      </div>
+      <span class="font-mono text-neutral-400 text-[10px]">${l.time}</span>
+    `;
+    container.appendChild(item);
+  });
+}
+
+// === FINANCIALS & INVOICE GENERATOR ===
+function previewInvoice(developer, description, amount) {
+  document.getElementById('inv-dev-preview').textContent = developer;
+  document.getElementById('inv-desc-preview').textContent = description;
+  
+  const amtNum = parseFloat(amount);
+  document.getElementById('inv-amt-preview').textContent = '₹' + amtNum.toLocaleString();
+  document.getElementById('inv-subtotal').textContent = '₹' + amtNum.toLocaleString();
+  
+  const gst = amtNum * 0.18;
+  document.getElementById('inv-gst').textContent = '₹' + gst.toLocaleString();
+  
+  const total = amtNum + gst;
+  document.getElementById('inv-total').textContent = '₹' + total.toLocaleString();
+
+  // Update transaction number and date
+  const randomNo = Math.floor(100 + Math.random() * 900);
+  document.getElementById('inv-num-preview').textContent = `Invoice: #WVIN-2026-${randomNo}`;
+  document.getElementById('inv-date-preview').textContent = `Date: ` + new Date().toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'});
+
+  // Display modal
+  document.getElementById('invoiceModal').classList.remove('hidden');
+}
+
+function closeInvoiceModal() {
+  document.getElementById('invoiceModal').classList.add('hidden');
+}
+
+function createInvoiceFromForm() {
+  const dev = document.getElementById('inv-dev').value;
+  const desc = document.getElementById('inv-desc').value;
+  const amt = document.getElementById('inv-amt').value;
+  
+  if (!dev || !desc || !amt) {
+    window.coraShowToast("Please fill all invoice inputs first.");
+    return;
+  }
+  previewInvoice(dev, desc, amt);
+}
+
+// === ADMIN USER POPOVER SYSTEM ===
+function toggleAdminPopover(event) {
+  event.stopPropagation();
+  const popover = document.getElementById('adminPopover');
+  popover.classList.toggle('hidden');
+}
+
+// Hide popover if clicking outside
+document.addEventListener('click', (e) => {
+  const popover = document.getElementById('adminPopover');
+  if (popover && !popover.classList.contains('hidden') && !e.target.closest('#adminPopover') && !e.target.closest('button[onclick^="toggleAdminPopover"]')) {
+    popover.classList.add('hidden');
+  }
+});
+
+// === INITIALIZATION ===
+window.onload = () => {
+  renderLeads();
+  renderProperties();
+  renderCalendar();
+  renderAriaLogs();
+  
+  // Show default visit details
+  if (visits.length > 0) {
+    showVisitDetails(visits[0]);
+  }
+};
+</script>
+</body>
+</html>
