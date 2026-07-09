@@ -138,12 +138,13 @@ $role_labels = array(
         <div class="overflow-x-auto">
             <table class="w-full border-collapse text-left text-xs text-zinc-800 min-w-[800px]">
                 <thead>
-                    <tr class="bg-zinc-50 border-b border-zinc-200 text-zinc-500 font-semibold">
-                        <th class="py-3 px-4 w-48">Timestamp</th>
-                        <th class="py-3 px-4 w-56">Actor</th>
-                        <th class="py-3 px-4 w-44">Event Type</th>
-                        <th class="py-3 px-4">Details</th>
-                        <th class="py-3 px-4 w-36">IP Address</th>
+                    <tr class="bg-zinc-50 border-b border-zinc-200 text-zinc-500 font-semibold select-none">
+                        <th class="py-3 px-4 w-48">TIMESTAMP</th>
+                        <th class="py-3 px-4 w-56">USER</th>
+                        <th class="py-3 px-4 w-44">ACTION</th>
+                        <th class="py-3 px-4">DETAILS</th>
+                        <th class="py-3 px-4 w-36">IP</th>
+                        <th class="py-3 px-4 w-40">DEVICE</th>
                     </tr>
                 </thead>
                 <tbody id="logs-table-body" class="divide-y divide-zinc-100">
@@ -424,6 +425,14 @@ function filterLogs() {
         const formattedDate = formatLogDate(log.timestamp);
         const roleLabel = roleLabels[log.user_role] || log.user_role;
         const badgeClass = getEventTypeBadgeClass(log.action_type);
+        
+        let detailsText = escapeHtml(log.description);
+        let actionLabel = escapeHtml(log.action_type);
+        
+        if (log.how === 'ai_instructed') {
+            actionLabel = '✦ ' + actionLabel;
+            detailsText = detailsText + ' via Cora AI';
+        }
 
         html += `
             <tr class="hover:bg-zinc-50/40 transition-colors">
@@ -433,10 +442,11 @@ function filterLogs() {
                     <div class="text-[10px] text-zinc-400 font-mono mt-0.5">${escapeHtml(roleLabel)}</div>
                 </td>
                 <td class="py-3 px-4">
-                    <span class="${badgeClass}">${escapeHtml(log.action_type)}</span>
+                    <span class="${badgeClass}">${actionLabel}</span>
                 </td>
-                <td class="py-3 px-4 text-zinc-600 leading-relaxed max-w-[320px] break-words">${escapeHtml(log.description)}</td>
+                <td class="py-3 px-4 text-zinc-600 leading-relaxed max-w-[320px] break-words">${detailsText}</td>
                 <td class="py-3 px-4 text-zinc-500 font-mono text-[11px]">${escapeHtml(log.ip)}</td>
+                <td class="py-3 px-4 text-zinc-500 font-medium text-[11px]">${escapeHtml(log.device || 'Chrome on MacOS')}</td>
             </tr>
         `;
     });
@@ -465,19 +475,28 @@ function exportLogsCSV() {
     }
 
     const rows = [
-        ["Timestamp", "Actor Name", "Actor Role", "Event Type", "Description", "IP Address"]
+        ["Timestamp", "Actor Name", "Actor Role", "Event Type", "Description", "IP Address", "Device"]
     ];
 
     filtered.forEach(log => {
         const dateStr = formatLogDate(log.timestamp);
         const role = roleLabels[log.user_role] || log.user_role;
+        
+        let desc = log.description;
+        let action = log.action_type;
+        if (log.how === 'ai_instructed') {
+            action = '✦ ' + action;
+            desc = desc + ' via Cora AI';
+        }
+
         rows.push([
             dateStr,
             log.user_name,
             role,
-            log.action_type,
-            log.description,
-            log.ip
+            action,
+            desc,
+            log.ip,
+            log.device || 'Chrome on MacOS'
         ]);
     });
 

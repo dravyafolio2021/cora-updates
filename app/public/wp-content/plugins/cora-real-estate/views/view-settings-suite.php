@@ -270,18 +270,18 @@ $roles      = wp_roles()->get_names();
                     </button>
                 </div>
                 
-                <form onsubmit="handleCreateBranch(event)" class="flex-1 overflow-y-auto p-6 space-y-5">
+                <div class="flex-1 overflow-y-auto p-6 space-y-5">
                     <div>
                         <label class="block text-xs font-bold text-zinc-800 mb-1.5">Branch Office Name</label>
-                        <input type="text" id="new-branch-name" required placeholder="e.g. Westside HQ" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
+                        <input type="text" id="new-branch-name" required placeholder="e.g. Westside HQ" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-955">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-zinc-800 mb-1.5">City</label>
-                        <input type="text" id="new-branch-city" required placeholder="e.g. Mumbai" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
+                        <input type="text" id="new-branch-city" required placeholder="e.g. Mumbai" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-955">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-zinc-800 mb-1.5">Office Address</label>
-                        <input type="text" id="new-branch-address" required placeholder="e.g. 402, Bandra Kurla Complex" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
+                        <input type="text" id="new-branch-address" required placeholder="e.g. 402, Bandra Kurla Complex" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-955">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-zinc-800 mb-1.5">Assign Branch Manager</label>
@@ -297,9 +297,9 @@ $roles      = wp_roles()->get_names();
                     </div>
                     
                     <div class="pt-4">
-                        <button type="submit" id="create-branch-btn" class="w-full py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm">Initialize Branch</button>
+                        <button type="button" onclick="handleCreateBranch(event)" id="create-branch-btn" class="w-full py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm">Initialize Branch</button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
 
@@ -313,7 +313,7 @@ $roles      = wp_roles()->get_names();
                     </button>
                 </div>
                 
-                <form onsubmit="handleEditBranch(event)" class="flex-1 overflow-y-auto p-6 space-y-5">
+                <div class="flex-1 overflow-y-auto p-6 space-y-5">
                     <input type="hidden" id="edit-branch-id">
                     
                     <div>
@@ -342,9 +342,9 @@ $roles      = wp_roles()->get_names();
                     </div>
                     
                     <div class="pt-4">
-                        <button type="submit" id="edit-branch-btn" class="w-full py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm">Save Shifts</button>
+                        <button type="button" onclick="handleEditBranch(event)" id="edit-branch-btn" class="w-full py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm">Save Shifts</button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
 
@@ -398,11 +398,16 @@ $roles      = wp_roles()->get_names();
             }
 
             function handleCreateBranch(e) {
-                e.preventDefault();
+                if (e && e.preventDefault) e.preventDefault();
                 var name = $('#new-branch-name').val().trim();
                 var city = $('#new-branch-city').val().trim();
                 var address = $('#new-branch-address').val().trim();
                 var manager = $('#new-branch-manager').val();
+
+                if (!name || !city || !address) {
+                    window.coraShowToast('Please fill all required fields.');
+                    return;
+                }
 
                 $('#create-branch-btn').prop('disabled', true).text('Initializing branch...');
 
@@ -415,7 +420,7 @@ $roles      = wp_roles()->get_names();
                     nonce: coraREData.ajaxNonce
                 }, function(res) {
                     if (res.success) {
-                        window.coraShowToast('Branch initialized successfully.');
+                        window.coraShowToast('Branch saved successfully.');
                         closeCreateBranchDrawer();
                         setTimeout(function() { window.location.reload(); }, 1000);
                     } else {
@@ -426,12 +431,17 @@ $roles      = wp_roles()->get_names();
             }
 
             function handleEditBranch(e) {
-                e.preventDefault();
+                if (e && e.preventDefault) e.preventDefault();
                 var id = $('#edit-branch-id').val();
                 var name = $('#edit-branch-name').val().trim();
                 var city = $('#edit-branch-city').val().trim();
                 var address = $('#edit-branch-address').val().trim();
                 var manager = $('#edit-branch-manager').val();
+
+                if (!name || !city || !address) {
+                    window.coraShowToast('Please fill all required fields.');
+                    return;
+                }
 
                 $('#edit-branch-btn').prop('disabled', true).text('Saving shifts...');
 
@@ -457,23 +467,29 @@ $roles      = wp_roles()->get_names();
 
             function deleteBranch(id, crewCount) {
                 if (crewCount > 0) {
-                    alert('You cannot delete a branch with active team members. Reassign all members first.');
+                    window.coraShowToast('You cannot delete a branch with active team members. Reassign all members first.');
                     return;
                 }
 
-                if (!confirm('Are you sure you want to delete this branch?')) return;
-                
-                window.coraShowToast('Deleting branch...');
-                $.post(coraREData.ajaxUrl, {
-                    action: 'cora_ajax_delete_branch',
-                    branch_id: id,
-                    nonce: coraREData.ajaxNonce
-                }, function(res) {
-                    if (res.success) {
-                        window.coraShowToast('Branch deleted successfully.');
-                        setTimeout(function() { window.location.reload(); }, 800);
+                window.coraConfirmAction(
+                    'Confirm Deletion',
+                    'Are you sure you want to delete this branch?',
+                    function() {
+                        window.coraShowToast('Deleting branch...');
+                        $.post(coraREData.ajaxUrl, {
+                            action: 'cora_ajax_delete_branch',
+                            branch_id: id,
+                            nonce: coraREData.ajaxNonce
+                        }, function(res) {
+                            if (res.success) {
+                                window.coraShowToast('Branch deleted successfully.');
+                                setTimeout(function() { window.location.reload(); }, 800);
+                            } else {
+                                window.coraShowToast(res.data.message || 'Failed to delete branch.');
+                            }
+                        });
                     }
-                });
+                );
             }
         </script>
 

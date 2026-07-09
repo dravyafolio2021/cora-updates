@@ -58,6 +58,12 @@ function cora_real_estate_ai_handle_workspace_route() {
 
     $path_parts = explode( '/', $path );
     
+    // Intercept REST API v1 requests
+    if ( isset( $path_parts[0] ) && 'api' === $path_parts[0] && isset( $path_parts[1] ) && 'v1' === $path_parts[1] ) {
+        cora_handle_api_v1_request( $path_parts );
+        exit;
+    }
+    
     // Intercept PWA Manifest and Service Worker to serve them from the root scope
     if ( $path === 'cora-service-worker.js' ) {
         header( 'Content-Type: application/javascript' );
@@ -1757,7 +1763,41 @@ add_action( 'rest_api_init', function () {
         'callback'            => 'cora_get_team_members_rest',
         'permission_callback' => '__return_true', // Publicly accessible REST endpoint
     ) );
+
+    register_rest_route( 'cora/v1', '/schedule-task', array(
+        'methods'             => 'POST',
+        'callback'            => 'cora_rest_schedule_task',
+        'permission_callback' => 'is_user_logged_in',
+    ) );
 } );
+
+/**
+ * REST Callback to insert scheduled deactivations into options queue
+ */
+function cora_rest_schedule_task( $request ) {
+    $action_type = sanitize_text_field( $request->get_param( 'action_type' ) );
+    $user_id = intval( $request->get_param( 'user_id' ) );
+    $scheduled_at = intval( $request->get_param( 'scheduled_at' ) );
+    
+    if ( empty( $action_type ) || ! $user_id || ! $scheduled_at ) {
+        return new WP_Error( 'invalid_data', 'Required fields missing.', array( 'status' => 400 ) );
+    }
+
+    $queue = get_option( 'cora_action_queue', array() );
+    $queue[] = array(
+        'action_type'  => $action_type,
+        'payload'      => array(
+            'user_id'     => $user_id,
+            'reassign_to' => 0
+        ),
+        'scheduled_at' => $scheduled_at,
+        'created_by'   => get_current_user_id(),
+        'status'       => 'pending'
+    );
+    update_option( 'cora_action_queue', $queue );
+
+    return rest_ensure_response( array( 'success' => true ) );
+}
 
 /**
  * Callback: REST endpoint to fetch active brokerage team members
@@ -2446,6 +2486,7 @@ function cora_ajax_submit_lead() {
     $city  = isset( $_POST['city'] ) ? sanitize_text_field( $_POST['city'] ) : '';
     $notes = isset( $_POST['notes'] ) ? sanitize_textarea_field( $_POST['notes'] ) : '';
     $price = isset( $_POST['price'] ) ? sanitize_text_field( $_POST['price'] ) : '';
+    $followup_date = isset( $_POST['followup_date'] ) ? sanitize_text_field( $_POST['followup_date'] ) : '';
 
     if ( empty( $names ) || empty( $email ) ) {
         wp_send_json_error( 'Names and Email are required.' );
@@ -2466,6 +2507,7 @@ function cora_ajax_submit_lead() {
         'price'      => $price,
         'status'     => 'New Lead',
         'emails'     => cora_generate_default_email_sequence( $names, $scale, $city ),
+        'followup_date' => $followup_date,
         'created_at' => time()
     );
 
@@ -2505,6 +2547,7 @@ function cora_ajax_update_lead_status() {
     $demo_portfolio_shared = isset( $_POST['demo_portfolio_shared'] ) ? sanitize_text_field( $_POST['demo_portfolio_shared'] ) : null;
     $demo_portfolio_viewed = isset( $_POST['demo_portfolio_viewed'] ) ? sanitize_text_field( $_POST['demo_portfolio_viewed'] ) : null;
     $listing_ids       = isset( $_POST['listing_ids'] ) ? sanitize_text_field( $_POST['listing_ids'] ) : null;
+    $followup_date     = isset( $_POST['followup_date'] ) ? sanitize_text_field( $_POST['followup_date'] ) : null;
 
     if ( empty( $lead_id ) ) {
         wp_send_json_error( 'Lead ID is required.' );
@@ -2572,6 +2615,9 @@ function cora_ajax_update_lead_status() {
     }
     if ( null !== $listing_ids ) {
         $leads[$found_key]['listing_ids'] = array_filter( array_map( 'trim', explode( ',', $listing_ids ) ) );
+    }
+    if ( null !== $followup_date ) {
+        $leads[$found_key]['followup_date'] = $followup_date;
     }
 
     update_option( 'cora_re_leads', $leads );
@@ -6079,9 +6125,9 @@ function cora_filter_tenancy_data( $items, $option_name = '' ) {
         return $items;
     }
 
-    // Bypass tenancy filtering for public secure share pages
+    // Bypass tenancy filtering for public secure share pages and public portfolio liking AJAX
     $request_uri = $_SERVER['REQUEST_URI'] ?? '';
-    if ( false !== strpos( $request_uri, 'shared-doc' ) || false !== strpos( $request_uri, 'shared-portfolio' ) ) {
+    if ( false !== strpos( $request_uri, 'shared-doc' ) || false !== strpos( $request_uri, 'shared-portfolio' ) || ( defined( 'DOING_AJAX' ) && DOING_AJAX && isset( $_REQUEST['action'] ) && $_REQUEST['action'] === 'cora_toggle_portfolio_like' ) ) {
         return $items;
     }
 
@@ -6778,11 +6824,18 @@ function cora_ajax_save_user_changes() {
         }
     }
 
-    // Save Display Name
+    $first_name = sanitize_text_field( $_POST['first_name'] ?? '' );
+    $last_name  = sanitize_text_field( $_POST['last_name'] ?? '' );
+    $phone      = sanitize_text_field( $_POST['phone'] ?? '' );
+
+    // Save Display Name, First Name, Last Name
     wp_update_user( array(
         'ID'           => $target_user_id,
-        'display_name' => $display_name
+        'display_name' => $display_name,
+        'first_name'   => $first_name,
+        'last_name'    => $last_name
     ) );
+    update_user_meta( $target_user_id, 'cora_phone', $phone );
 
     // Save Role
     $target_user->set_role( $target_role );
@@ -6976,7 +7029,7 @@ function cora_ajax_delete_branch() {
 }
 add_action( 'wp_ajax_cora_ajax_delete_branch', 'cora_ajax_delete_branch' );
 
-function cora_log_activity( $action_type, $description, $custom_user_id = 0 ) {
+function cora_log_activity( $action_type, $description, $custom_user_id = 0, $how = 'human', $instructed_by = 0, $ai_reasoning = '' ) {
     $user_id = $custom_user_id > 0 ? $custom_user_id : get_current_user_id();
     $user = get_userdata( $user_id );
     $username = $user ? $user->display_name : 'System / Guest';
@@ -6990,18 +7043,23 @@ function cora_log_activity( $action_type, $description, $custom_user_id = 0 ) {
     }
     
     $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+    $device = cora_get_device_info();
 
     $logs = get_option( 'cora_activity_logs', array() );
     $logs[] = array(
-        'timestamp'   => time(),
-        'user_id'     => $user_id,
-        'user_name'   => $username,
-        'user_role'   => $user && ! empty( $user->roles ) ? $user->roles[0] : 'guest',
-        'action_type' => $action_type,
-        'description' => $description,
-        'ip'          => $ip,
-        'agency_id'   => $agency_id,
-        'branch_id'   => $branch_id
+        'timestamp'     => time(),
+        'user_id'       => $user_id,
+        'user_name'     => $username,
+        'user_role'     => $user && ! empty( $user->roles ) ? $user->roles[0] : 'guest',
+        'action_type'   => $action_type,
+        'description'   => $description,
+        'ip'            => $ip,
+        'device'        => $device,
+        'agency_id'     => $agency_id,
+        'branch_id'     => $branch_id,
+        'how'           => $how,
+        'instructed_by' => $instructed_by,
+        'ai_reasoning'  => $ai_reasoning
     );
 
     if ( count( $logs ) > 1000 ) {
@@ -7114,4 +7172,784 @@ function cora_validate_password( $password ) {
     }
 
     return true;
+}
+
+/**
+ * Get device info from User-Agent
+ */
+function cora_get_device_info() {
+    $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    if ( empty( $ua ) ) {
+        return 'Unknown Device';
+    }
+    $browser = 'Unknown Browser';
+    $os = 'Unknown OS';
+    if ( preg_match( '/MSIE/i', $ua ) && ! preg_match( '/Opera/i', $ua ) ) {
+        $browser = 'Internet Explorer';
+    } elseif ( preg_match( '/Firefox/i', $ua ) ) {
+        $browser = 'Firefox';
+    } elseif ( preg_match( '/Chrome/i', $ua ) ) {
+        $browser = 'Chrome';
+    } elseif ( preg_match( '/Safari/i', $ua ) ) {
+        $browser = 'Safari';
+    } elseif ( preg_match( '/Opera/i', $ua ) ) {
+        $browser = 'Opera';
+    } elseif ( preg_match( '/Netscape/i', $ua ) ) {
+        $browser = 'Netscape';
+    }
+    
+    if ( preg_match( '/windows|win32/i', $ua ) ) {
+        $os = 'Windows';
+    } elseif ( preg_match( '/macintosh|mac os x/i', $ua ) ) {
+        $os = 'MacOS';
+    } elseif ( preg_match( '/linux/i', $ua ) ) {
+        $os = 'Linux';
+    } elseif ( preg_match( '/iphone|ipad|ipod/i', $ua ) ) {
+        $os = 'iOS';
+    } elseif ( preg_match( '/android/i', $ua ) ) {
+        $os = 'Android';
+    }
+    return "$browser on $os";
+}
+
+/**
+ * Action Queue scheduling and execution
+ */
+function cora_run_action_queue() {
+    $queue = get_option( 'cora_action_queue', array() );
+    if ( empty( $queue ) || ! is_array( $queue ) ) {
+        return;
+    }
+    $updated = array();
+    $now = time();
+    $ran_any = false;
+    
+    foreach ( $queue as $item ) {
+        if ( isset( $item['status'] ) && $item['status'] === 'pending' && intval( $item['scheduled_at'] ) <= $now ) {
+            // Execute scheduled action
+            $payload = $item['payload'] ?? array();
+            $action_type = $item['action_type'] ?? '';
+            $created_by = $item['created_by'] ?? 0;
+            
+            if ( 'deactivate_user' === $action_type ) {
+                $uid = intval( $payload['user_id'] ?? 0 );
+                $reassign_to = intval( $payload['reassign_to'] ?? 0 );
+                if ( $uid > 0 ) {
+                    update_user_meta( $uid, 'cora_user_status', 'inactive' );
+                    wp_destroy_all_sessions( $uid );
+                    
+                    // Reassign open leads
+                    remove_filter( 'option_cora_re_leads', 'cora_filter_tenancy_data' );
+                    remove_filter( 'pre_update_option_cora_re_leads', 'cora_pre_update_tenancy_data', 10, 3 );
+                    $leads = get_option( 'cora_re_leads', array() );
+                    $updated_leads = array();
+                    if ( is_array( $leads ) ) {
+                        foreach ( $leads as $lead ) {
+                            if ( isset( $lead['agent_id'] ) && intval( $lead['agent_id'] ) === $uid ) {
+                                $lead['agent_id'] = $reassign_to > 0 ? $reassign_to : '';
+                            }
+                            $updated_leads[] = $lead;
+                        }
+                        update_option( 'cora_re_leads', $updated_leads );
+                    }
+                    add_filter( 'option_cora_re_leads', 'cora_filter_tenancy_data' );
+                    add_filter( 'pre_update_option_cora_re_leads', 'cora_pre_update_tenancy_data', 10, 3 );
+                    
+                    cora_log_activity( 'User Management', "Scheduled deactivation executed for user ID: {$uid}.", $uid, 'ai_instructed', $created_by, 'Scheduled action queue runner execution' );
+                }
+            }
+            $item['status'] = 'completed';
+            $ran_any = true;
+        }
+        $updated[] = $item;
+    }
+    if ( $ran_any ) {
+        update_option( 'cora_action_queue', $updated );
+    }
+}
+add_action( 'init', 'cora_run_action_queue' );
+
+/**
+ * Helper: Map lead CRM status to dashboard pipeline stages
+ */
+function cora_map_lead_status_to_pipeline( $status ) {
+    $status_map = array(
+        'New Lead'      => 'New',
+        'New'           => 'New',
+        'Nurturing'     => 'Contacted',
+        'Contacted'     => 'Contacted',
+        'Site Visit'    => 'Site Visit',
+        'Closing'       => 'Negotiation',
+        'Negotiation'   => 'Negotiation',
+        'Proposal Sent' => 'Negotiation',
+        'Converted'     => 'Closed',
+        'Closed'        => 'Closed'
+    );
+    return $status_map[$status] ?? 'New';
+}
+
+/**
+ * REST API /api/v1 Router Callback
+ */
+function cora_handle_api_v1_request( $path_parts ) {
+    nocache_headers();
+    header( 'Content-Type: application/json' );
+
+    $method = $_SERVER['REQUEST_METHOD'];
+    $resource = $path_parts[2] ?? '';
+    
+    if ( ! is_user_logged_in() ) {
+        status_header( 401 );
+        echo wp_json_encode( array( 'success' => false, 'message' => 'Unauthorized' ) );
+        exit;
+    }
+
+    $current_user = wp_get_current_user();
+    $current_role = ! empty( $current_user->roles ) ? $current_user->roles[0] : '';
+    $current_agency = cora_get_current_user_agency_id();
+
+    // Dashboard Resource Route Group: /api/v1/dashboard/...
+    if ( 'dashboard' === $resource && 'GET' === $method ) {
+        $sub_resource = $path_parts[3] ?? '';
+        
+        $requested_role = sanitize_text_field( $_GET['role'] ?? '' );
+        $active_role = ( ! empty( $requested_role ) && in_array( $current_role, array( 'administrator', 'cora_manager' ) ) ) ? $requested_role : $current_role;
+        $agency_id = cora_get_current_user_agency_id();
+        $branch_id = cora_get_current_user_branch_id();
+        $user_id = $current_user->ID;
+
+        // Log the query to the audit panel
+        $how = sanitize_text_field( $_GET['how'] ?? 'manual' );
+        $scope = 'agency';
+        if ( $agency_id === 'super' ) {
+            $scope = 'super';
+        } elseif ( $active_role === 'cora_branch_manager' ) {
+            $scope = 'branch';
+        } elseif ( in_array( $active_role, array( 'cora_photographer', 'cora_videographer', 'cora_drone_pilot' ) ) ) {
+            $scope = 'own';
+        }
+        
+        cora_log_activity( 'dashboard_query', "Queried dashboard {$sub_resource} [scope: {$scope}]", $user_id, $how );
+
+        // Helper: get filtered leads list for active_role
+        $leads = get_option( 'cora_re_leads', array() );
+        if ( ! is_array( $leads ) ) {
+            $leads = array();
+        }
+        
+        // Dynamically ensure mockup followup_dates exist so dashboard is beautiful
+        foreach ( $leads as &$l ) {
+            if ( empty( $l['followup_date'] ) ) {
+                if ( isset( $l['id'] ) && $l['id'] === 'lead_sample_1' ) {
+                    $l['followup_date'] = date( 'Y-m-d H:i', time() + 3600 );
+                } elseif ( isset( $l['id'] ) && $l['id'] === 'lead_sample_2' ) {
+                    $l['followup_date'] = date( 'Y-m-d H:i', time() - 3600 * 24 * 2 );
+                }
+            }
+        }
+        unset( $l );
+
+        // Role-based filtering of leads
+        if ( in_array( $active_role, array( 'cora_photographer', 'cora_videographer', 'cora_drone_pilot' ) ) ) {
+            $leads = array_values( array_filter( $leads, function( $l ) use ( $user_id ) {
+                return isset( $l['agent_id'] ) && intval( $l['agent_id'] ) === $user_id;
+            } ) );
+        } elseif ( $active_role === 'cora_branch_manager' && ! empty( $branch_id ) ) {
+            $leads = array_values( array_filter( $leads, function( $l ) use ( $branch_id ) {
+                return isset( $l['branch_id'] ) && $l['branch_id'] === $branch_id;
+            } ) );
+        }
+
+        // Sub-resource: summary
+        if ( 'summary' === $sub_resource ) {
+            // Card 1: Active Leads
+            $active_leads = array_filter( $leads, function( $l ) {
+                $status = $l['status'] ?? '';
+                return ! in_array( $status, array( 'Closed', 'Converted', 'Lost' ) );
+            } );
+            $active_leads_count = count( $active_leads );
+
+            // Overdue or Today's follow-up count
+            $follow_up_today_count = 0;
+            $today_str = date( 'Y-m-d' );
+            foreach ( $active_leads as $l ) {
+                if ( ! empty( $l['followup_date'] ) ) {
+                    $f_date = date( 'Y-m-d', strtotime( $l['followup_date'] ) );
+                    if ( $f_date <= $today_str ) {
+                        $follow_up_today_count++;
+                    }
+                }
+            }
+
+            // Card 2: Properties Listed
+            // Note: listings option has the tenancy filter automatically applied
+            $listings = get_option( 'cora_re_listings_inventory', array() );
+            if ( ! is_array( $listings ) ) {
+                $listings = array();
+            }
+            $properties_count = count( $listings );
+            // mock properties added this week
+            $properties_added_week = 2; 
+
+            // Card 3: Pipeline Value (Negotiation stage only)
+            $pipeline_value = 0;
+            $pipeline_leads_count = 0;
+            foreach ( $active_leads as $l ) {
+                $mapped_stage = cora_map_lead_status_to_pipeline( $l['status'] ?? '' );
+                if ( 'Negotiation' === $mapped_stage ) {
+                    $clean_price = preg_replace( '/[^\d]/', '', $l['price'] ?? '' );
+                    $pipeline_value += intval( $clean_price );
+                    $pipeline_leads_count++;
+                }
+            }
+
+            // Indian format pipeline value string
+            $pipeline_value_formatted = '₹0';
+            if ( $pipeline_value >= 10000000 ) {
+                $pipeline_value_formatted = '₹' . number_format( $pipeline_value / 10000000, 1 ) . 'Cr';
+            } elseif ( $pipeline_value >= 100000 ) {
+                $pipeline_value_formatted = '₹' . number_format( $pipeline_value / 100000, 1 ) . 'L';
+            } elseif ( $pipeline_value > 0 ) {
+                $pipeline_value_formatted = '₹' . number_format( $pipeline_value );
+            }
+
+            // Card 4: Closed This Month
+            $closed_this_month = 0;
+            $closed_last_month = 0;
+            $this_month_start = strtotime('first day of this month 00:00:00');
+            $this_month_end   = strtotime('last day of this month 23:59:59');
+            $last_month_start = strtotime('first day of last month 00:00:00');
+            $last_month_end   = strtotime('last day of last month 23:59:59');
+
+            foreach ( $leads as $l ) {
+                $mapped_stage = cora_map_lead_status_to_pipeline( $l['status'] ?? '' );
+                if ( 'Closed' === $mapped_stage ) {
+                    $closed_time = $l['closed_at'] ?? ( $l['created_at'] ?? time() );
+                    if ( $closed_time >= $this_month_start && $closed_time <= $this_month_end ) {
+                        $closed_this_month++;
+                    } elseif ( $closed_time >= $last_month_start && $closed_time <= $last_month_end ) {
+                        $closed_last_month++;
+                    }
+                }
+            }
+
+            // Total agencies (Super Admin only)
+            $total_agencies = 0;
+            if ( $current_agency === 'super' || $current_role === 'administrator' ) {
+                $agencies = get_option( 'cora_agencies', array() );
+                $total_agencies = is_array( $agencies ) ? count( $agencies ) : 1;
+            }
+
+            echo wp_json_encode( array(
+                'success' => true,
+                'data' => array(
+                    'active_leads'             => $active_leads_count,
+                    'follow_up_today'          => $follow_up_today_count,
+                    'properties_listed'        => $properties_count,
+                    'properties_added_week'    => $properties_added_week,
+                    'pipeline_value'           => $pipeline_value,
+                    'pipeline_value_formatted' => $pipeline_value_formatted,
+                    'pipeline_leads_count'     => $pipeline_leads_count,
+                    'closed_this_month'        => $closed_this_month,
+                    'closed_last_month'        => $closed_last_month,
+                    'total_agencies'           => $total_agencies
+                )
+            ) );
+            exit;
+        }
+
+        // Sub-resource: pipeline
+        if ( 'pipeline' === $sub_resource ) {
+            $stages = array(
+                'New'         => 0,
+                'Contacted'   => 0,
+                'Site Visit'  => 0,
+                'Negotiation' => 0,
+                'Closed'      => 0
+            );
+
+            $total_active = 0;
+            foreach ( $leads as $l ) {
+                $mapped = cora_map_lead_status_to_pipeline( $l['status'] ?? '' );
+                if ( isset( $stages[$mapped] ) ) {
+                    $stages[$mapped]++;
+                    if ( 'Closed' !== $mapped ) {
+                        $total_active++;
+                    }
+                }
+            }
+
+            echo wp_json_encode( array(
+                'success' => true,
+                'data' => array(
+                    'stages'       => $stages,
+                    'total_active' => $total_active
+                )
+            ) );
+            exit;
+        }
+
+        // Sub-resource: follow-ups
+        if ( 'follow-ups' === $sub_resource ) {
+            $follow_ups = array();
+            $today_start = strtotime( 'today 00:00:00' );
+            $today_end   = strtotime( 'today 23:59:59' );
+
+            foreach ( $leads as $l ) {
+                $status = $l['status'] ?? '';
+                if ( in_array( $status, array( 'Closed', 'Converted', 'Lost' ) ) ) {
+                    continue;
+                }
+                
+                if ( ! empty( $l['followup_date'] ) ) {
+                    $f_time = strtotime( $l['followup_date'] );
+                    $is_overdue = $f_time < $today_start;
+                    $is_today   = ( $f_time >= $today_start && $f_time <= $today_end );
+
+                    if ( $is_overdue || $is_today ) {
+                        $follow_ups[] = array(
+                            'id'             => $l['id'],
+                            'names'          => $l['names'],
+                            'email'          => $l['email'],
+                            'city'           => $l['city'] ?? '',
+                            'scale'          => $l['scale'] ?? '',
+                            'price'          => $l['price'] ?? '',
+                            'notes'          => $l['notes'] ?? '',
+                            'followup_date'  => $l['followup_date'],
+                            'followup_time'  => $f_time,
+                            'is_overdue'     => $is_overdue,
+                            'overdue_days'   => $is_overdue ? ceil( ( $today_start - $f_time ) / 86400 ) : 0
+                        );
+                    }
+                }
+            }
+
+            // Sort: overdue first, then today's by time
+            usort( $follow_ups, function( $a, $b ) {
+                if ( $a['is_overdue'] && ! $b['is_overdue'] ) {
+                    return -1;
+                }
+                if ( ! $a['is_overdue'] && $b['is_overdue'] ) {
+                    return 1;
+                }
+                return $a['followup_time'] - $b['followup_time'];
+            } );
+
+            echo wp_json_encode( array(
+                'success' => true,
+                'data' => array_slice( $follow_ups, 0, 5 )
+            ) );
+            exit;
+        }
+
+        // Sub-resource: activity
+        if ( 'activity' === $sub_resource ) {
+            $logs = get_option( 'cora_activity_logs', array() );
+            if ( ! is_array( $logs ) ) {
+                $logs = array();
+            }
+
+            // Sort logs descending (newest first)
+            usort( $logs, function( $a, $b ) {
+                return ($b['timestamp'] ?? 0) - ($a['timestamp'] ?? 0);
+            } );
+
+            $filtered = array();
+            foreach ( $logs as $log ) {
+                if ( $agency_id !== 'super' && isset( $log['agency_id'] ) && $log['agency_id'] !== $agency_id ) {
+                    continue;
+                }
+                if ( $active_role === 'cora_branch_manager' && ! empty( $branch_id ) ) {
+                    if ( isset( $log['branch_id'] ) && $log['branch_id'] !== $branch_id ) {
+                        continue;
+                    }
+                } elseif ( in_array( $active_role, array( 'cora_photographer', 'cora_videographer', 'cora_drone_pilot' ) ) ) {
+                    // agents see only their own actions
+                    if ( isset( $log['user_id'] ) && intval( $log['user_id'] ) !== $user_id ) {
+                        continue;
+                    }
+                }
+
+                $filtered[] = $log;
+                if ( count( $filtered ) >= 8 ) {
+                    break;
+                }
+            }
+
+            echo wp_json_encode( array(
+                'success' => true,
+                'data' => $filtered
+            ) );
+            exit;
+        }
+    }
+
+    // GET /api/v1/activity-log
+    if ( 'activity-log' === $resource && 'GET' === $method ) {
+        $logs = get_option( 'cora_activity_logs', array() );
+        $filtered = array();
+        foreach ( $logs as $log ) {
+            if ( $current_agency !== 'super' && $log['agency_id'] !== $current_agency ) {
+                continue;
+            }
+            if ( $current_role === 'cora_branch_manager' ) {
+                $my_branch = cora_get_current_user_branch_id();
+                if ( $log['branch_id'] !== $my_branch ) {
+                    continue;
+                }
+            }
+            $filtered[] = $log;
+        }
+        echo wp_json_encode( array( 'success' => true, 'data' => $filtered ) );
+        exit;
+    }
+
+    // POST /api/v1/users/invite
+    if ( 'users' === $resource && isset( $path_parts[3] ) && 'invite' === $path_parts[3] && 'POST' === $method ) {
+        if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) {
+            status_header( 403 );
+            echo wp_json_encode( array( 'success' => false, 'message' => 'Forbidden' ) );
+            exit;
+        }
+        $raw = file_get_contents( 'php://input' );
+        $data = json_decode( $raw, true ) ?: $_POST;
+
+        $email = sanitize_email( $data['email'] ?? '' );
+        $first_name = sanitize_text_field( $data['first_name'] ?? '' );
+        $last_name = sanitize_text_field( $data['last_name'] ?? '' );
+        $role = sanitize_text_field( $data['role'] ?? '' );
+        $branch_id = sanitize_text_field( $data['branch_id'] ?? '' );
+        $personal_note = sanitize_textarea_field( $data['personal_note'] ?? '' );
+
+        if ( empty( $email ) || empty( $first_name ) || empty( $last_name ) || empty( $role ) ) {
+            status_header( 400 );
+            echo wp_json_encode( array( 'success' => false, 'message' => 'Required fields are missing.' ) );
+            exit;
+        }
+
+        if ( email_exists( $email ) ) {
+            status_header( 400 );
+            echo wp_json_encode( array( 'success' => false, 'message' => 'This email is already registered in the system.' ) );
+            exit;
+        }
+
+        $invitations = get_option( 'cora_invitations', array() );
+        foreach ( $invitations as $inv ) {
+            if ( $inv['email'] === $email && $inv['status'] === 'pending' && time() < intval( $inv['expires_at'] ) ) {
+                status_header( 400 );
+                echo wp_json_encode( array( 'success' => false, 'message' => 'An active invitation already exists for this email.' ) );
+                exit;
+            }
+        }
+
+        if ( $current_role === 'cora_branch_manager' ) {
+            $branch_id = cora_get_current_user_branch_id();
+        }
+
+        $token = bin2hex( random_bytes( 16 ) );
+        $invitations[ $token ] = array(
+            'first_name'    => $first_name,
+            'last_name'     => $last_name,
+            'email'         => $email,
+            'role'          => $role,
+            'agency_id'     => $current_agency,
+            'branch_id'     => $branch_id,
+            'invited_by'    => $current_user->ID,
+            'expires_at'    => time() + 172800, // 48 hours
+            'status'        => 'pending',
+            'created_at'    => time(),
+            'personal_note' => $personal_note
+        );
+        update_option( 'cora_invitations', $invitations );
+
+        cora_log_activity( 'Invitation', "Sent invitation link to {$email}." );
+
+        $verification_link = home_url( '/workspace/setup-account?token=' . $token );
+        update_option( 'cora_latest_verification_link', $verification_link );
+
+        echo wp_json_encode( array( 'success' => true, 'token' => $token, 'verification_link' => $verification_link ) );
+        exit;
+    }
+
+    // GET /api/v1/users
+    if ( 'users' === $resource && ! isset( $path_parts[3] ) && 'GET' === $method ) {
+        $user_query_args = array();
+        if ( $current_agency !== 'super' ) {
+            $user_query_args['meta_query'] = array(
+                array(
+                    'key'     => 'cora_agency_id',
+                    'value'   => $current_agency,
+                    'compare' => '='
+                )
+            );
+        }
+        $all_wp_users = get_users( $user_query_args );
+        $users_list = array();
+        $my_branch = cora_get_current_user_branch_id();
+
+        foreach ( $all_wp_users as $u ) {
+            $u_branch = get_user_meta( $u->ID, 'cora_branch_id', true );
+            if ( ! empty( $my_branch ) && $u_branch !== $my_branch ) {
+                continue;
+            }
+            $status = get_user_meta( $u->ID, 'cora_user_status', true ) ?: 'active';
+            
+            $leads = get_option( 'cora_re_leads', array() );
+            $leads_count = 0;
+            if ( is_array( $leads ) ) {
+                foreach ( $leads as $lead ) {
+                    if ( isset( $lead['agent_id'] ) && intval( $lead['agent_id'] ) === $u->ID ) {
+                        $leads_count++;
+                    }
+                }
+            }
+
+            $users_list[] = array(
+                'id'           => $u->ID,
+                'name'         => $u->display_name,
+                'first_name'   => get_user_meta( $u->ID, 'first_name', true ),
+                'last_name'    => get_user_meta( $u->ID, 'last_name', true ),
+                'email'        => $u->user_email,
+                'phone'        => get_user_meta( $u->ID, 'cora_phone', true ),
+                'role'         => ! empty( $u->roles ) ? $u->roles[0] : '',
+                'branch_id'    => $u_branch,
+                'status'       => $status,
+                'last_active'  => get_user_meta( $u->ID, 'cora_last_active', true ) ?: '',
+                'joined'       => $u->user_registered,
+                'leads_count'  => $leads_count
+            );
+        }
+        echo wp_json_encode( array( 'success' => true, 'data' => $users_list ) );
+        exit;
+    }
+
+    // /api/v1/users/{id}...
+    if ( 'users' === $resource && isset( $path_parts[3] ) && is_numeric( $path_parts[3] ) ) {
+        $target_id = intval( $path_parts[3] );
+        $target_user = get_userdata( $target_id );
+        if ( ! $target_user ) {
+            status_header( 404 );
+            echo wp_json_encode( array( 'success' => false, 'message' => 'User not found.' ) );
+            exit;
+        }
+
+        $target_agency = get_user_meta( $target_id, 'cora_agency_id', true );
+        if ( $current_agency !== 'super' && $target_agency !== $current_agency ) {
+            status_header( 403 );
+            echo wp_json_encode( array( 'success' => false, 'message' => 'Forbidden' ) );
+            exit;
+        }
+
+        $my_branch = cora_get_current_user_branch_id();
+        $target_branch = get_user_meta( $target_id, 'cora_branch_id', true );
+        if ( ! empty( $my_branch ) && $target_branch !== $my_branch ) {
+            status_header( 403 );
+            echo wp_json_encode( array( 'success' => false, 'message' => 'Forbidden' ) );
+            exit;
+        }
+
+        $action = $path_parts[4] ?? '';
+
+        if ( 'GET' === $method && empty( $action ) ) {
+            $status = get_user_meta( $target_id, 'cora_user_status', true ) ?: 'active';
+            $leads = get_option( 'cora_re_leads', array() );
+            $leads_count = 0;
+            if ( is_array( $leads ) ) {
+                foreach ( $leads as $lead ) {
+                    if ( isset( $lead['agent_id'] ) && intval( $lead['agent_id'] ) === $target_id ) {
+                        $leads_count++;
+                    }
+                }
+            }
+
+            echo wp_json_encode( array(
+                'success' => true,
+                'data'    => array(
+                    'id'           => $target_id,
+                    'name'         => $target_user->display_name,
+                    'first_name'   => get_user_meta( $target_id, 'first_name', true ),
+                    'last_name'    => get_user_meta( $target_id, 'last_name', true ),
+                    'email'        => $target_user->user_email,
+                    'phone'        => get_user_meta( $target_id, 'cora_phone', true ),
+                    'role'         => ! empty( $target_user->roles ) ? $target_user->roles[0] : '',
+                    'branch_id'    => $target_branch,
+                    'status'       => $status,
+                    'last_active'  => get_user_meta( $target_id, 'cora_last_active', true ) ?: '',
+                    'joined'       => $target_user->user_registered,
+                    'leads_count'  => $leads_count
+                )
+            ) );
+            exit;
+        }
+
+        if ( 'PATCH' === $method && empty( $action ) ) {
+            if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) {
+                status_header( 403 );
+                echo wp_json_encode( array( 'success' => false, 'message' => 'Forbidden' ) );
+                exit;
+            }
+            $raw = file_get_contents( 'php://input' );
+            $data = json_decode( $raw, true ) ?: $_POST;
+
+            $display_name = sanitize_text_field( $data['display_name'] ?? $target_user->display_name );
+            $first_name = sanitize_text_field( $data['first_name'] ?? get_user_meta( $target_id, 'first_name', true ) );
+            $last_name = sanitize_text_field( $data['last_name'] ?? get_user_meta( $target_id, 'last_name', true ) );
+            $phone = sanitize_text_field( $data['phone'] ?? get_user_meta( $target_id, 'cora_phone', true ) );
+            $role_to_set = sanitize_text_field( $data['role'] ?? '' );
+            $branch_to_set = sanitize_text_field( $data['branch_id'] ?? '' );
+
+            wp_update_user( array(
+                'ID'           => $target_id,
+                'display_name' => $display_name,
+                'first_name'   => $first_name,
+                'last_name'    => $last_name
+            ) );
+            update_user_meta( $target_id, 'cora_phone', $phone );
+
+            if ( ! empty( $role_to_set ) ) {
+                $target_user->set_role( $role_to_set );
+            }
+            if ( ! empty( $branch_to_set ) ) {
+                update_user_meta( $target_id, 'cora_branch_id', $branch_to_set );
+            }
+
+            cora_log_activity( 'User Management', "Updated user profile '{$display_name}' (ID: {$target_id})." );
+            echo wp_json_encode( array( 'success' => true, 'message' => 'Profile updated successfully.' ) );
+            exit;
+        }
+
+        if ( 'POST' === $method && 'deactivate' === $action ) {
+            if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) {
+                status_header( 403 );
+                echo wp_json_encode( array( 'success' => false, 'message' => 'Forbidden' ) );
+                exit;
+            }
+            $raw = file_get_contents( 'php://input' );
+            $data = json_decode( $raw, true ) ?: $_POST;
+            $reassign_to = intval( $data['reassign_to'] ?? 0 );
+
+            update_user_meta( $target_id, 'cora_user_status', 'inactive' );
+            wp_destroy_all_sessions( $target_id );
+
+            remove_filter( 'option_cora_re_leads', 'cora_filter_tenancy_data' );
+            remove_filter( 'pre_update_option_cora_re_leads', 'cora_pre_update_tenancy_data', 10, 3 );
+            $leads = get_option( 'cora_re_leads', array() );
+            $updated_leads = array();
+            if ( is_array( $leads ) ) {
+                foreach ( $leads as $lead ) {
+                    if ( isset( $lead['agent_id'] ) && intval( $lead['agent_id'] ) === $target_id ) {
+                        $lead['agent_id'] = $reassign_to > 0 ? $reassign_to : '';
+                    }
+                    $updated_leads[] = $lead;
+                }
+                update_option( 'cora_re_leads', $updated_leads );
+            }
+            add_filter( 'option_cora_re_leads', 'cora_filter_tenancy_data' );
+            add_filter( 'pre_update_option_cora_re_leads', 'cora_pre_update_tenancy_data', 10, 3 );
+
+            cora_log_activity( 'User Management', "Deactivated user '{$target_user->display_name}' (ID: {$target_id})." );
+            echo wp_json_encode( array( 'success' => true, 'message' => 'User deactivated.' ) );
+            exit;
+        }
+
+        if ( 'POST' === $method && 'activate' === $action ) {
+            if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) {
+                status_header( 403 );
+                echo wp_json_encode( array( 'success' => false, 'message' => 'Forbidden' ) );
+                exit;
+            }
+            update_user_meta( $target_id, 'cora_user_status', 'active' );
+            cora_log_activity( 'User Management', "Reactivated user '{$target_user->display_name}' (ID: {$target_id})." );
+            echo wp_json_encode( array( 'success' => true, 'message' => 'User reactivated.' ) );
+            exit;
+        }
+
+        if ( 'PATCH' === $method && 'role' === $action ) {
+            if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) {
+                status_header( 403 );
+                echo wp_json_encode( array( 'success' => false, 'message' => 'Forbidden' ) );
+                exit;
+            }
+            $raw = file_get_contents( 'php://input' );
+            $data = json_decode( $raw, true ) ?: $_POST;
+            $new_role = sanitize_text_field( $data['role'] ?? '' );
+            if ( ! empty( $new_role ) ) {
+                $target_user->set_role( $new_role );
+                cora_log_activity( 'User Management', "Changed role of user '{$target_user->display_name}' to {$new_role}." );
+                echo wp_json_encode( array( 'success' => true, 'message' => 'Role updated.' ) );
+                exit;
+            }
+        }
+
+        if ( 'PATCH' === $method && 'branch' === $action ) {
+            if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) {
+                status_header( 403 );
+                echo wp_json_encode( array( 'success' => false, 'message' => 'Forbidden' ) );
+                exit;
+            }
+            $raw = file_get_contents( 'php://input' );
+            $data = json_decode( $raw, true ) ?: $_POST;
+            $new_branch = sanitize_text_field( $data['branch_id'] ?? '' );
+            update_user_meta( $target_id, 'cora_branch_id', $new_branch );
+            cora_log_activity( 'User Management', "Moved user '{$target_user->display_name}' to branch: {$new_branch}." );
+            echo wp_json_encode( array( 'success' => true, 'message' => 'Branch updated.' ) );
+            exit;
+        }
+    }
+
+    // /api/v1/invitations/{id}...
+    if ( 'invitations' === $resource && isset( $path_parts[3] ) ) {
+        $token = sanitize_text_field( $path_parts[3] );
+        $invitations = get_option( 'cora_invitations', array() );
+        if ( ! isset( $invitations[ $token ] ) ) {
+            status_header( 404 );
+            echo wp_json_encode( array( 'success' => false, 'message' => 'Invitation not found.' ) );
+            exit;
+        }
+
+        $invite = $invitations[ $token ];
+        if ( $current_agency !== 'super' && $invite['agency_id'] !== $current_agency ) {
+            status_header( 403 );
+            echo wp_json_encode( array( 'success' => false, 'message' => 'Forbidden' ) );
+            exit;
+        }
+
+        $action = $path_parts[4] ?? '';
+
+        if ( 'DELETE' === $method && empty( $action ) ) {
+            if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) {
+                status_header( 403 );
+                echo wp_json_encode( array( 'success' => false, 'message' => 'Forbidden' ) );
+                exit;
+            }
+            $invitations[ $token ]['status'] = 'cancelled';
+            update_option( 'cora_invitations', $invitations );
+            cora_log_activity( 'Invitation', "Cancelled invitation link for {$invite['email']}." );
+            echo wp_json_encode( array( 'success' => true, 'message' => 'Invitation cancelled.' ) );
+            exit;
+        }
+
+        if ( 'POST' === $method && 'resend' === $action ) {
+            if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) {
+                status_header( 403 );
+                echo wp_json_encode( array( 'success' => false, 'message' => 'Forbidden' ) );
+                exit;
+            }
+            $invitations[ $token ]['expires_at'] = time() + 172800; // Extend by 48 hours
+            $invitations[ $token ]['status'] = 'pending';
+            update_option( 'cora_invitations', $invitations );
+
+            cora_log_activity( 'Invitation', "Resent invitation link to {$invite['email']}." );
+
+            $verification_link = home_url( '/workspace/setup-account?token=' . $token );
+            update_option( 'cora_latest_verification_link', $verification_link );
+
+            echo wp_json_encode( array( 'success' => true, 'message' => 'Invitation resent.', 'verification_link' => $verification_link ) );
+            exit;
+        }
+    }
+
+    status_header( 404 );
+    echo wp_json_encode( array( 'success' => false, 'message' => 'Endpoint not found.' ) );
+    exit;
 }

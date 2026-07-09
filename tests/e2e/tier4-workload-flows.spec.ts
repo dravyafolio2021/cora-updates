@@ -37,7 +37,7 @@ test.describe('Tier 4: Workload Flows', () => {
     await page.click('button[onclick="coraOpenNewMenuDrawer()"]');
     await page.waitForSelector('#cora-drawer-new-menu:not(.translate-x-full)', { state: 'visible' });
 
-    const menuName = `RedesignMenu_${Math.floor(Math.random() * 1000)}`;
+    const menuName = `RedesignMenu_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
     await page.fill('#cora-new-menu-name', menuName);
     await page.click('#cora-drawer-new-menu button:has-text("Create Menu")');
     await expect(page.locator('#cora-toast-container')).toContainText('Menu created successfully.');
