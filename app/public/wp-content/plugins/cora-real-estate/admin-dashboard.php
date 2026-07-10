@@ -8311,12 +8311,12 @@ wp_print_footer_scripts();
 
 <!-- Cora Advanced Command Search Modal (Command Palette) -->
 <div id="cora-command-palette" class="fixed inset-0 z-[999999] hidden flex items-start justify-center p-4 pt-[12vh] bg-zinc-950/40 backdrop-blur-sm transition-all duration-200">
-    <div class="cora-command-container w-full max-w-lg bg-white border border-zinc-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[440px] transition-transform transform scale-95 duration-200">
+    <div class="cora-command-container w-full max-w-2xl bg-white border border-zinc-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[380px] transition-transform transform scale-95 duration-200">
         
         <!-- Search Input Header -->
-        <div class="flex items-center gap-3 px-4 border-b border-zinc-100 py-3 shrink-0">
-            <svg class="text-zinc-400 shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="cora-command-input" placeholder="Search pages, settings, leads, or listings..." class="flex-1 text-xs bg-transparent border-0 outline-none focus:ring-0 text-zinc-900 placeholder-zinc-400 py-0.5" autocomplete="off">
+        <div class="flex items-center gap-3 px-4 border-b border-zinc-100 py-3.5 shrink-0">
+            <svg class="text-zinc-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="cora-command-input" placeholder="Search pages, settings, leads, or listings..." class="flex-1 text-sm bg-transparent border-0 outline-none focus:ring-0 text-zinc-900 placeholder-zinc-400 py-0.5" autocomplete="off">
             <kbd class="text-[9px] font-mono bg-zinc-100 px-1.5 py-0.5 rounded text-zinc-450 border border-zinc-200/60 shadow-sm shrink-0">⌘K</kbd>
         </div>
 
@@ -8330,15 +8330,15 @@ wp_print_footer_scripts();
         </div>
 
         <!-- Results List Area -->
-        <div class="flex-1 overflow-y-auto p-1.5 max-h-[280px]" id="cora-command-results">
+        <div class="flex-1 overflow-y-auto p-2" id="cora-command-results">
             <!-- Loading state / Suggestions list / Search results list -->
         </div>
 
         <!-- Footer Bar -->
-        <div class="border-t border-zinc-100 px-4 py-2 bg-zinc-50/50 flex items-center justify-between shrink-0">
-            <span class="text-[11px] text-zinc-400 font-medium">Need help finding something?</span>
-            <button type="button" class="px-2.5 py-1 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold text-[11px] rounded-lg transition-colors shadow-sm flex items-center gap-1.5 cursor-pointer" onclick="coraTriggerCommandAI()">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <div class="border-t border-zinc-100 px-4 py-2.5 bg-zinc-50/50 flex items-center justify-between shrink-0">
+            <span class="text-xs text-zinc-400 font-medium">Need help finding something?</span>
+            <button type="button" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold text-xs rounded-lg transition-colors shadow-sm flex items-center gap-1.5 cursor-pointer" onclick="coraTriggerCommandAI()">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 Ask Cora
             </button>
         </div>
@@ -8356,7 +8356,7 @@ wp_print_footer_scripts();
 .cora-command-item.selected {
     background-color: #f4f4f5 !important;
 }
-.cora-command-item.selected .w-8 {
+.cora-command-item.selected .w-9 {
     background-color: #ffffff !important;
     border-color: #d4d4d8 !important;
 }
@@ -8405,14 +8405,14 @@ wp_print_footer_scripts();
 .cora-dark-theme .cora-command-item.selected {
     background-color: #27272a !important;
 }
-.cora-dark-theme .cora-command-item.selected .w-8 {
+.cora-dark-theme .cora-command-item.selected .w-9 {
     background-color: #18181b !important;
     border-color: #3f3f46 !important;
 }
 .cora-dark-theme .cora-command-item.selected span.text-zinc-300 {
     color: #f4f4f5 !important;
 }
-.cora-dark-theme .cora-command-item .w-8 {
+.cora-dark-theme .cora-command-item .w-9 {
     background-color: #18181b;
     border-color: #27272a;
     color: #f4f4f5;
@@ -8506,18 +8506,18 @@ wp_print_footer_scripts();
                 let html = '<div class="space-y-0.5">';
                 data.data.results.forEach((item, index) => {
                     html += `
-                        <a href="${item.url}" class="cora-command-item flex items-center justify-between p-1.5 rounded-lg transition-all duration-150 cursor-pointer text-decoration-none group" data-index="${index}">
-                            <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                                <span class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/50 group-hover:bg-white group-hover:border-zinc-300 transition-colors shrink-0">
+                        <a href="${item.url}" class="cora-command-item flex items-center justify-between p-2.5 rounded-xl transition-all duration-150 cursor-pointer text-decoration-none group" data-index="${index}">
+                            <div class="flex items-center gap-3">
+                                <span class="w-9 h-9 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/50 group-hover:bg-white group-hover:border-zinc-300 transition-colors">
                                     ${getIconSVG(item.icon)}
                                 </span>
-                                <div class="space-y-0 min-w-0 flex-1">
-                                    <div class="text-[11px] font-bold text-zinc-900 truncate">${item.title}</div>
-                                    <p class="text-[9px] text-zinc-400 truncate">${item.description}</p>
+                                <div class="space-y-0.5">
+                                    <div class="text-xs font-bold text-zinc-900">${item.title}</div>
+                                    <p class="text-[10px] text-zinc-400 line-clamp-1">${item.description}</p>
                                 </div>
                             </div>
-                            <span class="text-zinc-300 group-hover:text-zinc-800 transition-colors shrink-0 pl-2">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></span >
+                            <span class="text-zinc-300 group-hover:text-zinc-800 transition-colors">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></span >
                             </span>
                         </a>
                     `;
