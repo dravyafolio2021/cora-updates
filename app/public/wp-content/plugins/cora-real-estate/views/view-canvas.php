@@ -20,7 +20,16 @@ if ( ! $live_theme ) {
 }
 $live_settings = $live_theme ? (json_decode($live_theme['settings'], true) ?: array()) : array();
 
-// Fetch all themes
+// Fetch all themes and automatically clean up excess drafts
+$all_draft_ids = $wpdb->get_col( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status != 'live' ORDER BY id DESC" );
+if ( count( $all_draft_ids ) > 3 ) {
+    $to_delete_ids = array_slice( $all_draft_ids, 3 );
+    $ids_placeholder = implode( ',', array_map( 'intval', $to_delete_ids ) );
+    $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_canvas_themes WHERE id IN ($ids_placeholder)" );
+    // Delete associated pages to prevent orphaned records
+    $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id IN ($ids_placeholder)" );
+}
+
 $themes = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes ORDER BY status = 'live' DESC, id DESC", ARRAY_A );
 
 // Fetch WP pages for dropdown selectors

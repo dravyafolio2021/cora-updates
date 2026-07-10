@@ -6059,13 +6059,15 @@ function cora_ajax_save_system_settings_suite() {
         'cora_workspace_name',
         'cora_workspace_address',
         'cora_workspace_tax_details',
-        'cora_pwd_policy_min_len'
+        'cora_pwd_policy_min_len',
+        'cora_activity_logs_retention',
+        'cora_workspace_allow_tours'
     );
 
     foreach ( $fields as $field ) {
         if ( isset( $_POST[ $field ] ) ) {
             $val = $_POST[ $field ];
-            if ( in_array( $field, array( 'users_can_register', 'blog_public', 'default_pingback_flag', 'comment_moderation', 'cora_pwd_policy_min_len' ) ) ) {
+            if ( in_array( $field, array( 'users_can_register', 'blog_public', 'default_pingback_flag', 'comment_moderation', 'cora_pwd_policy_min_len', 'cora_activity_logs_retention', 'cora_workspace_allow_tours' ) ) ) {
                 $val = intval( $val );
             } elseif ( in_array( $field, array( 'page_on_front', 'page_for_posts', 'default_category', 'wp_page_for_privacy_policy' ) ) ) {
                 $val = intval( $val );
@@ -6075,7 +6077,7 @@ function cora_ajax_save_system_settings_suite() {
                 $val = sanitize_text_field( $val );
             }
             update_option( $field, $val );
-        } elseif ( in_array( $field, array( 'users_can_register', 'blog_public', 'default_pingback_flag', 'comment_moderation' ) ) ) {
+        } elseif ( in_array( $field, array( 'users_can_register', 'blog_public', 'default_pingback_flag', 'comment_moderation', 'cora_workspace_allow_tours' ) ) ) {
             update_option( $field, 0 );
         }
     }
@@ -6093,6 +6095,16 @@ function cora_ajax_save_system_settings_suite() {
         global $wp_rewrite;
         $wp_rewrite->set_permalink_structure( sanitize_text_field( $_POST['permalink_structure'] ) );
         flush_rewrite_rules();
+    }
+
+    // If retention is set to a non-zero value, prune logs
+    $retention = intval( $_POST['cora_activity_logs_retention'] ?? 0 );
+    if ( $retention > 0 ) {
+        global $wpdb;
+        $wpdb->query( $wpdb->prepare(
+            "DELETE FROM {$wpdb->prefix}cora_activity_logs WHERE created_at < DATE_SUB(NOW(), INTERVAL %d DAY)",
+            $retention
+        ) );
     }
 
     cora_log_activity( 'Permissions', 'Updated global workspace and system settings.' );
@@ -8824,7 +8836,7 @@ function cora_db_get_activity_logs() {
                 'ip' => $r['ip_address'] ?? '127.0.0.1',
                 'device' => $r['user_agent'] ?? '',
                 'agency_id' => 'agency_' . $r['agency_id'],
-                'branch_id' => 'branch_' . $r['branch_id'],
+                'branch_id' => 'branch_' . ($r['branch_id'] ?? 0),
                 'how' => $r['how'] ?? 'human',
                 'instructed_by' => $r['instructed_by'],
                 'ai_reasoning' => $r['ai_reasoning'] ?? ''

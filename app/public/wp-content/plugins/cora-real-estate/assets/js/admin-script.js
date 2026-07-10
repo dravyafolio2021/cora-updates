@@ -8186,7 +8186,7 @@ jQuery(document).ready(function($) {
             data[field.name] = field.value;
         });
 
-        const checkboxes = ['users_can_register', 'blog_public', 'default_pingback_flag', 'default_comment_status', 'comment_moderation'];
+        const checkboxes = ['users_can_register', 'blog_public', 'default_pingback_flag', 'default_comment_status', 'comment_moderation', 'cora_workspace_allow_tours'];
         checkboxes.forEach(function(cbName) {
             const cb = form.find('input[name="' + cbName + '"]');
             if (cb.length > 0 && !cb.is(':checked')) {

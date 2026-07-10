@@ -35,32 +35,77 @@ $roles      = wp_roles()->get_names();
     </div>
 </div>
 
-<!-- Settings Tab Navigation -->
-<div class="flex items-center gap-2 border-b border-zinc-200/80 pb-3 overflow-x-auto">
-    <?php
-    $tabs = array(
-        'general'    => 'General Workspace Settings',
-        'pwd-policy' => 'Password Policy Settings',
-        'branches'   => 'Branch Management',
-        'brand'      => 'Branding & API Keys',
-        'reading'    => 'Reading & SEO Indexing',
-        'writing'    => 'Writing Defaults',
-        'discussion' => 'Discussion & Moderation',
-        'permalinks' => 'SEO Permalinks',
-        'privacy'    => 'Privacy Policy',
-    );
-    foreach ( $tabs as $tab_key => $tab_label ) :
-        $is_active = ( $active_tab === $tab_key );
-    ?>
-    <a href="?page=cora-workspace&sub=settings-suite&settings_tab=<?php echo esc_attr( $tab_key ); ?>" class="px-3.5 py-2 rounded-lg text-xs font-semibold transition-all <?php echo $is_active ? 'bg-zinc-950 text-white shadow-sm' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200/70 hover:text-zinc-900'; ?>">
-        <?php echo esc_html( $tab_label ); ?>
-    </a>
-    <?php endforeach; ?>
-</div>
+<!-- Settings Sidebar Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-6">
+    <!-- Left Column: Navigation Sidebar -->
+    <div class="lg:col-span-1 space-y-1.5">
+        <?php
+        $tabs = array(
+            'general'    => array(
+                'label' => 'General Settings',
+                'desc'  => 'Workspace details & identity',
+                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>'
+            ),
+            'pwd-policy' => array(
+                'label' => 'Password Policy',
+                'desc'  => 'Enforce security parameters',
+                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>'
+            ),
+            'branches'   => array(
+                'label' => 'Branch Management',
+                'desc'  => 'Brokerage physical offices',
+                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>'
+            ),
+            'brand'      => array(
+                'label' => 'Branding & API Keys',
+                'desc'  => 'Favicon, logos, integrations',
+                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>'
+            ),
+            'reading'    => array(
+                'label' => 'Reading & SEO',
+                'desc'  => 'Homepage and search engines',
+                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>'
+            ),
+            'writing'    => array(
+                'label' => 'Writing Defaults',
+                'desc'  => 'Category & format variables',
+                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>'
+            ),
+            'discussion' => array(
+                'label' => 'Discussion Suite',
+                'desc'  => 'Moderation & blacklists',
+                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>'
+            ),
+            'permalinks' => array(
+                'label' => 'SEO Permalinks',
+                'desc'  => 'SEO URL structures',
+                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>'
+            ),
+            'privacy'    => array(
+                'label' => 'Privacy Policy',
+                'desc'  => 'Compliance terms page',
+                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
+            )
+        );
+        foreach ( $tabs as $tab_key => $tab ) :
+            $is_active = ( $active_tab === $tab_key );
+        ?>
+        <a href="?page=cora-workspace&sub=settings-suite&settings_tab=<?php echo esc_attr( $tab_key ); ?>" class="flex items-center gap-3.5 px-4 py-3 rounded-xl border transition-all text-left group <?php echo $is_active ? 'bg-zinc-950 text-white border-zinc-950 shadow-md font-bold' : 'bg-white border-zinc-200/80 text-zinc-700 hover:bg-zinc-50/50 hover:border-zinc-300'; ?>">
+            <div class="<?php echo $is_active ? 'text-white' : 'text-zinc-400 group-hover:text-zinc-800'; ?> transition-colors shrink-0">
+                <?php echo $tab['icon']; ?>
+            </div>
+            <div class="min-w-0">
+                <div class="text-[11px] font-bold leading-tight <?php echo $is_active ? 'text-white' : 'text-zinc-900'; ?>"><?php echo esc_html( $tab['label'] ); ?></div>
+                <div class="text-[9px] mt-0.5 truncate <?php echo $is_active ? 'text-zinc-300' : 'text-zinc-400'; ?>"><?php echo esc_html( $tab['desc'] ); ?></div>
+            </div>
+        </a>
+        <?php endforeach; ?>
+    </div>
 
-<div class="bg-white border border-zinc-200/80 rounded-xl p-6 shadow-sm">
-    <form id="cora-settings-suite-form" onsubmit="event.preventDefault(); coraSaveSystemSettingsSuite();">
-        <input type="hidden" name="active_tab" value="<?php echo esc_attr( $active_tab ); ?>">
+    <!-- Right Column: Settings Form Card -->
+    <div class="lg:col-span-3 bg-white border border-zinc-200/80 rounded-xl p-6 shadow-sm flex flex-col justify-between">
+        <form id="cora-settings-suite-form" onsubmit="event.preventDefault(); coraSaveSystemSettingsSuite();">
+            <input type="hidden" name="active_tab" value="<?php echo esc_attr( $active_tab ); ?>">
 
         <?php if ( $active_tab === 'general' ) : ?>
         <!-- TAB 1: GENERAL SETTINGS -->
@@ -117,6 +162,24 @@ $roles      = wp_roles()->get_names();
                         <label class="block text-xs font-bold text-zinc-800 mb-1">Workspace Address</label>
                         <input type="text" name="cora_workspace_address" value="<?php echo esc_attr( get_option('cora_workspace_address', '101, BKC Road, Bandra East, Mumbai') ); ?>" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900" placeholder="Full physical office location">
                     </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-bold text-zinc-800 mb-1">Activity Log Auto-Archive Threshold</label>
+                        <select name="cora_activity_logs_retention" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none">
+                            <?php $retention = get_option('cora_activity_logs_retention', 0); ?>
+                            <option value="0" <?php selected( $retention, 0 ); ?>>Never (Keep all logs)</option>
+                            <option value="30" <?php selected( $retention, 30 ); ?>>30 Days</option>
+                            <option value="90" <?php selected( $retention, 90 ); ?>>90 Days</option>
+                            <option value="180" <?php selected( $retention, 180 ); ?>>180 Days</option>
+                            <option value="365" <?php selected( $retention, 365 ); ?>>1 Year</option>
+                        </select>
+                        <p class="text-[10px] text-zinc-400 mt-1">Prune system activity log events older than the selection to optimize database performance.</p>
+                    </div>
+                </div>
+                <div class="pt-2 border-t border-zinc-100 mt-4">
+                    <label class="flex items-center gap-2.5 text-xs text-zinc-800 font-semibold cursor-pointer">
+                        <input type="checkbox" name="cora_workspace_allow_tours" value="1" <?php checked( get_option('cora_workspace_allow_tours', 1), 1 ); ?> class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900">
+                        <span>Enable Workspace Interactive Tour guides for first-time logins</span>
+                    </label>
                 </div>
             </div>
 
@@ -806,6 +869,7 @@ $roles      = wp_roles()->get_names();
             </button>
         </div>
     </form>
+</div>
 </div>
 
 <script>

@@ -12,10 +12,12 @@ test.describe('Tier 6: New Refinements E2E Tests', () => {
     await page.goto('/workspace/settings-suite');
     
     // Choose general workspace tab
-    await page.click('a:has-text("General Workspace Settings")');
+    await page.click('a:has-text("General Settings")');
     await page.fill('input[name="cora_workspace_name"]', 'E2E Testing Office');
     await page.fill('input[name="cora_workspace_tax_details"]', 'GST-E2E-12345');
     await page.fill('input[name="cora_workspace_address"]', '404 Main St, Mumbai');
+    await page.selectOption('select[name="cora_activity_logs_retention"]', '90');
+    await page.check('input[name="cora_workspace_allow_tours"]');
     await page.click('button:has-text("Save All Settings")');
     await expect(page.locator('#cora-toast-container')).toContainText('Global system settings updated successfully.');
     
@@ -24,9 +26,11 @@ test.describe('Tier 6: New Refinements E2E Tests', () => {
     await expect(page.locator('input[name="cora_workspace_name"]')).toHaveValue('E2E Testing Office');
     await expect(page.locator('input[name="cora_workspace_tax_details"]')).toHaveValue('GST-E2E-12345');
     await expect(page.locator('input[name="cora_workspace_address"]')).toHaveValue('404 Main St, Mumbai');
+    await expect(page.locator('select[name="cora_activity_logs_retention"]')).toHaveValue('90');
+    await expect(page.locator('input[name="cora_workspace_allow_tours"]')).toBeChecked();
 
     // Configure password policy
-    await page.click('a:has-text("Password Policy Settings")');
+    await page.click('a:has-text("Password Policy")');
     await page.fill('input[name="cora_pwd_policy_min_len"]', '10');
     await page.check('input[name="cora_pwd_policy_numbers"]');
     await page.check('input[name="cora_pwd_policy_uppercase"]');
@@ -43,7 +47,7 @@ test.describe('Tier 6: New Refinements E2E Tests', () => {
     await page.goto('/workspace/settings-suite?settings_tab=general'); // Go back to settings
 
     // Reset password policy back to normal to keep the test environment clean
-    await page.click('a:has-text("Password Policy Settings")');
+    await page.click('a:has-text("Password Policy")');
     await page.fill('input[name="cora_pwd_policy_min_len"]', '8');
     await page.uncheck('input[name="cora_pwd_policy_numbers"]');
     await page.uncheck('input[name="cora_pwd_policy_uppercase"]');
