@@ -35,130 +35,6 @@ $wp_pages = get_pages();
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
 
 <style>
-    /* Quiet Luxury Design System Implementation */
-    body, button, input, select, textarea, label {
-        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif !important;
-        -webkit-font-smoothing: antialiased !important;
-    }
-    
-    h1, h2, h3, h4, h5, h6 {
-        letter-spacing: -0.025em !important;
-        color: #1A1A1A !important;
-        font-weight: 600 !important;
-    }
-
-    /* All Action Buttons styled as Pills */
-    button:not(.canvas-tab-btn):not(.elementor-panel-category-title) {
-        border-radius: 9999px !important;
-        font-size: 14px !important;
-        font-weight: 500 !important;
-        padding: 10px 18px !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        box-shadow: none !important;
-        text-shadow: none !important;
-        transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1) !important;
-        cursor: pointer !important;
-    }
-
-    button:not(.canvas-tab-btn):not(.elementor-panel-category-title) svg {
-        width: 16px !important;
-        height: 16px !important;
-        margin-right: 8px !important;
-        stroke-width: 1.8 !important;
-    }
-
-    /* Active/Pressed state scale-down */
-    button:active {
-        transform: scale(0.98) !important;
-    }
-
-    /* Primary CTAs - Solid Black */
-    .bg-zinc-950,
-    button.bg-zinc-950,
-    button.bg-green-600,
-    #activate-theme-header-btn {
-        background-color: #111111 !important;
-        color: #FFFFFF !important;
-        border: none !important;
-    }
-
-    .bg-zinc-950:hover,
-    button.bg-zinc-950:hover,
-    button.bg-green-600:hover,
-    #activate-theme-header-btn:hover {
-        background-color: #222222 !important;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
-    }
-
-    /* Secondary CTAs - White with Light-Gray Border */
-    .bg-white.border,
-    button.bg-white,
-    button.border-zinc-200 {
-        background-color: #FFFFFF !important;
-        border: 1px solid #E5E5E5 !important;
-        color: #1A1A1A !important;
-    }
-
-    .bg-white.border:hover,
-    button.bg-white:hover,
-    button.border-zinc-200:hover {
-        background-color: #FAFAFA !important;
-        border-color: #CCCCCC !important;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
-    }
-
-    /* Tertiary / Ghost buttons */
-    button.bg-transparent,
-    button.text-zinc-400,
-    button.text-zinc-500 {
-        background: transparent !important;
-        border: none !important;
-        color: #71717A !important;
-    }
-
-    button.bg-transparent:hover,
-    button.text-zinc-400:hover,
-    button.text-zinc-500:hover {
-        background-color: #FAFAFA !important;
-        color: #1A1A1A !important;
-    }
-
-    /* Inputs - Rounded 8-10px */
-    input[type="text"],
-    input[type="search"],
-    input[type="url"],
-    input[type="email"],
-    select,
-    textarea {
-        border-radius: 9px !important;
-        border: 1px solid #E5E5E5 !important;
-        outline: none !important;
-        font-size: 13px !important;
-        color: #1A1A1A !important;
-        transition: border-color 150ms ease !important;
-    }
-
-    input:focus, select:focus, textarea:focus {
-        border-color: #111111 !important;
-    }
-
-    /* Cards - Soft Rounded 12-16px */
-    .bg-white.border.border-zinc-200,
-    #tab-content-settings,
-    #tab-content-code > div,
-    .theme-card,
-    .draft-theme-card,
-    #drawer-new-theme-card,
-    #drawer-new-page-card,
-    #drawer-page-seo-card,
-    #drawer-page-revisions-card {
-        border-radius: 14px !important;
-        box-shadow: none !important;
-        border-color: #E5E5E5 !important;
-    }
-
     /* Monochromatic Transitions & Custom Scrollbars */
     .canvas-tab-btn.active {
         border-bottom-color: #18181b;
@@ -173,16 +49,18 @@ $wp_pages = get_pages();
     .theme-preview-box.draft::after {
         content: attr(data-status-label);
         position: absolute;
-        inset: 0;
-        background: rgba(24, 24, 27, 0.4);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 11px;
+        top: 8px;
+        left: 8px;
+        background: #f4f4f5;
+        color: #71717a;
+        border: 1px solid #e4e4e7;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 8px;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.05em;
+        line-height: 1;
     }
     .cora-canvas-editor-active .cora-sidebar {
         width: 64px !important;
@@ -425,6 +303,9 @@ $wp_pages = get_pages();
                     
                     // Render varied visual simulated layout templates for draft cards
                     $is_alternate = ($th['id'] % 2 === 0);
+                    $th_settings = json_decode( $th['settings'], true ) ?: array();
+                    $primary_color = $th_settings['primary_color'] ?? '#18181b';
+                    $secondary_color = $th_settings['secondary_color'] ?? '#71717a';
                 ?>
                 <div class="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm flex flex-col group hover:shadow-md hover:border-zinc-300 transition-all duration-300">
                     <div class="h-[140px] theme-preview-box draft relative flex flex-col bg-white border-b border-zinc-100 p-3 select-none pointer-events-none overflow-hidden" data-status-label="Draft">
@@ -432,21 +313,21 @@ $wp_pages = get_pages();
                             <!-- Blog / Article Feed Simulator -->
                             <div class="flex justify-between border-b border-zinc-100 pb-1 mb-1.5">
                                 <div class="font-bold text-[5px] text-zinc-900 uppercase tracking-wider">Apex Realty Blog</div>
-                                <div class="w-1.5 h-1.5 rounded-full bg-zinc-200"></div>
+                                <div class="w-1.5 h-1.5 rounded-full bg-zinc-200" style="background-color: <?php echo esc_attr( $primary_color ); ?>;"></div>
                             </div>
                             <div class="grid grid-cols-2 gap-1.5 flex-1">
                                 <div class="border border-zinc-100 rounded p-1 bg-zinc-50/30 flex flex-col justify-between">
-                                    <div class="h-6 bg-zinc-100 rounded mb-1"></div>
+                                    <div class="h-6 bg-zinc-100 rounded mb-1" style="background-color: <?php echo esc_attr( $primary_color ); ?>; opacity: 0.15;"></div>
                                     <div>
                                         <div class="font-bold text-[4px] text-zinc-800 leading-tight">Nitin & Shanaya Arora: Premium Market Forecast</div>
-                                        <div class="text-[3px] text-zinc-400 mt-0.5">Read →</div>
+                                        <div class="text-[3px] mt-0.5" style="color: <?php echo esc_attr( $secondary_color ); ?>;">Read →</div>
                                     </div>
                                 </div>
                                 <div class="border border-zinc-100 rounded p-1 bg-zinc-50/30 flex flex-col justify-between">
-                                    <div class="h-6 bg-zinc-100 rounded mb-1"></div>
+                                    <div class="h-6 bg-zinc-100 rounded mb-1" style="background-color: <?php echo esc_attr( $primary_color ); ?>; opacity: 0.15;"></div>
                                     <div>
                                         <div class="font-bold text-[4px] text-zinc-800 leading-tight">Luxury Showings in Delhi & Mumbai</div>
-                                        <div class="text-[3px] text-zinc-400 mt-0.5">Read →</div>
+                                        <div class="text-[3px] mt-0.5" style="color: <?php echo esc_attr( $secondary_color ); ?>;">Read →</div>
                                     </div>
                                 </div>
                             </div>
@@ -455,19 +336,19 @@ $wp_pages = get_pages();
                             <div class="flex items-center gap-1 border-b border-zinc-100 pb-1 mb-1.5 justify-between">
                                 <div class="font-semibold text-[5px] text-zinc-900 tracking-wider">APEX REALTY GALLERY</div>
                                 <div class="flex gap-0.5">
-                                    <div class="w-1 h-1 rounded-full bg-zinc-200"></div>
-                                    <div class="w-1 h-1 rounded-full bg-zinc-200"></div>
+                                    <div class="w-1 h-1 rounded-full bg-zinc-200" style="background-color: <?php echo esc_attr( $primary_color ); ?>;"></div>
+                                    <div class="w-1 h-1 rounded-full bg-zinc-200" style="background-color: <?php echo esc_attr( $secondary_color ); ?>;"></div>
                                 </div>
                             </div>
                             <div class="grid grid-cols-3 gap-1 flex-1">
                                 <div class="bg-zinc-50 border border-zinc-100 rounded flex items-center justify-center">
-                                    <svg viewBox="0 0 24 24" width="8" height="8" stroke="#a1a1aa" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+                                    <svg viewBox="0 0 24 24" width="8" height="8" stroke="<?php echo esc_attr( $primary_color ); ?>" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
                                 </div>
                                 <div class="bg-zinc-50 border border-zinc-100 rounded flex items-center justify-center">
-                                    <svg viewBox="0 0 24 24" width="8" height="8" stroke="#a1a1aa" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+                                    <svg viewBox="0 0 24 24" width="8" height="8" stroke="<?php echo esc_attr( $primary_color ); ?>" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
                                 </div>
                                 <div class="bg-zinc-50 border border-zinc-100 rounded flex items-center justify-center">
-                                    <svg viewBox="0 0 24 24" width="8" height="8" stroke="#a1a1aa" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+                                    <svg viewBox="0 0 24 24" width="8" height="8" stroke="<?php echo esc_attr( $secondary_color ); ?>" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
                                 </div>
                             </div>
                         <?php endif; ?>
