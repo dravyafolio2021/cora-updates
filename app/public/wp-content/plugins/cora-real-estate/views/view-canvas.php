@@ -35,6 +35,130 @@ $wp_pages = get_pages();
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
 
 <style>
+    /* Quiet Luxury Design System Implementation */
+    body, button, input, select, textarea, label {
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif !important;
+        -webkit-font-smoothing: antialiased !important;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        letter-spacing: -0.025em !important;
+        color: #1A1A1A !important;
+        font-weight: 600 !important;
+    }
+
+    /* All Action Buttons styled as Pills */
+    button:not(.canvas-tab-btn):not(.elementor-panel-category-title) {
+        border-radius: 9999px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        padding: 10px 18px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+        transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+        cursor: pointer !important;
+    }
+
+    button:not(.canvas-tab-btn):not(.elementor-panel-category-title) svg {
+        width: 16px !important;
+        height: 16px !important;
+        margin-right: 8px !important;
+        stroke-width: 1.8 !important;
+    }
+
+    /* Active/Pressed state scale-down */
+    button:active {
+        transform: scale(0.98) !important;
+    }
+
+    /* Primary CTAs - Solid Black */
+    .bg-zinc-950,
+    button.bg-zinc-950,
+    button.bg-green-600,
+    #activate-theme-header-btn {
+        background-color: #111111 !important;
+        color: #FFFFFF !important;
+        border: none !important;
+    }
+
+    .bg-zinc-950:hover,
+    button.bg-zinc-950:hover,
+    button.bg-green-600:hover,
+    #activate-theme-header-btn:hover {
+        background-color: #222222 !important;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+    }
+
+    /* Secondary CTAs - White with Light-Gray Border */
+    .bg-white.border,
+    button.bg-white,
+    button.border-zinc-200 {
+        background-color: #FFFFFF !important;
+        border: 1px solid #E5E5E5 !important;
+        color: #1A1A1A !important;
+    }
+
+    .bg-white.border:hover,
+    button.bg-white:hover,
+    button.border-zinc-200:hover {
+        background-color: #FAFAFA !important;
+        border-color: #CCCCCC !important;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+    }
+
+    /* Tertiary / Ghost buttons */
+    button.bg-transparent,
+    button.text-zinc-400,
+    button.text-zinc-500 {
+        background: transparent !important;
+        border: none !important;
+        color: #71717A !important;
+    }
+
+    button.bg-transparent:hover,
+    button.text-zinc-400:hover,
+    button.text-zinc-500:hover {
+        background-color: #FAFAFA !important;
+        color: #1A1A1A !important;
+    }
+
+    /* Inputs - Rounded 8-10px */
+    input[type="text"],
+    input[type="search"],
+    input[type="url"],
+    input[type="email"],
+    select,
+    textarea {
+        border-radius: 9px !important;
+        border: 1px solid #E5E5E5 !important;
+        outline: none !important;
+        font-size: 13px !important;
+        color: #1A1A1A !important;
+        transition: border-color 150ms ease !important;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        border-color: #111111 !important;
+    }
+
+    /* Cards - Soft Rounded 12-16px */
+    .bg-white.border.border-zinc-200,
+    #tab-content-settings,
+    #tab-content-code > div,
+    .theme-card,
+    .draft-theme-card,
+    #drawer-new-theme-card,
+    #drawer-new-page-card,
+    #drawer-page-seo-card,
+    #drawer-page-revisions-card {
+        border-radius: 14px !important;
+        box-shadow: none !important;
+        border-color: #E5E5E5 !important;
+    }
+
     /* Monochromatic Transitions & Custom Scrollbars */
     .canvas-tab-btn.active {
         border-bottom-color: #18181b;
