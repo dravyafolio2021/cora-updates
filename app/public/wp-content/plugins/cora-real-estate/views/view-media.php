@@ -1,14 +1,14 @@
 <?php
 /**
- * Cora PropOS — Media Library
+ * Cora — Media Library
  * Top-bar folder nav, full-width canvas, slide-in detail overlay.
  */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 $is_admin        = current_user_can( 'manage_options' );
 $current_user_id = get_current_user_id();
-$listings        = get_option( 'cora_re_listings_inventory', array() );
-$clients         = get_option( 'cora_re_clients', array() );
-$leads           = get_option( 'cora_re_leads', array() );
+$listings        = cora_db_get_properties();
+$clients         = cora_db_get_clients();
+$leads           = cora_db_get_leads();
 $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'Floor Plan', 'NOC / Approval', 'Invoice', 'Other' );
 ?>
 <style>

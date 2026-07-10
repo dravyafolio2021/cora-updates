@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cora Canvas — Interactive Developer Guide</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #FBFaf7; /* Warm cream background */
+        }
+        /* Custom Monochromatic Transitions & Styling */
+        .toast-system {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+        }
+        .nested-menu-item {
+            margin-left: 28px !important;
+            border-left: 2px solid #e4e4e7;
+            padding-left: 12px;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-zinc-900 antialiased p-6 flex flex-col items-center">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-[999999] flex flex-col gap-2.5"></div>
+
+    <div class="w-full max-w-6xl space-y-8">
+        
+        <!-- Header -->
+        <div class="border-b border-zinc-200 pb-5">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight text-zinc-950">Cora Canvas</h1>
+                    <p class="text-sm text-zinc-500 mt-1">Interactive guide & E2E validator for Canvas Level 1, 2, and 3 simulation workflow.</p>
+                </div>
+                <div class="px-3 py-1 bg-zinc-150 border border-zinc-200 rounded-full text-xs font-semibold text-zinc-600">
+                    Developer Spec Demo
+                </div>
+            </div>
+        </div>
+
+        <!-- Guide Panel Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Side Controls: The 13 Actions Checklist -->
+            <div class="lg:col-span-1 bg-white border border-zinc-200 rounded-xl p-5 shadow-sm space-y-4 self-start">
+                <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Simulated Actions Checklist</h3>
+                <div class="space-y-3">
+                    <button onclick="simulateAction(1)" class="w-full text-left px-3 py-2 border border-zinc-200 rounded-lg text-xs font-medium text-zinc-700 bg-white hover:bg-zinc-50 transition-all flex items-center justify-between">
+                        <span>1. Initialize Theme</span>
+                        <span class="text-[10px] text-zinc-400">Level 1</span>
+                    </button>
+                    <button onclick="simulateAction(2)" class="w-full text-left px-3 py-2 border border-zinc-200 rounded-lg text-xs font-medium text-zinc-700 bg-white hover:bg-zinc-50 transition-all flex items-center justify-between">
+                        <span>2. Duplicate Theme</span>
+                        <span class="text-[10px] text-zinc-400">Level 1</span>
+                    </button>
+                    <button onclick="simulateAction(3)" class="w-full text-left px-3 py-2 border border-zinc-200 rounded-lg text-xs font-medium text-zinc-700 bg-white hover:bg-zinc-50 transition-all flex items-center justify-between">
+                        <span>3. Activate Theme</span>
+                        <span class="text-[10px] text-zinc-400">Level 1</span>
+                    </button>
+                    <button onclick="simulateAction(4)" class="w-full text-left px-3 py-2 border border-zinc-200 rounded-lg text-xs font-medium text-zinc-700 bg-white hover:bg-zinc-50 transition-all flex items-center justify-between">
+                        <span>4. Rename Theme</span>
+                        <span class="text-[10px] text-zinc-400">Level 1</span>
+                    </button>
+                    <button onclick="simulateAction(5)" class="w-full text-left px-3 py-2 border border-zinc-200 rounded-lg text-xs font-medium text-zinc-700 bg-white hover:bg-zinc-50 transition-all flex items-center justify-between">
+                        <span>5. Delete Theme</span>
+                        <span class="text-[10px] text-zinc-400">Level 1</span>
+                    </button>
+                    <button onclick="simulateAction(6)" class="w-full text-left px-3 py-2 border border-zinc-200 rounded-lg text-xs font-medium text-zinc-700 bg-white hover:bg-zinc-50 transition-all flex items-center justify-between">
+                        <span>6. Add Page to Theme</span>
+                        <span class="text-[10px] text-zinc-400">Level 2</span>
+                    </button>
+                    <button onclick="simulateAction(7)" class="w-full text-left px-3 py-2 border border-zinc-200 rounded-lg text-xs font-medium text-zinc-700 bg-white hover:bg-zinc-50 transition-all flex items-center justify-between">
+                        <span>7. Edit Page layout</span>
+                        <span class="text-[10px] text-zinc-400">Level 3</span>
+                    </button>
+                    <button onclick="simulateAction(8)" class="w-full text-left px-3 py-2 border border-zinc-200 rounded-lg text-xs font-medium text-zinc-700 bg-white hover:bg-zinc-50 transition-all flex items-center justify-between">
+                        <span>8. Toggle Page Status</span>
+                        <span class="text-[10px] text-zinc-400">Level 2</span>
+                    </button>
+                    <button onclick="simulateAction(9)" class="w-full text-left px-3 py-2 border border-zinc-200 rounded-lg text-xs font-medium text-zinc-700 bg-white hover:bg-zinc-50 transition-all flex items-center justify-between">
+                        <span>9. Bulk Pages actions</span>
+                        <span class="text-[10px] text-zinc-400">Level 2</span>
+                    </button>
+                    <button onclick="simulateAction(10)" class="w-full text-left px-3 py-2 border border-zinc-200 rounded-lg text-xs font-medium text-zinc-700 bg-white hover:bg-zinc-50 transition-all flex items-center justify-between">
+                        <span>10. Set as Homepage</span>
+                        <span class="text-[10px] text-zinc-400">Level 2</span>
+                    </button>
+                    <button onclick="simulateAction(11)" class="w-full text-left px-3 py-2 border border-zinc-200 rounded-lg text-xs font-medium text-zinc-700 bg-white hover:bg-zinc-50 transition-all flex items-center justify-between">
+                        <span>11. Save Menus list</span>
+                        <span class="text-[10px] text-zinc-400">Level 2</span>
+                    </button>
+                    <button onclick="simulateAction(12)" class="w-full text-left px-3 py-2 border border-zinc-200 rounded-lg text-xs font-medium text-zinc-700 bg-white hover:bg-zinc-50 transition-all flex items-center justify-between">
+                        <span>12. Save Global Settings</span>
+                        <span class="text-[10px] text-zinc-400">Level 2</span>
+                    </button>
+                    <button onclick="simulateAction(13)" class="w-full text-left px-3 py-2 border border-zinc-200 rounded-lg text-xs font-medium text-zinc-700 bg-white hover:bg-zinc-50 transition-all flex items-center justify-between">
+                        <span>13. Open SEO Manager</span>
+                        <span class="text-[10px] text-zinc-400">Level 2</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Workspace Simulation Shell -->
+            <div class="lg:col-span-3 bg-zinc-100 border border-zinc-200 rounded-2xl p-4 shadow-inner relative min-h-[600px] overflow-hidden flex flex-col">
+                
+                <!-- Mock Topbar -->
+                <div class="flex items-center justify-between bg-white border border-zinc-200 rounded-xl px-4 py-2.5 shadow-sm mb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-zinc-200"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-zinc-300"></span>
+                        <span class="text-xs text-zinc-400 font-medium">cora.local/workspace/canvas</span>
+                    </div>
+                </div>
+
+                <!-- Simulation Main Layout -->
+                <div class="flex-1 bg-white border border-zinc-200 rounded-xl p-5 shadow-sm relative flex flex-col overflow-y-auto" id="canvas-shell-body">
+                    
+                    <!-- LEVEL 1 PREVIEW MOCK -->
+                    <div id="guide-level-1" class="space-y-6">
+                        <div class="flex items-center justify-between border-b border-zinc-100 pb-4">
+                            <div>
+                                <h2 class="text-base font-bold text-zinc-900">Canvas Hub</h2>
+                                <p class="text-[10px] text-zinc-500">Preview themes and initialize layouts.</p>
+                            </div>
+                            <button onclick="openNewThemeDrawer()" id="l1-new-theme-btn" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold shadow-sm transition-all">+ New Theme</button>
+                        </div>
+
+                        <!-- Mocked Active Theme Card -->
+                        <div class="bg-zinc-50/50 border border-zinc-200 rounded-xl p-5 flex flex-col md:flex-row gap-5 items-start justify-between shadow-sm">
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-1.5 py-0.5 text-[8px] font-bold uppercase rounded bg-green-50 text-green-700 border border-green-200">Live</span>
+                                    <span class="text-[10px] text-zinc-400">Active Theme</span>
+                                </div>
+                                <h3 id="active-theme-name" class="text-sm font-bold text-zinc-900">Aura Premium Catalog</h3>
+                                <p class="text-[10px] text-zinc-500">6 Pages Registered • Modified 2 mins ago</p>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <button onclick="simulateLevel2('Aura Premium Catalog', true)" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold shadow-sm transition-all">Edit Theme</button>
+                            </div>
+                        </div>
+
+                        <!-- Draft Themes Mock Catalog -->
+                        <div class="space-y-3">
+                            <h4 class="text-xs font-bold text-zinc-800 uppercase tracking-tight">Inactive Drafts</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="drafts-container">
+                                <!-- Duplicated/Draft theme card -->
+                                <div class="border border-zinc-200 rounded-xl p-4 flex justify-between items-start bg-zinc-50/20 shadow-sm" id="draft-theme-card-1">
+                                    <div>
+                                        <div class="flex items-center gap-1.5 mb-1.5">
+                                            <span class="px-1.5 py-0.5 text-[8px] font-bold uppercase rounded bg-zinc-100 border border-zinc-200 text-zinc-500">Draft</span>
+                                            <span id="draft-theme-title" class="text-xs font-bold text-zinc-900">Villa Elite Draft Workspace</span>
+                                        </div>
+                                        <p class="text-[10px] text-zinc-500">3 Pages • Last modified 4 hours ago</p>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <button onclick="simulateLevel2('Villa Elite Draft Workspace', false)" class="px-2 py-1 border border-zinc-200 text-[10px] font-semibold text-zinc-700 bg-white rounded-lg hover:bg-zinc-50 cursor-pointer">Edit</button>
+                                        <button onclick="activateDraftTheme()" class="px-2 py-1 bg-green-50 text-[10px] font-bold text-green-700 border border-green-200 rounded-lg hover:bg-green-100 cursor-pointer">Activate</button>
+                                        <button onclick="deleteDraftTheme()" class="px-2 py-1 border border-red-200 text-[10px] font-bold text-red-600 bg-white rounded-lg hover:bg-red-50 cursor-pointer">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LEVEL 2 PREVIEW MOCK -->
+                    <div id="guide-level-2" class="space-y-6 hidden">
+                        <!-- Breadcrumb & Activation Header -->
+                        <div class="flex items-center justify-between border-b border-zinc-100 pb-4">
+                            <div class="flex items-center gap-2">
+                                <button onclick="backToLevel1()" class="p-1 hover:bg-zinc-100 rounded text-zinc-500 hover:text-zinc-900 cursor-pointer transition-colors">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                                </button>
+                                <span class="text-xs text-zinc-400">Canvas</span>
+                                <span class="text-xs text-zinc-300">/</span>
+                                <span id="level-2-theme-title" class="text-xs font-bold text-zinc-900">Aura Premium Catalog</span>
+                                <span id="level-2-theme-badge" class="px-1.5 py-0.5 text-[8px] font-bold uppercase rounded bg-green-50 text-green-700 border border-green-200">Live</span>
+                            </div>
+                            <div id="activate-header-block">
+                                <button onclick="activateCurrentLevelTheme()" id="l2-activate-btn" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold shadow-sm transition-all hidden">Activate Theme</button>
+                            </div>
+                        </div>
+
+                        <!-- Tab bar -->
+                        <div class="border-b border-zinc-200 flex gap-5 text-xs font-semibold text-zinc-400 pb-1">
+                            <button onclick="switchMockTab('pages')" id="mtab-pages" class="pb-2 border-b-2 border-zinc-900 text-zinc-900">Pages</button>
+                            <button onclick="switchMockTab('menus')" id="mtab-menus" class="pb-2 border-b-2 border-transparent hover:text-zinc-900">Menus</button>
+                            <button onclick="switchMockTab('settings')" id="mtab-settings" class="pb-2 border-b-2 border-transparent hover:text-zinc-900">Theme Settings</button>
+                        </div>
+
+                        <!-- MOCK TAB PAGES -->
+                        <div id="mcontent-pages" class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-tight">Theme Pages Register</h4>
+                                <button onclick="openNewPageDrawer()" class="px-2.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all">+ New Page</button>
+                            </div>
+                            <div class="border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
+                                <table class="w-full border-collapse text-left text-xs">
+                                    <thead>
+                                        <tr class="bg-zinc-50 border-b border-zinc-200 text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+                                            <th class="p-3 w-8">
+                                                <input type="checkbox" id="bulk-all-check" onchange="toggleBulkSelectAll(this)" class="rounded cursor-pointer">
+                                            </th>
+                                            <th class="p-3">Title</th>
+                                            <th class="p-3">Status</th>
+                                            <th class="p-3">Template</th>
+                                            <th class="p-3 text-center">SEO</th>
+                                            <th class="p-3 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="mock-pages-list">
+                                        <!-- Page Rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Bulk Actions Bar -->
+                            <div id="mock-bulk-bar" class="bg-zinc-950 rounded-xl py-3 px-4 flex items-center justify-between text-white hidden shadow-xl">
+                                <div class="flex items-center gap-3">
+                                    <span id="mock-bulk-count" class="text-xs font-semibold text-zinc-200">0 selected</span>
+                                    <div class="h-4 w-[1px] bg-zinc-850"></div>
+                                    <select id="mock-bulk-action" class="px-2 py-1 bg-zinc-900 border border-zinc-800 rounded-md text-[10px] text-zinc-300 font-semibold focus:outline-none cursor-pointer">
+                                        <option value="publish">Publish</option>
+                                        <option value="unpublish">Unpublish</option>
+                                        <option value="delete">Delete Permanently</option>
+                                    </select>
+                                </div>
+                                <button onclick="applyMockBulkAction()" class="px-3 py-1 bg-white hover:bg-zinc-100 text-zinc-900 font-bold rounded-lg text-[10px] cursor-pointer transition-colors shadow-sm">Apply</button>
+                            </div>
+                        </div>
+
+                        <!-- MOCK TAB MENUS -->
+                        <div id="mcontent-menus" class="space-y-4 hidden">
+                            <div class="flex items-center justify-between border-b border-zinc-100 pb-2">
+                                <div>
+                                    <h4 class="text-xs font-bold text-zinc-900">Header Navigation Menu</h4>
+                                    <p class="text-[10px] text-zinc-500">Configure link structures.</p>
+                                </div>
+                                <button onclick="addMockMenuItem()" class="px-2.5 py-1.5 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-sm">+ Add Item</button>
+                            </div>
+                            <div id="mock-menu-items-list" class="space-y-2">
+                                <!-- Menu Items -->
+                            </div>
+                            <div class="flex justify-end pt-4">
+                                <button onclick="saveMockMenu()" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all">Save Menu</button>
+                            </div>
+                        </div>
+
+                        <!-- MOCK TAB THEME SETTINGS -->
+                        <div id="mcontent-settings" class="space-y-5 hidden">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="space-y-1.5">
+                                    <label class="block text-[10px] font-bold text-zinc-500 uppercase">Primary Color</label>
+                                    <input type="color" id="msetting-primary-color" value="#18181b" class="w-10 h-8 rounded border border-zinc-200 cursor-pointer">
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label class="block text-[10px] font-bold text-zinc-500 uppercase">Heading Font Style</label>
+                                    <select id="msetting-heading-font" class="w-full px-2.5 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none cursor-pointer">
+                                        <option value="Inter">Inter</option>
+                                        <option value="Outfit">Outfit</option>
+                                        <option value="Playfair Display">Playfair Display</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex justify-end pt-4 border-t border-zinc-100">
+                                <button onclick="saveMockThemeSettings()" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all">Save Global Settings</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LEVEL 3 PREVIEW MOCK -->
+                    <div id="guide-level-3" class="fixed inset-0 z-[9999] bg-white hidden flex flex-col">
+                        <div class="h-12 bg-zinc-900 border-b border-zinc-850 flex items-center justify-between px-4 text-white">
+                            <div class="flex items-center gap-3">
+                                <button onclick="closeMockEditor()" class="px-2.5 py-1 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg text-[10px] font-bold cursor-pointer transition-all flex items-center gap-1">
+                                    ← Theme Dashboard
+                                </button>
+                                <span class="text-[10px] text-zinc-400">Canvas / Aura Premium Catalog / <strong id="editor-mock-page-title" class="text-white">Page</strong></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="publishMockEditorChanges()" class="px-3 py-1 bg-zinc-100 hover:bg-white text-zinc-900 rounded-lg text-[10px] font-bold cursor-pointer transition-all">Publish</button>
+                            </div>
+                        </div>
+                        <div class="flex-1 flex flex-col items-center justify-center bg-zinc-50/50 p-6">
+                            <div class="max-w-md w-full border border-zinc-200 bg-white rounded-xl shadow-xl p-8 text-center space-y-4">
+                                <div class="w-12 h-12 bg-zinc-50 border border-zinc-200 rounded-full flex items-center justify-center mx-auto text-zinc-500">
+                                    ✏️
+                                </div>
+                                <h3 class="text-sm font-bold text-zinc-900">Elementor Core Editor</h3>
+                                <p class="text-xs text-zinc-500 leading-relaxed">This is the simulated headless Elementor page editor wrapper. Make edits as needed inside this panel.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOCK DRAWERS -->
+    
+    <!-- 1. New Theme Drawer -->
+    <div id="drawer-theme-mock" class="fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[420px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-theme-card">
+            <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+                <h3 class="text-sm font-bold text-zinc-950">Initialize New Theme</h3>
+                <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeNewThemeDrawer()">✕</button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6 space-y-4">
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase">Theme Name *</label>
+                    <input type="text" id="new-theme-name" placeholder="e.g. Westside Luxury Catalog" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                </div>
+            </div>
+            <div class="p-5 border-t border-zinc-100 flex items-center justify-end gap-3 bg-zinc-50/50">
+                <button type="button" class="px-4 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-semibold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeNewThemeDrawer()">Cancel</button>
+                <button type="button" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveNewThemeMock()">Create Theme</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. New Page Drawer -->
+    <div id="drawer-page-mock" class="fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[420px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-page-card">
+            <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+                <h3 class="text-sm font-bold text-zinc-950">Add Page to Theme</h3>
+                <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeNewPageDrawer()">✕</button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6 space-y-4">
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase">Page Title *</label>
+                    <input type="text" id="new-page-title" placeholder="e.g. Featured Penthouse Listings" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                </div>
+            </div>
+            <div class="p-5 border-t border-zinc-100 flex items-center justify-end gap-3 bg-zinc-50/50">
+                <button type="button" class="px-4 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-semibold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeNewPageDrawer()">Cancel</button>
+                <button type="button" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveNewPageMock()">Create Page</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. SEO Side Drawer -->
+    <div id="drawer-seo-mock" class="fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[420px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-seo-card">
+            <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+                <h3 class="text-sm font-bold text-zinc-950">SEO Manager Drawer</h3>
+                <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeSEODrawer()">✕</button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6 space-y-4">
+                <input type="hidden" id="seo-page-id">
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase">Meta Title *</label>
+                    <input type="text" id="seo-title" placeholder="Meta title length" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase">Meta Description *</label>
+                    <textarea id="seo-desc" rows="3" placeholder="Meta description length" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400"></textarea>
+                </div>
+            </div>
+            <div class="p-5 border-t border-zinc-100 flex items-center justify-end gap-3 bg-zinc-50/50">
+                <button type="button" class="px-4 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-semibold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeSEODrawer()">Cancel</button>
+                <button type="button" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveSEOMock()">Save SEO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Implementation -->
+    <script>
+        // Mock State Data
+        const state = {
+            activeThemeName: 'Aura Premium Catalog',
+            activeThemeIsLive: true,
+            activeTab: 'pages',
+            pages: [
+                { id: 1, title: 'Home Catalog', slug: 'home', status: 'published', template: 'agency', seoFilled: true, isHomepage: true },
+                { id: 2, title: 'Properties Listing', slug: 'listings', status: 'published', template: 'brokerage', seoFilled: false, isHomepage: false },
+                { id: 3, title: 'Penthouse Showcase', slug: 'penthouse', status: 'draft', template: 'landing-page', seoFilled: false, isHomepage: false }
+            ],
+            menuItems: [
+                { id: 101, label: 'Home Page', url: '/home', level: 0 },
+                { id: 102, label: 'Properties Showcase', url: '/listings', level: 0 },
+                { id: 103, label: 'Penthouse Promo', url: '/penthouse', level: 1 }
+            ]
+        };
+
+        // --- Custom Toast System ---
+        window.coraShowToast = function(message) {
+            const container = document.getElementById('toast-container');
+            const el = document.createElement('div');
+            el.className = "toast-system bg-zinc-950 border border-zinc-800 text-white rounded-xl shadow-2xl py-3 px-4 text-xs font-semibold flex items-center gap-2 max-w-sm transform translate-x-20 opacity-0";
+            el.innerHTML = `
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                <span>${message}</span>
+            `;
+            container.appendChild(el);
+            
+            // Trigger animation
+            setTimeout(() => {
+                el.classList.remove('translate-x-20', 'opacity-0');
+            }, 50);
+
+            // Close after duration
+            setTimeout(() => {
+                el.classList.add('translate-x-20', 'opacity-0');
+                setTimeout(() => el.remove(), 300);
+            }, 3000);
+        };
+
+        // Render Pages List on load
+        function renderPages() {
+            const list = document.getElementById('mock-pages-list');
+            list.innerHTML = '';
+            
+            state.pages.forEach(p => {
+                const homeBadge = p.isHomepage ? '<span class="ml-2 px-1 py-0.5 text-[8px] bg-zinc-150 border border-zinc-200 text-zinc-600 rounded">🏠 Home</span>' : '';
+                const seoCheck = p.seoFilled ? '<span class="text-green-600 font-bold">✓</span>' : '<span class="text-red-500 font-bold">✗</span>';
+                
+                list.innerHTML += `
+                    <tr class="border-b border-zinc-100 hover:bg-zinc-50/50">
+                        <td class="p-3">
+                            <input type="checkbox" class="mock-page-check rounded cursor-pointer" data-id="${p.id}" onchange="updateBulkState()">
+                        </td>
+                        <td class="p-3 font-semibold text-zinc-900 flex items-center">
+                            <span>${p.title}</span>
+                            ${homeBadge}
+                        </td>
+                        <td class="p-3">
+                            <select onchange="changePageStatus(${p.id}, this.value)" class="bg-zinc-100 text-[10px] rounded-lg px-2 py-0.5 border border-zinc-200 cursor-pointer">
+                                <option value="published" ${p.status === 'published' ? 'selected' : ''}>Published</option>
+                                <option value="draft" ${p.status === 'draft' ? 'selected' : ''}>Draft</option>
+                                <option value="scheduled" ${p.status === 'scheduled' ? 'selected' : ''}>Scheduled</option>
+                            </select>
+                        </td>
+                        <td class="p-3 text-[10px] font-mono text-zinc-500 uppercase">${p.template}</td>
+                        <td class="p-3 text-center cursor-pointer" onclick="openSEODrawer(${p.id})">${seoCheck}</td>
+                        <td class="p-3 text-right space-x-1.5">
+                            <button onclick="editPageInMockEditor(${p.id}, '${p.title}')" class="px-2 py-1 border border-zinc-200 rounded text-[10px] font-semibold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer">Edit Layout</button>
+                            <button onclick="setMockHomepage(${p.id})" class="px-2 py-1 text-[10px] font-semibold text-zinc-500 hover:text-zinc-900 cursor-pointer">Set Home</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Render Menu Items
+        function renderMenu() {
+            const list = document.getElementById('mock-menu-items-list');
+            list.innerHTML = '';
+            
+            state.menuItems.forEach((item, idx) => {
+                const nestedClass = item.level > 0 ? 'nested-menu-item' : '';
+                list.innerHTML += `
+                    <div class="flex items-center justify-between border border-zinc-200 bg-zinc-50/50 p-2.5 rounded-lg shadow-sm ${nestedClass}">
+                        <span class="text-xs font-semibold text-zinc-800">${item.label} (${item.url})</span>
+                        <div class="flex gap-2">
+                            <button onclick="indentMenuItem(${idx})" class="p-1 hover:bg-zinc-100 rounded text-zinc-400 hover:text-zinc-900">➔</button>
+                            <button onclick="removeMenuItem(${idx})" class="p-1 hover:bg-zinc-100 text-red-500 hover:text-red-700 rounded">✕</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Level 2 Simulation Boot
+        function simulateLevel2(name, isLive) {
+            state.activeThemeName = name;
+            state.activeThemeIsLive = isLive;
+            
+            document.getElementById('guide-level-1').classList.add('hidden');
+            document.getElementById('guide-level-2').classList.remove('hidden');
+            
+            document.getElementById('level-2-theme-title').innerText = name;
+            const badge = document.getElementById('level-2-theme-badge');
+            const actBtn = document.getElementById('l2-activate-btn');
+            
+            if (isLive) {
+                badge.className = "px-1.5 py-0.5 text-[8px] font-bold uppercase rounded bg-green-50 text-green-700 border border-green-200";
+                badge.innerText = "Live";
+                actBtn.classList.add('hidden');
+            } else {
+                badge.className = "px-1.5 py-0.5 text-[8px] font-bold uppercase rounded bg-zinc-100 border border-zinc-200 text-zinc-500";
+                badge.innerText = "Draft";
+                actBtn.classList.remove('hidden');
+            }
+            
+            renderPages();
+            renderMenu();
+        }
+
+        function backToLevel1() {
+            document.getElementById('guide-level-2').classList.add('hidden');
+            document.getElementById('guide-level-1').classList.remove('hidden');
+        }
+
+        // Tab Switching in mock Level 2
+        function switchMockTab(tab) {
+            state.activeTab = tab;
+            document.getElementById('mtab-pages').className = "pb-2 border-b-2 border-transparent hover:text-zinc-900";
+            document.getElementById('mtab-menus').className = "pb-2 border-b-2 border-transparent hover:text-zinc-900";
+            document.getElementById('mtab-settings').className = "pb-2 border-b-2 border-transparent hover:text-zinc-900";
+            
+            document.getElementById('mtab-' + tab).className = "pb-2 border-b-2 border-zinc-900 text-zinc-900";
+            
+            document.getElementById('mcontent-pages').classList.add('hidden');
+            document.getElementById('mcontent-menus').classList.add('hidden');
+            document.getElementById('mcontent-settings').classList.add('hidden');
+            
+            document.getElementById('mcontent-' + tab).classList.remove('hidden');
+        }
+
+        // Drawers controls
+        function openNewThemeDrawer() {
+            document.getElementById('drawer-theme-mock').className = "fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-100 pointer-events-auto transition-opacity duration-300";
+            document.getElementById('drawer-theme-card').className = "bg-white border-l border-zinc-200 h-full w-full max-w-[420px] shadow-2xl flex flex-col transform translate-x-0 transition-transform duration-300";
+        }
+        function closeNewThemeDrawer() {
+            document.getElementById('drawer-theme-card').className = "bg-white border-l border-zinc-200 h-full w-full max-w-[420px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300";
+            setTimeout(() => {
+                document.getElementById('drawer-theme-mock').className = "fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300";
+            }, 300);
+        }
+        function saveNewThemeMock() {
+            const name = document.getElementById('new-theme-name').value;
+            if (!name) return;
+            window.coraShowToast(`Theme workspace "${name}" initialized successfully.`);
+            closeNewThemeDrawer();
+        }
+
+        function openNewPageDrawer() {
+            document.getElementById('drawer-page-mock').className = "fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-100 pointer-events-auto transition-opacity duration-300";
+            document.getElementById('drawer-page-card').className = "bg-white border-l border-zinc-200 h-full w-full max-w-[420px] shadow-2xl flex flex-col transform translate-x-0 transition-transform duration-300";
+        }
+        function closeNewPageDrawer() {
+            document.getElementById('drawer-page-card').className = "bg-white border-l border-zinc-200 h-full w-full max-w-[420px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300";
+            setTimeout(() => {
+                document.getElementById('drawer-page-mock').className = "fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300";
+            }, 300);
+        }
+        function saveNewPageMock() {
+            const title = document.getElementById('new-page-title').value;
+            if (!title) return;
+            state.pages.push({
+                id: Date.now(),
+                title: title,
+                slug: title.toLowerCase().replace(/ /g, '-'),
+                status: 'draft',
+                template: 'agency',
+                seoFilled: false,
+                isHomepage: false
+            });
+            window.coraShowToast(`Page "${title}" successfully registered in template database.`);
+            renderPages();
+            closeNewPageDrawer();
+        }
+
+        // SEO Drawer
+        function openSEODrawer(id) {
+            const page = state.pages.find(p => p.id === id);
+            if (!page) return;
+            document.getElementById('seo-page-id').value = id;
+            document.getElementById('seo-title').value = page.title;
+            document.getElementById('seo-desc').value = '';
+            
+            document.getElementById('drawer-seo-mock').className = "fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-100 pointer-events-auto transition-opacity duration-300";
+            document.getElementById('drawer-seo-card').className = "bg-white border-l border-zinc-200 h-full w-full max-w-[420px] shadow-2xl flex flex-col transform translate-x-0 transition-transform duration-300";
+        }
+        function closeSEODrawer() {
+            document.getElementById('drawer-seo-card').className = "bg-white border-l border-zinc-200 h-full w-full max-w-[420px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300";
+            setTimeout(() => {
+                document.getElementById('drawer-seo-mock').className = "fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300";
+            }, 300);
+        }
+        function saveSEOMock() {
+            const id = parseInt(document.getElementById('seo-page-id').value);
+            const page = state.pages.find(p => p.id === id);
+            if (page) {
+                page.seoFilled = true;
+                window.coraShowToast(`SEO parameters for "${page.title}" synchronized successfully.`);
+                renderPages();
+            }
+            closeSEODrawer();
+        }
+
+        // Level 3 Mock Editor
+        function editPageInMockEditor(id, title) {
+            document.getElementById('editor-mock-page-title').innerText = title;
+            document.getElementById('guide-level-3').classList.remove('hidden');
+        }
+        function closeMockEditor() {
+            document.getElementById('guide-level-3').classList.add('hidden');
+        }
+        function publishMockEditorChanges() {
+            window.coraShowToast('Page layout published successfully via Elementor wrapper topbar!');
+            closeMockEditor();
+        }
+
+        // Menu changes
+        function addMockMenuItem() {
+            state.menuItems.push({
+                id: Date.now(),
+                label: 'New Link',
+                url: '/custom-url',
+                level: 0
+            });
+            renderMenu();
+            window.coraShowToast('Added custom link to menus editor list.');
+        }
+        function removeMenuItem(idx) {
+            state.menuItems.splice(idx, 1);
+            renderMenu();
+            window.coraShowToast('Menu item removed.');
+        }
+        function indentMenuItem(idx) {
+            if (state.menuItems[idx]) {
+                state.menuItems[idx].level = state.menuItems[idx].level === 0 ? 1 : 0;
+                renderMenu();
+                window.coraShowToast('Toggled hierarchy level for menu item.');
+            }
+        }
+        function saveMockMenu() {
+            window.coraShowToast('Menu configurations saved successfully.');
+        }
+
+        // Theme settings
+        function saveMockThemeSettings() {
+            const color = document.getElementById('msetting-primary-color').value;
+            window.coraShowToast(`Settings saved successfully. Primary Theme Color set to: ${color}`);
+        }
+
+        // Status change
+        function changePageStatus(id, status) {
+            const page = state.pages.find(p => p.id === id);
+            if (page) {
+                page.status = status;
+                window.coraShowToast(`Updated status of "${page.title}" to ${status}.`);
+            }
+        }
+
+        // Set homepage
+        function setMockHomepage(id) {
+            state.pages.forEach(p => p.isHomepage = (p.id === id));
+            window.coraShowToast('Designated new homepage successfully.');
+            renderPages();
+        }
+
+        // Active/Delete theme from dashboard Level 1 list
+        function activateDraftTheme() {
+            document.getElementById('active-theme-name').innerText = "Villa Elite Draft Workspace";
+            window.coraShowToast('Villa Elite Draft Workspace activated successfully.');
+        }
+        function deleteDraftTheme() {
+            document.getElementById('draft-theme-card-1').remove();
+            window.coraShowToast('Draft theme deleted successfully.');
+        }
+
+        // Bulk pages actions
+        function toggleBulkSelectAll(checkbox) {
+            const checks = document.querySelectorAll('.mock-page-check');
+            checks.forEach(c => c.checked = checkbox.checked);
+            updateBulkState();
+        }
+        function updateBulkState() {
+            const checked = document.querySelectorAll('.mock-page-check:checked');
+            const bar = document.getElementById('mock-bulk-bar');
+            if (checked.length > 0) {
+                document.getElementById('mock-bulk-count').innerText = `${checked.length} selected`;
+                bar.classList.remove('hidden');
+            } else {
+                bar.classList.add('hidden');
+            }
+        }
+        function applyMockBulkAction() {
+            const action = document.getElementById('mock-bulk-action').value;
+            const checked = document.querySelectorAll('.mock-page-check:checked');
+            const ids = Array.from(checked).map(c => parseInt(c.getAttribute('data-id')));
+            
+            if (action === 'delete') {
+                state.pages = state.pages.filter(p => !ids.includes(p.id));
+            } else {
+                state.pages.forEach(p => {
+                    if (ids.includes(p.id)) {
+                        p.status = action === 'publish' ? 'published' : 'draft';
+                    }
+                });
+            }
+            
+            document.getElementById('bulk-all-check').checked = false;
+            updateBulkState();
+            renderPages();
+            window.coraShowToast(`Bulk action "${action}" applied successfully.`);
+        }
+
+        // --- Action Simulator Engine (Demonstrates all 13 interactive actions) ---
+        function simulateAction(actionId) {
+            switch(actionId) {
+                case 1:
+                    // Initialize Theme Workspace
+                    openNewThemeDrawer();
+                    document.getElementById('new-theme-name').value = "Gurgaon Highrise Catalog";
+                    window.coraShowToast('Action Triggered: Initialize Theme Workspace. Setting name...');
+                    break;
+                case 2:
+                    // Duplicate Theme Workspace
+                    window.coraShowToast('Action Triggered: Duplicate Active Theme.');
+                    const parent = document.getElementById('drafts-container');
+                    parent.innerHTML += `
+                        <div class="border border-zinc-200 rounded-xl p-4 flex justify-between items-start bg-zinc-50/20 shadow-sm">
+                            <div>
+                                <div class="flex items-center gap-1.5 mb-1.5">
+                                    <span class="px-1.5 py-0.5 text-[8px] font-bold uppercase rounded bg-zinc-100 border border-zinc-200 text-zinc-500">Draft</span>
+                                    <span class="text-xs font-bold text-zinc-900">${state.activeThemeName} (Copy)</span>
+                                </div>
+                                <p class="text-[10px] text-zinc-500">6 Pages • Just now duplicated</p>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 3:
+                    // Activate Theme Workspace
+                    activateDraftTheme();
+                    break;
+                case 4:
+                    // Rename Theme Workspace
+                    const newName = "Villas Elite Premium Catalogue Workspace";
+                    document.getElementById('draft-theme-title').innerText = newName;
+                    window.coraShowToast(`Action Triggered: Rename Theme Workspace. Set title to: "${newName}"`);
+                    break;
+                case 5:
+                    // Delete Theme Workspace
+                    deleteDraftTheme();
+                    break;
+                case 6:
+                    // Add Page to Theme
+                    openNewPageDrawer();
+                    document.getElementById('new-page-title').value = "Gurgaon DLF Penthouse";
+                    window.coraShowToast('Action Triggered: Add Page to Theme. Opening setup drawer...');
+                    break;
+                case 7:
+                    // Edit Page layout via Elementor (Level 3 wrapper)
+                    editPageInMockEditor(1, 'Home Catalog');
+                    window.coraShowToast('Action Triggered: Edit Page via Elementor workspace wrapper.');
+                    break;
+                case 8:
+                    // Toggle Page Status
+                    const targetPage = state.pages[0];
+                    targetPage.status = targetPage.status === 'published' ? 'draft' : 'published';
+                    window.coraShowToast(`Action Triggered: Toggle status of "${targetPage.title}" to ${targetPage.status}.`);
+                    renderPages();
+                    break;
+                case 9:
+                    // Bulk Pages actions
+                    const pageCheckboxes = document.querySelectorAll('.mock-page-check');
+                    if (pageCheckboxes.length > 0) {
+                        pageCheckboxes.forEach(c => c.checked = true);
+                        updateBulkState();
+                        window.coraShowToast('Action Triggered: Bulk Select Pages. Activating bulk control bar.');
+                    }
+                    break;
+                case 10:
+                    // Set as Homepage
+                    setMockHomepage(2);
+                    break;
+                case 11:
+                    // Save Menus list
+                    switchMockTab('menus');
+                    saveMockMenu();
+                    break;
+                case 12:
+                    // Save Global Theme Settings
+                    switchMockTab('settings');
+                    saveMockThemeSettings();
+                    break;
+                case 13:
+                    // Open SEO Manager Panel Drawer
+                    openSEODrawer(1);
+                    window.coraShowToast('Action Triggered: Open SEO & Metadata Settings Drawer.');
+                    break;
+            }
+        }
+
+        // Initial setup on boot
+        renderPages();
+        renderMenu();
+    </script>
+</body>
+</html>

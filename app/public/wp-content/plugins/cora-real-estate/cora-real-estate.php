@@ -148,6 +148,7 @@ function cora_real_estate_ai_handle_workspace_route() {
                 nocache_headers();
                 $template_file = CORA_REAL_ESTATE_AI_PATH . 'views/' . $sub_page . '.php';
                 if ( file_exists( $template_file ) ) {
+                    status_header( 200 );
                     include $template_file;
                     exit;
                 }
@@ -208,7 +209,12 @@ function cora_real_estate_ai_handle_workspace_route() {
         
         $allowed_features = isset( $cora_permissions[$current_user_role] ) ? $cora_permissions[$current_user_role] : array();
         if ( $current_user_role === 'administrator' ) {
-            $allowed_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'attendance', 'tasks', 'visual-builder', 'audit-panel', 'media' );
+            $allowed_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'attendance', 'tasks', 'visual-builder', 'audit-panel', 'media', 'canvas' );
+        }
+        if ( in_array( $current_user_role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) {
+            if ( ! in_array( 'canvas', $allowed_features ) ) {
+                $allowed_features[] = 'canvas';
+            }
         }
 
         // Prevent accessing disallowed sub-pages
@@ -273,6 +279,7 @@ function cora_real_estate_ai_handle_workspace_route() {
         ));
         $cora_posts = $cora_posts_query->posts;
 
+        status_header( 200 );
         // Load the dashboard HTML template directly
         include CORA_REAL_ESTATE_AI_PATH . 'admin-dashboard.php';
         exit;
@@ -1345,6 +1352,68 @@ function cora_ajax_save_equipment() {
         }
     }
 
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $branch_id = cora_db_get_branch_id();
+
+    $db_id = 0;
+    if ( ! empty( $id ) ) {
+        $db_id = intval(preg_replace('/[^\d]/', '', $id));
+    }
+
+    if ( $db_id > 0 ) {
+        $update_data = array(
+            'title' => $name,
+            'description' => $notes,
+            'type' => $category,
+            'rera_number' => $rera_reg_id,
+            'location' => $notes,
+            'sync_link' => $sync_link,
+            'seo_title' => $seo_title,
+            'seo_description' => $seo_description,
+            'seo_keywords' => $seo_keywords,
+            'updated_at' => current_time('mysql')
+        );
+        $wpdb->update(
+            $wpdb->prefix . 'cora_properties',
+            $update_data,
+            array( 'id' => $db_id, 'agency_id' => $agency_id ),
+            array('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s'),
+            array('%d', '%d')
+        );
+        $new_id = $db_id;
+    } else {
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_properties',
+            array(
+                'agency_id' => $agency_id,
+                'branch_id' => $branch_id,
+                'added_by' => get_current_user_id(),
+                'title' => $name,
+                'description' => $notes,
+                'type' => $category,
+                'status' => 'available',
+                'price' => 0,
+                'location' => $notes,
+                'city' => '',
+                'area_sqft' => 0,
+                'bedrooms' => 0,
+                'bathrooms' => 0,
+                'rera_number' => $rera_reg_id,
+                'media_ids' => '[]',
+                'sync_link' => $sync_link,
+                'seo_title' => $seo_title,
+                'seo_description' => $seo_description,
+                'seo_keywords' => $seo_keywords,
+                'embed_vector' => 0,
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql')
+            ),
+            array('%d', '%d', '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s')
+        );
+        $new_id = $wpdb->insert_id;
+    }
+
     $inventory = get_option( 'cora_re_listings_inventory', array() );
     if ( ! is_array( $inventory ) ) {
         $inventory = array();
@@ -1353,7 +1422,7 @@ function cora_ajax_save_equipment() {
     $found_key = null;
     if ( ! empty( $id ) ) {
         foreach ( $inventory as $key => $item ) {
-            if ( isset( $item['id'] ) && $item['id'] === $id ) {
+            if ( isset( $item['id'] ) && strval($item['id']) === strval($id) ) {
                 $found_key = $key;
                 break;
             }
@@ -1374,7 +1443,6 @@ function cora_ajax_save_equipment() {
         }
         $saved_item = $inventory[$found_key];
     } else {
-        $new_id = 'eq' . ( count( $inventory ) + 1 ) . '_' . time();
         $saved_item = array(
             'id'              => $new_id,
             'name'            => $name,
@@ -1415,11 +1483,30 @@ function cora_ajax_assign_equipment() {
     $status = sanitize_text_field( $_POST['status'] );
     $assignment_note = isset( $_POST['assignment_note'] ) ? sanitize_text_field( $_POST['assignment_note'] ) : '';
 
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $db_id = intval(preg_replace('/[^\d]/', '', $eq_id));
+
+    $status_mapped = 'available';
+    $os = strtolower(trim($status));
+    if ($os === 'available') $status_mapped = 'available';
+    elseif ($os === 'under offer' || $os === 'under_offer' || $os === 'reserved') $status_mapped = 'under_offer';
+    elseif ($os === 'sold') $status_mapped = 'sold';
+    elseif ($os === 'off market' || $os === 'off_market') $status_mapped = 'off_market';
+
+    $wpdb->update(
+        $wpdb->prefix . 'cora_properties',
+        array( 'status' => $status_mapped, 'updated_at' => current_time('mysql') ),
+        array( 'id' => $db_id, 'agency_id' => $agency_id ),
+        array( '%s', '%s' ),
+        array( '%d', '%d' )
+    );
+
     $inventory = get_option( 'cora_re_listings_inventory', array() );
     $updated = false;
 
     foreach ( $inventory as &$item ) {
-        if ( $item['id'] === $eq_id ) {
+        if ( strval($item['id']) === strval($eq_id) ) {
             $item['status'] = $status;
             $item['crew'] = ( 'Available' === $status || 'Maintenance' === $status ) ? '' : $crew_name;
             $item['shoot'] = ( 'Available' === $status || 'Maintenance' === $status ) ? '' : $viewing_title;
@@ -1450,6 +1537,20 @@ function cora_ajax_save_crew_assignments() {
 
     $viewing_id = sanitize_text_field( $_POST['viewing_id'] );
     $crew = isset( $_POST['crew'] ) ? $_POST['crew'] : array();
+
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $db_booking_id = intval(preg_replace('/[^\d]/', '', $viewing_id));
+
+    if ( $db_booking_id > 0 ) {
+        $wpdb->update(
+            $wpdb->prefix . 'cora_bookings',
+            array( 'crew' => json_encode($crew), 'updated_at' => current_time('mysql') ),
+            array( 'id' => $db_booking_id, 'agency_id' => $agency_id ),
+            array( '%s', '%s' ),
+            array( '%d', '%d' )
+        );
+    }
 
     $assignments = get_option( 'cora_re_showing_assignments', array() );
     $assignments[$viewing_id] = $crew;
@@ -1583,12 +1684,22 @@ function cora_ajax_delete_equipment() {
         wp_send_json_error( 'Invalid Equipment ID.' );
     }
 
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $db_id = intval(preg_replace('/[^\d]/', '', $eq_id));
+
+    $wpdb->delete(
+        $wpdb->prefix . 'cora_properties',
+        array( 'id' => $db_id, 'agency_id' => $agency_id ),
+        array( '%d', '%d' )
+    );
+
     $inventory = get_option( 'cora_re_listings_inventory', array() );
     $updated_inventory = array();
     $found = false;
 
     foreach ( $inventory as $item ) {
-        if ( $item['id'] === $eq_id ) {
+        if ( strval($item['id']) === strval($eq_id) ) {
             $found = true;
             continue;
         }
@@ -1769,7 +1880,278 @@ add_action( 'rest_api_init', function () {
         'callback'            => 'cora_rest_schedule_task',
         'permission_callback' => 'is_user_logged_in',
     ) );
+
+    // Canvas REST API Endpoints
+    register_rest_route( 'cora/v1', '/canvas/themes', array(
+        'methods'             => 'GET',
+        'callback'            => 'cora_rest_canvas_get_themes',
+        'permission_callback' => 'cora_canvas_rest_permission_check_read',
+    ) );
+
+    register_rest_route( 'cora/v1', '/canvas/themes/(?P<id>\d+)/pages', array(
+        'methods'             => 'GET',
+        'callback'            => 'cora_rest_canvas_get_theme_pages',
+        'permission_callback' => 'cora_canvas_rest_permission_check_read',
+    ) );
+
+    register_rest_route( 'cora/v1', '/canvas/pages', array(
+        'methods'             => 'POST',
+        'callback'            => 'cora_rest_canvas_create_page',
+        'permission_callback' => 'cora_canvas_rest_permission_check_write',
+    ) );
+
+    register_rest_route( 'cora/v1', '/canvas/pages/(?P<id>\d+)/status', array(
+        'methods'             => 'PATCH',
+        'callback'            => 'cora_rest_canvas_update_page_status',
+        'permission_callback' => 'cora_canvas_rest_permission_check_write',
+    ) );
+
+    register_rest_route( 'cora/v1', '/canvas/pages/(?P<id>\d+)/seo', array(
+        'methods'             => 'PATCH',
+        'callback'            => 'cora_rest_canvas_update_page_seo',
+        'permission_callback' => 'cora_canvas_rest_permission_check_write',
+    ) );
+
+    register_rest_route( 'cora/v1', '/canvas/pages/(?P<id>\d+)', array(
+        'methods'             => 'DELETE',
+        'callback'            => 'cora_rest_canvas_delete_page',
+        'permission_callback' => 'cora_canvas_rest_permission_check_write',
+    ) );
+
+    register_rest_route( 'cora/v1', '/canvas/themes/(?P<id>\d+)/activate', array(
+        'methods'             => 'POST',
+        'callback'            => 'cora_rest_canvas_activate_theme',
+        'permission_callback' => 'cora_canvas_rest_permission_check_write',
+    ) );
 } );
+
+function cora_canvas_rest_permission_check_read() {
+    if ( ! is_user_logged_in() ) {
+        return false;
+    }
+    $user = wp_get_current_user();
+    if ( in_array( 'administrator', $user->roles ) || in_array( 'cora_manager', $user->roles ) || in_array( 'cora_branch_manager', $user->roles ) ) {
+        return true;
+    }
+    return false;
+}
+
+function cora_canvas_rest_permission_check_write() {
+    if ( ! is_user_logged_in() ) {
+        return false;
+    }
+    $user = wp_get_current_user();
+    if ( in_array( 'administrator', $user->roles ) || in_array( 'cora_manager', $user->roles ) ) {
+        return true;
+    }
+    return false;
+}
+
+function cora_rest_canvas_get_themes( $request ) {
+    global $wpdb;
+    $themes = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes ORDER BY id DESC", ARRAY_A );
+    if ( is_array($themes) ) {
+        foreach ( $themes as &$t ) {
+            $t['settings'] = json_decode($t['settings'], true) ?: array();
+            
+            $pages = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", $t['id'] ), ARRAY_A );
+            $t['page_count'] = count($pages);
+            
+            $published = 0;
+            $draft = 0;
+            $seo_issues = 0;
+            foreach ( $pages as $p ) {
+                if ( $p['status'] === 'published' ) {
+                    $published++;
+                } else {
+                    $draft++;
+                }
+                if ( empty( $p['seo_title'] ) || empty( $p['seo_description'] ) ) {
+                    $seo_issues++;
+                }
+            }
+            $t['stats'] = array(
+                'total' => count($pages),
+                'published' => $published,
+                'draft' => $draft,
+                'seo_issues' => $seo_issues
+            );
+        }
+    }
+    return rest_ensure_response( $themes );
+}
+
+function cora_rest_canvas_get_theme_pages( $request ) {
+    global $wpdb;
+    $theme_id = intval( $request->get_param( 'id' ) );
+    $pages = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d ORDER BY is_homepage DESC, title ASC", $theme_id ), ARRAY_A );
+    return rest_ensure_response( $pages );
+}
+
+function cora_rest_canvas_create_page( $request ) {
+    global $wpdb;
+    $theme_id = intval( $request->get_param( 'theme_id' ) );
+    $title = sanitize_text_field( $request->get_param( 'title' ) );
+    $slug = sanitize_title( $request->get_param( 'slug' ) );
+    $status = sanitize_text_field( $request->get_param( 'status' ) ?: 'draft' );
+    $template = sanitize_text_field( $request->get_param( 'template' ) ?: 'agency' );
+
+    if ( empty( $theme_id ) || empty( $title ) || empty( $slug ) ) {
+        return new WP_Error( 'missing_fields', 'Required fields missing.', array( 'status' => 400 ) );
+    }
+
+    $wp_post_id = wp_insert_post( array(
+        'post_title'   => $title,
+        'post_name'    => $slug,
+        'post_type'    => 'page',
+        'post_status'  => 'publish',
+        'post_content' => '<!-- Elementor Page Content -->'
+    ) );
+
+    if ( is_wp_error( $wp_post_id ) ) {
+        return new WP_Error( 'wp_error', $wp_post_id->get_error_message(), array( 'status' => 500 ) );
+    }
+
+    $wpdb->insert(
+        $wpdb->prefix . 'cora_canvas_pages',
+        array(
+            'agency_id'       => 1,
+            'theme_id'        => $theme_id,
+            'wp_post_id'      => $wp_post_id,
+            'title'           => $title,
+            'slug'            => $slug,
+            'status'          => $status,
+            'is_homepage'     => 0,
+            'template'        => $template,
+            'created_by'      => get_current_user_id(),
+            'created_at'      => current_time('mysql'),
+            'updated_at'      => current_time('mysql')
+        ),
+        array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%d', '%s', '%s' )
+    );
+
+    $page_id = $wpdb->insert_id;
+    cora_log_activity( 'Canvas', "Created canvas page '{$title}'." );
+
+    return rest_ensure_response( array(
+        'success'    => true,
+        'page_id'    => $page_id,
+        'wp_post_id' => $wp_post_id,
+        'message'    => 'Page created successfully.'
+    ) );
+}
+
+function cora_rest_canvas_update_page_status( $request ) {
+    global $wpdb;
+    $id = intval( $request->get_param( 'id' ) );
+    $status = sanitize_text_field( $request->get_param( 'status' ) );
+
+    if ( ! in_array( $status, array( 'published', 'draft', 'scheduled' ) ) ) {
+        return new WP_Error( 'invalid_status', 'Invalid status.', array( 'status' => 400 ) );
+    }
+
+    $page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d", $id ), ARRAY_A );
+    if ( ! $page ) {
+        return new WP_Error( 'not_found', 'Page not found.', array( 'status' => 404 ) );
+    }
+
+    $scheduled_at = null;
+    if ( $status === 'scheduled' ) {
+        $scheduled_at = sanitize_text_field( $request->get_param( 'scheduled_at' ) ?: current_time('mysql') );
+    }
+
+    $wpdb->update(
+        $wpdb->prefix . 'cora_canvas_pages',
+        array( 'status' => $status, 'scheduled_at' => $scheduled_at, 'updated_at' => current_time('mysql') ),
+        array( 'id' => $id ),
+        array( '%s', '%s', '%s' ),
+        array( '%d' )
+    );
+
+    cora_log_activity( 'Canvas', "Updated status of page '{$page['title']}' to {$status}." );
+
+    return rest_ensure_response( array( 'success' => true, 'message' => 'Status updated successfully.' ) );
+}
+
+function cora_rest_canvas_update_page_seo( $request ) {
+    global $wpdb;
+    $id = intval( $request->get_param( 'id' ) );
+    $seo_title = sanitize_text_field( $request->get_param( 'seo_title' ) );
+    $seo_description = sanitize_textarea_field( $request->get_param( 'seo_description' ) );
+    $seo_og_image = esc_url_raw( $request->get_param( 'seo_og_image' ) );
+
+    $page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d", $id ), ARRAY_A );
+    if ( ! $page ) {
+        return new WP_Error( 'not_found', 'Page not found.', array( 'status' => 404 ) );
+    }
+
+    $wpdb->update(
+        $wpdb->prefix . 'cora_canvas_pages',
+        array(
+            'seo_title' => $seo_title,
+            'seo_description' => $seo_description,
+            'seo_og_image' => $seo_og_image,
+            'updated_at' => current_time('mysql')
+        ),
+        array( 'id' => $id ),
+        array( '%s', '%s', '%s', '%s' ),
+        array( '%d' )
+    );
+
+    cora_log_activity( 'Canvas', "Updated SEO settings for page '{$page['title']}'." );
+
+    return rest_ensure_response( array( 'success' => true, 'message' => 'SEO settings updated successfully.' ) );
+}
+
+function cora_rest_canvas_delete_page( $request ) {
+    global $wpdb;
+    $id = intval( $request->get_param( 'id' ) );
+    $page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d", $id ), ARRAY_A );
+    if ( ! $page ) {
+        return new WP_Error( 'not_found', 'Page not found.', array( 'status' => 404 ) );
+    }
+
+    wp_delete_post( $page['wp_post_id'], true );
+
+    $wpdb->delete(
+        $wpdb->prefix . 'cora_canvas_pages',
+        array( 'id' => $id ),
+        array( '%d' )
+    );
+
+    cora_log_activity( 'Canvas', "Deleted page '{$page['title']}'." );
+
+    return rest_ensure_response( array( 'success' => true, 'message' => 'Page deleted successfully.' ) );
+}
+
+function cora_rest_canvas_activate_theme( $request ) {
+    global $wpdb;
+    $id = intval( $request->get_param( 'id' ) );
+    $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $id ), ARRAY_A );
+    if ( ! $theme ) {
+        return new WP_Error( 'not_found', 'Theme not found.', array( 'status' => 404 ) );
+    }
+
+    $wpdb->update(
+        $wpdb->prefix . 'cora_canvas_themes',
+        array( 'status' => 'draft', 'updated_at' => current_time('mysql') ),
+        array( 'status' => 'live' ),
+        array( '%s', '%s' ),
+        array( '%s' )
+    );
+
+    $wpdb->update(
+        $wpdb->prefix . 'cora_canvas_themes',
+        array( 'status' => 'live', 'activated_at' => current_time('mysql'), 'updated_at' => current_time('mysql') ),
+        array( 'id' => $id ),
+        array( '%s', '%s', '%s' ),
+        array( '%d' )
+    );
+
+    cora_log_activity( 'Canvas', "Activated theme '{$theme['name']}'." );
+
+    return rest_ensure_response( array( 'success' => true, 'message' => 'Theme activated successfully.' ) );
+}
 
 /**
  * REST Callback to insert scheduled deactivations into options queue
@@ -1986,6 +2368,13 @@ function cora_real_estate_ai_serve_frontend_homepage() {
             // Rewrite hardcoded admin-ajax URL to resolve dynamically on any WP installation
             $html = str_replace( '/wp-admin/admin-ajax.php', admin_url( 'admin-ajax.php' ), $html );
             
+            $styles = cora_get_active_theme_styles();
+            $js_head = cora_get_active_theme_js( 'head' );
+            $js_footer = cora_get_active_theme_js( 'footer' );
+
+            $html = str_replace( '</head>', $styles . $js_head . '</head>', $html );
+            $html = str_replace( '</body>', $js_footer . '</body>', $html );
+
             header( 'Content-Type: text/html; charset=UTF-8' );
             echo $html;
             exit;
@@ -1993,6 +2382,77 @@ function cora_real_estate_ai_serve_frontend_homepage() {
     }
 }
 add_action( 'template_redirect', 'cora_real_estate_ai_serve_frontend_homepage', 5 );
+
+function cora_get_active_theme_styles() {
+    global $wpdb;
+    $theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+    if ( ! $theme ) {
+        $theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes LIMIT 1", ARRAY_A );
+    }
+    
+    $settings = array();
+    if ( $theme ) {
+        $settings = json_decode( $theme['settings'], true ) ?: array();
+    }
+    
+    $primary = $settings['primary_color'] ?? '#18181b';
+    $secondary = $settings['secondary_color'] ?? '#27272a';
+    $accent = $settings['accent_color'] ?? '#10b981';
+    $text = $settings['text_color'] ?? '#09090b';
+    $bg = $settings['bg_color'] ?? '#ffffff';
+    $heading_font = $settings['heading_font'] ?? 'Inter';
+    $body_font = $settings['body_font'] ?? 'Inter';
+    $base_size = $settings['base_font_size'] ?? '16';
+
+    $style = "
+    <style id='cora-canvas-theme-variables'>
+    :root {
+        --primary-color: {$primary};
+        --secondary-color: {$secondary};
+        --accent-color: {$accent};
+        --text-color: {$text};
+        --bg-color: {$bg};
+        --heading-font: '{$heading_font}', sans-serif;
+        --body-font: '{$body_font}', sans-serif;
+        --base-font-size: {$base_size}px;
+    }
+    body {
+        font-family: var(--body-font);
+        font-size: var(--base-font-size);
+        color: var(--text-color);
+        background-color: var(--bg-color);
+    }
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--heading-font);
+    }
+    </style>
+    ";
+    
+    $custom_css = get_option( 'cora_canvas_custom_css', '' );
+    if ( ! empty( $custom_css ) ) {
+        $style .= "<style id='cora-canvas-custom-css'>\n" . esc_html( $custom_css ) . "\n</style>\n";
+    }
+
+    return $style;
+}
+
+function cora_get_active_theme_js( $position = 'head' ) {
+    $custom_js = get_option( 'cora_canvas_custom_js', '' );
+    $pos = get_option( 'cora_canvas_custom_js_position', 'head' );
+    if ( ! empty( $custom_js ) && $pos === $position ) {
+        return "<script id='cora-canvas-custom-js-" . esc_attr($position) . "'>\n" . $custom_js . "\n</script>\n";
+    }
+    return '';
+}
+
+add_action( 'wp_head', function () {
+    echo cora_get_active_theme_styles();
+    echo cora_get_active_theme_js( 'head' );
+}, 100 );
+
+add_action( 'wp_footer', function () {
+    echo cora_get_active_theme_js( 'footer' );
+}, 100 );
 
 /**
  * Helper to convert Google Drive URL to direct src link
@@ -2384,12 +2844,45 @@ function cora_post_leads_rest( $request ) {
         return new WP_Error( 'cora_invalid_email', 'Invalid email address.', array( 'status' => 400 ) );
     }
     
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $branch_id = cora_db_get_branch_id();
+
+    $wpdb->insert(
+        $wpdb->prefix . 'cora_leads',
+        array(
+            'agency_id' => $agency_id,
+            'branch_id' => $branch_id,
+            'assigned_to' => null,
+            'first_name' => $names,
+            'last_name' => '',
+            'email' => $email,
+            'phone' => '',
+            'source' => 'REST API',
+            'status' => 'new',
+            'budget_min' => 0,
+            'budget_max' => !empty($price) ? intval(preg_replace('/[^\d]/', '', $price)) : 0,
+            'preferred_locations' => $city,
+            'property_type' => $scale,
+            'notes' => $notes,
+            'followup_date' => null,
+            'followup_notes' => '',
+            'converted_to_client' => 0,
+            'client_id' => null,
+            'embed_vector' => 0,
+            'created_at' => current_time('mysql'),
+            'updated_at' => current_time('mysql')
+        ),
+        array('%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s')
+    );
+    $inserted_id = $wpdb->insert_id;
+
     $leads = get_option( 'cora_re_leads', array() );
     if ( ! is_array( $leads ) ) {
         $leads = array();
     }
     
-    $lead_id = 'lead_' . time() . '_' . wp_generate_password( 4, false );
+    $lead_id = $inserted_id;
     
     $new_lead = array(
         'id'         => $lead_id,
@@ -2492,13 +2985,51 @@ function cora_ajax_submit_lead() {
         wp_send_json_error( 'Names and Email are required.' );
     }
 
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $branch_id = cora_db_get_branch_id();
+
+    $followup_dt = null;
+    if ( ! empty($followup_date) ) {
+        $followup_dt = date('Y-m-d H:i:s', strtotime($followup_date));
+    }
+
+    $wpdb->insert(
+        $wpdb->prefix . 'cora_leads',
+        array(
+            'agency_id' => $agency_id,
+            'branch_id' => $branch_id,
+            'assigned_to' => null,
+            'first_name' => $names,
+            'last_name' => '',
+            'email' => $email,
+            'phone' => '',
+            'source' => 'Frontend',
+            'status' => 'new',
+            'budget_min' => 0,
+            'budget_max' => !empty($price) ? intval(preg_replace('/[^\d]/', '', $price)) : 0,
+            'preferred_locations' => $city,
+            'property_type' => $scale,
+            'notes' => $notes,
+            'followup_date' => $followup_dt,
+            'followup_notes' => '',
+            'converted_to_client' => 0,
+            'client_id' => null,
+            'embed_vector' => 0,
+            'created_at' => current_time('mysql'),
+            'updated_at' => current_time('mysql')
+        ),
+        array('%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s')
+    );
+    $inserted_id = $wpdb->insert_id;
+
     $leads = get_option( 'cora_re_leads', array() );
     if ( ! is_array( $leads ) ) {
         $leads = array();
     }
 
     $new_lead = array(
-        'id'         => 'lead_' . time() . '_' . wp_generate_password( 4, false ),
+        'id'         => $inserted_id,
         'names'      => $names,
         'email'      => $email,
         'scale'      => $scale,
@@ -2538,7 +3069,6 @@ function cora_ajax_update_lead_status() {
     $names   = isset( $_POST['names'] ) ? sanitize_text_field( $_POST['names'] ) : null;
     $email   = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : null;
     
-    // Additional sales pipeline enrichment fields
     $scale = isset( $_POST['scale'] ) ? sanitize_text_field( $_POST['scale'] ) : null;
     $city  = isset( $_POST['city'] ) ? sanitize_text_field( $_POST['city'] ) : null;
     $price = isset( $_POST['price'] ) ? sanitize_text_field( $_POST['price'] ) : null;
@@ -2553,6 +3083,67 @@ function cora_ajax_update_lead_status() {
         wp_send_json_error( 'Lead ID is required.' );
     }
 
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+
+    $update_data = array();
+    $update_format = array();
+
+    if ( ! empty( $status ) ) {
+        $status_enum = 'new';
+        $os = strtolower(trim($status));
+        if (strpos($os, 'new') !== false) $status_enum = 'new';
+        elseif (strpos($os, 'proposal') !== false || strpos($os, 'contact') !== false) $status_enum = 'contacted';
+        elseif (strpos($os, 'visit') !== false || strpos($os, 'showing') !== false) $status_enum = 'site_visit';
+        elseif (strpos($os, 'negotiat') !== false) $status_enum = 'negotiation';
+        elseif (strpos($os, 'closed') !== false || strpos($os, 'won') !== false || $os === 'converted') $status_enum = 'closed';
+        elseif (strpos($os, 'lost') !== false) $status_enum = 'lost';
+        
+        $update_data['status'] = $status_enum;
+        $update_format[] = '%s';
+    }
+    if ( null !== $notes ) {
+        $update_data['notes'] = $notes;
+        $update_format[] = '%s';
+    }
+    if ( null !== $names ) {
+        $update_data['first_name'] = $names;
+        $update_format[] = '%s';
+    }
+    if ( null !== $email ) {
+        $update_data['email'] = $email;
+        $update_format[] = '%s';
+    }
+    if ( null !== $scale ) {
+        $update_data['property_type'] = $scale;
+        $update_format[] = '%s';
+    }
+    if ( null !== $city ) {
+        $update_data['preferred_locations'] = $city;
+        $update_format[] = '%s';
+    }
+    if ( null !== $price ) {
+        $update_data['budget_max'] = !empty($price) ? intval(preg_replace('/[^\d]/', '', $price)) : 0;
+        $update_format[] = '%d';
+    }
+    if ( null !== $followup_date ) {
+        $update_data['followup_date'] = !empty($followup_date) ? date('Y-m-d H:i:s', strtotime($followup_date)) : null;
+        $update_format[] = '%s';
+    }
+
+    if ( ! empty($update_data) ) {
+        $update_data['updated_at'] = current_time('mysql');
+        $update_format[] = '%s';
+        
+        $wpdb->update(
+            $wpdb->prefix . 'cora_leads',
+            $update_data,
+            array( 'id' => $lead_id, 'agency_id' => $agency_id ),
+            $update_format,
+            array( '%d', '%d' )
+        );
+    }
+
     $leads = get_option( 'cora_re_leads', array() );
     if ( ! is_array( $leads ) ) {
         wp_send_json_error( 'No leads found.' );
@@ -2560,71 +3151,46 @@ function cora_ajax_update_lead_status() {
 
     $found_key = null;
     foreach ( $leads as $key => $lead ) {
-        if ( isset( $lead['id'] ) && $lead['id'] === $lead_id ) {
+        if ( isset( $lead['id'] ) && strval($lead['id']) === strval($lead_id) ) {
             $found_key = $key;
             break;
         }
     }
 
-    if ( null === $found_key ) {
-        wp_send_json_error( 'Lead not found.' );
-    }
-
-    if ( ! empty( $status ) ) {
-        $leads[$found_key]['status'] = $status;
-        
-        // If status changed to Converted, also copy to Clients list
-        if ( 'Converted' === $status ) {
-            // Auto-cancel remaining scheduled emails
-            if ( isset( $leads[$found_key]['emails'] ) && is_array( $leads[$found_key]['emails'] ) ) {
-                foreach ( $leads[$found_key]['emails'] as $ekey => $email_val ) {
-                    if ( isset( $email_val['status'] ) && 'Scheduled' === $email_val['status'] ) {
-                        $leads[$found_key]['emails'][$ekey]['status'] = 'Cancelled';
+    if ( null !== $found_key ) {
+        if ( ! empty( $status ) ) {
+            $leads[$found_key]['status'] = $status;
+            if ( 'Converted' === $status ) {
+                if ( isset( $leads[$found_key]['emails'] ) && is_array( $leads[$found_key]['emails'] ) ) {
+                    foreach ( $leads[$found_key]['emails'] as $ekey => $email_val ) {
+                        if ( isset( $email_val['status'] ) && 'Scheduled' === $email_val['status'] ) {
+                            $leads[$found_key]['emails'][$ekey]['status'] = 'Cancelled';
+                        }
                     }
                 }
+                cora_copy_lead_to_clients( $leads[$found_key] );
             }
-            cora_copy_lead_to_clients( $leads[$found_key] );
         }
-    }
-    if ( null !== $notes ) {
-        $leads[$found_key]['notes'] = $notes;
-    }
-    if ( null !== $names ) {
-        $leads[$found_key]['names'] = $names;
-    }
-    if ( null !== $email ) {
-        $leads[$found_key]['email'] = $email;
-    }
-    if ( null !== $scale ) {
-        $leads[$found_key]['scale'] = $scale;
-    }
-    if ( null !== $city ) {
-        $leads[$found_key]['city'] = $city;
-    }
-    if ( null !== $price ) {
-        $leads[$found_key]['price'] = $price;
-    }
-    if ( null !== $demo_portfolio ) {
-        $leads[$found_key]['demo_portfolio'] = $demo_portfolio;
-    }
-    if ( null !== $demo_portfolio_shared ) {
-        $leads[$found_key]['demo_portfolio_shared'] = ( $demo_portfolio_shared === 'true' );
-    }
-    if ( null !== $demo_portfolio_viewed ) {
-        $leads[$found_key]['demo_portfolio_viewed'] = ( $demo_portfolio_viewed === 'true' );
-    }
-    if ( null !== $listing_ids ) {
-        $leads[$found_key]['listing_ids'] = array_filter( array_map( 'trim', explode( ',', $listing_ids ) ) );
-    }
-    if ( null !== $followup_date ) {
-        $leads[$found_key]['followup_date'] = $followup_date;
-    }
+        if ( null !== $notes ) $leads[$found_key]['notes'] = $notes;
+        if ( null !== $names ) $leads[$found_key]['names'] = $names;
+        if ( null !== $email ) $leads[$found_key]['email'] = $email;
+        if ( null !== $scale ) $leads[$found_key]['scale'] = $scale;
+        if ( null !== $city ) $leads[$found_key]['city'] = $city;
+        if ( null !== $price ) $leads[$found_key]['price'] = $price;
+        if ( null !== $demo_portfolio ) $leads[$found_key]['demo_portfolio'] = $demo_portfolio;
+        if ( null !== $demo_portfolio_shared ) $leads[$found_key]['demo_portfolio_shared'] = ( $demo_portfolio_shared === 'true' );
+        if ( null !== $demo_portfolio_viewed ) $leads[$found_key]['demo_portfolio_viewed'] = ( $demo_portfolio_viewed === 'true' );
+        if ( null !== $listing_ids ) {
+            $leads[$found_key]['listing_ids'] = array_filter( array_map( 'trim', explode( ',', $listing_ids ) ) );
+        }
+        if ( null !== $followup_date ) $leads[$found_key]['followup_date'] = $followup_date;
 
-    update_option( 'cora_re_leads', $leads );
+        update_option( 'cora_re_leads', $leads );
+    }
 
     wp_send_json_success( array(
         'message' => 'Lead updated successfully.',
-        'lead'    => $leads[$found_key]
+        'lead'    => (null !== $found_key) ? $leads[$found_key] : array()
     ) );
 }
 add_action( 'wp_ajax_cora_update_lead_status', 'cora_ajax_update_lead_status' );
@@ -2645,26 +3211,30 @@ function cora_ajax_delete_lead() {
         wp_send_json_error( 'Lead ID is required.' );
     }
 
-    $leads = get_option( 'cora_re_leads', array() );
-    if ( ! is_array( $leads ) ) {
-        wp_send_json_error( 'No leads found.' );
-    }
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
 
-    $found_key = null;
-    foreach ( $leads as $key => $lead ) {
-        if ( isset( $lead['id'] ) && $lead['id'] === $lead_id ) {
-            $found_key = $key;
-            break;
+    $wpdb->delete(
+        $wpdb->prefix . 'cora_leads',
+        array( 'id' => $lead_id, 'agency_id' => $agency_id ),
+        array( '%d', '%d' )
+    );
+
+    $leads = get_option( 'cora_re_leads', array() );
+    if ( is_array( $leads ) ) {
+        $found_key = null;
+        foreach ( $leads as $key => $lead ) {
+            if ( isset( $lead['id'] ) && strval($lead['id']) === strval($lead_id) ) {
+                $found_key = $key;
+                break;
+            }
+        }
+        if ( null !== $found_key ) {
+            unset( $leads[$found_key] );
+            $leads = array_values( $leads );
+            update_option( 'cora_re_leads', $leads );
         }
     }
-
-    if ( null === $found_key ) {
-        wp_send_json_error( 'Lead not found.' );
-    }
-
-    unset( $leads[$found_key] );
-    $leads = array_values( $leads );
-    update_option( 'cora_re_leads', $leads );
 
     wp_send_json_success( array(
         'message' => 'Lead deleted.'
@@ -2676,20 +3246,57 @@ add_action( 'wp_ajax_cora_re_delete_lead', 'cora_ajax_delete_lead' );
  * Helper: Copy a Lead to Client Directory
  */
 function cora_copy_lead_to_clients( $lead ) {
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $branch_id = cora_db_get_branch_id();
+
+    $client_exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_clients WHERE lead_id = %d AND agency_id = %d", $lead['id'], $agency_id ) );
+    $inserted_client_id = 0;
+    if ( ! $client_exists ) {
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_clients',
+            array(
+                'agency_id' => $agency_id,
+                'branch_id' => $branch_id,
+                'lead_id' => $lead['id'],
+                'first_name' => $lead['names'] ?? '',
+                'last_name' => '',
+                'email' => $lead['email'] ?? '',
+                'phone' => $lead['phone'] ?? '',
+                'type' => 'buyer',
+                'notes' => $lead['scale'] ?? '',
+                'embed_vector' => 0,
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql')
+            ),
+            array('%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s')
+        );
+        $inserted_client_id = $wpdb->insert_id;
+        
+        $wpdb->update(
+            $wpdb->prefix . 'cora_leads',
+            array( 'converted_to_client' => 1, 'client_id' => $inserted_client_id ),
+            array( 'id' => $lead['id'], 'agency_id' => $agency_id ),
+            array( '%d', '%d' ),
+            array( '%d', '%d' )
+        );
+    }
+
     $clients = get_option( 'cora_re_clients', array() );
     if ( ! is_array( $clients ) ) {
         $clients = array();
     }
 
-    // Check if client already exists
     foreach ( $clients as $client ) {
-        if ( isset( $client['lead_id'] ) && $client['lead_id'] === $lead['id'] ) {
-            return; // already converted
+        if ( isset( $client['lead_id'] ) && strval($client['lead_id']) === strval($lead['id']) ) {
+            return;
         }
     }
 
+    $new_client_id = $client_exists ? $client_exists : $inserted_client_id;
+
     $clients[] = array(
-        'id'            => 'client_' . time() . '_' . wp_generate_password( 4, false ),
+        'id'            => $new_client_id,
         'lead_id'       => $lead['id'],
         'names'         => $lead['names'],
         'email'         => $lead['email'],
@@ -2724,32 +3331,40 @@ function cora_ajax_convert_lead_to_client() {
         wp_send_json_error( 'Lead ID is required.' );
     }
 
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+
+    $wpdb->update(
+        $wpdb->prefix . 'cora_leads',
+        array( 'status' => 'closed', 'converted_to_client' => 1 ),
+        array( 'id' => $lead_id, 'agency_id' => $agency_id ),
+        array( '%s', '%d' ),
+        array( '%d', '%d' )
+    );
+
     $leads = get_option( 'cora_re_leads', array() );
     $found_key = null;
     foreach ( $leads as $key => $lead ) {
-        if ( isset( $lead['id'] ) && $lead['id'] === $lead_id ) {
+        if ( isset( $lead['id'] ) && strval($lead['id']) === strval($lead_id) ) {
             $found_key = $key;
             break;
         }
     }
 
-    if ( null === $found_key ) {
-        wp_send_json_error( 'Lead not found.' );
-    }
-
-    $leads[$found_key]['status'] = 'Converted';
-    
-    // Auto-cancel remaining scheduled emails
-    if ( isset( $leads[$found_key]['emails'] ) && is_array( $leads[$found_key]['emails'] ) ) {
-        foreach ( $leads[$found_key]['emails'] as $ekey => $email ) {
-            if ( isset( $email['status'] ) && 'Scheduled' === $email['status'] ) {
-                $leads[$found_key]['emails'][$ekey]['status'] = 'Cancelled';
+    if ( null !== $found_key ) {
+        $leads[$found_key]['status'] = 'Converted';
+        
+        if ( isset( $leads[$found_key]['emails'] ) && is_array( $leads[$found_key]['emails'] ) ) {
+            foreach ( $leads[$found_key]['emails'] as $ekey => $email ) {
+                if ( isset( $email['status'] ) && 'Scheduled' === $email['status'] ) {
+                    $leads[$found_key]['emails'][$ekey]['status'] = 'Cancelled';
+                }
             }
         }
+        
+        cora_copy_lead_to_clients( $leads[$found_key] );
+        update_option( 'cora_re_leads', $leads );
     }
-    
-    cora_copy_lead_to_clients( $leads[$found_key] );
-    update_option( 'cora_re_leads', $leads );
 
     wp_send_json_success( array(
         'message' => 'Lead converted to Client directory successfully.'
@@ -2773,26 +3388,31 @@ function cora_ajax_delete_client() {
         wp_send_json_error( 'Client ID is required.' );
     }
 
-    $clients = get_option( 'cora_re_clients', array() );
-    if ( ! is_array( $clients ) ) {
-        wp_send_json_error( 'No clients found.' );
-    }
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $db_id = intval(preg_replace('/[^\d]/', '', $client_id));
 
-    $found_key = null;
-    foreach ( $clients as $key => $client ) {
-        if ( isset( $client['id'] ) && $client['id'] === $client_id ) {
-            $found_key = $key;
-            break;
+    $wpdb->delete(
+        $wpdb->prefix . 'cora_clients',
+        array( 'id' => $db_id, 'agency_id' => $agency_id ),
+        array( '%d', '%d' )
+    );
+
+    $clients = get_option( 'cora_re_clients', array() );
+    if ( is_array( $clients ) ) {
+        $found_key = null;
+        foreach ( $clients as $key => $client ) {
+            if ( isset( $client['id'] ) && strval($client['id']) === strval($client_id) ) {
+                $found_key = $key;
+                break;
+            }
+        }
+        if ( null !== $found_key ) {
+            unset( $clients[$found_key] );
+            $clients = array_values( $clients );
+            update_option( 'cora_re_clients', $clients );
         }
     }
-
-    if ( null === $found_key ) {
-        wp_send_json_error( 'Client not found.' );
-    }
-
-    unset( $clients[$found_key] );
-    $clients = array_values( $clients );
-    update_option( 'cora_re_clients', $clients );
 
     wp_send_json_success( array(
         'message' => 'Client removed from directory.'
@@ -2819,13 +3439,61 @@ function cora_ajax_save_booking() {
         wp_send_json_error( 'Client name is required.' );
     }
 
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $branch_id = cora_db_get_branch_id();
+
+    $wpdb->insert(
+        $wpdb->prefix . 'cora_clients',
+        array(
+            'agency_id' => $agency_id,
+            'branch_id' => $branch_id,
+            'lead_id' => null,
+            'first_name' => $name,
+            'last_name' => '',
+            'email' => strtolower( str_replace( ' ', '', $name ) ) . '@gmail.com',
+            'phone' => '',
+            'type' => 'buyer',
+            'notes' => strtolower( str_replace( ' ', '-', $type ) ),
+            'embed_vector' => 0,
+            'created_at' => current_time('mysql'),
+            'updated_at' => current_time('mysql')
+        ),
+        array('%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s')
+    );
+    $new_client_id = $wpdb->insert_id;
+
+    $package_value = intval(preg_replace('/[^\d]/', '', $price));
+    $showing_dt = !empty($date) ? date('Y-m-d H:i:s', strtotime($date)) : current_time('mysql');
+
+    $wpdb->insert(
+        $wpdb->prefix . 'cora_bookings',
+        array(
+            'agency_id' => $agency_id,
+            'branch_id' => $branch_id,
+            'lead_id' => null,
+            'client_id' => $new_client_id,
+            'property_id' => null,
+            'assigned_agent' => get_current_user_id(),
+            'showing_date' => $showing_dt,
+            'status' => 'confirmed',
+            'package_value' => $package_value,
+            'deal_type' => $type,
+            'crew' => '[]',
+            'notes' => $location,
+            'created_at' => current_time('mysql'),
+            'updated_at' => current_time('mysql')
+        ),
+        array('%d', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s')
+    );
+
     $clients = get_option( 'cora_re_clients', array() );
     if ( ! is_array( $clients ) ) {
         $clients = array();
     }
 
     $new_client = array(
-        'id'           => 'client_' . time() . '_' . wp_generate_password( 4, false ),
+        'id'           => $new_client_id,
         'names'        => $name,
         'email'        => strtolower( str_replace( ' ', '', $name ) ) . '@gmail.com',
         'scale'        => strtolower( str_replace( ' ', '-', $type ) ),
@@ -2861,11 +3529,36 @@ function cora_ajax_update_booking_status() {
         wp_send_json_error( 'Status is required.' );
     }
 
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $db_client_id = intval(preg_replace('/[^\d]/', '', $client_id));
+
+    if ( $db_client_id > 0 ) {
+        $wpdb->update(
+            $wpdb->prefix . 'cora_bookings',
+            array( 'status' => $status, 'updated_at' => current_time('mysql') ),
+            array( 'client_id' => $db_client_id, 'agency_id' => $agency_id ),
+            array( '%s', '%s' ),
+            array( '%d', '%d' )
+        );
+    } elseif ( ! empty($client_name) ) {
+        $resolved_client_id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_clients WHERE first_name = %s AND agency_id = %d", $client_name, $agency_id ) );
+        if ( $resolved_client_id ) {
+            $wpdb->update(
+                $wpdb->prefix . 'cora_bookings',
+                array( 'status' => $status, 'updated_at' => current_time('mysql') ),
+                array( 'client_id' => $resolved_client_id, 'agency_id' => $agency_id ),
+                array( '%s', '%s' ),
+                array( '%d', '%d' )
+            );
+        }
+    }
+
     $clients = get_option( 'cora_re_clients', array() );
     $updated = false;
 
     foreach ( $clients as $key => $client ) {
-        if ( ( ! empty( $client_id ) && $client['id'] === $client_id ) || ( ! empty( $client_name ) && $client['names'] === $client_name ) ) {
+        if ( ( ! empty( $client_id ) && strval($client['id']) === strval($client_id) ) || ( ! empty( $client_name ) && $client['names'] === $client_name ) ) {
             $clients[$key]['status'] = $status;
             $updated = true;
             break;
@@ -3023,6 +3716,57 @@ function cora_ajax_save_transaction() {
         wp_send_json_error( 'Description and a positive Amount are required.' );
     }
 
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $branch_id = cora_db_get_branch_id();
+
+    $db_client_id = intval(preg_replace('/[^\d]/', '', $client_link));
+    $amount_cents = intval($amount * 100);
+
+    $db_id = 0;
+    if ( ! empty( $id ) ) {
+        $db_id = intval(preg_replace('/[^\d]/', '', $id));
+    }
+
+    if ( $db_id > 0 ) {
+        $wpdb->update(
+            $wpdb->prefix . 'cora_ledger',
+            array(
+                'type' => strtolower($type),
+                'amount' => $amount_cents,
+                'description' => $description,
+                'client_id' => $db_client_id ?: null,
+                'status' => strtolower($status),
+                'transaction_date' => $date,
+                'updated_at' => current_time('mysql')
+            ),
+            array( 'id' => $db_id, 'agency_id' => $agency_id ),
+            array('%s', '%d', '%s', '%d', '%s', '%s', '%s'),
+            array('%d', '%d')
+        );
+        $new_id = $db_id;
+    } else {
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_ledger',
+            array(
+                'agency_id' => $agency_id,
+                'branch_id' => $branch_id,
+                'type' => strtolower($type),
+                'amount' => $amount_cents,
+                'description' => $description,
+                'lead_id' => null,
+                'client_id' => $db_client_id ?: null,
+                'status' => strtolower($status),
+                'transaction_date' => $date,
+                'created_by' => get_current_user_id(),
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql')
+            ),
+            array('%d', '%d', '%s', '%d', '%s', '%d', '%d', '%s', '%s', '%d', '%s', '%s')
+        );
+        $new_id = $wpdb->insert_id;
+    }
+
     $transactions = get_option( 'cora_re_ledger', array() );
     if ( ! is_array( $transactions ) ) {
         $transactions = array();
@@ -3033,7 +3777,7 @@ function cora_ajax_save_transaction() {
 
     if ( ! empty( $id ) ) {
         foreach ( $transactions as $key => $tx ) {
-            if ( isset( $tx['id'] ) && $tx['id'] === $id ) {
+            if ( isset( $tx['id'] ) && strval($tx['id']) === strval($id) ) {
                 $transactions[$key]['date'] = $date;
                 $transactions[$key]['description'] = $description;
                 $transactions[$key]['type'] = $type;
@@ -3050,7 +3794,7 @@ function cora_ajax_save_transaction() {
 
     if ( ! $updated ) {
         $new_tx = array(
-            'id' => 'tx_' . time() . '_' . rand(100, 999),
+            'id' => $new_id,
             'date' => $date,
             'description' => $description,
             'type' => $type,
@@ -3083,26 +3827,31 @@ function cora_ajax_delete_transaction() {
         wp_send_json_error( 'Transaction ID is required.' );
     }
 
-    $transactions = get_option( 'cora_re_ledger', array() );
-    if ( ! is_array( $transactions ) ) {
-        wp_send_json_error( 'No transactions found.' );
-    }
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $db_id = intval(preg_replace('/[^\d]/', '', $id));
 
-    $found_key = null;
-    foreach ( $transactions as $key => $tx ) {
-        if ( isset( $tx['id'] ) && $tx['id'] === $id ) {
-            $found_key = $key;
-            break;
+    $wpdb->delete(
+        $wpdb->prefix . 'cora_ledger',
+        array( 'id' => $db_id, 'agency_id' => $agency_id ),
+        array( '%d', '%d' )
+    );
+
+    $transactions = get_option( 'cora_re_ledger', array() );
+    if ( is_array( $transactions ) ) {
+        $found_key = null;
+        foreach ( $transactions as $key => $tx ) {
+            if ( isset( $tx['id'] ) && strval($tx['id']) === strval($id) ) {
+                $found_key = $key;
+                break;
+            }
+        }
+        if ( null !== $found_key ) {
+            unset( $transactions[$found_key] );
+            $transactions = array_values( $transactions );
+            update_option( 'cora_re_ledger', $transactions );
         }
     }
-
-    if ( null === $found_key ) {
-        wp_send_json_error( 'Transaction not found.' );
-    }
-
-    unset( $transactions[$found_key] );
-    $transactions = array_values( $transactions );
-    update_option( 'cora_re_ledger', $transactions );
 
     wp_send_json_success( array(
         'message' => 'Transaction deleted successfully.'
@@ -3231,6 +3980,9 @@ function cora_ajax_get_article() {
 
     $keyword = get_post_meta($post_id, '_cora_seo_keyword', true);
     $description = get_post_meta($post_id, '_cora_seo_description', true);
+    $assignee_id = get_post_meta($post_id, '_cora_assignee_id', true) ?: '';
+    $editorial_status = get_post_meta($post_id, '_cora_editorial_status', true) ?: ($post->post_status === 'publish' ? 'published' : 'draft');
+    $editorial_feedback = get_post_meta($post_id, '_cora_editorial_feedback', true) ?: '';
 
     $categories = wp_get_post_categories($post_id);
     $tags = wp_get_post_tags($post_id, array('fields' => 'ids'));
@@ -3238,13 +3990,17 @@ function cora_ajax_get_article() {
     $thumbnail_url = $thumbnail_id ? wp_get_attachment_image_url($thumbnail_id, 'full') : '';
 
     wp_send_json_success(array(
+        'title' => $post->post_title,
         'content' => $post->post_content,
         'keyword' => $keyword,
         'description' => $description,
         'categories' => $categories,
         'tags' => $tags,
         'thumbnail_id' => $thumbnail_id,
-        'thumbnail_url' => $thumbnail_url
+        'thumbnail_url' => $thumbnail_url,
+        'assignee_id' => $assignee_id,
+        'editorial_status' => $editorial_status,
+        'editorial_feedback' => $editorial_feedback
     ));
 }
 add_action( 'wp_ajax_cora_get_article', 'cora_ajax_get_article' );
@@ -3263,6 +4019,10 @@ function cora_ajax_save_article() {
     $description = isset($_POST['description']) ? sanitize_textarea_field($_POST['description']) : '';
     $seo_score = isset($_POST['seo_score']) ? intval($_POST['seo_score']) : '';
     
+    $assignee_id = isset($_POST['assignee_id']) ? intval($_POST['assignee_id']) : 0;
+    $editorial_status = isset($_POST['editorial_status']) ? sanitize_key($_POST['editorial_status']) : '';
+    $editorial_feedback = isset($_POST['editorial_feedback']) ? sanitize_textarea_field($_POST['editorial_feedback']) : '';
+
     $categories = isset($_POST['categories']) ? array_map('intval', (array)$_POST['categories']) : array();
     
     // Process tags: numeric values are existing IDs, strings are new tag names
@@ -3314,6 +4074,17 @@ function cora_ajax_save_article() {
 
     update_post_meta($saved_id, '_cora_seo_keyword', $keyword);
     update_post_meta($saved_id, '_cora_seo_description', $description);
+    update_post_meta($saved_id, '_cora_assignee_id', $assignee_id);
+    update_post_meta($saved_id, '_cora_editorial_feedback', $editorial_feedback);
+
+    if ($status === 'publish') {
+        update_post_meta($saved_id, '_cora_editorial_status', 'published');
+    } else if (!empty($editorial_status)) {
+        update_post_meta($saved_id, '_cora_editorial_status', $editorial_status);
+    } else {
+        update_post_meta($saved_id, '_cora_editorial_status', 'draft');
+    }
+
     if ($seo_score) {
         update_post_meta($saved_id, '_cora_seo_score', $seo_score);
     }
@@ -3321,6 +4092,153 @@ function cora_ajax_save_article() {
     wp_send_json_success();
 }
 add_action( 'wp_ajax_cora_save_article', 'cora_ajax_save_article' );
+
+/**
+ * AJAX Actions: Review State Management
+ */
+function cora_ajax_submit_for_review() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
+    if (!$post_id) wp_send_json_error('Invalid post ID');
+    
+    update_post_meta($post_id, '_cora_editorial_status', 'pending_review');
+    wp_send_json_success(array('message' => 'Article submitted for review successfully!'));
+}
+add_action( 'wp_ajax_cora_submit_for_review', 'cora_ajax_submit_for_review' );
+
+function cora_ajax_approve_draft() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
+    if (!$post_id) wp_send_json_error('Invalid post ID');
+    
+    update_post_meta($post_id, '_cora_editorial_status', 'approved');
+    update_post_meta($post_id, '_cora_editorial_feedback', '');
+    wp_send_json_success(array('message' => 'Article approved successfully!'));
+}
+add_action( 'wp_ajax_cora_approve_draft', 'cora_ajax_approve_draft' );
+
+function cora_ajax_reject_draft() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
+    $feedback = isset($_POST['feedback']) ? sanitize_textarea_field($_POST['feedback']) : '';
+    if (!$post_id) wp_send_json_error('Invalid post ID');
+    
+    update_post_meta($post_id, '_cora_editorial_status', 'draft');
+    update_post_meta($post_id, '_cora_editorial_feedback', $feedback);
+    wp_send_json_success(array('message' => 'Revisions requested successfully!'));
+}
+add_action( 'wp_ajax_cora_reject_draft', 'cora_ajax_reject_draft' );
+
+/**
+ * DB Helper: Get Captured Leads count for Blog Post
+ */
+function cora_db_get_article_lead_count( $post_id ) {
+    global $wpdb;
+    $count = $wpdb->get_var( $wpdb->prepare(
+        "SELECT COUNT(*) FROM {$wpdb->prefix}cora_leads WHERE source = %s",
+        'Blog Post ID: ' . $post_id
+    ) );
+    return intval( $count );
+}
+
+/**
+ * DB Helper: Get Captured Leads list for Blog Post
+ */
+function cora_db_get_article_leads( $post_id ) {
+    global $wpdb;
+    return $wpdb->get_results( $wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}cora_leads WHERE source = %s ORDER BY id DESC",
+        'Blog Post ID: ' . $post_id
+    ) );
+}
+
+/**
+ * AJAX Action: Submit Blog Lead
+ */
+function cora_ajax_submit_blog_lead() {
+    global $wpdb;
+    $post_id    = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
+    $first_name = isset( $_POST['first_name'] ) ? sanitize_text_field( $_POST['first_name'] ) : '';
+    $last_name  = isset( $_POST['last_name'] ) ? sanitize_text_field( $_POST['last_name'] ) : '';
+    $email      = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
+    $phone      = isset( $_POST['phone'] ) ? sanitize_text_field( $_POST['phone'] ) : '';
+    $notes      = isset( $_POST['notes'] ) ? sanitize_textarea_field( $_POST['notes'] ) : '';
+
+    if ( empty( $first_name ) || empty( $email ) ) {
+        wp_send_json_error( 'Name and email are required.' );
+    }
+
+    $lead_data = array(
+        'agency_id'     => 1,
+        'branch_id'     => 1,
+        'first_name'    => $first_name,
+        'last_name'     => $last_name,
+        'email'         => $email,
+        'phone'         => $phone,
+        'source'        => 'Blog Post ID: ' . $post_id,
+        'status'        => 'new',
+        'notes'         => $notes,
+        'created_at'    => current_time('mysql'),
+        'updated_at'    => current_time('mysql')
+    );
+
+    $inserted = $wpdb->insert(
+        $wpdb->prefix . 'cora_leads',
+        $lead_data,
+        array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
+    );
+
+    if ( $inserted ) {
+        $inserted_id = $wpdb->insert_id;
+        $leads_opt = get_option( 'cora_re_leads', array() );
+        if ( ! is_array( $leads_opt ) ) {
+            $leads_opt = array();
+        }
+        $leads_opt[] = array(
+            'id'         => $inserted_id,
+            'names'      => trim( $first_name . ' ' . $last_name ),
+            'email'      => $email,
+            'phone'      => $phone,
+            'source'     => 'Blog Post ID: ' . $post_id,
+            'status'     => 'new',
+            'notes'      => $notes,
+            'created_at' => time()
+        );
+        update_option( 'cora_re_leads', $leads_opt );
+
+        cora_sync_db_tables_to_options();
+        wp_send_json_success( array( 'message' => 'Your request was submitted successfully!' ) );
+    } else {
+        wp_send_json_error( 'Failed to submit request.' );
+    }
+}
+add_action( 'wp_ajax_cora_submit_blog_lead', 'cora_ajax_submit_blog_lead' );
+add_action( 'wp_ajax_nopriv_cora_submit_blog_lead', 'cora_ajax_submit_blog_lead' );
+
+/**
+ * AJAX Action: Get captured leads for Blog Post Drawer
+ */
+function cora_ajax_get_article_leads() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
+    if ( ! $post_id ) {
+        wp_send_json_error( 'Invalid post ID.' );
+    }
+    $leads = cora_db_get_article_leads( $post_id );
+    $response_data = array();
+    foreach ( $leads as $lead ) {
+        $response_data[] = array(
+            'first_name' => $lead->first_name,
+            'last_name'  => $lead->last_name ?: '',
+            'email'      => $lead->email ?: '',
+            'phone'      => $lead->phone ?: '',
+            'notes'      => $lead->notes ?: '',
+            'date'       => date( 'jS M, Y', strtotime( $lead->created_at ) )
+        );
+    }
+    wp_send_json_success( $response_data );
+}
+add_action( 'wp_ajax_cora_get_article_leads', 'cora_ajax_get_article_leads' );
 
 /**
  * AJAX Action: Get Page Details
@@ -5271,14 +6189,6 @@ function cora_enqueue_elementor_reskin_scripts() {
         time(),
         true
     );
-    // Enqueue Custom React Shell Wrapper
-    wp_enqueue_script(
-        'cora-elementor-react-shell',
-        plugin_dir_url( __FILE__ ) . 'build/index.js',
-        array('wp-element'),
-        time(),
-        true
-    );
 }
 add_action( 'elementor/editor/after_enqueue_scripts', 'cora_enqueue_elementor_reskin_scripts' );
 
@@ -6076,13 +6986,1579 @@ function cora_get_current_user_branch_id() {
     return get_user_meta( $user_id, 'cora_branch_id', true );
 }
 
+function cora_create_custom_tables() {
+    global $wpdb;
+    $theme_table = $wpdb->prefix . 'cora_canvas_themes';
+    $table_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $theme_table ) );
+    if ( get_option( 'cora_db_v2_created' ) && $table_exists ) {
+        return;
+    }
+    $charset_collate = $wpdb->get_charset_collate();
+
+    $table_queries = array();
+
+    // 1. cora_agencies
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_agencies (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      name varchar(255) NOT NULL,
+      slug varchar(100) NOT NULL,
+      owner_user_id bigint(20) unsigned NOT NULL,
+      plan varchar(50) NOT NULL DEFAULT 'beta',
+      status varchar(20) NOT NULL DEFAULT 'active',
+      settings longtext,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      UNIQUE KEY slug (slug)
+    ) $charset_collate;";
+
+    // 2. cora_branches
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_branches (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL,
+      name varchar(255) NOT NULL,
+      city varchar(100),
+      address text,
+      manager_id bigint(20) unsigned,
+      status varchar(20) NOT NULL DEFAULT 'active',
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY agency_id (agency_id)
+    ) $charset_collate;";
+
+    // 3. cora_users
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_users (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      wp_user_id bigint(20) unsigned NOT NULL,
+      agency_id bigint(20) unsigned NOT NULL,
+      branch_id bigint(20) unsigned,
+      role varchar(50) NOT NULL DEFAULT 'agent',
+      phone varchar(20),
+      status varchar(20) NOT NULL DEFAULT 'active',
+      invited_by bigint(20) unsigned,
+      last_active datetime,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      UNIQUE KEY wp_user_id (wp_user_id),
+      KEY agency_id (agency_id),
+      KEY branch_id (branch_id)
+    ) $charset_collate;";
+
+    // 4. cora_invitations
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_invitations (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL,
+      branch_id bigint(20) unsigned,
+      email varchar(255) NOT NULL,
+      role varchar(50) NOT NULL,
+      token varchar(64) NOT NULL,
+      invited_by bigint(20) unsigned NOT NULL,
+      status varchar(20) NOT NULL DEFAULT 'pending',
+      expires_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      accepted_at datetime,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      UNIQUE KEY token (token),
+      KEY agency_id (agency_id)
+    ) $charset_collate;";
+
+    // 5. cora_leads
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_leads (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL,
+      branch_id bigint(20) unsigned NOT NULL,
+      assigned_to bigint(20) unsigned,
+      first_name varchar(100) NOT NULL,
+      last_name varchar(100),
+      email varchar(255),
+      phone varchar(20),
+      source varchar(100),
+      status varchar(50) NOT NULL DEFAULT 'new',
+      budget_min bigint(20) unsigned,
+      budget_max bigint(20) unsigned,
+      preferred_locations text,
+      property_type varchar(100),
+      notes longtext,
+      followup_date datetime,
+      followup_notes text,
+      converted_to_client tinyint(1) NOT NULL DEFAULT 0,
+      client_id bigint(20) unsigned,
+      embed_vector tinyint(1) NOT NULL DEFAULT 0,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY agency_id (agency_id),
+      KEY branch_id (branch_id),
+      KEY assigned_to (assigned_to),
+      KEY status (status),
+      KEY followup_date (followup_date)
+    ) $charset_collate;";
+
+    // 6. cora_properties
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_properties (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL,
+      branch_id bigint(20) unsigned NOT NULL,
+      added_by bigint(20) unsigned NOT NULL,
+      title varchar(255) NOT NULL,
+      description longtext,
+      type varchar(100),
+      status varchar(50) NOT NULL DEFAULT 'available',
+      price bigint(20) unsigned,
+      location varchar(255),
+      city varchar(100),
+      area_sqft int(10) unsigned,
+      bedrooms tinyint(3) unsigned,
+      bathrooms tinyint(3) unsigned,
+      rera_number varchar(100),
+      media_ids text,
+      sync_link varchar(255),
+      seo_title varchar(255),
+      seo_description text,
+      seo_keywords text,
+      embed_vector tinyint(1) NOT NULL DEFAULT 0,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY agency_id (agency_id),
+      KEY branch_id (branch_id),
+      KEY status (status),
+      KEY city (city)
+    ) $charset_collate;";
+
+    // 7. cora_clients
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_clients (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL,
+      branch_id bigint(20) unsigned NOT NULL,
+      lead_id bigint(20) unsigned,
+      first_name varchar(100) NOT NULL,
+      last_name varchar(100),
+      email varchar(255),
+      phone varchar(20),
+      type varchar(50) NOT NULL DEFAULT 'buyer',
+      notes longtext,
+      embed_vector tinyint(1) NOT NULL DEFAULT 0,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY agency_id (agency_id),
+      KEY lead_id (lead_id)
+    ) $charset_collate;";
+
+    // 8. cora_bookings
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_bookings (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL,
+      branch_id bigint(20) unsigned NOT NULL,
+      lead_id bigint(20) unsigned,
+      client_id bigint(20) unsigned,
+      property_id bigint(20) unsigned,
+      assigned_agent bigint(20) unsigned,
+      showing_date datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      status varchar(50) NOT NULL DEFAULT 'confirmed',
+      package_value bigint(20) unsigned,
+      deal_type varchar(100),
+      crew text,
+      notes longtext,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY agency_id (agency_id),
+      KEY showing_date (showing_date),
+      KEY status (status)
+    ) $charset_collate;";
+
+    // 9. cora_ledger
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_ledger (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL,
+      branch_id bigint(20) unsigned NOT NULL,
+      type varchar(50) NOT NULL,
+      amount bigint(20) unsigned NOT NULL,
+      description text,
+      lead_id bigint(20) unsigned,
+      client_id bigint(20) unsigned,
+      status varchar(50) NOT NULL DEFAULT 'pending',
+      transaction_date date NOT NULL DEFAULT '0000-00-00',
+      created_by bigint(20) unsigned NOT NULL,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY agency_id (agency_id),
+      KEY type (type),
+      KEY transaction_date (transaction_date)
+    ) $charset_collate;";
+
+    // 10. cora_media
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_media (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL,
+      uploaded_by bigint(20) unsigned NOT NULL,
+      folder_id bigint(20) unsigned,
+      linked_type varchar(50),
+      linked_id bigint(20) unsigned,
+      file_name varchar(255) NOT NULL,
+      file_path varchar(500) NOT NULL,
+      file_type varchar(100) NOT NULL,
+      file_size bigint(20) unsigned NOT NULL,
+      mime_type varchar(100),
+      width int(10) unsigned,
+      height int(10) unsigned,
+      alt_text varchar(500),
+      title varchar(255),
+      caption text,
+      doc_type varchar(100),
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY agency_id (agency_id),
+      KEY uploaded_by (uploaded_by),
+      KEY linked_type_id (linked_type, linked_id),
+      KEY folder_id (folder_id)
+    ) $charset_collate;";
+
+    // 11. cora_media_folders
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_media_folders (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL,
+      parent_id bigint(20) unsigned,
+      name varchar(255) NOT NULL,
+      is_system tinyint(1) NOT NULL DEFAULT 0,
+      created_by bigint(20) unsigned NOT NULL,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY agency_id (agency_id),
+      KEY parent_id (parent_id)
+    ) $charset_collate;";
+
+    // 12. cora_activity_logs
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_activity_logs (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL,
+      user_id bigint(20) unsigned NOT NULL,
+      action_type varchar(100) NOT NULL,
+      description text NOT NULL,
+      record_type varchar(100),
+      record_id bigint(20) unsigned,
+      ip_address varchar(45),
+      user_agent varchar(255),
+      how varchar(50) NOT NULL DEFAULT 'manual',
+      instructed_by bigint(20) unsigned,
+      ai_reasoning text,
+      embed_vector tinyint(1) NOT NULL DEFAULT 0,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY agency_id (agency_id),
+      KEY user_id (user_id),
+      KEY action_type (action_type),
+      KEY created_at (created_at)
+    ) $charset_collate;";
+
+    // 13. cora_notifications
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_notifications (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL,
+      user_id bigint(20) unsigned NOT NULL,
+      title varchar(255) NOT NULL,
+      body text,
+      type varchar(100),
+      is_read tinyint(1) NOT NULL DEFAULT 0,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY user_id (user_id),
+      KEY is_read (is_read)
+    ) $charset_collate;";
+
+    // 14. cora_action_queue
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_action_queue (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL,
+      action_type varchar(100) NOT NULL,
+      payload longtext NOT NULL,
+      scheduled_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      executed_at datetime,
+      status varchar(50) NOT NULL DEFAULT 'pending',
+      created_by bigint(20) unsigned NOT NULL,
+      how varchar(50) NOT NULL DEFAULT 'manual',
+      instructed_by bigint(20) unsigned,
+      fail_reason text,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY agency_id (agency_id),
+      KEY status (status),
+      KEY scheduled_at (scheduled_at)
+    ) $charset_collate;";
+
+    // 15. cora_share_links
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_share_links (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL,
+      media_id bigint(20) unsigned NOT NULL,
+      token varchar(64) NOT NULL,
+      expires_at datetime,
+      created_by bigint(20) unsigned NOT NULL,
+      accessed_at datetime,
+      access_count int(10) unsigned NOT NULL DEFAULT 0,
+      is_active tinyint(1) NOT NULL DEFAULT 1,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      UNIQUE KEY token (token),
+      KEY media_id (media_id)
+    ) $charset_collate;";
+
+    // 16. cora_canvas_themes
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_canvas_themes (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL,
+      name varchar(255) NOT NULL,
+      status varchar(20) NOT NULL DEFAULT 'draft',
+      settings longtext,
+      activated_at datetime,
+      created_by bigint(20) unsigned NOT NULL,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY agency_id (agency_id),
+      KEY status (status)
+    ) $charset_collate;";
+
+    // 17. cora_canvas_pages
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_canvas_pages (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL,
+      theme_id bigint(20) unsigned NOT NULL,
+      wp_post_id bigint(20) unsigned NOT NULL,
+      title varchar(255) NOT NULL,
+      slug varchar(255) NOT NULL,
+      status varchar(20) NOT NULL DEFAULT 'draft',
+      is_homepage tinyint(1) NOT NULL DEFAULT 0,
+      template varchar(100),
+      seo_title varchar(255),
+      seo_description text,
+      seo_og_image varchar(500),
+      scheduled_at datetime,
+      created_by bigint(20) unsigned NOT NULL,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY agency_id (agency_id),
+      KEY theme_id (theme_id),
+      KEY wp_post_id (wp_post_id)
+    ) $charset_collate;";
+
+    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+    foreach ( $table_queries as $query ) {
+        dbDelta( $query );
+    }
+
+    update_option( 'cora_db_v2_created', true );
+}
+
+function cora_migrate_options_to_custom_tables() {
+    if ( get_option( 'cora_migration_v2_complete' ) ) {
+        return;
+    }
+    global $wpdb;
+
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}cora_agencies" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}cora_branches" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}cora_users" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}cora_leads" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}cora_properties" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}cora_clients" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}cora_bookings" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}cora_showing_crew" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}cora_ledger" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}cora_vault_docs" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}cora_portfolios" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}cora_activity_logs" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}cora_notifications" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}cora_action_queue" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}cora_share_links" );
+
+    // 1. Migrate agencies (seed default agency id 1)
+    $agency_exists = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_agencies WHERE id = 1" );
+    if ( !$agency_exists ) {
+        $logo_url = get_option('cora_brand_logo_url', '');
+        $favicon_url = get_option('cora_brand_favicon_url', '');
+        $currency_format = get_option('cora_currency_format', 'INR_LAKHS');
+        $pwd_min = get_option('cora_pwd_policy_min_len', 8);
+        $pwd_num = get_option('cora_pwd_policy_numbers', 0);
+        $pwd_upper = get_option('cora_pwd_policy_uppercase', 0);
+        $pwd_spec = get_option('cora_pwd_policy_special', 0);
+
+        $settings = array(
+            'logo_url' => $logo_url,
+            'favicon_url' => $favicon_url,
+            'currency_format' => $currency_format,
+            'pwd_policy_min_len' => $pwd_min,
+            'pwd_policy_numbers' => $pwd_num,
+            'pwd_policy_uppercase' => $pwd_upper,
+            'pwd_policy_special' => $pwd_spec
+        );
+
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_agencies',
+            array(
+                'id' => 1,
+                'name' => get_option('cora_workspace_name', 'Cora Default Agency'),
+                'slug' => 'default',
+                'owner_user_id' => 1,
+                'plan' => 'enterprise',
+                'status' => 'active',
+                'settings' => json_encode( $settings ),
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql')
+            ),
+            array('%d', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s')
+        );
+    }
+
+    // Helper status mappings
+    $map_lead_status = function($old_status) {
+        $os = strtolower(trim($old_status));
+        if (strpos($os, 'new') !== false) return 'new';
+        if (strpos($os, 'proposal') !== false || strpos($os, 'contact') !== false) return 'contacted';
+        if (strpos($os, 'visit') !== false || strpos($os, 'showing') !== false) return 'site_visit';
+        if (strpos($os, 'negotiat') !== false) return 'negotiation';
+        if (strpos($os, 'closed') !== false || strpos($os, 'won') !== false) return 'closed';
+        if (strpos($os, 'lost') !== false) return 'lost';
+        return 'new';
+    };
+
+    $parse_budget = function($price_str) {
+        if (is_numeric($price_str)) {
+            return intval($price_str);
+        }
+        $clean = preg_replace('/[^\d]/', '', $price_str);
+        return !empty($clean) ? intval($clean) : 0;
+    };
+
+    // 2. Migrate branches
+    $old_branches = get_option( 'cora_branches', array() );
+    $branch_id_map = array();
+    $default_branch_id = 0;
+    if ( is_array( $old_branches ) ) {
+        foreach ( $old_branches as $old_id => $b ) {
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_branches',
+                array(
+                    'agency_id' => 1,
+                    'name' => $b['name'] ?? 'Branch Office',
+                    'city' => $b['city'] ?? 'Default City',
+                    'address' => $b['address'] ?? 'Default Address',
+                    'manager_id' => intval($b['manager_id'] ?? 0),
+                    'status' => 'active',
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                ),
+                array('%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s')
+            );
+            $new_branch_id = $wpdb->insert_id;
+            $branch_id_map[ $old_id ] = $new_branch_id;
+            if ( $old_id === 'branch_1' || empty($default_branch_id) ) {
+                $default_branch_id = $new_branch_id;
+            }
+        }
+    }
+
+    // 3. Migrate users
+    $all_users = get_users();
+    foreach ( $all_users as $u ) {
+        $old_role = ! empty( $u->roles ) ? $u->roles[0] : '';
+        $role_mapped = 'agent';
+        switch ( $old_role ) {
+            case 'administrator': $role_mapped = 'super_admin'; break;
+            case 'cora_manager': $role_mapped = 'agency_owner'; break;
+            case 'cora_branch_manager': $role_mapped = 'branch_manager'; break;
+            case 'cora_photographer': $role_mapped = 'senior_agent'; break;
+            case 'cora_videographer': $role_mapped = 'agent'; break;
+            case 'cora_drone_pilot': $role_mapped = 'senior_agent'; break;
+            case 'cora_editor': $role_mapped = 'back_office'; break;
+            case 'cora_viewer': $role_mapped = 'viewer'; break;
+        }
+
+        $old_branch = get_user_meta( $u->ID, 'cora_branch_id', true );
+        $branch_new_id = isset($branch_id_map[$old_branch]) ? $branch_id_map[$old_branch] : $default_branch_id;
+
+        $phone = get_user_meta( $u->ID, 'cora_phone', true );
+        $status = (get_user_meta( $u->ID, 'cora_user_status', true ) === 'inactive') ? 'inactive' : 'active';
+
+        // Check if user already exists
+        $user_exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_users WHERE wp_user_id = %d", $u->ID ) );
+        if ( !$user_exists ) {
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_users',
+                array(
+                    'wp_user_id' => $u->ID,
+                    'agency_id' => 1,
+                    'branch_id' => $branch_new_id ?: null,
+                    'role' => $role_mapped,
+                    'phone' => $phone ?: '',
+                    'status' => $status,
+                    'invited_by' => 1,
+                    'last_active' => current_time('mysql'),
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                ),
+                array('%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s')
+            );
+        }
+    }
+
+    // 4. Migrate leads
+    $old_leads = get_option( 'cora_re_leads', array() );
+    $lead_id_map = array();
+    if ( is_array( $old_leads ) ) {
+        foreach ( $old_leads as $l ) {
+            $old_branch = $l['branch_id'] ?? '';
+            $branch_new_id = isset($branch_id_map[$old_branch]) ? $branch_id_map[$old_branch] : $default_branch_id;
+
+            $budget_max = $parse_budget($l['price'] ?? 0);
+
+            // Names splitting or assignment
+            $names = $l['names'] ?? 'Client Name';
+
+            // Convert created_at
+            $created_time = isset($l['created_at']) ? date('Y-m-d H:i:s', intval($l['created_at'])) : current_time('mysql');
+
+            $followup_dt = null;
+            if ( ! empty($l['followup_date']) ) {
+                $followup_dt = date('Y-m-d H:i:s', strtotime($l['followup_date']));
+            }
+
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_leads',
+                array(
+                    'agency_id' => 1,
+                    'branch_id' => $branch_new_id,
+                    'assigned_to' => null,
+                    'first_name' => $names,
+                    'last_name' => '',
+                    'email' => $l['email'] ?? '',
+                    'phone' => $l['phone'] ?? '',
+                    'source' => $l['source'] ?? 'Direct',
+                    'status' => $map_lead_status($l['status'] ?? 'New Lead'),
+                    'budget_min' => 0,
+                    'budget_max' => $budget_max,
+                    'preferred_locations' => $l['city'] ?? '',
+                    'property_type' => $l['scale'] ?? '',
+                    'notes' => $l['notes'] ?? '',
+                    'followup_date' => $followup_dt,
+                    'followup_notes' => $l['followup_notes'] ?? '',
+                    'converted_to_client' => 0,
+                    'client_id' => null,
+                    'embed_vector' => 0,
+                    'created_at' => $created_time,
+                    'updated_at' => current_time('mysql')
+                ),
+                array('%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s')
+            );
+            $lead_id_map[ $l['id'] ] = $wpdb->insert_id;
+        }
+    }
+
+    // 5. Migrate properties (listings)
+    $old_listings = get_option( 'cora_re_listings_inventory', array() );
+    $property_id_map = array();
+    if ( is_array( $old_listings ) ) {
+        foreach ( $old_listings as $lst ) {
+            $old_branch = $lst['branch_id'] ?? '';
+            $branch_new_id = isset($branch_id_map[$old_branch]) ? $branch_id_map[$old_branch] : $default_branch_id;
+
+            $status_mapped = 'available';
+            $os = strtolower(trim($lst['status'] ?? 'Available'));
+            if ($os === 'available') $status_mapped = 'available';
+            elseif ($os === 'under offer' || $os === 'under_offer') $status_mapped = 'under_offer';
+            elseif ($os === 'sold') $status_mapped = 'sold';
+            elseif ($os === 'off market' || $os === 'off_market') $status_mapped = 'off_market';
+
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_properties',
+                array(
+                    'agency_id' => 1,
+                    'branch_id' => $branch_new_id,
+                    'added_by' => 1,
+                    'title' => $lst['name'] ?? 'Property Listing',
+                    'description' => $lst['notes'] ?? '',
+                    'type' => $lst['category'] ?? '',
+                    'status' => $status_mapped,
+                    'price' => 0,
+                    'location' => $lst['notes'] ?? '',
+                    'city' => '',
+                    'area_sqft' => 0,
+                    'bedrooms' => 0,
+                    'bathrooms' => 0,
+                    'rera_number' => $lst['rera_reg_id'] ?? '',
+                    'media_ids' => '[]',
+                    'sync_link' => $lst['sync_link'] ?? '',
+                    'seo_title' => $lst['seo_title'] ?? '',
+                    'seo_description' => $lst['seo_description'] ?? '',
+                    'seo_keywords' => $lst['seo_keywords'] ?? '',
+                    'embed_vector' => 0,
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                ),
+                array('%d', '%d', '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s')
+            );
+            $property_id_map[ $lst['id'] ] = $wpdb->insert_id;
+        }
+    }
+
+    // 6. Migrate clients
+    $old_clients = get_option( 'cora_re_clients', array() );
+    $client_id_map = array();
+    if ( is_array( $old_clients ) ) {
+        foreach ( $old_clients as $c ) {
+            $old_branch = $c['branch_id'] ?? '';
+            $branch_new_id = isset($branch_id_map[$old_branch]) ? $branch_id_map[$old_branch] : $default_branch_id;
+
+            $created_time = isset($c['converted_at']) ? date('Y-m-d H:i:s', intval($c['converted_at'])) : current_time('mysql');
+
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_clients',
+                array(
+                    'agency_id' => 1,
+                    'branch_id' => $branch_new_id,
+                    'lead_id' => null,
+                    'first_name' => $c['names'] ?? 'Client Name',
+                    'last_name' => '',
+                    'email' => $c['email'] ?? '',
+                    'phone' => $c['phone'] ?? '',
+                    'type' => 'buyer',
+                    'notes' => $c['scale'] ?? '',
+                    'embed_vector' => 0,
+                    'created_at' => $created_time,
+                    'updated_at' => current_time('mysql')
+                ),
+                array('%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s')
+            );
+            $client_id_map[ $c['id'] ] = $wpdb->insert_id;
+        }
+    }
+
+    // 7. Migrate bookings
+    $old_bookings = get_option( 'cora_re_client_bookings', array() );
+    if ( is_array( $old_bookings ) ) {
+        foreach ( $old_bookings as $bk ) {
+            $old_branch = $bk['branch_id'] ?? '';
+            $branch_new_id = isset($branch_id_map[$old_branch]) ? $branch_id_map[$old_branch] : $default_branch_id;
+
+            $mapped_client = isset($bk['client_id']) ? ($client_id_map[ $bk['client_id'] ] ?? null) : null;
+            $mapped_property = isset($bk['listing_id']) ? ($property_id_map[ $bk['listing_id'] ] ?? null) : null;
+
+            $showing_dt = current_time('mysql');
+            if ( ! empty($bk['date']) ) {
+                $showing_dt = date('Y-m-d H:i:s', strtotime($bk['date'] . ' ' . ($bk['time'] ?? '10:00')));
+            }
+
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_bookings',
+                array(
+                    'agency_id' => 1,
+                    'branch_id' => $branch_new_id,
+                    'lead_id' => null,
+                    'client_id' => $mapped_client,
+                    'property_id' => $mapped_property,
+                    'assigned_agent' => intval($bk['assigned_agent'] ?? 0),
+                    'showing_date' => $showing_dt,
+                    'status' => $bk['status'] ?? 'confirmed',
+                    'package_value' => $parse_budget($bk['package_value'] ?? 0),
+                    'deal_type' => $bk['deal_type'] ?? 'Residential Buy',
+                    'crew' => json_encode($bk['crew'] ?? array()),
+                    'notes' => $bk['notes'] ?? '',
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                ),
+                array('%d', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s')
+            );
+        }
+    }
+
+    // 8. Migrate financials (ledger)
+    $old_ledger = get_option( 'cora_re_ledger', array() );
+    if ( is_array( $old_ledger ) ) {
+        foreach ( $old_ledger as $tx ) {
+            $old_branch = $tx['branch_id'] ?? '';
+            $branch_new_id = isset($branch_id_map[$old_branch]) ? $branch_id_map[$old_branch] : $default_branch_id;
+
+            $mapped_client = isset($tx['client_link']) ? ($client_id_map[ $tx['client_link'] ] ?? null) : null;
+            $type_mapped = strtolower($tx['type'] ?? 'inflow');
+            $status_mapped = strtolower($tx['status'] ?? 'pending');
+
+            $amount_cents = intval($tx['amount'] ?? 0) * 100;
+
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_ledger',
+                array(
+                    'agency_id' => 1,
+                    'branch_id' => $branch_new_id,
+                    'type' => $type_mapped,
+                    'amount' => $amount_cents,
+                    'description' => $tx['description'] ?? '',
+                    'lead_id' => null,
+                    'client_id' => $mapped_client,
+                    'status' => $status_mapped,
+                    'transaction_date' => $tx['date'] ?? date('Y-m-d'),
+                    'created_by' => 1,
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                ),
+                array('%d', '%d', '%s', '%d', '%s', '%d', '%d', '%s', '%s', '%d', '%s', '%s')
+            );
+        }
+    }
+
+    // 9. Migrate invitations
+    $old_invitations = get_option( 'cora_invitations', array() );
+    if ( is_array( $old_invitations ) ) {
+        foreach ( $old_invitations as $token => $invite ) {
+            $old_branch = $invite['branch_id'] ?? '';
+            $branch_new_id = isset($branch_id_map[$old_branch]) ? $branch_id_map[$old_branch] : $default_branch_id;
+
+            $expires_dt = isset($invite['expires_at']) ? date('Y-m-d H:i:s', intval($invite['expires_at'])) : current_time('mysql');
+
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_invitations',
+                array(
+                    'agency_id' => 1,
+                    'branch_id' => $branch_new_id,
+                    'email' => $invite['email'] ?? '',
+                    'role' => $invite['role'] ?? 'cora_videographer',
+                    'token' => $token,
+                    'invited_by' => intval($invite['invited_by'] ?? 1),
+                    'status' => $invite['status'] ?? 'pending',
+                    'expires_at' => $expires_dt,
+                    'accepted_at' => null,
+                    'created_at' => current_time('mysql')
+                ),
+                array('%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s')
+            );
+        }
+    }
+
+    // 10. Migrate activity logs
+    $old_logs = get_option( 'cora_activity_logs', array() );
+    if ( is_array( $old_logs ) ) {
+        foreach ( $old_logs as $log ) {
+            $user_obj = get_user_by( 'login', $log['user'] ?? 'cora' );
+            $uid = $user_obj ? $user_obj->ID : 1;
+
+            $log_dt = isset($log['timestamp']) ? date('Y-m-d H:i:s', intval($log['timestamp'])) : current_time('mysql');
+
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_activity_logs',
+                array(
+                    'agency_id' => 1,
+                    'user_id' => $uid,
+                    'action_type' => $log['section'] ?? 'System',
+                    'description' => $log['details'] ?? '',
+                    'record_type' => null,
+                    'record_id' => null,
+                    'ip_address' => null,
+                    'user_agent' => null,
+                    'how' => 'manual',
+                    'instructed_by' => null,
+                    'ai_reasoning' => null,
+                    'embed_vector' => 0,
+                    'created_at' => $log_dt
+                ),
+                array('%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%d', '%s', '%d', '%s')
+            );
+        }
+    }
+
+    // 11. Migrate notifications
+    $old_notifs = get_option( 'cora_notifications', array() );
+    if ( is_array( $old_notifs ) ) {
+        foreach ( $old_notifs as $n ) {
+            $notif_dt = isset($n['timestamp']) ? date('Y-m-d H:i:s', intval($n['timestamp'])) : current_time('mysql');
+
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_notifications',
+                array(
+                    'agency_id' => 1,
+                    'user_id' => intval($n['user_id'] ?? 1),
+                    'title' => $n['title'] ?? 'Notification',
+                    'body' => $n['description'] ?? '',
+                    'type' => 'alert',
+                    'is_read' => empty($n['read']) ? 0 : 1,
+                    'created_at' => $notif_dt
+                ),
+                array('%d', '%d', '%s', '%s', '%s', '%d', '%s')
+            );
+        }
+    }
+
+    // Seed default media folders if they don't exist
+    $folders = array(
+        'Properties' => 1,
+        'Clients' => 1,
+        'Agents' => 1,
+        'Branding' => 1
+    );
+    foreach ( $folders as $folder_name => $is_system ) {
+        $folder_exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_media_folders WHERE name = %s", $folder_name ) );
+        if ( !$folder_exists ) {
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_media_folders',
+                array(
+                    'agency_id' => 1,
+                    'parent_id' => null,
+                    'name' => $folder_name,
+                    'is_system' => $is_system,
+                    'created_by' => 1,
+                    'created_at' => current_time('mysql')
+                ),
+                array('%d', '%d', '%s', '%d', '%d', '%s')
+            );
+        }
+    }
+
+    // 12. Verification count checks
+    $leads_count = intval($wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_leads" ));
+    $properties_count = intval($wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_properties" ));
+    $clients_count = intval($wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_clients" ));
+    $bookings_count = intval($wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_bookings" ));
+    $ledger_count = intval($wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_ledger" ));
+
+    $expected_leads = count($old_leads);
+    $expected_properties = count($old_listings);
+    $expected_clients = count($old_clients);
+    $expected_bookings = count($old_bookings);
+    $expected_ledger = count($old_ledger);
+
+    if (
+        $leads_count >= $expected_leads &&
+        $properties_count >= $expected_properties &&
+        $clients_count >= $expected_clients &&
+        $bookings_count >= $expected_bookings &&
+        $ledger_count >= $expected_ledger
+    ) {
+        update_option( 'cora_migration_v2_complete', true );
+    } else {
+        error_log( "Cora Database Migration Error: Counts do not match expected options size!" );
+    }
+}
+
+function cora_db_get_agency_id() {
+    $agency_slug = cora_get_current_user_agency_id();
+    if ( $agency_slug === 'super' || empty($agency_slug) || $agency_slug === 'agency_1' ) {
+        return 1;
+    }
+    global $wpdb;
+    $id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_agencies WHERE slug = %s", $agency_slug ) );
+    return $id ? intval($id) : 1;
+}
+
+function cora_db_get_branch_id() {
+    $branch_meta = get_user_meta( get_current_user_id(), 'cora_branch_id', true );
+    if ( empty($branch_meta) || $branch_meta === 'branch_1' || $branch_meta === 1 ) {
+        return 1;
+    }
+    if ( is_numeric($branch_meta) ) {
+        return intval($branch_meta);
+    }
+    return 1;
+}
+function cora_db_get_leads() {
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $branch_id = cora_db_get_branch_id();
+
+    $user = wp_get_current_user();
+    $current_role = ! empty( $user->roles ) ? $user->roles[0] : '';
+    
+    $query = "SELECT * FROM {$wpdb->prefix}cora_leads WHERE agency_id = %d";
+    $params = array( $agency_id );
+
+    if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'super_admin', 'agency_owner' ) ) ) {
+        $query .= " AND branch_id = %d";
+        $params[] = $branch_id;
+    }
+
+    $query .= " ORDER BY created_at DESC";
+    $rows = $wpdb->get_results( $wpdb->prepare( $query, $params ), ARRAY_A );
+
+    $mapped = array();
+    if ( $rows ) {
+        foreach ( $rows as $r ) {
+            $status_text = 'New Lead';
+            switch($r['status']) {
+                case 'new': $status_text = 'New Lead'; break;
+                case 'contacted': $status_text = 'Proposal Sent'; break;
+                case 'site_visit': $status_text = 'Site Visit'; break;
+                case 'negotiation': $status_text = 'Negotiation'; break;
+                case 'closed': $status_text = 'Converted'; break;
+                case 'lost': $status_text = 'Lost'; break;
+            }
+
+            $price_text = '₹' . number_format($r['budget_max']);
+
+            $mapped[] = array(
+                'id' => $r['id'],
+                'names' => $r['first_name'],
+                'email' => $r['email'],
+                'phone' => $r['phone'],
+                'scale' => $r['property_type'],
+                'city' => $r['preferred_locations'],
+                'notes' => $r['notes'],
+                'price' => $price_text,
+                'status' => $status_text,
+                'followup_date' => $r['followup_date'] ? date('Y-m-d H:i', strtotime($r['followup_date'])) : '',
+                'followup_notes' => $r['followup_notes'] ?? '',
+                'created_at' => strtotime($r['created_at']),
+                'converted_to_client' => intval($r['converted_to_client']),
+                'client_id' => $r['client_id']
+            );
+        }
+    }
+    return $mapped;
+}
+
+function cora_db_get_clients() {
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $branch_id = cora_db_get_branch_id();
+
+    $user = wp_get_current_user();
+    $current_role = ! empty( $user->roles ) ? $user->roles[0] : '';
+    
+    $query = "SELECT * FROM {$wpdb->prefix}cora_clients WHERE agency_id = %d";
+    $params = array( $agency_id );
+
+    if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'super_admin', 'agency_owner' ) ) ) {
+        $query .= " AND branch_id = %d";
+        $params[] = $branch_id;
+    }
+
+    $query .= " ORDER BY created_at DESC";
+    $rows = $wpdb->get_results( $wpdb->prepare( $query, $params ), ARRAY_A );
+
+    $mapped = array();
+    if ( $rows ) {
+        foreach ( $rows as $r ) {
+            $mapped[] = array(
+                'id' => $r['id'],
+                'lead_id' => $r['lead_id'],
+                'names' => $r['first_name'],
+                'email' => $r['email'],
+                'phone' => $r['phone'],
+                'scale' => $r['notes'],
+                'city' => '', 
+                'price' => '',
+                'converted_at' => strtotime($r['created_at']),
+                'status' => 'confirmed',
+                'viewing_date' => '25th Jun, 2026',
+                'deal_type' => 'Residential Buy'
+            );
+        }
+    }
+    return $mapped;
+}
+
+function cora_db_get_properties() {
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $branch_id = cora_db_get_branch_id();
+
+    $user = wp_get_current_user();
+    $current_role = ! empty( $user->roles ) ? $user->roles[0] : '';
+
+    $query = "SELECT * FROM {$wpdb->prefix}cora_properties WHERE agency_id = %d";
+    $params = array( $agency_id );
+
+    if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'super_admin', 'agency_owner' ) ) ) {
+        $query .= " AND branch_id = %d";
+        $params[] = $branch_id;
+    }
+
+    $query .= " ORDER BY created_at DESC";
+    $rows = $wpdb->get_results( $wpdb->prepare( $query, $params ), ARRAY_A );
+
+    $mapped = array();
+    if ( $rows ) {
+        foreach ( $rows as $r ) {
+            $status_text = 'Available';
+            switch($r['status']) {
+                case 'available': $status_text = 'Available'; break;
+                case 'under_offer': $status_text = 'Under Offer'; break;
+                case 'sold': $status_text = 'Sold'; break;
+                case 'off_market': $status_text = 'Off Market'; break;
+            }
+
+            $mapped[] = array(
+                'id' => $r['id'],
+                'name' => $r['title'],
+                'category' => $r['type'],
+                'rera_reg_id' => $r['rera_number'],
+                'status' => $status_text,
+                'crew' => '',
+                'shoot' => '',
+                'sync_link' => $r['sync_link'] ?? '',
+                'notes' => $r['description'],
+                'seo_title' => $r['seo_title'] ?? '',
+                'seo_description' => $r['seo_description'] ?? '',
+                'seo_keywords' => $r['seo_keywords'] ?? ''
+            );
+        }
+    }
+    return $mapped;
+}
+
+function cora_db_get_bookings() {
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $branch_id = cora_db_get_branch_id();
+
+    $user = wp_get_current_user();
+    $current_role = ! empty( $user->roles ) ? $user->roles[0] : '';
+
+    $query = "SELECT * FROM {$wpdb->prefix}cora_bookings WHERE agency_id = %d";
+    $params = array( $agency_id );
+
+    if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'super_admin', 'agency_owner' ) ) ) {
+        $query .= " AND branch_id = %d";
+        $params[] = $branch_id;
+    }
+
+    $query .= " ORDER BY showing_date DESC";
+    $rows = $wpdb->get_results( $wpdb->prepare( $query, $params ), ARRAY_A );
+
+    $mapped = array();
+    if ( $rows ) {
+        foreach ( $rows as $r ) {
+            $client_old_id = 'client_' . $r['client_id'];
+            $listing_old_id = 'eq' . $r['property_id'];
+
+            $mapped[] = array(
+                'id' => $r['id'],
+                'client_id' => $client_old_id,
+                'listing_id' => $listing_old_id,
+                'date' => date('Y-m-d', strtotime($r['showing_date'])),
+                'time' => date('H:i', strtotime($r['showing_date'])),
+                'status' => $r['status'],
+                'assigned_agent' => $r['assigned_agent'],
+                'package_value' => '₹' . number_format($r['package_value']),
+                'deal_type' => $r['deal_type'],
+                'crew' => json_decode($r['crew'], true) ?: array(),
+                'notes' => $r['notes']
+            );
+        }
+    }
+    return $mapped;
+}
+
+function cora_db_get_ledger() {
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $branch_id = cora_db_get_branch_id();
+
+    $user = wp_get_current_user();
+    $current_role = ! empty( $user->roles ) ? $user->roles[0] : '';
+
+    $query = "SELECT * FROM {$wpdb->prefix}cora_ledger WHERE agency_id = %d";
+    $params = array( $agency_id );
+
+    if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'super_admin', 'agency_owner' ) ) ) {
+        $query .= " AND branch_id = %d";
+        $params[] = $branch_id;
+    }
+
+    $query .= " ORDER BY transaction_date DESC";
+    $rows = $wpdb->get_results( $wpdb->prepare( $query, $params ), ARRAY_A );
+
+    $mapped = array();
+    if ( $rows ) {
+        foreach ( $rows as $r ) {
+            $client_old_id = 'client_' . $r['client_id'];
+
+            $mapped[] = array(
+                'id' => $r['id'],
+                'date' => $r['transaction_date'],
+                'description' => $r['description'],
+                'type' => ucfirst($r['type']),
+                'amount' => intval($r['amount'] / 100),
+                'category' => '',
+                'status' => ucfirst($r['status']),
+                'client_link' => $client_old_id
+            );
+        }
+    }
+    return $mapped;
+}
+
+function cora_db_get_branches() {
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    
+    $rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_branches WHERE agency_id = %d", $agency_id ), ARRAY_A );
+
+    $mapped = array();
+    if ( $rows ) {
+        foreach ( $rows as $r ) {
+            $old_id = 'branch_' . $r['id'];
+            $mapped[$old_id] = array(
+                'id' => $old_id,
+                'agency_id' => 'agency_' . $r['agency_id'],
+                'name' => $r['name'],
+                'city' => $r['city'],
+                'address' => $r['address'],
+                'manager_id' => $r['manager_id']
+            );
+        }
+    }
+    return $mapped;
+}
+
+function cora_db_get_agencies() {
+    global $wpdb;
+    $rows = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_agencies", ARRAY_A );
+    $mapped = array();
+    if ( $rows ) {
+        foreach ( $rows as $r ) {
+            $old_id = 'agency_' . $r['id'];
+            $mapped[$old_id] = array(
+                'id' => $old_id,
+                'name' => $r['name'],
+                'subdomain' => $r['slug'],
+                'plan' => $r['plan'],
+                'status' => $r['status']
+            );
+        }
+    }
+    return $mapped;
+}
+
+function cora_db_get_invitations() {
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $branch_id = cora_db_get_branch_id();
+
+    $user = wp_get_current_user();
+    $current_role = ! empty( $user->roles ) ? $user->roles[0] : '';
+
+    $query = "SELECT * FROM {$wpdb->prefix}cora_invitations WHERE agency_id = %d";
+    $params = array( $agency_id );
+
+    if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'super_admin', 'agency_owner' ) ) ) {
+        $query .= " AND branch_id = %d";
+        $params[] = $branch_id;
+    }
+
+    $rows = $wpdb->get_results( $wpdb->prepare( $query, $params ), ARRAY_A );
+
+    $mapped = array();
+    if ( $rows ) {
+        foreach ( $rows as $r ) {
+            $mapped[$r['token']] = array(
+                'agency_id' => 'agency_' . $r['agency_id'],
+                'branch_id' => 'branch_' . $r['branch_id'],
+                'email' => $r['email'],
+                'role' => $r['role'],
+                'invited_by' => $r['invited_by'],
+                'status' => $r['status'],
+                'expires_at' => strtotime($r['expires_at']),
+                'accepted_at' => $r['accepted_at'] ? strtotime($r['accepted_at']) : null,
+                'created_at' => strtotime($r['created_at'])
+            );
+        }
+    }
+    return $mapped;
+}
+
+function cora_db_get_activity_logs() {
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $branch_id = cora_db_get_branch_id();
+
+    $user = wp_get_current_user();
+    $current_role = ! empty( $user->roles ) ? $user->roles[0] : '';
+
+    $query = "SELECT * FROM {$wpdb->prefix}cora_activity_logs WHERE agency_id = %d";
+    $params = array( $agency_id );
+
+    if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'super_admin', 'agency_owner' ) ) ) {
+        $query .= " AND branch_id = %d";
+        $params[] = $branch_id;
+    }
+
+    $query .= " ORDER BY created_at DESC LIMIT 1000";
+    $rows = $wpdb->get_results( $wpdb->prepare( $query, $params ), ARRAY_A );
+
+    $mapped = array();
+    if ( $rows ) {
+        foreach ( $rows as $r ) {
+            $user_obj = get_userdata( $r['user_id'] );
+            $username = $user_obj ? $user_obj->display_name : 'System / Guest';
+            $user_role = $user_obj && ! empty( $user_obj->roles ) ? $user_obj->roles[0] : 'guest';
+
+            $mapped[] = array(
+                'timestamp' => strtotime($r['created_at']),
+                'user_id' => $r['user_id'],
+                'user_name' => $username,
+                'user_role' => $user_role,
+                'action_type' => $r['action_type'],
+                'description' => $r['description'],
+                'ip' => $r['ip_address'] ?? '127.0.0.1',
+                'device' => $r['user_agent'] ?? '',
+                'agency_id' => 'agency_' . $r['agency_id'],
+                'branch_id' => 'branch_' . $r['branch_id'],
+                'how' => $r['how'] ?? 'human',
+                'instructed_by' => $r['instructed_by'],
+                'ai_reasoning' => $r['ai_reasoning'] ?? ''
+            );
+        }
+    }
+    return $mapped;
+}
+
+function cora_sync_user_to_custom_table( $user_id ) {
+    global $wpdb;
+    
+    $user = get_userdata( $user_id );
+    if ( ! $user ) {
+        return;
+    }
+
+    $old_role = ! empty( $user->roles ) ? $user->roles[0] : '';
+    $role_mapped = 'agent';
+    switch ( $old_role ) {
+        case 'administrator': $role_mapped = 'super_admin'; break;
+        case 'cora_manager': $role_mapped = 'agency_owner'; break;
+        case 'cora_branch_manager': $role_mapped = 'branch_manager'; break;
+        case 'cora_photographer': $role_mapped = 'senior_agent'; break;
+        case 'cora_videographer': $role_mapped = 'agent'; break;
+        case 'cora_drone_pilot': $role_mapped = 'senior_agent'; break;
+        case 'cora_editor': $role_mapped = 'back_office'; break;
+        case 'cora_viewer': $role_mapped = 'viewer'; break;
+    }
+
+    $old_branch = get_user_meta( $user_id, 'cora_branch_id', true );
+    $branch_new_id = empty($old_branch) ? 1 : intval(preg_replace('/[^\d]/', '', $old_branch));
+
+    $phone = get_user_meta( $user_id, 'cora_phone', true );
+    $status = (get_user_meta( $user_id, 'cora_user_status', true ) === 'inactive') ? 'inactive' : 'active';
+
+    $exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_users WHERE wp_user_id = %d", $user_id ) );
+    if ( $exists ) {
+        $wpdb->update(
+            $wpdb->prefix . 'cora_users',
+            array(
+                'role' => $role_mapped,
+                'phone' => $phone ?: '',
+                'status' => $status,
+                'branch_id' => $branch_new_id,
+                'updated_at' => current_time('mysql')
+            ),
+            array( 'wp_user_id' => $user_id ),
+            array( '%s', '%s', '%s', '%d', '%s' ),
+            array( '%d' )
+        );
+    } else {
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_users',
+            array(
+                'wp_user_id' => $user_id,
+                'agency_id' => 1,
+                'branch_id' => $branch_new_id,
+                'role' => $role_mapped,
+                'phone' => $phone ?: '',
+                'status' => $status,
+                'invited_by' => 1,
+                'last_active' => current_time('mysql'),
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql')
+            ),
+            array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s' )
+        );
+    }
+}
+add_action( 'profile_update', 'cora_sync_user_to_custom_table' );
+add_action( 'user_register', 'cora_sync_user_to_custom_table' );
+
+function cora_sync_delete_user( $user_id ) {
+    global $wpdb;
+    $wpdb->delete(
+        $wpdb->prefix . 'cora_users',
+        array( 'wp_user_id' => $user_id ),
+        array( '%d' )
+    );
+}
+add_action( 'delete_user', 'cora_sync_delete_user' );
+
+function cora_ajax_purge_options_data() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( 'Unauthorized.' );
+    }
+
+    delete_option('cora_re_leads');
+    delete_option('cora_re_listings_inventory');
+    delete_option('cora_re_clients');
+    delete_option('cora_re_client_bookings');
+    delete_option('cora_re_ledger');
+    delete_option('cora_branches');
+    delete_option('cora_invitations');
+    delete_option('cora_activity_logs');
+    delete_option('cora_notifications');
+
+    wp_send_json_success( 'Old wp_options legacy database tables purged successfully!' );
+}
+add_action( 'wp_ajax_cora_purge_options_data', 'cora_ajax_purge_options_data' );
+
+function cora_sync_db_tables_to_options() {
+    global $wpdb;
+    
+    // 1. Sync branches
+    $branches_opt = get_option( 'cora_branches', array() );
+    if ( is_array( $branches_opt ) ) {
+        $opt_ids = array();
+        $cleaned_branches = array();
+        foreach ( $branches_opt as $b_key => $b ) {
+            if ( preg_match( '/^branch_(\d+)$/', $b_key, $matches ) ) {
+                $branch_num_id = intval($matches[1]);
+                $opt_ids[] = $branch_num_id;
+                $cleaned_branches[$b_key] = $b;
+            } elseif ( $b_key === 'branch_1' ) {
+                $opt_ids[] = 1;
+                $cleaned_branches[$b_key] = $b;
+            }
+        }
+        if ( count( $cleaned_branches ) !== count( $branches_opt ) ) {
+            update_option( 'cora_branches', $cleaned_branches );
+        }
+        
+        if ( ! empty( $opt_ids ) ) {
+            $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_branches WHERE id NOT IN (" . implode( ',', $opt_ids ) . ")" );
+        } else {
+            $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_branches" );
+        }
+    }
+
+    // 2. Sync properties (listings)
+    $listings_opt = get_option( 'cora_re_listings_inventory', array() );
+    if ( is_array( $listings_opt ) ) {
+        $opt_ids = array();
+        $cleaned_listings = array();
+        foreach ( $listings_opt as $lst ) {
+            if ( isset( $lst['id'] ) && is_numeric( $lst['id'] ) ) {
+                $opt_ids[] = intval($lst['id']);
+                $cleaned_listings[] = $lst;
+            }
+        }
+        if ( count( $cleaned_listings ) !== count( $listings_opt ) ) {
+            update_option( 'cora_re_listings_inventory', $cleaned_listings );
+        }
+        if ( ! empty( $opt_ids ) ) {
+            $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_properties WHERE id NOT IN (" . implode( ',', $opt_ids ) . ")" );
+        } else {
+            $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_properties" );
+        }
+    }
+
+    // 3. Sync leads
+    $leads_opt = get_option( 'cora_re_leads', array() );
+    if ( is_array( $leads_opt ) ) {
+        $opt_ids = array();
+        $cleaned_leads = array();
+        foreach ( $leads_opt as $ld ) {
+            if ( isset( $ld['id'] ) && is_numeric( $ld['id'] ) ) {
+                $opt_ids[] = intval($ld['id']);
+                $cleaned_leads[] = $ld;
+            }
+        }
+        if ( count( $cleaned_leads ) !== count( $leads_opt ) ) {
+            update_option( 'cora_re_leads', $cleaned_leads );
+        }
+        if ( ! empty( $opt_ids ) ) {
+            $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_leads WHERE id NOT IN (" . implode( ',', $opt_ids ) . ")" );
+        } else {
+            $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_leads" );
+        }
+    }
+
+    // 4. Sync clients
+    $clients_opt = get_option( 'cora_re_clients', array() );
+    if ( is_array($clients_opt) ) {
+        $opt_ids = array();
+        $cleaned_clients = array();
+        foreach ( $clients_opt as $cl ) {
+            if ( isset( $cl['id'] ) && is_numeric( $cl['id'] ) ) {
+                $opt_ids[] = intval($cl['id']);
+                $cleaned_clients[] = $cl;
+            }
+        }
+        if ( count( $cleaned_clients ) !== count( $clients_opt ) ) {
+            update_option( 'cora_re_clients', $cleaned_clients );
+        }
+        if ( ! empty( $opt_ids ) ) {
+            $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_clients WHERE id NOT IN (" . implode( ',', $opt_ids ) . ")" );
+        } else {
+            $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_clients" );
+        }
+    }
+}
+
+function cora_seed_default_canvas_data() {
+    global $wpdb;
+    
+    // Migration: Update existing PropOS names to Cora in database
+    $wpdb->query( "UPDATE {$wpdb->prefix}cora_canvas_themes SET name = REPLACE(name, 'PropOS', 'Cora'), settings = REPLACE(settings, 'PropOS', 'Cora')" );
+    $wpdb->query( "UPDATE {$wpdb->prefix}cora_canvas_pages SET seo_title = REPLACE(seo_title, 'PropOS', 'Cora'), seo_description = REPLACE(seo_description, 'PropOS', 'Cora')" );
+
+    // Check if themes table has entries
+    $themes_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_themes" );
+    if ( intval( $themes_count ) === 0 ) {
+        // 1. Seed Active Live Theme
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_canvas_themes',
+            array(
+                'agency_id'    => 1,
+                'name'         => 'Cora Default Theme',
+                'status'       => 'live',
+                'settings'     => json_encode( array(
+                    'site_title'      => 'Cora Agency',
+                    'site_tagline'    => 'Modern Real Estate Workspace',
+                    'primary_color'   => '#18181b',
+                    'secondary_color' => '#27272a',
+                    'accent_color'    => '#10b981',
+                    'text_color'      => '#09090b',
+                    'bg_color'        => '#ffffff',
+                    'heading_font'    => 'Inter',
+                    'body_font'       => 'Inter',
+                    'base_font_size'  => '16',
+                    'header_layout'   => 'Logo Left',
+                    'sticky_header'   => '1',
+                    'header_bg_color' => '#ffffff',
+                    'footer_columns'  => '3',
+                    'copyright_text'  => '© ' . date('Y') . ' Cora Agency. All rights reserved.',
+                    'show_socials'    => '1'
+                ) ),
+                'activated_at' => current_time('mysql'),
+                'created_by'   => 1,
+                'created_at'   => current_time('mysql'),
+                'updated_at'   => current_time('mysql')
+            ),
+            array( '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
+        );
+        $live_theme_id = $wpdb->insert_id;
+
+        // 2. Seed Draft Theme
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_canvas_themes',
+            array(
+                'agency_id'    => 1,
+                'name'         => 'Cora Elegant Draft Theme',
+                'status'       => 'draft',
+                'settings'     => json_encode( array(
+                    'site_title'      => 'Elegant Agency',
+                    'site_tagline'    => 'Luxury properties catalog',
+                    'primary_color'   => '#0f172a',
+                    'secondary_color' => '#1e293b',
+                    'accent_color'    => '#f59e0b',
+                    'text_color'      => '#0f172a',
+                    'bg_color'        => '#f8fafc',
+                    'heading_font'    => 'Playfair Display',
+                    'body_font'       => 'Lora',
+                    'base_font_size'  => '16',
+                    'header_layout'   => 'Centered Logo',
+                    'sticky_header'   => '0',
+                    'header_bg_color' => '#ffffff',
+                    'footer_columns'  => '4',
+                    'copyright_text'  => '© ' . date('Y') . ' Elegant Group. All rights reserved.',
+                    'show_socials'    => '1'
+                ) ),
+                'created_by'   => 1,
+                'created_at'   => current_time('mysql'),
+                'updated_at'   => current_time('mysql')
+            ),
+            array( '%d', '%s', '%s', '%s', '%d', '%s', '%s' )
+        );
+
+        // Seed pages for the Live Theme
+        $default_pages = array(
+            array(
+                'title'       => 'Home Page',
+                'slug'        => 'home',
+                'status'      => 'published',
+                'is_homepage' => 1,
+                'template'    => 'agency',
+                'seo_title'   => 'Welcome to Cora Real Estate Agency',
+                'seo_desc'    => 'Find premium luxury villas, penthouses, and commercial spaces across India.'
+            ),
+            array(
+                'title'       => 'About Us',
+                'slug'        => 'about',
+                'status'      => 'published',
+                'is_homepage' => 0,
+                'template'    => 'brokerage',
+                'seo_title'   => 'About Our Brokerage | Cora Agency',
+                'seo_desc'    => 'Learn about our team of expert realtors and listing coordinators.'
+            ),
+            array(
+                'title'       => 'Contact Us',
+                'slug'        => 'contact',
+                'status'      => 'draft',
+                'is_homepage' => 0,
+                'template'    => 'minimal',
+                'seo_title'   => '',
+                'seo_desc'    => ''
+            )
+        );
+
+        foreach ( $default_pages as $dp ) {
+            $wp_post_id = 0;
+            $existing_page = get_page_by_path( $dp['slug'] );
+            if ( $existing_page ) {
+                $wp_post_id = $existing_page->ID;
+            } else {
+                $wp_post_id = wp_insert_post( array(
+                    'post_title'   => $dp['title'],
+                    'post_name'    => $dp['slug'],
+                    'post_type'    => 'page',
+                    'post_status'  => 'publish',
+                    'post_content' => '<!-- Elementor Page Content -->'
+                ) );
+            }
+            
+            if ( ! is_wp_error( $wp_post_id ) && $wp_post_id > 0 ) {
+                $wpdb->insert(
+                    $wpdb->prefix . 'cora_canvas_pages',
+                    array(
+                        'agency_id'       => 1,
+                        'theme_id'        => $live_theme_id,
+                        'wp_post_id'      => $wp_post_id,
+                        'title'           => $dp['title'],
+                        'slug'            => $dp['slug'],
+                        'status'          => $dp['status'],
+                        'is_homepage'     => $dp['is_homepage'],
+                        'template'        => $dp['template'],
+                        'seo_title'       => $dp['seo_title'],
+                        'seo_description' => $dp['seo_desc'],
+                        'created_by'      => 1,
+                        'created_at'      => current_time('mysql'),
+                        'updated_at'      => current_time('mysql')
+                    ),
+                    array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%d', '%s', '%s' )
+                );
+            }
+        }
+    }
+}
+
 function cora_ensure_default_agency_setup() {
+    cora_create_custom_tables();
+    cora_migrate_options_to_custom_tables();
     $agencies = get_option( 'cora_agencies', array() );
     if ( empty( $agencies ) ) {
         $agencies = array(
             'agency_1' => array(
                 'id'          => 'agency_1',
-                'name'        => 'PropOS Default Agency',
+                'name'        => 'Cora Default Agency',
                 'subdomain'   => 'default',
                 'plan'        => 'enterprise',
                 'status'      => 'active',
@@ -6107,6 +8583,25 @@ function cora_ensure_default_agency_setup() {
         update_option( 'cora_branches', $branches );
     }
 
+    $branches = get_option( 'cora_branches', array() );
+    if ( is_array( $branches ) ) {
+        $seen_chennai = false;
+        $modified = false;
+        foreach ( $branches as $key => $b ) {
+            if ( isset( $b['name'] ) && $b['name'] === 'Chennai Hub' ) {
+                if ( $seen_chennai ) {
+                    unset( $branches[$key] );
+                    $modified = true;
+                } else {
+                    $seen_chennai = true;
+                }
+            }
+        }
+        if ( $modified ) {
+            update_option( 'cora_branches', $branches );
+        }
+    }
+
     $user_id = get_current_user_id();
     if ( $user_id ) {
         $user_agency = get_user_meta( $user_id, 'cora_agency_id', true );
@@ -6115,6 +8610,9 @@ function cora_ensure_default_agency_setup() {
             update_user_meta( $user_id, 'cora_branch_id', 'branch_1' );
         }
     }
+
+    cora_seed_default_canvas_data();
+    cora_sync_db_tables_to_options();
 }
 add_action( 'init', 'cora_ensure_default_agency_setup', 5 );
 
@@ -6330,7 +8828,7 @@ function cora_ajax_login() {
         $agencies = get_option( 'cora_agencies', array() );
         if ( isset( $agencies[$agency_id] ) && $agencies[$agency_id]['status'] === 'suspended' ) {
             cora_log_activity( 'Authentication', "Blocked login for suspended agency (email: {$email}).", $user->ID );
-            wp_send_json_error( array( 'message' => 'Your agency account has been suspended. Contact PropOS support.' ) );
+            wp_send_json_error( array( 'message' => 'Your agency account has been suspended. Contact Cora support.' ) );
         }
     }
 
@@ -6382,7 +8880,7 @@ function cora_ajax_forgot_password() {
         cora_log_activity( 'Authentication', 'Requested a password reset link.', $user->ID );
         
         // Log the link to the PHP error log
-        error_log( "PropOS Reset Link: " . $reset_link );
+        error_log( "Cora Reset Link: " . $reset_link );
     }
 
     // Always send success for security reasons
@@ -6467,7 +8965,7 @@ function cora_ajax_resend_guest_verification() {
         
         cora_log_activity( 'Invitation', "Resent verification/setup link to {$email}." );
         
-        error_log( "PropOS Verification Link: " . $verification_link );
+        error_log( "Cora Verification Link: " . $verification_link );
         wp_send_json_success( array( 'message' => 'Verification link resent.' ) );
     } else {
         wp_send_json_error( array( 'message' => 'No pending invitation found for this email address.' ) );
@@ -6620,7 +9118,7 @@ function cora_ajax_send_invitation() {
 
     $verification_link = home_url( '/workspace/setup-account?token=' . $token );
     update_option( 'cora_latest_verification_link', $verification_link );
-    error_log( "PropOS Sent Invitation Link: " . $verification_link );
+    error_log( "Cora Sent Invitation Link: " . $verification_link );
 
     wp_send_json_success( array( 'message' => 'Invitation sent successfully.' ) );
 }
@@ -6860,7 +9358,7 @@ function cora_ajax_save_user_changes() {
 
     // Send Reactivation Notification/Email if toggled active
     if ( $old_status === 'inactive' && $status === 'active' ) {
-        error_log( "PropOS Reactivation Email: Your PropOS account has been reactivated." );
+        error_log( "Cora Reactivation Email: Your Cora account has been reactivated." );
     }
 
     // If deactivated, force logout all sessions immediately (Spec Section 6.3)
@@ -6955,13 +9453,44 @@ function cora_ajax_save_branch() {
         }
     }
 
-    // Determine target ID
-    if ( empty( $branch_id ) ) {
-        $branch_id = 'branch_' . uniqid();
+    global $wpdb;
+    $agency_db_id = empty($agency_id) ? 1 : intval(preg_replace('/[^\d]/', '', $agency_id));
+    $db_branch_id = intval(preg_replace('/[^\d]/', '', $branch_id));
+
+    if ( $db_branch_id > 0 ) {
+        $wpdb->update(
+            $wpdb->prefix . 'cora_branches',
+            array(
+                'name' => $branch_name,
+                'city' => $city,
+                'address' => $address,
+                'manager_id' => $manager_id ?: null,
+                'updated_at' => current_time('mysql')
+            ),
+            array( 'id' => $db_branch_id, 'agency_id' => $agency_db_id ),
+            array('%s', '%s', '%s', '%d', '%s'),
+            array('%d', '%d')
+        );
+        $new_id = $branch_id;
+    } else {
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_branches',
+            array(
+                'agency_id' => $agency_db_id ?: 1,
+                'name' => $branch_name,
+                'city' => $city,
+                'address' => $address,
+                'manager_id' => $manager_id ?: null,
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql')
+            ),
+            array('%d', '%s', '%s', '%s', '%d', '%s', '%s')
+        );
+        $new_id = 'branch_' . $wpdb->insert_id;
     }
 
-    $branches[ $branch_id ] = array(
-        'id'         => $branch_id,
+    $branches[ $new_id ] = array(
+        'id'         => $new_id,
         'agency_id'  => $agency_id,
         'name'       => $branch_name,
         'city'       => $city,
@@ -6974,7 +9503,7 @@ function cora_ajax_save_branch() {
 
     // If manager was assigned, update manager's metadata
     if ( $manager_id > 0 ) {
-        update_user_meta( $manager_id, 'cora_branch_id', $branch_id );
+        update_user_meta( $manager_id, 'cora_branch_id', $new_id );
         
         $mgr_user = get_userdata( $manager_id );
         if ( $mgr_user && ! in_array( 'cora_branch_manager', (array) $mgr_user->roles ) && ! in_array( 'cora_manager', (array) $mgr_user->roles ) && ! in_array( 'administrator', (array) $mgr_user->roles ) ) {
@@ -6982,7 +9511,7 @@ function cora_ajax_save_branch() {
         }
     }
 
-    cora_log_activity( 'Branch', "Saved branch '{$branch_name}' (ID: {$branch_id})." );
+    cora_log_activity( 'Branch', "Saved branch '{$branch_name}' (ID: {$new_id})." );
 
     wp_send_json_success( array( 'message' => 'Branch saved successfully.' ) );
 }
@@ -7007,7 +9536,7 @@ function cora_ajax_delete_branch() {
     $crew_count = 0;
     foreach ( $all_wp_users as $u ) {
         $u_branch = get_user_meta( $u->ID, 'cora_branch_id', true );
-        if ( $u_branch === $branch_id ) {
+        if ( strval($u_branch) === strval($branch_id) ) {
             $crew_count++;
         }
     }
@@ -7015,6 +9544,17 @@ function cora_ajax_delete_branch() {
     if ( $crew_count > 0 ) {
         wp_send_json_error( array( 'message' => 'You cannot delete a branch with active team members. Reassign all members first.' ) );
     }
+
+    global $wpdb;
+    $agency_id = cora_get_current_user_agency_id();
+    $agency_db_id = empty($agency_id) ? 1 : intval(preg_replace('/[^\d]/', '', $agency_id));
+    $db_branch_id = intval(preg_replace('/[^\d]/', '', $branch_id));
+
+    $wpdb->delete(
+        $wpdb->prefix . 'cora_branches',
+        array( 'id' => $db_branch_id, 'agency_id' => $agency_db_id ),
+        array( '%d', '%d' )
+    );
 
     $branches = get_option( 'cora_branches', array() );
     if ( isset( $branches[ $branch_id ] ) ) {
@@ -7034,7 +9574,6 @@ function cora_log_activity( $action_type, $description, $custom_user_id = 0, $ho
     $user = get_userdata( $user_id );
     $username = $user ? $user->display_name : 'System / Guest';
     
-    // Bypass active filters to get user tenant info
     $agency_id = '';
     $branch_id = '';
     if ( $user ) {
@@ -7042,10 +9581,37 @@ function cora_log_activity( $action_type, $description, $custom_user_id = 0, $ho
         $branch_id = get_user_meta( $user->ID, 'cora_branch_id', true );
     }
     
+    $agency_db_id = empty($agency_id) ? 1 : intval(preg_replace('/[^\d]/', '', $agency_id));
+    $branch_db_id = empty($branch_id) ? 1 : intval(preg_replace('/[^\d]/', '', $branch_id));
+
     $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
     $device = cora_get_device_info();
 
+    global $wpdb;
+    $wpdb->insert(
+        $wpdb->prefix . 'cora_activity_logs',
+        array(
+            'agency_id' => $agency_db_id,
+            'user_id' => $user_id ?: 1,
+            'action_type' => $action_type,
+            'description' => $description,
+            'record_type' => null,
+            'record_id' => null,
+            'ip_address' => $ip,
+            'user_agent' => $device,
+            'how' => $how,
+            'instructed_by' => $instructed_by ?: null,
+            'ai_reasoning' => $ai_reasoning,
+            'embed_vector' => 0,
+            'created_at' => current_time('mysql')
+        ),
+        array('%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%d', '%s', '%d', '%s')
+    );
+
     $logs = get_option( 'cora_activity_logs', array() );
+    if ( ! is_array( $logs ) ) {
+        $logs = array();
+    }
     $logs[] = array(
         'timestamp'     => time(),
         'user_id'       => $user_id,
@@ -7069,6 +9635,30 @@ function cora_log_activity( $action_type, $description, $custom_user_id = 0, $ho
 }
 
 function cora_add_notification( $user_id, $title, $description, $action_url = '' ) {
+    global $wpdb;
+    $agency_db_id = 1;
+    $user = get_userdata( $user_id );
+    if ( $user ) {
+        $user_agency = get_user_meta( $user->ID, 'cora_agency_id', true );
+        if ( ! empty($user_agency) ) {
+            $agency_db_id = intval(preg_replace('/[^\d]/', '', $user_agency)) ?: 1;
+        }
+    }
+
+    $wpdb->insert(
+        $wpdb->prefix . 'cora_notifications',
+        array(
+            'agency_id' => $agency_db_id,
+            'user_id' => intval( $user_id ),
+            'title' => sanitize_text_field( $title ),
+            'body' => sanitize_text_field( $description ),
+            'type' => 'alert',
+            'is_read' => 0,
+            'created_at' => current_time('mysql')
+        ),
+        array('%d', '%d', '%s', '%s', '%s', '%d', '%s')
+    );
+
     $notifications = get_option( 'cora_notifications', array() );
     if ( ! is_array( $notifications ) ) {
         $notifications = array();
@@ -7101,11 +9691,24 @@ function cora_ajax_mark_notif_read() {
         wp_send_json_error( array( 'message' => 'Invalid notification ID.' ) );
     }
 
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $db_notif_id = intval(preg_replace('/[^\d]/', '', $notif_id));
+    if ( $db_notif_id > 0 ) {
+        $wpdb->update(
+            $wpdb->prefix . 'cora_notifications',
+            array( 'is_read' => 1 ),
+            array( 'id' => $db_notif_id, 'user_id' => $user_id ),
+            array( '%d' ),
+            array( '%d', '%d' )
+        );
+    }
+
     $notifications = get_option( 'cora_notifications', array() );
     $updated = false;
     if ( is_array( $notifications ) ) {
         foreach ( $notifications as $key => $notif ) {
-            if ( isset( $notif['id'] ) && $notif['id'] === $notif_id && isset( $notif['user_id'] ) && intval( $notif['user_id'] ) === $user_id ) {
+            if ( isset( $notif['id'] ) && strval($notif['id']) === strval($notif_id) && isset( $notif['user_id'] ) && intval( $notif['user_id'] ) === $user_id ) {
                 $notifications[$key]['read'] = true;
                 $updated = true;
                 break;
@@ -7129,6 +9732,16 @@ function cora_ajax_mark_all_notifs_read() {
     if ( ! $user_id ) {
         wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
     }
+
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $wpdb->update(
+        $wpdb->prefix . 'cora_notifications',
+        array( 'is_read' => 1 ),
+        array( 'user_id' => $user_id, 'agency_id' => $agency_id ),
+        array( '%d' ),
+        array( '%d', '%d' )
+    );
 
     $notifications = get_option( 'cora_notifications', array() );
     if ( is_array( $notifications ) ) {
@@ -7953,3 +10566,708 @@ function cora_handle_api_v1_request( $path_parts ) {
     echo wp_json_encode( array( 'success' => false, 'message' => 'Endpoint not found.' ) );
     exit;
 }
+
+/**
+ * --- Canvas AJAX Actions ---
+ */
+
+function cora_canvas_ajax_permission_check( $write = false ) {
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( 'User not logged in.' );
+    }
+    $user = wp_get_current_user();
+    $roles = (array) $user->roles;
+    if ( in_array( 'administrator', $roles ) || in_array( 'cora_manager', $roles ) ) {
+        return true;
+    }
+    if ( ! $write && in_array( 'cora_branch_manager', $roles ) ) {
+        return true;
+    }
+    wp_send_json_error( 'Permission denied.' );
+}
+
+function cora_ajax_canvas_create_theme() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $name = sanitize_text_field( $_POST['name'] );
+    $start_from = sanitize_text_field( $_POST['start_from'] );
+    
+    $settings = array(
+        'site_title' => 'Cora Real Estate',
+        'site_tagline' => 'Luxury Homes Catalog',
+        'site_favicon' => '',
+        'site_logo' => '',
+        'heading_font' => 'Inter',
+        'body_font' => 'Inter',
+        'base_font_size' => 16,
+        'primary_color' => '#18181b',
+        'secondary_color' => '#27272a',
+        'accent_color' => '#10b981',
+        'text_color' => '#09090b',
+        'bg_color' => '#ffffff',
+        'header_layout' => 'Logo Left',
+        'footer_columns' => '3',
+        'sticky_header' => 1,
+        'show_socials' => 1,
+        'copyright_text' => '© ' . date('Y') . ' Cora Real Estate. All rights reserved.'
+    );
+
+    if ( $start_from === 'duplicate' ) {
+        $live = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+        if ( $live ) {
+            $settings = json_decode( $live['settings'], true ) ?: $settings;
+        }
+    }
+
+    $wpdb->insert(
+        $wpdb->prefix . 'cora_canvas_themes',
+        array(
+            'agency_id' => 1,
+            'name' => $name,
+            'status' => 'draft',
+            'settings' => json_encode($settings),
+            'created_at' => current_time('mysql'),
+            'updated_at' => current_time('mysql')
+        ),
+        array( '%d', '%s', '%s', '%s', '%s', '%s' )
+    );
+    
+    $new_id = $wpdb->insert_id;
+
+    if ( $start_from === 'duplicate' && ! empty($live) ) {
+        $pages = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", $live['id'] ), ARRAY_A );
+        foreach ( $pages as $p ) {
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_canvas_pages',
+                array(
+                    'agency_id' => 1,
+                    'theme_id' => $new_id,
+                    'wp_post_id' => $p['wp_post_id'],
+                    'title' => $p['title'],
+                    'slug' => $p['slug'],
+                    'status' => 'draft',
+                    'is_homepage' => $p['is_homepage'],
+                    'template' => $p['template'],
+                    'seo_title' => $p['seo_title'],
+                    'seo_description' => $p['seo_description'],
+                    'seo_og_image' => $p['seo_og_image'],
+                    'created_by' => get_current_user_id(),
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                ),
+                array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
+            );
+        }
+    }
+
+    cora_log_activity( 'Canvas', "Created draft theme workspace '{$name}'." );
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_cora_ajax_create_theme', 'cora_ajax_canvas_create_theme' );
+
+function cora_ajax_canvas_activate_theme() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $theme_id = intval( $_POST['theme_id'] );
+    
+    $wpdb->update(
+        $wpdb->prefix . 'cora_canvas_themes',
+        array( 'status' => 'draft', 'updated_at' => current_time('mysql') ),
+        array( 'status' => 'live' )
+    );
+    
+    $wpdb->update(
+        $wpdb->prefix . 'cora_canvas_themes',
+        array( 'status' => 'live', 'activated_at' => current_time('mysql'), 'updated_at' => current_time('mysql') ),
+        array( 'id' => $theme_id )
+    );
+
+    cora_log_activity( 'Canvas', "Activated theme id {$theme_id}." );
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_cora_ajax_activate_theme', 'cora_ajax_canvas_activate_theme' );
+
+function cora_ajax_canvas_rename_theme() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $theme_id = intval( $_POST['theme_id'] );
+    $name = sanitize_text_field( $_POST['name'] );
+    
+    $wpdb->update(
+        $wpdb->prefix . 'cora_canvas_themes',
+        array( 'name' => $name, 'updated_at' => current_time('mysql') ),
+        array( 'id' => $theme_id )
+    );
+    
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_cora_ajax_rename_theme', 'cora_ajax_canvas_rename_theme' );
+
+function cora_ajax_canvas_delete_theme() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $theme_id = intval( $_POST['theme_id'] );
+    
+    $pages = $wpdb->get_results( $wpdb->prepare( "SELECT wp_post_id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", $theme_id ) );
+    foreach ( $pages as $p ) {
+        wp_delete_post( $p->wp_post_id, true );
+    }
+    $wpdb->delete( $wpdb->prefix . 'cora_canvas_pages', array( 'theme_id' => $theme_id ) );
+    $wpdb->delete( $wpdb->prefix . 'cora_canvas_themes', array( 'id' => $theme_id ) );
+    
+    cora_log_activity( 'Canvas', "Deleted theme workspace id {$theme_id}." );
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_cora_ajax_delete_theme', 'cora_ajax_canvas_delete_theme' );
+
+function cora_ajax_canvas_duplicate_theme() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $theme_id = intval( $_POST['theme_id'] );
+    
+    $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+    if ( $theme ) {
+        $new_name = $theme['name'] . ' (Copy)';
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_canvas_themes',
+            array(
+                'agency_id' => 1,
+                'name' => $new_name,
+                'status' => 'draft',
+                'settings' => $theme['settings'],
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql')
+            ),
+            array( '%d', '%s', '%s', '%s', '%s', '%s' )
+        );
+        $new_id = $wpdb->insert_id;
+        
+        $pages = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", $theme_id ), ARRAY_A );
+        foreach ( $pages as $p ) {
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_canvas_pages',
+                array(
+                    'agency_id' => 1,
+                    'theme_id' => $new_id,
+                    'wp_post_id' => $p['wp_post_id'],
+                    'title' => $p['title'],
+                    'slug' => $p['slug'],
+                    'status' => 'draft',
+                    'is_homepage' => $p['is_homepage'],
+                    'template' => $p['template'],
+                    'seo_title' => $p['seo_title'],
+                    'seo_description' => $p['seo_description'],
+                    'seo_og_image' => $p['seo_og_image'],
+                    'created_by' => get_current_user_id(),
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                ),
+                array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
+            );
+        }
+        
+        cora_log_activity( 'Canvas', "Duplicated theme id {$theme_id} to {$new_id}." );
+        wp_send_json_success();
+    }
+    wp_send_json_error( 'Theme not found.' );
+}
+add_action( 'wp_ajax_cora_ajax_duplicate_theme', 'cora_ajax_canvas_duplicate_theme' );
+
+/**
+ * Validates and imports Elementor template kits or compatible themes.
+ */
+function cora_validate_and_import_elementor_kit( $file_path, $theme_name ) {
+    if ( ! class_exists( 'ZipArchive' ) ) {
+        return new WP_Error( 'zip_missing', 'PHP ZipArchive extension is not enabled on this server.' );
+    }
+
+    $zip = new ZipArchive;
+    if ( $zip->open( $file_path ) !== TRUE ) {
+        return new WP_Error( 'zip_open_failed', 'Failed to open ZIP file.' );
+    }
+
+    $is_elementor_kit = false;
+    $is_compatible_theme = false;
+    $templates_to_import = array();
+    $style_css_content = '';
+
+    // Loop through files inside ZIP
+    for ( $i = 0; $i < $zip->numFiles; $i++ ) {
+        $filename = $zip->getNameIndex( $i );
+        
+        // 1. Check for template kit manifest.json
+        if ( basename( $filename ) === 'manifest.json' ) {
+            $content = $zip->getFromIndex( $i );
+            $manifest_data = json_decode( $content, true );
+            if ( json_last_error() === JSON_ERROR_NONE && isset( $manifest_data['templates'] ) ) {
+                $is_elementor_kit = true;
+            }
+        }
+        
+        // 2. Check for style.css (Theme)
+        if ( basename( $filename ) === 'style.css' ) {
+            $style_css_content = $zip->getFromIndex( $i );
+            if ( preg_match( '/Theme Name:\s*(.*)/i', $style_css_content, $matches ) ) {
+                $theme_name_extracted = trim( $matches[1] );
+                if ( stripos( $theme_name_extracted, 'elementor' ) !== false || stripos( $style_css_content, 'elementor' ) !== false ) {
+                    $is_compatible_theme = true;
+                }
+            }
+        }
+
+        // 3. Scan JSON files for Elementor page builder structures
+        if ( pathinfo( $filename, PATHINFO_EXTENSION ) === 'json' && basename( $filename ) !== 'manifest.json' ) {
+            $content = $zip->getFromIndex( $i );
+            $json_data = json_decode( $content, true );
+            if ( json_last_error() === JSON_ERROR_NONE ) {
+                // Elementor template JSON structure check
+                if ( isset( $json_data['type'] ) && ( isset( $json_data['content'] ) || isset( $json_data['page_settings'] ) ) ) {
+                    $templates_to_import[] = array(
+                        'title' => isset( $json_data['title'] ) ? sanitize_text_field( $json_data['title'] ) : basename( $filename, '.json' ),
+                        'content' => $content,
+                        'type' => $json_data['type']
+                    );
+                    $is_elementor_kit = true;
+                }
+            }
+        }
+    }
+
+    if ( ! $is_elementor_kit && ! $is_compatible_theme ) {
+        $zip->close();
+        return new WP_Error( 'invalid_kit', 'Invalid Kit: This ZIP does not contain a valid Elementor Template Kit or an Elementor-compatible theme.' );
+    }
+
+    global $wpdb;
+
+    // Handle Theme ZIP registration
+    if ( $is_compatible_theme && ! $is_elementor_kit ) {
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_canvas_themes',
+            array(
+                'agency_id' => 1,
+                'name' => $theme_name,
+                'status' => 'draft',
+                'settings' => json_encode( array(
+                    'branding_primary' => '#18181b',
+                    'branding_secondary' => '#52525b',
+                    'branding_font' => 'system-ui',
+                    'copyright_text' => '© ' . date('Y') . ' Cora Real Estate. All rights reserved.'
+                ) ),
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql')
+            ),
+            array( '%d', '%s', '%s', '%s', '%s', '%s' )
+        );
+        $zip->close();
+        return array( 'success' => true, 'type' => 'theme', 'theme_id' => $wpdb->insert_id );
+    }
+
+    // Handle Elementor Template Kit import
+    $wpdb->insert(
+        $wpdb->prefix . 'cora_canvas_themes',
+        array(
+            'agency_id' => 1,
+            'name' => $theme_name,
+            'status' => 'draft',
+            'settings' => json_encode( array(
+                'branding_primary' => '#18181b',
+                'branding_secondary' => '#52525b',
+                'branding_font' => 'system-ui',
+                'copyright_text' => '© ' . date('Y') . ' Cora Real Estate. All rights reserved.'
+            ) ),
+            'created_at' => current_time('mysql'),
+            'updated_at' => current_time('mysql')
+        ),
+        array( '%d', '%s', '%s', '%s', '%s', '%s' )
+    );
+    $theme_id = $wpdb->insert_id;
+
+    // Import template pages
+    foreach ( $templates_to_import as $tpl ) {
+        if ( $tpl['type'] !== 'page' ) {
+            continue;
+        }
+
+        $wp_post_id = wp_insert_post( array(
+            'post_title'   => $tpl['title'],
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+            'post_author'  => get_current_user_id()
+        ) );
+
+        if ( ! is_wp_error( $wp_post_id ) ) {
+            $tpl_data = json_decode( $tpl['content'], true );
+            if ( isset( $tpl_data['content'] ) ) {
+                update_post_meta( $wp_post_id, '_elementor_data', wp_slash( json_encode( $tpl_data['content'] ) ) );
+            }
+            update_post_meta( $wp_post_id, '_elementor_edit_mode', 'builder' );
+            update_post_meta( $wp_post_id, '_elementor_template_type', 'page' );
+            
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_canvas_pages',
+                array(
+                    'agency_id' => 1,
+                    'theme_id' => $theme_id,
+                    'wp_post_id' => $wp_post_id,
+                    'title' => $tpl['title'],
+                    'slug' => sanitize_title( $tpl['title'] ),
+                    'status' => 'draft',
+                    'is_homepage' => 0,
+                    'template' => 'default',
+                    'created_by' => get_current_user_id(),
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                ),
+                array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%d', '%s', '%s' )
+            );
+        }
+    }
+
+    $zip->close();
+    return array( 'success' => true, 'type' => 'kit', 'theme_id' => $theme_id );
+}
+
+/**
+ * AJAX handler for importing template kits.
+ */
+function cora_ajax_canvas_import_kit() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    
+    if ( empty( $_FILES['kit_zip'] ) ) {
+        wp_send_json_error( 'No file uploaded.' );
+    }
+
+    $theme_name = sanitize_text_field( $_POST['theme_name'] );
+    if ( empty( $theme_name ) ) {
+        $theme_name = 'Imported Elementor Kit';
+    }
+
+    $file = $_FILES['kit_zip'];
+    $imported = cora_validate_and_import_elementor_kit( $file['tmp_name'], $theme_name );
+
+    if ( is_wp_error( $imported ) ) {
+        wp_send_json_error( $imported->get_error_message() );
+    }
+
+    cora_log_activity( 'Canvas', "Imported Elementor Kit/Theme '{$theme_name}'." );
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_cora_ajax_import_kit', 'cora_ajax_canvas_import_kit' );
+
+function cora_ajax_canvas_get_theme_pages() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( false );
+    global $wpdb;
+    $theme_id = intval( $_GET['theme_id'] );
+    
+    $pages = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d ORDER BY is_homepage DESC, title ASC", $theme_id ), ARRAY_A );
+    wp_send_json_success( $pages );
+}
+add_action( 'wp_ajax_cora_ajax_get_theme_pages', 'cora_ajax_canvas_get_theme_pages' );
+
+function cora_ajax_canvas_create_page() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $theme_id = intval( $_POST['theme_id'] );
+    $title = sanitize_text_field( $_POST['title'] );
+    $slug = sanitize_title( $_POST['slug'] );
+    $template = sanitize_text_field( $_POST['template'] );
+    $status = sanitize_text_field( $_POST['status'] );
+
+    $wp_post_id = wp_insert_post( array(
+        'post_title' => $title,
+        'post_name' => $slug,
+        'post_type' => 'page',
+        'post_status' => 'publish',
+        'post_content' => '<!-- Elementor Page Content -->'
+    ) );
+
+    if ( is_wp_error( $wp_post_id ) ) {
+        wp_send_json_error( array( 'message' => $wp_post_id->get_error_message() ) );
+    }
+
+    $wpdb->insert(
+        $wpdb->prefix . 'cora_canvas_pages',
+        array(
+            'agency_id' => 1,
+            'theme_id' => $theme_id,
+            'wp_post_id' => $wp_post_id,
+            'title' => $title,
+            'slug' => $slug,
+            'status' => $status,
+            'is_homepage' => 0,
+            'template' => $template,
+            'created_by' => get_current_user_id(),
+            'created_at' => current_time('mysql'),
+            'updated_at' => current_time('mysql')
+        ),
+        array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%d', '%s', '%s' )
+    );
+    
+    $page_id = $wpdb->insert_id;
+    cora_log_activity( 'Canvas', "Created canvas page '{$title}'." );
+
+    wp_send_json_success( array(
+        'page_id' => $page_id,
+        'wp_post_id' => $wp_post_id
+    ) );
+}
+add_action( 'wp_ajax_cora_ajax_create_page', 'cora_ajax_canvas_create_page' );
+
+function cora_ajax_canvas_set_homepage() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $page_id = intval( $_POST['page_id'] );
+    $theme_id = intval( $_POST['theme_id'] );
+    
+    $wpdb->update(
+        $wpdb->prefix . 'cora_canvas_pages',
+        array( 'is_homepage' => 0, 'updated_at' => current_time('mysql') ),
+        array( 'theme_id' => $theme_id )
+    );
+    
+    $wpdb->update(
+        $wpdb->prefix . 'cora_canvas_pages',
+        array( 'is_homepage' => 1, 'updated_at' => current_time('mysql') ),
+        array( 'id' => $page_id )
+    );
+
+    cora_log_activity( 'Canvas', "Designated page id {$page_id} as theme homepage." );
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_cora_ajax_set_homepage', 'cora_ajax_canvas_set_homepage' );
+
+function cora_ajax_canvas_rename_page() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $page_id = intval( $_POST['page_id'] );
+    $title = sanitize_text_field( $_POST['title'] );
+
+    $page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d", $page_id ) );
+    if ( $page ) {
+        wp_update_post( array(
+            'ID' => $page->wp_post_id,
+            'post_title' => $title
+        ) );
+        $wpdb->update(
+            $wpdb->prefix . 'cora_canvas_pages',
+            array( 'title' => $title, 'updated_at' => current_time('mysql') ),
+            array( 'id' => $page_id )
+        );
+        wp_send_json_success();
+    }
+    wp_send_json_error();
+}
+add_action( 'wp_ajax_cora_ajax_rename_page', 'cora_ajax_canvas_rename_page' );
+
+function cora_ajax_canvas_change_slug() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $page_id = intval( $_POST['page_id'] );
+    $slug = sanitize_title( $_POST['slug'] );
+
+    $page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d", $page_id ) );
+    if ( $page ) {
+        wp_update_post( array(
+            'ID' => $page->wp_post_id,
+            'post_name' => $slug
+        ) );
+        $wpdb->update(
+            $wpdb->prefix . 'cora_canvas_pages',
+            array( 'slug' => $slug, 'updated_at' => current_time('mysql') ),
+            array( 'id' => $page_id )
+        );
+        wp_send_json_success();
+    }
+    wp_send_json_error();
+}
+add_action( 'wp_ajax_cora_ajax_change_slug', 'cora_ajax_canvas_change_slug' );
+
+function cora_ajax_canvas_delete_page() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $page_id = intval( $_POST['page_id'] );
+
+    $page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d", $page_id ) );
+    if ( $page ) {
+        wp_delete_post( $page->wp_post_id, true );
+        $wpdb->delete( $wpdb->prefix . 'cora_canvas_pages', array( 'id' => $page_id ) );
+        wp_send_json_success();
+    }
+    wp_send_json_error();
+}
+add_action( 'wp_ajax_cora_ajax_delete_page', 'cora_ajax_canvas_delete_page' );
+
+function cora_ajax_canvas_duplicate_page() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $page_id = intval( $_POST['page_id'] );
+
+    $page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d", $page_id ), ARRAY_A );
+    if ( $page ) {
+        $new_title = $page['title'] . ' (Copy)';
+        $new_slug = $page['slug'] . '-copy';
+        
+        $wp_post_id = wp_insert_post( array(
+            'post_title' => $new_title,
+            'post_name' => $new_slug,
+            'post_type' => 'page',
+            'post_status' => 'publish',
+            'post_content' => '<!-- Elementor Page Content -->'
+        ) );
+        
+        if ( ! is_wp_error($wp_post_id) ) {
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_canvas_pages',
+                array(
+                    'agency_id' => 1,
+                    'theme_id' => $page['theme_id'],
+                    'wp_post_id' => $wp_post_id,
+                    'title' => $new_title,
+                    'slug' => $new_slug,
+                    'status' => 'draft',
+                    'is_homepage' => 0,
+                    'template' => $page['template'],
+                    'seo_title' => $page['seo_title'],
+                    'seo_description' => $page['seo_description'],
+                    'seo_og_image' => $page['seo_og_image'],
+                    'created_by' => get_current_user_id(),
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                ),
+                array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
+            );
+            wp_send_json_success();
+        }
+    }
+    wp_send_json_error();
+}
+add_action( 'wp_ajax_cora_ajax_duplicate_page', 'cora_ajax_canvas_duplicate_page' );
+
+function cora_ajax_canvas_bulk_pages() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $action_type = sanitize_text_field( $_POST['action_type'] );
+    $page_ids = array_map( 'intval', $_POST['page_ids'] );
+
+    if ( empty($page_ids) ) {
+        wp_send_json_error();
+    }
+
+    foreach ( $page_ids as $id ) {
+        if ( $action_type === 'delete' ) {
+            $page = $wpdb->get_row( $wpdb->prepare( "SELECT wp_post_id FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d", $id ) );
+            if ( $page ) {
+                wp_delete_post( $page->wp_post_id, true );
+            }
+            $wpdb->delete( $wpdb->prefix . 'cora_canvas_pages', array( 'id' => $id ) );
+        } elseif ( $action_type === 'publish' ) {
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_pages',
+                array( 'status' => 'published', 'updated_at' => current_time('mysql') ),
+                array( 'id' => $id )
+            );
+        } elseif ( $action_type === 'unpublish' ) {
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_pages',
+                array( 'status' => 'draft', 'updated_at' => current_time('mysql') ),
+                array( 'id' => $id )
+            );
+        }
+    }
+
+    cora_log_activity( 'Canvas', "Performed bulk action '{$action_type}' on pages count: " . count($page_ids) );
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_cora_ajax_bulk_pages', 'cora_ajax_canvas_bulk_pages' );
+
+function cora_ajax_canvas_save_theme_settings() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $theme_id = intval( $_POST['theme_id'] );
+    $settings = $_POST['settings'];
+    
+    $wpdb->update(
+        $wpdb->prefix . 'cora_canvas_themes',
+        array( 'settings' => json_encode($settings), 'updated_at' => current_time('mysql') ),
+        array( 'id' => $theme_id )
+    );
+
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_cora_ajax_save_theme_settings', 'cora_ajax_canvas_save_theme_settings' );
+
+function cora_ajax_canvas_save_custom_css() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    $css = $_POST['css'];
+    update_option( 'cora_canvas_custom_css', $css );
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_cora_ajax_save_custom_css', 'cora_ajax_canvas_save_custom_css' );
+
+function cora_ajax_canvas_save_custom_js() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    $js = $_POST['js'];
+    $position = sanitize_text_field( $_POST['position'] );
+    update_option( 'cora_canvas_custom_js', $js );
+    update_option( 'cora_canvas_custom_js_position', $position );
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_cora_ajax_save_custom_js', 'cora_ajax_canvas_save_custom_js' );
+
+function cora_ajax_canvas_publish_canvas_page() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $page_id = intval( $_POST['page_id'] );
+    
+    $wpdb->update(
+        $wpdb->prefix . 'cora_canvas_pages',
+        array( 'status' => 'published', 'updated_at' => current_time('mysql') ),
+        array( 'id' => $page_id )
+    );
+    
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_cora_ajax_publish_canvas_page', 'cora_ajax_canvas_publish_canvas_page' );
+
+function cora_ajax_canvas_save_page_seo() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $page_id = intval( $_POST['page_id'] );
+    $seo_title = sanitize_text_field( $_POST['seo_title'] );
+    $seo_desc = sanitize_textarea_field( $_POST['seo_description'] );
+    $seo_og_image = esc_url_raw( $_POST['seo_og_image'] );
+
+    $wpdb->update(
+        $wpdb->prefix . 'cora_canvas_pages',
+        array(
+            'seo_title' => $seo_title,
+            'seo_description' => $seo_desc,
+            'seo_og_image' => $seo_og_image,
+            'updated_at' => current_time('mysql')
+        ),
+        array( 'id' => $page_id )
+    );
+
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_cora_ajax_save_page_seo', 'cora_ajax_canvas_save_page_seo' );

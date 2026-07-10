@@ -7,14 +7,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Enqueue WordPress media libraries
 wp_enqueue_media();
 
-$cora_users = ( in_array( $sub_page, array( 'dashboard', 'bookings', 'team-roles', 'equipment' ) ) ) ? get_users() : array();
-$cora_re_listings = ( in_array( $sub_page, array( 'dashboard', 'equipment', 'leads', 'bookings' ) ) ) ? get_option( 'cora_re_listings_inventory', array() ) : array();
+$cora_users = ( in_array( $sub_page, array( 'dashboard', 'bookings', 'team-roles', 'equipment', 'blogs' ) ) ) ? get_users() : array();
+$cora_re_listings = ( in_array( $sub_page, array( 'dashboard', 'equipment', 'leads', 'bookings' ) ) ) ? cora_db_get_properties() : array();
 $cora_permissions = get_option( 'cora_role_permissions', array() );
 $cora_showing_assignments = get_option( 'cora_re_showing_assignments', array() );
 $cora_documents = get_option( 'cora_re_vault_docs', array() );
 $cora_portfolios = get_option( 'cora_re_portfolios', array() );
-$cora_re_leads = get_option( 'cora_re_leads', array() );
-$cora_re_clients = get_option( 'cora_re_clients', array() );
+$cora_re_leads = cora_db_get_leads();
+$cora_re_clients = cora_db_get_clients();
 $cora_re_attendance_logs = get_option( 'cora_re_attendance_logs', array() );
 $cora_re_client_tasks = get_option( 'cora_re_client_tasks', array() );
 
@@ -96,7 +96,7 @@ foreach ( $cora_re_clients as $client ) {
     }
 }
 
-$cora_financials = get_option( 'cora_re_ledger', array() );
+$cora_financials = cora_db_get_ledger();
 $cora_gbp_profile       = get_option( 'cora_gbp_profile', array() );
 $cora_gbp_is_connected  = ! empty( $cora_gbp_profile['connected'] ) &&
     ( ! empty( $cora_gbp_profile['location_name'] ) || ! empty( $cora_gbp_profile['place_id'] ) );
@@ -2372,7 +2372,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 <div>
                     <div class="cora-nav-group-label px-3 text-[10px] font-bold tracking-wider text-zinc-400 uppercase">Channels</div>
                     <ul class="cora-nav-list space-y-0.5 mt-2">
-                        <li class="cora-nav-item <?php echo $sub_page === 'visual-builder' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm text-zinc-650 rounded-md cursor-pointer hover:bg-zinc-200/40 hover:text-zinc-900 transition-all duration-150" data-target="visual-builder" title="Visual Builder">
+                        <li class="cora-nav-item <?php echo $sub_page === 'canvas' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm text-zinc-650 rounded-md cursor-pointer hover:bg-zinc-200/40 hover:text-zinc-900 transition-all duration-150" data-target="canvas" title="Canvas">
                             <div class="flex items-center gap-3">
                                 <span class="cora-nav-icon text-zinc-400">
                                     <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none">
@@ -2381,20 +2381,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                         <line x1="9" y1="9" x2="21" y2="9"></line>
                                     </svg>
                                 </span>
-                                <span class="cora-nav-text">Visual Builder</span>
-                            </div>
-                        </li>
-                        <li class="cora-nav-item <?php echo $sub_page === 'pages' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm text-zinc-650 rounded-md cursor-pointer hover:bg-zinc-200/40 hover:text-zinc-900 transition-all duration-150" data-target="pages" title="Landing Pages">
-                            <div class="flex items-center gap-3">
-                                <span class="cora-nav-icon text-zinc-400">
-                                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                        <polyline points="14 2 14 8 20 8"></polyline>
-                                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                                    </svg>
-                                </span>
-                                <span class="cora-nav-text">Landing Pages</span>
+                                <span class="cora-nav-text">Canvas</span>
                             </div>
                         </li>
                         <li class="cora-nav-item <?php echo $sub_page === 'blogs' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm text-zinc-655 rounded-md cursor-pointer hover:bg-zinc-200/40 hover:text-zinc-900 transition-all duration-150" data-target="blogs" title="Content & Blogs">
@@ -6000,10 +5987,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             </section>
             <?php endif; ?>
 
-            <!-- SECTION: VISUAL BUILDER -->
-            <?php if ( $sub_page === 'visual-builder' ) : ?>
-            <section id="cora-page-visual-builder" class="cora-page-section cora-active space-y-6">
-                <?php include CORA_REAL_ESTATE_AI_PATH . 'views/view-visual-builder.php'; ?>
+            <!-- SECTION: CANVAS -->
+            <?php if ( $sub_page === 'canvas' ) : ?>
+            <section id="cora-page-canvas" class="cora-page-section cora-active space-y-6">
+                <?php include CORA_REAL_ESTATE_AI_PATH . 'views/view-canvas.php'; ?>
             </section>
             <?php endif; ?>
 
@@ -6144,22 +6131,39 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     </div>
                 </div>
 
-                <!-- Articles Table -->
-                <div class="border border-zinc-200 rounded-lg overflow-hidden bg-white shadow-sm mt-6">
+                <!-- Notion-style Tab Selector -->
+                <div class="flex items-center gap-1 border-b border-zinc-200 mt-6 select-none">
+                    <button class="px-4 py-2 border-b-2 text-xs font-semibold cursor-pointer transition-all border-zinc-950 text-zinc-900 flex items-center gap-1.5" id="btn-tab-articles-list" onclick="coraSwitchBlogsTab('list')">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                        Articles Listing
+                    </button>
+                    <button class="px-4 py-2 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-400 hover:text-zinc-600 flex items-center gap-1.5" id="btn-tab-geo-analytics" onclick="coraSwitchBlogsTab('geo')">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                        Generative Search & GEO Tracking
+                    </button>
+                    <button class="px-4 py-2 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-400 hover:text-zinc-600 flex items-center gap-1.5" id="btn-tab-keywords-explorer" onclick="coraSwitchBlogsTab('keywords')">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        Local Intent Keyword Explorer
+                    </button>
+                </div>
+
+                <!-- Articles Table Container -->
+                <div id="cora-blogs-list-container" class="border border-zinc-200 rounded-lg overflow-hidden bg-white shadow-sm mt-6">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-zinc-50 border-b border-zinc-200 text-[10px] font-bold text-zinc-400 uppercase tracking-wider select-none">
                                 <th class="py-3 px-4">Article Title</th>
+                                <th class="py-3 px-4">Author</th>
                                 <th class="py-3 px-4">Status</th>
                                 <th class="py-3 px-4">SEO Health</th>
-                                <th class="py-3 px-4">Performance</th>
+                                <th class="py-3 px-4">Captured Leads</th>
                                 <th class="py-3 px-4 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-zinc-100 text-sm text-zinc-700" id="cora-articles-table-body">
                             <?php if (empty($cora_posts)): ?>
                                 <tr>
-                                    <td colspan="5" class="py-8 text-center text-zinc-500 text-sm">No articles found. Click "New AI Article" to start drafting!</td>
+                                    <td colspan="6" class="py-8 text-center text-zinc-500 text-sm">No articles found. Click "New AI Article" to start drafting!</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach($cora_posts as $post): 
@@ -6168,6 +6172,22 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     $thumbnail_url = get_the_post_thumbnail_url($post->ID, 'thumbnail');
                                     $content_esc = esc_js($post->post_content);
                                     $title_esc = esc_js($post->post_title);
+                                    $lead_count = cora_db_get_article_lead_count($post->ID);
+                                    
+                                    $assignee_id = get_post_meta($post->ID, '_cora_assignee_id', true);
+                                    $assignee_name = 'Unassigned';
+                                    if ($assignee_id) {
+                                        $user_obj = get_userdata($assignee_id);
+                                        if ($user_obj) {
+                                            $assignee_name = $user_obj->display_name;
+                                        }
+                                    }
+
+                                    $editorial_status = get_post_meta($post->ID, '_cora_editorial_status', true) ?: ($is_published ? 'published' : 'draft');
+
+                                    // Mock realistic conversion rate based on leads & mock pageviews
+                                    $pageviews = $is_published ? (120 + ($lead_count * 18)) : 0;
+                                    $conv_rate = ($pageviews > 0) ? sprintf('%.1f%%', ($lead_count / $pageviews) * 100) : '0.0%';
                                 ?>
                                 <tr class="hover:bg-zinc-50/50 transition-colors cursor-pointer cora-article-row" onclick="coraEditArticle(<?php echo $post->ID; ?>)">
                                     <td class="py-3 px-4">
@@ -6183,10 +6203,17 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                         </div>
                                     </td>
                                     <td class="py-3 px-4">
-                                        <?php if($is_published): ?>
-                                            <span class="px-2 py-1 bg-green-100 text-green-700 rounded-md text-[10px] font-bold tracking-wider uppercase">Published</span>
+                                        <span class="text-xs font-semibold text-zinc-650"><?php echo esc_html($assignee_name); ?></span>
+                                    </td>
+                                    <td class="py-3 px-4">
+                                        <?php if($editorial_status === 'published'): ?>
+                                            <span class="px-2 py-1 bg-green-150 text-green-700 rounded-md text-[10px] font-bold tracking-wider uppercase">Published</span>
+                                        <?php elseif($editorial_status === 'pending_review'): ?>
+                                            <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-md text-[10px] font-bold tracking-wider uppercase">In Review</span>
+                                        <?php elseif($editorial_status === 'approved'): ?>
+                                            <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded-md text-[10px] font-bold tracking-wider uppercase">Approved</span>
                                         <?php else: ?>
-                                            <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-md text-[10px] font-bold tracking-wider uppercase">Draft</span>
+                                            <span class="px-2 py-1 bg-zinc-100 text-zinc-600 rounded-md text-[10px] font-bold tracking-wider uppercase">Draft</span>
                                         <?php endif; ?>
                                     </td>
                                     <td class="py-3 px-4">
@@ -6197,7 +6224,12 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     </td>
                                     <td class="py-3 px-4">
                                         <?php if($is_published): ?>
-                                            <div class="text-xs font-semibold text-zinc-800">Tracking...</div>
+                                            <div class="flex items-center gap-2">
+                                                <button class="cora-btn-action px-2 py-0.5 border border-zinc-200 text-zinc-850 hover:bg-zinc-50 rounded text-xs font-bold cursor-pointer" onclick="event.stopPropagation(); coraShowArticleLeads(<?php echo $post->ID; ?>, '<?php echo esc_js($title_esc); ?>')">
+                                                    <?php echo $lead_count; ?> Leads
+                                                </button>
+                                                <span class="text-[10px] text-zinc-400 font-semibold">(<?php echo $conv_rate; ?> CR)</span>
+                                            </div>
                                         <?php else: ?>
                                             <div class="text-xs text-zinc-400 italic">Unpublished</div>
                                         <?php endif; ?>
@@ -6210,6 +6242,240 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             <?php endif; ?>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Local Intent Keyword Explorer Panel -->
+                <div id="cora-blogs-keywords-panel" class="hidden space-y-6 mt-6 animate-fade-in">
+                    <div class="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
+                        <div class="px-5 py-4 border-b border-zinc-200 bg-zinc-50/50 flex justify-between items-center">
+                            <div>
+                                <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Local Search Intents & Query Volume</h3>
+                                <p class="text-[10px] text-zinc-400 mt-0.5">High-intent searches happening in Delhi NCR. Build articles to capture AI citation share.</p>
+                            </div>
+                            <span class="px-2 py-1 bg-zinc-100 text-zinc-700 rounded text-[9px] font-bold uppercase">Delhi NCR Region</span>
+                        </div>
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-zinc-50/50 border-b border-zinc-100 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                                    <th class="py-2.5 px-4">Local Target Keyword</th>
+                                    <th class="py-2.5 px-4 text-center">Monthly Queries</th>
+                                    <th class="py-2.5 px-4 text-center">AI competition</th>
+                                    <th class="py-2.5 px-4 text-center">Opportunity Level</th>
+                                    <th class="py-2.5 px-4 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-zinc-100 text-zinc-700">
+                                <tr>
+                                    <td class="py-3 px-4 font-bold text-zinc-900">"luxury builder floor in Vasant Vihar Delhi"</td>
+                                    <td class="py-3 px-4 text-center font-bold">850/mo</td>
+                                    <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 bg-green-50 text-green-700 font-bold border border-green-200 rounded">LOW</span></td>
+                                    <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 bg-green-100 text-green-900 font-bold rounded">HIGH</span></td>
+                                    <td class="py-3 px-4 text-right">
+                                        <button class="cora-btn-primary px-3 py-1 bg-zinc-950 hover:bg-zinc-800 text-white rounded text-[10px] font-bold cursor-pointer transition-colors" onclick="coraOneClickDraft('luxury builder floor in Vasant Vihar Delhi', 'Modern Luxury Builder Floors for Sale in Vasant Vihar', 'Explore premium multi-level builder floors with private elevators and security in Vasant Vihar, South Delhi.')">One-Click Write</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 font-bold text-zinc-900">"average price of 4BHK penthouses DLF Phase 5 Gurgaon"</td>
+                                    <td class="py-3 px-4 text-center font-bold">620/mo</td>
+                                    <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 bg-green-50 text-green-700 font-bold border border-green-200 rounded">VERY LOW</span></td>
+                                    <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 bg-green-100 text-green-900 font-bold rounded">HIGH</span></td>
+                                    <td class="py-3 px-4 text-right">
+                                        <button class="cora-btn-primary px-3 py-1 bg-zinc-950 hover:bg-zinc-800 text-white rounded text-[10px] font-bold cursor-pointer transition-colors" onclick="coraOneClickDraft('average price of 4BHK penthouses DLF Phase 5 Gurgaon', 'Gurgaon DLF Phase 5 Penthouse Price Index & Trends', 'Detailed breakdown of average square yard pricing, maintenance metrics, and villa sales inside Gurgaon DLF Phase 5.')">One-Click Write</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 font-bold text-zinc-900">"eco-friendly villa developments near Golf Course Road"</td>
+                                    <td class="py-3 px-4 text-center font-bold">480/mo</td>
+                                    <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 bg-yellow-50 text-yellow-700 font-bold border border-yellow-250 rounded">MEDIUM</span></td>
+                                    <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 bg-zinc-100 text-zinc-800 font-bold rounded">MEDIUM</span></td>
+                                    <td class="py-3 px-4 text-right">
+                                        <button class="cora-btn-primary px-3 py-1 bg-zinc-950 hover:bg-zinc-800 text-white rounded text-[10px] font-bold cursor-pointer transition-colors" onclick="coraOneClickDraft('eco-friendly villa developments near Golf Course Road', 'Sustainable Eco-Friendly Villas near Golf Course Road Gurgaon', 'A comprehensive catalog profiling solar-powered, water-conserving luxury villas on Golf Course Road.')">One-Click Write</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 font-bold text-zinc-900">"DLF CyberCity corporate commercial lease space rates"</td>
+                                    <td class="py-3 px-4 text-center font-bold">1,200/mo</td>
+                                    <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 bg-yellow-50 text-yellow-700 font-bold border border-yellow-250 rounded">MEDIUM</span></td>
+                                    <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 bg-zinc-100 text-zinc-800 font-bold rounded">MEDIUM</span></td>
+                                    <td class="py-3 px-4 text-right">
+                                        <button class="cora-btn-primary px-3 py-1 bg-zinc-950 hover:bg-zinc-800 text-white rounded text-[10px] font-bold cursor-pointer transition-colors" onclick="coraOneClickDraft('DLF CyberCity corporate commercial lease space rates', 'Corporate Commercial Lease Space Rates inside DLF CyberCity Gurgaon', 'Track commercial rates per square foot, common area expenses, and tenancy agreements inside DLF CyberCity.')">One-Click Write</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- GEO & AISEO Analytics Panel -->
+                <div id="cora-blogs-geo-panel" class="hidden space-y-6 mt-6 animate-fade-in">
+                    <!-- Analytics Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- AI Search Citations -->
+                        <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm">
+                            <h3 class="text-xs font-bold text-zinc-450 uppercase tracking-wider mb-4">Generative Visibility</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between pb-2 border-b border-zinc-50">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                        <span class="text-xs font-bold text-zinc-800">Google Gemini</span>
+                                    </div>
+                                    <span class="text-xs font-black text-zinc-900">45% Cited</span>
+                                </div>
+                                <div class="flex items-center justify-between pb-2 border-b border-zinc-50">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                        <span class="text-xs font-bold text-zinc-800">OpenAI SearchGPT</span>
+                                    </div>
+                                    <span class="text-xs font-black text-zinc-900">38% Cited</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                        <span class="text-xs font-bold text-zinc-800">Perplexity AI</span>
+                                    </div>
+                                    <span class="text-xs font-black text-zinc-900">52% Cited</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AI Citation Volumetrics -->
+                        <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm col-span-2 flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-xs font-bold text-zinc-450 uppercase tracking-wider mb-2">Generative Search Citations (Last 30 Days)</h3>
+                                <p class="text-[10px] text-zinc-500">Estimated instances where Nitin & Shanaya Arora / Apex Realty Group was cited in AI Search results.</p>
+                            </div>
+                            <div class="flex items-end gap-3 h-20 mt-4 select-none">
+                                <div class="flex-1 bg-zinc-100 rounded-t h-[40%] hover:bg-zinc-200 transition-all cursor-pointer relative group"><div class="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-zinc-950 text-white text-[8px] font-bold py-0.5 px-1 rounded shadow">12</div></div>
+                                <div class="flex-1 bg-zinc-100 rounded-t h-[60%] hover:bg-zinc-200 transition-all cursor-pointer relative group"><div class="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-zinc-950 text-white text-[8px] font-bold py-0.5 px-1 rounded shadow">18</div></div>
+                                <div class="flex-1 bg-zinc-100 rounded-t h-[55%] hover:bg-zinc-200 transition-all cursor-pointer relative group"><div class="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-zinc-950 text-white text-[8px] font-bold py-0.5 px-1 rounded shadow">15</div></div>
+                                <div class="flex-1 bg-zinc-100 rounded-t h-[75%] hover:bg-zinc-200 transition-all cursor-pointer relative group"><div class="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-zinc-950 text-white text-[8px] font-bold py-0.5 px-1 rounded shadow">24</div></div>
+                                <div class="flex-1 bg-zinc-950 rounded-t h-[95%] hover:bg-zinc-800 transition-all cursor-pointer relative group"><div class="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-zinc-950 text-white text-[8px] font-bold py-0.5 px-1 rounded shadow">32</div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Generative Search Query Intents Tracker -->
+                    <div class="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
+                        <div class="px-5 py-4 border-b border-zinc-200 bg-zinc-50/50">
+                            <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Generative Search Intents & Queries</h3>
+                        </div>
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-zinc-50/50 border-b border-zinc-100 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                                    <th class="py-2.5 px-4">Search Query Prompt</th>
+                                    <th class="py-2.5 px-4 text-center">AI Citation State</th>
+                                    <th class="py-2.5 px-4 text-center">Visibility Score</th>
+                                    <th class="py-2.5 px-4 text-right">Primary Citation Source</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-zinc-100 text-zinc-700">
+                                <tr>
+                                    <td class="py-3 px-4 font-bold text-zinc-900">"who are the best real estate agents in Delhi NCR for luxury villas?"</td>
+                                    <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 bg-green-50 text-green-700 font-bold border border-green-200 rounded">CITED</span></td>
+                                    <td class="py-3 px-4 text-center font-bold">85%</td>
+                                    <td class="py-3 px-4 text-right text-zinc-500 font-medium">Nitin & Shanaya Arora: Premium Market Forecast</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 font-bold text-zinc-900">"average price statistics for 4BHK penthouses in Gurgaon DLF Phase 5"</td>
+                                    <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 bg-green-50 text-green-700 font-bold border border-green-200 rounded">CITED</span></td>
+                                    <td class="py-3 px-4 text-center font-bold">72%</td>
+                                    <td class="py-3 px-4 text-right text-zinc-500 font-medium">Gurgaon DLF Luxury Villas for Sale</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 font-bold text-zinc-900">"realtor recommendations for corporate office lease space Cyber City"</td>
+                                    <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 bg-zinc-50 text-zinc-400 font-medium border border-zinc-200 rounded">NOT CITED</span></td>
+                                    <td class="py-3 px-4 text-center font-bold">12%</td>
+                                    <td class="py-3 px-4 text-right text-zinc-500 italic">None</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- AI Content Demand Recommendations -->
+                    <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-5 flex items-start gap-4">
+                        <div class="p-2 bg-zinc-900 rounded text-white shrink-0 mt-0.5">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-zinc-900">AI Search Demand Alerts (Local Delhi NCR)</h4>
+                            <p class="text-[11px] text-zinc-500 mt-1 leading-relaxed">Gemini and SearchGPT are experiencing a 65% surge in queries for <strong>"eco-friendly luxury villas in Gurgaon"</strong>. We recommend publishing a short summary article with a structured price table to capture up to 45% citation share on AI Overviews.</p>
+                        </div>
+                    <!-- Team Attribution & Lead Performance Leaderboard -->
+                    <div class="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
+                        <div class="px-5 py-4 border-b border-zinc-200 bg-zinc-50/50 flex justify-between items-center">
+                            <div>
+                                <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Team Attribution & Lead Performance</h3>
+                                <p class="text-[10px] text-zinc-400 mt-0.5">Track and reward team members generating the highest conversion rates and citations.</p>
+                            </div>
+                            <span class="px-2 py-1 bg-zinc-100 text-zinc-700 rounded text-[9px] font-bold uppercase">Team Leaderboard</span>
+                        </div>
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-zinc-50/50 border-b border-zinc-100 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                                    <th class="py-2.5 px-4">Team Member</th>
+                                    <th class="py-2.5 px-4 text-center">Articles Written</th>
+                                    <th class="py-2.5 px-4 text-center">AI Citation Score</th>
+                                    <th class="py-2.5 px-4 text-center">Captured Leads</th>
+                                    <th class="py-2.5 px-4 text-right">Avg Conversion Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-zinc-100 text-zinc-700">
+                                <?php
+                                // Map leads by assignee
+                                $user_stats = array();
+                                // Initialize stats for each registered user
+                                foreach ($cora_users as $usr) {
+                                    $user_stats[$usr->ID] = array(
+                                        'name' => $usr->display_name,
+                                        'posts' => 0,
+                                        'leads' => 0,
+                                        'pageviews' => 0,
+                                        'seo_sum' => 0
+                                    );
+                                }
+                                // Gather metrics from posts
+                                foreach ($cora_posts as $post) {
+                                    $author_id = get_post_meta($post->ID, '_cora_assignee_id', true);
+                                    if ($author_id && isset($user_stats[$author_id])) {
+                                        $user_stats[$author_id]['posts']++;
+                                        $p_leads = cora_db_get_article_lead_count($post->ID);
+                                        $user_stats[$author_id]['leads'] += $p_leads;
+                                        $user_stats[$author_id]['seo_sum'] += (get_post_meta($post->ID, '_cora_seo_score', true) ?: 75);
+                                        if ($post->post_status === 'publish') {
+                                            $user_stats[$author_id]['pageviews'] += (120 + ($p_leads * 18));
+                                        }
+                                    }
+                                }
+                                
+                                $has_stats = false;
+                                foreach ($user_stats as $u_id => $stats):
+                                    if ($stats['posts'] === 0) continue;
+                                    $has_stats = true;
+                                    $avg_seo = round($stats['seo_sum'] / $stats['posts']);
+                                    $cr = ($stats['pageviews'] > 0) ? sprintf('%.1f%%', ($stats['leads'] / $stats['pageviews']) * 100) : '0.0%';
+                                ?>
+                                <tr>
+                                    <td class="py-3 px-4 font-bold text-zinc-900"><?php echo esc_html($stats['name']); ?></td>
+                                    <td class="py-3 px-4 text-center font-bold"><?php echo $stats['posts']; ?></td>
+                                    <td class="py-3 px-4 text-center">
+                                        <div class="flex items-center justify-center gap-1">
+                                            <span class="font-bold text-zinc-800"><?php echo $avg_seo; ?></span> <span class="text-zinc-400 text-[10px]">/100</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-4 text-center font-bold"><?php echo $stats['leads']; ?> Leads</td>
+                                    <td class="py-3 px-4 text-right font-black text-green-700"><?php echo $cr; ?></td>
+                                </tr>
+                                <?php endforeach;
+                                if (!$has_stats): ?>
+                                <tr>
+                                    <td colspan="5" class="py-6 text-center text-zinc-550 italic">Assign keywords or articles to team members to track performance leaderboard metrics!</td>
+                                </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    </div>
                 </div>
             </section>
             <?php endif; ?>
@@ -7196,6 +7462,43 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         </div>
     </aside>
 
+    <!-- Sliding Drawer: Article Captured Leads -->
+    <aside id="drawer-article-leads" class="fixed top-0 right-0 h-full w-[450px] bg-white border-l border-zinc-200 shadow-2xl z-[90] transform translate-x-full transition-transform duration-300 ease-out flex flex-col overflow-hidden">
+        <header class="p-5 border-b border-zinc-100 flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-2">
+                <span class="p-1.5 bg-zinc-100 rounded text-zinc-800 flex items-center">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </span>
+                <div>
+                    <h3 class="text-sm font-bold text-zinc-900 uppercase tracking-wider" id="cora-article-leads-title">Captured Leads</h3>
+                    <p class="text-[9px] text-zinc-400 font-medium">Attributed CRM submissions from this article</p>
+                </div>
+            </div>
+            <button class="p-1.5 border border-zinc-200 rounded text-zinc-400 hover:text-zinc-900 transition-colors hover:bg-zinc-50 cursor-pointer" onclick="coraToggleArticleLeadsDrawer(false)">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-5 space-y-4">
+            <div class="border border-zinc-200 rounded-lg overflow-hidden bg-white">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-zinc-50 border-b border-zinc-100 text-[9px] font-bold text-zinc-400 uppercase tracking-wider">
+                            <th class="py-2 px-3">Lead Contact</th>
+                            <th class="py-2 px-3">Details / Request</th>
+                            <th class="py-2 px-3 text-right">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cora-article-leads-list" class="divide-y divide-zinc-100 text-zinc-700">
+                        <tr>
+                            <td colspan="3" class="py-6 text-center text-zinc-400">Loading captured leads...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </aside>
+
     <!-- Mobile Bottom Navigation (Shopify style) -->
     <nav class="cora-bottom-nav fixed bottom-0 left-0 w-full h-14 bg-white/95 backdrop-blur-sm border-t border-zinc-200 flex justify-around items-center z-45 px-2 lg:hidden shadow-[0_-2px_10px_rgba(0,0,0,0.03)]">
         <div class="cora-bottom-nav-item <?php echo $sub_page === 'dashboard' ? 'cora-active' : ''; ?> flex flex-col items-center justify-center text-[10px] font-medium text-zinc-400 cursor-pointer py-1 flex-1 transition-colors duration-150" data-target="dashboard">
@@ -7456,6 +7759,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 <button class="px-4 py-2 border border-zinc-200 rounded-md text-zinc-700 bg-white font-semibold hover:bg-zinc-50 transition-all cursor-pointer text-xs" onclick="coraSaveArticle('draft')">
                     Save Draft
                 </button>
+                <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition-all cursor-pointer text-xs flex items-center gap-1.5 shadow-sm active:scale-95" id="cora-btn-submit-review" onclick="coraSubmitArticleForReview()">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Submit for Review
+                </button>
                 <button class="px-4 py-2 bg-zinc-950 text-white font-semibold rounded-md hover:bg-zinc-800 transition-all cursor-pointer text-xs flex items-center gap-2 shadow-sm active:scale-95" onclick="coraSaveArticle('publish')">
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
                     Publish Live
@@ -7467,7 +7774,35 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         <div class="flex-1 flex overflow-hidden">
             <!-- Main Writing Area -->
             <main class="flex-1 overflow-y-auto px-10 py-12 md:px-24 xl:px-48 relative">
-                <div class="max-w-3xl mx-auto w-full flex flex-col gap-4">
+                <div class="max-w-3xl mx-auto w-full flex flex-col">
+                    <!-- Sticky Editorial Banner -->
+                    <div id="cora-editorial-banner" class="hidden mb-6 p-4 border rounded-xl bg-zinc-50 border-zinc-200 shadow-sm flex flex-col gap-3 animate-fade-in select-none">
+                        <div class="flex items-center justify-between w-full">
+                            <div class="flex items-center gap-3">
+                                <span class="p-2 bg-blue-100 text-blue-700 rounded-lg shrink-0 flex items-center">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                </span>
+                                <div>
+                                    <span class="text-xs font-bold text-zinc-900 block" id="cora-editorial-banner-status">Draft Pending Review</span>
+                                    <span class="text-[10px] text-zinc-400 block leading-tight">Submitted for approval by <strong id="cora-editorial-banner-author">Writer</strong></span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button class="px-3 py-1.5 bg-green-950 hover:bg-green-800 text-white rounded font-bold text-[10px] uppercase cursor-pointer transition-colors shadow-sm" onclick="coraApproveEditorialDraft()">Approve Draft</button>
+                                <button class="px-3 py-1.5 border border-zinc-250 bg-white hover:bg-zinc-50 rounded text-zinc-700 font-bold text-[10px] uppercase cursor-pointer transition-colors" onclick="coraPromptRevisions()">Request Revisions</button>
+                            </div>
+                        </div>
+                        <!-- Inline Feedback Form Container -->
+                        <div id="cora-feedback-input-container" class="hidden pt-3 border-t border-zinc-200 w-full">
+                            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Enter Revision Feedback</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="cora-feedback-input-field" placeholder="e.g. Please add Vasant Vihar statistics and insert Valuation CTA..." class="flex-1 text-xs border border-zinc-200 rounded p-2 focus:outline-none focus:border-zinc-400 bg-white">
+                                <button class="px-3 py-1 bg-zinc-950 text-white rounded text-xs font-bold cursor-pointer transition-colors hover:bg-zinc-800" onclick="coraSubmitRevisionsFeedback()">Submit Feedback</button>
+                                <button class="px-2 py-1 border border-zinc-200 hover:bg-zinc-50 rounded text-xs text-zinc-650 cursor-pointer" onclick="coraToggleFeedbackInput(false)">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <input type="hidden" id="cora-article-id" value="">
                     
                     <input type="text" id="cora-article-title" placeholder="Article Title" class="text-4xl md:text-5xl font-black text-zinc-900 placeholder:text-zinc-200 w-full border-none focus:ring-0 focus:outline-none bg-transparent leading-tight tracking-tight mb-2">
@@ -7527,28 +7862,178 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     </div>
                 </div>
 
-                <!-- SEO Section -->
-                <div class="p-6 space-y-4">
-                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">SEO Optimization</span>
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-medium text-zinc-600 block">Focus Keyword</label>
-                        <input type="text" id="cora-seo-keyword" placeholder="e.g. Property Listings" class="w-full text-xs border border-zinc-200 rounded p-2 focus:outline-none focus:border-zinc-400 bg-white">
+                <!-- Team & Editorial Settings -->
+                <div class="p-6 border-b border-zinc-200 space-y-4">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Assignee / Author</label>
+                        <select id="cora-article-assignee" class="w-full text-xs border border-zinc-200 rounded p-2 focus:outline-none focus:border-zinc-400 bg-white">
+                            <option value="0">Unassigned</option>
+                            <?php foreach($cora_users as $usr): ?>
+                                <option value="<?php echo $usr->ID; ?>"><?php echo esc_html($usr->display_name); ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-medium text-zinc-600 block">Meta Description</label>
-                        <textarea id="cora-seo-description" placeholder="Summarize for Google..." rows="3" class="w-full text-[11px] border border-zinc-200 rounded p-2 focus:outline-none focus:border-zinc-400 resize-none text-zinc-600 bg-white"></textarea>
+
+                    <!-- Editorial Feedback Notification box -->
+                    <div id="cora-editorial-feedback-box" class="hidden p-3 rounded-lg border border-yellow-250 bg-yellow-50/70 text-[11px] text-yellow-800 leading-tight space-y-2">
+                        <div class="flex items-center gap-1.5 font-bold">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            <span>Revision Required</span>
+                        </div>
+                        <p id="cora-editorial-feedback-text" class="italic"></p>
                     </div>
-                    
-                    <!-- AI SEO Score -->
-                    <div class="mt-4 pt-4 border-t border-zinc-200">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">SEO Score</span>
-                            <div class="flex items-end gap-1 text-green-600 font-bold">
-                                <span class="text-xl leading-none" id="cora-seo-score-display">--</span>
+                </div>
+
+                <!-- Traditional SEO vs GEO Tabbed Section -->
+                <div class="border-t border-zinc-200">
+                    <!-- Tab Headers -->
+                    <div class="flex border-b border-zinc-200 bg-zinc-100/50 select-none text-[10px] font-bold uppercase tracking-wider">
+                        <button class="flex-1 py-3 text-center border-b-2 border-zinc-950 text-zinc-900 cursor-pointer transition-colors flex items-center justify-center gap-1.5" id="btn-sidebar-seo" onclick="coraSwitchSidebarTab('seo')">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            SEO
+                        </button>
+                        <button class="flex-1 py-3 text-center border-b-2 border-transparent text-zinc-400 hover:text-zinc-600 cursor-pointer transition-colors flex items-center justify-center gap-1.5" id="btn-sidebar-geo" onclick="coraSwitchSidebarTab('geo')">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            GEO / AISEO
+                        </button>
+                    </div>
+
+                    <!-- SEO Content -->
+                    <div id="panel-sidebar-seo" class="p-6 space-y-4">
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-medium text-zinc-600 block">Focus Keyword</label>
+                            <input type="text" id="cora-seo-keyword" placeholder="e.g. Property Listings" class="w-full text-xs border border-zinc-200 rounded p-2 focus:outline-none focus:border-zinc-400 bg-white">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-medium text-zinc-600 block">Meta Description</label>
+                            <textarea id="cora-seo-description" placeholder="Summarize for Google..." rows="3" class="w-full text-[11px] border border-zinc-200 rounded p-2 focus:outline-none focus:border-zinc-400 resize-none text-zinc-600 bg-white"></textarea>
+                        </div>
+                        
+                        <!-- AI SEO Score -->
+                        <div class="mt-4 pt-4 border-t border-zinc-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">SEO Score</span>
+                                <div class="flex items-end gap-1 text-green-600 font-bold">
+                                    <span class="text-xl leading-none" id="cora-seo-score-display">--</span>
+                                    <span class="text-[9px] text-zinc-400">/100</span>
+                                </div>
+                            </div>
+                            <button class="w-full py-1.5 text-[10px] font-bold text-zinc-500 bg-white border border-zinc-200 rounded hover:bg-zinc-100 transition-colors cursor-pointer" onclick="coraAnalyzeSEO()">Run SEO Analysis</button>
+                        </div>
+                    </div>
+
+                    <!-- GEO & AISEO Content -->
+                    <div id="panel-sidebar-geo" class="hidden p-6 space-y-4 animate-fade-in">
+                        <!-- GEO Score Indicator -->
+                        <div class="flex items-center justify-between pb-3 border-b border-zinc-200">
+                            <div>
+                                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">GEO Score</span>
+                                <span class="text-[9px] text-zinc-500">AI Search Visibility Index</span>
+                            </div>
+                            <div class="flex items-end gap-0.5 text-zinc-900 font-black">
+                                <span class="text-2xl leading-none" id="cora-geo-score-display">65</span>
                                 <span class="text-[9px] text-zinc-400">/100</span>
                             </div>
                         </div>
-                        <button class="w-full py-1.5 text-[10px] font-bold text-zinc-500 bg-white border border-zinc-200 rounded hover:bg-zinc-100 transition-colors cursor-pointer" onclick="coraAnalyzeSEO()">Run SEO Analysis</button>
+
+                        <!-- Visibility Engine Checklist -->
+                        <div class="space-y-3">
+                            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">GEO Optimizations</span>
+                            
+                            <div class="flex items-start gap-2 text-xs">
+                                <input type="checkbox" id="chk-geo-direct-answer" disabled class="mt-0.5 rounded border-zinc-300 text-zinc-950 focus:ring-0">
+                                <div>
+                                    <span class="font-bold text-zinc-800 block">Direct Answer Block</span>
+                                    <span class="text-[9px] text-zinc-400 block leading-tight">Short Q&A block answering core local queries under 100 words.</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-2 text-xs">
+                                <input type="checkbox" id="chk-geo-info-density" disabled class="mt-0.5 rounded border-zinc-300 text-zinc-950 focus:ring-0">
+                                <div>
+                                    <span class="font-bold text-zinc-800 block">Structured Data Table</span>
+                                    <span class="text-[9px] text-zinc-400 block leading-tight">A summarized pricing/amenities Markdown table or data list.</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-2 text-xs">
+                                <input type="checkbox" id="chk-geo-citations" disabled class="mt-0.5 rounded border-zinc-300 text-zinc-950 focus:ring-0">
+                                <div>
+                                    <span class="font-bold text-zinc-800 block">Authority Citations</span>
+                                    <span class="text-[9px] text-zinc-400 block leading-tight">External links or industry citations validating local metrics.</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-2 text-xs">
+                                <input type="checkbox" id="chk-geo-schema" disabled class="mt-0.5 rounded border-zinc-300 text-zinc-950 focus:ring-0">
+                                <div>
+                                    <span class="font-bold text-zinc-800 block">JSON-LD Schema Markup</span>
+                                    <span class="text-[9px] text-zinc-400 block leading-tight">Article structured data script enqueued.</span>
+                                </div>
+                            </div>
+                        <!-- In-Post Lead Capture CTAs -->
+                        <div class="space-y-2 pt-2 border-t border-zinc-200">
+                            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">In-Post Lead Capture CTAs</span>
+                            <div class="grid grid-cols-1 gap-2">
+                                <button type="button" class="w-full text-left p-2 border border-zinc-200 hover:border-zinc-400 rounded-md bg-white hover:bg-zinc-50 transition-all cursor-pointer flex items-center gap-2" onclick="coraInjectQuillCTA('valuation')">
+                                    <span class="p-1 bg-zinc-100 rounded text-zinc-800 shrink-0">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                    </span>
+                                    <div>
+                                        <span class="text-[10px] font-bold text-zinc-800 block">Property Valuation Form</span>
+                                        <span class="text-[8px] text-zinc-400 block leading-none">Captures home seller appraisal requests</span>
+                                    </div>
+                                </button>
+                                <button type="button" class="w-full text-left p-2 border border-zinc-200 hover:border-zinc-400 rounded-md bg-white hover:bg-zinc-50 transition-all cursor-pointer flex items-center gap-2" onclick="coraInjectQuillCTA('catalog')">
+                                    <span class="p-1 bg-zinc-100 rounded text-zinc-800 shrink-0">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                    </span>
+                                    <div>
+                                        <span class="text-[10px] font-bold text-zinc-800 block">Pricing Guide Download Card</span>
+                                        <span class="text-[8px] text-zinc-400 block leading-none">Captures local buyers catalog leads</span>
+                                    </div>
+                                </button>
+                                <button type="button" class="w-full text-left p-2 border border-zinc-200 hover:border-zinc-400 rounded-md bg-white hover:bg-zinc-50 transition-all cursor-pointer flex items-center gap-2" onclick="coraInjectQuillCTA('scheduler')">
+                                    <span class="p-1 bg-zinc-100 rounded text-zinc-800 shrink-0">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                    </span>
+                                    <div>
+                                        <span class="text-[10px] font-bold text-zinc-800 block">Virtual Tour Scheduler</span>
+                                        <span class="text-[8px] text-zinc-400 block leading-none">Captures showing calendar bookings</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Local Entity Mentions -->
+                        <div class="space-y-2 pt-2 border-t border-zinc-200">
+                            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Local Entity Mentions (GEO)</span>
+                            <div class="flex flex-wrap gap-1.5 select-none" id="cora-geo-entities-list">
+                                <span class="px-2 py-0.5 border border-zinc-200 rounded text-[9px] font-semibold text-zinc-400" id="entity-mention-vasant">Vasant Vihar</span>
+                                <span class="px-2 py-0.5 border border-zinc-200 rounded text-[9px] font-semibold text-zinc-400" id="entity-mention-dlf">DLF Phase 5</span>
+                                <span class="px-2 py-0.5 border border-zinc-200 rounded text-[9px] font-semibold text-zinc-400" id="entity-mention-gurgaon">Gurgaon</span>
+                                <span class="px-2 py-0.5 border border-zinc-200 rounded text-[9px] font-semibold text-zinc-400" id="entity-mention-cyber">Cyber City</span>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-2 border-t border-zinc-200"></div>
+
+                        <!-- Auto-Optimize Button -->
+                        <button class="w-full py-2 mt-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm" onclick="coraAutoOptimizeGEO()">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+                            Run GEO Auto-Optimize
+                        </button>
+
+                        <!-- Schema Preview Accordion -->
+                        <div class="border border-zinc-200 rounded-lg overflow-hidden bg-white mt-3">
+                            <button class="w-full px-3 py-2 bg-zinc-50 hover:bg-zinc-100 flex items-center justify-between text-[9px] font-bold text-zinc-500 uppercase tracking-wider cursor-pointer border-none focus:outline-none" onclick="jQuery('#cora-schema-preview-container').toggleClass('hidden')">
+                                <span>JSON-LD Schema Preview</span>
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </button>
+                            <div id="cora-schema-preview-container" class="hidden p-3 border-t border-zinc-200 bg-zinc-50 overflow-x-auto">
+                                <pre class="text-[9px] text-zinc-600 font-mono" id="cora-schema-preview-block">{}</pre>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </aside>

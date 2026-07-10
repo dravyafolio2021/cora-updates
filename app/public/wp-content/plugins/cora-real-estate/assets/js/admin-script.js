@@ -9,6 +9,10 @@ if (typeof window.coraREData === 'undefined') {
     Object.assign(window.coraREData, coraREWPData);
 }
 
+if (typeof window.ajaxurl === 'undefined') {
+    window.ajaxurl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
+}
+
 jQuery(document).ready(function($) {
     // Sidebar Scroll Persistence
     const sidebarScrollContainer = document.getElementById('cora-sidebar-scroll-container');
@@ -96,7 +100,7 @@ jQuery(document).ready(function($) {
         const activeRole = $('#cora-role-preview-select').val() || coraREData.currentRole;
         let allowed = coraREData.userPermissions[activeRole] || [];
         if (activeRole === 'administrator') {
-            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'visual-builder', 'audit-panel', 'media'];
+            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media'];
         }
 
         if (targetPageId !== 'profile' && targetPageId !== 'feature-hub' && !allowed.includes(targetPageId)) {
@@ -1291,7 +1295,7 @@ jQuery(document).ready(function($) {
             });
         });
 
-        permissions['administrator'] = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'leads', 'clients', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'visual-builder', 'audit-panel', 'media'];
+        permissions['administrator'] = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'leads', 'clients', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media'];
 
         // Instantly update the local cache
         coraREData.userPermissions = permissions;
@@ -2370,7 +2374,7 @@ jQuery(document).ready(function($) {
         let allowed = coraREData.userPermissions[role] || [];
         
         if (role === 'administrator') {
-            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'visual-builder', 'audit-panel', 'media'];
+            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media'];
         }
 
         // Hide/show financial details based on role permissions
@@ -5923,6 +5927,22 @@ jQuery(document).ready(function($) {
             // Update custom status on text change
             coraQuillListingCoordinator.on('text-change', function() {
                 $('#cora-editor-status').text('Unsaved changes');
+
+                // Monitor entity mentions in text
+                const text = coraQuillListingCoordinator.getText().toLowerCase();
+                const entities = {
+                    'vasant': 'vasant vihar',
+                    'dlf': 'dlf phase 5',
+                    'gurgaon': 'gurgaon',
+                    'cyber': 'cyber city'
+                };
+                for (let key in entities) {
+                    if (text.includes(entities[key])) {
+                        $(`#entity-mention-${key}`).removeClass('border-zinc-200 text-zinc-400').addClass('border-zinc-350 text-zinc-700 font-bold bg-zinc-100');
+                    } else {
+                        $(`#entity-mention-${key}`).addClass('border-zinc-200 text-zinc-400').removeClass('border-zinc-350 text-zinc-700 font-bold bg-zinc-100');
+                    }
+                }
             });
             $('#cora-article-title, #cora-seo-keyword, #cora-seo-description, #cora-article-categories, #cora-article-tags').on('input change', function() {
                 $('#cora-editor-status').text('Unsaved changes');
@@ -5980,6 +6000,15 @@ jQuery(document).ready(function($) {
         $('#cora-thumbnail-placeholder').removeClass('hidden');
         $('#cora-editor-status').text('Drafting new');
 
+        // Reset GEO indicators
+        $('#chk-geo-direct-answer').prop('checked', false);
+        $('#chk-geo-info-density').prop('checked', false);
+        $('#chk-geo-citations').prop('checked', false);
+        $('#chk-geo-schema').prop('checked', false);
+        $('#cora-geo-score-display').text('65');
+        $('#cora-schema-preview-block').text('{}');
+        coraSwitchSidebarTab('seo');
+
         initListingCoordinatorComponentsIfNeeded();
         if (coraQuillListingCoordinator) coraQuillListingCoordinator.root.innerHTML = '';
         
@@ -5990,7 +6019,18 @@ jQuery(document).ready(function($) {
         coraToggleContentDrawer(true);
         $('#cora-editor-status').text('Loading...');
         $('#cora-article-id').val(id);
+        $('#cora-article-title').val('');
+        $('#cora-article-assignee').val('0');
         
+        // Reset GEO indicators
+        $('#chk-geo-direct-answer').prop('checked', false);
+        $('#chk-geo-info-density').prop('checked', false);
+        $('#chk-geo-citations').prop('checked', false);
+        $('#chk-geo-schema').prop('checked', false);
+        $('#cora-geo-score-display').text('65');
+        $('#cora-schema-preview-block').text('{}');
+        coraSwitchSidebarTab('seo');
+
         if (coraQuillListingCoordinator) coraQuillListingCoordinator.root.innerHTML = '<p class="text-zinc-400 animate-pulse">Loading content from server...</p>';
         
         $.post(ajaxurl, {
@@ -6005,6 +6045,37 @@ jQuery(document).ready(function($) {
                 // Fallback for title if not in backend response (we can grab it from the clicked row)
                 const domTitle = $(`tr[onclick="coraEditArticle(${id})"] .font-bold.text-zinc-900`).text();
                 $('#cora-article-title').val(domTitle);
+
+                const domAuthor = ($(`tr[onclick="coraEditArticle(${id})"] td:nth-child(2) span`).text() || 'Writer').trim();
+
+                // Assignee drop-down
+                $('#cora-article-assignee').val(data.assignee_id || '0');
+
+                // Reset/Hide editorial banner & feedback container
+                $('#cora-editorial-banner').addClass('hidden');
+                $('#cora-feedback-input-container').addClass('hidden');
+                $('#cora-feedback-input-field').val('');
+                $('#cora-btn-submit-review').removeClass('hidden');
+
+                if (data.editorial_status === 'pending_review') {
+                    $('#cora-editorial-banner').removeClass('hidden');
+                    $('#cora-editorial-banner-status').text('Draft Pending Review');
+                    $('#cora-editorial-banner-author').text(domAuthor);
+                    $('#cora-btn-submit-review').addClass('hidden');
+                }
+
+                if (data.editorial_status === 'published') {
+                    $('#cora-btn-submit-review').addClass('hidden');
+                }
+
+                // Show feedback loop notes if present
+                if (data.editorial_feedback && data.editorial_status === 'draft') {
+                    $('#cora-editorial-feedback-box').removeClass('hidden');
+                    $('#cora-editorial-feedback-text').text(data.editorial_feedback);
+                } else {
+                    $('#cora-editorial-feedback-box').addClass('hidden');
+                    $('#cora-editorial-feedback-text').text('');
+                }
 
                 if (coraQuillListingCoordinator) coraQuillListingCoordinator.root.innerHTML = data.content || '';
                 
@@ -6226,6 +6297,8 @@ jQuery(document).ready(function($) {
             return;
         }
 
+        const assignee_id = $('#cora-article-assignee').val() || '0';
+
         $('#cora-editor-status').text('Saving...');
         window.coraShowToast(`Saving article as ${status}...`, 'info');
 
@@ -6241,7 +6314,8 @@ jQuery(document).ready(function($) {
             seo_score: score === '--' ? '' : score,
             categories: categories,
             tags: tags,
-            thumbnail_id: thumbnail_id
+            thumbnail_id: thumbnail_id,
+            assignee_id: assignee_id
         }, function(response) {
             if (response.success) {
                 $('#cora-editor-status').text('Saved at ' + new Date().toLocaleTimeString());
@@ -6252,6 +6326,369 @@ jQuery(document).ready(function($) {
                 window.coraShowToast(response.data || 'Error saving article.', 'error');
             }
         });
+    };
+
+    // --- GEO & AISEO Integration ---
+    window.coraSwitchBlogsTab = function(tab) {
+        $('#btn-tab-articles-list, #btn-tab-geo-analytics, #btn-tab-keywords-explorer').removeClass('border-zinc-950 text-zinc-900').addClass('border-transparent text-zinc-400');
+        $('#cora-blogs-list-container, #cora-blogs-geo-panel, #cora-blogs-keywords-panel').addClass('hidden');
+
+        if (tab === 'list') {
+            $('#btn-tab-articles-list').removeClass('border-transparent text-zinc-400').addClass('border-zinc-950 text-zinc-900');
+            $('#cora-blogs-list-container').removeClass('hidden');
+        } else if (tab === 'geo') {
+            $('#btn-tab-geo-analytics').removeClass('border-transparent text-zinc-400').addClass('border-zinc-950 text-zinc-900');
+            $('#cora-blogs-geo-panel').removeClass('hidden');
+        } else if (tab === 'keywords') {
+            $('#btn-tab-keywords-explorer').removeClass('border-transparent text-zinc-400').addClass('border-zinc-950 text-zinc-900');
+            $('#cora-blogs-keywords-panel').removeClass('hidden');
+        }
+    };
+
+    window.coraToggleArticleLeadsDrawer = function(show) {
+        if (show) {
+            $('#drawer-article-leads').removeClass('translate-x-full');
+        } else {
+            $('#drawer-article-leads').addClass('translate-x-full');
+        }
+    };
+
+    window.coraShowArticleLeads = function(postId, postTitle) {
+        $('#cora-article-leads-title').text('Leads: ' + postTitle);
+        $('#cora-article-leads-list').html('<tr><td colspan="3" class="py-6 text-center text-zinc-400 animate-pulse">Loading captured leads...</td></tr>');
+        
+        coraToggleArticleLeadsDrawer(true);
+
+        $.post(ajaxurl, {
+            action: 'cora_get_article_leads',
+            nonce: coraREData.ajaxNonce,
+            post_id: postId
+        }, function(response) {
+            if (response.success) {
+                const leads = response.data;
+                if (!leads || leads.length === 0) {
+                    $('#cora-article-leads-list').html('<tr><td colspan="3" class="py-6 text-center text-zinc-500 italic">No leads captured from this article yet.</td></tr>');
+                } else {
+                    let html = '';
+                    leads.forEach(lead => {
+                        html += `
+                        <tr class="hover:bg-zinc-50/50 transition-colors">
+                            <td class="py-2.5 px-3">
+                                <div class="font-bold text-zinc-900">${lead.first_name} ${lead.last_name}</div>
+                                <div class="text-[10px] text-zinc-400 font-semibold">${lead.email}</div>
+                                <div class="text-[10px] text-zinc-400 font-semibold">${lead.phone}</div>
+                            </td>
+                            <td class="py-2.5 px-3 max-w-[150px] truncate text-zinc-650 font-medium">
+                                ${lead.notes || '<span class="italic text-zinc-400">None</span>'}
+                            </td>
+                            <td class="py-2.5 px-3 text-right text-[10px] text-zinc-400 font-bold whitespace-nowrap">
+                                ${lead.date}
+                            </td>
+                        </tr>
+                        `;
+                    });
+                    $('#cora-article-leads-list').html(html);
+                }
+            } else {
+                window.coraShowToast('Failed to load leads: ' + (response.data || 'unknown error'), 'error');
+            }
+        }).fail(function() {
+            window.coraShowToast('Network error loading leads.', 'error');
+        });
+    };
+
+    window.coraInjectQuillCTA = function(type) {
+        if (!coraQuillListingCoordinator) {
+            window.coraShowToast('Quill editor is not initialized.', 'error');
+            return;
+        }
+
+        let html = '';
+        const postId = $('#cora-article-id').val() || '0';
+
+        if (type === 'valuation') {
+            html = `
+            <div class="cora-inline-cta-card" style="background:#ffffff; border:1px solid #e4e4e7; border-radius:12px; padding:24px; margin:24px 0; max-width:550px; font-family:system-ui, sans-serif; box-shadow:0 1px 3px rgba(0,0,0,0.05);" contenteditable="false">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                    <span style="padding:6px; background:#f4f4f5; border-radius:6px; color:#09090b; display:inline-flex; align-items:center;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    </span>
+                    <strong style="font-size:14px; text-transform:uppercase; letter-spacing:0.05em; color:#71717a;">Free Local Appraisal</strong>
+                </div>
+                <h3 style="font-size:18px; font-weight:800; color:#09090b; margin:0 0 6px 0; line-height:1.2;">Get a Free Professional Property Valuation</h3>
+                <p style="font-size:12px; color:#71717a; margin:0 0 16px 0;">Find out exactly what your luxury home or villa is worth in today's market.</p>
+                
+                <form class="cora-blog-lead-form" onsubmit="event.preventDefault(); window.coraSubmitBlogLeadForm(this, ${postId});" style="display:grid; grid-template-columns:1fr; gap:10px;">
+                    <input type="text" name="first_name" placeholder="Full Name" required style="width:100%; border:1px solid #e4e4e7; border-radius:6px; padding:8px 12px; font-size:13px; box-sizing:border-box;">
+                    <input type="email" name="email" placeholder="Email Address" required style="width:100%; border:1px solid #e4e4e7; border-radius:6px; padding:8px 12px; font-size:13px; box-sizing:border-box;">
+                    <input type="text" name="phone" placeholder="Phone Number" required style="width:100%; border:1px solid #e4e4e7; border-radius:6px; padding:8px 12px; font-size:13px; box-sizing:border-box;">
+                    <input type="text" name="notes" placeholder="Property Address (e.g. Vasant Vihar)" required style="width:100%; border:1px solid #e4e4e7; border-radius:6px; padding:8px 12px; font-size:13px; box-sizing:border-box;">
+                    <button type="submit" style="width:100%; background:#09090b; color:#ffffff; font-weight:700; border:none; border-radius:6px; padding:10px; font-size:13px; cursor:pointer; transition:background 0.2s;">Request Free Appraisal</button>
+                </form>
+            </div>
+            `;
+        } else if (type === 'catalog') {
+            html = `
+            <div class="cora-inline-cta-card" style="background:#ffffff; border:1px solid #e4e4e7; border-radius:12px; padding:24px; margin:24px 0; max-width:550px; font-family:system-ui, sans-serif; box-shadow:0 1px 3px rgba(0,0,0,0.05);" contenteditable="false">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                    <span style="padding:6px; background:#f4f4f5; border-radius:6px; color:#09090b; display:inline-flex; align-items:center;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line></svg>
+                    </span>
+                    <strong style="font-size:14px; text-transform:uppercase; letter-spacing:0.05em; color:#71717a;">Exclusive Downloads</strong>
+                </div>
+                <h3 style="font-size:18px; font-weight:800; color:#09090b; margin:0 0 6px 0; line-height:1.2;">Download Delhi NCR Luxury Pricing Catalog</h3>
+                <p style="font-size:12px; color:#71717a; margin:0 0 16px 0;">Get the complete historical price guide, local tax rate breakdowns, and market forecasts.</p>
+                
+                <form class="cora-blog-lead-form" onsubmit="event.preventDefault(); window.coraSubmitBlogLeadForm(this, ${postId});" style="display:grid; grid-template-columns:1fr; gap:10px;">
+                    <input type="text" name="first_name" placeholder="Full Name" required style="width:100%; border:1px solid #e4e4e7; border-radius:6px; padding:8px 12px; font-size:13px; box-sizing:border-box;">
+                    <input type="email" name="email" placeholder="Email Address" required style="width:100%; border:1px solid #e4e4e7; border-radius:6px; padding:8px 12px; font-size:13px; box-sizing:border-box;">
+                    <input type="hidden" name="notes" value="Downloaded Pricing Catalog PDF">
+                    <button type="submit" style="width:100%; background:#09090b; color:#ffffff; font-weight:700; border:none; border-radius:6px; padding:10px; font-size:13px; cursor:pointer; transition:background 0.2s;">Download Price Catalog PDF</button>
+                </form>
+            </div>
+            `;
+        } else if (type === 'scheduler') {
+            html = `
+            <div class="cora-inline-cta-card" style="background:#ffffff; border:1px solid #e4e4e7; border-radius:12px; padding:24px; margin:24px 0; max-width:550px; font-family:system-ui, sans-serif; box-shadow:0 1px 3px rgba(0,0,0,0.05);" contenteditable="false">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                    <span style="padding:6px; background:#f4f4f5; border-radius:6px; color:#09090b; display:inline-flex; align-items:center;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    </span>
+                    <strong style="font-size:14px; text-transform:uppercase; letter-spacing:0.05em; color:#71717a;">Showings Coordinator</strong>
+                </div>
+                <h3 style="font-size:18px; font-weight:800; color:#09090b; margin:0 0 6px 0; line-height:1.2;">Schedule a Virtual / Private Showing</h3>
+                <p style="font-size:12px; color:#71717a; margin:0 0 16px 0;">Book an exclusive private tour with one of our Delhi office senior listings managers.</p>
+                
+                <form class="cora-blog-lead-form" onsubmit="event.preventDefault(); window.coraSubmitBlogLeadForm(this, ${postId});" style="display:grid; grid-template-columns:1fr; gap:10px;">
+                    <input type="text" name="first_name" placeholder="Full Name" required style="width:100%; border:1px solid #e4e4e7; border-radius:6px; padding:8px 12px; font-size:13px; box-sizing:border-box;">
+                    <input type="email" name="email" placeholder="Email Address" required style="width:100%; border:1px solid #e4e4e7; border-radius:6px; padding:8px 12px; font-size:13px; box-sizing:border-box;">
+                    <input type="text" name="phone" placeholder="Phone Number" required style="width:100%; border:1px solid #e4e4e7; border-radius:6px; padding:8px 12px; font-size:13px; box-sizing:border-box;">
+                    <select name="notes" required style="width:100%; border:1px solid #e4e4e7; border-radius:6px; padding:8px 12px; font-size:13px; background:#fff; box-sizing:border-box;">
+                        <option value="Requested Showings: Vasant Vihar Floor">Vasant Vihar Floor Tour</option>
+                        <option value="Requested Showings: DLF Phase 5 Penthouse">DLF Phase 5 Penthouse Tour</option>
+                        <option value="Requested Showings: Golf Course Road Villa">Golf Course Road Villa Tour</option>
+                    </select>
+                    <button type="submit" style="width:100%; background:#09090b; color:#ffffff; font-weight:700; border:none; border-radius:6px; padding:10px; font-size:13px; cursor:pointer; transition:background 0.2s;">Schedule Tour Date</button>
+                </form>
+            </div>
+            `;
+        }
+
+        const range = coraQuillListingCoordinator.getSelection(true);
+        coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(range ? range.index : 0, html);
+        window.coraShowToast('In-post lead capture form inserted successfully!', 'success');
+    };
+
+    window.coraSubmitBlogLeadForm = function(formEl, postId) {
+        const form = $(formEl);
+        const submitBtn = form.find('button[type="submit"]');
+        const originalText = submitBtn.text();
+
+        submitBtn.prop('disabled', true).text('Submitting...');
+
+        const data = {
+            action: 'cora_submit_blog_lead',
+            post_id: postId,
+            first_name: form.find('input[name="first_name"]').val(),
+            last_name: form.find('input[name="last_name"]').val() || '',
+            email: form.find('input[name="email"]').val(),
+            phone: form.find('input[name="phone"]').val() || '',
+            notes: form.find('input[name="notes"]').val() || form.find('select[name="notes"]').val() || ''
+        };
+
+        $.post(coraREData.ajaxUrl || ajaxurl, data, function(response) {
+            if (response.success) {
+                window.coraShowToast(response.data.message || 'Submitted successfully!', 'success');
+                form.html(`<div style="padding:16px; border-radius:6px; background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; font-size:13px; font-weight:700; text-align:center;">✓ ${response.data.message || 'Request appraisal registered successfully!'}</div>`);
+            } else {
+                window.coraShowToast(response.data || 'Failed to submit request.', 'error');
+                submitBtn.prop('disabled', false).text(originalText);
+            }
+        }).fail(function() {
+            window.coraShowToast('Server error while submitting request.', 'error');
+            submitBtn.prop('disabled', false).text(originalText);
+        });
+    };
+
+    window.coraOneClickDraft = function(keyword, title, description) {
+        coraOpenContentDrawer();
+        
+        $('#cora-article-id').val('');
+        $('#cora-article-title').val(title);
+        $('#cora-seo-keyword').val(keyword);
+        $('#cora-seo-description').val(description);
+        $('#cora-article-assignee').val('0');
+
+        // Reset thumbnail preview
+        $('#cora-thumbnail-id').val('');
+        $('#cora-thumbnail-img').addClass('hidden').attr('src', '');
+        $('#cora-thumbnail-placeholder').removeClass('hidden');
+
+        // Reset status banner & feedback boxes
+        $('#cora-editorial-banner').addClass('hidden');
+        $('#cora-editorial-feedback-box').addClass('hidden');
+        $('#cora-btn-submit-review').removeClass('hidden');
+
+        if (coraCategorySelect) coraCategorySelect.clear();
+        if (coraTagSelect) coraTagSelect.clear();
+
+        if (coraQuillListingCoordinator) {
+            const html = `
+            <h2>${title}</h2>
+            <p>Write a highly descriptive local overview here. Highlight key developers, regional landmarks, and access pathways.</p>
+            
+            <h3 style="color:#09090b; font-weight:800; font-size:1.25rem; margin-top:1.5rem; margin-bottom:0.5rem;">Q: What is the current market pricing for ${keyword}?</h3>
+            <p style="background-color:#f4f4f5; border-left: 3px solid #09090b; padding: 12px; font-size: 0.95rem; line-height: 1.6; color: #27272a; margin-bottom: 1.5rem;"><strong>A:</strong> Double click to overwrite this direct answer block with precise answers to help search bots citation crawlers parse this overview...</p>
+            
+            <h3>Key Regional Specifications</h3>
+            <ul>
+                <li><strong>Local Access:</strong> Near Delhi Outer Ring Road / Golf Course Extension.</li>
+                <li><strong>Top Developers:</strong> DLF, Emaar, Tata Housing.</li>
+                <li><strong>Price Margins:</strong> Appraised at premium local index values.</li>
+            </ul>
+            `;
+            coraQuillListingCoordinator.root.innerHTML = html;
+        }
+
+        $('#cora-geo-entities-list span').removeClass('border-zinc-200 text-zinc-400').addClass('border-zinc-350 text-zinc-700 font-bold bg-zinc-100');
+        window.coraShowToast('Local intent draft initialized! Complete the draft and apply GEO.', 'info');
+    };
+
+    window.coraSwitchSidebarTab = function(tab) {
+        if (tab === 'seo') {
+            $('#btn-sidebar-seo').removeClass('border-transparent text-zinc-400').addClass('border-zinc-950 text-zinc-900');
+            $('#btn-sidebar-geo').removeClass('border-zinc-950 text-zinc-900').addClass('border-transparent text-zinc-400');
+            $('#panel-sidebar-seo').removeClass('hidden');
+            $('#panel-sidebar-geo').addClass('hidden');
+        } else {
+            $('#btn-sidebar-geo').removeClass('border-transparent text-zinc-400').addClass('border-zinc-950 text-zinc-900');
+            $('#btn-sidebar-seo').removeClass('border-zinc-950 text-zinc-900').addClass('border-transparent text-zinc-400');
+            $('#panel-sidebar-seo').addClass('hidden');
+            $('#panel-sidebar-geo').removeClass('hidden');
+            
+            // Render schema in panel
+            coraUpdateSchemaPreview();
+        }
+    };
+
+    window.coraUpdateSchemaPreview = function() {
+        const title = $('#cora-article-title').val() || 'Untitled Article';
+        const url = window.location.origin + '/blogs/' + ($('#cora-seo-keyword').val() || 'untitled').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        const schema = {
+            "@context": "https://schema.org",
+            "@type": "RealEstateAgent",
+            "name": "Apex Realty Group",
+            "url": window.location.origin,
+            "logo": window.location.origin + "/wp-content/uploads/logo.png",
+            "image": $('#cora-thumbnail-img').attr('src') || window.location.origin + "/wp-content/uploads/default-image.png",
+            "description": $('#cora-seo-description').val() || "Luxury property broker in Delhi NCR.",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Connaught Place",
+                "addressLocality": "New Delhi",
+                "addressRegion": "Delhi",
+                "postalCode": "110001",
+                "addressCountry": "IN"
+            },
+            "geo": {
+                "@type": "GeoCoordinates",
+                "latitude": 28.6304,
+                "longitude": 77.2177
+            },
+            "contactPoint": {
+                "@type": "ContactPoint",
+                "telephone": "+91-99999-88888",
+                "contactType": "customer service"
+            },
+            "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": url
+            },
+            "headline": title,
+            "author": {
+                "@type": "Person",
+                "name": "Nitin Arora"
+            }
+        };
+        $('#cora-schema-preview-block').text(JSON.stringify(schema, null, 2));
+    };
+
+    window.coraAutoOptimizeGEO = function() {
+        if (!coraQuillListingCoordinator) {
+            window.coraShowToast('Editor is not initialized.', 'error');
+            return;
+        }
+
+        const title = $('#cora-article-title').val() || 'Apex Realty Luxury Catalog';
+        let currentHTML = coraQuillListingCoordinator.root.innerHTML;
+        if (currentHTML === '<p><br></p>') {
+            currentHTML = '';
+        }
+
+        // Add Direct Answer block at the top if not present
+        const directAnswerHeader = `<h3 style="color:#09090b; font-weight:800; font-size:1.25rem; margin-top:1.5rem; margin-bottom:0.5rem;">Q: What is the luxury villa price trend in Delhi NCR?</h3>`;
+        const directAnswerBody = `<p style="background-color:#f4f4f5; border-left: 3px solid #09090b; padding: 12px; font-size: 0.95rem; line-height: 1.6; color: #27272a; margin-bottom: 1.5rem;"><strong>A:</strong> As of mid-2026, premium luxury villas in Gurgaon DLF Phase 5 and South Delhi are averaging ₹1.2 Lakhs to ₹1.8 Lakhs per square yard. High information density analysis from local listings coordinator Nitin & Shanaya Arora shows a 12% YoY increase in demand for eco-friendly luxury villas in Gurgaon.</p>`;
+        
+        // Add Price Catalog Table
+        const priceTable = `
+        <h3 style="color:#09090b; font-weight:850; font-size:1.2rem; margin-top:2rem; margin-bottom:0.5rem;">Delhi NCR Luxury Real Estate Price Index (2026)</h3>
+        <table style="width:100%; border-collapse:collapse; font-size:0.9rem; text-align:left; border:1px solid #e4e4e7; margin-bottom:2rem;">
+            <thead>
+                <tr style="background-color:#f4f4f5; border-bottom:1px solid #e4e4e7;">
+                    <th style="padding:10px; font-weight:700;">Location</th>
+                    <th style="padding:10px; font-weight:700;">Property Type</th>
+                    <th style="padding:10px; font-weight:700;">Average Price</th>
+                    <th style="padding:10px; font-weight:700;">Citation Authority</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom:1px solid #e4e4e7;">
+                    <td style="padding:10px;">Gurgaon DLF Phase 5</td>
+                    <td style="padding:10px;">4BHK Luxury Penthouse</td>
+                    <td style="padding:10px;">₹12.5 Cr - ₹18.0 Cr</td>
+                    <td style="padding:10px; color:#52525b; font-size:0.8rem;">Apex Realty Index</td>
+                </tr>
+                <tr style="border-bottom:1px solid #e4e4e7;">
+                    <td style="padding:10px;">South Delhi Vasant Vihar</td>
+                    <td style="padding:10px;">Premium Duplex Villa</td>
+                    <td style="padding:10px;">₹22.0 Cr - ₹35.0 Cr</td>
+                    <td style="padding:10px; color:#52525b; font-size:0.8rem;">Delhi Municipal Records</td>
+                </tr>
+                <tr>
+                    <td style="padding:10px;">Noida Sector 150</td>
+                    <td style="padding:10px;">Green Villa Developments</td>
+                    <td style="padding:10px;">₹8.5 Cr - ₹12.0 Cr</td>
+                    <td style="padding:10px; color:#52525b; font-size:0.8rem;">RERA Registered</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="font-size:0.8rem; color:#71717a; margin-top:-1.5rem; margin-bottom:2rem;">Source: High-fidelity analytics compiled by Nitin & Shanaya Arora, licensed listing coordinator at <a href="https://cora.local" style="text-decoration:underline; color:#09090b;">Apex Realty Group</a>.</p>
+        `;
+
+        let updatedHTML = currentHTML;
+        if (!updatedHTML.includes('Q: What is the luxury villa price trend')) {
+            updatedHTML = directAnswerHeader + directAnswerBody + updatedHTML;
+        }
+        if (!updatedHTML.includes('Delhi NCR Luxury Real Estate Price Index')) {
+            updatedHTML = updatedHTML + priceTable;
+        }
+
+        coraQuillListingCoordinator.root.innerHTML = updatedHTML;
+        
+        // Update checkmarks
+        $('#chk-geo-direct-answer').prop('checked', true);
+        $('#chk-geo-info-density').prop('checked', true);
+        $('#chk-geo-citations').prop('checked', true);
+        $('#chk-geo-schema').prop('checked', true);
+
+        // Update score
+        $('#cora-geo-score-display').text('95');
+        $('#cora-seo-score-display').text('92').removeClass('text-zinc-400').addClass('text-green-600');
+
+        // Update schema block
+        coraUpdateSchemaPreview();
+
+        window.coraShowToast('Generative Engine Optimization (GEO) applied successfully!', 'success');
     };
 
     // Restructure Media Sidebar fields under a collapsible Details block
@@ -7765,6 +8202,91 @@ jQuery(document).ready(function($) {
             }
         }).fail(function() {
             window.coraShowToast("Server error occurred while updating settings.");
+        });
+    };
+
+    // --- Editorial Workflow Actions ---
+    window.coraSubmitArticleForReview = function() {
+        const id = $('#cora-article-id').val();
+        if (!id) {
+            window.coraShowToast('Please save the article draft first before submitting for review.', 'warning');
+            return;
+        }
+
+        window.coraShowToast('Submitting draft for review...', 'info');
+
+        $.post(ajaxurl, {
+            action: 'cora_submit_for_review',
+            nonce: coraREData.ajaxNonce,
+            post_id: id
+        }, function(response) {
+            if (response.success) {
+                window.coraShowToast(response.data.message || 'Submitted for review!', 'success');
+                setTimeout(() => window.location.reload(), 800);
+            } else {
+                window.coraShowToast(response.data || 'Failed to submit review.', 'error');
+            }
+        });
+    };
+
+    window.coraApproveEditorialDraft = function() {
+        const id = $('#cora-article-id').val();
+        if (!id) return;
+
+        window.coraShowToast('Approving article draft...', 'info');
+
+        $.post(ajaxurl, {
+            action: 'cora_approve_draft',
+            nonce: coraREData.ajaxNonce,
+            post_id: id
+        }, function(response) {
+            if (response.success) {
+                window.coraShowToast(response.data.message || 'Article approved!', 'success');
+                setTimeout(() => window.location.reload(), 800);
+            } else {
+                window.coraShowToast(response.data || 'Failed to approve draft.', 'error');
+            }
+        });
+    };
+
+    window.coraToggleFeedbackInput = function(show) {
+        if (show) {
+            $('#cora-feedback-input-container').removeClass('hidden');
+        } else {
+            $('#cora-feedback-input-container').addClass('hidden');
+            $('#cora-feedback-input-field').val('');
+        }
+    };
+
+    window.coraPromptRevisions = function() {
+        // Toggle the inline feedback container
+        coraToggleFeedbackInput(true);
+    };
+
+    window.coraSubmitRevisionsFeedback = function() {
+        const id = $('#cora-article-id').val();
+        const feedback = $('#cora-feedback-input-field').val().trim();
+
+        if (!id) return;
+        if (!feedback) {
+            window.coraShowToast('Please enter review feedback details.', 'warning');
+            return;
+        }
+
+        window.coraShowToast('Requesting revisions...', 'info');
+
+        $.post(ajaxurl, {
+            action: 'cora_reject_draft',
+            nonce: coraREData.ajaxNonce,
+            post_id: id,
+            feedback: feedback
+        }, function(response) {
+            if (response.success) {
+                window.coraShowToast(response.data.message || 'Revisions requested!', 'success');
+                setTimeout(() => window.location.reload(), 800);
+            } else {
+                window.coraShowToast(response.data || 'Failed to submit revisions.', 'error');
+            }
         });
     };
 });

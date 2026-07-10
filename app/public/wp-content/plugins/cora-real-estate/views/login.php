@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PropOS — Login</title>
+    <title>Cora — Login</title>
     <style>
         :root {
             --bg-color: #fcfcfc;
@@ -203,7 +203,7 @@
 </head>
 <body>
     <div id="login-card">
-        <h2>PropOS Portal</h2>
+        <h2>Cora Portal</h2>
         <p class="subtitle">Enter your credentials to access the workspace.</p>
         
         <form id="login-form" onsubmit="handleLoginSubmit(event)">
@@ -247,7 +247,7 @@
                 showToast('Your account has been deactivated. Contact your agency admin.');
             }
             if (urlParams.get('suspended')) {
-                showToast('Your agency account has been suspended. Contact PropOS support.');
+                showToast('Your agency account has been suspended. Contact Cora support.');
             }
             if (urlParams.get('password_updated')) {
                 showToast('Password updated. Please log in.');

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PropOS — Set New Password</title>
+    <title>Cora — Set New Password</title>
     <style>
         :root {
             --bg-color: #fcfcfc;

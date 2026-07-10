@@ -40,11 +40,11 @@ $map = array(
 $role_label = isset( $map[$role] ) ? $map[$role] : $role;
 
 $agency_id = get_user_meta( $user->ID, 'cora_agency_id', true );
-$agencies  = get_option( 'cora_agencies', array() );
+$agencies  = cora_db_get_agencies();
 $agency_name = isset( $agencies[$agency_id] ) ? $agencies[$agency_id]['name'] : 'Default Agency';
 
 $branch_id = get_user_meta( $user->ID, 'cora_branch_id', true );
-$branches  = get_option( 'cora_branches', array() );
+$branches  = cora_db_get_branches();
 $branch_name = isset( $branches[$branch_id] ) ? $branches[$branch_id]['name'] : 'Main Branch';
 
 $joined_on = $user->user_registered;

@@ -26,9 +26,103 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
 }
 
-/* 2. Top Bar & Header Overrides */
-.e-top-bar, #e-top-bar, .e-route-panel, #elementor-editor-wrapper-v2, .elementor-panel-header {
-    display: none !important;
+#elementor-editor-wrapper-v2 header,
+#elementor-editor-wrapper-v2 header > div,
+#editor-one-top-bar,
+#editor-one-top-bar > div,
+.e-top-bar,
+.e-top-bar > div,
+#e-top-bar,
+#e-top-bar > div,
+.elementor-panel-header {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #e4e4e7 !important;
+    color: #18181b !important;
+    
+    /* Override Elementor's CSS variables inside the topbar scope */
+    --e-a-bg-invert: #ffffff !important;
+    --e-a-color-txt-invert: #18181b !important;
+    --e-a-color-white: #18181b !important;
+    --e-a-color-black: #ffffff !important;
+    --e-a-border-color: #e4e4e7 !important;
+}
+
+/* Restyle text, buttons and icons inside the top bar */
+#elementor-editor-wrapper-v2 header *,
+#editor-one-top-bar *, 
+.e-top-bar *, 
+#e-top-bar * {
+    color: #52525b !important;
+    border-color: #e4e4e7 !important;
+}
+
+#elementor-editor-wrapper-v2 header svg,
+#elementor-editor-wrapper-v2 header i,
+#editor-one-top-bar svg,
+#editor-one-top-bar i,
+.e-top-bar svg,
+.e-top-bar i,
+#e-top-bar svg,
+#e-top-bar i {
+    fill: #52525b !important;
+    stroke: #52525b !important;
+    color: #52525b !important;
+}
+
+/* Hover states on topbar items */
+#elementor-editor-wrapper-v2 header button:hover,
+#elementor-editor-wrapper-v2 header [role="button"]:hover,
+#editor-one-top-bar button:hover,
+#editor-one-top-bar [role="button"]:hover,
+.e-top-bar button:hover,
+.e-top-bar [role="button"]:hover,
+#e-top-bar button:hover,
+#e-top-bar [role="button"]:hover {
+    background-color: #f4f4f5 !important;
+}
+
+#elementor-editor-wrapper-v2 header button:hover *,
+#editor-one-top-bar button:hover *,
+.e-top-bar button:hover *,
+#e-top-bar button:hover * {
+    color: #18181b !important;
+    fill: #18181b !important;
+    stroke: #18181b !important;
+}
+
+/* Monochromatic dark CTA buttons (Publish/Update/Save) inside the top bar */
+#elementor-editor-wrapper-v2 header button[class*="containedPrimary"],
+#elementor-editor-wrapper-v2 header [class*="publish"],
+#editor-one-top-bar [class*="publish"],
+#editor-one-top-bar button[class*="submit"],
+.e-top-bar [class*="publish"],
+.e-top-bar button[class*="submit"],
+#e-top-bar [class*="publish"],
+#e-top-bar button[class*="submit"] {
+    background-color: #18181b !important;
+    border: none !important;
+    border-radius: 6px !important;
+}
+
+#elementor-editor-wrapper-v2 header button[class*="containedPrimary"] *,
+#elementor-editor-wrapper-v2 header [class*="publish"] *,
+#editor-one-top-bar [class*="publish"] *,
+#editor-one-top-bar button[class*="submit"] *,
+.e-top-bar [class*="publish"] *,
+.e-top-bar button[class*="submit"] *,
+#e-top-bar [class*="publish"] *,
+#e-top-bar button[class*="submit"] * {
+    color: #ffffff !important;
+    fill: #ffffff !important;
+    stroke: #ffffff !important;
+}
+
+#elementor-editor-wrapper-v2 header button[class*="containedPrimary"]:hover,
+#elementor-editor-wrapper-v2 header [class*="publish"]:hover,
+#editor-one-top-bar [class*="publish"]:hover,
+.e-top-bar [class*="publish"]:hover,
+#e-top-bar [class*="publish"]:hover {
+    background-color: #09090b !important;
 }
 
 /* 3. Aggressively Hide All "Pro" Upsells and Banners */
@@ -48,9 +142,10 @@ i[class*="eicon-pro-icon"],
     display: none !important;
 }
 
-/* 4. Panel Completely Hidden for Custom React Shell */
+/* 4. Panel Layout Overrides */
 #elementor-panel, .elementor-panel {
-    display: none !important;
+    background-color: var(--e-panel-background) !important;
+    border-right: var(--e-panel-border) !important;
 }
 
 /* 5. Buttons & Controls */
@@ -93,4 +188,64 @@ i[class*="eicon-pro-icon"],
 /* 7. Hide AI / Copilot buttons */
 .e-copilot-badge, .e-ai-button, .elementor-ai-button, .e-ai-container {
     display: none !important;
+}
+
+/* 8. Injected Topbar Navigation Merger */
+.cora-editor-injected-nav {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin-right: 16px !important;
+    margin-left: 12px !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+.cora-injected-exit-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 5px 10px !important;
+    border: 1px solid #e4e4e7 !important;
+    background-color: #ffffff !important;
+    color: #18181b !important;
+    border-radius: 6px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    line-height: 1 !important;
+}
+
+.cora-injected-exit-btn svg {
+    width: 10px !important;
+    height: 10px !important;
+}
+
+.cora-injected-exit-btn:hover {
+    background-color: #fafafa !important;
+    border-color: #18181b !important;
+}
+
+.cora-injected-separator {
+    width: 1px !important;
+    height: 16px !important;
+    background-color: #e4e4e7 !important;
+}
+
+.cora-injected-breadcrumbs {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    color: #71717a !important;
+}
+
+.cora-injected-crumb-theme {
+    color: #18181b !important;
+}
+
+.cora-injected-crumb-page {
+    color: #18181b !important;
+    font-weight: 700 !important;
 }

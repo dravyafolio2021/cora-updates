@@ -4,7 +4,7 @@ import PropertiesPanel from './components/PropertiesPanel';
 import useElementor from './hooks/useElementor';
 
 export default function App() {
-    const { activeElement, controls, settings, updateSetting, addWidget } = useElementor();
+    const { activeElement, controls, settings, updateSetting, addWidget, widgets } = useElementor();
 
     return (
         <div style={{
@@ -23,7 +23,7 @@ export default function App() {
                 display: 'flex',
                 flexDirection: 'column'
             }}>
-                <Sidebar addWidget={addWidget} />
+                <Sidebar addWidget={addWidget} widgets={widgets} />
             </div>
 
             {/* Main Canvas Area (Transparent to show Elementor Iframe) */}

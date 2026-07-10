@@ -14,7 +14,7 @@ $current_agency = cora_get_current_user_agency_id();
 $current_branch = cora_get_current_user_branch_id();
 
 // Retrieve logs option
-$all_logs = get_option( 'cora_activity_logs', array() );
+$all_logs = cora_db_get_activity_logs();
 $filtered_logs = array();
 
 // Apply multi-tenant security isolation rules

@@ -49,26 +49,11 @@ foreach ( $all_wp_users as $u ) {
 }
 
 // Fetch invitations
-$invitations = get_option( 'cora_invitations', array() );
-$pending_invites = array();
-foreach ( $invitations as $token => $invite ) {
-    if ( $invite['agency_id'] !== $current_agency ) {
-        continue;
-    }
-    if ( ! empty( $current_branch ) && $invite['branch_id'] !== $current_branch ) {
-        continue;
-    }
-    $pending_invites[$token] = $invite;
-}
+$pending_invites = cora_db_get_invitations();
 
 // Fetch branches
-$branches = get_option( 'cora_branches', array() );
-$agency_branches = array();
-foreach ( $branches as $b_id => $b ) {
-    if ( $current_agency === 'super' || $b['agency_id'] === $current_agency ) {
-        $agency_branches[$b_id] = $b;
-    }
-}
+$branches = cora_db_get_branches();
+$agency_branches = $branches;
 
 // Permissions Matrix options
 $cora_permissions = get_option( 'cora_role_permissions', array() );

@@ -119,6 +119,24 @@ $roles      = wp_roles()->get_names();
                     </div>
                 </div>
             </div>
+
+            <!-- Database Clean Up Section -->
+            <div class="border-t border-zinc-150 pt-5 space-y-4">
+                <div class="border-b border-zinc-100 pb-3">
+                    <h3 class="text-sm font-bold text-red-600">Database Optimization</h3>
+                    <p class="text-xs text-zinc-500">Clean up legacy key-value storage once you have verified custom database tables are fully working.</p>
+                </div>
+                <div class="p-4 border border-red-200 bg-red-50/50 rounded-lg space-y-3">
+                    <p class="text-xs text-zinc-700">
+                        Purging legacy data removes the redundant data tables from <code>wp_options</code>. 
+                        <strong>Note:</strong> Make sure you have verified the data migration counts are correct before purging.
+                    </p>
+                    <button type="button" id="cora-purge-legacy-options" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs transition-colors flex items-center gap-1.5 cursor-pointer">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        Purge Old wp_options Cache
+                    </button>
+                </div>
+            </div>
         </div>
 
         <?php elseif ( $active_tab === 'pwd-policy' ) : ?>
@@ -156,15 +174,8 @@ $roles      = wp_roles()->get_names();
 
         <?php elseif ( $active_tab === 'branches' ) : 
             $agency_id = cora_get_current_user_agency_id();
-            $branches  = get_option( 'cora_branches', array() );
-            
-            // Filter branches
-            $filtered_branches = array();
-            foreach ( $branches as $b_id => $b ) {
-                if ( $agency_id === 'super' || $b['agency_id'] === $agency_id ) {
-                    $filtered_branches[$b_id] = $b;
-                }
-            }
+            $branches  = cora_db_get_branches();
+            $filtered_branches = $branches;
 
             // Count active agents per branch
             $all_wp_users = get_users();
@@ -796,3 +807,30 @@ $roles      = wp_roles()->get_names();
         </div>
     </form>
 </div>
+
+<script>
+jQuery(document).ready(function($) {
+    $('#cora-purge-legacy-options').on('click', function(e) {
+        e.preventDefault();
+        
+        var $btn = $(this);
+        $btn.prop('disabled', true).text('Purging options...');
+        
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_purge_options_data',
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast(res.data || 'Old options cache database tables purged successfully!');
+                setTimeout(function() { window.location.reload(); }, 1200);
+            } else {
+                window.coraShowToast(res.data || 'Failed to purge database options.');
+                $btn.prop('disabled', false).text('Purge Old wp_options Cache');
+            }
+        }).fail(function() {
+            window.coraShowToast('A system error occurred during purge.');
+            $btn.prop('disabled', false).text('Purge Old wp_options Cache');
+        });
+    });
+});
+</script>
