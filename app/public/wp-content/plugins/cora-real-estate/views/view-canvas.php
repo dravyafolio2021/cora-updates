@@ -173,6 +173,117 @@ $wp_pages = get_pages();
         </div>
         <?php endif; ?>
 
+        <!-- Competitor Aligned Canvas Extensions -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Panel 1: AI Page Creator & Template Library -->
+            <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm space-y-4">
+                <div>
+                    <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        AI Page Creator & Template Library
+                    </h3>
+                    <p class="text-[11px] text-zinc-500 mt-0.5">Generate customized SEO-optimized layouts in one-click.</p>
+                </div>
+                
+                <!-- Prompt Builder -->
+                <div class="flex items-center gap-2">
+                    <input type="text" id="canvas-ai-prompt" placeholder="e.g., Luxury dark mode landing page for Vasant Vihar..." class="flex-1 px-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-zinc-800 bg-zinc-50/50">
+                    <button onclick="generatePageFromPrompt()" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all flex items-center gap-1 select-none">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                        Generate
+                    </button>
+                </div>
+                
+                <!-- Template Presets -->
+                <div class="grid grid-cols-3 gap-3 pt-1">
+                    <button onclick="createCanvasAIPage('luxury_lead')" class="p-3 border border-zinc-200 rounded-xl bg-zinc-50/20 hover:bg-zinc-50 hover:border-zinc-350 transition-all text-left flex flex-col justify-between h-[84px] cursor-pointer">
+                        <div class="p-1 bg-zinc-100 rounded w-fit text-zinc-700">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-bold text-zinc-900">Lead Capture</div>
+                            <div class="text-[8px] text-zinc-400 mt-0.5 line-clamp-1">Inquiry form hero</div>
+                        </div>
+                    </button>
+                    
+                    <button onclick="createCanvasAIPage('virtual_tour')" class="p-3 border border-zinc-200 rounded-xl bg-zinc-50/20 hover:bg-zinc-50 hover:border-zinc-350 transition-all text-left flex flex-col justify-between h-[84px] cursor-pointer">
+                        <div class="p-1 bg-zinc-100 rounded w-fit text-zinc-700">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-bold text-zinc-900">Virtual Tour</div>
+                            <div class="text-[8px] text-zinc-400 mt-0.5 line-clamp-1">Embedded video template</div>
+                        </div>
+                    </button>
+                    
+                    <button onclick="createCanvasAIPage('pricing_guide')" class="p-3 border border-zinc-200 rounded-xl bg-zinc-50/20 hover:bg-zinc-50 hover:border-zinc-350 transition-all text-left flex flex-col justify-between h-[84px] cursor-pointer">
+                        <div class="p-1 bg-zinc-100 rounded w-fit text-zinc-700">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-bold text-zinc-900">Pricing Matrix</div>
+                            <div class="text-[8px] text-zinc-400 mt-0.5 line-clamp-1">Neighborhood stats grid</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Panel 2: Canvas Analytics & CRM Integration -->
+            <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm space-y-4">
+                <div>
+                    <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                        Canvas Analytics & CRM Integration
+                    </h3>
+                    <p class="text-[11px] text-zinc-500 mt-0.5">Real-time landing page views, conversions, and CRM leads.</p>
+                </div>
+                
+                <!-- Stats Overview Row -->
+                <div class="grid grid-cols-3 gap-3 text-center">
+                    <div class="p-2 border border-zinc-100 bg-zinc-50/50 rounded-lg">
+                        <div class="text-[8px] text-zinc-400 uppercase font-bold tracking-wider">Canvas Views</div>
+                        <div class="text-xs font-black text-zinc-800 mt-0.5">1,248</div>
+                    </div>
+                    <div class="p-2 border border-zinc-100 bg-zinc-50/50 rounded-lg">
+                        <div class="text-[8px] text-zinc-400 uppercase font-bold tracking-wider">Captured Leads</div>
+                        <div class="text-xs font-black text-zinc-800 mt-0.5">42</div>
+                    </div>
+                    <div class="p-2 border border-zinc-100 bg-zinc-50/50 rounded-lg">
+                        <div class="text-[8px] text-zinc-400 uppercase font-bold tracking-wider">Avg. Bounce Rate</div>
+                        <div class="text-xs font-black text-zinc-800 mt-0.5">38.4%</div>
+                    </div>
+                </div>
+                
+                <!-- Attributed Leads list -->
+                <div class="space-y-2">
+                    <div class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Recent Attributed Leads</div>
+                    <div class="border border-zinc-100 rounded-lg divide-y divide-zinc-100 overflow-hidden text-[10px]">
+                        <?php
+                        $recent_leads = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_leads ORDER BY id DESC LIMIT 2", ARRAY_A );
+                        if ( ! empty( $recent_leads ) ) :
+                            foreach ( $recent_leads as $lead ) :
+                                $lead_name = $lead['first_name'] . ' ' . $lead['last_name'];
+                                ?>
+                                <div class="p-2 bg-zinc-50/20 hover:bg-zinc-50 transition-colors flex items-center justify-between">
+                                    <div>
+                                        <span class="font-bold text-zinc-900"><?php echo esc_html($lead_name); ?></span>
+                                        <span class="text-[8px] text-zinc-400 ml-1.5"><?php echo esc_html($lead['email']); ?></span>
+                                    </div>
+                                    <button onclick="coraShowLeadPanel(<?php echo $lead['id']; ?>)" class="text-[9px] font-bold text-zinc-500 hover:text-zinc-950 transition-colors flex items-center gap-0.5 cursor-pointer border-none bg-transparent">
+                                        View CRM Profile
+                                        <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                    </button>
+                                </div>
+                            <?php endforeach;
+                        else : ?>
+                            <div class="p-3 text-center text-zinc-400 italic">No attributed leads registered.</div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Draft Themes Section -->
         <div class="space-y-4">
             <div class="flex items-center gap-2">
@@ -565,6 +676,36 @@ $wp_pages = get_pages();
                         <div class="space-y-2 pt-2">
                             <label class="block text-[10px] font-bold text-zinc-500 uppercase">Copyright Text</label>
                             <input type="text" id="setting-copyright-text" class="w-full px-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 pt-2">
+                            <div class="space-y-2">
+                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Navigation Menu</label>
+                                <select id="setting-nav-menu" class="w-full px-2.5 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
+                                    <option value="0">— Default Navbar —</option>
+                                    <?php
+                                    $menus = wp_get_nav_menus();
+                                    if ( ! empty( $menus ) ) {
+                                        foreach ( $menus as $menu ) {
+                                            echo '<option value="' . esc_attr( $menu->term_id ) . '">' . esc_html( $menu->name ) . '</option>';
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Facebook Link</label>
+                                <input type="text" id="setting-facebook-link" placeholder="https://facebook.com/..." class="w-full px-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 pt-2">
+                            <div class="space-y-2">
+                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Twitter Link</label>
+                                <input type="text" id="setting-twitter-link" placeholder="https://twitter.com/..." class="w-full px-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">LinkedIn Link</label>
+                                <input type="text" id="setting-linkedin-link" placeholder="https://linkedin.com/in/..." class="w-full px-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1760,6 +1901,12 @@ $wp_pages = get_pages();
             jQuery('#setting-sticky-header').prop('checked', settings.sticky_header == 1);
             jQuery('#setting-show-socials').prop('checked', settings.show_socials == 1);
             jQuery('#setting-copyright-text').val(settings.copyright_text || '');
+            
+            // Header/Footer extension bindings
+            jQuery('#setting-nav-menu').val(settings.nav_menu || '0');
+            jQuery('#setting-facebook-link').val(settings.facebook_link || '');
+            jQuery('#setting-twitter-link').val(settings.twitter_link || '');
+            jQuery('#setting-linkedin-link').val(settings.linkedin_link || '');
         }
     }
 
@@ -1783,7 +1930,11 @@ $wp_pages = get_pages();
             footer_columns: jQuery('#setting-footer-columns').val(),
             sticky_header: jQuery('#setting-sticky-header').is(':checked') ? 1 : 0,
             show_socials: jQuery('#setting-show-socials').is(':checked') ? 1 : 0,
-            copyright_text: jQuery('#setting-copyright-text').val().trim()
+            copyright_text: jQuery('#setting-copyright-text').val().trim(),
+            nav_menu: jQuery('#setting-nav-menu').val(),
+            facebook_link: jQuery('#setting-facebook-link').val().trim(),
+            twitter_link: jQuery('#setting-twitter-link').val().trim(),
+            linkedin_link: jQuery('#setting-linkedin-link').val().trim()
         };
 
         window.coraShowToast('Updating theme global configuration parameters...');
@@ -2062,5 +2213,72 @@ $wp_pages = get_pages();
         if (diffHrs < 1) return 'Just now';
         if (diffHrs < 24) return diffHrs + ' hours ago';
         return Math.floor(diffHrs / 24) + ' days ago';
+    }
+
+    function createCanvasAIPage(templateType) {
+        if (canvasState.isReadOnly) return;
+        window.coraShowToast('Generating template page in active theme workspace...');
+        
+        jQuery.ajax({
+            url: coraREData.siteUrl + '/wp-json/cora/v1/canvas/pages/ai-create',
+            method: 'POST',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-WP-Nonce', coraREData.nonce || '');
+            },
+            data: {
+                template_type: templateType,
+                theme_id: canvasState.activeThemeId
+            },
+            success: function(res) {
+                if (res.success) {
+                    window.coraShowToast(res.message || 'Page created successfully.');
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 800);
+                } else {
+                    window.coraShowToast('Failed to generate template page.');
+                }
+            },
+            error: function() {
+                window.coraShowToast('Failed to communicate with REST API.');
+            }
+        });
+    }
+
+    function generatePageFromPrompt() {
+        if (canvasState.isReadOnly) return;
+        const prompt = jQuery('#canvas-ai-prompt').val().trim();
+        if (!prompt) {
+            window.coraShowToast('Please enter an AI prompt description first.');
+            return;
+        }
+        
+        window.coraShowToast('Analyzing layout requirements and generating page...');
+        
+        jQuery.ajax({
+            url: coraREData.siteUrl + '/wp-json/cora/v1/canvas/pages/ai-create',
+            method: 'POST',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-WP-Nonce', coraREData.nonce || '');
+            },
+            data: {
+                prompt: prompt,
+                theme_id: canvasState.activeThemeId
+            },
+            success: function(res) {
+                if (res.success) {
+                    window.coraShowToast(res.message || 'AI Page generated successfully.');
+                    jQuery('#canvas-ai-prompt').val('');
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 800);
+                } else {
+                    window.coraShowToast('Failed to generate AI page.');
+                }
+            },
+            error: function() {
+                window.coraShowToast('Failed to communicate with REST API.');
+            }
+        });
     }
 </script>

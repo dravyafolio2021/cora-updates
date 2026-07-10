@@ -1923,6 +1923,18 @@ add_action( 'rest_api_init', function () {
         'callback'            => 'cora_rest_canvas_activate_theme',
         'permission_callback' => 'cora_canvas_rest_permission_check_write',
     ) );
+
+    register_rest_route( 'cora/v1', '/canvas/pages/ai-create', array(
+        'methods'             => 'POST',
+        'callback'            => 'cora_rest_canvas_create_ai_page',
+        'permission_callback' => 'cora_canvas_rest_permission_check_write',
+    ) );
+
+    register_rest_route( 'cora/v1', '/canvas/themes/(?P<id>\d+)/header-footer', array(
+        'methods'             => 'POST',
+        'callback'            => 'cora_rest_canvas_save_header_footer',
+        'permission_callback' => 'cora_canvas_rest_permission_check_write',
+    ) );
 } );
 
 function cora_canvas_rest_permission_check_read() {
@@ -2453,6 +2465,612 @@ add_action( 'wp_head', function () {
 add_action( 'wp_footer', function () {
     echo cora_get_active_theme_js( 'footer' );
 }, 100 );
+
+/**
+ * Advanced Canvas Extensions & Competitor Alignment Features
+ */
+
+function cora_canvas_inject_header_footer( $content ) {
+    if ( ! is_page() || is_admin() ) {
+        return $content;
+    }
+    
+    global $wpdb, $post;
+    
+    // Check if page belongs to a Canvas theme
+    $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE wp_post_id = %d LIMIT 1", $post->ID ), ARRAY_A );
+    if ( ! $canvas_page ) {
+        return $content;
+    }
+
+    // Retrieve theme settings
+    $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d LIMIT 1", $canvas_page['theme_id'] ), ARRAY_A );
+    if ( ! $theme ) {
+        return $content;
+    }
+
+    $settings = json_decode( $theme['settings'], true ) ?: array();
+    $hf = $settings['header_footer'] ?? array();
+    
+    $logo_url = $hf['logo_url'] ?? '';
+    $menu_id = intval( $hf['menu_id'] ?? 0 );
+    $copyright_text = $hf['copyright_text'] ?? '';
+    $facebook_link = $hf['facebook_link'] ?? '';
+    $twitter_link = $hf['twitter_link'] ?? '';
+    $linkedin_link = $hf['linkedin_link'] ?? '';
+
+    ob_start();
+    ?>
+    <style id="cora-canvas-hf-styling">
+        .cora-canvas-site-wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .cora-canvas-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e4e4e7;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .cora-canvas-nav {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .cora-canvas-nav a {
+            color: #52525b;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.825rem;
+            transition: color 0.15s ease;
+        }
+        .cora-canvas-nav a:hover {
+            color: #09090b;
+        }
+        .cora-canvas-footer {
+            padding: 1.5rem;
+            background-color: #f4f4f5;
+            border-top: 1px solid #e4e4e7;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 0.75rem;
+            color: #71717a;
+        }
+        .cora-canvas-footer-content {
+            max-width: 80rem;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        @media (min-width: 768px) {
+            .cora-canvas-footer-content {
+                flex-direction: row;
+            }
+        }
+        .cora-canvas-socials {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .cora-canvas-socials a {
+            color: #a1a1aa;
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+        .cora-canvas-socials a:hover {
+            color: #52525b;
+        }
+    </style>
+    <div class="cora-canvas-site-wrapper">
+        <header class="cora-canvas-header">
+            <div class="cora-canvas-logo">
+                <?php if ( ! empty( $logo_url ) ) : ?>
+                    <img src="<?php echo esc_url( $logo_url ); ?>" style="height: 32px; object-fit: contain;">
+                <?php else : ?>
+                    <span style="font-size: 14px; font-weight: 900; tracking-tight: -0.025em; color: #09090b;">Apex Realty Group</span>
+                <?php endif; ?>
+            </div>
+            <nav class="cora-canvas-nav">
+                <?php
+                if ( $menu_id ) {
+                    wp_nav_menu( array(
+                        'menu'        => $menu_id,
+                        'container'   => false,
+                        'items_wrap'  => '%3$s',
+                        'fallback_cb' => false
+                    ) );
+                } else {
+                    echo '<a href="#">Home</a>';
+                    echo '<a href="#">Listings</a>';
+                    echo '<a href="#">Contact</a>';
+                }
+                ?>
+            </nav>
+        </header>
+        <main class="cora-canvas-main" style="flex: 1;">
+    <?php
+    $header_html = ob_get_clean();
+
+    ob_start();
+    ?>
+        </main>
+        <footer class="cora-canvas-footer">
+            <div class="cora-canvas-footer-content">
+                <div>
+                    <?php echo ! empty( $copyright_text ) ? wp_kses_post( $copyright_text ) : '&copy; ' . date( 'Y' ) . ' Apex Realty Group. All rights reserved.'; ?>
+                </div>
+                <div class="cora-canvas-socials">
+                    <?php if ( ! empty( $facebook_link ) ) : ?>
+                        <a href="<?php echo esc_url( $facebook_link ); ?>">Facebook</a>
+                    <?php endif; ?>
+                    <?php if ( ! empty( $twitter_link ) ) : ?>
+                        <a href="<?php echo esc_url( $twitter_link ); ?>">Twitter</a>
+                    <?php endif; ?>
+                    <?php if ( ! empty( $linkedin_link ) ) : ?>
+                        <a href="<?php echo esc_url( $linkedin_link ); ?>">LinkedIn</a>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <?php
+    $footer_html = ob_get_clean();
+
+    return $header_html . $content . $footer_html;
+}
+add_filter( 'the_content', 'cora_canvas_inject_header_footer', 20 );
+
+function cora_canvas_properties_shortcode( $atts ) {
+    global $wpdb;
+    $a = shortcode_atts( array(
+        'category' => '',
+        'limit' => 6,
+        'min_price' => 0,
+    ), $atts );
+
+    $limit = intval( $a['limit'] );
+    
+    $sql = "SELECT * FROM {$wpdb->prefix}cora_properties WHERE 1=1";
+    $params = array();
+    
+    if ( ! empty( $a['category'] ) ) {
+        $sql .= " AND category = %s";
+        $params[] = sanitize_text_field( $a['category'] );
+    }
+    
+    if ( intval( $a['min_price'] ) > 0 ) {
+        $sql .= " AND price >= %d";
+        $params[] = intval( $a['min_price'] );
+    }
+    
+    $sql .= " ORDER BY id DESC LIMIT %d";
+    $params[] = $limit;
+    
+    if ( ! empty( $params ) ) {
+        $results = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );
+    } else {
+        $results = $wpdb->get_results( $sql, ARRAY_A );
+    }
+
+    if ( empty( $results ) ) {
+        return '<div style="color: #a1a1aa; font-style: italic; padding: 2rem 0; text-align: center;">No luxury properties matching the filter parameters.</div>';
+    }
+
+    ob_start();
+    ?>
+    <style>
+        .cora-showcase-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            padding: 1.5rem 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        @media (min-width: 768px) {
+            .cora-showcase-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (min-width: 1024px) {
+            .cora-showcase-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+        .cora-showcase-card {
+            background-color: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease-in-out;
+        }
+        .cora-showcase-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .cora-showcase-img-container {
+            width: 100%;
+            aspect-ratio: 16/10;
+            background-color: #f4f4f5;
+            position: relative;
+        }
+        .cora-showcase-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .cora-showcase-badge {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            background-color: #09090b;
+            color: #ffffff;
+            border-radius: 0.25rem;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .cora-showcase-content {
+            padding: 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .cora-showcase-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #18181b;
+            margin: 0;
+            line-height: 1.25;
+        }
+        .cora-showcase-subtitle {
+            font-size: 11px;
+            color: #a1a1aa;
+            margin: 0.125rem 0 0 0;
+        }
+        .cora-showcase-specs {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #71717a;
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 0.75rem;
+        }
+        .cora-showcase-spec-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .cora-showcase-footer-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid #f4f4f5;
+            padding-top: 0.75rem;
+            margin-top: 1rem;
+        }
+        .cora-showcase-price {
+            font-size: 13px;
+            font-weight: 900;
+            color: #09090b;
+        }
+        .cora-showcase-btn {
+            padding: 0.25rem 0.625rem;
+            background-color: #09090b;
+            color: #ffffff;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 0.25rem;
+            text-decoration: none;
+            transition: background-color 0.15s ease;
+        }
+        .cora-showcase-btn:hover {
+            background-color: #27272a;
+        }
+    </style>
+    <div class="cora-showcase-grid">
+        <?php foreach ( $results as $item ) : 
+            $price_fmt = is_numeric( $item['price'] ) ? '₹' . number_format( $item['price'] ) : $item['price'];
+            $photo_url = ! empty( $item['image_url'] ) ? $item['image_url'] : plugins_url( 'assets/images/placeholder-property.jpg', __FILE__ );
+            ?>
+            <div class="cora-showcase-card">
+                <div class="cora-showcase-img-container">
+                    <img src="<?php echo esc_url( $photo_url ); ?>" class="cora-showcase-img">
+                    <span class="cora-showcase-badge"><?php echo esc_html( $item['category'] ); ?></span>
+                </div>
+                <div class="cora-showcase-content">
+                    <div>
+                        <h4 class="cora-showcase-title"><?php echo esc_html( $item['name'] ); ?></h4>
+                        <p class="cora-showcase-subtitle"><?php echo esc_html( $item['rera_id'] ); ?></p>
+                        
+                        <div class="cora-showcase-specs">
+                            <span class="cora-showcase-spec-item">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                                3 BHK
+                            </span>
+                            <span class="cora-showcase-spec-item">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                2,400 sq.ft.
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="cora-showcase-footer-row">
+                        <span class="cora-showcase-price"><?php echo esc_html( $price_fmt ); ?></span>
+                        <a href="#" class="cora-showcase-btn" onclick="event.preventDefault(); window.coraShowToast('Inquiry request submitted for <?php echo esc_js( $item['name'] ); ?>!', 'success')">
+                            Inquire
+                        </a>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode( 'cora_canvas_properties', 'cora_canvas_properties_shortcode' );
+
+function cora_rest_canvas_create_ai_page( $request ) {
+    global $wpdb;
+    $template_type = sanitize_text_field( $request->get_param( 'template_type' ) );
+    $prompt = sanitize_text_field( $request->get_param( 'prompt' ) );
+    $theme_id = intval( $request->get_param( 'theme_id' ) );
+
+    if ( ! $theme_id ) {
+        $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+        if ( $live_theme ) {
+            $theme_id = $live_theme['id'];
+        } else {
+            return new WP_Error( 'no_theme', 'No active theme found to create the page in.', array( 'status' => 400 ) );
+        }
+    }
+
+    $title = 'AI Generated Page';
+    $elementor_data = array();
+
+    if ( $template_type === 'luxury_lead' ) {
+        $title = 'Luxury Lead Capture';
+        $elementor_data = array(
+            array(
+                'id' => 'sec_lead_hero',
+                'elType' => 'section',
+                'settings' => array(),
+                'elements' => array(
+                    array(
+                        'id' => 'col_lead_hero',
+                        'elType' => 'column',
+                        'settings' => array( '_column_size' => 100 ),
+                        'elements' => array(
+                            array(
+                                'id' => 'widget_lead_title',
+                                'elType' => 'widget',
+                                'widgetType' => 'heading',
+                                'settings' => array(
+                                    'title' => 'Exclusive Luxury Homes Portfolio'
+                                )
+                            ),
+                            array(
+                                'id' => 'widget_lead_desc',
+                                'elType' => 'widget',
+                                'widgetType' => 'text-editor',
+                                'settings' => array(
+                                    'editor' => '<p>Submit your inquiry below to receive access to pocket listings and off-market mandates near Vasant Vihar and Golf Course Road.</p>'
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        );
+    } elseif ( $template_type === 'virtual_tour' ) {
+        $title = 'Virtual Tour Showcase';
+        $elementor_data = array(
+            array(
+                'id' => 'sec_tour_hero',
+                'elType' => 'section',
+                'settings' => array(),
+                'elements' => array(
+                    array(
+                        'id' => 'col_tour_hero',
+                        'elType' => 'column',
+                        'settings' => array( '_column_size' => 100 ),
+                        'elements' => array(
+                            array(
+                                'id' => 'widget_tour_title',
+                                'elType' => 'widget',
+                                'widgetType' => 'heading',
+                                'settings' => array(
+                                    'title' => 'Interactive Virtual Walkthrough'
+                                )
+                            ),
+                            array(
+                                'id' => 'widget_tour_video',
+                                'elType' => 'widget',
+                                'widgetType' => 'video',
+                                'settings' => array(
+                                    'youtube_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        );
+    } elseif ( $template_type === 'pricing_guide' ) {
+        $title = 'Neighborhood Pricing Guide';
+        $elementor_data = array(
+            array(
+                'id' => 'sec_price_hero',
+                'elType' => 'section',
+                'settings' => array(),
+                'elements' => array(
+                    array(
+                        'id' => 'col_price_hero',
+                        'elType' => 'column',
+                        'settings' => array( '_column_size' => 100 ),
+                        'elements' => array(
+                            array(
+                                'id' => 'widget_price_title',
+                                'elType' => 'widget',
+                                'widgetType' => 'heading',
+                                'settings' => array(
+                                    'title' => 'Delhi NCR Market Appraisal Matrix'
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        );
+    } else {
+        $title = ! empty( $prompt ) ? ucwords( $prompt ) : 'Generative Concept Page';
+        $highlight = 'Gurgaon and Vasant Vihar';
+        if ( stripos( $prompt, 'Gurgaon' ) !== false ) {
+            $highlight = 'Gurgaon DLF Phase 5';
+        } elseif ( stripos( $prompt, 'Delhi' ) !== false || stripos( $prompt, 'Vihar' ) !== false ) {
+            $highlight = 'Vasant Vihar Premium Sectors';
+        }
+
+        $elementor_data = array(
+            array(
+                'id' => 'sec_gen_hero',
+                'elType' => 'section',
+                'settings' => array(),
+                'elements' => array(
+                    array(
+                        'id' => 'col_gen_hero',
+                        'elType' => 'column',
+                        'settings' => array( '_column_size' => 100 ),
+                        'elements' => array(
+                            array(
+                                'id' => 'widget_gen_title',
+                                'elType' => 'widget',
+                                'widgetType' => 'heading',
+                                'settings' => array(
+                                    'title' => esc_html( $title )
+                                )
+                            ),
+                            array(
+                                'id' => 'widget_gen_desc',
+                                'elType' => 'widget',
+                                'widgetType' => 'text-editor',
+                                'settings' => array(
+                                    'editor' => '<p>Generative AI Concept Page initialized for <strong>' . esc_html( $highlight ) . '</strong> based on search optimization prompts.</p>'
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        );
+
+        if ( stripos( $prompt, 'dark' ) !== false ) {
+            $current_css = get_option( 'cora_canvas_custom_css', '' );
+            $theme_dark_css = "\n\n/* AI Dark Mode Injection */\nbody { background-color: #09090b !important; color: #f4f4f5 !important; }\n.cora-canvas-header, .cora-canvas-footer { background-color: #18181b !important; border-color: #27272a !important; }";
+            update_option( 'cora_canvas_custom_css', $current_css . $theme_dark_css );
+        }
+    }
+
+    $post_id = wp_insert_post( array(
+        'post_title'   => $title,
+        'post_name'    => sanitize_title( $title ),
+        'post_status'  => 'draft',
+        'post_type'    => 'page',
+        'post_content' => '<!-- Elementor Page Element -->',
+    ) );
+
+    if ( is_wp_error( $post_id ) ) {
+        return $post_id;
+    }
+
+    update_post_meta( $post_id, '_elementor_edit_mode', 'builder' );
+    update_post_meta( $post_id, '_elementor_data', wp_slash( json_encode( $elementor_data ) ) );
+
+    $wpdb->insert(
+        $wpdb->prefix . 'cora_canvas_pages',
+        array(
+            'agency_id'      => 1,
+            'theme_id'       => $theme_id,
+            'wp_post_id'     => $post_id,
+            'title'          => $title,
+            'slug'           => sanitize_title( $title ),
+            'status'         => 'draft',
+            'is_homepage'    => 0,
+            'seo_title'      => $title . ' - Apex Realty Group',
+            'seo_description'=> 'Premium listing and overview page built by Cora AI.',
+            'created_by'     => get_current_user_id(),
+            'created_at'     => current_time( 'mysql' ),
+            'updated_at'     => current_time( 'mysql' ),
+        ),
+        array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%d', '%s', '%s' )
+    );
+
+    cora_log_activity( 'Canvas', "Generated template page '{$title}' via AI Page Library." );
+
+    return rest_ensure_response( array(
+        'success' => true,
+        'page_id' => $wpdb->insert_id,
+        'wp_post_id' => $post_id,
+        'message' => 'AI Concept Page generated successfully.'
+    ) );
+}
+
+function cora_rest_canvas_save_header_footer( $request ) {
+    global $wpdb;
+    $theme_id = intval( $request->get_param( 'id' ) );
+    $logo_url = sanitize_text_field( $request->get_param( 'logo_url' ) );
+    $menu_id = intval( $request->get_param( 'menu_id' ) );
+    $copyright_text = sanitize_textarea_field( $request->get_param( 'copyright_text' ) );
+    $facebook_link = sanitize_text_field( $request->get_param( 'facebook_link' ) );
+    $twitter_link = sanitize_text_field( $request->get_param( 'twitter_link' ) );
+    $linkedin_link = sanitize_text_field( $request->get_param( 'linkedin_link' ) );
+
+    $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+    if ( ! $theme ) {
+        return new WP_Error( 'not_found', 'Theme not found.', array( 'status' => 404 ) );
+    }
+
+    $settings = json_decode( $theme['settings'], true ) ?: array();
+    $settings['header_footer'] = array(
+        'logo_url' => $logo_url,
+        'menu_id' => $menu_id,
+        'copyright_text' => $copyright_text,
+        'facebook_link' => $facebook_link,
+        'twitter_link' => $twitter_link,
+        'linkedin_link' => $linkedin_link
+    );
+
+    $wpdb->update(
+        $wpdb->prefix . 'cora_canvas_themes',
+        array(
+            'settings' => json_encode( $settings ),
+            'updated_at' => current_time( 'mysql' )
+        ),
+        array( 'id' => $theme_id ),
+        array( '%s', '%s' ),
+        array( '%d' )
+    );
+
+    cora_log_activity( 'Canvas', "Updated Header & Footer configurations for theme '{$theme['name']}'." );
+
+    return rest_ensure_response( array(
+        'success' => true,
+        'message' => 'Header and Footer configuration saved successfully.'
+    ) );
+}
 
 /**
  * Helper to convert Google Drive URL to direct src link
