@@ -2964,7 +2964,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             <div class="cora-module-details flex flex-col items-start gap-1">
                                 <span class="cora-module-name font-semibold text-sm text-zinc-900">Local SEO Rank Crawler</span>
                                 <span class="cora-module-status-pill text-[9px] font-bold uppercase inline-flex items-center px-1.5 py-0.5 rounded cora-module-status-pill active" id="badge-module-seo">Active</span>
-                                <span class="cora-module-desc text-xs text-zinc-500 mt-1 leading-relaxed">Monitors local search ranking and auto-injects SEO keywords to WordPress media attachment meta.</span>
+                                <span class="cora-module-desc text-xs text-zinc-500 mt-1 leading-relaxed">Monitors local search ranking and auto-injects SEO keywords to media attachment meta.</span>
                             </div>
                             <label class="cora-switch relative inline-flex items-center cursor-pointer mt-4 self-start">
                                 <input type="checkbox" id="module-seo" checked onchange="coraToggleModule('seo', this.checked)" class="sr-only peer">
@@ -7255,7 +7255,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         </div>
         <div class="flex-1 overflow-y-auto p-5 space-y-4">
             <input type="hidden" id="cora-share-doc-id" value="">
-            <p class="text-xs text-zinc-500 leading-normal pb-2 border-b border-zinc-100">Send an encrypted, self-expiring link directly to the client's email via WordPress mail relay.</p>
+            <p class="text-xs text-zinc-500 leading-normal pb-2 border-b border-zinc-100">Send an encrypted, self-expiring link directly to the client's email via secure mail relay.</p>
             
             <div class="cora-form-group flex flex-col gap-1.5">
                 <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Client Email Address</label>

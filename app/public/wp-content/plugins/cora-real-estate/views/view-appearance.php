@@ -172,7 +172,7 @@ $pages = get_pages();
         <div>
             <label class="block text-xs font-bold text-zinc-800 mb-1">Item Type</label>
             <select id="cora-menu-item-type" class="w-full bg-white border border-zinc-300 rounded-lg p-2.5 text-xs text-zinc-900 font-semibold focus:outline-none" onchange="coraToggleMenuItemTypeFields(this.value)">
-                <option value="page">Link to WordPress Page</option>
+                <option value="page">Link to Static Page</option>
                 <option value="custom">Custom URL / External Link</option>
             </select>
         </div>

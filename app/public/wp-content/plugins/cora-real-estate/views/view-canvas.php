@@ -1690,7 +1690,7 @@ $wp_pages = get_pages();
         if (canvasState.isReadOnly) return;
         window.coraConfirmAction(
             'Delete Page',
-            'Are you sure you want to delete this page permanently? This will remove the page from the template registry and delete the associated WordPress post.',
+            'Are you sure you want to delete this page permanently? This will remove the page from the template registry and delete the associated platform post.',
             function() {
                 window.coraShowToast('Removing page...');
                 jQuery.ajax({

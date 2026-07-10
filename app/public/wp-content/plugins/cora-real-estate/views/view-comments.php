@@ -1,6 +1,6 @@
 <?php
 /**
- * Cora Real Estate CRM - Module 2: Client Discussions & WP Comment Moderation
+ * Cora Real Estate CRM - Module 2: Client Discussions & Discussion Moderation
  * Studio-Grade Monochromatic UI/UX
  */
 

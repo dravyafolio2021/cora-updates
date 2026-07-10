@@ -986,7 +986,7 @@ jQuery(document).ready(function($) {
             </svg>
             Add Brokerage Member
         `);
-        $('#cora-team-form-desc').text('Create a new WordPress user profile mapped to your studio\'s brokerage operational roles.');
+        $('#cora-team-form-desc').text('Create a new team member profile mapped to your studio\'s brokerage operational roles.');
         $('#cora-save-user-btn').text('Add Member');
         $('#cora-cancel-user-btn').addClass('hidden');
 
@@ -1646,7 +1646,7 @@ jQuery(document).ready(function($) {
         
         <h3>Summary</h3>
         <p>Meeting discussions addressed CRM functionality improvements and team access management for better lead tracking operations.</p>
-        <p><strong>CRM Capabilities and Integration</strong><br>Discussion centered on the current limitations of WordPress for lead management and how the new CRM platform improves visual organization. The system integrates Google Business Profiles and automated WhatsApp follow-up tools.</p>
+        <p><strong>CRM Capabilities and Integration</strong><br>Discussion centered on the current limitations of legacy tools for lead management and how the new CRM platform improves visual organization. The system integrates Google Business Profiles and automated WhatsApp follow-up tools.</p>
         <p><strong>Technical Workflow and Access</strong><br>The platform enables third-party API integrations for portfolios and supports Zoho syncing for invoices. The system provides customizable access permissions for team members to protect sensitive financial data.</p>
         <p><strong>System Implementation Decisions</strong><br>It was decided to create a functional platform demonstration to evaluate lead synchronization and scheduling capabilities. The system utilizes Progressive Web App technology to support mobile access for field tasks.</p>
         
@@ -3169,7 +3169,7 @@ jQuery(document).ready(function($) {
             
             vaultUploader.open();
         } else {
-            window.coraShowToast("WordPress media library not available.");
+            window.coraShowToast("Media library not available.");
         }
     };
 
@@ -5902,7 +5902,7 @@ jQuery(document).ready(function($) {
                     });
                     customUploader.open();
                 } else {
-                    window.coraShowToast('WordPress media library is not loaded.');
+                    window.coraShowToast('Media library is not loaded.');
                 }
             });
             toolbar.addHandler('video', function() {
@@ -5920,7 +5920,7 @@ jQuery(document).ready(function($) {
                     });
                     customUploader.open();
                 } else {
-                    window.coraShowToast('WordPress media library is not loaded.');
+                    window.coraShowToast('Media library is not loaded.');
                 }
             });
             
@@ -7347,7 +7347,7 @@ jQuery(document).ready(function($) {
             });
             frame.open();
         } else {
-            window.coraShowToast('WordPress media library not available.');
+            window.coraShowToast('Media library not available.');
         }
     };
 
@@ -7595,7 +7595,7 @@ jQuery(document).ready(function($) {
             });
             frame.open();
         } else {
-            window.coraShowToast('WordPress media library not available.');
+            window.coraShowToast('Media library not available.');
         }
     };
 

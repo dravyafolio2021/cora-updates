@@ -40,7 +40,7 @@ $memory_limit  = defined('WP_MEMORY_LIMIT') ? WP_MEMORY_LIMIT : ini_get('memory_
 <!-- Section 1: Real-time Site Health Audits -->
 <div class="space-y-3">
     <div class="flex items-center justify-between">
-        <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Real-time Server & WordPress Diagnostics</h3>
+        <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Real-time Server & Platform Diagnostics</h3>
         <span class="text-xs font-mono text-zinc-500">System Health: <strong class="text-emerald-700">100% Operational</strong></span>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -94,7 +94,7 @@ $memory_limit  = defined('WP_MEMORY_LIMIT') ? WP_MEMORY_LIMIT : ini_get('memory_
     </div>
 </div>
 
-<!-- Section 2: Data Migration Engine (WXR XML) -->
+<!-- Section 2: Data Migration Engine (XML) -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Export WXR XML -->
     <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
@@ -102,11 +102,11 @@ $memory_limit  = defined('WP_MEMORY_LIMIT') ? WP_MEMORY_LIMIT : ini_get('memory_
             <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
                 <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-2">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    Export WordPress XML Data (WXR)
+                    Export Platform XML Data
                 </h3>
                 <span class="text-[10px] bg-zinc-100 px-2 py-0.5 rounded font-mono font-bold text-zinc-600">Export</span>
             </div>
-            <p class="text-xs text-zinc-600 leading-relaxed">Generate a standard WordPress Extended RSS (WXR) file containing your posts, static pages, comments, custom fields, categories, and tags for safe backups or migration.</p>
+            <p class="text-xs text-zinc-600 leading-relaxed">Generate a standard Extended RSS (CXR) XML file containing your posts, static pages, comments, custom fields, categories, and tags for safe backups or migration.</p>
             <div class="space-y-2 pt-1">
                 <label class="flex items-center gap-2.5 text-xs text-zinc-800 font-semibold cursor-pointer">
                     <input type="radio" name="cora_export_type" value="all" checked class="text-zinc-900 focus:ring-zinc-900">
@@ -144,12 +144,12 @@ $memory_limit  = defined('WP_MEMORY_LIMIT') ? WP_MEMORY_LIMIT : ini_get('memory_
                 </h3>
                 <span class="text-[10px] bg-zinc-100 px-2 py-0.5 rounded font-mono font-bold text-zinc-600">Import</span>
             </div>
-            <p class="text-xs text-zinc-600 leading-relaxed">Import posts, pages, comments, custom fields, categories, and media from a standard WordPress WXR export file or external platform archive.</p>
+            <p class="text-xs text-zinc-600 leading-relaxed">Import posts, pages, comments, custom fields, categories, and media from a standard platform CXR XML export file or external platform archive.</p>
             <div class="border-2 border-dashed border-zinc-200 rounded-xl p-6 text-center space-y-2 bg-zinc-50/50 hover:bg-zinc-50 transition-colors">
                 <div class="w-10 h-10 rounded-full bg-white border border-zinc-200 flex items-center justify-center mx-auto text-zinc-700 shadow-sm">
                     <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                 </div>
-                <div class="text-xs font-bold text-zinc-900">Select WXR `.xml` file to import</div>
+                <div class="text-xs font-bold text-zinc-900">Select CXR `.xml` file to import</div>
                 <p class="text-[11px] text-zinc-400">Max upload file size: <?php echo esc_html( size_format( wp_max_upload_size() ) ); ?></p>
                 <input type="file" id="cora-import-file" accept=".xml" class="hidden" onchange="coraShowSelectedImportFile(this)">
                 <button class="mt-2 px-3.5 py-1.5 bg-white border border-zinc-300 hover:bg-zinc-100 text-zinc-800 font-semibold text-xs rounded-lg transition-colors cursor-pointer shadow-sm inline-block" onclick="document.getElementById('cora-import-file').click()">
