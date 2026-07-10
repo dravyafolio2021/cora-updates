@@ -563,12 +563,20 @@ jQuery(document).ready(function($) {
         }
     };
 
-    // Toggle button and search bar opens the sidebar instead of a modal
-    $('#cora-quick-ai-btn, .cora-sidebar-search').on('click', function(e) {
+    // Toggle button opens the sidebar
+    $('#cora-quick-ai-btn').on('click', function(e) {
         e.preventDefault();
         const sidebar = $('#cora-ai-sidebar');
         const isCollapsed = sidebar.hasClass('collapsed');
         coraToggleSidebar(isCollapsed);
+    });
+
+    // Search bar opens the command palette modal
+    $('.cora-sidebar-search').on('click', function(e) {
+        e.preventDefault();
+        if (typeof window.coraOpenCommandPalette === 'function') {
+            window.coraOpenCommandPalette();
+        }
     });
 
     // Send chat messages from input box

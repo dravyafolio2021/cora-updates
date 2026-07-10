@@ -1864,6 +1864,7 @@ function cora_ajax_share_document() {
     }
 }
 add_action( 'wp_ajax_cora_share_document', 'cora_ajax_share_document' );
+add_action( 'wp_ajax_cora_advanced_search', 'cora_ajax_advanced_search' );
 
 /**
  * Register Public REST API route for frontend team integration
@@ -1880,6 +1881,8 @@ add_action( 'rest_api_init', function () {
         'callback'            => 'cora_rest_mcp_handler',
         'permission_callback' => '__return_true',
     ) );
+
+
 
     register_rest_route( 'cora/v1', '/schedule-task', array(
         'methods'             => 'POST',
@@ -2197,6 +2200,185 @@ function cora_rest_schedule_task( $request ) {
     update_option( 'cora_action_queue', $queue );
 
     return rest_ensure_response( array( 'success' => true ) );
+}
+
+/**
+ * Callback: AJAX handler for Advanced Command Search requests
+ */
+function cora_ajax_advanced_search() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+
+    global $wpdb;
+    $query = isset( $_GET['q'] ) ? sanitize_text_field( $_GET['q'] ) : '';
+    $filter = isset( $_GET['filter'] ) ? sanitize_text_field( $_GET['filter'] ) : 'all';
+
+    if ( empty( $filter ) ) {
+        $filter = 'all';
+    }
+
+    $results = array();
+
+    // 1. Settings Search
+    if ( $filter === 'all' || $filter === 'settings' ) {
+        $settings_items = array(
+            array(
+                'title' => 'General Settings',
+                'category' => 'Settings',
+                'description' => 'Workspace details, identity, log retention, and tours configurations.',
+                'url' => admin_url( 'admin.php?page=cora-workspace&sub=settings-suite&settings_tab=general' ),
+                'icon' => 'settings'
+            ),
+            array(
+                'title' => 'Password Policy',
+                'category' => 'Settings',
+                'description' => 'Configure and enforce minimum length, digits, and uppercase symbols.',
+                'url' => admin_url( 'admin.php?page=cora-workspace&sub=settings-suite&settings_tab=pwd-policy' ),
+                'icon' => 'lock'
+            ),
+            array(
+                'title' => 'Branch Management',
+                'category' => 'Settings',
+                'description' => 'Manage physical brokerage offices, cities, and address list.',
+                'url' => admin_url( 'admin.php?page=cora-workspace&sub=settings-suite&settings_tab=branches' ),
+                'icon' => 'map-pin'
+            ),
+            array(
+                'title' => 'Branding & API Keys',
+                'category' => 'Settings',
+                'description' => 'Set logo, favicon, Google Maps integration, and WhatsApp cloud credentials.',
+                'url' => admin_url( 'admin.php?page=cora-workspace&sub=settings-suite&settings_tab=brand' ),
+                'icon' => 'image'
+            ),
+            array(
+                'title' => 'AI Tools MCP Integration',
+                'category' => 'Settings',
+                'description' => 'Access and configure Model Context Protocol (MCP) server endpoints.',
+                'url' => admin_url( 'admin.php?page=cora-workspace&sub=settings-suite&settings_tab=mcp' ),
+                'icon' => 'cpu'
+            ),
+            array(
+                'title' => 'Reading & SEO Indexing',
+                'category' => 'Settings',
+                'description' => 'Setup home landing pages and control search engine crawlers.',
+                'url' => admin_url( 'admin.php?page=cora-workspace&sub=settings-suite&settings_tab=reading' ),
+                'icon' => 'book-open'
+            ),
+            array(
+                'title' => 'SEO Permalinks',
+                'category' => 'Settings',
+                'description' => 'Set standard clean and SEO-friendly slug url formats.',
+                'url' => admin_url( 'admin.php?page=cora-workspace&sub=settings-suite&settings_tab=permalinks' ),
+                'icon' => 'link'
+            ),
+            array(
+                'title' => 'Privacy Policy Page',
+                'category' => 'Settings',
+                'description' => 'Configure legal compliance page.',
+                'url' => admin_url( 'admin.php?page=cora-workspace&sub=settings-suite&settings_tab=privacy' ),
+                'icon' => 'file-text'
+            ),
+            array(
+                'title' => 'Audit logs panel',
+                'category' => 'Security',
+                'description' => 'View system log feed and download transaction records.',
+                'url' => admin_url( 'admin.php?page=cora-workspace&sub=audit-panel' ),
+                'icon' => 'activity'
+            )
+        );
+
+        foreach ( $settings_items as $item ) {
+            if ( empty( $query ) || stripos( $item['title'], $query ) !== false || stripos( $item['description'], $query ) !== false ) {
+                $results[] = $item;
+            }
+        }
+    }
+
+    // 2. Leads Search (CRM)
+    if ( $filter === 'all' || $filter === 'leads' ) {
+        if ( ! empty( $query ) ) {
+            $leads = $wpdb->get_results( $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}cora_leads WHERE name LIKE %s OR email LIKE %s OR phone LIKE %s ORDER BY id DESC LIMIT 5",
+                '%' . $wpdb->esc_like( $query ) . '%',
+                '%' . $wpdb->esc_like( $query ) . '%',
+                '%' . $wpdb->esc_like( $query ) . '%'
+            ), ARRAY_A );
+        } else {
+            $leads = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_leads ORDER BY id DESC LIMIT 5", ARRAY_A );
+        }
+
+        if ( ! empty( $leads ) ) {
+            foreach ( $leads as $l ) {
+                $results[] = array(
+                    'title' => $l['name'],
+                    'category' => 'Leads',
+                    'description' => 'Client: ' . $l['email'] . ' | Phone: ' . $l['phone'],
+                    'url' => admin_url( 'admin.php?page=cora-workspace&sub=leads&lead_id=' . $l['id'] ),
+                    'icon' => 'user'
+                );
+            }
+        }
+    }
+
+    // 3. Pages Search
+    if ( $filter === 'all' || $filter === 'pages' ) {
+        if ( ! empty( $query ) ) {
+            $canvas_pages = $wpdb->get_results( $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE title LIKE %s OR slug LIKE %s ORDER BY id DESC LIMIT 5",
+                '%' . $wpdb->esc_like( $query ) . '%',
+                '%' . $wpdb->esc_like( $query ) . '%'
+            ), ARRAY_A );
+        } else {
+            $canvas_pages = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages ORDER BY id DESC LIMIT 5", ARRAY_A );
+        }
+
+        if ( ! empty( $canvas_pages ) ) {
+            foreach ( $canvas_pages as $cp ) {
+                $results[] = array(
+                    'title' => $cp['title'],
+                    'category' => 'Pages',
+                    'description' => 'Canvas Page: /' . $cp['slug'] . ' (' . ucfirst($cp['status']) . ')',
+                    'url' => admin_url( 'admin.php?page=cora-workspace&sub=canvas&edit_page=' . $cp['id'] ),
+                    'icon' => 'layout'
+                );
+            }
+        }
+    }
+
+    // 4. Listings Search (Properties)
+    if ( $filter === 'all' || $filter === 'listings' ) {
+        $post_type = post_type_exists( 'cora_listing' ) ? 'cora_listing' : 'post';
+        $args = array(
+            'post_type'      => $post_type,
+            'posts_per_page' => 5,
+            'post_status'    => 'any'
+        );
+        if ( ! empty( $query ) ) {
+            $args['s'] = $query;
+        }
+
+        $posts_query = new WP_Query( $args );
+        $posts = $posts_query->posts;
+
+        if ( ! empty( $posts ) ) {
+            foreach ( $posts as $p ) {
+                $results[] = array(
+                    'title' => $p->post_title,
+                    'category' => 'Listings',
+                    'description' => 'Property Post ID: ' . $p->ID . ' | Status: ' . $p->post_status,
+                    'url' => admin_url( 'admin.php?page=cora-workspace&sub=properties&property_id=' . $p->ID ),
+                    'icon' => 'home'
+                );
+            }
+        }
+    }
+
+    wp_send_json_success( array(
+        'results' => $results
+    ) );
 }
 
 /**

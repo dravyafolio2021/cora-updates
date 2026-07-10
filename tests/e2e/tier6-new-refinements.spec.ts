@@ -217,4 +217,41 @@ test.describe('Tier 6: New Refinements E2E Tests', () => {
     expect(bodyCallLeads.result.content[0].text).toContain('Recent CRM Leads');
   });
 
+  test('6. Advanced Command Search Modal (Command Palette) Keyboard Validation', async ({ page }) => {
+    await page.goto('/workspace/settings-suite');
+
+    // 1. Click sidebar search bar -> opens command palette modal
+    await page.click('.cora-sidebar-search');
+    await expect(page.locator('#cora-command-palette')).toBeVisible();
+
+    // 2. Close it via Escape key
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#cora-command-palette')).toBeHidden();
+
+    // 3. Open it via Ctrl+K shortcut key
+    await page.keyboard.press('Control+k');
+    await expect(page.locator('#cora-command-palette')).toBeVisible();
+
+    // 4. Verify search input has focus and type "Password"
+    await page.fill('#cora-command-input', 'Password');
+    await page.waitForTimeout(300); // Wait for debounce and REST fetch
+
+    // 5. Verify results contain Password Policy item
+    await expect(page.locator('#cora-command-results')).toContainText('Password Policy');
+
+    // 6. Test arrow keys down navigation
+    await page.keyboard.press('ArrowDown');
+    const selectedItem = page.locator('.cora-command-item.selected');
+    await expect(selectedItem).toBeVisible();
+
+    // 7. Test filter pills click (which searches "Password" under Leads filter, yielding no results)
+    await page.click('.cora-search-pill[data-filter="leads"]');
+    await page.waitForTimeout(300);
+    await expect(page.locator('#cora-command-results')).toContainText('No results found');
+
+    // 8. Press Escape to close palette modal
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#cora-command-palette')).toBeHidden();
+  });
+
 });

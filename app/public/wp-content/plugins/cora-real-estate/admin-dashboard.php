@@ -8309,5 +8309,354 @@ wp_print_footer_scripts();
 })();
 </script>
 
+<!-- Cora Advanced Command Search Modal (Command Palette) -->
+<div id="cora-command-palette" class="fixed inset-0 z-[999999] hidden flex items-start justify-center p-4 pt-[12vh] bg-zinc-950/40 backdrop-blur-sm transition-all duration-200">
+    <div class="cora-command-container w-full max-w-2xl bg-white border border-zinc-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[60vh] transition-transform transform scale-95 duration-200">
+        
+        <!-- Search Input Header -->
+        <div class="flex items-center gap-3 px-4 border-b border-zinc-100 py-3.5 shrink-0">
+            <svg class="text-zinc-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="cora-command-input" placeholder="Search pages, settings, leads, or listings..." class="flex-1 text-sm bg-transparent border-0 outline-none focus:ring-0 text-zinc-900 placeholder-zinc-400 py-0.5" autocomplete="off">
+            <kbd class="text-[9px] font-mono bg-zinc-100 px-1.5 py-0.5 rounded text-zinc-450 border border-zinc-200/60 shadow-sm shrink-0">⌘K</kbd>
+        </div>
+
+        <!-- Filter Pills Bar -->
+        <div class="flex items-center gap-1.5 px-4 py-2 border-b border-zinc-100 bg-zinc-50/50 overflow-x-auto shrink-0 select-none no-scrollbar">
+            <button type="button" class="cora-search-pill active text-xs font-semibold px-3 py-1 rounded-full border border-zinc-200 bg-zinc-900 text-white transition-all cursor-pointer" data-filter="all">Overview</button>
+            <button type="button" class="cora-search-pill text-xs font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 transition-all cursor-pointer" data-filter="pages">Pages</button>
+            <button type="button" class="cora-search-pill text-xs font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 transition-all cursor-pointer" data-filter="leads">Leads</button>
+            <button type="button" class="cora-search-pill text-xs font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 transition-all cursor-pointer" data-filter="settings">Settings</button>
+            <button type="button" class="cora-search-pill text-xs font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 transition-all cursor-pointer" data-filter="listings">Listings</button>
+        </div>
+
+        <!-- Results List Area -->
+        <div class="flex-1 overflow-y-auto p-2 min-h-[220px]" id="cora-command-results">
+            <!-- Loading state / Suggestions list / Search results list -->
+        </div>
+
+        <!-- Footer Bar -->
+        <div class="border-t border-zinc-100 px-4 py-2.5 bg-zinc-50/50 flex items-center justify-between shrink-0">
+            <span class="text-xs text-zinc-400 font-medium">Need help finding something?</span>
+            <button type="button" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold text-xs rounded-lg transition-colors shadow-sm flex items-center gap-1.5 cursor-pointer" onclick="coraTriggerCommandAI()">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Ask Cora
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<style>
+#cora-command-palette.active {
+    display: flex !important;
+}
+#cora-command-palette.active .cora-command-container {
+    transform: scale(1) !important;
+}
+.cora-command-item.selected {
+    background-color: #f4f4f5 !important;
+}
+.cora-command-item.selected .w-9 {
+    background-color: #ffffff !important;
+    border-color: #d4d4d8 !important;
+}
+.cora-command-item.selected span.text-zinc-300 {
+    color: #18181b !important;
+}
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Dark mode overrides for search */
+.cora-dark-theme #cora-command-palette {
+    background-color: rgba(9, 9, 11, 0.6) !important;
+}
+.cora-dark-theme .cora-command-container {
+    background-color: #09090b !important;
+    border-color: #27272a !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+.cora-dark-theme #cora-command-input {
+    color: #f4f4f5 !important;
+}
+.cora-dark-theme .cora-command-container div {
+    border-color: #18181b !important;
+}
+.cora-dark-theme .cora-search-pill {
+    background-color: #09090b;
+    border-color: #27272a;
+    color: #a1a1aa;
+}
+.cora-dark-theme .cora-search-pill.active {
+    background-color: #f4f4f5;
+    border-color: #f4f4f5;
+    color: #09090b;
+}
+.cora-dark-theme .cora-search-pill:hover:not(.active) {
+    background-color: #18181b;
+}
+.cora-dark-theme #cora-command-results .cora-command-item:hover:not(.selected) {
+    background-color: #18181b !important;
+}
+.cora-dark-theme .cora-command-item.selected {
+    background-color: #27272a !important;
+}
+.cora-dark-theme .cora-command-item.selected .w-9 {
+    background-color: #18181b !important;
+    border-color: #3f3f46 !important;
+}
+.cora-dark-theme .cora-command-item.selected span.text-zinc-300 {
+    color: #f4f4f5 !important;
+}
+.cora-dark-theme .cora-command-item .w-9 {
+    background-color: #18181b;
+    border-color: #27272a;
+    color: #f4f4f5;
+}
+.cora-dark-theme .cora-command-item .text-zinc-900 {
+    color: #f4f4f5 !important;
+}
+.cora-dark-theme .cora-command-item .text-zinc-400 {
+    color: #a1a1aa !important;
+}
+</style>
+
+<script>
+(function() {
+    let selectedIndex = -1;
+    let searchDebounceTimeout = null;
+    let currentFilter = 'all';
+
+    window.coraOpenCommandPalette = function() {
+        const palette = document.getElementById('cora-command-palette');
+        const input = document.getElementById('cora-command-input');
+        if (!palette) return;
+
+        palette.classList.add('active');
+        palette.classList.remove('hidden');
+        input.value = '';
+        input.focus();
+        selectedIndex = -1;
+        
+        // Load initial suggestions
+        coraPerformCommandSearch('');
+    };
+
+    window.coraCloseCommandPalette = function() {
+        const palette = document.getElementById('cora-command-palette');
+        if (palette) {
+            palette.classList.remove('active');
+            palette.classList.add('hidden');
+        }
+    };
+
+    window.coraTriggerCommandAI = function() {
+        coraCloseCommandPalette();
+        const sidebar = document.getElementById('cora-ai-sidebar');
+        const chatInput = document.getElementById('cora-sidebar-chat-input');
+        if (sidebar && typeof window.coraToggleSidebar === 'function') {
+            window.coraToggleSidebar(true);
+            setTimeout(() => {
+                if (chatInput) chatInput.focus();
+            }, 300);
+        }
+    };
+
+    function getIconSVG(name) {
+        const icons = {
+            'settings': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`,
+            'lock': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`,
+            'map-pin': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`,
+            'image': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`,
+            'cpu': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="15" x2="23" y2="15"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="15" x2="4" y2="15"></line></svg>`,
+            'book-open': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>`,
+            'link': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>`,
+            'file-text': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
+            'activity': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>`,
+            'user': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
+            'layout': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`,
+            'home': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`
+        };
+        return icons[name] || icons['settings'];
+    }
+
+    function coraPerformCommandSearch(query) {
+        const resultsContainer = document.getElementById('cora-command-results');
+        if (!resultsContainer) return;
+
+        resultsContainer.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-10 space-y-2">
+                <div class="w-5 h-5 border-2 border-zinc-900 border-t-transparent rounded-full animate-spin"></div>
+                <span class="text-[10px] text-zinc-400 font-medium">Searching workspace database...</span>
+            </div>
+        `;
+
+        const url = coraREData.ajaxUrl + '?action=cora_advanced_search&nonce=' + coraREData.ajaxNonce + '&q=' + encodeURIComponent(query) + '&filter=' + currentFilter;
+        
+        fetch(url, {
+            method: 'GET'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data && data.data.results && data.data.results.length > 0) {
+                let html = '<div class="space-y-0.5">';
+                data.data.results.forEach((item, index) => {
+                    html += `
+                        <a href="${item.url}" class="cora-command-item flex items-center justify-between p-2.5 rounded-xl transition-all duration-150 cursor-pointer text-decoration-none group" data-index="${index}">
+                            <div class="flex items-center gap-3">
+                                <span class="w-9 h-9 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/50 group-hover:bg-white group-hover:border-zinc-300 transition-colors">
+                                    ${getIconSVG(item.icon)}
+                                </span>
+                                <div class="space-y-0.5">
+                                    <div class="text-xs font-bold text-zinc-900">${item.title}</div>
+                                    <p class="text-[10px] text-zinc-400 line-clamp-1">${item.description}</p>
+                                </div>
+                            </div>
+                            <span class="text-zinc-300 group-hover:text-zinc-800 transition-colors">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></span >
+                            </span>
+                        </a>
+                    `;
+                });
+                html += '</div>';
+                resultsContainer.innerHTML = html;
+                selectedIndex = -1;
+            } else {
+                resultsContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-12 text-center">
+                        <svg class="text-zinc-300 mb-2" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <span class="text-xs font-semibold text-zinc-850">No results found</span>
+                        <p class="text-[10px] text-zinc-450 mt-0.5">Try searching with other filters or keywords</p>
+                    </div>
+                `;
+                selectedIndex = -1;
+            }
+        })
+        .catch(err => {
+            console.error('Advanced Search Error:', err);
+            resultsContainer.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-10 text-center">
+                    <span class="text-xs font-semibold text-zinc-800">Connection error</span>
+                    <p class="text-[10px] text-zinc-400">Failed to fetch search data.</p>
+                </div>
+            `;
+        });
+    }
+
+    // Keyboard bindings for global workspace triggers
+    document.addEventListener('keydown', function(e) {
+        // Toggle Cmd+K / Ctrl+K
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            const palette = document.getElementById('cora-command-palette');
+            if (palette && !palette.classList.contains('hidden')) {
+                coraCloseCommandPalette();
+            } else {
+                coraOpenCommandPalette();
+            }
+            return;
+        }
+
+        const palette = document.getElementById('cora-command-palette');
+        if (!palette || palette.classList.contains('hidden')) return;
+
+        // Escape closes
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            coraCloseCommandPalette();
+            return;
+        }
+
+        const items = document.querySelectorAll('.cora-command-item');
+        if (items.length === 0) return;
+
+        // ArrowDown
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedIndex++;
+            if (selectedIndex >= items.length) {
+                selectedIndex = 0;
+            }
+            updateSelectedItem(items);
+            return;
+        }
+
+        // ArrowUp
+        if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex--;
+            if (selectedIndex < 0) {
+                selectedIndex = items.length - 1;
+            }
+            updateSelectedItem(items);
+            return;
+        }
+
+        // Enter triggers navigation
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (selectedIndex >= 0 && selectedIndex < items.length) {
+                items[selectedIndex].click();
+            }
+        }
+    });
+
+    function updateSelectedItem(items) {
+        items.forEach((item, idx) => {
+            if (idx === selectedIndex) {
+                item.classList.add('selected');
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.classList.remove('selected');
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Input text change listener
+        const input = document.getElementById('cora-command-input');
+        if (input) {
+            input.addEventListener('input', function() {
+                clearTimeout(searchDebounceTimeout);
+                const query = this.value.trim();
+                searchDebounceTimeout = setTimeout(() => {
+                    coraPerformCommandSearch(query);
+                }, 150);
+            });
+        }
+
+        // Click outside closes modal
+        const palette = document.getElementById('cora-command-palette');
+        if (palette) {
+            palette.addEventListener('click', function(e) {
+                if (e.target === palette) {
+                    coraCloseCommandPalette();
+                }
+            });
+        }
+
+        // Filter pills click listeners
+        const pills = document.querySelectorAll('.cora-search-pill');
+        pills.forEach(pill => {
+            pill.addEventListener('click', function() {
+                pills.forEach(p => {
+                    p.classList.remove('active', 'bg-zinc-900', 'text-white');
+                    p.classList.add('bg-white', 'text-zinc-600');
+                });
+                this.classList.add('active', 'bg-zinc-900', 'text-white');
+                this.classList.remove('bg-white', 'text-zinc-600');
+                currentFilter = this.getAttribute('data-filter');
+                const query = document.getElementById('cora-command-input').value.trim();
+                coraPerformCommandSearch(query);
+            });
+        });
+    });
+})();
+</script>
+
 </body>
 </html>
