@@ -15,14 +15,18 @@ test.describe('Canvas Advanced Extensions & Competitor Alignment E2E Tests', () 
     await expect(page.locator('h3:has-text("Canvas Analytics")')).toBeVisible();
 
     // 2. Test Template Preset instantiation
-    await page.click('button:has-text("Virtual Tour")');
-    // Wait for reload and page recovery
+    await Promise.all([
+      page.waitForNavigation({ waitUntil: 'load' }),
+      page.click('button:has-text("Virtual Tour")')
+    ]);
     await page.waitForSelector('#canvas-level-1', { state: 'visible' });
 
     // 3. Test AI Prompt to Page creation
     await page.fill('#canvas-ai-prompt', 'Dark luxury villa collection in Vasant Vihar');
-    await page.click('button:has-text("Generate")');
-    // Wait for page creation AJAX and reload
+    await Promise.all([
+      page.waitForNavigation({ waitUntil: 'load' }),
+      page.click('button:has-text("Generate")')
+    ]);
     await page.waitForSelector('#canvas-level-1', { state: 'visible' });
 
     // 4. Go to Level 2 (Theme Dashboard) by clicking "Edit Theme"
@@ -39,8 +43,8 @@ test.describe('Canvas Advanced Extensions & Competitor Alignment E2E Tests', () 
     await page.fill('#setting-linkedin-link', 'https://linkedin.com/in/apexrealty');
     await page.fill('#setting-copyright-text', '© 2026 Apex Luxury Holdings. All rights reserved.');
 
-    // Save configurations
-    await page.click('button:has-text("Save Settings")');
+    // Save configurations with force click to bypass potential toast overlays
+    await page.click('button:has-text("Save Settings")', { force: true });
     const toast = page.locator('#cora-toast-container');
     await expect(toast).toContainText('Settings parameters synchronized successfully.');
 
