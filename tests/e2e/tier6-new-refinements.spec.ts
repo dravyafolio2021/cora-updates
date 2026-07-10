@@ -133,4 +133,88 @@ test.describe('Tier 6: New Refinements E2E Tests', () => {
     expect(download.suggestedFilename()).toContain('propOS_audit_logs');
   });
 
+  test('5. Model Context Protocol (MCP) Server Validation', async ({ page }) => {
+    // 1. Retrieve the secure token from settings suite mcp tab
+    await page.goto('/workspace/settings-suite?settings_tab=mcp');
+    await page.waitForSelector('input[name="cora_mcp_access_token"]');
+    const validToken = await page.inputValue('input[name="cora_mcp_access_token"]');
+    expect(validToken.length).toBeGreaterThan(0);
+
+    // 2. Perform request with invalid token -> 401 Unauthorized
+    const resInvalid = await page.request.post('/wp-json/cora/v1/mcp', {
+      headers: {
+        'Authorization': 'Bearer invalid_token_123',
+        'Content-Type': 'application/json'
+      },
+      data: {
+        jsonrpc: '2.0',
+        method: 'tools/list',
+        id: 1
+      }
+    });
+    expect(resInvalid.status()).toBe(401);
+    const bodyInvalid = await resInvalid.json();
+    expect(bodyInvalid.error.message).toContain('Unauthorized');
+
+    // 3. Perform request with valid token -> tools/list list of tools
+    const resList = await page.request.post('/wp-json/cora/v1/mcp', {
+      headers: {
+        'Authorization': `Bearer ${validToken}`,
+        'Content-Type': 'application/json'
+      },
+      data: {
+        jsonrpc: '2.0',
+        method: 'tools/list',
+        id: 2
+      }
+    });
+    expect(resList.status()).toBe(200);
+    const bodyList = await resList.json();
+    expect(bodyList.result.tools).toBeDefined();
+    const tools = bodyList.result.tools;
+    expect(tools.some(t => t.name === 'cora_get_platform_info')).toBe(true);
+    expect(tools.some(t => t.name === 'cora_get_leads')).toBe(true);
+
+    // 4. Perform tool call -> cora_get_platform_info
+    const resCallInfo = await page.request.post('/wp-json/cora/v1/mcp', {
+      headers: {
+        'Authorization': `Bearer ${validToken}`,
+        'Content-Type': 'application/json'
+      },
+      data: {
+        jsonrpc: '2.0',
+        method: 'tools/call',
+        params: {
+          name: 'cora_get_platform_info'
+        },
+        id: 3
+      }
+    });
+    expect(resCallInfo.status()).toBe(200);
+    const bodyCallInfo = await resCallInfo.json();
+    expect(bodyCallInfo.result.isError).toBe(false);
+    expect(bodyCallInfo.result.content[0].text).toContain('Cora Platform Info');
+
+    // 5. Perform tool call -> cora_get_leads
+    const resCallLeads = await page.request.post('/wp-json/cora/v1/mcp', {
+      headers: {
+        'Authorization': `Bearer ${validToken}`,
+        'Content-Type': 'application/json'
+      },
+      data: {
+        jsonrpc: '2.0',
+        method: 'tools/call',
+        params: {
+          name: 'cora_get_leads',
+          arguments: { limit: 2 }
+        },
+        id: 4
+      }
+    });
+    expect(resCallLeads.status()).toBe(200);
+    const bodyCallLeads = await resCallLeads.json();
+    expect(bodyCallLeads.result.isError).toBe(false);
+    expect(bodyCallLeads.result.content[0].text).toContain('Recent CRM Leads');
+  });
+
 });

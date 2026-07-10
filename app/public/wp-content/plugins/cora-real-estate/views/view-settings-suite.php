@@ -61,6 +61,11 @@ $roles      = wp_roles()->get_names();
                 'desc'  => 'Favicon, logos, integrations',
                 'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>'
             ),
+            'mcp'        => array(
+                'label' => 'AI Tools MCP',
+                'desc'  => 'Connect custom external AI',
+                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>'
+            ),
             'reading'    => array(
                 'label' => 'Reading & SEO',
                 'desc'  => 'Homepage and search engines',
@@ -679,6 +684,116 @@ $roles      = wp_roles()->get_names();
                 </div>
             </div>
         </div>
+
+        <?php elseif ( $active_tab === 'mcp' ) : 
+            $mcp_token = get_option( 'cora_mcp_access_token' );
+            if ( empty( $mcp_token ) ) {
+                $mcp_token = bin2hex( wp_generate_password( 32, false ) );
+                update_option( 'cora_mcp_access_token', $mcp_token );
+            }
+            $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
+        ?>
+        <!-- TAB: MODEL CONTEXT PROTOCOL (MCP) AI TOOLS SERVER -->
+        <div class="space-y-6 max-w-2xl animate-in fade-in duration-200">
+            <div class="border-b border-zinc-100 pb-3 flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-bold text-zinc-900">Model Context Protocol (MCP) AI Tools Server</h3>
+                    <p class="text-xs text-zinc-500">Connect your custom external AI agents directly with Cora's data schemas.</p>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-800 text-[9px] font-bold uppercase tracking-wider">Beta Gateway</span>
+            </div>
+
+            <div class="space-y-5">
+                <div class="p-4 border border-zinc-200 rounded-xl bg-zinc-50/50 space-y-3">
+                    <p class="text-xs text-zinc-650 leading-relaxed">
+                        Cora exposes an <strong>MCP tool server</strong> endpoint. By registering this gateway in your local AI platform (like Claude Desktop or Cursor), your AI assistant can query listings, create leads, check audit logs, and retrieve workspace statistics in real-time.
+                    </p>
+                </div>
+
+                <!-- MCP Gateway URL -->
+                <div>
+                    <label class="block text-xs font-bold text-zinc-800 mb-1">MCP Gateway Endpoint URL</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="cora-mcp-gateway-url" readonly value="<?php echo esc_url( $mcp_url ); ?>" class="flex-1 bg-zinc-100 border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-700 font-mono focus:outline-none">
+                        <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraCopyToClipboard('cora-mcp-gateway-url')">Copy URL</button>
+                    </div>
+                </div>
+
+                <!-- MCP Secure Token -->
+                <div>
+                    <label class="block text-xs font-bold text-zinc-800 mb-1">Secure Bearer Access Token</label>
+                    <div class="flex gap-2">
+                        <input type="password" id="cora-mcp-access-token" name="cora_mcp_access_token" value="<?php echo esc_attr( $mcp_token ); ?>" class="flex-1 bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 font-mono focus:outline-none focus:border-zinc-900">
+                        <button type="button" class="px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-semibold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraToggleTokenVisibility()">Show</button>
+                        <button type="button" class="px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-semibold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraGenerateNewMCPToken()">Regenerate</button>
+                    </div>
+                    <p class="text-[10px] text-zinc-400 mt-1">Authenticate requests by sending this value in the HTTP header: <code>Authorization: Bearer &lt;token&gt;</code>.</p>
+                </div>
+
+                <!-- Configuration Example card -->
+                <div class="space-y-2 pt-2">
+                    <span class="block text-xs font-bold text-zinc-800">Claude Desktop Integration Settings Example:</span>
+                    <div class="bg-zinc-900 text-zinc-100 rounded-xl p-4 font-mono text-[10px] leading-relaxed overflow-x-auto shadow-inner relative">
+                        <button type="button" class="absolute top-3 right-3 px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded text-[9px] cursor-pointer" onclick="coraCopyClaudeConfig()">Copy Config</button>
+                        <pre id="cora-claude-config-code"><code>{
+  "mcpServers": {
+    "cora-crm": {
+      "command": "curl",
+      "args": [
+        "-X", "POST",
+        "<?php echo esc_url( $mcp_url ); ?>",
+        "-H", "Authorization: Bearer <?php echo esc_attr( $mcp_token ); ?>",
+        "-H", "Content-Type: application/json",
+        "-d", "{\"jsonrpc\":\"2.0\",\"method\":\"tools/list\",\"id\":1}"
+      ]
+    }
+  }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function coraCopyToClipboard(inputId) {
+                var copyText = document.getElementById(inputId);
+                copyText.select();
+                copyText.setSelectionRange(0, 99999);
+                navigator.clipboard.writeText(copyText.value);
+                window.coraShowToast("Copied to clipboard.");
+            }
+
+            function coraToggleTokenVisibility() {
+                var x = document.getElementById("cora-mcp-access-token");
+                if (x.type === "password") {
+                    x.type = "text";
+                } else {
+                    x.type = "password";
+                }
+            }
+
+            function coraGenerateNewMCPToken() {
+                window.coraConfirmAction(
+                    'Regenerate MCP Token',
+                    'Are you sure you want to regenerate the secure token? Current active AI tools connections will immediately fail authentication.',
+                    function() {
+                        var chars = 'abcdef0123456789';
+                        var newToken = '';
+                        for (var i = 0; i < 32; i++) {
+                            newToken += chars.charAt(Math.floor(Math.random() * chars.length));
+                        }
+                        document.getElementById("cora-mcp-access-token").value = newToken;
+                        window.coraShowToast("New secure token generated. Save all settings to persist.");
+                    }
+                );
+            }
+
+            function coraCopyClaudeConfig() {
+                var codeText = document.getElementById("cora-claude-config-code").innerText;
+                navigator.clipboard.writeText(codeText);
+                window.coraShowToast("Claude configuration copied to clipboard.");
+            }
+        </script>
 
         <?php elseif ( $active_tab === 'reading' ) : ?>
         <!-- TAB 2: READING & SEO SETTINGS -->

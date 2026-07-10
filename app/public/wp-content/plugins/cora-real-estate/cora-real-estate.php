@@ -1875,6 +1875,12 @@ add_action( 'rest_api_init', function () {
         'permission_callback' => '__return_true', // Publicly accessible REST endpoint
     ) );
 
+    register_rest_route( 'cora/v1', '/mcp', array(
+        'methods'             => 'POST',
+        'callback'            => 'cora_rest_mcp_handler',
+        'permission_callback' => '__return_true',
+    ) );
+
     register_rest_route( 'cora/v1', '/schedule-task', array(
         'methods'             => 'POST',
         'callback'            => 'cora_rest_schedule_task',
@@ -2191,6 +2197,290 @@ function cora_rest_schedule_task( $request ) {
     update_option( 'cora_action_queue', $queue );
 
     return rest_ensure_response( array( 'success' => true ) );
+}
+
+/**
+ * Callback: REST handler for Model Context Protocol (MCP) JSON-RPC requests
+ */
+function cora_rest_mcp_handler( $request ) {
+    $token = get_option( 'cora_mcp_access_token' );
+    if ( empty( $token ) ) {
+        $token = bin2hex( wp_generate_password( 32, false ) );
+        update_option( 'cora_mcp_access_token', $token );
+    }
+
+    $provided_token = '';
+    $auth_header = $request->get_header( 'Authorization' );
+    if ( ! empty( $auth_header ) && preg_match( '/Bearer\s+(.*)$/i', $auth_header, $matches ) ) {
+        $provided_token = $matches[1];
+    } else {
+        $provided_token = $request->get_param( 'token' );
+    }
+
+    if ( empty( $provided_token ) || hash_equals( $token, $provided_token ) === false ) {
+        return new WP_REST_Response( array(
+            'jsonrpc' => '2.0',
+            'error'   => array(
+                'code'    => -32001,
+                'message' => 'Unauthorized: Invalid or missing MCP token.'
+            ),
+            'id'      => null
+        ), 401 );
+    }
+
+    $params = $request->get_json_params();
+    $method = isset( $params['method'] ) ? sanitize_text_field( $params['method'] ) : '';
+    $id     = isset( $params['id'] ) ? $params['id'] : null;
+
+    if ( ! $method ) {
+        return new WP_REST_Response( array(
+            'jsonrpc' => '2.0',
+            'error'   => array(
+                'code'    => -32600,
+                'message' => 'Invalid Request: Missing method.'
+            ),
+            'id'      => $id
+        ), 400 );
+    }
+
+    switch ( $method ) {
+        case 'tools/list':
+            return cora_mcp_handle_list_tools( $id );
+        case 'tools/call':
+            $tool_name = isset( $params['params']['name'] ) ? sanitize_text_field( $params['params']['name'] ) : '';
+            $tool_args = isset( $params['params']['arguments'] ) ? $params['params']['arguments'] : array();
+            return cora_mcp_handle_call_tool( $tool_name, $tool_args, $id );
+        default:
+            return new WP_REST_Response( array(
+                'jsonrpc' => '2.0',
+                'error'   => array(
+                    'code'    => -32601,
+                    'message' => 'Method not found: ' . $method
+                ),
+                'id'      => $id
+            ), 404 );
+    }
+}
+
+function cora_mcp_handle_list_tools( $id ) {
+    $tools = array(
+        array(
+            'name'        => 'cora_get_platform_info',
+            'description' => 'Get general statistics and platform configuration of the Cora Real Estate workspace.',
+            'inputSchema' => array(
+                'type'       => 'object',
+                'properties' => (object) array(),
+            )
+        ),
+        array(
+            'name'        => 'cora_search_listings',
+            'description' => 'Query real estate property listings based on location, price range, type, or status.',
+            'inputSchema' => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'query'  => array(
+                        'type'        => 'string',
+                        'description' => 'Search phrase or keyword for location/name.'
+                    ),
+                    'status' => array(
+                        'type'        => 'string',
+                        'description' => 'Listing status filter: publish, draft, private.'
+                    )
+                )
+            )
+        ),
+        array(
+            'name'        => 'cora_get_leads',
+            'description' => 'Retrieve recent client leads, interest history, contact parameters, and assignment state.',
+            'inputSchema' => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'limit' => array(
+                        'type'        => 'integer',
+                        'description' => 'Maximum number of leads to fetch (default: 10).'
+                    )
+                )
+            )
+        ),
+        array(
+            'name'        => 'cora_create_lead',
+            'description' => 'Create/register a new client lead in the CRM dashboard.',
+            'inputSchema' => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'name'  => array( 'type' => 'string', 'description' => 'Full name of the client lead.' ),
+                    'email' => array( 'type' => 'string', 'description' => 'Email address of the client.' ),
+                    'phone' => array( 'type' => 'string', 'description' => 'Phone number of the client.' ),
+                    'notes' => array( 'type' => 'string', 'description' => 'Notes regarding property preferences or inquiry details.' )
+                ),
+                'required'   => array( 'name', 'email' )
+            )
+        ),
+        array(
+            'name'        => 'cora_get_activity_logs',
+            'description' => 'Fetch recent system audit and security logs from the platform.',
+            'inputSchema' => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'limit' => array(
+                        'type'        => 'integer',
+                        'description' => 'Maximum logs to retrieve (default: 10).'
+                    )
+                )
+            )
+        )
+    );
+
+    return new WP_REST_Response( array(
+        'jsonrpc' => '2.0',
+        'result'  => array(
+            'tools' => $tools
+        ),
+        'id'      => $id
+    ), 200 );
+}
+
+function cora_mcp_handle_call_tool( $name, $args, $id ) {
+    global $wpdb;
+
+    switch ( $name ) {
+        case 'cora_get_platform_info':
+            $listings_count = wp_count_posts( 'cora_listing' )->publish ?? 0;
+            if ( ! post_type_exists( 'cora_listing' ) ) {
+                $listings_count = wp_count_posts( 'post' )->publish ?? 0;
+            }
+            $leads_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_leads" ) ?? 0;
+            $branches = cora_db_get_branches();
+            $branches_count = count( $branches );
+
+            $content = "Cora Platform Info:\n";
+            $content .= "- Workspace Name: " . get_option('cora_workspace_name', 'Cora Studio') . "\n";
+            $content .= "- Active Listings: " . $listings_count . "\n";
+            $content .= "- CRM Leads: " . $leads_count . "\n";
+            $content .= "- Brokerage Branches: " . $branches_count . "\n";
+            $content .= "- PHP Version: " . PHP_VERSION . "\n";
+            $content .= "- System Currency Format: " . get_option('cora_currency_format', 'INR_LAKHS') . "\n";
+
+            return cora_mcp_make_tool_response( $content, $id );
+
+        case 'cora_search_listings':
+            $query = isset( $args['query'] ) ? sanitize_text_field( $args['query'] ) : '';
+            $status = isset( $args['status'] ) ? sanitize_text_field( $args['status'] ) : 'publish';
+
+            $post_type = post_type_exists( 'cora_listing' ) ? 'cora_listing' : 'post';
+            $query_args = array(
+                'post_type'      => $post_type,
+                'post_status'    => $status,
+                'posts_per_page' => 10,
+                's'              => $query
+            );
+            $posts_query = new WP_Query( $query_args );
+            $posts = $posts_query->posts;
+
+            $content = "Search Results for '{$query}':\n";
+            if ( empty( $posts ) ) {
+                $content .= "No listings found matching query.\n";
+            } else {
+                foreach ( $posts as $p ) {
+                    $content .= "- ID: {$p->ID} | Title: {$p->post_title} | Date: {$p->post_date}\n";
+                }
+            }
+            return cora_mcp_make_tool_response( $content, $id );
+
+        case 'cora_get_leads':
+            $limit = isset( $args['limit'] ) ? intval( $args['limit'] ) : 10;
+            $rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_leads ORDER BY id DESC LIMIT %d", $limit ), ARRAY_A );
+
+            $content = "Recent CRM Leads:\n";
+            if ( empty( $rows ) ) {
+                $content .= "No leads found.\n";
+            } else {
+                foreach ( $rows as $r ) {
+                    $content .= "- ID: {$r['id']} | Name: {$r['name']} | Email: {$r['email']} | Status: {$r['status']} | Notes: {$r['notes']}\n";
+                }
+            }
+            return cora_mcp_make_tool_response( $content, $id );
+
+        case 'cora_create_lead':
+            $lead_name  = isset( $args['name'] ) ? sanitize_text_field( $args['name'] ) : '';
+            $lead_email = isset( $args['email'] ) ? sanitize_email( $args['email'] ) : '';
+            $lead_phone = isset( $args['phone'] ) ? sanitize_text_field( $args['phone'] ) : '';
+            $lead_notes = isset( $args['notes'] ) ? sanitize_textarea_field( $args['notes'] ) : '';
+
+            if ( empty( $lead_name ) || empty( $lead_email ) ) {
+                return cora_mcp_make_tool_error( "Name and email are required parameters to create a lead.", $id );
+            }
+
+            $success = $wpdb->insert(
+                "{$wpdb->prefix}cora_leads",
+                array(
+                    'name'       => $lead_name,
+                    'email'      => $lead_email,
+                    'phone'      => $lead_phone,
+                    'notes'      => $lead_notes,
+                    'status'     => 'new',
+                    'created_at' => current_time( 'mysql' )
+                )
+            );
+
+            if ( $success ) {
+                $new_id = $wpdb->insert_id;
+                cora_log_activity( 'CRM', "Registered new lead '{$lead_name}' via MCP." );
+                return cora_mcp_make_tool_response( "Successfully created lead '{$lead_name}' with ID {$new_id}.", $id );
+            } else {
+                return cora_mcp_make_tool_error( "Database error occurred while trying to insert the lead.", $id );
+            }
+
+        case 'cora_get_activity_logs':
+            $limit = isset( $args['limit'] ) ? intval( $args['limit'] ) : 10;
+            $logs = cora_db_get_activity_logs( $limit );
+
+            $content = "Recent Activity Logs:\n";
+            if ( empty( $logs ) ) {
+                $content .= "No logs found.\n";
+            } else {
+                foreach ( $logs as $l ) {
+                    $date = date( 'Y-m-d H:i:s', $l['timestamp'] );
+                    $content .= "- [{$date}] | Category: {$l['action_type']} | User: {$l['user_name']} | Action: {$l['description']}\n";
+                }
+            }
+            return cora_mcp_make_tool_response( $content, $id );
+
+        default:
+            return cora_mcp_make_tool_error( "Tool '{$name}' not found.", $id );
+    }
+}
+
+function cora_mcp_make_tool_response( $text, $id ) {
+    return new WP_REST_Response( array(
+        'jsonrpc' => '2.0',
+        'result'  => array(
+            'content' => array(
+                array(
+                    'type' => 'text',
+                    'text' => $text
+                )
+            ),
+            'isError' => false
+        ),
+        'id'      => $id
+    ), 200 );
+}
+
+function cora_mcp_make_tool_error( $error_msg, $id ) {
+    return new WP_REST_Response( array(
+        'jsonrpc' => '2.0',
+        'result'  => array(
+            'content' => array(
+                array(
+                    'type' => 'text',
+                    'text' => $error_msg
+                )
+            ),
+            'isError' => true
+        ),
+        'id'      => $id
+    ), 200 );
 }
 
 /**
@@ -6061,7 +6351,8 @@ function cora_ajax_save_system_settings_suite() {
         'cora_workspace_tax_details',
         'cora_pwd_policy_min_len',
         'cora_activity_logs_retention',
-        'cora_workspace_allow_tours'
+        'cora_workspace_allow_tours',
+        'cora_mcp_access_token'
     );
 
     foreach ( $fields as $field ) {
