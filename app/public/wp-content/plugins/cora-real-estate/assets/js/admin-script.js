@@ -100,7 +100,7 @@ jQuery(document).ready(function($) {
         const activeRole = $('#cora-role-preview-select').val() || coraREData.currentRole;
         let allowed = coraREData.userPermissions[activeRole] || [];
         if (activeRole === 'administrator') {
-            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media'];
+            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'ecosystem'];
         }
 
         if (targetPageId !== 'profile' && targetPageId !== 'feature-hub' && !allowed.includes(targetPageId)) {

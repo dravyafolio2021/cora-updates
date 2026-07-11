@@ -207,7 +207,7 @@ $wp_pages = get_pages();
                 </div>
                 
                 <!-- Template Presets -->
-                <div class="grid grid-cols-3 gap-3 pt-1">
+                <div class="grid grid-cols-4 gap-3 pt-1">
                     <button onclick="createCanvasAIPage('luxury_lead')" class="p-3 border border-zinc-200 rounded-xl bg-zinc-50/20 hover:bg-zinc-50 hover:border-zinc-350 transition-all text-left flex flex-col justify-between h-[84px] cursor-pointer">
                         <div class="p-1 bg-zinc-100 rounded w-fit text-zinc-700">
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
@@ -235,6 +235,16 @@ $wp_pages = get_pages();
                         <div>
                             <div class="text-[10px] font-bold text-zinc-900">Pricing Matrix</div>
                             <div class="text-[8px] text-zinc-400 mt-0.5 line-clamp-1">Neighborhood stats grid</div>
+                        </div>
+                    </button>
+
+                    <button onclick="createCanvasAIPage('bip_problems')" class="p-3 border border-zinc-200 rounded-xl bg-zinc-50/20 hover:bg-zinc-50 hover:border-zinc-350 transition-all text-left flex flex-col justify-between h-[84px] cursor-pointer">
+                        <div class="p-1 bg-zinc-100 rounded w-fit text-zinc-700">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-bold text-zinc-900">BIP Problems</div>
+                            <div class="text-[8px] text-zinc-400 mt-0.5 line-clamp-1">Stream presentation map</div>
                         </div>
                     </button>
                 </div>

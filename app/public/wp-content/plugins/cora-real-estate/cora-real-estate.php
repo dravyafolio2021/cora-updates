@@ -132,6 +132,20 @@ function cora_real_estate_ai_handle_workspace_route() {
         wp_die( __( 'Invalid or secure portfolio link.', 'cora-real-estate' ), __( 'Access Denied', 'cora-real-estate' ), array( 'response' => 403 ) );
     }
 
+    if ( isset( $path_parts[0] ) && 'shared-form' === $path_parts[0] ) {
+        $form_id = isset( $path_parts[1] ) ? intval( $path_parts[1] ) : 0;
+        if ( $form_id > 0 ) {
+            global $wpdb;
+            $form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_forms WHERE id = %d", $form_id ), ARRAY_A );
+            if ( $form ) {
+                nocache_headers();
+                include CORA_REAL_ESTATE_AI_PATH . 'public-form-view.php';
+                exit;
+            }
+        }
+        wp_die( __( 'Invalid or inactive form link.', 'cora-real-estate' ), __( 'Access Denied', 'cora-real-estate' ), array( 'response' => 403 ) );
+    }
+
     if ( isset( $path_parts[0] ) && 'workspace' === $path_parts[0] ) {
         $sub_page = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : '';
         $public_subs = array( 'login', 'forgot-password', 'reset-password', 'setup-account' );
@@ -208,18 +222,44 @@ function cora_real_estate_ai_handle_workspace_route() {
         $current_user_role = ! empty( $user->roles ) ? $user->roles[0] : 'subscriber';
         
         $allowed_features = isset( $cora_permissions[$current_user_role] ) ? $cora_permissions[$current_user_role] : array();
-        if ( $current_user_role === 'administrator' ) {
-            $allowed_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'attendance', 'tasks', 'visual-builder', 'audit-panel', 'media', 'canvas' );
+        if ( empty( $allowed_features ) ) {
+            $allowed_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'attendance', 'tasks', 'visual-builder', 'audit-panel', 'media', 'canvas', 'forms', 'ecosystem' );
         }
+        
         if ( in_array( $current_user_role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) {
             if ( ! in_array( 'canvas', $allowed_features ) ) {
                 $allowed_features[] = 'canvas';
             }
+            if ( ! in_array( 'forms', $allowed_features ) ) {
+                $allowed_features[] = 'forms';
+            }
+            if ( ! in_array( 'ecosystem', $allowed_features ) ) {
+                $allowed_features[] = 'ecosystem';
+            }
+            if ( ! in_array( 'blogs', $allowed_features ) ) {
+                $allowed_features[] = 'blogs';
+            }
+            if ( ! in_array( 'media', $allowed_features ) ) {
+                $allowed_features[] = 'media';
+            }
+            if ( ! in_array( 'visual-builder', $allowed_features ) ) {
+                $allowed_features[] = 'visual-builder';
+            }
+            if ( ! in_array( 'audit-panel', $allowed_features ) ) {
+                $allowed_features[] = 'audit-panel';
+            }
         }
-
+        
         // Prevent accessing disallowed sub-pages
         if ( $sub_page !== 'dashboard' && $sub_page !== 'feature-hub' && ! in_array( $sub_page, $allowed_features ) ) {
             wp_redirect( home_url( '/workspace/dashboard' ) );
+            exit;
+        }
+
+        // Standalone presentation page intercept for Ecosystem Map
+        if ( $sub_page === 'ecosystem' ) {
+            nocache_headers();
+            include CORA_REAL_ESTATE_AI_PATH . 'views/view-ecosystem.php';
             exit;
         }
 
@@ -785,7 +825,7 @@ function cora_real_estate_ai_seed_data() {
 
     if ( ! get_option( 'cora_role_permissions' ) ) {
         $default_permissions = array(
-            'administrator' => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'gbp', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'plugins', 'attendance', 'tasks' ),
+            'administrator' => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'gbp', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'plugins', 'attendance', 'tasks', 'forms', 'ecosystem' ),
             'cora_manager' => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'vault', 'portfolio', 'leads', 'clients', 'gbp', 'pages', 'attendance', 'tasks' ),
             'cora_photographer' => array( 'dashboard', 'bookings' ),
             'cora_videographer' => array( 'dashboard', 'bookings' ),
@@ -825,7 +865,7 @@ function cora_real_estate_ai_seed_data() {
                 $permissions['administrator'][] = 'pages';
                 $has_permission_updates = true;
             }
-            $new_core_features = array( 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'plugins', 'attendance', 'tasks' );
+            $new_core_features = array( 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'plugins', 'attendance', 'tasks', 'forms', 'ecosystem' );
             foreach ( $new_core_features as $ncf ) {
                 if ( ! in_array( $ncf, $permissions['administrator'] ) ) {
                     $permissions['administrator'][] = $ncf;
@@ -1943,6 +1983,76 @@ add_action( 'rest_api_init', function () {
         'methods'             => 'POST',
         'callback'            => 'cora_rest_canvas_save_header_footer',
         'permission_callback' => 'cora_canvas_rest_permission_check_write',
+    ) );
+
+    // Forms Module REST API Routes
+    register_rest_route( 'cora/v1', '/forms', array(
+        array(
+            'methods'             => 'GET',
+            'callback'            => 'cora_rest_get_forms',
+            'permission_callback' => 'is_user_logged_in',
+        ),
+        array(
+            'methods'             => 'POST',
+            'callback'            => 'cora_rest_save_form',
+            'permission_callback' => 'is_user_logged_in',
+        )
+    ) );
+
+    register_rest_route( 'cora/v1', '/forms/(?P<id>\d+)', array(
+        array(
+            'methods'             => 'GET',
+            'callback'            => 'cora_rest_get_form',
+            'permission_callback' => 'is_user_logged_in',
+        ),
+        array(
+            'methods'             => 'DELETE',
+            'callback'            => 'cora_rest_delete_form',
+            'permission_callback' => 'is_user_logged_in',
+        )
+    ) );
+
+    register_rest_route( 'cora/v1', '/forms/(?P<id>\d+)/submissions', array(
+        'methods'             => 'GET',
+        'callback'            => 'cora_rest_get_form_submissions',
+        'permission_callback' => 'is_user_logged_in',
+    ) );
+
+    register_rest_route( 'cora/v1', '/forms/(?P<id>\d+)/ai-schema', array(
+        'methods'             => 'GET',
+        'callback'            => 'cora_rest_get_form_ai_schema',
+        'permission_callback' => '__return_true',
+    ) );
+
+    register_rest_route( 'cora/v1', '/forms/(?P<id>\d+)/submit', array(
+        'methods'             => 'POST',
+        'callback'            => 'cora_rest_submit_form',
+        'permission_callback' => '__return_true',
+    ) );
+
+    register_rest_route( 'cora/v1', '/forms/clauses', array(
+        array(
+            'methods'             => 'GET',
+            'callback'            => 'cora_rest_get_clauses',
+            'permission_callback' => 'is_user_logged_in',
+        ),
+        array(
+            'methods'             => 'POST',
+            'callback'            => 'cora_rest_save_clause',
+            'permission_callback' => 'is_user_logged_in',
+        )
+    ) );
+
+    register_rest_route( 'cora/v1', '/forms/clauses/(?P<id>\d+)', array(
+        'methods'             => 'DELETE',
+        'callback'            => 'cora_rest_delete_clause',
+        'permission_callback' => 'is_user_logged_in',
+    ) );
+
+    register_rest_route( 'cora/v1', '/forms/audit-log', array(
+        'methods'             => 'GET',
+        'callback'            => 'cora_rest_get_form_audit_log',
+        'permission_callback' => 'is_user_logged_in',
     ) );
 } );
 
@@ -3313,7 +3423,9 @@ function cora_rest_canvas_create_ai_page( $request ) {
     $title = 'AI Generated Page';
     $elementor_data = array();
 
-    if ( $template_type === 'luxury_lead' ) {
+    if ( $template_type === 'bip_problems' ) {
+        $title = 'Episode 01: Core Real Estate Problems';
+    } elseif ( $template_type === 'luxury_lead' ) {
         $title = 'Luxury Lead Capture';
         $elementor_data = array(
             array(
@@ -3468,8 +3580,14 @@ function cora_rest_canvas_create_ai_page( $request ) {
         return $post_id;
     }
 
-    update_post_meta( $post_id, '_elementor_edit_mode', 'builder' );
-    update_post_meta( $post_id, '_elementor_data', wp_slash( json_encode( $elementor_data ) ) );
+    if ( $template_type === 'bip_problems' ) {
+        update_post_meta( $post_id, '_cora_is_visual_builder', '1' );
+        update_post_meta( $post_id, '_cora_visual_builder_html', cora_get_bip_problems_html() );
+        update_post_meta( $post_id, '_cora_visual_builder_css', 'body { background-color: #FBFaf7; }' );
+    } else {
+        update_post_meta( $post_id, '_elementor_edit_mode', 'builder' );
+        update_post_meta( $post_id, '_elementor_data', wp_slash( json_encode( $elementor_data ) ) );
+    }
 
     $wpdb->insert(
         $wpdb->prefix . 'cora_canvas_pages',
@@ -8093,7 +8211,13 @@ function cora_create_custom_tables() {
     global $wpdb;
     $theme_table = $wpdb->prefix . 'cora_canvas_themes';
     $table_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $theme_table ) );
-    if ( get_option( 'cora_db_v2_created' ) && $table_exists ) {
+    $forms_table = $wpdb->prefix . 'cora_forms';
+    $forms_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $forms_table ) );
+    $has_agency_col = false;
+    if ( $forms_exists ) {
+        $has_agency_col = ! empty( $wpdb->get_results( "SHOW COLUMNS FROM {$forms_table} LIKE 'agency_id'" ) );
+    }
+    if ( get_option( 'cora_db_v2_created' ) && $table_exists && $forms_exists && $has_agency_col ) {
         return;
     }
     $charset_collate = $wpdb->get_charset_collate();
@@ -8452,9 +8576,80 @@ function cora_create_custom_tables() {
       KEY wp_post_id (wp_post_id)
     ) $charset_collate;";
 
+    // 18. cora_forms
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_forms (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL,
+      title varchar(255) NOT NULL,
+      status varchar(50) NOT NULL DEFAULT 'draft',
+      styling text,
+      settings text,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY agency_id (agency_id)
+    ) $charset_collate;";
+
+    // 19. cora_form_blocks
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_form_blocks (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      form_id bigint(20) unsigned NOT NULL,
+      blocks_json longtext,
+      logic_json longtext,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY form_id (form_id)
+    ) $charset_collate;";
+
+    // 20. cora_form_submissions
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_form_submissions (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      form_id bigint(20) unsigned NOT NULL,
+      submitted_data longtext,
+      ip_address varchar(50),
+      is_partial tinyint(1) NOT NULL DEFAULT 0,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY form_id (form_id)
+    ) $charset_collate;";
+
+    // 21. cora_form_clauses
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_form_clauses (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL,
+      title varchar(255) NOT NULL,
+      content text,
+      is_mandatory tinyint(1) NOT NULL DEFAULT 0,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY agency_id (agency_id)
+    ) $charset_collate;";
+
+    // 22. cora_form_audit_log
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_form_audit_log (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      form_id bigint(20) unsigned,
+      action_type varchar(100) NOT NULL,
+      details text,
+      performed_by bigint(20) unsigned,
+      ip_address varchar(50),
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY form_id (form_id)
+    ) $charset_collate;";
+
     require_once ABSPATH . 'wp-admin/includes/upgrade.php';
     foreach ( $table_queries as $query ) {
         dbDelta( $query );
+    }
+
+    // Migration/schema update: Ensure agency_id column exists in wp_cora_forms
+    $forms_table = $wpdb->prefix . 'cora_forms';
+    $has_agency_id = $wpdb->get_results( "SHOW COLUMNS FROM {$forms_table} LIKE 'agency_id'" );
+    if ( empty( $has_agency_id ) ) {
+        $wpdb->query( "ALTER TABLE {$forms_table} ADD COLUMN agency_id bigint(20) unsigned NOT NULL AFTER id;" );
+        $wpdb->query( "ALTER TABLE {$forms_table} ADD KEY agency_id (agency_id);" );
     }
 
     update_option( 'cora_db_v2_created', true );
@@ -9649,6 +9844,47 @@ function cora_seed_default_canvas_data() {
                     array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%d', '%s', '%s' )
                 );
             }
+        }
+    }
+
+    // Ensure BIP problems page exists
+    $bip_page_exists = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_pages WHERE slug = 'problems-realization'" );
+    if ( intval( $bip_page_exists ) === 0 ) {
+        $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+        $theme_id = $live_theme ? intval( $live_theme['id'] ) : 1;
+
+        $wp_post_id = wp_insert_post( array(
+            'post_title'   => 'Episode 01: Core Real Estate Problems',
+            'post_name'    => 'problems-realization',
+            'post_type'    => 'page',
+            'post_status'  => 'draft',
+            'post_content' => '<!-- Elementor Page Content -->'
+        ) );
+
+        if ( ! is_wp_error( $wp_post_id ) && $wp_post_id > 0 ) {
+            update_post_meta( $wp_post_id, '_cora_is_visual_builder', '1' );
+            update_post_meta( $wp_post_id, '_cora_visual_builder_html', cora_get_bip_problems_html() );
+            update_post_meta( $wp_post_id, '_cora_visual_builder_css', 'body { background-color: #FBFaf7; }' );
+
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_canvas_pages',
+                array(
+                    'agency_id'       => 1,
+                    'theme_id'        => $theme_id,
+                    'wp_post_id'      => $wp_post_id,
+                    'title'           => 'Episode 01: Core Real Estate Problems',
+                    'slug'            => 'problems-realization',
+                    'status'          => 'draft',
+                    'is_homepage'     => 0,
+                    'template'        => 'minimal',
+                    'seo_title'       => 'Episode 01: Core Real Estate Problems',
+                    'seo_description' => 'Real estate subscription bleed and response latency simulation.',
+                    'created_by'      => 1,
+                    'created_at'      => current_time('mysql'),
+                    'updated_at'      => current_time('mysql')
+                ),
+                array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%d', '%s', '%s' )
+            );
         }
     }
 }
@@ -12374,3 +12610,686 @@ function cora_ajax_canvas_save_page_seo() {
     wp_send_json_success();
 }
 add_action( 'wp_ajax_cora_ajax_save_page_seo', 'cora_ajax_canvas_save_page_seo' );
+
+function cora_get_bip_problems_html() {
+    return '
+<div class="min-h-screen bg-[#FBFaf7] text-zinc-900 flex flex-col font-sans select-none antialiased">
+    <!-- Header presentation bar -->
+    <header class="w-full border-b border-zinc-250 bg-[#F9F6F0] py-4 px-8 flex justify-between items-center z-25">
+        <div class="flex items-center gap-3">
+            <span class="p-1.5 bg-zinc-950 text-white rounded-lg">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                    <polyline points="2 17 12 22 22 17"></polyline>
+                    <polyline points="2 12 12 17 22 12"></polyline>
+                </svg>
+            </span>
+            <div>
+                <h1 class="text-sm font-bold uppercase tracking-wider text-zinc-900">Cora OS</h1>
+                <p class="text-[9px] text-zinc-400 font-semibold tracking-widest uppercase">Decoupled Canvas Presentation</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-1.5 px-3 py-1 border border-zinc-200 rounded-full bg-white text-[10px] font-bold text-zinc-500">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                LIVE STREAM MODE
+            </div>
+            <div class="text-[10px] font-bold tracking-widest text-zinc-400 uppercase">EPISODE 01: PROBLEM REALIZATION</div>
+        </div>
+    </header>
+
+    <!-- Presentation canvas container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-8 flex flex-col justify-center gap-8">
+        
+        <!-- Hero intro details -->
+        <div class="text-center max-w-3xl mx-auto space-y-3">
+            <span class="text-[10px] font-bold tracking-[0.3em] text-zinc-400 uppercase block">The Cost of Bloated Operations</span>
+            <h2 class="text-4xl font-extrabold tracking-tight text-zinc-900 uppercase">The Subscription Bleed & Lead Leakage</h2>
+            <p class="text-xs text-zinc-500 max-w-xl mx-auto font-medium leading-relaxed">
+                Why traditional Indian real estate agencies lose up to 80% of marketing ROI to fragmented monthly software bills and slow lead response cycles.
+            </p>
+        </div>
+
+        <!-- Simulation Grid: Desktop side-by-side presentation widgets -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+            
+            <!-- Left panel: Subscription cost audit card -->
+            <div class="bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-zinc-350 transition-colors">
+                <div>
+                    <div class="flex items-center justify-between border-b border-zinc-100 pb-3 mb-4">
+                        <h3 class="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-2">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                            Tool Subscription Audit
+                        </h3>
+                        <span class="text-[10px] font-bold text-zinc-400">Standard Indian Agency Stack</span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <!-- Checkbox row 1 -->
+                        <label class="flex items-center justify-between p-3 border border-zinc-200 rounded-xl bg-zinc-50/20 hover:bg-zinc-50 transition-colors cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" checked data-cost="1500" class="bleed-checkbox rounded border-zinc-300 text-zinc-950 focus:ring-zinc-950" onchange="recalculateCost()">
+                                <div>
+                                    <div class="text-xs font-bold text-zinc-900">Form Builders</div>
+                                    <div class="text-[9px] text-zinc-400 font-medium">Typeform / WPForms Pro</div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-zinc-800">₹1,500 / mo</span>
+                        </label>
+
+                        <!-- Checkbox row 2 -->
+                        <label class="flex items-center justify-between p-3 border border-zinc-200 rounded-xl bg-zinc-50/20 hover:bg-zinc-50 transition-colors cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" checked data-cost="1200" class="bleed-checkbox rounded border-zinc-300 text-zinc-950 focus:ring-zinc-950" onchange="recalculateCost()">
+                                <div>
+                                    <div class="text-xs font-bold text-zinc-900">Scheduling Calendar</div>
+                                    <div class="text-[9px] text-zinc-400 font-medium">Calendly Pro</div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-zinc-800">₹1,200 / mo</span>
+                        </label>
+
+                        <!-- Checkbox row 3 -->
+                        <label class="flex items-center justify-between p-3 border border-zinc-200 rounded-xl bg-zinc-50/20 hover:bg-zinc-50 transition-colors cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" checked data-cost="650" class="bleed-checkbox rounded border-zinc-300 text-zinc-950 focus:ring-zinc-950" onchange="recalculateCost()">
+                                <div>
+                                    <div class="text-xs font-bold text-zinc-900">Cloud Storage & Backups</div>
+                                    <div class="text-[9px] text-zinc-400 font-medium">Google Drive / Dropbox</div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-zinc-800">₹650 / mo</span>
+                        </label>
+
+                        <!-- Checkbox row 4 -->
+                        <label class="flex items-center justify-between p-3 border border-zinc-200 rounded-xl bg-zinc-50/20 hover:bg-zinc-50 transition-colors cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" checked data-cost="3500" class="bleed-checkbox rounded border-zinc-300 text-zinc-950 focus:ring-zinc-950" onchange="recalculateCost()">
+                                <div>
+                                    <div class="text-xs font-bold text-zinc-900">CRM & Lead Management</div>
+                                    <div class="text-[9px] text-zinc-400 font-medium">Salesforce / Generic Real Estate CRM</div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-zinc-800">₹3,500 / mo</span>
+                        </label>
+
+                        <!-- Checkbox row 5 -->
+                        <label class="flex items-center justify-between p-3 border border-zinc-200 rounded-xl bg-zinc-50/20 hover:bg-zinc-50 transition-colors cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" checked data-cost="1500" class="bleed-checkbox rounded border-zinc-300 text-zinc-950 focus:ring-zinc-950" onchange="recalculateCost()">
+                                <div>
+                                    <div class="text-xs font-bold text-zinc-900">WhatsApp & SMS API Gateway</div>
+                                    <div class="text-[9px] text-zinc-400 font-medium">Twilio / Msg91 dispatch module</div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-zinc-800">₹1,500 / mo</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Live totals and savings comparison -->
+                <div class="border-t border-zinc-200 pt-5 mt-6 space-y-4">
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl">
+                            <span class="text-[8px] font-bold text-zinc-400 uppercase tracking-wider block">Monthly Bleed</span>
+                            <span id="monthly-leakage" class="text-lg font-black text-zinc-900 mt-1 block">₹8,350</span>
+                        </div>
+                        <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl">
+                            <span class="text-[8px] font-bold text-zinc-400 uppercase tracking-wider block">Annual Loss</span>
+                            <span id="annual-leakage" class="text-lg font-black text-zinc-900 mt-1 block">₹1,00,200</span>
+                        </div>
+                    </div>
+
+                    <!-- Comparison chart bars -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-[10px] font-bold">
+                            <span class="text-zinc-500 uppercase tracking-wider">Traditional stack cost</span>
+                            <span id="monthly-leakage-label" class="text-zinc-900">₹8,350/mo</span>
+                        </div>
+                        <div class="h-2.5 w-full bg-zinc-100 rounded-full overflow-hidden">
+                            <div id="status-quo-bar" class="h-full bg-red-500 rounded-full transition-all duration-300" style="width: 100%;"></div>
+                        </div>
+
+                        <div class="flex justify-between items-center text-[10px] font-bold pt-1">
+                            <span class="text-zinc-500 uppercase tracking-wider">Cora Consolidated flat price</span>
+                            <span class="text-emerald-600">₹2,000/mo</span>
+                        </div>
+                        <div class="h-2.5 w-full bg-zinc-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-emerald-500 rounded-full" style="width: 24%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- savings toast alert -->
+                    <div class="flex items-center gap-3 p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800 text-xs font-semibold">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <div>
+                            Consolidating returns <span id="annual-savings" class="font-extrabold text-emerald-950">₹76,200</span> directly to your annual bottom line.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right panel: Speed-to-lead latency simulator -->
+            <div class="bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-zinc-350 transition-colors">
+                <div>
+                    <div class="flex items-center justify-between border-b border-zinc-100 pb-3 mb-4">
+                        <h3 class="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-2">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            Speed-to-Lead Simulator
+                        </h3>
+                        <span class="text-[10px] font-bold text-zinc-400">Response Latency Demo</span>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Path A: Manual path -->
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold uppercase text-red-650 tracking-wide">Path A: Traditional Manual Flow</span>
+                                <div class="flex items-center gap-2">
+                                    <span id="manual-timer" class="font-mono text-xs font-bold text-zinc-800">0.0s</span>
+                                    <span id="manual-status" class="hidden text-[8px] font-bold uppercase bg-red-100 text-red-700 px-1 rounded">Dead Lead</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Flow grid -->
+                            <div class="grid grid-cols-4 gap-2 text-center">
+                                <div class="manual-node p-2 border border-zinc-200 bg-zinc-50/50 rounded-lg transition-all duration-300">
+                                    <div class="text-[8px] font-bold text-zinc-400 uppercase">Step 1</div>
+                                    <div class="text-[9px] font-bold text-zinc-800 mt-0.5">Portal Inquiry</div>
+                                </div>
+                                <div class="manual-node p-2 border border-zinc-200 bg-zinc-50/50 rounded-lg transition-all duration-300">
+                                    <div class="text-[8px] font-bold text-zinc-400 uppercase">Step 2</div>
+                                    <div class="text-[9px] font-bold text-zinc-800 mt-0.5">Excel Copy</div>
+                                </div>
+                                <div class="manual-node p-2 border border-zinc-200 bg-zinc-50/50 rounded-lg transition-all duration-300">
+                                    <div class="text-[8px] font-bold text-zinc-400 uppercase">Step 3</div>
+                                    <div class="text-[9px] font-bold text-zinc-800 mt-0.5">WhatsApp Group</div>
+                                </div>
+                                <div class="manual-node p-2 border border-zinc-200 bg-zinc-50/50 rounded-lg transition-all duration-300">
+                                    <div class="text-[8px] font-bold text-zinc-400 uppercase">Step 4</div>
+                                    <div class="text-[9px] font-bold text-zinc-800 mt-0.5">Agent Calls</div>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-zinc-400 leading-relaxed font-medium italic">
+                                Manual copy-pasting lead details from listing portals to agents takes hours, during which the client goes cold.
+                            </p>
+                        </div>
+
+                        <!-- Path B: Cora automation path -->
+                        <div class="space-y-3 pt-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold uppercase text-emerald-600 tracking-wide">Path B: Cora OS Automated Route</span>
+                                <div class="flex items-center gap-2">
+                                    <span id="cora-timer" class="font-mono text-xs font-bold text-zinc-800">0.0s</span>
+                                    <span id="cora-status" class="hidden text-[8px] font-bold uppercase bg-emerald-100 text-emerald-700 px-1 rounded">Dispatched</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Flow grid -->
+                            <div class="grid grid-cols-4 gap-2 text-center">
+                                <div class="cora-node p-2 border border-zinc-200 bg-zinc-50/50 rounded-lg transition-all duration-300">
+                                    <div class="text-[8px] font-bold text-zinc-400 uppercase">Step 1</div>
+                                    <div class="text-[9px] font-bold text-zinc-800 mt-0.5">API Ingest</div>
+                                </div>
+                                <div class="cora-node p-2 border border-zinc-200 bg-zinc-50/50 rounded-lg transition-all duration-300">
+                                    <div class="text-[8px] font-bold text-zinc-400 uppercase">Step 2</div>
+                                    <div class="text-[9px] font-bold text-zinc-800 mt-0.5">REST Router</div>
+                                </div>
+                                <div class="cora-node p-2 border border-zinc-200 bg-zinc-50/50 rounded-lg transition-all duration-300">
+                                    <div class="text-[8px] font-bold text-zinc-400 uppercase">Step 3</div>
+                                    <div class="text-[9px] font-bold text-zinc-800 mt-0.5">Auto WhatsApp</div>
+                                </div>
+                                <div class="cora-node p-2 border border-zinc-200 bg-zinc-50/50 rounded-lg transition-all duration-300">
+                                    <div class="text-[8px] font-bold text-zinc-400 uppercase">Step 4</div>
+                                    <div class="text-[9px] font-bold text-zinc-800 mt-0.5">KYC Secured</div>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-zinc-400 leading-relaxed font-medium italic">
+                                The moment a client inquires, Cora automatically dispatches the PAN/Aadhaar secure upload link and brochure via WhatsApp instantly.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Simulation trigger controls -->
+                <div class="border-t border-zinc-200 pt-5 mt-6 flex justify-between items-center">
+                    <div class="text-[10px] font-bold text-zinc-400">Target response speed limit: 5 Minutes</div>
+                    <button onclick="runLeadSimulation()" class="px-5 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold shadow-sm transition-all cursor-pointer">
+                        Simulate Portal Lead Inquiry
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- Section 3: The 5 Core Operational Leaks -->
+        <div class="space-y-4">
+            <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-wider text-center">The 5 Core Operational Leaks</h3>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                
+                <!-- Leak 1 -->
+                <div class="p-4 bg-white border border-zinc-200 rounded-xl hover:border-zinc-350 transition-colors flex flex-col justify-between gap-3">
+                    <span class="w-7 h-7 flex items-center justify-center bg-zinc-100 text-zinc-700 rounded-lg">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </span>
+                    <div>
+                        <h4 class="text-xs font-bold text-zinc-900 leading-tight">1. Insecure KYC Compliance</h4>
+                        <p class="text-[9px] text-zinc-400 leading-normal mt-1 font-medium">PAN and Aadhaar photo files stored in agent galleries. High risk of breach.</p>
+                    </div>
+                </div>
+
+                <!-- Leak 2 -->
+                <div class="p-4 bg-white border border-zinc-200 rounded-xl hover:border-zinc-350 transition-colors flex flex-col justify-between gap-3">
+                    <span class="w-7 h-7 flex items-center justify-center bg-zinc-100 text-zinc-700 rounded-lg">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+                    </span>
+                    <div>
+                        <h4 class="text-xs font-bold text-zinc-900 leading-tight">2. Portal Login Fatigue</h4>
+                        <p class="text-[9px] text-zinc-400 leading-normal mt-1 font-medium">Logging into 3 different portals everyday just to see where leads came from.</p>
+                    </div>
+                </div>
+
+                <!-- Leak 3 -->
+                <div class="p-4 bg-white border border-zinc-200 rounded-xl hover:border-zinc-350 transition-colors flex flex-col justify-between gap-3">
+                    <span class="w-7 h-7 flex items-center justify-center bg-zinc-100 text-zinc-700 rounded-lg">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    </span>
+                    <div>
+                        <h4 class="text-xs font-bold text-zinc-900 leading-tight">3. Manual Brochure Sharing</h4>
+                        <p class="text-[9px] text-zinc-400 leading-normal mt-1 font-medium">Agents spend 15 mins drafting emails & copying files for every inquiry request.</p>
+                    </div>
+                </div>
+
+                <!-- Leak 4 -->
+                <div class="p-4 bg-white border border-zinc-200 rounded-xl hover:border-zinc-350 transition-colors flex flex-col justify-between gap-3">
+                    <span class="w-7 h-7 flex items-center justify-center bg-zinc-100 text-zinc-700 rounded-lg">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    </span>
+                    <div>
+                        <h4 class="text-xs font-bold text-zinc-900 leading-tight">4. UPI Payment Friction</h4>
+                        <p class="text-[9px] text-zinc-400 leading-normal mt-1 font-medium">Tracking screenshots manually, leading to tax & billing reconciliation chaos.</p>
+                    </div>
+                </div>
+
+                <!-- Leak 5 -->
+                <div class="p-4 bg-white border border-zinc-200 rounded-xl hover:border-zinc-350 transition-colors flex flex-col justify-between gap-3">
+                    <span class="w-7 h-7 flex items-center justify-center bg-zinc-100 text-zinc-700 rounded-lg">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                    </span>
+                    <div>
+                        <h4 class="text-xs font-bold text-zinc-900 leading-tight">5. No Google Review Loop</h4>
+                        <p class="text-[9px] text-zinc-400 leading-normal mt-1 font-medium">90% of clients forget to leave reviews because there is no post-deal automated trigger.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Interactive presentation scripts -->
+    <script>
+        function recalculateCost() {
+            let total = 0;
+            const checkboxes = document.querySelectorAll(".bleed-checkbox");
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    total += parseInt(cb.getAttribute("data-cost"));
+                }
+            });
+            
+            const monthlyTotal = total;
+            const annualTotal = total * 12;
+            const coraMonthly = 2000;
+            const coraAnnual = 24000;
+            const annualSavings = Math.max(0, annualTotal - coraAnnual);
+            
+            document.getElementById("monthly-leakage").textContent = "₹" + monthlyTotal.toLocaleString("en-IN");
+            document.getElementById("annual-leakage").textContent = "₹" + annualTotal.toLocaleString("en-IN");
+            document.getElementById("monthly-leakage-label").textContent = "₹" + monthlyTotal.toLocaleString("en-IN") + "/mo";
+            document.getElementById("annual-savings").textContent = "₹" + annualSavings.toLocaleString("en-IN");
+            
+            const maxCost = 8350;
+            const currentPercent = (monthlyTotal / maxCost) * 100;
+            document.getElementById("status-quo-bar").style.width = currentPercent + "%";
+        }
+
+        let simInterval = null;
+        function runLeadSimulation() {
+            const manualNodes = document.querySelectorAll(".manual-node");
+            const coraNodes = document.querySelectorAll(".cora-node");
+            
+            manualNodes.forEach(node => node.className = "manual-node p-2 border border-zinc-200 bg-zinc-50/50 rounded-lg transition-all duration-300");
+            coraNodes.forEach(node => node.className = "cora-node p-2 border border-zinc-200 bg-zinc-50/50 rounded-lg transition-all duration-300");
+            
+            document.getElementById("manual-timer").textContent = "0.0s";
+            document.getElementById("cora-timer").textContent = "0.0s";
+            document.getElementById("manual-status").className = "hidden";
+            document.getElementById("cora-status").className = "hidden";
+            
+            let coraTime = 0;
+            const coraTimer = setInterval(() => {
+                coraTime += 0.1;
+                document.getElementById("cora-timer").textContent = coraTime.toFixed(1) + "s";
+                
+                // Highlight nodes progressively
+                if (coraTime >= 0.3) coraNodes[0].className = "cora-node p-2 border border-emerald-400 bg-emerald-50 text-emerald-700 rounded-lg transition-all duration-300";
+                if (coraTime >= 0.6) coraNodes[1].className = "cora-node p-2 border border-emerald-400 bg-emerald-50 text-emerald-700 rounded-lg transition-all duration-300";
+                if (coraTime >= 0.9) coraNodes[2].className = "cora-node p-2 border border-emerald-400 bg-emerald-50 text-emerald-700 rounded-lg transition-all duration-300";
+                
+                if (coraTime >= 1.2) {
+                    clearInterval(coraTimer);
+                    document.getElementById("cora-timer").textContent = "1.2s";
+                    coraNodes[3].className = "cora-node p-2 border border-emerald-400 bg-emerald-50 text-emerald-700 rounded-lg transition-all duration-300";
+                    document.getElementById("cora-status").className = "text-[8px] font-bold uppercase bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded";
+                }
+            }, 100);
+            
+            let manualTime = 0;
+            const manualTimer = setInterval(() => {
+                manualTime += 0.1;
+                const hours = (manualTime * 1.0).toFixed(1);
+                document.getElementById("manual-timer").textContent = hours + " hrs";
+                
+                if (manualTime >= 1.0) manualNodes[0].className = "manual-node p-2 border border-red-300 bg-red-50/50 text-red-700 rounded-lg transition-all duration-300";
+                if (manualTime >= 2.0) manualNodes[1].className = "manual-node p-2 border border-red-300 bg-red-50/50 text-red-700 rounded-lg transition-all duration-300";
+                if (manualTime >= 3.0) manualNodes[2].className = "manual-node p-2 border border-red-300 bg-red-50/50 text-red-700 rounded-lg transition-all duration-300";
+                
+                if (manualTime >= 4.5) {
+                    clearInterval(manualTimer);
+                    document.getElementById("manual-timer").textContent = "4.5 hrs";
+                    manualNodes[3].className = "manual-node p-2 border border-red-400 bg-red-50 text-red-700 rounded-lg transition-all duration-300";
+                    document.getElementById("manual-status").className = "text-[8px] font-bold uppercase bg-red-100 text-red-700 px-1.5 py-0.5 rounded";
+                }
+            }, 100);
+        }
+    </script>
+</div>
+';
+}
+
+// ── Forms Module REST API Handlers ──────────────────────────────────────────
+
+function cora_rest_get_forms( $request ) {
+    global $wpdb;
+    $forms = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_forms ORDER BY id DESC", ARRAY_A );
+    if ( is_array( $forms ) ) {
+        foreach ( $forms as &$form ) {
+            $form['styling'] = json_decode( $form['styling'], true ) ?: array();
+            $form['settings'] = json_decode( $form['settings'], true ) ?: array();
+            
+            // Fetch blocks
+            $blocks_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_form_blocks WHERE form_id = %d", $form['id'] ), ARRAY_A );
+            $form['blocks'] = $blocks_row ? (json_decode( $blocks_row['blocks_json'], true ) ?: array()) : array();
+            $form['logic'] = $blocks_row ? (json_decode( $blocks_row['logic_json'], true ) ?: array()) : array();
+        }
+    } else {
+        $forms = array();
+    }
+    return rest_ensure_response( $forms );
+}
+
+function cora_rest_save_form( $request ) {
+    global $wpdb;
+    $params = $request->get_json_params();
+    if ( empty( $params ) ) {
+        return new WP_Error( 'bad_request', 'Missing form body', array( 'status' => 400 ) );
+    }
+
+    $id = isset( $params['id'] ) ? intval( $params['id'] ) : 0;
+    $title = isset( $params['title'] ) ? sanitize_text_field( $params['title'] ) : 'Untitled Form';
+    $status = isset( $params['status'] ) ? sanitize_text_field( $params['status'] ) : 'draft';
+    $styling = isset( $params['styling'] ) ? json_encode( $params['styling'] ) : '{}';
+    $settings = isset( $params['settings'] ) ? json_encode( $params['settings'] ) : '{}';
+    $blocks = isset( $params['blocks'] ) ? $params['blocks'] : array();
+    $logic = isset( $params['logic'] ) ? $params['logic'] : array();
+
+    if ( $id > 0 ) {
+        // Update
+        $wpdb->update(
+            $wpdb->prefix . 'cora_forms',
+            array(
+                'title'      => $title,
+                'status'     => $status,
+                'styling'    => $styling,
+                'settings'   => $settings,
+                'updated_at' => current_time('mysql')
+            ),
+            array( 'id' => $id )
+        );
+    } else {
+        // Insert
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_forms',
+            array(
+                'agency_id'  => 1,
+                'title'      => $title,
+                'status'     => $status,
+                'styling'    => $styling,
+                'settings'   => $settings,
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql')
+            )
+        );
+        $id = $wpdb->insert_id;
+    }
+
+    // Update or insert blocks
+    $blocks_row = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_form_blocks WHERE form_id = %d", $id ) );
+    if ( $blocks_row ) {
+        $wpdb->update(
+            $wpdb->prefix . 'cora_form_blocks',
+            array(
+                'blocks_json' => json_encode( $blocks ),
+                'logic_json'  => json_encode( $logic ),
+                'updated_at'  => current_time('mysql')
+            ),
+            array( 'form_id' => $id )
+        );
+    } else {
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_form_blocks',
+            array(
+                'form_id'     => $id,
+                'blocks_json' => json_encode( $blocks ),
+                'logic_json'  => json_encode( $logic ),
+                'created_at'  => current_time('mysql'),
+                'updated_at'  => current_time('mysql')
+            )
+        );
+    }
+
+    // Add audit log entry
+    $wpdb->insert(
+        $wpdb->prefix . 'cora_form_audit_log',
+        array(
+            'form_id'      => $id,
+            'action_type'  => 'form_saved',
+            'details'      => 'Form saved and published: ' . $title,
+            'performed_by' => get_current_user_id(),
+            'ip_address'   => $_SERVER['REMOTE_ADDR'] ?? '',
+            'created_at'   => current_time('mysql')
+        )
+    );
+
+    $form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_forms WHERE id = %d", $id ), ARRAY_A );
+    $form['styling'] = json_decode( $form['styling'], true ) ?: array();
+    $form['settings'] = json_decode( $form['settings'], true ) ?: array();
+    $form['blocks'] = $blocks;
+    $form['logic'] = $logic;
+
+    return rest_ensure_response( $form );
+}
+
+function cora_rest_get_form( $request ) {
+    global $wpdb;
+    $id = intval( $request->get_param('id') );
+    $form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_forms WHERE id = %d", $id ), ARRAY_A );
+    if ( ! $form ) {
+        return new WP_Error( 'not_found', 'Form not found', array( 'status' => 404 ) );
+    }
+    $form['styling'] = json_decode( $form['styling'], true ) ?: array();
+    $form['settings'] = json_decode( $form['settings'], true ) ?: array();
+
+    $blocks_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_form_blocks WHERE form_id = %d", $id ), ARRAY_A );
+    $form['blocks'] = $blocks_row ? (json_decode( $blocks_row['blocks_json'], true ) ?: array()) : array();
+    $form['logic'] = $blocks_row ? (json_decode( $blocks_row['logic_json'], true ) ?: array()) : array();
+
+    return rest_ensure_response( $form );
+}
+
+function cora_rest_delete_form( $request ) {
+    global $wpdb;
+    $id = intval( $request->get_param('id') );
+    $wpdb->delete( $wpdb->prefix . 'cora_forms', array( 'id' => $id ) );
+    $wpdb->delete( $wpdb->prefix . 'cora_form_blocks', array( 'form_id' => $id ) );
+    $wpdb->delete( $wpdb->prefix . 'cora_form_submissions', array( 'form_id' => $id ) );
+    return rest_ensure_response( array( 'success' => true ) );
+}
+
+function cora_rest_get_form_submissions( $request ) {
+    global $wpdb;
+    $id = intval( $request->get_param('id') );
+    $subs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_form_submissions WHERE form_id = %d ORDER BY id DESC", $id ), ARRAY_A );
+    if ( is_array( $subs ) ) {
+        foreach ( $subs as &$sub ) {
+            $sub['submitted_data'] = json_decode( $sub['submitted_data'], true ) ?: array();
+        }
+    } else {
+        $subs = array();
+    }
+    return rest_ensure_response( $subs );
+}
+
+function cora_rest_get_form_ai_schema( $request ) {
+    global $wpdb;
+    $id = intval( $request->get_param('id') );
+    
+    $blocks_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_form_blocks WHERE form_id = %d", $id ), ARRAY_A );
+    $blocks = $blocks_row ? (json_decode( $blocks_row['blocks_json'], true ) ?: array()) : array();
+
+    $properties = array();
+    foreach ( $blocks as $b ) {
+        if ( isset( $b['type'] ) && $b['type'] === 'input' ) {
+            $label = isset( $b['label'] ) ? $b['label'] : 'field';
+            $inputType = isset( $b['inputType'] ) ? $b['inputType'] : 'text';
+            $properties[$label] = array(
+                'type'        => ($inputType === 'number') ? 'number' : 'string',
+                'description' => isset( $b['placeholder'] ) ? $b['placeholder'] : ''
+            );
+        }
+    }
+
+    if ( empty( $properties ) ) {
+        $properties['contact_name'] = array( 'type' => 'string', 'description' => 'Your full name' );
+    }
+
+    $schema = array(
+        'type'       => 'object',
+        'properties' => $properties
+    );
+
+    return rest_ensure_response( $schema );
+}
+
+function cora_rest_submit_form( $request ) {
+    global $wpdb;
+    $id = intval( $request->get_param('id') );
+    $params = $request->get_json_params();
+    if ( empty( $params ) ) {
+        $params = $request->get_params();
+    }
+
+    // 1. Honeypot check
+    $hp = isset( $params['cora_hp_verify'] ) ? sanitize_text_field( $params['cora_hp_verify'] ) : '';
+    if ( ! empty( $hp ) ) {
+        return new WP_Error( 'spam_detected', 'Spam attempt detected by honeypot.', array( 'status' => 400 ) );
+    }
+
+    // 2. IP Rate Limiting (max 10 submissions per minute)
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+    $one_minute_ago = date( 'Y-m-d H:i:s', time() - 60 );
+    
+    $recent_count = $wpdb->get_var( $wpdb->prepare(
+        "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_submissions WHERE ip_address = %s AND created_at > %s",
+        $ip,
+        $one_minute_ago
+    ) );
+
+    if ( intval( $recent_count ) >= 10 ) {
+        return new WP_Error( 'rate_limited', 'Too many requests. Please wait before submitting again.', array( 'status' => 429 ) );
+    }
+
+    // 3. Save Submission
+    $submitted_data = isset( $params['submitted_data'] ) ? $params['submitted_data'] : array();
+    $is_partial = isset( $params['is_partial'] ) ? intval( $params['is_partial'] ) : 0;
+
+    $wpdb->insert(
+        $wpdb->prefix . 'cora_form_submissions',
+        array(
+            'form_id'        => $id,
+            'submitted_data' => json_encode( $submitted_data ),
+            'ip_address'     => $ip,
+            'is_partial'     => $is_partial,
+            'created_at'     => current_time('mysql')
+        )
+    );
+
+    return rest_ensure_response( array( 'success' => true, 'submission_id' => $wpdb->insert_id ) );
+}
+
+function cora_rest_get_clauses( $request ) {
+    global $wpdb;
+    $clauses = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_form_clauses ORDER BY id DESC", ARRAY_A );
+    return rest_ensure_response( $clauses ?: array() );
+}
+
+function cora_rest_save_clause( $request ) {
+    global $wpdb;
+    $params = $request->get_json_params();
+    if ( empty( $params ) ) {
+        $params = $request->get_params();
+    }
+    
+    $id = isset( $params['id'] ) ? intval( $params['id'] ) : 0;
+    $title = isset( $params['title'] ) ? sanitize_text_field( $params['title'] ) : 'Untitled Clause';
+    $content = isset( $params['content'] ) ? sanitize_textarea_field( $params['content'] ) : '';
+    $is_mandatory = isset( $params['is_mandatory'] ) ? intval( $params['is_mandatory'] ) : 0;
+
+    if ( $id > 0 ) {
+        $wpdb->update(
+            $wpdb->prefix . 'cora_form_clauses',
+            array( 'title' => $title, 'content' => $content, 'is_mandatory' => $is_mandatory ),
+            array( 'id' => $id )
+        );
+    } else {
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_form_clauses',
+            array(
+                'agency_id' => 1,
+                'title' => $title,
+                'content' => $content,
+                'is_mandatory' => $is_mandatory,
+                'created_at' => current_time('mysql')
+            )
+        );
+        $id = $wpdb->insert_id;
+    }
+    
+    $clause = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_form_clauses WHERE id = %d", $id ), ARRAY_A );
+    return rest_ensure_response( $clause );
+}
+
+function cora_rest_delete_clause( $request ) {
+    global $wpdb;
+    $id = intval( $request->get_param('id') );
+    $wpdb->delete( $wpdb->prefix . 'cora_form_clauses', array( 'id' => $id ) );
+    return rest_ensure_response( array( 'success' => true ) );
+}
+
+function cora_rest_get_form_audit_log( $request ) {
+    global $wpdb;
+    $logs = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_form_audit_log ORDER BY id DESC LIMIT 100", ARRAY_A );
+    return rest_ensure_response( $logs ?: array() );
+}
+

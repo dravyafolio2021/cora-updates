@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cora OS — Product Planning Canvas</title>
+    
+    <!-- Google Fonts for Geist display, Plus Jakarta Sans and Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@350;450;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Geist', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                        display: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        body: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            overflow: hidden;
+            user-select: none;
+        }
+        
+        /* Font stack for Glitz styling custom font override */
+        .glitz-font {
+            font-family: 'Glitz', 'Geist', 'Plus Jakarta Sans', sans-serif;
+        }
+        
+        /* Whiteboard grid backgrounds */
+        .whiteboard-bg {
+            background-color: #fcfcf9;
+            background-image: radial-gradient(#d1d1ca 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            transition: background-color 0.2s;
+        }
+        
+        .dark .whiteboard-bg {
+            background-color: #0e0e11;
+            background-image: radial-gradient(#27272a 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+        
+        /* Node selections and dragging */
+        .node {
+            cursor: grab;
+            transition: box-shadow 0.15s, border-color 0.15s;
+        }
+        .node:active {
+            cursor: grabbing;
+        }
+        .node.selected {
+            outline: 2.5px solid #3b82f6 !important;
+            outline-offset: 2.5px;
+            box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.18) !important;
+        }
+        
+        /* Connector svg styling */
+        .connector-line {
+            fill: none;
+            stroke: #71717a;
+            stroke-width: 2.2;
+            transition: stroke 0.15s;
+        }
+        .connector-line:hover {
+            stroke: #0f172a;
+            stroke-width: 3;
+        }
+        .dark .connector-line:hover {
+            stroke: #fafafa;
+        }
+    </style>
+</head>
+<body class="w-screen h-screen flex flex-col bg-[#fcfcf9] dark:bg-[#0e0e11] text-neutral-900 dark:text-neutral-50 font-sans transition-colors duration-200">
+
+    <!-- TOP CONTROL BAR -->
+    <header class="fixed top-4 left-4 right-4 h-14 bg-white/95 dark:bg-zinc-900/95 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-lg flex items-center justify-between px-6 z-50 backdrop-blur-md">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-zinc-950 dark:bg-zinc-100 flex items-center justify-center text-white dark:text-black font-extrabold text-sm shadow-sm font-sans">
+                CO
+            </div>
+            <div>
+                <span class="text-[9px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest block font-bold leading-none">BIP Presentation Canvas</span>
+                <h1 class="text-xs font-black uppercase text-zinc-900 dark:text-zinc-50 mt-0.5 tracking-wide glitz-font">Cora Product Plan Map</h1>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-2">
+            <!-- Undo Redo Controls (Rule 3) -->
+            <button onclick="undo()" class="w-9 h-9 rounded-xl border border-zinc-200 dark:border-zinc-850 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-xs transition-all" title="Undo [Ctrl+Z]">
+                <i class="fa-solid fa-rotate-left text-zinc-600 dark:text-zinc-400"></i>
+            </button>
+            <button onclick="redo()" class="w-9 h-9 rounded-xl border border-zinc-200 dark:border-zinc-850 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-xs transition-all" title="Redo [Ctrl+Y]">
+                <i class="fa-solid fa-rotate-right text-zinc-600 dark:text-zinc-400"></i>
+            </button>
+            <div class="h-6 w-px bg-zinc-200 dark:bg-zinc-800 mx-1"></div>
+            
+            <!-- View Mode Switch -->
+            <button onclick="toggleDarkMode()" class="w-9 h-9 rounded-xl border border-zinc-200 dark:border-zinc-850 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-xs transition-all" title="Toggle Light/Dark Theme">
+                <i class="fa-solid fa-circle-half-stroke text-zinc-600 dark:text-zinc-400"></i>
+            </button>
+            <button onclick="resetBoard()" class="px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-850 text-[10.5px] font-bold uppercase tracking-wider hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-1.5 transition-all">
+                <i class="fa-solid fa-arrows-rotate text-zinc-400"></i> Reset Plan
+            </button>
+            <button onclick="exportBoard()" class="px-3 py-1.5 rounded-xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-black text-[10.5px] font-bold uppercase tracking-wider hover:opacity-90 flex items-center gap-1.5 transition-all">
+                <i class="fa-solid fa-download"></i> Save JSON
+            </button>
+        </div>
+    </header>
+
+    <!-- WHITEBOARD WINDOW WORKSPACE -->
+    <div id="whiteboard" class="flex-1 w-full h-full relative overflow-hidden" 
+         onmousedown="onBgMouseDown(event)" 
+         onmousemove="onBgMouseMove(event)" 
+         onmouseup="onBgMouseUp(event)"
+         onwheel="onBgWheel(event)"
+         style="touch-action: none;">
+         
+        <!-- Translating & Scaling Inner Board -->
+        <div id="board-viewport" class="absolute inset-0 origin-top-left pointer-events-none">
+            
+            <!-- Infinite grid dots layer (Rule 3) -->
+            <div class="absolute w-[12000px] h-[12000px] whiteboard-bg pointer-events-none" style="left: -6000px; top: -6000px; z-index: 0;"></div>
+            
+            <!-- SVG Connections & Drawings Layer -->
+            <svg id="connections-svg" class="absolute inset-0 w-[4000px] h-[4000px] pointer-events-auto z-10" style="left: -2000px; top: -2000px;">
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#71717a" class="dark:fill-zinc-500" />
+                    </marker>
+                </defs>
+                <g id="drawings-group"></g>
+                <path id="active-stroke-path" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="dark:stroke-zinc-100 pointer-events-none" />
+                <!-- Dynamic Lines Rendered Here -->
+            </svg>
+            
+            <!-- Nodes Layer -->
+            <div id="nodes-container" class="absolute w-0 h-0 pointer-events-auto z-20">
+                <!-- Dynamic Nodes Rendered Here -->
+            </div>
+            
+            <!-- Selection Marquee (lives inside the scaled viewport) -->
+            <div id="selection-marquee" class="absolute border-2 border-dashed border-blue-500/60 bg-blue-500/5 pointer-events-none hidden z-30"></div>
+        </div>
+    </div>
+
+    <!-- WHITEBOARD BOTTOM TOOLBAR -->
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 h-14 bg-white/95 dark:bg-zinc-900/95 border border-zinc-200 dark:border-zinc-800 px-3 rounded-2xl shadow-xl flex items-center gap-1 z-50 backdrop-blur-md">
+        <button onclick="setTool('select')" id="tool-select" class="w-10 h-10 rounded-xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-black flex items-center justify-center transition-all" title="Select / Move Elements [V]">
+            <i class="fa-solid fa-arrow-pointer"></i>
+        </button>
+        <button onclick="setTool('hand')" id="tool-hand" class="w-10 h-10 rounded-xl text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center transition-all" title="Pan Canvas Hand [Space / G]">
+            <i class="fa-regular fa-hand text-base"></i>
+        </button>
+        <div class="h-6 w-px bg-zinc-200 dark:bg-zinc-800 mx-1"></div>
+        <button onclick="setTool('sticky')" id="tool-sticky" class="w-10 h-10 rounded-xl text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center transition-all" title="Add Sticky Note [S or N]">
+            <i class="fa-regular fa-note-sticky text-base"></i>
+        </button>
+        <button onclick="setTool('card')" id="tool-card" class="w-10 h-10 rounded-xl text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center transition-all" title="Add Container Card [C or R]">
+            <i class="fa-regular fa-square text-base"></i>
+        </button>
+        <button onclick="setTool('connector')" id="tool-connector" class="w-10 h-10 rounded-xl text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center transition-all" title="Draw Connection Arrow [L or A]">
+            <i class="fa-solid fa-arrow-right-arrow-left text-sm"></i>
+        </button>
+        <button onclick="setTool('text')" id="tool-text" class="w-10 h-10 rounded-xl text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center transition-all" title="Add Plain Text Label [T]">
+            <i class="fa-solid fa-font text-sm"></i>
+        </button>
+        <button onclick="setTool('stylus')" id="tool-stylus" class="w-10 h-10 rounded-xl text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center transition-all" title="Stylus Drawing Pen [P or D]">
+            <i class="fa-solid fa-pen text-sm"></i>
+        </button>
+        <button onclick="setTool('highlight')" id="tool-highlight" class="w-10 h-10 rounded-xl text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center transition-all" title="Highlighter [H]">
+            <i class="fa-solid fa-highlighter text-sm"></i>
+        </button>
+        <button onclick="setTool('eraser')" id="tool-eraser" class="w-10 h-10 rounded-xl text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center transition-all" title="Eraser [E]">
+            <i class="fa-solid fa-eraser text-sm"></i>
+        </button>
+        <button onclick="triggerImageUpload()" id="tool-image" class="w-10 h-10 rounded-xl text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center transition-all" title="Upload Image [I]">
+            <i class="fa-regular fa-image text-base"></i>
+        </button>
+        <input type="file" id="image-loader" accept="image/*" class="hidden" onchange="handleImageFile(event)">
+        <div class="h-6 w-px bg-zinc-200 dark:bg-zinc-800 mx-1"></div>
+        <button onclick="deleteSelected()" class="w-10 h-10 rounded-xl text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center justify-center transition-all" title="Delete Selected [Backspace / Del]">
+            <i class="fa-regular fa-trash-can"></i>
+        </button>
+    </div>
+
+    <!-- ZOOM LEVEL CONTROLS INDICATOR -->
+    <div class="fixed bottom-6 right-6 bg-white/95 dark:bg-zinc-900/95 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-lg flex items-center p-1 z-50 text-[11px] font-bold">
+        <button onclick="adjustZoom(-0.1)" class="w-7 h-7 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg flex items-center justify-center"><i class="fa-solid fa-minus"></i></button>
+        <span id="zoom-indicator" class="px-2 w-12 text-center font-mono">100%</span>
+        <button onclick="adjustZoom(0.1)" class="w-7 h-7 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg flex items-center justify-center"><i class="fa-solid fa-plus"></i></button>
+    </div>
+
+    <!-- MONOCHROME TOAST SYSTEM -->
+    <div id="cora-toast-container" class="fixed top-20 left-1/2 -translate-x-1/2 z-[99999] pointer-events-none transition-all duration-300 opacity-0 transform translate-y-2">
+        <div class="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-black text-xs font-bold px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 border border-zinc-850 dark:border-zinc-200">
+            <i class="fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600"></i>
+            <span id="cora-toast-text">Toast Message</span>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP FOR NODE TEXT EDITING -->
+    <div id="edit-modal" class="fixed inset-0 z-[99999] bg-zinc-950/40 dark:bg-black/60 flex items-center justify-center hidden backdrop-blur-xs">
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-[420px] rounded-2xl shadow-2xl p-5 space-y-4">
+            <div class="flex justify-between items-center">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-400">Edit Note Content</h4>
+                <button onclick="closeEditModal()" class="text-zinc-400 hover:text-zinc-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <textarea id="edit-node-text" rows="4" class="w-full text-xs p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl outline-none focus:border-zinc-900 dark:focus:border-zinc-100 resize-none font-sans text-neutral-800 dark:text-neutral-200"></textarea>
+            
+            <div class="space-y-1">
+                <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Element Color</label>
+                <div class="flex gap-2" id="node-color-palette">
+                    <!-- Javascript colors -->
+                </div>
+            </div>
+            
+            <div class="flex justify-end gap-2 pt-2 text-[10.5px] font-bold uppercase tracking-wider">
+                <button onclick="closeEditModal()" class="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-850">Cancel</button>
+                <button onclick="saveNodeEdits()" class="px-4 py-2 rounded-xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-black hover:opacity-90">Apply Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CANVAS ENGINE SCRIPT -->
+    <script>
+        // Custom Toast Utility
+        window.coraShowToast = function(msg) {
+            const container = document.getElementById('cora-toast-container');
+            const text = document.getElementById('cora-toast-text');
+            text.textContent = msg;
+            container.style.opacity = '1';
+            container.style.transform = 'translateY(0)';
+            setTimeout(() => {
+                container.style.opacity = '0';
+                container.style.transform = 'translateY(8px)';
+            }, 3000);
+        };
+
+        // Dark Mode switch
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                window.coraShowToast("Light theme enabled.");
+            } else {
+                html.classList.add('dark');
+                window.coraShowToast("Dark theme enabled.");
+            }
+            drawConnections();
+        }
+
+        // Seeding initial board data (Powerfully & logically spaced out to prevent overlap)
+        const initialNodes = [
+            { id: "node-title", x: -360, y: -250, width: 500, height: 72, type: "text", text: "CORA SYSTEM OS — COMPREHENSIVE PRODUCT ROADMAP\nTransitioning Fragmented Operations into a Unified AI Brain", color: "white" },
+            
+            // Stack Column 1 (Fragmented CRM - Left)
+            { id: "note-crm", x: -360, y: -100, width: 220, height: 95, type: "sticky", text: "FRAGMENTED SALES CRM\nSalesforce / ₹3,000/mo\n- No inbound lead sync\n- Average speed-to-lead: 4.5h", color: "zinc" },
+            { id: "note-forms", x: -360, y: 25, width: 220, height: 95, type: "sticky", text: "QUESTIONNAIRE INTAKE\nTypeform / ₹1,500/mo\n- Manual copying required\n- No agency dashboard sync", color: "zinc" },
+            { id: "note-booking", x: -360, y: 150, width: 220, height: 95, type: "sticky", text: "SHOWINGS SCHEDULER\nCalendly / ₹1,200/mo\n- Isolated booking pages\n- No field routing links", color: "zinc" },
+            { id: "note-whatsapp", x: -360, y: 275, width: 220, height: 95, type: "sticky", text: "WHATSAPP MESSAGING\nCustom API / ₹1,500/mo\n- Disconnected shared inbox\n- Manual document dispatch", color: "zinc" },
+            
+            // Bottleneck Column 2 (Leaks - Middle)
+            { id: "note-bt-speed", x: -70, y: -45, width: 220, height: 95, type: "sticky", text: "SPEED-TO-LEAD LATENCY\nAverage routing delay: 4.5 hours\nResult: 80% customer dropoff", color: "dark" },
+            { id: "note-bt-media", x: -70, y: 85, width: 220, height: 95, type: "sticky", text: "MANUAL ASSETS DISPATCH\nFiles shared on raw Drive folders\nNo premium viewer or password gate", color: "dark" },
+            { id: "note-bt-finance", x: -70, y: 215, width: 220, height: 95, type: "sticky", text: "OFFLINE FINANCIALS\nToken advances ledger on sheets\nManual brokerage split accounting", color: "dark" },
+
+            // Central Brain Hub Column 3 (Cora OS Hub - Middle Right)
+            { id: "card-hub", x: 230, y: -100, width: 360, height: 460, type: "card", text: "CORA OS CENTRAL BRAIN HUB\nUnified real estate database & automated micro-actions", color: "white" },
+            { id: "note-hub-db", x: 260, y: -45, width: 300, height: 75, type: "sticky", text: "UNIFIED INBOUND QUEUE\nPre-seeded database options table capturing webhooks & leads instantly", color: "cora" },
+            { id: "note-hub-ai", x: 260, y: 55, width: 300, height: 75, type: "sticky", text: "AI ROUTING & SUMMARIES\nAuto-attributions of site tours, agent load indicators & priority checklist", color: "cora" },
+            { id: "note-hub-whatsapp", x: 260, y: 155, width: 300, height: 75, type: "sticky", text: "ARIA INSTANT DISPATCHER\n1.2s dispatch response containing PDF brochures & maps via WhatsApp", color: "cora" },
+            { id: "note-hub-visual", x: 260, y: 255, width: 300, height: 75, type: "sticky", text: "VISUAL CMS BUILDER\nGrapesJS visual page builder for high-performance single-listing landers", color: "cora" },
+
+            // Ops Column 4 (Cora Self-Working Ops - Right)
+            { id: "note-op-followup", x: 670, y: -80, width: 220, height: 95, type: "sticky", text: "AUTOPILOT FOLLOW-UPS\nAutomated CRM reminders and WhatsApp broadcasts for hot buyer lists", color: "white" },
+            { id: "note-op-galleries", x: 670, y: 45, width: 220, height: 95, type: "sticky", text: "SECURE CLIENT PORTALS\nCustom password protection lock, expiring link tokens, masonry grids", color: "white" },
+            { id: "note-op-schedule", x: 670, y: 170, width: 220, height: 95, type: "sticky", text: "SITE VISIT LOGISTICS\nAgent schedule allocations, vehicle logistics logs, valuer flight dispatch", color: "white" },
+            { id: "note-op-ledger", x: 670, y: 295, width: 220, height: 95, type: "sticky", text: "DOUBLE-ENTRY LEDGER\nCommission logs, digital agreements signatures, advance token tracking", color: "white" }
+        ];
+
+        const initialConnections = [
+            { from: "note-crm", to: "note-bt-speed" },
+            { from: "note-forms", to: "note-bt-speed" },
+            { from: "note-booking", to: "note-bt-media" },
+            { from: "note-whatsapp", to: "note-bt-finance" },
+            
+            { from: "note-bt-speed", to: "card-hub" },
+            { from: "note-bt-media", to: "card-hub" },
+            { from: "note-bt-finance", to: "card-hub" },
+            
+            { from: "card-hub", to: "note-op-followup" },
+            { from: "card-hub", to: "note-op-galleries" },
+            { from: "card-hub", to: "note-op-schedule" },
+            { from: "card-hub", to: "note-op-ledger" }
+        ];
+
+        let nodes = [];
+        let connections = [];
+        let drawings = []; // stylus paths [{ points: [{x,y}], color: 'white'|'dark'|'highlight' }]
+        
+        // Undo / Redo Snapstacks (Rule 3)
+        let historyStack = [];
+        let redoStack = [];
+        
+        // Viewport Transform Matrix State
+        let panX = 0;
+        let panY = 0;
+        let zoom = 1.0;
+        
+        // Tool State
+        let currentTool = 'select'; // 'select', 'hand', 'sticky', 'card', 'connector', 'text', 'stylus', 'highlight', 'eraser'
+        
+        // Selection & Dragging States
+        let selectedNodeIds = []; // Multi-select nodes list
+        let connectionStartNodeId = null;
+        
+        // Dragging & Resize State
+        let isDraggingBg = false;
+        let isDraggingNode = false;
+        let isSelectingMarquee = false;
+        let isResizingNode = false;
+        let resizingNodeId = null;
+        let hasErasedInDragSequence = false;
+        
+        let marqueeStart = { x: 0, y: 0 };
+        let dragStartMousePos = { x: 0, y: 0 };
+        let dragStartPositions = {}; // id -> {x, y}
+        let resizeStartDims = { width: 0, height: 0 };
+        let resizeStartMousePos = { x: 0, y: 0 };
+        let currentStroke = [];
+        let dragStartNodeOffset = { x: 0, y: 0 };
+        let lastMousePos = { x: 0, y: 0 };
+
+        // Color definitions
+        const colors = {
+            white: { bg: 'bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-neutral-900 dark:text-neutral-50' },
+            zinc: { bg: 'bg-zinc-150 dark:bg-zinc-900 border-zinc-300 dark:border-zinc-800 text-neutral-900 dark:text-neutral-200' },
+            dark: { bg: 'bg-zinc-850 dark:bg-zinc-950 border-zinc-700 dark:border-zinc-900 text-white dark:text-zinc-300' },
+            cora: { bg: 'bg-zinc-900 dark:bg-zinc-50 border-zinc-800 dark:border-zinc-200 text-white dark:text-black font-semibold' }
+        };
+
+        // State Save Persistence
+        function saveStateToLocalStorage() {
+            localStorage.setItem('cora_board_nodes', JSON.stringify(nodes));
+            localStorage.setItem('cora_board_connections', JSON.stringify(connections));
+            localStorage.setItem('cora_board_drawings', JSON.stringify(drawings));
+            localStorage.setItem('cora_board_panX', panX.toString());
+            localStorage.setItem('cora_board_panY', panY.toString());
+            localStorage.setItem('cora_board_zoom', zoom.toString());
+        }
+
+        // Snap state to Undo Stack
+        function pushHistory() {
+            if (historyStack.length > 50) historyStack.shift();
+            historyStack.push(JSON.stringify({ nodes, connections, drawings }));
+            redoStack = []; // Reset redo stack on new action
+        }
+
+        // Undo function
+        function undo() {
+            if (historyStack.length > 1) {
+                const currentState = historyStack.pop();
+                redoStack.push(currentState);
+                
+                const prevState = JSON.parse(historyStack[historyStack.length - 1]);
+                nodes = prevState.nodes;
+                connections = prevState.connections;
+                drawings = prevState.drawings;
+                
+                saveStateToLocalStorage();
+                renderNodes();
+                drawConnections();
+                window.coraShowToast("Action undone.");
+            } else {
+                window.coraShowToast("Nothing to undo.");
+            }
+        }
+
+        // Redo function
+        function redo() {
+            if (redoStack.length > 0) {
+                const nextState = redoStack.pop();
+                historyStack.push(nextState);
+                
+                const stateObj = JSON.parse(nextState);
+                nodes = stateObj.nodes;
+                connections = stateObj.connections;
+                drawings = stateObj.drawings;
+                
+                saveStateToLocalStorage();
+                renderNodes();
+                drawConnections();
+                window.coraShowToast("Action redone.");
+            } else {
+                window.coraShowToast("Nothing to redo.");
+            }
+        }
+
+        // Initialize board
+        function resetBoard() {
+            // Clean localStorage
+            localStorage.removeItem('cora_board_nodes');
+            localStorage.removeItem('cora_board_connections');
+            localStorage.removeItem('cora_board_drawings');
+            
+            nodes = JSON.parse(JSON.stringify(initialNodes));
+            connections = JSON.parse(JSON.stringify(initialConnections));
+            drawings = [];
+            historyStack = [];
+            redoStack = [];
+            
+            // Center the camera on nodes
+            const screenW = window.innerWidth;
+            const screenH = window.innerHeight;
+            panX = screenW / 2 - 200;
+            panY = screenH / 2 - 50;
+            zoom = 1.0;
+            
+            selectedNodeIds = [];
+            connectionStartNodeId = null;
+            
+            updateViewport();
+            renderNodes();
+            drawConnections();
+            
+            pushHistory();
+            saveStateToLocalStorage();
+            window.coraShowToast("Plan map reset to default.");
+        }
+
+        // Load Persistent State on Startup
+        function loadSavedState() {
+            const savedNodes = localStorage.getItem('cora_board_nodes');
+            const savedConns = localStorage.getItem('cora_board_connections');
+            const savedDraws = localStorage.getItem('cora_board_drawings');
+            const savedPanX = localStorage.getItem('cora_board_panX');
+            const savedPanY = localStorage.getItem('cora_board_panY');
+            const savedZoom = localStorage.getItem('cora_board_zoom');
+            
+            if (savedNodes) nodes = JSON.parse(savedNodes);
+            else nodes = JSON.parse(JSON.stringify(initialNodes));
+            
+            if (savedConns) connections = JSON.parse(savedConns);
+            else connections = JSON.parse(JSON.stringify(initialConnections));
+            
+            if (savedDraws) drawings = JSON.parse(savedDraws);
+            else drawings = [];
+            
+            if (savedPanX) panX = parseFloat(savedPanX);
+            else panX = window.innerWidth / 2 - 200;
+            
+            if (savedPanY) panY = parseFloat(savedPanY);
+            else panY = window.innerHeight / 2 - 50;
+            
+            if (savedZoom) zoom = parseFloat(savedZoom);
+            else zoom = 1.0;
+            
+            updateViewport();
+            renderNodes();
+            drawConnections();
+            
+            pushHistory(); // push starting snapshot
+        }
+
+        // Update CSS Transforms for Viewport
+        function updateViewport() {
+            const viewport = document.getElementById('board-viewport');
+            viewport.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+            document.getElementById('zoom-indicator').textContent = `${Math.round(zoom * 100)}%`;
+        }
+
+        // Set active tool and toolbar colors
+        function setTool(tool) {
+            currentTool = tool;
+            const buttons = document.querySelectorAll('div.fixed.bottom-6.left-1\\/2 button');
+            buttons.forEach(btn => {
+                if (btn.id === `tool-${tool}`) {
+                    btn.className = "w-10 h-10 rounded-xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-black flex items-center justify-center transition-all shadow-md";
+                } else if (btn.id) {
+                    btn.className = "w-10 h-10 rounded-xl text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center transition-all";
+                }
+            });
+            
+            // Switch cursors depending on active tool (Rule 3)
+            const whiteboard = document.getElementById('whiteboard');
+            if (tool === 'stylus' || tool === 'highlight') {
+                whiteboard.style.cursor = 'crosshair';
+            } else if (tool === 'eraser') {
+                whiteboard.style.cursor = 'cell';
+            } else if (tool === 'hand') {
+                whiteboard.style.cursor = 'grab';
+            } else {
+                whiteboard.style.cursor = 'default';
+            }
+            
+            window.coraShowToast(`Selected tool: ${tool.toUpperCase()}`);
+        }
+
+        // Render nodes DOM
+        function renderNodes() {
+            const container = document.getElementById('nodes-container');
+            container.innerHTML = '';
+            
+            nodes.forEach(node => {
+                const div = document.createElement('div');
+                div.id = node.id;
+                
+                // Color styles
+                const col = colors[node.color] || colors.white;
+                
+                // Construct basic classes
+                let baseClasses = `absolute border p-4 shadow-sm node select-none rounded-2xl flex flex-col justify-between ${col.bg}`;
+                
+                if (node.type === 'card') {
+                    baseClasses = `absolute border-2 border-dashed p-5 node select-none rounded-3xl ${col.bg}`;
+                } else if (node.type === 'text') {
+                    baseClasses = `absolute p-2 node select-none text-neutral-800 dark:text-neutral-100 font-extrabold ${node.color === 'white' ? 'bg-transparent border-none shadow-none text-lg tracking-tight' : col.bg}`;
+                } else if (node.type === 'image') {
+                    baseClasses = `absolute border p-1 shadow-sm node select-none rounded-2xl bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 flex flex-col justify-between overflow-hidden`;
+                }
+                
+                const isSelected = selectedNodeIds.includes(node.id);
+                div.className = `${baseClasses} ${isSelected ? 'selected' : ''}`;
+                
+                // Position size styles
+                div.style.left = `${node.x}px`;
+                div.style.top = `${node.y}px`;
+                div.style.width = `${node.width || 180}px`;
+                div.style.height = `${node.height || 180}px`;
+                
+                // Inner layout
+                let innerHtml = '';
+                if (node.type === 'sticky') {
+                    innerHtml = `
+                        <div class="text-[10.5px] leading-relaxed whitespace-pre-wrap font-medium flex-1 overflow-hidden pointer-events-none">${node.text}</div>
+                        <div class="flex items-center justify-between text-[8px] font-mono text-zinc-400 dark:text-zinc-500 mt-2 pointer-events-none">
+                            <span class="uppercase font-bold tracking-wider">${node.type}</span>
+                            <span>Double click to edit</span>
+                        </div>
+                    `;
+                } else if (node.type === 'card') {
+                    innerHtml = `
+                        <div class="flex justify-between items-start pointer-events-none">
+                            <h3 class="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500 leading-none">${node.text.split('\n')[0]}</h3>
+                            <span class="text-[8px] font-mono border border-zinc-200 dark:border-zinc-800 px-1.5 py-0.5 rounded-md leading-none uppercase font-bold text-zinc-400">Card container</span>
+                        </div>
+                        <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-2 pointer-events-none">${node.text.split('\n').slice(1).join('\n') || ''}</p>
+                    `;
+                } else if (node.type === 'image') {
+                    innerHtml = `
+                        <div class="w-full flex-1 overflow-hidden rounded-xl bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center pointer-events-none">
+                            <img src="${node.url}" class="max-w-full max-h-full object-contain pointer-events-none">
+                        </div>
+                        <div class="text-[9px] font-mono text-zinc-400 dark:text-zinc-500 mt-1.5 px-1 truncate pointer-events-none flex justify-between items-center">
+                            <span class="truncate">${node.text || 'Image'}</span>
+                            <span class="uppercase font-bold tracking-wider font-extrabold text-[8px]">Image</span>
+                        </div>
+                    `;
+                } else {
+                    // Text
+                    innerHtml = `<div class="text-xs whitespace-pre-wrap leading-snug pointer-events-none">${node.text}</div>`;
+                }
+                
+                div.innerHTML = innerHtml;
+                
+                // Append resize handle if selected and not plain text
+                if (isSelected && node.type !== 'text') {
+                    const resizeHandle = document.createElement('div');
+                    resizeHandle.className = 'absolute bottom-1 right-1 w-3.5 h-3.5 bg-zinc-900 border border-white rounded-md cursor-se-resize z-40 flex items-center justify-center';
+                    resizeHandle.innerHTML = '<i class="fa-solid fa-arrows-left-right text-[7px] text-white rotate-45 pointer-events-none"></i>';
+                    resizeHandle.onmousedown = (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        isResizingNode = true;
+                        resizingNodeId = node.id;
+                        
+                        const rect = document.getElementById('whiteboard').getBoundingClientRect();
+                        resizeStartMousePos = {
+                            x: (e.clientX - rect.left - panX) / zoom,
+                            y: (e.clientY - rect.top - panY) / zoom
+                        };
+                        resizeStartDims = {
+                            width: node.width || 180,
+                            height: node.height || 180
+                        };
+                    };
+                    div.appendChild(resizeHandle);
+                }
+                
+                // Event bindings
+                div.onmousedown = (e) => onNodeMouseDown(e, node.id);
+                div.ondblclick = () => openEditModal(node.id);
+                
+                container.appendChild(div);
+            });
+        }
+
+        // Draw SVG connections & drawings
+        function drawConnections() {
+            const svg = document.getElementById('connections-svg');
+            const isDark = document.documentElement.classList.contains('dark');
+            
+            // Remove existing lines but keep marker definition
+            const lines = svg.querySelectorAll('.connector-line');
+            lines.forEach(l => l.remove());
+            
+            // Render connections
+            connections.forEach(conn => {
+                const fromNode = nodes.find(n => n.id === conn.from);
+                const toNode = nodes.find(n => n.id === conn.to);
+                
+                if (fromNode && toNode) {
+                    const fromCenter = getNodeCenter(fromNode);
+                    const toCenter = getNodeCenter(toNode);
+                    
+                    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    
+                    const dx = toCenter.x - fromCenter.x;
+                    const dy = toCenter.y - fromCenter.y;
+                    
+                    const cp1x = fromCenter.x + dx * 0.5;
+                    const cp1y = fromCenter.y;
+                    const cp2x = fromCenter.x + dx * 0.5;
+                    const cp2y = toCenter.y;
+                    
+                    const d = `M ${fromCenter.x} ${fromCenter.y} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${toCenter.x} ${toCenter.y}`;
+                    
+                    path.setAttribute('d', d);
+                    path.setAttribute('class', 'connector-line');
+                    path.setAttribute('marker-end', 'url(#arrow)');
+                    path.onclick = (e) => {
+                        e.stopPropagation();
+                        deleteConnection(conn.from, conn.to);
+                    };
+                    
+                    svg.appendChild(path);
+                }
+            });
+            
+            // Render Drawings
+            renderDrawings();
+        }
+
+        // Render Stylus & Highlight Drawings
+        function renderDrawings() {
+            const group = document.getElementById('drawings-group');
+            group.innerHTML = '';
+            
+            drawings.forEach((draw, idx) => {
+                if (draw.points && draw.points.length > 1) {
+                    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    
+                    let d = `M ${draw.points[0].x + 2000} ${draw.points[0].y + 2000}`;
+                    for (let i = 1; i < draw.points.length; i++) {
+                        d += ` L ${draw.points[i].x + 2000} ${draw.points[i].y + 2000}`;
+                    }
+                    
+                    // Determine stroke color and width (Rule 3)
+                    let strokeColor = draw.color === 'white' ? '#f4f4f5' : '#18181b';
+                    let strokeWidth = '3';
+                    let opacity = '1';
+                    
+                    if (draw.color === 'highlight') {
+                        strokeColor = '#facc15'; // yellow highlighter
+                        strokeWidth = '14';
+                        opacity = '0.45';
+                    }
+                    
+                    path.setAttribute('d', d);
+                    path.setAttribute('fill', 'none');
+                    path.setAttribute('stroke', strokeColor);
+                    path.setAttribute('stroke-width', strokeWidth);
+                    path.setAttribute('stroke-opacity', opacity);
+                    path.setAttribute('stroke-linecap', 'round');
+                    path.setAttribute('stroke-linejoin', 'round');
+                    path.style.cursor = currentTool === 'select' || currentTool === 'eraser' ? 'pointer' : 'default';
+                    
+                    // Clicking drawing deletes it with select or eraser tool
+                    path.onclick = (e) => {
+                        if (currentTool === 'select' || currentTool === 'eraser') {
+                            e.stopPropagation();
+                            drawings.splice(idx, 1);
+                            pushHistory();
+                            saveStateToLocalStorage();
+                            drawConnections();
+                            window.coraShowToast("Drawing stroke deleted.");
+                        }
+                    };
+                    
+                    group.appendChild(path);
+                }
+            });
+        }
+
+        function getNodeCenter(node) {
+            const w = node.width || 180;
+            const h = node.height || 180;
+            return {
+                x: node.x + w / 2 + 2000,
+                y: node.y + h / 2 + 2000
+            };
+        }
+
+        // Delete Connection
+        function deleteConnection(fromId, toId) {
+            connections = connections.filter(c => !(c.from === fromId && c.to === toId));
+            pushHistory();
+            saveStateToLocalStorage();
+            drawConnections();
+            window.coraShowToast("Connection line deleted.");
+        }
+
+        // Bg Wheel Zooming
+        function onBgWheel(e) {
+            e.preventDefault();
+            const scaleAmount = 0.05;
+            let newZoom = zoom - e.deltaY * scaleAmount * 0.01;
+            
+            newZoom = Math.min(Math.max(newZoom, 0.2), 3.0);
+            
+            const rect = document.getElementById('whiteboard').getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            const boardX = (mouseX - panX) / zoom;
+            const boardY = (mouseY - panY) / zoom;
+            
+            zoom = newZoom;
+            panX = mouseX - boardX * zoom;
+            panY = mouseY - boardY * zoom;
+            
+            updateViewport();
+            saveStateToLocalStorage();
+        }
+
+        function adjustZoom(amount) {
+            let newZoom = zoom + amount;
+            newZoom = Math.min(Math.max(newZoom, 0.2), 3.0);
+            zoom = newZoom;
+            updateViewport();
+            saveStateToLocalStorage();
+        }
+
+        // Bg Mouse Down (Pan or Create or Draw or Erase or Marquee Select)
+        function onBgMouseDown(e) {
+            const isDrawTool = ['stylus', 'highlight', 'eraser'].includes(currentTool);
+            if (e.target.id === 'whiteboard' || e.target.id === 'connections-svg' || isDrawTool) {
+                const rect = document.getElementById('whiteboard').getBoundingClientRect();
+                const clickX = (e.clientX - rect.left - panX) / zoom;
+                const clickY = (e.clientY - rect.top - panY) / zoom;
+                
+                // Clear selection if clicking canvas empty space without shift key
+                if (!e.shiftKey && currentTool === 'select') {
+                    selectedNodeIds = [];
+                    renderNodes();
+                }
+                
+                if (currentTool === 'stylus' || currentTool === 'highlight') {
+                    isDrawing = true;
+                    currentStroke = [{ x: clickX, y: clickY }];
+                    
+                    const activePath = document.getElementById('active-stroke-path');
+                    activePath.setAttribute('d', `M ${clickX + 2000} ${clickY + 2000}`);
+                    
+                    if (currentTool === 'highlight') {
+                        activePath.setAttribute('stroke', '#facc15');
+                        activePath.setAttribute('stroke-width', '14');
+                        activePath.setAttribute('stroke-opacity', '0.45');
+                    } else {
+                        const isDark = document.documentElement.classList.contains('dark');
+                        activePath.setAttribute('stroke', isDark ? '#f4f4f5' : '#18181b');
+                        activePath.setAttribute('stroke-width', '3');
+                        activePath.setAttribute('stroke-opacity', '1');
+                    }
+                } else if (currentTool === 'eraser') {
+                    isDrawing = true;
+                    hasErasedInDragSequence = false;
+                    eraseAt(clickX, clickY);
+                } else if (currentTool === 'select') {
+                    isSelectingMarquee = true;
+                    marqueeStart = { x: clickX, y: clickY };
+                    
+                    const marquee = document.getElementById('selection-marquee');
+                    marquee.style.left = `${clickX}px`;
+                    marquee.style.top = `${clickY}px`;
+                    marquee.style.width = '0px';
+                    marquee.style.height = '0px';
+                    marquee.classList.remove('hidden');
+                } else {
+                    // Pan Hand tool or other
+                    isDraggingBg = true;
+                    lastMousePos = { x: e.clientX, y: e.clientY };
+                }
+            }
+        }
+
+        // Node Mouse Down (Select or Connect or Drag or Erase)
+        function onNodeMouseDown(e, nodeId) {
+            if (currentTool === 'stylus' || currentTool === 'highlight') {
+                // Bubbles to whiteboard background to draw strokes
+                return;
+            }
+            e.stopPropagation();
+            
+            if (currentTool === 'eraser') {
+                nodes = nodes.filter(n => n.id !== nodeId);
+                connections = connections.filter(c => c.from !== nodeId && c.to !== nodeId);
+                pushHistory();
+                saveStateToLocalStorage();
+                renderNodes();
+                drawConnections();
+                window.coraShowToast("Node deleted with eraser.");
+                return;
+            }
+            
+            if (currentTool === 'connector') {
+                if (!connectionStartNodeId) {
+                    connectionStartNodeId = nodeId;
+                    window.coraShowToast("Source node selected. Click destination node.");
+                } else {
+                    if (connectionStartNodeId !== nodeId) {
+                        const exists = connections.find(c => c.from === connectionStartNodeId && c.to === nodeId);
+                        if (!exists) {
+                            connections.push({ from: connectionStartNodeId, to: nodeId });
+                            pushHistory();
+                            saveStateToLocalStorage();
+                            drawConnections();
+                            window.coraShowToast("Connection arrow drawn.");
+                        }
+                    }
+                    connectionStartNodeId = null;
+                    setTool('select');
+                }
+            } else {
+                // Select & Dragging
+                if (!selectedNodeIds.includes(nodeId)) {
+                    if (e.shiftKey) {
+                        selectedNodeIds.push(nodeId);
+                    } else {
+                        selectedNodeIds = [nodeId];
+                    }
+                } else if (e.shiftKey) {
+                    // Toggle selection off
+                    selectedNodeIds = selectedNodeIds.filter(id => id !== nodeId);
+                }
+                
+                isDraggingNode = true;
+                const rect = document.getElementById('whiteboard').getBoundingClientRect();
+                const mouseBoardX = (e.clientX - rect.left - panX) / zoom;
+                const mouseBoardY = (e.clientY - rect.top - panY) / zoom;
+                
+                dragStartMousePos = { x: mouseBoardX, y: mouseBoardY };
+                dragStartPositions = {};
+                selectedNodeIds.forEach(id => {
+                    const n = nodes.find(node => node.id === id);
+                    if (n) {
+                        dragStartPositions[id] = { x: n.x, y: n.y };
+                    }
+                });
+                
+                renderNodes();
+            }
+        }
+
+        // Point/Stroke Distance Eraser helper
+        function eraseAt(clickX, clickY) {
+            let erasedSomething = false;
+            const newDrawings = [];
+            
+            drawings.forEach(draw => {
+                const segments = [];
+                let currentSegment = [];
+                // Scale eraser hit test threshold dynamically by current zoom factor (Rule 3)
+                const thresh = (draw.color === 'highlight' ? 30 : 20) / zoom;
+                
+                draw.points.forEach(p => {
+                    const dx = p.x - clickX;
+                    const dy = p.y - clickY;
+                    const isClose = Math.sqrt(dx * dx + dy * dy) < thresh;
+                    
+                    if (isClose) {
+                        // Terminate the current segment
+                        if (currentSegment.length > 1) {
+                            segments.push(currentSegment);
+                        }
+                        currentSegment = [];
+                    } else {
+                        currentSegment.push(p);
+                    }
+                });
+                
+                // Add the remaining segment
+                if (currentSegment.length > 1) {
+                    segments.push(currentSegment);
+                }
+                
+                if (segments.length === 1 && segments[0].length === draw.points.length) {
+                    // Stroke was not touched by eraser, keep intact
+                    newDrawings.push(draw);
+                } else {
+                    // Stroke was split or partially erased
+                    erasedSomething = true;
+                    segments.forEach(seg => {
+                        newDrawings.push({
+                            points: seg,
+                            color: draw.color
+                        });
+                    });
+                }
+            });
+            
+            if (erasedSomething) {
+                drawings = newDrawings;
+                hasErasedInDragSequence = true;
+                saveStateToLocalStorage();
+                drawConnections();
+            }
+        }
+
+        // Move Mouse
+        function onBgMouseMove(e) {
+            const rect = document.getElementById('whiteboard').getBoundingClientRect();
+            const clickX = (e.clientX - rect.left - panX) / zoom;
+            const clickY = (e.clientY - rect.top - panY) / zoom;
+            
+            if (isDrawing && (currentTool === 'stylus' || currentTool === 'highlight')) {
+                currentStroke.push({ x: clickX, y: clickY });
+                
+                const activePath = document.getElementById('active-stroke-path');
+                let d = activePath.getAttribute('d');
+                d += ` L ${clickX + 2000} ${clickY + 2000}`;
+                activePath.setAttribute('d', d);
+            } else if (isDrawing && currentTool === 'eraser') {
+                eraseAt(clickX, clickY);
+            } else if (isResizingNode && resizingNodeId) {
+                const node = nodes.find(n => n.id === resizingNodeId);
+                if (node) {
+                    const dx = clickX - resizeStartMousePos.x;
+                    const dy = clickY - resizeStartMousePos.y;
+                    
+                    node.width = Math.max(80, Math.round(resizeStartDims.width + dx));
+                    node.height = Math.max(40, Math.round(resizeStartDims.height + dy));
+                    
+                    const div = document.getElementById(node.id);
+                    if (div) {
+                        div.style.width = `${node.width}px`;
+                        div.style.height = `${node.height}px`;
+                    }
+                    drawConnections();
+                }
+            } else if (isSelectingMarquee) {
+                const left = Math.min(clickX, marqueeStart.x);
+                const top = Math.min(clickY, marqueeStart.y);
+                const width = Math.abs(clickX - marqueeStart.x);
+                const height = Math.abs(clickY - marqueeStart.y);
+                
+                const marquee = document.getElementById('selection-marquee');
+                marquee.style.left = `${left}px`;
+                marquee.style.top = `${top}px`;
+                marquee.style.width = `${width}px`;
+                marquee.style.height = `${height}px`;
+            } else if (isDraggingBg) {
+                const dx = e.clientX - lastMousePos.x;
+                const dy = e.clientY - lastMousePos.y;
+                panX += dx;
+                panY += dy;
+                lastMousePos = { x: e.clientX, y: e.clientY };
+                updateViewport();
+            } else if (isDraggingNode && selectedNodeIds.length > 0) {
+                const dx = clickX - dragStartMousePos.x;
+                const dy = clickY - dragStartMousePos.y;
+                
+                selectedNodeIds.forEach(id => {
+                    const n = nodes.find(node => node.id === id);
+                    const startPos = dragStartPositions[id];
+                    if (n && startPos) {
+                        n.x = Math.round(startPos.x + dx);
+                        n.y = Math.round(startPos.y + dy);
+                        
+                        const div = document.getElementById(n.id);
+                        if (div) {
+                            div.style.left = `${n.x}px`;
+                            div.style.top = `${n.y}px`;
+                        }
+                    }
+                });
+                drawConnections();
+            }
+        }
+
+        // Mouse Up
+        function onBgMouseUp(e) {
+            if (isDrawing) {
+                isDrawing = false;
+                
+                if (currentTool === 'stylus' || currentTool === 'highlight') {
+                    const isDark = document.documentElement.classList.contains('dark');
+                    if (currentStroke.length > 1) {
+                        drawings.push({
+                            points: currentStroke,
+                            color: currentTool === 'highlight' ? 'highlight' : (isDark ? 'white' : 'dark')
+                        });
+                        
+                        pushHistory();
+                        saveStateToLocalStorage();
+                        drawConnections();
+                    }
+                } else if (currentTool === 'eraser') {
+                    if (hasErasedInDragSequence) {
+                        pushHistory();
+                        saveStateToLocalStorage();
+                    }
+                    hasErasedInDragSequence = false;
+                }
+                
+                const activePath = document.getElementById('active-stroke-path');
+                activePath.removeAttribute('d');
+            }
+            
+            if (isSelectingMarquee) {
+                isSelectingMarquee = false;
+                const marquee = document.getElementById('selection-marquee');
+                marquee.classList.add('hidden');
+                
+                const rect = document.getElementById('whiteboard').getBoundingClientRect();
+                const clickX = (e.clientX - rect.left - panX) / zoom;
+                const clickY = (e.clientY - rect.top - panY) / zoom;
+                
+                const left = Math.min(clickX, marqueeStart.x);
+                const top = Math.min(clickY, marqueeStart.y);
+                const width = Math.abs(clickX - marqueeStart.x);
+                const height = Math.abs(clickY - marqueeStart.y);
+                
+                // Select nodes intersecting this marquee box
+                const newlySelected = [];
+                nodes.forEach(node => {
+                    const w = node.width || 180;
+                    const h = node.height || 180;
+                    const xIntersect = (node.x < left + width) && (node.x + w > left);
+                    const yIntersect = (node.y < top + height) && (node.y + h > top);
+                    if (xIntersect && yIntersect) {
+                        newlySelected.push(node.id);
+                    }
+                });
+                
+                selectedNodeIds = newlySelected;
+                renderNodes();
+                
+                if (selectedNodeIds.length > 0) {
+                    window.coraShowToast(`Selected ${selectedNodeIds.length} elements.`);
+                }
+            }
+            
+            if (isResizingNode) {
+                isResizingNode = false;
+                resizingNodeId = null;
+                pushHistory();
+                saveStateToLocalStorage();
+            }
+            
+            if (isDraggingNode) {
+                isDraggingNode = false;
+                pushHistory();
+                saveStateToLocalStorage();
+            }
+            
+            isDraggingBg = false;
+        }
+
+        // Delete elements
+        function deleteSelected() {
+            if (selectedNodeIds.length > 0) {
+                nodes = nodes.filter(n => !selectedNodeIds.includes(n.id));
+                connections = connections.filter(c => !selectedNodeIds.includes(c.from) && !selectedNodeIds.includes(c.to));
+                selectedNodeIds = [];
+                renderNodes();
+                drawConnections();
+                pushHistory();
+                saveStateToLocalStorage();
+                window.coraShowToast("Selected elements deleted.");
+            }
+        }
+
+        // Modal Operations
+        let editingNodeId = null;
+        function openEditModal(nodeId) {
+            const node = nodes.find(n => n.id === nodeId);
+            if (node) {
+                editingNodeId = nodeId;
+                const modal = document.getElementById('edit-modal');
+                const textarea = document.getElementById('edit-node-text');
+                textarea.value = node.text;
+                
+                const palette = document.getElementById('node-color-palette');
+                palette.innerHTML = '';
+                
+                Object.keys(colors).forEach(cName => {
+                    const btn = document.createElement('button');
+                    let borderClass = 'border border-zinc-300 dark:border-zinc-800';
+                    let bgClass = 'bg-white';
+                    if (cName === 'zinc') bgClass = 'bg-zinc-200';
+                    if (cName === 'dark') bgClass = 'bg-zinc-800';
+                    if (cName === 'cora') bgClass = 'bg-zinc-950';
+                    
+                    btn.className = `w-7 h-7 rounded-lg ${bgClass} ${borderClass} ${node.color === cName ? 'ring-2 ring-blue-500' : ''}`;
+                    btn.onclick = () => {
+                        const btns = palette.querySelectorAll('button');
+                        btns.forEach(b => b.classList.remove('ring-2', 'ring-blue-500'));
+                        btn.classList.add('ring-2', 'ring-blue-500');
+                        node.tempColor = cName;
+                    };
+                    palette.appendChild(btn);
+                });
+                
+                node.tempColor = node.color;
+                modal.classList.remove('hidden');
+                textarea.focus();
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+            editingNodeId = null;
+        }
+
+        function saveNodeEdits() {
+            if (editingNodeId) {
+                const node = nodes.find(n => n.id === editingNodeId);
+                const textarea = document.getElementById('edit-node-text');
+                if (node) {
+                    node.text = textarea.value;
+                    node.color = node.tempColor || node.color;
+                    
+                    if (node.type === 'text') {
+                        node.height = 40;
+                    }
+                    
+                    renderNodes();
+                    drawConnections();
+                    pushHistory();
+                    saveStateToLocalStorage();
+                }
+                closeEditModal();
+                window.coraShowToast("Content updated.");
+            }
+        }
+
+        // Export/Save JSON
+        function exportBoard() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ nodes, connections, drawings }, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "cora_product_roadmap.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            window.coraShowToast("Whiteboard configurations exported.");
+        }
+
+        // Image Loader helper functions
+        function triggerImageUpload() {
+            document.getElementById('image-loader').click();
+        }
+        
+        function handleImageFile(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const base64Data = event.target.result;
+                    const screenW = window.innerWidth;
+                    const screenH = window.innerHeight;
+                    const boardCenterX = (screenW / 2 - panX) / zoom;
+                    const boardCenterY = (screenH / 2 - panY) / zoom;
+                    
+                    const imgNodeId = `node-${Date.now()}`;
+                    nodes.push({
+                        id: imgNodeId,
+                        x: Math.round(boardCenterX - 125),
+                        y: Math.round(boardCenterY - 100),
+                        width: 250,
+                        height: 200,
+                        type: 'image',
+                        url: base64Data,
+                        text: file.name,
+                        color: 'white'
+                    });
+                    renderNodes();
+                    pushHistory();
+                    saveStateToLocalStorage();
+                    window.coraShowToast("Image uploaded and added to canvas.");
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Drag & Drop Image listener on whiteboard DOM
+        const wb = document.getElementById('whiteboard');
+        wb.ondragover = (e) => {
+            e.preventDefault();
+        };
+        wb.ondrop = (e) => {
+            e.preventDefault();
+            const files = e.dataTransfer.files;
+            if (files && files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    const rect = wb.getBoundingClientRect();
+                    const clickX = (e.clientX - rect.left - panX) / zoom;
+                    const clickY = (e.clientY - rect.top - panY) / zoom;
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const base64Data = event.target.result;
+                        const imgNodeId = `node-${Date.now()}`;
+                        nodes.push({
+                            id: imgNodeId,
+                            x: Math.round(clickX - 125),
+                            y: Math.round(clickY - 100),
+                            width: 250,
+                            height: 200,
+                            type: 'image',
+                            url: base64Data,
+                            text: file.name,
+                            color: 'white'
+                        });
+                        renderNodes();
+                        pushHistory();
+                        saveStateToLocalStorage();
+                        window.coraShowToast("Image dropped and added.");
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        };
+
+        // Keyboard Shortcuts Listeners (Rule 3)
+        let previousToolBeforeSpace = null;
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+            
+            // Temporary hand pan tool toggle holding Spacebar
+            if (e.key === ' ' && currentTool !== 'hand') {
+                e.preventDefault();
+                previousToolBeforeSpace = currentTool;
+                setTool('hand');
+                return;
+            }
+            
+            // Undo: Cmd+Z / Ctrl+Z
+            if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key.toLowerCase() === 'z') {
+                e.preventDefault();
+                undo();
+                return;
+            }
+
+            // Redo: Cmd+Shift+Z / Ctrl+Shift+Z / Cmd+Y / Ctrl+Y
+            if ((e.metaKey || e.ctrlKey) && (e.shiftKey && e.key.toLowerCase() === 'z' || e.key.toLowerCase() === 'y')) {
+                e.preventDefault();
+                redo();
+                return;
+            }
+            
+            // Export: Cmd+S / Ctrl+S
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                exportBoard();
+                return;
+            }
+            
+            switch (e.key.toLowerCase()) {
+                case 'v':
+                    setTool('select');
+                    break;
+                case 'g':
+                    setTool('hand');
+                    break;
+                case 's':
+                case 'n':
+                    setTool('sticky');
+                    break;
+                case 'c':
+                case 'r':
+                    setTool('card');
+                    break;
+                case 'l':
+                case 'a':
+                    setTool('connector');
+                    break;
+                case 't':
+                    setTool('text');
+                    break;
+                case 'p':
+                case 'd':
+                    setTool('stylus');
+                    break;
+                case 'h':
+                    setTool('highlight');
+                    break;
+                case 'e':
+                    setTool('eraser');
+                    break;
+                case 'i':
+                    triggerImageUpload();
+                    break;
+                case 'backspace':
+                case 'delete':
+                    deleteSelected();
+                    break;
+                case '=':
+                case '+':
+                    adjustZoom(0.1);
+                    break;
+                case '-':
+                    adjustZoom(-0.1);
+                    break;
+                case '0':
+                    zoom = 1.0;
+                    panX = window.innerWidth / 2 - 200;
+                    panY = window.innerHeight / 2 - 50;
+                    updateViewport();
+                    saveStateToLocalStorage();
+                    window.coraShowToast("Camera centered.");
+                    break;
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === ' ' && previousToolBeforeSpace !== null) {
+                setTool(previousToolBeforeSpace);
+                previousToolBeforeSpace = null;
+            }
+        });
+
+        // Initialize / Load Persistent data
+        loadSavedState();
+    </script>
+</body>
+</html>

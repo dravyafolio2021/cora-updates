@@ -6043,6 +6043,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             </section>
             <?php endif; ?>
 
+            <!-- SECTION: CORA FORMS -->
+            <?php if ( $sub_page === 'forms' ) : ?>
+            <section id="cora-page-forms" class="cora-page-section cora-active space-y-6">
+                <?php include CORA_REAL_ESTATE_AI_PATH . 'views/view-forms.php'; ?>
+            </section>
+            <?php endif; ?>
+
             <!-- SECTION: MEDIA LIBRARY -->
             <?php if ( $sub_page === 'media' ) : ?>
             <?php
