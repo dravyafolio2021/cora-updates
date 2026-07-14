@@ -84,7 +84,12 @@ jQuery(document).ready(function($) {
         const activeRole = $('#cora-role-preview-select').val() || coraData.currentRole;
         let allowed = coraData.userPermissions[activeRole] || [];
         if (activeRole === 'administrator') {
-            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'gallery', 'leads', 'clients', 'blogs', 'gbp', 'plugins'];
+            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'gallery', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'my-profile'];
+        }
+
+        // my-profile is accessible by all logged-in users
+        if (!allowed.includes('my-profile')) {
+            allowed.push('my-profile');
         }
 
         if (targetPageId !== 'feature-hub' && !allowed.includes(targetPageId)) {
@@ -882,7 +887,23 @@ jQuery(document).ready(function($) {
         // Hide all sub-sections and show active one
         parentSection.find('.cora-sub-section').addClass('hidden').removeClass('active');
         parentSection.find(`#cora-sub-page-${target}`).removeClass('hidden').addClass('active');
+
+        // Update URL hash without jumping
+        if (history.pushState) {
+            history.pushState(null, null, '#' + target);
+        } else {
+            window.location.hash = '#' + target;
+        }
     });
+
+    // Initialize sub-tabs based on URL hash
+    if (window.location.hash) {
+        const target = window.location.hash.substring(1);
+        const tab = $(`.cora-sub-tab[data-sub-target="${target}"]`);
+        if (tab.length) {
+            tab.trigger('click');
+        }
+    }
 
     // Toggle allocation input visibility in assign equipment tab
     $('#cora-assign-eq-status').on('change', function() {
@@ -2217,6 +2238,8 @@ jQuery(document).ready(function($) {
         if (savedPreviewRole) {
             $('#cora-role-preview-select').val(savedPreviewRole);
             initialRole = savedPreviewRole;
+            const selectedText = $('#cora-role-preview-select option:selected').text();
+            $('#cora-sidebar-user-role').text(selectedText + ' (Preview)');
         }
     }
     coraEnforcePermissions(initialRole);
@@ -2224,11 +2247,16 @@ jQuery(document).ready(function($) {
     // Bind Preview Change Dropdown
     $('#cora-role-preview-select').on('change', function() {
         const selectedRole = $(this).val();
+        const selectedText = $('#cora-role-preview-select option:selected').text();
         try {
             sessionStorage.setItem('cora_preview_role', selectedRole);
         } catch(e) {}
         coraEnforcePermissions(selectedRole);
-        window.coraShowToast(`Previewing dashboard as ${$('#cora-role-preview-select option:selected').text()}`);
+        
+        // Update sidebar widget
+        $('#cora-sidebar-user-role').text(selectedText + ' (Preview)');
+        
+        window.coraShowToast(`Previewing dashboard as ${selectedText}`);
     });
 
     // ============================================================
@@ -5857,9 +5885,9 @@ jQuery(document).ready(function($) {
     window.coraFetchMediaLibrary = function() {
         $('#cora-media-library-grid').html('<div class="col-span-3 py-10 text-center"><div class="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div></div>');
         
-        $.post(coraData.ajaxurl, {
+        $.post(coraData.ajaxUrl, {
             action: 'cora_get_media',
-            nonce: coraData.nonce
+            nonce: coraData.ajaxNonce
         }, function(response) {
             if (response.success && response.data.images) {
                 let html = '';
@@ -5924,13 +5952,13 @@ jQuery(document).ready(function($) {
     function coraUploadMedia(file) {
         let formData = new FormData();
         formData.append('action', 'cora_upload_media');
-        formData.append('nonce', coraData.nonce);
+        formData.append('nonce', coraData.ajaxNonce);
         formData.append('file', file);
         
         $('#cora-media-upload-status').text('Uploading...').removeClass('text-red-500 text-green-500').addClass('text-blue-500');
         
         $.ajax({
-            url: coraData.ajaxurl,
+            url: coraData.ajaxUrl,
             type: 'POST',
             data: formData,
             contentType: false,
@@ -6490,4 +6518,843 @@ jQuery(document).ready(function($) {
     // Run auto-create document check
     coraCheckAutoCreateDoc();
 });
+
+
+// ==========================================
+// ATTENDANCE & GEOLOCATION
+// ==========================================
+
+let isPunchedIn = false;
+
+function coraInitAttendance() {
+    // Check initial state on load if possible, or just fetch
+    coraLoadAttendance();
+}
+
+function coraTogglePunch() {
+    if (!navigator.geolocation) {
+        window.coraShowToast("Geolocation is not supported by your browser.", "error");
+        return;
+    }
+
+    const btnText = document.getElementById('cora-punch-text');
+    const originalText = btnText.innerText;
+    btnText.innerText = "Locating...";
+
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const action = isPunchedIn ? 'cora_punch_out' : 'cora_punch_in';
+
+            const formData = new FormData();
+            formData.append('action', action);
+            formData.append('nonce', coraData.ajaxNonce);
+            formData.append('lat', lat);
+            formData.append('lng', lng);
+    const name = document.getElementById('cora-office-address-search').value;
+    if (name) formData.append('name', name);
+
+            fetch(coraData.ajaxUrl, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    isPunchedIn = !isPunchedIn;
+                    btnText.innerText = isPunchedIn ? "Punch Out" : "Punch In";
+                    
+                    const iconWrapper = document.getElementById('cora-punch-icon-wrapper');
+                    if (iconWrapper) {
+                        if (isPunchedIn) {
+                            iconWrapper.classList.remove('bg-green-50', 'text-green-600');
+                            iconWrapper.classList.add('bg-amber-50', 'text-amber-600');
+                        } else {
+                            iconWrapper.classList.remove('bg-amber-50', 'text-amber-600');
+                            iconWrapper.classList.add('bg-green-50', 'text-green-600');
+                        }
+                    }
+                    
+                    window.coraShowToast(res.data.message);
+                    coraLoadAttendance();
+                } else {
+                    btnText.innerText = originalText;
+                    window.coraShowToast(res.data, "error");
+                    
+                    // Failsafe state sync if already punched in/out
+                    if (res.data.includes("already punched in")) {
+                        isPunchedIn = true;
+                        btnText.innerText = "Punch Out";
+                    } else if (res.data.includes("already punched out") || res.data.includes("not punched in")) {
+                        isPunchedIn = false;
+                        btnText.innerText = "Punch In";
+                    }
+                }
+            })
+            .catch(err => {
+                btnText.innerText = originalText;
+                window.coraShowToast("Network error while punching.", "error");
+            });
+        },
+        function(error) {
+            btnText.innerText = originalText;
+            window.coraShowToast("Please allow location access to punch in/out.", "error");
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+}
+
+function coraLoadAttendance() {
+    const tbody = document.getElementById('cora-attendance-tbody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-zinc-400">Loading attendance...</td></tr>';
+
+    const formData = new FormData();
+    formData.append('action', 'cora_get_attendance');
+    formData.append('nonce', coraData.ajaxNonce);
+
+    fetch(coraData.ajaxUrl, {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.success) {
+            const logs = res.data.logs || [];
+            const stats = res.data.stats || { total_team: '--', present_today: '--', missing_absent: '--', flagged_locations: '--' };
+
+            // Update stats overview boxes
+            const totalEl = document.getElementById('cora-overview-total');
+            const presentEl = document.getElementById('cora-overview-present');
+            const absentEl = document.getElementById('cora-overview-absent');
+            const flaggedEl = document.getElementById('cora-overview-flagged');
+
+            if (totalEl) totalEl.innerText = stats.total_team;
+            if (presentEl) presentEl.innerText = stats.present_today;
+            if (absentEl) absentEl.innerText = stats.missing_absent;
+            if (flaggedEl) flaggedEl.innerText = stats.flagged_locations;
+
+            if (logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-zinc-400">No attendance records found.</td></tr>';
+                return;
+            }
+
+            let html = '';
+            
+            // Auto-detect current user's punch status from today's logs
+            const today = new Date().toISOString().split('T')[0];
+            
+            logs.forEach(log => {
+                // If it's the current user and today's log, sync button state
+                if (log.date === today && log.punch_in && !log.punch_out && !isPunchedIn) {
+                    isPunchedIn = true;
+                    document.getElementById('cora-punch-text').innerText = "Punch Out";
+                }
+                
+                const punchInTime = log.punch_in ? new Date(log.punch_in.replace(' ', 'T')).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--';
+                const punchOutTime = log.punch_out ? new Date(log.punch_out.replace(' ', 'T')).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--';
+                
+                let locationHtml = '--';
+                if (log.punch_in_lat && log.punch_in_lng) {
+                    locationHtml = `<a href="https://www.google.com/maps/search/?api=1&query=${log.punch_in_lat},${log.punch_in_lng}" target="_blank" class="text-blue-500 hover:underline">View Map</a>`;
+                }
+                
+                let actionHtml = '<div class="flex items-center justify-end gap-2">';
+                
+                if (log.edit_history && log.edit_history.length > 0) {
+                    const logDataStr = encodeURIComponent(JSON.stringify(log));
+                    actionHtml += `<button onclick="coraViewAttendanceHistory('${logDataStr}')" class="px-2 py-1 border border-amber-200 bg-amber-50 rounded text-[10px] font-bold text-amber-700 hover:bg-amber-100 transition-all" title="View Audit Trail">Modified</button>`;
+                }
+                
+                if (log.can_edit) {
+                    actionHtml += `<button onclick="coraEditAttendance(${log.user_id}, '${log.date}', '${log.punch_in || ''}', '${log.punch_out || ''}')" class="px-2 py-1 border border-zinc-200 rounded text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 transition-all cursor-pointer">Edit</button>`;
+                }
+                
+                if (log.can_manage) {
+                    actionHtml += `
+                        <div class="flex items-center border border-zinc-200 rounded ml-2 overflow-hidden shadow-sm">
+                            <button onclick="coraManageAttendance(${log.user_id}, '${log.date}', 'approve')" class="px-2 py-1 bg-white hover:bg-green-50 text-green-600 border-r border-zinc-200 transition-colors" title="Approve">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </button>
+                            <button onclick="coraManageAttendance(${log.user_id}, '${log.date}', 'reject')" class="px-2 py-1 bg-white hover:bg-red-50 text-red-600 border-r border-zinc-200 transition-colors" title="Reject">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                            <button onclick="if(confirm('Are you sure you want to delete this log?')) coraManageAttendance(${log.user_id}, '${log.date}', 'delete')" class="px-2 py-1 bg-white hover:bg-red-50 text-zinc-500 hover:text-red-600 transition-colors" title="Delete">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                actionHtml += '</div>';
+                
+                let nameHtml = log.name;
+                if (log.status === 'approved') {
+                    nameHtml += ` <span class="inline-flex items-center gap-1 ml-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-green-100 text-green-700" title="Approved by Admin"><svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>Approved</span>`;
+                } else if (log.flagged) {
+                    nameHtml += ` <span class="inline-flex items-center gap-1 ml-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-red-100 text-red-700" title="${log.flag_reason || 'Outside 1000m'}"><svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="3" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>${log.status === 'rejected' ? 'Rejected' : 'Flagged'}</span>`;
+                }
+
+                html += `
+                    <tr class="hover:bg-zinc-50/50 transition-colors">
+                        <td class="px-4 py-3 font-medium text-zinc-900">${nameHtml}</td>
+                        <td class="px-4 py-3">${log.date}</td>
+                        <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700">${punchInTime}</span></td>
+                        <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold ${log.punch_out ? 'bg-zinc-100 text-zinc-700' : 'bg-amber-100 text-amber-700'}">${log.punch_out ? punchOutTime : 'Active'}</span></td>
+                        <td class="px-4 py-3">${locationHtml}</td>
+                        <td class="px-4 py-3">${actionHtml}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+    });
+}
+
+// Hook into DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Other inits...
+    setTimeout(coraInitAttendance, 1000);
+    coraInitOfficeLocationBtn(); // slight delay to not block main thread
+});
+
+
+// --- Enterprise Attendance Log Editing & Audit ---
+
+window.coraEditAttendance = function(userId, date, currentIn, currentOut) {
+    // We'll use a simple prompt for now, but a modal is better.
+    // Let's create a custom drawer for this to match the global rules.
+    const drawerHtml = `
+        <div id="cora-attendance-drawer" class="fixed inset-y-0 right-0 w-full sm:w-96 bg-white shadow-2xl z-50 transform transition-transform translate-x-full border-l border-zinc-200 flex flex-col">
+            <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+                <h3 class="text-sm font-bold text-zinc-900">Edit Attendance Record</h3>
+                <button onclick="document.getElementById('cora-attendance-drawer').remove()" class="text-zinc-400 hover:text-zinc-600">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="p-5 space-y-4 flex-1 overflow-y-auto">
+                <div class="cora-form-group flex flex-col gap-1.5">
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Punch In Time</label>
+                    <input type="datetime-local" id="cora-edit-punch-in" class="w-full border border-zinc-200 rounded-md p-2 text-sm focus:border-zinc-400 focus:outline-none" value="${currentIn.replace(' ', 'T')}">
+                </div>
+                <div class="cora-form-group flex flex-col gap-1.5">
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Punch Out Time</label>
+                    <input type="datetime-local" id="cora-edit-punch-out" class="w-full border border-zinc-200 rounded-md p-2 text-sm focus:border-zinc-400 focus:outline-none" value="${currentOut ? currentOut.replace(' ', 'T') : ''}">
+                </div>
+                <div class="cora-form-group flex flex-col gap-1.5">
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Reason for Edit</label>
+                    <input type="text" id="cora-edit-reason" class="w-full border border-zinc-200 rounded-md p-2 text-sm focus:border-zinc-400 focus:outline-none" placeholder="e.g. Forgot to punch out">
+                </div>
+            </div>
+            <div class="p-5 border-t border-zinc-200 bg-zinc-50 flex justify-end gap-3">
+                <button onclick="document.getElementById('cora-attendance-drawer').remove()" class="px-4 py-2 border border-zinc-200 rounded-md text-xs font-bold text-zinc-700 bg-white hover:bg-zinc-50">Cancel</button>
+                <button onclick="coraSubmitAttendanceEdit(${userId}, '${date}')" class="px-4 py-2 bg-zinc-950 text-white rounded-md text-xs font-bold hover:bg-zinc-800">Save Changes</button>
+            </div>
+        </div>
+    `;
+    
+    // Append and animate
+    $('body').append(drawerHtml);
+    setTimeout(() => {
+        $('#cora-attendance-drawer').removeClass('translate-x-full');
+    }, 10);
+};
+
+window.coraSubmitAttendanceEdit = function(userId, date) {
+    const punchIn = $('#cora-edit-punch-in').val().replace('T', ' ');
+    const punchOut = $('#cora-edit-punch-out').val().replace('T', ' ');
+    const reason = $('#cora-edit-reason').val().trim();
+    
+    if (!reason) {
+        coraShowToast("Reason for edit is mandatory.", "error");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('action', 'cora_edit_attendance');
+    formData.append('nonce', coraData.ajaxNonce);
+    formData.append('user_id', userId);
+    formData.append('date', date);
+    formData.append('punch_in', punchIn);
+    formData.append('punch_out', punchOut);
+    formData.append('reason', reason);
+
+    const btn = $('#cora-attendance-drawer button.bg-zinc-950');
+    const originalText = btn.text();
+    btn.text('Saving...').prop('disabled', true);
+
+    fetch(coraData.ajaxUrl, {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.success) {
+            window.coraShowToast(res.data.message);
+            $('#cora-attendance-drawer').addClass('translate-x-full');
+            setTimeout(() => {
+                $('#cora-attendance-drawer').remove();
+                coraLoadAttendance();
+            }, 300);
+        } else {
+            window.coraShowToast(res.data, 'error');
+            btn.text(originalText).prop('disabled', false);
+        }
+    })
+    .catch(err => {
+        window.coraShowToast('Network error while saving.', 'error');
+        btn.text(originalText).prop('disabled', false);
+    });
+};
+
+window.coraManageAttendance = function(userId, date, action) {
+    const formData = new FormData();
+    formData.append('action', 'cora_manage_attendance');
+    formData.append('nonce', coraData.ajaxNonce);
+    formData.append('user_id', userId);
+    formData.append('date', date);
+    formData.append('manage_action', action);
+
+    fetch(coraData.ajaxUrl, {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.success) {
+            window.coraShowToast(res.data.message);
+            coraLoadAttendance();
+        } else {
+            window.coraShowToast(res.data, 'error');
+        }
+    })
+    .catch(err => {
+        window.coraShowToast('Network error while updating.', 'error');
+    });
+};
+
+window.coraViewAttendanceHistory = function(logDataStr) {
+    const logData = JSON.parse(decodeURIComponent(logDataStr));
+    const history = logData.edit_history || [];
+    
+    let historyHtml = history.map(h => `
+        <div class="border-l-2 border-zinc-200 pl-4 py-1 relative">
+            <span class="absolute -left-[5px] top-2 w-2 h-2 rounded-full bg-zinc-300"></span>
+            <p class="text-xs font-bold text-zinc-900">${h.editor_name} <span class="font-normal text-zinc-500">edited this record</span></p>
+            <p class="text-[10px] text-zinc-400 mb-1">${h.timestamp}</p>
+            <div class="bg-zinc-50 rounded p-2 text-[10px] border border-zinc-100">
+                <span class="font-semibold">Reason:</span> ${h.reason}<br>
+                <span class="font-semibold text-red-600">Old In:</span> ${h.old_punch_in || '--'} &rarr; <span class="font-semibold text-emerald-600">New In:</span> ${h.new_punch_in || '--'}<br>
+                <span class="font-semibold text-red-600">Old Out:</span> ${h.old_punch_out || '--'} &rarr; <span class="font-semibold text-emerald-600">New Out:</span> ${h.new_punch_out || '--'}
+            </div>
+        </div>
+    `).join('');
+
+    if (history.length === 0) historyHtml = '<p class="text-xs text-zinc-500">No edits recorded.</p>';
+
+    const drawerHtml = `
+        <div id="cora-audit-drawer" class="fixed inset-y-0 right-0 w-full sm:w-96 bg-white shadow-2xl z-50 transform transition-transform translate-x-full border-l border-zinc-200 flex flex-col">
+            <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+                <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-2">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    Audit Trail
+                </h3>
+                <button onclick="document.getElementById('cora-audit-drawer').remove()" class="text-zinc-400 hover:text-zinc-600">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="p-5 space-y-4 flex-1 overflow-y-auto">
+                ${historyHtml}
+            </div>
+        </div>
+    `;
+
+    $('body').append(drawerHtml);
+    setTimeout(() => {
+        $('#cora-audit-drawer').removeClass('translate-x-full');
+    }, 10);
+};
+
+
+window.coraAddAttendanceRecord = function() {
+    const members = coraData.teamMembers || [];
+    const memberOptions = members.map(m => `<option value="${m.id}">${m.display_name} (${m.email})</option>`).join('');
+
+    const todayDate = new Date().toISOString().split('T')[0];
+    const today = new Date();
+    today.setHours(9, 0, 0, 0);
+    const defaultPunchIn = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+
+    const drawerHtml = `
+        <div id="cora-add-attendance-drawer" class="fixed inset-y-0 right-0 w-full sm:w-96 bg-white shadow-2xl z-50 transform transition-transform translate-x-full border-l border-zinc-200 flex flex-col">
+            <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+                <h3 class="text-sm font-bold text-zinc-900">Add Attendance Record Manually</h3>
+                <button onclick="document.getElementById('cora-add-attendance-drawer').remove()" class="text-zinc-400 hover:text-zinc-600">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="p-5 space-y-4 flex-1 overflow-y-auto">
+                <div class="cora-form-group flex flex-col gap-1.5">
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Select Team Member</label>
+                    <select id="cora-add-user-id" class="w-full border border-zinc-200 rounded-md p-2 text-sm focus:border-zinc-400 focus:outline-none">
+                        <option value="">-- Choose Member --</option>
+                        ${memberOptions}
+                    </select>
+                </div>
+                <div class="cora-form-group flex flex-col gap-1.5">
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Record Date</label>
+                    <input type="date" id="cora-add-date" class="w-full border border-zinc-200 rounded-md p-2 text-sm focus:border-zinc-400 focus:outline-none" value="${todayDate}">
+                </div>
+                <div class="cora-form-group flex flex-col gap-1.5">
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Punch In Time</label>
+                    <input type="datetime-local" id="cora-add-punch-in" class="w-full border border-zinc-200 rounded-md p-2 text-sm focus:border-zinc-400 focus:outline-none" value="${defaultPunchIn}">
+                </div>
+                <div class="cora-form-group flex flex-col gap-1.5">
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Punch Out Time (Optional)</label>
+                    <input type="datetime-local" id="cora-add-punch-out" class="w-full border border-zinc-200 rounded-md p-2 text-sm focus:border-zinc-400 focus:outline-none">
+                </div>
+                <div class="cora-form-group flex flex-col gap-1.5">
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Reason for Manual Entry</label>
+                    <input type="text" id="cora-add-reason" class="w-full border border-zinc-200 rounded-md p-2 text-sm focus:border-zinc-400 focus:outline-none" placeholder="e.g. Forgot phone / Onsite direct visit">
+                </div>
+            </div>
+            <div class="p-5 border-t border-zinc-200 bg-zinc-50 flex justify-end gap-3">
+                <button onclick="document.getElementById('cora-add-attendance-drawer').remove()" class="px-4 py-2 border border-zinc-200 rounded-md text-xs font-bold text-zinc-700 bg-white hover:bg-zinc-50">Cancel</button>
+                <button onclick="coraSubmitAttendanceAdd()" class="px-4 py-2 bg-zinc-950 text-white rounded-md text-xs font-bold hover:bg-zinc-800">Add Record</button>
+            </div>
+        </div>
+    `;
+
+    $('body').append(drawerHtml);
+    setTimeout(() => {
+        $('#cora-add-attendance-drawer').removeClass('translate-x-full');
+    }, 10);
+};
+
+window.coraSubmitAttendanceAdd = function() {
+    const userId = $('#cora-add-user-id').val();
+    const date = $('#cora-add-date').val();
+    const punchIn = $('#cora-add-punch-in').val().replace('T', ' ');
+    const punchOutVal = $('#cora-add-punch-out').val();
+    const punchOut = punchOutVal ? punchOutVal.replace('T', ' ') : '';
+    const reason = $('#cora-add-reason').val().trim();
+
+    if (!userId) {
+        coraShowToast("Please select a team member.", "error");
+        return;
+    }
+    if (!date) {
+        coraShowToast("Please select a date.", "error");
+        return;
+    }
+    if (!punchIn) {
+        coraShowToast("Punch in time is mandatory.", "error");
+        return;
+    }
+    if (!reason) {
+        coraShowToast("Reason for manual entry is mandatory.", "error");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('action', 'cora_add_attendance');
+    formData.append('nonce', coraData.ajaxNonce);
+    formData.append('user_id', userId);
+    formData.append('date', date);
+    formData.append('punch_in', punchIn);
+    formData.append('punch_out', punchOut);
+    formData.append('reason', reason);
+
+    const btn = $('#cora-add-attendance-drawer button.bg-zinc-950');
+    const originalText = btn.text();
+    btn.text('Saving...').prop('disabled', true);
+
+    fetch(coraData.ajaxUrl, {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.success) {
+            window.coraShowToast(res.data.message);
+            $('#cora-add-attendance-drawer').addClass('translate-x-full');
+            setTimeout(() => {
+                $('#cora-add-attendance-drawer').remove();
+                coraLoadAttendance();
+            }, 300);
+        } else {
+            window.coraShowToast(res.data, 'error');
+            btn.text(originalText).prop('disabled', false);
+        }
+    })
+    .catch(err => {
+        window.coraShowToast('Network error while saving.', 'error');
+        btn.text(originalText).prop('disabled', false);
+    });
+};
+
+
+let coraOfficeMap = null;
+let coraOfficeMarker = null;
+
+
+window.coraInitOfficeLocationBtn = function() {
+    fetch(coraData.ajaxUrl + '?action=cora_get_office_location&nonce=' + coraData.ajaxNonce)
+    .then(r => r.json())
+    .then(res => {
+        if (res.success && res.data.name) {
+            const btnText = document.getElementById('cora-office-btn-text');
+            if (btnText) btnText.innerText = 'Office: ' + res.data.name.substring(0, 15) + (res.data.name.length > 15 ? '...' : '');
+        }
+    });
+};
+
+window.coraToggleOfficeLocationDrawer = function(show) {
+    const drawer = document.getElementById('cora-office-location-drawer');
+    if (show) {
+        drawer.classList.remove('translate-x-full');
+        coraRenderSearchHistory();
+        // Initialize Map
+        setTimeout(() => {
+            if (!coraOfficeMap) {
+                coraOfficeMap = L.map('cora-office-map').setView([20.5937, 78.9629], 5); // Default India center
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap'
+                }).addTo(coraOfficeMap);
+
+                // Fetch existing location
+                fetch(coraData.ajaxUrl + '?action=cora_get_office_location&nonce=' + coraData.ajaxNonce)
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success && res.data.lat && res.data.lng) {
+                        const lat = parseFloat(res.data.lat);
+                        const lng = parseFloat(res.data.lng);
+                        coraSetMapMarker(lat, lng);
+                        if (res.data.name) document.getElementById('cora-office-address-search').value = res.data.name;
+                    }
+                });
+
+                coraOfficeMap.on('click', function(e) {
+                    coraSetMapMarker(e.latlng.lat, e.latlng.lng);
+                });
+            } else {
+                coraOfficeMap.invalidateSize();
+            }
+        }, 300);
+    } else {
+        drawer.classList.add('translate-x-full');
+        document.getElementById('cora-office-search-results').classList.add('hidden');
+    }
+}
+
+window.coraSetMapMarker = function(lat, lng) {
+    if (coraOfficeMarker) {
+        coraOfficeMap.removeLayer(coraOfficeMarker);
+    }
+    coraOfficeMarker = L.marker([lat, lng]).addTo(coraOfficeMap);
+    coraOfficeMap.setView([lat, lng], 15);
+    document.getElementById('cora-office-lat').value = lat.toFixed(6);
+    document.getElementById('cora-office-lng').value = lng.toFixed(6);
+}
+
+let searchTimeout = null;
+window.coraDebounceSearch = function(query) {
+    if (searchTimeout) clearTimeout(searchTimeout);
+    if (!query || query.length < 3) {
+        document.getElementById('cora-office-search-results').classList.add('hidden');
+        return;
+    }
+    searchTimeout = setTimeout(() => {
+        coraSearchOfficeLocation(query);
+    }, 500); // 500ms debounce
+}
+
+window.coraSearchOfficeLocation = function(searchQuery) {
+    const query = searchQuery || document.getElementById('cora-office-address-search').value;
+    if (!query) return;
+
+    // Check if it's a coordinate string or Google Maps URL with coordinates in string
+    const latLngMatch = query.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) || query.match(/^(-?\d+\.\d+)[\s,]+(-?\d+\.\d+)$/);
+    if (latLngMatch) {
+        const lat = parseFloat(latLngMatch[1]);
+        const lng = parseFloat(latLngMatch[2]);
+        coraSetMapMarker(lat, lng);
+        document.getElementById('cora-office-address-search').value = query;
+        coraAddSearchHistory(query, lat, lng);
+        document.getElementById('cora-office-search-results').classList.add('hidden');
+        return;
+    }
+
+    if (query.startsWith('http://') || query.startsWith('https://')) {
+        const resultsContainer = document.getElementById('cora-office-search-results');
+        resultsContainer.innerHTML = '<div class="p-3 text-xs text-zinc-500">Resolving Maps URL...</div>';
+        resultsContainer.classList.remove('hidden');
+        
+        const formData = new FormData();
+        formData.append('action', 'cora_resolve_map_url');
+        formData.append('nonce', coraData.ajaxNonce);
+        formData.append('url', query);
+        
+        fetch(coraData.ajaxUrl, {
+            method: 'POST',
+            body: formData
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success && res.data.lat && res.data.lng) {
+                const lat = parseFloat(res.data.lat);
+                const lng = parseFloat(res.data.lng);
+                coraSetMapMarker(lat, lng);
+                document.getElementById('cora-office-address-search').value = query;
+                coraAddSearchHistory(query, lat, lng);
+                resultsContainer.classList.add('hidden');
+            } else {
+                resultsContainer.innerHTML = '<div class="p-3 text-xs text-zinc-500">Could not extract coordinates from this URL.</div>';
+            }
+        })
+        .catch(err => {
+            resultsContainer.innerHTML = '<div class="p-3 text-xs text-zinc-500">Error resolving URL.</div>';
+        });
+        return;
+    }
+    
+    // Add &addressdetails=1 to try and get better fuzzy matching sometimes, though Nominatim is strict
+    // Add &countrycodes=in to restrict search to India only
+    fetch('https://nominatim.openstreetmap.org/search?format=json&countrycodes=in&q=' + encodeURIComponent(query))
+    .then(r => r.json())
+    .then(data => {
+        const resultsContainer = document.getElementById('cora-office-search-results');
+        resultsContainer.innerHTML = '';
+        if (data.length === 0) {
+            resultsContainer.innerHTML = '<div class="p-3 text-xs text-zinc-500">No exact results found. Try simplifying your query.</div>';
+        } else {
+            data.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "p-2 hover:bg-zinc-50 text-xs border-b border-zinc-100 cursor-pointer text-zinc-700";
+                div.innerText = item.display_name;
+                div.onclick = () => {
+                    coraSetMapMarker(parseFloat(item.lat), parseFloat(item.lon));
+                    resultsContainer.classList.add('hidden');
+                    document.getElementById('cora-office-address-search').value = item.display_name;
+                    coraAddSearchHistory(item.display_name, item.lat, item.lon);
+                };
+                resultsContainer.appendChild(div);
+            });
+        }
+        resultsContainer.classList.remove('hidden');
+    })
+    .catch(err => console.error(err));
+}
+
+window.coraAddSearchHistory = function(name, lat, lng) {
+    let history = JSON.parse(localStorage.getItem('cora_office_search_history') || '[]');
+    // Remove if already exists
+    history = history.filter(h => h.name !== name);
+    // Add to front
+    history.unshift({name, lat, lng});
+    if (history.length > 5) history.pop();
+    localStorage.setItem('cora_office_search_history', JSON.stringify(history));
+    coraRenderSearchHistory();
+};
+
+window.coraRenderSearchHistory = function() {
+    let history = JSON.parse(localStorage.getItem('cora_office_search_history') || '[]');
+    let container = document.getElementById('cora-office-search-history');
+    
+    if (!container) {
+        // Create it if it doesn't exist
+        const searchDiv = document.getElementById('cora-office-address-search').parentNode.parentNode;
+        container = document.createElement('div');
+        container.id = 'cora-office-search-history';
+        container.className = 'flex flex-wrap gap-2 mt-2';
+        searchDiv.appendChild(container);
+    }
+    
+    if (history.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    container.innerHTML = '<span class="text-[10px] text-zinc-400 w-full mb-1">Recent Searches:</span>' + history.map(h => {
+        return `<span class="text-[10px] bg-zinc-100 border border-zinc-200 text-zinc-600 px-2 py-1 rounded cursor-pointer hover:bg-zinc-200 transition-colors truncate max-w-[150px]" onclick="coraSetMapMarker(${h.lat}, ${h.lng}); document.getElementById('cora-office-address-search').value = '${h.name.replace(/'/g, "\\'")}'">${h.name}</span>`;
+    }).join('');
+};
+
+// Hide search results when clicking outside
+document.addEventListener('click', function(e) {
+    const searchContainer = document.getElementById('cora-office-search-results');
+    const searchInput = document.getElementById('cora-office-address-search');
+    if (searchContainer && !searchContainer.contains(e.target) && e.target !== searchInput && e.target.tagName !== 'BUTTON') {
+        searchContainer.classList.add('hidden');
+    }
+});
+
+window.coraSaveOfficeLocationDrawer = function() {
+    const lat = document.getElementById('cora-office-lat').value;
+    const lng = document.getElementById('cora-office-lng').value;
+
+    if (!lat || !lng) {
+        window.coraShowToast("Please select a location first.", "error");
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('action', 'cora_set_office_location');
+    formData.append('nonce', coraData.ajaxNonce);
+    formData.append('lat', lat);
+    formData.append('lng', lng);
+    
+    fetch(coraData.ajaxUrl, {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.success) {
+            window.coraShowToast("Office location saved.");
+            coraToggleOfficeLocationDrawer(false);
+            coraInitOfficeLocationBtn();
+        } else {
+            window.coraShowToast(res.data || "Error saving location.", "error");
+        }
+    })
+    .catch(err => {
+        window.coraShowToast("Error saving office location.", "error");
+    });
+};
+
+// ═══ MY PROFILE PAGE FUNCTIONALITY ═══
+// Preview avatar locally upon selection
+$(document).ready(function() {
+    $(document).on('change', '#cora-profile-avatar-input', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = $('#cora-profile-avatar-img');
+                if (img.is('img')) {
+                    img.attr('src', event.target.result);
+                } else {
+                    // Replace fallback initials div with actual img element
+                    const newImg = $('<img>', {
+                        id: 'cora-profile-avatar-img',
+                        src: event.target.result,
+                        class: 'w-20 h-20 rounded-full object-cover border-2 border-zinc-200/60 shadow-sm',
+                        alt: 'Profile Avatar'
+                    });
+                    img.replaceWith(newImg);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+});
+
+window.coraSaveMyProfile = function() {
+    const displayName = $('#cora-profile-display-name').val().trim();
+    const email = $('#cora-profile-email').val().trim();
+    const phone = $('#cora-profile-phone').val().trim();
+    const bio = $('#cora-profile-bio').val().trim();
+    const avatarInput = $('#cora-profile-avatar-input')[0];
+    const saveBtn = $('#cora-profile-save-btn');
+    const statusSpan = $('#cora-profile-save-status');
+
+    if (!displayName) {
+        window.coraShowToast("Display name cannot be empty.", "error");
+        return;
+    }
+
+    if (!email) {
+        window.coraShowToast("Email address cannot be empty.", "error");
+        return;
+    }
+
+    saveBtn.prop('disabled', true).addClass('opacity-50').html(
+        `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg> Saving...`
+    );
+    statusSpan.text('');
+
+    const formData = new FormData();
+    formData.append('action', 'cora_update_my_profile');
+    formData.append('nonce', coraData.ajaxNonce);
+    formData.append('display_name', displayName);
+    formData.append('email', email);
+    formData.append('phone', phone);
+    formData.append('bio', bio);
+    if (avatarInput && avatarInput.files.length > 0) {
+        formData.append('avatar_file', avatarInput.files[0]);
+    }
+
+    fetch(coraData.ajaxUrl, {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(res => {
+        saveBtn.prop('disabled', false).removeClass('opacity-50').html(
+            `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" class="inline mr-1.5"><polyline points="20 6 9 17 4 12"></polyline></svg>Save Changes`
+        );
+        if (res.success) {
+            window.coraShowToast("Profile details updated successfully.");
+            statusSpan.text('Saved. Reloading page...').addClass('text-emerald-600').removeClass('text-red-500');
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            window.coraShowToast(res.data || "Error saving profile details.", "error");
+            statusSpan.text(res.data || "Save failed.").addClass('text-red-500').removeClass('text-emerald-600');
+        }
+    })
+    .catch(err => {
+        saveBtn.prop('disabled', false).removeClass('opacity-50').html(
+            `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" class="inline mr-1.5"><polyline points="20 6 9 17 4 12"></polyline></svg>Save Changes`
+        );
+        window.coraShowToast("Network error saving profile details.", "error");
+        statusSpan.text("Network error.").addClass('text-red-500');
+    });
+};
+
+window.coraSaveStudioSettings = function(btnElement) {
+    const brandName = $('#cora-settings-brand-name').val().trim();
+    const updatesUrl = $('#cora-settings-updates-url').val().trim();
+    
+    if (!brandName) {
+        window.coraShowToast("Studio Brand Name cannot be empty.", "error");
+        return;
+    }
+
+    const btn = $(btnElement);
+    const oldHtml = btn.html();
+    btn.prop('disabled', true).text('Saving...');
+
+    $.ajax({
+        url: coraData.ajaxUrl,
+        method: 'POST',
+        data: {
+            action: 'cora_save_studio_settings',
+            security: coraData.ajaxNonce,
+            brand_name: brandName,
+            updates_url: updatesUrl
+        },
+        success: function(res) {
+            btn.prop('disabled', false).html(oldHtml);
+            if (res.success) {
+                window.coraShowToast("Studio settings saved successfully.");
+            } else {
+                window.coraShowToast(res.data || "Error saving settings.", "error");
+            }
+        },
+        error: function() {
+            btn.prop('disabled', false).html(oldHtml);
+            window.coraShowToast("Network error saving studio settings.", "error");
+        }
+    });
+};
+
 

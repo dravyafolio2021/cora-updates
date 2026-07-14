@@ -3,7 +3,7 @@
  * Plugin Name: Cora for Real Estate
  * Plugin URI: https://cora.ai
  * Description: A clean, minimal Notion-style workspace dashboard for real estate agencies in India and globally. Empowered with AI workflows, booking management, and photo helpers.
- * Version: 1.0.0
+  * Version: 1.0.0
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -13292,4 +13292,115 @@ function cora_rest_get_form_audit_log( $request ) {
     $logs = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_form_audit_log ORDER BY id DESC LIMIT 100", ARRAY_A );
     return rest_ensure_response( $logs ?: array() );
 }
+
+// ═══ DYNAMIC REMOTE PLUGIN UPDATER SYSTEM ═══
+if ( ! class_exists( 'Cora_Real_Estate_Plugin_Updater' ) ) {
+    class Cora_Real_Estate_Plugin_Updater {
+        private $plugin_slug;
+        private $plugin_file;
+        private $update_url;
+        
+        public function __construct( $plugin_file, $update_url ) {
+            $this->plugin_file = $plugin_file;
+            $this->plugin_slug = plugin_basename( $plugin_file );
+            $this->update_url  = $update_url;
+            
+            // Hook into update checks
+            add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_update' ) );
+            
+            // Hook into plugins details modal display
+            add_filter( 'plugins_api', array( $this, 'plugin_info' ), 20, 3 );
+        }
+        
+        public function check_update( $transient ) {
+            if ( empty( $transient->checked ) ) {
+                return $transient;
+            }
+            
+            // Fetch remote update information
+            $response = wp_remote_get( $this->update_url, array(
+                'timeout' => 15,
+                'headers' => array(
+                    'Accept' => 'application/json'
+                )
+            ) );
+            
+            if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
+                return $transient;
+            }
+            
+            $remote_data = json_decode( wp_remote_retrieve_body( $response ) );
+            if ( ! $remote_data || empty( $remote_data->version ) ) {
+                return $transient;
+            }
+            
+            $local_version = '';
+            if ( ! function_exists( 'get_plugin_data' ) ) {
+                require_once ABSPATH . 'wp-admin/includes/plugin.php';
+            }
+            $plugin_data = get_plugin_data( $this->plugin_file );
+            $local_version = $plugin_data['Version'];
+            
+            if ( version_compare( $local_version, $remote_data->version, '<' ) ) {
+                $obj = new stdClass();
+                $obj->slug = 'cora-real-estate';
+                $obj->plugin = $this->plugin_slug;
+                $obj->new_version = $remote_data->version;
+                $obj->tested = isset( $remote_data->tested ) ? $remote_data->tested : '6.5';
+                $obj->package = $remote_data->download_url;
+                $obj->url = 'https://cora.ai';
+                
+                $transient->response[ $this->plugin_slug ] = $obj;
+            }
+            
+            return $transient;
+        }
+        
+        public function plugin_info( $res, $action, $args ) {
+            if ( $action !== 'plugin_information' ) {
+                return $res;
+            }
+            
+            if ( isset( $args->slug ) && $args->slug === 'cora-real-estate' ) {
+                $response = wp_remote_get( $this->update_url, array(
+                    'timeout' => 15,
+                    'headers' => array(
+                        'Accept' => 'application/json'
+                    )
+                ) );
+                
+                if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
+                    return $res;
+                }
+                
+                $remote_data = json_decode( wp_remote_retrieve_body( $response ) );
+                if ( ! $remote_data ) {
+                    return $res;
+                }
+                
+                $res = new stdClass();
+                $res->name = $remote_data->name;
+                $res->slug = 'cora-real-estate';
+                $res->version = $remote_data->version;
+                $res->tested = isset( $remote_data->tested ) ? $remote_data->tested : '6.5';
+                $res->author = 'Dravya Bansal (ClaraVerse)';
+                $res->homepage = 'https://cora.ai';
+                $res->download_link = $remote_data->download_url;
+                
+                $res->sections = array(
+                    'description' => isset( $remote_data->sections->description ) ? $remote_data->sections->description : '',
+                    'changelog'   => isset( $remote_data->sections->changelog ) ? $remote_data->sections->changelog : ''
+                );
+                
+                return $res;
+            }
+            
+            return $res;
+        }
+    }
+}
+
+$cora_re_updates_url = get_option( 'cora_re_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-real-estate.json' );
+new Cora_Real_Estate_Plugin_Updater( __FILE__, $cora_re_updates_url );
+
 

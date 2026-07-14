@@ -1,10 +1,11 @@
 <?php
+
 /**
  * Plugin Name: Cora for Studio
  * Plugin URI: https://cora.ai
- * Description: A clean, minimal Notion-style workspace dashboard for photography studios in India and globally. Empowered with AI workflows, booking management, and photo helpers.
- * Version: 1.0.0
- * Author: Cora AI Team
+ * Description: The ultimate AI workspace and CRM for modern photography studios. Features smart shoot bookings, WhatsApp integrations, AI image culling, financial tracking, Google Business Profile management, and real-time attendance logging.
+  * Version: 1.2.0
+ * Author: Dravya Bansal (ClaraVerse)
  * Author URI: https://cora.ai
  * License: GPL2
  */
@@ -146,7 +147,11 @@ function cora_studio_ai_handle_workspace_route() {
         
         $allowed_features = isset( $cora_permissions[$current_user_role] ) ? $cora_permissions[$current_user_role] : array();
         if ( $current_user_role === 'administrator' ) {
-            $allowed_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'gallery', 'leads', 'clients', 'blogs', 'gbp', 'plugins' );
+            $allowed_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'gallery', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'my-profile' );
+        }
+        // My Profile is accessible by all logged-in users
+        if ( ! in_array( 'my-profile', $allowed_features ) ) {
+            $allowed_features[] = 'my-profile';
         }
 
         // Prevent accessing disallowed sub-pages
@@ -448,6 +453,18 @@ function cora_send_verification_email( $user_id ) {
     $to = $user->user_email;
     $subject = 'Activate your Cora for Studio Workspace';
     $headers = array('Content-Type: text/html; charset=UTF-8');
+
+    $studio_name = get_option( 'cora_workspace_name', 'Cora for Studio' );
+    $current_user = wp_get_current_user();
+    $admin_name = $current_user->exists() ? $current_user->display_name : '';
+    
+    if ( ! empty( $admin_name ) ) {
+        $from_name = $admin_name . ' via ' . $studio_name;
+        $invitation_text = esc_html( $admin_name ) . ' has invited you to join the <strong>' . esc_html( $studio_name ) . '</strong> workspace on Cora.';
+    } else {
+        $from_name = $studio_name;
+        $invitation_text = 'Welcome to <strong>' . esc_html( $studio_name ) . '</strong>! Please verify your email address to unlock your photography CRM dashboard, automated WhatsApp pipelines, and AI caption culling engines.';
+    }
     
     $message = '
     <html>
@@ -464,9 +481,9 @@ function cora_send_verification_email( $user_id ) {
     </head>
     <body>
         <div class="container">
-            <div class="logo">Cora for Studio</div>
+            <div class="logo">' . esc_html( $studio_name ) . '</div>
             <h2>Confirm your workspace registration</h2>
-            <p>Welcome to Cora! Please verify your email address to unlock your photography CRM dashboard, automated WhatsApp pipelines, and AI caption culling engines.</p>
+            <p>' . $invitation_text . '</p>
             <p><a href="' . esc_url( $verify_url ) . '" class="btn" style="color:#ffffff;">Verify Email Address</a></p>
             <p class="footer">If you did not request this account, please ignore this email.</p>
         </div>
@@ -474,7 +491,18 @@ function cora_send_verification_email( $user_id ) {
     </html>
     ';
     
-    return wp_mail( $to, $subject, $message, $headers );
+    // Add temporary filter for custom From Name
+    $from_name_filter = function() use ( $from_name ) {
+        return $from_name;
+    };
+    add_filter( 'wp_mail_from_name', $from_name_filter );
+
+    $result_mail = wp_mail( $to, $subject, $message, $headers );
+
+    // Clean up filter
+    remove_filter( 'wp_mail_from_name', $from_name_filter );
+    
+    return $result_mail;
 }
 
 /**
@@ -3576,3 +3604,833 @@ function cora_ajax_gbp_create_post() {
     wp_send_json_success( $body );
 }
 add_action( 'wp_ajax_cora_gbp_create_post', 'cora_ajax_gbp_create_post' );
+
+// ==========================================
+// ATTENDANCE & GEOLOCATION
+// ==========================================
+
+/**
+ * Handle staff punch in
+ */
+function cora_ajax_punch_in() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! is_user_logged_in() ) wp_send_json_error( 'Not authenticated.' );
+
+    $lat = isset( $_POST['lat'] ) ? sanitize_text_field( wp_unslash( $_POST['lat'] ) ) : '';
+    $lng = isset( $_POST['lng'] ) ? sanitize_text_field( wp_unslash( $_POST['lng'] ) ) : '';
+
+    if ( empty( $lat ) || empty( $lng ) ) {
+        wp_send_json_error( 'Location data is missing.' );
+    }
+
+    $user_id = get_current_user_id();
+    $dt = new DateTime('now', new DateTimeZone('Asia/Kolkata'));
+    $today = $dt->format('Y-m-d');
+    $now = $dt->format('Y-m-d H:i:s');
+
+    $attendance_logs = get_option( 'cora_attendance_logs', array() );
+
+    // Ensure array structure
+    if ( ! isset( $attendance_logs[ $user_id ] ) ) {
+        $attendance_logs[ $user_id ] = array();
+    }
+
+    // Check if already punched in today
+    if ( isset( $attendance_logs[ $user_id ][ $today ] ) && ! empty( $attendance_logs[ $user_id ][ $today ]['punch_in'] ) ) {
+        wp_send_json_error( 'You have already punched in today.' );
+    }
+
+    $office_loc = get_option( 'cora_office_location', false );
+    $flagged = false;
+    $flag_reason = '';
+    
+    if ( $office_loc && ! empty( $office_loc['lat'] ) && ! empty( $office_loc['lng'] ) ) {
+        $distance = cora_calculate_distance( $lat, $lng, $office_loc['lat'], $office_loc['lng'] );
+        if ( $distance > 1000 ) {
+            $flagged = true;
+            $flag_reason = 'Outside 1000m radius (' . round($distance) . 'm)';
+        }
+    }
+
+    $attendance_logs[ $user_id ][ $today ] = array(
+        'punch_in'      => $now,
+        'punch_out'     => '',
+        'punch_in_lat'  => $lat,
+        'punch_in_lng'  => $lng,
+        'punch_out_lat' => '',
+        'punch_out_lng' => '',
+        'flagged'       => $flagged,
+        'flag_reason'   => $flag_reason
+    );
+
+    update_option( 'cora_attendance_logs', $attendance_logs );
+
+    // Send email notification to admin
+    $admin_email = get_option( 'admin_email' );
+    $current_user = wp_get_current_user();
+    $user_display_name = $current_user->exists() ? $current_user->display_name : 'Staff';
+    $subject = sprintf( '[Attendance] %s Punched In', $user_display_name );
+    $message = sprintf(
+        "Staff member %s has punched in.\n\nTime: %s\nLatitude: %s\nLongitude: %s\nStatus: %s",
+        $user_display_name,
+        $now,
+        $lat,
+        $lng,
+        $flagged ? 'Flagged (' . $flag_reason . ')' : 'Normal'
+    );
+    wp_mail( $admin_email, $subject, $message );
+
+    wp_send_json_success( array(
+        'message' => 'Punched in successfully.',
+        'log'     => $attendance_logs[ $user_id ][ $today ]
+    ) );
+}
+add_action( 'wp_ajax_cora_punch_in', 'cora_ajax_punch_in' );
+
+/**
+ * Handle staff punch out
+ */
+function cora_ajax_punch_out() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! is_user_logged_in() ) wp_send_json_error( 'Not authenticated.' );
+
+    $lat = isset( $_POST['lat'] ) ? sanitize_text_field( wp_unslash( $_POST['lat'] ) ) : '';
+    $lng = isset( $_POST['lng'] ) ? sanitize_text_field( wp_unslash( $_POST['lng'] ) ) : '';
+
+    $user_id = get_current_user_id();
+    $dt = new DateTime('now', new DateTimeZone('Asia/Kolkata'));
+    $today = $dt->format('Y-m-d');
+    $now = $dt->format('Y-m-d H:i:s');
+
+    $attendance_logs = get_option( 'cora_attendance_logs', array() );
+
+    if ( ! isset( $attendance_logs[ $user_id ][ $today ] ) || empty( $attendance_logs[ $user_id ][ $today ]['punch_in'] ) ) {
+        wp_send_json_error( 'You have not punched in today.' );
+    }
+
+    if ( ! empty( $attendance_logs[ $user_id ][ $today ]['punch_out'] ) ) {
+        wp_send_json_error( 'You have already punched out today.' );
+    }
+
+    $office_loc = get_option( 'cora_office_location', false );
+    $flagged = isset($attendance_logs[ $user_id ][ $today ]['flagged']) ? $attendance_logs[ $user_id ][ $today ]['flagged'] : false;
+    $flag_reason = isset($attendance_logs[ $user_id ][ $today ]['flag_reason']) ? $attendance_logs[ $user_id ][ $today ]['flag_reason'] : '';
+    
+    if ( $office_loc && ! empty( $office_loc['lat'] ) && ! empty( $office_loc['lng'] ) ) {
+        $distance = cora_calculate_distance( $lat, $lng, $office_loc['lat'], $office_loc['lng'] );
+        if ( $distance > 1000 ) {
+            $flagged = true;
+            $flag_reason .= ($flag_reason ? ' | ' : '') . 'Punch Out: Outside 1000m (' . round($distance) . 'm)';
+        }
+    }
+
+    $attendance_logs[ $user_id ][ $today ]['punch_out']     = $now;
+    $attendance_logs[ $user_id ][ $today ]['punch_out_lat'] = $lat;
+    $attendance_logs[ $user_id ][ $today ]['punch_out_lng'] = $lng;
+    $attendance_logs[ $user_id ][ $today ]['flagged']       = $flagged;
+    $attendance_logs[ $user_id ][ $today ]['flag_reason']   = $flag_reason;
+
+    update_option( 'cora_attendance_logs', $attendance_logs );
+
+    // Send email notification to admin
+    $admin_email = get_option( 'admin_email' );
+    $current_user = wp_get_current_user();
+    $user_display_name = $current_user->exists() ? $current_user->display_name : 'Staff';
+    $subject = sprintf( '[Attendance] %s Punched Out', $user_display_name );
+    $message = sprintf(
+        "Staff member %s has punched out.\n\nTime: %s\nLatitude: %s\nLongitude: %s\nStatus: %s",
+        $user_display_name,
+        $now,
+        $lat,
+        $lng,
+        $flagged ? 'Flagged (' . $flag_reason . ')' : 'Normal'
+    );
+    wp_mail( $admin_email, $subject, $message );
+
+    wp_send_json_success( array(
+        'message' => 'Punched out successfully.',
+        'log'     => $attendance_logs[ $user_id ][ $today ]
+    ) );
+}
+add_action( 'wp_ajax_cora_punch_out', 'cora_ajax_punch_out' );
+
+/**
+ * Get attendance logs (Admin sees all, User sees own)
+ */
+function cora_ajax_get_attendance() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! is_user_logged_in() ) wp_send_json_error( 'Not authenticated.' );
+
+    $user = wp_get_current_user();
+    $is_admin = in_array( 'administrator', (array) $user->roles ) || in_array( 'cora_manager', (array) $user->roles );
+    $user_id = get_current_user_id();
+    
+    $attendance_logs = get_option( 'cora_attendance_logs', array() );
+    
+    $result = array();
+
+    if ( $is_admin ) {
+        // Admin gets all users
+        foreach ( $attendance_logs as $uid => $logs ) {
+            $user_info = get_userdata( $uid );
+            $name = $user_info ? $user_info->display_name : 'Unknown User';
+            foreach ( $logs as $date => $log ) {
+                $log['user_id'] = $uid;
+                $log['name'] = $name;
+                $log['date'] = $date;
+                $result[] = $log;
+            }
+        }
+    } else {
+        // Staff gets only their own
+        if ( isset( $attendance_logs[ $user_id ] ) ) {
+            foreach ( $attendance_logs[ $user_id ] as $date => $log ) {
+                $log['user_id'] = $user_id;
+                $log['name'] = $user->display_name;
+                $log['date'] = $date;
+                $result[] = $log;
+            }
+        }
+    }
+
+    // Sort by date DESC
+    usort($result, function($a, $b) {
+        return strtotime($b['date']) - strtotime($a['date']);
+    });
+    
+    // Get Office Location
+    $office_loc = get_option( 'cora_office_location', array() );
+    $office_lat = isset( $office_loc['lat'] ) ? floatval( $office_loc['lat'] ) : 0;
+    $office_lng = isset( $office_loc['lng'] ) ? floatval( $office_loc['lng'] ) : 0;
+
+    $is_super_admin = current_user_can( 'administrator' );
+    $now = time();
+    foreach ( $result as &$log_item ) {
+        $log_item['can_edit'] = $is_super_admin;
+        
+        // Check if out of bounds (200m radius)
+        $log_item['flagged'] = false;
+        
+        $status = isset($log_item['status']) ? $log_item['status'] : '';
+        
+        if ( $status === 'approved' ) {
+            $log_item['flagged'] = false;
+        } else if ( $status === 'rejected' ) {
+            $log_item['flagged'] = true;
+            $log_item['flag_reason'] = 'Rejected by Admin';
+        } else if ( $office_lat && $office_lng && !empty($log_item['punch_in_lat']) && !empty($log_item['punch_in_lng']) ) {
+            $user_lat = floatval($log_item['punch_in_lat']);
+            $user_lng = floatval($log_item['punch_in_lng']);
+            
+            // Haversine formula
+            $earth_radius = 6371000; // meters
+            $dLat = deg2rad($user_lat - $office_lat);
+            $dLng = deg2rad($user_lng - $office_lng);
+            $a = sin($dLat/2) * sin($dLat/2) + cos(deg2rad($office_lat)) * cos(deg2rad($user_lat)) * sin($dLng/2) * sin($dLng/2);
+            $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+            $distance = $earth_radius * $c;
+            
+            if ($distance > 1000) {
+                $log_item['flagged'] = true;
+                $log_item['distance'] = round($distance);
+                $log_item['flag_reason'] = 'Outside 1000m (' . round($distance) . 'm away)';
+            }
+        }
+        
+        // Super Admin gets manage options
+        $log_item['can_manage'] = $is_super_admin;
+    }
+    unset( $log_item );
+
+    // Calculate dynamic overview stats for today
+    $dt = new DateTime('now', new DateTimeZone('Asia/Kolkata'));
+    $today = $dt->format('Y-m-d');
+    
+    $team_users = get_users( array(
+        'role__in' => array( 'administrator', 'cora_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor' )
+    ) );
+    $total_team = count( $team_users );
+    
+    $present_today = 0;
+    $flagged_today = 0;
+    
+    foreach ( $attendance_logs as $uid => $days ) {
+        if ( isset( $days[$today] ) && ! empty( $days[$today]['punch_in'] ) ) {
+            $present_today++;
+            
+            // Re-verify compliance using distance check or status
+            $today_log = $days[$today];
+            $flagged = false;
+            $status = isset($today_log['status']) ? $today_log['status'] : '';
+            if ( $status === 'approved' ) {
+                $flagged = false;
+            } else if ( $status === 'rejected' ) {
+                $flagged = true;
+            } else if ( $office_lat && $office_lng && !empty($today_log['punch_in_lat']) && !empty($today_log['punch_in_lng']) ) {
+                $user_lat = floatval($today_log['punch_in_lat']);
+                $user_lng = floatval($today_log['punch_in_lng']);
+                $earth_radius = 6371000;
+                $dLat = deg2rad($user_lat - $office_lat);
+                $dLng = deg2rad($user_lng - $office_lng);
+                $a = sin($dLat/2) * sin($dLat/2) + cos(deg2rad($office_lat)) * cos(deg2rad($user_lat)) * sin($dLng/2) * sin($dLng/2);
+                $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+                $distance = $earth_radius * $c;
+                if ($distance > 1000) {
+                    $flagged = true;
+                }
+            }
+            if ( $flagged ) {
+                $flagged_today++;
+            }
+        }
+    }
+    
+    $missing_absent = max( 0, $total_team - $present_today );
+    
+    $response_data = array(
+        'logs'  => $result,
+        'stats' => array(
+            'total_team'        => $total_team,
+            'present_today'     => $present_today,
+            'missing_absent'    => $missing_absent,
+            'flagged_locations' => $flagged_today
+        )
+    );
+ 
+    wp_send_json_success( $response_data );
+}
+add_action( 'wp_ajax_cora_get_attendance', 'cora_ajax_get_attendance' );
+
+
+/**
+ * AJAX: Add attendance record manually (Super Admin only)
+ */
+function cora_ajax_add_attendance() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'administrator' ) ) {
+        wp_send_json_error( 'Only the Super Admin is authorized to add attendance records manually.' );
+    }
+
+    $target_user_id = isset( $_POST['user_id'] ) ? intval( $_POST['user_id'] ) : 0;
+    $target_date = isset( $_POST['date'] ) ? sanitize_text_field( wp_unslash( $_POST['date'] ) ) : '';
+    $punch_in = isset( $_POST['punch_in'] ) ? sanitize_text_field( wp_unslash( $_POST['punch_in'] ) ) : '';
+    $punch_out = isset( $_POST['punch_out'] ) ? sanitize_text_field( wp_unslash( $_POST['punch_out'] ) ) : '';
+    $reason = isset( $_POST['reason'] ) ? sanitize_text_field( wp_unslash( $_POST['reason'] ) ) : '';
+
+    if ( ! $target_user_id ) {
+        wp_send_json_error( 'Please select a team member.' );
+    }
+    if ( empty( $target_date ) ) {
+        wp_send_json_error( 'Please select a date.' );
+    }
+    if ( empty( $punch_in ) ) {
+        wp_send_json_error( 'Punch in time is required.' );
+    }
+    if ( empty( $reason ) ) {
+        wp_send_json_error( 'Reason for manual entry is required.' );
+    }
+
+    $attendance_logs = get_option( 'cora_attendance_logs', array() );
+
+    if ( ! isset( $attendance_logs[ $target_user_id ] ) ) {
+        $attendance_logs[ $target_user_id ] = array();
+    }
+
+    if ( isset( $attendance_logs[ $target_user_id ][ $target_date ] ) ) {
+        wp_send_json_error( 'An attendance record already exists for this member on ' . $target_date . '.' );
+    }
+
+    $current_user = wp_get_current_user();
+    $dt = new DateTime('now', new DateTimeZone('Asia/Kolkata'));
+    $now_timestamp = $dt->format('Y-m-d H:i:s');
+
+    $attendance_logs[ $target_user_id ][ $target_date ] = array(
+        'punch_in'      => $punch_in,
+        'punch_out'     => $punch_out,
+        'punch_in_lat'  => '',
+        'punch_in_lng'  => '',
+        'punch_out_lat' => '',
+        'punch_out_lng' => '',
+        'flagged'       => false,
+        'flag_reason'   => '',
+        'status'        => 'approved',
+        'edit_history'  => array(
+            array(
+                'editor_id' => get_current_user_id(),
+                'editor_name' => $current_user->display_name,
+                'timestamp' => $now_timestamp,
+                'reason' => 'Manual Entry: ' . $reason,
+                'old_punch_in' => '',
+                'old_punch_out' => '',
+                'new_punch_in' => $punch_in,
+                'new_punch_out' => $punch_out,
+            )
+        )
+    );
+
+    update_option( 'cora_attendance_logs', $attendance_logs );
+
+    wp_send_json_success( array(
+        'message' => 'Attendance record added successfully.'
+    ) );
+}
+add_action( 'wp_ajax_cora_add_attendance', 'cora_ajax_add_attendance' );
+
+
+/**
+ * Edit attendance record
+ */
+function cora_ajax_edit_attendance() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! is_user_logged_in() ) wp_send_json_error( 'Not authenticated.' );
+
+    if ( ! current_user_can( 'administrator' ) ) {
+        wp_send_json_error( 'Only the Super Admin is authorized to edit attendance records.' );
+    }
+
+    $current_user = wp_get_current_user();
+    $editor_id = get_current_user_id();
+
+    $target_user_id = isset( $_POST['user_id'] ) ? intval( $_POST['user_id'] ) : 0;
+    $target_date = isset( $_POST['date'] ) ? sanitize_text_field( wp_unslash( $_POST['date'] ) ) : '';
+    
+    $new_punch_in = isset( $_POST['punch_in'] ) ? sanitize_text_field( wp_unslash( $_POST['punch_in'] ) ) : '';
+    $new_punch_out = isset( $_POST['punch_out'] ) ? sanitize_text_field( wp_unslash( $_POST['punch_out'] ) ) : '';
+    $reason = isset( $_POST['reason'] ) ? sanitize_text_field( wp_unslash( $_POST['reason'] ) ) : '';
+
+    if ( empty( $reason ) ) {
+        wp_send_json_error( 'Reason for edit is required.' );
+    }
+
+    if ( ! $target_user_id || empty( $target_date ) ) {
+        wp_send_json_error( 'Missing record identifiers.' );
+    }
+
+
+
+    $attendance_logs = get_option( 'cora_attendance_logs', array() );
+
+    if ( ! isset( $attendance_logs[ $target_user_id ][ $target_date ] ) ) {
+        wp_send_json_error( 'Record not found.' );
+    }
+
+    $record = &$attendance_logs[ $target_user_id ][ $target_date ];
+
+    // Prepare audit entry
+    $dt = new DateTime('now', new DateTimeZone('Asia/Kolkata'));
+    $now = $dt->format('Y-m-d H:i:s');
+
+    $audit_entry = array(
+        'editor_id' => $editor_id,
+        'editor_name' => $current_user->display_name,
+        'timestamp' => $now,
+        'reason' => $reason,
+        'old_punch_in' => $record['punch_in'],
+        'old_punch_out' => $record['punch_out'],
+        'new_punch_in' => $new_punch_in,
+        'new_punch_out' => $new_punch_out,
+    );
+    
+    if ( ! isset( $record['edit_history'] ) ) {
+        $record['edit_history'] = array();
+    }
+    
+    $record['edit_history'][] = $audit_entry;
+
+    $record['punch_in'] = $new_punch_in;
+    $record['punch_out'] = $new_punch_out;
+
+    update_option( 'cora_attendance_logs', $attendance_logs );
+
+    // Send email notification
+    $admin_email = get_option( 'admin_email' );
+    $subject = 'Attendance Edit Notification';
+    $message = sprintf(
+        "An attendance record was edited.\n\nEditor: %s\nTarget User ID: %d\nDate: %s\nReason: %s\n\nOld Punch In: %s\nOld Punch Out: %s\nNew Punch In: %s\nNew Punch Out: %s",
+        $current_user->display_name,
+        $target_user_id,
+        $target_date,
+        $reason,
+        $audit_entry['old_punch_in'],
+        $audit_entry['old_punch_out'],
+        $new_punch_in,
+        $new_punch_out
+    );
+    wp_mail( $admin_email, $subject, $message );
+    
+    wp_send_json_success( array(
+        'message' => 'Attendance record updated.',
+        'log' => $record
+    ) );
+}
+add_action( 'wp_ajax_cora_edit_attendance', 'cora_ajax_edit_attendance' );
+
+/**
+ * Manage attendance record (Approve, Reject, Delete)
+ */
+function cora_ajax_manage_attendance() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'administrator' ) ) wp_send_json_error( 'Only super admin can perform this action.' );
+
+    $target_user_id = isset( $_POST['user_id'] ) ? intval( $_POST['user_id'] ) : 0;
+    $target_date = isset( $_POST['date'] ) ? sanitize_text_field( wp_unslash( $_POST['date'] ) ) : '';
+    $action_type = isset( $_POST['manage_action'] ) ? sanitize_text_field( wp_unslash( $_POST['manage_action'] ) ) : '';
+
+    if ( ! $target_user_id || empty( $target_date ) || empty( $action_type ) ) {
+        wp_send_json_error( 'Missing parameters.' );
+    }
+
+    $attendance_logs = get_option( 'cora_attendance_logs', array() );
+
+    if ( ! isset( $attendance_logs[ $target_user_id ][ $target_date ] ) ) {
+        wp_send_json_error( 'Record not found.' );
+    }
+
+    if ( $action_type === 'delete' ) {
+        unset( $attendance_logs[ $target_user_id ][ $target_date ] );
+        $msg = 'Attendance log deleted.';
+    } else if ( $action_type === 'approve' || $action_type === 'reject' ) {
+        $attendance_logs[ $target_user_id ][ $target_date ]['status'] = $action_type;
+        $msg = 'Attendance log ' . $action_type . 'd.';
+    } else {
+        wp_send_json_error( 'Invalid action.' );
+    }
+
+    update_option( 'cora_attendance_logs', $attendance_logs );
+    
+    wp_send_json_success( array(
+        'message' => $msg
+    ) );
+}
+add_action( 'wp_ajax_cora_manage_attendance', 'cora_ajax_manage_attendance' );
+
+// Function to calculate distance between two coordinates in meters
+function cora_calculate_distance($lat1, $lon1, $lat2, $lon2) {
+    if (empty($lat1) || empty($lon1) || empty($lat2) || empty($lon2)) return 0;
+    $earth_radius = 6371000; // in meters
+    $dLat = deg2rad($lat2 - $lat1);
+    $dLon = deg2rad($lon2 - $lon1);
+    $a = sin($dLat/2) * sin($dLat/2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon/2) * sin($dLon/2);
+    $c = 2 * asin(sqrt($a));
+    return $earth_radius * $c;
+}
+
+// Set office location
+function cora_ajax_set_office_location() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if (!current_user_can('manage_options') && !current_user_can('cora_manager')) {
+        wp_send_json_error('Permission denied.');
+    }
+    
+    $lat = isset($_POST['lat']) ? sanitize_text_field(wp_unslash($_POST['lat'])) : '';
+    $lng = isset($_POST['lng']) ? sanitize_text_field(wp_unslash($_POST['lng'])) : '';
+    $name = isset($_POST['name']) ? sanitize_text_field(wp_unslash($_POST['name'])) : '';
+    
+    if (empty($lat) || empty($lng)) {
+        wp_send_json_error('Location data is missing.');
+    }
+    
+    update_option('cora_office_location', array('lat' => $lat, 'lng' => $lng, 'name' => $name));
+    wp_send_json_success('Office location saved successfully.');
+}
+add_action('wp_ajax_cora_set_office_location', 'cora_ajax_set_office_location');
+
+function cora_ajax_get_office_location() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if (!is_user_logged_in()) {
+        wp_send_json_error('Permission denied.');
+    }
+    $office_loc = get_option('cora_office_location', array());
+    wp_send_json_success($office_loc);
+}
+add_action('wp_ajax_cora_get_office_location', 'cora_ajax_get_office_location');
+
+function cora_ajax_resolve_map_url() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if (!is_user_logged_in()) {
+        wp_send_json_error('Permission denied.');
+    }
+    $url = isset($_POST['url']) ? esc_url_raw($_POST['url']) : '';
+    if (empty($url) || strpos($url, 'http') !== 0) {
+        wp_send_json_error('Invalid URL.');
+    }
+    
+    $final_url = $url;
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_exec($ch);
+        $final_url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+        curl_close($ch);
+    }
+    
+    preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', $final_url, $matches);
+    if ($matches) {
+        wp_send_json_success(array('lat' => $matches[1], 'lng' => $matches[2], 'url' => $final_url));
+    } else {
+        wp_send_json_error('Could not extract coordinates.');
+    }
+}
+add_action('wp_ajax_cora_resolve_map_url', 'cora_ajax_resolve_map_url');
+
+// Update user profile
+function cora_ajax_update_my_profile() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( 'Permission denied.' );
+    }
+    $current_user = wp_get_current_user();
+    $user_id = $current_user->ID;
+
+    // Update display name
+    $display_name = isset( $_POST['display_name'] ) ? sanitize_text_field( $_POST['display_name'] ) : '';
+    if ( ! empty( $display_name ) ) {
+        wp_update_user( array( 'ID' => $user_id, 'display_name' => $display_name ) );
+    }
+
+    // Update email (only if valid and not already taken)
+    $email = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
+    if ( ! empty( $email ) && is_email( $email ) && $email !== $current_user->user_email ) {
+        $existing = email_exists( $email );
+        if ( $existing && $existing !== $user_id ) {
+            wp_send_json_error( 'This email address is already in use by another account.' );
+        }
+        wp_update_user( array( 'ID' => $user_id, 'user_email' => $email ) );
+    }
+
+    // Update phone (user meta)
+    if ( isset( $_POST['phone'] ) ) {
+        update_user_meta( $user_id, 'cora_phone', sanitize_text_field( $_POST['phone'] ) );
+    }
+
+    // Update bio (user meta)
+    if ( isset( $_POST['bio'] ) ) {
+        update_user_meta( $user_id, 'description', sanitize_textarea_field( $_POST['bio'] ) );
+    }
+
+    // Handle avatar file upload
+    if ( ! empty( $_FILES['avatar_file'] ) && $_FILES['avatar_file']['size'] > 0 ) {
+        require_once ABSPATH . 'wp-admin/includes/image.php';
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        require_once ABSPATH . 'wp-admin/includes/media.php';
+        $attachment_id = media_handle_upload( 'avatar_file', 0 );
+        if ( ! is_wp_error( $attachment_id ) ) {
+            $avatar_url = wp_get_attachment_url( $attachment_id );
+            update_user_meta( $user_id, 'cora_avatar_url', $avatar_url );
+        }
+    }
+
+    wp_send_json_success( 'Profile updated successfully.' );
+}
+add_action( 'wp_ajax_cora_update_my_profile', 'cora_ajax_update_my_profile' );
+
+// Schedule daily attendance report cron event at 9:00 PM IST
+function cora_schedule_daily_attendance_report() {
+    if ( ! wp_next_scheduled( 'cora_daily_attendance_report_event' ) ) {
+        $timezone = new DateTimeZone('Asia/Kolkata');
+        $time_at_9pm = new DateTime('21:00:00', $timezone);
+        if ( $time_at_9pm->getTimestamp() < time() ) {
+            $time_at_9pm->modify('+1 day');
+        }
+        wp_schedule_event( $time_at_9pm->getTimestamp(), 'daily', 'cora_daily_attendance_report_event' );
+    }
+}
+add_action( 'wp', 'cora_schedule_daily_attendance_report' );
+
+// Clean up cron event on deactivation
+register_deactivation_hook( __FILE__, 'cora_clear_daily_attendance_report_cron' );
+function cora_clear_daily_attendance_report_cron() {
+    wp_clear_scheduled_hook( 'cora_daily_attendance_report_event' );
+}
+
+// Daily summary report generator and dispatcher
+function cora_send_daily_attendance_report() {
+    $dt = new DateTime('now', new DateTimeZone('Asia/Kolkata'));
+    $today = $dt->format('Y-m-d');
+    $today_human = $dt->format('d M, Y');
+
+    $attendance_logs = get_option( 'cora_attendance_logs', array() );
+    
+    $users = get_users();
+    $user_map = array();
+    foreach ( $users as $u ) {
+        $user_map[$u->ID] = $u->display_name ? $u->display_name : $u->user_login;
+    }
+
+    $report_lines = array();
+    $report_lines[] = "Daily Attendance Report - " . $today_human;
+    $report_lines[] = "=====================================\n";
+
+    $has_logs = false;
+    if ( ! empty( $attendance_logs ) ) {
+        foreach ( $attendance_logs as $user_id => $days ) {
+            if ( isset( $days[$today] ) ) {
+                $has_logs = true;
+                $log = $days[$today];
+                $name = isset( $user_map[$user_id] ) ? $user_map[$user_id] : 'User ID ' . $user_id;
+                
+                $punch_in_time = ! empty( $log['punch_in'] ) ? date( 'h:i A', strtotime( $log['punch_in'] ) ) : 'N/A';
+                $punch_out_time = ! empty( $log['punch_out'] ) ? date( 'h:i A', strtotime( $log['punch_out'] ) ) : 'N/A';
+                $status = ! empty( $log['flagged'] ) ? 'Flagged (' . $log['flag_reason'] . ')' : 'Normal';
+                
+                $report_lines[] = sprintf(
+                    "Staff: %s\n- Punch In: %s\n- Punch Out: %s\n- Status: %s\n",
+                    $name,
+                    $punch_in_time,
+                    $punch_out_time,
+                    $status
+                );
+            }
+        }
+    }
+
+    if ( ! $has_logs ) {
+        $report_lines[] = "No attendance logs recorded for today.";
+    }
+
+    $admin_email = get_option( 'admin_email' );
+    $subject = 'Daily Attendance Summary: ' . $today_human;
+    $message = implode( "\n", $report_lines );
+
+    wp_mail( $admin_email, $subject, $message );
+}
+add_action( 'cora_daily_attendance_report_event', 'cora_send_daily_attendance_report' );
+
+// ═══ DYNAMIC REMOTE PLUGIN UPDATER SYSTEM ═══
+class Cora_Plugin_Updater {
+    private $plugin_slug;
+    private $plugin_file;
+    private $update_url;
+    
+    public function __construct( $plugin_file, $update_url ) {
+        $this->plugin_file = $plugin_file;
+        $this->plugin_slug = plugin_basename( $plugin_file );
+        $this->update_url  = $update_url;
+        
+        // Hook into update checks
+        add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_update' ) );
+        
+        // Hook into plugins details modal display
+        add_filter( 'plugins_api', array( $this, 'plugin_info' ), 20, 3 );
+    }
+    
+    public function check_update( $transient ) {
+        if ( empty( $transient->checked ) ) {
+            return $transient;
+        }
+        
+        // Fetch remote update information
+        $response = wp_remote_get( $this->update_url, array(
+            'timeout' => 15,
+            'headers' => array(
+                'Accept' => 'application/json'
+            )
+        ) );
+        
+        if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
+            return $transient;
+        }
+        
+        $remote_data = json_decode( wp_remote_retrieve_body( $response ) );
+        if ( ! $remote_data || empty( $remote_data->version ) ) {
+            return $transient;
+        }
+        
+        $local_version = '';
+        if ( ! function_exists( 'get_plugin_data' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+        $plugin_data = get_plugin_data( $this->plugin_file );
+        $local_version = $plugin_data['Version'];
+        
+        if ( version_compare( $local_version, $remote_data->version, '<' ) ) {
+            $obj = new stdClass();
+            $obj->slug = 'cora-studio-ai-locked';
+            $obj->plugin = $this->plugin_slug;
+            $obj->new_version = $remote_data->version;
+            $obj->tested = isset( $remote_data->tested ) ? $remote_data->tested : '6.5';
+            $obj->package = $remote_data->download_url;
+            $obj->url = 'https://cora.ai';
+            
+            $transient->response[ $this->plugin_slug ] = $obj;
+        }
+        
+        return $transient;
+    }
+    
+    public function plugin_info( $res, $action, $args ) {
+        if ( $action !== 'plugin_information' ) {
+            return $res;
+        }
+        
+        if ( isset( $args->slug ) && $args->slug === 'cora-studio-ai-locked' ) {
+            $response = wp_remote_get( $this->update_url, array(
+                'timeout' => 15,
+                'headers' => array(
+                    'Accept' => 'application/json'
+                )
+            ) );
+            
+            if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
+                return $res;
+            }
+            
+            $remote_data = json_decode( wp_remote_retrieve_body( $response ) );
+            if ( ! $remote_data ) {
+                return $res;
+            }
+            
+            $res = new stdClass();
+            $res->name = $remote_data->name;
+            $res->slug = 'cora-studio-ai-locked';
+            $res->version = $remote_data->version;
+            $res->tested = isset( $remote_data->tested ) ? $remote_data->tested : '6.5';
+            $res->author = 'Dravya Bansal (ClaraVerse)';
+            $res->homepage = 'https://cora.ai';
+            $res->download_link = $remote_data->download_url;
+            
+            $res->sections = array(
+                'description' => isset( $remote_data->sections->description ) ? $remote_data->sections->description : '',
+                'changelog'   => isset( $remote_data->sections->changelog ) ? $remote_data->sections->changelog : ''
+            );
+            
+            return $res;
+        }
+        
+        return $res;
+    }
+}
+
+/**
+ * AJAX: Save Studio settings (Brand Name + Updates URL)
+ */
+function cora_ajax_save_studio_settings() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( 'Unauthorized.' );
+    }
+    
+    $brand_name  = sanitize_text_field( $_POST['brand_name'] ?? '' );
+    $updates_url = esc_url_raw( $_POST['updates_url'] ?? '' );
+    
+    if ( ! empty( $brand_name ) ) {
+        update_option( 'cora_studio_brand_name', $brand_name );
+    }
+    if ( ! empty( $updates_url ) ) {
+        update_option( 'cora_updates_server_url', $updates_url );
+    } else {
+        delete_option( 'cora_updates_server_url' );
+    }
+    
+    wp_send_json_success( 'Studio settings saved.' );
+}
+add_action( 'wp_ajax_cora_save_studio_settings', 'cora_ajax_save_studio_settings' );
+
+$cora_updates_url = get_option( 'cora_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-studio-ai-locked.json' );
+new Cora_Plugin_Updater( __FILE__, $cora_updates_url );
+
+
+

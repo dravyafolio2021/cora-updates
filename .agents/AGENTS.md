@@ -17,3 +17,6 @@ This file outlines workspace rules and style guides that apply across this proje
 - **Light/Dark Mode Support**: Maintain functional classes for light and dark modes, ensuring smooth theme switching with persistent preferences.
 - **Clean SVG Iconography**: Utilize thin-lined vector SVGs (`stroke-width: 1.8` or `2.2`) for all indicator elements.
 - **System Font Stack**: Fallback automatically to system-ui sans-serif fonts to guarantee caching safety and browser consistency.
+
+## 4. Plugin Packaging
+- **Version Increment**: Whenever you are asked to package or zip the plugin for distribution, you MUST first increment the plugin version number in the main plugin file header (e.g. `cora-studio-ai.php`) before creating the zip archive.

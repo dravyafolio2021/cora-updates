@@ -128,6 +128,7 @@
          onmousemove="onBgMouseMove(event)" 
          onmouseup="onBgMouseUp(event)"
          onwheel="onBgWheel(event)"
+         oncontextmenu="event.preventDefault();"
          style="touch-action: none;">
          
         <!-- Translating & Scaling Inner Board -->
@@ -137,14 +138,12 @@
             <div class="absolute w-[12000px] h-[12000px] whiteboard-bg pointer-events-none" style="left: -6000px; top: -6000px; z-index: 0;"></div>
             
             <!-- SVG Connections & Drawings Layer -->
-            <svg id="connections-svg" class="absolute inset-0 w-[4000px] h-[4000px] pointer-events-auto z-10" style="left: -2000px; top: -2000px;">
+            <svg id="connections-svg" class="absolute inset-0 w-[4000px] h-[4000px] pointer-events-none z-10" style="left: -2000px; top: -2000px;">
                 <defs>
                     <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                         <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#71717a" class="dark:fill-zinc-500" />
                     </marker>
                 </defs>
-                <g id="drawings-group"></g>
-                <path id="active-stroke-path" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="dark:stroke-zinc-100 pointer-events-none" />
                 <!-- Dynamic Lines Rendered Here -->
             </svg>
             
@@ -152,6 +151,12 @@
             <div id="nodes-container" class="absolute w-0 h-0 pointer-events-auto z-20">
                 <!-- Dynamic Nodes Rendered Here -->
             </div>
+            
+            <!-- Drawings Layer (Above Nodes) -->
+            <svg id="drawings-svg" class="absolute inset-0 w-[4000px] h-[4000px] pointer-events-none z-30" style="left: -2000px; top: -2000px;">
+                <g id="drawings-group"></g>
+                <path id="active-stroke-path" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="dark:stroke-zinc-100 pointer-events-none hidden" />
+            </svg>
             
             <!-- Selection Marquee (lives inside the scaled viewport) -->
             <div id="selection-marquee" class="absolute border-2 border-dashed border-blue-500/60 bg-blue-500/5 pointer-events-none hidden z-30"></div>
@@ -196,6 +201,12 @@
         <button onclick="deleteSelected()" class="w-10 h-10 rounded-xl text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center justify-center transition-all" title="Delete Selected [Backspace / Del]">
             <i class="fa-regular fa-trash-can"></i>
         </button>
+    </div>
+
+    
+    <!-- MULTI-PAGE TABS BAR (FigJam style) -->
+    <div class="fixed bottom-6 left-6 bg-white/95 dark:bg-zinc-900/95 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-lg flex items-center p-1 z-50 overflow-x-auto max-w-sm hide-scrollbar" id="pages-tabs">
+        <!-- Rendered via JS -->
     </div>
 
     <!-- ZOOM LEVEL CONTROLS INDICATOR -->
@@ -266,47 +277,157 @@
 
         // Seeding initial board data (Powerfully & logically spaced out to prevent overlap)
         const initialNodes = [
-            { id: "node-title", x: -360, y: -250, width: 500, height: 72, type: "text", text: "CORA SYSTEM OS — COMPREHENSIVE PRODUCT ROADMAP\nTransitioning Fragmented Operations into a Unified AI Brain", color: "white" },
-            
-            // Stack Column 1 (Fragmented CRM - Left)
-            { id: "note-crm", x: -360, y: -100, width: 220, height: 95, type: "sticky", text: "FRAGMENTED SALES CRM\nSalesforce / ₹3,000/mo\n- No inbound lead sync\n- Average speed-to-lead: 4.5h", color: "zinc" },
-            { id: "note-forms", x: -360, y: 25, width: 220, height: 95, type: "sticky", text: "QUESTIONNAIRE INTAKE\nTypeform / ₹1,500/mo\n- Manual copying required\n- No agency dashboard sync", color: "zinc" },
-            { id: "note-booking", x: -360, y: 150, width: 220, height: 95, type: "sticky", text: "SHOWINGS SCHEDULER\nCalendly / ₹1,200/mo\n- Isolated booking pages\n- No field routing links", color: "zinc" },
-            { id: "note-whatsapp", x: -360, y: 275, width: 220, height: 95, type: "sticky", text: "WHATSAPP MESSAGING\nCustom API / ₹1,500/mo\n- Disconnected shared inbox\n- Manual document dispatch", color: "zinc" },
-            
-            // Bottleneck Column 2 (Leaks - Middle)
-            { id: "note-bt-speed", x: -70, y: -45, width: 220, height: 95, type: "sticky", text: "SPEED-TO-LEAD LATENCY\nAverage routing delay: 4.5 hours\nResult: 80% customer dropoff", color: "dark" },
-            { id: "note-bt-media", x: -70, y: 85, width: 220, height: 95, type: "sticky", text: "MANUAL ASSETS DISPATCH\nFiles shared on raw Drive folders\nNo premium viewer or password gate", color: "dark" },
-            { id: "note-bt-finance", x: -70, y: 215, width: 220, height: 95, type: "sticky", text: "OFFLINE FINANCIALS\nToken advances ledger on sheets\nManual brokerage split accounting", color: "dark" },
 
-            // Central Brain Hub Column 3 (Cora OS Hub - Middle Right)
-            { id: "card-hub", x: 230, y: -100, width: 360, height: 460, type: "card", text: "CORA OS CENTRAL BRAIN HUB\nUnified real estate database & automated micro-actions", color: "white" },
-            { id: "note-hub-db", x: 260, y: -45, width: 300, height: 75, type: "sticky", text: "UNIFIED INBOUND QUEUE\nPre-seeded database options table capturing webhooks & leads instantly", color: "cora" },
-            { id: "note-hub-ai", x: 260, y: 55, width: 300, height: 75, type: "sticky", text: "AI ROUTING & SUMMARIES\nAuto-attributions of site tours, agent load indicators & priority checklist", color: "cora" },
-            { id: "note-hub-whatsapp", x: 260, y: 155, width: 300, height: 75, type: "sticky", text: "ARIA INSTANT DISPATCHER\n1.2s dispatch response containing PDF brochures & maps via WhatsApp", color: "cora" },
-            { id: "note-hub-visual", x: 260, y: 255, width: 300, height: 75, type: "sticky", text: "VISUAL CMS BUILDER\nGrapesJS visual page builder for high-performance single-listing landers", color: "cora" },
+            // ═══════════════════════════════════════════════
+            // ZONE 0 — TITLE HEADER
+            // ═══════════════════════════════════════════════
+            { id: "title-main", x: -350, y: -510, width: 890, height: 55, type: "text", text: "WVIN WEALTH INFRA — THE DAILY HUSTLE OF A 10+ MEMBER REAL ESTATE AGENCY\nGurgaon, Haryana · ₹200Cr+ Inventory Under Management · Founded 2019", color: "white" },
+            { id: "title-sub", x: -350, y: -445, width: 890, height: 30, type: "text", text: "How a growing brokerage runs today — and where every hour is bleeding money", color: "white" },
 
-            // Ops Column 4 (Cora Self-Working Ops - Right)
-            { id: "note-op-followup", x: 670, y: -80, width: 220, height: 95, type: "sticky", text: "AUTOPILOT FOLLOW-UPS\nAutomated CRM reminders and WhatsApp broadcasts for hot buyer lists", color: "white" },
-            { id: "note-op-galleries", x: 670, y: 45, width: 220, height: 95, type: "sticky", text: "SECURE CLIENT PORTALS\nCustom password protection lock, expiring link tokens, masonry grids", color: "white" },
-            { id: "note-op-schedule", x: 670, y: 170, width: 220, height: 95, type: "sticky", text: "SITE VISIT LOGISTICS\nAgent schedule allocations, vehicle logistics logs, valuer flight dispatch", color: "white" },
-            { id: "note-op-ledger", x: 670, y: 295, width: 220, height: 95, type: "sticky", text: "DOUBLE-ENTRY LEDGER\nCommission logs, digital agreements signatures, advance token tracking", color: "white" }
+            // ═══════════════════════════════════════════════
+            // ZONE 1 — THE TEAM (Left Column)
+            // ═══════════════════════════════════════════════
+            { id: "card-team", x: -730, y: -390, width: 340, height: 880, type: "card", text: "THE TEAM — 12 MEMBERS\nWvin Wealth Infra, Gurgaon", color: "zinc" },
+
+            { id: "team-founder", x: -710, y: -325, width: 300, height: 85, type: "sticky", text: "👤 NITIN ARORA — Founder & CEO\nOverall strategy, investor relations,\nfinal deal closures, site approvals", color: "cora" },
+            { id: "team-sales-head", x: -710, y: -220, width: 300, height: 85, type: "sticky", text: "👤 SALES HEAD\nManages 4 sales executives,\nassigns leads, tracks weekly targets", color: "dark" },
+
+            { id: "team-sales1", x: -710, y: -115, width: 140, height: 75, type: "sticky", text: "👤 SALES EXEC 1\nSector 65–80\nField visits", color: "white" },
+            { id: "team-sales2", x: -555, y: -115, width: 140, height: 75, type: "sticky", text: "👤 SALES EXEC 2\nGolf Course Rd\nCold calls", color: "white" },
+            { id: "team-sales3", x: -710, y: -20, width: 140, height: 75, type: "sticky", text: "👤 SALES EXEC 3\nDwarka Exp.\nSite visits", color: "white" },
+            { id: "team-sales4", x: -555, y: -20, width: 140, height: 75, type: "sticky", text: "👤 SALES EXEC 4\nNew Gurgaon\nChannel sales", color: "white" },
+
+            { id: "team-marketing", x: -710, y: 75, width: 300, height: 80, type: "sticky", text: "👤 MARKETING MANAGER\nRuns Meta & Google ads, manages\ncreatives, tracks CPL & spend", color: "dark" },
+            { id: "team-admin", x: -710, y: 175, width: 300, height: 80, type: "sticky", text: "👤 ADMIN / ACCOUNTS\nCommission tracking, invoicing,\nbank reconciliation, GST filing", color: "white" },
+            { id: "team-coordinator", x: -710, y: 275, width: 300, height: 80, type: "sticky", text: "👤 SITE VISIT COORDINATOR\nSchedules visits, arranges cabs,\nconfirms with builder reps", color: "white" },
+            { id: "team-backend", x: -710, y: 375, width: 300, height: 80, type: "sticky", text: "👤 BACK-OFFICE / IT\nWebsite updates, listing uploads,\nWhatsApp broadcast management", color: "white" },
+
+            // ═══════════════════════════════════════════════
+            // ZONE 2 — MORNING HUSTLE (Top Row)
+            // Container: 890w x 310h, 4 tasks + 3 pains
+            // ═══════════════════════════════════════════════
+            { id: "card-morning", x: -350, y: -390, width: 890, height: 320, type: "card", text: "🌅 MORNING HUSTLE — 8:00 AM to 12:00 PM\nThe scramble before lunch", color: "white" },
+
+            { id: "morning-1", x: -325, y: -325, width: 195, height: 115, type: "sticky", text: "8:00 AM — LEAD DUMP\nCheck 99acres, MagicBricks,\nHousing.com dashboards\n≈ 15–30 new enquiries", color: "zinc" },
+            { id: "morning-2", x: -110, y: -325, width: 195, height: 115, type: "sticky", text: "8:30 AM — COPY-PASTE\nManually copy leads into\nGoogle Sheets master file\nName / Phone / Budget row", color: "zinc" },
+            { id: "morning-3", x: 105, y: -325, width: 195, height: 115, type: "sticky", text: "9:00 AM — ASSIGNMENTS\nSales Head WhatsApps\neach exec their leads\n\"Yeh tera, yeh mera\"", color: "zinc" },
+            { id: "morning-4", x: 320, y: -325, width: 195, height: 115, type: "sticky", text: "10:00 AM — COLD CALLS\nExecs call from personal\nphones — no tracking\nNo call recording logs", color: "zinc" },
+
+            { id: "morning-pain-1", x: -325, y: -190, width: 265, height: 90, type: "sticky", text: "⚠️ PAIN: Speed-to-Lead = 4.5 HOURS\n80% of portal leads go cold before\nfirst call — competitors respond in 2 min", color: "dark" },
+            { id: "morning-pain-2", x: -40, y: -190, width: 265, height: 90, type: "sticky", text: "⚠️ PAIN: ZERO CALL ANALYTICS\nNo idea who called whom, duration,\noutcome — sales is a black box", color: "dark" },
+            { id: "morning-pain-3", x: 245, y: -190, width: 265, height: 90, type: "sticky", text: "⚠️ PAIN: DUPLICATE LEADS\nSame buyer appears on 3 portals,\nassigned to 2 execs → internal fights", color: "dark" },
+
+            // ═══════════════════════════════════════════════
+            // ZONE 3 — AFTERNOON OPS (Middle Row)
+            // Gap: 40px below morning
+            // ═══════════════════════════════════════════════
+            { id: "card-afternoon", x: -350, y: -30, width: 890, height: 320, type: "card", text: "☀️ AFTERNOON OPERATIONS — 12:00 PM to 5:00 PM\nSite visits, negotiations, and media chaos", color: "white" },
+
+            { id: "afternoon-1", x: -325, y: 35, width: 195, height: 115, type: "sticky", text: "12:30 PM — SITE VISITS\nCoordinator calls builder,\nbooks slots, arranges cab\nAll on personal WhatsApp", color: "zinc" },
+            { id: "afternoon-2", x: -110, y: 35, width: 195, height: 115, type: "sticky", text: "1:30 PM — BROCHURE SEND\nClient asks for floor plans\nExec searches Google Drive\nforwards a 45MB raw PDF", color: "zinc" },
+            { id: "afternoon-3", x: 105, y: 35, width: 195, height: 115, type: "sticky", text: "3:00 PM — FOLLOW-UPS\n\"Sir ne decide kiya?\" calls\nNo system — just memory\nand scattered sticky notes", color: "zinc" },
+            { id: "afternoon-4", x: 320, y: 35, width: 195, height: 115, type: "sticky", text: "4:00 PM — PRICE NEGOTIATION\nExec calls builder for best\nprice. Calculates brokerage\non phone calculator app", color: "zinc" },
+
+            { id: "afternoon-pain-1", x: -325, y: 170, width: 265, height: 90, type: "sticky", text: "⚠️ PAIN: NO VISIT TRACKING\nFounder has no idea how many\nsite visits happened today or this week", color: "dark" },
+            { id: "afternoon-pain-2", x: -40, y: 170, width: 265, height: 90, type: "sticky", text: "⚠️ PAIN: BROCHURES = RAW FILES\nNo branded viewer, no analytics,\nno idea if client even opened it", color: "dark" },
+            { id: "afternoon-pain-3", x: 245, y: 170, width: 265, height: 90, type: "sticky", text: "⚠️ PAIN: BROKERAGE CALC IS MANUAL\nEvery deal's commission is calculated\non paper — errors lose ₹50K+ monthly", color: "dark" },
+
+            // ═══════════════════════════════════════════════
+            // ZONE 4 — EVENING CHAOS (Bottom Row)
+            // Gap: 40px below afternoon
+            // ═══════════════════════════════════════════════
+            { id: "card-evening", x: -350, y: 330, width: 890, height: 310, type: "card", text: "🌙 EVENING CHAOS — 5:00 PM to 9:00 PM\nReporting, payments, and the marketing grind", color: "white" },
+
+            { id: "evening-1", x: -325, y: 395, width: 195, height: 110, type: "sticky", text: "5:30 PM — DAILY REPORT\nSales Head asks each exec\n\"Kitne calls, kitne visits?\"\nReplies come on WhatsApp", color: "zinc" },
+            { id: "evening-2", x: -110, y: 395, width: 195, height: 110, type: "sticky", text: "6:00 PM — TOKEN ADVANCE\nClient pays ₹5L token\nAdmin notes it in diary\nNo digital receipt/ledger", color: "zinc" },
+            { id: "evening-3", x: 105, y: 395, width: 195, height: 110, type: "sticky", text: "7:00 PM — AD CAMPAIGNS\nMarketing runs FB/Google\nads, manually counts CPL\n\"Leads aaye kitne?\" — guess", color: "zinc" },
+            { id: "evening-4", x: 320, y: 395, width: 195, height: 110, type: "sticky", text: "8:30 PM — FOUNDER REVIEW\nNitin opens WhatsApp chats\ntries to piece together\nwho's doing what — fails", color: "zinc" },
+
+            { id: "evening-pain-1", x: -325, y: 525, width: 265, height: 85, type: "sticky", text: "⚠️ NO SINGLE DASHBOARD\nFounder runs blind — data lives in\n8+ apps, 20+ WhatsApp groups", color: "dark" },
+            { id: "evening-pain-2", x: -40, y: 525, width: 265, height: 85, type: "sticky", text: "⚠️ MONEY LEAKS EVERYWHERE\nToken advances untracked, brokerage\ndelayed, GST compliance manual", color: "dark" },
+            { id: "evening-pain-3", x: 245, y: 525, width: 265, height: 85, type: "sticky", text: "⚠️ MARKETING ROI = UNKNOWN\nNo attribution — ₹2L/mo ad spend\nwith zero clarity on which ad works", color: "dark" },
+
+            // ═══════════════════════════════════════════════
+            // ZONE 5 — TOOL STACK (Right Column)
+            // ═══════════════════════════════════════════════
+            { id: "card-tools", x: 580, y: -390, width: 340, height: 880, type: "card", text: "🔧 CURRENT TOOL STACK — ₹35K+/month\nDisconnected SaaS chaos costing time & money", color: "zinc" },
+
+            { id: "tool-1", x: 600, y: -325, width: 300, height: 60, type: "sticky", text: "99acres + MagicBricks + Housing\n₹8,000/mo — 3 separate login dashboards", color: "white" },
+            { id: "tool-2", x: 600, y: -250, width: 300, height: 60, type: "sticky", text: "Google Sheets — Master Lead Sheet\nFree — but zero automation or alerts", color: "white" },
+            { id: "tool-3", x: 600, y: -175, width: 300, height: 60, type: "sticky", text: "WhatsApp Business + Personal\n₹0 — but no CRM sync, no templates", color: "white" },
+            { id: "tool-4", x: 600, y: -100, width: 300, height: 60, type: "sticky", text: "Google Drive — Brochures & Floor Plans\nFree — raw files, no viewer, no tracking", color: "white" },
+            { id: "tool-5", x: 600, y: -25, width: 300, height: 60, type: "sticky", text: "Canva Pro — Marketing Creatives\n₹4,000/mo — designer creates posts", color: "white" },
+            { id: "tool-6", x: 600, y: 50, width: 300, height: 60, type: "sticky", text: "Meta Ads Manager + Google Ads\n₹2,00,000/mo spend — manual CPL tracking", color: "white" },
+            { id: "tool-7", x: 600, y: 125, width: 300, height: 60, type: "sticky", text: "Tally / Excel — Accounting\n₹3,000/mo — manual brokerage entries", color: "white" },
+            { id: "tool-8", x: 600, y: 200, width: 300, height: 60, type: "sticky", text: "Personal Phones — Call Logs\n₹0 — no recording, no CRM link", color: "white" },
+            { id: "tool-9", x: 600, y: 275, width: 300, height: 60, type: "sticky", text: "Calendly / Google Calendar\n₹1,500/mo — visit scheduling isolated", color: "white" },
+            { id: "tool-10", x: 600, y: 350, width: 300, height: 60, type: "sticky", text: "Physical Diary — Token Advance Log\n₹0 — handwritten, losable, unauditable", color: "white" },
+
+            { id: "tool-total", x: 600, y: 430, width: 300, height: 55, type: "sticky", text: "TOTAL: ₹35,000+/mo on tools\nthat DON'T TALK TO EACH OTHER", color: "dark" },
+
+            // ═══════════════════════════════════════════════
+            // ZONE 6 — THE REAL COST (Bottom Center)
+            // Gap: 50px below evening
+            // ═══════════════════════════════════════════════
+            { id: "card-cost", x: -100, y: 700, width: 550, height: 220, type: "card", text: "💰 THE REAL COST OF THIS CHAOS\nWhat Wvin is losing every single month", color: "dark" },
+
+            { id: "cost-1", x: -75, y: 770, width: 240, height: 60, type: "sticky", text: "🔴 ₹8–12L/mo LOST REVENUE\nfrom slow lead response &\nzero follow-up automation", color: "cora" },
+            { id: "cost-2", x: 185, y: 770, width: 240, height: 60, type: "sticky", text: "🔴 40+ HOURS/WEEK wasted\non manual data entry, copy-\npasting, and status chasing", color: "cora" },
+            { id: "cost-3", x: -75, y: 845, width: 240, height: 55, type: "sticky", text: "🔴 ₹50K+/mo BROKERAGE ERRORS\nwrong splits, missed payments,\nmanual calculation mistakes", color: "cora" },
+            { id: "cost-4", x: 185, y: 845, width: 240, height: 55, type: "sticky", text: "🔴 ZERO BUSINESS INTELLIGENCE\nFounder cannot forecast,\nplan, or scale with confidence", color: "cora" }
         ];
 
         const initialConnections = [
-            { from: "note-crm", to: "note-bt-speed" },
-            { from: "note-forms", to: "note-bt-speed" },
-            { from: "note-booking", to: "note-bt-media" },
-            { from: "note-whatsapp", to: "note-bt-finance" },
-            
-            { from: "note-bt-speed", to: "card-hub" },
-            { from: "note-bt-media", to: "card-hub" },
-            { from: "note-bt-finance", to: "card-hub" },
-            
-            { from: "card-hub", to: "note-op-followup" },
-            { from: "card-hub", to: "note-op-galleries" },
-            { from: "card-hub", to: "note-op-schedule" },
-            { from: "card-hub", to: "note-op-ledger" }
+            // Morning flow (left → right)
+            { from: "morning-1", to: "morning-2" },
+            { from: "morning-2", to: "morning-3" },
+            { from: "morning-3", to: "morning-4" },
+
+            // Morning → Pain points
+            { from: "morning-1", to: "morning-pain-1" },
+            { from: "morning-4", to: "morning-pain-2" },
+            { from: "morning-2", to: "morning-pain-3" },
+
+            // Afternoon flow
+            { from: "afternoon-1", to: "afternoon-2" },
+            { from: "afternoon-2", to: "afternoon-3" },
+            { from: "afternoon-3", to: "afternoon-4" },
+
+            // Afternoon → Pain points
+            { from: "afternoon-1", to: "afternoon-pain-1" },
+            { from: "afternoon-2", to: "afternoon-pain-2" },
+            { from: "afternoon-4", to: "afternoon-pain-3" },
+
+            // Evening flow
+            { from: "evening-1", to: "evening-2" },
+            { from: "evening-2", to: "evening-3" },
+            { from: "evening-3", to: "evening-4" },
+
+            // Evening → Pain points
+            { from: "evening-4", to: "evening-pain-1" },
+            { from: "evening-2", to: "evening-pain-2" },
+            { from: "evening-3", to: "evening-pain-3" },
+
+            // Team → Timeline entry points
+            { from: "team-sales-head", to: "morning-3" },
+            { from: "team-marketing", to: "evening-3" },
+            { from: "team-coordinator", to: "afternoon-1" },
+            { from: "team-admin", to: "evening-2" },
+            { from: "team-backend", to: "morning-1" },
+
+            // Tools → Tasks
+            { from: "tool-1", to: "morning-1" },
+            { from: "tool-2", to: "morning-2" },
+            { from: "tool-3", to: "morning-3" },
+            { from: "tool-8", to: "morning-4" },
+            { from: "tool-4", to: "afternoon-2" },
+            { from: "tool-9", to: "afternoon-1" },
+
+            // Pain points → Cost
+            { from: "morning-pain-1", to: "cost-1" },
+            { from: "afternoon-pain-3", to: "cost-3" },
+            { from: "evening-pain-1", to: "cost-4" },
+            { from: "evening-pain-3", to: "cost-2" }
         ];
 
         let nodes = [];
@@ -349,19 +470,18 @@
         // Color definitions
         const colors = {
             white: { bg: 'bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-neutral-900 dark:text-neutral-50' },
-            zinc: { bg: 'bg-zinc-150 dark:bg-zinc-900 border-zinc-300 dark:border-zinc-800 text-neutral-900 dark:text-neutral-200' },
-            dark: { bg: 'bg-zinc-850 dark:bg-zinc-950 border-zinc-700 dark:border-zinc-900 text-white dark:text-zinc-300' },
+            zinc: { bg: 'bg-zinc-100 dark:bg-zinc-900 border-zinc-300 dark:border-zinc-800 text-neutral-900 dark:text-neutral-200' },
+            dark: { bg: 'bg-zinc-800 dark:bg-zinc-950 border-zinc-700 dark:border-zinc-900 text-white dark:text-zinc-300' },
             cora: { bg: 'bg-zinc-900 dark:bg-zinc-50 border-zinc-800 dark:border-zinc-200 text-white dark:text-black font-semibold' }
         };
 
         // State Save Persistence
         function saveStateToLocalStorage() {
-            localStorage.setItem('cora_board_nodes', JSON.stringify(nodes));
-            localStorage.setItem('cora_board_connections', JSON.stringify(connections));
-            localStorage.setItem('cora_board_drawings', JSON.stringify(drawings));
-            localStorage.setItem('cora_board_panX', panX.toString());
-            localStorage.setItem('cora_board_panY', panY.toString());
-            localStorage.setItem('cora_board_zoom', zoom.toString());
+            if (pages[currentPageIndex]) {
+                pages[currentPageIndex].nodes = [...nodes];
+                pages[currentPageIndex].connections = [...connections];
+            }
+            localStorage.setItem("cora_board_pages", JSON.stringify(pages));
         }
 
         // Snap state to Undo Stack
@@ -444,19 +564,160 @@
         }
 
         // Load Persistent State on Startup
+                // ═══════════════════════════════════════════
+        // PAGES SYSTEM — FigJam-style multi-page canvas
+        // ═══════════════════════════════════════════
+        let pages = [];
+        let currentPageIndex = 0;
+
+        function renderPagesBar() {
+            const container = document.getElementById('pages-tabs');
+            if (!container) return;
+            
+            let html = '';
+            pages.forEach((page, index) => {
+                const isActive = index === currentPageIndex;
+                html += `
+                    <div class="group flex items-center gap-1 ${isActive ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-sm' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400'} px-3 py-1.5 rounded-lg text-[10px] font-bold cursor-pointer transition-colors" onclick="switchPage(${index})">
+                        <span class="truncate max-w-[100px] uppercase tracking-wider" ondblclick="renamePage(${index}, event)">${page.name}</span>
+                        ${pages.length > 1 ? `<button onclick="deletePage(${index}, event)" class="opacity-0 group-hover:opacity-100 ml-1 text-zinc-400 hover:text-red-500 transition-opacity"><i class="fa-solid fa-xmark"></i></button>` : ''}
+                    </div>
+                `;
+            });
+            
+            html += `
+                <button onclick="addPage()" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white px-2 py-1.5 rounded-lg transition-colors">
+                    <i class="fa-solid fa-plus text-[10px]"></i>
+                </button>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function switchPage(index) {
+            // Save current page state
+            if (pages[currentPageIndex]) {
+                pages[currentPageIndex].nodes = [...nodes];
+                pages[currentPageIndex].connections = [...connections];
+            }
+            
+            currentPageIndex = index;
+            nodes = [...pages[index].nodes];
+            connections = [...pages[index].connections];
+            historyStack = [];
+            redoStack = [];
+            selectedNodeIds = [];
+            
+            pushHistory();
+            renderNodes();
+            drawConnections();
+            renderPagesBar();
+            
+            // Sync URL hash
+            window.history.replaceState(null, '', '#' + pages[index].id);
+        }
+
+        function addPage() {
+            // Save current page state
+            if (pages[currentPageIndex]) {
+                pages[currentPageIndex].nodes = [...nodes];
+                pages[currentPageIndex].connections = [...connections];
+            }
+            
+            const newIndex = pages.length;
+            pages.push({
+                id: `page-${Date.now()}`,
+                name: `Day ${newIndex + 1}`,
+                nodes: JSON.parse(JSON.stringify(initialNodes)),
+                connections: JSON.parse(JSON.stringify(initialConnections))
+            });
+            switchPage(newIndex);
+            saveStateToLocalStorage();
+            window.coraShowToast("New board created.");
+        }
+
+        function renamePage(index, event) {
+            event.stopPropagation();
+            const page = pages[index];
+            if (!page) return;
+            const nameSpan = event.target;
+            const oldName = page.name;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = oldName;
+            input.className = 'bg-transparent outline-none text-[10px] font-bold w-20 border-b border-zinc-400';
+            const finish = () => {
+                page.name = input.value.trim() || oldName;
+                saveStateToLocalStorage();
+                renderPagesBar();
+            };
+            input.onblur = finish;
+            input.onkeydown = (e) => { if (e.key === 'Enter') input.blur(); };
+            nameSpan.replaceWith(input);
+            input.focus();
+        }
+
+        function deletePage(index, event) {
+            event.stopPropagation();
+            if (pages.length <= 1) return;
+            pages.splice(index, 1);
+            if (currentPageIndex >= index && currentPageIndex > 0) {
+                currentPageIndex--;
+            }
+            switchPage(currentPageIndex);
+            saveStateToLocalStorage();
+            window.coraShowToast("Page deleted.");
+        }
+
         function loadSavedState() {
-            const savedNodes = localStorage.getItem('cora_board_nodes');
-            const savedConns = localStorage.getItem('cora_board_connections');
+            const savedPages = localStorage.getItem('cora_board_pages');
+            if (savedPages) {
+                pages = JSON.parse(savedPages);
+                
+                // Check if URL has a specific page hash
+                const hash = window.location.hash.replace('#', '');
+                let targetIndex = 0;
+                if (hash) {
+                    const foundIndex = pages.findIndex(p => p.id === hash);
+                    if (foundIndex !== -1) {
+                        targetIndex = foundIndex;
+                    }
+                }
+                currentPageIndex = targetIndex;
+                nodes = [...pages[currentPageIndex].nodes];
+                connections = [...pages[currentPageIndex].connections];
+                
+                // Sync URL hash
+                window.history.replaceState(null, '', '#' + pages[currentPageIndex].id);
+            } else {
+                // Migrate old flat data if it exists
+                const oldNodes = localStorage.getItem('cora_board_nodes');
+                if (oldNodes) {
+                    const migratedPage = {
+                        id: `page-migrated-${Date.now()}`,
+                        name: 'Daily Hustle Map',
+                        nodes: JSON.parse(oldNodes),
+                        connections: JSON.parse(localStorage.getItem('cora_board_connections') || '[]')
+                    };
+                    pages = [migratedPage];
+                    nodes = [...migratedPage.nodes];
+                    connections = [...migratedPage.connections];
+                } else {
+                    pages = [{
+                        id: `page-${Date.now()}`,
+                        name: 'Day 1',
+                        nodes: JSON.parse(JSON.stringify(initialNodes)),
+                        connections: JSON.parse(JSON.stringify(initialConnections))
+                    }];
+                    nodes = [...pages[0].nodes];
+                    connections = [...pages[0].connections];
+                }
+            }
+            
             const savedDraws = localStorage.getItem('cora_board_drawings');
             const savedPanX = localStorage.getItem('cora_board_panX');
             const savedPanY = localStorage.getItem('cora_board_panY');
             const savedZoom = localStorage.getItem('cora_board_zoom');
-            
-            if (savedNodes) nodes = JSON.parse(savedNodes);
-            else nodes = JSON.parse(JSON.stringify(initialNodes));
-            
-            if (savedConns) connections = JSON.parse(savedConns);
-            else connections = JSON.parse(JSON.stringify(initialConnections));
             
             if (savedDraws) drawings = JSON.parse(savedDraws);
             else drawings = [];
@@ -471,11 +732,25 @@
             else zoom = 1.0;
             
             updateViewport();
+            renderPagesBar();
+            pushHistory();
             renderNodes();
             drawConnections();
-            
-            pushHistory(); // push starting snapshot
         }
+
+        // Listen for browser back/forward buttons to switch pages
+        window.addEventListener('hashchange', () => {
+            const hash = window.location.hash.replace('#', '');
+            if (hash) {
+                const index = pages.findIndex(p => p.id === hash);
+                if (index !== -1 && index !== currentPageIndex) {
+                    switchPage(index);
+                }
+            }
+        });
+
+
+
 
         // Update CSS Transforms for Viewport
         function updateViewport() {
@@ -524,7 +799,7 @@
                 const col = colors[node.color] || colors.white;
                 
                 // Construct basic classes
-                let baseClasses = `absolute border p-4 shadow-sm node select-none rounded-2xl flex flex-col justify-between ${col.bg}`;
+                let baseClasses = `absolute border p-3 shadow-sm node select-none rounded-2xl flex flex-col justify-between ${col.bg}`;
                 
                 if (node.type === 'card') {
                     baseClasses = `absolute border-2 border-dashed p-5 node select-none rounded-3xl ${col.bg}`;
@@ -548,10 +823,6 @@
                 if (node.type === 'sticky') {
                     innerHtml = `
                         <div class="text-[10.5px] leading-relaxed whitespace-pre-wrap font-medium flex-1 overflow-hidden pointer-events-none">${node.text}</div>
-                        <div class="flex items-center justify-between text-[8px] font-mono text-zinc-400 dark:text-zinc-500 mt-2 pointer-events-none">
-                            <span class="uppercase font-bold tracking-wider">${node.type}</span>
-                            <span>Double click to edit</span>
-                        </div>
                     `;
                 } else if (node.type === 'card') {
                     innerHtml = `
@@ -578,11 +849,11 @@
                 
                 div.innerHTML = innerHtml;
                 
-                // Append resize handle if selected and not plain text
-                if (isSelected && node.type !== 'text') {
+                // Append resize handle if selected (all node types are now resizable)
+                if (isSelected) {
                     const resizeHandle = document.createElement('div');
-                    resizeHandle.className = 'absolute bottom-1 right-1 w-3.5 h-3.5 bg-zinc-900 border border-white rounded-md cursor-se-resize z-40 flex items-center justify-center';
-                    resizeHandle.innerHTML = '<i class="fa-solid fa-arrows-left-right text-[7px] text-white rotate-45 pointer-events-none"></i>';
+                    resizeHandle.className = 'absolute -bottom-2 -right-2 w-5 h-5 bg-blue-500 border-2 border-white dark:border-zinc-900 rounded-full cursor-se-resize z-40 flex items-center justify-center shadow-md hover:scale-110 transition-transform';
+                    resizeHandle.innerHTML = '<i class="fa-solid fa-up-right-and-down-left-from-center text-[8px] text-white pointer-events-none"></i>';
                     resizeHandle.onmousedown = (e) => {
                         e.stopPropagation();
                         e.preventDefault();
@@ -641,7 +912,7 @@
                     const d = `M ${fromCenter.x} ${fromCenter.y} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${toCenter.x} ${toCenter.y}`;
                     
                     path.setAttribute('d', d);
-                    path.setAttribute('class', 'connector-line');
+                    path.setAttribute('class', 'connector-line pointer-events-auto');
                     path.setAttribute('marker-end', 'url(#arrow)');
                     path.onclick = (e) => {
                         e.stopPropagation();
@@ -652,7 +923,7 @@
                 }
             });
             
-            // Render Drawings
+            // Render Drawings (now in separate SVG)
             renderDrawings();
         }
 
@@ -671,7 +942,8 @@
                     }
                     
                     // Determine stroke color and width (Rule 3)
-                    let strokeColor = draw.color === 'white' ? '#f4f4f5' : '#18181b';
+                    const isDark = document.documentElement.classList.contains('dark');
+                    let strokeColor = isDark ? '#ffffff' : '#18181b';
                     let strokeWidth = '3';
                     let opacity = '1';
                     
@@ -728,24 +1000,36 @@
         // Bg Wheel Zooming
         function onBgWheel(e) {
             e.preventDefault();
-            const scaleAmount = 0.05;
-            let newZoom = zoom - e.deltaY * scaleAmount * 0.01;
             
-            newZoom = Math.min(Math.max(newZoom, 0.2), 3.0);
-            
-            const rect = document.getElementById('whiteboard').getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-            
-            const boardX = (mouseX - panX) / zoom;
-            const boardY = (mouseY - panY) / zoom;
-            
-            zoom = newZoom;
-            panX = mouseX - boardX * zoom;
-            panY = mouseY - boardY * zoom;
+            if (e.ctrlKey || e.metaKey) {
+                // Zooming (Pinch to zoom on trackpad, or Ctrl/Cmd + Scroll)
+                const scaleAmount = 0.02;
+                let newZoom = zoom - e.deltaY * scaleAmount;
+                newZoom = Math.min(Math.max(newZoom, 0.1), 4.0);
+                
+                const rect = document.getElementById('whiteboard').getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                const boardX = (mouseX - panX) / zoom;
+                const boardY = (mouseY - panY) / zoom;
+                
+                zoom = newZoom;
+                panX = mouseX - boardX * zoom;
+                panY = mouseY - boardY * zoom;
+            } else {
+                // Panning (Two-finger swipe on trackpad, or standard mouse wheel scroll)
+                panX -= e.deltaX;
+                panY -= e.deltaY;
+            }
             
             updateViewport();
-            saveStateToLocalStorage();
+            
+            // Only save to localStorage after user stops scrolling to avoid spam
+            clearTimeout(window.wheelSaveTimeout);
+            window.wheelSaveTimeout = setTimeout(() => {
+                saveStateToLocalStorage();
+            }, 300);
         }
 
         function adjustZoom(amount) {
@@ -759,38 +1043,101 @@
         // Bg Mouse Down (Pan or Create or Draw or Erase or Marquee Select)
         function onBgMouseDown(e) {
             const isDrawTool = ['stylus', 'highlight', 'eraser'].includes(currentTool);
-            if (e.target.id === 'whiteboard' || e.target.id === 'connections-svg' || isDrawTool) {
+            const isPanTool = currentTool === 'hand';
+            const isMiddleOrRightClick = e.button === 1 || e.button === 2;
+            
+            if (isMiddleOrRightClick) {
+                e.preventDefault(); // Prevent browser auto-scroll cursor or context menus
+            }
+            
+            if (e.target.id === 'whiteboard' || e.target.id === 'connections-svg' || e.target.id === 'drawings-svg' || isDrawTool || isPanTool || isMiddleOrRightClick) {
                 const rect = document.getElementById('whiteboard').getBoundingClientRect();
                 const clickX = (e.clientX - rect.left - panX) / zoom;
                 const clickY = (e.clientY - rect.top - panY) / zoom;
                 
                 // Clear selection if clicking canvas empty space without shift key
-                if (!e.shiftKey && currentTool === 'select') {
+                if (!e.shiftKey && currentTool === 'select' && !isMiddleOrRightClick) {
                     selectedNodeIds = [];
                     renderNodes();
                 }
                 
-                if (currentTool === 'stylus' || currentTool === 'highlight') {
+                if (isPanTool || isMiddleOrRightClick) {
+                    // Hand tool or middle/right click always pans
+                    isDraggingBg = true;
+                    lastMousePos = { x: e.clientX, y: e.clientY };
+                    document.getElementById('whiteboard').style.cursor = 'grabbing';
+                } else if (currentTool === 'stylus' || currentTool === 'highlight') {
                     isDrawing = true;
                     currentStroke = [{ x: clickX, y: clickY }];
                     
                     const activePath = document.getElementById('active-stroke-path');
                     activePath.setAttribute('d', `M ${clickX + 2000} ${clickY + 2000}`);
+                    activePath.classList.remove('hidden');
                     
                     if (currentTool === 'highlight') {
-                        activePath.setAttribute('stroke', '#facc15');
-                        activePath.setAttribute('stroke-width', '14');
-                        activePath.setAttribute('stroke-opacity', '0.45');
+                        activePath.setAttribute('stroke', '#fde047');
+                        activePath.setAttribute('stroke-width', '16');
+                        activePath.setAttribute('opacity', '0.5');
                     } else {
                         const isDark = document.documentElement.classList.contains('dark');
-                        activePath.setAttribute('stroke', isDark ? '#f4f4f5' : '#18181b');
+                        activePath.setAttribute('stroke', isDark ? '#ffffff' : '#18181b');
                         activePath.setAttribute('stroke-width', '3');
-                        activePath.setAttribute('stroke-opacity', '1');
+                        activePath.setAttribute('opacity', '1');
                     }
                 } else if (currentTool === 'eraser') {
                     isDrawing = true;
                     hasErasedInDragSequence = false;
                     eraseAt(clickX, clickY);
+                } else if (currentTool === 'sticky') {
+                    pushHistory();
+                    const newId = `node-${Date.now()}`;
+                    nodes.push({
+                        id: newId,
+                        x: Math.round(clickX - 90),
+                        y: Math.round(clickY - 45),
+                        width: 220,
+                        height: 95,
+                        type: 'sticky',
+                        text: 'New Sticky Note\nDouble click to edit details.',
+                        color: 'white'
+                    });
+                    setTool('select');
+                    renderNodes();
+                    saveStateToLocalStorage();
+                    window.coraShowToast("Note added to whiteboard.");
+                } else if (currentTool === 'card') {
+                    pushHistory();
+                    const newId = `node-${Date.now()}`;
+                    nodes.push({
+                        id: newId,
+                        x: Math.round(clickX - 150),
+                        y: Math.round(clickY - 150),
+                        width: 300,
+                        height: 300,
+                        type: 'card',
+                        text: 'New Container Title\nDescribe group/area details here.',
+                        color: 'white'
+                    });
+                    setTool('select');
+                    renderNodes();
+                    saveStateToLocalStorage();
+                    window.coraShowToast("Container card added.");
+                } else if (currentTool === 'text') {
+                    pushHistory();
+                    const newId = `node-${Date.now()}`;
+                    nodes.push({
+                        id: newId,
+                        x: Math.round(clickX - 100),
+                        y: Math.round(clickY - 20),
+                        width: 200,
+                        height: 40,
+                        type: 'text',
+                        text: 'Label Text',
+                        color: 'white'
+                    });
+                    setTool('select');
+                    renderNodes();
+                    saveStateToLocalStorage();
                 } else if (currentTool === 'select') {
                     isSelectingMarquee = true;
                     marqueeStart = { x: clickX, y: clickY };
@@ -811,8 +1158,9 @@
 
         // Node Mouse Down (Select or Connect or Drag or Erase)
         function onNodeMouseDown(e, nodeId) {
-            if (currentTool === 'stylus' || currentTool === 'highlight') {
-                // Bubbles to whiteboard background to draw strokes
+            const isMiddleOrRightClick = e.button === 1 || e.button === 2;
+            if (currentTool === 'stylus' || currentTool === 'highlight' || currentTool === 'hand' || isMiddleOrRightClick) {
+                // Bubbles to whiteboard background to draw strokes or pan
                 return;
             }
             e.stopPropagation();
@@ -940,7 +1288,6 @@
             
             if (isDrawing && (currentTool === 'stylus' || currentTool === 'highlight')) {
                 currentStroke.push({ x: clickX, y: clickY });
-                
                 const activePath = document.getElementById('active-stroke-path');
                 let d = activePath.getAttribute('d');
                 d += ` L ${clickX + 2000} ${clickY + 2000}`;
@@ -1009,17 +1356,20 @@
                 isDrawing = false;
                 
                 if (currentTool === 'stylus' || currentTool === 'highlight') {
-                    const isDark = document.documentElement.classList.contains('dark');
-                    if (currentStroke.length > 1) {
-                        drawings.push({
-                            points: currentStroke,
-                            color: currentTool === 'highlight' ? 'highlight' : (isDark ? 'white' : 'dark')
-                        });
-                        
-                        pushHistory();
-                        saveStateToLocalStorage();
-                        drawConnections();
+                    // Commit stroke to drawings array
+                    if (currentTool === 'highlight') {
+                        drawings.push({ points: currentStroke, color: 'highlight' });
+                    } else {
+                        drawings.push({ points: currentStroke, color: document.documentElement.classList.contains('dark') ? 'white' : 'dark' });
                     }
+                    
+                    // Hide active path
+                    const activePath = document.getElementById('active-stroke-path');
+                    activePath.classList.add('hidden');
+                    
+                    pushHistory();
+                    saveStateToLocalStorage();
+                    drawConnections();
                 } else if (currentTool === 'eraser') {
                     if (hasErasedInDragSequence) {
                         pushHistory();
@@ -1027,9 +1377,6 @@
                     }
                     hasErasedInDragSequence = false;
                 }
-                
-                const activePath = document.getElementById('active-stroke-path');
-                activePath.removeAttribute('d');
             }
             
             if (isSelectingMarquee) {
@@ -1079,7 +1426,14 @@
                 saveStateToLocalStorage();
             }
             
+            if (isDraggingBg) {
+                pushHistory();
+            }
+            
             isDraggingBg = false;
+            if (currentTool === 'hand') {
+                document.getElementById('whiteboard').style.cursor = 'grab';
+            }
         }
 
         // Delete elements
