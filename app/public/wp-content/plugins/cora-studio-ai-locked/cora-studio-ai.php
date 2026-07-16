@@ -58,6 +58,8 @@ function cora_studio_ai_handle_workspace_route() {
     $path = trim( parse_url( $path, PHP_URL_PATH ), '/' );
 
     $path_parts = explode( '/', $path );
+
+
     if ( isset( $path_parts[0] ) && 'shared-doc' === $path_parts[0] ) {
         $hash = isset( $path_parts[1] ) ? sanitize_text_field( $path_parts[1] ) : '';
         if ( ! empty( $hash ) ) {
@@ -1731,6 +1733,16 @@ add_action( 'wp_ajax_cora_sync_google_doc', 'cora_ajax_sync_google_doc' );
  * Serve custom index.html for frontend homepage if it exists
  */
 function cora_studio_ai_serve_frontend_homepage() {
+    $request_uri = $_SERVER['REQUEST_URI'];
+    $home_path = parse_url( home_url(), PHP_URL_PATH );
+    $path = substr( $request_uri, strlen( $home_path ) );
+    $path = trim( parse_url( $path, PHP_URL_PATH ), '/' );
+
+    // Skip hijacking if this is a workspace or shared resource route
+    if ( strpos( $path, 'workspace' ) === 0 || strpos( $path, 'shared-doc' ) === 0 || strpos( $path, 'shared-gallery' ) === 0 ) {
+        return;
+    }
+
     if ( is_front_page() && ! is_admin() ) {
         $frontend_file = plugin_dir_path( __FILE__ ) . 'nitin-arora-photography/index.html';
         if ( file_exists( $frontend_file ) ) {
