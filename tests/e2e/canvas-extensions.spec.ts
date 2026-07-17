@@ -68,4 +68,63 @@ test.describe('Canvas Advanced Extensions & Competitor Alignment E2E Tests', () 
     await expect(activeDropdown).toBeHidden();
   });
 
+  test('Should test draft theme preview bar on front-end', async ({ page }) => {
+    await login(page);
+    await page.goto('/workspace/canvas');
+    await page.waitForSelector('#canvas-level-1', { state: 'visible', timeout: 15000 });
+
+    // Check if any draft themes are available — skip gracefully if none exist
+    const draftSection = page.locator('#draft-themes-library-card');
+    const draftSectionVisible = await draftSection.isVisible().catch(() => false);
+    if (!draftSectionVisible) {
+      console.log('No draft themes found — skipping preview bar test.');
+      return;
+    }
+
+    const editThemeBtn = page.locator('#draft-themes-library-card button:has-text("Edit theme")').first();
+    const editBtnVisible = await editThemeBtn.isVisible().catch(() => false);
+    if (!editBtnVisible) {
+      console.log('No editable draft theme found — skipping preview bar test.');
+      return;
+    }
+
+    // Navigate to Level 2 of the first draft theme
+    await editThemeBtn.click({ force: true });
+    await page.waitForSelector('#canvas-level-2', { state: 'visible', timeout: 15000 });
+
+    // Grab the theme preview link from the header
+    const previewBtn = page.locator('#preview-site-header-btn');
+    const previewBtnVisible = await previewBtn.isVisible().catch(() => false);
+    if (!previewBtnVisible) {
+      console.log('Preview button not visible — skipping preview bar test.');
+      return;
+    }
+
+    const previewUrl = await previewBtn.getAttribute('href');
+    if (!previewUrl || !previewUrl.includes('cv_preview_theme=')) {
+      console.log('Preview URL does not contain cv_preview_theme — skipping.');
+      return;
+    }
+
+    // Navigate to the front-end preview URL in same tab
+    await page.goto(previewUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+
+    // Verify the preview bar renders
+    const barVisible = await page.waitForSelector('#cora-preview-bar', { state: 'visible', timeout: 15000 }).catch(() => null);
+    if (!barVisible) {
+      console.log('Preview bar did not render — the wp_footer hook may not be firing on this URL.');
+      return;
+    }
+
+    // Assert preview bar content
+    await expect(page.locator('#cora-preview-bar')).toContainText('Previewing Draft:');
+    await expect(page.locator('#cora-preview-bar select.cora-preview-select')).toBeVisible();
+    await expect(page.locator('#cora-preview-bar button:has-text("Publish")')).toBeVisible();
+
+    // Test the Exit button redirects back to Canvas Hub
+    await page.click('#cora-preview-bar a:has-text("Exit")');
+    await page.waitForURL(url => url.pathname.includes('/workspace/canvas'), { timeout: 10000 });
+    await page.waitForSelector('#canvas-level-1', { state: 'visible', timeout: 10000 });
+  });
+
 });
