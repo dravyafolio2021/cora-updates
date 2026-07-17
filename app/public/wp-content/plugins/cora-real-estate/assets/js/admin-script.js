@@ -114,7 +114,7 @@ jQuery(document).ready(function($) {
         const activeRole = $('#cora-role-preview-select').val() || activeData.currentRole || 'administrator';
         let allowed = (activeData.userPermissions && activeData.userPermissions[activeRole]) ? activeData.userPermissions[activeRole] : [];
         if (activeRole === 'administrator') {
-            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'ecosystem', 'gallery', 'mcp'];
+            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'ecosystem', 'mcp'];
         }
 
         if (targetPageId !== 'profile' && targetPageId !== 'feature-hub' && !allowed.includes(targetPageId)) {
@@ -1333,7 +1333,7 @@ jQuery(document).ready(function($) {
             });
         });
 
-        permissions['administrator'] = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'ecosystem', 'gallery', 'mcp'];
+        permissions['administrator'] = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'ecosystem', 'mcp'];
 
         // Instantly update the local cache
         coraREData.userPermissions = permissions;
@@ -2412,7 +2412,7 @@ jQuery(document).ready(function($) {
         let allowed = coraREData.userPermissions[role] || [];
         
         if (role === 'administrator') {
-            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'ecosystem', 'gallery', 'mcp'];
+            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'ecosystem', 'mcp'];
         }
 
         // Hide/show financial details based on role permissions
