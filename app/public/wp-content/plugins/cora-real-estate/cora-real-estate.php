@@ -13451,6 +13451,37 @@ function cora_ajax_canvas_get_theme_pages() {
     $theme_id = intval( $_GET['theme_id'] );
     
     $pages = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d ORDER BY is_homepage DESC, title ASC", $theme_id ), ARRAY_A );
+    
+    // Self-healing database check: Recreate WordPress pages if they were deleted or are out of sync
+    if ( is_array( $pages ) ) {
+        foreach ( $pages as $key => $p ) {
+            $wp_post_id = intval( $p['wp_post_id'] );
+            $post = get_post( $wp_post_id );
+            if ( ! $post || $post->post_type !== 'page' ) {
+                // Re-create the WordPress page
+                $new_post_id = wp_insert_post( array(
+                    'post_title'   => $p['title'],
+                    'post_name'    => $p['slug'],
+                    'post_type'    => 'page',
+                    'post_status'  => 'publish',
+                    'post_content' => '<!-- Elementor Page Content -->'
+                ) );
+                if ( ! is_wp_error( $new_post_id ) && $new_post_id > 0 ) {
+                    // Update database
+                    $wpdb->update(
+                        $wpdb->prefix . 'cora_canvas_pages',
+                        array( 'wp_post_id' => $new_post_id ),
+                        array( 'id' => intval( $p['id'] ) ),
+                        array( '%d' ),
+                        array( '%d' )
+                    );
+                    // Update current page array
+                    $pages[$key]['wp_post_id'] = $new_post_id;
+                }
+            }
+        }
+    }
+    
     wp_send_json_success( $pages );
 }
 add_action( 'wp_ajax_cora_ajax_get_theme_pages', 'cora_ajax_canvas_get_theme_pages' );
