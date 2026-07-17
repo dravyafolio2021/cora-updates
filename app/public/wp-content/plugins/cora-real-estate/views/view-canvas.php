@@ -584,7 +584,7 @@ $wp_pages = get_pages();
                         $theme_ver_name = '4.1.3';
                     }
                     ?>
-                    <div class="p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:bg-zinc-50/10 transition-colors <?php echo $is_collapsed ? 'hidden draft-theme-collapsed' : ''; ?>">
+                    <div data-draft-theme-id="<?php echo $th['id']; ?>" class="p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:bg-zinc-50/10 transition-colors <?php echo $is_collapsed ? 'hidden draft-theme-collapsed' : ''; ?>">
                         <div class="flex items-center gap-3.5 min-w-0">
                             <!-- Live iframe thumbnail preview -->
                             <?php $preview_url = home_url('/?cv_preview_theme=' . $th['id']); ?>
@@ -626,7 +626,7 @@ $wp_pages = get_pages();
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
                                 </button>
                                 
-                                <div id="draft-actions-menu-<?php echo $th['id']; ?>" class="hidden absolute right-0 top-full mt-1.5 w-52 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-35 text-left font-sans select-none animate-in fade-in slide-in-from-top-2 duration-100">
+                                <div id="draft-actions-menu-<?php echo $th['id']; ?>" class="hidden absolute right-0 w-52 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-[9999] text-left font-sans select-none">
                                     <button onclick="triggerRenameTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">Rename</button>
                                     <button onclick="triggerDuplicateTheme(<?php echo $th['id']; ?>)" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">Duplicate</button>
                                     <a href="<?php echo home_url('/?cv_preview_theme=' . $th['id']); ?>" target="_blank" class="w-full px-3 py-2 text-xs text-zinc-850 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors no-underline">Preview theme</a>
@@ -2262,6 +2262,10 @@ $wp_pages = get_pages();
     }
 
     function triggerDeleteTheme(id) {
+        // Close the dropdown first
+        const openMenu = document.getElementById('draft-actions-menu-' + id);
+        if (openMenu) openMenu.classList.add('hidden');
+
         window.coraConfirmAction(
             'Delete Theme',
             'Are you sure you want to delete this theme workspace permanently? All containing pages will be removed.',
@@ -2273,8 +2277,22 @@ $wp_pages = get_pages();
                     nonce: coraREData.ajaxNonce
                 }, function(res) {
                     if (res.success) {
+                        // Remove the card from the DOM — no page refresh
+                        const card = document.querySelector('[data-draft-theme-id="' + id + '"]');
+                        if (card) {
+                            card.style.transition = 'opacity 0.25s ease, max-height 0.35s ease, margin 0.35s ease';
+                            card.style.overflow = 'hidden';
+                            card.style.opacity = '0';
+                            card.style.maxHeight = card.offsetHeight + 'px';
+                            setTimeout(function() {
+                                card.style.maxHeight = '0';
+                                card.style.marginTop = '0';
+                                card.style.paddingTop = '0';
+                                card.style.paddingBottom = '0';
+                            }, 50);
+                            setTimeout(function() { card.remove(); }, 400);
+                        }
                         window.coraShowToast('Theme deleted successfully.');
-                        setTimeout(function() { window.location.reload(); }, 800);
                     } else {
                         window.coraShowToast('Failed to delete theme.');
                     }
@@ -3493,12 +3511,37 @@ $wp_pages = get_pages();
     // --- Draft Themes Interactive Handlers ---
     window.toggleDraftActionsMenu = function(id, e) {
         e.stopPropagation();
+        // Close all other open menus
         document.querySelectorAll('[id^="draft-actions-menu-"]').forEach(menu => {
             if (menu.id !== 'draft-actions-menu-' + id) menu.classList.add('hidden');
         });
         const menu = document.getElementById('draft-actions-menu-' + id);
-        if (menu) {
-            menu.classList.toggle('hidden');
+        if (!menu) return;
+
+        const isHidden = menu.classList.contains('hidden');
+        menu.classList.toggle('hidden');
+
+        if (isHidden) {
+            // Smart positioning: flip the dropdown upward if it would overflow below viewport
+            menu.style.top = '';
+            menu.style.bottom = '';
+            menu.classList.remove('top-full', 'bottom-full');
+
+            const btn = e.currentTarget;
+            const btnRect = btn.getBoundingClientRect();
+            const menuHeight = 260; // approx max height of the menu
+            const spaceBelow = window.innerHeight - btnRect.bottom;
+            const spaceAbove = btnRect.top;
+
+            if (spaceBelow < menuHeight && spaceAbove > menuHeight) {
+                // Flip upward
+                menu.style.top = 'auto';
+                menu.style.bottom = 'calc(100% + 6px)';
+            } else {
+                // Default: open downward
+                menu.style.top = 'calc(100% + 6px)';
+                menu.style.bottom = 'auto';
+            }
         }
     };
 

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, request } from '@playwright/test';
 import { login } from './helpers';
 
 test.describe('Canvas Front-End Management System E2E Tests', () => {
@@ -113,6 +113,44 @@ test.describe('Canvas Front-End Management System E2E Tests', () => {
 
     // Ensure no unhandled exceptions occurred
     expect(consoleErrors.length).toBe(0);
+  });
+
+  // ── After all tests, clean up E2E-generated themes so they don't accumulate ──
+  test.afterAll(async ({ browser }) => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await login(page);
+    await page.goto('/workspace/canvas');
+    await page.waitForSelector('#canvas-level-1', { state: 'visible', timeout: 15000 });
+
+    // Find and delete any theme whose name starts with 'E2E'
+    let cleaned = 0;
+    for (let attempt = 0; attempt < 20; attempt++) {
+      const e2eThemeBtn = await page.$('#draft-themes-library-card [data-draft-theme-id]');
+      if (!e2eThemeBtn) break;
+
+      // Get theme ID
+      const themeId = await e2eThemeBtn.getAttribute('data-draft-theme-id');
+      const themeName = await e2eThemeBtn.$eval('h4', (el: Element) => el.textContent?.trim() || '').catch(() => '');
+      if (!themeName.startsWith('E2E') && !themeName.startsWith('e2e')) break;
+
+      // Use the delete AJAX endpoint directly
+      const nonce = await page.evaluate(() => (window as any).coraREData?.ajaxNonce || '');
+      const ajaxUrl = await page.evaluate(() => (window as any).coraREData?.ajaxUrl || '/wp-admin/admin-ajax.php');
+      if (themeId && nonce) {
+        await page.evaluate(async ({ ajaxUrl, nonce, themeId }) => {
+          const fd = new FormData();
+          fd.append('action', 'cora_ajax_delete_theme');
+          fd.append('theme_id', themeId);
+          fd.append('nonce', nonce);
+          await fetch(ajaxUrl, { method: 'POST', body: fd });
+        }, { ajaxUrl, nonce, themeId });
+        cleaned++;
+      }
+      await page.waitForTimeout(300);
+    }
+    if (cleaned > 0) console.log(`E2E cleanup: removed ${cleaned} test theme(s).`);
+    await context.close();
   });
 
   test('Should import valid Elementor kits and reject invalid uploads with toasts', async ({ page }) => {
