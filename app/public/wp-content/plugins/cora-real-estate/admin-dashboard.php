@@ -3207,7 +3207,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 </div>
  
                 <!-- Lovable-Style Command Search (Ask anything...) -->
-                <div class="w-full max-w-2xl mx-4 md:mx-auto mb-8 relative z-[999]" id="cora-search-container">
+                <div class="w-full max-w-2xl mx-4 md:mx-auto mt-8 mb-12 relative z-[999]" id="cora-search-container">
                     <div class="relative flex items-center bg-white/85 dark:bg-zinc-900/70 backdrop-blur-md border border-zinc-200/60 dark:border-zinc-800/50 hover:border-zinc-350 dark:hover:border-zinc-700 focus-within:border-zinc-900 dark:focus-within:border-zinc-100 focus-within:ring-2 focus-within:ring-zinc-100/30 dark:focus-within:ring-zinc-800/30 rounded-full shadow-2xs transition-all duration-200 p-2 pl-4 pr-3">
                         <span class="text-purple-600 dark:text-purple-400 mr-2.5 flex shrink-0">
                             <!-- Lovable Character Icon -->
