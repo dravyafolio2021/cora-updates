@@ -236,6 +236,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 margin: 0 !important;
                 padding: 0 !important;
             }
+            .cora-main {
+                height: calc(100vh - 52px) !important;
+                overflow-y: auto !important;
+            }
+            .cora-sidebar {
+                height: calc(100vh - 52px) !important;
+            }
         }
 
 
