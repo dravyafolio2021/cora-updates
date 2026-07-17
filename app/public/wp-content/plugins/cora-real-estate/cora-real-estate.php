@@ -229,6 +229,10 @@ function cora_real_estate_ai_handle_workspace_route() {
             wp_redirect( home_url( '/workspace/settings-suite?settings_tab=audit' ) );
             exit;
         }
+        if ( $sub_page === 'settings-suite' && isset( $_GET['settings_tab'] ) && $_GET['settings_tab'] === 'mcp' ) {
+            wp_redirect( home_url( '/workspace/mcp' ) );
+            exit;
+        }
 
         // Role-based access control check (Server-Side)
         $cora_permissions = get_option( 'cora_role_permissions', array() );
@@ -2362,10 +2366,10 @@ function cora_ajax_advanced_search() {
                 'icon' => 'image'
             ),
             array(
-                'title' => 'AI Tools MCP Integration',
+                'title' => 'Model Context Protocol (MCP)',
                 'category' => 'Settings',
                 'description' => 'Access and configure Model Context Protocol (MCP) server endpoints.',
-                'url' => admin_url( 'admin.php?page=cora-workspace&sub=settings-suite&settings_tab=mcp' ),
+                'url' => admin_url( 'admin.php?page=cora-workspace&sub=mcp' ),
                 'icon' => 'cpu'
             ),
             array(
