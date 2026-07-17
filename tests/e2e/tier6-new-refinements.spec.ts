@@ -100,7 +100,7 @@ test.describe('Tier 6: New Refinements E2E Tests', () => {
     await expect(page.locator('#cora-toast-container')).toContainText('All notifications marked as read.');
 
     // Close dropdown by clicking outside
-    await page.click('.cora-breadcrumbs');
+    await page.click('main');
     await expect(page.locator('#cora-notif-dropdown')).toBeHidden();
   });
 

@@ -4,6 +4,10 @@ export async function login(page: Page) {
   await page.goto('/wp-login.php');
   // If already logged in and redirected to wp-admin or workspace, return immediately
   if (page.url().includes('/wp-admin') || page.url().includes('/workspace')) {
+    await page.evaluate(() => {
+      localStorage.setItem('cora_re_tour_completed', 'true');
+      localStorage.setItem('cora_studio_tour_completed', 'true');
+    });
     return;
   }
   try {
@@ -17,10 +21,18 @@ export async function login(page: Page) {
     await page.click('#wp-submit');
   } catch (e) {
     if (page.url().includes('/wp-admin') || page.url().includes('/workspace')) {
+      await page.evaluate(() => {
+        localStorage.setItem('cora_re_tour_completed', 'true');
+        localStorage.setItem('cora_studio_tour_completed', 'true');
+      });
       return;
     }
     throw e;
   }
   await page.waitForURL(url => url.pathname.includes('/wp-admin') || url.pathname.includes('/workspace'));
+  await page.evaluate(() => {
+    localStorage.setItem('cora_re_tour_completed', 'true');
+    localStorage.setItem('cora_studio_tour_completed', 'true');
+  });
 }
 

@@ -142,7 +142,7 @@ foreach ( $cora_pages as $c_page ) {
                                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                                 </div>
                                 <div>
-                                    <div class="font-bold text-zinc-900"><?php echo esc_html( $page_title ); ?></div>
+                                    <div class="font-bold text-zinc-900 truncate max-w-[280px]" title="<?php echo esc_attr($page_title); ?>"><?php echo esc_html( $page_title ); ?></div>
                                     <?php if ( $page->menu_order > 0 ) : ?>
                                         <div class="text-[10px] text-zinc-400 font-medium">Order: <?php echo esc_html( $page->menu_order ); ?></div>
                                     <?php endif; ?>

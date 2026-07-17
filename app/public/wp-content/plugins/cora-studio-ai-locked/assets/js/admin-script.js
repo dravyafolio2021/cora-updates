@@ -11,10 +11,10 @@ if (typeof window.coraData === 'undefined') {
 
 jQuery(document).ready(function($) {
     // Custom Toast Notification System
-    window.coraShowToast = function(message) {
+    window.coraShowToast = function(message, type = 'info') {
         let toastContainer = $('#cora-toast-container');
         if (toastContainer.length === 0) {
-            $('body').append('<div id="cora-toast-container" class="fixed bottom-4 right-4 z-[9999] flex flex-col-reverse gap-2 pointer-events-none"></div>');
+            $('body').append('<div id="cora-toast-container" class="fixed bottom-5 right-5 z-[9999] flex flex-col-reverse gap-2.5 pointer-events-none"></div>');
             toastContainer = $('#cora-toast-container');
         }
         
@@ -37,7 +37,7 @@ jQuery(document).ready(function($) {
                 if (oldRemoveId) clearTimeout(oldRemoveId);
 
                 const tId = setTimeout(() => {
-                    existingToast.addClass('translate-y-2 opacity-0');
+                    existingToast.addClass('translate-y-3 opacity-0');
                     const rId = setTimeout(() => {
                         existingToast.remove();
                     }, 300);
@@ -53,10 +53,22 @@ jQuery(document).ready(function($) {
         if (duplicateFound) return;
 
         const toastId = 'toast-' + Date.now();
+        
+        let iconHtml = '';
+        if (type === 'success') {
+            iconHtml = `<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-green-500 shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+        } else if (type === 'error') {
+            iconHtml = `<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-red-500 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+        } else if (type === 'warning') {
+            iconHtml = `<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-amber-500 shrink-0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+        } else {
+            iconHtml = `<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-blue-500 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+        }
+
         const toastHtml = `
-            <div id="${toastId}" class="bg-zinc-950 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-xl border border-zinc-800 flex items-center gap-2 pointer-events-auto transition-all duration-300 transform translate-y-2 opacity-0 select-none">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                <span>${message}</span>
+            <div id="${toastId}" class="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-100 text-xs font-semibold px-4 py-3 rounded-xl shadow-lg border border-zinc-200 dark:border-zinc-800 flex items-center gap-3 pointer-events-auto transition-all duration-300 transform translate-y-3 opacity-0 select-none max-w-sm">
+                ${iconHtml}
+                <span class="flex-1">${message}</span>
             </div>
         `;
         toastContainer.append(toastHtml);
@@ -64,12 +76,12 @@ jQuery(document).ready(function($) {
         const toast = $(`#${toastId}`);
         // Fade & slide in
         setTimeout(() => {
-            toast.removeClass('translate-y-2 opacity-0');
+            toast.removeClass('translate-y-3 opacity-0');
         }, 50);
         
         // Auto remove after 3 seconds
         const tId = setTimeout(() => {
-            toast.addClass('translate-y-2 opacity-0');
+            toast.addClass('translate-y-3 opacity-0');
             const rId = setTimeout(() => {
                 toast.remove();
             }, 300);
@@ -81,10 +93,11 @@ jQuery(document).ready(function($) {
 
     // 1. Navigation & Tab Switching
     window.coraNavigateTo = function(targetPageId) {
-        const activeRole = $('#cora-role-preview-select').val() || coraData.currentRole;
-        let allowed = coraData.userPermissions[activeRole] || [];
+        const activeData = (window.coraData && window.coraData.currentRole) ? window.coraData : (window.coraREData || {});
+        const activeRole = $('#cora-role-preview-select').val() || activeData.currentRole || 'administrator';
+        let allowed = (activeData.userPermissions && activeData.userPermissions[activeRole]) ? activeData.userPermissions[activeRole] : [];
         if (activeRole === 'administrator') {
-            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'gallery', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'my-profile'];
+            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'gallery', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'my-profile', 'canvas'];
         }
 
         // my-profile is accessible by all logged-in users
@@ -98,8 +111,8 @@ jQuery(document).ready(function($) {
         }
 
         // If the target page is different from the current page, redirect
-        if (targetPageId !== coraData.currentPage) {
-            let siteUrl = coraData.siteUrl || '';
+        if (targetPageId !== activeData.currentPage) {
+            let siteUrl = activeData.siteUrl || window.location.origin;
             if (siteUrl.endsWith('/')) {
                 siteUrl = siteUrl.slice(0, -1);
             }
@@ -107,7 +120,7 @@ jQuery(document).ready(function($) {
         }
     };
 
-    $('.cora-nav-item, .cora-bottom-nav-item').on('click', function(e) {
+    $('.cora-nav-item, .cora-bottom-nav-item').off('click').on('click', function(e) {
         const item = $(this).closest('.cora-nav-item, .cora-bottom-nav-item');
         if (item.hasClass('cora-nav-soon')) {
             window.coraShowToast("AI Assistants & Automation features are coming soon. Stay tuned!");
@@ -647,7 +660,7 @@ jQuery(document).ready(function($) {
     });
 
     // Prevent popover closing when clicking internal elements
-    $('#cora-profile-popover').on('click', function(e) {
+    $('#cora-profile-popover, #cora-header-profile-popover').on('click', function(e) {
         e.stopPropagation();
     });
 
@@ -655,6 +668,10 @@ jQuery(document).ready(function($) {
         // Close popover if clicked outside profile card area
         if (!$(e.target).closest('#cora-profile-popover').length && !$(e.target).closest('.cora-user-settings-btn').length) {
             $('#cora-profile-popover').addClass('hidden');
+        }
+        // Close header profile popover if clicked outside
+        if (!$(e.target).closest('#cora-header-profile-popover').length && !$(e.target).closest('.cora-header-profile-btn').length) {
+            $('#cora-header-profile-popover').addClass('hidden');
         }
     });
 
@@ -6366,6 +6383,14 @@ jQuery(document).ready(function($) {
         if (!$tourBackdrop || $tourBackdrop.length === 0) {
             $tourBackdrop = $('<div class="cora-tour-backdrop fixed inset-0 bg-zinc-950/45 z-[999998] pointer-events-none opacity-0 transition-opacity duration-300"></div>');
             $('body').append($tourBackdrop);
+            $tourBackdrop.on('click', function() {
+                coraEndProductTour();
+            });
+            $(document).on('keydown.coraTour', function(e) {
+                if (e.key === 'Escape') {
+                    coraEndProductTour();
+                }
+            });
         }
         
         if (!$tourPopover || $tourPopover.length === 0) {
@@ -6453,7 +6478,9 @@ jQuery(document).ready(function($) {
         if ($tourPopover) {
             $tourPopover.removeClass('pointer-events-auto opacity-100 translate-y-0').addClass('pointer-events-none opacity-0 translate-y-2');
         }
+        $(document).off('keydown.coraTour');
         localStorage.setItem('cora_tour_completed', 'true');
+        localStorage.setItem('cora_studio_tour_completed', 'true');
     }
     
     $(window).on('resize', function() {

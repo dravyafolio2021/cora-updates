@@ -15,9 +15,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_REAL_ESTATE_AI_VERSION', time() );
+define( 'CORA_REAL_ESTATE_AI_VERSION', '1.0.0' );
 define( 'CORA_REAL_ESTATE_AI_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_REAL_ESTATE_AI_URL', plugin_dir_url( __FILE__ ) );
+define( 'CORA_PLUGIN_FILE', __FILE__ );
+
+// Autoloaders / Libraries
 
 /**
  * Add the admin menu page
@@ -156,6 +159,12 @@ function cora_real_estate_ai_handle_workspace_route() {
             exit;
         }
 
+
+
+
+
+
+
         // If not logged in
         if ( ! is_user_logged_in() ) {
             if ( in_array( $sub_page, $public_subs ) ) {
@@ -227,26 +236,11 @@ function cora_real_estate_ai_handle_workspace_route() {
         }
         
         if ( in_array( $current_user_role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) {
-            if ( ! in_array( 'canvas', $allowed_features ) ) {
-                $allowed_features[] = 'canvas';
-            }
-            if ( ! in_array( 'forms', $allowed_features ) ) {
-                $allowed_features[] = 'forms';
-            }
-            if ( ! in_array( 'ecosystem', $allowed_features ) ) {
-                $allowed_features[] = 'ecosystem';
-            }
-            if ( ! in_array( 'blogs', $allowed_features ) ) {
-                $allowed_features[] = 'blogs';
-            }
-            if ( ! in_array( 'media', $allowed_features ) ) {
-                $allowed_features[] = 'media';
-            }
-            if ( ! in_array( 'visual-builder', $allowed_features ) ) {
-                $allowed_features[] = 'visual-builder';
-            }
-            if ( ! in_array( 'audit-panel', $allowed_features ) ) {
-                $allowed_features[] = 'audit-panel';
+            $all_admin_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'attendance', 'tasks', 'visual-builder', 'audit-panel', 'media', 'canvas', 'forms', 'ecosystem', 'profile' );
+            foreach ( $all_admin_features as $feat ) {
+                if ( ! in_array( $feat, $allowed_features ) ) {
+                    $allowed_features[] = $feat;
+                }
             }
         }
         
@@ -2923,7 +2917,7 @@ function cora_real_estate_ai_serve_frontend_homepage() {
         $path = trim( parse_url( $path, PHP_URL_PATH ), '/' );
         $path_parts = explode( '/', $path );
         $first_part = isset( $path_parts[0] ) ? $path_parts[0] : '';
-        $reserved_paths = array( 'workspace', 'shared-doc', 'shared-portfolio', 'cora-service-worker.js', 'cora-manifest.json' );
+        $reserved_paths = array( 'api', 'workspace', 'shared-doc', 'shared-portfolio', 'cora-service-worker.js', 'cora-manifest.json' );
         if ( in_array( $first_part, $reserved_paths ) ) {
             return;
         }
@@ -2977,9 +2971,445 @@ function cora_real_estate_ai_serve_frontend_homepage() {
 }
 add_action( 'template_redirect', 'cora_real_estate_ai_serve_frontend_homepage', 5 );
 
+/**
+ * Early asset proxy to resolve CORS issues when loading React modules from different domains.
+ */
+function cora_git_sync_proxy_assets() {
+    if ( '1' !== get_option( 'cora_git_sync_enabled' ) ) {
+        return;
+    }
+
+    $request_uri = $_SERVER['REQUEST_URI'];
+    $home_path   = parse_url( home_url(), PHP_URL_PATH );
+    $path        = substr( $request_uri, strlen( $home_path ) );
+    $path        = trim( parse_url( $path, PHP_URL_PATH ), '/' );
+
+    // Intercept requests targeting assets/ or static files like placeholder.svg
+    if ( strpos( $path, 'assets/' ) === 0 || strpos( $path, 'placeholder.svg' ) === 0 ) {
+        global $wpdb;
+
+        // Resolve active/preview theme ID from HTTP referrer header
+        $active_theme_id = 0;
+        $referer = isset( $_SERVER['HTTP_REFERER'] ) ? $_SERVER['HTTP_REFERER'] : '';
+        if ( ! empty( $referer ) ) {
+            $referer_query = parse_url( $referer, PHP_URL_QUERY );
+            if ( ! empty( $referer_query ) ) {
+                parse_str( $referer_query, $query_params );
+                if ( isset( $query_params['cv_preview_theme'] ) ) {
+                    $active_theme_id = intval( $query_params['cv_preview_theme'] );
+                }
+            }
+        }
+
+        // Fallback to active live theme if referer lacks preview param
+        if ( ! $active_theme_id ) {
+            $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+            if ( ! $live_theme ) {
+                $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes LIMIT 1", ARRAY_A );
+            }
+            $active_theme_id = $live_theme ? intval( $live_theme['id'] ) : 0;
+        }
+
+        $active_theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $active_theme_id ), ARRAY_A );
+        $theme_settings = $active_theme ? (json_decode( $active_theme['settings'], true ) ?: array()) : array();
+
+        $live_url   = isset( $theme_settings['lovable_project_url'] ) ? $theme_settings['lovable_project_url'] : get_option( 'cora_git_sync_live_url', '' );
+        $nested_dir = isset( $theme_settings['nested_dir'] ) ? $theme_settings['nested_dir'] : get_option( 'cora_git_sync_nested_dir', '' );
+
+        if ( ! empty( $live_url ) ) {
+            $proxy_url = rtrim( $live_url, '/' );
+            $remote_url = $proxy_url . '/' . $path;
+
+            $response = wp_remote_get( $remote_url, array(
+                'timeout' => 25,
+                'headers' => array(
+                    'User-Agent' => 'Cora-Git-Sync-Asset-Proxy'
+                )
+            ) );
+
+            if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
+                $content = wp_remote_retrieve_body( $response );
+                $headers = wp_remote_retrieve_headers( $response );
+
+                $content_type = isset( $headers['content-type'] ) ? $headers['content-type'] : '';
+                if ( empty( $content_type ) ) {
+                    if ( substr( $path, -3 ) === '.js' ) {
+                        $content_type = 'application/javascript; charset=utf-8';
+                    } elseif ( substr( $path, -4 ) === '.css' ) {
+                        $content_type = 'text/css; charset=utf-8';
+                    } elseif ( substr( $path, -4 ) === '.svg' ) {
+                        $content_type = 'image/svg+xml';
+                    }
+                }
+
+                header( 'Content-Type: ' . $content_type );
+                header( 'Cache-Control: public, max-age=31536000, immutable' );
+                echo $content;
+                exit;
+            }
+        } elseif ( ! empty( $nested_dir ) ) {
+            $upload_dir = wp_get_upload_dir();
+            
+            // Look into theme-isolated assets directory first, fall back to global if not unzipped yet
+            $file_path  = $upload_dir['basedir'] . '/cora-git-sync-' . $active_theme_id . '/' . $nested_dir . '/' . $path;
+            if ( ! file_exists( $file_path ) ) {
+                $file_path  = $upload_dir['basedir'] . '/cora-git-sync/' . $nested_dir . '/' . $path;
+            }
+
+            if ( file_exists( $file_path ) ) {
+                $content_type = '';
+                if ( substr( $path, -3 ) === '.js' ) {
+                    $content_type = 'application/javascript; charset=utf-8';
+                } elseif ( substr( $path, -4 ) === '.css' ) {
+                    $content_type = 'text/css; charset=utf-8';
+                } elseif ( substr( $path, -4 ) === '.svg' ) {
+                    $content_type = 'image/svg+xml';
+                } else {
+                    $content_type = mime_content_type( $file_path );
+                }
+
+                header( 'Content-Type: ' . $content_type );
+                header( 'Cache-Control: public, max-age=31536000, immutable' );
+                readfile( $file_path );
+                exit;
+            }
+        }
+    }
+}
+add_action( 'init', 'cora_git_sync_proxy_assets', 1 );
+
+/**
+ * Intercept template redirects to serve Git-synced frontends (Lovable)
+ */
+function cora_git_sync_serve_frontend() {
+    if ( '1' !== get_option( 'cora_git_sync_enabled' ) ) {
+        return;
+    }
+
+    if ( is_admin() ) {
+        return;
+    }
+
+    if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+        return;
+    }
+    if ( isset( $_GET['rest_route'] ) ) {
+        return;
+    }
+    if ( false !== strpos( $_SERVER['REQUEST_URI'], '/wp-json/' ) ) {
+        return;
+    }
+
+    global $wpdb;
+
+    // Detect active theme ID (either preview or live)
+    $preview_theme_id = cora_get_preview_theme_id();
+    if ( $preview_theme_id ) {
+        $active_theme_id = $preview_theme_id;
+    } else {
+        $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+        if ( ! $live_theme ) {
+            $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes LIMIT 1", ARRAY_A );
+        }
+        $active_theme_id = $live_theme ? intval( $live_theme['id'] ) : 0;
+    }
+
+    $active_theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $active_theme_id ), ARRAY_A );
+    $theme_settings = $active_theme ? (json_decode( $active_theme['settings'], true ) ?: array()) : array();
+
+    $repo       = isset( $theme_settings['github_repo'] ) ? $theme_settings['github_repo'] : get_option( 'cora_git_sync_repo', '' );
+    $nested_dir = isset( $theme_settings['nested_dir'] ) ? $theme_settings['nested_dir'] : get_option( 'cora_git_sync_nested_dir', '' );
+    $page_id    = intval( get_option( 'cora_git_sync_page_id', 0 ) );
+    $live_url   = isset( $theme_settings['lovable_project_url'] ) ? $theme_settings['lovable_project_url'] : get_option( 'cora_git_sync_live_url', '' );
+
+    if ( empty( $live_url ) && ( empty( $repo ) || empty( $nested_dir ) ) ) {
+        return;
+    }
+
+    $request_uri = $_SERVER['REQUEST_URI'];
+    $home_path   = parse_url( home_url(), PHP_URL_PATH );
+    $path        = substr( $request_uri, strlen( $home_path ) );
+    $path        = trim( parse_url( $path, PHP_URL_PATH ), '/' );
+
+    $should_intercept = false;
+    $target_route     = '';
+
+    $canvas_page = null;
+    $mappings = isset( $theme_settings['page_mappings'] ) ? $theme_settings['page_mappings'] : get_option( 'cora_git_sync_page_mappings', array() );
+
+    // 1. First check if any of the mapped pages match the requested slug (handles duplicate slugs perfectly)
+    if ( is_array( $mappings ) && ! empty( $mappings ) ) {
+        $mapped_page_ids = array_keys( $mappings );
+        $placeholders = implode( ',', array_fill( 0, count( $mapped_page_ids ), '%d' ) );
+        
+        if ( empty( $path ) ) {
+            $query = $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id IN ($placeholders) AND is_homepage = 1 LIMIT 1",
+                $mapped_page_ids
+            );
+        } else {
+            $query = $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id IN ($placeholders) AND slug = %s LIMIT 1",
+                array_merge( $mapped_page_ids, array( $path ) )
+            );
+        }
+        $canvas_page = $wpdb->get_row( $query, ARRAY_A );
+    }
+
+    // 2. Fall back to resolved post ID match if no direct mapped page matched
+    if ( ! $canvas_page ) {
+        $current_post_id = get_queried_object_id();
+        if ( $current_post_id ) {
+            $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE wp_post_id = %d LIMIT 1", $current_post_id ), ARRAY_A );
+        }
+    }
+
+    // 3. Fall back to generic slug match if still not found
+    if ( ! $canvas_page ) {
+        if ( empty( $path ) ) {
+            $canvas_page = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE is_homepage = 1 LIMIT 1", ARRAY_A );
+        } else {
+            $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE slug = %s LIMIT 1", $path ), ARRAY_A );
+        }
+    }
+
+    if ( $canvas_page ) {
+        if ( is_array( $mappings ) && ! empty( $mappings[ $canvas_page['id'] ] ) ) {
+            $should_intercept = true;
+            $target_route     = $mappings[ $canvas_page['id'] ];
+        }
+    }
+
+    // Default mapped page configs fallback
+    if ( ! $should_intercept ) {
+        if ( $page_id === 0 && empty( $path ) ) {
+            $should_intercept = true;
+            $target_route     = '/';
+        } elseif ( $page_id > 0 && is_page( $page_id ) ) {
+            $should_intercept = true;
+            $target_route     = '/';
+        }
+    }
+
+    if ( $should_intercept ) {
+        if ( ! empty( $live_url ) ) {
+            $proxy_url = rtrim( $live_url, '/' );
+            $remote_url = $proxy_url . ( ( '/' === $target_route ) ? '' : $target_route );
+
+            $response = wp_remote_get( $remote_url, array(
+                'timeout' => 15,
+                'headers' => array(
+                    'User-Agent' => 'Cora-Git-Sync-Proxy'
+                )
+            ) );
+
+            if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
+                $html = wp_remote_retrieve_body( $response );
+
+                // Keep assets local to cora.local so they load via our CORS-free asset proxy
+                $html = str_replace( 'src="./assets/', 'src="/assets/', $html );
+                $html = str_replace( 'href="./assets/', 'href="/assets/', $html );
+                $html = str_replace( 'src="assets/', 'src="/assets/', $html );
+                $html = str_replace( 'href="assets/', 'href="/assets/', $html );
+
+                // Strip Lovable "Edit with Lovable" badge from HTML output
+                $html = preg_replace( '/<aside\s+id="lovable-badge".*?<\/aside>/is', '', $html );
+
+                $api_url = home_url( '/api/v1/public/' );
+                $nonce = wp_create_nonce( 'wp_rest' );
+                
+                $injection = "\n<script>\n";
+                $injection .= "  (function() {\n";
+                $injection .= "    var targetRoute = '" . esc_js( $target_route ) . "';\n";
+                $injection .= "    if (targetRoute && targetRoute !== '/') {\n";
+                $injection .= "      Object.defineProperty(window.Location.prototype, 'pathname', {\n";
+                $injection .= "        get: function() { return targetRoute; },\n";
+                $injection .= "        configurable: true\n";
+                $injection .= "      });\n";
+                $injection .= "    }\n";
+                $injection .= "  })();\n";
+                $injection .= "  window.CORA_API_URL = '" . esc_url_raw( $api_url ) . "';\n";
+                $injection .= "  window.CORA_NONCE = '" . esc_js( $nonce ) . "';\n";
+                $injection .= "<\/script>\n";
+                $bridge_tag = '<script src="' . esc_url( plugins_url( 'assets/js/cora-bridge.js', CORA_PLUGIN_FILE ) ) . '" defer><\/script>' . "\n";
+
+                if ( stripos( $html, '<\/head>' ) !== false ) {
+                    $html = str_ireplace( '<\/head>', $injection . $bridge_tag . '<\/head>', $html );
+                } else {
+                    $html = $injection . $bridge_tag . $html;
+                }
+
+                while ( ob_get_level() > 0 ) {
+                    ob_end_clean();
+                }
+
+                header( 'Content-Type: text/html; charset=UTF-8' );
+                echo $html;
+                exit;
+            } else {
+                cora_log_activity( 'git_sync', "Proxy request failed to {$remote_url}" );
+            }
+        } else {
+            $upload_dir = wp_get_upload_dir();
+            $base_dir = $upload_dir['basedir'] . '/cora-git-sync-' . $active_theme_id . '/' . $nested_dir;
+            $base_url = $upload_dir['baseurl'] . '/cora-git-sync-' . $active_theme_id . '/' . $nested_dir;
+            if ( ! is_dir( $base_dir ) ) {
+                $base_dir = $upload_dir['basedir'] . '/cora-git-sync/' . $nested_dir;
+                $base_url = $upload_dir['baseurl'] . '/cora-git-sync/' . $nested_dir;
+            }
+
+            $frontend_file = $base_dir . '/index.html';
+
+            if ( file_exists( $frontend_file ) ) {
+                $html = file_get_contents( $frontend_file );
+
+                // Keep assets local to cora.local so they load via our CORS-free asset proxy
+                $html = str_replace( 'src="./assets/', 'src="/assets/', $html );
+                $html = str_replace( 'href="./assets/', 'href="/assets/', $html );
+                $html = str_replace( 'src="assets/', 'src="/assets/', $html );
+                $html = str_replace( 'href="assets/', 'href="/assets/', $html );
+
+                // Strip Lovable "Edit with Lovable" badge from HTML output
+                $html = preg_replace( '/<aside\s+id="lovable-badge".*?<\/aside>/is', '', $html );
+
+                $api_url = home_url( '/api/v1/public/' );
+                $nonce = wp_create_nonce( 'wp_rest' );
+                
+                $injection = "\n<script>\n";
+                $injection .= "  (function() {\n";
+                $injection .= "    var targetRoute = '" . esc_js( $target_route ) . "';\n";
+                $injection .= "    if (targetRoute && targetRoute !== '/') {\n";
+                $injection .= "      Object.defineProperty(window.Location.prototype, 'pathname', {\n";
+                $injection .= "        get: function() { return targetRoute; },\n";
+                $injection .= "        configurable: true\n";
+                $injection .= "      });\n";
+                $injection .= "    }\n";
+                $injection .= "  })();\n";
+                $injection .= "  window.CORA_API_URL = '" . esc_url_raw( $api_url ) . "';\n";
+                $injection .= "  window.CORA_NONCE = '" . esc_js( $nonce ) . "';\n";
+                $injection .= "<\/script>\n";
+                $bridge_tag = '<script src="' . esc_url( plugins_url( 'assets/js/cora-bridge.js', CORA_PLUGIN_FILE ) ) . '" defer><\/script>' . "\n";
+
+                if ( stripos( $html, '<\/head>' ) !== false ) {
+                    $html = str_ireplace( '<\/head>', $injection . $bridge_tag . '<\/head>', $html );
+                } else {
+                    $html = $injection . $bridge_tag . $html;
+                }
+
+
+                while ( ob_get_level() > 0 ) {
+                    ob_end_clean();
+                }
+
+                header( 'Content-Type: text/html; charset=UTF-8' );
+                echo $html;
+                exit;
+            }
+        }
+    }
+}
+add_action( 'template_redirect', 'cora_git_sync_serve_frontend', 4 );
+
+function cora_get_preview_theme_id() {
+    global $wpdb;
+    if ( isset( $_GET['preview_theme_id'] ) ) {
+        return intval( $_GET['preview_theme_id'] );
+    }
+    if ( isset( $_GET['cv_preview_theme'] ) ) {
+        return intval( $_GET['cv_preview_theme'] );
+    }
+    if ( is_page() ) {
+        $post_id = get_queried_object_id();
+        if ( $post_id ) {
+            $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT theme_id FROM {$wpdb->prefix}cora_canvas_pages WHERE wp_post_id = %d LIMIT 1", $post_id ), ARRAY_A );
+            if ( $canvas_page ) {
+                return intval( $canvas_page['theme_id'] );
+            }
+        }
+    }
+    return 0;
+}
+
+// ── Dynamic query interceptor to resolve pages of draft themes on the frontend ──
+add_action( 'pre_get_posts', 'cora_canvas_route_preview_pages' );
+function cora_canvas_route_preview_pages( $query ) {
+    if ( is_admin() || ! $query->is_main_query() ) {
+        return;
+    }
+
+    global $wpdb;
+    $preview_theme_id = cora_get_preview_theme_id();
+
+    // Fall back to live theme if no preview param is present
+    if ( ! $preview_theme_id ) {
+        $live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+        if ( $live_theme ) {
+            $preview_theme_id = intval( $live_theme['id'] );
+        }
+    }
+
+    if ( ! $preview_theme_id ) {
+        return;
+    }
+
+    // Resolve requested slug path
+    $path = trim( parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ), '/' );
+    $home_path = trim( parse_url( home_url(), PHP_URL_PATH ), '/' );
+    if ( ! empty( $home_path ) && strpos( $path, $home_path ) === 0 ) {
+        $path = trim( substr( $path, strlen( $home_path ) ), '/' );
+    }
+
+    $canvas_page = null;
+    if ( empty( $path ) ) {
+        // Resolve theme homepage
+        $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND is_homepage = 1 LIMIT 1", $preview_theme_id ), ARRAY_A );
+    } else {
+        // Resolve theme page by slug
+        $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s LIMIT 1", $preview_theme_id, $path ), ARRAY_A );
+    }
+
+    if ( $canvas_page ) {
+        $query->set( 'page_id', intval( $canvas_page['wp_post_id'] ) );
+        $query->is_404 = false;
+    }
+}
+
+// ── Append preview theme query arguments to generated frontend links ──
+add_filter( 'page_link', 'cora_canvas_append_preview_query_arg', 10, 2 );
+add_filter( 'post_link', 'cora_canvas_append_preview_query_arg', 10, 2 );
+add_filter( 'post_type_link', 'cora_canvas_append_preview_query_arg', 10, 2 );
+function cora_canvas_append_preview_query_arg( $url, $post ) {
+    $preview_theme_id = cora_get_preview_theme_id();
+    if ( $preview_theme_id > 0 ) {
+        if ( strpos( $url, home_url() ) !== false ) {
+            $url = add_query_arg( 'cv_preview_theme', $preview_theme_id, $url );
+        }
+    }
+    return $url;
+}
+
+// ── Append preview theme query arguments to custom menus links ──
+add_filter( 'wp_setup_nav_menu_item', 'cora_canvas_filter_menu_item_preview_url' );
+function cora_canvas_filter_menu_item_preview_url( $menu_item ) {
+    $preview_theme_id = cora_get_preview_theme_id();
+    if ( $preview_theme_id > 0 ) {
+        if ( ! empty( $menu_item->url ) && strpos( $menu_item->url, home_url() ) !== false ) {
+            $menu_item->url = add_query_arg( 'cv_preview_theme', $preview_theme_id, $menu_item->url );
+        }
+    }
+    return $menu_item;
+}
+
 function cora_get_active_theme_styles() {
     global $wpdb;
-    $theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+    $preview_theme_id = cora_get_preview_theme_id();
+    $theme = null;
+    if ( $preview_theme_id > 0 ) {
+        $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d LIMIT 1", $preview_theme_id ), ARRAY_A );
+    }
+    if ( ! $theme ) {
+        $theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+    }
     if ( ! $theme ) {
         $theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes LIMIT 1", ARRAY_A );
     }
@@ -3022,7 +3452,8 @@ function cora_get_active_theme_styles() {
     </style>
     ";
     
-    $custom_css = get_option( 'cora_canvas_custom_css', '' );
+    // Prioritize custom CSS from theme settings
+    $custom_css = $settings['custom_css'] ?? get_option( 'cora_canvas_custom_css', '' );
     if ( ! empty( $custom_css ) ) {
         $style .= "<style id='cora-canvas-custom-css'>\n" . esc_html( $custom_css ) . "\n</style>\n";
     }
@@ -3031,8 +3462,28 @@ function cora_get_active_theme_styles() {
 }
 
 function cora_get_active_theme_js( $position = 'head' ) {
-    $custom_js = get_option( 'cora_canvas_custom_js', '' );
-    $pos = get_option( 'cora_canvas_custom_js_position', 'head' );
+    global $wpdb;
+    $preview_theme_id = cora_get_preview_theme_id();
+    $theme = null;
+    if ( $preview_theme_id > 0 ) {
+        $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d LIMIT 1", $preview_theme_id ), ARRAY_A );
+    }
+    if ( ! $theme ) {
+        $theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+    }
+    if ( ! $theme ) {
+        $theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes LIMIT 1", ARRAY_A );
+    }
+
+    $settings = array();
+    if ( $theme ) {
+        $settings = json_decode( $theme['settings'], true ) ?: array();
+    }
+
+    // Prioritize custom JS from theme settings
+    $custom_js = $settings['custom_js'] ?? get_option( 'cora_canvas_custom_js', '' );
+    $pos = $settings['custom_js_position'] ?? get_option( 'cora_canvas_custom_js_position', 'head' );
+    
     if ( ! empty( $custom_js ) && $pos === $position ) {
         return "<script id='cora-canvas-custom-js-" . esc_attr($position) . "'>\n" . $custom_js . "\n</script>\n";
     }
@@ -3065,8 +3516,10 @@ function cora_canvas_inject_header_footer( $content ) {
         return $content;
     }
 
-    // Retrieve theme settings
-    $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d LIMIT 1", $canvas_page['theme_id'] ), ARRAY_A );
+    // Retrieve theme settings (prioritizing active preview theme)
+    $preview_theme_id = cora_get_preview_theme_id();
+    $theme_id = ( $preview_theme_id > 0 ) ? $preview_theme_id : $canvas_page['theme_id'];
+    $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d LIMIT 1", $theme_id ), ARRAY_A );
     if ( ! $theme ) {
         return $content;
     }
@@ -6652,15 +7105,21 @@ function cora_ajax_save_system_settings_suite() {
         'cora_pwd_policy_min_len',
         'cora_activity_logs_retention',
         'cora_workspace_allow_tours',
-        'cora_mcp_access_token'
+        'cora_mcp_access_token',
+        'cora_git_sync_enabled',
+        'cora_git_sync_repo',
+        'cora_git_sync_branch',
+        'cora_git_sync_token',
+        'cora_git_sync_page_id',
+        'cora_git_sync_live_url'
     );
 
     foreach ( $fields as $field ) {
         if ( isset( $_POST[ $field ] ) ) {
             $val = $_POST[ $field ];
-            if ( in_array( $field, array( 'users_can_register', 'blog_public', 'default_pingback_flag', 'comment_moderation', 'cora_pwd_policy_min_len', 'cora_activity_logs_retention', 'cora_workspace_allow_tours' ) ) ) {
+            if ( in_array( $field, array( 'users_can_register', 'blog_public', 'default_pingback_flag', 'comment_moderation', 'cora_pwd_policy_min_len', 'cora_activity_logs_retention', 'cora_workspace_allow_tours', 'cora_git_sync_enabled' ) ) ) {
                 $val = intval( $val );
-            } elseif ( in_array( $field, array( 'page_on_front', 'page_for_posts', 'default_category', 'wp_page_for_privacy_policy' ) ) ) {
+            } elseif ( in_array( $field, array( 'page_on_front', 'page_for_posts', 'default_category', 'wp_page_for_privacy_policy', 'cora_git_sync_page_id' ) ) ) {
                 $val = intval( $val );
             } elseif ( in_array( $field, array( 'moderation_keys', 'disallowed_keys' ) ) ) {
                 $val = trim( $val );
@@ -6668,7 +7127,7 @@ function cora_ajax_save_system_settings_suite() {
                 $val = sanitize_text_field( $val );
             }
             update_option( $field, $val );
-        } elseif ( in_array( $field, array( 'users_can_register', 'blog_public', 'default_pingback_flag', 'comment_moderation', 'cora_workspace_allow_tours' ) ) ) {
+        } elseif ( in_array( $field, array( 'users_can_register', 'blog_public', 'default_pingback_flag', 'comment_moderation', 'cora_workspace_allow_tours', 'cora_git_sync_enabled' ) ) ) {
             update_option( $field, 0 );
         }
     }
@@ -6703,6 +7162,362 @@ function cora_ajax_save_system_settings_suite() {
     wp_send_json_success( array( 'message' => 'Global system settings updated successfully.' ) );
 }
 add_action( 'wp_ajax_cora_save_system_settings_suite', 'cora_ajax_save_system_settings_suite' );
+
+/**
+ * AJAX Action: Trigger Git Sync
+ */
+function cora_ajax_trigger_git_sync() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+    }
+
+    $theme_id = isset( $_POST['theme_id'] ) ? intval( $_POST['theme_id'] ) : 0;
+    
+    // Auto-update values if passed from the JS form
+    if ( isset( $_POST['repo'] ) ) {
+        update_option( 'cora_git_sync_repo', sanitize_text_field( $_POST['repo'] ) );
+    }
+    if ( isset( $_POST['branch'] ) ) {
+        update_option( 'cora_git_sync_branch', sanitize_text_field( $_POST['branch'] ) );
+    }
+    if ( isset( $_POST['token'] ) ) {
+        update_option( 'cora_git_sync_token', sanitize_text_field( $_POST['token'] ) );
+    }
+    if ( isset( $_POST['live_url'] ) ) {
+        update_option( 'cora_git_sync_live_url', esc_url_raw( $_POST['live_url'] ) );
+    }
+    if ( isset( $_POST['enabled'] ) ) {
+        update_option( 'cora_git_sync_enabled', sanitize_text_field( $_POST['enabled'] ) );
+    }
+
+    $settings = array();
+    if ( $theme_id ) {
+        $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+        if ( $theme ) {
+            $settings = json_decode( $theme['settings'], true ) ?: array();
+            if ( isset( $_POST['repo'] ) ) {
+                $settings['github_repo'] = esc_url_raw( $_POST['repo'] );
+            }
+            if ( isset( $_POST['branch'] ) ) {
+                $settings['github_branch'] = sanitize_text_field( $_POST['branch'] );
+            }
+            if ( isset( $_POST['token'] ) ) {
+                $settings['lovable_pat'] = sanitize_text_field( $_POST['token'] );
+            }
+            if ( isset( $_POST['live_url'] ) ) {
+                $settings['lovable_project_url'] = esc_url_raw( $_POST['live_url'] );
+            }
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_themes',
+                array( 'settings' => json_encode( $settings ), 'updated_at' => current_time('mysql') ),
+                array( 'id' => $theme_id )
+            );
+        }
+    }
+
+    $live_url = ($theme_id && isset($settings['lovable_project_url'])) ? $settings['lovable_project_url'] : get_option( 'cora_git_sync_live_url', '' );
+    if ( ! empty( $live_url ) ) {
+        update_option( 'cora_git_sync_last_time', time() );
+        update_option( 'cora_git_sync_last_status', 'Success' );
+        cora_log_activity( 'git_sync', "Enabled Lovable Live URL Proxy: {$live_url}" );
+        wp_send_json_success( array(
+            'message'   => 'Live URL configured and enabled successfully!',
+            'timestamp' => date( 'Y-m-d H:i:s' ),
+            'status'    => 'Success'
+        ) );
+    }
+
+    $repo   = ($theme_id && isset($settings['github_repo'])) ? $settings['github_repo'] : get_option( 'cora_git_sync_repo', '' );
+    $branch = ($theme_id && isset($settings['github_branch'])) ? $settings['github_branch'] : get_option( 'cora_git_sync_branch', 'main' );
+    $token  = ($theme_id && isset($settings['lovable_pat'])) ? $settings['lovable_pat'] : get_option( 'cora_git_sync_token', '' );
+
+    if ( empty( $repo ) ) {
+        wp_send_json_error( array( 'message' => 'GitHub Repository path is required.' ) );
+    }
+
+    // Support both full URL and username/repo format
+    if ( preg_match( '/github\.com\/([^\/]+)\/([^\/\?#]+)/i', $repo, $matches ) ) {
+        $owner = $matches[1];
+        $repo_name = $matches[2];
+    } else {
+        $repo_parts = explode( '/', trim( $repo, '/' ) );
+        if ( count( $repo_parts ) !== 2 ) {
+            wp_send_json_error( array( 'message' => 'Invalid repository format. Please use "username/repo" or the full GitHub URL.' ) );
+        }
+        $owner = $repo_parts[0];
+        $repo_name = $repo_parts[1];
+    }
+
+    // Force trailing extension removal if pasted as repo.git
+    if ( substr( strtolower( $repo_name ), -4 ) === '.git' ) {
+        $repo_name = substr( $repo_name, 0, -4 );
+    }
+
+    $download_url = sprintf( 'https://api.github.com/repos/%s/%s/zipball/%s', $owner, $repo_name, $branch );
+
+    $args = array(
+        'timeout'    => 60,
+        'headers'    => array(
+            'User-Agent' => 'Cora-Git-Sync-Plugin',
+            'Accept'     => 'application/vnd.github+json',
+        ),
+    );
+
+    if ( ! empty( $token ) ) {
+        $args['headers']['Authorization'] = 'Bearer ' . $token;
+    }
+
+    require_once ABSPATH . 'wp-admin/includes/file.php';
+    
+    // Safely apply headers only to GitHub and codeload domains, stripping them for S3 redirects
+    add_filter( 'http_request_args', function( $http_args, $url ) use ( $download_url, $args ) {
+        $parsed_url = parse_url( $url );
+        $host = isset( $parsed_url['host'] ) ? $parsed_url['host'] : '';
+        if ( in_array( $host, array( 'api.github.com', 'codeload.github.com', 'github.com' ) ) ) {
+            if ( isset( $args['headers']['Authorization'] ) ) {
+                $http_args['headers']['Authorization'] = $args['headers']['Authorization'];
+            }
+        } else {
+            unset( $http_args['headers']['Authorization'] );
+        }
+        $http_args['headers']['User-Agent'] = 'Cora-Git-Sync-Plugin';
+        return $http_args;
+    }, 10, 2 );
+
+    $tmp_file = download_url( $download_url );
+
+    if ( is_wp_error( $tmp_file ) ) {
+        wp_send_json_error( array( 'message' => 'Download failed: ' . $tmp_file->get_error_message() ) );
+    }
+
+    $upload_dir = wp_get_upload_dir();
+    $target_dir = $theme_id ? ($upload_dir['basedir'] . '/cora-git-sync-' . $theme_id) : ($upload_dir['basedir'] . '/cora-git-sync');
+
+    global $wp_filesystem;
+    if ( empty( $wp_filesystem ) ) {
+        WP_Filesystem();
+    }
+
+    if ( $wp_filesystem->exists( $target_dir ) ) {
+        $wp_filesystem->delete( $target_dir, true );
+    }
+
+    $wp_filesystem->mkdir( $target_dir );
+
+    $unzipped = unzip_file( $tmp_file, $target_dir );
+    @unlink( $tmp_file );
+
+    if ( is_wp_error( $unzipped ) ) {
+        wp_send_json_error( array( 'message' => 'Extraction failed: ' . $unzipped->get_error_message() ) );
+    }
+
+    $files = $wp_filesystem->dirlist( $target_dir );
+    $nested_dir = '';
+    if ( ! empty( $files ) ) {
+        foreach ( $files as $name => $info ) {
+            if ( $info['type'] === 'd' ) {
+                $nested_dir = $name;
+                break;
+            }
+        }
+    }
+
+    if ( empty( $nested_dir ) ) {
+        wp_send_json_error( array( 'message' => 'Failed to locate extracted nested directory from GitHub.' ) );
+    }
+
+    // Scan extracted HTML for Cora bridge compatibility flags inside the target folder
+    $compat_flags = array();
+    $index_html = $target_dir . '/' . $nested_dir . '/index.html';
+    if ( file_exists( $index_html ) ) {
+        $html_content = file_get_contents( $index_html );
+        if ( strpos( $html_content, 'data-cora-inject' ) !== false ) {
+            $compat_flags[] = 'data-bridge';
+        }
+        if ( strpos( $html_content, 'CORA_API_URL' ) !== false ) {
+            $compat_flags[] = 'api-url';
+        }
+        if ( strpos( $html_content, 'CORA_NONCE' ) !== false ) {
+            $compat_flags[] = 'nonce';
+        }
+        if ( strpos( $html_content, 'cora-nonce' ) !== false ) {
+            $compat_flags[] = 'nonce-input';
+        }
+    }
+
+    // Save metadata specifically to theme settings
+    if ( $theme_id ) {
+        $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+        if ( $theme ) {
+            $theme_settings = json_decode( $theme['settings'], true ) ?: array();
+            $theme_settings['nested_dir'] = $nested_dir;
+            $theme_settings['compat_flags'] = $compat_flags;
+            $theme_settings['last_sync_time'] = time();
+            $theme_settings['last_sync_status'] = 'Success';
+            
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_themes',
+                array( 'settings' => json_encode( $theme_settings ), 'updated_at' => current_time('mysql') ),
+                array( 'id' => $theme_id )
+            );
+        }
+    }
+
+    // Fallback/Legacy global option updates
+    update_option( 'cora_git_sync_last_time', time() );
+    update_option( 'cora_git_sync_last_status', 'Success' );
+    update_option( 'cora_git_sync_nested_dir', $nested_dir );
+    update_option( 'cora_git_sync_compat_flags', $compat_flags );
+
+    // Count detected routes using our dynamic method
+    $routes = cora_git_sync_get_lovable_routes( $theme_id );
+
+    cora_log_activity( 'git_sync', "Synchronized repository {$repo} [branch: {$branch}]" );
+
+    wp_send_json_success( array(
+        'message'      => 'Repository synced and deployed successfully!',
+        'timestamp'    => date( 'Y-m-d H:i:s' ),
+        'status'       => 'Success',
+        'compat_flags' => $compat_flags,
+        'route_count'  => count( $routes ),
+    ) );
+}
+add_action( 'wp_ajax_cora_trigger_git_sync', 'cora_ajax_trigger_git_sync' );
+
+/**
+ * Get all pages/routes detected in the synced Lovable React project.
+ */
+function cora_git_sync_get_lovable_routes( $theme_id = 0 ) {
+    global $wpdb;
+    $repo = '';
+    $nested_dir = '';
+    
+    if ( $theme_id ) {
+        $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+        if ( $theme ) {
+            $settings = json_decode( $theme['settings'], true ) ?: array();
+            $repo = isset( $settings['github_repo'] ) ? $settings['github_repo'] : '';
+            $nested_dir = isset( $settings['nested_dir'] ) ? $settings['nested_dir'] : '';
+        }
+    }
+    
+    if ( empty( $repo ) || empty( $nested_dir ) ) {
+        $repo = get_option( 'cora_git_sync_repo', '' );
+        $nested_dir = get_option( 'cora_git_sync_nested_dir', '' );
+    }
+
+    if ( empty( $repo ) || empty( $nested_dir ) ) {
+        return array();
+    }
+
+    $upload_dir = wp_get_upload_dir();
+    if ( $theme_id ) {
+        $routes_dir = $upload_dir['basedir'] . '/cora-git-sync-' . $theme_id . '/' . $nested_dir . '/src/routes';
+        if ( ! is_dir( $routes_dir ) ) {
+            $routes_dir = $upload_dir['basedir'] . '/cora-git-sync/' . $nested_dir . '/src/routes';
+        }
+    } else {
+        $routes_dir = $upload_dir['basedir'] . '/cora-git-sync/' . $nested_dir . '/src/routes';
+    }
+
+    if ( ! is_dir( $routes_dir ) ) {
+        return array();
+    }
+
+    $files = scandir( $routes_dir );
+    $routes = array();
+
+    foreach ( $files as $file ) {
+        if ( in_array( $file, array( '.', '..', '__root.tsx' ) ) ) {
+            continue;
+        }
+
+        if ( substr( $file, -4 ) === '.tsx' || substr( $file, -3 ) === '.ts' || substr( $file, -3 ) === '.js' || substr( $file, -4 ) === '.jsx' ) {
+            $base_name = pathinfo( $file, PATHINFO_FILENAME );
+            
+            // Map TanStack dot notation to URL paths (e.g. assets.$assetId.edit -> /assets/$assetId/edit)
+            if ( $base_name === 'index' ) {
+                $path = '/';
+            } else {
+                $path = '/' . str_replace( '.', '/', $base_name );
+                if ( substr( $path, -6 ) === '/index' ) {
+                    $path = substr( $path, 0, -6 );
+                }
+            }
+
+            // Capitalize names for clean presentation
+            $title = ucwords( str_replace( array( '-', '.', '$' ), ' ', $base_name ) );
+            if ( $title === 'Index' ) {
+                $title = 'Home / Landing Page';
+            }
+
+            $routes[] = array(
+                'title' => $title,
+                'path'  => $path,
+                'file'  => $file
+            );
+        }
+    }
+
+    return $routes;
+}
+
+/**
+ * Save Lovable route mapping for a Canvas page.
+ */
+function cora_ajax_save_page_lovable_mapping() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    global $wpdb;
+
+    $page_id = isset( $_POST['page_id'] ) ? intval( $_POST['page_id'] ) : 0;
+    $route   = isset( $_POST['route'] ) ? sanitize_text_field( $_POST['route'] ) : '';
+
+    if ( ! $page_id ) {
+        wp_send_json_error( array( 'message' => 'Invalid Page ID' ) );
+    }
+
+    // Save to the specific theme's settings
+    $page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d", $page_id ), ARRAY_A );
+    if ( $page ) {
+        $theme_id = intval( $page['theme_id'] );
+        $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+        if ( $theme ) {
+            $settings = json_decode( $theme['settings'], true ) ?: array();
+            if ( ! isset( $settings['page_mappings'] ) || ! is_array( $settings['page_mappings'] ) ) {
+                $settings['page_mappings'] = array();
+            }
+            if ( empty( $route ) ) {
+                unset( $settings['page_mappings'][ $page_id ] );
+            } else {
+                $settings['page_mappings'][ $page_id ] = $route;
+            }
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_themes',
+                array( 'settings' => json_encode( $settings ), 'updated_at' => current_time('mysql') ),
+                array( 'id' => $theme_id )
+            );
+        }
+    }
+
+    // Fallback/Legacy global mappings option update
+    $mappings = get_option( 'cora_git_sync_page_mappings', array() );
+    if ( ! is_array( $mappings ) ) {
+        $mappings = array();
+    }
+    if ( empty( $route ) ) {
+        unset( $mappings[ $page_id ] );
+    } else {
+        $mappings[ $page_id ] = $route;
+    }
+    update_option( 'cora_git_sync_page_mappings', $mappings );
+
+    wp_send_json_success( array( 'message' => 'Mapping saved successfully.' ) );
+}
+add_action( 'wp_ajax_cora_save_page_lovable_mapping', 'cora_ajax_save_page_lovable_mapping' );
 
 function cora_ajax_save_appearance_settings() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
@@ -9393,7 +10208,7 @@ function cora_db_get_branches() {
     global $wpdb;
     $agency_id = cora_db_get_agency_id();
     
-    $rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_branches WHERE agency_id = %d", $agency_id ), ARRAY_A );
+    $rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_branches WHERE agency_id = %d OR agency_id = 1", $agency_id ), ARRAY_A );
 
     $mapped = array();
     if ( $rows ) {
@@ -9407,6 +10222,15 @@ function cora_db_get_branches() {
                 'address' => $r['address'],
                 'manager_id' => $r['manager_id']
             );
+        }
+    }
+    
+    $opt_branches = get_option( 'cora_branches', array() );
+    if ( is_array( $opt_branches ) ) {
+        foreach ( $opt_branches as $k => $vb ) {
+            if ( ! isset( $mapped[$k] ) && is_array($vb) && ! empty($vb['name']) ) {
+                $mapped[$k] = $vb;
+            }
         }
     }
     return $mapped;
@@ -9621,6 +10445,28 @@ function cora_sync_db_tables_to_options() {
                 $branch_num_id = intval($matches[1]);
                 $opt_ids[] = $branch_num_id;
                 $cleaned_branches[$b_key] = $b;
+                
+                $exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_branches WHERE id = %d", $branch_num_id ) );
+                if ( ! $exists ) {
+                    $agency_num = 1;
+                    if ( ! empty($b['agency_id']) && preg_match('/^agency_(\d+)$/', $b['agency_id'], $ag_m) ) {
+                        $agency_num = intval($ag_m[1]);
+                    }
+                    $wpdb->insert(
+                        $wpdb->prefix . 'cora_branches',
+                        array(
+                            'id' => $branch_num_id,
+                            'agency_id' => $agency_num,
+                            'name' => $b['name'] ?? 'Branch',
+                            'city' => $b['city'] ?? '',
+                            'address' => $b['address'] ?? '',
+                            'manager_id' => intval($b['manager_id'] ?? 0),
+                            'created_at' => current_time('mysql'),
+                            'updated_at' => current_time('mysql')
+                        ),
+                        array('%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s')
+                    );
+                }
             } elseif ( $b_key === 'branch_1' ) {
                 $opt_ids[] = 1;
                 $cleaned_branches[$b_key] = $b;
@@ -11250,6 +12096,193 @@ function cora_handle_api_v1_request( $path_parts ) {
     $method = $_SERVER['REQUEST_METHOD'];
     $resource = $path_parts[2] ?? '';
     
+    // PUBLIC UNAUTHENTICATED ENDPOINTS GROUP: /api/v1/public/...
+    if ( 'public' === $resource ) {
+        $sub_resource = $path_parts[3] ?? '';
+        
+        // GET /api/v1/public/listings
+        if ( 'listings' === $sub_resource && 'GET' === $method ) {
+            $listings = cora_db_get_properties();
+            echo wp_json_encode( array( 'success' => true, 'data' => $listings ) );
+            exit;
+        }
+        
+        // POST /api/v1/public/leads
+        if ( 'leads' === $sub_resource && 'POST' === $method ) {
+            $raw = file_get_contents( 'php://input' );
+            $data = json_decode( $raw, true ) ?: $_POST;
+            
+            $names = isset( $data['names'] ) ? sanitize_text_field( $data['names'] ) : '';
+            $email = isset( $data['email'] ) ? sanitize_email( $data['email'] ) : '';
+            $scale = isset( $data['scale'] ) ? sanitize_text_field( $data['scale'] ) : '';
+            $city  = isset( $data['city'] ) ? sanitize_text_field( $data['city'] ) : '';
+            $notes = isset( $data['notes'] ) ? sanitize_textarea_field( $data['notes'] ) : '';
+            $price = isset( $data['price'] ) ? sanitize_text_field( $data['price'] ) : '';
+            $followup_date = isset( $data['followup_date'] ) ? sanitize_text_field( $data['followup_date'] ) : '';
+
+            if ( empty( $names ) || empty( $email ) ) {
+                status_header( 400 );
+                echo wp_json_encode( array( 'success' => false, 'message' => 'Names and Email are required.' ) );
+                exit;
+            }
+
+            global $wpdb;
+            $agency_id = cora_db_get_agency_id();
+            $branch_id = cora_db_get_branch_id();
+
+            $followup_dt = null;
+            if ( ! empty($followup_date) ) {
+                $followup_dt = date('Y-m-d H:i:s', strtotime($followup_date));
+            }
+
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_leads',
+                array(
+                    'agency_id' => $agency_id,
+                    'branch_id' => $branch_id,
+                    'assigned_to' => null,
+                    'first_name' => $names,
+                    'last_name' => '',
+                    'email' => $email,
+                    'phone' => '',
+                    'source' => 'Frontend (Git Sync)',
+                    'status' => 'new',
+                    'budget_min' => 0,
+                    'budget_max' => !empty($price) ? intval(preg_replace('/[^\d]/', '', $price)) : 0,
+                    'preferred_locations' => $city,
+                    'property_type' => $scale,
+                    'notes' => $notes,
+                    'followup_date' => $followup_dt,
+                    'followup_notes' => '',
+                    'converted_to_client' => 0,
+                    'client_id' => null,
+                    'embed_vector' => 0,
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                ),
+                array('%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s')
+            );
+            $inserted_id = $wpdb->insert_id;
+
+            $leads = get_option( 'cora_re_leads', array() );
+            if ( ! is_array( $leads ) ) {
+                $leads = array();
+            }
+
+            $new_lead = array(
+                'id'            => $inserted_id,
+                'names'         => $names,
+                'email'         => $email,
+                'scale'         => $scale,
+                'city'          => $city,
+                'notes'         => $notes,
+                'price'         => $price,
+                'status'        => 'New Lead',
+                'emails'        => cora_generate_default_email_sequence( $names, $scale, $city ),
+                'followup_date' => $followup_date,
+                'created_at'    => time()
+            );
+            $leads[] = $new_lead;
+            update_option( 'cora_re_leads', $leads );
+
+            cora_log_activity( 'Lead Capture', "Captured new lead via Git Sync frontend: {$names} ({$email})" );
+
+            echo wp_json_encode( array( 'success' => true, 'message' => 'Lead submitted successfully!', 'id' => $inserted_id ) );
+            exit;
+        }
+
+        // POST /api/v1/public/bookings
+        if ( 'bookings' === $sub_resource && 'POST' === $method ) {
+            $raw = file_get_contents( 'php://input' );
+            $data = json_decode( $raw, true ) ?: $_POST;
+
+            $names         = isset( $data['names'] ) ? sanitize_text_field( $data['names'] ) : '';
+            $email         = isset( $data['email'] ) ? sanitize_email( $data['email'] ) : '';
+            $property_id   = isset( $data['property_id'] ) ? intval( $data['property_id'] ) : 0;
+            $showing_date  = isset( $data['showing_date'] ) ? sanitize_text_field( $data['showing_date'] ) : '';
+            $notes         = isset( $data['notes'] ) ? sanitize_textarea_field( $data['notes'] ) : '';
+
+            if ( empty( $names ) || empty( $email ) || empty( $property_id ) || empty( $showing_date ) ) {
+                status_header( 400 );
+                echo wp_json_encode( array( 'success' => false, 'message' => 'Names, Email, Property ID, and Showing Date are required.' ) );
+                exit;
+            }
+
+            global $wpdb;
+            $agency_id = cora_db_get_agency_id();
+            $branch_id = cora_db_get_branch_id();
+
+            $client_id = 0;
+            $existing_client = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_clients WHERE email = %s AND agency_id = %d", $email, $agency_id ) );
+            if ( $existing_client ) {
+                $client_id = $existing_client->id;
+            } else {
+                $wpdb->insert(
+                    $wpdb->prefix . 'cora_clients',
+                    array(
+                        'agency_id'  => $agency_id,
+                        'branch_id'  => $branch_id,
+                        'names'      => $names,
+                        'email'      => $email,
+                        'phone'      => '',
+                        'status'     => 'Active Client',
+                        'city'       => '',
+                        'deal_type'  => 'Buy',
+                        'created_at' => current_time('mysql')
+                    ),
+                    array('%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s')
+                );
+                $client_id = $wpdb->insert_id;
+
+                $clients = get_option( 'cora_re_clients', array() );
+                if ( ! is_array( $clients ) ) {
+                    $clients = array();
+                }
+                $clients[] = array(
+                    'id'        => $client_id,
+                    'names'     => $names,
+                    'email'     => $email,
+                    'phone'     => '',
+                    'status'    => 'Active Client',
+                    'city'      => '',
+                    'deal_type' => 'Buy'
+                );
+                update_option( 'cora_re_clients', $clients );
+            }
+
+            $formatted_date = date('Y-m-d H:i:s', strtotime($showing_date));
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_bookings',
+                array(
+                    'agency_id'      => $agency_id,
+                    'branch_id'      => $branch_id,
+                    'client_id'      => $client_id,
+                    'property_id'    => $property_id,
+                    'showing_date'   => $formatted_date,
+                    'status'         => 'Pending',
+                    'assigned_agent' => 'Cora System',
+                    'package_value'  => 0,
+                    'deal_type'      => 'Showing',
+                    'crew'           => '[]',
+                    'notes'          => $notes,
+                    'created_at'     => current_time('mysql'),
+                    'updated_at'     => current_time('mysql')
+                ),
+                array('%d', '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s')
+            );
+            $inserted_id = $wpdb->insert_id;
+
+            cora_log_activity( 'Booking Creation', "Captured new booking request via Git Sync frontend for client: {$names}" );
+
+            echo wp_json_encode( array( 'success' => true, 'message' => 'Booking scheduled successfully!', 'id' => $inserted_id ) );
+            exit;
+        }
+
+        status_header( 404 );
+        echo wp_json_encode( array( 'success' => false, 'message' => 'Public resource not found.' ) );
+        exit;
+    }
+
     if ( ! is_user_logged_in() ) {
         status_header( 401 );
         echo wp_json_encode( array( 'success' => false, 'message' => 'Unauthorized' ) );
@@ -11959,6 +12992,38 @@ function cora_ajax_canvas_create_theme() {
         }
     }
 
+    // Wizard onboarding custom parameters
+    if ( isset( $_POST['builder'] ) ) {
+        $settings['source'] = sanitize_text_field( $_POST['builder'] );
+        if ( $_POST['builder'] === 'lovable' ) {
+            $settings['lovable_project_url'] = esc_url_raw( $_POST['lovable_url'] );
+            $settings['lovable_pat'] = sanitize_text_field( $_POST['lovable_token'] );
+            
+            // Persist GitHub credentials to WP options for automatic prefill
+            if ( ! empty( $_POST['github_repo'] ) ) {
+                update_option( 'cora_git_sync_repo', esc_url_raw( $_POST['github_repo'] ) );
+                $settings['github_repo'] = esc_url_raw( $_POST['github_repo'] );
+            }
+            if ( ! empty( $_POST['github_token'] ) ) {
+                update_option( 'cora_git_sync_token', sanitize_text_field( $_POST['github_token'] ) );
+            }
+            if ( ! empty( $_POST['github_branch'] ) ) {
+                update_option( 'cora_git_sync_branch', sanitize_text_field( $_POST['github_branch'] ) );
+                $settings['github_branch'] = sanitize_text_field( $_POST['github_branch'] );
+            } else {
+                $settings['github_branch'] = 'main';
+            }
+        } elseif ( $_POST['builder'] === 'elementor' ) {
+            $settings['sub_mode'] = sanitize_text_field( $_POST['sub_mode'] );
+            if ( $_POST['sub_mode'] === 'github' ) {
+                $settings['github_repo'] = esc_url_raw( $_POST['github_repo'] );
+                $settings['github_branch'] = sanitize_text_field( $_POST['github_branch'] );
+            } else {
+                $settings['elementor_kit'] = sanitize_text_field( $_POST['elementor_kit'] );
+            }
+        }
+    }
+
     $wpdb->insert(
         $wpdb->prefix . 'cora_canvas_themes',
         array(
@@ -12044,6 +13109,36 @@ function cora_ajax_canvas_rename_theme() {
     wp_send_json_success();
 }
 add_action( 'wp_ajax_cora_ajax_rename_theme', 'cora_ajax_canvas_rename_theme' );
+
+function cora_ajax_canvas_connect_lovable() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    
+    // Fetch live/active theme
+    $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+    if ( ! $live_theme ) {
+        $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes LIMIT 1", ARRAY_A );
+    }
+    
+    if ( $live_theme ) {
+        $settings = json_decode( $live_theme['settings'], true ) ?: array();
+        $settings['source'] = 'lovable';
+        $settings['lovable_project_url'] = sanitize_text_field( $_POST['project_url'] );
+        
+        $wpdb->update(
+            $wpdb->prefix . 'cora_canvas_themes',
+            array( 
+                'settings' => json_encode( $settings ), 
+                'updated_at' => current_time('mysql') 
+            ),
+            array( 'id' => $live_theme['id'] )
+        );
+    }
+    
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_cora_ajax_connect_lovable', 'cora_ajax_canvas_connect_lovable' );
 
 function cora_ajax_canvas_delete_theme() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
@@ -12193,6 +13288,7 @@ function cora_validate_and_import_elementor_kit( $file_path, $theme_name ) {
                 'name' => $theme_name,
                 'status' => 'draft',
                 'settings' => json_encode( array(
+                    'source' => 'elementor',
                     'branding_primary' => '#18181b',
                     'branding_secondary' => '#52525b',
                     'branding_font' => 'system-ui',
@@ -12215,6 +13311,7 @@ function cora_validate_and_import_elementor_kit( $file_path, $theme_name ) {
             'name' => $theme_name,
             'status' => 'draft',
             'settings' => json_encode( array(
+                'source' => 'elementor',
                 'branding_primary' => '#18181b',
                 'branding_secondary' => '#52525b',
                 'branding_font' => 'system-ui',
@@ -12247,6 +13344,7 @@ function cora_validate_and_import_elementor_kit( $file_path, $theme_name ) {
             }
             update_post_meta( $wp_post_id, '_elementor_edit_mode', 'builder' );
             update_post_meta( $wp_post_id, '_elementor_template_type', 'page' );
+            update_post_meta( $wp_post_id, '_wp_page_template', 'elementor_canvas' );
             
             $wpdb->insert(
                 $wpdb->prefix . 'cora_canvas_pages',
@@ -12300,6 +13398,44 @@ function cora_ajax_canvas_import_kit() {
 }
 add_action( 'wp_ajax_cora_ajax_import_kit', 'cora_ajax_canvas_import_kit' );
 
+function cora_ajax_canvas_scan_kit() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+
+    if ( empty( $_FILES['kit_zip'] ) ) {
+        wp_send_json_error( 'No file uploaded.' );
+    }
+
+    $file = $_FILES['kit_zip'];
+    if ( ! class_exists( 'ZipArchive' ) ) {
+        wp_send_json_error( 'PHP ZipArchive extension is not enabled on this server.' );
+    }
+
+    $zip = new ZipArchive;
+    if ( $zip->open( $file['tmp_name'] ) !== TRUE ) {
+        wp_send_json_error( 'Failed to open ZIP file.' );
+    }
+
+    $pages = array();
+    for ( $i = 0; $i < $zip->numFiles; $i++ ) {
+        $filename = $zip->getNameIndex( $i );
+        // Scan JSON files (excluding manifest.json)
+        if ( pathinfo( $filename, PATHINFO_EXTENSION ) === 'json' && basename( $filename ) !== 'manifest.json' ) {
+            $content = $zip->getFromIndex( $i );
+            $json_data = json_decode( $content, true );
+            if ( json_last_error() === JSON_ERROR_NONE ) {
+                if ( isset( $json_data['type'] ) && $json_data['type'] === 'page' ) {
+                    $pages[] = isset( $json_data['title'] ) ? sanitize_text_field( $json_data['title'] ) : basename( $filename, '.json' );
+                }
+            }
+        }
+    }
+    $zip->close();
+
+    wp_send_json_success( array( 'pages' => $pages ) );
+}
+add_action( 'wp_ajax_cora_ajax_scan_kit', 'cora_ajax_canvas_scan_kit' );
+
 function cora_ajax_canvas_get_theme_pages() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
     cora_canvas_ajax_permission_check( false );
@@ -12321,6 +13457,11 @@ function cora_ajax_canvas_create_page() {
     $template = sanitize_text_field( $_POST['template'] );
     $status = sanitize_text_field( $_POST['status'] );
 
+    // Query theme source setting to check if we are building under Elementor
+    $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+    $theme_settings = json_decode( $theme['settings'], true ) ?: array();
+    $source = isset( $theme_settings['source'] ) ? $theme_settings['source'] : '';
+
     $wp_post_id = wp_insert_post( array(
         'post_title' => $title,
         'post_name' => $slug,
@@ -12331,6 +13472,20 @@ function cora_ajax_canvas_create_page() {
 
     if ( is_wp_error( $wp_post_id ) ) {
         wp_send_json_error( array( 'message' => $wp_post_id->get_error_message() ) );
+    }
+
+    // Initialize Elementor post meta for compatibility and style inheritance
+    if ( $source === 'elementor' ) {
+        update_post_meta( $wp_post_id, '_elementor_edit_mode', 'builder' );
+        update_post_meta( $wp_post_id, '_elementor_template_type', 'page' );
+        update_post_meta( $wp_post_id, '_elementor_data', wp_slash( json_encode( array() ) ) );
+
+        // Select the appropriate template based on requested layout
+        if ( $template === 'landing-page' || $template === 'minimal' ) {
+            update_post_meta( $wp_post_id, '_wp_page_template', 'elementor_canvas' );
+        } else {
+            update_post_meta( $wp_post_id, '_wp_page_template', 'elementor_header_footer' );
+        }
     }
 
     $wpdb->insert(
@@ -12352,7 +13507,7 @@ function cora_ajax_canvas_create_page() {
     );
     
     $page_id = $wpdb->insert_id;
-    cora_log_activity( 'Canvas', "Created canvas page '{$title}'." );
+    cora_log_activity( 'Canvas', "Created canvas page '{$title}' under theme workspace ID {$theme_id}." );
 
     wp_send_json_success( array(
         'page_id' => $page_id,
@@ -12554,7 +13709,24 @@ add_action( 'wp_ajax_cora_ajax_save_theme_settings', 'cora_ajax_canvas_save_them
 function cora_ajax_canvas_save_custom_css() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
     cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $theme_id = intval( $_POST['theme_id'] );
     $css = $_POST['css'];
+
+    if ( $theme_id > 0 ) {
+        $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+        if ( $theme ) {
+            $settings = json_decode( $theme['settings'], true ) ?: array();
+            $settings['custom_css'] = $css;
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_themes',
+                array( 'settings' => json_encode($settings), 'updated_at' => current_time('mysql') ),
+                array( 'id' => $theme_id )
+            );
+        }
+    }
+
+    // Update global option as fallback
     update_option( 'cora_canvas_custom_css', $css );
     wp_send_json_success();
 }
@@ -12563,8 +13735,26 @@ add_action( 'wp_ajax_cora_ajax_save_custom_css', 'cora_ajax_canvas_save_custom_c
 function cora_ajax_canvas_save_custom_js() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
     cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $theme_id = intval( $_POST['theme_id'] );
     $js = $_POST['js'];
     $position = sanitize_text_field( $_POST['position'] );
+
+    if ( $theme_id > 0 ) {
+        $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+        if ( $theme ) {
+            $settings = json_decode( $theme['settings'], true ) ?: array();
+            $settings['custom_js'] = $js;
+            $settings['custom_js_position'] = $position;
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_themes',
+                array( 'settings' => json_encode($settings), 'updated_at' => current_time('mysql') ),
+                array( 'id' => $theme_id )
+            );
+        }
+    }
+
+    // Update global options as fallbacks
     update_option( 'cora_canvas_custom_js', $js );
     update_option( 'cora_canvas_custom_js_position', $position );
     wp_send_json_success();

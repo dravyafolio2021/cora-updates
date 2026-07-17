@@ -78,3 +78,9 @@
     top: 24px;
     border-left-color: #ffffff;
 }
+
+/* Ensure utility class .hidden strictly overrides flex or grid defaults when applied */
+.hidden {
+    display: none !important;
+}
+

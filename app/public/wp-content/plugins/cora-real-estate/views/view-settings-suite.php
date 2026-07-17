@@ -38,7 +38,7 @@ $roles      = wp_roles()->get_names();
 <!-- Settings Sidebar Grid Layout -->
 <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-6">
     <!-- Left Column: Navigation Sidebar -->
-    <div class="lg:col-span-1 space-y-1.5">
+    <div class="lg:col-span-1 space-y-1.5 pb-20">
         <?php
         $tabs = array(
             'general'    => array(
@@ -90,6 +90,11 @@ $roles      = wp_roles()->get_names();
                 'label' => 'Privacy Policy',
                 'desc'  => 'Compliance terms page',
                 'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
+            ),
+            'git-sync'   => array(
+                'label' => 'Git Sync',
+                'desc'  => 'Lovable & GitHub Integrations',
+                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="18" r="3"></circle><path d="M18 15V9a4 4 0 0 0-4-4h-4a4 4 0 0 0-4 4v6"></path><circle cx="12" cy="5" r="1"></circle></svg>'
             )
         );
         foreach ( $tabs as $tab_key => $tab ) :
@@ -972,6 +977,152 @@ $roles      = wp_roles()->get_names();
                         <?php endforeach; ?>
                     </select>
                     <a href="?page=cora-workspace&sub=pages" class="px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-semibold text-xs rounded-lg transition-colors flex items-center gap-1">Create New Page</a>
+                </div>
+            </div>
+        </div>
+        <?php elseif ( $active_tab === 'git-sync' ) : ?>
+        <!-- TAB 7: GIT SYNC (LOVABLE & GITHUB) -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+            <!-- Left side: Form Settings -->
+            <div class="xl:col-span-7 space-y-6 bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-3xs">
+                <div class="border-b border-zinc-100 pb-3">
+                    <h3 class="text-sm font-bold text-zinc-900">Git Sync Integration</h3>
+                    <p class="text-xs text-zinc-500">Deploy custom frontends built in Lovable or other vibe-coding platforms directly to WordPress pages using GitHub.</p>
+                </div>
+                
+                <!-- Enable toggle -->
+                <div class="flex items-center justify-between p-3.5 bg-zinc-50/50 border border-zinc-200/60 rounded-xl">
+                    <div class="flex flex-col gap-0.5">
+                        <span class="text-xs font-bold text-zinc-900">Enable Git Sync Hosting</span>
+                        <span class="text-[10px] text-zinc-500">Route requests on the mapped page to load files from the Git repository.</span>
+                    </div>
+                    <label class="cora-switch relative inline-flex items-center cursor-pointer scale-[0.8] shrink-0">
+                        <input type="checkbox" name="cora_git_sync_enabled" value="1" <?php checked( get_option('cora_git_sync_enabled'), '1' ); ?> class="sr-only peer">
+                        <div class="w-9 h-5 bg-zinc-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-950"></div>
+                    </label>
+                </div>
+
+                <!-- GitHub Repo Input -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-800 mb-1">GitHub Repository Link</label>
+                        <input type="text" name="cora_git_sync_repo" value="<?php echo esc_attr( get_option('cora_git_sync_repo', '') ); ?>" placeholder="e.g. https://github.com/dravyafolio2021/asset-ace-96" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-950">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-800 mb-1">Branch (Usually "main")</label>
+                        <input type="text" name="cora_git_sync_branch" value="<?php echo esc_attr( get_option('cora_git_sync_branch', 'main') ); ?>" placeholder="e.g. main" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-950">
+                    </div>
+                </div>
+
+                <!-- GitHub Access Token -->
+                <div>
+                    <label class="block text-xs font-bold text-zinc-800 mb-1">GitHub Security Token (Only if repository is Private)</label>
+                    <input type="password" name="cora_git_sync_token" value="<?php echo esc_attr( get_option('cora_git_sync_token', '') ); ?>" placeholder="e.g. ghp_aBcDeFgHiJkLmNoPqRsTuVwXyZ1234567890" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-950">
+                    <p class="text-[10px] text-zinc-400 mt-1">Leave empty if your repository is Public. Only paste a token if the repository is private.</p>
+                </div>
+
+                <!-- Lovable Live URL -->
+                <div>
+                    <label class="block text-xs font-bold text-zinc-800 mb-1">Lovable Live URL (Alternative Deploy URL)</label>
+                    <input type="text" name="cora_git_sync_live_url" value="<?php echo esc_attr( get_option('cora_git_sync_live_url', '') ); ?>" placeholder="e.g. https://asset-ace-96.lovable.app" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-950">
+                    <p class="text-[10px] text-zinc-400 mt-1">Optional. If your repository contains React source code rather than compiled static files, enter your live Lovable website link here.</p>
+                </div>
+
+                <!-- Page Mapping -->
+                <div>
+                    <label class="block text-xs font-bold text-zinc-800 mb-1">Choose Where to Show this Website</label>
+                    <select name="cora_git_sync_page_id" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none">
+                        <option value="0">— Site Homepage (/) —</option>
+                        <?php foreach ( $pages as $p ) : ?>
+                            <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( get_option('cora_git_sync_page_id'), $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?> (<?php echo esc_html( get_page_uri($p->ID) ); ?>)</option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Manual Sync action button -->
+                <div class="pt-4 border-t border-zinc-100 flex items-center justify-between">
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-zinc-900">Synchronize Repository</span>
+                        <?php 
+                        $last_sync = get_option('cora_git_sync_last_time', '');
+                        $last_status = get_option('cora_git_sync_last_status', '');
+                        ?>
+                        <span class="text-[9px] text-zinc-400 mt-0.5" id="cora-git-sync-status">
+                            <?php if ( ! empty($last_sync) ) : ?>
+                                Last sync: <?php echo esc_html( date('Y-m-d H:i:s', intval($last_sync)) ); ?> (Status: <?php echo esc_html($last_status); ?>)
+                            <?php else: ?>
+                                Never synchronized.
+                            <?php endif; ?>
+                        </span>
+                    </div>
+                    <button type="button" id="cora-btn-git-sync-now" class="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center gap-1.5 border border-zinc-200">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="animate-spin hidden mr-1" id="cora-git-sync-spinner"><circle cx="12" cy="12" r="10"></circle><path d="M22 12a10 10 0 0 1-9 9"></path></svg>
+                        Sync & Deploy Now
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right side: Onboarding & Instructions -->
+            <div class="xl:col-span-5 space-y-5 bg-zinc-50/50 border border-zinc-200/80 rounded-2xl p-6 shadow-3xs">
+                <div class="flex items-center gap-2 pb-2 border-b border-zinc-200">
+                    <span class="text-zinc-900 shrink-0">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                    </span>
+                    <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Lovable Integration Guide</h4>
+                </div>
+
+                <!-- Step-by-step tutorial cards -->
+                <div class="space-y-5 text-xs text-zinc-700">
+                    <!-- Step 1 -->
+                    <div class="flex gap-3">
+                        <div class="w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-[10px] shrink-0">1</div>
+                        <div class="space-y-1">
+                            <span class="font-bold text-zinc-900">Initiate your Lovable Project</span>
+                            <p class="leading-relaxed">Go to <a href="https://lovable.dev" target="_blank" class="underline font-semibold text-zinc-950">Lovable.dev</a> and prompt your real estate client site or application using plain English.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="flex gap-3">
+                        <div class="w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-[10px] shrink-0">2</div>
+                        <div class="space-y-1">
+                            <span class="font-bold text-zinc-900">Publish your site to GitHub</span>
+                            <p class="leading-relaxed">Inside Lovable, click **Publish** or **Connect to GitHub** in the top-right corner. Follow the prompts to create a new folder for your website on GitHub.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="flex gap-3">
+                        <div class="w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-[10px] shrink-0">3</div>
+                        <div class="space-y-1">
+                            <span class="font-bold text-zinc-900">Generate a GitHub Security Token</span>
+                            <p class="leading-relaxed mb-2">If your project on GitHub is Private, you must generate a security key so Cora can pull your designs. Click the button below, log in to GitHub, and click the green **"Generate token"** button at the bottom of the page.</p>
+                            <a href="https://github.com/settings/tokens/new?scopes=repo&description=Cora%20Git%20Sync" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 text-white hover:bg-zinc-800 text-[10px] font-bold rounded-lg transition-colors shadow-sm">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                Auto-Generate Token on GitHub
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="flex gap-3">
+                        <div class="w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-[10px] shrink-0">4</div>
+                        <div class="space-y-1">
+                            <span class="font-bold text-zinc-900">Copy details and Sync!</span>
+                            <p class="leading-relaxed">Copy the website link from your browser address bar on GitHub, paste it into the **GitHub Repository Link** field, paste your token, and click **Sync & Deploy Now**.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Alert box -->
+                <div class="p-3.5 bg-zinc-100 rounded-xl border border-zinc-200/50 flex gap-3 mt-4">
+                    <span class="text-zinc-600 shrink-0 mt-0.5">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    </span>
+                    <div class="space-y-1">
+                        <span class="text-[10px] font-bold text-zinc-800 uppercase tracking-wider">Dynamic Integrations</span>
+                        <p class="text-[10px] text-zinc-500 leading-relaxed">Cora injects `window.CORA_API_URL` and `window.CORA_NONCE` automatically. Any form submissions or listing requests made in your Lovable code will dynamically query this site's databases.</p>
+                    </div>
                 </div>
             </div>
         </div>

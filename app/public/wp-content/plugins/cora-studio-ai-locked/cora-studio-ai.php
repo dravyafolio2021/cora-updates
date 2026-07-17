@@ -148,12 +148,13 @@ function cora_studio_ai_handle_workspace_route() {
         $current_user_role = ! empty( $user->roles ) ? $user->roles[0] : 'subscriber';
         
         $allowed_features = isset( $cora_permissions[$current_user_role] ) ? $cora_permissions[$current_user_role] : array();
-        if ( $current_user_role === 'administrator' ) {
-            $allowed_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'gallery', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'my-profile' );
-        }
-        // My Profile is accessible by all logged-in users
-        if ( ! in_array( 'my-profile', $allowed_features ) ) {
-            $allowed_features[] = 'my-profile';
+        if ( in_array( $current_user_role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) {
+            $all_studio_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'gallery', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'my-profile', 'settings-suite', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'attendance', 'tasks', 'visual-builder', 'audit-panel', 'media', 'canvas', 'forms', 'ecosystem', 'profile' );
+            foreach ( $all_studio_features as $feat ) {
+                if ( ! in_array( $feat, $allowed_features ) ) {
+                    $allowed_features[] = $feat;
+                }
+            }
         }
 
         // Prevent accessing disallowed sub-pages
@@ -1739,7 +1740,7 @@ function cora_studio_ai_serve_frontend_homepage() {
     $path = trim( parse_url( $path, PHP_URL_PATH ), '/' );
 
     // Skip hijacking if this is a workspace or shared resource route
-    if ( strpos( $path, 'workspace' ) === 0 || strpos( $path, 'shared-doc' ) === 0 || strpos( $path, 'shared-gallery' ) === 0 ) {
+    if ( strpos( $path, 'api' ) === 0 || strpos( $path, 'workspace' ) === 0 || strpos( $path, 'shared-doc' ) === 0 || strpos( $path, 'shared-gallery' ) === 0 ) {
         return;
     }
 
@@ -3546,6 +3547,61 @@ function cora_ajax_gbp_reply_review() {
     update_option( 'cora_gbp_review_replies', $replies );
     wp_send_json_success( array( 'comment' => $reply_text ) );
 }
+function cora_ajax_mark_notif_read() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    $user_id = get_current_user_id();
+    if ( ! $user_id ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    }
+
+    $notif_id = sanitize_key( $_POST['notif_id'] ?? '' );
+    if ( empty( $notif_id ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid notification ID.' ) );
+    }
+
+    $notifications = get_option( 'cora_notifications', array() );
+    $updated = false;
+    if ( is_array( $notifications ) ) {
+        foreach ( $notifications as $key => $notif ) {
+            if ( isset( $notif['id'] ) && strval($notif['id']) === strval($notif_id) && isset( $notif['user_id'] ) && intval( $notif['user_id'] ) === $user_id ) {
+                $notifications[$key]['read'] = true;
+                $updated = true;
+                break;
+            }
+        }
+    }
+
+    if ( $updated ) {
+        update_option( 'cora_notifications', $notifications );
+        wp_send_json_success();
+    }
+
+    wp_send_json_error( array( 'message' => 'Notification not found.' ) );
+}
+add_action( 'wp_ajax_cora_ajax_mark_notif_read', 'cora_ajax_mark_notif_read' );
+
+function cora_ajax_mark_all_notifs_read() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    $user_id = get_current_user_id();
+    if ( ! $user_id ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    }
+
+    $notifications = get_option( 'cora_notifications', array() );
+    if ( is_array( $notifications ) ) {
+        foreach ( $notifications as $key => $notif ) {
+            if ( isset( $notif['user_id'] ) && intval( $notif['user_id'] ) === $user_id ) {
+                $notifications[$key]['read'] = true;
+            }
+        }
+        update_option( 'cora_notifications', $notifications );
+    }
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_cora_ajax_mark_all_notifs_read', 'cora_ajax_mark_all_notifs_read' );
+
 add_action( 'wp_ajax_cora_gbp_reply_review', 'cora_ajax_gbp_reply_review' );
 
 /**
