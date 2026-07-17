@@ -171,73 +171,88 @@ $roles      = wp_roles()->get_names();
     </div>
 </div>
 
+<!-- Mobile Horizontal Tab Strip (Hidden on Desktop) -->
+<div class="lg:hidden flex overflow-x-auto gap-2 pb-3 mb-2 scrollbar-none border-b border-zinc-200/50 dark:border-zinc-800/40 w-full" style="-webkit-overflow-scrolling: touch;">
+    <?php
+    $tabs = array(
+        'general'    => array(
+            'label' => 'General Settings',
+            'desc'  => 'Workspace details & identity',
+            'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>'
+        ),
+        'pwd-policy' => array(
+            'label' => 'Password Policy',
+            'desc'  => 'Enforce security parameters',
+            'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>'
+        ),
+        'branches'   => array(
+            'label' => 'Branches',
+            'desc'  => 'Brokerage physical offices',
+            'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>'
+        ),
+        'brand'      => array(
+            'label' => 'Branding & APIs',
+            'desc'  => 'Favicon, logos, integrations',
+            'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>'
+        ),
+        'mcp'        => array(
+            'label' => 'AI Tools MCP',
+            'desc'  => 'Connect custom external AI',
+            'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>'
+        ),
+        'reading'    => array(
+            'label' => 'Reading & SEO',
+            'desc'  => 'Homepage and search engines',
+            'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>'
+        ),
+        'writing'    => array(
+            'label' => 'Writing',
+            'desc'  => 'Category & format variables',
+            'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>'
+        ),
+        'discussion' => array(
+            'label' => 'Discussion',
+            'desc'  => 'Moderation & blacklists',
+            'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>'
+        ),
+        'permalinks' => array(
+            'label' => 'Permalinks',
+            'desc'  => 'SEO URL structures',
+            'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>'
+        ),
+        'privacy'    => array(
+            'label' => 'Privacy',
+            'desc'  => 'Compliance terms page',
+            'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
+        ),
+        'git-sync'   => array(
+            'label' => 'Git Sync',
+            'desc'  => 'Lovable & GitHub Integrations',
+            'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="18" r="3"></circle><path d="M18 15V9a4 4 0 0 0-4-4h-4a4 4 0 0 0-4 4v6"></path><circle cx="12" cy="5" r="1"></circle></svg>'
+        )
+    );
+    foreach ( $tabs as $tab_key => $tab ) :
+        $is_active = ( $active_tab === $tab_key );
+    ?>
+    <a href="?page=cora-workspace&sub=settings-suite&settings_tab=<?php echo esc_attr( $tab_key ); ?>" class="flex items-center gap-1.5 px-3.5 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors shrink-0 <?php echo $is_active ? 'bg-zinc-950 text-white dark:bg-white dark:text-zinc-950' : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-850 dark:text-zinc-300 dark:hover:bg-zinc-800'; ?>">
+        <span class="shrink-0 <?php echo $is_active ? 'text-white dark:text-zinc-950' : 'text-zinc-550 dark:text-zinc-400'; ?>">
+            <?php echo $tab['icon']; ?>
+        </span>
+        <span><?php echo esc_html( $tab['label'] ); ?></span>
+    </a>
+    <?php endforeach; ?>
+</div>
+
 <!-- Settings Sidebar Grid Layout -->
 <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-6">
-    <!-- Left Column: Navigation Sidebar -->
-    <div class="lg:col-span-1 space-y-1.5 pb-20">
+    <!-- Left Column: Navigation Sidebar (Hidden on Mobile) -->
+    <div class="hidden lg:block lg:col-span-1 space-y-1.5 pb-20">
         <?php
-        $tabs = array(
-            'general'    => array(
-                'label' => 'General Settings',
-                'desc'  => 'Workspace details & identity',
-                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>'
-            ),
-            'pwd-policy' => array(
-                'label' => 'Password Policy',
-                'desc'  => 'Enforce security parameters',
-                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>'
-            ),
-            'branches'   => array(
-                'label' => 'Branch Management',
-                'desc'  => 'Brokerage physical offices',
-                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>'
-            ),
-            'brand'      => array(
-                'label' => 'Branding & API Keys',
-                'desc'  => 'Favicon, logos, integrations',
-                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>'
-            ),
-            'mcp'        => array(
-                'label' => 'AI Tools MCP',
-                'desc'  => 'Connect custom external AI',
-                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>'
-            ),
-            'reading'    => array(
-                'label' => 'Reading & SEO',
-                'desc'  => 'Homepage and search engines',
-                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>'
-            ),
-            'writing'    => array(
-                'label' => 'Writing Defaults',
-                'desc'  => 'Category & format variables',
-                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>'
-            ),
-            'discussion' => array(
-                'label' => 'Discussion Suite',
-                'desc'  => 'Moderation & blacklists',
-                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>'
-            ),
-            'permalinks' => array(
-                'label' => 'SEO Permalinks',
-                'desc'  => 'SEO URL structures',
-                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>'
-            ),
-            'privacy'    => array(
-                'label' => 'Privacy Policy',
-                'desc'  => 'Compliance terms page',
-                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
-            ),
-            'git-sync'   => array(
-                'label' => 'Git Sync',
-                'desc'  => 'Lovable & GitHub Integrations',
-                'icon'  => '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="18" r="3"></circle><path d="M18 15V9a4 4 0 0 0-4-4h-4a4 4 0 0 0-4 4v6"></path><circle cx="12" cy="5" r="1"></circle></svg>'
-            )
-        );
         foreach ( $tabs as $tab_key => $tab ) :
             $is_active = ( $active_tab === $tab_key );
         ?>
         <a href="?page=cora-workspace&sub=settings-suite&settings_tab=<?php echo esc_attr( $tab_key ); ?>" class="cora-settings-nav-item <?php echo $is_active ? 'active' : ''; ?>">
-            <div class="<?php echo $is_active ? 'text-zinc-800 dark:text-zinc-100' : 'text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-700'; ?> shrink-0">
+            <div class="<?php echo $is_active ? 'text-zinc-800 dark:text-zinc-100' : 'text-zinc-400 dark:text-zinc-555 group-hover:text-zinc-700'; ?> shrink-0">
                 <?php echo $tab['icon']; ?>
             </div>
             <div class="min-w-0">
@@ -249,7 +264,7 @@ $roles      = wp_roles()->get_names();
     </div>
 
     <!-- Right Column: Settings Form Content (Shopify-Style Discrete Cards) -->
-    <div class="lg:col-span-3">
+    <div class="lg:col-span-3 pb-24">
         <form id="cora-settings-suite-form" onsubmit="event.preventDefault(); coraSaveSystemSettingsSuite();" class="space-y-6">
             <input type="hidden" name="active_tab" value="<?php echo esc_attr( $active_tab ); ?>">
 
@@ -442,47 +457,49 @@ $roles      = wp_roles()->get_names();
             </div>
 
             <div class="cora-shopify-card p-0 overflow-hidden">
-                <table class="min-w-full divide-y divide-zinc-200 text-xs text-left">
-                    <thead class="bg-zinc-50/50">
-                        <tr>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Branch Name</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Location / Address</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Branch Manager</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Active Crew</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-zinc-100">
-                        <?php if ( empty( $filtered_branches ) ) : ?>
+                <div class="overflow-x-auto w-full" style="-webkit-overflow-scrolling: touch;">
+                    <table class="min-w-full divide-y divide-zinc-200 text-xs text-left">
+                        <thead class="bg-zinc-50/50">
                             <tr>
-                                <td colspan="5" class="px-5 py-8 text-center text-zinc-400 font-medium">No branches configured.</td>
+                                <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Branch Name</th>
+                                <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Location / Address</th>
+                                <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Branch Manager</th>
+                                <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Active Crew</th>
+                                <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-right">Actions</th>
                             </tr>
-                        <?php else : ?>
-                            <?php foreach ( $filtered_branches as $b_id => $b ) :
-                                $mgr = ! empty( $b['manager_id'] ) ? get_userdata( $b['manager_id'] ) : null;
-                                $mgr_name = $mgr ? $mgr->display_name : 'Unassigned';
-                                $crew_count = $branch_agent_counts[$b_id] ?? 0;
-                            ?>
-                                <tr class="hover:bg-zinc-50/10">
-                                    <td class="px-5 py-3.5 font-bold text-zinc-900"><?php echo esc_html( $b['name'] ); ?></td>
-                                    <td class="px-5 py-3.5 text-zinc-500 font-semibold"><?php echo esc_html( $b['city'] . ' / ' . $b['address'] ); ?></td>
-                                    <td class="px-5 py-3.5 font-semibold text-zinc-700">
-                                        <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-800 text-[9px] font-bold">
-                                            <?php echo esc_html( $mgr_name ); ?>
-                                        </span>
-                                    </td>
-                                    <td class="px-5 py-3.5 font-bold text-zinc-900"><?php echo esc_html( $crew_count ); ?> Agents</td>
-                                    <td class="px-5 py-3.5 text-right">
-                                        <div class="flex items-center justify-end gap-2">
-                                            <button type="button" onclick="openEditBranchDrawer('<?php echo esc_attr($b_id); ?>', '<?php echo esc_attr($b['name']); ?>', '<?php echo esc_attr($b['city']); ?>', '<?php echo esc_attr($b['address']); ?>', '<?php echo esc_attr($b['manager_id'] ?? ''); ?>')" class="px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-sm transition-colors">Edit</button>
-                                            <button type="button" onclick="deleteBranch('<?php echo esc_attr($b_id); ?>', <?php echo $crew_count; ?>)" class="px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-red-600 bg-white hover:bg-red-50 hover:border-red-200 cursor-pointer shadow-sm transition-colors">Delete</button>
-                                        </div>
-                                    </td>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-100">
+                            <?php if ( empty( $filtered_branches ) ) : ?>
+                                <tr>
+                                    <td colspan="5" class="px-5 py-8 text-center text-zinc-400 font-medium">No branches configured.</td>
                                 </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                            <?php else : ?>
+                                <?php foreach ( $filtered_branches as $b_id => $b ) :
+                                    $mgr = ! empty( $b['manager_id'] ) ? get_userdata( $b['manager_id'] ) : null;
+                                    $mgr_name = $mgr ? $mgr->display_name : 'Unassigned';
+                                    $crew_count = $branch_agent_counts[$b_id] ?? 0;
+                                ?>
+                                    <tr class="hover:bg-zinc-50/10">
+                                        <td class="px-5 py-3.5 font-bold text-zinc-900"><?php echo esc_html( $b['name'] ); ?></td>
+                                        <td class="px-5 py-3.5 text-zinc-500 font-semibold"><?php echo esc_html( $b['city'] . ' / ' . $b['address'] ); ?></td>
+                                        <td class="px-5 py-3.5 font-semibold text-zinc-700">
+                                            <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-800 text-[9px] font-bold">
+                                                <?php echo esc_html( $mgr_name ); ?>
+                                            </span>
+                                        </td>
+                                        <td class="px-5 py-3.5 font-bold text-zinc-900"><?php echo esc_html( $crew_count ); ?> Agents</td>
+                                        <td class="px-5 py-3.5 text-right">
+                                            <div class="flex items-center justify-end gap-2">
+                                                <button type="button" onclick="openEditBranchDrawer('<?php echo esc_attr($b_id); ?>', '<?php echo esc_attr($b['name']); ?>', '<?php echo esc_attr($b['city']); ?>', '<?php echo esc_attr($b['address']); ?>', '<?php echo esc_attr($b['manager_id'] ?? ''); ?>')" class="px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-sm transition-colors">Edit</button>
+                                                <button type="button" onclick="deleteBranch('<?php echo esc_attr($b_id); ?>', <?php echo $crew_count; ?>)" class="px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-red-600 bg-white hover:bg-red-50 hover:border-red-200 cursor-pointer shadow-sm transition-colors">Delete</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
