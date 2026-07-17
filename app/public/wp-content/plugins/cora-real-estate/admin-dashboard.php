@@ -2247,6 +2247,27 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             background-image: radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px) !important;
         }
 
+        /* Clean responsive bento grid layout with independent containment */
+        .cora-bento-grid {
+            display: grid !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            gap: 20px !important;
+            padding: 0 24px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        .cora-bento-grid > * {
+            min-width: 0;
+            overflow: hidden;
+        }
+        @media (max-width: 1023px) {
+            .cora-bento-grid {
+                grid-template-columns: 1fr !important;
+                gap: 16px !important;
+                padding: 0 16px !important;
+            }
+        }
+        
         /* Dashboard Sketched Grid Layout */
         .cora-sketch-grid {
             display: grid !important;
@@ -3108,6 +3129,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     $greeting_title = 'Good evening!';
                 }
                 ?>
+                <div class="cora-dashboard-upper" style="padding: 0 24px; box-sizing: border-box; width: 100%;">
                 <!-- Metrics Card Grid (Real Estate Telemetry Redesign - Centered Non-Overlapping Layout) -->
                 <div class="bg-white/80 dark:bg-zinc-900/60 p-3 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-800/40 rounded-2xl p-4.5 max-w-3xl mx-4 md:mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 shadow-3xs select-none">
                     <!-- Listed Properties -->
@@ -3271,8 +3293,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             Create Brochure
                         </button>
                     </div>
+                </div><!-- end cora-dashboard-upper -->
                 <!-- Premium Bento Grid Layout -->
-                <div class="cora-sketch-grid pt-2">
+                <div class="cora-bento-grid pt-2">
                     
                     <!-- BENTO CARD 1: Showing Status (Spans 2 Columns) -->
                     <div class="border border-zinc-200/50 dark:border-zinc-800/55 rounded-2xl bg-white dark:bg-zinc-900 p-6 shadow-2xs md:col-span-2 min-h-[268px]">
@@ -3594,8 +3617,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     </div>
                 </div>
 
+                <div class="cora-dashboard-lower" style="padding: 0 24px; box-sizing: border-box; width: 100%; margin-top: 24px;">
                 <!-- Call Out Box: Today's Priority Alert & Recommendation (Sketched Top Wide Box, now sitting cleanly at the bottom) -->
-                <div class="bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-zinc-800/40 rounded-xl p-5 space-y-4 mt-6">
+                <div class="bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-zinc-800/40 rounded-xl p-5 space-y-4">
                     <div class="flex items-start gap-3">
                         <span class="text-zinc-400 shrink-0 mt-0.5 flex animate-pulse">
                             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -3626,6 +3650,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         </button>
                     </div>
                 </div>
+                </div><!-- end cora-dashboard-lower -->
             </section>
             <?php endif; ?>
             
