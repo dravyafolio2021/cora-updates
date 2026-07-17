@@ -228,6 +228,16 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             scrollbar-width: none !important;  /* Firefox */
         }
 
+        /* Desktop Independent Scroll Viewport Rules */
+        @media (min-width: 1024px) {
+            html, body {
+                height: 100% !important;
+                overflow: hidden !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+        }
+
 
         /* Active onboarding tour highlight styling */
         .cora-tour-highlight {
@@ -2545,7 +2555,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 </div>
 <?php endif; ?>
 
-<div id="cora-workspace" class="flex flex-col min-h-screen bg-[#f7f7f5] text-zinc-900">
+<div id="cora-workspace" class="flex flex-col min-h-screen lg:min-h-0 lg:h-screen lg:overflow-hidden bg-[#f7f7f5] text-zinc-900">
     <!-- Global Dark Topbar (Shopify UI/UX) -->
     <?php
     $cora_current_user_id = get_current_user_id();
@@ -2707,11 +2717,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     </header>
 
     <!-- Workspace Main Container (Sidebar + Content Row) -->
-    <div class="flex flex-row flex-1 min-h-0 relative w-full">
+    <div class="flex flex-row flex-1 min-h-0 relative w-full lg:overflow-hidden">
     <!-- Workspace Sidebar -->
     <aside class="cora-sidebar w-64 bg-[#f9fafb] dark:bg-[#0c0c0e] border-r border-zinc-200/80 dark:border-zinc-800/40 flex flex-col shrink-0 h-[calc(100vh-52px)] fixed lg:sticky top-[52px] left-0 z-50 lg:z-30 transition-all duration-200">
         <!-- UPPER BLOCK: SCROLLABLE NAVIGATION CONTENT -->
-        <div class="flex-1 flex flex-col min-h-0 overflow-y-auto">
+        <div id="cora-sidebar-scroll-container" class="flex-1 flex flex-col min-h-0 overflow-y-auto">
             <!-- Sidebar Top Header / Brand Logo & Toggle -->
             <div class="flex items-center justify-between gap-2 px-3 pt-4 pb-2 shrink-0 select-none">
                 <!-- Workspace Switcher Card + Dropdown -->
@@ -3109,7 +3119,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <div id="cora-sidebar-backdrop" class="fixed inset-0 bg-zinc-950/20 backdrop-blur-sm z-40 hidden lg:hidden"></div>
 
     <!-- Main Content Pane -->
-    <main class="cora-main flex-1 bg-white flex flex-col min-h-screen relative pb-16 lg:pb-0 min-w-0 w-full overflow-x-clip">
+    <main class="cora-main flex-1 bg-white flex flex-col min-h-screen lg:min-h-0 lg:h-full lg:overflow-y-auto relative pb-16 lg:pb-0 min-w-0 w-full overflow-x-clip">
 
 
         <!-- Dynamic Content Sections -->
