@@ -3189,7 +3189,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     </div>
                 </div>
                         <!-- Centered Welcome Greeting Section with sparkle SVG -->
-                <div class="text-center mt-20 mb-14 px-4 space-y-3 relative">
+                <div class="text-center py-16 px-4 space-y-3 relative">
                     <div class="inline-flex items-center justify-center gap-3">
                         <!-- Slate Charcoal Star Sparkle -->
                         <span class="text-zinc-450 dark:text-zinc-600 shrink-0">
