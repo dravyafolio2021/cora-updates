@@ -225,6 +225,10 @@ function cora_real_estate_ai_handle_workspace_route() {
         if ( empty( $sub_page ) ) {
             $sub_page = 'dashboard';
         }
+        if ( $sub_page === 'audit-panel' ) {
+            wp_redirect( home_url( '/workspace/settings-suite?settings_tab=audit' ) );
+            exit;
+        }
 
         // Role-based access control check (Server-Side)
         $cora_permissions = get_option( 'cora_role_permissions', array() );
@@ -2389,7 +2393,7 @@ function cora_ajax_advanced_search() {
                 'title' => 'Audit logs panel',
                 'category' => 'Security',
                 'description' => 'View system log feed and download transaction records.',
-                'url' => admin_url( 'admin.php?page=cora-workspace&sub=audit-panel' ),
+                'url' => admin_url( 'admin.php?page=cora-workspace&sub=settings-suite&settings_tab=audit' ),
                 'icon' => 'activity'
             )
         );

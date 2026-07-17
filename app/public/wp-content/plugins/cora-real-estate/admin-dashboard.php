@@ -2965,18 +2965,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 <span class="cora-nav-text">Google Profile</span>
                             </div>
                         </li>
-                        <li class="cora-nav-item <?php echo $sub_page === 'audit-panel' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="audit-panel">
-                            <div class="flex items-center gap-3">
-                                <span class="cora-nav-icon">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <line x1="18" y1="20" x2="18" y2="10"></line>
-                                        <line x1="12" y1="20" x2="12" y2="4"></line>
-                                        <line x1="6" y1="20" x2="6" y2="14"></line>
-                                    </svg>
-                                </span>
-                                <span class="cora-nav-text">Cost & Tool Audit</span>
-                            </div>
-                        </li>
                     </ul>
                 </div>
 
@@ -6710,13 +6698,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             <?php if ( $sub_page === 'profile' ) : ?>
             <section id="cora-page-profile" class="cora-page-section cora-active space-y-6">
                 <?php include CORA_REAL_ESTATE_AI_PATH . 'views/view-profile.php'; ?>
-            </section>
-            <?php endif; ?>
-
-            <!-- SECTION: AGENCY COST AUDIT -->
-            <?php if ( $sub_page === 'audit-panel' ) : ?>
-            <section id="cora-page-audit-panel" class="cora-page-section cora-active space-y-6">
-                <?php include CORA_REAL_ESTATE_AI_PATH . 'views/view-audit-panel.php'; ?>
             </section>
             <?php endif; ?>
 
