@@ -2821,13 +2821,20 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 <span class="cora-nav-text">Dashboard</span>
                             </div>
                         </li>
-                    </ul>
-                </div>
-
-                <!-- Group 2: CRM & Leads -->
-                <div>
-                    <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase">CRM & Leads</div>
-                    <ul class="cora-nav-list space-y-0.5 mt-1">
+                        <li class="cora-nav-item <?php echo $sub_page === 'blogs' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="blogs">
+                            <div class="flex items-center gap-3">
+                                <span class="cora-nav-icon">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        <polyline points="10 9 9 9 8 9"></polyline>
+                                    </svg>
+                                </span>
+                                <span class="cora-nav-text">Content Suite</span>
+                            </div>
+                        </li>
                         <li class="cora-nav-item <?php echo $sub_page === 'leads' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="leads">
                             <div class="flex items-center gap-3">
                                 <span class="cora-nav-icon">
@@ -2855,10 +2862,34 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             </div>
                             <span class="cora-badge cora-badge-sidebar px-1.5 py-0.5 text-[10px] font-medium bg-zinc-200 text-zinc-800 rounded-full"><?php echo $dynamic_active_bookings_count; ?></span>
                         </li>
+                        <li class="cora-nav-item <?php echo $sub_page === 'financials' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="financials">
+                            <div class="flex items-center gap-3">
+                                <span class="cora-nav-icon">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                    </svg>
+                                </span>
+                                <span class="cora-nav-text">Financial Overview</span>
+                            </div>
+                        </li>
+                        <li class="cora-nav-item <?php echo $sub_page === 'team-roles' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="team-roles">
+                            <div class="flex items-center gap-3">
+                                <span class="cora-nav-icon">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                </span>
+                                <span class="cora-nav-text">User & Roles</span>
+                            </div>
+                        </li>
                     </ul>
                 </div>
 
-                <!-- Group 3: Property Portfolio -->
+                <!-- Group 2: Property Portfolio -->
                 <div>
                     <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase">Property Portfolio</div>
                     <ul class="cora-nav-list space-y-0.5 mt-1">
@@ -2874,18 +2905,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             </div>
                             <span class="cora-badge cora-badge-sidebar px-1.5 py-0.5 text-[10px] font-medium bg-zinc-200 text-zinc-800 rounded-full"><?php echo count( $cora_re_listings ); ?></span>
                         </li>
-                        <li class="cora-nav-item <?php echo $sub_page === 'canvas' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="canvas">
-                            <div class="flex items-center gap-3">
-                                <span class="cora-nav-icon">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                                        <polyline points="2 17 12 22 22 17"></polyline>
-                                        <polyline points="2 12 12 17 22 12"></polyline>
-                                    </svg>
-                                </span>
-                                <span class="cora-nav-text">Floorplan Canvas</span>
-                            </div>
-                        </li>
                         <li class="cora-nav-item <?php echo $sub_page === 'vault' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="vault">
                             <div class="flex items-center gap-3">
                                 <span class="cora-nav-icon">
@@ -2900,24 +2919,29 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     </ul>
                 </div>
 
+                <!-- Group 3: Sales Channel -->
+                <div>
+                    <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase">Sales Channel</div>
+                    <ul class="cora-nav-list space-y-0.5 mt-1">
+                        <li class="cora-nav-item <?php echo $sub_page === 'canvas' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="canvas">
+                            <div class="flex items-center gap-3">
+                                <span class="cora-nav-icon">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                        <polyline points="2 17 12 22 22 17"></polyline>
+                                        <polyline points="2 12 12 17 22 12"></polyline>
+                                    </svg>
+                                </span>
+                                <span class="cora-nav-text">Canvas</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
                 <!-- Group 4: AI Marketing -->
                 <div>
                     <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase">AI Marketing</div>
                     <ul class="cora-nav-list space-y-0.5 mt-1">
-                        <li class="cora-nav-item <?php echo $sub_page === 'blogs' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="blogs">
-                            <div class="flex items-center gap-3">
-                                <span class="cora-nav-icon">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                        <polyline points="14 2 14 8 20 8"></polyline>
-                                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                                        <polyline points="10 9 9 9 8 9"></polyline>
-                                    </svg>
-                                </span>
-                                <span class="cora-nav-text">Content Suite</span>
-                            </div>
-                        </li>
                         <li class="cora-nav-item <?php echo $sub_page === 'gallery' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="gallery">
                             <div class="flex items-center gap-3">
                                 <span class="cora-nav-icon">
@@ -2941,44 +2965,25 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 <span class="cora-nav-text">Google Profile</span>
                             </div>
                         </li>
-                    </ul>
-                </div>
-
-                <!-- Group 5: Administration -->
-                <div>
-                    <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase">Administration</div>
-                    <ul class="cora-nav-list space-y-0.5 mt-1">
-                        <li class="cora-nav-item <?php echo $sub_page === 'team-roles' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="team-roles">
+                        <li class="cora-nav-item <?php echo $sub_page === 'audit-panel' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="audit-panel">
                             <div class="flex items-center gap-3">
                                 <span class="cora-nav-icon">
                                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                        <circle cx="9" cy="7" r="4"></circle>
-                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                                        <line x1="6" y1="20" x2="6" y2="14"></line>
                                     </svg>
                                 </span>
-                                <span class="cora-nav-text">Agent Roster</span>
+                                <span class="cora-nav-text">Cost & Tool Audit</span>
                             </div>
                         </li>
                     </ul>
                 </div>
 
-                <!-- Group 6: System -->
+                <!-- Group 5: Settings -->
                 <div>
-                    <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase">System</div>
+                    <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase">Settings</div>
                     <ul class="cora-nav-list space-y-0.5 mt-1">
-                        <li class="cora-nav-item <?php echo $sub_page === 'financials' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="financials">
-                            <div class="flex items-center gap-3">
-                                <span class="cora-nav-icon">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <line x1="12" y1="1" x2="12" y2="23"></line>
-                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                                    </svg>
-                                </span>
-                                <span class="cora-nav-text">Financial Board</span>
-                            </div>
-                        </li>
                         <li class="cora-nav-item <?php echo $sub_page === 'feature-hub' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="feature-hub">
                             <div class="flex items-center gap-3">
                                 <span class="cora-nav-icon">
@@ -2990,18 +2995,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     </svg>
                                 </span>
                                 <span class="cora-nav-text">App Integrations</span>
-                            </div>
-                        </li>
-                        <li class="cora-nav-item <?php echo $sub_page === 'audit-panel' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="audit-panel">
-                            <div class="flex items-center gap-3">
-                                <span class="cora-nav-icon">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <line x1="18" y1="20" x2="18" y2="10"></line>
-                                        <line x1="12" y1="20" x2="12" y2="4"></line>
-                                        <line x1="6" y1="20" x2="6" y2="14"></line>
-                                    </svg>
-                                </span>
-                                <span class="cora-nav-text">Cost & Tool Audit</span>
                             </div>
                         </li>
                         <li class="cora-nav-item <?php echo $sub_page === 'settings-suite' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="settings-suite">
