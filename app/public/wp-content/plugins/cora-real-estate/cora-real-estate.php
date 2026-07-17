@@ -240,11 +240,11 @@ function cora_real_estate_ai_handle_workspace_route() {
         
         $allowed_features = isset( $cora_permissions[$current_user_role] ) ? $cora_permissions[$current_user_role] : array();
         if ( empty( $allowed_features ) ) {
-            $allowed_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'attendance', 'tasks', 'visual-builder', 'audit-panel', 'media', 'canvas', 'forms', 'ecosystem' );
+            $allowed_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'attendance', 'tasks', 'visual-builder', 'audit-panel', 'media', 'canvas', 'forms', 'ecosystem', 'gallery', 'mcp' );
         }
         
         if ( in_array( $current_user_role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) {
-            $all_admin_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'attendance', 'tasks', 'visual-builder', 'audit-panel', 'media', 'canvas', 'forms', 'ecosystem', 'profile' );
+            $all_admin_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'attendance', 'tasks', 'visual-builder', 'audit-panel', 'media', 'canvas', 'forms', 'ecosystem', 'profile', 'gallery', 'mcp' );
             foreach ( $all_admin_features as $feat ) {
                 if ( ! in_array( $feat, $allowed_features ) ) {
                     $allowed_features[] = $feat;

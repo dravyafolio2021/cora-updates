@@ -2873,8 +2873,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             <div class="flex items-center gap-3">
                                 <span class="cora-nav-icon">
                                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <line x1="12" y1="1" x2="12" y2="23"></line>
-                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                                        <line x1="6" y1="20" x2="6" y2="14"></line>
                                     </svg>
                                 </span>
                                 <span class="cora-nav-text">Financial Overview</span>
@@ -6223,12 +6224,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <div class="cora-page-header flex items-center gap-3">
                         <span class="cora-page-emoji text-zinc-900 flex shrink-0">
                             <svg viewBox="0 0 24 24" width="30" height="30" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="12" y1="1" x2="12" y2="23"></line>
-                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                <line x1="18" y1="20" x2="18" y2="10"></line>
+                                <line x1="12" y1="20" x2="12" y2="4"></line>
+                                <line x1="6" y1="20" x2="6" y2="14"></line>
                             </svg>
                         </span>
                         <div>
-                            <h1 class="cora-page-title text-2xl font-bold tracking-tight text-zinc-900">Financial Board</h1>
+                            <h1 class="cora-page-title text-2xl font-bold tracking-tight text-zinc-900">Financial Overview</h1>
                             <p class="cora-section-desc text-xs text-zinc-500 mt-1">Track cash inflows, outflows, log studio expenses, and monitor outstanding client dues.</p>
                         </div>
                     </div>
