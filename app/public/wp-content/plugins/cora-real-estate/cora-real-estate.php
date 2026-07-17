@@ -3168,11 +3168,81 @@ function cora_real_estate_ai_serve_frontend_homepage() {
             $js_head = cora_get_active_theme_js( 'head' );
             $js_footer = cora_get_active_theme_js( 'footer' );
 
+            // ── Inject the Cora draft preview bar into the static HTML ──
+            // The bar JS reads ?cv_preview_theme from the URL, fetches REST data,
+            // and renders the floating bar entirely client-side.
+            $rest_url  = esc_url( rest_url( 'cora/v1/preview-bar-data' ) );
+            $site_url  = esc_url( home_url() );
+            $rest_json = json_encode( $rest_url );
+            $site_json = json_encode( $site_url );
+            $preview_bar_script = <<<BARSCRIPT
+<script id="cora-preview-bar-injector">
+(function(){
+  var REST_BASE={$rest_json};
+  var SITE_URL={$site_json};
+  var params=new URLSearchParams(window.location.search);
+  var themeId=params.get('cv_preview_theme');
+  if(!themeId)return;
+  fetch(REST_BASE+'?theme_id='+encodeURIComponent(themeId))
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(data){
+      if(!data||data.code)return;
+      var currentPath=window.location.pathname.replace(/^\/+|\/+$/g,'');
+      var optionsHTML=data.pages.map(function(p){
+        var slug=p.slug||'';
+        var sel=(currentPath===slug||(p.is_homepage&&currentPath===''||currentPath==='/'))?' selected':'';
+        return '<option value="'+slug+'"'+sel+'>'+p.title+'</option>';
+      }).join('');
+      var style=document.createElement('style');
+      style.id='cora-preview-bar-style';
+      style.textContent='#cora-preview-bar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);width:calc(100% - 40px);max-width:780px;height:56px;background:rgba(9,9,11,0.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);border-radius:9999px;box-shadow:0 20px 40px rgba(0,0,0,0.5);z-index:2147483647;display:flex;align-items:center;justify-content:space-between;padding:0 16px;color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:13px;animation:coraBarSlideUp 0.35s cubic-bezier(0.34,1.56,0.64,1) both}'
+        +'@keyframes coraBarSlideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}'
+        +'#cora-preview-bar .cpb-left{display:flex;align-items:center;gap:10px;min-width:0}'
+        +'#cora-preview-bar .cpb-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:coraDotPulse 1.8s ease-in-out infinite}'
+        +'@keyframes coraDotPulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.6)}50%{box-shadow:0 0 0 5px rgba(34,197,94,0)}}'
+        +'#cora-preview-bar .cpb-label{font-size:11px;color:#a1a1aa;white-space:nowrap}'
+        +'#cora-preview-bar .cpb-name{font-size:12px;font-weight:700;color:#fff;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}'
+        +'#cora-preview-bar .cpb-divider{width:1px;height:20px;background:rgba(255,255,255,0.15)}'
+        +'#cora-preview-bar .cpb-select{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:8px;padding:4px 8px;font-size:11px;font-weight:600;cursor:pointer;max-width:180px}'
+        +'#cora-preview-bar .cpb-select option{background:#18181b;color:#fff}'
+        +'#cora-preview-bar .cpb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}'
+        +'#cora-preview-bar .cpb-exit{font-size:11px;font-weight:600;color:#a1a1aa;text-decoration:none;padding:6px 12px;border-radius:8px;transition:background 0.15s}'
+        +'#cora-preview-bar .cpb-exit:hover{background:rgba(255,255,255,0.08);color:#fff}'
+        +'#cora-preview-bar .cpb-publish{background:#fff;color:#09090b;border:none;border-radius:8px;padding:7px 14px;font-size:11px;font-weight:800;cursor:pointer;transition:all 0.15s}'
+        +'#cora-preview-bar .cpb-publish:hover{background:#e4e4e7}'
+        +'#cora-preview-bar .cpb-publish.confirming{background:#ef4444;color:#fff}';
+      document.head.appendChild(style);
+      var bar=document.createElement('div');
+      bar.id='cora-preview-bar';
+      bar.innerHTML='<div class="cpb-left"><span class="cpb-dot"></span><div><div class="cpb-label">Previewing Draft:</div><div class="cpb-name">'+data.theme_name+'</div></div></div>'
+        +'<div class="cpb-left"><div class="cpb-divider"></div><select class="cpb-select" id="cpb-page-select">'+optionsHTML+'</select></div>'
+        +'<div class="cpb-right"><a class="cpb-exit" href="'+data.canvas_url+'">← Exit</a><button class="cpb-publish" id="cpb-publish-btn">Publish</button></div>';
+      document.body.appendChild(bar);
+      document.getElementById('cpb-page-select').addEventListener('change',function(){
+        var slug=this.value;
+        window.location.href=SITE_URL+(slug?'/'+slug+'/':'/')+('?cv_preview_theme='+themeId);
+      });
+      var pub=document.getElementById('cpb-publish-btn'),confirming=false;
+      pub.addEventListener('click',function(){
+        if(!confirming){confirming=true;pub.textContent='Confirm Publish';pub.classList.add('confirming');setTimeout(function(){if(confirming){confirming=false;pub.textContent='Publish';pub.classList.remove('confirming');}},3000);return;}
+        pub.disabled=true;pub.textContent='Publishing…';
+        var fd=new FormData();fd.append('action','cora_ajax_activate_theme');fd.append('theme_id',themeId);fd.append('nonce',data.nonce);
+        fetch(data.ajax_url,{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(res){
+          if(res.success){pub.textContent='✓ Published!';setTimeout(function(){window.location.href=SITE_URL;},1200);}
+          else{pub.textContent='Failed — retry';pub.disabled=false;}
+        }).catch(function(){pub.textContent='Error — retry';pub.disabled=false;});
+      });
+    }).catch(function(){});
+})();
+</script>
+BARSCRIPT;
+
             $html = str_replace( '</head>', $styles . $js_head . '</head>', $html );
-            $html = str_replace( '</body>', $js_footer . '</body>', $html );
+            $html = str_replace( '</body>', $js_footer . $preview_bar_script . '</body>', $html );
 
             header( 'Content-Type: text/html; charset=UTF-8' );
             echo $html;
+
             exit;
         }
     }
@@ -3608,316 +3678,248 @@ function cora_canvas_filter_menu_item_preview_url( $menu_item ) {
     return $menu_item;
 }
 
-// ── Inject a Shopify-like fixed bottom preview bar on the frontend when previewing draft themes ──
+// ══════════════════════════════════════════════════════════════════════════════
+// ██  CANVAS DRAFT PREVIEW BAR — REST endpoint + client-side injection
+// ██  Architecture: a tiny JS snippet (injected via wp_footer) reads
+// ██  ?cv_preview_theme=<id> from the URL, calls the REST endpoint for bar
+// ██  data, then renders the bar DOM entirely client-side.
+// ██  This works on ANY page regardless of theme/template/Elementor mode.
+// ══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * REST endpoint: GET /wp-json/cora/v1/preview-bar-data?theme_id=<id>
+ * Returns theme name + page list for the bar's page switcher.
+ */
+add_action( 'rest_api_init', function () {
+    register_rest_route( 'cora/v1', '/preview-bar-data', array(
+        'methods'             => 'GET',
+        'callback'            => 'cora_rest_preview_bar_data',
+        'permission_callback' => '__return_true', // public – data is not sensitive
+        'args'                => array(
+            'theme_id' => array(
+                'required'          => true,
+                'validate_callback' => fn( $v ) => is_numeric( $v ) && intval( $v ) > 0,
+                'sanitize_callback' => 'absint',
+            ),
+        ),
+    ) );
+} );
+
+function cora_rest_preview_bar_data( WP_REST_Request $request ) {
+    global $wpdb;
+    $theme_id = $request->get_param( 'theme_id' );
+
+    $theme = $wpdb->get_row( $wpdb->prepare(
+        "SELECT id, name, status FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d",
+        $theme_id
+    ), ARRAY_A );
+
+    if ( ! $theme ) {
+        return new WP_Error( 'not_found', 'Theme not found.', array( 'status' => 404 ) );
+    }
+    if ( $theme['status'] === 'live' ) {
+        return new WP_Error( 'not_draft', 'Theme is already live.', array( 'status' => 400 ) );
+    }
+
+    $pages = $wpdb->get_results( $wpdb->prepare(
+        "SELECT id, title, slug, is_homepage FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d ORDER BY is_homepage DESC, title ASC",
+        $theme_id
+    ), ARRAY_A );
+
+    return rest_ensure_response( array(
+        'theme_id'   => intval( $theme['id'] ),
+        'theme_name' => $theme['name'],
+        'pages'      => array_map( fn( $p ) => array(
+            'title'       => $p['title'],
+            'slug'        => $p['slug'],
+            'is_homepage' => intval( $p['is_homepage'] ) === 1,
+        ), $pages ),
+        'canvas_url' => home_url( '/workspace/canvas' ),
+        'ajax_url'   => admin_url( 'admin-ajax.php' ),
+        'nonce'      => wp_create_nonce( 'cora_ajax_nonce' ),
+    ) );
+}
+
+/**
+ * Client-side preview bar injector.
+ * Injected via wp_footer (and also as a standalone script for non-WP pages).
+ * Reads ?cv_preview_theme from the URL, fetches bar data from REST, renders bar.
+ */
+add_action( 'wp_footer', 'cora_canvas_inject_preview_bar_script', 5 );
+function cora_canvas_inject_preview_bar_script() {
+    // Skip inside the Elementor visual editor only
+    if ( is_admin() || isset( $_GET['elementor-preview'] ) ) return;
+    if ( class_exists( '\Elementor\Plugin' ) ) {
+        $el = \Elementor\Plugin::$instance;
+        if ( isset( $el->editor ) && $el->editor->is_edit_mode() ) return;
+    }
+    $rest_url = esc_url( rest_url( 'cora/v1/preview-bar-data' ) );
+    $site_url = esc_url( home_url() );
+    echo '<script id="cora-preview-bar-injector">' . "\n";
+    echo '(function(){' . "\n";
+    echo '  var REST_BASE = ' . json_encode( $rest_url ) . ';' . "\n";
+    echo '  var SITE_URL  = ' . json_encode( $site_url ) . ';' . "\n";
+    echo cora_canvas_preview_bar_js();
+    echo '})();' . "\n";
+    echo '</script>' . "\n";
+}
+
+/**
+ * Returns the self-contained preview bar JavaScript (no jQuery dependency).
+ */
+function cora_canvas_preview_bar_js() { ob_start(); ?>
+  var params = new URLSearchParams(window.location.search);
+  var themeId = params.get('cv_preview_theme');
+  if (!themeId) return;
+
+  // Fetch bar data from REST endpoint
+  fetch(REST_BASE + '?theme_id=' + encodeURIComponent(themeId))
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data || data.code) return; // error or not draft
+
+      // ── Build page options for the switcher ──
+      var currentPath = window.location.pathname.replace(/^\/+|\/+$/g, '');
+      var optionsHTML = data.pages.map(function(p) {
+        var slug = p.slug || '';
+        var selected = (currentPath === slug || (p.is_homepage && currentPath === '')) ? ' selected' : '';
+        return '<option value="' + slug + '"' + selected + '>' + p.title + '</option>';
+      }).join('');
+
+      // ── Inject styles ──
+      var style = document.createElement('style');
+      style.id = 'cora-preview-bar-style';
+      style.textContent = `
+        #cora-preview-bar {
+          position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+          width: calc(100% - 40px); max-width: 780px; height: 56px;
+          background: rgba(9,9,11,0.96); backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(255,255,255,0.1); border-radius: 9999px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+          z-index: 2147483647; display: flex; align-items: center;
+          justify-content: space-between; padding: 0 16px;
+          color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          font-size: 13px; animation: coraBarSlideUp 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+        }
+        @keyframes coraBarSlideUp {
+          from { opacity:0; transform: translateX(-50%) translateY(20px); }
+          to   { opacity:1; transform: translateX(-50%) translateY(0); }
+        }
+        #cora-preview-bar .cpb-left { display:flex; align-items:center; gap:10px; min-width:0; }
+        #cora-preview-bar .cpb-dot  {
+          width:8px; height:8px; border-radius:50%; background:#22c55e; flex-shrink:0;
+          animation: coraDotPulse 1.8s ease-in-out infinite;
+        }
+        @keyframes coraDotPulse {
+          0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.6); }
+          50%      { box-shadow: 0 0 0 5px rgba(34,197,94,0); }
+        }
+        #cora-preview-bar .cpb-label { font-size:11px; color:#a1a1aa; white-space:nowrap; }
+        #cora-preview-bar .cpb-name  { font-size:12px; font-weight:700; color:#fff; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        #cora-preview-bar .cpb-divider { width:1px; height:20px; background:rgba(255,255,255,0.15); }
+        #cora-preview-bar .cpb-select {
+          background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+          color:#fff; border-radius:8px; padding:4px 8px; font-size:11px; font-weight:600;
+          cursor:pointer; max-width:180px;
+        }
+        #cora-preview-bar .cpb-select option { background:#18181b; color:#fff; }
+        #cora-preview-bar .cpb-right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+        #cora-preview-bar .cpb-exit {
+          font-size:11px; font-weight:600; color:#a1a1aa; text-decoration:none;
+          padding:6px 12px; border-radius:8px; transition:background 0.15s;
+        }
+        #cora-preview-bar .cpb-exit:hover { background:rgba(255,255,255,0.08); color:#fff; }
+        #cora-preview-bar .cpb-publish {
+          background:#fff; color:#09090b; border:none; border-radius:8px;
+          padding:7px 14px; font-size:11px; font-weight:800; cursor:pointer;
+          transition:all 0.15s; letter-spacing:-0.01em;
+        }
+        #cora-preview-bar .cpb-publish:hover { background:#e4e4e7; }
+        #cora-preview-bar .cpb-publish.confirming {
+          background:#ef4444; color:#fff;
+        }
+      `;
+      document.head.appendChild(style);
+
+      // ── Build bar HTML ──
+      var bar = document.createElement('div');
+      bar.id = 'cora-preview-bar';
+      bar.innerHTML =
+        '<div class="cpb-left">' +
+          '<span class="cpb-dot"></span>' +
+          '<div><div class="cpb-label">Previewing Draft:</div><div class="cpb-name">' + data.theme_name + '</div></div>' +
+        '</div>' +
+        '<div class="cpb-left">' +
+          '<div class="cpb-divider"></div>' +
+          '<select class="cpb-select" id="cpb-page-select">' + optionsHTML + '</select>' +
+        '</div>' +
+        '<div class="cpb-right">' +
+          '<a class="cpb-exit" href="' + data.canvas_url + '">← Exit</a>' +
+          '<button class="cpb-publish" id="cpb-publish-btn">Publish</button>' +
+        '</div>';
+      document.body.appendChild(bar);
+
+      // ── Page switcher ──
+      document.getElementById('cpb-page-select').addEventListener('change', function() {
+        var slug = this.value;
+        var url  = SITE_URL + (slug ? '/' + slug + '/' : '/');
+        window.location.href = url + '?cv_preview_theme=' + themeId;
+      });
+
+      // ── Publish button (two-step confirm) ──
+      var publishBtn = document.getElementById('cpb-publish-btn');
+      var confirming = false;
+      publishBtn.addEventListener('click', function() {
+        if (!confirming) {
+          confirming = true;
+          publishBtn.textContent = 'Confirm Publish';
+          publishBtn.classList.add('confirming');
+          setTimeout(function() {
+            if (confirming) {
+              confirming = false;
+              publishBtn.textContent = 'Publish';
+              publishBtn.classList.remove('confirming');
+            }
+          }, 3000);
+          return;
+        }
+        // Execute publish
+        publishBtn.disabled = true;
+        publishBtn.textContent = 'Publishing…';
+        var fd = new FormData();
+        fd.append('action',   'cora_ajax_activate_theme');
+        fd.append('theme_id', themeId);
+        fd.append('nonce',    data.nonce);
+        fetch(data.ajax_url, { method: 'POST', body: fd })
+          .then(function(r){ return r.json(); })
+          .then(function(res) {
+            if (res.success) {
+              publishBtn.textContent = '✓ Published!';
+              setTimeout(function() { window.location.href = SITE_URL; }, 1200);
+            } else {
+              publishBtn.textContent = 'Failed — retry';
+              publishBtn.disabled = false;
+            }
+          })
+          .catch(function() {
+            publishBtn.textContent = 'Error — retry';
+            publishBtn.disabled = false;
+          });
+      });
+    })
+    .catch(function(){ /* silently ignore network errors */ });
+<?php return ob_get_clean(); }
+
+// ── Legacy wp_footer PHP injection (kept for backward compatibility, now a no-op) ──
 add_action( 'wp_footer', 'cora_canvas_inject_draft_preview_bar' );
 function cora_canvas_inject_draft_preview_bar() {
-    // Do not show inside the Elementor editor interface or preview frame
-    if ( is_admin() || isset( $_GET['elementor-preview'] ) || isset( $_GET['preview'] ) ) {
-        return;
-    }
-    if ( class_exists( '\Elementor\Plugin' ) ) {
-        $elementor = \Elementor\Plugin::$instance;
-        if ( isset( $elementor->editor ) && $elementor->editor->is_edit_mode() ) {
-            return;
-        }
-        if ( isset( $elementor->preview ) && $elementor->preview->is_preview_mode() ) {
-            return;
-        }
-    }
-
-    global $wpdb;
-    $preview_theme_id = cora_get_preview_theme_id();
-    if ( ! $preview_theme_id ) {
-        return;
-    }
-
-    // Verify the theme exists and is currently a draft (not live)
-    $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $preview_theme_id ), ARRAY_A );
-    if ( ! $theme || $theme['status'] === 'live' ) {
-        return;
-    }
-
-    // Fetch all pages associated with this draft theme to construct the switcher menu
-    $pages = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d ORDER BY is_homepage DESC, title ASC", $preview_theme_id ), ARRAY_A );
-    if ( empty( $pages ) ) {
-        return;
-    }
-
-    // Resolve active subpage slug path to mark the correct select option
-    $current_slug = '';
-    $path = trim( parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ), '/' );
-    $home_path = trim( parse_url( home_url(), PHP_URL_PATH ), '/' );
-    if ( ! empty( $home_path ) && strpos( $path, $home_path ) === 0 ) {
-        $path = trim( substr( $path, strlen( $home_path ) ), '/' );
-    }
-    if ( empty( $path ) ) {
-        foreach ( $pages as $p ) {
-            if ( intval( $p['is_homepage'] ) === 1 ) {
-                $current_slug = $p['slug'];
-                break;
-            }
-        }
-    } else {
-        $current_slug = $path;
-    }
-
-    // Render the styled HTML bottom bar and JS script
-    ?>
-    <style>
-        #cora-preview-bar {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: calc(100% - 40px);
-            max-width: 780px;
-            height: 56px;
-            background: rgba(9, 9, 11, 0.95);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid #27272a;
-            border-radius: 9999px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
-            z-index: 999999999;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            color: #f4f4f5;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            font-size: 13px;
-            letter-spacing: -0.01em;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        #cora-preview-bar .cora-preview-status {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        #cora-preview-bar .cora-preview-badge {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: #22c55e;
-            border-radius: 50%;
-            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.4);
-            animation: cora-pulse 2s infinite;
-        }
-        @keyframes cora-pulse {
-            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
-            70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-        }
-        #cora-preview-bar .cora-preview-dropdown-wrapper {
-            position: relative;
-        }
-        #cora-preview-bar select.cora-preview-select {
-            appearance: none;
-            -webkit-appearance: none;
-            background: #18181b;
-            border: 1px solid #3f3f46;
-            color: #f4f4f5;
-            padding: 6px 32px 6px 12px;
-            border-radius: 9999px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            outline: none;
-            transition: border-color 0.2s;
-            max-width: 220px;
-        }
-        #cora-preview-bar select.cora-preview-select:focus {
-            border-color: #71717a;
-        }
-        #cora-preview-bar .cora-preview-dropdown-icon {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
-            color: #a1a1aa;
-            display: flex;
-            align-items: center;
-        }
-        #cora-preview-bar .cora-preview-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        #cora-preview-bar .cora-btn {
-            padding: 6px 12px;
-            border-radius: 9999px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            text-decoration: none;
-        }
-        #cora-preview-bar .cora-btn-primary {
-            background-color: #ffffff;
-            color: #09090b;
-        }
-        #cora-preview-bar .cora-btn-primary:hover {
-            background-color: #e4e4e7;
-        }
-        #cora-preview-bar .cora-btn-secondary {
-            background-color: transparent;
-            color: #a1a1aa;
-            border: 1px solid #27272a;
-        }
-        #cora-preview-bar .cora-btn-secondary:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-            color: #f4f4f5;
-            border-color: #3f3f46;
-        }
-        #cora-preview-toast {
-            display: none;
-            position: fixed;
-            bottom: 90px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #09090b;
-            border: 1px solid #27272a;
-            color: #fff;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 700;
-            z-index: 9999999999;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-    </style>
-
-    <div id="cora-preview-toast"></div>
-    
-    <div id="cora-preview-bar">
-        <div class="cora-preview-status">
-            <span class="cora-preview-badge"></span>
-            <span style="color: #a1a1aa; font-weight: 500;">Previewing Draft: <strong style="color: #fff; font-weight: 750;"><?php echo esc_html( $theme['name'] ); ?></strong></span>
-        </div>
-        
-        <div class="cora-preview-dropdown-wrapper">
-            <select class="cora-preview-select" onchange="window.location.href=this.value">
-                <?php foreach ( $pages as $p ) : 
-                    $page_url = home_url( '/' . ( intval($p['is_homepage']) === 1 ? '' : $p['slug'] ) );
-                    $page_url = add_query_arg( 'cv_preview_theme', $preview_theme_id, $page_url );
-                    $is_selected = ( $p['slug'] === $current_slug ) || ( intval($p['is_homepage']) === 1 && empty($current_slug) );
-                ?>
-                    <option value="<?php echo esc_url( $page_url ); ?>" <?php selected( $is_selected ); ?>>
-                        <?php echo esc_html( $p['title'] ); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-            <div class="cora-preview-dropdown-icon">
-                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            </div>
-        </div>
-        
-        <div class="cora-preview-actions" id="cora-preview-actions-default">
-            <button onclick="coraShowPublishConfirm()" class="cora-btn cora-btn-primary">
-                Publish
-            </button>
-            <a href="<?php echo esc_url( home_url( '/workspace/canvas' ) ); ?>" class="cora-btn cora-btn-secondary">
-                Exit
-            </a>
-        </div>
-        
-        <div class="cora-preview-actions" id="cora-preview-actions-confirm" style="display: none; gap: 8px; align-items: center;">
-            <span style="color: #a1a1aa; font-size: 11px; font-weight: 600;">Publish theme?</span>
-            <button onclick="coraDoPublish(<?php echo $preview_theme_id; ?>)" class="cora-btn cora-btn-primary" style="background-color: #22c55e; color: #fff;">
-                Confirm
-            </button>
-            <button onclick="coraCancelPublish()" class="cora-btn cora-btn-secondary">
-                Cancel
-            </button>
-        </div>
-    </div>
-    
-    <script>
-        function coraShowPublishConfirm() {
-            document.getElementById('cora-preview-actions-default').style.display = 'none';
-            document.getElementById('cora-preview-actions-confirm').style.display = 'flex';
-        }
-        
-        function coraCancelPublish() {
-            document.getElementById('cora-preview-actions-confirm').style.display = 'none';
-            document.getElementById('cora-preview-actions-default').style.display = 'flex';
-        }
-        
-        function coraShowToast(msg, isSuccess) {
-            const toast = document.getElementById('cora-preview-toast');
-            toast.innerText = msg;
-            toast.style.borderColor = isSuccess ? '#27272a' : '#ef4444';
-            toast.style.display = 'block';
-            setTimeout(() => {
-                toast.style.opacity = '1';
-            }, 50);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => { toast.style.display = 'none'; }, 300);
-            }, 3000);
-        }
-        
-        function coraDoPublish(themeId) {
-            const nonce = "<?php echo wp_create_nonce('cora_ajax_nonce'); ?>";
-            const ajaxUrl = "<?php echo admin_url('admin-ajax.php'); ?>";
-            
-            coraShowToast("Publishing theme...", true);
-            
-            if (window.jQuery) {
-                jQuery.post(ajaxUrl, {
-                    action: 'cora_ajax_activate_theme',
-                    theme_id: themeId,
-                    nonce: nonce
-                }, function(res) {
-                    if (res.success) {
-                        coraShowToast("Theme activated! Redirecting...", true);
-                        setTimeout(() => {
-                            window.location.href = "<?php echo home_url('/'); ?>";
-                        }, 1200);
-                    } else {
-                        coraShowToast("Activation failed.", false);
-                        coraCancelPublish();
-                    }
-                });
-            } else {
-                const params = new URLSearchParams();
-                params.append('action', 'cora_ajax_activate_theme');
-                params.append('theme_id', themeId);
-                params.append('nonce', nonce);
-                
-                fetch(ajaxUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: params.toString()
-                })
-                .then(res => res.json())
-                .then(res => {
-                    if (res.success) {
-                        coraShowToast("Theme activated! Redirecting...", true);
-                        setTimeout(() => {
-                            window.location.href = "<?php echo home_url('/'); ?>";
-                        }, 1200);
-                    } else {
-                        coraShowToast("Activation failed.", false);
-                        coraCancelPublish();
-                    }
-                })
-                .catch(() => {
-                    coraShowToast("Network error.", false);
-                    coraCancelPublish();
-                });
-            }
-        }
-    </script>
-    <?php
+    // Bar is now fully rendered client-side via cora_canvas_inject_preview_bar_script().
+    // This function intentionally does nothing — kept to avoid fatal errors on any
+    // direct calls that may exist in older code paths.
+    return;
 }
+
 
 function cora_get_active_theme_styles() {
     global $wpdb;
