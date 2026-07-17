@@ -50,6 +50,206 @@ function cora_real_estate_ai_render_dashboard() {
 }
 add_action( 'admin_menu', 'cora_real_estate_ai_admin_menu' );
 
+// ══════════════════════════════════════════════════════════════════════════════
+// ██  CORA PLATFORM — WORDPRESS WHITE-LABEL LAYER
+// ██  Completely hides all WordPress branding from end-users.
+// ██  Covers: admin bar, favicons, generator tags, login page, error pages,
+// ██  version leakage, head artifacts, emoji scripts, and admin notices.
+// ══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * 1. HIDE ADMIN BAR — Remove the black WP toolbar from the frontend entirely.
+ */
+add_filter( 'show_admin_bar', '__return_false' );
+add_action( 'wp_head', function() {
+    echo '<style>#wpadminbar { display: none !important; } html { margin-top: 0 !important; } * html body { margin-top: 0 !important; }</style>' . "\n";
+}, 100 );
+
+/**
+ * 2. FAVICON — Replace the WordPress "W" favicon with the Cora logo on all pages.
+ */
+function cora_whitelabel_favicon() {
+    $favicon_url = CORA_REAL_ESTATE_AI_URL . 'assets/images/cora-favicon.png';
+    echo '<link rel="icon" type="image/png" href="' . esc_url( $favicon_url ) . '" sizes="32x32">' . "\n";
+    echo '<link rel="shortcut icon" href="' . esc_url( $favicon_url ) . '">' . "\n";
+    echo '<link rel="apple-touch-icon" href="' . esc_url( $favicon_url ) . '">' . "\n";
+}
+add_action( 'wp_head',    'cora_whitelabel_favicon', 1 );
+add_action( 'admin_head', 'cora_whitelabel_favicon', 1 );
+add_action( 'login_head', 'cora_whitelabel_favicon', 1 );
+
+/**
+ * 3. REMOVE GENERATOR TAG — Hides <meta name="generator" content="WordPress x.x.x" />.
+ */
+remove_action( 'wp_head', 'wp_generator' );
+add_filter( 'the_generator', '__return_empty_string' );
+
+/**
+ * 4. REMOVE VERSION NUMBERS from script/style query strings (?ver=X.X fingerprinting).
+ */
+function cora_whitelabel_remove_version( $src ) {
+    if ( strpos( $src, '?ver=' ) || strpos( $src, '&ver=' ) ) {
+        $src = remove_query_arg( 'ver', $src );
+    }
+    return $src;
+}
+add_filter( 'style_loader_src',  'cora_whitelabel_remove_version', 9999 );
+add_filter( 'script_loader_src', 'cora_whitelabel_remove_version', 9999 );
+
+/**
+ * 5. REMOVE UNNECESSARY HEAD ARTIFACTS that expose WordPress to scanners/inspectors.
+ */
+remove_action( 'wp_head', 'rsd_link' );
+remove_action( 'wp_head', 'wlwmanifest_link' );
+remove_action( 'wp_head', 'wp_shortlink_wp_head' );
+remove_action( 'wp_head', 'feed_links',         2 );
+remove_action( 'wp_head', 'feed_links_extra',   3 );
+remove_action( 'wp_head', 'wp_oembed_add_discovery_links' );
+remove_action( 'wp_head', 'wp_oembed_add_host_js' );
+remove_action( 'wp_head', 'rest_output_link_wp_head', 10 );
+remove_action( 'template_redirect', 'rest_output_link_header', 11 );
+remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+remove_action( 'wp_print_styles', 'print_emoji_styles' );
+remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+remove_action( 'admin_print_styles',  'print_emoji_styles' );
+remove_filter( 'the_content_feed',   'wp_staticize_emoji' );
+remove_filter( 'comment_text_rss',   'wp_staticize_emoji' );
+remove_filter( 'wp_mail',            'wp_staticize_emoji_for_email' );
+
+/**
+ * 6. REMOVE SERVER HEADERS that expose the platform.
+ */
+add_filter( 'wp_headers', function( $headers ) {
+    unset( $headers['X-Powered-By'] );
+    return $headers;
+} );
+
+/**
+ * 7. CUSTOM LOGIN PAGE — Strip WordPress branding from wp-login.php.
+ */
+add_action( 'login_enqueue_scripts', function() {
+    $favicon_url = CORA_REAL_ESTATE_AI_URL . 'assets/images/cora-favicon.png';
+    echo '<style>
+        body.login { background: #f9f9f8 !important; }
+        #login h1 a {
+            background-image: url(' . esc_url( $favicon_url ) . ') !important;
+            background-size: contain !important;
+            background-position: center !important;
+            width: 80px !important;
+            height: 80px !important;
+        }
+        .login #nav a, .login #backtoblog a { color: #3f3f46 !important; }
+        .login form { border-top: 2px solid #18181b !important; }
+        body.login div#login_error, body.login .message, body.login .success {
+            border-left: 3px solid #18181b !important;
+        }
+    </style>' . "\n";
+} );
+add_filter( 'login_headerurl',  fn() => home_url( '/workspace' ) );
+add_filter( 'login_headertext', fn() => 'Cora Platform' );
+add_filter( 'login_title', function( $login_title ) {
+    return str_replace( array( 'WordPress', 'Log In' ), array( 'Cora', 'Sign In' ), $login_title );
+} );
+
+/**
+ * 8. CUSTOM WP_DIE HANDLER — Replace the WP-branded error screen with a Cora error card.
+ */
+add_filter( 'wp_die_handler', function() {
+    return 'cora_custom_die_handler';
+} );
+function cora_custom_die_handler( $message, $title = '', $args = array() ) {
+    // Only intercept frontend; let admin/AJAX use default handler
+    if ( is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+        _default_wp_die_handler( $message, $title, $args );
+        return;
+    }
+    if ( is_wp_error( $message ) ) {
+        $message = $message->get_error_message();
+    }
+    $title   = empty( $title ) ? 'Error — Cora' : esc_html( $title ) . ' — Cora';
+    $message = wp_kses_post( $message );
+    $favicon = CORA_REAL_ESTATE_AI_URL . 'assets/images/cora-favicon.png';
+    status_header( isset( $args['response'] ) ? $args['response'] : 500 );
+    nocache_headers();
+    header( 'Content-Type: text/html; charset=utf-8' );
+    echo '<!DOCTYPE html><html lang="en"><head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>' . esc_html( $title ) . '</title>
+        <link rel="icon" type="image/png" href="' . esc_url( $favicon ) . '">
+        <style>
+            * { margin:0; padding:0; box-sizing:border-box; }
+            body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+                   background:#fafafa; display:flex; align-items:center;
+                   justify-content:center; min-height:100vh; color:#18181b; }
+            .cora-err { background:#fff; border:1px solid #e4e4e7; border-radius:12px;
+                padding:40px 48px; max-width:480px; text-align:center;
+                box-shadow:0 4px 24px rgba(0,0,0,.06); }
+            .cora-err-logo { width:48px; height:48px; margin:0 auto 20px;
+                background-image:url(' . esc_url( $favicon ) . ');
+                background-size:contain; background-repeat:no-repeat;
+                background-position:center; }
+            h1 { font-size:18px; font-weight:700; margin-bottom:10px; }
+            p  { font-size:14px; color:#71717a; line-height:1.6; }
+            a  { display:inline-block; margin-top:24px; padding:9px 20px;
+                background:#18181b; color:#fff; text-decoration:none;
+                border-radius:8px; font-size:13px; font-weight:600; }
+        </style>
+    </head><body>
+        <div class="cora-err">
+            <div class="cora-err-logo"></div>
+            <h1>Something went wrong</h1>
+            <p>' . $message . '</p>
+            <a href="' . esc_url( home_url( '/workspace' ) ) . '">← Back to Dashboard</a>
+        </div>
+    </body></html>';
+    exit;
+}
+
+/**
+ * 9. ADMIN AREA BRANDING — Clean up "Howdy", WP logo, footer credits, update banners.
+ */
+add_action( 'admin_bar_menu', function( $wp_admin_bar ) {
+    // Remove "Howdy," greeting from the account node
+    $account = $wp_admin_bar->get_node( 'my-account' );
+    if ( $account ) {
+        $account->title = str_replace( 'Howdy,', '', $account->title );
+        $wp_admin_bar->add_node( (array) $account );
+    }
+    // Remove the WordPress logo menu from admin bar
+    $wp_admin_bar->remove_node( 'wp-logo' );
+}, 25 );
+// Replace "Thank you for creating with WordPress" in admin footer
+add_filter( 'admin_footer_text', fn() => '<span>Powered by <strong>Cora Platform</strong></span>' );
+// Remove WordPress version number from admin footer right side
+add_filter( 'update_footer', '__return_empty_string', 11 );
+// Replace "WordPress" with "Cora" in admin browser tab <title>
+add_filter( 'admin_title', function( $admin_title ) {
+    return str_replace( ' &#8212; WordPress', ' &#8212; Cora', $admin_title );
+} );
+// Remove WordPress-specific dashboard widgets
+add_action( 'wp_dashboard_setup', function() {
+    remove_meta_box( 'dashboard_primary',     'dashboard', 'side'   );
+    remove_meta_box( 'dashboard_quick_press', 'dashboard', 'side'   );
+    remove_meta_box( 'dashboard_right_now',   'dashboard', 'normal' );
+    remove_meta_box( 'dashboard_activity',    'dashboard', 'normal' );
+} );
+
+/**
+ * 10. SUPPRESS UPDATE NAGS — Hide "WordPress X.X is available" notices from non-superadmins.
+ */
+add_action( 'admin_init', function() {
+    if ( ! current_user_can( 'update_core' ) ) {
+        remove_action( 'admin_notices',         'update_nag', 3 );
+        remove_action( 'network_admin_notices', 'update_nag', 3 );
+    }
+} );
+add_filter( 'pre_option_update_core', '__return_null' );
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ██  END WHITE-LABEL LAYER
+// ══════════════════════════════════════════════════════════════════════════════
+
 /**
  * Intercept requests to /workspace and render the standalone dashboard
  */
