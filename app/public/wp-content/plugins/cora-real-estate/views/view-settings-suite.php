@@ -14,6 +14,142 @@ $categories = get_categories();
 $roles      = wp_roles()->get_names();
 ?>
 
+<style>
+/* Shopify-style Complete Settings Suite Stylesheet */
+.cora-shopify-settings-theme {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+}
+.cora-shopify-settings-theme label:not(.flex):not(.cora-label-raw) {
+    display: block !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: #52525b !important; /* zinc-600 */
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    margin-bottom: 6px !important;
+}
+.dark .cora-shopify-settings-theme label:not(.flex):not(.cora-label-raw) {
+    color: #a1a1aa !important; /* zinc-400 */
+}
+.cora-shopify-settings-theme input[type="text"],
+.cora-shopify-settings-theme input[type="email"],
+.cora-shopify-settings-theme input[type="password"],
+.cora-shopify-settings-theme input[type="number"],
+.cora-shopify-settings-theme input[type="url"],
+.cora-shopify-settings-theme select {
+    width: 100% !important;
+    background-color: #ffffff !important;
+    border: 1px solid #d4d4d8 !important; /* zinc-300 */
+    border-radius: 6px !important;
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+    color: #18181b !important; /* zinc-900 */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04) !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+.cora-shopify-settings-theme input[type="text"]:focus,
+.cora-shopify-settings-theme input[type="email"]:focus,
+.cora-shopify-settings-theme input[type="password"]:focus,
+.cora-shopify-settings-theme input[type="number"]:focus,
+.cora-shopify-settings-theme input[type="url"]:focus,
+.cora-shopify-settings-theme select:focus {
+    outline: none !important;
+    border-color: #18181b !important; /* zinc-900 */
+    box-shadow: 0 0 0 1px #18181b, 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+/* Dark Mode Override */
+.dark .cora-shopify-settings-theme input[type="text"],
+.dark .cora-shopify-settings-theme input[type="email"],
+.dark .cora-shopify-settings-theme input[type="password"],
+.dark .cora-shopify-settings-theme input[type="number"],
+.dark .cora-shopify-settings-theme input[type="url"],
+.dark .cora-shopify-settings-theme select {
+    background-color: #09090b !important; /* zinc-950 */
+    border-color: #27272a !important; /* zinc-800 */
+    color: #f4f4f5 !important; /* zinc-100 */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2) !important;
+}
+.dark .cora-shopify-settings-theme input[type="text"]:focus,
+.dark .cora-shopify-settings-theme input[type="email"]:focus,
+.dark .cora-shopify-settings-theme input[type="password"]:focus,
+.dark .cora-shopify-settings-theme input[type="number"]:focus,
+.dark .cora-shopify-settings-theme input[type="url"]:focus,
+.dark .cora-shopify-settings-theme select:focus {
+    border-color: #f4f4f5 !important; /* zinc-100 */
+    box-shadow: 0 0 0 1px #f4f4f5, 0 1px 2px 0 rgba(0, 0, 0, 0.25) !important;
+}
+/* Shopify discrete card blocks */
+.cora-shopify-card {
+    background-color: #ffffff !important;
+    border: 1px solid #e4e4e7 !important;
+    border-radius: 8px !important;
+    padding: 20px 24px !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.01), 0 1px 2px 0 rgba(0, 0, 0, 0.02) !important;
+}
+.dark .cora-shopify-card {
+    background-color: #18181b !important; /* zinc-900 */
+    border-color: #27272a !important; /* zinc-800 */
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+/* Left sidebar items */
+.cora-settings-nav-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 7px 12px !important;
+    border-radius: 6px !important;
+    font-size: 12px !important;
+    font-weight: 550 !important;
+    color: #4b5563 !important; /* gray-600 */
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    transition: all 0.15s ease !important;
+}
+.cora-settings-nav-item:hover {
+    background-color: #f4f4f5 !important; /* zinc-100 */
+    color: #111827 !important; /* gray-900 */
+}
+.cora-settings-nav-item.active {
+    background-color: #f4f4f5 !important; /* zinc-100 */
+    color: #111827 !important; /* gray-900 */
+    font-weight: 600 !important;
+}
+.dark .cora-settings-nav-item {
+    color: #9ca3af !important; /* gray-400 */
+}
+.dark .cora-settings-nav-item:hover {
+    background-color: #27272a !important; /* zinc-800 */
+    color: #f9fafb !important; /* gray-50 */
+}
+.dark .cora-settings-nav-item.active {
+    background-color: #27272a !important; /* zinc-800 */
+    color: #f9fafb !important; /* gray-50 */
+}
+/* Shopify-style Actions Bar sticky container */
+.cora-shopify-actions-bar {
+    position: sticky !important;
+    bottom: 16px !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid #e4e4e7 !important;
+    border-radius: 8px !important;
+    padding: 12px 20px !important;
+    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.03), 0 1px 3px 0 rgba(0, 0, 0, 0.02) !important;
+    z-index: 100 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-top: 24px !important;
+}
+.dark .cora-shopify-actions-bar {
+    background: rgba(24, 24, 27, 0.85) !important; /* zinc-900 */
+    border-color: #27272a !important; /* zinc-800 */
+    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.2), 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+}
+</style>
+
+<div class="cora-shopify-settings-theme">
 <div class="cora-page-header flex flex-col sm:flex-row sm:items-center justify-between gap-4">
     <div class="flex items-center gap-3">
         <span class="cora-page-emoji text-zinc-900 flex shrink-0">
@@ -100,81 +236,84 @@ $roles      = wp_roles()->get_names();
         foreach ( $tabs as $tab_key => $tab ) :
             $is_active = ( $active_tab === $tab_key );
         ?>
-        <a href="?page=cora-workspace&sub=settings-suite&settings_tab=<?php echo esc_attr( $tab_key ); ?>" class="flex items-center gap-3.5 px-4 py-3 rounded-xl border transition-all text-left group <?php echo $is_active ? 'bg-zinc-950 text-white border-zinc-950 shadow-md font-bold' : 'bg-white border-zinc-200/80 text-zinc-700 hover:bg-zinc-50/50 hover:border-zinc-300'; ?>">
-            <div class="<?php echo $is_active ? 'text-white' : 'text-zinc-400 group-hover:text-zinc-800'; ?> transition-colors shrink-0">
+        <a href="?page=cora-workspace&sub=settings-suite&settings_tab=<?php echo esc_attr( $tab_key ); ?>" class="cora-settings-nav-item <?php echo $is_active ? 'active' : ''; ?>">
+            <div class="<?php echo $is_active ? 'text-zinc-800 dark:text-zinc-100' : 'text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-700'; ?> shrink-0">
                 <?php echo $tab['icon']; ?>
             </div>
             <div class="min-w-0">
-                <div class="text-[11px] font-bold leading-tight <?php echo $is_active ? 'text-white' : 'text-zinc-900'; ?>"><?php echo esc_html( $tab['label'] ); ?></div>
-                <div class="text-[9px] mt-0.5 truncate <?php echo $is_active ? 'text-zinc-300' : 'text-zinc-400'; ?>"><?php echo esc_html( $tab['desc'] ); ?></div>
+                <div class="text-[11px] font-bold leading-tight <?php echo $is_active ? 'text-zinc-900 dark:text-white' : 'text-zinc-750 dark:text-zinc-350'; ?>"><?php echo esc_html( $tab['label'] ); ?></div>
+                <div class="text-[9px] mt-0.5 truncate <?php echo $is_active ? 'text-zinc-500 dark:text-zinc-400' : 'text-zinc-400 dark:text-zinc-500'; ?>"><?php echo esc_html( $tab['desc'] ); ?></div>
             </div>
         </a>
         <?php endforeach; ?>
     </div>
 
-    <!-- Right Column: Settings Form Card -->
-    <div class="lg:col-span-3 bg-white border border-zinc-200/80 rounded-xl p-6 shadow-sm flex flex-col justify-between">
-        <form id="cora-settings-suite-form" onsubmit="event.preventDefault(); coraSaveSystemSettingsSuite();">
+    <!-- Right Column: Settings Form Content (Shopify-Style Discrete Cards) -->
+    <div class="lg:col-span-3">
+        <form id="cora-settings-suite-form" onsubmit="event.preventDefault(); coraSaveSystemSettingsSuite();" class="space-y-6">
             <input type="hidden" name="active_tab" value="<?php echo esc_attr( $active_tab ); ?>">
 
         <?php if ( $active_tab === 'general' ) : ?>
         <!-- TAB 1: GENERAL SETTINGS -->
-        <div class="space-y-6 max-w-2xl">
-            <div class="border-b border-zinc-100 pb-3">
-                <h3 class="text-sm font-bold text-zinc-900">General Site Configuration</h3>
-                <p class="text-xs text-zinc-500">Core identity and default user registration parameters.</p>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-bold text-zinc-800 mb-1">Site Title</label>
-                    <input type="text" name="blogname" value="<?php echo esc_attr( get_option('blogname') ); ?>" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900">
+        <div class="space-y-6 max-w-3xl">
+            <!-- Card 1: General Site Configuration -->
+            <div class="cora-shopify-card space-y-4">
+                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">General Site Configuration</h3>
+                    <p class="text-xs text-zinc-500">Core identity and default user registration parameters.</p>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-zinc-800 mb-1">Tagline / Subtitle</label>
-                    <input type="text" name="blogdescription" value="<?php echo esc_attr( get_option('blogdescription') ); ?>" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label>Site Title</label>
+                        <input type="text" name="blogname" value="<?php echo esc_attr( get_option('blogname') ); ?>">
+                    </div>
+                    <div>
+                        <label>Tagline / Subtitle</label>
+                        <input type="text" name="blogdescription" value="<?php echo esc_attr( get_option('blogdescription') ); ?>">
+                    </div>
+                    <div>
+                        <label>Administration Email Address</label>
+                        <input type="email" name="admin_email" value="<?php echo esc_attr( get_option('admin_email') ); ?>">
+                    </div>
+                    <div>
+                        <label>New User Default Role</label>
+                        <select name="default_role">
+                            <?php foreach ( $roles as $role_key => $role_name ) : ?>
+                                <option value="<?php echo esc_attr( $role_key ); ?>" <?php selected( get_option('default_role'), $role_key ); ?>><?php echo esc_html( $role_name ); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-zinc-800 mb-1">Administration Email Address</label>
-                    <input type="email" name="admin_email" value="<?php echo esc_attr( get_option('admin_email') ); ?>" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900">
+                <div class="pt-2">
+                    <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-300 font-semibold cursor-pointer">
+                        <input type="checkbox" name="users_can_register" value="1" <?php checked( get_option('users_can_register'), 1 ); ?> class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
+                        <span class="cora-label-raw">Membership: Anyone can register for an account</span>
+                    </label>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-zinc-800 mb-1">New User Default Role</label>
-                    <select name="default_role" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none">
-                        <?php foreach ( $roles as $role_key => $role_name ) : ?>
-                            <option value="<?php echo esc_attr( $role_key ); ?>" <?php selected( get_option('default_role'), $role_key ); ?>><?php echo esc_html( $role_name ); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-            </div>
-            <div class="pt-2">
-                <label class="flex items-center gap-2.5 text-xs text-zinc-800 font-semibold cursor-pointer">
-                    <input type="checkbox" name="users_can_register" value="1" <?php checked( get_option('users_can_register'), 1 ); ?> class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900">
-                    <span>Membership: Anyone can register for an account</span>
-                </label>
             </div>
 
-            <!-- Workspace Details Section -->
-            <div class="border-t border-zinc-150 pt-5 space-y-4">
-                <div class="border-b border-zinc-100 pb-3">
-                    <h3 class="text-sm font-bold text-zinc-900">General Workspace Settings</h3>
+            <!-- Card 2: Workspace Details Section -->
+            <div class="cora-shopify-card space-y-4">
+                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">General Workspace Settings</h3>
                     <p class="text-xs text-zinc-500">Corporate identity, localized workspace address, and billing tax descriptors.</p>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1">Workspace Name</label>
-                        <input type="text" name="cora_workspace_name" value="<?php echo esc_attr( get_option('cora_workspace_name', 'Cora Studio') ); ?>" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900" placeholder="e.g. Mumbai Main Office">
+                        <label>Workspace Name</label>
+                        <input type="text" name="cora_workspace_name" value="<?php echo esc_attr( get_option('cora_workspace_name', 'Cora Studio') ); ?>" placeholder="e.g. Mumbai Main Office">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1">Tax Registration Details</label>
-                        <input type="text" name="cora_workspace_tax_details" value="<?php echo esc_attr( get_option('cora_workspace_tax_details', 'GSTIN: 27AAAAA1111A1Z1') ); ?>" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900" placeholder="e.g. VAT / GSTIN / PAN details">
+                        <label>Tax Registration Details</label>
+                        <input type="text" name="cora_workspace_tax_details" value="<?php echo esc_attr( get_option('cora_workspace_tax_details', 'GSTIN: 27AAAAA1111A1Z1') ); ?>" placeholder="e.g. VAT / GSTIN / PAN details">
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="block text-xs font-bold text-zinc-800 mb-1">Workspace Address</label>
-                        <input type="text" name="cora_workspace_address" value="<?php echo esc_attr( get_option('cora_workspace_address', '101, BKC Road, Bandra East, Mumbai') ); ?>" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900" placeholder="Full physical office location">
+                        <label>Workspace Address</label>
+                        <input type="text" name="cora_workspace_address" value="<?php echo esc_attr( get_option('cora_workspace_address', '101, BKC Road, Bandra East, Mumbai') ); ?>" placeholder="Full physical office location">
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="block text-xs font-bold text-zinc-800 mb-1">Activity Log Auto-Archive Threshold</label>
-                        <select name="cora_activity_logs_retention" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none">
+                        <label>Activity Log Auto-Archive Threshold</label>
+                        <select name="cora_activity_logs_retention">
                             <?php $retention = get_option('cora_activity_logs_retention', 0); ?>
                             <option value="0" <?php selected( $retention, 0 ); ?>>Never (Keep all logs)</option>
                             <option value="30" <?php selected( $retention, 30 ); ?>>30 Days</option>
@@ -185,22 +324,22 @@ $roles      = wp_roles()->get_names();
                         <p class="text-[10px] text-zinc-400 mt-1">Prune system activity log events older than the selection to optimize database performance.</p>
                     </div>
                 </div>
-                <div class="pt-2 border-t border-zinc-100 mt-4">
-                    <label class="flex items-center gap-2.5 text-xs text-zinc-800 font-semibold cursor-pointer">
-                        <input type="checkbox" name="cora_workspace_allow_tours" value="1" <?php checked( get_option('cora_workspace_allow_tours', 1), 1 ); ?> class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900">
-                        <span>Enable Workspace Interactive Tour guides for first-time logins</span>
+                <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800/40 mt-4">
+                    <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-300 font-semibold cursor-pointer">
+                        <input type="checkbox" name="cora_workspace_allow_tours" value="1" <?php checked( get_option('cora_workspace_allow_tours', 1), 1 ); ?> class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
+                        <span class="cora-label-raw">Enable Workspace Interactive Tour guides for first-time logins</span>
                     </label>
                 </div>
             </div>
 
-            <!-- Database Clean Up Section -->
-            <div class="border-t border-zinc-150 pt-5 space-y-4">
-                <div class="border-b border-zinc-100 pb-3">
-                    <h3 class="text-sm font-bold text-red-600">Database Optimization</h3>
+            <!-- Card 3: Database Clean Up Section -->
+            <div class="cora-shopify-card space-y-4">
+                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                    <h3 class="text-sm font-semibold text-red-650">Database Optimization</h3>
                     <p class="text-xs text-zinc-500">Clean up legacy key-value storage once you have verified custom database tables are fully working.</p>
                 </div>
-                <div class="p-4 border border-red-200 bg-red-50/50 rounded-lg space-y-3">
-                    <p class="text-xs text-zinc-700">
+                <div class="p-4 border border-red-200 dark:border-red-900/60 bg-red-50/50 dark:bg-red-950/10 rounded-lg space-y-3">
+                    <p class="text-xs text-zinc-700 dark:text-zinc-300">
                         Purging legacy data removes the redundant data tables from <code>wp_options</code>. 
                         <strong>Note:</strong> Make sure you have verified the data migration counts are correct before purging.
                     </p>
@@ -214,33 +353,36 @@ $roles      = wp_roles()->get_names();
 
         <?php elseif ( $active_tab === 'pwd-policy' ) : ?>
         <!-- TAB: PASSWORD POLICY SETTINGS -->
-        <div class="space-y-6 max-w-2xl">
-            <div class="border-b border-zinc-100 pb-3">
-                <h3 class="text-sm font-bold text-zinc-900">Workspace Password Policy</h3>
-                <p class="text-xs text-zinc-500">Enforce minimum complexity guidelines for passwords across logins, setups, and resets.</p>
-            </div>
-            
-            <div class="space-y-4">
-                <div class="w-48">
-                    <label class="block text-xs font-bold text-zinc-800 mb-1.5">Minimum Password Length</label>
-                    <input type="number" min="6" max="32" name="cora_pwd_policy_min_len" value="<?php echo esc_attr( get_option('cora_pwd_policy_min_len', 8) ); ?>" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900">
+        <div class="space-y-6 max-w-3xl">
+            <!-- Card: Password Policy -->
+            <div class="cora-shopify-card space-y-4">
+                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Workspace Password Policy</h3>
+                    <p class="text-xs text-zinc-500">Enforce minimum complexity guidelines for passwords across logins, setups, and resets.</p>
                 </div>
+                
+                <div class="space-y-4">
+                    <div class="w-48">
+                        <label>Minimum Password Length</label>
+                        <input type="number" min="6" max="32" name="cora_pwd_policy_min_len" value="<?php echo esc_attr( get_option('cora_pwd_policy_min_len', 8) ); ?>">
+                    </div>
 
-                <div class="pt-2 space-y-3">
-                    <label class="flex items-center gap-2.5 text-xs text-zinc-850 font-semibold cursor-pointer">
-                        <input type="checkbox" name="cora_pwd_policy_numbers" value="1" <?php checked( get_option('cora_pwd_policy_numbers', 0), 1 ); ?> class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900">
-                        <span>Require at least one number (0-9)</span>
-                    </label>
+                    <div class="pt-2 space-y-3">
+                        <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-300 font-semibold cursor-pointer">
+                            <input type="checkbox" name="cora_pwd_policy_numbers" value="1" <?php checked( get_option('cora_pwd_policy_numbers', 0), 1 ); ?> class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
+                            <span class="cora-label-raw">Require at least one number (0-9)</span>
+                        </label>
 
-                    <label class="flex items-center gap-2.5 text-xs text-zinc-850 font-semibold cursor-pointer">
-                        <input type="checkbox" name="cora_pwd_policy_uppercase" value="1" <?php checked( get_option('cora_pwd_policy_uppercase', 0), 1 ); ?> class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900">
-                        <span>Require at least one uppercase letter (A-Z)</span>
-                    </label>
+                        <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-300 font-semibold cursor-pointer">
+                            <input type="checkbox" name="cora_pwd_policy_uppercase" value="1" <?php checked( get_option('cora_pwd_policy_uppercase', 0), 1 ); ?> class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
+                            <span class="cora-label-raw">Require at least one uppercase letter (A-Z)</span>
+                        </label>
 
-                    <label class="flex items-center gap-2.5 text-xs text-zinc-850 font-semibold cursor-pointer">
-                        <input type="checkbox" name="cora_pwd_policy_special" value="1" <?php checked( get_option('cora_pwd_policy_special', 0), 1 ); ?> class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900">
-                        <span>Require at least one special character (e.g. !, @, #, $, %, etc.)</span>
-                    </label>
+                        <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-300 font-semibold cursor-pointer">
+                            <input type="checkbox" name="cora_pwd_policy_special" value="1" <?php checked( get_option('cora_pwd_policy_special', 0), 1 ); ?> class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
+                            <span class="cora-label-raw">Require at least one special character (e.g. !, @, #, $, %, etc.)</span>
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -287,10 +429,10 @@ $roles      = wp_roles()->get_names();
             }
         ?>
         <!-- TAB: BRANCH MANAGEMENT -->
-        <div class="space-y-6">
-            <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
+        <div class="space-y-6 max-w-3xl">
+            <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
                 <div>
-                    <h3 class="text-sm font-bold text-zinc-900">Brokerage Branches</h3>
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Brokerage Branches</h3>
                     <p class="text-xs text-zinc-500">Manage multiple physical offices, assign localized managers, and monitor regional agent counts.</p>
                 </div>
                 <button type="button" onclick="openCreateBranchDrawer()" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm flex items-center gap-1.5">
@@ -299,7 +441,7 @@ $roles      = wp_roles()->get_names();
                 </button>
             </div>
 
-            <div class="bg-white border border-zinc-200/85 rounded-xl shadow-sm overflow-hidden">
+            <div class="cora-shopify-card p-0 overflow-hidden">
                 <table class="min-w-full divide-y divide-zinc-200 text-xs text-left">
                     <thead class="bg-zinc-50/50">
                         <tr>
@@ -579,26 +721,27 @@ $roles      = wp_roles()->get_names();
 
         <?php elseif ( $active_tab === 'brand' ) : ?>
         <!-- TAB 7: BRANDING & API KEYS -->
-        <div class="space-y-6 max-w-2xl animate-in fade-in duration-200">
-            <div class="border-b border-zinc-100 pb-3">
-                <h3 class="text-sm font-bold text-zinc-900">Brand Identity & API Integrations</h3>
-                <p class="text-xs text-zinc-500">Configure your agency's logo, custom favicon, currency layout, and third-party developer API credentials.</p>
-            </div>
-            
-            <div class="space-y-5">
+        <div class="space-y-6 max-w-3xl">
+            <!-- Card 1: Brand Assets -->
+            <div class="cora-shopify-card space-y-4">
+                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Brand Assets</h3>
+                    <p class="text-xs text-zinc-500">Configure your agency's logo and browser favicon.</p>
+                </div>
+                
                 <!-- Agency Logo Settings -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border border-zinc-200 rounded-xl bg-zinc-50/50">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/40">
                     <div class="md:col-span-2 space-y-3">
                         <div>
-                            <label class="block text-xs font-bold text-zinc-800 mb-1">Agency Logo URL</label>
+                            <label>Agency Logo URL</label>
                             <div class="flex gap-2">
-                                <input type="url" id="cora-brand-logo-url-suite" name="cora_brand_logo_url" value="<?php echo esc_url( get_option('cora_brand_logo_url', '') ); ?>" placeholder="https://..." class="flex-1 bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900">
-                                <button type="button" class="px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-semibold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraOpenMediaSelector('cora-brand-logo-url-suite')">Browse</button>
+                                <input type="url" id="cora-brand-logo-url-suite" name="cora_brand_logo_url" value="<?php echo esc_url( get_option('cora_brand_logo_url', '') ); ?>" placeholder="https://...">
+                                <button type="button" class="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-semibold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraOpenMediaSelector('cora-brand-logo-url-suite')">Browse</button>
                             </div>
                         </div>
-                        <p class="text-[11px] text-zinc-400">Upload your real estate group's official logo. This will be used on all shared portfolios, custom client portals, and invoice headers.</p>
+                        <p class="text-[11px] text-zinc-400">Upload your real estate group's official logo. This will be used on all shared portfolios and custom client portals.</p>
                     </div>
-                    <div class="flex items-center justify-center border border-zinc-200 rounded-lg bg-white p-3 h-28">
+                    <div class="flex items-center justify-center border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 p-3 h-28">
                         <?php $logo_url = get_option('cora_brand_logo_url', ''); ?>
                         <div id="cora-suite-logo-preview" class="w-full h-full flex items-center justify-center overflow-hidden">
                             <?php if ( ! empty( $logo_url ) ) : ?>
@@ -611,20 +754,20 @@ $roles      = wp_roles()->get_names();
                 </div>
 
                 <!-- Custom Favicon Settings -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border border-zinc-200 rounded-xl bg-zinc-50/50">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/40">
                     <div class="md:col-span-2 space-y-3">
                         <div>
-                            <label class="block text-xs font-bold text-zinc-800 mb-1">Custom Favicon URL (32x32 / 64x64 PNG)</label>
+                            <label>Custom Favicon URL (32x32 / 64x64 PNG)</label>
                             <div class="flex gap-2">
-                                <input type="url" id="cora-brand-favicon-url-suite" name="cora_brand_favicon_url" value="<?php echo esc_url( get_option('cora_brand_favicon_url', '') ); ?>" placeholder="https://..." class="flex-1 bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900">
-                                <button type="button" class="px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-semibold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraOpenMediaSelector('cora-brand-favicon-url-suite')">Browse</button>
+                                <input type="url" id="cora-brand-favicon-url-suite" name="cora_brand_favicon_url" value="<?php echo esc_url( get_option('cora_brand_favicon_url', '') ); ?>" placeholder="https://...">
+                                <button type="button" class="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-semibold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraOpenMediaSelector('cora-brand-favicon-url-suite')">Browse</button>
                             </div>
                         </div>
                         <div class="flex gap-2">
-                            <button type="button" class="px-2.5 py-1.5 border border-zinc-200 hover:border-zinc-450 bg-white text-zinc-700 font-semibold text-[10px] rounded transition-colors cursor-pointer" onclick="coraSetDefaultPremiumFavicon()">
+                            <button type="button" class="px-2.5 py-1.5 border border-zinc-200 dark:border-zinc-850 hover:border-zinc-450 bg-white dark:bg-zinc-900 text-zinc-750 dark:text-zinc-300 font-semibold text-[10px] rounded transition-colors cursor-pointer" onclick="coraSetDefaultPremiumFavicon()">
                                 Set to Premium Monogram Icon
                             </button>
-                            <button type="button" class="px-2.5 py-1.5 border border-zinc-200 hover:border-zinc-450 bg-white text-zinc-700 font-semibold text-[10px] rounded transition-colors cursor-pointer" onclick="document.getElementById('cora-brand-favicon-url-suite').value='';">
+                            <button type="button" class="px-2.5 py-1.5 border border-zinc-200 dark:border-zinc-850 hover:border-zinc-450 bg-white dark:bg-zinc-900 text-zinc-750 dark:text-zinc-300 font-semibold text-[10px] rounded transition-colors cursor-pointer" onclick="document.getElementById('cora-brand-favicon-url-suite').value='';">
                                 Clear Favicon
                             </button>
                         </div>
@@ -641,9 +784,9 @@ $roles      = wp_roles()->get_names();
                                 window.coraShowToast("Premium Monogram Icon selected as Favicon.");
                             }
                         </script>
-                        <p class="text-[11px] text-zinc-400">Configure your website browser tab favicon. You can use your own or select the unique custom-designed Cora Real Estate monogram favicon.</p>
+                        <p class="text-[11px] text-zinc-400">Configure your website browser tab favicon.</p>
                     </div>
-                    <div class="flex flex-col items-center justify-center border border-zinc-200 rounded-lg bg-white p-3 h-28 space-y-1.5">
+                    <div class="flex flex-col items-center justify-center border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 p-3 h-28 space-y-1.5">
                         <span class="text-[9px] text-zinc-400 uppercase font-bold tracking-wider">Tab Favicon</span>
                         <?php 
                         $favicon_url = get_option('cora_brand_favicon_url', ''); 
@@ -651,46 +794,48 @@ $roles      = wp_roles()->get_names();
                             $favicon_url = CORA_REAL_ESTATE_AI_URL . 'assets/images/cora-favicon.png';
                         }
                         ?>
-                        <div id="cora-suite-favicon-preview" class="w-12 h-12 flex items-center justify-center border border-zinc-100 rounded-md bg-zinc-50">
+                        <div id="cora-suite-favicon-preview" class="w-12 h-12 flex items-center justify-center border border-zinc-100 dark:border-zinc-850 rounded-md bg-zinc-50 dark:bg-zinc-900">
                             <img src="<?php echo esc_url( $favicon_url ); ?>" class="w-8 h-8 object-contain" alt="Favicon Preview">
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Google Maps API and WhatsApp integration -->
+            <!-- Card 2: Developer Keys & API Integrations -->
+            <div class="cora-shopify-card space-y-4">
+                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Third-Party Developer Keys</h3>
+                    <p class="text-xs text-zinc-500">Provide map keys and CRM notification credentials.</p>
+                </div>
+                
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1">Google Maps API Key</label>
-                        <input type="text" name="cora_gbp_maps_api_key" value="<?php echo esc_attr( get_option('cora_gbp_maps_api_key', '') ); ?>" placeholder="AIzaSy..." class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900">
-                        <p class="text-[10px] text-zinc-400 mt-1">Required for geolocating listing properties and rendering location matrix details on property maps.</p>
+                        <label>Google Maps API Key</label>
+                        <input type="text" name="cora_gbp_maps_api_key" value="<?php echo esc_attr( get_option('cora_gbp_maps_api_key', '') ); ?>" placeholder="AIzaSy...">
+                        <p class="text-[10px] text-zinc-400 mt-1">Required for geolocating listing properties.</p>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1">System Currency Layout</label>
-                        <select name="cora_currency_format" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none">
+                        <label>System Currency Layout</label>
+                        <select name="cora_currency_format">
                             <?php $curr_format = get_option('cora_currency_format', 'INR_LAKHS'); ?>
                             <option value="INR_LAKHS" <?php selected( $curr_format, 'INR_LAKHS' ); ?>>Indian Rupees (Lakhs/Crores - e.g. ₹1.80 L / ₹4.50 Cr)</option>
                             <option value="INR_STANDARD" <?php selected( $curr_format, 'INR_STANDARD' ); ?>>Indian Rupees Standard (Comma separated - e.g. ₹1,80,000)</option>
                             <option value="USD" <?php selected( $curr_format, 'USD' ); ?>>US Dollars (Standard - e.g. $180,000)</option>
                         </select>
-                        <p class="text-[10px] text-zinc-400 mt-1">Determines how prices, transactions, invoices, and payouts are formatted in the Ledger.</p>
+                        <p class="text-[10px] text-zinc-400 mt-1">Determines how prices are formatted in Ledger.</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-zinc-100 pt-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-zinc-100 dark:border-zinc-800/40 pt-4">
                     <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1">WhatsApp Cloud API Token</label>
-                        <input type="password" name="cora_whatsapp_api_token" value="<?php echo esc_attr( get_option('cora_whatsapp_api_token', '') ); ?>" placeholder="EAAW..." class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900">
+                        <label>WhatsApp Cloud API Token</label>
+                        <input type="password" name="cora_whatsapp_api_token" value="<?php echo esc_attr( get_option('cora_whatsapp_api_token', '') ); ?>" placeholder="EAAW...">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1">WhatsApp Business Phone ID</label>
-                        <input type="text" name="cora_whatsapp_phone_number" value="<?php echo esc_attr( get_option('cora_whatsapp_phone_number', '') ); ?>" placeholder="e.g. 1093847291039" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900">
+                        <label>WhatsApp Business Phone ID</label>
+                        <input type="text" name="cora_whatsapp_phone_number" value="<?php echo esc_attr( get_option('cora_whatsapp_phone_number', '') ); ?>" placeholder="e.g. 1093847291039">
                     </div>
-                    <p class="sm:col-span-2 text-[10px] text-zinc-400">Configure WhatsApp credentials to activate automated transaction notifications, client shortlisting alerts, and showing follow-ups.</p>
-                </div>
-            </div>
-        </div>
-
-        <?php elseif ( $active_tab === 'mcp' ) : 
+               <?php elseif ( $active_tab === 'mcp' ) : 
             $mcp_token = get_option( 'cora_mcp_access_token' );
             if ( empty( $mcp_token ) ) {
                 $mcp_token = bin2hex( wp_generate_password( 32, false ) );
@@ -699,47 +844,54 @@ $roles      = wp_roles()->get_names();
             $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
         ?>
         <!-- TAB: MODEL CONTEXT PROTOCOL (MCP) AI TOOLS SERVER -->
-        <div class="space-y-6 max-w-2xl animate-in fade-in duration-200">
-            <div class="border-b border-zinc-100 pb-3 flex items-center justify-between">
-                <div>
-                    <h3 class="text-sm font-bold text-zinc-900">Model Context Protocol (MCP) AI Tools Server</h3>
-                    <p class="text-xs text-zinc-500">Connect your custom external AI agents directly with Cora's data schemas.</p>
+        <div class="space-y-6 max-w-3xl">
+            <!-- Card 1: Configuration -->
+            <div class="cora-shopify-card space-y-4">
+                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Model Context Protocol (MCP) AI Tools Server</h3>
+                        <p class="text-xs text-zinc-500">Connect your custom external AI agents directly with Cora's data schemas.</p>
+                    </div>
+                    <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-[9px] font-bold uppercase tracking-wider">Beta Gateway</span>
                 </div>
-                <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-800 text-[9px] font-bold uppercase tracking-wider">Beta Gateway</span>
-            </div>
 
-            <div class="space-y-5">
-                <div class="p-4 border border-zinc-200 rounded-xl bg-zinc-50/50 space-y-3">
-                    <p class="text-xs text-zinc-650 leading-relaxed">
+                <div class="p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/40 space-y-3">
+                    <p class="text-xs text-zinc-650 dark:text-zinc-350 leading-relaxed">
                         Cora exposes an <strong>MCP tool server</strong> endpoint. By registering this gateway in your local AI platform (like Claude Desktop or Cursor), your AI assistant can query listings, create leads, check audit logs, and retrieve workspace statistics in real-time.
                     </p>
                 </div>
 
                 <!-- MCP Gateway URL -->
                 <div>
-                    <label class="block text-xs font-bold text-zinc-800 mb-1">MCP Gateway Endpoint URL</label>
+                    <label>MCP Gateway Endpoint URL</label>
                     <div class="flex gap-2">
-                        <input type="text" id="cora-mcp-gateway-url" readonly value="<?php echo esc_url( $mcp_url ); ?>" class="flex-1 bg-zinc-100 border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-700 font-mono focus:outline-none">
-                        <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraCopyToClipboard('cora-mcp-gateway-url')">Copy URL</button>
+                        <input type="text" id="cora-mcp-gateway-url" readonly value="<?php echo esc_url( $mcp_url ); ?>" class="font-mono bg-zinc-50 dark:bg-zinc-900/50">
+                        <button type="button" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraCopyToClipboard('cora-mcp-gateway-url')">Copy URL</button>
                     </div>
                 </div>
 
                 <!-- MCP Secure Token -->
                 <div>
-                    <label class="block text-xs font-bold text-zinc-800 mb-1">Secure Bearer Access Token</label>
+                    <label>Secure Bearer Access Token</label>
                     <div class="flex gap-2">
-                        <input type="password" id="cora-mcp-access-token" name="cora_mcp_access_token" value="<?php echo esc_attr( $mcp_token ); ?>" class="flex-1 bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 font-mono focus:outline-none focus:border-zinc-900">
-                        <button type="button" class="px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-semibold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraToggleTokenVisibility()">Show</button>
-                        <button type="button" class="px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-semibold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraGenerateNewMCPToken()">Regenerate</button>
+                        <input type="password" id="cora-mcp-access-token" name="cora_mcp_access_token" value="<?php echo esc_attr( $mcp_token ); ?>" class="font-mono">
+                        <button type="button" class="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 font-semibold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraToggleTokenVisibility()">Show</button>
+                        <button type="button" class="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 font-semibold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraGenerateNewMCPToken()">Regenerate</button>
                     </div>
                     <p class="text-[10px] text-zinc-400 mt-1">Authenticate requests by sending this value in the HTTP header: <code>Authorization: Bearer &lt;token&gt;</code>.</p>
                 </div>
+            </div>
 
-                <!-- Configuration Example card -->
+            <!-- Card 2: Configuration Example -->
+            <div class="cora-shopify-card space-y-4">
+                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Claude Desktop Integration Example</h3>
+                    <p class="text-xs text-zinc-500">Configure your local Claude client settings file to connect this tool provider.</p>
+                </div>
+                
                 <div class="space-y-2 pt-2">
-                    <span class="block text-xs font-bold text-zinc-800">Claude Desktop Integration Settings Example:</span>
                     <div class="bg-zinc-900 text-zinc-100 rounded-xl p-4 font-mono text-[10px] leading-relaxed overflow-x-auto shadow-inner relative">
-                        <button type="button" class="absolute top-3 right-3 px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded text-[9px] cursor-pointer" onclick="coraCopyClaudeConfig()">Copy Config</button>
+                        <button type="button" class="absolute top-3 right-3 px-2 py-1 bg-zinc-800 hover:bg-zinc-750 text-zinc-300 rounded text-[9px] cursor-pointer" onclick="coraCopyClaudeConfig()">Copy Config</button>
                         <pre id="cora-claude-config-code"><code>{
   "mcpServers": {
     "cora-crm": {
@@ -802,51 +954,64 @@ $roles      = wp_roles()->get_names();
 
         <?php elseif ( $active_tab === 'reading' ) : ?>
         <!-- TAB 2: READING & SEO SETTINGS -->
-        <div class="space-y-6 max-w-2xl">
-            <div class="border-b border-zinc-100 pb-3">
-                <h3 class="text-sm font-bold text-zinc-900">Reading & Search Engine Indexing</h3>
-                <p class="text-xs text-zinc-500">Control homepage display mode and search engine crawler visibility.</p>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-zinc-800 mb-2">Homepage Displays</label>
-                    <div class="space-y-2">
-                        <label class="flex items-center gap-2 text-xs text-zinc-800 font-medium cursor-pointer">
-                            <input type="radio" name="show_on_front" value="posts" <?php checked( get_option('show_on_front'), 'posts' ); ?> class="text-zinc-900 focus:ring-zinc-900">
-                            <span>Your latest blog posts feed</span>
-                        </label>
-                        <label class="flex items-center gap-2 text-xs text-zinc-800 font-medium cursor-pointer">
-                            <input type="radio" name="show_on_front" value="page" <?php checked( get_option('show_on_front'), 'page' ); ?> class="text-zinc-900 focus:ring-zinc-900">
-                            <span>A static landing page</span>
-                        </label>
-                    </div>
+        <div class="space-y-6 max-w-3xl">
+            <!-- Card 1: Homepage Displays -->
+            <div class="cora-shopify-card space-y-4">
+                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Reading & Search Engine Indexing</h3>
+                    <p class="text-xs text-zinc-500">Control homepage display mode and static page assignments.</p>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                
+                <div class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1">Static Homepage</label>
-                        <select name="page_on_front" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none">
-                            <option value="0">— Select Page —</option>
-                            <?php foreach ( $pages as $p ) : ?>
-                                <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( get_option('page_on_front'), $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                        <label>Homepage Displays</label>
+                        <div class="space-y-2.5 mt-2">
+                            <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-300 font-medium cursor-pointer">
+                                <input type="radio" name="show_on_front" value="posts" <?php checked( get_option('show_on_front'), 'posts' ); ?> class="text-zinc-900 focus:ring-zinc-900">
+                                <span class="cora-label-raw">Your latest blog posts feed</span>
+                            </label>
+                            <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-300 font-medium cursor-pointer">
+                                <input type="radio" name="show_on_front" value="page" <?php checked( get_option('show_on_front'), 'page' ); ?> class="text-zinc-900 focus:ring-zinc-900">
+                                <span class="cora-label-raw">A static landing page</span>
+                            </label>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1">Posts Page (Blog Archive)</label>
-                        <select name="page_for_posts" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none">
-                            <option value="0">— Select Page —</option>
-                            <?php foreach ( $pages as $p ) : ?>
-                                <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( get_option('page_for_posts'), $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
-                <div class="pt-4 border-t border-zinc-100">
-                    <label class="flex items-start gap-2.5 text-xs text-zinc-800 font-semibold cursor-pointer">
-                        <input type="checkbox" name="blog_public" value="0" <?php checked( get_option('blog_public'), 0 ); ?> class="rounded border-zinc-300 text-red-600 focus:ring-red-600 mt-0.5">
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                         <div>
-                            <span class="text-red-700 font-bold">Discourage search engines from indexing this site</span>
-                            <p class="text-[11px] text-zinc-500 font-normal">Modifies robots.txt and meta tags. Note: It is up to search engines to honor this request.</p>
+                            <label>Static Homepage</label>
+                            <select name="page_on_front">
+                                <option value="0">— Select Page —</option>
+                                <?php foreach ( $pages as $p ) : ?>
+                                    <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( get_option('page_on_front'), $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Posts Page (Blog Archive)</label>
+                            <select name="page_for_posts">
+                                <option value="0">— Select Page —</option>
+                                <?php foreach ( $pages as $p ) : ?>
+                                    <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( get_option('page_for_posts'), $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Crawler Visibility -->
+            <div class="cora-shopify-card space-y-4">
+                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Search Engine Crawler Visibility</h3>
+                    <p class="text-xs text-zinc-500">Configure robots.txt headers and search engine crawlers visibility permissions.</p>
+                </div>
+                <div class="p-4 border border-red-200 dark:border-red-950/60 bg-red-50/30 dark:bg-red-950/5 rounded-lg">
+                    <label class="flex items-start gap-2.5 text-xs text-zinc-800 dark:text-zinc-300 font-semibold cursor-pointer">
+                        <input type="checkbox" name="blog_public" value="0" <?php checked( get_option('blog_public'), 0 ); ?> class="rounded border-zinc-300 text-red-600 focus:ring-red-650 mt-0.5">
+                        <div class="space-y-0.5">
+                            <span class="text-red-700 dark:text-red-400 font-bold cora-label-raw">Discourage search engines from indexing this site</span>
+                            <p class="text-[11px] text-zinc-550 dark:text-zinc-400 font-normal">Modifies robots.txt and meta tags. Note: It is up to search engines to honor this request.</p>
                         </div>
                     </label>
                 </div>
@@ -855,183 +1020,214 @@ $roles      = wp_roles()->get_names();
 
         <?php elseif ( $active_tab === 'writing' ) : ?>
         <!-- TAB 3: WRITING DEFAULTS -->
-        <div class="space-y-6 max-w-xl">
-            <div class="border-b border-zinc-100 pb-3">
-                <h3 class="text-sm font-bold text-zinc-900">Writing & Content Defaults</h3>
-                <p class="text-xs text-zinc-500">Configure default taxonomy labeling and publishing format presets.</p>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-zinc-800 mb-1">Default Post Category</label>
-                    <select name="default_category" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none">
-                        <?php foreach ( $categories as $cat ) : ?>
-                            <option value="<?php echo esc_attr( $cat->term_id ); ?>" <?php selected( get_option('default_category'), $cat->term_id ); ?>><?php echo esc_html( $cat->name ); ?></option>
-                        <?php endforeach; ?>
-                    </select>
+        <div class="space-y-6 max-w-3xl">
+            <!-- Card: Writing Defaults -->
+            <div class="cora-shopify-card space-y-4">
+                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Writing & Content Defaults</h3>
+                    <p class="text-xs text-zinc-500">Configure default taxonomy labeling and publishing format presets.</p>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-zinc-800 mb-1">Default Post Format</label>
-                    <select name="default_post_format" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none">
-                        <option value="0" <?php selected( get_option('default_post_format'), '0' ); ?>>Standard</option>
-                        <option value="gallery" <?php selected( get_option('default_post_format'), 'gallery' ); ?>>Gallery</option>
-                        <option value="video" <?php selected( get_option('default_post_format'), 'video' ); ?>>Video</option>
-                        <option value="quote" <?php selected( get_option('default_post_format'), 'quote' ); ?>>Quote</option>
-                    </select>
+                
+                <div class="space-y-4 max-w-md">
+                    <div>
+                        <label>Default Post Category</label>
+                        <select name="default_category">
+                            <?php foreach ( $categories as $cat ) : ?>
+                                <option value="<?php echo esc_attr( $cat->term_id ); ?>" <?php selected( get_option('default_category'), $cat->term_id ); ?>><?php echo esc_html( $cat->name ); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Default Post Format</label>
+                        <select name="default_post_format">
+                            <option value="0" <?php selected( get_option('default_post_format'), '0' ); ?>>Standard</option>
+                            <option value="gallery" <?php selected( get_option('default_post_format'), 'gallery' ); ?>>Gallery</option>
+                            <option value="video" <?php selected( get_option('default_post_format'), 'video' ); ?>>Video</option>
+                            <option value="quote" <?php selected( get_option('default_post_format'), 'quote' ); ?>>Quote</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
 
         <?php elseif ( $active_tab === 'discussion' ) : ?>
         <!-- TAB 4: DISCUSSION & MODERATION -->
-        <div class="space-y-6 max-w-2xl">
-            <div class="border-b border-zinc-100 pb-3">
-                <h3 class="text-sm font-bold text-zinc-900">Discussion & Comment Moderation Rules</h3>
-                <p class="text-xs text-zinc-500">Automate spam filtering, link limits, and moderation blacklists.</p>
+        <div class="space-y-6 max-w-3xl">
+            <!-- Card 1: Comment Moderation Policies -->
+            <div class="cora-shopify-card space-y-4">
+                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Comment Moderation Policies</h3>
+                    <p class="text-xs text-zinc-500">Enforce global submission guidelines for blog discussions and listing comments.</p>
+                </div>
+                
+                <div class="space-y-3.5">
+                    <label class="flex items-center gap-2.5 text-xs text-zinc-850 dark:text-zinc-300 font-semibold cursor-pointer">
+                        <input type="checkbox" name="default_pingback_flag" value="1" <?php checked( get_option('default_pingback_flag'), 1 ); ?> class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
+                        <span class="cora-label-raw">Allow link notifications from other blogs (pingbacks and trackbacks)</span>
+                    </label>
+                    
+                    <label class="flex items-center gap-2.5 text-xs text-zinc-850 dark:text-zinc-300 font-semibold cursor-pointer">
+                        <input type="checkbox" name="default_comment_status" value="open" <?php checked( get_option('default_comment_status'), 'open' ); ?> class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
+                        <span class="cora-label-raw">Allow people to submit comments on new articles</span>
+                    </label>
+                    
+                    <label class="flex items-center gap-2.5 text-xs text-zinc-850 dark:text-zinc-300 font-semibold cursor-pointer">
+                        <input type="checkbox" name="comment_moderation" value="1" <?php checked( get_option('comment_moderation'), 1 ); ?> class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
+                        <span class="cora-label-raw">Comment must be manually approved before publishing</span>
+                    </label>
+                </div>
             </div>
-            <div class="space-y-4">
-                <div class="space-y-2">
-                    <label class="flex items-center gap-2.5 text-xs text-zinc-800 font-semibold cursor-pointer">
-                        <input type="checkbox" name="default_pingback_flag" value="1" <?php checked( get_option('default_pingback_flag'), 1 ); ?> class="rounded border-zinc-300 text-zinc-900">
-                        <span>Allow link notifications from other blogs (pingbacks and trackbacks)</span>
-                    </label>
-                    <label class="flex items-center gap-2.5 text-xs text-zinc-800 font-semibold cursor-pointer">
-                        <input type="checkbox" name="default_comment_status" value="open" <?php checked( get_option('default_comment_status'), 'open' ); ?> class="rounded border-zinc-300 text-zinc-900">
-                        <span>Allow people to submit comments on new articles</span>
-                    </label>
-                    <label class="flex items-center gap-2.5 text-xs text-zinc-800 font-semibold cursor-pointer">
-                        <input type="checkbox" name="comment_moderation" value="1" <?php checked( get_option('comment_moderation'), 1 ); ?> class="rounded border-zinc-300 text-zinc-900">
-                        <span>Comment must be manually approved before publishing</span>
-                    </label>
+
+            <!-- Card 2: Spam Filtering & Moderation Keywords -->
+            <div class="cora-shopify-card space-y-4">
+                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Spam Filtering & Moderation Keywords</h3>
+                    <p class="text-xs text-zinc-500">Automate comment holds and trash actions using exact keyword triggers.</p>
                 </div>
-                <div class="pt-2">
-                    <label class="block text-xs font-bold text-zinc-800 mb-1">Comment Moderation Queue Keywords</label>
-                    <textarea name="moderation_keys" rows="3" placeholder="One word, IP address, or URL per line..." class="w-full bg-white border border-zinc-300 rounded-lg p-2.5 text-xs text-zinc-900 font-mono focus:outline-none"><?php echo esc_textarea( get_option('moderation_keys') ); ?></textarea>
-                    <p class="text-[11px] text-zinc-400 mt-1">When a comment contains any of these words in its content, name, URL, email, or IP address, it will be held in the moderation queue.</p>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-red-800 mb-1">Disallowed Comment Keys (Automatic Trash/Spam)</label>
-                    <textarea name="disallowed_keys" rows="3" placeholder="One word, IP address, or URL per line..." class="w-full bg-white border border-red-300 rounded-lg p-2.5 text-xs text-zinc-900 font-mono focus:outline-none"><?php echo esc_textarea( get_option('disallowed_keys') ); ?></textarea>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label>Comment Moderation Queue Keywords</label>
+                        <textarea name="moderation_keys" rows="3" placeholder="One word, IP address, or URL per line..." class="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-xs text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-100 shadow-3xs"><?php echo esc_textarea( get_option('moderation_keys') ); ?></textarea>
+                        <p class="text-[10px] text-zinc-400 mt-1">When a comment contains any of these words, it will be held in the moderation queue.</p>
+                    </div>
+                    <div>
+                        <label class="text-red-700 dark:text-red-400">Disallowed Comment Keys (Automatic Trash/Spam)</label>
+                        <textarea name="disallowed_keys" rows="3" placeholder="One word, IP address, or URL per line..." class="w-full bg-white dark:bg-zinc-950 border border-red-200 dark:border-red-900/60 rounded-lg p-2.5 text-xs text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:ring-1 focus:ring-red-650 dark:focus:ring-red-650 shadow-3xs"><?php echo esc_textarea( get_option('disallowed_keys') ); ?></textarea>
+                        <p class="text-[10px] text-zinc-400 mt-1">Comments matching these triggers will be instantly moved to trash.</p>
+                    </div>
                 </div>
             </div>
         </div>
 
         <?php elseif ( $active_tab === 'permalinks' ) : ?>
         <!-- TAB 5: SEO PERMALINKS -->
-        <div class="space-y-6 max-w-xl">
-            <div class="border-b border-zinc-100 pb-3">
-                <h3 class="text-sm font-bold text-zinc-900">SEO URL Permalinks Structure</h3>
-                <p class="text-xs text-zinc-500">Choose clean, human-readable URL routing schemas for better search engine rankings.</p>
-            </div>
-            <div class="space-y-3">
-                <?php $current_permalink = get_option('permalink_structure'); ?>
-                <label class="flex flex-col sm:flex-row sm:items-center justify-between p-3 border border-zinc-200 rounded-lg bg-zinc-50 hover:bg-zinc-100 cursor-pointer transition-colors gap-2">
-                    <div class="flex items-center gap-3">
-                        <input type="radio" name="permalink_structure" value="" <?php checked( $current_permalink, '' ); ?> class="text-zinc-900 focus:ring-zinc-900">
-                        <span class="text-xs font-bold text-zinc-900">Plain</span>
-                    </div>
-                    <code class="text-[11px] text-zinc-500 font-mono truncate break-all"><?php echo esc_url( home_url('/?p=123') ); ?></code>
-                </label>
-
-                <label class="flex flex-col sm:flex-row sm:items-center justify-between p-3 border border-zinc-200 rounded-lg bg-zinc-50 hover:bg-zinc-100 cursor-pointer transition-colors gap-2">
-                    <div class="flex items-center gap-3">
-                        <input type="radio" name="permalink_structure" value="/%year%/%monthnum%/%day%/%postname%/" <?php checked( $current_permalink, '/%year%/%monthnum%/%day%/%postname%/' ); ?> class="text-zinc-900 focus:ring-zinc-900">
-                        <span class="text-xs font-bold text-zinc-900">Day and name</span>
-                    </div>
-                    <code class="text-[11px] text-zinc-500 font-mono truncate break-all"><?php echo esc_url( home_url('/2026/07/08/sample-post/') ); ?></code>
-                </label>
-
-                <label class="flex flex-col sm:flex-row sm:items-center justify-between p-3 border border-zinc-200 rounded-lg bg-zinc-50 hover:bg-zinc-100 cursor-pointer transition-colors gap-2">
-                    <div class="flex items-center gap-3">
-                        <input type="radio" name="permalink_structure" value="/%year%/%monthnum%/%postname%/" <?php checked( $current_permalink, '/%year%/%monthnum%/%postname%/' ); ?> class="text-zinc-900 focus:ring-zinc-900">
-                        <span class="text-xs font-bold text-zinc-900">Month and name</span>
-                    </div>
-                    <code class="text-[11px] text-zinc-500 font-mono truncate break-all"><?php echo esc_url( home_url('/2026/07/sample-post/') ); ?></code>
-                </label>
-
-                <label class="flex flex-col sm:flex-row sm:items-center justify-between p-3 border border-zinc-900 rounded-lg bg-zinc-900/5 hover:bg-zinc-900/10 cursor-pointer transition-colors gap-2">
-                    <div class="flex items-center gap-3">
-                        <input type="radio" name="permalink_structure" value="/%postname%/" <?php checked( $current_permalink, '/%postname%/' ); ?> class="text-zinc-900 focus:ring-zinc-900">
-                        <div>
-                            <span class="text-xs font-bold text-zinc-900">Post name (Recommended SEO)</span>
+        <div class="space-y-6 max-w-3xl">
+            <!-- Card: SEO URL Permalinks -->
+            <div class="cora-shopify-card space-y-4">
+                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">SEO URL Permalinks Structure</h3>
+                    <p class="text-xs text-zinc-500">Choose clean, human-readable URL routing schemas for better search engine rankings.</p>
+                </div>
+                
+                <div class="space-y-3">
+                    <?php $current_permalink = get_option('permalink_structure'); ?>
+                    
+                    <label class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-zinc-50/50 dark:bg-zinc-900/30 hover:bg-zinc-100/50 dark:hover:bg-zinc-900/60 cursor-pointer transition-colors gap-2">
+                        <div class="flex items-center gap-3">
+                            <input type="radio" name="permalink_structure" value="" <?php checked( $current_permalink, '' ); ?> class="text-zinc-900 focus:ring-zinc-900">
+                            <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200 cora-label-raw">Plain</span>
                         </div>
-                    </div>
-                    <code class="text-[11px] text-zinc-900 font-bold font-mono truncate break-all"><?php echo esc_url( home_url('/sample-post/') ); ?></code>
-                </label>
+                        <code class="text-[10px] text-zinc-500 font-mono truncate break-all"><?php echo esc_url( home_url('/?p=123') ); ?></code>
+                    </label>
+
+                    <label class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-zinc-50/50 dark:bg-zinc-900/30 hover:bg-zinc-100/50 dark:hover:bg-zinc-900/60 cursor-pointer transition-colors gap-2">
+                        <div class="flex items-center gap-3">
+                            <input type="radio" name="permalink_structure" value="/%year%/%monthnum%/%day%/%postname%/" <?php checked( $current_permalink, '/%year%/%monthnum%/%day%/%postname%/' ); ?> class="text-zinc-900 focus:ring-zinc-900">
+                            <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200 cora-label-raw">Day and name</span>
+                        </div>
+                        <code class="text-[10px] text-zinc-500 font-mono truncate break-all"><?php echo esc_url( home_url('/2026/07/08/sample-post/') ); ?></code>
+                    </label>
+
+                    <label class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-zinc-50/50 dark:bg-zinc-900/30 hover:bg-zinc-100/50 dark:hover:bg-zinc-900/60 cursor-pointer transition-colors gap-2">
+                        <div class="flex items-center gap-3">
+                            <input type="radio" name="permalink_structure" value="/%year%/%monthnum%/%postname%/" <?php checked( $current_permalink, '/%year%/%monthnum%/%postname%/' ); ?> class="text-zinc-900 focus:ring-zinc-900">
+                            <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200 cora-label-raw">Month and name</span>
+                        </div>
+                        <code class="text-[10px] text-zinc-500 font-mono truncate break-all"><?php echo esc_url( home_url('/2026/07/sample-post/') ); ?></code>
+                    </label>
+
+                    <label class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 border border-zinc-900 dark:border-zinc-100 rounded-lg bg-zinc-900/5 dark:bg-zinc-100/5 hover:bg-zinc-900/10 dark:hover:bg-zinc-100/10 cursor-pointer transition-colors gap-2">
+                        <div class="flex items-center gap-3">
+                            <input type="radio" name="permalink_structure" value="/%postname%/" <?php checked( $current_permalink, '/%postname%/' ); ?> class="text-zinc-900 focus:ring-zinc-900">
+                            <div>
+                                <span class="text-xs font-bold text-zinc-900 dark:text-white cora-label-raw">Post name (Recommended SEO)</span>
+                            </div>
+                        </div>
+                        <code class="text-[10px] text-zinc-900 dark:text-white font-bold font-mono truncate break-all"><?php echo esc_url( home_url('/sample-post/') ); ?></code>
+                    </label>
+                </div>
             </div>
         </div>
 
         <?php elseif ( $active_tab === 'privacy' ) : ?>
         <!-- TAB 6: PRIVACY POLICY -->
-        <div class="space-y-6 max-w-xl">
-            <div class="border-b border-zinc-100 pb-3">
-                <h3 class="text-sm font-bold text-zinc-900">Privacy Policy Page Assignment</h3>
-                <p class="text-xs text-zinc-500">Designate an official privacy policy page for legal compliance and user transparency.</p>
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-zinc-800 mb-1">Change your Privacy Policy page</label>
-                <div class="flex gap-2">
-                    <select name="wp_page_for_privacy_policy" class="flex-1 bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none">
-                        <option value="0">— Select Page —</option>
-                        <?php foreach ( $pages as $p ) : ?>
-                            <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( get_option('wp_page_for_privacy_policy'), $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <a href="?page=cora-workspace&sub=pages" class="px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-semibold text-xs rounded-lg transition-colors flex items-center gap-1">Create New Page</a>
+        <div class="space-y-6 max-w-3xl">
+            <!-- Card: Privacy Policy -->
+            <div class="cora-shopify-card space-y-4">
+                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Privacy Policy Page Assignment</h3>
+                    <p class="text-xs text-zinc-500">Designate an official privacy policy page for legal compliance and user transparency.</p>
+                </div>
+                
+                <div class="space-y-4 max-w-md">
+                    <div>
+                        <label>Select Privacy Policy Page</label>
+                        <div class="flex gap-2">
+                            <select name="wp_page_for_privacy_policy" class="flex-1">
+                                <option value="0">— Select Page —</option>
+                                <?php foreach ( $pages as $p ) : ?>
+                                    <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( get_option('wp_page_for_privacy_policy'), $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <a href="?page=cora-workspace&sub=pages" class="px-3.5 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-semibold text-xs rounded-lg transition-colors flex items-center gap-1 shadow-3xs cursor-pointer">Create Page</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         <?php elseif ( $active_tab === 'git-sync' ) : ?>
         <!-- TAB 7: GIT SYNC (LOVABLE & GITHUB) -->
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-            <!-- Left side: Form Settings -->
-            <div class="xl:col-span-7 space-y-6 bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-3xs">
-                <div class="border-b border-zinc-100 pb-3">
-                    <h3 class="text-sm font-bold text-zinc-900">Git Sync Integration</h3>
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start max-w-full">
+            <!-- Left side: Form Settings Card -->
+            <div class="xl:col-span-7 space-y-6 cora-shopify-card">
+                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Git Sync Integration</h3>
                     <p class="text-xs text-zinc-500">Deploy custom frontends built in Lovable or other vibe-coding platforms directly to WordPress pages using GitHub.</p>
                 </div>
                 
                 <!-- Enable toggle -->
-                <div class="flex items-center justify-between p-3.5 bg-zinc-50/50 border border-zinc-200/60 rounded-xl">
+                <div class="flex items-center justify-between p-3.5 bg-zinc-50/50 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg">
                     <div class="flex flex-col gap-0.5">
-                        <span class="text-xs font-bold text-zinc-900">Enable Git Sync Hosting</span>
-                        <span class="text-[10px] text-zinc-500">Route requests on the mapped page to load files from the Git repository.</span>
+                        <span class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Enable Git Sync Hosting</span>
+                        <span class="text-[10px] text-zinc-550 dark:text-zinc-400">Route requests on the mapped page to load files from the Git repository.</span>
                     </div>
                     <label class="cora-switch relative inline-flex items-center cursor-pointer scale-[0.8] shrink-0">
                         <input type="checkbox" name="cora_git_sync_enabled" value="1" <?php checked( get_option('cora_git_sync_enabled'), '1' ); ?> class="sr-only peer">
-                        <div class="w-9 h-5 bg-zinc-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-950"></div>
+                        <div class="w-9 h-5 bg-zinc-200 dark:bg-zinc-850 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 dark:after:border-zinc-800 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-950 dark:peer-checked:bg-zinc-100"></div>
                     </label>
                 </div>
 
                 <!-- GitHub Repo Input -->
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1">GitHub Repository Link</label>
-                        <input type="text" name="cora_git_sync_repo" value="<?php echo esc_attr( get_option('cora_git_sync_repo', '') ); ?>" placeholder="e.g. https://github.com/dravyafolio2021/asset-ace-96" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-950">
+                        <label>GitHub Repository Link</label>
+                        <input type="text" name="cora_git_sync_repo" value="<?php echo esc_attr( get_option('cora_git_sync_repo', '') ); ?>" placeholder="e.g. https://github.com/user/repo">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1">Branch (Usually "main")</label>
-                        <input type="text" name="cora_git_sync_branch" value="<?php echo esc_attr( get_option('cora_git_sync_branch', 'main') ); ?>" placeholder="e.g. main" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-950">
+                        <label>Branch (Usually "main")</label>
+                        <input type="text" name="cora_git_sync_branch" value="<?php echo esc_attr( get_option('cora_git_sync_branch', 'main') ); ?>" placeholder="e.g. main">
                     </div>
                 </div>
 
                 <!-- GitHub Access Token -->
                 <div>
-                    <label class="block text-xs font-bold text-zinc-800 mb-1">GitHub Security Token (Only if repository is Private)</label>
-                    <input type="password" name="cora_git_sync_token" value="<?php echo esc_attr( get_option('cora_git_sync_token', '') ); ?>" placeholder="e.g. ghp_aBcDeFgHiJkLmNoPqRsTuVwXyZ1234567890" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-950">
-                    <p class="text-[10px] text-zinc-400 mt-1">Leave empty if your repository is Public. Only paste a token if the repository is private.</p>
+                    <label>GitHub Security Token (Only if repository is Private)</label>
+                    <input type="password" name="cora_git_sync_token" value="<?php echo esc_attr( get_option('cora_git_sync_token', '') ); ?>" placeholder="e.g. ghp_...">
+                    <p class="text-[10px] text-zinc-450 mt-1">Leave empty if your repository is Public. Only paste a token if the repository is private.</p>
                 </div>
 
                 <!-- Lovable Live URL -->
                 <div>
-                    <label class="block text-xs font-bold text-zinc-800 mb-1">Lovable Live URL (Alternative Deploy URL)</label>
-                    <input type="text" name="cora_git_sync_live_url" value="<?php echo esc_attr( get_option('cora_git_sync_live_url', '') ); ?>" placeholder="e.g. https://asset-ace-96.lovable.app" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-950">
-                    <p class="text-[10px] text-zinc-400 mt-1">Optional. If your repository contains React source code rather than compiled static files, enter your live Lovable website link here.</p>
+                    <label>Lovable Live URL (Alternative Deploy URL)</label>
+                    <input type="text" name="cora_git_sync_live_url" value="<?php echo esc_attr( get_option('cora_git_sync_live_url', '') ); ?>" placeholder="e.g. https://app-name.lovable.app">
+                    <p class="text-[10px] text-zinc-450 mt-1">Optional. If your repository contains React source code rather than compiled static files, enter your live Lovable website link here.</p>
                 </div>
 
                 <!-- Page Mapping -->
                 <div>
-                    <label class="block text-xs font-bold text-zinc-800 mb-1">Choose Where to Show this Website</label>
-                    <select name="cora_git_sync_page_id" class="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none">
+                    <label>Choose Where to Show this Website</label>
+                    <select name="cora_git_sync_page_id">
                         <option value="0">— Site Homepage (/) —</option>
                         <?php foreach ( $pages as $p ) : ?>
                             <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( get_option('cora_git_sync_page_id'), $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?> (<?php echo esc_html( get_page_uri($p->ID) ); ?>)</option>
@@ -1040,14 +1236,14 @@ $roles      = wp_roles()->get_names();
                 </div>
 
                 <!-- Manual Sync action button -->
-                <div class="pt-4 border-t border-zinc-100 flex items-center justify-between">
+                <div class="pt-4 border-t border-zinc-100 dark:border-zinc-800/40 flex items-center justify-between gap-4">
                     <div class="flex flex-col">
-                        <span class="text-xs font-bold text-zinc-900">Synchronize Repository</span>
+                        <span class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Synchronize Repository</span>
                         <?php 
                         $last_sync = get_option('cora_git_sync_last_time', '');
                         $last_status = get_option('cora_git_sync_last_status', '');
                         ?>
-                        <span class="text-[9px] text-zinc-400 mt-0.5" id="cora-git-sync-status">
+                        <span class="text-[9px] text-zinc-400 mt-0.5 font-medium" id="cora-git-sync-status">
                             <?php if ( ! empty($last_sync) ) : ?>
                                 Last sync: <?php echo esc_html( date('Y-m-d H:i:s', intval($last_sync)) ); ?> (Status: <?php echo esc_html($last_status); ?>)
                             <?php else: ?>
@@ -1055,49 +1251,49 @@ $roles      = wp_roles()->get_names();
                             <?php endif; ?>
                         </span>
                     </div>
-                    <button type="button" id="cora-btn-git-sync-now" class="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center gap-1.5 border border-zinc-200">
+                    <button type="button" id="cora-btn-git-sync-now" class="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center gap-1.5 border border-zinc-200 dark:border-zinc-700 shadow-3xs shrink-0">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="animate-spin hidden mr-1" id="cora-git-sync-spinner"><circle cx="12" cy="12" r="10"></circle><path d="M22 12a10 10 0 0 1-9 9"></path></svg>
                         Sync & Deploy Now
                     </button>
                 </div>
             </div>
 
-            <!-- Right side: Onboarding & Instructions -->
-            <div class="xl:col-span-5 space-y-5 bg-zinc-50/50 border border-zinc-200/80 rounded-2xl p-6 shadow-3xs">
-                <div class="flex items-center gap-2 pb-2 border-b border-zinc-200">
-                    <span class="text-zinc-900 shrink-0">
+            <!-- Right side: Onboarding & Instructions Card -->
+            <div class="xl:col-span-5 space-y-5 cora-shopify-card dark:bg-zinc-900/60 bg-zinc-50/50">
+                <div class="flex items-center gap-2.5 pb-2 border-b border-zinc-200 dark:border-zinc-800/40">
+                    <span class="text-zinc-900 dark:text-zinc-100 shrink-0">
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                     </span>
-                    <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Lovable Integration Guide</h4>
+                    <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Lovable Integration Guide</h4>
                 </div>
 
-                <!-- Step-by-step tutorial cards -->
-                <div class="space-y-5 text-xs text-zinc-700">
+                <!-- Step-by-step tutorial list -->
+                <div class="space-y-5 text-xs text-zinc-700 dark:text-zinc-350">
                     <!-- Step 1 -->
                     <div class="flex gap-3">
-                        <div class="w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-[10px] shrink-0">1</div>
+                        <div class="w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px] shrink-0">1</div>
                         <div class="space-y-1">
-                            <span class="font-bold text-zinc-900">Initiate your Lovable Project</span>
-                            <p class="leading-relaxed">Go to <a href="https://lovable.dev" target="_blank" class="underline font-semibold text-zinc-950">Lovable.dev</a> and prompt your real estate client site or application using plain English.</p>
+                            <span class="font-bold text-zinc-900 dark:text-zinc-100">Initiate your Lovable Project</span>
+                            <p class="leading-relaxed">Go to <a href="https://lovable.dev" target="_blank" class="underline font-semibold text-zinc-950 dark:text-white">Lovable.dev</a> and prompt your real estate client site or application using plain English.</p>
                         </div>
                     </div>
 
                     <!-- Step 2 -->
                     <div class="flex gap-3">
-                        <div class="w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-[10px] shrink-0">2</div>
+                        <div class="w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px] shrink-0">2</div>
                         <div class="space-y-1">
-                            <span class="font-bold text-zinc-900">Publish your site to GitHub</span>
+                            <span class="font-bold text-zinc-900 dark:text-zinc-100">Publish your site to GitHub</span>
                             <p class="leading-relaxed">Inside Lovable, click **Publish** or **Connect to GitHub** in the top-right corner. Follow the prompts to create a new folder for your website on GitHub.</p>
                         </div>
                     </div>
 
                     <!-- Step 3 -->
                     <div class="flex gap-3">
-                        <div class="w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-[10px] shrink-0">3</div>
+                        <div class="w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px] shrink-0">3</div>
                         <div class="space-y-1">
-                            <span class="font-bold text-zinc-900">Generate a GitHub Security Token</span>
+                            <span class="font-bold text-zinc-900 dark:text-zinc-100">Generate a GitHub Security Token</span>
                             <p class="leading-relaxed mb-2">If your project on GitHub is Private, you must generate a security key so Cora can pull your designs. Click the button below, log in to GitHub, and click the green **"Generate token"** button at the bottom of the page.</p>
-                            <a href="https://github.com/settings/tokens/new?scopes=repo&description=Cora%20Git%20Sync" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 text-white hover:bg-zinc-800 text-[10px] font-bold rounded-lg transition-colors shadow-sm">
+                            <a href="https://github.com/settings/tokens/new?scopes=repo&description=Cora%20Git%20Sync" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-white text-[10px] font-bold rounded-lg transition-colors shadow-3xs cursor-pointer">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                                 Auto-Generate Token on GitHub
                             </a>
@@ -1106,32 +1302,36 @@ $roles      = wp_roles()->get_names();
 
                     <!-- Step 4 -->
                     <div class="flex gap-3">
-                        <div class="w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-[10px] shrink-0">4</div>
+                        <div class="w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px] shrink-0">4</div>
                         <div class="space-y-1">
-                            <span class="font-bold text-zinc-900">Copy details and Sync!</span>
+                            <span class="font-bold text-zinc-900 dark:text-zinc-100">Copy details and Sync!</span>
                             <p class="leading-relaxed">Copy the website link from your browser address bar on GitHub, paste it into the **GitHub Repository Link** field, paste your token, and click **Sync & Deploy Now**.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Info Alert box -->
-                <div class="p-3.5 bg-zinc-100 rounded-xl border border-zinc-200/50 flex gap-3 mt-4">
-                    <span class="text-zinc-600 shrink-0 mt-0.5">
+                <div class="p-3.5 bg-zinc-100 dark:bg-zinc-950 rounded-xl border border-zinc-200/50 dark:border-zinc-800/60 flex gap-3 mt-4">
+                    <span class="text-zinc-650 dark:text-zinc-400 shrink-0 mt-0.5">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                     </span>
                     <div class="space-y-1">
-                        <span class="text-[10px] font-bold text-zinc-800 uppercase tracking-wider">Dynamic Integrations</span>
-                        <p class="text-[10px] text-zinc-500 leading-relaxed">Cora injects `window.CORA_API_URL` and `window.CORA_NONCE` automatically. Any form submissions or listing requests made in your Lovable code will dynamically query this site's databases.</p>
+                        <span class="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider">Dynamic Integrations</span>
+                        <p class="text-[10px] text-zinc-550 dark:text-zinc-450 leading-relaxed font-medium">Cora injects `window.CORA_API_URL` and `window.CORA_NONCE` automatically. Any form submissions or listing requests made in your Lovable code will dynamically query this site's databases.</p>
                     </div>
                 </div>
             </div>
         </div>
         <?php endif; ?>
 
-        <div class="pt-6 mt-6 border-t border-zinc-200 flex items-center justify-end">
-            <button type="submit" class="px-6 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors shadow-sm cursor-pointer flex items-center gap-2">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2 2H5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                Save All Settings
+        <!-- Sticky Save Actions Bar (Shopify Style) -->
+        <div class="cora-shopify-actions-bar">
+            <div class="text-xs text-zinc-500 font-semibold hidden sm:block">
+                Configure your Cora system environment.
+            </div>
+            <button type="submit" class="px-5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors shadow-sm cursor-pointer flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M19 21H5a2 2 0 0 1-2 2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                Save Settings
             </button>
         </div>
     </form>
@@ -1164,3 +1364,4 @@ jQuery(document).ready(function($) {
     });
 });
 </script>
+</div><!-- end cora-shopify-settings-theme -->
