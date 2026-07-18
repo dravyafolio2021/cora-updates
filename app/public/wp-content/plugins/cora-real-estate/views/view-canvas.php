@@ -1908,7 +1908,14 @@ $wp_pages = get_pages();
             <!-- Row 1 -->
             <div class="h-12 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between px-4 w-full bg-zinc-50 dark:bg-zinc-950">
                 <!-- Left: Logo & Theme Selector -->
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1.5 select-none shrink-0 mr-1">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-850 dark:text-zinc-150">
+                            <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5" stroke-width="2"></polygon>
+                            <circle cx="12" cy="12" r="3.5" stroke-width="1.5"></circle>
+                        </svg>
+                        <span class="text-xs font-black tracking-tight text-zinc-900 dark:text-zinc-100">cora</span>
+                    </div>
                     <button onclick="closeElementorEditor()" class="h-8 px-3 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-150 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5 bg-white dark:bg-zinc-900">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
                         Theme Dashboard
@@ -1968,7 +1975,7 @@ $wp_pages = get_pages();
                         Templates
                     </button>
                     <button id="cora-git-btn" onclick="openGitDrawer()" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5 relative" title="Git Version Control">
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M6 9v6"></path><path d="M9 18h9"></path></svg>
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
                         Git
                         <span id="cora-git-status-dot" class="hidden w-1.5 h-1.5 rounded-full bg-emerald-500 absolute top-1.5 right-1.5"></span>
                     </button>
@@ -1991,14 +1998,14 @@ $wp_pages = get_pages();
                         </button>
                         <!-- Page dropdown -->
                         <div id="cora-page-switcher-dropdown" class="hidden absolute top-full left-0 mt-1 w-64 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl z-[99999] overflow-hidden">
-                            <div class="p-2 border-b border-zinc-100 dark:border-zinc-800">
+                            <div class="p-2 border-b border-zinc-150 dark:border-zinc-800">
                                 <input id="cora-page-switcher-search" type="text" placeholder="Search pages..." oninput="filterPageSwitcher(this.value)" class="w-full px-2.5 py-1.5 text-[11px] border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-400" />
                             </div>
                             <div id="cora-page-switcher-list" class="max-h-60 overflow-y-auto py-1"></div>
                         </div>
                     </div>
                     <div class="h-4 w-[1px] bg-zinc-200 dark:bg-zinc-800"></div>
-                    <!-- Viewport devices + custom -->
+                    <!-- Viewport devices -->
                     <div class="flex items-center gap-1">
                         <div class="flex items-center bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg" id="cora-device-pill">
                             <button id="cora-device-desktop" onclick="switchDevice('desktop')" title="Desktop" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-700 shadow-sm cursor-pointer transition-all">
@@ -2010,27 +2017,7 @@ $wp_pages = get_pages();
                             <button id="cora-device-mobile" onclick="switchDevice('mobile')" title="Mobile (375px)" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-pointer transition-all">
                                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
                             </button>
-                            <!-- Custom viewport buttons injected here by JS -->
-                            <div id="cora-custom-viewports"></div>
                         </div>
-                        <!-- Add custom viewport button -->
-                        <div class="relative">
-                            <button onclick="toggleViewportPopover(event)" title="Add custom viewport" class="w-7 h-7 rounded-lg border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-all">
-                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            </button>
-                            <div id="cora-viewport-popover" class="hidden absolute top-9 right-0 w-56 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl p-3 z-[99999] space-y-2">
-                                <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Custom Viewport</p>
-                                <div class="flex items-center gap-1.5">
-                                    <input id="cora-vp-width" type="number" min="240" max="3840" placeholder="Width px" class="flex-1 px-2 py-1.5 text-[11px] border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-400" />
-                                    <input id="cora-vp-label" type="text" maxlength="6" placeholder="Label" class="w-16 px-2 py-1.5 text-[11px] border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-400" />
-                                </div>
-                                <button onclick="addCustomViewport()" class="w-full h-8 bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-lg text-[11px] cursor-pointer transition-colors border-none">Add Viewport</button>
-                            </div>
-                        </div>
-                        <!-- Ruler toggle -->
-                        <button id="cora-ruler-toggle" onclick="toggleRuler()" title="Toggle ruler" class="w-7 h-7 rounded-lg border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-all ml-0.5">
-                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18M3 7v10a1 1 0 001 1h16a1 1 0 001-1V7M3 7l3-3h12l3 3"/><line x1="7" y1="11" x2="7" y2="14"/><line x1="11" y1="11" x2="11" y2="13"/><line x1="15" y1="11" x2="15" y2="14"/><line x1="19" y1="11" x2="19" y2="13"/></svg>
-                        </button>
                     </div>
                 </div>
                 
@@ -2058,11 +2045,6 @@ $wp_pages = get_pages();
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Pixel Ruler -->
-        <div id="cora-canvas-ruler" class="hidden flex-shrink-0 h-6 bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 overflow-hidden relative select-none" style="font-size:9px;font-family:monospace;color:#a1a1aa">
-            <canvas id="cora-ruler-canvas" style="display:block;width:100%;height:100%"></canvas>
         </div>
 
         <!-- iframe container -->
@@ -6671,36 +6653,18 @@ $wp_pages = get_pages();
     }
 
     function switchDevice(device) {
-        const isCustom = device.startsWith('custom-');
-        const customWidth = isCustom ? parseInt(device.split('-')[1]) : null;
-
         // Update active state of preset device buttons
         ['desktop', 'tablet', 'mobile'].forEach(d => {
             const btn = document.getElementById('cora-device-' + d);
             if (btn) {
-                btn.className = (!isCustom && d === device)
+                btn.className = (d === device)
                     ? 'w-7 h-7 rounded-md flex items-center justify-center text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-700 shadow-sm cursor-pointer transition-all'
                     : 'w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-pointer transition-all';
             }
         });
 
-        // Update active state of custom viewport buttons
-        document.querySelectorAll('#cora-custom-viewports button').forEach(btn => {
-            const vpW = parseInt(btn.getAttribute('data-vp-width'));
-            btn.style.background = (isCustom && vpW === customWidth) ? 'rgba(0,0,0,0.08)' : '';
-        });
-
         const iframe = document.getElementById('elementor-editor-iframe');
         if (!iframe || !iframe.contentWindow) return;
-
-        if (isCustom && customWidth) {
-            // For custom widths: directly resize iframe; don't alter Elementor's responsive mode
-            iframe.style.width = customWidth + 'px';
-            iframe.style.maxWidth = customWidth + 'px';
-            iframe.style.transition = 'width 0.25s ease';
-            setTimeout(() => drawRuler(), 300);
-            return;
-        }
 
         // Reset iframe width for preset devices
         const presetWidths = { desktop: '', tablet: '768px', mobile: '375px' };
@@ -6712,7 +6676,6 @@ $wp_pages = get_pages();
         try {
             if (cw.elementor && cw.elementor.changeDeviceMode) {
                 cw.elementor.changeDeviceMode(device);
-                setTimeout(() => drawRuler(), 300);
                 return;
             }
         } catch (e) {}
@@ -6720,14 +6683,12 @@ $wp_pages = get_pages();
         try {
             if (cw.elementor && cw.elementor.channels && cw.elementor.channels.deviceMode) {
                 cw.elementor.channels.deviceMode.trigger('change', device);
-                setTimeout(() => drawRuler(), 300);
                 return;
             }
         } catch (e) {}
         // Strategy 3: $e route for responsive mode
         try {
             cw.$e.route('responsive', { device: device });
-            setTimeout(() => drawRuler(), 300);
             return;
         } catch (e) {}
         // Strategy 4: Click native Elementor responsive buttons in the top bar
@@ -6737,7 +6698,6 @@ $wp_pages = get_pages();
             `[data-device="${device}"], [aria-label="${label}"], [title="${label}"], [data-tooltip="${label}"]`
         );
         if (nativeBtn) nativeBtn.click();
-        setTimeout(() => drawRuler(), 300);
     }
 
 
@@ -6882,99 +6842,7 @@ $wp_pages = get_pages();
         }
     });
 
-    // ── Custom Viewports ──────────────────────────────────────────────────
-    (function initCustomViewports() {
-        const stored = JSON.parse(localStorage.getItem('cora_custom_viewports') || '[]');
-        stored.forEach(vp => addViewportButton(vp.width, vp.label));
-    })();
 
-    function toggleViewportPopover(e) {
-        e.stopPropagation();
-        const pop = document.getElementById('cora-viewport-popover');
-        if (pop) pop.classList.toggle('hidden');
-    }
-
-    function addCustomViewport() {
-        const w = parseInt(document.getElementById('cora-vp-width').value);
-        const l = (document.getElementById('cora-vp-label').value || '').trim() || w + 'px';
-        if (!w || w < 240 || w > 3840) { window.coraShowToast && window.coraShowToast('Enter a valid width (240–3840 px)', 'error'); return; }
-        addViewportButton(w, l);
-        const stored = JSON.parse(localStorage.getItem('cora_custom_viewports') || '[]');
-        if (!stored.find(v => v.width === w)) { stored.push({width: w, label: l}); localStorage.setItem('cora_custom_viewports', JSON.stringify(stored)); }
-        switchDevice('custom-' + w);
-        document.getElementById('cora-viewport-popover').classList.add('hidden');
-        window.coraShowToast && window.coraShowToast('Viewport ' + l + ' (' + w + 'px) added', 'success');
-    }
-
-    function addViewportButton(width, label) {
-        const container = document.getElementById('cora-custom-viewports');
-        if (!container) return;
-        const id = 'cora-device-custom-' + width;
-        if (document.getElementById(id)) return;
-        const btn = document.createElement('button');
-        btn.id = id; btn.title = label + ' (' + width + 'px) — Right-click to remove';
-        btn.setAttribute('data-vp-width', width);
-        btn.className = 'px-1.5 h-7 rounded-md text-[9px] font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 cursor-pointer transition-all';
-        btn.textContent = label;
-        btn.onclick = () => switchDevice('custom-' + width);
-        btn.oncontextmenu = (e) => {
-            e.preventDefault();
-            btn.remove();
-            const stored = JSON.parse(localStorage.getItem('cora_custom_viewports') || '[]');
-            localStorage.setItem('cora_custom_viewports', JSON.stringify(stored.filter(vp => vp.width !== width)));
-            window.coraShowToast && window.coraShowToast('Viewport removed', 'success');
-        };
-        container.appendChild(btn);
-    }
-
-    document.addEventListener('click', function(e) {
-        const pop = document.getElementById('cora-viewport-popover');
-        if (pop && !pop.classList.contains('hidden') && !e.target.closest('#cora-viewport-popover') && !e.target.closest('[onclick*="toggleViewportPopover"]')) {
-            pop.classList.add('hidden');
-        }
-    });
-
-    // ── Pixel Ruler ───────────────────────────────────────────────────────
-    function toggleRuler() {
-        const ruler = document.getElementById('cora-canvas-ruler');
-        const btn   = document.getElementById('cora-ruler-toggle');
-        if (!ruler) return;
-        const isNowHidden = ruler.classList.toggle('hidden');
-        if (btn) btn.style.background = isNowHidden ? '' : 'rgb(228 228 231)';
-        if (!isNowHidden) drawRuler();
-        localStorage.setItem('cora_ruler_on', isNowHidden ? '0' : '1');
-    }
-
-    function drawRuler() {
-        const ruler = document.getElementById('cora-canvas-ruler');
-        const canvas = document.getElementById('cora-ruler-canvas');
-        if (!ruler || !canvas || ruler.classList.contains('hidden')) return;
-        const W = ruler.offsetWidth, H = ruler.offsetHeight;
-        const dpr = window.devicePixelRatio || 1;
-        canvas.width = W * dpr; canvas.height = H * dpr;
-        canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
-        const ctx = canvas.getContext('2d');
-        ctx.scale(dpr, dpr); ctx.clearRect(0, 0, W, H);
-        const iframe = document.getElementById('elementor-editor-iframe');
-        const vpW = iframe ? (parseInt(iframe.style.width) || iframe.offsetWidth || W) : W;
-        const container = document.getElementById('elementor-iframe-container');
-        const containerW = container ? container.offsetWidth : W;
-        const offsetX = Math.max(0, (containerW - vpW) / 2);
-        ctx.fillStyle = '#f4f4f5'; ctx.fillRect(0, 0, W, H);
-        ctx.strokeStyle = '#d4d4d8'; ctx.lineWidth = 1;
-        ctx.fillStyle = '#a1a1aa'; ctx.font = '8px monospace'; ctx.textBaseline = 'top';
-        const step = vpW <= 400 ? 10 : vpW <= 800 ? 20 : 50;
-        const labelEvery = vpW <= 400 ? 50 : 100;
-        for (let px = 0; px <= vpW; px += step) {
-            const x = offsetX + (px / vpW) * vpW;
-            const major = px % labelEvery === 0;
-            ctx.beginPath(); ctx.moveTo(x, H); ctx.lineTo(x, major ? 0 : H * 0.45); ctx.stroke();
-            if (major) ctx.fillText(px === 0 ? '0' : String(px), x + 2, 2);
-        }
-    }
-
-    (function() { if (localStorage.getItem('cora_ruler_on') === '1') { const r = document.getElementById('cora-canvas-ruler'); if (r) r.classList.remove('hidden'); } })();
-    window.addEventListener('resize', drawRuler);
 
     // ── Git Integration Drawer ──────────────────────────────────────────
     function openGitDrawer() {
