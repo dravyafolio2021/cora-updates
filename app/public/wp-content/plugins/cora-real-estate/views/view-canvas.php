@@ -1912,7 +1912,7 @@ $wp_pages = get_pages();
                 
                 <!-- Right: History, View, Notes, Help, Avatar -->
                 <div class="flex items-center gap-1.5">
-                    <button onclick="runElementorCommand('panel/open-page', { page: 'history' })" class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
+                    <button onclick="openHistoryPanel()" class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                         History
                     </button>
@@ -1920,12 +1920,12 @@ $wp_pages = get_pages();
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                         View
                     </button>
-                    <button class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5 relative">
+                    <button onclick="toggleNotesMode()" class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5 relative">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                         Notes
                         <span class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center text-[8px] font-black">2</span>
                     </button>
-                    <button class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
+                    <button onclick="toggleHelpMode()" class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                         Help
                     </button>
@@ -1959,7 +1959,7 @@ $wp_pages = get_pages();
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
                         Templates
                     </button>
-                    <button onclick="runElementorCommand('panel/open-page', { page: 'history' })" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
+                    <button onclick="openHistoryPanel()" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect></svg>
                         Versions
                     </button>
@@ -1976,7 +1976,7 @@ $wp_pages = get_pages();
                 
                 <!-- Center: Page Navigator & Devices -->
                 <div class="flex items-center gap-3">
-                    <div class="flex items-center gap-1 cursor-pointer select-none">
+                    <div onclick="openSearchFinder()" class="flex items-center gap-1 cursor-pointer select-none">
                         <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200" id="cora-topbar-page-selector">Home Page</span>
                         <svg class="w-3.5 h-3.5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
@@ -1996,7 +1996,7 @@ $wp_pages = get_pages();
                 
                 <!-- Right: Search, Navigator, Preview, Publish -->
                 <div class="flex items-center gap-2">
-                    <button onclick="runElementorCommand('panel/open-page', { page: 'finder' })" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
+                    <button onclick="openSearchFinder()" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         Search
                     </button>
@@ -2011,7 +2011,7 @@ $wp_pages = get_pages();
                     
                     <!-- Split Publish Button -->
                     <div class="inline-flex rounded-lg shadow-sm relative">
-                        <button onclick="runElementorCommand('document/save/publish')" class="h-8 px-4 bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-50 text-white dark:text-zinc-900 rounded-l-lg text-[11px] font-extrabold cursor-pointer transition-colors flex items-center justify-center">
+                        <button onclick="publishPage()" class="h-8 px-4 bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-50 text-white dark:text-zinc-900 rounded-l-lg text-[11px] font-extrabold cursor-pointer transition-colors flex items-center justify-center">
                             Publish
                         </button>
                         <div class="w-[1px] h-8 bg-zinc-800 dark:bg-zinc-100"></div>
@@ -2020,10 +2020,13 @@ $wp_pages = get_pages();
                         </button>
                         <!-- Publish Dropdown Menu -->
                         <div id="cora-publish-dropdown" class="absolute right-0 top-10 w-40 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-xl py-1 hidden z-50">
-                            <button onclick="runElementorCommand('document/save/draft'); togglePublishDropdown(event);" class="w-full text-left px-4 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-xs font-bold text-zinc-700 dark:text-zinc-200 cursor-pointer">Save Draft</button>
-                            <button onclick="runElementorCommand('document/save/template'); togglePublishDropdown(event);" class="w-full text-left px-4 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-xs font-bold text-zinc-700 dark:text-zinc-200 cursor-pointer">Save as Template</button>
+                            <button onclick="saveDraftPage(); togglePublishDropdown(event);" class="w-full text-left px-4 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-xs font-bold text-zinc-700 dark:text-zinc-200 cursor-pointer">Save Draft</button>
+                            <button onclick="saveTemplatePage(); togglePublishDropdown(event);" class="w-full text-left px-4 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-xs font-bold text-zinc-700 dark:text-zinc-200 cursor-pointer">Save as Template</button>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
                 </div>
             </div>
         </div>
@@ -5164,6 +5167,14 @@ $wp_pages = get_pages();
     function openPageEditor(pageId, title, wpPostId) {
         canvasState.level = 3;
         canvasState.activePageId = pageId;
+        canvasState.activeWpPostId = wpPostId;
+
+        // Auto-sync global settings to Elementor active kit in background before loading editor
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_sync_elementor_globals',
+            theme_id: canvasState.activeThemeId,
+            nonce: coraREData.ajaxNonce
+        });
 
         // Show custom topbar and update context names
         jQuery('#cora-parent-editor-topbar').removeClass('hidden');
@@ -6338,11 +6349,64 @@ $wp_pages = get_pages();
     function toggleWidgetsPanel() {
         const iframe = document.getElementById('elementor-editor-iframe');
         if (iframe && iframe.contentWindow) {
-            const btn = iframe.contentWindow.document.querySelector('button.elementor-header-button:has(.eicon-apps), .eicon-apps, button[title="Widgets Panel"]');
+            try {
+                // Try official Elementor open panel editor command
+                iframe.contentWindow.$e.run('panel/editor/open');
+            } catch (e) {
+                const btn = iframe.contentWindow.document.querySelector('button.elementor-header-button:has(.eicon-apps), .eicon-apps, button[title="Widgets Panel"]');
+                if (btn) btn.click();
+            }
+        }
+    }
+
+    function openHistoryPanel() {
+        const iframe = document.getElementById('elementor-editor-iframe');
+        if (iframe && iframe.contentWindow) {
+            const btn = iframe.contentWindow.document.querySelector('#elementor-panel-footer-history, .elementor-panel-footer-history, .eicon-history, i.eicon-history, [data-tooltip="History"]');
             if (btn) {
                 btn.click();
             } else {
-                runElementorCommand('panel/open-page', { page: 'elements' });
+                runElementorCommand('panel/open-page', { page: 'history' });
+            }
+        }
+    }
+
+    function toggleNotesMode() {
+        const iframe = document.getElementById('elementor-editor-iframe');
+        if (iframe && iframe.contentWindow) {
+            try {
+                iframe.contentWindow.$e.run('notes/toggle');
+            } catch (e) {
+                const btn = iframe.contentWindow.document.querySelector('[data-tooltip="Notes"], .eicon-comment, i.eicon-comment');
+                if (btn) btn.click();
+            }
+        }
+    }
+
+    function toggleHelpMode() {
+        const iframe = document.getElementById('elementor-editor-iframe');
+        if (iframe && iframe.contentWindow) {
+            const btn = iframe.contentWindow.document.querySelector('#elementor-panel-footer-help, .elementor-panel-footer-help, .eicon-help, i.eicon-help, [data-tooltip="Help"]');
+            if (btn) btn.click();
+        }
+    }
+
+    function openSearchFinder() {
+        const iframe = document.getElementById('elementor-editor-iframe');
+        if (iframe && iframe.contentWindow) {
+            try {
+                iframe.contentWindow.$e.run('finder/open');
+            } catch (e) {
+                // Simulating cmd + e event fallback
+                const event = new iframe.contentWindow.KeyboardEvent('keydown', {
+                    key: 'e',
+                    keyCode: 69,
+                    code: 'KeyE',
+                    metaKey: true,
+                    ctrlKey: true,
+                    bubbles: true
+                });
+                iframe.contentWindow.document.dispatchEvent(event);
             }
         }
     }
@@ -6362,10 +6426,39 @@ $wp_pages = get_pages();
     }
 
     function previewPage() {
-        const link = document.getElementById('editor-preview-link');
-        if (link && link.href) {
-            window.open(link.href, '_blank');
+        if (canvasState.activeWpPostId) {
+            window.open(coraREData.siteUrl + '/?p=' + canvasState.activeWpPostId + '&preview=true', '_blank');
+        } else {
+            const link = document.getElementById('editor-preview-link');
+            if (link && link.href) {
+                window.open(link.href, '_blank');
+            }
         }
+    }
+
+    function publishPage() {
+        window.coraShowToast('Publishing page layout to live site...');
+        runElementorCommand('document/save/publish');
+        
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_publish_canvas_page',
+            page_id: canvasState.activePageId,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast('Page layout published successfully!');
+                fetchThemePages(canvasState.activeThemeId);
+            }
+        });
+    }
+
+    function saveDraftPage() {
+        window.coraShowToast('Saving page layout draft...');
+        runElementorCommand('document/save/draft');
+    }
+
+    function saveTemplatePage() {
+        runElementorCommand('library/save-template');
     }
 
     function togglePublishDropdown(event) {
