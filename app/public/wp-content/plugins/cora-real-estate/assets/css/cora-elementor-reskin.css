@@ -95,14 +95,31 @@ header.MuiAppBar-root,
     display: none !important;
 }
 
+/* Editor wrapper — fill the available viewport height, no overflow */
 #elementor-editor-wrapper-v2 {
     top: 0 !important;
-    height: 100% !important;
+    height: fit-content !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
 }
 
+/* Side panel — stretch to fill the wrapper, no scroll leakage */
 #elementor-panel {
     top: 0 !important;
     height: 100% !important;
+    max-height: 100% !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+}
+
+/* Elementor canvas area — fill remaining space next to side panel */
+#elementor-preview,
+#elementor-preview-iframe,
+.elementor-editor-preview {
+    height: 100% !important;
+    min-height: 0 !important;
+    flex: 1 !important;
 }
 
 /* Hide Elementor onboarding toast alerts */

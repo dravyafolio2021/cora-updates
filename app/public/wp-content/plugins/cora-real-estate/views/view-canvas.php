@@ -142,6 +142,30 @@ $wp_pages = get_pages();
         border-left: 2px solid #e4e4e7;
         padding-left: 12px;
     }
+
+    /* ── Canvas Level-3 Editor Layout ─────────────────────────────────── */
+    #canvas-level-3 {
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    /* Editor topbar takes a fixed height; iframe container fills the rest */
+    #cora-parent-editor-topbar {
+        flex-shrink: 0 !important;
+    }
+    #elementor-iframe-container {
+        flex: 1 1 0% !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+    }
+    #elementor-editor-iframe {
+        width: 100% !important;
+        height: 100% !important;
+        border: none !important;
+        display: block !important;
+    }
 </style>
 
 <div class="space-y-6" id="cora-canvas-container">
@@ -1888,9 +1912,32 @@ $wp_pages = get_pages();
                     <button onclick="closeElementorEditor()" class="w-6 h-6 rounded-full bg-black dark:bg-white flex items-center justify-center overflow-hidden border border-zinc-200 dark:border-zinc-800 hover:scale-[1.05] transition-transform cursor-pointer">
                         <img src="<?php echo esc_url( CORA_REAL_ESTATE_AI_URL . 'assets/images/cora-favicon.png' ); ?>" class="w-4 h-4 object-contain" alt="Cora" />
                     </button>
-                    <div onclick="closeElementorEditor()" class="flex items-center gap-1 cursor-pointer select-none">
-                        <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200" id="cora-topbar-theme-name">Theme</span>
-                        <svg class="w-3 h-3 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    <div class="relative inline-block text-left">
+                        <div onclick="toggleTopbarThemeDropdown(event)" class="flex items-center gap-1 cursor-pointer select-none">
+                            <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200" id="cora-topbar-theme-name">Theme</span>
+                            <svg class="w-3 h-3 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        
+                        <!-- Topbar Theme Actions Dropdown Menu -->
+                        <div id="cora-topbar-theme-dropdown" class="absolute left-0 top-full mt-2 w-48 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-xl py-1 hidden z-50">
+                            <button onclick="runElementorCommand('panel/open-page', { page: 'settings' }); toggleTopbarThemeDropdown(event);" class="w-full px-4 py-2 text-left text-xs font-semibold text-zinc-750 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-900 flex items-center gap-2.5 cursor-pointer bg-transparent border-none">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="3"></circle><path d="M19.07 4.93l-1.41 1.41M5.34 18.66l-1.41 1.41M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M5.34 5.34L3.93 3.93M12 2v2M12 20v2"></path></svg>
+                                Site Settings
+                            </button>
+                            <button onclick="triggerRenameThemeFromEditor(); toggleTopbarThemeDropdown(event);" class="w-full px-4 py-2 text-left text-xs font-semibold text-zinc-750 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-900 flex items-center gap-2.5 cursor-pointer bg-transparent border-none">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                Rename Theme
+                            </button>
+                            <button onclick="triggerDownloadTheme(canvasState.activeThemeId); toggleTopbarThemeDropdown(event);" class="w-full px-4 py-2 text-left text-xs font-semibold text-zinc-750 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-900 flex items-center gap-2.5 cursor-pointer bg-transparent border-none">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
+                                Download Theme
+                            </button>
+                            <div class="border-t border-zinc-150 dark:border-zinc-800 my-1"></div>
+                            <button onclick="closeElementorEditor(); toggleTopbarThemeDropdown(event);" class="w-full px-4 py-2 text-left text-xs font-semibold text-red-650 hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center gap-2.5 cursor-pointer bg-transparent border-none">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-red-500"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"></path></svg>
+                                Exit to Dashboard
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
@@ -1910,20 +1957,15 @@ $wp_pages = get_pages();
                     </div>
                 </div>
                 
-                <!-- Right: History, View, Notes, Help, Avatar -->
+                <!-- Right: Preview, Notes, Help, Avatar -->
                 <div class="flex items-center gap-1.5">
-                    <button onclick="openHistoryPanel()" class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                        History
-                    </button>
                     <button onclick="previewPage()" class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                        View
+                        Preview
                     </button>
-                    <button onclick="toggleNotesMode()" class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5 relative">
+                    <button onclick="toggleNotesMode()" class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                         Notes
-                        <span class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center text-[8px] font-black">2</span>
                     </button>
                     <button onclick="toggleHelpMode()" class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
@@ -1948,20 +1990,21 @@ $wp_pages = get_pages();
 
             <!-- Row 2 -->
             <div class="h-12 border-b border-zinc-200 dark:border-zinc-850 flex items-center justify-between px-4 w-full bg-white dark:bg-zinc-900">
-                <!-- Left: Add, Templates, Versions, Undo/Redo -->
+                <!-- Left: Add, Templates, Undo/Redo -->
                 <div class="flex items-center gap-2">
                     <button onclick="toggleWidgetsPanel()" class="h-8 px-3.5 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         Add
                         <svg class="w-3.5 h-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </button>
-                    <button onclick="runElementorCommand('library/open')" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
+                    <button onclick="openTemplatesLibrary()" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
                         Templates
                     </button>
-                    <button onclick="openHistoryPanel()" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect></svg>
-                        Versions
+                    <button id="cora-kit-btn" onclick="openKitDrawer()" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5 relative">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path><line x1="12" y1="12" x2="12" y2="17"></line><line x1="9" y1="14.5" x2="15" y2="14.5"></line></svg>
+                        Kit
+                        <span id="cora-kit-status-dot" class="hidden w-1.5 h-1.5 rounded-full bg-emerald-500 absolute top-1.5 right-1.5"></span>
                     </button>
                     <div class="h-4 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-1"></div>
                     <button onclick="runElementorCommand('document/history/undo')" class="h-8 px-2 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1">
@@ -1994,19 +2037,15 @@ $wp_pages = get_pages();
                     </div>
                 </div>
                 
-                <!-- Right: Search, Navigator, Preview, Publish -->
+                <!-- Right: Search, Navigator, Publish -->
                 <div class="flex items-center gap-2">
                     <button onclick="openSearchFinder()" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         Search
                     </button>
-                    <button onclick="runElementorCommand('navigator/toggle')" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
+                    <button onclick="toggleNavigatorPanel()" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>
                         Navigator
-                    </button>
-                    <button onclick="previewPage()" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                        Preview
                     </button>
                     
                     <!-- Split Publish Button -->
@@ -2029,7 +2068,7 @@ $wp_pages = get_pages();
         </div>
 
         <!-- iframe container -->
-        <div id="elementor-iframe-container" class="flex-1 w-full bg-zinc-50 relative flex items-center justify-center">
+        <div id="elementor-iframe-container" class="flex-1 min-h-0 w-full bg-zinc-50 relative flex items-center justify-center">
             <!-- Loading Indicator -->
             <div id="iframe-loader" class="absolute inset-0 flex flex-col items-center justify-center bg-white z-10 gap-3 text-xs text-zinc-500 font-semibold">
                 <div class="animate-spin rounded-full h-6 w-6 border-2 border-zinc-900 border-t-transparent"></div>
@@ -2474,25 +2513,129 @@ $wp_pages = get_pages();
     </div>
 </div>
 
-<!-- 6. Theme Rename Modal (Centered Popup) -->
-<div id="drawer-rename-theme" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-    <div class="bg-white border border-zinc-200 rounded-xl shadow-2xl p-6 w-full max-w-sm space-y-4 transform scale-95 transition-transform duration-300" id="drawer-rename-theme-card">
-        <div class="flex items-center justify-between">
-            <h3 class="text-sm font-bold text-zinc-950">Rename Theme Workspace</h3>
+<!-- 6. Theme Rename Modal (Sliding Right-Drawer) -->
+<div id="drawer-rename-theme" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[420px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-rename-theme-card">
+        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+            <div>
+                <h3 class="text-sm font-bold text-zinc-950">Rename Theme</h3>
+                <p class="text-[10px] text-zinc-500 mt-0.5">Specify a new display name for this theme workspace.</p>
+            </div>
             <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeRenameThemeDrawer()">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-        <div class="space-y-4">
+        <div class="flex-1 overflow-y-auto p-5 space-y-5">
             <input type="hidden" id="rename-theme-id-input">
             <div class="space-y-2">
-                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Theme Name *</label>
-                <input type="text" id="rename-theme-name-input" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Theme Name *</label>
+                <input type="text" id="rename-theme-name-input" placeholder="e.g. Cora Custom Theme" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium">
             </div>
         </div>
-        <div class="flex items-center justify-end gap-2.5 pt-2">
-            <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-semibold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeRenameThemeDrawer()">Cancel</button>
-            <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveRenamedTheme()">Rename Theme</button>
+        <div class="p-5 border-t border-zinc-200 flex items-center justify-end gap-2.5 bg-zinc-50/30">
+            <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeRenameThemeDrawer()">Cancel</button>
+            <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveRenamedTheme()">Rename Theme</button>
+        </div>
+    </div>
+</div>
+
+<!-- Lovable Connection Modal (Centered Popup) -->
+<!-- 7. Template Kit Connection Drawer (Right-Sliding Sheet) -->
+<div id="drawer-kit-connect" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
+    <div class="bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-kit-connect-card">
+        <!-- Drawer Header -->
+        <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/50 flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" class="text-zinc-700 dark:text-zinc-300"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path><line x1="12" y1="12" x2="12" y2="17"></line><line x1="9" y1="14.5" x2="15" y2="14.5"></line></svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-zinc-950 dark:text-zinc-50">Template Kit</h3>
+                    <p class="text-[10px] text-zinc-500 mt-0.5">Connect your Elementor Template Kit</p>
+                </div>
+            </div>
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-1 transition-colors" onclick="closeKitDrawer()">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <!-- Kit connected banner -->
+        <div id="kit-connected-banner" class="hidden mx-5 mt-5 p-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span>
+                <div>
+                    <p class="text-[11px] font-bold text-zinc-800 dark:text-zinc-200" id="kit-connected-name">Kit Connected</p>
+                    <p class="text-[10px] text-zinc-500" id="kit-connected-meta">via Elementor Kit Library</p>
+                </div>
+            </div>
+            <button onclick="disconnectKit()" class="text-[10px] font-bold text-zinc-500 hover:text-red-600 transition-colors cursor-pointer border-none bg-transparent">Disconnect</button>
+        </div>
+        <!-- Drawer Body -->
+        <div class="flex-1 overflow-y-auto p-5 space-y-6">
+            <!-- How it works -->
+            <div class="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 space-y-3">
+                <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">How Kit Connection Works</p>
+                <div class="space-y-2.5">
+                    <div class="flex items-start gap-2.5">
+                        <div class="w-5 h-5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center text-[9px] font-black flex-shrink-0 mt-0.5">1</div>
+                        <p class="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">Your kit lives on <strong>your Elementor / Envato account</strong> — Cora never stores or manages kit files directly.</p>
+                    </div>
+                    <div class="flex items-start gap-2.5">
+                        <div class="w-5 h-5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center text-[9px] font-black flex-shrink-0 mt-0.5">2</div>
+                        <p class="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">Paste your kit URL (e.g. from Envato Elements or a self-hosted zip URL). Elementor imports directly from your account.</p>
+                    </div>
+                    <div class="flex items-start gap-2.5">
+                        <div class="w-5 h-5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center text-[9px] font-black flex-shrink-0 mt-0.5">3</div>
+                        <p class="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">Template pages are applied to this theme. You control updates and version branching from your kit provider directly.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Option A: Open Elementor Kit Library -->
+            <div class="space-y-2">
+                <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Option A — Elementor Kit Library</p>
+                <button onclick="openElementorKitLibrary()" class="w-full px-4 py-3 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-200 transition-colors flex items-center gap-3 cursor-pointer">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" class="text-zinc-500 flex-shrink-0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                    Open Elementor Kit Library
+                    <svg class="w-3.5 h-3.5 ml-auto text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </button>
+                <p class="text-[10px] text-zinc-400 leading-relaxed pl-1">Opens Elementor's native Kit Library inside the editor — browse and apply kits from your Elementor Pro or Envato Elements subscription.</p>
+            </div>
+            <!-- Option B: Manual Kit URL -->
+            <div class="space-y-3">
+                <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Option B — Manual Kit URL</p>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-zinc-500">Kit Name <span class="text-red-400">*</span></label>
+                    <input type="text" id="kit-name-input" placeholder="e.g. Suda Front — Real Estate Kit" class="w-full px-3 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-400 font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-zinc-500">Kit URL <span class="text-red-400">*</span></label>
+                    <input type="url" id="kit-url-input" placeholder="https://elements.envato.com/your-kit or direct .zip URL" class="w-full px-3 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-400 font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+                    <p class="text-[10px] text-zinc-400 pl-1">Supports Envato Elements, ThemeForest, or any direct HTTPS kit URL. Your access credentials stay with your account — Cora only stores the reference URL.</p>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-zinc-500">Kit Provider</label>
+                    <select id="kit-provider-input" class="w-full px-3 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-400 font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 cursor-pointer">
+                        <option value="">Select provider...</option>
+                        <option value="envato">Envato Elements / ThemeForest</option>
+                        <option value="elementor">Elementor Pro Kit Library</option>
+                        <option value="sudafront">Suda Front</option>
+                        <option value="piotnet">Piotnet / FounderKit</option>
+                        <option value="custom">Self-Hosted / Custom</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-zinc-500">Purchase Code <span class="text-zinc-400 font-normal">(optional, stored encrypted)</span></label>
+                    <input type="text" id="kit-license-input" placeholder="Envato purchase code or kit license key" class="w-full px-3 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-400 font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+                    <p class="text-[10px] text-zinc-400 pl-1">Stored encrypted in your site's database only. Never transmitted to Cora's servers.</p>
+                </div>
+            </div>
+        </div>
+        <!-- Drawer Footer -->
+        <div class="p-5 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-end gap-2.5 bg-zinc-50/30 dark:bg-zinc-900/30 flex-shrink-0">
+            <button type="button" class="px-3.5 py-2 border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeKitDrawer()">Cancel</button>
+            <button type="button" id="kit-save-btn" class="px-3.5 py-2 bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center gap-2" onclick="saveKitConnection()">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Save Kit Connection
+            </button>
         </div>
     </div>
 </div>
@@ -3187,16 +3330,16 @@ $wp_pages = get_pages();
         jQuery('#rename-theme-id-input').val(id);
         jQuery('#rename-theme-name-input').val(name);
         const modal = jQuery('#drawer-rename-theme');
-        modal.removeClass('hidden');
+        modal.removeClass('hidden').css('pointer-events', 'auto');
         setTimeout(() => {
             modal.removeClass('opacity-0').css('opacity', '1');
-            jQuery('#drawer-rename-theme-card').removeClass('scale-95').addClass('scale-100');
+            jQuery('#drawer-rename-theme-card').removeClass('translate-x-full').addClass('translate-x-0');
         }, 10);
     }
     function closeRenameThemeDrawer() {
-        jQuery('#drawer-rename-theme-card').removeClass('scale-100').addClass('scale-95');
+        jQuery('#drawer-rename-theme-card').removeClass('translate-x-0').addClass('translate-x-full');
         const modal = jQuery('#drawer-rename-theme');
-        modal.addClass('opacity-0').css('opacity', '0');
+        modal.addClass('opacity-0').css('opacity', '0').css('pointer-events', 'none');
         setTimeout(function() {
             modal.addClass('hidden');
         }, 300);
@@ -6345,14 +6488,36 @@ $wp_pages = get_pages();
 
     function toggleWidgetsPanel() {
         const iframe = document.getElementById('elementor-editor-iframe');
-        if (iframe && iframe.contentWindow) {
-            try {
-                // Try official Elementor open panel editor command
-                iframe.contentWindow.$e.run('panel/editor/open');
-            } catch (e) {
-                const btn = iframe.contentWindow.document.querySelector('button.elementor-header-button:has(.eicon-apps), .eicon-apps, button[title="Widgets Panel"]');
-                if (btn) btn.click();
+        if (!iframe || !iframe.contentWindow) return;
+        const cw = iframe.contentWindow;
+        // Strategy 1: Elementor 3.x getPanelView API
+        try {
+            if (cw.elementor && cw.elementor.getPanelView) {
+                cw.elementor.getPanelView().setPage('elements');
+                return;
             }
+        } catch (e) {}
+        // Strategy 2: $e router
+        try {
+            cw.$e.route('panel/elements/global');
+            return;
+        } catch (e) {}
+        // Strategy 3: $e run open-page
+        try {
+            cw.$e.run('panel/open-page', { name: 'elements' });
+            return;
+        } catch (e) {}
+        // Strategy 4: Click the native Elementor Elements button in the panel header
+        const selectors = [
+            'button[aria-label="Elements"]',
+            '[data-tooltip="Elements"]',
+            '.elementor-panel-header-add-btn',
+            '#elementor-panel-header-add-btn',
+            'button.elementor-header-button'
+        ];
+        for (const sel of selectors) {
+            const btn = cw.document.querySelector(sel);
+            if (btn) { btn.click(); return; }
         }
     }
 
@@ -6409,17 +6574,44 @@ $wp_pages = get_pages();
     }
 
     function switchDevice(device) {
+        // Update active state of our custom device buttons
         ['desktop', 'tablet', 'mobile'].forEach(d => {
             const btn = document.getElementById('cora-device-' + d);
             if (btn) {
-                if (d === device) {
-                    btn.className = 'w-7 h-7 rounded-md flex items-center justify-center text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-700 shadow-sm cursor-pointer transition-all';
-                } else {
-                    btn.className = 'w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-pointer transition-all';
-                }
+                btn.className = d === device
+                    ? 'w-7 h-7 rounded-md flex items-center justify-center text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-700 shadow-sm cursor-pointer transition-all'
+                    : 'w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-pointer transition-all';
             }
         });
-        runElementorCommand('editor/responsive/change', { device: device });
+        const iframe = document.getElementById('elementor-editor-iframe');
+        if (!iframe || !iframe.contentWindow) return;
+        const cw = iframe.contentWindow;
+        // Strategy 1: Elementor 3.x+ changeDeviceMode (most reliable)
+        try {
+            if (cw.elementor && cw.elementor.changeDeviceMode) {
+                cw.elementor.changeDeviceMode(device);
+                return;
+            }
+        } catch (e) {}
+        // Strategy 2: channels-based device mode trigger
+        try {
+            if (cw.elementor && cw.elementor.channels && cw.elementor.channels.deviceMode) {
+                cw.elementor.channels.deviceMode.trigger('change', device);
+                return;
+            }
+        } catch (e) {}
+        // Strategy 3: $e route for responsive mode
+        try {
+            cw.$e.route('responsive', { device: device });
+            return;
+        } catch (e) {}
+        // Strategy 4: Click native Elementor responsive buttons in the top bar
+        const deviceMap = { desktop: 'Desktop', tablet: 'Tablet', mobile: 'Mobile' };
+        const label = deviceMap[device];
+        const nativeBtn = cw.document.querySelector(
+            `[data-device="${device}"], [aria-label="${label}"], [title="${label}"], [data-tooltip="${label}"]`
+        );
+        if (nativeBtn) nativeBtn.click();
     }
 
     function previewPage() {
@@ -6466,13 +6658,189 @@ $wp_pages = get_pages();
         }
     }
 
-    // Close publish dropdown on click outside
+    // Close active dropdowns on click outside
     window.addEventListener('click', function(e) {
         const dropdown = document.getElementById('cora-publish-dropdown');
         if (dropdown && !dropdown.classList.contains('hidden') && !e.target.closest('#cora-publish-dropdown') && !e.target.closest('button[onclick="togglePublishDropdown(event)"]')) {
             dropdown.classList.add('hidden');
         }
+        const themeDropdown = document.getElementById('cora-topbar-theme-dropdown');
+        if (themeDropdown && !themeDropdown.classList.contains('hidden') && !e.target.closest('#cora-topbar-theme-dropdown') && !e.target.closest('[onclick*="toggleTopbarThemeDropdown"]')) {
+            themeDropdown.classList.add('hidden');
+        }
     });
+
+    // Topbar Theme Actions Dropdown Handler
+    function toggleTopbarThemeDropdown(event) {
+        if (event) event.stopPropagation();
+        const dropdown = document.getElementById('cora-topbar-theme-dropdown');
+        if (dropdown) {
+            dropdown.classList.toggle('hidden');
+        }
+    }
+
+    function triggerRenameThemeFromEditor() {
+        triggerRenameTheme(canvasState.activeThemeId, canvasState.activeThemeName);
+    }
+
+    function openTemplatesLibrary() {
+        const iframe = document.getElementById('elementor-editor-iframe');
+        if (iframe && iframe.contentWindow) {
+            try {
+                iframe.contentWindow.$e.run('library/open');
+            } catch (e) {
+                const btn = iframe.contentWindow.document.querySelector('.elementor-add-section-area-button.elementor-add-template-button, .eicon-folder, [data-tooltip="Add Template"]');
+                if (btn) btn.click();
+            }
+        }
+    }
+
+    function toggleNavigatorPanel() {
+        const iframe = document.getElementById('elementor-editor-iframe');
+        if (iframe && iframe.contentWindow) {
+            try {
+                iframe.contentWindow.$e.run('navigator/toggle');
+            } catch (e) {
+                const btn = iframe.contentWindow.document.querySelector('.elementor-panel-footer-navigator, .eicon-navigator, i.eicon-navigator, [data-tooltip="Navigator"]');
+                if (btn) btn.click();
+            }
+        }
+    }
+
+    // ── Template Kit Drawer ─────────────────────────────────────────────
+    function openKitDrawer() {
+        const drawer = document.getElementById('drawer-kit-connect');
+        const card   = document.getElementById('drawer-kit-connect-card');
+        if (!drawer || !card) return;
+        drawer.classList.remove('hidden');
+        requestAnimationFrame(() => {
+            drawer.classList.remove('opacity-0');
+            drawer.classList.remove('pointer-events-none');
+            card.classList.remove('translate-x-full');
+            card.classList.add('translate-x-0');
+        });
+        loadKitStatus();
+    }
+
+    function closeKitDrawer() {
+        const drawer = document.getElementById('drawer-kit-connect');
+        const card   = document.getElementById('drawer-kit-connect-card');
+        if (!drawer || !card) return;
+        card.classList.remove('translate-x-0');
+        card.classList.add('translate-x-full');
+        drawer.classList.add('opacity-0');
+        drawer.classList.add('pointer-events-none');
+        setTimeout(() => drawer.classList.add('hidden'), 300);
+    }
+
+    // Close kit drawer on backdrop click
+    document.getElementById('drawer-kit-connect') && document.getElementById('drawer-kit-connect').addEventListener('click', function(e) {
+        if (e.target === this) closeKitDrawer();
+    });
+
+    function openElementorKitLibrary() {
+        closeKitDrawer();
+        const iframe = document.getElementById('elementor-editor-iframe');
+        if (!iframe || !iframe.contentWindow) {
+            window.coraShowToast('Open a page in the editor first, then try Kit Library.');
+            return;
+        }
+        const cw = iframe.contentWindow;
+        // Strategy 1: Elementor 3.20+ kit-library route
+        try { cw.$e.route('kit-library'); return; } catch (e) {}
+        // Strategy 2: library/open with kit-library source
+        try { cw.$e.run('library/open', { activeSource: 'kit-library' }); return; } catch (e) {}
+        // Strategy 3: generic library open
+        try { cw.$e.run('library/open'); return; } catch (e) {}
+        // Strategy 4: click native Kit Library tab button
+        const btn = cw.document.querySelector('[data-tab="kit-library"], [aria-label="Kit Library"], [title="Kit Library"]');
+        if (btn) { btn.click(); return; }
+        window.coraShowToast('Could not open Kit Library — please update Elementor to v3.20+.');
+    }
+
+    function loadKitStatus() {
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_get_canvas_kit',
+            nonce: coraREData.nonce,
+            theme_id: canvasState.activeThemeId || 0
+        }, function(res) {
+            if (res.success && res.data && res.data.kit_name) {
+                const banner = document.getElementById('kit-connected-banner');
+                const dot    = document.getElementById('cora-kit-status-dot');
+                if (banner) banner.classList.remove('hidden');
+                if (dot)    dot.classList.remove('hidden');
+                const nameEl = document.getElementById('kit-connected-name');
+                const metaEl = document.getElementById('kit-connected-meta');
+                if (nameEl) nameEl.textContent = res.data.kit_name;
+                if (metaEl) metaEl.textContent = 'via ' + (res.data.kit_provider || 'Manual URL');
+                // Pre-fill fields
+                const nameInput     = document.getElementById('kit-name-input');
+                const urlInput      = document.getElementById('kit-url-input');
+                const providerInput = document.getElementById('kit-provider-input');
+                if (nameInput)     nameInput.value     = res.data.kit_name     || '';
+                if (urlInput)      urlInput.value      = res.data.kit_url      || '';
+                if (providerInput) providerInput.value = res.data.kit_provider || '';
+            }
+        });
+    }
+
+    function saveKitConnection() {
+        const name     = (document.getElementById('kit-name-input')     || {}).value || '';
+        const url      = (document.getElementById('kit-url-input')      || {}).value || '';
+        const provider = (document.getElementById('kit-provider-input') || {}).value || '';
+        const license  = (document.getElementById('kit-license-input')  || {}).value || '';
+        if (!name.trim() || !url.trim()) {
+            window.coraShowToast('Kit Name and Kit URL are required.');
+            return;
+        }
+        const btn = document.getElementById('kit-save-btn');
+        if (btn) btn.disabled = true;
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_save_canvas_kit',
+            nonce: coraREData.nonce,
+            theme_id: canvasState.activeThemeId || 0,
+            kit_name: name,
+            kit_url: url,
+            kit_provider: provider,
+            kit_license: license
+        }, function(res) {
+            if (btn) btn.disabled = false;
+            if (res.success) {
+                window.coraShowToast('Template Kit connected successfully.');
+                const dot = document.getElementById('cora-kit-status-dot');
+                if (dot) dot.classList.remove('hidden');
+                closeKitDrawer();
+            } else {
+                window.coraShowToast(res.data || 'Failed to save Kit connection.');
+            }
+        });
+    }
+
+    function disconnectKit() {
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_save_canvas_kit',
+            nonce: coraREData.nonce,
+            theme_id: canvasState.activeThemeId || 0,
+            kit_name: '',
+            kit_url: '',
+            kit_provider: '',
+            kit_license: ''
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast('Template Kit disconnected.');
+                const banner = document.getElementById('kit-connected-banner');
+                const dot    = document.getElementById('cora-kit-status-dot');
+                if (banner) banner.classList.add('hidden');
+                if (dot)    dot.classList.add('hidden');
+                ['kit-name-input','kit-url-input','kit-license-input'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = '';
+                });
+                const providerInput = document.getElementById('kit-provider-input');
+                if (providerInput) providerInput.value = '';
+            }
+        });
+    }
 
     // Auto-save changes dirty status observer loop
     setInterval(() => {

@@ -14712,6 +14712,67 @@ function cora_ajax_canvas_save_page_seo() {
 }
 add_action( 'wp_ajax_cora_ajax_save_page_seo', 'cora_ajax_canvas_save_page_seo' );
 
+// ── Template Kit Connection AJAX ────────────────────────────────────────────
+
+function cora_ajax_save_canvas_kit() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+
+    $theme_id    = intval( $_POST['theme_id'] );
+    $kit_name    = sanitize_text_field( $_POST['kit_name'] );
+    $kit_url     = esc_url_raw( $_POST['kit_url'] );
+    $kit_provider = sanitize_text_field( $_POST['kit_provider'] );
+    $kit_license = sanitize_text_field( $_POST['kit_license'] );
+
+    // Encrypt the license/purchase code so it is not stored in plain text.
+    $encrypted_license = '';
+    if ( ! empty( $kit_license ) ) {
+        $key    = defined( 'AUTH_KEY' ) ? AUTH_KEY : 'cora_fallback_key';
+        $iv_len = openssl_cipher_iv_length( 'AES-256-CBC' );
+        $iv     = openssl_random_pseudo_bytes( $iv_len );
+        $raw    = openssl_encrypt( $kit_license, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv );
+        $encrypted_license = base64_encode( $iv . $raw );
+    }
+
+    $user_id = get_current_user_id();
+    $meta_key = 'cora_canvas_kit_' . $theme_id;
+
+    update_user_meta( $user_id, $meta_key, array(
+        'kit_name'     => $kit_name,
+        'kit_url'      => $kit_url,
+        'kit_provider' => $kit_provider,
+        'kit_license'  => $encrypted_license,
+        'updated_at'   => current_time( 'mysql' ),
+    ) );
+
+    wp_send_json_success( array( 'kit_name' => $kit_name ) );
+}
+add_action( 'wp_ajax_cora_save_canvas_kit', 'cora_ajax_save_canvas_kit' );
+
+function cora_ajax_get_canvas_kit() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+
+    $theme_id = intval( $_POST['theme_id'] );
+    $user_id  = get_current_user_id();
+    $meta_key = 'cora_canvas_kit_' . $theme_id;
+    $kit      = get_user_meta( $user_id, $meta_key, true );
+
+    if ( empty( $kit ) || empty( $kit['kit_name'] ) ) {
+        wp_send_json_success( array() );
+        return;
+    }
+
+    // Return data — license is intentionally omitted from the response for security.
+    wp_send_json_success( array(
+        'kit_name'     => $kit['kit_name'],
+        'kit_url'      => $kit['kit_url'],
+        'kit_provider' => $kit['kit_provider'],
+        'updated_at'   => $kit['updated_at'] ?? '',
+    ) );
+}
+add_action( 'wp_ajax_cora_get_canvas_kit', 'cora_ajax_get_canvas_kit' );
+
 function cora_get_bip_problems_html() {
     return '
 <div class="min-h-screen bg-[#FBFaf7] text-zinc-900 flex flex-col font-sans select-none antialiased">
