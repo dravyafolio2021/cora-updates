@@ -2736,7 +2736,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <aside class="cora-sidebar w-64 bg-[#f9fafb] dark:bg-[#0c0c0e] border-r border-zinc-200/80 dark:border-zinc-800/40 flex flex-col shrink-0 h-[calc(100vh-52px)] fixed lg:sticky top-[52px] left-0 z-50 lg:z-30 transition-all duration-200 transform -translate-x-full lg:translate-x-0">
         <!-- UPPER BLOCK: SCROLLABLE NAVIGATION CONTENT -->
         <div id="cora-sidebar-scroll-container" class="flex-1 flex flex-col min-h-0 overflow-y-auto">
-            <!-- Sidebar Top Header / Brand Logo &             <?php
+            <!-- Sidebar Top Header / Brand Logo & Toggle -->
+            <?php
             $cora_ws_name = get_option( 'cora_workspace_name', 'Cora Real Estate' );
             $cora_ws_initial = ! empty( $cora_ws_name ) ? strtoupper( substr( $cora_ws_name, 0, 1 ) ) : 'C';
             ?>
