@@ -103,7 +103,11 @@ function initCoraReskin() {
                 wrapper.style.setProperty('display', 'none', 'important');
             }
         });
-
+        // Hide native Elementor header topbar
+        const nativeHeader = document.querySelector('header.MuiAppBar-root, .e-top-bar, #e-top-bar, .elementor-editor-top-bar');
+        if (nativeHeader) {
+            nativeHeader.style.setProperty('display', 'none', 'important');
+        }
         // Replace Elementor Logo button with Cora logo
         document.querySelectorAll('button').forEach(btn => {
             const svg = btn.querySelector('svg');

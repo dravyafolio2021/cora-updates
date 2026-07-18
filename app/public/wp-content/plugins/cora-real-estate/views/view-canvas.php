@@ -1880,26 +1880,151 @@ $wp_pages = get_pages();
     <!-- LEVEL 3 — ELEMENTOR PAGE EDITOR iframe wrapper -->
     <div id="canvas-level-3" class="fixed inset-0 z-[9999] bg-white hidden flex flex-col">
         <!-- Editor Topbar Wrapper -->
-        <div id="cora-parent-editor-topbar" class="h-12 bg-zinc-900 border-b border-zinc-850 flex items-center justify-between px-4 text-white hidden">
-            <div class="flex items-center gap-4">
-                <button onclick="closeElementorEditor()" class="px-2.5 py-1 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg text-[10px] font-bold cursor-pointer transition-all flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                    Theme Dashboard
-                </button>
-                <div class="h-4 w-[1px] bg-zinc-850"></div>
-                <div class="flex items-center gap-2 text-[10px] font-semibold text-zinc-400">
-                    <span>Canvas</span>
-                    <span>/</span>
-                    <span id="editor-theme-title" class="text-zinc-300">Theme</span>
-                    <span>/</span>
-                    <span id="editor-page-title" class="text-white font-bold">Page Title</span>
+        <div id="cora-parent-editor-topbar" class="h-24 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex flex-col hidden select-none">
+            <!-- Row 1 -->
+            <div class="h-12 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between px-4 w-full bg-zinc-50 dark:bg-zinc-950">
+                <!-- Left: Logo & Theme Selector -->
+                <div class="flex items-center gap-2">
+                    <button onclick="closeElementorEditor()" class="w-6 h-6 rounded-full bg-black dark:bg-white flex items-center justify-center overflow-hidden border border-zinc-200 dark:border-zinc-800 hover:scale-[1.05] transition-transform cursor-pointer">
+                        <img src="<?php echo esc_url( CORA_REAL_ESTATE_AI_URL . 'assets/images/cora-favicon.png' ); ?>" class="w-4 h-4 object-contain" alt="Cora" />
+                    </button>
+                    <div onclick="closeElementorEditor()" class="flex items-center gap-1 cursor-pointer select-none">
+                        <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200" id="cora-topbar-theme-name">Theme</span>
+                        <svg class="w-3 h-3 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                </div>
+                
+                <!-- Center: Breadcrumbs & Save Status -->
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[11px] font-medium">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                        <span>/</span>
+                        <span>Pages</span>
+                        <span>/</span>
+                        <span class="text-zinc-800 dark:text-zinc-200 font-bold" id="cora-topbar-page-name">Home Page</span>
+                    </div>
+                    <div class="h-3 w-[1px] bg-zinc-250 dark:bg-zinc-800"></div>
+                    <div class="flex items-center gap-1.5 text-[10px] text-zinc-500 dark:text-zinc-400">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span id="cora-save-status-text">All changes saved</span>
+                    </div>
+                </div>
+                
+                <!-- Right: History, View, Notes, Help, Avatar -->
+                <div class="flex items-center gap-1.5">
+                    <button onclick="runElementorCommand('panel/open-page', { page: 'history' })" class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        History
+                    </button>
+                    <button onclick="previewPage()" class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        View
+                    </button>
+                    <button class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5 relative">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        Notes
+                        <span class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center text-[8px] font-black">2</span>
+                    </button>
+                    <button class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        Help
+                    </button>
+                    <div class="h-4 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-1"></div>
+                    <div class="flex items-center gap-1 cursor-pointer select-none">
+                        <div class="w-7 h-7 rounded-full overflow-hidden bg-zinc-200 dark:bg-zinc-800">
+                            <?php 
+                            $current_user = wp_get_current_user();
+                            $avatar_url = get_avatar_url($current_user->ID, array('size' => 56));
+                            if (!$avatar_url) {
+                                $avatar_url = CORA_REAL_ESTATE_AI_URL . 'assets/images/avatar.png';
+                            }
+                            ?>
+                            <img src="<?php echo esc_url($avatar_url); ?>" class="w-full h-full object-cover" alt="User" />
+                        </div>
+                        <svg class="w-3 h-3 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
                 </div>
             </div>
 
-            <div class="flex items-center gap-2">
-                <a id="editor-preview-link" href="#" target="_blank" class="px-2.5 py-1 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg text-[10px] font-bold cursor-pointer transition-all">Preview</a>
-                <button onclick="triggerElementorAction('save')" class="px-2.5 py-1 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg text-[10px] font-bold cursor-pointer transition-all">Save Draft</button>
-                <button onclick="triggerElementorAction('publish')" class="px-3 py-1 bg-zinc-100 hover:bg-white text-zinc-900 rounded-lg text-[10px] font-bold cursor-pointer transition-all">Publish</button>
+            <!-- Row 2 -->
+            <div class="h-12 border-b border-zinc-200 dark:border-zinc-850 flex items-center justify-between px-4 w-full bg-white dark:bg-zinc-900">
+                <!-- Left: Add, Templates, Versions, Undo/Redo -->
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleWidgetsPanel()" class="h-8 px-3.5 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Add
+                        <svg class="w-3.5 h-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <button onclick="runElementorCommand('library/open')" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                        Templates
+                    </button>
+                    <button onclick="runElementorCommand('panel/open-page', { page: 'history' })" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect></svg>
+                        Versions
+                    </button>
+                    <div class="h-4 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-1"></div>
+                    <button onclick="runElementorCommand('document/history/undo')" class="h-8 px-2 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
+                        Undo
+                    </button>
+                    <button onclick="runElementorCommand('document/history/redo')" class="h-8 px-2 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg>
+                        Redo
+                    </button>
+                </div>
+                
+                <!-- Center: Page Navigator & Devices -->
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1 cursor-pointer select-none">
+                        <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200" id="cora-topbar-page-selector">Home Page</span>
+                        <svg class="w-3.5 h-3.5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <div class="h-4 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-1"></div>
+                    <div class="flex items-center bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg">
+                        <button id="cora-device-desktop" onclick="switchDevice('desktop')" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-700 shadow-sm cursor-pointer transition-all">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                        </button>
+                        <button id="cora-device-tablet" onclick="switchDevice('tablet')" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-pointer transition-all">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                        </button>
+                        <button id="cora-device-mobile" onclick="switchDevice('mobile')" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-pointer transition-all">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Right: Search, Navigator, Preview, Publish -->
+                <div class="flex items-center gap-2">
+                    <button onclick="runElementorCommand('panel/open-page', { page: 'finder' })" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        Search
+                    </button>
+                    <button onclick="runElementorCommand('navigator/toggle')" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>
+                        Navigator
+                    </button>
+                    <button onclick="previewPage()" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        Preview
+                    </button>
+                    
+                    <!-- Split Publish Button -->
+                    <div class="inline-flex rounded-lg shadow-sm relative">
+                        <button onclick="runElementorCommand('document/save/publish')" class="h-8 px-4 bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-50 text-white dark:text-zinc-900 rounded-l-lg text-[11px] font-extrabold cursor-pointer transition-colors flex items-center justify-center">
+                            Publish
+                        </button>
+                        <div class="w-[1px] h-8 bg-zinc-800 dark:bg-zinc-100"></div>
+                        <button onclick="togglePublishDropdown(event)" class="h-8 px-2 bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-50 text-white dark:text-zinc-900 rounded-r-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center justify-center">
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <!-- Publish Dropdown Menu -->
+                        <div id="cora-publish-dropdown" class="absolute right-0 top-10 w-40 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-xl py-1 hidden z-50">
+                            <button onclick="runElementorCommand('document/save/draft'); togglePublishDropdown(event);" class="w-full text-left px-4 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-xs font-bold text-zinc-700 dark:text-zinc-200 cursor-pointer">Save Draft</button>
+                            <button onclick="runElementorCommand('document/save/template'); togglePublishDropdown(event);" class="w-full text-left px-4 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-xs font-bold text-zinc-700 dark:text-zinc-200 cursor-pointer">Save as Template</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -5040,8 +5165,12 @@ $wp_pages = get_pages();
         canvasState.level = 3;
         canvasState.activePageId = pageId;
 
-        jQuery('#editor-theme-title').text(canvasState.activeThemeName);
-        jQuery('#editor-page-title').text(title);
+        // Show custom topbar and update context names
+        jQuery('#cora-parent-editor-topbar').removeClass('hidden');
+        jQuery('#cora-topbar-theme-name').text(canvasState.activeThemeName);
+        jQuery('#cora-topbar-page-name').text(title);
+        jQuery('#cora-topbar-page-selector').text(title);
+
         jQuery('#editor-preview-link').attr('href', coraREData.siteUrl + '/?p=' + wpPostId + '&preview=true');
 
         // Collapse sidebar and hide header
@@ -5074,6 +5203,7 @@ $wp_pages = get_pages();
         canvasState.level = 2;
         canvasState.activePageId = null;
         jQuery('#elementor-editor-iframe').attr('src', '');
+        jQuery('#cora-parent-editor-topbar').addClass('hidden');
         
         jQuery('body').removeClass('cora-canvas-editor-active');
         jQuery('#canvas-level-3').addClass('hidden');
@@ -6189,5 +6319,84 @@ $wp_pages = get_pages();
         }
     });
 
+    // Custom Topbar controls helper functions and status observers
+    function runElementorCommand(command, args) {
+        const iframe = document.getElementById('elementor-editor-iframe');
+        if (iframe && iframe.contentWindow && iframe.contentWindow.$e) {
+            try {
+                if (args) {
+                    iframe.contentWindow.$e.run(command, args);
+                } else {
+                    iframe.contentWindow.$e.run(command);
+                }
+            } catch (e) {
+                console.error("Error executing Elementor command: " + command, e);
+            }
+        }
+    }
+
+    function toggleWidgetsPanel() {
+        const iframe = document.getElementById('elementor-editor-iframe');
+        if (iframe && iframe.contentWindow) {
+            const btn = iframe.contentWindow.document.querySelector('button.elementor-header-button:has(.eicon-apps), .eicon-apps, button[title="Widgets Panel"]');
+            if (btn) {
+                btn.click();
+            } else {
+                runElementorCommand('panel/open-page', { page: 'elements' });
+            }
+        }
+    }
+
+    function switchDevice(device) {
+        ['desktop', 'tablet', 'mobile'].forEach(d => {
+            const btn = document.getElementById('cora-device-' + d);
+            if (btn) {
+                if (d === device) {
+                    btn.className = 'w-7 h-7 rounded-md flex items-center justify-center text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-700 shadow-sm cursor-pointer transition-all';
+                } else {
+                    btn.className = 'w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-pointer transition-all';
+                }
+            }
+        });
+        runElementorCommand('editor/responsive/change', { device: device });
+    }
+
+    function previewPage() {
+        const link = document.getElementById('editor-preview-link');
+        if (link && link.href) {
+            window.open(link.href, '_blank');
+        }
+    }
+
+    function togglePublishDropdown(event) {
+        if (event) event.stopPropagation();
+        const dropdown = document.getElementById('cora-publish-dropdown');
+        if (dropdown) {
+            dropdown.classList.toggle('hidden');
+        }
+    }
+
+    // Close publish dropdown on click outside
+    window.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('cora-publish-dropdown');
+        if (dropdown && !dropdown.classList.contains('hidden') && !e.target.closest('#cora-publish-dropdown') && !e.target.closest('button[onclick="togglePublishDropdown(event)"]')) {
+            dropdown.classList.add('hidden');
+        }
+    });
+
+    // Auto-save changes dirty status observer loop
+    setInterval(() => {
+        const iframe = document.getElementById('elementor-editor-iframe');
+        if (iframe && iframe.contentWindow && iframe.contentWindow.elementor) {
+            const isDirty = iframe.contentWindow.elementor.isDirty();
+            const statusText = document.getElementById('cora-save-status-text');
+            if (statusText) {
+                statusText.innerText = isDirty ? 'Unsaved changes' : 'All changes saved';
+                statusText.previousElementSibling.className = isDirty ? 'w-1.5 h-1.5 rounded-full bg-amber-500' : 'w-1.5 h-1.5 rounded-full bg-emerald-500';
+            }
+        }
+    }, 1500);
+
 </script>
+
 

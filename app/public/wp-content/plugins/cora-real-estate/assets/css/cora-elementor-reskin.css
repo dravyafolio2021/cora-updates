@@ -87,4 +87,23 @@ a[href*="wp-admin/post.php"],
     display: none !important;
 }
 
+/* Hide Elementor native Top Bar and reset editor panel height */
+header.MuiAppBar-root,
+.e-top-bar,
+#e-top-bar,
+.elementor-editor-top-bar {
+    display: none !important;
+}
+
+#elementor-editor-wrapper-v2 {
+    top: 0 !important;
+    height: 100% !important;
+}
+
+#elementor-panel {
+    top: 0 !important;
+    height: 100% !important;
+}
+
+
 
