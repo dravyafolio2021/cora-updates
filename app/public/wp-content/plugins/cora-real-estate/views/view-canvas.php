@@ -6597,30 +6597,48 @@ $wp_pages = get_pages();
         const iframe = document.getElementById('elementor-editor-iframe');
         if (!iframe || !iframe.contentWindow) return;
         const cw = iframe.contentWindow;
-        // Strategy 1: Elementor 3.x getPanelView API
+
+        // Strategy 1: Official Elementor $e Commands (Most reliable in 3.x+)
+        try {
+            if (cw.$e) {
+                // Try opening default panel view (elements/categories)
+                try {
+                    cw.$e.run('panel/open-default');
+                    return;
+                } catch (e) {}
+
+                // Try routing to elements/categories page
+                try {
+                    cw.$e.route('panel/elements/categories');
+                    return;
+                } catch (e) {}
+
+                // Try opening elements page specifically
+                try {
+                    cw.$e.run('panel/open-page', { name: 'elements' });
+                    return;
+                } catch (e) {}
+            }
+        } catch (e) {}
+
+        // Strategy 2: Elementor 3.x getPanelView API
         try {
             if (cw.elementor && cw.elementor.getPanelView) {
                 cw.elementor.getPanelView().setPage('elements');
                 return;
             }
         } catch (e) {}
-        // Strategy 2: $e router
-        try {
-            cw.$e.route('panel/elements/global');
-            return;
-        } catch (e) {}
-        // Strategy 3: $e run open-page
-        try {
-            cw.$e.run('panel/open-page', { name: 'elements' });
-            return;
-        } catch (e) {}
-        // Strategy 4: Click the native Elementor Elements button in the panel header
+
+        // Strategy 3: Click the native Elementor Elements button in the panel header
         const selectors = [
             'button[aria-label="Elements"]',
             '[data-tooltip="Elements"]',
             '.elementor-panel-header-add-btn',
             '#elementor-panel-header-add-btn',
-            'button.elementor-header-button'
+            'button.elementor-header-button',
+            '[data-tab="elements"]',
+            '.eicon-grid',
+            'i.eicon-grid'
         ];
         for (const sel of selectors) {
             const btn = cw.document.querySelector(sel);
