@@ -8551,6 +8551,17 @@ add_action( 'template_redirect', 'cora_real_estate_ai_intercept_visual_builder_p
  * Intercept template redirect to render platform landing page from trial views
  */
 function cora_real_estate_intercept_landing_page_template( $template ) {
+    // Do not intercept if loading inside Elementor Editor or Preview to prevent "preview could not be loaded" crash
+    if ( isset( $_GET['elementor-preview'] ) || ( isset( $_GET['action'] ) && $_GET['action'] === 'elementor' ) ) {
+        return $template;
+    }
+    if ( did_action( 'elementor/loaded' ) ) {
+        $el = \Elementor\Plugin::$instance;
+        if ( isset( $el->editor ) && ( $el->editor->is_edit_mode() || $el->preview->is_preview_mode() ) ) {
+            return $template;
+        }
+    }
+
     if ( is_page() ) {
         $page_id = get_the_ID();
         // Check if page template is template-landing-page.php or if it is mapped in cora_canvas_pages with template = 'landing-page'
