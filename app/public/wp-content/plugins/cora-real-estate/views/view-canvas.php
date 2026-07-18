@@ -692,91 +692,181 @@ $wp_pages = get_pages();
                 <button onclick="switchTab('pages')" id="tab-btn-pages" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors active">Pages</button>
                 <button onclick="switchTab('menus')" id="tab-btn-menus" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Menus</button>
                 <button onclick="switchTab('settings')" id="tab-btn-settings" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Theme Settings</button>
-                <button onclick="switchTab('code')" id="tab-btn-code" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Custom Code</button>
+<button onclick="switchTab('code')" id="tab-btn-code" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Custom Code</button>
             </div>
         </div>
 
         <!-- TAB CONTENT: PAGES -->
-        <div id="tab-content-pages" class="space-y-4">
-            <!-- Filter Bar -->
-            <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-zinc-50/50 border border-zinc-200 rounded-xl p-3.5 shadow-sm">
-                <div class="flex flex-wrap items-center gap-3 flex-1">
-                    <div class="relative w-full md:w-56">
-                        <input type="text" id="page-search-input" onkeyup="filterPages()" placeholder="Search by page name..." class="w-full px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-xs placeholder-zinc-400 focus:outline-none focus:border-zinc-400">
+        <div id="tab-content-pages" class="space-y-0">
+
+            <?php
+            // ── Stat card counts ──
+            global $wpdb;
+            $stat_theme_id = $current_theme_id ?? 0;
+            $stat_pages    = $wpdb->get_results( $wpdb->prepare( "SELECT status FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", $stat_theme_id ), ARRAY_A ) ?: [];
+            $stat_total    = count( $stat_pages );
+            $stat_active   = count( array_filter( $stat_pages, fn($p) => $p['status'] === 'published' ) );
+            $stat_draft    = count( array_filter( $stat_pages, fn($p) => $p['status'] === 'draft' ) );
+            $stat_other    = $stat_total - $stat_active - $stat_draft;
+            ?>
+
+            <!-- ── Stats Cards ── -->
+            <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-zinc-100 border border-zinc-200 rounded-xl bg-white mb-5 shadow-sm overflow-hidden">
+                <div class="px-5 py-4">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="#71717a" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                        <span class="text-[11px] text-zinc-500">Total pages</span>
                     </div>
-                    <select id="page-status-filter" onchange="filterPages()" class="px-2.5 py-1.5 bg-white border border-zinc-200 rounded-lg text-xs text-zinc-650 focus:outline-none focus:border-zinc-200 cursor-pointer">
-                        <option value="all">All Statuses</option>
-                        <option value="published">Published</option>
-                        <option value="draft">Draft</option>
-                        <option value="scheduled">Scheduled</option>
-                    </select>
-                    <select id="page-template-filter" onchange="filterPages()" class="px-2.5 py-1.5 bg-white border border-zinc-200 rounded-lg text-xs text-zinc-650 focus:outline-none focus:border-zinc-200 cursor-pointer">
-                        <option value="all">All Templates</option>
-                        <option value="agency">Agency</option>
-                        <option value="brokerage">Brokerage</option>
-                        <option value="minimal">Minimal</option>
-                        <option value="landing-page">Landing Page</option>
-                    </select>
-                    <select id="page-sort-filter" onchange="filterPages()" class="px-2.5 py-1.5 bg-white border border-zinc-200 rounded-lg text-xs text-zinc-650 focus:outline-none focus:border-zinc-200 cursor-pointer">
-                        <option value="modified">Last Modified</option>
-                        <option value="alpha">Alphabetical</option>
-                        <option value="created">Date Created</option>
-                    </select>
+                    <div class="text-[22px] font-bold text-zinc-900 leading-none" id="stat-total-pages"><?php echo $stat_total; ?></div>
+                </div>
+                <div class="px-5 py-4">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <span class="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"></span>
+                        <span class="text-[11px] text-zinc-500">Active pages</span>
+                    </div>
+                    <div class="text-[22px] font-bold text-zinc-900 leading-none" id="stat-active-pages"><?php echo $stat_active; ?></div>
+                </div>
+                <div class="px-5 py-4">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <span class="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0"></span>
+                        <span class="text-[11px] text-zinc-500">Draft pages</span>
+                    </div>
+                    <div class="text-[22px] font-bold text-zinc-900 leading-none" id="stat-draft-pages"><?php echo $stat_draft; ?></div>
+                </div>
+                <div class="px-5 py-4">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <span class="w-2 h-2 rounded-full bg-zinc-400 flex-shrink-0"></span>
+                        <span class="text-[11px] text-zinc-500">Other pages <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full border border-zinc-300 text-[8px] text-zinc-400 cursor-pointer" title="Scheduled or archived pages">i</span></span>
+                    </div>
+                    <div class="text-[22px] font-bold text-zinc-900 leading-none" id="stat-other-pages"><?php echo $stat_other; ?></div>
+                </div>
+            </div>
+
+            <!-- ── Section Header ── -->
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2.5">
+                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="#18181b" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                    <span class="text-[15px] font-bold text-zinc-900">Pages</span>
                 </div>
                 <?php if ( ! $is_read_only ) : ?>
-                <button onclick="openNewPageDrawer()" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all shrink-0">+ New Page</button>
+                <button onclick="openNewPageDrawer()" id="btn-add-page" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 active:scale-95 text-white rounded-lg text-[12px] font-bold shadow-sm cursor-pointer transition-all">Add page</button>
                 <?php endif; ?>
             </div>
 
-            <!-- Pages Table -->
-            <div class="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
-                <table class="w-full border-collapse text-left text-xs">
+            <!-- ── Table Card ── -->
+            <div class="bg-white border border-zinc-200 rounded-xl overflow-visible shadow-sm">
+
+                <!-- Tab strip + icon toolbar -->
+                <div class="flex items-center justify-between px-4 py-2.5 border-b border-zinc-100">
+                    <!-- Left: Tab pills -->
+                    <div class="flex items-center gap-1">
+                        <button id="pages-tab-all" onclick="setPageStatusFilter('all')" class="px-3 py-1.5 rounded-md text-[12px] font-semibold bg-zinc-100 text-zinc-900 cursor-pointer transition-all">All</button>
+                        <?php if ( ! $is_read_only ) : ?>
+                        <button onclick="openNewPageDrawer()" class="w-7 h-7 flex items-center justify-center rounded-md text-[16px] font-normal text-zinc-400 hover:bg-zinc-50 hover:text-zinc-700 cursor-pointer transition-all border border-transparent hover:border-zinc-200 leading-none">+</button>
+                        <?php endif; ?>
+                    </div>
+                    <!-- Right: Icon actions -->
+                    <div class="flex items-center gap-0.5">
+                        <!-- Search icon + popover -->
+                        <div class="relative">
+                            <button onclick="cpbToggle('search')" id="pages-search-trigger" class="w-8 h-8 flex items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-50 hover:text-zinc-700 cursor-pointer transition-all" title="Search">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                            </button>
+                            <div id="cpb-panel-search" class="hidden absolute right-0 top-full mt-2 z-30 bg-white border border-zinc-200 rounded-xl shadow-lg px-3 py-2.5 w-60">
+                                <input type="text" id="page-search-input" onkeyup="filterPages()" placeholder="Search pages…" autofocus
+                                    class="w-full text-[13px] bg-transparent border-none focus:outline-none placeholder-zinc-400 text-zinc-800">
+                            </div>
+                        </div>
+                        <!-- Filter icon + popover -->
+                        <div class="relative">
+                            <button onclick="cpbToggle('filter')" id="pages-filter-trigger" class="w-8 h-8 flex items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-50 hover:text-zinc-700 cursor-pointer transition-all" title="Filter">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                            </button>
+                            <div id="cpb-panel-filter" class="hidden absolute right-0 top-full mt-2 z-30 bg-white border border-zinc-200 rounded-xl shadow-lg p-3 w-48 space-y-2">
+                                <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Filter by status</p>
+                                <button onclick="setPageStatusFilter('all')"       class="cpb-filter-btn w-full text-left px-2.5 py-1.5 rounded-lg text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 transition-colors" data-filter="all">All statuses</button>
+                                <button onclick="setPageStatusFilter('published')" class="cpb-filter-btn w-full text-left px-2.5 py-1.5 rounded-lg text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 transition-colors" data-filter="published">Active (Visible)</button>
+                                <button onclick="setPageStatusFilter('draft')"     class="cpb-filter-btn w-full text-left px-2.5 py-1.5 rounded-lg text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 transition-colors" data-filter="draft">Draft</button>
+                                <button onclick="setPageStatusFilter('scheduled')" class="cpb-filter-btn w-full text-left px-2.5 py-1.5 rounded-lg text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 transition-colors" data-filter="scheduled">Scheduled</button>
+                            </div>
+                        </div>
+                        <!-- Sort icon + popover -->
+                        <div class="relative">
+                            <button onclick="cpbToggle('sort')" id="pages-sort-trigger" class="w-8 h-8 flex items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-50 hover:text-zinc-700 cursor-pointer transition-all" title="Sort">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 6h18M7 12h10M11 18h2"/></svg>
+                            </button>
+                            <div id="cpb-panel-sort" class="hidden absolute right-0 top-full mt-2 z-30 bg-white border border-zinc-200 rounded-xl shadow-lg p-3 w-44 space-y-1">
+                                <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Sort by</p>
+                                <button onclick="setPageSort('modified')" class="cpb-sort-btn w-full text-left px-2.5 py-1.5 rounded-lg text-[12px] font-medium text-zinc-700 hover:bg-zinc-50" data-sort="modified">Last updated</button>
+                                <button onclick="setPageSort('alpha')"    class="cpb-sort-btn w-full text-left px-2.5 py-1.5 rounded-lg text-[12px] font-medium text-zinc-700 hover:bg-zinc-50" data-sort="alpha">Alphabetical (A–Z)</button>
+                                <button onclick="setPageSort('created')"  class="cpb-sort-btn w-full text-left px-2.5 py-1.5 rounded-lg text-[12px] font-medium text-zinc-700 hover:bg-zinc-50" data-sort="created">Date created</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <table class="w-full border-collapse text-left">
                     <thead>
-                        <tr class="bg-zinc-50 border-b border-zinc-200 text-[10px] font-bold uppercase tracking-wider text-zinc-500">
-                            <th class="p-4 w-10">
-                                <input type="checkbox" id="pages-select-all-checkbox" onchange="toggleSelectAllPages(this)" class="rounded cursor-pointer">
+                        <tr class="border-b border-zinc-100 text-[11px] font-semibold text-zinc-400">
+                            <th class="pl-4 pr-2 py-3 w-10">
+                                <input type="checkbox" id="pages-select-all-checkbox" onchange="toggleSelectAllPages(this)" class="rounded cursor-pointer accent-zinc-900">
                             </th>
-                            <th class="p-4">Page Name</th>
-                            <th class="p-4">Status</th>
-                            <th class="p-4">Template</th>
-                            <th class="p-4 lovable-route-col">Lovable Route</th>
-                            <th class="p-4">Last Modified</th>
-                            <th class="p-4 w-20 text-center">SEO</th>
-                            <th class="p-4 w-32 text-right">Actions</th>
+                            <th class="px-4 py-3">
+                                <button onclick="setPageSort(pageSortState==='alpha'?'alpha-desc':'alpha')" class="flex items-center gap-1 text-zinc-400 hover:text-zinc-700 cursor-pointer transition-colors group font-semibold">
+                                    Title
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="opacity-40 group-hover:opacity-100 transition-opacity"><path d="M7 15l5 5 5-5M7 9l5-5 5 5"/></svg>
+                                </button>
+                            </th>
+                            <th class="px-4 py-3 font-semibold">Visibility</th>
+                            <th class="px-4 py-3 font-semibold">Content</th>
+                            <th class="px-4 py-3 font-semibold">Updated</th>
+                            <th class="px-4 py-3 w-10"></th>
                         </tr>
                     </thead>
                     <tbody id="pages-table-body">
-                        <!-- Pages rows populated dynamically by Javascript -->
+                        <!-- Populated by renderPagesTable() -->
                     </tbody>
                 </table>
+
+                <!-- Table footer -->
+                <div class="px-4 py-3 border-t border-zinc-100 text-center text-[11px] text-zinc-400">
+                    Learn more about <a href="#" class="text-blue-500 hover:underline inline-flex items-center gap-1">pages <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></a>
+                </div>
             </div>
+
+            <!-- Hidden legacy filters (kept for JS compatibility) -->
+            <select id="page-status-filter" class="hidden">
+                <option value="all">All</option><option value="published">Published</option><option value="draft">Draft</option><option value="scheduled">Scheduled</option>
+            </select>
+            <select id="page-sort-filter" class="hidden">
+                <option value="modified">Modified</option><option value="alpha">Alpha</option><option value="created">Created</option>
+            </select>
 
             <?php
             $git_enabled = get_option('cora_git_sync_enabled') === '1';
-            $git_repo = get_option('cora_git_sync_repo', '');
-            $live_url = get_option('cora_git_sync_live_url', '');
-            $is_synced = ! empty($git_repo) || ! empty($live_url);
+            $git_repo    = get_option('cora_git_sync_repo', '');
+            $live_url    = get_option('cora_git_sync_live_url', '');
+            $is_synced   = ! empty($git_repo) || ! empty($live_url);
             $compat_flags = get_option('cora_git_sync_compat_flags', []);
-            $last_sync_time = get_option('cora_git_sync_last_time', 0);
-            $last_sync_status = get_option('cora_git_sync_last_status', '');
             ?>
             <!-- Lovable Studio Trigger Bar -->
-            <div id="lovable-trigger-bar" class="flex items-center justify-between bg-white border border-zinc-200 rounded-xl px-5 py-3.5 mt-6 shadow-sm">
+            <div id="lovable-trigger-bar" class="flex items-center justify-between bg-white border border-zinc-200 rounded-xl px-5 py-3.5 mt-5 shadow-sm">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 bg-zinc-950 rounded-lg flex items-center justify-center shrink-0">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="white" stroke-width="2" fill="none"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
                     </div>
                     <div>
                         <div class="text-sm font-bold text-zinc-900">Lovable Studio</div>
-                        <div class="text-[11px] text-zinc-500"><?php if ($git_enabled && $is_synced) { echo 'Connected &mdash; ' . esc_html(basename($git_repo ?: $live_url)); } else { echo 'Build Lovable-compatible pages for Cora &mdash; Prompt Library + GitHub Sync'; } ?></div>
+                        <div class="text-[11px] text-zinc-500"><?php echo ($git_enabled && $is_synced) ? 'Connected &mdash; ' . esc_html(basename($git_repo ?: $live_url)) : 'Build Lovable-compatible pages for Cora &mdash; Prompt Library + GitHub Sync'; ?></div>
                     </div>
                 </div>
                 <div class="flex items-center gap-2.5">
                     <?php if ($git_enabled && $is_synced) : ?>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold rounded-lg border bg-zinc-50 text-zinc-700 border-zinc-200">
-                            <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                            <?php echo !empty($compat_flags) ? 'Bridge Active' : 'Sync Active'; ?>
-                        </span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold rounded-lg border bg-zinc-50 text-zinc-700 border-zinc-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                        <?php echo !empty($compat_flags) ? 'Bridge Active' : 'Sync Active'; ?>
+                    </span>
                     <?php endif; ?>
                     <button onclick="openLovableStudio()" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-all shadow-sm">
                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -785,14 +875,11 @@ $wp_pages = get_pages();
                 </div>
             </div>
 
-
-
             <?php include plugin_dir_path( CORA_PLUGIN_FILE ) . 'views/partials/lovable-studio-drawer.php'; ?>
 
             <!-- Bulk Actions Bar -->
             <div id="pages-bulk-actions-bar" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl py-3 px-5 items-center gap-4 hidden transition-all duration-300">
                 <span id="bulk-selected-count" class="text-xs font-semibold text-white">0 selected</span>
-
                 <div class="h-4 w-[1px] bg-zinc-800"></div>
                 <select id="pages-bulk-action-select" class="px-2 py-1 bg-zinc-900 border border-zinc-800 rounded-md text-[10px] text-zinc-300 font-semibold focus:outline-none cursor-pointer">
                     <option value="publish">Publish</option>
@@ -2439,34 +2526,96 @@ $wp_pages = get_pages();
         });
     }
 
+    // ── Pages tab state ──
+    var pageSortState     = 'modified';
+    var pageStatusFilter  = 'all';
+
+    // Toggle icon-button popovers (search / filter / sort)
+    function cpbToggle(panel) {
+        var panels = { search: 'cpb-panel-search', filter: 'cpb-panel-filter', sort: 'cpb-panel-sort' };
+        Object.keys(panels).forEach(function(k) {
+            var el = document.getElementById(panels[k]);
+            if (!el) return;
+            if (k === panel) el.classList.toggle('hidden');
+            else el.classList.add('hidden');
+        });
+        if (panel === 'search') setTimeout(function() {
+            var inp = document.getElementById('page-search-input');
+            if (inp) inp.focus();
+        }, 50);
+    }
+
+    // Close all popovers when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('#pages-search-trigger') && !e.target.closest('#cpb-panel-search')) {
+            var el = document.getElementById('cpb-panel-search'); if (el) el.classList.add('hidden');
+        }
+        if (!e.target.closest('#pages-filter-trigger') && !e.target.closest('#cpb-panel-filter')) {
+            var el = document.getElementById('cpb-panel-filter'); if (el) el.classList.add('hidden');
+        }
+        if (!e.target.closest('#pages-sort-trigger') && !e.target.closest('#cpb-panel-sort')) {
+            var el = document.getElementById('cpb-panel-sort'); if (el) el.classList.add('hidden');
+        }
+        if (!e.target.closest('[id^="page-menu-"]') && !e.target.closest('[onclick*="togglePageRowActions"]')) {
+            jQuery('[id^="page-menu-"]').addClass('hidden');
+        }
+    });
+
+    function setPageStatusFilter(status) {
+        pageStatusFilter = status;
+        // Highlight active tab pill
+        document.querySelectorAll('.cpb-filter-btn').forEach(function(btn) {
+            btn.classList.toggle('bg-zinc-100', btn.dataset.filter === status);
+            btn.classList.toggle('font-bold',    btn.dataset.filter === status);
+        });
+        var tabAll = document.getElementById('pages-tab-all');
+        if (tabAll) {
+            tabAll.classList.toggle('bg-zinc-100', status === 'all');
+            tabAll.classList.toggle('text-zinc-900', status === 'all');
+        }
+        var el = document.getElementById('cpb-panel-filter'); if (el) el.classList.add('hidden');
+        filterPages();
+    }
+
+    function setPageSort(val) {
+        pageSortState = val;
+        document.querySelectorAll('.cpb-sort-btn').forEach(function(btn) {
+            var isActive = btn.dataset.sort === val.replace('-desc','');
+            btn.classList.toggle('bg-zinc-100', isActive);
+            btn.classList.toggle('font-bold',    isActive);
+        });
+        var el = document.getElementById('cpb-panel-sort'); if (el) el.classList.add('hidden');
+        filterPages();
+    }
+
     function filterPages() {
-        const query = jQuery('#page-search-input').val().toLowerCase();
-        const status = jQuery('#page-status-filter').val();
-        const template = jQuery('#page-template-filter').val();
-        const sort = jQuery('#page-sort-filter').val();
+        var searchEl = document.getElementById('page-search-input');
+        var query    = searchEl ? searchEl.value.toLowerCase() : '';
+        var status   = pageStatusFilter || 'all';
 
-        let filtered = [...canvasState.pages];
+        var filtered = canvasState.pages.slice();
+        if (query)         filtered = filtered.filter(function(p) { return p.title.toLowerCase().includes(query) || p.slug.toLowerCase().includes(query); });
+        if (status !== 'all') filtered = filtered.filter(function(p) { return p.status === status; });
 
-        if (query) {
-            filtered = filtered.filter(p => p.title.toLowerCase().includes(query) || p.slug.toLowerCase().includes(query));
-        }
-        if (status !== 'all') {
-            filtered = filtered.filter(p => p.status === status);
-        }
-        if (template !== 'all') {
-            filtered = filtered.filter(p => p.template === template);
-        }
-
-        if (sort === 'alpha') {
-            filtered.sort((a, b) => a.title.localeCompare(b.title));
-        } else if (sort === 'created') {
-            filtered.sort((a, b) => b.id - a.id);
-        } else {
-            // modified
-            filtered.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-        }
+        if (pageSortState === 'alpha')      filtered.sort(function(a,b){ return a.title.localeCompare(b.title); });
+        else if (pageSortState === 'alpha-desc') filtered.sort(function(a,b){ return b.title.localeCompare(a.title); });
+        else if (pageSortState === 'created')   filtered.sort(function(a,b){ return b.id - a.id; });
+        else filtered.sort(function(a,b){ return new Date(b.updated_at) - new Date(a.updated_at); });
 
         renderPagesTable(filtered);
+        updatePageStats();
+    }
+
+    function updatePageStats() {
+        var all = canvasState.pages;
+        var total  = all.length;
+        var active = all.filter(function(p){ return p.status === 'published'; }).length;
+        var draft  = all.filter(function(p){ return p.status === 'draft'; }).length;
+        var other  = total - active - draft;
+        var t = document.getElementById('stat-total-pages');  if(t) t.textContent = total;
+        var a = document.getElementById('stat-active-pages'); if(a) a.textContent = active;
+        var d = document.getElementById('stat-draft-pages');  if(d) d.textContent = draft;
+        var o = document.getElementById('stat-other-pages');  if(o) o.textContent = other;
     }
 
     function renderPagesTable(pages) {
@@ -2474,96 +2623,85 @@ $wp_pages = get_pages();
         body.empty();
 
         if (pages.length === 0) {
-            body.append(`
-                <tr>
-                    <td colspan="7" class="p-8 text-center text-zinc-400">No pages found matching these criteria.</td>
-                </tr>
-            `);
+            body.append(`<tr><td colspan="6" class="p-10 text-center text-[12px] text-zinc-400">No pages found.</td></tr>`);
             return;
         }
 
         pages.forEach(p => {
-            const statusPill = getStatusPill(p.status, p.scheduled_at);
-            const seoIcon = getSEOIcon(p.seo_title, p.seo_description);
-            const homeBadge = p.is_homepage == 1 ? '<span class="px-1.5 py-0.5 text-[9px] font-bold rounded bg-zinc-100 border border-zinc-200 text-zinc-700 ml-1.5 flex items-center gap-1">🏠 Home</span>' : '';
-
-            // Render Lovable Route Mapping Dropdown
-            let lovableSelect = '<span class="text-zinc-400 text-[10px]">—</span>';
-            if (window.CORA_LOVABLE_ROUTES && window.CORA_LOVABLE_ROUTES.length > 0) {
-                const mappedRoute = (window.CORA_PAGE_MAPPINGS && window.CORA_PAGE_MAPPINGS[p.id]) ? window.CORA_PAGE_MAPPINGS[p.id] : '';
-                lovableSelect = `
-                    <select onchange="savePageLovableMapping(${p.id}, this.value)" class="px-1.5 py-1 bg-white border border-zinc-200 rounded text-[11px] text-zinc-700 focus:outline-none focus:border-zinc-400 cursor-pointer w-full max-w-[150px]">
-                        <option value="">— None —</option>
-                        ${window.CORA_LOVABLE_ROUTES.map(r => `
-                            <option value="${esc_html(r.path)}" ${mappedRoute === r.path ? 'selected' : ''}>
-                                ${esc_html(r.title)} (${esc_html(r.path)})
-                            </option>
-                        `).join('')}
-                    </select>
-                `;
-            }
+            const visibilityPill = getVisibilityPill(p.status, p.scheduled_at);
+            const contentPreview = (p.content && p.content.trim())
+                ? `<span class="text-zinc-500 text-[12px]">${esc_html(p.content.replace(/<[^>]+>/g,'').substring(0,60))}…</span>`
+                : `<span class="text-zinc-300 text-[12px]">—</span>`;
+            const homeBadge = p.is_homepage == 1
+                ? `<span class="ml-2 px-1.5 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 border border-zinc-200 text-zinc-600 inline-flex items-center gap-0.5"><svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Home</span>`
+                : '';
 
             body.append(`
-                <tr class="border-b border-zinc-100 hover:bg-zinc-50/50">
-                    <td class="p-4">
-                        <input type="checkbox" class="page-row-checkbox rounded cursor-pointer" data-id="${p.id}" onchange="updateBulkActionState()">
+                <tr class="border-b border-zinc-100 hover:bg-zinc-50/60 group transition-colors">
+                    <td class="pl-4 pr-2 py-3.5">
+                        <input type="checkbox" class="page-row-checkbox rounded cursor-pointer accent-zinc-900" data-id="${p.id}" onchange="updateBulkActionState()">
                     </td>
-                    <td class="p-4">
-                        <div class="flex items-center">
-                            <div>
-                                <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id})" class="font-semibold text-zinc-900 hover:underline text-left cursor-pointer">${esc_html(p.title)}</button>
-                                <div class="text-[10px] text-zinc-400 font-mono mt-0.5">/${esc_html(p.slug)}</div>
-                            </div>
+                    <td class="px-4 py-3.5">
+                        <div class="flex items-center flex-wrap gap-1">
+                            <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id})"
+                                class="text-[13px] font-semibold text-zinc-900 hover:underline text-left cursor-pointer leading-snug">
+                                ${esc_html(p.title)}
+                            </button>
                             ${homeBadge}
                         </div>
                     </td>
-                    <td class="p-4">${statusPill}</td>
-                    <td class="p-4 text-zinc-500 uppercase font-mono text-[9px]">${esc_html(p.template)}</td>
-                    ${canvasState.activeThemeIsElementor ? '' : `<td class="p-4 lovable-route-col">${lovableSelect}</td>`}
-                    <td class="p-4 text-zinc-500">${getRelativeTime(p.updated_at)}</td>
-                    <td class="p-4 text-center cursor-pointer" onclick="openSEODrawer(${p.id}, '${esc_js(p.title)}', '${esc_js(p.seo_title)}', '${esc_js(p.seo_description)}', '${esc_js(p.seo_og_image)}')">${seoIcon}</td>
-                    <td class="p-4 text-right space-x-1.5">
-                        <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id})" class="px-2 py-1 border border-zinc-200 hover:border-zinc-400 rounded-lg font-semibold text-[10px] text-zinc-700 bg-white transition-all cursor-pointer">Edit</button>
-                        <a href="${coraREData.siteUrl}/${p.slug}${p.slug.includes('?') ? '&' : '?'}cv_preview_theme=${canvasState.activeThemeId}" target="_blank" class="px-2 py-1 border border-zinc-200 hover:border-zinc-400 rounded-lg font-semibold text-[10px] text-zinc-700 bg-white transition-all">Preview</a>
-                        <?php if ( ! $is_read_only ) : ?>
+                    <td class="px-4 py-3.5">${visibilityPill}</td>
+                    <td class="px-4 py-3.5 max-w-[220px] truncate">${contentPreview}</td>
+                    <td class="px-4 py-3.5 text-[12px] text-zinc-400 whitespace-nowrap">${getRelativeTime(p.updated_at)}</td>
+                    <td class="px-4 py-3.5">
                         <div class="relative inline-block text-left">
-                            <button onclick="togglePageRowActions(${p.id}, event)" class="p-1 hover:bg-zinc-100 rounded text-zinc-400 hover:text-zinc-700 cursor-pointer align-middle">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                            <button onclick="togglePageRowActions(${p.id}, event)"
+                                class="w-7 h-7 flex items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 cursor-pointer opacity-0 group-hover:opacity-100 transition-all">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
                             </button>
-                            <div id="page-menu-${p.id}" class="hidden absolute right-0 top-full mt-1 w-36 bg-white border border-zinc-200 rounded-lg shadow-lg py-1 z-10 text-left">
-                                <button onclick="triggerDuplicatePage(${p.id})" class="w-full px-3 py-1.5 text-left text-[10px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">Duplicate Page</button>
-                                <button onclick="triggerRenamePage(${p.id}, '${esc_js(p.title)}')" class="w-full px-3 py-1.5 text-left text-[10px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">Rename</button>
-                                <button onclick="triggerChangePageSlug(${p.id}, '${esc_js(p.slug)}')" class="w-full px-3 py-1.5 text-left text-[10px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">Change Slug</button>
-                                <button onclick="triggerSetHomepage(${p.id}, '${esc_js(p.title)}', ${p.is_homepage})" class="w-full px-3 py-1.5 text-left text-[10px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">Set as Homepage</button>
-                                <button onclick="openSEODrawer(${p.id}, '${esc_js(p.title)}', '${esc_js(p.seo_title)}', '${esc_js(p.seo_description)}', '${esc_js(p.seo_og_image)}')" class="w-full px-3 py-1.5 text-left text-[10px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">SEO Settings</button>
-                                <button onclick="openRevisionsDrawer(${p.id}, '${esc_js(p.title)}')" class="w-full px-3 py-1.5 text-left text-[10px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">Revision History</button>
+                            <div id="page-menu-${p.id}" class="hidden absolute right-0 top-full mt-1 w-44 bg-white border border-zinc-200 rounded-xl shadow-lg py-1 z-20 text-left">
+                                <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                    Edit page
+                                </button>
+                                <a href="${coraREData.siteUrl}/${p.slug}${p.slug.includes('?') ? '&' : '?'}cv_preview_theme=${canvasState.activeThemeId}" target="_blank" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Preview
+                                </a>
+                                <?php if ( ! $is_read_only ) : ?>
                                 <div class="border-t border-zinc-100 my-1"></div>
-                                <button onclick="triggerDeletePage(${p.id})" class="w-full px-3 py-1.5 text-left text-[10px] text-red-600 hover:bg-red-50 font-semibold cursor-pointer">Delete</button>
+                                <button onclick="triggerDuplicatePage(${p.id})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">Duplicate</button>
+                                <button onclick="triggerRenamePage(${p.id}, '${esc_js(p.title)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">Rename</button>
+                                <button onclick="triggerChangePageSlug(${p.id}, '${esc_js(p.slug)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">Change slug</button>
+                                <button onclick="triggerSetHomepage(${p.id}, '${esc_js(p.title)}', ${p.is_homepage})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">Set as homepage</button>
+                                <button onclick="openSEODrawer(${p.id}, '${esc_js(p.title)}', '${esc_js(p.seo_title)}', '${esc_js(p.seo_description)}', '${esc_js(p.seo_og_image)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">SEO settings</button>
+                                <button onclick="openRevisionsDrawer(${p.id}, '${esc_js(p.title)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">Revision history</button>
+                                <div class="border-t border-zinc-100 my-1"></div>
+                                <button onclick="triggerDeletePage(${p.id})" class="w-full px-3.5 py-2 text-left text-[12px] text-red-600 hover:bg-red-50 font-semibold cursor-pointer">Delete</button>
+                                <?php endif; ?>
                             </div>
                         </div>
-                        <?php endif; ?>
                     </td>
                 </tr>
             `);
         });
     }
 
-    function getStatusPill(status, dateStr) {
+    function getVisibilityPill(status, dateStr) {
         if (status === 'published') {
-            return '<span class="px-2 py-0.5 text-[9px] font-bold uppercase rounded bg-green-50 text-green-700 border border-green-200">Published</span>';
+            return '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-green-50 text-green-700 border border-green-200"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Visible</span>';
         } else if (status === 'scheduled') {
-            return `<span class="px-2 py-0.5 text-[9px] font-bold uppercase rounded bg-amber-50 text-amber-700 border border-amber-200 cursor-pointer" title="Scheduled for: ${dateStr}">Scheduled ℹ️</span>`;
+            return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-amber-50 text-amber-700 border border-amber-200 cursor-pointer" title="Scheduled for: ${dateStr}"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>Scheduled</span>`;
         }
-        return '<span class="px-2 py-0.5 text-[9px] font-bold uppercase rounded bg-zinc-50 text-zinc-500 border border-zinc-200">Draft</span>';
+        return '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-zinc-50 text-zinc-500 border border-zinc-200"><span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>Hidden</span>';
     }
+    // keep legacy alias
+    function getStatusPill(status, dateStr) { return getVisibilityPill(status, dateStr); }
 
     function getSEOIcon(title, desc) {
-        if (title && desc) {
-            return '<span class="text-green-600 font-bold" title="All fields filled.">✓</span>';
-        } else if (title || desc) {
-            return '<span class="text-amber-500 font-bold text-sm" title="Title or Description is missing.">⚠️</span>';
-        }
-        return '<span class="text-red-500 font-bold" title="Title and Description missing.">✗</span>';
+        if (title && desc) return '<svg viewBox="0 0 24 24" width="13" height="13" stroke="#16a34a" stroke-width="2.5" fill="none" title="SEO complete"><polyline points="20 6 9 17 4 12"/></svg>';
+        if (title || desc) return '<svg viewBox="0 0 24 24" width="13" height="13" stroke="#d97706" stroke-width="2.5" fill="none" title="SEO incomplete"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+        return '<svg viewBox="0 0 24 24" width="13" height="13" stroke="#dc2626" stroke-width="2.5" fill="none" title="No SEO"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
     }
 
     function togglePageRowActions(id, e) {
