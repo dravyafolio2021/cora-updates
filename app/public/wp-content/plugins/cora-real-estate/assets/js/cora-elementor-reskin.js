@@ -103,6 +103,21 @@ function initCoraReskin() {
                 wrapper.style.setProperty('display', 'none', 'important');
             }
         });
+
+        // Replace Elementor Logo button with Cora logo
+        document.querySelectorAll('button').forEach(btn => {
+            const svg = btn.querySelector('svg');
+            if (svg) {
+                const title = svg.querySelector('title');
+                if (title && title.textContent === 'Elementor Logo') {
+                    btn.setAttribute('title', 'Cora Logo');
+                    btn.setAttribute('aria-label', 'Cora Logo');
+                    btn.setAttribute('data-tooltip', 'Cora Logo');
+                    const logoUrl = window.location.origin + '/wp-content/plugins/cora-real-estate/assets/images/cora-favicon.png';
+                    btn.innerHTML = `<img src="${logoUrl}" style="width: 20px; height: 20px; object-fit: contain;" alt="Cora Logo" />`;
+                }
+            }
+        });
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
