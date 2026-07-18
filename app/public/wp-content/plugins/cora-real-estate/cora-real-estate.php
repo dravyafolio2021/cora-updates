@@ -236,6 +236,24 @@ add_action( 'wp_dashboard_setup', function() {
 } );
 
 /**
+ * 10. DISABLE ELEMENTOR NOTES MODULE TO PREVENT RESKIN INITIALIZATION CRASHES
+ */
+add_filter( 'elementor/notes/is_active', '__return_false' );
+
+function cora_disable_elementor_notes_scripts() {
+    wp_dequeue_script( 'elementor-pro-notes' );
+    wp_deregister_script( 'elementor-pro-notes' );
+    wp_dequeue_script( 'elementor-notes' );
+    wp_deregister_script( 'elementor-notes' );
+    wp_dequeue_script( 'notes' );
+    wp_deregister_script( 'notes' );
+}
+add_action( 'wp_enqueue_scripts', 'cora_disable_elementor_notes_scripts', 999 );
+add_action( 'admin_enqueue_scripts', 'cora_disable_elementor_notes_scripts', 999 );
+add_action( 'elementor/editor/before_enqueue_scripts', 'cora_disable_elementor_notes_scripts', 999 );
+add_action( 'elementor/editor/after_enqueue_scripts', 'cora_disable_elementor_notes_scripts', 999 );
+
+/**
  * 10. SUPPRESS UPDATE NAGS — Hide "WordPress X.X is available" notices from non-superadmins.
  */
 add_action( 'admin_init', function() {

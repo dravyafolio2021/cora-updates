@@ -2027,9 +2027,6 @@ $wp_pages = get_pages();
                 </div>
             </div>
         </div>
-                </div>
-            </div>
-        </div>
 
         <!-- iframe container -->
         <div id="elementor-iframe-container" class="flex-1 w-full bg-zinc-50 relative flex items-center justify-center">
@@ -6480,8 +6477,8 @@ $wp_pages = get_pages();
     // Auto-save changes dirty status observer loop
     setInterval(() => {
         const iframe = document.getElementById('elementor-editor-iframe');
-        if (iframe && iframe.contentWindow && iframe.contentWindow.elementor) {
-            const isDirty = iframe.contentWindow.elementor.isDirty();
+        if (iframe && iframe.contentWindow && iframe.contentWindow.elementor && iframe.contentWindow.elementor.saver && typeof iframe.contentWindow.elementor.saver.isDirty === 'function') {
+            const isDirty = iframe.contentWindow.elementor.saver.isDirty();
             const statusText = document.getElementById('cora-save-status-text');
             if (statusText) {
                 statusText.innerText = isDirty ? 'Unsaved changes' : 'All changes saved';
