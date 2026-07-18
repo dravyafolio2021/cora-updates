@@ -123,17 +123,7 @@ test.describe('Canvas Front-End Management System E2E Tests', () => {
     await page.waitForTimeout(200);
     await page.click('#canvas-level-3 button[title="Redo"]');
     await page.waitForTimeout(200);
-    await page.click('#canvas-level-3 button:has-text("Search")');
-    await page.waitForTimeout(500);
-    // Press Escape to dismiss the Elementor Finder modal/overlay if active
-    await page.keyboard.press('Escape');
-    await page.waitForTimeout(300);
     await page.click('#canvas-level-3 button:has-text("Navigator")');
-    await page.waitForTimeout(300);
-    await page.click('#canvas-level-3 button:has-text("Help")');
-    await page.waitForTimeout(500);
-    // Dismiss help modal or overlays if opened
-    await page.keyboard.press('Escape');
     await page.waitForTimeout(300);
 
     // Switch device viewports

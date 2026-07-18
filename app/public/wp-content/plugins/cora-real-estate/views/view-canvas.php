@@ -6666,38 +6666,49 @@ $wp_pages = get_pages();
         const iframe = document.getElementById('elementor-editor-iframe');
         if (!iframe || !iframe.contentWindow) return;
 
-        // Reset iframe width for preset devices
-        const presetWidths = { desktop: '', tablet: '768px', mobile: '375px' };
-        iframe.style.width = presetWidths[device] || '';
-        iframe.style.maxWidth = presetWidths[device] || '';
-
         const cw = iframe.contentWindow;
-        // Strategy 1: Elementor 3.x+ changeDeviceMode (most reliable)
+
+        // Strategy 1: Elementor $e command (most robust)
+        try {
+            if (cw.$e && cw.$e.run) {
+                cw.$e.run('editor/responsive/change', { device: device });
+                return;
+            }
+        } catch (e) {}
+
+        // Strategy 2: Elementor 3.x+ changeDeviceMode
         try {
             if (cw.elementor && cw.elementor.changeDeviceMode) {
                 cw.elementor.changeDeviceMode(device);
                 return;
             }
         } catch (e) {}
-        // Strategy 2: channels-based device mode trigger
+
+        // Strategy 3: channels-based device mode trigger
         try {
             if (cw.elementor && cw.elementor.channels && cw.elementor.channels.deviceMode) {
                 cw.elementor.channels.deviceMode.trigger('change', device);
                 return;
             }
         } catch (e) {}
-        // Strategy 3: $e route for responsive mode
+
+        // Strategy 4: $e route for responsive mode
         try {
-            cw.$e.route('responsive', { device: device });
-            return;
+            if (cw.$e && cw.$e.route) {
+                cw.$e.route('responsive', { device: device });
+                return;
+            }
         } catch (e) {}
-        // Strategy 4: Click native Elementor responsive buttons in the top bar
-        const deviceMap = { desktop: 'Desktop', tablet: 'Tablet', mobile: 'Mobile' };
-        const label = deviceMap[device];
-        const nativeBtn = cw.document.querySelector(
-            `[data-device="${device}"], [aria-label="${label}"], [title="${label}"], [data-tooltip="${label}"]`
-        );
-        if (nativeBtn) nativeBtn.click();
+
+        // Strategy 5: Click native Elementor responsive buttons in the top bar
+        try {
+            const deviceMap = { desktop: 'Desktop', tablet: 'Tablet', mobile: 'Mobile' };
+            const label = deviceMap[device];
+            const nativeBtn = cw.document.querySelector(
+                `[data-device="${device}"], [aria-label="${label}"], [title="${label}"], [data-tooltip="${label}"]`
+            );
+            if (nativeBtn) nativeBtn.click();
+        } catch (e) {}
     }
 
 
