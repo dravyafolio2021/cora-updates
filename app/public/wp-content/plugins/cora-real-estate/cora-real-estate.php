@@ -8548,6 +8548,144 @@ function cora_real_estate_ai_intercept_visual_builder_pages() {
 add_action( 'template_redirect', 'cora_real_estate_ai_intercept_visual_builder_pages', 5 );
 
 /**
+ * Intercept template redirect to render platform landing page from trial views
+ */
+function cora_real_estate_intercept_landing_page_template( $template ) {
+    if ( is_page() ) {
+        $page_id = get_the_ID();
+        // Check if page template is template-landing-page.php or if it is mapped in cora_canvas_pages with template = 'landing-page'
+        $wp_template = get_post_meta( $page_id, '_wp_page_template', true );
+        global $wpdb;
+        $cora_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE wp_post_id = %d LIMIT 1", $page_id ), ARRAY_A );
+        if ( $wp_template === 'template-landing-page.php' || ( $cora_page && $cora_page['template'] === 'landing-page' ) ) {
+            $landing_php = dirname( dirname( dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) ) ) . '/cora-platform/modules/trial/views/landing-page.php';
+            if ( file_exists( $landing_php ) ) {
+                return $landing_php;
+            }
+        }
+    }
+    return $template;
+}
+add_filter( 'template_include', 'cora_real_estate_intercept_landing_page_template', 99 );
+
+/**
+ * AJAX Handler: Cora Trial Onboarding On-demand Signup
+ */
+function cora_ajax_trial_signup() {
+    check_ajax_referer( 'cora_trial_signup', '_nonce' );
+
+    $name     = isset( $_POST['name'] ) ? sanitize_text_field( $_POST['name'] ) : '';
+    $agency   = isset( $_POST['agency_name'] ) ? sanitize_text_field( $_POST['agency_name'] ) : '';
+    $whatsapp = isset( $_POST['whatsapp'] ) ? sanitize_text_field( $_POST['whatsapp'] ) : '';
+    $city     = isset( $_POST['city'] ) ? sanitize_text_field( $_POST['city'] ) : '';
+
+    if ( empty( $name ) || empty( $agency ) || empty( $whatsapp ) ) {
+        wp_send_json_error( array( 'message' => 'Please fill in all required fields.' ) );
+    }
+
+    global $wpdb;
+
+    // 1. Update Agency details in the database
+    $agency_exists = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_agencies WHERE id = 1" );
+    if ( $agency_exists ) {
+        $wpdb->update(
+            $wpdb->prefix . 'cora_agencies',
+            array(
+                'name' => $agency,
+                'updated_at' => current_time( 'mysql' )
+            ),
+            array( 'id' => 1 ),
+            array( '%s', '%s' ),
+            array( '%d' )
+        );
+    } else {
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_agencies',
+            array(
+                'id' => 1,
+                'name' => $agency,
+                'slug' => 'default',
+                'owner_user_id' => 1,
+                'plan' => 'enterprise',
+                'status' => 'active',
+                'settings' => json_encode( array() ),
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql')
+            ),
+            array('%d', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s')
+        );
+    }
+    update_option( 'cora_workspace_name', $agency );
+
+    // 2. Update Branch details
+    $branch_exists = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_branches WHERE id = 1" );
+    if ( $branch_exists ) {
+        $wpdb->update(
+            $wpdb->prefix . 'cora_branches',
+            array(
+                'name' => 'Main Branch (' . $agency . ')',
+                'city' => $city,
+                'updated_at' => current_time( 'mysql' )
+            ),
+            array( 'id' => 1 ),
+            array( '%s', '%s', '%s' ),
+            array( '%d' )
+        );
+    } else {
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_branches',
+            array(
+                'id' => 1,
+                'agency_id' => 1,
+                'name' => 'Main Branch (' . $agency . ')',
+                'city' => $city,
+                'address' => 'Gurgaon Delhi NCR',
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql')
+            ),
+            array('%d', '%d', '%s', '%s', '%s', '%s', '%s')
+        );
+    }
+
+    // Update options arrays
+    $agencies = get_option( 'cora_agencies', array() );
+    $agencies['agency_1'] = array(
+        'id'          => 'agency_1',
+        'name'        => $agency,
+        'subdomain'   => 'default',
+        'plan'        => 'enterprise',
+        'status'      => 'active',
+        'created_at'  => date( 'Y-m-d H:i:s' )
+    );
+    update_option( 'cora_agencies', $agencies );
+
+    $branches = get_option( 'cora_branches', array() );
+    $branches['branch_1'] = array(
+        'id'         => 'branch_1',
+        'agency_id'  => 'agency_1',
+        'name'       => 'Main Branch (' . $agency . ')',
+        'city'       => $city,
+        'address'    => 'Gurgaon Delhi NCR',
+        'manager_id' => 0
+    );
+    update_option( 'cora_branches', $branches );
+
+    // 3. Programmatically log in user "cora_admin" (ID 1) so they get instant dashboard access
+    $user = get_user_by( 'login', 'cora_admin' );
+    if ( $user ) {
+        wp_clear_auth_cookie();
+        wp_set_current_user( $user->ID );
+        wp_set_auth_cookie( $user->ID );
+    }
+
+    wp_send_json_success( array(
+        'workspace_url' => home_url( '/workspace/dashboard' )
+    ) );
+}
+add_action( 'wp_ajax_cora_trial_signup', 'cora_ajax_trial_signup' );
+add_action( 'wp_ajax_nopriv_cora_trial_signup', 'cora_ajax_trial_signup' );
+
+/**
  * AJAX Action: Save Builder Page
  */
 function cora_ajax_save_builder_page() {

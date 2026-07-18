@@ -2736,17 +2736,20 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <aside class="cora-sidebar w-64 bg-[#f9fafb] dark:bg-[#0c0c0e] border-r border-zinc-200/80 dark:border-zinc-800/40 flex flex-col shrink-0 h-[calc(100vh-52px)] fixed lg:sticky top-[52px] left-0 z-50 lg:z-30 transition-all duration-200 transform -translate-x-full lg:translate-x-0">
         <!-- UPPER BLOCK: SCROLLABLE NAVIGATION CONTENT -->
         <div id="cora-sidebar-scroll-container" class="flex-1 flex flex-col min-h-0 overflow-y-auto">
-            <!-- Sidebar Top Header / Brand Logo & Toggle -->
+            <!-- Sidebar Top Header / Brand Logo &             <?php
+            $cora_ws_name = get_option( 'cora_workspace_name', 'Cora Real Estate' );
+            $cora_ws_initial = ! empty( $cora_ws_name ) ? strtoupper( substr( $cora_ws_name, 0, 1 ) ) : 'C';
+            ?>
             <div class="flex items-center justify-between gap-2 px-3 pt-4 pb-2 shrink-0 select-none">
                 <!-- Workspace Switcher Card + Dropdown -->
                 <div class="relative flex-1 min-w-0">
                     <!-- Trigger Card (Exact Reference Design) -->
-                    <div class="cora-workspace-card flex items-center justify-between gap-2 px-2.5 py-1.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900/50 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-850 rounded-lg cursor-pointer transition-all select-none" onclick="event.stopPropagation(); $('#cora-workspace-popover').toggleClass('hidden'); $('#cora-profile-popover').addClass('hidden');">
+                    <div class="cora-workspace-card flex items-center justify-between gap-2 px-2.5 py-1.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900/50 dark:hover:bg-zinc-850 border border-zinc-200 dark:border-zinc-850 rounded-lg cursor-pointer transition-all select-none" onclick="event.stopPropagation(); $('#cora-workspace-popover').toggleClass('hidden'); $('#cora-profile-popover').addClass('hidden');">
                         <div class="flex items-center gap-2 min-w-0">
                             <div class="w-6 h-6 rounded bg-black dark:bg-white text-white dark:text-black font-bold text-[13px] flex items-center justify-center shrink-0 leading-none">
-                                C
+                                <?php echo esc_html( $cora_ws_initial ); ?>
                             </div>
-                            <span class="cora-studio-info text-zinc-900 dark:text-zinc-100 font-bold text-xs truncate">Cora Real Estate</span>
+                            <span class="cora-studio-info text-zinc-900 dark:text-zinc-100 font-bold text-xs truncate"><?php echo esc_html( $cora_ws_name ); ?></span>
                         </div>
                         <svg class="cora-switcher-arrow text-zinc-500 shrink-0" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
@@ -2756,10 +2759,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         <!-- Header: 40x40 icon + title & subtitle -->
                         <div class="flex items-center gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800">
                             <div class="w-10 h-10 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-black text-lg flex items-center justify-center shrink-0 leading-none shadow-sm">
-                                C
+                                <?php echo esc_html( $cora_ws_initial ); ?>
                             </div>
                             <div class="flex flex-col min-w-0 flex-1 leading-snug">
-                                <span class="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">Cora Real Estate</span>
+                                <span class="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate"><?php echo esc_html( $cora_ws_name ); ?></span>
                                 <span class="text-xs font-medium text-zinc-400 dark:text-zinc-500 truncate">Delhi Office v2</span>
                             </div>
                         </div>
@@ -2782,9 +2785,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             <div class="flex items-center justify-between px-3 py-2 bg-zinc-50 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl hover:bg-zinc-100/80 dark:hover:bg-zinc-850 cursor-pointer transition-colors">
                                 <div class="flex items-center gap-2.5 min-w-0">
                                     <div class="w-7 h-7 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold text-xs flex items-center justify-center shrink-0 leading-none">
-                                        C
+                                        <?php echo esc_html( $cora_ws_initial ); ?>
                                     </div>
-                                    <span class="text-xs font-semibold text-zinc-900 dark:text-zinc-100 truncate">Cora Real Estate</span>
+                                    <span class="text-xs font-semibold text-zinc-900 dark:text-zinc-100 truncate"><?php echo esc_html( $cora_ws_name ); ?></span>
                                 </div>
                                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-900 dark:text-white shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
                             </div>
