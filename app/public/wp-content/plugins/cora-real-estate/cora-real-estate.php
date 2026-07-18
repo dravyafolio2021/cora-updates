@@ -8832,14 +8832,23 @@ function cora_enqueue_elementor_reskin_scripts() {
 add_action( 'elementor/editor/after_enqueue_scripts', 'cora_enqueue_elementor_reskin_scripts' );
 
 /**
- * Remove admin bar from Elementor editor
+ * Optimize Elementor Editor performance and remove admin bar
  */
-function cora_remove_admin_bar_in_elementor() {
-    if ( isset( $_GET['action'] ) && $_GET['action'] === 'elementor' ) {
+function cora_optimize_elementor_editor_performance() {
+    if ( ( isset( $_GET['action'] ) && $_GET['action'] === 'elementor' ) || isset( $_GET['elementor-preview'] ) ) {
+        // Boost PHP memory limit and execution time to prevent hangs/blank editor pages
+        @ini_set( 'memory_limit', '512M' );
+        @ini_set( 'max_execution_time', '300' );
+        
+        // Remove admin bar inside Elementor editor screen
         add_filter( 'show_admin_bar', '__return_false' );
+        
+        // Disable Gutenberg default scripts/styles when editing in Elementor to free significant memory overhead
+        remove_action( 'wp_enqueue_scripts', 'wp_common_block_scripts_and_styles' );
+        remove_action( 'admin_enqueue_scripts', 'wp_common_block_scripts_and_styles' );
     }
 }
-add_action( 'init', 'cora_remove_admin_bar_in_elementor' );
+add_action( 'init', 'cora_optimize_elementor_editor_performance', 1 );
 
 /* ═══════════════════════════════════════════════════════════════════
  * MEDIA LIBRARY MODULE — AJAX HANDLERS

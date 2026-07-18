@@ -5722,7 +5722,7 @@ $wp_pages = get_pages();
     // ── Open / Close ───────────────────────────────────────────
     window.openAddThemeWizard = function(skipUrlPush) {
         _wizStep    = 1;
-        _wizBuilder = null;
+        _wizBuilder = 'elementor';
         _wizSubMode = 'upload';
 
         // Hide all steps
@@ -5734,6 +5734,7 @@ $wp_pages = get_pages();
         if (s1) { s1.style.display = 'flex'; s1.style.flex = '1'; }
 
         wizardResetCards();
+        wizardSelectBuilder('elementor');
         wizUpdateProgress(1);
 
         var backBtn = document.getElementById('wiz-back-btn');
