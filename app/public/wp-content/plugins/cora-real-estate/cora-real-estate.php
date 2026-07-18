@@ -3940,26 +3940,73 @@ function cora_get_active_theme_styles() {
         $settings = json_decode( $theme['settings'], true ) ?: array();
     }
     
-    $primary = $settings['primary_color'] ?? '#18181b';
+    $primary   = $settings['primary_color']   ?? '#18181b';
     $secondary = $settings['secondary_color'] ?? '#27272a';
-    $accent = $settings['accent_color'] ?? '#10b981';
-    $text = $settings['text_color'] ?? '#09090b';
-    $bg = $settings['bg_color'] ?? '#ffffff';
+    $accent    = $settings['accent_color']    ?? '#10b981';
+    $text      = $settings['text_color']      ?? '#09090b';
+    $bg        = $settings['bg_color']        ?? '#ffffff';
+    $surface   = $settings['surface_color']   ?? '#f4f4f5';
+    $success   = $settings['success_color']   ?? '#16a34a';
+    $warning   = $settings['warning_color']   ?? '#d97706';
+    $danger    = $settings['danger_color']    ?? '#dc2626';
+    $info      = $settings['info_color']      ?? '#2563eb';
+    $btn_bg    = $settings['btn_bg']          ?? $primary;
+    $btn_text  = $settings['btn_text']        ?? '#ffffff';
+    $btn_hover = $settings['btn_hover_bg']    ?? $secondary;
+
     $heading_font = $settings['heading_font'] ?? 'Inter';
-    $body_font = $settings['body_font'] ?? 'Inter';
-    $base_size = $settings['base_font_size'] ?? '16';
+    $body_font    = $settings['body_font']    ?? 'Inter';
+    $base_size    = $settings['base_font_size'] ?? '16';
+
+    $container_width   = $settings['container_width']  ?? 1280;
+    $section_padding   = $settings['section_padding']  ?? 80;
+    $element_gap       = $settings['element_gap']      ?? 24;
+    $border_radius     = $settings['border_radius']    ?? 8;
+    $border_color      = $settings['border_color']     ?? '#e4e4e7';
+    $border_width      = $settings['border_width']     ?? 1;
+    $box_shadow        = $settings['box_shadow']       ?? '0 1px 3px rgba(0,0,0,0.06)';
+    $header_bg         = $settings['header_bg']        ?? '#ffffff';
+    $header_text       = $settings['header_text_color'] ?? '#18181b';
+    $footer_bg         = $settings['footer_bg']        ?? '#18181b';
+    $footer_text       = $settings['footer_text_color'] ?? '#a1a1aa';
 
     $style = "
     <style id='cora-canvas-theme-variables'>
     :root {
+        /* ── Core Palette ── */
         --primary-color: {$primary};
         --secondary-color: {$secondary};
         --accent-color: {$accent};
         --text-color: {$text};
         --bg-color: {$bg};
+        --color-surface: {$surface};
+        /* ── Semantic Colors ── */
+        --color-success: {$success};
+        --color-warning: {$warning};
+        --color-danger: {$danger};
+        --color-info: {$info};
+        /* ── Button Colors ── */
+        --btn-bg: {$btn_bg};
+        --btn-text: {$btn_text};
+        --btn-hover-bg: {$btn_hover};
+        /* ── Typography ── */
         --heading-font: '{$heading_font}', sans-serif;
         --body-font: '{$body_font}', sans-serif;
         --base-font-size: {$base_size}px;
+        /* ── Spacing & Layout ── */
+        --container-width: {$container_width}px;
+        --section-padding: {$section_padding}px;
+        --element-gap: {$element_gap}px;
+        /* ── Borders & Radius ── */
+        --border-radius: {$border_radius}px;
+        --border-color: {$border_color};
+        --border-width: {$border_width}px;
+        --box-shadow: {$box_shadow};
+        /* ── Header & Footer ── */
+        --header-bg: {$header_bg};
+        --header-text: {$header_text};
+        --footer-bg: {$footer_bg};
+        --footer-text: {$footer_text};
     }
     body {
         font-family: var(--body-font);
@@ -4011,14 +4058,49 @@ function cora_get_active_theme_js( $position = 'head' ) {
     return '';
 }
 
+
 add_action( 'wp_head', function () {
     echo cora_get_active_theme_styles();
     echo cora_get_active_theme_js( 'head' );
+    // Output raw head HTML injection (font imports, meta tags, pixels, etc.)
+    global $wpdb;
+    $preview_theme_id = cora_get_preview_theme_id();
+    $th = null;
+    if ( $preview_theme_id > 0 ) {
+        $th = $wpdb->get_row( $wpdb->prepare( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d LIMIT 1", $preview_theme_id ), ARRAY_A );
+    }
+    if ( ! $th ) {
+        $th = $wpdb->get_row( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+    }
+    if ( $th ) {
+        $s = json_decode( $th['settings'], true ) ?: [];
+        if ( ! empty( $s['custom_head'] ) ) {
+            echo "\n<!-- Cora Canvas: Head Injection -->\n" . $s['custom_head'] . "\n";
+        }
+    }
 }, 100 );
 
 add_action( 'wp_footer', function () {
     echo cora_get_active_theme_js( 'footer' );
+    // Output raw body/footer script injection
+    global $wpdb;
+    $preview_theme_id = cora_get_preview_theme_id();
+    $th = null;
+    if ( $preview_theme_id > 0 ) {
+        $th = $wpdb->get_row( $wpdb->prepare( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d LIMIT 1", $preview_theme_id ), ARRAY_A );
+    }
+    if ( ! $th ) {
+        $th = $wpdb->get_row( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+    }
+    if ( $th ) {
+        $s = json_decode( $th['settings'], true ) ?: [];
+        if ( ! empty( $s['custom_body'] ) ) {
+            echo "\n<!-- Cora Canvas: Body Injection -->\n" . $s['custom_body'] . "\n";
+        }
+    }
 }, 100 );
+
+
 
 /**
  * Advanced Canvas Extensions & Competitor Alignment Features
@@ -14246,17 +14328,218 @@ function cora_ajax_canvas_save_theme_settings() {
     cora_canvas_ajax_permission_check( true );
     global $wpdb;
     $theme_id = intval( $_POST['theme_id'] );
-    $settings = $_POST['settings'];
-    
+    $incoming = $_POST['settings'];
+
+    // ── SAFE MERGE: read existing settings and overlay only the incoming keys ──
+    $theme = $wpdb->get_row( $wpdb->prepare( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+    $existing = array();
+    if ( $theme && ! empty( $theme['settings'] ) ) {
+        $existing = json_decode( $theme['settings'], true ) ?: array();
+    }
+    // Sanitize and merge incoming fields
+    $safe_incoming = array();
+    $text_fields = [ 'site_title','site_tagline','site_description','site_favicon','site_logo',
+                     'site_logo_dark','og_image','title_format','heading_font','body_font','accent_font',
+                     'header_layout','footer_columns','copyright_text','nav_menu',
+                     'facebook_link','twitter_link','linkedin_link','instagram_link','youtube_link','tiktok_link',
+                     'ga4_id','gtm_id','fb_pixel','robots','border_width','border_color','box_shadow',
+                     'page_width','header_bg','header_text_color','footer_bg','footer_text_color',
+                     'primary_color','secondary_color','accent_color','text_color','bg_color',
+                     'surface_color','success_color','warning_color','danger_color','info_color',
+                     'btn_bg','btn_text','btn_hover_bg',
+                     'el_primary','el_secondary','el_text','el_accent',
+                     'el_type_primary_family','el_type_secondary_family','el_type_text_family','el_type_accent_family',
+                     'el_type_primary_weight','el_type_secondary_weight','el_type_text_weight','el_type_accent_weight',
+                     'css_prefix','gfonts_key' ];
+    $int_fields  = [ 'base_font_size','container_width','section_padding','element_gap','widgets_spacing','border_radius' ];
+    $bool_fields = [ 'sticky_header','show_socials','transparent_header','smooth_scroll','sitemap_enable','dark_tokens' ];
+    foreach ( $text_fields as $k ) {
+        if ( isset( $incoming[$k] ) ) $safe_incoming[$k] = sanitize_text_field( $incoming[$k] );
+    }
+    foreach ( $int_fields as $k ) {
+        if ( isset( $incoming[$k] ) ) $safe_incoming[$k] = intval( $incoming[$k] );
+    }
+    foreach ( $bool_fields as $k ) {
+        if ( isset( $incoming[$k] ) ) $safe_incoming[$k] = intval( $incoming[$k] );
+    }
+    // Type scale keys
+    foreach ( ['h1','h2','h3','body','small','btn'] as $level ) {
+        foreach ( ['size','weight','lh','ls'] as $prop ) {
+            $k = "type_{$level}_{$prop}";
+            if ( isset( $incoming[$k] ) ) $safe_incoming[$k] = sanitize_text_field( $incoming[$k] );
+        }
+    }
+    // Merge: existing fields win for any key NOT in safe_incoming
+    $merged = array_merge( $existing, $safe_incoming );
+
     $wpdb->update(
         $wpdb->prefix . 'cora_canvas_themes',
-        array( 'settings' => json_encode($settings), 'updated_at' => current_time('mysql') ),
+        array( 'settings' => json_encode( $merged ), 'updated_at' => current_time('mysql') ),
         array( 'id' => $theme_id )
     );
 
-    wp_send_json_success();
+    // ── Context-aware sync ──────────────────────────────────────────────────
+    $source = $merged['source'] ?? '';
+    $has_github = ! empty( $merged['github_repo'] );
+    $has_lovable = ! empty( $merged['lovable_project_url'] );
+    $is_elementor = ( $source === 'elementor' || ( ! $has_github && ! $has_lovable ) );
+
+    if ( $is_elementor ) {
+        // Attempt to push colors + typography to Elementor active kit
+        cora_push_settings_to_elementor_kit( $merged );
+    } elseif ( $has_lovable || $has_github ) {
+        // Generate :root {} CSS token file for Lovable/GitHub theme
+        cora_generate_lovable_token_css( $merged );
+    }
+
+    wp_send_json_success( array( 'merged' => true ) );
 }
 add_action( 'wp_ajax_cora_ajax_save_theme_settings', 'cora_ajax_canvas_save_theme_settings' );
+
+// ── Elementor Global Kit Sync ───────────────────────────────────────────────
+function cora_push_settings_to_elementor_kit( $settings ) {
+    if ( ! function_exists( 'get_option' ) ) return;
+    $kit_id = (int) get_option( 'elementor_active_kit', 0 );
+    if ( $kit_id <= 0 ) return;
+
+    $kit_meta = get_post_meta( $kit_id, '_elementor_page_settings', true );
+    if ( ! is_array( $kit_meta ) ) $kit_meta = array();
+
+    // System Colors — 4 Elementor global colors
+    $primary   = $settings['el_primary']   ?? $settings['primary_color']   ?? '#18181b';
+    $secondary = $settings['el_secondary'] ?? $settings['secondary_color']  ?? '#27272a';
+    $text      = $settings['el_text']      ?? $settings['text_color']       ?? '#09090b';
+    $accent    = $settings['el_accent']    ?? $settings['accent_color']     ?? '#10b981';
+
+    $kit_meta['system_colors'] = array(
+        array( '_id' => 'primary',   'title' => 'Primary',   'color' => sanitize_hex_color( $primary )   ?: '#18181b' ),
+        array( '_id' => 'secondary', 'title' => 'Secondary', 'color' => sanitize_hex_color( $secondary ) ?: '#27272a' ),
+        array( '_id' => 'text',      'title' => 'Text',      'color' => sanitize_hex_color( $text )      ?: '#09090b' ),
+        array( '_id' => 'accent',    'title' => 'Accent',    'color' => sanitize_hex_color( $accent )    ?: '#10b981' ),
+    );
+
+    // System Typography — 4 Elementor global typography presets
+    $type_map = array(
+        'primary'   => array( 'title' => 'Primary',   'weight_fallback' => 700 ),
+        'secondary' => array( 'title' => 'Secondary', 'weight_fallback' => 600 ),
+        'text'      => array( 'title' => 'Text',      'weight_fallback' => 400 ),
+        'accent'    => array( 'title' => 'Accent',    'weight_fallback' => 600 ),
+    );
+    $heading_font = $settings['heading_font'] ?? 'Inter';
+    $body_font    = $settings['body_font']    ?? 'Inter';
+
+    $kit_meta['system_typography'] = array();
+    foreach ( $type_map as $tid => $tdef ) {
+        $family = $settings[ "el_type_{$tid}_family" ] ?? ( ( $tid === 'text' ) ? $body_font : $heading_font );
+        $weight = $settings[ "el_type_{$tid}_weight" ] ?? $tdef['weight_fallback'];
+        $kit_meta['system_typography'][] = array(
+            '_id'   => $tid,
+            'title' => $tdef['title'],
+            'typography_typography'   => 'custom',
+            'typography_font_family'  => sanitize_text_field( $family ),
+            'typography_font_weight'  => intval( $weight ),
+        );
+    }
+
+    update_post_meta( $kit_id, '_elementor_page_settings', $kit_meta );
+
+    // Flush Elementor's CSS cache so changes render on the next page load
+    delete_post_meta( $kit_id, '_elementor_css' );
+
+    // Also flush via Elementor Pro's files manager if available
+    if ( class_exists( 'Elementor\Plugin' ) && isset( Elementor\Plugin::$instance->files_manager ) ) {
+        Elementor\Plugin::$instance->files_manager->clear_cache();
+    }
+}
+
+// ── Standalone Elementor Sync AJAX (called from "Sync to Elementor Now" button) ──
+function cora_ajax_sync_elementor_globals() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $theme_id = intval( $_POST['theme_id'] );
+    $theme = $wpdb->get_row( $wpdb->prepare( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+    if ( ! $theme ) { wp_send_json_error( 'Theme not found' ); return; }
+    $settings = json_decode( $theme['settings'], true ) ?: array();
+    cora_push_settings_to_elementor_kit( $settings );
+    wp_send_json_success( array( 'synced_at' => current_time( 'c' ) ) );
+}
+add_action( 'wp_ajax_cora_ajax_sync_elementor_globals', 'cora_ajax_sync_elementor_globals' );
+
+// ── Lovable / GitHub CSS Token File Generator ───────────────────────────────
+function cora_generate_lovable_token_css( $settings ) {
+    $prefix = $settings['css_prefix'] ?? '--';
+
+    $tokens = array(
+        'color-primary'    => $settings['primary_color']   ?? '#18181b',
+        'color-secondary'  => $settings['secondary_color'] ?? '#27272a',
+        'color-accent'     => $settings['accent_color']    ?? '#10b981',
+        'color-text'       => $settings['text_color']      ?? '#09090b',
+        'color-background' => $settings['bg_color']        ?? '#ffffff',
+        'color-surface'    => $settings['surface_color']   ?? '#f4f4f5',
+        'color-success'    => $settings['success_color']   ?? '#16a34a',
+        'color-warning'    => $settings['warning_color']   ?? '#d97706',
+        'color-danger'     => $settings['danger_color']    ?? '#dc2626',
+        'color-info'       => $settings['info_color']      ?? '#2563eb',
+        'btn-bg'           => $settings['btn_bg']          ?? $settings['primary_color'] ?? '#18181b',
+        'btn-text'         => $settings['btn_text']        ?? '#ffffff',
+        'btn-hover-bg'     => $settings['btn_hover_bg']    ?? $settings['secondary_color'] ?? '#27272a',
+        'heading-font'     => "'" . ( $settings['heading_font'] ?? 'Inter' ) . "', sans-serif",
+        'body-font'        => "'" . ( $settings['body_font']    ?? 'Inter' ) . "', sans-serif",
+        'base-font-size'   => ( $settings['base_font_size'] ?? 16 ) . 'px',
+        'container-width'  => ( $settings['container_width'] ?? 1280 ) . 'px',
+        'section-padding'  => ( $settings['section_padding'] ?? 80 ) . 'px',
+        'element-gap'      => ( $settings['element_gap']     ?? 24 ) . 'px',
+        'border-radius'    => ( $settings['border_radius']   ?? 8 ) . 'px',
+        'border-color'     => $settings['border_color']  ?? '#e4e4e7',
+        'border-width'     => ( $settings['border_width'] ?? 1 ) . 'px',
+        'box-shadow'       => $settings['box_shadow']    ?? '0 1px 3px rgba(0,0,0,0.06)',
+        'header-bg'        => $settings['header_bg']    ?? '#ffffff',
+        'header-text'      => $settings['header_text_color'] ?? '#18181b',
+        'footer-bg'        => $settings['footer_bg']    ?? '#18181b',
+        'footer-text'      => $settings['footer_text_color'] ?? '#a1a1aa',
+    );
+
+    $css = "/* Cora Global Design Tokens — auto-generated, do not edit manually */\n:root {\n";
+    foreach ( $tokens as $k => $v ) {
+        $css .= "  {$prefix}{$k}: {$v};\n";
+    }
+    $css .= "}\n";
+
+    $upload_dir = wp_upload_dir();
+    $cora_dir   = trailingslashit( $upload_dir['basedir'] ) . 'cora/';
+    if ( ! file_exists( $cora_dir ) ) wp_mkdir_p( $cora_dir );
+    file_put_contents( $cora_dir . 'cora-global-tokens.css', $css );
+}
+
+// ── Standalone Lovable Token Sync AJAX ──────────────────────────────────────
+function cora_ajax_sync_lovable_tokens() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $theme_id = intval( $_POST['theme_id'] );
+    $theme = $wpdb->get_row( $wpdb->prepare( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+    if ( ! $theme ) { wp_send_json_error( 'Theme not found' ); return; }
+    $settings = json_decode( $theme['settings'], true ) ?: array();
+    cora_generate_lovable_token_css( $settings );
+    $upload_dir = wp_upload_dir();
+    wp_send_json_success( array(
+        'file_url'  => trailingslashit( $upload_dir['baseurl'] ) . 'cora/cora-global-tokens.css',
+        'synced_at' => current_time( 'c' ),
+    ) );
+}
+add_action( 'wp_ajax_cora_ajax_sync_lovable_tokens', 'cora_ajax_sync_lovable_tokens' );
+
+// ── Frontend: enqueue Lovable token CSS file on every page ──────────────────
+add_action( 'wp_enqueue_scripts', 'cora_enqueue_global_token_css', 5 );
+function cora_enqueue_global_token_css() {
+    $upload_dir = wp_upload_dir();
+    $token_file = trailingslashit( $upload_dir['basedir'] ) . 'cora/cora-global-tokens.css';
+    if ( file_exists( $token_file ) ) {
+        $token_url = trailingslashit( $upload_dir['baseurl'] ) . 'cora/cora-global-tokens.css';
+        wp_enqueue_style( 'cora-global-tokens', $token_url, array(), filemtime( $token_file ) );
+    }
+}
 
 function cora_ajax_canvas_save_custom_css() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
@@ -14306,12 +14589,61 @@ function cora_ajax_canvas_save_custom_js() {
         }
     }
 
-    // Update global options as fallbacks
     update_option( 'cora_canvas_custom_js', $js );
     update_option( 'cora_canvas_custom_js_position', $position );
     wp_send_json_success();
 }
 add_action( 'wp_ajax_cora_ajax_save_custom_js', 'cora_ajax_canvas_save_custom_js' );
+
+// ── Save: Head HTML Injection ────────────────────────────────────────────────
+function cora_ajax_canvas_save_custom_head() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $theme_id  = intval( $_POST['theme_id'] );
+    $head_html = current_user_can( 'unfiltered_html' ) ? $_POST['head_html'] : wp_kses_post( $_POST['head_html'] );
+
+    if ( $theme_id > 0 ) {
+        $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+        if ( $theme ) {
+            $settings = json_decode( $theme['settings'], true ) ?: array();
+            $settings['custom_head'] = $head_html;
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_themes',
+                array( 'settings' => json_encode($settings), 'updated_at' => current_time('mysql') ),
+                array( 'id' => $theme_id )
+            );
+        }
+    }
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_cora_ajax_save_custom_head', 'cora_ajax_canvas_save_custom_head' );
+
+// ── Save: Body Script Injection ──────────────────────────────────────────────
+function cora_ajax_canvas_save_custom_body() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+    $theme_id  = intval( $_POST['theme_id'] );
+    $body_html = current_user_can( 'unfiltered_html' ) ? $_POST['body_html'] : wp_kses_post( $_POST['body_html'] );
+
+    if ( $theme_id > 0 ) {
+        $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+        if ( $theme ) {
+            $settings = json_decode( $theme['settings'], true ) ?: array();
+            $settings['custom_body'] = $body_html;
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_themes',
+                array( 'settings' => json_encode($settings), 'updated_at' => current_time('mysql') ),
+                array( 'id' => $theme_id )
+            );
+        }
+    }
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_cora_ajax_save_custom_body', 'cora_ajax_canvas_save_custom_body' );
+
+
 
 function cora_ajax_canvas_publish_canvas_page() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );

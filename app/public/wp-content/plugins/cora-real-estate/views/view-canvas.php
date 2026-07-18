@@ -38,12 +38,63 @@ $wp_pages = get_pages();
 
 <!-- Include CodeMirror Assets for CSS/JS Editor -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/neat.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
+
 
 <style>
+    /* Premium Monochromatic CodeMirror Theme */
+    .CodeMirror {
+        background: #18181b !important;
+        color: #e4e4e7 !important;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+        font-size: 11px !important;
+        line-height: 1.6 !important;
+        height: 100% !important;
+        border-radius: 0 0 12px 12px;
+    }
+    .CodeMirror-gutters {
+        background: #09090b !important;
+        border-right: 1px solid #27272a !important;
+        width: 32px;
+    }
+    .CodeMirror-linenumber {
+        color: #52525b !important;
+        padding-left: 4px !important;
+    }
+    .CodeMirror-cursor {
+        border-left: 2px solid #f4f4f5 !important;
+    }
+    /* Syntax highlighting token colors */
+    .cm-keyword { color: #f43f5e !important; font-weight: 600; }
+    .cm-atom { color: #d946ef !important; }
+    .cm-number { color: #f59e0b !important; }
+    .cm-def { color: #38bdf8 !important; }
+    .cm-variable { color: #e4e4e7 !important; }
+    .cm-variable-2 { color: #22c55e !important; }
+    .cm-variable-3, .cm-type { color: #a855f7 !important; }
+    .cm-property { color: #38bdf8 !important; }
+    .cm-operator { color: #f43f5e !important; }
+    .cm-comment { color: #71717a !important; font-style: italic; }
+    .cm-string { color: #eab308 !important; }
+    .cm-string-2 { color: #22c55e !important; }
+    .cm-meta { color: #a1a1aa !important; }
+    .cm-qualifier { color: #f59e0b !important; }
+    .cm-builtin { color: #38bdf8 !important; }
+    .cm-bracket { color: #a1a1aa !important; }
+    .cm-tag { color: #f43f5e !important; }
+    .cm-attribute { color: #fb923c !important; }
+    .cm-header { color: #38bdf8 !important; }
+    .cm-quote { color: #71717a !important; }
+    .cm-hr { color: #71717a !important; }
+    .cm-link { color: #38bdf8 !important; text-decoration: underline; }
+    .cm-error { background: #991b1b !important; color: #fef2f2 !important; }
+    .CodeMirror-activeline-background { background: #27272a !important; }
+    .CodeMirror-matchingbracket { text-decoration: underline; color: #fff !important; }
+
     /* Monochromatic Transitions & Custom Scrollbars */
     .canvas-tab-btn.active {
         border-bottom-color: #18181b;
@@ -769,48 +820,60 @@ $wp_pages = get_pages();
 
                 <!-- Tab strip + icon toolbar -->
                 <div class="flex items-center justify-between px-4 py-2.5 border-b border-zinc-100">
-                    <!-- Left: Tab pills -->
-                    <div class="flex items-center gap-1">
-                        <button id="pages-tab-all" onclick="setPageStatusFilter('all')" class="px-3 py-1.5 rounded-md text-[12px] font-semibold bg-zinc-100 text-zinc-900 cursor-pointer transition-all">All</button>
-                        <?php if ( ! $is_read_only ) : ?>
-                        <button onclick="openNewPageDrawer()" class="w-7 h-7 flex items-center justify-center rounded-md text-[16px] font-normal text-zinc-400 hover:bg-zinc-50 hover:text-zinc-700 cursor-pointer transition-all border border-transparent hover:border-zinc-200 leading-none">+</button>
-                        <?php endif; ?>
+                    <!-- Left: Tab pills / Views Strip -->
+                    <div class="flex items-center gap-1" id="pages-views-tab-strip">
+                        <button id="pages-view-all" onclick="setViewFilter('all')" data-view="all" class="pages-view-btn px-3 py-1.5 rounded-md text-[11px] font-semibold bg-zinc-900 text-white cursor-pointer transition-all">All</button>
+                        
+                        <!-- Plus Button for custom view configuration -->
+                        <div class="relative">
+                            <button id="add-view-btn" onclick="toggleAddViewDropdown()" class="w-7 h-7 flex items-center justify-center rounded-md text-[15px] font-semibold text-zinc-400 hover:bg-zinc-50 hover:text-zinc-700 cursor-pointer transition-all border border-zinc-200 leading-none" title="Add view">+</button>
+                            <div id="add-view-dropdown" class="hidden absolute left-0 top-full mt-1.5 z-30 bg-white border border-zinc-200 rounded-xl shadow-lg p-2.5 w-52 space-y-2">
+                                <p class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Create Custom View</p>
+                                <input type="text" id="new-view-name" placeholder="e.g. Listings, Blog, Agent..." onkeyup="if(event.key==='Enter') createNewCustomView()"
+                                    class="w-full px-2.5 py-1.5 border border-zinc-200 focus:border-zinc-400 focus:outline-none rounded-lg text-[11px] bg-white text-zinc-800">
+                                <button onclick="createNewCustomView()" 
+                                    class="w-full py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[10px] font-bold cursor-pointer transition-all text-center">
+                                    Create View
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <!-- Right: Icon actions -->
-                    <div class="flex items-center gap-0.5">
-                        <!-- Search icon + popover -->
+                    <!-- Right: Search input + dropdown chips -->
+                    <div class="flex items-center gap-1.5">
+                        <!-- Inline Search Input -->
+                        <div class="relative flex items-center bg-zinc-50 border border-zinc-200 rounded-lg px-2.5 py-1 w-48 focus-within:border-zinc-400 focus-within:bg-white transition-all mr-1.5">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="#a1a1aa" stroke-width="2.5" fill="none" class="mr-1.5 shrink-0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                            <input type="text" id="page-search-input" onkeyup="filterPages()" placeholder="Search pages…" 
+                                class="bg-transparent border-none text-[11px] placeholder-zinc-400 focus:outline-none focus:ring-0 p-0 w-full text-zinc-800">
+                        </div>
+
+                        <!-- Filter dropdown chip -->
                         <div class="relative">
-                            <button onclick="cpbToggle('search')" id="pages-search-trigger" class="w-8 h-8 flex items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-50 hover:text-zinc-700 cursor-pointer transition-all" title="Search">
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                            <button id="filter-chip-btn" onclick="toggleDropdownChip('filter')" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 hover:border-zinc-300 text-zinc-600 rounded-lg text-[11px] font-semibold transition-all cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                                <span>Status: All</span>
+                                <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none" class="opacity-50"><polyline points="6 9 12 15 18 9"/></svg>
                             </button>
-                            <div id="cpb-panel-search" class="hidden absolute right-0 top-full mt-2 z-30 bg-white border border-zinc-200 rounded-xl shadow-lg px-3 py-2.5 w-60">
-                                <input type="text" id="page-search-input" onkeyup="filterPages()" placeholder="Search pages…" autofocus
-                                    class="w-full text-[13px] bg-transparent border-none focus:outline-none placeholder-zinc-400 text-zinc-800">
+                            <div id="chip-dropdown-filter" class="hidden absolute right-0 top-full mt-1 z-30 bg-white border border-zinc-200 rounded-xl shadow-lg p-1.5 w-40 space-y-0.5">
+                                <button onclick="selectChipFilter('all', 'Status: All')" class="w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors">All statuses</button>
+                                <button onclick="selectChipFilter('published', 'Status: Active')" class="w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors">Active (Visible)</button>
+                                <button onclick="selectChipFilter('draft', 'Status: Draft')" class="w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors">Draft</button>
+                                <button onclick="selectChipFilter('scheduled', 'Status: Scheduled')" class="w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors">Scheduled</button>
+                                <button onclick="selectChipFilter('private', 'Status: Private')" class="w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors">Private / Unlisted</button>
                             </div>
                         </div>
-                        <!-- Filter icon + popover -->
+
+                        <!-- Sort dropdown chip -->
                         <div class="relative">
-                            <button onclick="cpbToggle('filter')" id="pages-filter-trigger" class="w-8 h-8 flex items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-50 hover:text-zinc-700 cursor-pointer transition-all" title="Filter">
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                            <button id="sort-chip-btn" onclick="toggleDropdownChip('sort')" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 hover:border-zinc-300 text-zinc-600 rounded-lg text-[11px] font-semibold transition-all cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 6h18M7 12h10M11 18h2"/></svg>
+                                <span>Sort: Updated</span>
+                                <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none" class="opacity-50"><polyline points="6 9 12 15 18 9"/></svg>
                             </button>
-                            <div id="cpb-panel-filter" class="hidden absolute right-0 top-full mt-2 z-30 bg-white border border-zinc-200 rounded-xl shadow-lg p-3 w-48 space-y-2">
-                                <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Filter by status</p>
-                                <button onclick="setPageStatusFilter('all')"       class="cpb-filter-btn w-full text-left px-2.5 py-1.5 rounded-lg text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 transition-colors" data-filter="all">All statuses</button>
-                                <button onclick="setPageStatusFilter('published')" class="cpb-filter-btn w-full text-left px-2.5 py-1.5 rounded-lg text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 transition-colors" data-filter="published">Active (Visible)</button>
-                                <button onclick="setPageStatusFilter('draft')"     class="cpb-filter-btn w-full text-left px-2.5 py-1.5 rounded-lg text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 transition-colors" data-filter="draft">Draft</button>
-                                <button onclick="setPageStatusFilter('scheduled')" class="cpb-filter-btn w-full text-left px-2.5 py-1.5 rounded-lg text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 transition-colors" data-filter="scheduled">Scheduled</button>
-                            </div>
-                        </div>
-                        <!-- Sort icon + popover -->
-                        <div class="relative">
-                            <button onclick="cpbToggle('sort')" id="pages-sort-trigger" class="w-8 h-8 flex items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-50 hover:text-zinc-700 cursor-pointer transition-all" title="Sort">
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 6h18M7 12h10M11 18h2"/></svg>
-                            </button>
-                            <div id="cpb-panel-sort" class="hidden absolute right-0 top-full mt-2 z-30 bg-white border border-zinc-200 rounded-xl shadow-lg p-3 w-44 space-y-1">
-                                <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Sort by</p>
-                                <button onclick="setPageSort('modified')" class="cpb-sort-btn w-full text-left px-2.5 py-1.5 rounded-lg text-[12px] font-medium text-zinc-700 hover:bg-zinc-50" data-sort="modified">Last updated</button>
-                                <button onclick="setPageSort('alpha')"    class="cpb-sort-btn w-full text-left px-2.5 py-1.5 rounded-lg text-[12px] font-medium text-zinc-700 hover:bg-zinc-50" data-sort="alpha">Alphabetical (A–Z)</button>
-                                <button onclick="setPageSort('created')"  class="cpb-sort-btn w-full text-left px-2.5 py-1.5 rounded-lg text-[12px] font-medium text-zinc-700 hover:bg-zinc-50" data-sort="created">Date created</button>
+                            <div id="chip-dropdown-sort" class="hidden absolute right-0 top-full mt-1 z-30 bg-white border border-zinc-200 rounded-xl shadow-lg p-1.5 w-36 space-y-0.5">
+                                <button onclick="selectChipSort('modified', 'Sort: Updated')" class="w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors">Last updated</button>
+                                <button onclick="selectChipSort('alpha', 'Sort: A–Z')" class="w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors">Alphabetical</button>
+                                <button onclick="selectChipSort('created', 'Sort: Created')" class="w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors">Date created</button>
                             </div>
                         </div>
                     </div>
@@ -832,7 +895,7 @@ $wp_pages = get_pages();
                             <th class="px-3 py-2 font-semibold">Visibility</th>
                             <th class="px-3 py-2 font-semibold">Content</th>
                             <th class="px-3 py-2 font-semibold">Updated</th>
-                            <th class="px-3 py-2 w-10"></th>
+                            <th class="px-3 py-2 w-28 text-right font-semibold">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="pages-table-body">
@@ -973,231 +1036,845 @@ $wp_pages = get_pages();
         </div>
 
         <!-- TAB CONTENT: THEME SETTINGS -->
-        <div id="tab-content-settings" class="bg-white border border-zinc-200 rounded-xl p-6 shadow-sm hidden space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Left Column -->
-                <div class="space-y-6">
-                    <!-- Identity Section -->
-                    <div class="space-y-3">
-                        <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider border-b border-zinc-100 pb-2">Identity</h4>
-                        <div class="space-y-2">
-                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Site Title</label>
-                            <input type="text" id="setting-site-title" class="w-full px-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Site Tagline</label>
-                            <input type="text" id="setting-site-tagline" class="w-full px-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Favicon Icon URL</label>
-                                <input type="text" id="setting-site-favicon" placeholder="e.g. icon.png" class="w-full px-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Agency Logo URL</label>
-                                <input type="text" id="setting-site-logo" placeholder="e.g. logo.png" class="w-full px-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
-                            </div>
+        <div id="tab-content-settings" class="bg-white border border-zinc-200 rounded-xl shadow-sm hidden">
+
+            <!-- ── Settings Tab Navigation Pills ───────────────────── -->
+            <div class="flex items-center gap-1 border-b border-zinc-100 px-6 pt-4 pb-0" id="settings-nav-pills">
+                <button onclick="switchSettingsPanel('identity')" id="spill-identity" class="settings-pill active px-3 py-2 text-[10px] font-bold uppercase tracking-wider rounded-t-lg border-b-2 border-zinc-950 text-zinc-900 bg-transparent cursor-pointer transition-all">Identity</button>
+                <button onclick="switchSettingsPanel('colors')" id="spill-colors" class="settings-pill px-3 py-2 text-[10px] font-bold uppercase tracking-wider rounded-t-lg border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 bg-transparent cursor-pointer transition-all">Colors</button>
+                <button onclick="switchSettingsPanel('typography')" id="spill-typography" class="settings-pill px-3 py-2 text-[10px] font-bold uppercase tracking-wider rounded-t-lg border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 bg-transparent cursor-pointer transition-all">Typography</button>
+                <button onclick="switchSettingsPanel('spacing')" id="spill-spacing" class="settings-pill px-3 py-2 text-[10px] font-bold uppercase tracking-wider rounded-t-lg border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 bg-transparent cursor-pointer transition-all">Spacing &amp; Borders</button>
+                <button onclick="switchSettingsPanel('layout')" id="spill-layout" class="settings-pill px-3 py-2 text-[10px] font-bold uppercase tracking-wider rounded-t-lg border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 bg-transparent cursor-pointer transition-all">Layout</button>
+                <button onclick="switchSettingsPanel('social')" id="spill-social" class="settings-pill px-3 py-2 text-[10px] font-bold uppercase tracking-wider rounded-t-lg border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 bg-transparent cursor-pointer transition-all">Social &amp; SEO</button>
+                <div id="spill-elementor-wrap" class="hidden">
+                    <button onclick="switchSettingsPanel('elementor')" id="spill-elementor" class="settings-pill px-3 py-2 text-[10px] font-bold uppercase tracking-wider rounded-t-lg border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 bg-transparent cursor-pointer transition-all">
+                        <span class="inline-flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Elementor Sync
+                        </span>
+                    </button>
+                </div>
+                <div id="spill-lovable-wrap" class="hidden">
+                    <button onclick="switchSettingsPanel('lovable')" id="spill-lovable" class="settings-pill px-3 py-2 text-[10px] font-bold uppercase tracking-wider rounded-t-lg border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 bg-transparent cursor-pointer transition-all">
+                        <span class="inline-flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-violet-500"></span>CSS Tokens
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════ -->
+            <!-- PANEL: Identity                                       -->
+            <!-- ══════════════════════════════════════════════════════ -->
+            <div id="spanel-identity" class="settings-panel p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-4">
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase">Site Title</label>
+                        <input type="text" id="setting-site-title" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase">Site Tagline</label>
+                        <input type="text" id="setting-site-tagline" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase">Site Description (SEO)</label>
+                        <textarea id="setting-site-description" rows="3" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 resize-none" placeholder="Brief site description for search engines..."></textarea>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase">Default Page Title Format</label>
+                        <input type="text" id="setting-title-format" placeholder="e.g. %s — Site Name" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                        <p class="text-[10px] text-zinc-400">Use %s for the page name placeholder.</p>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase">Agency Logo URL</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="setting-site-logo" placeholder="https://... or /wp-content/..." class="flex-1 px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                            <button onclick="openMediaPicker('setting-site-logo')" class="px-2.5 py-2 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-600 hover:bg-zinc-50 cursor-pointer transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                            </button>
                         </div>
                     </div>
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase">Logo Dark Mode URL</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="setting-site-logo-dark" placeholder="https://... (optional)" class="flex-1 px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                            <button onclick="openMediaPicker('setting-site-logo-dark')" class="px-2.5 py-2 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-600 hover:bg-zinc-50 cursor-pointer transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase">Favicon Icon URL</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="setting-site-favicon" placeholder="e.g. /favicon.png" class="flex-1 px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                            <button onclick="openMediaPicker('setting-site-favicon')" class="px-2.5 py-2 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-600 hover:bg-zinc-50 cursor-pointer transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase">OG / Share Image URL</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="setting-og-image" placeholder="https://... 1200×630px recommended" class="flex-1 px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                            <button onclick="openMediaPicker('setting-og-image')" class="px-2.5 py-2 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-600 hover:bg-zinc-50 cursor-pointer transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                    <!-- Typography Section -->
-                    <div class="space-y-3">
-                        <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider border-b border-zinc-100 pb-2">Typography</h4>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Heading Font</label>
-                                <select id="setting-heading-font" class="w-full px-2.5 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
-                                    <option value="Inter">Inter</option>
-                                    <option value="Playfair Display">Playfair Display</option>
-                                    <option value="Outfit">Outfit</option>
-                                    <option value="Roboto">Roboto</option>
-                                    <option value="Lora">Lora</option>
-                                </select>
+            <!-- ══════════════════════════════════════════════════════ -->
+            <!-- PANEL: Colors                                         -->
+            <!-- ══════════════════════════════════════════════════════ -->
+            <div id="spanel-colors" class="settings-panel p-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Core palette -->
+                    <div class="space-y-4">
+                        <h5 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-100 pb-2">Core Palette</h5>
+                        <?php
+                        $color_fields = [
+                            ['id' => 'setting-color-primary', 'label' => 'Primary Color', 'desc' => 'Mapped to Elementor System Color 1'],
+                            ['id' => 'setting-color-secondary', 'label' => 'Secondary Color', 'desc' => 'Mapped to Elementor System Color 2'],
+                            ['id' => 'setting-color-accent', 'label' => 'Accent / Brand Color', 'desc' => 'Mapped to Elementor System Color 3 · --color-accent'],
+                            ['id' => 'setting-color-text', 'label' => 'Default Text Color', 'desc' => 'Mapped to Elementor System Color 4 · --color-text'],
+                            ['id' => 'setting-color-bg', 'label' => 'Background Color', 'desc' => '--color-background'],
+                            ['id' => 'setting-color-surface', 'label' => 'Surface / Muted Color', 'desc' => 'Card backgrounds, secondary surfaces · --color-surface'],
+                        ];
+                        foreach ($color_fields as $cf): ?>
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase"><?php echo esc_html($cf['label']); ?></label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="<?php echo esc_attr($cf['id']); ?>" class="w-9 h-9 rounded-lg border border-zinc-200 cursor-pointer p-0.5 flex-shrink-0" oninput="document.getElementById('<?php echo esc_attr($cf['id']); ?>-text').value=this.value">
+                                <input type="text" id="<?php echo esc_attr($cf['id']); ?>-text" class="flex-1 px-3 py-2 border border-zinc-200 rounded-lg text-xs uppercase font-mono focus:outline-none focus:border-zinc-400" oninput="syncColorPicker('<?php echo esc_attr($cf['id']); ?>', this.value)">
                             </div>
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Body Font</label>
-                                <select id="setting-body-font" class="w-full px-2.5 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
-                                    <option value="Inter">Inter</option>
-                                    <option value="Roboto">Roboto</option>
-                                    <option value="Lora">Lora</option>
-                                    <option value="Outfit">Outfit</option>
-                                </select>
+                            <p class="text-[9px] text-zinc-400"><?php echo esc_html($cf['desc']); ?></p>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <!-- Semantic & state colors -->
+                    <div class="space-y-4">
+                        <h5 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-100 pb-2">Semantic State Colors</h5>
+                        <?php
+                        $semantic_fields = [
+                            ['id' => 'setting-color-success', 'label' => 'Success Color', 'desc' => '--color-success · confirmation states, sold badges'],
+                            ['id' => 'setting-color-warning', 'label' => 'Warning Color', 'desc' => '--color-warning · alerts, pending status'],
+                            ['id' => 'setting-color-danger', 'label' => 'Danger / Error Color', 'desc' => '--color-danger · validation errors, price drops'],
+                            ['id' => 'setting-color-info', 'label' => 'Info Color', 'desc' => '--color-info · tooltips, informational callouts'],
+                        ];
+                        foreach ($semantic_fields as $cf): ?>
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase"><?php echo esc_html($cf['label']); ?></label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="<?php echo esc_attr($cf['id']); ?>" class="w-9 h-9 rounded-lg border border-zinc-200 cursor-pointer p-0.5 flex-shrink-0" oninput="document.getElementById('<?php echo esc_attr($cf['id']); ?>-text').value=this.value">
+                                <input type="text" id="<?php echo esc_attr($cf['id']); ?>-text" class="flex-1 px-3 py-2 border border-zinc-200 rounded-lg text-xs uppercase font-mono focus:outline-none focus:border-zinc-400" oninput="syncColorPicker('<?php echo esc_attr($cf['id']); ?>', this.value)">
                             </div>
+                            <p class="text-[9px] text-zinc-400"><?php echo esc_html($cf['desc']); ?></p>
+                        </div>
+                        <?php endforeach; ?>
+
+                        <h5 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-100 pb-2 mt-6">Button Colors</h5>
+                        <?php
+                        $btn_fields = [
+                            ['id' => 'setting-color-btn-bg', 'label' => 'Button Background', 'desc' => '--btn-bg'],
+                            ['id' => 'setting-color-btn-text', 'label' => 'Button Text Color', 'desc' => '--btn-text'],
+                            ['id' => 'setting-color-btn-hover', 'label' => 'Button Hover Background', 'desc' => '--btn-hover-bg'],
+                        ];
+                        foreach ($btn_fields as $cf): ?>
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase"><?php echo esc_html($cf['label']); ?></label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="<?php echo esc_attr($cf['id']); ?>" class="w-9 h-9 rounded-lg border border-zinc-200 cursor-pointer p-0.5 flex-shrink-0" oninput="document.getElementById('<?php echo esc_attr($cf['id']); ?>-text').value=this.value">
+                                <input type="text" id="<?php echo esc_attr($cf['id']); ?>-text" class="flex-1 px-3 py-2 border border-zinc-200 rounded-lg text-xs uppercase font-mono focus:outline-none focus:border-zinc-400" oninput="syncColorPicker('<?php echo esc_attr($cf['id']); ?>', this.value)">
+                            </div>
+                            <p class="text-[9px] text-zinc-400"><?php echo esc_html($cf['desc']); ?></p>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════ -->
+            <!-- PANEL: Typography                                     -->
+            <!-- ══════════════════════════════════════════════════════ -->
+            <div id="spanel-typography" class="settings-panel p-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-5">
+                        <h5 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-100 pb-2">Font Families</h5>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Heading Font</label>
+                            <select id="setting-heading-font" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
+                                <?php
+                                $fonts = ['Inter','Playfair Display','Outfit','Roboto','Lora','Montserrat','Raleway','Poppins','DM Sans','DM Serif Display','Nunito','Source Serif 4','Libre Baskerville','Merriweather','Cormorant Garamond','Space Grotesk','Syne','Plus Jakarta Sans','Josefin Sans','Fraunces'];
+                                foreach ($fonts as $f) echo '<option value="' . esc_attr($f) . '">' . esc_html($f) . '</option>';
+                                ?>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Body Font</label>
+                            <select id="setting-body-font" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
+                                <?php foreach ($fonts as $f) echo '<option value="' . esc_attr($f) . '">' . esc_html($f) . '</option>'; ?>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Accent / Display Font</label>
+                            <select id="setting-accent-font" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
+                                <option value="">— Same as Heading —</option>
+                                <?php foreach ($fonts as $f) echo '<option value="' . esc_attr($f) . '">' . esc_html($f) . '</option>'; ?>
+                            </select>
                         </div>
                         <div class="space-y-2">
                             <div class="flex justify-between items-center text-[10px] font-bold text-zinc-500 uppercase">
                                 <span>Base Font Size</span>
                                 <span id="font-size-val">16px</span>
                             </div>
-                            <input type="range" id="setting-font-size" min="14" max="18" value="16" oninput="$('#font-size-val').text(this.value + 'px')" class="w-full accent-zinc-950 cursor-pointer">
+                            <input type="range" id="setting-font-size" min="12" max="20" step="1" value="16" oninput="jQuery('#font-size-val').text(this.value + 'px')" class="w-full accent-zinc-950 cursor-pointer">
+                            <div class="flex justify-between text-[9px] text-zinc-400"><span>12px</span><span>16px</span><span>20px</span></div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Google Fonts API Key (optional)</label>
+                            <input type="text" id="setting-gfonts-key" placeholder="AIza... for self-hosted fonts" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs font-mono focus:outline-none focus:border-zinc-400">
+                            <p class="text-[9px] text-zinc-400">Leave blank to use the standard Google Fonts CDN embed.</p>
                         </div>
                     </div>
-                </div>
-
-                <!-- Right Column -->
-                <div class="space-y-6">
-                    <!-- Colors Section -->
                     <div class="space-y-3">
-                        <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider border-b border-zinc-100 pb-2">Theme Colors</h4>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Primary Color</label>
-                                <div class="flex items-center gap-2">
-                                    <input type="color" id="setting-color-primary" class="w-8 h-8 rounded border border-zinc-200 cursor-pointer p-0">
-                                    <input type="text" id="setting-color-primary-text" class="flex-1 px-3 py-1.5 border border-zinc-200 rounded-lg text-xs uppercase" oninput="$('#setting-color-primary').val(this.value)">
+                        <h5 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-100 pb-2">Type Scale — Per Level</h5>
+                        <p class="text-[10px] text-zinc-400">These map directly to Elementor Typography Presets and CSS variables.</p>
+                        <?php
+                        $type_levels = [
+                            ['key' => 'h1', 'label' => 'H1 — Hero Heading', 'def_size' => 56, 'def_weight' => 800],
+                            ['key' => 'h2', 'label' => 'H2 — Section Heading', 'def_size' => 40, 'def_weight' => 700],
+                            ['key' => 'h3', 'label' => 'H3 — Sub-heading', 'def_size' => 28, 'def_weight' => 600],
+                            ['key' => 'body', 'label' => 'Body — Paragraph', 'def_size' => 16, 'def_weight' => 400],
+                            ['key' => 'small', 'label' => 'Small / Caption', 'def_size' => 13, 'def_weight' => 400],
+                            ['key' => 'btn', 'label' => 'Button Text', 'def_size' => 14, 'def_weight' => 600],
+                        ];
+                        foreach ($type_levels as $tl): ?>
+                        <div class="border border-zinc-100 rounded-lg p-3 space-y-2">
+                            <p class="text-[10px] font-bold text-zinc-700"><?php echo esc_html($tl['label']); ?></p>
+                            <div class="grid grid-cols-4 gap-2">
+                                <div class="space-y-1">
+                                    <label class="text-[9px] font-bold text-zinc-400 uppercase">Size (px)</label>
+                                    <input type="number" id="setting-type-<?php echo esc_attr($tl['key']); ?>-size" value="<?php echo esc_attr($tl['def_size']); ?>" min="10" max="120" class="w-full px-2 py-1 border border-zinc-200 rounded text-xs font-mono text-center focus:outline-none focus:border-zinc-400">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[9px] font-bold text-zinc-400 uppercase">Weight</label>
+                                    <select id="setting-type-<?php echo esc_attr($tl['key']); ?>-weight" class="w-full px-1 py-1 border border-zinc-200 rounded text-[10px] focus:outline-none focus:border-zinc-400 cursor-pointer">
+                                        <?php foreach ([100=>'Thin',200=>'ExLight',300=>'Light',400=>'Regular',500=>'Medium',600=>'SemiBold',700=>'Bold',800=>'ExBold',900=>'Black'] as $w=>$wl): ?>
+                                        <option value="<?php echo $w; ?>" <?php echo $w==$tl['def_weight']?'selected':''; ?>><?php echo $w; ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[9px] font-bold text-zinc-400 uppercase">L.H.</label>
+                                    <input type="number" id="setting-type-<?php echo esc_attr($tl['key']); ?>-lh" value="1.2" min="1" max="3" step="0.1" class="w-full px-2 py-1 border border-zinc-200 rounded text-xs font-mono text-center focus:outline-none focus:border-zinc-400">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[9px] font-bold text-zinc-400 uppercase">Spc</label>
+                                    <input type="number" id="setting-type-<?php echo esc_attr($tl['key']); ?>-ls" value="0" min="-5" max="10" step="0.01" class="w-full px-2 py-1 border border-zinc-200 rounded text-xs font-mono text-center focus:outline-none focus:border-zinc-400">
                                 </div>
                             </div>
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Secondary Color</label>
-                                <div class="flex items-center gap-2">
-                                    <input type="color" id="setting-color-secondary" class="w-8 h-8 rounded border border-zinc-200 cursor-pointer p-0">
-                                    <input type="text" id="setting-color-secondary-text" class="flex-1 px-3 py-1.5 border border-zinc-200 rounded-lg text-xs uppercase" oninput="$('#setting-color-secondary').val(this.value)">
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Accent Color</label>
-                                <div class="flex items-center gap-2">
-                                    <input type="color" id="setting-color-accent" class="w-8 h-8 rounded border border-zinc-200 cursor-pointer p-0">
-                                    <input type="text" id="setting-color-accent-text" class="flex-1 px-3 py-1.5 border border-zinc-200 rounded-lg text-xs uppercase" oninput="$('#setting-color-accent').val(this.value)">
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Text Default</label>
-                                <div class="flex items-center gap-2">
-                                    <input type="color" id="setting-color-text" class="w-8 h-8 rounded border border-zinc-200 cursor-pointer p-0">
-                                    <input type="text" id="setting-color-text-text" class="flex-1 px-3 py-1.5 border border-zinc-200 rounded-lg text-xs uppercase" oninput="$('#setting-color-text').val(this.value)">
-                                </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════ -->
+            <!-- PANEL: Spacing & Borders                              -->
+            <!-- ══════════════════════════════════════════════════════ -->
+            <div id="spanel-spacing" class="settings-panel p-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-5">
+                        <h5 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-100 pb-2">Layout Spacing</h5>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-[10px] font-bold text-zinc-500 uppercase"><span>Container Max Width</span><span id="container-width-val">1280px</span></div>
+                            <input type="range" id="setting-container-width" min="960" max="1800" step="40" value="1280" oninput="jQuery('#container-width-val').text(this.value+'px')" class="w-full accent-zinc-950 cursor-pointer">
+                            <div class="flex justify-between text-[9px] text-zinc-400"><span>960px</span><span>1280px</span><span>1800px</span></div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-[10px] font-bold text-zinc-500 uppercase"><span>Section Vertical Padding</span><span id="section-padding-val">80px</span></div>
+                            <input type="range" id="setting-section-padding" min="20" max="200" step="10" value="80" oninput="jQuery('#section-padding-val').text(this.value+'px')" class="w-full accent-zinc-950 cursor-pointer">
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-[10px] font-bold text-zinc-500 uppercase"><span>Element Column Gap</span><span id="element-gap-val">24px</span></div>
+                            <input type="range" id="setting-element-gap" min="8" max="80" step="4" value="24" oninput="jQuery('#element-gap-val').text(this.value+'px')" class="w-full accent-zinc-950 cursor-pointer">
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-[10px] font-bold text-zinc-500 uppercase"><span>Widgets Spacing</span><span id="widgets-spacing-val">20px</span></div>
+                            <input type="range" id="setting-widgets-spacing" min="0" max="60" step="4" value="20" oninput="jQuery('#widgets-spacing-val').text(this.value+'px')" class="w-full accent-zinc-950 cursor-pointer">
+                        </div>
+                    </div>
+                    <div class="space-y-5">
+                        <h5 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-100 pb-2">Border Radius System</h5>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Radius Preset</label>
+                            <div class="grid grid-cols-5 gap-2" id="radius-preset-group">
+                                <?php
+                                $presets = ['none'=>'0','sm'=>'4px','md'=>'8px','lg'=>'16px','pill'=>'999px'];
+                                foreach ($presets as $pk=>$pv): ?>
+                                <button type="button" onclick="selectRadiusPreset('<?php echo esc_attr($pv); ?>', this)" class="radius-preset-btn border border-zinc-200 rounded-lg py-2 text-[10px] font-bold text-zinc-600 hover:border-zinc-950 hover:text-zinc-950 transition-all cursor-pointer bg-transparent">
+                                    <div class="flex flex-col items-center gap-1">
+                                        <div class="w-6 h-6 border-2 border-current" style="border-radius:<?php echo esc_attr($pv); ?>"></div>
+                                        <span><?php echo esc_html(ucfirst($pk)); ?></span>
+                                    </div>
+                                </button>
+                                <?php endforeach; ?>
                             </div>
                         </div>
                         <div class="space-y-2">
-                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Background Color</label>
-                            <div class="flex items-center gap-2 w-1/2">
-                                <input type="color" id="setting-color-bg" class="w-8 h-8 rounded border border-zinc-200 cursor-pointer p-0">
-                                <input type="text" id="setting-color-bg-text" class="flex-1 px-3 py-1.5 border border-zinc-200 rounded-lg text-xs uppercase" oninput="$('#setting-color-bg').val(this.value)">
-                            </div>
+                            <div class="flex justify-between text-[10px] font-bold text-zinc-500 uppercase"><span>Custom Border Radius (px)</span><span id="border-radius-val">8px</span></div>
+                            <input type="range" id="setting-border-radius" min="0" max="32" step="2" value="8" oninput="jQuery('#border-radius-val').text(this.value+'px')" class="w-full accent-zinc-950 cursor-pointer">
                         </div>
-                    </div>
-
-                    <!-- Header/Footer Layout Options -->
-                    <div class="space-y-3">
-                        <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider border-b border-zinc-100 pb-2">Layout Config</h4>
+                        <h5 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-100 pb-2 mt-2">Default Borders</h5>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="space-y-2">
-                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Header Style</label>
-                                <select id="setting-header-layout" class="w-full px-2.5 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
-                                    <option value="Logo Left">Logo Left</option>
-                                    <option value="Centered Logo">Centered Logo</option>
-                                    <option value="Split Navigation">Split Navigation</option>
+                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Border Width</label>
+                                <select id="setting-border-width" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
+                                    <option value="0">None</option>
+                                    <option value="1" selected>1px</option>
+                                    <option value="2">2px</option>
+                                    <option value="3">3px</option>
                                 </select>
                             </div>
                             <div class="space-y-2">
-                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Footer Columns</label>
-                                <select id="setting-footer-columns" class="w-full px-2.5 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
-                                    <option value="1">1 Column</option>
-                                    <option value="2">2 Columns</option>
-                                    <option value="3">3 Columns</option>
-                                    <option value="4">4 Columns</option>
-                                </select>
+                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Border Color</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="setting-border-color" value="#e4e4e7" class="w-9 h-9 rounded-lg border border-zinc-200 cursor-pointer p-0.5" oninput="document.getElementById('setting-border-color-text').value=this.value">
+                                    <input type="text" id="setting-border-color-text" value="#e4e4e7" class="flex-1 px-3 py-2 border border-zinc-200 rounded-lg text-xs font-mono uppercase focus:outline-none focus:border-zinc-400" oninput="syncColorPicker('setting-border-color', this.value)">
+                                </div>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-4 pt-2">
+                        <h5 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-100 pb-2 mt-2">Box Shadows</h5>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Default Box Shadow</label>
+                            <select id="setting-box-shadow" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
+                                <option value="none">None</option>
+                                <option value="0 1px 3px rgba(0,0,0,0.06)" selected>Subtle (xs)</option>
+                                <option value="0 4px 12px rgba(0,0,0,0.08)">Soft (sm)</option>
+                                <option value="0 8px 24px rgba(0,0,0,0.10)">Medium</option>
+                                <option value="0 20px 60px rgba(0,0,0,0.15)">Deep (lg)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════ -->
+            <!-- PANEL: Layout                                         -->
+            <!-- ══════════════════════════════════════════════════════ -->
+            <div id="spanel-layout" class="settings-panel p-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-5">
+                        <h5 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-100 pb-2">Header</h5>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Header Style</label>
+                            <select id="setting-header-layout" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
+                                <option value="Logo Left">Logo Left — Nav Right</option>
+                                <option value="Centered Logo">Centered Logo</option>
+                                <option value="Split Navigation">Split Navigation (Logo Center)</option>
+                                <option value="Minimal">Minimal — Logo Only</option>
+                                <option value="Full Width">Full Width Bar</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Navigation Menu</label>
+                            <select id="setting-nav-menu" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
+                                <option value="0">— Default Navbar —</option>
+                                <?php
+                                $menus = wp_get_nav_menus();
+                                if ( ! empty( $menus ) ) {
+                                    foreach ( $menus as $menu ) {
+                                        echo '<option value="' . esc_attr( $menu->term_id ) . '">' . esc_html( $menu->name ) . '</option>';
+                                    }
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
                             <div class="flex items-center gap-2">
                                 <input type="checkbox" id="setting-sticky-header" class="rounded cursor-pointer">
                                 <label class="text-xs font-semibold text-zinc-700 cursor-pointer" for="setting-sticky-header">Sticky Header</label>
                             </div>
                             <div class="flex items-center gap-2">
-                                <input type="checkbox" id="setting-show-socials" class="rounded cursor-pointer">
-                                <label class="text-xs font-semibold text-zinc-700 cursor-pointer" for="setting-show-socials">Show Social Links</label>
+                                <input type="checkbox" id="setting-transparent-header" class="rounded cursor-pointer">
+                                <label class="text-xs font-semibold text-zinc-700 cursor-pointer" for="setting-transparent-header">Transparent on Hero</label>
                             </div>
                         </div>
-                        <div class="space-y-2 pt-2">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Header BG Color</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="setting-header-bg" value="#ffffff" class="w-9 h-9 rounded-lg border border-zinc-200 cursor-pointer p-0.5" oninput="document.getElementById('setting-header-bg-text').value=this.value">
+                                    <input type="text" id="setting-header-bg-text" value="#ffffff" class="flex-1 px-2 py-2 border border-zinc-200 rounded-lg text-[10px] font-mono uppercase focus:outline-none focus:border-zinc-400" oninput="syncColorPicker('setting-header-bg', this.value)">
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Header Text Color</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="setting-header-text-color" value="#18181b" class="w-9 h-9 rounded-lg border border-zinc-200 cursor-pointer p-0.5" oninput="document.getElementById('setting-header-text-color-text').value=this.value">
+                                    <input type="text" id="setting-header-text-color-text" value="#18181b" class="flex-1 px-2 py-2 border border-zinc-200 rounded-lg text-[10px] font-mono uppercase focus:outline-none focus:border-zinc-400" oninput="syncColorPicker('setting-header-text-color', this.value)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-5">
+                        <h5 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-100 pb-2">Footer</h5>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Footer Columns</label>
+                            <select id="setting-footer-columns" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
+                                <option value="1">1 Column — Centered</option>
+                                <option value="2">2 Columns</option>
+                                <option value="3" selected>3 Columns</option>
+                                <option value="4">4 Columns</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
                             <label class="block text-[10px] font-bold text-zinc-500 uppercase">Copyright Text</label>
-                            <input type="text" id="setting-copyright-text" class="w-full px-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                            <input type="text" id="setting-copyright-text" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
                         </div>
-                        <div class="grid grid-cols-2 gap-4 pt-2">
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="setting-show-socials" class="rounded cursor-pointer">
+                            <label class="text-xs font-semibold text-zinc-700 cursor-pointer" for="setting-show-socials">Show Social Links in Footer</label>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
                             <div class="space-y-2">
-                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Navigation Menu</label>
-                                <select id="setting-nav-menu" class="w-full px-2.5 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
-                                    <option value="0">— Default Navbar —</option>
-                                    <?php
-                                    $menus = wp_get_nav_menus();
-                                    if ( ! empty( $menus ) ) {
-                                        foreach ( $menus as $menu ) {
-                                            echo '<option value="' . esc_attr( $menu->term_id ) . '">' . esc_html( $menu->name ) . '</option>';
-                                        }
-                                    }
-                                    ?>
-                                </select>
+                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Footer BG Color</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="setting-footer-bg" value="#18181b" class="w-9 h-9 rounded-lg border border-zinc-200 cursor-pointer p-0.5" oninput="document.getElementById('setting-footer-bg-text').value=this.value">
+                                    <input type="text" id="setting-footer-bg-text" value="#18181b" class="flex-1 px-2 py-2 border border-zinc-200 rounded-lg text-[10px] font-mono uppercase focus:outline-none focus:border-zinc-400" oninput="syncColorPicker('setting-footer-bg', this.value)">
+                                </div>
                             </div>
                             <div class="space-y-2">
-                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Facebook Link</label>
-                                <input type="text" id="setting-facebook-link" placeholder="https://facebook.com/..." class="w-full px-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Footer Text Color</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="setting-footer-text-color" value="#a1a1aa" class="w-9 h-9 rounded-lg border border-zinc-200 cursor-pointer p-0.5" oninput="document.getElementById('setting-footer-text-color-text').value=this.value">
+                                    <input type="text" id="setting-footer-text-color-text" value="#a1a1aa" class="flex-1 px-2 py-2 border border-zinc-200 rounded-lg text-[10px] font-mono uppercase focus:outline-none focus:border-zinc-400" oninput="syncColorPicker('setting-footer-text-color', this.value)">
+                                </div>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-4 pt-2">
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Twitter Link</label>
-                                <input type="text" id="setting-twitter-link" placeholder="https://twitter.com/..." class="w-full px-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-bold text-zinc-500 uppercase">LinkedIn Link</label>
-                                <input type="text" id="setting-linkedin-link" placeholder="https://linkedin.com/in/..." class="w-full px-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
-                            </div>
+                        <h5 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-100 pb-2 mt-2">Page Defaults</h5>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Default Page Width</label>
+                            <select id="setting-page-width" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
+                                <option value="full-width">Full Width</option>
+                                <option value="boxed" selected>Boxed (with sidebar)</option>
+                                <option value="narrow">Narrow Content</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="setting-smooth-scroll" class="rounded cursor-pointer" checked>
+                            <label class="text-xs font-semibold text-zinc-700 cursor-pointer" for="setting-smooth-scroll">Enable Smooth Scroll</label>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="flex items-center justify-end border-t border-zinc-100 pt-4 mt-4">
-                <button onclick="saveThemeSettings()" <?php echo $is_read_only ? 'disabled' : ''; ?> class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all">Save Settings</button>
+            <!-- ══════════════════════════════════════════════════════ -->
+            <!-- PANEL: Social & SEO                                   -->
+            <!-- ══════════════════════════════════════════════════════ -->
+            <div id="spanel-social" class="settings-panel p-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <h5 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-100 pb-2">Social Profiles</h5>
+                        <?php
+                        $social_fields = [
+                            ['id'=>'setting-facebook-link','label'=>'Facebook','placeholder'=>'https://facebook.com/...'],
+                            ['id'=>'setting-twitter-link','label'=>'X / Twitter','placeholder'=>'https://x.com/...'],
+                            ['id'=>'setting-instagram-link','label'=>'Instagram','placeholder'=>'https://instagram.com/...'],
+                            ['id'=>'setting-linkedin-link','label'=>'LinkedIn','placeholder'=>'https://linkedin.com/in/...'],
+                            ['id'=>'setting-youtube-link','label'=>'YouTube','placeholder'=>'https://youtube.com/@...'],
+                            ['id'=>'setting-tiktok-link','label'=>'TikTok','placeholder'=>'https://tiktok.com/@...'],
+                        ];
+                        foreach ($social_fields as $sf): ?>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase"><?php echo esc_html($sf['label']); ?></label>
+                            <input type="url" id="<?php echo esc_attr($sf['id']); ?>" placeholder="<?php echo esc_attr($sf['placeholder']); ?>" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="space-y-4">
+                        <h5 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-100 pb-2">SEO & Analytics</h5>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Google Analytics (GA4) ID</label>
+                            <input type="text" id="setting-ga4-id" placeholder="G-XXXXXXXXXX" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs font-mono focus:outline-none focus:border-zinc-400">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Google Tag Manager ID</label>
+                            <input type="text" id="setting-gtm-id" placeholder="GTM-XXXXXXX" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs font-mono focus:outline-none focus:border-zinc-400">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Facebook Pixel ID</label>
+                            <input type="text" id="setting-fb-pixel" placeholder="1234567890" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs font-mono focus:outline-none focus:border-zinc-400">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Robots.txt Directive</label>
+                            <select id="setting-robots" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
+                                <option value="index,follow">Index, Follow (default)</option>
+                                <option value="noindex,follow">No Index — Follow Links</option>
+                                <option value="noindex,nofollow">No Index, No Follow</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="setting-sitemap-enable" class="rounded cursor-pointer" checked>
+                            <label class="text-xs font-semibold text-zinc-700 cursor-pointer" for="setting-sitemap-enable">Generate XML Sitemap</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════ -->
+            <!-- PANEL: Elementor Sync (conditional)                   -->
+            <!-- ══════════════════════════════════════════════════════ -->
+            <div id="spanel-elementor" class="settings-panel p-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-5">
+                        <div class="flex items-start gap-3 p-4 bg-zinc-50 border border-zinc-200 rounded-xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                            <div>
+                                <p class="text-xs font-bold text-zinc-900">Elementor Global Settings Sync</p>
+                                <p class="text-[10px] text-zinc-500 mt-1 leading-relaxed">Changes saved here are pushed directly into Elementor's active Kit — the same global settings you see in Elementor → Site Settings. Changes apply instantly across all Elementor pages.</p>
+                                <p class="text-[10px] text-zinc-400 mt-2">Last synced: <span id="elementor-last-sync" class="font-mono">Never</span></p>
+                            </div>
+                        </div>
+                        <h5 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-100 pb-2">Elementor Global Colors</h5>
+                        <p class="text-[10px] text-zinc-400">These 4 colors map 1:1 to the Elementor system color palette (Primary, Secondary, Text, Accent). Changing them here updates Elementor Site Settings → Global Colors.</p>
+                        <?php
+                        $el_colors = [
+                            ['id'=>'setting-el-primary','label'=>'System Color 1 — Primary'],
+                            ['id'=>'setting-el-secondary','label'=>'System Color 2 — Secondary'],
+                            ['id'=>'setting-el-text','label'=>'System Color 3 — Text'],
+                            ['id'=>'setting-el-accent','label'=>'System Color 4 — Accent'],
+                        ];
+                        foreach ($el_colors as $ec): ?>
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase"><?php echo esc_html($ec['label']); ?></label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="<?php echo esc_attr($ec['id']); ?>" class="w-9 h-9 rounded-lg border border-zinc-200 cursor-pointer p-0.5" oninput="document.getElementById('<?php echo esc_attr($ec['id']); ?>-text').value=this.value">
+                                <input type="text" id="<?php echo esc_attr($ec['id']); ?>-text" class="flex-1 px-3 py-2 border border-zinc-200 rounded-lg text-xs font-mono uppercase focus:outline-none focus:border-zinc-400" oninput="syncColorPicker('<?php echo esc_attr($ec['id']); ?>', this.value)">
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="space-y-5">
+                        <h5 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-100 pb-2">Elementor Global Typography</h5>
+                        <p class="text-[10px] text-zinc-400">These 4 typography presets map to Elementor Site Settings → Global Fonts (Primary, Secondary, Text, Accent typography groups).</p>
+                        <?php
+                        $el_types = [
+                            ['key'=>'primary','label'=>'Typography 1 — Primary (Headings)'],
+                            ['key'=>'secondary','label'=>'Typography 2 — Secondary (Subheadings)'],
+                            ['key'=>'text','label'=>'Typography 3 — Text (Body)'],
+                            ['key'=>'accent','label'=>'Typography 4 — Accent (Buttons/Labels)'],
+                        ];
+                        foreach ($el_types as $et): ?>
+                        <div class="border border-zinc-100 rounded-lg p-3 space-y-3">
+                            <p class="text-[10px] font-bold text-zinc-700"><?php echo esc_html($et['label']); ?></p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="space-y-1">
+                                    <label class="text-[9px] font-bold text-zinc-400 uppercase">Font Family</label>
+                                    <select id="setting-el-type-<?php echo esc_attr($et['key']); ?>-family" class="w-full px-1.5 py-1.5 border border-zinc-200 rounded text-[10px] focus:outline-none focus:border-zinc-400 cursor-pointer">
+                                        <?php foreach ($fonts as $f) echo '<option value="' . esc_attr($f) . '">' . esc_html($f) . '</option>'; ?>
+                                    </select>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[9px] font-bold text-zinc-400 uppercase">Weight</label>
+                                    <select id="setting-el-type-<?php echo esc_attr($et['key']); ?>-weight" class="w-full px-1.5 py-1.5 border border-zinc-200 rounded text-[10px] focus:outline-none focus:border-zinc-400 cursor-pointer">
+                                        <?php foreach ([100,200,300,400,500,600,700,800,900] as $w): ?>
+                                        <option value="<?php echo $w; ?>" <?php echo $w===($et['key']==='text'||$et['key']==='accent'?400:700)?'selected':''; ?>><?php echo $w; ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                        <button onclick="triggerElementorSync()" class="w-full mt-2 px-4 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+                            Sync to Elementor Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════ -->
+            <!-- PANEL: Lovable CSS Tokens (conditional)               -->
+            <!-- ══════════════════════════════════════════════════════ -->
+            <div id="spanel-lovable" class="settings-panel p-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-5">
+                        <div class="flex items-start gap-3 p-4 bg-violet-50 border border-violet-100 rounded-xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-violet-600 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                            <div>
+                                <p class="text-xs font-bold text-zinc-900">CSS Design Tokens — Global Sync</p>
+                                <p class="text-[10px] text-zinc-500 mt-1 leading-relaxed">All settings are compiled into a <code class="bg-violet-100 px-1 rounded text-[9px]">:root{}</code> CSS token block and injected on every frontend page. Your Lovable React components that use these CSS variables will update instantly.</p>
+                                <p class="text-[10px] text-zinc-400 mt-2">Token file: <span id="lovable-token-path" class="font-mono text-violet-600">cora-global-tokens.css</span></p>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">CSS Variable Prefix</label>
+                            <div class="flex items-center gap-2">
+                                <input type="text" id="setting-css-prefix" value="--" class="w-16 px-3 py-2 border border-zinc-200 rounded-lg text-xs font-mono focus:outline-none focus:border-zinc-400">
+                                <p class="text-[10px] text-zinc-400">Default <code class="bg-zinc-100 px-1 rounded">--</code> works with any Lovable Tailwind config or plain CSS.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="setting-dark-tokens" class="rounded cursor-pointer">
+                            <label class="text-xs font-semibold text-zinc-700 cursor-pointer" for="setting-dark-tokens">Generate Dark Mode tokens (<code class="text-[10px]">[data-theme=dark]</code>)</label>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h5 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Live Token Preview</h5>
+                            <button onclick="refreshTokenPreview()" class="text-[10px] text-zinc-500 hover:text-zinc-900 font-bold cursor-pointer transition-colors">↻ Refresh</button>
+                        </div>
+                        <div class="bg-zinc-950 rounded-xl p-4 overflow-auto max-h-80 font-mono text-[10px] leading-relaxed">
+                            <pre id="lovable-token-preview" class="text-zinc-300 whitespace-pre-wrap">/* Loading tokens... */</pre>
+                        </div>
+                        <button onclick="triggerLovableTokenSync()" class="w-full px-4 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+                            Push Tokens to Frontend
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ── Save Footer ──────────────────────────────────────── -->
+            <div class="flex items-center justify-between border-t border-zinc-100 px-6 py-4">
+                <p class="text-[10px] text-zinc-400" id="settings-save-hint">Changes apply globally across all pages when saved.</p>
+                <button onclick="saveThemeSettings()" <?php echo $is_read_only ? 'disabled' : ''; ?> class="px-5 py-2 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white rounded-lg text-xs font-bold shadow-sm cursor-pointer transition-all">Save Settings</button>
             </div>
         </div>
 
         <!-- TAB CONTENT: CUSTOM CODE -->
-        <div id="tab-content-code" class="grid grid-cols-1 lg:grid-cols-2 gap-6 hidden">
-            <!-- Custom CSS Editor -->
-            <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm flex flex-col justify-between min-h-[400px]">
-                <div class="space-y-4">
-                    <div>
-                        <h3 class="text-xs font-bold text-zinc-800 uppercase tracking-tight">Custom CSS Overrides</h3>
-                        <p class="text-[10px] text-zinc-500 mt-0.5">Style declarations injected inside standard `&lt;style&gt;` block in header.</p>
-                    </div>
-                    <div class="border border-zinc-200 rounded-lg overflow-hidden">
-                        <textarea id="custom-css-textarea" class="w-full h-64 p-3 font-mono text-xs focus:outline-none"></textarea>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between border-t border-zinc-100 pt-4 mt-6">
-                    <span class="text-[10px] text-zinc-400 font-mono" id="css-char-count">0 characters</span>
-                    <button onclick="saveCustomCSS()" <?php echo $is_read_only ? 'disabled' : ''; ?> class="px-3.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all">Save CSS</button>
-                </div>
-            </div>
+        <div id="tab-content-code" class="hidden">
+            <div class="flex gap-0 bg-white border border-zinc-200 rounded-xl shadow-sm overflow-hidden" style="min-height:580px">
 
-            <!-- Custom JS Editor -->
-            <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm flex flex-col justify-between min-h-[400px]">
-                <div class="space-y-4">
-                    <div>
-                        <h3 class="text-xs font-bold text-zinc-800 uppercase tracking-tight">Custom JavaScript Injection</h3>
-                        <p class="text-[10px] text-zinc-500 mt-0.5">Custom script commands loaded on all frontend routes.</p>
+                <!-- ── Left Nav: Code Sections ── -->
+                <div class="w-44 flex-shrink-0 border-r border-zinc-100 bg-zinc-50 flex flex-col">
+                    <div class="px-3 pt-4 pb-2">
+                        <p class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Code Injections</p>
                     </div>
-                    <div class="bg-amber-50 border border-amber-100 rounded-lg p-3 text-[10px] text-amber-800 leading-relaxed">
-                        ⚠️ **JavaScript errors here can break your pages.** Test script operations thoroughly before updating.
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <label class="text-[10px] font-bold text-zinc-500 uppercase whitespace-nowrap">Injection Point</label>
-                        <select id="setting-js-position" class="px-2.5 py-1 bg-white border border-zinc-200 rounded-lg text-[10px] text-zinc-650 focus:outline-none cursor-pointer">
-                            <option value="head">Inside Page Head</option>
-                            <option value="footer">Before Body Close</option>
-                        </select>
-                    </div>
-                    <div class="border border-zinc-200 rounded-lg overflow-hidden">
-                        <textarea id="custom-js-textarea" class="w-full h-48 p-3 font-mono text-xs focus:outline-none"></textarea>
+                    <nav class="flex flex-col gap-0.5 px-2 flex-1" id="code-section-nav">
+                        <?php
+                        $code_sections = [
+                            ['id'=>'css',   'label'=>'Global CSS',       'icon'=>'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',    'hint'=>'Injected in &lt;head&gt; on every page'],
+                            ['id'=>'js',    'label'=>'Custom JS',        'icon'=>'<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',                    'hint'=>'Runs on every frontend page'],
+                            ['id'=>'head',  'label'=>'Head HTML',        'icon'=>'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>','hint'=>'Tags appended to &lt;head&gt;'],
+                            ['id'=>'body',  'label'=>'Body Scripts',     'icon'=>'<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>','hint'=>'Injected before &lt;/body&gt;'],
+                            ['id'=>'snips', 'label'=>'Snippets',         'icon'=>'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>','hint'=>'Reusable code blocks'],
+                        ];
+                        foreach ($code_sections as $i => $cs): ?>
+                        <button onclick="switchCodeSection('<?php echo esc_attr($cs['id']); ?>')" id="code-nav-<?php echo esc_attr($cs['id']); ?>"
+                            class="code-nav-btn group w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-all <?php echo $i === 0 ? 'bg-white shadow-sm border border-zinc-200 text-zinc-900' : 'text-zinc-500 hover:text-zinc-900 hover:bg-white'; ?> cursor-pointer border border-transparent">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
+                                <?php echo $cs['icon']; ?>
+                            </svg>
+                            <span class="text-[11px] font-semibold leading-tight"><?php echo esc_html($cs['label']); ?></span>
+                        </button>
+                        <?php endforeach; ?>
+                    </nav>
+
+                    <!-- Bottom: Save indicator -->
+                    <div class="px-3 py-3 border-t border-zinc-100 mt-auto">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-300" id="code-save-dot"></span>
+                            <span class="text-[9px] text-zinc-400 font-medium" id="code-save-status">No changes</span>
+                        </div>
+                        <p class="text-[9px] text-zinc-300 mt-1">⌘S / Ctrl+S to save</p>
                     </div>
                 </div>
-                <div class="flex items-center justify-end border-t border-zinc-100 pt-4 mt-6">
-                    <button onclick="saveCustomJS()" <?php echo $is_read_only ? 'disabled' : ''; ?> class="px-3.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all">Save JS</button>
-                </div>
-            </div>
+
+                <!-- ── Right: Editor Area ── -->
+                <div class="flex-1 flex flex-col min-w-0">
+
+                    <!-- ══════════════════════════════════════════════ -->
+                    <!-- SECTION: Global CSS                           -->
+                    <!-- ══════════════════════════════════════════════ -->
+                    <div id="code-section-css" class="code-section flex flex-col flex-1">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-zinc-100">
+                            <div>
+                                <p class="text-xs font-bold text-zinc-900">Global CSS Overrides</p>
+                                <p class="text-[10px] text-zinc-400 mt-0.5">Compiled and injected in <code class="bg-zinc-100 px-1 rounded text-[9px]">&lt;style&gt;</code> inside the page <code class="bg-zinc-100 px-1 rounded text-[9px]">&lt;head&gt;</code>. Scoped to this theme.</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[9px] text-zinc-400 font-mono" id="css-stats">0 lines · 0 chars</span>
+                                <button onclick="saveCustomCSS()" <?php echo $is_read_only ? 'disabled' : ''; ?>
+                                    class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-40 text-white rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all flex items-center gap-1.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                    Save CSS
+                                </button>
+                            </div>
+                        </div>
+                        <!-- CodeMirror mount target -->
+                        <div class="flex-1 relative" style="min-height:460px">
+                            <textarea id="custom-css-textarea" class="hidden"></textarea>
+                            <div id="css-editor-mount" class="absolute inset-0 overflow-auto font-mono text-xs"></div>
+                        </div>
+                    </div>
+
+                    <!-- ══════════════════════════════════════════════ -->
+                    <!-- SECTION: Custom JS                            -->
+                    <!-- ══════════════════════════════════════════════ -->
+                    <div id="code-section-js" class="code-section flex flex-col flex-1 hidden">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-zinc-100">
+                            <div>
+                                <p class="text-xs font-bold text-zinc-900">Custom JavaScript</p>
+                                <p class="text-[10px] text-zinc-400 mt-0.5">Runs on all frontend pages of this theme.</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <select id="setting-js-position" class="px-2.5 py-1.5 bg-white border border-zinc-200 rounded-lg text-[10px] text-zinc-600 focus:outline-none cursor-pointer">
+                                    <option value="footer">Before &lt;/body&gt; (Recommended)</option>
+                                    <option value="head">Inside &lt;head&gt;</option>
+                                </select>
+                                <span class="text-[9px] text-zinc-400 font-mono" id="js-stats">0 lines · 0 chars</span>
+                                <button onclick="saveCustomJS()" <?php echo $is_read_only ? 'disabled' : ''; ?>
+                                    class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-40 text-white rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all flex items-center gap-1.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                    Save JS
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Warning banner -->
+                        <div class="mx-4 mt-3 flex items-start gap-2 p-3 bg-amber-50 border border-amber-100 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2" class="flex-shrink-0 mt-0.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <p class="text-[10px] text-amber-800 leading-relaxed">JS errors here can break all frontend pages. Test locally before saving. Do not include the <code class="bg-amber-100 px-0.5 rounded">&lt;script&gt;</code> wrapper tags.</p>
+                        </div>
+                        <div class="flex-1 relative mt-3" style="min-height:410px">
+                            <textarea id="custom-js-textarea" class="hidden"></textarea>
+                            <div id="js-editor-mount" class="absolute inset-0 overflow-auto font-mono text-xs"></div>
+                        </div>
+                    </div>
+
+                    <!-- ══════════════════════════════════════════════ -->
+                    <!-- SECTION: Head HTML                            -->
+                    <!-- ══════════════════════════════════════════════ -->
+                    <div id="code-section-head" class="code-section flex flex-col flex-1 hidden">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-zinc-100">
+                            <div>
+                                <p class="text-xs font-bold text-zinc-900">Head HTML Injection</p>
+                                <p class="text-[10px] text-zinc-400 mt-0.5">Raw HTML tags appended to <code class="bg-zinc-100 px-1 rounded text-[9px]">&lt;head&gt;</code> — ideal for font imports, meta tags, and pixel base code.</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[9px] text-zinc-400 font-mono" id="head-stats">0 lines · 0 chars</span>
+                                <button onclick="saveHeadHTML()" <?php echo $is_read_only ? 'disabled' : ''; ?>
+                                    class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-40 text-white rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all flex items-center gap-1.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                    Save HTML
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Quick-insert chips -->
+                        <div class="flex items-center gap-2 flex-wrap px-4 py-2 border-b border-zinc-50">
+                            <span class="text-[9px] font-bold text-zinc-400 uppercase">Quick insert:</span>
+                            <?php
+                            $head_snippets = [
+                                ['label'=>'Google Font', 'code'=>'<link rel="preconnect" href="https://fonts.googleapis.com">' . "\n" . '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n" . '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">'],
+                                ['label'=>'Meta Viewport', 'code'=>'<meta name="viewport" content="width=device-width, initial-scale=1.0">'],
+                                ['label'=>'OG Tags', 'code'=>'<meta property="og:title" content="Your Site">' . "\n" . '<meta property="og:description" content="Description">' . "\n" . '<meta property="og:image" content="https://example.com/image.jpg">'],
+                                ['label'=>'Canonical URL', 'code'=>'<link rel="canonical" href="https://yoursite.com/">'],
+                                ['label'=>'No-index', 'code'=>'<meta name="robots" content="noindex, nofollow">'],
+                            ];
+                            foreach ($head_snippets as $qs): ?>
+                            <button data-code="<?php echo esc_attr($qs['code']); ?>"
+                                class="quick-insert-btn-head px-2 py-0.5 rounded-md border border-zinc-200 text-[9px] font-semibold text-zinc-600 hover:border-zinc-400 hover:text-zinc-900 bg-white cursor-pointer transition-all"><?php echo esc_html($qs['label']); ?></button>
+                            <?php endforeach; ?>
+                        </div>
+                        <div class="flex-1 relative" style="min-height:420px">
+                            <textarea id="custom-head-textarea" class="hidden"></textarea>
+                            <div id="head-editor-mount" class="absolute inset-0 overflow-auto font-mono text-xs"></div>
+                        </div>
+                    </div>
+
+                    <!-- ══════════════════════════════════════════════ -->
+                    <!-- SECTION: Body Scripts                         -->
+                    <!-- ══════════════════════════════════════════════ -->
+                    <div id="code-section-body" class="code-section flex flex-col flex-1 hidden">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-zinc-100">
+                            <div>
+                                <p class="text-xs font-bold text-zinc-900">Body Script Injection</p>
+                                <p class="text-[10px] text-zinc-400 mt-0.5">HTML/scripts injected just before <code class="bg-zinc-100 px-1 rounded text-[9px]">&lt;/body&gt;</code>. Ideal for chat widgets, analytics, and deferred scripts.</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[9px] text-zinc-400 font-mono" id="body-stats">0 lines · 0 chars</span>
+                                <button onclick="saveBodyHTML()" <?php echo $is_read_only ? 'disabled' : ''; ?>
+                                    class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-40 text-white rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all flex items-center gap-1.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                    Save Body
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Quick-insert chips -->
+                        <div class="flex items-center gap-2 flex-wrap px-4 py-2 border-b border-zinc-50">
+                            <span class="text-[9px] font-bold text-zinc-400 uppercase">Quick insert:</span>
+                            <?php
+                            $body_snippets = [
+                                ['label'=>'Google Analytics', 'code'=>'<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>' . "\n" . '<script>' . "\n" . '  window.dataLayer = window.dataLayer || [];' . "\n" . '  function gtag(){dataLayer.push(arguments);}' . "\n" . '  gtag(\'js\', new Date());' . "\n" . '  gtag(\'config\', \'G-XXXXXXXXXX\');' . "\n" . '</script>'],
+                                ['label'=>'GTM Body', 'code'=>'<!-- Google Tag Manager (noscript) -->' . "\n" . '<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"' . "\n" . 'height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>'],
+                                ['label'=>'FB Pixel', 'code'=>'<script>' . "\n" . '  !function(f,b,e,v,n,t,s)' . "\n" . '  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?' . "\n" . '  n.callMethod.apply(n,arguments):n.queue.push(arguments)};' . "\n" . '  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version=\'2.0\';' . "\n" . '  n.queue=[];t=b.createElement(e);t.async=!0;' . "\n" . '  t.src=v;s=b.getElementsByTagName(e)[0];' . "\n" . '  s.parentNode.insertBefore(t,s)}(window, document,\'script\',' . "\n" . '  \'https://connect.facebook.net/en_US/fbevents.js\');' . "\n" . '  fbq(\'init\', \'YOUR_PIXEL_ID\');' . "\n" . '  fbq(\'track\', \'PageView\');' . "\n" . '</script>'],
+                                ['label'=>'Intercom', 'code'=>'<script>' . "\n" . '  window.intercomSettings = {' . "\n" . '    api_base: "https://api-iam.intercom.io",' . "\n" . '    app_id: "YOUR_APP_ID"' . "\n" . '  };' . "\n" . '  (function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic(\'reattach_activator\');ic(\'update\',w.intercomSettings);}else{var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.Intercom=i;var l=function(){var s=d.createElement(\'script\');s.type=\'text/javascript\';s.async=true;s.src=\'https://widget.intercom.io/widget/YOUR_APP_ID\';var x=d.getElementsByTagName(\'script\')[0];x.parentNode.insertBefore(s,x);};if(document.readyState===\'complete\'){l();}else if(w.attachEvent){w.attachEvent(\'onload\',l);}else{w.addEventListener(\'load\',l,false);}}}());' . "\n" . '</script>'],
+                                ['label'=>'Crisp Chat', 'code'=>'<script type="text/javascript">' . "\n" . '  window.$crisp=[];window.CRISP_WEBSITE_ID="YOUR-WEBSITE-ID";' . "\n" . '  (function(){d=document;s=d.createElement("script");' . "\n" . '  s.src="https://client.crisp.chat/l.js";' . "\n" . '  s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();' . "\n" . '</script>'],
+                            ];
+                            foreach ($body_snippets as $bs): ?>
+                            <button data-code="<?php echo esc_attr($bs['code']); ?>"
+                                class="quick-insert-btn-body px-2 py-0.5 rounded-md border border-zinc-200 text-[9px] font-semibold text-zinc-600 hover:border-zinc-400 hover:text-zinc-900 bg-white cursor-pointer transition-all"><?php echo esc_html($bs['label']); ?></button>
+                            <?php endforeach; ?>
+                        </div>
+                        <div class="flex-1 relative" style="min-height:390px">
+                            <textarea id="custom-body-textarea" class="hidden"></textarea>
+                            <div id="body-editor-mount" class="absolute inset-0 overflow-auto font-mono text-xs"></div>
+                        </div>
+                    </div>
+
+                    <!-- ══════════════════════════════════════════════ -->
+                    <!-- SECTION: Snippets Library                     -->
+                    <!-- ══════════════════════════════════════════════ -->
+                    <div id="code-section-snips" class="code-section flex flex-col flex-1 hidden">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-zinc-100">
+                            <div>
+                                <p class="text-xs font-bold text-zinc-900">Snippets Library</p>
+                                <p class="text-[10px] text-zinc-400 mt-0.5">Pre-built code blocks. Click any snippet to insert it into the relevant editor.</p>
+                            </div>
+                        </div>
+                        <div class="flex-1 overflow-auto p-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="snippets-grid">
+                                <?php
+                                $snippets = [
+                                    ['cat'=>'CSS', 'title'=>'Smooth Scroll', 'desc'=>'Enables CSS smooth scrolling globally', 'code'=>'html { scroll-behavior: smooth; }'],
+                                    ['cat'=>'CSS', 'title'=>'Custom Scrollbar', 'desc'=>'Styled webkit scrollbar for Chrome/Safari', 'code'=>"::-webkit-scrollbar { width: 6px; }\n::-webkit-scrollbar-track { background: #f4f4f5; }\n::-webkit-scrollbar-thumb { background: #a1a1aa; border-radius: 3px; }\n::-webkit-scrollbar-thumb:hover { background: #71717a; }"],
+                                    ['cat'=>'CSS', 'title'=>'Selection Color', 'desc'=>'Custom text selection highlight color', 'code'=>"::selection { background: var(--color-primary, #18181b); color: #fff; }\n::-moz-selection { background: var(--color-primary, #18181b); color: #fff; }"],
+                                    ['cat'=>'CSS', 'title'=>'Image Lazy Fade', 'desc'=>'Fade in images as they lazy load', 'code'=>"img[loading='lazy'] { opacity: 0; transition: opacity 0.4s ease; }\nimg[loading='lazy'].loaded { opacity: 1; }"],
+                                    ['cat'=>'JS',  'title'=>'Back to Top', 'desc'=>'Scroll to top when button#back-to-top is clicked', 'code'=>"document.getElementById('back-to-top')?.addEventListener('click', () => {\n  window.scrollTo({ top: 0, behavior: 'smooth' });\n});"],
+                                    ['cat'=>'JS',  'title'=>'Lazy Image Load', 'desc'=>'Trigger loaded class on lazy images', 'code'=>'document.querySelectorAll(\'img[loading="lazy"]\').forEach(img => {' . "\n" . '  img.addEventListener(\'load\', () => img.classList.add(\'loaded\'));' . "\n" . '  if (img.complete) img.classList.add(\'loaded\');' . "\n" . '});'],
+                                    ['cat'=>'JS',  'title'=>'Console Welcome', 'desc'=>'A branded console message', 'code'=>"console.log('%c ✦ Built with Cora ', 'background:#18181b;color:#fff;font-size:14px;border-radius:4px;padding:4px 8px;');"],
+                                    ['cat'=>'HTML','title'=>'Google Font Import', 'desc'=>'Inter font from Google Fonts CDN', 'code'=>'<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">'],
+                                    ['cat'=>'HTML','title'=>'Schema — LocalBusiness', 'desc'=>'Structured data for local business SEO', 'code'=>'<script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Your Agency","address":{"@type":"PostalAddress","streetAddress":"123 Main St","addressLocality":"City","addressRegion":"ST","postalCode":"00000"},"telephone":"+1-555-555-5555","url":"https://yoursite.com"}</script>'],
+                                    ['cat'=>'HTML','title'=>'Open Graph Tags', 'desc'=>'Social share meta tags', 'code'=>'<meta property="og:title" content="Your Site Title"><meta property="og:description" content="Your site description"><meta property="og:type" content="website"><meta property="og:url" content="https://yoursite.com"><meta property="og:image" content="https://yoursite.com/og-image.jpg">'],
+                                ];
+                                foreach ($snippets as $sn): ?>
+                                <div class="border border-zinc-200 rounded-xl p-3.5 hover:border-zinc-400 transition-all group bg-white">
+                                    <div class="flex items-start justify-between gap-2 mb-2">
+                                        <div>
+                                            <span class="inline-block px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wide <?php echo $sn['cat']==='CSS'?'bg-blue-50 text-blue-700':($sn['cat']==='JS'?'bg-amber-50 text-amber-700':'bg-zinc-100 text-zinc-600'); ?> mb-1"><?php echo esc_html($sn['cat']); ?></span>
+                                            <p class="text-[11px] font-bold text-zinc-900"><?php echo esc_html($sn['title']); ?></p>
+                                            <p class="text-[10px] text-zinc-500 mt-0.5"><?php echo esc_html($sn['desc']); ?></p>
+                                        </div>
+                                        <button data-cat="<?php echo esc_attr($sn['cat']); ?>" data-code="<?php echo esc_attr($sn['code']); ?>"
+                                            class="quick-insert-btn-snip flex-shrink-0 px-2.5 py-1.5 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-600 hover:bg-zinc-950 hover:text-white hover:border-zinc-950 cursor-pointer transition-all">
+                                            Insert
+                                        </button>
+                                    </div>
+                                    <pre class="bg-zinc-950 text-zinc-300 rounded-lg p-2.5 text-[9px] font-mono leading-relaxed overflow-auto max-h-24 whitespace-pre-wrap"><?php echo esc_html(mb_strimwidth($sn['code'], 0, 180, '...')); ?></pre>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- end editor area -->
+            </div><!-- end flex container -->
         </div>
+
     </div>
 
     <!-- LEVEL 3 — ELEMENTOR PAGE EDITOR iframe wrapper -->
@@ -2197,38 +2874,12 @@ $wp_pages = get_pages();
     };
 
     jQuery(document).ready(function($) {
-        // Init editors on DOM load
-        initCodeEditors();
-        
         // Hide standard menu click list if click outside
         $(document).on('click', function() {
             $('[id^="theme-menu-"]').addClass('hidden');
             $('#add-menu-item-dropdown').addClass('hidden');
         });
     });
-
-    // Code Editors Initialization
-    function initCodeEditors() {
-        if (typeof CodeMirror !== 'undefined') {
-            canvasState.cssEditor = CodeMirror.fromTextArea(document.getElementById('custom-css-textarea'), {
-                mode: 'css',
-                lineNumbers: true,
-                theme: 'neat'
-            });
-            canvasState.cssEditor.on('change', function(cm) {
-                const len = cm.getValue().length;
-                jQuery('#css-char-count').text(len + ' characters');
-            });
-            canvasState.cssEditor.setValue(jQuery('#custom-css-textarea').val());
-
-            canvasState.jsEditor = CodeMirror.fromTextArea(document.getElementById('custom-js-textarea'), {
-                mode: 'javascript',
-                lineNumbers: true,
-                theme: 'neat'
-            });
-            canvasState.jsEditor.setValue(jQuery('#custom-js-textarea').val());
-        }
-    }
 
     // --- Level 1 Theme Functions ---
     function openNewThemeDrawer() {
@@ -2315,6 +2966,23 @@ $wp_pages = get_pages();
             } else {
                 jQuery('#import-file-name-display').text('Click to select or drag & drop ZIP here');
             }
+        });
+
+        // Quick-insert snippets handlers (avoiding inline quote escaping issues)
+        jQuery(document).on('click', '.quick-insert-btn-head', function() {
+            const code = jQuery(this).attr('data-code');
+            insertHeadSnippet(code);
+            window.coraShowToast('Head HTML snippet inserted.');
+        });
+        jQuery(document).on('click', '.quick-insert-btn-body', function() {
+            const code = jQuery(this).attr('data-code');
+            insertBodySnippet(code);
+            window.coraShowToast('Body script snippet inserted.');
+        });
+        jQuery(document).on('click', '.quick-insert-btn-snip', function() {
+            const cat = jQuery(this).attr('data-cat');
+            const code = jQuery(this).attr('data-code');
+            insertSnippet(cat, code);
         });
     });
 
@@ -2618,32 +3286,165 @@ $wp_pages = get_pages();
     // ── Pages tab state ──
     var pageSortState     = 'modified';
     var pageStatusFilter  = 'all';
+    var activeViewFilter   = 'all';
+    var customViewsList    = [{ id: 'all', label: 'All', query: '' }];
 
-    // Toggle icon-button popovers (search / filter / sort)
-    function cpbToggle(panel) {
-        var panels = { search: 'cpb-panel-search', filter: 'cpb-panel-filter', sort: 'cpb-panel-sort' };
+    try {
+        const stored = localStorage.getItem('cora_pages_custom_views');
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                if (typeof parsed[0] === 'string') {
+                    const labels = {
+                        all: 'All',
+                        listing: 'Listings',
+                        product: 'Products',
+                        standard: 'Standard',
+                        policy: 'Policies'
+                    };
+                    customViewsList = parsed.map(v => ({
+                        id: v,
+                        label: labels[v] || v,
+                        query: v === 'all' ? '' : v.toLowerCase()
+                    }));
+                } else {
+                    customViewsList = parsed;
+                }
+            }
+        }
+    } catch(e) {}
+
+    // Render views tab strip on ready
+    jQuery(document).ready(function() {
+        renderViewsTabStrip();
+    });
+
+    // Toggle views tab creation dropdown
+    function toggleAddViewDropdown() {
+        jQuery('#add-view-dropdown').toggleClass('hidden');
+        if (!jQuery('#add-view-dropdown').hasClass('hidden')) {
+            setTimeout(function() {
+                var inp = document.getElementById('new-view-name');
+                if (inp) inp.focus();
+            }, 50);
+        }
+    }
+
+    // Toggle filter/sort dropdown chips
+    function toggleDropdownChip(type) {
+        var panels = { filter: 'chip-dropdown-filter', sort: 'chip-dropdown-sort' };
         Object.keys(panels).forEach(function(k) {
             var el = document.getElementById(panels[k]);
             if (!el) return;
-            if (k === panel) el.classList.toggle('hidden');
+            if (k === type) el.classList.toggle('hidden');
             else el.classList.add('hidden');
         });
-        if (panel === 'search') setTimeout(function() {
-            var inp = document.getElementById('page-search-input');
-            if (inp) inp.focus();
-        }, 50);
     }
 
-    // Close all popovers when clicking outside
+    // Handles filter select from the dropdown chip
+    function selectChipFilter(status, label) {
+        pageStatusFilter = status;
+        jQuery('#filter-chip-btn span').text(label);
+        jQuery('#chip-dropdown-filter').addClass('hidden');
+        filterPages();
+    }
+
+    // Handles sort select from the dropdown chip
+    function selectChipSort(val, label) {
+        pageSortState = val;
+        jQuery('#sort-chip-btn span').text(label);
+        jQuery('#chip-dropdown-sort').addClass('hidden');
+        filterPages();
+    }
+
+    // Create new custom view tab
+    function createNewCustomView() {
+        const input = document.getElementById('new-view-name');
+        if (!input) return;
+        const name = input.value.trim();
+        if (!name) return;
+
+        const viewId = 'view_' + Date.now();
+        const newView = {
+            id: viewId,
+            label: name,
+            query: name.toLowerCase()
+        };
+
+        customViewsList.push(newView);
+        localStorage.setItem('cora_pages_custom_views', JSON.stringify(customViewsList));
+        
+        input.value = '';
+        jQuery('#add-view-dropdown').addClass('hidden');
+        renderViewsTabStrip();
+        setViewFilter(viewId);
+    }
+
+    // Remove custom view tab
+    function removeCustomView(viewId, event) {
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+        customViewsList = customViewsList.filter(v => v.id !== viewId);
+        localStorage.setItem('cora_pages_custom_views', JSON.stringify(customViewsList));
+        if (activeViewFilter === viewId) {
+            activeViewFilter = 'all';
+        }
+        renderViewsTabStrip();
+        filterPages();
+    }
+
+    // Set active list view filter
+    function setViewFilter(viewId) {
+        activeViewFilter = viewId;
+        jQuery('#pages-views-tab-strip .view-tab-btn').each(function() {
+            const vid = jQuery(this).data('view');
+            if (vid) {
+                const isActive = vid === viewId;
+                jQuery(this)
+                    .toggleClass('bg-zinc-900 text-white', isActive)
+                    .toggleClass('bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60', !isActive);
+            }
+        });
+        filterPages();
+    }
+
+    // Render the custom views tabs
+    function renderViewsTabStrip() {
+        const container = jQuery('#pages-views-tab-strip');
+        if (!container.length) return;
+        
+        container.find('.pages-view-btn').remove();
+        
+        const tabsHtml = customViewsList.map(v => {
+            const label = v.label;
+            const isActive = v.id === activeViewFilter;
+            const activeClasses = isActive ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60';
+            
+            if (v.id === 'all') {
+                return `<button onclick="setViewFilter('all')" data-view="all" class="view-tab-btn px-3 py-1.5 rounded-md text-[11px] font-semibold transition-all cursor-pointer pages-view-btn ${activeClasses}">${label}</button>`;
+            } else {
+                return `<div data-view="${v.id}" class="view-tab-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-semibold transition-all pages-view-btn ${activeClasses}">
+                    <span class="cursor-pointer" onclick="setViewFilter('${v.id}')">${label}</span>
+                    <button onclick="removeCustomView('${v.id}', event)" class="hover:text-red-500 text-[12px] ml-1 font-bold bg-transparent border-none p-0 cursor-pointer focus:outline-none leading-none opacity-60 hover:opacity-100">&times;</button>
+                </div>`;
+            }
+        }).join('');
+        
+        container.prepend(tabsHtml);
+    }
+
+    // Close all popovers and dropdowns when clicking outside
     document.addEventListener('click', function(e) {
-        if (!e.target.closest('#pages-search-trigger') && !e.target.closest('#cpb-panel-search')) {
-            var el = document.getElementById('cpb-panel-search'); if (el) el.classList.add('hidden');
+        if (!e.target.closest('#add-view-btn') && !e.target.closest('#add-view-dropdown')) {
+            var el = document.getElementById('add-view-dropdown'); if (el) el.classList.add('hidden');
         }
-        if (!e.target.closest('#pages-filter-trigger') && !e.target.closest('#cpb-panel-filter')) {
-            var el = document.getElementById('cpb-panel-filter'); if (el) el.classList.add('hidden');
+        if (!e.target.closest('#filter-chip-btn') && !e.target.closest('#chip-dropdown-filter')) {
+            var el = document.getElementById('chip-dropdown-filter'); if (el) el.classList.add('hidden');
         }
-        if (!e.target.closest('#pages-sort-trigger') && !e.target.closest('#cpb-panel-sort')) {
-            var el = document.getElementById('cpb-panel-sort'); if (el) el.classList.add('hidden');
+        if (!e.target.closest('#sort-chip-btn') && !e.target.closest('#chip-dropdown-sort')) {
+            var el = document.getElementById('chip-dropdown-sort'); if (el) el.classList.add('hidden');
         }
         if (!e.target.closest('[id^="page-menu-"]') && !e.target.closest('[onclick*="togglePageRowActions"]')) {
             jQuery('[id^="page-menu-"]').addClass('hidden');
@@ -2684,7 +3485,43 @@ $wp_pages = get_pages();
 
         var filtered = canvasState.pages.slice();
         if (query)         filtered = filtered.filter(function(p) { return p.title.toLowerCase().includes(query) || p.slug.toLowerCase().includes(query); });
-        if (status !== 'all') filtered = filtered.filter(function(p) { return p.status === status; });
+        
+        // Handle filter dropdown chip values
+        if (status !== 'all') {
+            if (status === 'private') {
+                filtered = filtered.filter(function(p) { return p.status === 'private' || p.status === 'unlisted'; });
+            } else {
+                filtered = filtered.filter(function(p) { return p.status === status; });
+            }
+        }
+
+        // Handle custom views category filters
+        if (activeViewFilter !== 'all') {
+            const activeView = customViewsList.find(v => v.id === activeViewFilter);
+            if (activeView && activeView.query) {
+                const q = activeView.query;
+                filtered = filtered.filter(function(p) {
+                    const titleLower = p.title.toLowerCase();
+                    const slugLower = p.slug.toLowerCase();
+                    const templateLower = (p.template || '').toLowerCase();
+                    
+                    if (q === 'listing' || q === 'listings') {
+                        return templateLower.includes('listing') || slugLower.includes('listing') || titleLower.includes('listing');
+                    } else if (q === 'product' || q === 'products') {
+                        return templateLower.includes('product') || slugLower.includes('product') || titleLower.includes('product');
+                    } else if (q === 'policy' || q === 'policies' || q === 'privacy' || q === 'terms') {
+                        return templateLower.includes('policy') || slugLower.includes('policy') || slugLower.includes('privacy') || slugLower.includes('terms') || titleLower.includes('policy') || titleLower.includes('terms');
+                    } else if (q === 'standard') {
+                        const isListing = templateLower.includes('listing') || slugLower.includes('listing') || titleLower.includes('listing');
+                        const isProduct = templateLower.includes('product') || slugLower.includes('product') || titleLower.includes('product');
+                        const isPolicy = templateLower.includes('policy') || slugLower.includes('policy') || slugLower.includes('privacy') || slugLower.includes('terms') || titleLower.includes('policy') || titleLower.includes('terms');
+                        return !isListing && !isProduct && !isPolicy;
+                    }
+                    
+                    return titleLower.includes(q) || slugLower.includes(q) || templateLower.includes(q);
+                });
+            }
+        }
 
         if (pageSortState === 'alpha')      filtered.sort(function(a,b){ return a.title.localeCompare(b.title); });
         else if (pageSortState === 'alpha-desc') filtered.sort(function(a,b){ return b.title.localeCompare(a.title); });
@@ -2742,13 +3579,28 @@ $wp_pages = get_pages();
                     <td class="px-3 py-2">${visibilityPill}</td>
                     <td class="px-3 py-2 max-w-[220px] truncate">${contentPreview}</td>
                     <td class="px-3 py-2 text-[11px] text-zinc-400 whitespace-nowrap">${getRelativeTime(p.updated_at)}</td>
-                    <td class="px-3 py-2">
-                        <div class="relative inline-block text-left">
-                            <button onclick="togglePageRowActions(${p.id}, event)"
-                                class="w-6 h-6 flex items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 cursor-pointer opacity-0 group-hover:opacity-100 transition-all">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                    <td class="px-3 py-2 w-28 whitespace-nowrap text-right">
+                        <div class="flex items-center gap-1 justify-end">
+                            <!-- Preview/View shortcut -->
+                            <a href="${coraREData.siteUrl}/${p.slug}${p.slug.includes('?') ? '&' : '?'}cv_preview_theme=${canvasState.activeThemeId}" target="_blank"
+                                class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900 cursor-pointer transition-all"
+                                title="Preview Page">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </a>
+                            <!-- Edit/Pencil shortcut -->
+                            <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id})"
+                                class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900 cursor-pointer transition-all"
+                                title="Edit Page">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                             </button>
-                            <div id="page-menu-${p.id}" class="hidden absolute right-0 top-full mt-1 w-44 bg-white border border-zinc-200 rounded-xl shadow-lg py-1 z-20 text-left">
+                            <!-- More Actions (Three Dots) -->
+                            <div class="relative inline-block text-left">
+                                <button onclick="togglePageRowActions(${p.id}, event)"
+                                    class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 cursor-pointer transition-all"
+                                    title="More Actions">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                                </button>
+                                <div id="page-menu-${p.id}" class="hidden absolute right-0 top-full mt-1 w-44 bg-white border border-zinc-200 rounded-xl shadow-lg py-1 z-20 text-left">
                                 <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
                                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                     Edit page
@@ -3577,59 +4429,131 @@ $wp_pages = get_pages();
             
             jQuery('#setting-site-title').val(settings.site_title || '');
             jQuery('#setting-site-tagline').val(settings.site_tagline || '');
+            jQuery('#setting-site-description').val(settings.site_description || '');
             jQuery('#setting-site-favicon').val(settings.site_favicon || '');
             jQuery('#setting-site-logo').val(settings.site_logo || '');
+            jQuery('#setting-site-logo-dark').val(settings.site_logo_dark || '');
+            jQuery('#setting-og-image').val(settings.og_image || '');
+            jQuery('#setting-title-format').val(settings.title_format || '');
             
+            // Typography
             jQuery('#setting-heading-font').val(settings.heading_font || 'Inter');
             jQuery('#setting-body-font').val(settings.body_font || 'Inter');
+            jQuery('#setting-accent-font').val(settings.accent_font || '');
             jQuery('#setting-font-size').val(settings.base_font_size || 16);
             jQuery('#font-size-val').text((settings.base_font_size || 16) + 'px');
+            jQuery('#setting-gfonts-key').val(settings.gfonts_key || '');
 
-            jQuery('#setting-color-primary').val(settings.primary_color || '#18181b');
-            jQuery('#setting-color-primary-text').val(settings.primary_color || '#18181b');
-            
-            jQuery('#setting-color-secondary').val(settings.secondary_color || '#27272a');
-            jQuery('#setting-color-secondary-text').val(settings.secondary_color || '#27272a');
-            
-            jQuery('#setting-color-accent').val(settings.accent_color || '#10b981');
-            jQuery('#setting-color-accent-text').val(settings.accent_color || '#10b981');
+            // Type scale
+            const typeLevels = ['h1','h2','h3','body','small','btn'];
+            typeLevels.forEach(function(lv) {
+                const defs = {h1:{size:56,weight:800,lh:1.2,ls:0},h2:{size:40,weight:700,lh:1.25,ls:0},h3:{size:28,weight:600,lh:1.3,ls:0},body:{size:16,weight:400,lh:1.65,ls:0},small:{size:13,weight:400,lh:1.5,ls:0},btn:{size:14,weight:600,lh:1.2,ls:0}};
+                const d = defs[lv] || {size:16,weight:400,lh:1.5,ls:0};
+                jQuery('#setting-type-' + lv + '-size').val(settings['type_' + lv + '_size'] || d.size);
+                jQuery('#setting-type-' + lv + '-weight').val(settings['type_' + lv + '_weight'] || d.weight);
+                jQuery('#setting-type-' + lv + '-lh').val(settings['type_' + lv + '_lh'] || d.lh);
+                jQuery('#setting-type-' + lv + '-ls').val(settings['type_' + lv + '_ls'] || d.ls);
+            });
 
-            jQuery('#setting-color-text').val(settings.text_color || '#09090b');
-            jQuery('#setting-color-text-text').val(settings.text_color || '#09090b');
+            // Core Colors
+            function setColor(id, val) {
+                jQuery('#' + id).val(val);
+                jQuery('#' + id + '-text').val(val);
+            }
+            setColor('setting-color-primary',   settings.primary_color   || '#18181b');
+            setColor('setting-color-secondary',  settings.secondary_color || '#27272a');
+            setColor('setting-color-accent',     settings.accent_color    || '#10b981');
+            setColor('setting-color-text',       settings.text_color      || '#09090b');
+            setColor('setting-color-bg',         settings.bg_color        || '#ffffff');
+            setColor('setting-color-surface',    settings.surface_color   || '#f4f4f5');
+            // Semantic colors
+            setColor('setting-color-success',    settings.success_color   || '#16a34a');
+            setColor('setting-color-warning',    settings.warning_color   || '#d97706');
+            setColor('setting-color-danger',     settings.danger_color    || '#dc2626');
+            setColor('setting-color-info',       settings.info_color      || '#2563eb');
+            // Button colors
+            setColor('setting-color-btn-bg',     settings.btn_bg          || settings.primary_color || '#18181b');
+            setColor('setting-color-btn-text',   settings.btn_text        || '#ffffff');
+            setColor('setting-color-btn-hover',  settings.btn_hover_bg    || settings.secondary_color || '#27272a');
 
-            jQuery('#setting-color-bg').val(settings.bg_color || '#ffffff');
-            jQuery('#setting-color-bg-text').val(settings.bg_color || '#ffffff');
+            // Spacing
+            const cw = settings.container_width || 1280;
+            jQuery('#setting-container-width').val(cw);
+            jQuery('#container-width-val').text(cw + 'px');
+            const sp = settings.section_padding || 80;
+            jQuery('#setting-section-padding').val(sp);
+            jQuery('#section-padding-val').text(sp + 'px');
+            const eg = settings.element_gap || 24;
+            jQuery('#setting-element-gap').val(eg);
+            jQuery('#element-gap-val').text(eg + 'px');
+            const ws = settings.widgets_spacing || 20;
+            jQuery('#setting-widgets-spacing').val(ws);
+            jQuery('#widgets-spacing-val').text(ws + 'px');
+            const br = settings.border_radius || 8;
+            jQuery('#setting-border-radius').val(br);
+            jQuery('#border-radius-val').text(br + 'px');
+            jQuery('#setting-border-width').val(settings.border_width || '1');
+            setColor('setting-border-color', settings.border_color || '#e4e4e7');
+            jQuery('#setting-box-shadow').val(settings.box_shadow || '0 1px 3px rgba(0,0,0,0.06)');
 
+            // Layout
             jQuery('#setting-header-layout').val(settings.header_layout || 'Logo Left');
-            jQuery('#setting-footer-columns').val(settings.footer_columns || '3');
-            jQuery('#setting-sticky-header').prop('checked', settings.sticky_header == 1);
-            jQuery('#setting-show-socials').prop('checked', settings.show_socials == 1);
-            jQuery('#setting-copyright-text').val(settings.copyright_text || '');
-            
-            // Header/Footer extension bindings
             jQuery('#setting-nav-menu').val(settings.nav_menu || '0');
-            jQuery('#setting-facebook-link').val(settings.facebook_link || '');
-            jQuery('#setting-twitter-link').val(settings.twitter_link || '');
-            jQuery('#setting-linkedin-link').val(settings.linkedin_link || '');
+            jQuery('#setting-sticky-header').prop('checked', settings.sticky_header == 1);
+            jQuery('#setting-transparent-header').prop('checked', settings.transparent_header == 1);
+            setColor('setting-header-bg',         settings.header_bg         || '#ffffff');
+            setColor('setting-header-text-color',  settings.header_text_color || '#18181b');
+            jQuery('#setting-footer-columns').val(settings.footer_columns || '3');
+            jQuery('#setting-copyright-text').val(settings.copyright_text || '');
+            jQuery('#setting-show-socials').prop('checked', settings.show_socials == 1);
+            setColor('setting-footer-bg',          settings.footer_bg         || '#18181b');
+            setColor('setting-footer-text-color',  settings.footer_text_color || '#a1a1aa');
+            jQuery('#setting-page-width').val(settings.page_width || 'boxed');
+            jQuery('#setting-smooth-scroll').prop('checked', settings.smooth_scroll !== 0);
 
-            // Load custom code rules into editors
-            const customCss = settings.custom_css || '';
-            const customJs = settings.custom_js || '';
-            const jsPos = settings.custom_js_position || 'head';
+            // Social & SEO
+            jQuery('#setting-facebook-link').val(settings.facebook_link  || '');
+            jQuery('#setting-twitter-link').val(settings.twitter_link    || '');
+            jQuery('#setting-instagram-link').val(settings.instagram_link || '');
+            jQuery('#setting-linkedin-link').val(settings.linkedin_link  || '');
+            jQuery('#setting-youtube-link').val(settings.youtube_link    || '');
+            jQuery('#setting-tiktok-link').val(settings.tiktok_link      || '');
+            jQuery('#setting-ga4-id').val(settings.ga4_id     || '');
+            jQuery('#setting-gtm-id').val(settings.gtm_id     || '');
+            jQuery('#setting-fb-pixel').val(settings.fb_pixel  || '');
+            jQuery('#setting-robots').val(settings.robots      || 'index,follow');
+            jQuery('#setting-sitemap-enable').prop('checked', settings.sitemap_enable !== 0);
 
-            if (canvasState.cssEditor) {
-                canvasState.cssEditor.setValue(customCss);
-            } else {
-                jQuery('#custom-css-textarea').val(customCss);
-            }
+            // Elementor panel
+            setColor('setting-el-primary',   settings.el_primary   || settings.primary_color   || '#18181b');
+            setColor('setting-el-secondary',  settings.el_secondary || settings.secondary_color  || '#27272a');
+            setColor('setting-el-text',       settings.el_text      || settings.text_color       || '#09090b');
+            setColor('setting-el-accent',     settings.el_accent    || settings.accent_color     || '#10b981');
+            const hf = settings.heading_font || 'Inter';
+            const bf = settings.body_font    || 'Inter';
+            jQuery('#setting-el-type-primary-family').val(settings.el_type_primary_family     || hf);
+            jQuery('#setting-el-type-primary-weight').val(settings.el_type_primary_weight     || 700);
+            jQuery('#setting-el-type-secondary-family').val(settings.el_type_secondary_family || hf);
+            jQuery('#setting-el-type-secondary-weight').val(settings.el_type_secondary_weight || 600);
+            jQuery('#setting-el-type-text-family').val(settings.el_type_text_family           || bf);
+            jQuery('#setting-el-type-text-weight').val(settings.el_type_text_weight           || 400);
+            jQuery('#setting-el-type-accent-family').val(settings.el_type_accent_family       || hf);
+            jQuery('#setting-el-type-accent-weight').val(settings.el_type_accent_weight       || 600);
 
-            if (canvasState.jsEditor) {
-                canvasState.jsEditor.setValue(customJs);
-            } else {
-                jQuery('#custom-js-textarea').val(customJs);
-            }
+            // Lovable tokens panel
+            jQuery('#setting-css-prefix').val(settings.css_prefix || '--');
+            jQuery('#setting-dark-tokens').prop('checked', settings.dark_tokens == 1);
 
-            jQuery('#setting-js-position').val(jsPos);
+            // Show/hide context-specific tabs
+            showSettingsPanelForThemeType();
+
+
+
+
+            // Load custom code rules into all four injection editors
+            initCodeEditors(settings);
+
+
 
             // Populate Lovable Studio inputs with theme settings (if applicable)
             if (!canvasState.activeThemeIsElementor) {
@@ -3645,30 +4569,116 @@ $wp_pages = get_pages();
         if (canvasState.isReadOnly) return;
         
         const payload = {
-            site_title: jQuery('#setting-site-title').val().trim(),
-            site_tagline: jQuery('#setting-site-tagline').val().trim(),
-            site_favicon: jQuery('#setting-site-favicon').val().trim(),
-            site_logo: jQuery('#setting-site-logo').val().trim(),
-            heading_font: jQuery('#setting-heading-font').val(),
-            body_font: jQuery('#setting-body-font').val(),
-            base_font_size: jQuery('#setting-font-size').val(),
-            primary_color: jQuery('#setting-color-primary').val(),
-            secondary_color: jQuery('#setting-color-secondary').val(),
-            accent_color: jQuery('#setting-color-accent').val(),
-            text_color: jQuery('#setting-color-text').val(),
-            bg_color: jQuery('#setting-color-bg').val(),
-            header_layout: jQuery('#setting-header-layout').val(),
-            footer_columns: jQuery('#setting-footer-columns').val(),
-            sticky_header: jQuery('#setting-sticky-header').is(':checked') ? 1 : 0,
-            show_socials: jQuery('#setting-show-socials').is(':checked') ? 1 : 0,
-            copyright_text: jQuery('#setting-copyright-text').val().trim(),
-            nav_menu: jQuery('#setting-nav-menu').val(),
-            facebook_link: jQuery('#setting-facebook-link').val().trim(),
-            twitter_link: jQuery('#setting-twitter-link').val().trim(),
-            linkedin_link: jQuery('#setting-linkedin-link').val().trim()
+            // Identity
+            site_title:        jQuery('#setting-site-title').val().trim(),
+            site_tagline:      jQuery('#setting-site-tagline').val().trim(),
+            site_description:  jQuery('#setting-site-description').val().trim(),
+            site_favicon:      jQuery('#setting-site-favicon').val().trim(),
+            site_logo:         jQuery('#setting-site-logo').val().trim(),
+            site_logo_dark:    jQuery('#setting-site-logo-dark').val().trim(),
+            og_image:          jQuery('#setting-og-image').val().trim(),
+            title_format:      jQuery('#setting-title-format').val().trim(),
+            // Typography
+            heading_font:      jQuery('#setting-heading-font').val(),
+            body_font:         jQuery('#setting-body-font').val(),
+            accent_font:       jQuery('#setting-accent-font').val(),
+            base_font_size:    jQuery('#setting-font-size').val(),
+            gfonts_key:        jQuery('#setting-gfonts-key').val().trim(),
+            // Type scale
+            type_h1_size:      jQuery('#setting-type-h1-size').val(),
+            type_h1_weight:    jQuery('#setting-type-h1-weight').val(),
+            type_h1_lh:        jQuery('#setting-type-h1-lh').val(),
+            type_h1_ls:        jQuery('#setting-type-h1-ls').val(),
+            type_h2_size:      jQuery('#setting-type-h2-size').val(),
+            type_h2_weight:    jQuery('#setting-type-h2-weight').val(),
+            type_h2_lh:        jQuery('#setting-type-h2-lh').val(),
+            type_h2_ls:        jQuery('#setting-type-h2-ls').val(),
+            type_h3_size:      jQuery('#setting-type-h3-size').val(),
+            type_h3_weight:    jQuery('#setting-type-h3-weight').val(),
+            type_h3_lh:        jQuery('#setting-type-h3-lh').val(),
+            type_h3_ls:        jQuery('#setting-type-h3-ls').val(),
+            type_body_size:    jQuery('#setting-type-body-size').val(),
+            type_body_weight:  jQuery('#setting-type-body-weight').val(),
+            type_body_lh:      jQuery('#setting-type-body-lh').val(),
+            type_body_ls:      jQuery('#setting-type-body-ls').val(),
+            type_small_size:   jQuery('#setting-type-small-size').val(),
+            type_small_weight: jQuery('#setting-type-small-weight').val(),
+            type_small_lh:     jQuery('#setting-type-small-lh').val(),
+            type_small_ls:     jQuery('#setting-type-small-ls').val(),
+            type_btn_size:     jQuery('#setting-type-btn-size').val(),
+            type_btn_weight:   jQuery('#setting-type-btn-weight').val(),
+            type_btn_lh:       jQuery('#setting-type-btn-lh').val(),
+            type_btn_ls:       jQuery('#setting-type-btn-ls').val(),
+            // Core colors
+            primary_color:     jQuery('#setting-color-primary').val(),
+            secondary_color:   jQuery('#setting-color-secondary').val(),
+            accent_color:      jQuery('#setting-color-accent').val(),
+            text_color:        jQuery('#setting-color-text').val(),
+            bg_color:          jQuery('#setting-color-bg').val(),
+            surface_color:     jQuery('#setting-color-surface').val(),
+            // Semantic colors
+            success_color:     jQuery('#setting-color-success').val(),
+            warning_color:     jQuery('#setting-color-warning').val(),
+            danger_color:      jQuery('#setting-color-danger').val(),
+            info_color:        jQuery('#setting-color-info').val(),
+            // Button colors
+            btn_bg:            jQuery('#setting-color-btn-bg').val(),
+            btn_text:          jQuery('#setting-color-btn-text').val(),
+            btn_hover_bg:      jQuery('#setting-color-btn-hover').val(),
+            // Spacing
+            container_width:   jQuery('#setting-container-width').val(),
+            section_padding:   jQuery('#setting-section-padding').val(),
+            element_gap:       jQuery('#setting-element-gap').val(),
+            widgets_spacing:   jQuery('#setting-widgets-spacing').val(),
+            border_radius:     jQuery('#setting-border-radius').val(),
+            border_width:      jQuery('#setting-border-width').val(),
+            border_color:      jQuery('#setting-border-color').val(),
+            box_shadow:        jQuery('#setting-box-shadow').val(),
+            // Layout
+            header_layout:     jQuery('#setting-header-layout').val(),
+            nav_menu:          jQuery('#setting-nav-menu').val(),
+            sticky_header:     jQuery('#setting-sticky-header').is(':checked') ? 1 : 0,
+            transparent_header: jQuery('#setting-transparent-header').is(':checked') ? 1 : 0,
+            header_bg:         jQuery('#setting-header-bg').val(),
+            header_text_color: jQuery('#setting-header-text-color').val(),
+            footer_columns:    jQuery('#setting-footer-columns').val(),
+            copyright_text:    jQuery('#setting-copyright-text').val().trim(),
+            show_socials:      jQuery('#setting-show-socials').is(':checked') ? 1 : 0,
+            footer_bg:         jQuery('#setting-footer-bg').val(),
+            footer_text_color: jQuery('#setting-footer-text-color').val(),
+            page_width:        jQuery('#setting-page-width').val(),
+            smooth_scroll:     jQuery('#setting-smooth-scroll').is(':checked') ? 1 : 0,
+            // Social & SEO
+            facebook_link:     jQuery('#setting-facebook-link').val().trim(),
+            twitter_link:      jQuery('#setting-twitter-link').val().trim(),
+            instagram_link:    jQuery('#setting-instagram-link').val().trim(),
+            linkedin_link:     jQuery('#setting-linkedin-link').val().trim(),
+            youtube_link:      jQuery('#setting-youtube-link').val().trim(),
+            tiktok_link:       jQuery('#setting-tiktok-link').val().trim(),
+            ga4_id:            jQuery('#setting-ga4-id').val().trim(),
+            gtm_id:            jQuery('#setting-gtm-id').val().trim(),
+            fb_pixel:          jQuery('#setting-fb-pixel').val().trim(),
+            robots:            jQuery('#setting-robots').val(),
+            sitemap_enable:    jQuery('#setting-sitemap-enable').is(':checked') ? 1 : 0,
+            // Elementor
+            el_primary:        jQuery('#setting-el-primary').val(),
+            el_secondary:      jQuery('#setting-el-secondary').val(),
+            el_text:           jQuery('#setting-el-text').val(),
+            el_accent:         jQuery('#setting-el-accent').val(),
+            el_type_primary_family:   jQuery('#setting-el-type-primary-family').val(),
+            el_type_primary_weight:   jQuery('#setting-el-type-primary-weight').val(),
+            el_type_secondary_family: jQuery('#setting-el-type-secondary-family').val(),
+            el_type_secondary_weight: jQuery('#setting-el-type-secondary-weight').val(),
+            el_type_text_family:      jQuery('#setting-el-type-text-family').val(),
+            el_type_text_weight:      jQuery('#setting-el-type-text-weight').val(),
+            el_type_accent_family:    jQuery('#setting-el-type-accent-family').val(),
+            el_type_accent_weight:    jQuery('#setting-el-type-accent-weight').val(),
+            // Lovable
+            css_prefix:        jQuery('#setting-css-prefix').val() || '--',
+            dark_tokens:       jQuery('#setting-dark-tokens').is(':checked') ? 1 : 0,
         };
 
-        window.coraShowToast('Updating theme global configuration parameters...');
+        window.coraShowToast('Saving global design system settings...');
         jQuery.post(coraREData.ajaxUrl, {
             action: 'cora_ajax_save_theme_settings',
             theme_id: canvasState.activeThemeId,
@@ -3676,27 +4686,257 @@ $wp_pages = get_pages();
             nonce: coraREData.ajaxNonce
         }, function(res) {
             if (res.success) {
-                window.coraShowToast('Settings parameters synchronized successfully.');
-                // Update local theme object
+                // Merge the payload back into local theme state (preserving source, menus, etc.)
                 const themeObj = canvasState.themes.find(t => t.id == canvasState.activeThemeId);
-                if (themeObj) themeObj.settings = payload;
+                if (themeObj) {
+                    const existing = typeof themeObj.settings === 'string' ? JSON.parse(themeObj.settings || '{}') : (themeObj.settings || {});
+                    themeObj.settings = Object.assign({}, existing, payload);
+                }
+                window.coraShowToast('Settings saved and synced to your theme engine.');
+                // Refresh the Lovable token preview if on that panel
+                refreshTokenPreview();
             } else {
-                window.coraShowToast('Failed to save settings.');
+                window.coraShowToast('Failed to save settings. Please retry.');
             }
         });
     }
 
+    // --- Tab 3 Settings Helper Functions ---
+
+    function switchSettingsPanel(panelId) {
+        // Deactivate all pills
+        jQuery('.settings-pill').removeClass('active border-zinc-950 text-zinc-900').addClass('border-transparent text-zinc-400');
+        jQuery('#spill-' + panelId).addClass('active border-zinc-950 text-zinc-900').removeClass('border-transparent text-zinc-400');
+        // Hide all panels
+        jQuery('.settings-panel').addClass('hidden');
+        jQuery('#spanel-' + panelId).removeClass('hidden');
+    }
+
+    function syncColorPicker(inputId, hexValue) {
+        // Sync text input → color swatch
+        if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(hexValue)) {
+            jQuery('#' + inputId).val(hexValue);
+        }
+    }
+
+    function selectRadiusPreset(value, btn) {
+        jQuery('.radius-preset-btn').removeClass('border-zinc-950 text-zinc-950').addClass('border-zinc-200 text-zinc-600');
+        jQuery(btn).addClass('border-zinc-950 text-zinc-950').removeClass('border-zinc-200 text-zinc-600');
+        const pxVal = parseInt(value) || 0;
+        jQuery('#setting-border-radius').val(pxVal);
+        jQuery('#border-radius-val').text(pxVal + 'px');
+    }
+
+    function openMediaPicker(targetInputId) {
+        if (typeof wp !== 'undefined' && wp.media) {
+            var frame = wp.media({
+                title: 'Select or Upload Image',
+                button: { text: 'Use this image' },
+                multiple: false
+            });
+            frame.on('select', function() {
+                var attachment = frame.state().get('selection').first().toJSON();
+                jQuery('#' + targetInputId).val(attachment.url);
+            });
+            frame.open();
+        } else {
+            window.coraShowToast('WordPress Media Library not available. Paste URL directly.');
+        }
+    }
+
+    function triggerElementorSync() {
+        window.coraShowToast('Syncing to Elementor Global Settings...');
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_sync_elementor_globals',
+            theme_id: canvasState.activeThemeId,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                const ts = new Date(res.data.synced_at).toLocaleTimeString();
+                jQuery('#elementor-last-sync').text(ts);
+                jQuery('#spill-elementor .w-1\\.5').removeClass('bg-red-500').addClass('bg-green-500');
+                window.coraShowToast('Elementor Global Colors & Typography updated. Reload any open Elementor editor to see changes.');
+            } else {
+                window.coraShowToast('Elementor sync failed. Check that Elementor is active and an active kit exists.');
+            }
+        });
+    }
+
+    function triggerLovableTokenSync() {
+        window.coraShowToast('Generating and pushing CSS tokens to frontend...');
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_sync_lovable_tokens',
+            theme_id: canvasState.activeThemeId,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                const ts = new Date(res.data.synced_at).toLocaleTimeString();
+                jQuery('#lovable-token-path').text('cora-global-tokens.css (last pushed ' + ts + ')');
+                window.coraShowToast('CSS tokens pushed to frontend. All pages updated instantly.');
+                refreshTokenPreview();
+            } else {
+                window.coraShowToast('Token push failed. Check upload directory permissions.');
+            }
+        });
+    }
+
+    function refreshTokenPreview() {
+        const el = document.getElementById('lovable-token-preview');
+        if (!el) return;
+        const s = (function() {
+            const themeObj = canvasState.themes.find(t => t.id == canvasState.activeThemeId);
+            return themeObj ? (typeof themeObj.settings === 'string' ? JSON.parse(themeObj.settings || '{}') : (themeObj.settings || {})) : {};
+        })();
+        const prefix = jQuery('#setting-css-prefix').val() || '--';
+        const tokens = {
+            [`${prefix}color-primary`]:    jQuery('#setting-color-primary').val()   || s.primary_color   || '#18181b',
+            [`${prefix}color-secondary`]:  jQuery('#setting-color-secondary').val() || s.secondary_color  || '#27272a',
+            [`${prefix}color-accent`]:     jQuery('#setting-color-accent').val()    || s.accent_color     || '#10b981',
+            [`${prefix}color-text`]:       jQuery('#setting-color-text').val()      || s.text_color       || '#09090b',
+            [`${prefix}color-background`]: jQuery('#setting-color-bg').val()        || s.bg_color         || '#ffffff',
+            [`${prefix}color-surface`]:    jQuery('#setting-color-surface').val()   || s.surface_color    || '#f4f4f5',
+            [`${prefix}color-success`]:    jQuery('#setting-color-success').val()   || s.success_color    || '#16a34a',
+            [`${prefix}color-warning`]:    jQuery('#setting-color-warning').val()   || s.warning_color    || '#d97706',
+            [`${prefix}color-danger`]:     jQuery('#setting-color-danger').val()    || s.danger_color     || '#dc2626',
+            [`${prefix}heading-font`]:     `'${jQuery('#setting-heading-font').val() || s.heading_font || 'Inter'}', sans-serif`,
+            [`${prefix}body-font`]:        `'${jQuery('#setting-body-font').val()    || s.body_font    || 'Inter'}', sans-serif`,
+            [`${prefix}base-font-size`]:   (jQuery('#setting-font-size').val()      || s.base_font_size || 16) + 'px',
+            [`${prefix}container-width`]:  (jQuery('#setting-container-width').val()|| s.container_width || 1280) + 'px',
+            [`${prefix}border-radius`]:    (jQuery('#setting-border-radius').val()  || s.border_radius   || 8) + 'px',
+            [`${prefix}box-shadow`]:       jQuery('#setting-box-shadow').val()      || s.box_shadow      || 'none',
+        };
+        let css = ':root {\n';
+        for (const [k, v] of Object.entries(tokens)) css += `  ${k}: ${v};\n`;
+        css += '}';
+        el.textContent = css;
+    }
+
+    function showSettingsPanelForThemeType() {
+        if (canvasState.activeThemeIsElementor) {
+            jQuery('#spill-elementor-wrap').removeClass('hidden');
+            jQuery('#spill-lovable-wrap').addClass('hidden');
+        } else {
+            jQuery('#spill-lovable-wrap').removeClass('hidden');
+            jQuery('#spill-elementor-wrap').addClass('hidden');
+        }
+    }
+
     // --- Tab 4 Custom Code Editor Functions ---
     function openThemeSettingsDrawer() {
-        // Redirect to Tab 3 settings view
         editTheme(canvasState.activeThemeId, canvasState.activeThemeName, canvasState.activeThemeIsLive);
         switchTab('settings');
     }
 
+    // ── Code section nav switcher ──────────────────────────────────
+    var activeCodeSection = 'css';
+    function switchCodeSection(sectionId) {
+        activeCodeSection = sectionId;
+        jQuery('.code-nav-btn').removeClass('bg-white shadow-sm border-zinc-200 text-zinc-900')
+            .addClass('border-transparent text-zinc-500');
+        jQuery('#code-nav-' + sectionId).addClass('bg-white shadow-sm border-zinc-200 text-zinc-900')
+            .removeClass('border-transparent text-zinc-500');
+        jQuery('.code-section').addClass('hidden');
+        jQuery('#code-section-' + sectionId).removeClass('hidden');
+        if (sectionId === 'css'  && canvasState.cssEditor)  { try { canvasState.cssEditor.refresh();  } catch(e){} }
+        if (sectionId === 'js'   && canvasState.jsEditor)   { try { canvasState.jsEditor.refresh();   } catch(e){} }
+        if (sectionId === 'head' && canvasState.headEditor) { try { canvasState.headEditor.refresh();  } catch(e){} }
+        if (sectionId === 'body' && canvasState.bodyEditor) { try { canvasState.bodyEditor.refresh();  } catch(e){} }
+    }
+
+    // ── CodeMirror initialisation ──────────────────────────────────
+    function initCodeEditors(settings) {
+        const s = settings || {};
+        function makeEditor(mountId, mode, initialVal, statsId) {
+            const mount = document.getElementById(mountId);
+            if (!mount) return null;
+            if (mount._cmInstance) { mount._cmInstance.setValue(initialVal || ''); return mount._cmInstance; }
+            const CM = (typeof CodeMirror !== 'undefined') ? CodeMirror : (typeof wp !== 'undefined' && wp.CodeMirror ? wp.CodeMirror : null);
+            if (CM) {
+                const cm = CM(mount, {
+                    value: initialVal || '',
+                    mode: mode,
+                    theme: 'default',
+                    lineNumbers: true,
+                    lineWrapping: true,
+                    indentUnit: 2,
+                    tabSize: 2,
+                    indentWithTabs: false,
+                    extraKeys: {
+                        'Ctrl-S': function() { triggerSaveForSection(activeCodeSection); },
+                        'Cmd-S':  function() { triggerSaveForSection(activeCodeSection); }
+                    }
+                });
+                cm.setSize('100%', '100%');
+                if (statsId) cm.on('change', function() { updateCodeStats(cm, statsId); markCodeUnsaved(); });
+                updateCodeStats(cm, statsId);
+                mount._cmInstance = cm;
+                return cm;
+            } else {
+                mount.innerHTML = '';
+                const ta = document.createElement('textarea');
+                ta.value = initialVal || '';
+                ta.style.cssText = 'width:100%;height:100%;padding:12px;font-family:monospace;font-size:12px;border:none;outline:none;resize:none;background:#18181b;color:#d4d4d8;';
+                mount.style.background = '#18181b';
+                mount.appendChild(ta);
+                const wrapper = {
+                    getValue: () => ta.value,
+                    setValue: (v) => { ta.value = v; },
+                    refresh: () => {},
+                    replaceSelection: (v) => { ta.value += v; }
+                };
+                ta.addEventListener('input', function() {
+                    if (statsId) jQuery('#' + statsId).text(ta.value.split('\n').length + ' lines \xb7 ' + ta.value.length + ' chars');
+                    markCodeUnsaved();
+                });
+                mount._cmInstance = wrapper;
+                return wrapper;
+            }
+        }
+        canvasState.cssEditor  = makeEditor('css-editor-mount',  'css',        s.custom_css  || '', 'css-stats');
+        canvasState.jsEditor   = makeEditor('js-editor-mount',   'javascript', s.custom_js   || '', 'js-stats');
+        canvasState.headEditor = makeEditor('head-editor-mount', 'htmlmixed',  s.custom_head || '', 'head-stats');
+        canvasState.bodyEditor = makeEditor('body-editor-mount', 'htmlmixed',  s.custom_body || '', 'body-stats');
+        if (s.custom_js_position) jQuery('#setting-js-position').val(s.custom_js_position);
+    }
+
+    function updateCodeStats(cm, statsId) {
+        if (!statsId) return;
+        const val = cm.getValue();
+        jQuery('#' + statsId).text(val.split('\n').length + ' lines \xb7 ' + val.length + ' chars');
+    }
+
+    var codeUnsaved = false;
+    function markCodeUnsaved() {
+        codeUnsaved = true;
+        jQuery('#code-save-dot').css('background', '#f59e0b');
+        jQuery('#code-save-status').text('Unsaved changes');
+    }
+    function markCodeSaved() {
+        codeUnsaved = false;
+        const now = new Date();
+        jQuery('#code-save-dot').css('background', '#22c55e');
+        jQuery('#code-save-status').text('Saved ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0'));
+        setTimeout(() => { jQuery('#code-save-dot').css('background','#d4d4d8'); jQuery('#code-save-status').text('No changes'); }, 4000);
+    }
+
+    function triggerSaveForSection(sectionId) {
+        if      (sectionId === 'css')  saveCustomCSS();
+        else if (sectionId === 'js')   saveCustomJS();
+        else if (sectionId === 'head') saveHeadHTML();
+        else if (sectionId === 'body') saveBodyHTML();
+    }
+
+    jQuery(document).on('keydown.coraCode', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 's' && canvasState.activeTab === 'code') {
+            e.preventDefault();
+            triggerSaveForSection(activeCodeSection);
+        }
+    });
+
+    // ── Save: CSS ──────────────────────────────────────────────────
     function saveCustomCSS() {
         if (canvasState.isReadOnly) return;
         const cssVal = canvasState.cssEditor ? canvasState.cssEditor.getValue() : jQuery('#custom-css-textarea').val();
-        
         window.coraShowToast('Compiling custom CSS rules...');
         jQuery.post(coraREData.ajaxUrl, {
             action: 'cora_ajax_save_custom_css',
@@ -3705,47 +4945,94 @@ $wp_pages = get_pages();
             nonce: coraREData.ajaxNonce
         }, function(res) {
             if (res.success) {
-                // Update local cached theme object settings
                 const themeObj = canvasState.themes.find(t => t.id == canvasState.activeThemeId);
-                if (themeObj) {
-                    const settings = typeof themeObj.settings === 'string' ? JSON.parse(themeObj.settings) : themeObj.settings;
-                    settings.custom_css = cssVal;
-                    themeObj.settings = settings;
-                }
-                window.coraShowToast('Custom CSS variables compiled and live.');
-            } else {
-                window.coraShowToast('Failed to compile CSS.');
-            }
+                if (themeObj) { const st = typeof themeObj.settings==='string'?JSON.parse(themeObj.settings):themeObj.settings; st.custom_css=cssVal; themeObj.settings=st; }
+                markCodeSaved(); window.coraShowToast('Custom CSS compiled and live.');
+            } else { window.coraShowToast('Failed to compile CSS.'); }
         });
     }
 
+    // ── Save: JS ───────────────────────────────────────────────────
     function saveCustomJS() {
         if (canvasState.isReadOnly) return;
         const jsVal = canvasState.jsEditor ? canvasState.jsEditor.getValue() : jQuery('#custom-js-textarea').val();
         const pos = jQuery('#setting-js-position').val();
-
         window.coraShowToast('Injecting scripts...');
         jQuery.post(coraREData.ajaxUrl, {
             action: 'cora_ajax_save_custom_js',
             theme_id: canvasState.activeThemeId,
-            js: jsVal,
-            position: pos,
+            js: jsVal, position: pos,
             nonce: coraREData.ajaxNonce
         }, function(res) {
             if (res.success) {
-                // Update local cached theme object settings
                 const themeObj = canvasState.themes.find(t => t.id == canvasState.activeThemeId);
-                if (themeObj) {
-                    const settings = typeof themeObj.settings === 'string' ? JSON.parse(themeObj.settings) : themeObj.settings;
-                    settings.custom_js = jsVal;
-                    settings.custom_js_position = pos;
-                    themeObj.settings = settings;
-                }
-                window.coraShowToast('JavaScript modifications updated.');
-            } else {
-                window.coraShowToast('Failed to inject script.');
-            }
+                if (themeObj) { const st=typeof themeObj.settings==='string'?JSON.parse(themeObj.settings):themeObj.settings; st.custom_js=jsVal; st.custom_js_position=pos; themeObj.settings=st; }
+                markCodeSaved(); window.coraShowToast('JavaScript injection updated.');
+            } else { window.coraShowToast('Failed to save JavaScript.'); }
         });
+    }
+
+    // ── Save: Head HTML ────────────────────────────────────────────
+    function saveHeadHTML() {
+        if (canvasState.isReadOnly) return;
+        const val = canvasState.headEditor ? canvasState.headEditor.getValue() : '';
+        window.coraShowToast('Saving head injection...');
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_save_custom_head',
+            theme_id: canvasState.activeThemeId,
+            head_html: val,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                const themeObj = canvasState.themes.find(t => t.id == canvasState.activeThemeId);
+                if (themeObj) { const st=typeof themeObj.settings==='string'?JSON.parse(themeObj.settings):themeObj.settings; st.custom_head=val; themeObj.settings=st; }
+                markCodeSaved(); window.coraShowToast('Head HTML injection saved.');
+            } else { window.coraShowToast('Failed to save head injection.'); }
+        });
+    }
+
+    // ── Save: Body HTML ────────────────────────────────────────────
+    function saveBodyHTML() {
+        if (canvasState.isReadOnly) return;
+        const val = canvasState.bodyEditor ? canvasState.bodyEditor.getValue() : '';
+        window.coraShowToast('Saving body injection...');
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_save_custom_body',
+            theme_id: canvasState.activeThemeId,
+            body_html: val,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                const themeObj = canvasState.themes.find(t => t.id == canvasState.activeThemeId);
+                if (themeObj) { const st=typeof themeObj.settings==='string'?JSON.parse(themeObj.settings):themeObj.settings; st.custom_body=val; themeObj.settings=st; }
+                markCodeSaved(); window.coraShowToast('Body script injection saved.');
+            } else { window.coraShowToast('Failed to save body injection.'); }
+        });
+    }
+
+    // ── Snippet insertion helpers ──────────────────────────────────
+    function insertSnippet(cat, code) {
+        const map = { 'CSS': 'cssEditor', 'JS': 'jsEditor', 'HTML': 'headEditor' };
+        const ed = canvasState[map[cat] || 'headEditor'];
+        if (!ed) return;
+        if (ed.replaceSelection) ed.replaceSelection(code);
+        else ed.setValue(ed.getValue() + '\n' + code);
+        markCodeUnsaved();
+        const secMap = { 'CSS': 'css', 'JS': 'js', 'HTML': 'head' };
+        switchCodeSection(secMap[cat] || 'head');
+        window.coraShowToast('Snippet inserted — review and save.');
+    }
+    function insertHeadSnippet(code) {
+        const ed = canvasState.headEditor;
+        if (!ed) return;
+        if (ed.replaceSelection) ed.replaceSelection(code); else ed.setValue(ed.getValue() + '\n' + code);
+        markCodeUnsaved();
+    }
+    function insertBodySnippet(code) {
+        const ed = canvasState.bodyEditor;
+        if (!ed) return;
+        if (ed.replaceSelection) ed.replaceSelection(code); else ed.setValue(ed.getValue() + '\n' + code);
+        markCodeUnsaved();
     }
 
     // --- LEVEL 3 Elementor Iframe Page Editor Wrapper ---
