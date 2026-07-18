@@ -664,9 +664,9 @@ $wp_pages = get_pages();
     </div>
 
     <!-- LEVEL 2 — THEME DASHBOARD -->
-    <div id="canvas-level-2" class="space-y-6 hidden">
+    <div id="canvas-level-2" class="space-y-4 hidden">
         <!-- Breadcrumb & Header Controls -->
-        <div class="flex items-center justify-between border-b border-zinc-100 pb-4">
+        <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
             <div class="flex items-center gap-3">
                 <button onclick="backToCanvasHub()" class="p-1.5 hover:bg-zinc-100 rounded-lg text-zinc-500 hover:text-zinc-900 cursor-pointer transition-colors">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -687,12 +687,30 @@ $wp_pages = get_pages();
         </div>
 
         <!-- Dashboard Workspace Tabs -->
-        <div class="border-b border-zinc-200">
+        <div class="border-b border-zinc-200 flex items-center justify-between pb-1">
             <div class="flex gap-6 text-xs font-semibold">
                 <button onclick="switchTab('pages')" id="tab-btn-pages" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors active">Pages</button>
                 <button onclick="switchTab('menus')" id="tab-btn-menus" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Menus</button>
                 <button onclick="switchTab('settings')" id="tab-btn-settings" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Theme Settings</button>
-<button onclick="switchTab('code')" id="tab-btn-code" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Custom Code</button>
+                <button onclick="switchTab('code')" id="tab-btn-code" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Custom Code</button>
+            </div>
+            
+            <!-- Dynamic active tab actions aligned directly on the right side of the workspace tabs bar -->
+            <div class="flex items-center gap-2">
+                <!-- Action button for Pages tab -->
+                <?php if ( ! $is_read_only ) : ?>
+                <button onclick="openNewPageDrawer()" id="tab-action-pages" class="tab-action-btn px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all active:scale-95">Add page</button>
+                <?php endif; ?>
+
+                <!-- Action button for Menus tab -->
+                <?php if ( ! $is_read_only ) : ?>
+                <button onclick="triggerCreateNewMenu()" id="tab-action-menus" class="tab-action-btn hidden px-3 py-1.5 border border-zinc-200 text-zinc-700 bg-white hover:bg-zinc-50 rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all active:scale-95">+ New Menu</button>
+                <?php endif; ?>
+
+                <!-- Action button for Theme Settings tab -->
+                <?php if ( ! $is_read_only ) : ?>
+                <button onclick="saveThemeSettings()" id="tab-action-settings" class="tab-action-btn hidden px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all active:scale-95">Save Settings</button>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -711,46 +729,35 @@ $wp_pages = get_pages();
             ?>
 
             <!-- ── Stats Cards ── -->
-            <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-zinc-100 border border-zinc-200 rounded-xl bg-white mb-5 shadow-sm overflow-hidden">
-                <div class="px-5 py-4">
-                    <div class="flex items-center gap-2 mb-1.5">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="#71717a" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-                        <span class="text-[11px] text-zinc-500">Total pages</span>
+            <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-zinc-100 border border-zinc-200 rounded-xl bg-white mb-4 shadow-sm overflow-hidden">
+                <div class="px-4 py-2.5">
+                    <div class="flex items-center gap-1.5 mb-1">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="#71717a" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                        <span class="text-[10px] text-zinc-500 font-medium">Total pages</span>
                     </div>
-                    <div class="text-[22px] font-bold text-zinc-900 leading-none" id="stat-total-pages"><?php echo $stat_total; ?></div>
+                    <div class="text-[18px] font-bold text-zinc-900 leading-none" id="stat-total-pages"><?php echo $stat_total; ?></div>
                 </div>
-                <div class="px-5 py-4">
-                    <div class="flex items-center gap-2 mb-1.5">
-                        <span class="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"></span>
-                        <span class="text-[11px] text-zinc-500">Active pages</span>
+                <div class="px-4 py-2.5">
+                    <div class="flex items-center gap-1.5 mb-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0"></span>
+                        <span class="text-[10px] text-zinc-500 font-medium">Active pages</span>
                     </div>
-                    <div class="text-[22px] font-bold text-zinc-900 leading-none" id="stat-active-pages"><?php echo $stat_active; ?></div>
+                    <div class="text-[18px] font-bold text-zinc-900 leading-none" id="stat-active-pages"><?php echo $stat_active; ?></div>
                 </div>
-                <div class="px-5 py-4">
-                    <div class="flex items-center gap-2 mb-1.5">
-                        <span class="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0"></span>
-                        <span class="text-[11px] text-zinc-500">Draft pages</span>
+                <div class="px-4 py-2.5">
+                    <div class="flex items-center gap-1.5 mb-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-400 flex-shrink-0"></span>
+                        <span class="text-[10px] text-zinc-500 font-medium">Draft pages</span>
                     </div>
-                    <div class="text-[22px] font-bold text-zinc-900 leading-none" id="stat-draft-pages"><?php echo $stat_draft; ?></div>
+                    <div class="text-[18px] font-bold text-zinc-900 leading-none" id="stat-draft-pages"><?php echo $stat_draft; ?></div>
                 </div>
-                <div class="px-5 py-4">
-                    <div class="flex items-center gap-2 mb-1.5">
-                        <span class="w-2 h-2 rounded-full bg-zinc-400 flex-shrink-0"></span>
-                        <span class="text-[11px] text-zinc-500">Other pages <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full border border-zinc-300 text-[8px] text-zinc-400 cursor-pointer" title="Scheduled or archived pages">i</span></span>
+                <div class="px-4 py-2.5">
+                    <div class="flex items-center gap-1.5 mb-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 flex-shrink-0"></span>
+                        <span class="text-[10px] text-zinc-500 font-medium">Other pages <span class="inline-flex items-center justify-center w-3 h-3 rounded-full border border-zinc-300 text-[7px] text-zinc-400 cursor-pointer" title="Scheduled or archived pages">i</span></span>
                     </div>
-                    <div class="text-[22px] font-bold text-zinc-900 leading-none" id="stat-other-pages"><?php echo $stat_other; ?></div>
+                    <div class="text-[18px] font-bold text-zinc-900 leading-none" id="stat-other-pages"><?php echo $stat_other; ?></div>
                 </div>
-            </div>
-
-            <!-- ── Section Header ── -->
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-2.5">
-                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="#18181b" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-                    <span class="text-[15px] font-bold text-zinc-900">Pages</span>
-                </div>
-                <?php if ( ! $is_read_only ) : ?>
-                <button onclick="openNewPageDrawer()" id="btn-add-page" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 active:scale-95 text-white rounded-lg text-[12px] font-bold shadow-sm cursor-pointer transition-all">Add page</button>
-                <?php endif; ?>
             </div>
 
             <!-- ── Table Card ── -->
@@ -809,19 +816,19 @@ $wp_pages = get_pages();
                 <table class="w-full border-collapse text-left">
                     <thead>
                         <tr class="border-b border-zinc-100 text-[11px] font-semibold text-zinc-400">
-                            <th class="pl-4 pr-2 py-3 w-10">
+                            <th class="pl-3 pr-1 py-2 w-10">
                                 <input type="checkbox" id="pages-select-all-checkbox" onchange="toggleSelectAllPages(this)" class="rounded cursor-pointer accent-zinc-900">
                             </th>
-                            <th class="px-4 py-3">
+                            <th class="px-3 py-2">
                                 <button onclick="setPageSort(pageSortState==='alpha'?'alpha-desc':'alpha')" class="flex items-center gap-1 text-zinc-400 hover:text-zinc-700 cursor-pointer transition-colors group font-semibold">
                                     Title
                                     <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="opacity-40 group-hover:opacity-100 transition-opacity"><path d="M7 15l5 5 5-5M7 9l5-5 5 5"/></svg>
                                 </button>
                             </th>
-                            <th class="px-4 py-3 font-semibold">Visibility</th>
-                            <th class="px-4 py-3 font-semibold">Content</th>
-                            <th class="px-4 py-3 font-semibold">Updated</th>
-                            <th class="px-4 py-3 w-10"></th>
+                            <th class="px-3 py-2 font-semibold">Visibility</th>
+                            <th class="px-3 py-2 font-semibold">Content</th>
+                            <th class="px-3 py-2 font-semibold">Updated</th>
+                            <th class="px-3 py-2 w-10"></th>
                         </tr>
                     </thead>
                     <tbody id="pages-table-body">
@@ -2500,6 +2507,12 @@ $wp_pages = get_pages();
 
         jQuery('#tab-content-' + tabId).removeClass('hidden');
 
+        // Toggle action buttons in the tab bar row
+        jQuery('.tab-action-btn').addClass('hidden');
+        if (!canvasState.isReadOnly) {
+            jQuery('#tab-action-' + tabId).removeClass('hidden');
+        }
+
         if (tabId === 'menus') {
             renderMenusList();
             renderMenuEditor();
@@ -2623,41 +2636,41 @@ $wp_pages = get_pages();
         body.empty();
 
         if (pages.length === 0) {
-            body.append(`<tr><td colspan="6" class="p-10 text-center text-[12px] text-zinc-400">No pages found.</td></tr>`);
+            body.append(`<tr><td colspan="6" class="p-8 text-center text-[12px] text-zinc-400">No pages found.</td></tr>`);
             return;
         }
 
         pages.forEach(p => {
             const visibilityPill = getVisibilityPill(p.status, p.scheduled_at);
             const contentPreview = (p.content && p.content.trim())
-                ? `<span class="text-zinc-500 text-[12px]">${esc_html(p.content.replace(/<[^>]+>/g,'').substring(0,60))}…</span>`
-                : `<span class="text-zinc-300 text-[12px]">—</span>`;
+                ? `<span class="text-zinc-500 text-[11px]">${esc_html(p.content.replace(/<[^>]+>/g,'').substring(0,60))}…</span>`
+                : `<span class="text-zinc-300 text-[11px]">—</span>`;
             const homeBadge = p.is_homepage == 1
-                ? `<span class="ml-2 px-1.5 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 border border-zinc-200 text-zinc-600 inline-flex items-center gap-0.5"><svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Home</span>`
+                ? `<span class="ml-2 px-1.5 py-0.5 text-[8px] font-bold rounded-md bg-zinc-100 border border-zinc-200 text-zinc-500 inline-flex items-center gap-0.5"><svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Home</span>`
                 : '';
 
             body.append(`
                 <tr class="border-b border-zinc-100 hover:bg-zinc-50/60 group transition-colors">
-                    <td class="pl-4 pr-2 py-3.5">
+                    <td class="pl-3 pr-1 py-2">
                         <input type="checkbox" class="page-row-checkbox rounded cursor-pointer accent-zinc-900" data-id="${p.id}" onchange="updateBulkActionState()">
                     </td>
-                    <td class="px-4 py-3.5">
+                    <td class="px-3 py-2">
                         <div class="flex items-center flex-wrap gap-1">
                             <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id})"
-                                class="text-[13px] font-semibold text-zinc-900 hover:underline text-left cursor-pointer leading-snug">
+                                class="text-xs font-semibold text-zinc-900 hover:underline text-left cursor-pointer leading-snug">
                                 ${esc_html(p.title)}
                             </button>
                             ${homeBadge}
                         </div>
                     </td>
-                    <td class="px-4 py-3.5">${visibilityPill}</td>
-                    <td class="px-4 py-3.5 max-w-[220px] truncate">${contentPreview}</td>
-                    <td class="px-4 py-3.5 text-[12px] text-zinc-400 whitespace-nowrap">${getRelativeTime(p.updated_at)}</td>
-                    <td class="px-4 py-3.5">
+                    <td class="px-3 py-2">${visibilityPill}</td>
+                    <td class="px-3 py-2 max-w-[220px] truncate">${contentPreview}</td>
+                    <td class="px-3 py-2 text-[11px] text-zinc-400 whitespace-nowrap">${getRelativeTime(p.updated_at)}</td>
+                    <td class="px-3 py-2">
                         <div class="relative inline-block text-left">
                             <button onclick="togglePageRowActions(${p.id}, event)"
-                                class="w-7 h-7 flex items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 cursor-pointer opacity-0 group-hover:opacity-100 transition-all">
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                                class="w-6 h-6 flex items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 cursor-pointer opacity-0 group-hover:opacity-100 transition-all">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
                             </button>
                             <div id="page-menu-${p.id}" class="hidden absolute right-0 top-full mt-1 w-44 bg-white border border-zinc-200 rounded-xl shadow-lg py-1 z-20 text-left">
                                 <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
@@ -2684,7 +2697,6 @@ $wp_pages = get_pages();
                     </td>
                 </tr>
             `);
-        });
     }
 
     function getVisibilityPill(status, dateStr) {
