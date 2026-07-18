@@ -62,3 +62,29 @@
     color: #18181b !important;
     font-weight: 700 !important;
 }
+
+/* White-label Elementor: Hide Exit to WordPress options and branding */
+.elementor-panel-menu-item-exit,
+.elementor-panel-menu-item-exit-to-dashboard,
+#elementor-panel-footer-exit-to-dashboard,
+.elementor-panel-footer-sub-menu-item[href*="post.php"],
+a[href*="wp-admin/post.php"],
+.eicon-editor-close,
+.eicon-exit {
+    display: none !important;
+}
+
+/* Hide AI Angie, Checklist, and What's New features from Elementor Top Bar */
+[data-tooltip="Angie"],
+[aria-label="Angie"],
+[title="Angie"],
+[data-tooltip="Checklist"],
+[aria-label="Checklist"],
+[title="Checklist"],
+[data-tooltip="What's New"],
+[aria-label="What's New"],
+[title="What's New"] {
+    display: none !important;
+}
+
+

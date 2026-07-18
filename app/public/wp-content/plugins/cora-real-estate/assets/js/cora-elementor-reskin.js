@@ -75,6 +75,37 @@ function initCoraReskin() {
             }
         });
     }, 500);
+
+    // MutationObserver to white-label WordPress references and logos dynamically
+    const observer = new MutationObserver(() => {
+        // Hide panel footer exit options
+        document.querySelectorAll('#elementor-panel-footer-exit-to-dashboard, .elementor-panel-menu-item-exit, .elementor-panel-menu-item-exit-to-dashboard').forEach(el => {
+            el.style.setProperty('display', 'none', 'important');
+        });
+        
+        // Hide menu items or text blocks containing WordPress/Exit to references
+        document.querySelectorAll('.elementor-panel-menu-item, .elementor-panel-menu-item-title, [class*="menu-item"]').forEach(el => {
+            const text = el.textContent || '';
+            if (text.toLowerCase().includes('wordpress') || text.toLowerCase().includes('exit to')) {
+                el.style.setProperty('display', 'none', 'important');
+                const parentLi = el.closest('li');
+                if (parentLi) {
+                    parentLi.style.setProperty('display', 'none', 'important');
+                }
+            }
+        });
+
+        // Hide specific top bar features: Angie, Checklist, What's New
+        document.querySelectorAll('[data-tooltip="Angie"], [aria-label="Angie"], [title="Angie"], [data-tooltip="Checklist"], [aria-label="Checklist"], [title="Checklist"], [data-tooltip="What\'s New"], [aria-label="What\'s New"], [title="What\'s New"]').forEach(el => {
+            el.style.setProperty('display', 'none', 'important');
+            const wrapper = el.closest('span');
+            if (wrapper) {
+                wrapper.style.setProperty('display', 'none', 'important');
+            }
+        });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
 }
 
 if (document.readyState === 'loading') {
