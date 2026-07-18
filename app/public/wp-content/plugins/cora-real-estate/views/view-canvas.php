@@ -919,33 +919,25 @@ $wp_pages = get_pages();
                     <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
                         <div>
                             <h3 id="menu-editor-title" class="text-sm font-bold text-zinc-900">Header Main Menu</h3>
-                            <p class="text-[10px] text-zinc-500 mt-0.5">Drag to reorder, shift right to nest sub-items.</p>
+                            <p class="text-[10px] text-zinc-500 mt-0.5 font-medium">Add, customize, and structure navigation link hierarchy.</p>
                         </div>
                         <?php if ( ! $is_read_only ) : ?>
-                        <div class="flex items-center gap-2">
-                            <div class="relative inline-block text-left">
-                                <button onclick="toggleAddMenuItemDropdown(event)" class="px-2.5 py-1.5 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-sm flex items-center gap-1">+ Add Item</button>
-                                <div id="add-menu-item-dropdown" class="hidden absolute right-0 mt-1 w-48 bg-white border border-zinc-200 rounded-lg shadow-lg py-1 z-10 text-left">
-                                    <h4 class="px-3 py-1 text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Select Page Link</h4>
-                                    <div id="dropdown-pages-list" class="max-h-32 overflow-y-auto">
-                                        <!-- List of pages -->
-                                    </div>
-                                    <div class="border-t border-zinc-100 my-1"></div>
-                                    <button onclick="triggerAddCustomLink()" class="w-full px-3 py-1.5 text-left text-[10px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">Custom Link URL...</button>
-                                </div>
-                            </div>
-                        </div>
+                        <button onclick="openMenuItemDrawer()" class="px-2.5 py-1.5 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-sm flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            + Add Item
+                        </button>
                         <?php endif; ?>
                     </div>
 
-                    <!-- Draggable menu items container -->
+                    <!-- Menu items container -->
                     <div id="menu-items-editor-container" class="space-y-1.5 max-h-[360px] overflow-y-auto pr-1">
                         <!-- Populated by JS -->
                     </div>
                 </div>
 
-                <div class="flex items-center justify-end border-t border-zinc-100 pt-4 mt-6">
-                    <button onclick="saveCurrentMenu()" <?php echo $is_read_only ? 'disabled' : ''; ?> class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all">Save Menu</button>
+                <div class="flex items-center justify-between border-t border-zinc-100 pt-4 mt-6">
+                    <span class="text-[10px] text-zinc-400 font-medium">Changes here will be saved to this theme settings.</span>
+                    <button onclick="saveCurrentMenu()" <?php echo $is_read_only ? 'disabled' : ''; ?> class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all active:scale-95">Save Menu</button>
                 </div>
             </div>
         </div>
@@ -1447,6 +1439,60 @@ $wp_pages = get_pages();
             <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeNewPageDrawer()">Cancel</button>
             <button type="button" class="px-3.5 py-2 border border-zinc-200 hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveNewPage(false)">Create Only</button>
             <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveNewPage(true)">Create & Edit</button>
+        </div>
+    </div>
+</div>
+
+<!-- 2.5. Menu Item Setup Drawer (Sliding Right-Drawer) -->
+<div id="drawer-menu-item" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[420px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-menu-item-card">
+        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+            <div>
+                <h3 id="drawer-menu-item-title" class="text-sm font-bold text-zinc-950">Add Menu Item</h3>
+                <p class="text-[10px] text-zinc-500 mt-0.5">Configure link text, destination, and target options.</p>
+            </div>
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeMenuItemDrawer()">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-5 space-y-5">
+            <input type="hidden" id="menu-item-edit-index" value="">
+            
+            <div class="space-y-2">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Link Label *</label>
+                <input type="text" id="menu-item-label-input" placeholder="e.g. Listings" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium">
+            </div>
+            
+            <div class="space-y-2">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Link Destination Type</label>
+                <select id="menu-item-type-input" onchange="toggleMenuItemTypeFields()" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer bg-white font-medium">
+                    <option value="page">Internal Page</option>
+                    <option value="custom">Custom URL Link</option>
+                </select>
+            </div>
+            
+            <div id="menu-item-page-field" class="space-y-2">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Select Page *</label>
+                <select id="menu-item-page-select" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer bg-white font-medium">
+                    <!-- Dynamic Page list options will be inserted here -->
+                </select>
+            </div>
+            
+            <div id="menu-item-url-field" class="space-y-2 hidden">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Custom URL Link *</label>
+                <input type="text" id="menu-item-url-input" placeholder="e.g. /custom-page or https://..." class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium">
+            </div>
+
+            <div class="pt-2">
+                <label class="flex items-center gap-2 text-xs text-zinc-700 cursor-pointer select-none">
+                    <input type="checkbox" id="menu-item-newtab-input" class="accent-zinc-950 rounded">
+                    Open in a new browser tab
+                </label>
+            </div>
+        </div>
+        <div class="p-5 border-t border-zinc-200 flex items-center justify-end gap-2.5 bg-zinc-50/30">
+            <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeMenuItemDrawer()">Cancel</button>
+            <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveMenuItem()">Apply Changes</button>
         </div>
     </div>
 </div>
@@ -2697,6 +2743,7 @@ $wp_pages = get_pages();
                     </td>
                 </tr>
             `);
+        });
     }
 
     function getVisibilityPill(status, dateStr) {
@@ -3026,12 +3073,22 @@ $wp_pages = get_pages();
         const container = jQuery('#menus-list-container');
         container.empty();
 
-        canvasState.menus.forEach(m => {
-            const activeClass = m.id === canvasState.activeMenuId ? 'bg-zinc-50 text-zinc-900 border-l-2 border-zinc-900 font-bold' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50/50';
+        if (canvasState.menus.length === 0) {
             container.append(`
-                <button onclick="selectActiveMenu('${m.id}')" class="w-full px-3 py-2 text-left rounded-lg text-xs flex items-center justify-between cursor-pointer transition-colors ${activeClass}">
-                    <span>${esc_html(m.name)}</span>
-                    <span class="text-[10px] text-zinc-400 font-normal">${m.items.length} items</span>
+                <p class="text-[10.5px] text-zinc-400 italic text-center py-2">No menus created yet.</p>
+            `);
+            return;
+        }
+
+        canvasState.menus.forEach(m => {
+            const activeClass = m.id === canvasState.activeMenuId ? 'bg-zinc-100 text-zinc-950 border border-zinc-200/60 font-bold shadow-xs' : 'text-zinc-500 hover:text-zinc-950 hover:bg-zinc-50/50';
+            container.append(`
+                <button onclick="selectActiveMenu('${m.id}')" class="w-full px-3 py-2 text-left rounded-lg text-[12px] flex items-center justify-between cursor-pointer transition-colors ${activeClass}">
+                    <span class="flex items-center gap-2">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        ${esc_html(m.name)}
+                    </span>
+                    <span class="text-[10px] text-zinc-400 font-normal bg-zinc-50 border border-zinc-100 px-1.5 py-0.5 rounded-full">${m.items ? m.items.length : 0} items</span>
                 </button>
             `);
         });
@@ -3050,60 +3107,326 @@ $wp_pages = get_pages();
         const container = jQuery('#menu-items-editor-container');
         container.empty();
 
-        if (!currentMenu || currentMenu.items.length === 0) {
+        if (!currentMenu) {
             container.append(`
-                <div class="py-12 text-center text-xs text-zinc-400 border border-dashed border-zinc-200 rounded-xl">
-                    No menu items in this navigation folder. Click "+ Add Item" to register page links.
+                <div class="py-12 text-center text-xs text-zinc-400 border border-dashed border-zinc-200 rounded-xl bg-zinc-50/10">
+                    No active menu selected. Select a menu folder or create a new one.
+                </div>
+            `);
+            return;
+        }
+
+        if (!currentMenu.items || currentMenu.items.length === 0) {
+            container.append(`
+                <div class="py-12 text-center text-xs text-zinc-400 border border-dashed border-zinc-200 rounded-xl bg-zinc-50/10">
+                    No links in this folder. Click "+ Add Item" to define navigation structure.
                 </div>
             `);
             return;
         }
 
         currentMenu.items.forEach((item, idx) => {
-            const nestedClass = item.level > 0 ? 'menu-item-nested' : '';
+            const isNested = item.level > 0;
+            const nestingStyle = isNested ? 'ml-6 pl-5 border-l-2 border-dashed border-zinc-200/80 relative' : '';
+            const linkBadge = item.url.startsWith('/') && !item.url.startsWith('//')
+                ? `<span class="px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-500 text-[9px] font-bold border border-zinc-200/50">page: ${esc_html(item.url)}</span>`
+                : `<span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[9px] font-bold border border-blue-100">url: ${esc_html(item.url)}</span>`;
+            
+            const tabBadge = item.newTab 
+                ? `<span class="px-2 py-0.5 rounded-full bg-green-50 text-green-700 text-[9px] font-bold border border-green-100">new tab</span>` 
+                : '';
+
             container.append(`
-                <div class="flex items-center justify-between bg-zinc-50/50 hover:bg-zinc-50 border border-zinc-200 rounded-lg p-2.5 shadow-sm transition-all ${nestedClass}" data-index="${idx}">
+                <div class="group/item flex items-center justify-between bg-white border border-zinc-200 rounded-xl p-3 shadow-xs hover:shadow-sm transition-all ${nestingStyle}" data-index="${idx}">
+                    ${isNested ? '<span class="absolute left-0 top-1/2 -translate-y-1/2 w-3.5 h-[1.5px] bg-zinc-200/80 border-t border-dashed border-zinc-200"></span>' : ''}
+                    
                     <div class="flex items-center gap-3 flex-1">
-                        <!-- Reorder handles -->
-                        <span class="text-zinc-400 cursor-grab hover:text-zinc-900">
-                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="8" y1="9" x2="16" y2="9"></line><line x1="8" y1="15" x2="16" y2="15"></line></svg>
+                        <!-- Six dots drag handle representation -->
+                        <span class="text-zinc-300 hover:text-zinc-650 transition-colors">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></svg>
                         </span>
-                        <div class="grid grid-cols-2 gap-3 flex-1">
-                            <input type="text" value="${esc_html(item.label)}" onchange="updateMenuLabel(${idx}, this.value)" placeholder="Menu Label" class="px-2 py-1 bg-white border border-zinc-200 rounded text-xs focus:outline-none focus:border-zinc-400 font-semibold" <?php echo $is_read_only ? 'readonly' : ''; ?>>
-                            <span class="px-2 py-1 text-[10px] text-zinc-400 font-mono flex items-center">${esc_html(item.url)}</span>
+                        
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-xs font-bold text-zinc-950">${esc_html(item.label)}</span>
+                            ${linkBadge}
+                            ${tabBadge}
                         </div>
                     </div>
-                    
-                    <div class="flex items-center gap-3 ml-4">
-                        <label class="flex items-center gap-1 text-[10px] text-zinc-500 cursor-pointer">
-                            <input type="checkbox" ${item.newTab ? 'checked' : ''} onchange="toggleMenuNewTab(${idx}, this.checked)" class="accent-zinc-900" <?php echo $is_read_only ? 'disabled' : ''; ?>>
-                            New Tab
-                        </label>
+
+                    <div class="flex items-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity">
+                        <!-- Indent/Outdent chevrons -->
                         <?php if ( ! $is_read_only ) : ?>
-                        <div class="flex items-center gap-1">
-                            <button onclick="changeMenuNesting(${idx}, 'indent')" class="p-1 hover:bg-zinc-100 rounded text-zinc-400 hover:text-zinc-900 cursor-pointer" title="Nest under above item">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                            </button>
-                            <button onclick="changeMenuNesting(${idx}, 'outdent')" class="p-1 hover:bg-zinc-100 rounded text-zinc-400 hover:text-zinc-900 cursor-pointer" title="Move to root level">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                            </button>
-                            <button onclick="removeMenuItem(${idx})" class="p-1 hover:bg-zinc-100 rounded text-red-500 hover:text-red-700 cursor-pointer" title="Remove Link">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                            </button>
-                        </div>
+                        <button onclick="changeMenuNesting(${idx}, 'outdent')" class="p-1.5 hover:bg-zinc-50 border border-transparent hover:border-zinc-200 rounded-lg text-zinc-400 hover:text-zinc-800 cursor-pointer transition-colors" title="Move to root level">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+                        </button>
+                        <button onclick="changeMenuNesting(${idx}, 'indent')" class="p-1.5 hover:bg-zinc-50 border border-transparent hover:border-zinc-200 rounded-lg text-zinc-400 hover:text-zinc-800 cursor-pointer transition-colors" title="Nest link items">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+                        </button>
+                        
+                        <!-- Edit link details -->
+                        <button onclick="openMenuItemDrawer(${idx})" class="px-2.5 py-1 text-[10px] font-bold text-zinc-600 hover:text-zinc-900 bg-zinc-50 border border-zinc-200 rounded-md cursor-pointer transition-colors" title="Edit item link and text">Edit</button>
+                        
+                        <!-- Remove link item -->
+                        <button onclick="removeMenuItem(${idx})" class="p-1.5 hover:bg-red-50 border border-transparent hover:border-red-100 rounded-lg text-zinc-400 hover:text-red-650 cursor-pointer transition-colors" title="Remove Link">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
                         <?php endif; ?>
                     </div>
                 </div>
             `);
         });
+    }
 
-        // Populate Add Item pages dropdown list
-        const dropList = jQuery('#dropdown-pages-list');
-        dropList.empty();
+    function openMenuItemDrawer(index = null) {
+        if (canvasState.isReadOnly) return;
+        
+        // Populate select list with canvas pages
+        const select = jQuery('#menu-item-page-select');
+        select.empty();
         canvasState.pages.forEach(p => {
-            dropList.append(`
-                <button onclick="addPageToMenu('${esc_js(p.title)}', '/${esc_js(p.slug)}')" class="w-full px-3 py-1 text-left text-[10px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">${esc_html(p.title)}</button>
-            `);
+            select.append(`<option value="/${p.slug}">${p.title} (/${p.slug})</option>`);
+        });
+
+        if (index !== null && index !== undefined) {
+            const currentMenu = canvasState.menus.find(m => m.id === canvasState.activeMenuId);
+            if (!currentMenu || !currentMenu.items || !currentMenu.items[index]) return;
+            const item = currentMenu.items[index];
+
+            jQuery('#drawer-menu-item-title').text('Edit Menu Item');
+            jQuery('#menu-item-edit-index').val(index);
+            jQuery('#menu-item-label-input').val(item.label);
+            
+            // Check if page url matches one of the internal pages
+            const isInternal = canvasState.pages.some(p => '/' + p.slug === item.url || p.slug === item.url);
+            if (isInternal) {
+                jQuery('#menu-item-type-input').val('page');
+                const matchedSlug = item.url.startsWith('/') ? item.url : '/' + item.url;
+                jQuery('#menu-item-page-select').val(matchedSlug);
+            } else {
+                jQuery('#menu-item-type-input').val('custom');
+                jQuery('#menu-item-url-input').val(item.url);
+            }
+            jQuery('#menu-item-newtab-input').prop('checked', !!item.newTab);
+        } else {
+            jQuery('#drawer-menu-item-title').text('Add Menu Item');
+            jQuery('#menu-item-edit-index').val('');
+            jQuery('#menu-item-label-input').val('');
+            jQuery('#menu-item-type-input').val('page');
+            jQuery('#menu-item-url-input').val('');
+            jQuery('#menu-item-newtab-input').prop('checked', false);
+        }
+
+        toggleMenuItemTypeFields();
+
+        const modal = jQuery('#drawer-menu-item');
+        modal.removeClass('hidden');
+        setTimeout(() => {
+            modal.removeClass('opacity-0').css('opacity', '1');
+            jQuery('#drawer-menu-item-card').removeClass('translate-x-full').addClass('translate-x-0');
+        }, 10);
+    }
+
+    function closeMenuItemDrawer() {
+        jQuery('#drawer-menu-item-card').removeClass('translate-x-0').addClass('translate-x-full');
+        const modal = jQuery('#drawer-menu-item');
+        modal.addClass('opacity-0').css('opacity', '0');
+        setTimeout(function() {
+            modal.addClass('hidden');
+        }, 300);
+    }
+
+    function toggleMenuItemTypeFields() {
+        const type = jQuery('#menu-item-type-input').val();
+        if (type === 'page') {
+            jQuery('#menu-item-page-field').removeClass('hidden');
+            jQuery('#menu-item-url-field').addClass('hidden');
+        } else {
+            jQuery('#menu-item-page-field').addClass('hidden');
+            jQuery('#menu-item-url-field').removeClass('hidden');
+        }
+    }
+
+    function saveMenuItem() {
+        if (canvasState.isReadOnly) return;
+        const indexVal = jQuery('#menu-item-edit-index').val();
+        const label = jQuery('#menu-item-label-input').val().trim();
+        const type = jQuery('#menu-item-type-input').val();
+        const newTab = jQuery('#menu-item-newtab-input').is(':checked');
+        
+        let url = '';
+        if (type === 'page') {
+            url = jQuery('#menu-item-page-select').val();
+        } else {
+            url = jQuery('#menu-item-url-input').val().trim();
+        }
+
+        if (!label) {
+            window.coraShowToast('Please enter a link label text.', 'error');
+            return;
+        }
+        if (!url) {
+            window.coraShowToast('Please specify a link destination URL.', 'error');
+            return;
+        }
+
+        const currentMenu = canvasState.menus.find(m => m.id === canvasState.activeMenuId);
+        if (!currentMenu) return;
+
+        if (indexVal !== '') {
+            // Update existing
+            const idx = parseInt(indexVal, 10);
+            if (currentMenu.items && currentMenu.items[idx]) {
+                currentMenu.items[idx].label = label;
+                currentMenu.items[idx].url = url;
+                currentMenu.items[idx].newTab = newTab;
+            }
+        } else {
+            // Add new item
+            if (!currentMenu.items) currentMenu.items = [];
+            const newItemId = 'mi_' + Date.now();
+            currentMenu.items.push({
+                id: newItemId,
+                label: label,
+                url: url,
+                newTab: newTab,
+                level: 0
+            });
+        }
+
+        // Sync local cache settings
+        const themeObj = canvasState.themes.find(t => t.id == canvasState.activeThemeId);
+        if (themeObj) {
+            const settings = typeof themeObj.settings === 'string' ? JSON.parse(themeObj.settings || '{}') : (themeObj.settings || {});
+            settings.menus = canvasState.menus;
+            themeObj.settings = settings;
+        }
+
+        closeMenuItemDrawer();
+        renderMenuEditor();
+        renderMenusList();
+    }
+
+    function changeMenuNesting(index, direction) {
+        if (canvasState.isReadOnly) return;
+        const currentMenu = canvasState.menus.find(m => m.id === canvasState.activeMenuId);
+        if (!currentMenu || !currentMenu.items || !currentMenu.items[index]) return;
+        
+        if (direction === 'indent') {
+            if (index > 0) {
+                currentMenu.items[index].level = 1;
+            } else {
+                window.coraShowToast('The top item cannot be indented.', 'error');
+                return;
+            }
+        } else {
+            currentMenu.items[index].level = 0;
+        }
+        
+        renderMenuEditor();
+    }
+
+    function removeMenuItem(index) {
+        if (canvasState.isReadOnly) return;
+        const currentMenu = canvasState.menus.find(m => m.id === canvasState.activeMenuId);
+        if (!currentMenu || !currentMenu.items || !currentMenu.items[index]) return;
+        
+        window.coraConfirmAction(
+            'Remove Menu Item',
+            `Are you sure you want to remove "${currentMenu.items[index].label}"?`,
+            function() {
+                currentMenu.items.splice(index, 1);
+                
+                // Sync local cache
+                const themeObj = canvasState.themes.find(t => t.id == canvasState.activeThemeId);
+                if (themeObj) {
+                    const settings = typeof themeObj.settings === 'string' ? JSON.parse(themeObj.settings || '{}') : (themeObj.settings || {});
+                    settings.menus = canvasState.menus;
+                    themeObj.settings = settings;
+                }
+                
+                renderMenuEditor();
+                renderMenusList();
+            }
+        );
+    }
+
+    function triggerCreateNewMenu() {
+        if (canvasState.isReadOnly) return;
+        const container = jQuery('#menus-list-container');
+        
+        if (jQuery('#new-menu-inline-input').length > 0) {
+            jQuery('#new-menu-inline-input').focus();
+            return;
+        }
+        
+        container.append(`
+            <div class="w-full px-3 py-2 border border-zinc-200 rounded-lg flex items-center gap-2 bg-white" id="inline-new-menu-container">
+                <input type="text" id="new-menu-inline-input" placeholder="Menu name..." class="flex-1 bg-transparent border-none text-xs focus:outline-none font-semibold text-zinc-900">
+                <button onclick="saveInlineNewMenu()" class="p-1 hover:bg-zinc-50 rounded text-zinc-800 cursor-pointer font-bold text-[10px] border-none bg-transparent">Save</button>
+                <button onclick="cancelInlineNewMenu()" class="p-1 hover:bg-zinc-50 rounded text-zinc-400 cursor-pointer font-bold text-[10px] border-none bg-transparent">X</button>
+            </div>
+        `);
+        jQuery('#new-menu-inline-input').focus().on('keypress', function(e) {
+            if (e.which === 13) {
+                saveInlineNewMenu();
+            }
+        });
+    }
+
+    window.saveInlineNewMenu = function() {
+        const nameVal = jQuery('#new-menu-inline-input').val().trim();
+        if (!nameVal) {
+            window.coraShowToast('Menu name cannot be empty.', 'error');
+            return;
+        }
+        
+        const newMenuId = 'menu_' + Date.now();
+        canvasState.menus.push({
+            id: newMenuId,
+            name: nameVal,
+            items: []
+        });
+        
+        // Sync local cache
+        const themeObj = canvasState.themes.find(t => t.id == canvasState.activeThemeId);
+        if (themeObj) {
+            const settings = typeof themeObj.settings === 'string' ? JSON.parse(themeObj.settings || '{}') : (themeObj.settings || {});
+            settings.menus = canvasState.menus;
+            themeObj.settings = settings;
+        }
+        
+        canvasState.activeMenuId = newMenuId;
+        renderMenusList();
+        renderMenuEditor();
+        window.coraShowToast(`Menu "${nameVal}" created.`, 'success');
+    };
+
+    window.cancelInlineNewMenu = function() {
+        jQuery('#inline-new-menu-container').remove();
+    };
+
+    function saveCurrentMenu() {
+        if (canvasState.isReadOnly) return;
+        
+        const themeObj = canvasState.themes.find(t => t.id == canvasState.activeThemeId);
+        if (!themeObj) return;
+        
+        const settings = typeof themeObj.settings === 'string' ? JSON.parse(themeObj.settings || '{}') : (themeObj.settings || {});
+        settings.menus = canvasState.menus;
+        
+        window.coraShowToast('Synchronizing theme menus...');
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_save_theme_settings',
+            theme_id: canvasState.activeThemeId,
+            settings: settings,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast('Navigation menu structure synchronized successfully.', 'success');
+                themeObj.settings = settings;
+            } else {
+                window.coraShowToast('Failed to save menu changes.', 'error');
+            }
         });
     }
 
@@ -3116,7 +3439,31 @@ $wp_pages = get_pages();
     function fetchThemeSettings(themeId) {
         const themeObj = canvasState.themes.find(t => t.id == themeId);
         if (themeObj) {
-            const settings = typeof themeObj.settings === 'string' ? JSON.parse(themeObj.settings) : themeObj.settings;
+            const settings = typeof themeObj.settings === 'string' ? JSON.parse(themeObj.settings || '{}') : (themeObj.settings || {});
+            
+            // Dynamic menus extraction from theme settings
+            if (settings && settings.menus && Array.isArray(settings.menus)) {
+                canvasState.menus = settings.menus;
+            } else {
+                canvasState.menus = [
+                    { id: 'menu_1', name: 'Header Main Menu', items: [
+                        { id: 'mi_1', label: 'Home', url: '/home', newTab: false, level: 0 },
+                        { id: 'mi_2', label: 'Listings', url: '/listings', newTab: false, level: 0 },
+                        { id: 'mi_3', label: 'About Us', url: '/about', newTab: false, level: 0 }
+                    ]},
+                    { id: 'menu_2', name: 'Footer Links', items: [
+                        { id: 'mi_4', label: 'Privacy Policy', url: '/privacy', newTab: false, level: 0 },
+                        { id: 'mi_5', label: 'Support Desk', url: '/support', newTab: true, level: 0 }
+                    ]}
+                ];
+            }
+            if (canvasState.menus.length > 0) {
+                if (!canvasState.menus.some(m => m.id === canvasState.activeMenuId)) {
+                    canvasState.activeMenuId = canvasState.menus[0].id;
+                }
+            } else {
+                canvasState.activeMenuId = '';
+            }
             
             jQuery('#setting-site-title').val(settings.site_title || '');
             jQuery('#setting-site-tagline').val(settings.site_tagline || '');
