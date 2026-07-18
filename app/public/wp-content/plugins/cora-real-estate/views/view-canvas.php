@@ -702,9 +702,13 @@ $wp_pages = get_pages();
                 <button onclick="openNewPageDrawer()" id="tab-action-pages" class="tab-action-btn px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all active:scale-95">Add page</button>
                 <?php endif; ?>
 
-                <!-- Action button for Menus tab -->
+                <!-- Action buttons for Menus tab -->
                 <?php if ( ! $is_read_only ) : ?>
-                <button onclick="triggerCreateNewMenu()" id="tab-action-menus" class="tab-action-btn hidden px-3 py-1.5 border border-zinc-200 text-zinc-700 bg-white hover:bg-zinc-50 rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all active:scale-95">+ New Menu</button>
+                <div id="tab-action-menus" class="tab-action-btn hidden flex items-center gap-2">
+                    <button onclick="window.coraShowToast('URL Redirects panel loading...', 'success')" id="menu-btn-redirects" class="px-3 py-1.5 border border-zinc-200 text-zinc-700 bg-white hover:bg-zinc-50 rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all active:scale-95">URL redirects</button>
+                    <button onclick="triggerCreateNewMenu()" id="menu-btn-create" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all active:scale-95">Create menu</button>
+                    <button onclick="duplicateActiveMenu()" id="menu-btn-duplicate" class="hidden px-3 py-1.5 border border-zinc-200 text-zinc-700 bg-white hover:bg-zinc-50 rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all active:scale-95">Duplicate</button>
+                </div>
                 <?php endif; ?>
 
                 <!-- Action button for Theme Settings tab -->
@@ -903,19 +907,6 @@ $wp_pages = get_pages();
             
             <!-- 1. MENUS LIST VIEW -->
             <div id="menus-list-view" class="space-y-4">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2 text-zinc-800">
-                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                        <h2 class="text-[14px] font-bold text-zinc-950">Menus</h2>
-                    </div>
-                    <?php if ( ! $is_read_only ) : ?>
-                    <div class="flex items-center gap-2">
-                        <button onclick="window.coraShowToast('URL Redirects panel loading...', 'success')" class="px-3 py-1.5 border border-zinc-200 text-zinc-700 bg-white hover:bg-zinc-50 rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all active:scale-95">URL redirects</button>
-                        <button onclick="triggerCreateNewMenu()" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all active:scale-95">Create menu</button>
-                    </div>
-                    <?php endif; ?>
-                </div>
-
                 <div class="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
                     <table class="w-full border-collapse text-left">
                         <thead>
@@ -938,7 +929,7 @@ $wp_pages = get_pages();
 
             <!-- 2. MENU DETAIL VIEW -->
             <div id="menus-detail-view" class="space-y-4 hidden">
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between pb-1">
                     <div class="flex items-center gap-3">
                         <button onclick="exitMenuDetail()" class="p-1.5 hover:bg-zinc-100 rounded-lg text-zinc-500 hover:text-zinc-900 cursor-pointer transition-colors border-none bg-transparent">
                             <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
@@ -946,9 +937,6 @@ $wp_pages = get_pages();
                         <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
                         <span id="menu-detail-header-title" class="text-[13px] font-bold text-zinc-950">Customer account main menu</span>
                     </div>
-                    <?php if ( ! $is_read_only ) : ?>
-                    <button onclick="duplicateActiveMenu()" class="px-3 py-1.5 border border-zinc-200 text-zinc-700 bg-white hover:bg-zinc-50 rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all active:scale-95">Duplicate</button>
-                    <?php endif; ?>
                 </div>
 
                 <!-- Name & Handle Card -->
@@ -3115,10 +3103,16 @@ $wp_pages = get_pages();
         if (canvasState.activeMenuDetailId) {
             jQuery('#menus-list-view').addClass('hidden');
             jQuery('#menus-detail-view').removeClass('hidden');
+            // In detail view: show Duplicate, hide list-level actions
+            jQuery('#menu-btn-redirects, #menu-btn-create').addClass('hidden');
+            jQuery('#menu-btn-duplicate').removeClass('hidden');
             renderMenuDetailEditor();
         } else {
             jQuery('#menus-list-view').removeClass('hidden');
             jQuery('#menus-detail-view').addClass('hidden');
+            // In list view: show URL redirects + Create menu, hide Duplicate
+            jQuery('#menu-btn-redirects, #menu-btn-create').removeClass('hidden');
+            jQuery('#menu-btn-duplicate').addClass('hidden');
             renderMenusList();
         }
     }
