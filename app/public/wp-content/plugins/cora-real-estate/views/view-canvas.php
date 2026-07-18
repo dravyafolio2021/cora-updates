@@ -1979,6 +1979,13 @@ $wp_pages = get_pages();
                         Git
                         <span id="cora-git-status-dot" class="hidden w-1.5 h-1.5 rounded-full bg-emerald-500 absolute top-1.5 right-1.5"></span>
                     </button>
+                    <button onclick="openPageSettings()" class="h-8 px-2.5 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5" title="Page Settings">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                        Settings
+                    </button>
                     <div class="h-4 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-1"></div>
                     <button onclick="runElementorCommand('document/history/undo')" class="h-8 w-8 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg cursor-pointer transition-colors flex items-center justify-center" title="Undo">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
@@ -6639,6 +6646,42 @@ $wp_pages = get_pages();
             '[data-tab="elements"]',
             '.eicon-grid',
             'i.eicon-grid'
+        ];
+        for (const sel of selectors) {
+            const btn = cw.document.querySelector(sel);
+            if (btn) { btn.click(); return; }
+        }
+    }
+
+    function openPageSettings() {
+        const iframe = document.getElementById('elementor-editor-iframe');
+        if (!iframe || !iframe.contentWindow) return;
+        const cw = iframe.contentWindow;
+
+        // Strategy 1: Official Elementor $e Commands
+        try {
+            if (cw.$e) {
+                // Try routing to page settings page
+                try {
+                    cw.$e.run('panel/open-page', { name: 'page_settings' });
+                    return;
+                } catch (e) {}
+
+                try {
+                    cw.$e.route('panel/page-settings/settings');
+                    return;
+                } catch (e) {}
+            }
+        } catch (e) {}
+
+        // Strategy 2: Click the native Elementor page settings gear icon in the panel footer
+        const selectors = [
+            '#elementor-panel-footer-settings',
+            '.elementor-panel-footer-settings',
+            '.eicon-cog',
+            'i.eicon-cog',
+            '[data-tooltip="Settings"]',
+            'button[aria-label="Settings"]'
         ];
         for (const sel of selectors) {
             const btn = cw.document.querySelector(sel);

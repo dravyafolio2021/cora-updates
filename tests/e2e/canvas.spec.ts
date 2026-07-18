@@ -123,6 +123,8 @@ test.describe('Canvas Front-End Management System E2E Tests', () => {
     await page.waitForTimeout(200);
     await page.click('#canvas-level-3 button[title="Redo"]');
     await page.waitForTimeout(200);
+    await page.click('#canvas-level-3 button[title="Page Settings"]');
+    await page.waitForTimeout(500);
     await page.click('#canvas-level-3 button:has-text("Navigator")');
     await page.waitForTimeout(300);
 
