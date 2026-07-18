@@ -144,7 +144,7 @@ $wp_pages = get_pages();
     }
 
     /* ── Canvas Level-3 Editor Layout ─────────────────────────────────── */
-    #canvas-level-3 {
+    #canvas-level-3:not(.hidden) {
         height: 100dvh !important;
         max-height: 100dvh !important;
         overflow: hidden !important;
@@ -1909,36 +1909,12 @@ $wp_pages = get_pages();
             <div class="h-12 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between px-4 w-full bg-zinc-50 dark:bg-zinc-950">
                 <!-- Left: Logo & Theme Selector -->
                 <div class="flex items-center gap-2">
-                    <button onclick="closeElementorEditor()" class="w-6 h-6 rounded-full bg-black dark:bg-white flex items-center justify-center overflow-hidden border border-zinc-200 dark:border-zinc-800 hover:scale-[1.05] transition-transform cursor-pointer">
-                        <img src="<?php echo esc_url( CORA_REAL_ESTATE_AI_URL . 'assets/images/cora-favicon.png' ); ?>" class="w-4 h-4 object-contain" alt="Cora" />
+                    <button onclick="closeElementorEditor()" class="h-8 px-3 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-150 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5 bg-white dark:bg-zinc-900">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        Theme Dashboard
                     </button>
-                    <div class="relative inline-block text-left">
-                        <div onclick="toggleTopbarThemeDropdown(event)" class="flex items-center gap-1 cursor-pointer select-none">
-                            <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200" id="cora-topbar-theme-name">Theme</span>
-                            <svg class="w-3 h-3 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                        </div>
-                        
-                        <!-- Topbar Theme Actions Dropdown Menu -->
-                        <div id="cora-topbar-theme-dropdown" class="absolute left-0 top-full mt-2 w-48 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-xl py-1 hidden z-50">
-                            <button onclick="runElementorCommand('panel/open-page', { page: 'settings' }); toggleTopbarThemeDropdown(event);" class="w-full px-4 py-2 text-left text-xs font-semibold text-zinc-750 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-900 flex items-center gap-2.5 cursor-pointer bg-transparent border-none">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="3"></circle><path d="M19.07 4.93l-1.41 1.41M5.34 18.66l-1.41 1.41M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M5.34 5.34L3.93 3.93M12 2v2M12 20v2"></path></svg>
-                                Site Settings
-                            </button>
-                            <button onclick="triggerRenameThemeFromEditor(); toggleTopbarThemeDropdown(event);" class="w-full px-4 py-2 text-left text-xs font-semibold text-zinc-750 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-900 flex items-center gap-2.5 cursor-pointer bg-transparent border-none">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                                Rename Theme
-                            </button>
-                            <button onclick="triggerDownloadTheme(canvasState.activeThemeId); toggleTopbarThemeDropdown(event);" class="w-full px-4 py-2 text-left text-xs font-semibold text-zinc-750 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-900 flex items-center gap-2.5 cursor-pointer bg-transparent border-none">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
-                                Download Theme
-                            </button>
-                            <div class="border-t border-zinc-150 dark:border-zinc-800 my-1"></div>
-                            <button onclick="closeElementorEditor(); toggleTopbarThemeDropdown(event);" class="w-full px-4 py-2 text-left text-xs font-semibold text-red-650 hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center gap-2.5 cursor-pointer bg-transparent border-none">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-red-500"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"></path></svg>
-                                Exit to Dashboard
-                            </button>
-                        </div>
-                    </div>
+                    <!-- Retain the ID for E2E selector safety -->
+                    <span id="cora-topbar-theme-name" class="hidden"></span>
                 </div>
                 
                 <!-- Center: Breadcrumbs & Save Status -->
@@ -1957,19 +1933,11 @@ $wp_pages = get_pages();
                     </div>
                 </div>
                 
-                <!-- Right: Preview, Notes, Help, Avatar -->
+                <!-- Right: Preview + Avatar -->
                 <div class="flex items-center gap-1.5">
                     <button onclick="previewPage()" class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                         Preview
-                    </button>
-                    <button onclick="toggleNotesMode()" class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                        Notes
-                    </button>
-                    <button onclick="toggleHelpMode()" class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                        Help
                     </button>
                     <div class="h-4 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-1"></div>
                     <div class="flex items-center gap-1 cursor-pointer select-none">
@@ -1992,57 +1960,82 @@ $wp_pages = get_pages();
             <div class="h-12 border-b border-zinc-200 dark:border-zinc-850 flex items-center justify-between px-4 w-full bg-white dark:bg-zinc-900">
                 <!-- Left: Add, Templates, Undo/Redo -->
                 <div class="flex items-center gap-2">
-                    <button onclick="toggleWidgetsPanel()" class="h-8 px-3.5 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                        Add
-                        <svg class="w-3.5 h-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    <button onclick="toggleWidgetsPanel()" class="h-8 w-8 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg cursor-pointer transition-colors flex items-center justify-center" title="Add Element">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     </button>
                     <button onclick="openTemplatesLibrary()" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
                         Templates
                     </button>
-                    <button id="cora-kit-btn" onclick="openKitDrawer()" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5 relative">
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path><line x1="12" y1="12" x2="12" y2="17"></line><line x1="9" y1="14.5" x2="15" y2="14.5"></line></svg>
-                        Kit
-                        <span id="cora-kit-status-dot" class="hidden w-1.5 h-1.5 rounded-full bg-emerald-500 absolute top-1.5 right-1.5"></span>
+                    <button id="cora-git-btn" onclick="openGitDrawer()" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5 relative" title="Git Version Control">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M6 9v6"></path><path d="M9 18h9"></path></svg>
+                        Git
+                        <span id="cora-git-status-dot" class="hidden w-1.5 h-1.5 rounded-full bg-emerald-500 absolute top-1.5 right-1.5"></span>
                     </button>
                     <div class="h-4 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-1"></div>
-                    <button onclick="runElementorCommand('document/history/undo')" class="h-8 px-2 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
-                        Undo
+                    <button onclick="runElementorCommand('document/history/undo')" class="h-8 w-8 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg cursor-pointer transition-colors flex items-center justify-center" title="Undo">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
                     </button>
-                    <button onclick="runElementorCommand('document/history/redo')" class="h-8 px-2 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg>
-                        Redo
+                    <button onclick="runElementorCommand('document/history/redo')" class="h-8 w-8 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg cursor-pointer transition-colors flex items-center justify-center" title="Redo">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg>
                     </button>
                 </div>
                 
-                <!-- Center: Page Navigator & Devices -->
+                <!-- Center: Page Switcher Dropdown & Devices -->
                 <div class="flex items-center gap-3">
-                    <div onclick="openSearchFinder()" class="flex items-center gap-1 cursor-pointer select-none">
-                        <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200" id="cora-topbar-page-selector">Home Page</span>
-                        <svg class="w-3.5 h-3.5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    <!-- Page switcher -->
+                    <div class="relative" id="cora-page-switcher-wrap">
+                        <button onclick="togglePageSwitcher(event)" class="flex items-center gap-1 cursor-pointer select-none h-8 px-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                            <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200" id="cora-topbar-page-selector">Home Page</span>
+                            <svg class="w-3.5 h-3.5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <!-- Page dropdown -->
+                        <div id="cora-page-switcher-dropdown" class="hidden absolute top-full left-0 mt-1 w-64 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl z-[99999] overflow-hidden">
+                            <div class="p-2 border-b border-zinc-100 dark:border-zinc-800">
+                                <input id="cora-page-switcher-search" type="text" placeholder="Search pages..." oninput="filterPageSwitcher(this.value)" class="w-full px-2.5 py-1.5 text-[11px] border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-400" />
+                            </div>
+                            <div id="cora-page-switcher-list" class="max-h-60 overflow-y-auto py-1"></div>
+                        </div>
                     </div>
-                    <div class="h-4 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-1"></div>
-                    <div class="flex items-center bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg">
-                        <button id="cora-device-desktop" onclick="switchDevice('desktop')" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-700 shadow-sm cursor-pointer transition-all">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                        </button>
-                        <button id="cora-device-tablet" onclick="switchDevice('tablet')" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-pointer transition-all">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
-                        </button>
-                        <button id="cora-device-mobile" onclick="switchDevice('mobile')" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-pointer transition-all">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                    <div class="h-4 w-[1px] bg-zinc-200 dark:bg-zinc-800"></div>
+                    <!-- Viewport devices + custom -->
+                    <div class="flex items-center gap-1">
+                        <div class="flex items-center bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg" id="cora-device-pill">
+                            <button id="cora-device-desktop" onclick="switchDevice('desktop')" title="Desktop" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-700 shadow-sm cursor-pointer transition-all">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                            </button>
+                            <button id="cora-device-tablet" onclick="switchDevice('tablet')" title="Tablet (768px)" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-pointer transition-all">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                            </button>
+                            <button id="cora-device-mobile" onclick="switchDevice('mobile')" title="Mobile (375px)" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-pointer transition-all">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                            </button>
+                            <!-- Custom viewport buttons injected here by JS -->
+                            <div id="cora-custom-viewports"></div>
+                        </div>
+                        <!-- Add custom viewport button -->
+                        <div class="relative">
+                            <button onclick="toggleViewportPopover(event)" title="Add custom viewport" class="w-7 h-7 rounded-lg border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-all">
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            </button>
+                            <div id="cora-viewport-popover" class="hidden absolute top-9 right-0 w-56 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl p-3 z-[99999] space-y-2">
+                                <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Custom Viewport</p>
+                                <div class="flex items-center gap-1.5">
+                                    <input id="cora-vp-width" type="number" min="240" max="3840" placeholder="Width px" class="flex-1 px-2 py-1.5 text-[11px] border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-400" />
+                                    <input id="cora-vp-label" type="text" maxlength="6" placeholder="Label" class="w-16 px-2 py-1.5 text-[11px] border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-400" />
+                                </div>
+                                <button onclick="addCustomViewport()" class="w-full h-8 bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-lg text-[11px] cursor-pointer transition-colors border-none">Add Viewport</button>
+                            </div>
+                        </div>
+                        <!-- Ruler toggle -->
+                        <button id="cora-ruler-toggle" onclick="toggleRuler()" title="Toggle ruler" class="w-7 h-7 rounded-lg border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-all ml-0.5">
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18M3 7v10a1 1 0 001 1h16a1 1 0 001-1V7M3 7l3-3h12l3 3"/><line x1="7" y1="11" x2="7" y2="14"/><line x1="11" y1="11" x2="11" y2="13"/><line x1="15" y1="11" x2="15" y2="14"/><line x1="19" y1="11" x2="19" y2="13"/></svg>
                         </button>
                     </div>
                 </div>
                 
-                <!-- Right: Search, Navigator, Publish -->
+                <!-- Right: Navigator, Publish -->
                 <div class="flex items-center gap-2">
-                    <button onclick="openSearchFinder()" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        Search
-                    </button>
                     <button onclick="toggleNavigatorPanel()" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>
                         Navigator
@@ -2067,8 +2060,14 @@ $wp_pages = get_pages();
             </div>
         </div>
 
+        <!-- Pixel Ruler -->
+        <div id="cora-canvas-ruler" class="hidden flex-shrink-0 h-6 bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 overflow-hidden relative select-none" style="font-size:9px;font-family:monospace;color:#a1a1aa">
+            <canvas id="cora-ruler-canvas" style="display:block;width:100%;height:100%"></canvas>
+        </div>
+
         <!-- iframe container -->
         <div id="elementor-iframe-container" class="flex-1 min-h-0 w-full bg-zinc-50 relative flex items-center justify-center">
+
             <!-- Loading Indicator -->
             <div id="iframe-loader" class="absolute inset-0 flex flex-col items-center justify-center bg-white z-10 gap-3 text-xs text-zinc-500 font-semibold">
                 <div class="animate-spin rounded-full h-6 w-6 border-2 border-zinc-900 border-t-transparent"></div>
@@ -2528,114 +2527,211 @@ $wp_pages = get_pages();
         <div class="flex-1 overflow-y-auto p-5 space-y-5">
             <input type="hidden" id="rename-theme-id-input">
             <div class="space-y-2">
-                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Theme Name *</label>
-                <input type="text" id="rename-theme-name-input" placeholder="e.g. Cora Custom Theme" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Theme Name *</label>
+                <input type="text" id="rename-theme-name-input" placeholder="e.g. Cora Custom Theme" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium font-sans">
             </div>
         </div>
         <div class="p-5 border-t border-zinc-200 flex items-center justify-end gap-2.5 bg-zinc-50/30">
-            <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeRenameThemeDrawer()">Cancel</button>
-            <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveRenamedTheme()">Rename Theme</button>
+            <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="closeRenameThemeDrawer()">Cancel</button>
+            <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="saveRenamedTheme()">Rename Theme</button>
         </div>
     </div>
 </div>
 
-<!-- Lovable Connection Modal (Centered Popup) -->
-<!-- 7. Template Kit Connection Drawer (Right-Sliding Sheet) -->
-<div id="drawer-kit-connect" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
-    <div class="bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-kit-connect-card">
-        <!-- Drawer Header -->
+<!-- 7. Git Connection Drawer (Right-Sliding Sheet) -->
+<div id="drawer-git-connect" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
+    <div class="bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-git-connect-card">
         <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/50 flex-shrink-0">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" class="text-zinc-700 dark:text-zinc-300"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path><line x1="12" y1="12" x2="12" y2="17"></line><line x1="9" y1="14.5" x2="15" y2="14.5"></line></svg>
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" class="text-zinc-700 dark:text-zinc-300"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M6 9v6"></path><path d="M9 18h9"></path></svg>
                 </div>
                 <div>
-                    <h3 class="text-sm font-bold text-zinc-950 dark:text-zinc-50">Template Kit</h3>
-                    <p class="text-[10px] text-zinc-500 mt-0.5">Connect your Elementor Template Kit</p>
+                    <h3 class="text-sm font-bold text-zinc-950 dark:text-zinc-50 font-sans">Git Integration</h3>
+                    <p class="text-[10px] text-zinc-500 mt-0.5 font-sans">Sync your website design with GitHub</p>
                 </div>
             </div>
-            <button type="button" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-1 transition-colors" onclick="closeKitDrawer()">
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-1 transition-colors bg-transparent border-none" onclick="closeGitDrawer()">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-        <!-- Kit connected banner -->
-        <div id="kit-connected-banner" class="hidden mx-5 mt-5 p-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl flex items-center justify-between gap-3">
-            <div class="flex items-center gap-2.5">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span>
-                <div>
-                    <p class="text-[11px] font-bold text-zinc-800 dark:text-zinc-200" id="kit-connected-name">Kit Connected</p>
-                    <p class="text-[10px] text-zinc-500" id="kit-connected-meta">via Elementor Kit Library</p>
-                </div>
-            </div>
-            <button onclick="disconnectKit()" class="text-[10px] font-bold text-zinc-500 hover:text-red-600 transition-colors cursor-pointer border-none bg-transparent">Disconnect</button>
-        </div>
+        
         <!-- Drawer Body -->
         <div class="flex-1 overflow-y-auto p-5 space-y-6">
-            <!-- How it works -->
-            <div class="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 space-y-3">
-                <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">How Kit Connection Works</p>
-                <div class="space-y-2.5">
-                    <div class="flex items-start gap-2.5">
-                        <div class="w-5 h-5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center text-[9px] font-black flex-shrink-0 mt-0.5">1</div>
-                        <p class="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">Your kit lives on <strong>your Elementor / Envato account</strong> — Cora never stores or manages kit files directly.</p>
+            <!-- STEP 1: CONNECT PAT -->
+            <div id="git-step-connect-pat" class="space-y-5 hidden" style="display:none" data-alias="git-unconnected-form"></div><!-- alias bridge -->
+            <div id="git-unconnected-form" class="space-y-5">
+
+                <div class="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 space-y-2">
+                    <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Easy Setup</p>
+                    <p class="text-[11px] text-zinc-650 dark:text-zinc-400 leading-relaxed font-sans">
+                        Let's connect your website to GitHub so your designs are safely saved and versioned automatically.
+                    </p>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="p-4 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-white dark:bg-zinc-900 space-y-3">
+                        <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-50 text-[10px] font-bold text-white dark:text-zinc-950">1</span>
+                        <p class="text-xs font-bold text-zinc-800 dark:text-zinc-200 font-sans inline-block ml-1">Get your GitHub Access Token</p>
+                        <p class="text-[11px] text-zinc-500 leading-relaxed font-sans">
+                            Click the button below to open GitHub (create a free account if you don't have one). Scroll down and click the green <strong>"Generate token"</strong> button at the bottom.
+                        </p>
+                        <a href="https://github.com/settings/tokens/new?scopes=repo&description=Cora%2520Studio%2520Integration" target="_blank" class="w-full h-9 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 border border-zinc-200 dark:border-zinc-750 no-underline font-sans">
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Get GitHub Access Token
+                        </a>
                     </div>
-                    <div class="flex items-start gap-2.5">
-                        <div class="w-5 h-5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center text-[9px] font-black flex-shrink-0 mt-0.5">2</div>
-                        <p class="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">Paste your kit URL (e.g. from Envato Elements or a self-hosted zip URL). Elementor imports directly from your account.</p>
+
+                    <div class="p-4 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-white dark:bg-zinc-900 space-y-3">
+                        <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-50 text-[10px] font-bold text-white dark:text-zinc-950">2</span>
+                        <label for="git-pat-input" class="text-xs font-bold text-zinc-800 dark:text-zinc-200 font-sans inline-block ml-1">Paste your Access Token</label>
+                        <p class="text-[11px] text-zinc-500 leading-relaxed font-sans">
+                            Copy the generated token from GitHub (starts with <code>ghp_</code>) and paste it below.
+                        </p>
+                        <input type="password" id="git-pat-input" placeholder="ghp_..." class="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-850 dark:focus:border-zinc-400 font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-sans">
                     </div>
-                    <div class="flex items-start gap-2.5">
-                        <div class="w-5 h-5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center text-[9px] font-black flex-shrink-0 mt-0.5">3</div>
-                        <p class="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">Template pages are applied to this theme. You control updates and version branching from your kit provider directly.</p>
+                </div>
+
+                <div class="pt-2">
+                    <button type="button" id="git-connect-btn" onclick="connectGitRepository()" class="w-full h-10 bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center justify-center gap-2 border-none">
+                        Connect Account
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 2: CHOOSE OR CREATE REPOSITORY -->
+            <div id="git-step-select-repo" class="space-y-5 hidden">
+                <div class="p-4 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0 animate-pulse"></span>
+                        <p class="text-[11px] font-bold text-zinc-800 dark:text-zinc-200 font-sans" id="git-connected-user-temp">Connected as @user</p>
+                    </div>
+                    <button onclick="disconnectGit()" class="text-[10px] font-bold text-zinc-500 hover:text-red-650 transition-colors cursor-pointer border-none bg-transparent font-sans">Disconnect</button>
+                </div>
+
+                <div class="space-y-4">
+                    <p class="text-[10px] font-bold text-zinc-450 uppercase tracking-wider font-sans">Setup Repository</p>
+                    
+                    <!-- TAB OPTIONS -->
+                    <div class="grid grid-cols-2 gap-2 p-0.5 bg-zinc-100 dark:bg-zinc-900 rounded-lg">
+                        <button onclick="switchRepoTab('create')" id="tab-repo-create" class="py-1.5 text-[10px] font-bold rounded-md transition-all cursor-pointer border-none bg-white dark:bg-zinc-800 text-zinc-850 dark:text-zinc-100 shadow-sm">
+                            Create New (Recommended)
+                        </button>
+                        <button onclick="switchRepoTab('link')" id="tab-repo-link" class="py-1.5 text-[10px] font-bold rounded-md transition-all cursor-pointer border-none bg-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200">
+                            Link Existing
+                        </button>
+                    </div>
+
+                    <!-- TAB 1: CREATE NEW -->
+                    <div id="panel-repo-create" class="space-y-3.5">
+                        <p class="text-[11px] text-zinc-500 leading-relaxed font-sans">
+                            We will automatically create a private, secure repository on GitHub for you to store your pages.
+                        </p>
+                        <div class="space-y-1.5">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">New Repository Name</label>
+                            <input type="text" id="git-new-repo-name" value="cora-website" placeholder="cora-website" class="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-850 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-sans font-medium">
+                        </div>
+                        <button type="button" id="git-create-repo-btn" onclick="createGitRepository()" class="w-full h-10 bg-zinc-950 dark:bg-white hover:bg-zinc-850 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-lg text-xs transition-colors cursor-pointer border-none font-sans flex items-center justify-center gap-2">
+                            Create Private Repository
+                        </button>
+                    </div>
+
+                    <!-- TAB 2: LINK EXISTING -->
+                    <div id="panel-repo-link" class="space-y-3.5 hidden">
+                        <p class="text-[11px] text-zinc-500 leading-relaxed font-sans">
+                            If you already have a repository on GitHub, enter its path below to link it.
+                        </p>
+                        <div class="space-y-1.5">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Repository Path</label>
+                            <input type="text" id="git-link-repo-path" placeholder="username/repository-name" class="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-850 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-sans font-medium">
+                            <p class="text-[9px] text-zinc-400 pl-1">Format: <code>owner/repository-name</code></p>
+                        </div>
+                        <button type="button" id="git-link-repo-btn" onclick="linkGitRepository()" class="w-full h-10 bg-zinc-950 dark:bg-white hover:bg-zinc-850 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-lg text-xs transition-colors cursor-pointer border-none font-sans flex items-center justify-center gap-2">
+                            Link Repository
+                        </button>
                     </div>
                 </div>
             </div>
-            <!-- Option A: Open Elementor Kit Library -->
-            <div class="space-y-2">
-                <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Option A — Elementor Kit Library</p>
-                <button onclick="openElementorKitLibrary()" class="w-full px-4 py-3 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-200 transition-colors flex items-center gap-3 cursor-pointer">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" class="text-zinc-500 flex-shrink-0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-                    Open Elementor Kit Library
-                    <svg class="w-3.5 h-3.5 ml-auto text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                </button>
-                <p class="text-[10px] text-zinc-400 leading-relaxed pl-1">Opens Elementor's native Kit Library inside the editor — browse and apply kits from your Elementor Pro or Envato Elements subscription.</p>
-            </div>
-            <!-- Option B: Manual Kit URL -->
-            <div class="space-y-3">
-                <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Option B — Manual Kit URL</p>
-                <div class="space-y-2">
-                    <label class="block text-[10px] font-bold text-zinc-500">Kit Name <span class="text-red-400">*</span></label>
-                    <input type="text" id="kit-name-input" placeholder="e.g. Suda Front — Real Estate Kit" class="w-full px-3 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-400 font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+
+            <!-- STEP 3: CONNECTED DASHBOARD -->
+            <div id="git-connected-dashboard" class="space-y-6 hidden">
+                <!-- Status Banner -->
+                <div class="p-4 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0 animate-pulse"></span>
+                        <div>
+                            <p class="text-[11px] font-bold text-zinc-800 dark:text-zinc-200 font-sans" id="git-connected-user">Connected as @user</p>
+                            <a href="#" id="git-connected-repo-link" target="_blank" class="text-[10px] text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center gap-1 font-sans">
+                                owner/repo
+                                <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            </a>
+                        </div>
+                    </div>
+                    <button onclick="disconnectGit()" class="text-[10px] font-bold text-zinc-500 hover:text-red-650 transition-colors cursor-pointer border-none bg-transparent font-sans">Disconnect</button>
                 </div>
+
+                <!-- Branch Management -->
                 <div class="space-y-2">
-                    <label class="block text-[10px] font-bold text-zinc-500">Kit URL <span class="text-red-400">*</span></label>
-                    <input type="url" id="kit-url-input" placeholder="https://elements.envato.com/your-kit or direct .zip URL" class="w-full px-3 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-400 font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
-                    <p class="text-[10px] text-zinc-400 pl-1">Supports Envato Elements, ThemeForest, or any direct HTTPS kit URL. Your access credentials stay with your account — Cora only stores the reference URL.</p>
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Active Branch</label>
+                    <div class="flex items-center gap-2">
+                        <div class="relative flex-1">
+                            <select id="git-branch-select" onchange="changeActiveBranch()" class="w-full px-3 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-400 font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 cursor-pointer font-sans">
+                                <option value="main">main</option>
+                            </select>
+                        </div>
+                        <button onclick="toggleInlineNewBranch(true)" class="h-9 px-3 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-850 rounded-lg text-[10px] font-bold text-zinc-700 dark:text-zinc-200 transition-colors cursor-pointer flex items-center gap-1 bg-white dark:bg-zinc-900 font-sans">
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            New
+                        </button>
+                    </div>
+
+                    <!-- Inline New Branch Form -->
+                    <div id="git-new-branch-container" class="hidden mt-2 p-3 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 rounded-xl space-y-3">
+                        <div class="space-y-1.5">
+                            <label class="block text-[9px] font-bold text-zinc-400 uppercase tracking-wider font-sans">New Branch Name</label>
+                            <input type="text" id="new-branch-name-input" placeholder="e.g. feature-homepage-redesign" class="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-400 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium font-sans">
+                        </div>
+                        <div class="flex justify-end gap-2">
+                            <button onclick="toggleInlineNewBranch(false)" class="px-2.5 py-1.5 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-[10px] text-zinc-650 dark:text-zinc-300 font-bold rounded-md hover:bg-zinc-50 transition-colors cursor-pointer font-sans">Cancel</button>
+                            <button onclick="submitCreateBranch()" class="px-2.5 py-1.5 bg-zinc-950 dark:bg-white text-white dark:text-zinc-900 text-[10px] font-bold rounded-md hover:bg-zinc-850 transition-colors cursor-pointer border-none font-sans">Create</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="space-y-2">
-                    <label class="block text-[10px] font-bold text-zinc-500">Kit Provider</label>
-                    <select id="kit-provider-input" class="w-full px-3 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-400 font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 cursor-pointer">
-                        <option value="">Select provider...</option>
-                        <option value="envato">Envato Elements / ThemeForest</option>
-                        <option value="elementor">Elementor Pro Kit Library</option>
-                        <option value="sudafront">Suda Front</option>
-                        <option value="piotnet">Piotnet / FounderKit</option>
-                        <option value="custom">Self-Hosted / Custom</option>
-                    </select>
+
+                <!-- Manual Commit Actions -->
+                <div class="space-y-3 border-t border-zinc-150 dark:border-zinc-800 pt-5">
+                    <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Commit & Sync Changes</p>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold text-zinc-400 font-sans">Commit Message</label>
+                        <textarea id="git-commit-msg" rows="3" placeholder="Describe the layout edits or components updated..." class="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-400 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium font-sans resize-none"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 pt-1">
+                        <button type="button" id="git-push-btn" onclick="pushPageLayout()" class="h-9 bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 border-none font-sans">
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 16 12 12 8 16"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path><polyline points="16 16 12 12 8 16"></polyline></svg>
+                            Commit & Push
+                        </button>
+                        <button type="button" id="git-pull-btn" onclick="pullDesignTemplates()" class="h-9 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-850 rounded-lg text-xs font-bold text-zinc-700 dark:text-zinc-200 transition-colors cursor-pointer flex items-center justify-center gap-1.5 bg-white dark:bg-zinc-900 font-sans">
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="8 17 12 21 16 17"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path><polyline points="8 17 12 21 16 17"></polyline></svg>
+                            Pull Design
+                        </button>
+                    </div>
                 </div>
-                <div class="space-y-2">
-                    <label class="block text-[10px] font-bold text-zinc-500">Purchase Code <span class="text-zinc-400 font-normal">(optional, stored encrypted)</span></label>
-                    <input type="text" id="kit-license-input" placeholder="Envato purchase code or kit license key" class="w-full px-3 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-400 font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
-                    <p class="text-[10px] text-zinc-400 pl-1">Stored encrypted in your site's database only. Never transmitted to Cora's servers.</p>
+
+                <!-- Recent Commit History -->
+                <div class="space-y-3 border-t border-zinc-150 dark:border-zinc-800 pt-5">
+                    <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Recent Commit Log</p>
+                    <div id="git-commit-log" class="space-y-2">
+                        <!-- Will be populated dynamically -->
+                        <div class="text-[10px] text-zinc-400 italic pl-1 font-sans">Loading recent commits...</div>
+                    </div>
                 </div>
             </div>
         </div>
         <!-- Drawer Footer -->
         <div class="p-5 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-end gap-2.5 bg-zinc-50/30 dark:bg-zinc-900/30 flex-shrink-0">
-            <button type="button" class="px-3.5 py-2 border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeKitDrawer()">Cancel</button>
-            <button type="button" id="kit-save-btn" class="px-3.5 py-2 bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center gap-2" onclick="saveKitConnection()">
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                Save Kit Connection
-            </button>
+            <button type="button" class="px-3.5 py-2 border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="closeGitDrawer()">Cancel</button>
         </div>
     </div>
 </div>
@@ -6456,6 +6552,7 @@ $wp_pages = get_pages();
                     }
                 }
             }
+            loadGitStatus();
         } catch(e) {}
     })();
 
@@ -6574,22 +6671,48 @@ $wp_pages = get_pages();
     }
 
     function switchDevice(device) {
-        // Update active state of our custom device buttons
+        const isCustom = device.startsWith('custom-');
+        const customWidth = isCustom ? parseInt(device.split('-')[1]) : null;
+
+        // Update active state of preset device buttons
         ['desktop', 'tablet', 'mobile'].forEach(d => {
             const btn = document.getElementById('cora-device-' + d);
             if (btn) {
-                btn.className = d === device
+                btn.className = (!isCustom && d === device)
                     ? 'w-7 h-7 rounded-md flex items-center justify-center text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-700 shadow-sm cursor-pointer transition-all'
                     : 'w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-pointer transition-all';
             }
         });
+
+        // Update active state of custom viewport buttons
+        document.querySelectorAll('#cora-custom-viewports button').forEach(btn => {
+            const vpW = parseInt(btn.getAttribute('data-vp-width'));
+            btn.style.background = (isCustom && vpW === customWidth) ? 'rgba(0,0,0,0.08)' : '';
+        });
+
         const iframe = document.getElementById('elementor-editor-iframe');
         if (!iframe || !iframe.contentWindow) return;
+
+        if (isCustom && customWidth) {
+            // For custom widths: directly resize iframe; don't alter Elementor's responsive mode
+            iframe.style.width = customWidth + 'px';
+            iframe.style.maxWidth = customWidth + 'px';
+            iframe.style.transition = 'width 0.25s ease';
+            setTimeout(() => drawRuler(), 300);
+            return;
+        }
+
+        // Reset iframe width for preset devices
+        const presetWidths = { desktop: '', tablet: '768px', mobile: '375px' };
+        iframe.style.width = presetWidths[device] || '';
+        iframe.style.maxWidth = presetWidths[device] || '';
+
         const cw = iframe.contentWindow;
         // Strategy 1: Elementor 3.x+ changeDeviceMode (most reliable)
         try {
             if (cw.elementor && cw.elementor.changeDeviceMode) {
                 cw.elementor.changeDeviceMode(device);
+                setTimeout(() => drawRuler(), 300);
                 return;
             }
         } catch (e) {}
@@ -6597,12 +6720,14 @@ $wp_pages = get_pages();
         try {
             if (cw.elementor && cw.elementor.channels && cw.elementor.channels.deviceMode) {
                 cw.elementor.channels.deviceMode.trigger('change', device);
+                setTimeout(() => drawRuler(), 300);
                 return;
             }
         } catch (e) {}
         // Strategy 3: $e route for responsive mode
         try {
             cw.$e.route('responsive', { device: device });
+            setTimeout(() => drawRuler(), 300);
             return;
         } catch (e) {}
         // Strategy 4: Click native Elementor responsive buttons in the top bar
@@ -6612,7 +6737,9 @@ $wp_pages = get_pages();
             `[data-device="${device}"], [aria-label="${label}"], [title="${label}"], [data-tooltip="${label}"]`
         );
         if (nativeBtn) nativeBtn.click();
+        setTimeout(() => drawRuler(), 300);
     }
+
 
     function previewPage() {
         if (canvasState.activeWpPostId) {
@@ -6706,11 +6833,153 @@ $wp_pages = get_pages();
             }
         }
     }
+    // ── Page Switcher Dropdown ─────────────────────────────────────────────
+    function togglePageSwitcher(e) {
+        e.stopPropagation();
+        const dd = document.getElementById('cora-page-switcher-dropdown');
+        if (!dd) return;
+        if (dd.classList.contains('hidden')) {
+            renderPageSwitcherList('');
+            dd.classList.remove('hidden');
+            setTimeout(() => { const si = document.getElementById('cora-page-switcher-search'); if (si) { si.value = ''; si.focus(); } }, 50);
+        } else {
+            dd.classList.add('hidden');
+        }
+    }
 
-    // ── Template Kit Drawer ─────────────────────────────────────────────
-    function openKitDrawer() {
-        const drawer = document.getElementById('drawer-kit-connect');
-        const card   = document.getElementById('drawer-kit-connect-card');
+    function renderPageSwitcherList(query) {
+        const list = document.getElementById('cora-page-switcher-list');
+        if (!list) return;
+        const pages = (window.canvasState && window.canvasState.pages) ? window.canvasState.pages : [];
+        const q = (query || '').toLowerCase();
+        const filtered = q ? pages.filter(p => p.title && p.title.toLowerCase().includes(q)) : pages;
+        if (!filtered.length) { list.innerHTML = '<div class="px-3 py-4 text-center text-[11px] text-zinc-400">No pages found</div>'; return; }
+        const currentId = window.canvasState && window.canvasState.currentPageId;
+        list.innerHTML = filtered.map(p => {
+            const active = p.id == currentId;
+            return `<button onclick="switchToPage(${p.id},'${(p.title||'').replace(/'/g,"\\'")}',${ p.wp_post_id||0})"
+                class="w-full text-left px-3 py-2 text-[11px] font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors flex items-center gap-2 ${active?'text-zinc-950 dark:text-white':'text-zinc-600 dark:text-zinc-400'}">
+                <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${active?'bg-emerald-500':'bg-zinc-200 dark:bg-zinc-700'}"></span>
+                <span class="truncate flex-1">${p.title||'Untitled'}</span>
+                <span class="text-[9px] text-zinc-400 flex-shrink-0">${p.slug||''}</span>
+            </button>`;
+        }).join('');
+    }
+
+    function filterPageSwitcher(q) { renderPageSwitcherList(q); }
+
+    function switchToPage(pageId, title, wpPostId) {
+        const dd = document.getElementById('cora-page-switcher-dropdown');
+        if (dd) dd.classList.add('hidden');
+        openPageEditor(pageId, title, wpPostId);
+    }
+
+    document.addEventListener('click', function(e) {
+        const wrap = document.getElementById('cora-page-switcher-wrap');
+        if (wrap && !wrap.contains(e.target)) {
+            const dd = document.getElementById('cora-page-switcher-dropdown');
+            if (dd) dd.classList.add('hidden');
+        }
+    });
+
+    // ── Custom Viewports ──────────────────────────────────────────────────
+    (function initCustomViewports() {
+        const stored = JSON.parse(localStorage.getItem('cora_custom_viewports') || '[]');
+        stored.forEach(vp => addViewportButton(vp.width, vp.label));
+    })();
+
+    function toggleViewportPopover(e) {
+        e.stopPropagation();
+        const pop = document.getElementById('cora-viewport-popover');
+        if (pop) pop.classList.toggle('hidden');
+    }
+
+    function addCustomViewport() {
+        const w = parseInt(document.getElementById('cora-vp-width').value);
+        const l = (document.getElementById('cora-vp-label').value || '').trim() || w + 'px';
+        if (!w || w < 240 || w > 3840) { window.coraShowToast && window.coraShowToast('Enter a valid width (240–3840 px)', 'error'); return; }
+        addViewportButton(w, l);
+        const stored = JSON.parse(localStorage.getItem('cora_custom_viewports') || '[]');
+        if (!stored.find(v => v.width === w)) { stored.push({width: w, label: l}); localStorage.setItem('cora_custom_viewports', JSON.stringify(stored)); }
+        switchDevice('custom-' + w);
+        document.getElementById('cora-viewport-popover').classList.add('hidden');
+        window.coraShowToast && window.coraShowToast('Viewport ' + l + ' (' + w + 'px) added', 'success');
+    }
+
+    function addViewportButton(width, label) {
+        const container = document.getElementById('cora-custom-viewports');
+        if (!container) return;
+        const id = 'cora-device-custom-' + width;
+        if (document.getElementById(id)) return;
+        const btn = document.createElement('button');
+        btn.id = id; btn.title = label + ' (' + width + 'px) — Right-click to remove';
+        btn.setAttribute('data-vp-width', width);
+        btn.className = 'px-1.5 h-7 rounded-md text-[9px] font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 cursor-pointer transition-all';
+        btn.textContent = label;
+        btn.onclick = () => switchDevice('custom-' + width);
+        btn.oncontextmenu = (e) => {
+            e.preventDefault();
+            btn.remove();
+            const stored = JSON.parse(localStorage.getItem('cora_custom_viewports') || '[]');
+            localStorage.setItem('cora_custom_viewports', JSON.stringify(stored.filter(vp => vp.width !== width)));
+            window.coraShowToast && window.coraShowToast('Viewport removed', 'success');
+        };
+        container.appendChild(btn);
+    }
+
+    document.addEventListener('click', function(e) {
+        const pop = document.getElementById('cora-viewport-popover');
+        if (pop && !pop.classList.contains('hidden') && !e.target.closest('#cora-viewport-popover') && !e.target.closest('[onclick*="toggleViewportPopover"]')) {
+            pop.classList.add('hidden');
+        }
+    });
+
+    // ── Pixel Ruler ───────────────────────────────────────────────────────
+    function toggleRuler() {
+        const ruler = document.getElementById('cora-canvas-ruler');
+        const btn   = document.getElementById('cora-ruler-toggle');
+        if (!ruler) return;
+        const isNowHidden = ruler.classList.toggle('hidden');
+        if (btn) btn.style.background = isNowHidden ? '' : 'rgb(228 228 231)';
+        if (!isNowHidden) drawRuler();
+        localStorage.setItem('cora_ruler_on', isNowHidden ? '0' : '1');
+    }
+
+    function drawRuler() {
+        const ruler = document.getElementById('cora-canvas-ruler');
+        const canvas = document.getElementById('cora-ruler-canvas');
+        if (!ruler || !canvas || ruler.classList.contains('hidden')) return;
+        const W = ruler.offsetWidth, H = ruler.offsetHeight;
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = W * dpr; canvas.height = H * dpr;
+        canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr); ctx.clearRect(0, 0, W, H);
+        const iframe = document.getElementById('elementor-editor-iframe');
+        const vpW = iframe ? (parseInt(iframe.style.width) || iframe.offsetWidth || W) : W;
+        const container = document.getElementById('elementor-iframe-container');
+        const containerW = container ? container.offsetWidth : W;
+        const offsetX = Math.max(0, (containerW - vpW) / 2);
+        ctx.fillStyle = '#f4f4f5'; ctx.fillRect(0, 0, W, H);
+        ctx.strokeStyle = '#d4d4d8'; ctx.lineWidth = 1;
+        ctx.fillStyle = '#a1a1aa'; ctx.font = '8px monospace'; ctx.textBaseline = 'top';
+        const step = vpW <= 400 ? 10 : vpW <= 800 ? 20 : 50;
+        const labelEvery = vpW <= 400 ? 50 : 100;
+        for (let px = 0; px <= vpW; px += step) {
+            const x = offsetX + (px / vpW) * vpW;
+            const major = px % labelEvery === 0;
+            ctx.beginPath(); ctx.moveTo(x, H); ctx.lineTo(x, major ? 0 : H * 0.45); ctx.stroke();
+            if (major) ctx.fillText(px === 0 ? '0' : String(px), x + 2, 2);
+        }
+    }
+
+    (function() { if (localStorage.getItem('cora_ruler_on') === '1') { const r = document.getElementById('cora-canvas-ruler'); if (r) r.classList.remove('hidden'); } })();
+    window.addEventListener('resize', drawRuler);
+
+    // ── Git Integration Drawer ──────────────────────────────────────────
+    function openGitDrawer() {
+        const drawer = document.getElementById('drawer-git-connect');
+        const card   = document.getElementById('drawer-git-connect-card');
         if (!drawer || !card) return;
         drawer.classList.remove('hidden');
         requestAnimationFrame(() => {
@@ -6719,12 +6988,12 @@ $wp_pages = get_pages();
             card.classList.remove('translate-x-full');
             card.classList.add('translate-x-0');
         });
-        loadKitStatus();
+        loadGitStatus();
     }
 
-    function closeKitDrawer() {
-        const drawer = document.getElementById('drawer-kit-connect');
-        const card   = document.getElementById('drawer-kit-connect-card');
+    function closeGitDrawer() {
+        const drawer = document.getElementById('drawer-git-connect');
+        const card   = document.getElementById('drawer-git-connect-card');
         if (!drawer || !card) return;
         card.classList.remove('translate-x-0');
         card.classList.add('translate-x-full');
@@ -6733,111 +7002,322 @@ $wp_pages = get_pages();
         setTimeout(() => drawer.classList.add('hidden'), 300);
     }
 
-    // Close kit drawer on backdrop click
-    document.getElementById('drawer-kit-connect') && document.getElementById('drawer-kit-connect').addEventListener('click', function(e) {
-        if (e.target === this) closeKitDrawer();
+    document.getElementById('drawer-git-connect') && document.getElementById('drawer-git-connect').addEventListener('click', function(e) {
+        if (e.target === this) closeGitDrawer();
     });
 
-    function openElementorKitLibrary() {
-        closeKitDrawer();
-        const iframe = document.getElementById('elementor-editor-iframe');
-        if (!iframe || !iframe.contentWindow) {
-            window.coraShowToast('Open a page in the editor first, then try Kit Library.');
-            return;
+    function toggleInlineNewBranch(show) {
+        const container = document.getElementById('git-new-branch-container');
+        if (!container) return;
+        if (show) {
+            container.classList.remove('hidden');
+            const input = document.getElementById('new-branch-name-input');
+            if (input) {
+                input.value = '';
+                input.focus();
+            }
+        } else {
+            container.classList.add('hidden');
         }
-        const cw = iframe.contentWindow;
-        // Strategy 1: Elementor 3.20+ kit-library route
-        try { cw.$e.route('kit-library'); return; } catch (e) {}
-        // Strategy 2: library/open with kit-library source
-        try { cw.$e.run('library/open', { activeSource: 'kit-library' }); return; } catch (e) {}
-        // Strategy 3: generic library open
-        try { cw.$e.run('library/open'); return; } catch (e) {}
-        // Strategy 4: click native Kit Library tab button
-        const btn = cw.document.querySelector('[data-tab="kit-library"], [aria-label="Kit Library"], [title="Kit Library"]');
-        if (btn) { btn.click(); return; }
-        window.coraShowToast('Could not open Kit Library — please update Elementor to v3.20+.');
     }
 
-    function loadKitStatus() {
+    function loadGitStatus() {
         jQuery.post(coraREData.ajaxUrl, {
-            action: 'cora_get_canvas_kit',
-            nonce: coraREData.nonce,
-            theme_id: canvasState.activeThemeId || 0
+            action: 'cora_github_get_status',
+            nonce: coraREData.ajaxNonce
         }, function(res) {
-            if (res.success && res.data && res.data.kit_name) {
-                const banner = document.getElementById('kit-connected-banner');
-                const dot    = document.getElementById('cora-kit-status-dot');
-                if (banner) banner.classList.remove('hidden');
-                if (dot)    dot.classList.remove('hidden');
-                const nameEl = document.getElementById('kit-connected-name');
-                const metaEl = document.getElementById('kit-connected-meta');
-                if (nameEl) nameEl.textContent = res.data.kit_name;
-                if (metaEl) metaEl.textContent = 'via ' + (res.data.kit_provider || 'Manual URL');
-                // Pre-fill fields
-                const nameInput     = document.getElementById('kit-name-input');
-                const urlInput      = document.getElementById('kit-url-input');
-                const providerInput = document.getElementById('kit-provider-input');
-                if (nameInput)     nameInput.value     = res.data.kit_name     || '';
-                if (urlInput)      urlInput.value      = res.data.kit_url      || '';
-                if (providerInput) providerInput.value = res.data.kit_provider || '';
+            if (res.success && res.data) {
+                const data = res.data;
+                const unconnectedForm = document.getElementById('git-unconnected-form');
+                const selectRepoStep = document.getElementById('git-step-select-repo');
+                const connectedDashboard = document.getElementById('git-connected-dashboard');
+                const statusDot = document.getElementById('cora-git-status-dot');
+
+                if (data.connected && data.has_repo) {
+                    if (unconnectedForm) unconnectedForm.classList.add('hidden');
+                    if (selectRepoStep) selectRepoStep.classList.add('hidden');
+                    if (connectedDashboard) connectedDashboard.classList.remove('hidden');
+                    if (statusDot) statusDot.classList.remove('hidden');
+
+                    const userEl = document.getElementById('git-connected-user');
+                    const repoLink = document.getElementById('git-connected-repo-link');
+                    if (userEl) userEl.textContent = 'Connected as @' + data.username;
+                    if (repoLink) {
+                        repoLink.textContent = data.repo;
+                        repoLink.href = 'https://github.com/' + data.repo;
+                    }
+
+                    const branchSelect = document.getElementById('git-branch-select');
+                    if (branchSelect) {
+                        branchSelect.innerHTML = '';
+                        if (data.branches && data.branches.length) {
+                            data.branches.forEach(branch => {
+                                const option = document.createElement('option');
+                                option.value = branch;
+                                option.textContent = branch;
+                                branchSelect.appendChild(option);
+                            });
+                        } else {
+                            const option = document.createElement('option');
+                            option.value = 'main';
+                            option.textContent = 'main';
+                            branchSelect.appendChild(option);
+                        }
+                        const savedBranch = localStorage.getItem('cora_active_branch') || 'main';
+                        branchSelect.value = savedBranch;
+                    }
+
+                    const commitLog = document.getElementById('git-commit-log');
+                    if (commitLog) {
+                        commitLog.innerHTML = '';
+                        if (data.recent_commits && data.recent_commits.length) {
+                            data.recent_commits.forEach(commit => {
+                                const commitEl = document.createElement('div');
+                                commitEl.className = 'p-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-150 dark:border-zinc-800 rounded-xl space-y-1';
+                                const commitDate = new Date(commit.date).toLocaleString();
+                                commitEl.innerHTML = `
+                                    <div class="flex items-center justify-between gap-2">
+                                        <a href="${commit.url}" target="_blank" class="text-[10px] font-bold text-zinc-850 dark:text-zinc-200 hover:underline flex items-center gap-1">
+                                            <code>${commit.sha}</code>
+                                        </a>
+                                        <span class="text-[9px] text-zinc-400 font-sans">${commitDate}</span>
+                                    </div>
+                                    <p class="text-[10px] text-zinc-600 dark:text-zinc-400 font-sans leading-snug">${commit.message}</p>
+                                `;
+                                commitLog.appendChild(commitEl);
+                            });
+                        } else {
+                            commitLog.innerHTML = '<div class="text-[10px] text-zinc-400 italic pl-1 font-sans">No recent commits found.</div>';
+                        }
+                    }
+
+                } else if (data.connected && !data.has_repo) {
+                    if (unconnectedForm) unconnectedForm.classList.add('hidden');
+                    if (selectRepoStep) selectRepoStep.classList.remove('hidden');
+                    if (connectedDashboard) connectedDashboard.classList.add('hidden');
+                    if (statusDot) statusDot.classList.add('hidden');
+
+                    const userTemp = document.getElementById('git-connected-user-temp');
+                    if (userTemp) {
+                        userTemp.textContent = 'Connected as @' + data.username;
+                    }
+                } else {
+                    if (unconnectedForm) unconnectedForm.classList.remove('hidden');
+                    if (selectRepoStep) selectRepoStep.classList.add('hidden');
+                    if (connectedDashboard) connectedDashboard.classList.add('hidden');
+                    if (statusDot) statusDot.classList.add('hidden');
+                }
             }
         });
     }
 
-    function saveKitConnection() {
-        const name     = (document.getElementById('kit-name-input')     || {}).value || '';
-        const url      = (document.getElementById('kit-url-input')      || {}).value || '';
-        const provider = (document.getElementById('kit-provider-input') || {}).value || '';
-        const license  = (document.getElementById('kit-license-input')  || {}).value || '';
-        if (!name.trim() || !url.trim()) {
-            window.coraShowToast('Kit Name and Kit URL are required.');
-            return;
-        }
-        const btn = document.getElementById('kit-save-btn');
-        if (btn) btn.disabled = true;
+    function connectGitRepository() {
+        const pat = (document.getElementById('git-pat-input') || {}).value || '';
+        if (!pat.trim()) { window.coraShowToast('Personal Access Token is required.'); return; }
+        const btn = document.getElementById('git-connect-btn');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<div class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent"></div> Connecting...'; }
+
         jQuery.post(coraREData.ajaxUrl, {
-            action: 'cora_save_canvas_kit',
-            nonce: coraREData.nonce,
-            theme_id: canvasState.activeThemeId || 0,
-            kit_name: name,
-            kit_url: url,
-            kit_provider: provider,
-            kit_license: license
+            action: 'cora_github_save_pat',
+            nonce: coraREData.ajaxNonce,
+            pat: pat
         }, function(res) {
-            if (btn) btn.disabled = false;
-            if (res.success) {
-                window.coraShowToast('Template Kit connected successfully.');
-                const dot = document.getElementById('cora-kit-status-dot');
-                if (dot) dot.classList.remove('hidden');
-                closeKitDrawer();
-            } else {
-                window.coraShowToast(res.data || 'Failed to save Kit connection.');
-            }
+            if (btn) { btn.disabled = false; btn.innerHTML = 'Connect Account'; }
+            if (res.success) { window.coraShowToast('Account connected successfully! Let\'s setup your repository.'); loadGitStatus(); }
+            else { window.coraShowToast(res.data.message || 'Invalid Personal Access Token.'); }
         });
     }
 
-    function disconnectKit() {
+    function switchRepoTab(tab) {
+        const tabCreate = document.getElementById('tab-repo-create');
+        const tabLink = document.getElementById('tab-repo-link');
+        const panelCreate = document.getElementById('panel-repo-create');
+        const panelLink = document.getElementById('panel-repo-link');
+
+        if (tab === 'create') {
+            if (tabCreate) tabCreate.className = 'py-1.5 text-[10px] font-bold rounded-md transition-all cursor-pointer border-none bg-white dark:bg-zinc-800 text-zinc-850 dark:text-zinc-100 shadow-sm';
+            if (tabLink) tabLink.className = 'py-1.5 text-[10px] font-bold rounded-md transition-all cursor-pointer border-none bg-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200';
+            if (panelCreate) panelCreate.classList.remove('hidden');
+            if (panelLink) panelLink.classList.add('hidden');
+        } else {
+            if (tabLink) tabLink.className = 'py-1.5 text-[10px] font-bold rounded-md transition-all cursor-pointer border-none bg-white dark:bg-zinc-800 text-zinc-850 dark:text-zinc-100 shadow-sm';
+            if (tabCreate) tabCreate.className = 'py-1.5 text-[10px] font-bold rounded-md transition-all cursor-pointer border-none bg-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200';
+            if (panelLink) panelLink.classList.remove('hidden');
+            if (panelCreate) panelCreate.classList.add('hidden');
+        }
+    }
+
+    function createGitRepository() {
+        const repoNameInput = document.getElementById('git-new-repo-name');
+        const repoName = repoNameInput ? repoNameInput.value.trim() : '';
+        if (!repoName) { window.coraShowToast('Repository name is required.'); return; }
+        const btn = document.getElementById('git-create-repo-btn');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<div class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent"></div> Creating...'; }
+
         jQuery.post(coraREData.ajaxUrl, {
-            action: 'cora_save_canvas_kit',
-            nonce: coraREData.nonce,
-            theme_id: canvasState.activeThemeId || 0,
-            kit_name: '',
-            kit_url: '',
-            kit_provider: '',
-            kit_license: ''
+            action: 'cora_github_create_repo',
+            nonce: coraREData.ajaxNonce,
+            repo_name: repoName
+        }, function(res) {
+            if (btn) { btn.disabled = false; btn.innerHTML = 'Create Private Repository'; }
+            if (res.success) { window.coraShowToast('Repository created and linked successfully!'); loadGitStatus(); }
+            else { window.coraShowToast(res.data.message || 'Failed to create repository.'); }
+        });
+    }
+
+    function linkGitRepository() {
+        const repoPathInput = document.getElementById('git-link-repo-path');
+        const repoPath = repoPathInput ? repoPathInput.value.trim() : '';
+        if (!repoPath) { window.coraShowToast('Repository path (owner/repo) is required.'); return; }
+        const btn = document.getElementById('git-link-repo-btn');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<div class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent"></div> Linking...'; }
+
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_github_link_repo',
+            nonce: coraREData.ajaxNonce,
+            repo: repoPath
+        }, function(res) {
+            if (btn) { btn.disabled = false; btn.innerHTML = 'Link Repository'; }
+            if (res.success) { window.coraShowToast('Repository linked successfully!'); loadGitStatus(); }
+            else { window.coraShowToast(res.data.message || 'Failed to link repository.'); }
+        });
+    }
+
+    function disconnectGit() {
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_github_disconnect',
+            nonce: coraREData.ajaxNonce
         }, function(res) {
             if (res.success) {
-                window.coraShowToast('Template Kit disconnected.');
-                const banner = document.getElementById('kit-connected-banner');
-                const dot    = document.getElementById('cora-kit-status-dot');
-                if (banner) banner.classList.add('hidden');
-                if (dot)    dot.classList.add('hidden');
-                ['kit-name-input','kit-url-input','kit-license-input'].forEach(id => {
+                window.coraShowToast('Disconnected from GitHub.');
+                localStorage.removeItem('cora_active_branch');
+                ['git-pat-input', 'git-new-repo-name', 'git-link-repo-path'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.value = '';
                 });
-                const providerInput = document.getElementById('kit-provider-input');
-                if (providerInput) providerInput.value = '';
+                loadGitStatus();
+            } else { window.coraShowToast('Failed to disconnect repository.'); }
+        });
+    }
+
+    function changeActiveBranch() {
+        const select = document.getElementById('git-branch-select');
+        if (select) { localStorage.setItem('cora_active_branch', select.value); window.coraShowToast('Active branch changed to: ' + select.value); }
+    }
+
+    function submitCreateBranch() {
+        const input = document.getElementById('new-branch-name-input');
+        const select = document.getElementById('git-branch-select');
+        if (!input || !input.value.trim()) { window.coraShowToast('Branch name is required.'); return; }
+
+        const fromBranch = (select ? select.value : 'main') || 'main';
+        const newBranchName = input.value.trim();
+
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_github_create_branch',
+            nonce: coraREData.ajaxNonce,
+            branch_name: newBranchName,
+            from_branch: fromBranch
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast('Branch ' + newBranchName + ' created successfully.');
+                toggleInlineNewBranch(false);
+                jQuery.post(coraREData.ajaxUrl, {
+                    action: 'cora_github_get_status',
+                    nonce: coraREData.ajaxNonce
+                }, function(statusRes) {
+                    if (statusRes.success && statusRes.data) {
+                        const data = statusRes.data;
+                        const branchSelect = document.getElementById('git-branch-select');
+                        if (branchSelect) {
+                            branchSelect.innerHTML = '';
+                            if (data.branches && data.branches.length) {
+                                data.branches.forEach(branch => {
+                                    const option = document.createElement('option');
+                                    option.value = branch;
+                                    option.textContent = branch;
+                                    branchSelect.appendChild(option);
+                                });
+                            }
+                            branchSelect.value = newBranchName;
+                            localStorage.setItem('cora_active_branch', newBranchName);
+                        }
+                    }
+                });
+            } else {
+                window.coraShowToast(res.data.message || 'Failed to create branch.');
+            }
+        });
+    }
+
+    function pushPageLayout() {
+        const activeBranch = localStorage.getItem('cora_active_branch') || 'main';
+        const commitMsg = (document.getElementById('git-commit-msg') || {}).value || '';
+        
+        const iframe = document.getElementById('elementor-editor-iframe');
+        if (!iframe || !iframe.contentWindow) {
+            window.coraShowToast('Please open the page in the editor first.');
+            return;
+        }
+
+        const pushBtn = document.getElementById('git-push-btn');
+        if (pushBtn) {
+            pushBtn.disabled = true;
+            pushBtn.innerHTML = '<div class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent"></div> Pushing...';
+        }
+
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_github_commit_page',
+            nonce: coraREData.ajaxNonce,
+            page_id: canvasState.activePageId || 0,
+            message: commitMsg,
+            branch: activeBranch
+        }, function(res) {
+            if (pushBtn) {
+                pushBtn.disabled = false;
+                pushBtn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 16 12 12 8 16"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path><polyline points="16 16 12 12 8 16"></polyline></svg> Commit & Push';
+            }
+
+            if (res.success) {
+                window.coraShowToast('Page layout committed and pushed successfully!');
+                const commitMsgInput = document.getElementById('git-commit-msg');
+                if (commitMsgInput) commitMsgInput.value = '';
+                loadGitStatus();
+            } else {
+                window.coraShowToast(res.data.message || 'Failed to commit/push page layout.');
+            }
+        });
+    }
+
+    function pullDesignTemplates() {
+        const activeBranch = localStorage.getItem('cora_active_branch') || 'main';
+
+        const pullBtn = document.getElementById('git-pull-btn');
+        if (pullBtn) {
+            pullBtn.disabled = true;
+            pullBtn.innerHTML = '<div class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-zinc-705 border-t-transparent"></div> Pulling...';
+        }
+
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_trigger_git_sync',
+            nonce: coraREData.ajaxNonce,
+            theme_id: canvasState.activeThemeId || 0,
+            branch: activeBranch
+        }, function(res) {
+            if (pullBtn) {
+                pullBtn.disabled = false;
+                pullBtn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="8 17 12 21 16 17"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path><polyline points="8 17 12 21 16 17"></polyline></svg> Pull Design';
+            }
+
+            if (res.success) {
+                window.coraShowToast(res.data.message || 'Repository synced and deployed successfully!');
+                const iframe = document.getElementById('elementor-editor-iframe');
+                if (iframe) {
+                    document.getElementById('iframe-loader').classList.remove('hidden');
+                    iframe.contentWindow.location.reload();
+                }
+            } else {
+                window.coraShowToast(res.data.message || 'Failed to pull repository design sync.');
             }
         });
     }

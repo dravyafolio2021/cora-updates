@@ -22,6 +22,9 @@ define( 'CORA_PLUGIN_FILE', __FILE__ );
 
 // Autoloaders / Libraries
 
+// ── Git Integration ────────────────────────────────────────────────────────
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-github-integration.php';
+
 /**
  * Add the admin menu page
  */
@@ -247,11 +250,76 @@ function cora_disable_elementor_notes_scripts() {
     wp_deregister_script( 'elementor-notes' );
     wp_dequeue_script( 'notes' );
     wp_deregister_script( 'notes' );
+
+    // Dequeue all Elementor AI scripts — removes "Edit with AI" feature entirely
+    $ai_handles = array(
+        'elementor-ai',
+        'elementor-ai-layout',
+        'elementor-ai-media-library',
+        'elementor-ai-gutenberg',
+        'elementor-ai-admin',
+        'elementor-ai-unify-product-images',
+    );
+    foreach ( $ai_handles as $handle ) {
+        wp_dequeue_script( $handle );
+        wp_deregister_script( $handle );
+    }
 }
 add_action( 'wp_enqueue_scripts', 'cora_disable_elementor_notes_scripts', 999 );
 add_action( 'admin_enqueue_scripts', 'cora_disable_elementor_notes_scripts', 999 );
 add_action( 'elementor/editor/before_enqueue_scripts', 'cora_disable_elementor_notes_scripts', 999 );
 add_action( 'elementor/editor/after_enqueue_scripts', 'cora_disable_elementor_notes_scripts', 999 );
+
+/**
+ * 11. BLOCK ALL PLUGIN INSTALLATION GLOBALLY — Platform Security
+ *
+ * Strips install_plugins and activate_plugins capabilities from every user
+ * on the platform. No user — including administrators — can install or activate
+ * plugins via the Elementor notice banners (e.g. "Install Ally"), the WordPress
+ * admin plugin page, or any direct wp-admin/update.php URL.
+ *
+ * This is a platform-level security lock, not a role-level permission.
+ */
+add_filter( 'user_has_cap', function( $allcaps, $caps, $args, $user ) {
+    $blocked = array( 'install_plugins', 'activate_plugins', 'update_plugins', 'delete_plugins', 'upload_plugins' );
+    foreach ( $blocked as $cap ) {
+        $allcaps[ $cap ] = false;
+    }
+    return $allcaps;
+}, 999, 4 );
+
+// Also hard-block the wp-admin/update.php install-plugin action via a redirect
+add_action( 'admin_init', function() {
+    if (
+        isset( $_GET['action'] ) &&
+        in_array( $_GET['action'], array( 'install-plugin', 'upload-plugin', 'activate-plugin', 'update-plugin' ), true ) &&
+        strpos( $_SERVER['PHP_SELF'] ?? '', 'update.php' ) !== false
+    ) {
+        wp_die(
+            '<strong>Plugin installation is disabled on this platform.</strong> Contact your system administrator.',
+            'Action Not Allowed',
+            array( 'response' => 403, 'back_link' => true )
+        );
+    }
+} );
+
+// Block the Elementor editor AJAX events that trigger plugin install notice clicks
+add_action( 'wp_ajax_elementor_pro_allow_ally', function() {
+    wp_send_json_error( array( 'message' => 'Plugin installation is disabled on this platform.' ), 403 );
+} );
+add_action( 'wp_ajax_elementor_allow_plugin_install', function() {
+    wp_send_json_error( array( 'message' => 'Plugin installation is disabled on this platform.' ), 403 );
+} );
+
+// Suppress Elementor in-panel control notice rendering (PHP filter)
+add_filter( 'elementor/control/register', function( $control ) {
+    // Block the notice control type from rendering any 'install-plugin' action URL
+    if ( method_exists( $control, 'get_type' ) && $control->get_type() === 'notice' ) {
+        return null; // Returning null prevents registration
+    }
+    return $control;
+} );
+
 
 /**
  * 10. SUPPRESS UPDATE NAGS — Hide "WordPress X.X is available" notices from non-superadmins.
@@ -8828,9 +8896,17 @@ add_action( 'wp_ajax_cora_generate_layout', 'cora_ajax_generate_layout' );
  * Elementor Reskin Module
  */
 function cora_enqueue_elementor_reskin_styles() {
+    // Core reskin
     wp_enqueue_style(
         'cora-elementor-reskin-css',
         plugin_dir_url( __FILE__ ) . 'assets/css/cora-elementor-reskin.css',
+        array(),
+        time()
+    );
+    // Git integration drawer styles
+    wp_enqueue_style(
+        'cora-git-integration-css',
+        plugin_dir_url( __FILE__ ) . 'assets/css/cora-git-integration.css',
         array(),
         time()
     );
@@ -8839,6 +8915,7 @@ add_action( 'elementor/editor/after_enqueue_styles', 'cora_enqueue_elementor_res
 add_action( 'elementor/preview/enqueue_styles', 'cora_enqueue_elementor_reskin_styles' );
 
 function cora_enqueue_elementor_reskin_scripts() {
+    // Core reskin
     wp_enqueue_script(
         'cora-elementor-reskin-js',
         plugin_dir_url( __FILE__ ) . 'assets/js/cora-elementor-reskin.js',
@@ -8846,6 +8923,18 @@ function cora_enqueue_elementor_reskin_scripts() {
         time(),
         true
     );
+    // Git integration
+    wp_enqueue_script(
+        'cora-git-integration-js',
+        plugin_dir_url( __FILE__ ) . 'assets/js/cora-git-integration.js',
+        array(),
+        time(),
+        true
+    );
+    wp_localize_script( 'cora-git-integration-js', 'coraGitData', array(
+        'ajax_url' => admin_url( 'admin-ajax.php' ),
+        'nonce'    => wp_create_nonce( 'cora_ajax_nonce' ),
+    ) );
 }
 add_action( 'elementor/editor/after_enqueue_scripts', 'cora_enqueue_elementor_reskin_scripts' );
 

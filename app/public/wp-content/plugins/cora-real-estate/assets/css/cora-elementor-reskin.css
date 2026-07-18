@@ -87,11 +87,27 @@ a[href*="wp-admin/post.php"],
     display: none !important;
 }
 
-/* Hide Elementor native Top Bar and reset editor panel height */
+/* Make the Elementor Top Bar visible but styled minimalistically */
 header.MuiAppBar-root,
 .e-top-bar,
 #e-top-bar,
 .elementor-editor-top-bar {
+    display: flex !important;
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #e4e4e7 !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 12px !important;
+    box-sizing: border-box !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+}
+
+/* Hide all native child elements of the top bar except our custom injected nav */
+header.MuiAppBar-root > *:not(.cora-editor-injected-nav),
+.e-top-bar > *:not(.cora-editor-injected-nav),
+#e-top-bar > *:not(.cora-editor-injected-nav),
+.elementor-editor-top-bar > *:not(.cora-editor-injected-nav) {
     display: none !important;
 }
 
@@ -125,4 +141,56 @@ header.MuiAppBar-root,
 /* Hide Elementor onboarding toast alerts */
 #elementor-toast {
     display: none !important;
+}
+
+/* ── Hide "Edit with AI" sparkle button on all controls ── */
+.e-ai-button,
+[class*="e-ai-button"],
+button.e-ai-button {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* ── Block all Elementor in-panel plugin install / upsell notice banners ──
+   This includes notices like "Accessible structure matters", "Install Ally",
+   and any other .elementor-control-notice that ships an install-plugin CTA.
+   Users must not be able to install plugins from inside the editor. */
+.elementor-control-notice,
+.elementor-control-notice-type-info,
+.elementor-control-notice-type-warning,
+.elementor-control-notice-type-danger,
+.elementor-control-notice-type-success,
+[class*="elementor-control-notice"] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Also hide any stray Elementor admin notice / Go Pro promo bars */
+.elementor-promotion,
+.elementor-panel-scheme-choose .elementor-panel-scheme-item[data-scheme="custom"],
+.e-notice,
+.e-notice-bar,
+[class*="e-notice"],
+.elementor-upgrade-notice,
+.elementor-go-pro,
+[class*="go-pro"],
+.elementor-button-go-pro,
+a[href*="elementor.com/pro"],
+a[href*="go.elementor.com"],
+a[href*="install-plugin"],
+button[data-event][data-settings*="install-plugin"] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
 }

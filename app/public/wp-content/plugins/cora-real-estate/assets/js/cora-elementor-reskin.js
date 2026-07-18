@@ -13,58 +13,6 @@ function initCoraReskin() {
         }
     };
 
-    // Wait for Elementor topbar to render, then inject custom breadcrumbs and exit button
-    const checkTopbar = setInterval(() => {
-        const topbar = document.querySelector('#elementor-editor-wrapper-v2 header, #editor-one-top-bar, #e-top-bar, .e-top-bar');
-        if (topbar) {
-            clearInterval(checkTopbar);
-            
-            if (!document.getElementById('cora-editor-injected-nav')) {
-                const navContainer = document.createElement('div');
-                navContainer.id = 'cora-editor-injected-nav';
-                navContainer.className = 'cora-editor-injected-nav';
-                
-                const exitBtn = document.createElement('button');
-                exitBtn.className = 'cora-injected-exit-btn';
-                exitBtn.innerHTML = `
-                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                    Theme Dashboard
-                `;
-                exitBtn.onclick = function() {
-                    if (window.parent && window.parent.closeElementorEditor) {
-                        window.parent.closeElementorEditor();
-                    }
-                };
-
-                const separator = document.createElement('div');
-                separator.className = 'cora-injected-separator';
-
-                const breadcrumbs = document.createElement('div');
-                breadcrumbs.className = 'cora-injected-breadcrumbs';
-                
-                const themeTitle = (window.parent && window.parent.canvasState && window.parent.canvasState.activeThemeName) 
-                    ? window.parent.canvasState.activeThemeName 
-                    : 'Theme';
-                const pageTitle = (window.parent && window.parent.document.getElementById('editor-page-title')) 
-                    ? window.parent.document.getElementById('editor-page-title').innerText 
-                    : 'Page';
-
-                breadcrumbs.innerHTML = `
-                    <span>Canvas</span>
-                    <span>/</span>
-                    <span class="cora-injected-crumb-theme">${themeTitle}</span>
-                    <span>/</span>
-                    <span class="cora-injected-crumb-page">${pageTitle}</span>
-                `;
-
-                navContainer.appendChild(exitBtn);
-                navContainer.appendChild(separator);
-                navContainer.appendChild(breadcrumbs);
-
-                topbar.insertBefore(navContainer, topbar.firstChild);
-            }
-        }
-    }, 200);
 
     // Auto-click "Take Over" modal button if it appears
     const checkTakeOver = setInterval(() => {
@@ -103,7 +51,7 @@ function initCoraReskin() {
                 wrapper.style.setProperty('display', 'none', 'important');
             }
         });
-        // Hide native Elementor header topbar
+        // Hide the native Elementor topbar — all navigation lives in the parent topbar now
         const nativeHeader = document.querySelector('header.MuiAppBar-root, .e-top-bar, #e-top-bar, .elementor-editor-top-bar');
         if (nativeHeader) {
             nativeHeader.style.setProperty('display', 'none', 'important');
@@ -125,6 +73,43 @@ function initCoraReskin() {
                     const logoUrl = window.location.origin + '/wp-content/plugins/cora-real-estate/assets/images/cora-favicon.png';
                     btn.innerHTML = `<img src="${logoUrl}" style="width: 20px; height: 20px; object-fit: contain;" alt="Cora Logo" />`;
                 }
+            }
+        });
+
+        // ── Remove "Edit with AI" sparkle buttons ──
+        // Elementor dynamically injects .e-ai-button next to text, image and
+        // other controls. Remove them as soon as they appear in the DOM.
+        document.querySelectorAll('.e-ai-button, [class*="e-ai-button"]').forEach(el => {
+            el.remove();
+        });
+
+        // ── Block all plugin install / upsell notice banners ──
+        // Elementor injects .elementor-control-notice blocks inside widget panels
+        // that contain "Install now" buttons pointing to wp-admin/update.php.
+        // We remove them entirely so no user can trigger a plugin install from here.
+        document.querySelectorAll(
+            '.elementor-control-notice, ' +
+            '[class*="elementor-control-notice"], ' +
+            '.e-notice, .e-notice-bar, ' +
+            '[class*="e-notice"], ' +
+            '.elementor-promotion, ' +
+            '.elementor-upgrade-notice, ' +
+            '.elementor-go-pro, ' +
+            '[class*="go-pro"]'
+        ).forEach(el => {
+            el.remove();
+        });
+
+        // Also scrub any lingering "Install now" / "install-plugin" anchor or button CTAs
+        document.querySelectorAll(
+            'a[href*="install-plugin"], ' +
+            'button[data-settings*="install-plugin"]'
+        ).forEach(el => {
+            const notice = el.closest('.elementor-control-notice, [class*="elementor-control-notice"]');
+            if (notice) {
+                notice.remove();
+            } else {
+                el.remove();
             }
         });
     });
