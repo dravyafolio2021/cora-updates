@@ -108,6 +108,11 @@ function initCoraReskin() {
         if (nativeHeader) {
             nativeHeader.style.setProperty('display', 'none', 'important');
         }
+        // Hide onboarding toasts/dialogues
+        const onboardingToast = document.getElementById('elementor-toast');
+        if (onboardingToast) {
+            onboardingToast.style.setProperty('display', 'none', 'important');
+        }
         // Replace Elementor Logo button with Cora logo
         document.querySelectorAll('button').forEach(btn => {
             const svg = btn.querySelector('svg');

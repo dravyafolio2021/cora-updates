@@ -105,5 +105,11 @@ header.MuiAppBar-root,
     height: 100% !important;
 }
 
+/* Hide Elementor onboarding toast alerts */
+#elementor-toast {
+    display: none !important;
+}
+
+
 
 
