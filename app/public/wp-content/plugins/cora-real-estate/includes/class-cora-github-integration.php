@@ -164,6 +164,46 @@ class Cora_GitHub_Integration {
 			if ( $br["code"] === 200 ) $payload["branches"] = array_column( $br["data"], "name" );
 			$cr = $this->github_request( "GET", "/repos/{$repo}/commits?per_page=5" );
 			if ( $cr["code"] === 200 ) $payload["recent_commits"] = array_map( function( $c ) { return array( "sha" => substr( $c["sha"], 0, 7 ), "message" => $c["commit"]["message"], "date" => $c["commit"]["committer"]["date"], "url" => $c["html_url"] ); }, (array) $cr["data"] );
+
+			// Check working directory status for current active page
+			$page_id = isset( $_POST["page_id"] ) ? absint( $_POST["page_id"] ) : 0;
+			$branch  = isset( $_POST["branch"] ) ? sanitize_text_field( wp_unslash( $_POST["branch"] ) ) : "main";
+			if ( $page_id ) {
+				$post = get_post( $page_id );
+				if ( $post ) {
+					$slug = $post->post_name ?: sanitize_title( $post->post_title );
+					$file_path = "pages/{$slug}/design.json";
+					$existing  = $this->github_request( "GET", "/repos/{$repo}/contents/{$file_path}?ref={$branch}" );
+					
+					if ( $existing["code"] === 200 && ! empty( $existing["data"]["content"] ) ) {
+						$content = json_decode( base64_decode( $existing["data"]["content"] ), true );
+						$git_modified = isset( $content["modified"] ) ? $content["modified"] : "";
+						$local_modified = $post->post_modified_gmt;
+						
+						// If local modified time is different, mark it modified
+						if ( empty( $git_modified ) || $local_modified !== $git_modified ) {
+							$payload["page_status"] = array(
+								"modified" => true,
+								"file_path" => $file_path,
+								"suggested_message" => "update " . strtolower( $post->post_title ) . " page layout"
+							);
+						} else {
+							$payload["page_status"] = array(
+								"modified" => false,
+								"file_path" => $file_path,
+								"suggested_message" => ""
+							);
+						}
+					} else {
+						// Not found on git yet
+						$payload["page_status"] = array(
+							"modified" => true,
+							"file_path" => $file_path,
+							"suggested_message" => "create " . strtolower( $post->post_title ) . " page layout"
+						);
+					}
+				}
+			}
 		}
 		wp_send_json_success( $payload );
 	}

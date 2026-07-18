@@ -2680,6 +2680,34 @@ $wp_pages = get_pages();
                     </div>
                 </div>
 
+                <!-- Working Tree Status -->
+                <div id="git-working-tree-section" class="space-y-2 border-t border-zinc-150 dark:border-zinc-800 pt-5 hidden">
+                    <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Working Tree Changes</p>
+                    <div class="p-3 bg-amber-50/50 dark:bg-amber-950/10 border border-amber-200 dark:border-amber-900/50 rounded-xl flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0 animate-pulse"></span>
+                            <span id="git-working-tree-file" class="text-[10.5px] font-mono text-zinc-700 dark:text-zinc-300">pages/about/design.json</span>
+                        </div>
+                        <span class="text-[9px] bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider font-sans">Modified</span>
+                    </div>
+                    <!-- Suggestion Box -->
+                    <div id="git-suggestion-box" class="p-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-850 rounded-xl space-y-2">
+                        <div class="flex items-center gap-1.5">
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" class="text-zinc-500"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                            <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-tight font-sans">AI Commit Suggestion</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                            <span id="git-suggestion-text" class="text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 italic font-sans">"update page layout"</span>
+                            <button onclick="applyCommitSuggestion()" class="text-[10px] font-bold text-zinc-900 dark:text-white bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 px-2 py-1 rounded-md transition-colors cursor-pointer border-none font-sans">Apply</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="git-clean-tree-section" class="p-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl flex items-center gap-2 hidden">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
+                    <span class="text-[10.5px] font-bold text-zinc-700 dark:text-zinc-300 font-sans">Working tree clean. All changes committed.</span>
+                </div>
+
                 <!-- Manual Commit Actions -->
                 <div class="space-y-3 border-t border-zinc-150 dark:border-zinc-800 pt-5">
                     <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Commit & Sync Changes</p>
@@ -6735,6 +6763,15 @@ $wp_pages = get_pages();
             if (res.success) {
                 window.coraShowToast('Page layout published successfully!');
                 fetchThemePages(canvasState.activeThemeId);
+                // Trigger auto-commit and push to GitHub if Git integration is connected
+                jQuery.post(coraREData.ajaxUrl, {
+                    action: 'cora_github_get_status',
+                    nonce: coraREData.ajaxNonce
+                }, function(gitRes) {
+                    if (gitRes.success && gitRes.data && gitRes.data.connected && gitRes.data.has_repo) {
+                        autoCommitAndPush();
+                    }
+                });
             }
         });
     }
@@ -6901,9 +6938,12 @@ $wp_pages = get_pages();
     }
 
     function loadGitStatus() {
+        const activeBranch = localStorage.getItem('cora_active_branch') || 'main';
         jQuery.post(coraREData.ajaxUrl, {
             action: 'cora_github_get_status',
-            nonce: coraREData.ajaxNonce
+            nonce: coraREData.ajaxNonce,
+            page_id: canvasState.activeWpPostId || 0,
+            branch: activeBranch
         }, function(res) {
             if (res.success && res.data) {
                 const data = res.data;
@@ -6924,6 +6964,30 @@ $wp_pages = get_pages();
                     if (repoLink) {
                         repoLink.textContent = data.repo;
                         repoLink.href = 'https://github.com/' + data.repo;
+                    }
+
+                    // Handle working tree status (modified / clean)
+                    const workingTreeSec = document.getElementById('git-working-tree-section');
+                    const cleanTreeSec = document.getElementById('git-clean-tree-section');
+                    
+                    if (data.page_status) {
+                        const status = data.page_status;
+                        if (status.modified) {
+                            if (workingTreeSec) {
+                                workingTreeSec.classList.remove('hidden');
+                                const fileEl = document.getElementById('git-working-tree-file');
+                                if (fileEl) fileEl.textContent = status.file_path;
+                                const suggEl = document.getElementById('git-suggestion-text');
+                                if (suggEl) suggEl.textContent = `"${status.suggested_message}"`;
+                            }
+                            if (cleanTreeSec) cleanTreeSec.classList.add('hidden');
+                        } else {
+                            if (workingTreeSec) workingTreeSec.classList.add('hidden');
+                            if (cleanTreeSec) cleanTreeSec.classList.remove('hidden');
+                        }
+                    } else {
+                        if (workingTreeSec) workingTreeSec.classList.add('hidden');
+                        if (cleanTreeSec) cleanTreeSec.classList.add('hidden');
                     }
 
                     const branchSelect = document.getElementById('git-branch-select');
@@ -7148,7 +7212,7 @@ $wp_pages = get_pages();
         jQuery.post(coraREData.ajaxUrl, {
             action: 'cora_github_commit_page',
             nonce: coraREData.ajaxNonce,
-            page_id: canvasState.activePageId || 0,
+            page_id: canvasState.activeWpPostId || 0,
             message: commitMsg,
             branch: activeBranch
         }, function(res) {
@@ -7197,6 +7261,43 @@ $wp_pages = get_pages();
                 }
             } else {
                 window.coraShowToast(res.data.message || 'Failed to pull repository design sync.');
+            }
+        });
+    }
+
+    function applyCommitSuggestion() {
+        const textEl = document.getElementById('git-suggestion-text');
+        const inputEl = document.getElementById('git-commit-msg');
+        if (textEl && inputEl) {
+            let msg = textEl.textContent.trim();
+            if (msg.startsWith('"') && msg.endsWith('"')) {
+                msg = msg.substring(1, msg.length - 1);
+            }
+            inputEl.value = msg;
+            window.coraShowToast('Commit suggestion applied!', 'success');
+        }
+    }
+
+    function autoCommitAndPush() {
+        const activeBranch = localStorage.getItem('cora_active_branch') || 'main';
+        const pageTitle = document.getElementById('cora-topbar-page-name')?.textContent || 'Page';
+        const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+        const commitMsg = `publish: ${pageTitle} · ${timestamp} UTC`;
+        
+        window.coraShowToast('Automatically committing design changes to GitHub...');
+        
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_github_commit_page',
+            nonce: coraREData.ajaxNonce,
+            page_id: canvasState.activeWpPostId || 0,
+            message: commitMsg,
+            branch: activeBranch
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast('Changes committed and pushed to GitHub automatically!', 'success');
+                loadGitStatus();
+            } else {
+                console.error('Auto-commit failed:', res.data?.message);
             }
         });
     }
