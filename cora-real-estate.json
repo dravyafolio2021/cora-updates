@@ -1,8 +1,8 @@
 {
     "name": "Cora Workspace Platform",
-    "slug": "cora-real-estate",
-    "version": "2.0.1",
-    "download_url": "https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-real-estate.zip",
+    "slug": "cora-workspace",
+    "version": "2.0.0",
+    "download_url": "https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-workspace.zip",
     "tested": "6.5",
     "sections": {
         "description": "A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.",
