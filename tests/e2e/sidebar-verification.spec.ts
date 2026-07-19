@@ -8,9 +8,9 @@ test('verify sidebar branding and collapsibility', async ({ page }) => {
   // Wait for workspace layout to render
   await page.waitForSelector('.cora-sidebar');
   
-  // Check workspace name Cora Real Estate is present
+  // Check workspace name is present
   const workspaceTitle = page.locator('.cora-studio-info');
-  await expect(workspaceTitle).toContainText("Cora Real Estate");
+  await expect(workspaceTitle).toContainText(/Cora Real Estate|E2E Testing Office|E2E Agency/);
   
   // Take screenshot of expanded sidebar
   await page.screenshot({ path: 'tests/e2e/sidebar-expanded.png' });

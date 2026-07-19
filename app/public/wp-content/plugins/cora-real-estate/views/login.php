@@ -229,8 +229,12 @@
                 <a href="<?php echo esc_url( home_url( '/workspace/forgot-password' ) ); ?>" class="forgot-link">Forgot password?</a>
             </div>
             
-            <button type="submit" class="submit-btn" id="login-btn">Sign In</button>
+        <button type="submit" class="submit-btn" id="login-btn">Sign In</button>
         </form>
+        <div style="margin-top:20px; text-align:center; font-size:12px; color:var(--text-secondary);">
+            Don't have an account?
+            <a href="<?php echo esc_url( home_url( '/workspace/register' ) ); ?>" style="color:var(--text-primary);font-weight:700;text-decoration:none;">Create workspace →</a>
+        </div>
     </div>
 
     <div id="cora-toast-container"></div>
@@ -251,6 +255,9 @@
             }
             if (urlParams.get('password_updated')) {
                 showToast('Password updated. Please log in.');
+            }
+            if (urlParams.get('expired')) {
+                showToast('Your account access has expired. Please contact your administrator.');
             }
         });
 

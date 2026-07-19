@@ -581,12 +581,13 @@ if ( ! defined( 'ABSPATH' ) ) {
             background-color: #ffffff;
             color: var(--primary-color);
             font-family: var(--font-sans);
-            transition: border-color 0.15s ease;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
 
         .form-input:focus {
             outline: none;
             border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(24, 24, 27, 0.08);
         }
 
         .form-input::placeholder {
@@ -632,6 +633,79 @@ if ( ! defined( 'ABSPATH' ) ) {
             text-align: center;
             margin: 0;
             line-height: 1.4;
+        }
+
+        /* Onboarding Wizard Styles */
+        .onboarding-step {
+            display: none;
+            opacity: 0;
+            transform: translateY(8px) scale(0.995);
+        }
+        .onboarding-step.active {
+            display: block !important;
+            animation: fadeInStep 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes fadeInStep {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .onboarding-progress {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            justify-content: center;
+            align-items: center;
+        }
+        .progress-dot {
+            width: 32px;
+            height: 4px;
+            border-radius: 2px;
+            background-color: #e4e4e7;
+            transition: background-color 0.3s ease, width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .progress-dot.active {
+            background-color: #18181b;
+            width: 48px;
+        }
+        .btn-google {
+            width: 100%;
+            padding: 12px;
+            background-color: #ffffff;
+            color: #18181b;
+            border: 1px solid #e4e4e7;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+            box-sizing: border-box;
+        }
+        .btn-google:hover {
+            background-color: #fafafa;
+            border-color: #d4d4d8;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        .btn-google:active {
+            transform: scale(0.98);
+        }
+        .verification-box {
+            border: 1px solid #e4e4e7;
+            border-radius: 8px;
+            padding: 20px;
+            background: #fafafa;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            box-sizing: border-box;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.01);
         }
 
         /* Tool Auditor cost calculator section styling */
@@ -1019,31 +1093,75 @@ if ( ! defined( 'ABSPATH' ) ) {
             Zero hosting setup. Pre-seeded demo database. Get instant access to your admin workspace.
         </p>
 
-        <form id="cora-signup-form" onsubmit="event.preventDefault(); handleCoraSignup();">
-            <div class="form-group" style="margin-bottom: 12px;">
-                <label class="form-label">Full Name</label>
-                <input type="text" id="signup-name" class="form-input" placeholder="e.g. Dravya Bansal" required />
-            </div>
+        <!-- Progress Indicator -->
+        <div id="onboarding-progress" class="onboarding-progress">
+            <div class="progress-dot active" data-step="1"></div>
+            <div class="progress-dot" data-step="2"></div>
+            <div class="progress-dot" data-step="3"></div>
+        </div>
 
-            <div class="form-group" style="margin-bottom: 12px;">
-                <label class="form-label">Agency Name</label>
-                <input type="text" id="signup-agency" class="form-input" placeholder="e.g. Apex Realty" required />
-            </div>
-
-            <div class="form-group" style="margin-bottom: 12px;">
-                <label class="form-label">WhatsApp Number</label>
-                <input type="tel" id="signup-whatsapp" class="form-input" placeholder="e.g. +919876543210" required />
-            </div>
-
-            <div class="form-group" style="margin-bottom: 18px;">
-                <label class="form-label">City</label>
-                <input type="text" id="signup-city" class="form-input" placeholder="e.g. Gurgaon" required />
-            </div>
-
-            <button type="submit" id="submit-btn" class="btn-submit">
-                Spin Up My Workspace
+        <!-- Step 1: Sign up with Google -->
+        <div id="onboarding-step-1" class="onboarding-step">
+            <p style="font-size: 13px; color: #27272a; margin-bottom: 20px; line-height: 1.5;">
+                Create your secure account. Get started with Google for instant verification.
+            </p>
+            <button type="button" id="google-signup-btn" onclick="goToStep(2)" class="btn-google">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+                </svg>
+                Continue with Google
             </button>
-        </form>
+            <div style="text-align: center; margin-top: 15px;">
+                <span style="font-size: 11px; color: #a1a1aa;">or</span>
+                <a href="javascript:void(0)" onclick="goToStep(2)" style="font-size: 11px; color: #18181b; font-weight: 600; text-decoration: underline; margin-left: 6px;">Sign up with email</a>
+            </div>
+        </div>
+
+        <!-- Step 2: Email Verification -->
+        <div id="onboarding-step-2" class="onboarding-step" style="display: none;">
+            <div class="verification-box">
+                <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="2" fill="none" style="color: #22c55e;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                <div style="font-weight: 700; font-size: 14px; color: #18181b;">Check your email</div>
+                <p style="font-size: 12px; color: #71717a; margin: 0; line-height: 1.5;">
+                    We sent a verification link to your email address. Click the button below to verify and complete setup.
+                </p>
+            </div>
+            <button type="button" id="verify-email-btn" onclick="goToStep(3)" class="btn-submit" style="margin-top: 15px;">
+                Verify Email & Continue
+            </button>
+        </div>
+
+        <!-- Step 3: Parameters Form -->
+        <div id="onboarding-step-3" class="onboarding-step" style="display: none;">
+            <form id="cora-signup-form" onsubmit="event.preventDefault(); handleCoraSignup();">
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="signup-name" class="form-input" placeholder="e.g. Dravya Bansal" required />
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label">Agency Name</label>
+                    <input type="text" id="signup-agency" class="form-input" placeholder="e.g. Apex Realty" required />
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label">WhatsApp Number</label>
+                    <input type="tel" id="signup-whatsapp" class="form-input" placeholder="e.g. +919876543210" required />
+                </div>
+
+                <div class="form-group" style="margin-bottom: 18px;">
+                    <label class="form-label">City</label>
+                    <input type="text" id="signup-city" class="form-input" placeholder="e.g. Gurgaon" required />
+                </div>
+
+                <button type="submit" id="submit-btn" class="btn-submit">
+                    Spin Up My Workspace
+                </button>
+            </form>
+        </div>
 
         <p class="drawer-subtext">By launching, you get 30 days free access. No credit card required.</p>
     </div>
@@ -1088,15 +1206,41 @@ if ( ! defined( 'ABSPATH' ) ) {
         }, 3000);
     }
 
+    function goToStep(step) {
+        document.querySelectorAll('.onboarding-step').forEach(function(el) {
+            el.style.display = 'none';
+        });
+        var targetEl = document.getElementById('onboarding-step-' + step);
+        if (targetEl) {
+            targetEl.style.display = 'block';
+        }
+        var progressContainer = document.getElementById('onboarding-progress');
+        if (progressContainer) {
+            progressContainer.querySelectorAll('.progress-dot').forEach(function(dot) {
+                var s = parseInt(dot.getAttribute('data-step'));
+                if (s === step) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+    }
+
     function openSignupDrawer(mode) {
+        var prog = document.getElementById('onboarding-progress');
         if (mode === 'demo') {
             document.getElementById('drawer-headline').innerText = "Book a Live Demo";
             document.getElementById('drawer-description').innerText = "Schedule a 1-on-1 walkthrough session with our product experts to learn how Cora can run your agency on a single system.";
             document.getElementById('submit-btn').innerText = "Request Demo Call";
+            if (prog) prog.style.display = 'none';
+            goToStep(3);
         } else {
             document.getElementById('drawer-headline').innerText = "Launch Free Sandbox Site";
             document.getElementById('drawer-description').innerText = "Zero hosting setup. Pre-seeded demo database. Get instant access to your admin workspace.";
             document.getElementById('submit-btn').innerText = "Spin Up My Workspace";
+            if (prog) prog.style.display = 'flex';
+            goToStep(1);
         }
         document.getElementById('cora-drawer-overlay').classList.add('show');
         document.getElementById('cora-drawer').classList.add('show');
@@ -1104,6 +1248,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
     // Export function to window
     window.openSignupDrawer = openSignupDrawer;
+    window.goToStep = goToStep;
+    window.coraShowToast = showToast;
 
     function closeSignupDrawer() {
         document.getElementById('cora-drawer-overlay').classList.remove('show');

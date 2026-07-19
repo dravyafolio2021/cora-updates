@@ -49,18 +49,9 @@ if ( is_array( $all_logs ) ) {
     }
 }
 
-// Map role display names
-$role_labels = array(
-    'administrator'       => 'Super Admin',
-    'cora_manager'        => 'Agency Owner',
-    'cora_branch_manager' => 'Branch Manager',
-    'cora_photographer'   => 'Senior Agent',
-    'cora_videographer'   => 'Agent',
-    'cora_drone_pilot'    => 'Telecaller',
-    'cora_editor'         => 'Back Office',
-    'cora_viewer'         => 'Viewer',
-    'guest'               => 'Guest / System'
-);
+// Map role display names dynamically
+$role_labels = cora_get_all_roles();
+$role_labels['guest'] = 'Guest / System';
 ?>
 
 <div class="cora-page-header flex flex-col sm:flex-row sm:items-center justify-between gap-4">

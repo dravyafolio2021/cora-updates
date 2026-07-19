@@ -128,14 +128,7 @@ $current_wp_user = wp_get_current_user();
 $current_user_role = ! empty( $current_wp_user->roles ) ? $current_wp_user->roles[0] : 'subscriber';
 $cora_is_unverified = false; // Disable verification lockout block on login
 
-$cora_role_labels = array(
-    'administrator' => 'Super Admin',
-    'cora_manager' => 'Broker Owner',
-    'cora_photographer' => 'Managing Agent',
-    'cora_videographer' => 'Showing Assistant',
-    'cora_drone_pilot' => 'Property Valuer',
-    'cora_editor' => 'ListingCoordinator'
-);
+$cora_role_labels = cora_get_all_roles();
 
 $current_user_display_name = $current_wp_user->exists() ? $current_wp_user->display_name : 'Dravya Bansal';
 $current_user_role_label = isset($cora_role_labels[$current_user_role]) ? $cora_role_labels[$current_user_role] : ucfirst($current_user_role);
@@ -2620,7 +2613,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
         <!-- Center Section: Command Palette Trigger -->
         <div class="flex-1 max-w-2xl mx-4 hidden sm:flex items-center justify-center">
-            <div onclick="event.stopPropagation(); window.coraOpenCommandPalette();" class="cora-sidebar-search w-full h-10 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800/90 hover:border-zinc-700 rounded-lg px-3 flex items-center justify-between text-zinc-400 hover:text-zinc-200 cursor-pointer transition-all shadow-inner" style="height: 40px !important;">
+            <div onclick="event.stopPropagation(); window.coraOpenRECommandPalette();" class="cora-sidebar-search w-full h-10 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800/90 hover:border-zinc-700 rounded-lg px-3 flex items-center justify-between text-zinc-400 hover:text-zinc-200 cursor-pointer transition-all shadow-inner" style="height: 40px !important;">
                 <div class="flex items-center gap-2 text-xs font-medium">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <span>Search anything...</span>
@@ -3001,7 +2994,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                         <rect x="3" y="14" width="7" height="7"></rect>
                                     </svg>
                                 </span>
-                                <span class="cora-nav-text">App Integrations</span>
+                                <span class="cora-nav-text">App Modules</span>
                             </div>
                         </li>
                         <li class="cora-nav-item <?php echo $sub_page === 'settings-suite' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="settings-suite">
@@ -3061,6 +3054,20 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         Appearance
                     </button>
                 </div>
+
+                <?php if ( in_array( $current_user_role, array( 'administrator', 'cora_shruti', 'cora_super_admin' ) ) ) : ?>
+                <div class="border-t border-zinc-100 dark:border-zinc-850"></div>
+                <div id="cora-in-app-update-notice" class="hidden px-2 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl flex flex-col gap-1.5">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                        <span class="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wide">Update Available</span>
+                    </div>
+                    <p class="text-[10px] text-zinc-500 leading-normal font-medium">New version <code class="font-mono text-zinc-700 dark:text-zinc-300 font-bold" id="cora-update-ver">v1.4.0</code> is ready. Upgrade instantly.</p>
+                    <button type="button" id="cora-btn-app-upgrade" class="w-full py-1.5 bg-zinc-950 dark:bg-zinc-100 hover:opacity-85 text-white dark:text-zinc-950 font-bold rounded-lg text-[10px] transition-colors cursor-pointer text-center select-none shadow-3xs" onclick="coraTriggerInAppUpgrade(this)">
+                        Upgrade Workspace
+                    </button>
+                </div>
+                <?php endif; ?>
 
                 <div class="border-t border-zinc-100 dark:border-zinc-850"></div>
 
@@ -9226,13 +9233,13 @@ wp_print_footer_scripts();
 </div>
 
 <!-- Cora Advanced Command Search Modal (Command Palette for CRM subpages) -->
-<div id="cora-command-palette" class="fixed inset-0 z-[999999] hidden items-start justify-center p-4 pt-[12vh] bg-zinc-950/40 backdrop-blur-sm transition-all duration-200">
+<div id="cora-re-command-palette" class="fixed inset-0 z-[999999] hidden items-start justify-center p-4 pt-[12vh] bg-zinc-950/40 backdrop-blur-sm transition-all duration-200">
     <div class="cora-command-container w-full max-w-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[380px] transition-transform transform scale-95 duration-200">
         
         <!-- Search Input Header -->
         <div class="flex items-center gap-3 px-4 border-b border-zinc-100 dark:border-zinc-800/40 py-3.5 shrink-0">
             <svg class="text-zinc-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="cora-command-input" placeholder="Search pages, settings, leads, or listings..." class="flex-1 text-sm bg-transparent border-0 outline-none focus:ring-0 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 py-0.5" autocomplete="off">
+            <input type="text" id="cora-re-command-input" placeholder="Search pages, settings, leads, or listings..." class="flex-1 text-sm bg-transparent border-0 outline-none focus:ring-0 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 py-0.5" autocomplete="off">
             <kbd class="text-[9px] font-mono bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-450 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-700/60 shadow-sm shrink-0">⌘K</kbd>
         </div>
 
@@ -9246,7 +9253,7 @@ wp_print_footer_scripts();
         </div>
 
         <!-- Results List Area -->
-        <div class="flex-1 overflow-y-auto p-2" id="cora-command-results">
+        <div class="flex-1 overflow-y-auto p-2" id="cora-re-command-results">
             <!-- Loading state / Suggestions list / Search results list -->
         </div>
 
@@ -9263,16 +9270,16 @@ wp_print_footer_scripts();
 </div>
 
 <style>
-#cora-command-palette {
+#cora-re-command-palette {
     display: none;
 }
-#cora-command-palette:not(.active) {
+#cora-re-command-palette:not(.active) {
     display: none !important;
 }
-#cora-command-palette.active {
+#cora-re-command-palette.active {
     display: flex !important;
 }
-#cora-command-palette.active .cora-command-container {
+#cora-re-command-palette.active .cora-command-container {
     transform: scale(1) !important;
 }
 .cora-command-item.selected {
@@ -9294,7 +9301,7 @@ wp_print_footer_scripts();
 }
 
 /* Dark mode overrides for search */
-.cora-dark-theme #cora-command-palette {
+.cora-dark-theme #cora-re-command-palette {
     background-color: rgba(9, 9, 11, 0.6) !important;
 }
 .cora-dark-theme .cora-command-container {
@@ -9302,7 +9309,7 @@ wp_print_footer_scripts();
     border-color: #27272a !important;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
 }
-.cora-dark-theme #cora-command-input {
+.cora-dark-theme #cora-re-command-input {
     color: #f4f4f5 !important;
 }
 .cora-dark-theme .cora-command-container div {
@@ -9321,7 +9328,7 @@ wp_print_footer_scripts();
 .cora-dark-theme .cora-search-pill:hover:not(.active) {
     background-color: #18181b;
 }
-.cora-dark-theme #cora-command-results .cora-command-item:hover:not(.selected) {
+.cora-dark-theme #cora-re-command-results .cora-command-item:hover:not(.selected) {
     background-color: #18181b !important;
 }
 .cora-dark-theme .cora-command-item.selected {
@@ -9400,20 +9407,15 @@ wp_print_footer_scripts();
             'lock': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`,
             'map-pin': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`,
             'image': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`,
-            'cpu': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="15" x2="23" y2="15"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="15" x2="4" y2="15"></line></svg>`,
-            'book-open': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>`,
-            'link': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>`,
-            'file-text': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
-            'activity': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>`,
-            'user': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
-            'layout': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`,
-            'home': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`
+            'leads': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`,
+            'listings': `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`
         };
         return icons[name] || icons['settings'];
     }
 
     function coraPerformCommandSearch(query, isInline = false) {
-        const resultsContainer = document.getElementById(isInline ? 'cora-inline-command-results' : 'cora-command-results');
+        const parentPalette = document.getElementById(isInline ? 'cora-inline-command-palette' : 'cora-re-command-palette');
+        const resultsContainer = parentPalette ? parentPalette.querySelector(isInline ? '#cora-inline-command-results' : '#cora-re-command-results') : null;
         if (!resultsContainer) return;
 
         resultsContainer.innerHTML = `
@@ -9480,26 +9482,26 @@ wp_print_footer_scripts();
         // Toggle Cmd+K / Ctrl+K
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
             e.preventDefault();
-            const palette = document.getElementById('cora-command-palette');
+            const palette = document.getElementById('cora-re-command-palette');
             if (palette && !palette.classList.contains('hidden')) {
-                coraCloseCommandPalette();
+                coraCloseRECommandPalette();
             } else {
-                coraOpenCommandPalette();
+                coraOpenRECommandPalette();
             }
             return;
         }
 
-        const palette = document.getElementById('cora-command-palette');
+        const palette = document.getElementById('cora-re-command-palette');
         if (!palette || palette.classList.contains('hidden')) return;
 
         // Escape closes
         if (e.key === 'Escape') {
             e.preventDefault();
-            coraCloseCommandPalette();
+            coraCloseRECommandPalette();
             return;
         }
 
-        const items = document.querySelectorAll('#cora-command-palette .cora-command-item');
+        const items = document.querySelectorAll('#cora-re-command-palette .cora-command-item');
         if (items.length === 0) return;
 
         // ArrowDown
@@ -9565,14 +9567,15 @@ wp_print_footer_scripts();
         })();
 
         // Input text focus/click listeners to toggle absolute dropdown or modal
-        const input = document.getElementById('cora-command-input');
+        const paletteContainer = document.getElementById('cora-re-command-palette');
+        const input = paletteContainer ? paletteContainer.querySelector('#cora-re-command-input') : null;
         if (input) {
             input.addEventListener('focus', function() {
-                coraOpenCommandPalette();
+                coraOpenRECommandPalette();
             });
             input.addEventListener('click', function(e) {
                 e.stopPropagation();
-                coraOpenCommandPalette();
+                coraOpenRECommandPalette();
             });
             input.addEventListener('input', function() {
                 clearTimeout(searchDebounceTimeout);
@@ -9609,11 +9612,11 @@ wp_print_footer_scripts();
 
         // Close dropdown when clicking outside search container or modal
         document.addEventListener('click', function(e) {
-            if (e.target.closest('.cora-sidebar-search') || e.target.closest('[onclick*="coraOpenCommandPalette"]')) return;
+            if (e.target.closest('.cora-sidebar-search') || e.target.closest('[onclick*="coraOpenRECommandPalette"]')) return;
 
-            const palette = document.getElementById('cora-command-palette');
+            const palette = document.getElementById('cora-re-command-palette');
             if (palette && !palette.classList.contains('hidden') && !palette.contains(e.target)) {
-                coraCloseCommandPalette();
+                coraCloseRECommandPalette();
             }
 
             const inlinePalette = document.getElementById('cora-inline-command-palette');
@@ -9649,12 +9652,12 @@ wp_print_footer_scripts();
         });
 
         // Filter pills click listeners
-        const pills = document.querySelectorAll('.cora-search-pill');
+        const pills = document.querySelectorAll('#cora-re-command-palette .cora-search-pill, #cora-inline-command-palette .cora-search-pill');
         pills.forEach(pill => {
             pill.addEventListener('click', function(e) {
                 e.stopPropagation(); // Prevent dropdown closure
                 const isInlinePill = this.closest('#cora-inline-command-palette') !== null;
-                const parentPalette = isInlinePill ? document.getElementById('cora-inline-command-palette') : document.getElementById('cora-command-palette');
+                const parentPalette = isInlinePill ? document.getElementById('cora-inline-command-palette') : document.getElementById('cora-re-command-palette');
                 if (parentPalette) {
                     parentPalette.querySelectorAll('.cora-search-pill').forEach(p => {
                         p.classList.remove('active', 'bg-zinc-900', 'text-white', 'dark:bg-zinc-100', 'dark:text-zinc-950');
@@ -9668,7 +9671,8 @@ wp_print_footer_scripts();
                     const query = document.getElementById('cora-inline-command-input') ? document.getElementById('cora-inline-command-input').value.trim() : '';
                     coraPerformCommandSearch(query, true);
                 } else {
-                    const query = document.getElementById('cora-command-input') ? document.getElementById('cora-command-input').value.trim() : '';
+                    const inputEl = parentPalette ? parentPalette.querySelector('#cora-re-command-input') : null;
+                    const query = inputEl ? inputEl.value.trim() : '';
                     coraPerformCommandSearch(query, false);
                 }
             });
@@ -9708,6 +9712,45 @@ wp_print_footer_scripts();
             });
         }
     });
+
+    // Check for plugin updates in-app
+    <?php if ( in_array( $current_user_role, array( 'administrator', 'cora_shruti', 'cora_super_admin' ) ) ) : ?>
+    setTimeout(function() {
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_check_plugin_update',
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success && res.data.update_available) {
+                $('#cora-update-ver').text('v' + res.data.new_version);
+                $('#cora-in-app-update-notice').removeClass('hidden');
+                // Add update indicator dot to the profile footer
+                $('.cora-user-footer').append('<span id="cora-update-indicator-dot" class="absolute top-2.5 right-12 w-2 h-2 rounded-full bg-blue-500 animate-pulse z-50"></span>');
+            }
+        });
+    }, 3000);
+
+    window.coraTriggerInAppUpgrade = function(btn) {
+        if (!confirm('Are you sure you want to upgrade the Cora workspace to the latest version? The screen will reload once complete.')) return;
+        
+        $(btn).prop('disabled', true).text('Upgrading workspace...');
+        
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_trigger_in_app_update',
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast(res.data.message || 'Workspace upgraded!');
+                setTimeout(function() { window.location.reload(); }, 1500);
+            } else {
+                window.coraShowToast(res.data.message || 'Upgrade failed.');
+                $(btn).prop('disabled', false).text('Upgrade Workspace');
+            }
+        }).fail(function() {
+            window.coraShowToast('Server error during upgrade.');
+            $(btn).prop('disabled', false).text('Upgrade Workspace');
+        });
+    };
+    <?php endif; ?>
 })();
 </script>
 

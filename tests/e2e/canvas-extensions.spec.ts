@@ -23,16 +23,20 @@ test.describe('Canvas Advanced Extensions & Competitor Alignment E2E Tests', () 
     await page.click('#tab-btn-settings');
     await page.waitForSelector('#tab-content-settings:not(.hidden)', { state: 'visible' });
 
-    // Fill Header & Footer Configuration options
+    // Switch to Social & SEO subtab
+    await page.click('#spill-social');
     await page.fill('#setting-facebook-link', 'https://facebook.com/apexrealty');
     await page.fill('#setting-twitter-link', 'https://twitter.com/apexrealty');
     await page.fill('#setting-linkedin-link', 'https://linkedin.com/in/apexrealty');
+
+    // Switch to Layout subtab
+    await page.click('#spill-layout');
     await page.fill('#setting-copyright-text', '© 2026 Apex Luxury Holdings. All rights reserved.');
 
     // Save configurations with force click to bypass potential toast overlays
     await page.click('button:has-text("Save Settings")', { force: true });
     const toast = page.locator('#cora-toast-container');
-    await expect(toast).toContainText('Settings parameters synchronized successfully.');
+    await expect(toast).toContainText('Settings saved');
 
     // Exit Level 2 back to Level 1 Theme Dashboard
     await page.click('button[onclick="backToCanvasHub()"]');
@@ -118,7 +122,7 @@ test.describe('Canvas Advanced Extensions & Competitor Alignment E2E Tests', () 
 
     // Assert preview bar content
     await expect(page.locator('#cora-preview-bar')).toContainText('Previewing Draft:');
-    await expect(page.locator('#cora-preview-bar select.cora-preview-select')).toBeVisible();
+    await expect(page.locator('#cora-preview-bar select.cpb-select')).toBeVisible();
     await expect(page.locator('#cora-preview-bar button:has-text("Publish")')).toBeVisible();
 
     // Test the Exit button redirects back to Canvas Hub

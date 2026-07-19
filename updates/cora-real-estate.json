@@ -1,10 +1,10 @@
 {
-    "name": "Cora Real Estate",
+    "name": "Cora for Real Estate",
     "slug": "cora-real-estate",
-    "version": "1.0.0",
+    "version": "1.4.0",
     "download_url": "https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-real-estate.zip",
     "sections": {
         "description": "The ultimate white-label minimalist CRM for real estate agencies.",
-        "changelog": "<h4>1.0.0</h4><ul><li>Initial release with GitHub automated update support</li></ul>"
+        "changelog": "<h4>1.4.0</h4><ul><li>Added User Onboarding Settings Suite and Google OAuth callback flow.</li><li>Added custom landing page modal popup with quick email-only registration and SSO.</li><li>Added workspace custom roles creation with live Permissions Matrix mapping.</li><li>Added in-app single-click updates directly from the sidebar profile panel.</li></ul>"
     }
 }

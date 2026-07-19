@@ -1,1 +1,5 @@
 @import "tailwindcss";
+@config "../tailwind.config.js";
+@source "../views/**/*.php";
+@source "../admin-dashboard.php";
+@source "../cora-real-estate.php";

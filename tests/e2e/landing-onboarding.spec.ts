@@ -22,6 +22,14 @@ test('onboarding landing page loads and successfully provisions workspace', asyn
   await expect(page.locator('#calc-savings')).toContainText('₹2,70,000');
 
   // 2. Fill in Onboarding Sandbox form
+  await page.click('button:has-text("Start 30-day free trial")');
+  
+  // Click through Step 1: Sign up with Google
+  await page.click('#google-signup-btn');
+  
+  // Click through Step 2: Email Verification
+  await page.click('#verify-email-btn');
+
   const uniqueAgencyName = `E2E Agency ${Math.floor(Math.random() * 10000)}`;
   await page.fill('#signup-name', 'E2E Owner');
   await page.fill('#signup-agency', uniqueAgencyName);

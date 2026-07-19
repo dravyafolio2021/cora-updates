@@ -276,6 +276,78 @@ class Cora_Header_Widget extends Widget_Base {
             </div>
         </header>
 
+        <!-- Onboarding SignUp Modal Overlay -->
+        <?php
+        $google_enabled  = get_option( 'cora_onboarding_google_enabled', 1 ) && ! empty( get_option( 'cora_google_client_id', '' ) );
+        $email_enabled   = get_option( 'cora_onboarding_email_enabled', 1 );
+        $google_auth_url = home_url( '/workspace/auth/google' );
+        ?>
+        <div class="cora-modal-overlay" id="cora-signup-modal" aria-hidden="true">
+            <div class="cora-modal-card">
+                <!-- Close Button -->
+                <button type="button" class="cora-modal-close" id="cora-modal-close-btn" aria-label="Close modal">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+
+                <!-- Signup Form State -->
+                <div id="cora-modal-form-state">
+                    <div class="cora-modal-header">
+                        <div class="cora-modal-tagline">Start building.</div>
+                        <h2 class="cora-modal-title">Create free account</h2>
+                    </div>
+
+                    <div class="cora-modal-sso-container">
+                        <?php if ( $google_enabled ) : ?>
+                        <a href="<?php echo esc_url( $google_auth_url ); ?>" class="cora-modal-sso-btn cora-modal-google-btn">
+                            <span class="cora-google-pill">LAST USED</span>
+                            <svg width="18" height="18" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right:2px;">
+                                <path d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" fill="#FFC107"/>
+                                <path d="M6.306,14.691l6.571,4.819C14.655,15.108,19.003,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z" fill="#FF3D00"/>
+                                <path d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z" fill="#4CAF50"/>
+                                <path d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z" fill="#1976D2"/>
+                            </svg>
+                            Continue with Google
+                        </a>
+                        <?php endif; ?>
+                    </div>
+
+                    <?php if ( $email_enabled ) : ?>
+                    <div class="cora-modal-divider">or</div>
+
+                    <form class="cora-modal-form" id="cora-modal-signup-form" autocomplete="off">
+                        <input type="email" class="cora-modal-input" id="cora-modal-email" required placeholder="Enter your email address..." autocomplete="email">
+                        <button type="submit" class="cora-modal-btn-submit" id="cora-modal-submit-btn">Continue</button>
+                    </form>
+                    <?php endif; ?>
+
+                    <div class="cora-modal-footer-tos">
+                        By continuing, you agree to the <a href="<?php echo esc_url( home_url( '/privacy' ) ); ?>" target="_blank">Terms of Service</a> and <a href="<?php echo esc_url( home_url( '/privacy' ) ); ?>" target="_blank">Privacy Policy</a>.
+                    </div>
+
+                    <div class="cora-modal-footer-separator"></div>
+
+                    <div class="cora-modal-sso-note">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" style="margin-right:2px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        SSO available on <a href="<?php echo esc_url( home_url( '/#pricing' ) ); ?>">Business and Enterprise</a> plans
+                    </div>
+                </div>
+
+                <!-- Success / Inbox State -->
+                <div id="cora-modal-success-state" class="cora-modal-success">
+                    <div class="cora-modal-success-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                    </div>
+                    <h3 class="cora-modal-success-title">Check your inbox</h3>
+                    <p class="cora-modal-success-text">We sent a verification link to <strong id="cora-modal-success-email"></strong>. Click the link to activate your workspace and sign in automatically.</p>
+                    <p style="font-size:11.5px; color:#71717a; margin-bottom:4px;">Didn't receive it?</p>
+                    <button type="button" class="cora-modal-btn-resend" id="cora-modal-resend-btn">Resend verification email</button>
+                </div>
+            </div>
+        </div>
+
         <script>
         (function() {
             var header  = document.getElementById('cora-site-header');
@@ -310,6 +382,137 @@ class Cora_Header_Widget extends Widget_Base {
                         burger.classList.remove('open');
                         burger.setAttribute('aria-expanded', 'false');
                         mobileNav.setAttribute('aria-hidden', 'true');
+                    });
+                });
+            }
+
+            // --- Modal Open/Close Logic ---
+            var modal = document.getElementById('cora-signup-modal');
+            var closeBtn = document.getElementById('cora-modal-close-btn');
+            var registeredEmail = '';
+
+            function openModal(e) {
+                var isEnabled = <?php echo get_option( 'cora_onboarding_enabled', 1 ) ? 'true' : 'false'; ?>;
+                if (!isEnabled) {
+                    // If onboarding is disabled, let the default href link action happen (redirects to home/login)
+                    return;
+                }
+                if (modal) {
+                    if (e) e.preventDefault();
+                    modal.classList.add('open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+            }
+
+            function closeModal() {
+                if (modal) {
+                    modal.classList.remove('open');
+                    modal.setAttribute('aria-hidden', 'true');
+                    // Reset modal state
+                    document.getElementById('cora-modal-form-state').style.display = 'block';
+                    document.getElementById('cora-modal-success-state').style.display = 'none';
+                    var emailInput = document.getElementById('cora-modal-email');
+                    if (emailInput) emailInput.value = '';
+                }
+            }
+
+            // Bind to CTA buttons in Header & Landing Hero sections
+            document.addEventListener('click', function(e) {
+                var target = e.target;
+                // Match class or tag
+                if (target.classList.contains('cora-header-cta') || 
+                    target.classList.contains('cora-hero-cta-primary') || 
+                    target.closest('.cora-header-cta') || 
+                    target.closest('.cora-hero-cta-primary') ||
+                    (target.tagName === 'A' && target.getAttribute('href') === '#cora-signup')) {
+                    
+                    var href = target.getAttribute('href') || (target.closest('a') ? target.closest('a').getAttribute('href') : '');
+                    if (href === '#' || href === '#cora-signup' || href === '') {
+                        openModal(e);
+                    }
+                }
+            });
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeModal);
+            }
+
+            // Close on overlay click
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) closeModal();
+                });
+            }
+
+            // Handle Modal Form Submit
+            var form = document.getElementById('cora-modal-signup-form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    var email = document.getElementById('cora-modal-email').value.trim();
+                    if (!email) return;
+
+                    var btn = document.getElementById('cora-modal-submit-btn');
+                    btn.disabled = true;
+                    btn.textContent = 'Sending link...';
+
+                    var formData = new FormData();
+                    formData.append('action', 'cora_modal_register');
+                    formData.append('email', email);
+                    formData.append('nonce', '<?php echo wp_create_nonce( "cora_login_nonce" ); ?>');
+
+                    fetch('<?php echo admin_url( "admin-ajax.php" ); ?>', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(function(r) { return r.json(); })
+                    .then(function(res) {
+                        if (res.success) {
+                            registeredEmail = email;
+                            document.getElementById('cora-modal-form-state').style.display = 'none';
+                            document.getElementById('cora-modal-success-state').style.display = 'block';
+                            document.getElementById('cora-modal-success-email').textContent = email;
+                        } else {
+                            // If user helper is loaded, show toast, otherwise alert safely
+                            if (window.coraShowToast) {
+                                window.coraShowToast(res.data.message || 'Error occurred.');
+                            } else {
+                                alert(res.data.message || 'Error occurred.');
+                            }
+                            btn.disabled = false;
+                            btn.textContent = 'Continue';
+                        }
+                    })
+                    .catch(function() {
+                        if (window.coraShowToast) {
+                            window.coraShowToast('Network error. Please try again.');
+                        } else {
+                            alert('Network error. Please try again.');
+                        }
+                        btn.disabled = false;
+                        btn.textContent = 'Continue';
+                    });
+                });
+            }
+
+            // Handle Resend
+            var resendBtn = document.getElementById('cora-modal-resend-btn');
+            if (resendBtn) {
+                resendBtn.addEventListener('click', function() {
+                    if (!registeredEmail) return;
+                    if (window.coraShowToast) window.coraShowToast('Sending verification link...');
+                    
+                    var formData = new FormData();
+                    formData.append('action', 'cora_ajax_resend_verification');
+                    formData.append('email', registeredEmail);
+                    formData.append('nonce', '<?php echo wp_create_nonce( "cora_login_nonce" ); ?>');
+                    
+                    fetch('<?php echo admin_url( "admin-ajax.php" ); ?>', { method: 'POST', body: formData })
+                    .then(function(r) { return r.json(); })
+                    .then(function(res) {
+                        if (window.coraShowToast) {
+                            window.coraShowToast(res.data.message || 'Link sent!');
+                        }
                     });
                 });
             }

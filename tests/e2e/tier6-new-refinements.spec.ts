@@ -12,7 +12,7 @@ test.describe('Tier 6: New Refinements E2E Tests', () => {
     await page.goto('/workspace/settings-suite');
     
     // Choose general workspace tab
-    await page.click('a:has-text("General Settings")');
+    await page.locator('a:has-text("General Settings")').filter({ visible: true }).first().click();
     await page.fill('input[name="cora_workspace_name"]', 'E2E Testing Office');
     await page.fill('input[name="cora_workspace_tax_details"]', 'GST-E2E-12345');
     await page.fill('input[name="cora_workspace_address"]', '404 Main St, Mumbai');
@@ -30,7 +30,7 @@ test.describe('Tier 6: New Refinements E2E Tests', () => {
     await expect(page.locator('input[name="cora_workspace_allow_tours"]')).toBeChecked();
 
     // Configure password policy
-    await page.click('a:has-text("Password Policy")');
+    await page.locator('a:has-text("Password Policy")').filter({ visible: true }).first().click();
     await page.fill('input[name="cora_pwd_policy_min_len"]', '10');
     await page.check('input[name="cora_pwd_policy_numbers"]');
     await page.check('input[name="cora_pwd_policy_uppercase"]');
@@ -47,7 +47,7 @@ test.describe('Tier 6: New Refinements E2E Tests', () => {
     await page.goto('/workspace/settings-suite?settings_tab=general'); // Go back to settings
 
     // Reset password policy back to normal to keep the test environment clean
-    await page.click('a:has-text("Password Policy")');
+    await page.locator('a:has-text("Password Policy")').filter({ visible: true }).first().click();
     await page.fill('input[name="cora_pwd_policy_min_len"]', '8');
     await page.uncheck('input[name="cora_pwd_policy_numbers"]');
     await page.uncheck('input[name="cora_pwd_policy_uppercase"]');
@@ -134,10 +134,10 @@ test.describe('Tier 6: New Refinements E2E Tests', () => {
   });
 
   test('5. Model Context Protocol (MCP) Server Validation', async ({ page }) => {
-    // 1. Retrieve the secure token from settings suite mcp tab
-    await page.goto('/workspace/settings-suite?settings_tab=mcp');
-    await page.waitForSelector('input[name="cora_mcp_access_token"]');
-    const validToken = await page.inputValue('input[name="cora_mcp_access_token"]');
+    // 1. Retrieve the secure token from workspace mcp tab
+    await page.goto('/workspace/mcp');
+    await page.waitForSelector('input[name="cora_mcp_access_token_direct"]');
+    const validToken = await page.inputValue('input[name="cora_mcp_access_token_direct"]');
     expect(validToken.length).toBeGreaterThan(0);
 
     // 2. Perform request with invalid token -> 401 Unauthorized
@@ -245,7 +245,7 @@ test.describe('Tier 6: New Refinements E2E Tests', () => {
     await expect(selectedItem).toBeVisible();
 
     // 7. Test filter pills click (which searches "Password" under Leads filter, yielding no results)
-    await page.click('.cora-search-pill[data-filter="leads"]');
+    await page.click('#cora-command-palette .cora-search-pill[data-filter="leads"]');
     await page.waitForTimeout(300);
     await expect(page.locator('#cora-command-results')).toContainText('No results found');
 

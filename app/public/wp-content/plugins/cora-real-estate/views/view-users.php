@@ -8,17 +8,8 @@ $current_role = ! empty( wp_get_current_user()->roles ) ? wp_get_current_user()-
 $current_agency = cora_get_current_user_agency_id();
 $current_branch = cora_get_current_user_branch_id();
 
-// Build custom user roles labels
-$role_labels = array(
-    'administrator' => 'Super Admin',
-    'cora_manager' => 'Broker Owner',
-    'cora_branch_manager' => 'Branch Manager',
-    'cora_photographer' => 'Managing Agent',
-    'cora_videographer' => 'Showing Assistant',
-    'cora_drone_pilot' => 'Property Valuer',
-    'cora_editor' => 'Listing Coordinator',
-    'cora_viewer' => 'Viewer'
-);
+// Build user roles labels dynamically (including custom roles)
+$role_labels = cora_get_all_roles();
 
 // Fetch all users in active agency (multi-tenant scope)
 $user_query_args = array();
@@ -85,10 +76,12 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     </div>
 
     <!-- Sub Navigation Tabs -->
-    <div class="cora-sub-tabs border-b border-zinc-200 flex gap-4 text-xs font-bold text-zinc-550 select-none pb-0.5">
         <button class="cora-sub-tab active pb-2 border-b-2 border-zinc-950 text-zinc-950 cursor-pointer" data-target="tab-active-members">Active Members</button>
         <button class="cora-sub-tab pb-2 border-b-2 border-transparent hover:text-zinc-900 cursor-pointer" data-target="tab-pending-invites">Pending Invitations</button>
         <button class="cora-sub-tab pb-2 border-b-2 border-transparent hover:text-zinc-900 cursor-pointer" data-target="tab-permissions-matrix">Permissions Matrix</button>
+        <?php if ( in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin' ) ) ) : ?>
+            <button class="cora-sub-tab pb-2 border-b-2 border-transparent hover:text-zinc-900 cursor-pointer" data-target="tab-custom-roles">Custom Roles</button>
+        <?php endif; ?>
     </div>
 
     <!-- TAB 1: ACTIVE MEMBERS -->
@@ -301,15 +294,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         </tr>
                         <!-- Custom roles -->
                         <?php 
-                        $target_roles = array(
-                            'cora_manager' => 'Broker Owner',
-                            'cora_branch_manager' => 'Branch Manager',
-                            'cora_photographer' => 'Managing Agent',
-                            'cora_videographer' => 'Showing Assistant',
-                            'cora_drone_pilot' => 'Property Valuer',
-                            'cora_editor' => 'Listing Coordinator',
-                            'cora_viewer' => 'Viewer'
-                        );
+                        $all_roles = cora_get_all_roles();
+                        $target_roles = array();
+                        foreach ( $all_roles as $rk => $rl ) {
+                            if ( $rk !== 'administrator' && $rk !== 'cora_shruti' ) {
+                                $target_roles[$rk] = $rl;
+                            }
+                        }
                         $features = array('dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings');
                         
                         foreach ($target_roles as $role_key => $role_name): 
@@ -328,6 +319,67 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 4: CUSTOM ROLES -->
+    <div id="tab-custom-roles" class="cora-tab-content space-y-4 hidden">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Create custom role form -->
+            <div class="cora-card bg-white border border-zinc-200/85 rounded-xl p-5 shadow-sm space-y-4 h-fit">
+                <div class="border-b border-zinc-100 pb-2">
+                    <h3 class="text-sm font-bold text-zinc-900">Define Custom Role</h3>
+                    <p class="text-[11px] text-zinc-400 mt-0.5">Add a tailored role for your brokerage departments.</p>
+                </div>
+                <form id="create-custom-role-form" onsubmit="handleCreateCustomRole(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-zinc-550 uppercase tracking-wider mb-1.5">Role Display Name</label>
+                        <input type="text" id="custom-role-name" required placeholder="e.g. Social Media Specialist" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
+                    </div>
+                    <button type="submit" id="create-role-submit-btn" class="w-full bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs py-2.5 rounded-lg transition-colors cursor-pointer active:scale-95 shadow-sm">
+                        Create Role
+                    </button>
+                </form>
+            </div>
+
+            <!-- Custom roles list table -->
+            <div class="cora-card bg-white border border-zinc-200/85 rounded-xl p-5 shadow-sm space-y-4 md:col-span-2">
+                <div class="border-b border-zinc-100 pb-2">
+                    <h3 class="text-sm font-bold text-zinc-900">Active Custom Roles</h3>
+                    <p class="text-[11px] text-zinc-400 mt-0.5">Roles currently registered in this workspace environment.</p>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-zinc-200 text-xs text-left">
+                        <thead>
+                            <tr class="bg-zinc-50/50">
+                                <th class="px-4 py-2.5 font-bold text-zinc-550 uppercase tracking-wider text-[10px]">Role Name</th>
+                                <th class="px-4 py-2.5 font-bold text-zinc-550 uppercase tracking-wider text-[10px]">System Identifier</th>
+                                <th class="px-4 py-2.5 font-bold text-zinc-550 uppercase tracking-wider text-[10px] text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-150">
+                            <?php
+                            $my_custom_roles = get_option( 'cora_custom_roles', array() );
+                            if ( empty( $my_custom_roles ) ) :
+                            ?>
+                            <tr>
+                                <td colspan="3" class="px-4 py-8 text-center text-zinc-400">No custom roles defined yet.</td>
+                            </tr>
+                            <?php else : ?>
+                                <?php foreach ( $my_custom_roles as $cr ) : ?>
+                                <tr class="hover:bg-zinc-50/30">
+                                    <td class="px-4 py-3 font-semibold text-zinc-800"><?php echo esc_html( $cr['role_name'] ); ?></td>
+                                    <td class="px-4 py-3"><code class="text-zinc-500 font-mono"><?php echo esc_html( $cr['role_key'] ); ?></code></td>
+                                    <td class="px-4 py-3 text-right">
+                                        <button onclick="handleDeleteCustomRole('<?php echo esc_attr( $cr['role_key'] ); ?>')" class="text-red-650 hover:text-red-700 font-bold hover:underline cursor-pointer">Delete</button>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -702,4 +754,45 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             }
         });
     });
+
+    // Custom Roles Handlers
+    function handleCreateCustomRole(e) {
+        e.preventDefault();
+        var name = $('#custom-role-name').val().trim();
+        if (!name) return;
+
+        var btn = $('#create-role-submit-btn');
+        btn.prop('disabled', true).text('Creating role...');
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_create_custom_role',
+            role_name: name,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast(res.data.message || 'Custom role created successfully.');
+                setTimeout(function() { window.location.reload(); }, 800);
+            } else {
+                window.coraShowToast(res.data.message || 'Failed to create role.');
+                btn.prop('disabled', false).text('Create Role');
+            }
+        });
+    }
+
+    function handleDeleteCustomRole(roleKey) {
+        if (!confirm('Are you sure you want to delete this custom role? Users assigned to this role will lose access.')) return;
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_delete_custom_role',
+            role_key: roleKey,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast(res.data.message || 'Custom role deleted.');
+                setTimeout(function() { window.location.reload(); }, 800);
+            } else {
+                window.coraShowToast(res.data.message || 'Failed to delete role.');
+            }
+        });
+    }
 </script>

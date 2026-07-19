@@ -68,6 +68,11 @@ $cora_settings_tabs = array(
         'label' => 'Audit & Logs',
         'desc'  => 'System activity & cost analysis',
         'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>'
+    ),
+    'onboarding' => array(
+        'label' => 'User Onboarding',
+        'desc'  => 'Registration, Google OAuth & access',
+        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>'
     )
 );
 ?>
@@ -1233,7 +1238,257 @@ $cora_settings_tabs = array(
         <div class="space-y-6 max-w-5xl">
             <?php include CORA_REAL_ESTATE_AI_PATH . 'views/view-audit-panel.php'; ?>
         </div>
-        <?php endif; ?>
+
+        <?php elseif ( $active_tab === 'onboarding' ) : ?>
+        <!-- TAB 13: USER ONBOARDING PANEL -->
+        <?php
+        $ob_enabled       = get_option( 'cora_onboarding_enabled', 1 );
+        $ob_google        = get_option( 'cora_onboarding_google_enabled', 1 );
+        $ob_email         = get_option( 'cora_onboarding_email_enabled', 1 );
+        $ob_verify        = get_option( 'cora_onboarding_require_verification', 1 );
+        $ob_role          = get_option( 'cora_onboarding_default_role', 'cora_manager' );
+        $ob_duration      = get_option( 'cora_onboarding_account_duration', 0 );
+        $ob_welcome       = get_option( 'cora_onboarding_welcome_message', '' );
+        $ob_client_id     = get_option( 'cora_google_client_id', '' );
+        $ob_client_secret = get_option( 'cora_google_client_secret', '' );
+        $ob_redirect_uri  = home_url( '/workspace/auth/google/callback' );
+
+        // Fetch self-registered users (auth_provider = email or google, not invited)
+        $ob_users = get_users( array(
+            'meta_query' => array(
+                'relation' => 'OR',
+                array( 'key' => 'cora_auth_provider', 'value' => 'email',  'compare' => '=' ),
+                array( 'key' => 'cora_auth_provider', 'value' => 'google', 'compare' => '=' ),
+            ),
+            'number' => 100,
+        ) );
+        ?>
+        <div class="space-y-6 max-w-4xl">
+
+            <!-- Section: Registration Controls -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
+                <div class="px-5 py-4 border-b border-zinc-100 dark:border-zinc-800">
+                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Registration Controls</h3>
+                    <p class="text-xs text-zinc-500 mt-0.5">Control how new workspace owners sign up on your platform.</p>
+                </div>
+                <div class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                    <?php
+                    $toggles = array(
+                        array( 'key' => 'cora_onboarding_enabled',              'val' => $ob_enabled,  'label' => 'Enable Self-Registration',         'desc' => 'Allow new users to create their own workspace account.' ),
+                        array( 'key' => 'cora_onboarding_google_enabled',       'val' => $ob_google,   'label' => 'Allow Google Sign-In',              'desc' => 'Show a "Continue with Google" button on the register page.' ),
+                        array( 'key' => 'cora_onboarding_email_enabled',        'val' => $ob_email,    'label' => 'Allow Email + Password Sign-Up',    'desc' => 'Show the email registration form.' ),
+                        array( 'key' => 'cora_onboarding_require_verification', 'val' => $ob_verify,   'label' => 'Require Email Verification',        'desc' => 'Users must click the email link before accessing the workspace.' ),
+                    );
+                    foreach ( $toggles as $toggle ) : ?>
+                    <div class="px-5 py-3.5 flex items-center justify-between gap-4">
+                        <div>
+                            <div class="text-xs font-semibold text-zinc-800 dark:text-zinc-200"><?php echo esc_html( $toggle['label'] ); ?></div>
+                            <div class="text-xs text-zinc-500 mt-0.5"><?php echo esc_html( $toggle['desc'] ); ?></div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                            <input type="checkbox" name="<?php echo esc_attr( $toggle['key'] ); ?>" value="1" <?php checked( 1, intval( $toggle['val'] ) ); ?> class="sr-only peer">
+                            <div class="w-9 h-5 bg-zinc-200 dark:bg-zinc-850 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 dark:after:border-zinc-800 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-950 dark:peer-checked:bg-zinc-100"></div>
+                        </label>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <!-- Section: Google OAuth Credentials -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
+                <div class="px-5 py-4 border-b border-zinc-100 dark:border-zinc-800">
+                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Google OAuth Credentials</h3>
+                    <p class="text-xs text-zinc-500 mt-0.5">Required to enable "Continue with Google" sign-in.</p>
+                </div>
+                <div class="p-5 space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Google Client ID</label>
+                        <input type="text" name="cora_google_client_id" value="<?php echo esc_attr( $ob_client_id ); ?>" placeholder="123456789-abc.apps.googleusercontent.com" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Google Client Secret</label>
+                        <input type="password" name="cora_google_client_secret" value="<?php echo esc_attr( $ob_client_secret ? str_repeat('*', 20) : '' ); ?>" placeholder="Leave blank to keep current value" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400">
+                    </div>
+                    <div class="p-3 bg-zinc-50 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
+                        <p class="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest mb-1.5">Authorized Redirect URI</p>
+                        <p class="text-[11px] text-zinc-500 mb-2">Copy this exactly into your Google Cloud Console → OAuth credentials → Authorized redirect URIs.</p>
+                        <div class="flex items-center gap-2">
+                            <code class="flex-1 text-[11px] font-mono text-zinc-700 dark:text-zinc-300 break-all"><?php echo esc_html( $ob_redirect_uri ); ?></code>
+                            <button type="button" onclick="navigator.clipboard.writeText('<?php echo esc_js( $ob_redirect_uri ); ?>').then(function(){ window.coraShowToast('Redirect URI copied.'); })" class="shrink-0 px-2.5 py-1.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-[10px] font-bold rounded-lg cursor-pointer hover:opacity-80 transition-opacity">
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: Account Defaults -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
+                <div class="px-5 py-4 border-b border-zinc-100 dark:border-zinc-800">
+                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Account Defaults</h3>
+                    <p class="text-xs text-zinc-500 mt-0.5">Set the default role, access duration, and welcome message for new sign-ups.</p>
+                </div>
+                <div class="p-5 space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Default Role for New Users</label>
+                        <select name="cora_onboarding_default_role" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400">
+                            <?php
+                            $cora_roles = array(
+                                'cora_manager'        => 'Workspace Owner (cora_manager)',
+                                'cora_branch_manager' => 'Branch Manager',
+                                'cora_photographer'   => 'Photographer',
+                                'cora_videographer'   => 'Videographer',
+                                'cora_drone_pilot'    => 'Drone Pilot',
+                                'cora_editor'         => 'Editor',
+                                'cora_viewer'         => 'Viewer (Read-Only)',
+                            );
+                            foreach ( $cora_roles as $role_key => $role_label ) :
+                            ?>
+                            <option value="<?php echo esc_attr( $role_key ); ?>" <?php selected( $ob_role, $role_key ); ?>><?php echo esc_html( $role_label ); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Account Duration (days)</label>
+                        <input type="number" name="cora_onboarding_account_duration" value="<?php echo intval( $ob_duration ); ?>" min="0" placeholder="0 = Lifetime" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400">
+                        <p class="text-[10px] text-zinc-400 mt-1">Set to 0 for unlimited (lifetime) access. Any positive number limits access to that many days from registration.</p>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Welcome Message (optional)</label>
+                        <textarea name="cora_onboarding_welcome_message" rows="2" placeholder="Welcome to the platform! Here's how to get started..." class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400 resize-none"><?php echo esc_textarea( $ob_welcome ); ?></textarea>
+                        <p class="text-[10px] text-zinc-400 mt-1">Shown as a toast notification on first dashboard visit (when <code>?welcome=1</code> is in the URL).</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: Registered Users Table -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
+                <div class="px-5 py-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Self-Registered Users</h3>
+                        <p class="text-xs text-zinc-500 mt-0.5"><?php echo count( $ob_users ); ?> users registered via the onboarding flow.</p>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <?php if ( empty( $ob_users ) ) : ?>
+                    <div class="px-5 py-8 text-center text-xs text-zinc-400">
+                        No self-registered users yet. Share your registration link: <code class="text-zinc-600 dark:text-zinc-300"><?php echo esc_html( home_url( '/workspace/register' ) ); ?></code>
+                    </div>
+                    <?php else : ?>
+                    <table class="w-full" id="ob-users-table">
+                        <thead class="bg-zinc-50 dark:bg-zinc-800">
+                            <tr>
+                                <th class="px-4 py-2.5 text-left text-[10px] font-bold text-zinc-500 uppercase tracking-widest">User</th>
+                                <th class="px-4 py-2.5 text-left text-[10px] font-bold text-zinc-500 uppercase tracking-widest hidden sm:table-cell">Provider</th>
+                                <th class="px-4 py-2.5 text-left text-[10px] font-bold text-zinc-500 uppercase tracking-widest hidden md:table-cell">Role</th>
+                                <th class="px-4 py-2.5 text-left text-[10px] font-bold text-zinc-500 uppercase tracking-widest hidden lg:table-cell">Verified</th>
+                                <th class="px-4 py-2.5 text-left text-[10px] font-bold text-zinc-500 uppercase tracking-widest hidden lg:table-cell">Expiry</th>
+                                <th class="px-4 py-2.5 text-right text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                        <?php foreach ( $ob_users as $ob_u ) :
+                            $ob_verified  = get_user_meta( $ob_u->ID, 'cora_re_email_verified', true );
+                            $ob_status    = get_user_meta( $ob_u->ID, 'cora_user_status',        true );
+                            $ob_provider  = get_user_meta( $ob_u->ID, 'cora_auth_provider',      true );
+                            $ob_exp       = get_user_meta( $ob_u->ID, 'cora_account_expires_at', true );
+                            $ob_role_disp = implode( ', ', array_keys( $ob_u->roles ) );
+                            $ob_exp_str   = ( $ob_exp && intval( $ob_exp ) > 0 ) ? date( 'M j, Y', intval( $ob_exp ) ) : 'Lifetime';
+                            $ob_exp_cls   = ( $ob_exp && intval( $ob_exp ) > 0 && time() > intval( $ob_exp ) ) ? 'text-red-500' : 'text-zinc-500';
+                        ?>
+                        <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors" data-uid="<?php echo $ob_u->ID; ?>">
+                            <td class="px-4 py-3">
+                                <div class="text-xs font-semibold text-zinc-800 dark:text-zinc-200"><?php echo esc_html( $ob_u->display_name ); ?></div>
+                                <div class="text-[10px] text-zinc-400 mt-0.5"><?php echo esc_html( $ob_u->user_email ); ?></div>
+                                <?php if ( $ob_status === 'inactive' ) : ?>
+                                <span class="inline-block mt-0.5 text-[9px] font-bold bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 px-1.5 py-0.5 rounded">Deactivated</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="px-4 py-3 hidden sm:table-cell">
+                                <span class="text-[10px] font-semibold text-zinc-500 capitalize"><?php echo esc_html( $ob_provider ?: 'email' ); ?></span>
+                            </td>
+                            <td class="px-4 py-3 hidden md:table-cell">
+                                <span class="text-[10px] text-zinc-600 dark:text-zinc-400"><?php echo esc_html( $ob_role_disp ); ?></span>
+                            </td>
+                            <td class="px-4 py-3 hidden lg:table-cell">
+                                <?php if ( $ob_verified === '1' || $ob_provider === 'google' ) : ?>
+                                <span class="text-[10px] font-bold text-green-600">✓ Verified</span>
+                                <?php else : ?>
+                                <span class="text-[10px] font-bold text-zinc-400">Pending</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="px-4 py-3 hidden lg:table-cell">
+                                <span class="text-[10px] <?php echo $ob_exp_cls; ?>"><?php echo esc_html( $ob_exp_str ); ?></span>
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex items-center justify-end gap-1.5">
+                                    <button type="button" onclick="obChangeRole(<?php echo $ob_u->ID; ?>)" class="px-2 py-1 text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded text-zinc-700 dark:text-zinc-300 transition-colors cursor-pointer">Role</button>
+                                    <button type="button" onclick="obSetExpiry(<?php echo $ob_u->ID; ?>)" class="px-2 py-1 text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded text-zinc-700 dark:text-zinc-300 transition-colors cursor-pointer">Expiry</button>
+                                    <?php if ( $ob_status === 'inactive' ) : ?>
+                                    <button type="button" onclick="obToggleStatus(<?php echo $ob_u->ID; ?>, 'activate')" class="px-2 py-1 text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded text-zinc-700 dark:text-zinc-300 transition-colors cursor-pointer">Activate</button>
+                                    <?php else : ?>
+                                    <button type="button" onclick="obToggleStatus(<?php echo $ob_u->ID; ?>, 'deactivate')" class="px-2 py-1 text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded text-zinc-700 dark:text-zinc-300 transition-colors cursor-pointer">Deactivate</button>
+                                    <?php endif; ?>
+                                    <button type="button" onclick="obDeleteUser(<?php echo $ob_u->ID; ?>)" class="px-2 py-1 text-[10px] font-semibold bg-red-50 hover:bg-red-100 rounded text-red-600 transition-colors cursor-pointer">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Registration Link Card -->
+            <div class="p-4 bg-zinc-50 dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 flex items-center gap-3">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                <div class="flex-1 min-w-0">
+                    <div class="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest mb-0.5">Registration Link</div>
+                    <code class="text-[11px] text-zinc-700 dark:text-zinc-300 truncate block"><?php echo esc_html( home_url( '/workspace/register' ) ); ?></code>
+                </div>
+                <button type="button" onclick="navigator.clipboard.writeText('<?php echo esc_js( home_url( '/workspace/register' ) ); ?>').then(function(){ window.coraShowToast('Link copied!'); })" class="shrink-0 px-3 py-1.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-[10px] font-bold rounded-lg cursor-pointer hover:opacity-80 transition-opacity">Copy</button>
+            </div>
+        </div>
+
+        <script>
+        function obAction(uid, action, extra) {
+            extra = extra || {};
+            var data = Object.assign({
+                action: 'cora_onboarding_update_user',
+                sub_action: action,
+                target_user_id: uid,
+                nonce: (typeof coraREData !== 'undefined') ? coraREData.ajaxNonce : ''
+            }, extra);
+            jQuery.post((typeof coraREData !== 'undefined') ? coraREData.ajaxUrl : '', data, function(res) {
+                if (res.success) { window.coraShowToast(res.data.message); setTimeout(function(){ location.reload(); }, 1200); }
+                else { window.coraShowToast(res.data.message || 'Something went wrong.'); }
+            });
+        }
+        function obChangeRole(uid) {
+            var roles = ['cora_manager','cora_branch_manager','cora_photographer','cora_videographer','cora_drone_pilot','cora_editor','cora_viewer'];
+            var labels = ['Workspace Owner','Branch Manager','Photographer','Videographer','Drone Pilot','Editor','Viewer'];
+            var html = '<select id="ob-role-sel" style="width:100%;padding:6px;margin-bottom:10px;border:1px solid #e4e4e7;border-radius:6px;font-size:12px;">';
+            roles.forEach(function(r,i){ html += '<option value="'+r+'">'+labels[i]+'</option>'; });
+            html += '</select>';
+            // Use a simple browser-style prompt replacement (toast-based picker)
+            var role = window.prompt('Enter role key (cora_manager, cora_branch_manager, cora_photographer, cora_videographer, cora_drone_pilot, cora_editor, cora_viewer):');
+            if (role && roles.indexOf(role) >= 0) { obAction(uid, 'change_role', {new_role: role}); }
+            else if (role) { window.coraShowToast('Invalid role key. Use one of the listed keys.'); }
+        }
+        function obSetExpiry(uid) {
+            var days = window.prompt('Set expiry in days (0 = lifetime access, remove expiry):');
+            if (days !== null) { obAction(uid, 'set_expiry', {days: parseInt(days)||0}); }
+        }
+        function obToggleStatus(uid, action) { obAction(uid, action); }
+        function obDeleteUser(uid) {
+            if (window.confirm && window.confirm('Permanently delete this user? This cannot be undone.')) {
+                obAction(uid, 'delete');
+            }
+        }
+        </script>
+
+        <?php endif; // end onboarding tab ?>
 
         <!-- Sticky Save Actions Bar (Shopify Style) -->
         <?php if ( $active_tab !== 'audit' ) : ?>

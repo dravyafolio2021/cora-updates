@@ -377,9 +377,9 @@ test.describe('Tier 1: Feature Coverage', () => {
 
   test('Settings-Suite - 1. Tab Navigation', async ({ page }) => {
     await page.goto('/workspace/settings-suite');
-    await page.click('a[href*="settings_tab=reading"]');
+    await page.click('a.cora-settings-nav-item[href*="settings_tab=reading"]');
     await expect(page).toHaveURL(/.*settings_tab=reading.*/);
-    await page.click('a[href*="settings_tab=writing"]');
+    await page.click('a.cora-settings-nav-item[href*="settings_tab=writing"]');
     await expect(page).toHaveURL(/.*settings_tab=writing.*/);
   });
 
