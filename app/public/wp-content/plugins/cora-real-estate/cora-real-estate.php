@@ -3,7 +3,7 @@
  * Plugin Name: Cora for Real Estate
  * Plugin URI: https://cora.ai
  * Description: A clean, minimal Notion-style workspace dashboard for real estate agencies in India and globally. Empowered with AI workflows, booking management, and photo helpers.
- * Version: 1.4.0
+ * Version: 1.5.0
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_REAL_ESTATE_AI_VERSION', '1.4.0' );
+define( 'CORA_REAL_ESTATE_AI_VERSION', '1.5.0' );
 define( 'CORA_REAL_ESTATE_AI_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_REAL_ESTATE_AI_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -16423,7 +16423,7 @@ function cora_handle_google_oauth_callback() {
             $username = $username_base . '_' . substr( $google_id, 0, 6 );
         }
 
-        $default_role = sanitize_text_field( get_option( 'cora_onboarding_default_role', 'cora_manager' ) );
+        $default_role = sanitize_text_field( get_option( 'cora_onboarding_default_role', 'cora_super_admin' ) );
         $name_parts   = explode( ' ', $google_name, 2 );
 
         $user_id = wp_insert_user( array(
@@ -16514,7 +16514,7 @@ function cora_ajax_self_register() {
         $username = $username_base . '_' . substr( md5( $email ), 0, 6 );
     }
 
-    $default_role = sanitize_text_field( get_option( 'cora_onboarding_default_role', 'cora_manager' ) );
+    $default_role = sanitize_text_field( get_option( 'cora_onboarding_default_role', 'cora_super_admin' ) );
     $name_parts   = explode( ' ', $name, 2 );
 
     $user_id = wp_insert_user( array(
@@ -16567,7 +16567,7 @@ function cora_ajax_save_onboarding_settings() {
     update_option( 'cora_onboarding_google_enabled',       intval( $_POST['google_enabled']       ?? 1 ) );
     update_option( 'cora_onboarding_email_enabled',        intval( $_POST['email_enabled']        ?? 1 ) );
     update_option( 'cora_onboarding_require_verification', intval( $_POST['require_verification'] ?? 1 ) );
-    update_option( 'cora_onboarding_default_role',         sanitize_text_field( $_POST['default_role']   ?? 'cora_manager' ) );
+    update_option( 'cora_onboarding_default_role',         sanitize_text_field( $_POST['default_role']   ?? 'cora_super_admin' ) );
     update_option( 'cora_onboarding_account_duration',     intval( $_POST['account_duration']     ?? 0 ) );
     update_option( 'cora_onboarding_welcome_message',      sanitize_textarea_field( $_POST['welcome_message'] ?? '' ) );
 
@@ -16688,7 +16688,7 @@ function cora_ajax_modal_register() {
         $username = $username_base . '_' . substr( md5( $email ), 0, 6 );
     }
 
-    $default_role = sanitize_text_field( get_option( 'cora_onboarding_default_role', 'cora_manager' ) );
+    $default_role = sanitize_text_field( get_option( 'cora_onboarding_default_role', 'cora_super_admin' ) );
     $password     = wp_generate_password( 16, true, true );
 
     $user_id = wp_insert_user( array(
