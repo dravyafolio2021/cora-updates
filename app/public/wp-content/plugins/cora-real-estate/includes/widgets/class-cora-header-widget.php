@@ -282,6 +282,270 @@ class Cora_Header_Widget extends Widget_Base {
         $email_enabled   = get_option( 'cora_onboarding_email_enabled', 1 );
         $google_auth_url = home_url( '/workspace/auth/google' );
         ?>
+        <style>
+        .cora-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(9, 9, 11, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 999999;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .cora-modal-overlay.open {
+            display: flex;
+            opacity: 1;
+        }
+        .cora-modal-card {
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 24px;
+            padding: 40px 32px 32px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            position: relative;
+            transform: translateY(16px) scale(0.98);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #18181b;
+            text-align: left;
+            box-sizing: border-box;
+        }
+        .cora-modal-overlay.open .cora-modal-card {
+            transform: translateY(0) scale(1);
+        }
+        .cora-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #a1a1aa;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.15s, color 0.15s;
+            box-sizing: border-box;
+        }
+        .cora-modal-close:hover {
+            background-color: #f4f4f5;
+            color: #18181b;
+        }
+        .cora-modal-header {
+            margin-bottom: 24px;
+        }
+        .cora-modal-tagline {
+            font-size: 13px;
+            font-weight: 500;
+            color: #a1a1aa;
+            margin-bottom: 2px;
+        }
+        .cora-modal-title {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: #09090b;
+            margin: 0;
+        }
+        .cora-modal-sso-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .cora-modal-sso-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 11px 16px;
+            background: #ffffff;
+            border: 1.5px solid #e4e4e7;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #18181b;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+            position: relative;
+            box-sizing: border-box;
+        }
+        .cora-modal-sso-btn:hover {
+            background-color: #fcfcfc;
+            border-color: #a1a1aa;
+        }
+        .cora-modal-google-btn {
+            border-color: #2563eb;
+        }
+        .cora-modal-google-btn:hover {
+            border-color: #1d4ed8;
+        }
+        .cora-google-pill {
+            position: absolute;
+            top: -8px;
+            right: 12px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 1px 6px;
+            border-radius: 4px;
+            letter-spacing: 0.05em;
+            border: 1px solid #bfdbfe;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        .cora-modal-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+            color: #a1a1aa;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .cora-modal-divider::before,
+        .cora-modal-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e4e4e7;
+        }
+        .cora-modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .cora-modal-input {
+            width: 100%;
+            padding: 11px 14px;
+            font-size: 14px;
+            border: 1px solid #e4e4e7;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #18181b;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+        .cora-modal-input:focus {
+            border-color: #18181b;
+            box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.07);
+        }
+        .cora-modal-btn-submit {
+            width: 100%;
+            padding: 11px;
+            background: #18181b;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.15s, transform 0.1s;
+            box-sizing: border-box;
+        }
+        .cora-modal-btn-submit:hover {
+            background: #27272a;
+        }
+        .cora-modal-btn-submit:active {
+            transform: scale(0.98);
+        }
+        .cora-modal-footer-tos {
+            margin-top: 16px;
+            font-size: 11px;
+            line-height: 1.5;
+            color: #71717a;
+            text-align: left;
+        }
+        .cora-modal-footer-tos a {
+            color: #18181b;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+        .cora-modal-footer-tos a:hover {
+            color: #000000;
+        }
+        .cora-modal-footer-separator {
+            height: 1px;
+            background: #f4f4f5;
+            margin: 20px 0;
+        }
+        .cora-modal-sso-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 11.5px;
+            color: #71717a;
+        }
+        .cora-modal-sso-note a {
+            font-weight: 600;
+            color: #18181b;
+            text-decoration: underline;
+        }
+        .cora-modal-sso-note a:hover {
+            color: #000000;
+        }
+        .cora-modal-success {
+            text-align: center;
+            display: none;
+        }
+        .cora-modal-success-icon {
+            width: 48px;
+            height: 48px;
+            background: #f4f4f5;
+            border: 1px solid #e4e4e7;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            color: #18181b;
+            box-sizing: border-box;
+        }
+        .cora-modal-success-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #09090b;
+            margin-bottom: 8px;
+        }
+        .cora-modal-success-text {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #71717a;
+            margin-bottom: 20px;
+        }
+        .cora-modal-success-text strong {
+            color: #18181b;
+        }
+        .cora-modal-btn-resend {
+            background: none;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            color: #71717a;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 0;
+        }
+        .cora-modal-btn-resend:hover {
+            color: #18181b;
+        }
+        </style>
+
         <div class="cora-modal-overlay" id="cora-signup-modal" aria-hidden="true">
             <div class="cora-modal-card">
                 <!-- Close Button -->
