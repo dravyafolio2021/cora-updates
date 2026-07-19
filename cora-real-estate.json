@@ -1,10 +1,11 @@
 {
-    "name": "Cora for Real Estate",
+    "name": "Cora Workspace Platform",
     "slug": "cora-real-estate",
-    "version": "1.6.0",
+    "version": "2.0.0",
     "download_url": "https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-real-estate.zip",
+    "tested": "6.5",
     "sections": {
-        "description": "The ultimate white-label minimalist CRM for real estate agencies.",
-        "changelog": "<h4>1.6.0</h4><ul><li>Released dummy test update v1.6.0 to verify auto-upgrade flows.</li></ul>"
+        "description": "A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.",
+        "changelog": "<h4>2.0.0 — Unified Workspace Platform</h4><ul><li><strong>Unified Architecture</strong>: Merged Cora for Real Estate and Cora for Studio into a single plugin with a modular industry registry. Users select their workspace type during onboarding.</li><li><strong>Module Registry</strong>: Introduced <code>Cora_Module_Registry</code> — a central class that dynamically loads sidebar navigation, roles, CRM stages, and dashboard widgets based on the active industry module (Real Estate or Photography Studio).</li><li><strong>Auto-Updater</strong>: Added one-click workspace update system. Admins see a pulsing update button next to the logo whenever a new version is available. No manual plugin uploads needed.</li><li><strong>Dynamic Onboarding</strong>: Industry selector step added to the signup flow. Users configure their workspace profile at registration.</li><li><strong>Performance</strong>: Transient-based caching for dashboard stats. Lazy loading for GrapesJS and CodeMirror assets.</li><li><strong>Layout Fixes</strong>: Resolved horizontal sidebar scrollbar. Standardised workspace popover widths.</li></ul><h4>1.6.x — Previous Releases</h4><ul><li>Studio module integration, CRM dynamic stages, user role dynamicization, E2E test coverage (104/104 passing).</li></ul>"
     }
 }
