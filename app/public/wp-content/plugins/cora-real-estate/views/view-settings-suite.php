@@ -329,6 +329,14 @@ $cora_settings_tabs = array(
                         <label>Tax Registration Details</label>
                         <input type="text" name="cora_workspace_tax_details" value="<?php echo esc_attr( get_option('cora_workspace_tax_details', 'GSTIN: 27AAAAA1111A1Z1') ); ?>" placeholder="e.g. VAT / GSTIN / PAN details">
                     </div>
+                    <div>
+                        <label>Workspace Industry Profile</label>
+                        <select name="cora_workspace_industry" style="width: 100%; padding: 10px 14px; font-size: 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;">
+                            <?php $industry = get_option('cora_workspace_industry', 'real_estate'); ?>
+                            <option value="real_estate" <?php selected( $industry, 'real_estate' ); ?>>Real Estate Agency</option>
+                            <option value="photography" <?php selected( $industry, 'photography' ); ?>>Photography Studio</option>
+                        </select>
+                    </div>
                     <div class="sm:col-span-2">
                         <label>Workspace Address</label>
                         <input type="text" name="cora_workspace_address" value="<?php echo esc_attr( get_option('cora_workspace_address', '101, BKC Road, Bandra East, Mumbai') ); ?>" placeholder="Full physical office location">

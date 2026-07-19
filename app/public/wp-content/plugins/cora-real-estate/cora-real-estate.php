@@ -3,7 +3,7 @@
  * Plugin Name: Cora for Real Estate
  * Plugin URI: https://cora.ai
  * Description: A clean, minimal Notion-style workspace dashboard for real estate agencies in India and globally. Empowered with AI workflows, booking management, and photo helpers.
- * Version: 1.6.0
+ * Version: 1.6.2
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,12 +15,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_REAL_ESTATE_AI_VERSION', '1.6.0' );
+define( 'CORA_REAL_ESTATE_AI_VERSION', '1.6.2' );
 define( 'CORA_REAL_ESTATE_AI_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_REAL_ESTATE_AI_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
 
 // Autoloaders / Libraries
+
+// ── Modular Platform Engine ─────────────────────────────────────────────────
+require_once plugin_dir_path( __FILE__ ) . 'modules/interface-cora-module.php';
+require_once plugin_dir_path( __FILE__ ) . 'modules/class-cora-module-registry.php';
+Cora_Module_Registry::initialize();
 
 // ── Git Integration ────────────────────────────────────────────────────────
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-github-integration.php';
@@ -781,11 +786,17 @@ function cora_real_estate_ai_register_form() {
     <p>
         <label for="cora_role"><?php _e( 'Agent Role', 'cora-real-estate' ); ?><br />
         <select name="cora_role" id="cora_role" class="input" style="width: 100%; height: 40px; margin-top: 2px; margin-bottom: 20px; border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 6px; background: #fafafa; font-family: inherit; font-size: 14px; padding: 0 10px;">
-            <option value="cora_manager" <?php selected( $role, 'cora_manager' ); ?>>Broker Owner</option>
-            <option value="cora_photographer" <?php selected( $role, 'cora_photographer' ); ?>>Managing Agent</option>
-            <option value="cora_videographer" <?php selected( $role, 'cora_videographer' ); ?>>Showing Assistant</option>
-            <option value="cora_drone_pilot" <?php selected( $role, 'cora_drone_pilot' ); ?>>Property Valuer</option>
-            <option value="cora_editor" <?php selected( $role, 'cora_editor' ); ?>>Listing Coordinator</option>
+            <?php
+            $active_industry = get_option( 'cora_workspace_industry', 'real_estate' );
+            $module = Cora_Module_Registry::get_module( $active_industry );
+            $roles_list = $module ? $module->get_industry_roles() : array();
+            foreach ( $roles_list as $role_key => $role_label ) {
+                if ( $role_key === 'administrator' ) {
+                    continue;
+                }
+                echo '<option value="' . esc_attr( $role_key ) . '" ' . selected( $role, $role_key, false ) . '>' . esc_html( $role_label ) . '</option>';
+            }
+            ?>
         </select></label>
     </p>
     <?php
@@ -1059,18 +1070,26 @@ add_action( 'init', 'cora_real_estate_ai_register_taxonomies' );
  * Retrieve all user roles dynamically (standard + custom)
  */
 function cora_get_all_roles() {
+    $active_industry = get_option( 'cora_workspace_industry', 'real_estate' );
+    $module = Cora_Module_Registry::get_module( $active_industry );
+    
     $roles = array(
         'administrator'       => 'Super Admin',
         'cora_shruti'         => 'Owner (Shruti)',
         'cora_super_admin'    => 'Workspace Super Admin',
-        'cora_manager'        => 'Manager',
         'cora_branch_manager' => 'Branch Manager',
-        'cora_photographer'   => 'Photographer',
-        'cora_videographer'   => 'Videographer',
-        'cora_drone_pilot'    => 'Drone Pilot',
-        'cora_editor'         => 'Editor',
         'cora_viewer'         => 'Viewer'
     );
+    
+    if ( $module ) {
+        $roles = array_merge( $roles, $module->get_industry_roles() );
+    } else {
+        $roles['cora_manager']      = 'Manager';
+        $roles['cora_photographer'] = 'Photographer';
+        $roles['cora_videographer'] = 'Videographer';
+        $roles['cora_drone_pilot']  = 'Drone Pilot';
+        $roles['cora_editor']       = 'Editor';
+    }
     
     // Add custom roles
     $custom = get_option( 'cora_custom_roles', array() );
@@ -1644,14 +1663,9 @@ function cora_ajax_create_team_user() {
         }
     }
 
-    $map = array(
-        'administrator' => 'Super Admin',
-        'cora_manager' => 'Broker Owner',
-        'cora_photographer' => 'Managing Agent',
-        'cora_videographer' => 'Showing Assistant',
-        'cora_drone_pilot' => 'Property Valuer',
-        'cora_editor' => 'Listing Coordinator'
-    );
+    $active_industry = get_option( 'cora_workspace_industry', 'real_estate' );
+    $module = Cora_Module_Registry::get_module( $active_industry );
+    $map = $module ? $module->get_industry_roles() : array();
     $role_label = isset( $map[$role] ) ? $map[$role] : $role;
 
     wp_send_json_success( array(
@@ -2042,14 +2056,9 @@ function cora_ajax_update_team_user() {
         }
     }
 
-    $map = array(
-        'administrator' => 'Super Admin',
-        'cora_manager' => 'Broker Owner',
-        'cora_photographer' => 'Managing Agent',
-        'cora_videographer' => 'Showing Assistant',
-        'cora_drone_pilot' => 'Property Valuer',
-        'cora_editor' => 'Listing Coordinator'
-    );
+    $active_industry = get_option( 'cora_workspace_industry', 'real_estate' );
+    $module = Cora_Module_Registry::get_module( $active_industry );
+    $map = $module ? $module->get_industry_roles() : array();
     $role_label = isset( $map[$role] ) ? $map[$role] : $role;
 
     wp_send_json_success( array(
@@ -8069,7 +8078,8 @@ function cora_ajax_save_system_settings_suite() {
         'cora_onboarding_account_duration',
         'cora_onboarding_welcome_message',
         'cora_google_client_id',
-        'cora_google_client_secret'
+        'cora_google_client_secret',
+        'cora_workspace_industry'
     );
 
     foreach ( $fields as $field ) {
@@ -12065,6 +12075,10 @@ function cora_ensure_default_agency_setup() {
         }
     }
 
+    if ( ! get_option( 'cora_workspace_industry' ) ) {
+        add_option( 'cora_workspace_industry', 'real_estate' );
+    }
+
     cora_seed_default_canvas_data();
     cora_sync_db_tables_to_options();
 }
@@ -13356,6 +13370,31 @@ function cora_map_lead_status_to_pipeline( $status ) {
 }
 
 /**
+ * Clear dashboard summaries and pipeline transients.
+ */
+function cora_clear_dashboard_cache( $agency_id = 0 ) {
+    if ( empty( $agency_id ) ) {
+        $agency_id = get_option( 'cora_agency_setup_id', 1 );
+    }
+    $roles = array( 'administrator', 'cora_manager', 'cora_branch_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor', 'cora_viewer' );
+    foreach ( $roles as $role ) {
+        delete_transient( "cora_dbsummary_{$agency_id}_{$role}" );
+        delete_transient( "cora_dbpipeline_{$agency_id}_{$role}" );
+        delete_transient( "cora_dbfollowups_{$agency_id}_{$role}" );
+    }
+}
+
+add_action( 'updated_option', 'cora_clear_dashboard_cache_on_option_change', 10, 3 );
+add_action( 'added_option', 'cora_clear_dashboard_cache_on_option_change', 10, 3 );
+add_action( 'deleted_option', 'cora_clear_dashboard_cache_on_option_change', 10, 3 );
+function cora_clear_dashboard_cache_on_option_change( $option, $old_val = null, $new_val = null ) {
+    $watched = array( 'cora_re_leads', 'cora_re_listings_inventory', 'cora_re_clients', 'cora_re_bookings', 'cora_workspace_industry' );
+    if ( in_array( $option, $watched, true ) ) {
+        cora_clear_dashboard_cache();
+    }
+}
+
+/**
  * REST API /api/v1 Router Callback
  */
 function cora_handle_api_v1_request( $path_parts ) {
@@ -13616,87 +13655,85 @@ function cora_handle_api_v1_request( $path_parts ) {
 
         // Sub-resource: summary
         if ( 'summary' === $sub_resource ) {
-            // Card 1: Active Leads
-            $active_leads = array_filter( $leads, function( $l ) {
-                $status = $l['status'] ?? '';
-                return ! in_array( $status, array( 'Closed', 'Converted', 'Lost' ) );
-            } );
-            $active_leads_count = count( $active_leads );
+            $cache_key = "cora_dbsummary_{$agency_id}_{$active_role}";
+            $summary_data = get_transient( $cache_key );
+            if ( false === $summary_data ) {
+                // Card 1: Active Leads
+                $active_leads = array_filter( $leads, function( $l ) {
+                    $status = $l['status'] ?? '';
+                    return ! in_array( $status, array( 'Closed', 'Converted', 'Lost' ) );
+                } );
+                $active_leads_count = count( $active_leads );
 
-            // Overdue or Today's follow-up count
-            $follow_up_today_count = 0;
-            $today_str = date( 'Y-m-d' );
-            foreach ( $active_leads as $l ) {
-                if ( ! empty( $l['followup_date'] ) ) {
-                    $f_date = date( 'Y-m-d', strtotime( $l['followup_date'] ) );
-                    if ( $f_date <= $today_str ) {
-                        $follow_up_today_count++;
+                // Overdue or Today's follow-up count
+                $follow_up_today_count = 0;
+                $today_str = date( 'Y-m-d' );
+                foreach ( $active_leads as $l ) {
+                    if ( ! empty( $l['followup_date'] ) ) {
+                        $f_date = date( 'Y-m-d', strtotime( $l['followup_date'] ) );
+                        if ( $f_date <= $today_str ) {
+                            $follow_up_today_count++;
+                        }
                     }
                 }
-            }
 
-            // Card 2: Properties Listed
-            // Note: listings option has the tenancy filter automatically applied
-            $listings = get_option( 'cora_re_listings_inventory', array() );
-            if ( ! is_array( $listings ) ) {
-                $listings = array();
-            }
-            $properties_count = count( $listings );
-            // mock properties added this week
-            $properties_added_week = 2; 
-
-            // Card 3: Pipeline Value (Negotiation stage only)
-            $pipeline_value = 0;
-            $pipeline_leads_count = 0;
-            foreach ( $active_leads as $l ) {
-                $mapped_stage = cora_map_lead_status_to_pipeline( $l['status'] ?? '' );
-                if ( 'Negotiation' === $mapped_stage ) {
-                    $clean_price = preg_replace( '/[^\d]/', '', $l['price'] ?? '' );
-                    $pipeline_value += intval( $clean_price );
-                    $pipeline_leads_count++;
+                // Card 2: Properties Listed
+                $listings = get_option( 'cora_re_listings_inventory', array() );
+                if ( ! is_array( $listings ) ) {
+                    $listings = array();
                 }
-            }
+                $properties_count = count( $listings );
+                $properties_added_week = 2; 
 
-            // Indian format pipeline value string
-            $pipeline_value_formatted = '₹0';
-            if ( $pipeline_value >= 10000000 ) {
-                $pipeline_value_formatted = '₹' . number_format( $pipeline_value / 10000000, 1 ) . 'Cr';
-            } elseif ( $pipeline_value >= 100000 ) {
-                $pipeline_value_formatted = '₹' . number_format( $pipeline_value / 100000, 1 ) . 'L';
-            } elseif ( $pipeline_value > 0 ) {
-                $pipeline_value_formatted = '₹' . number_format( $pipeline_value );
-            }
-
-            // Card 4: Closed This Month
-            $closed_this_month = 0;
-            $closed_last_month = 0;
-            $this_month_start = strtotime('first day of this month 00:00:00');
-            $this_month_end   = strtotime('last day of this month 23:59:59');
-            $last_month_start = strtotime('first day of last month 00:00:00');
-            $last_month_end   = strtotime('last day of last month 23:59:59');
-
-            foreach ( $leads as $l ) {
-                $mapped_stage = cora_map_lead_status_to_pipeline( $l['status'] ?? '' );
-                if ( 'Closed' === $mapped_stage ) {
-                    $closed_time = $l['closed_at'] ?? ( $l['created_at'] ?? time() );
-                    if ( $closed_time >= $this_month_start && $closed_time <= $this_month_end ) {
-                        $closed_this_month++;
-                    } elseif ( $closed_time >= $last_month_start && $closed_time <= $last_month_end ) {
-                        $closed_last_month++;
+                // Card 3: Pipeline Value
+                $pipeline_value = 0;
+                $pipeline_leads_count = 0;
+                foreach ( $active_leads as $l ) {
+                    $mapped_stage = cora_map_lead_status_to_pipeline( $l['status'] ?? '' );
+                    if ( 'Negotiation' === $mapped_stage ) {
+                        $clean_price = preg_replace( '/[^\d]/', '', $l['price'] ?? '' );
+                        $pipeline_value += intval( $clean_price );
+                        $pipeline_leads_count++;
                     }
                 }
-            }
 
-            // Total agencies (Super Admin only)
-            $total_agencies = 0;
-            if ( $current_agency === 'super' || $current_role === 'administrator' ) {
-                $agencies = get_option( 'cora_agencies', array() );
-                $total_agencies = is_array( $agencies ) ? count( $agencies ) : 1;
-            }
+                $pipeline_value_formatted = '₹0';
+                if ( $pipeline_value >= 10000000 ) {
+                    $pipeline_value_formatted = '₹' . number_format( $pipeline_value / 10000000, 1 ) . 'Cr';
+                } elseif ( $pipeline_value >= 100000 ) {
+                    $pipeline_value_formatted = '₹' . number_format( $pipeline_value / 100000, 1 ) . 'L';
+                } elseif ( $pipeline_value > 0 ) {
+                    $pipeline_value_formatted = '₹' . number_format( $pipeline_value );
+                }
 
-            echo wp_json_encode( array(
-                'success' => true,
-                'data' => array(
+                // Card 4: Closed This Month
+                $closed_this_month = 0;
+                $closed_last_month = 0;
+                $this_month_start = strtotime('first day of this month 00:00:00');
+                $this_month_end   = strtotime('last day of this month 23:59:59');
+                $last_month_start = strtotime('first day of last month 00:00:00');
+                $last_month_end   = strtotime('last day of last month 23:59:59');
+
+                foreach ( $leads as $l ) {
+                    $mapped_stage = cora_map_lead_status_to_pipeline( $l['status'] ?? '' );
+                    if ( 'Closed' === $mapped_stage ) {
+                        $closed_time = $l['closed_at'] ?? ( $l['created_at'] ?? time() );
+                        if ( $closed_time >= $this_month_start && $closed_time <= $this_month_end ) {
+                            $closed_this_month++;
+                        } elseif ( $closed_time >= $last_month_start && $closed_time <= $last_month_end ) {
+                            $closed_last_month++;
+                        }
+                    }
+                }
+
+                // Total agencies
+                $total_agencies = 0;
+                if ( $current_agency === 'super' || $current_role === 'administrator' ) {
+                    $agencies = get_option( 'cora_agencies', array() );
+                    $total_agencies = is_array( $agencies ) ? count( $agencies ) : 1;
+                }
+
+                $summary_data = array(
                     'active_leads'             => $active_leads_count,
                     'follow_up_today'          => $follow_up_today_count,
                     'properties_listed'        => $properties_count,
@@ -13707,91 +13744,110 @@ function cora_handle_api_v1_request( $path_parts ) {
                     'closed_this_month'        => $closed_this_month,
                     'closed_last_month'        => $closed_last_month,
                     'total_agencies'           => $total_agencies
-                )
+                );
+                set_transient( $cache_key, $summary_data, 12 * HOUR_IN_SECONDS );
+            }
+
+            echo wp_json_encode( array(
+                'success' => true,
+                'data' => $summary_data
             ) );
             exit;
         }
 
         // Sub-resource: pipeline
         if ( 'pipeline' === $sub_resource ) {
-            $stages = array(
-                'New'         => 0,
-                'Contacted'   => 0,
-                'Site Visit'  => 0,
-                'Negotiation' => 0,
-                'Closed'      => 0
-            );
+            $cache_key = "cora_dbpipeline_{$agency_id}_{$active_role}";
+            $pipeline_data = get_transient( $cache_key );
+            if ( false === $pipeline_data ) {
+                $stages = array(
+                    'New'         => 0,
+                    'Contacted'   => 0,
+                    'Site Visit'  => 0,
+                    'Negotiation' => 0,
+                    'Closed'      => 0
+                );
 
-            $total_active = 0;
-            foreach ( $leads as $l ) {
-                $mapped = cora_map_lead_status_to_pipeline( $l['status'] ?? '' );
-                if ( isset( $stages[$mapped] ) ) {
-                    $stages[$mapped]++;
-                    if ( 'Closed' !== $mapped ) {
-                        $total_active++;
+                $total_active = 0;
+                foreach ( $leads as $l ) {
+                    $mapped = cora_map_lead_status_to_pipeline( $l['status'] ?? '' );
+                    if ( isset( $stages[$mapped] ) ) {
+                        $stages[$mapped]++;
+                        if ( 'Closed' !== $mapped ) {
+                            $total_active++;
+                        }
                     }
                 }
+                $pipeline_data = array(
+                    'stages'       => $stages,
+                    'total_active' => $total_active
+                );
+                set_transient( $cache_key, $pipeline_data, 12 * HOUR_IN_SECONDS );
             }
 
             echo wp_json_encode( array(
                 'success' => true,
-                'data' => array(
-                    'stages'       => $stages,
-                    'total_active' => $total_active
-                )
+                'data' => $pipeline_data
             ) );
             exit;
         }
 
         // Sub-resource: follow-ups
         if ( 'follow-ups' === $sub_resource ) {
-            $follow_ups = array();
-            $today_start = strtotime( 'today 00:00:00' );
-            $today_end   = strtotime( 'today 23:59:59' );
+            $cache_key = "cora_dbfollowups_{$agency_id}_{$active_role}";
+            $follow_ups_data = get_transient( $cache_key );
+            if ( false === $follow_ups_data ) {
+                $follow_ups = array();
+                $today_start = strtotime( 'today 00:00:00' );
+                $today_end   = strtotime( 'today 23:59:59' );
 
-            foreach ( $leads as $l ) {
-                $status = $l['status'] ?? '';
-                if ( in_array( $status, array( 'Closed', 'Converted', 'Lost' ) ) ) {
-                    continue;
-                }
-                
-                if ( ! empty( $l['followup_date'] ) ) {
-                    $f_time = strtotime( $l['followup_date'] );
-                    $is_overdue = $f_time < $today_start;
-                    $is_today   = ( $f_time >= $today_start && $f_time <= $today_end );
+                foreach ( $leads as $l ) {
+                    $status = $l['status'] ?? '';
+                    if ( in_array( $status, array( 'Closed', 'Converted', 'Lost' ) ) ) {
+                        continue;
+                    }
+                    
+                    if ( ! empty( $l['followup_date'] ) ) {
+                        $f_time = strtotime( $l['followup_date'] );
+                        $is_overdue = $f_time < $today_start;
+                        $is_today   = ( $f_time >= $today_start && $f_time <= $today_end );
 
-                    if ( $is_overdue || $is_today ) {
-                        $follow_ups[] = array(
-                            'id'             => $l['id'],
-                            'names'          => $l['names'],
-                            'email'          => $l['email'],
-                            'city'           => $l['city'] ?? '',
-                            'scale'          => $l['scale'] ?? '',
-                            'price'          => $l['price'] ?? '',
-                            'notes'          => $l['notes'] ?? '',
-                            'followup_date'  => $l['followup_date'],
-                            'followup_time'  => $f_time,
-                            'is_overdue'     => $is_overdue,
-                            'overdue_days'   => $is_overdue ? ceil( ( $today_start - $f_time ) / 86400 ) : 0
-                        );
+                        if ( $is_overdue || $is_today ) {
+                            $follow_ups[] = array(
+                                'id'             => $l['id'],
+                                'names'          => $l['names'],
+                                'email'          => $l['email'],
+                                'city'           => $l['city'] ?? '',
+                                'scale'          => $l['scale'] ?? '',
+                                'price'          => $l['price'] ?? '',
+                                'notes'          => $l['notes'] ?? '',
+                                'followup_date'  => $l['followup_date'],
+                                'followup_time'  => $f_time,
+                                'is_overdue'     => $is_overdue,
+                                'overdue_days'   => $is_overdue ? ceil( ( $today_start - $f_time ) / 86400 ) : 0
+                            );
+                        }
                     }
                 }
-            }
 
-            // Sort: overdue first, then today's by time
-            usort( $follow_ups, function( $a, $b ) {
-                if ( $a['is_overdue'] && ! $b['is_overdue'] ) {
-                    return -1;
-                }
-                if ( ! $a['is_overdue'] && $b['is_overdue'] ) {
-                    return 1;
-                }
-                return $a['followup_time'] - $b['followup_time'];
-            } );
+                // Sort: overdue first, then today's by time
+                usort( $follow_ups, function( $a, $b ) {
+                    if ( $a['is_overdue'] && ! $b['is_overdue'] ) {
+                        return -1;
+                    }
+                    if ( ! $a['is_overdue'] && $b['is_overdue'] ) {
+                        return 1;
+                    }
+                    return $a['followup_time'] - $b['followup_time'];
+                } );
+
+                $follow_ups_data = array_slice( $follow_ups, 0, 5 );
+                set_transient( $cache_key, $follow_ups_data, 12 * HOUR_IN_SECONDS );
+            }
 
             echo wp_json_encode( array(
                 'success' => true,
-                'data' => array_slice( $follow_ups, 0, 5 )
+                'data' => $follow_ups_data
             ) );
             exit;
         }
@@ -16490,6 +16546,7 @@ function cora_ajax_self_register() {
     $name     = sanitize_text_field( $_POST['name']     ?? '' );
     $agency   = sanitize_text_field( $_POST['agency']   ?? '' );
     $email    = sanitize_email(      $_POST['email']    ?? '' );
+    $industry = sanitize_text_field( $_POST['industry'] ?? 'real_estate' );
     $password = $_POST['password'] ?? '';
     $confirm  = $_POST['confirm']  ?? '';
 
@@ -16536,6 +16593,11 @@ function cora_ajax_self_register() {
     update_user_meta( $user_id, 'cora_re_email_verified', '0' );
     update_user_meta( $user_id, 'cora_user_status',      'active' );
     update_user_meta( $user_id, 'cora_auth_provider',    'email' );
+
+    // Save selected industry option
+    if ( in_array( $industry, array( 'real_estate', 'photography' ), true ) ) {
+        update_option( 'cora_workspace_industry', $industry );
+    }
 
     // Account expiry if configured
     $duration = intval( get_option( 'cora_onboarding_account_duration', 0 ) );

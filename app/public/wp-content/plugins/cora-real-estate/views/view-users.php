@@ -411,13 +411,21 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             <div>
                 <label class="block text-xs font-bold text-zinc-800 mb-1.5">Operational Role</label>
                 <select id="invite-role" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
-                    <?php if ( $current_role === 'administrator' || $current_role === 'cora_manager' ) : ?>
-                        <option value="cora_branch_manager">Branch Manager</option>
-                    <?php endif; ?>
-                    <option value="cora_photographer">Managing Agent</option>
-                    <option value="cora_videographer">Showing Assistant</option>
-                    <option value="cora_drone_pilot">Property Valuer</option>
-                    <option value="cora_editor">Listing Coordinator</option>
+                    <?php
+                    $active_industry = get_option( 'cora_workspace_industry', 'real_estate' );
+                    $module = Cora_Module_Registry::get_module( $active_industry );
+                    $roles_list = $module ? $module->get_industry_roles() : array();
+                    
+                    if ( $current_role === 'administrator' || $current_role === 'cora_manager' ) {
+                        echo '<option value="cora_branch_manager">Branch Manager</option>';
+                    }
+                    foreach ( $roles_list as $role_key => $role_label ) {
+                        if ( in_array( $role_key, array( 'administrator', 'cora_manager' ) ) ) {
+                            continue;
+                        }
+                        echo '<option value="' . esc_attr( $role_key ) . '">' . esc_html( $role_label ) . '</option>';
+                    }
+                    ?>
                     <option value="cora_viewer">Viewer</option>
                 </select>
             </div>
@@ -458,13 +466,21 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             <div>
                 <label class="block text-xs font-bold text-zinc-800 mb-1.5">Operational Role</label>
                 <select id="edit-role" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
-                    <?php if ( $current_role === 'administrator' || $current_role === 'cora_manager' ) : ?>
-                        <option value="cora_branch_manager">Branch Manager</option>
-                    <?php endif; ?>
-                    <option value="cora_photographer">Managing Agent</option>
-                    <option value="cora_videographer">Showing Assistant</option>
-                    <option value="cora_drone_pilot">Property Valuer</option>
-                    <option value="cora_editor">Listing Coordinator</option>
+                    <?php
+                    $active_industry = get_option( 'cora_workspace_industry', 'real_estate' );
+                    $module = Cora_Module_Registry::get_module( $active_industry );
+                    $roles_list = $module ? $module->get_industry_roles() : array();
+                    
+                    if ( $current_role === 'administrator' || $current_role === 'cora_manager' ) {
+                        echo '<option value="cora_branch_manager">Branch Manager</option>';
+                    }
+                    foreach ( $roles_list as $role_key => $role_label ) {
+                        if ( in_array( $role_key, array( 'administrator', 'cora_manager' ) ) ) {
+                            continue;
+                        }
+                        echo '<option value="' . esc_attr( $role_key ) . '">' . esc_html( $role_label ) . '</option>';
+                    }
+                    ?>
                     <option value="cora_viewer">Viewer</option>
                 </select>
             </div>

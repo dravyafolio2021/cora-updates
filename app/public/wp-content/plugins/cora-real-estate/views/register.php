@@ -332,6 +332,13 @@ $google_auth_url = home_url( '/workspace/auth/google' );
                 <input type="email" id="reg-email" required placeholder="jane@myagency.com" autocomplete="email">
             </div>
             <div class="form-group">
+                <label for="reg-industry">Industry Profile</label>
+                <select id="reg-industry" style="width: 100%; padding: 10px 14px; font-size: 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;">
+                    <option value="real_estate">Real Estate Agency</option>
+                    <option value="photography">Photography Studio</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="reg-password">Password</label>
                 <input type="password" id="reg-password" required placeholder="Min. 8 characters">
                 <button type="button" class="pw-toggle" onclick="togglePw('reg-password','eye-open-1','eye-closed-1')">
@@ -427,6 +434,7 @@ $google_auth_url = home_url( '/workspace/auth/google' );
         var email    = document.getElementById('reg-email').value.trim();
         var password = document.getElementById('reg-password').value;
         var confirm  = document.getElementById('reg-confirm').value;
+        var industry = document.getElementById('reg-industry').value;
 
         if (!name)   { showToast('Please enter your full name.'); return; }
         if (!agency) { showToast('Please enter your agency name.'); return; }
@@ -443,6 +451,7 @@ $google_auth_url = home_url( '/workspace/auth/google' );
         formData.append('name', name);
         formData.append('agency', agency);
         formData.append('email', email);
+        formData.append('industry', industry);
         formData.append('password', password);
         formData.append('confirm', confirm);
         formData.append('nonce', '<?php echo wp_create_nonce( "cora_login_nonce" ); ?>');

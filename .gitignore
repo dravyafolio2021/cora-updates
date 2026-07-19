@@ -17,3 +17,15 @@
 # IDE files
 .vscode/
 .idea/
+
+# Node dependencies
+node_modules/
+
+# Production ZIP releases
+*.zip
+
+# Playwright test artifacts
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

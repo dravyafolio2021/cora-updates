@@ -2613,7 +2613,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
         <!-- Center Section: Command Palette Trigger -->
         <div class="flex-1 max-w-2xl mx-4 hidden sm:flex items-center justify-center">
-            <div onclick="event.stopPropagation(); window.coraOpenRECommandPalette();" class="cora-sidebar-search w-full h-10 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800/90 hover:border-zinc-700 rounded-lg px-3 flex items-center justify-between text-zinc-400 hover:text-zinc-200 cursor-pointer transition-all shadow-inner" style="height: 40px !important;">
+            <div onclick="event.stopPropagation(); window.coraOpenCommandPalette();" class="cora-sidebar-search w-full h-10 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800/90 hover:border-zinc-700 rounded-lg px-3 flex items-center justify-between text-zinc-400 hover:text-zinc-200 cursor-pointer transition-all shadow-inner" style="height: 40px !important;">
                 <div class="flex items-center gap-2 text-xs font-medium">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <span>Search anything...</span>
@@ -2808,208 +2808,44 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
             <!-- Navigation Menu -->
             <nav class="cora-sidebar-nav px-0 pt-1.5 pb-4 space-y-4">
-                <!-- Group 1: Workspace -->
+                <?php
+                $active_industry = get_option( 'cora_workspace_industry', 'real_estate' );
+                $module = Cora_Module_Registry::get_module( $active_industry );
+                $nav_groups = array();
+                if ( $module ) {
+                    $nav_groups = $module->get_navigation_groups( $role );
+                    // Dynamically inject the local badge counts computed in this page
+                    foreach ( $nav_groups as $g_key => $group ) {
+                        if ( isset( $group['items']['bookings'] ) ) {
+                            $nav_groups[$g_key]['items']['bookings']['badge'] = $dynamic_active_bookings_count;
+                        }
+                        if ( isset( $group['items']['equipment'] ) ) {
+                            $nav_groups[$g_key]['items']['equipment']['badge'] = is_array( $cora_re_listings ) ? count( $cora_re_listings ) : 0;
+                        }
+                    }
+                }
+                
+                foreach ( $nav_groups as $group ) :
+                ?>
                 <div>
-                    <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase">Workspace</div>
+                    <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase"><?php echo esc_html($group['label']); ?></div>
                     <ul class="cora-nav-list space-y-0.5 mt-1">
-                        <li class="cora-nav-item <?php echo $sub_page === 'dashboard' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="dashboard">
+                        <?php foreach ( $group['items'] as $target => $item ) : ?>
+                        <li class="cora-nav-item <?php echo $sub_page === $target ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="<?php echo esc_attr($target); ?>">
                             <div class="flex items-center gap-3">
                                 <span class="cora-nav-icon">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect x="3" y="3" width="7" height="9" rx="1"></rect>
-                                        <rect x="14" y="3" width="7" height="5" rx="1"></rect>
-                                        <rect x="14" y="12" width="7" height="9" rx="1"></rect>
-                                        <rect x="3" y="16" width="7" height="5" rx="1"></rect>
-                                    </svg>
+                                    <?php echo $item['icon']; ?>
                                 </span>
-                                <span class="cora-nav-text">Dashboard</span>
+                                <span class="cora-nav-text"><?php echo esc_html($item['title']); ?></span>
                             </div>
+                            <?php if ( isset($item['badge']) && intval($item['badge']) > 0 ) : ?>
+                            <span class="cora-badge cora-badge-sidebar px-1.5 py-0.5 text-[10px] font-medium bg-zinc-200 text-zinc-800 rounded-full"><?php echo intval($item['badge']); ?></span>
+                            <?php endif; ?>
                         </li>
-                        <li class="cora-nav-item <?php echo $sub_page === 'blogs' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="blogs">
-                            <div class="flex items-center gap-3">
-                                <span class="cora-nav-icon">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                        <polyline points="14 2 14 8 20 8"></polyline>
-                                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                                        <polyline points="10 9 9 9 8 9"></polyline>
-                                    </svg>
-                                </span>
-                                <span class="cora-nav-text">Content Suite</span>
-                            </div>
-                        </li>
-                        <li class="cora-nav-item <?php echo $sub_page === 'leads' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="leads">
-                            <div class="flex items-center gap-3">
-                                <span class="cora-nav-icon">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect x="3" y="3" width="7" height="9" rx="1"></rect>
-                                        <rect x="14" y="3" width="7" height="9" rx="1"></rect>
-                                        <rect x="3" y="14" width="7" height="7" rx="1"></rect>
-                                        <rect x="14" y="14" width="7" height="7" rx="1"></rect>
-                                    </svg>
-                                </span>
-                                <span class="cora-nav-text">Buyer Leads (CRM)</span>
-                            </div>
-                        </li>
-                        <li class="cora-nav-item <?php echo $sub_page === 'bookings' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="bookings">
-                            <div class="flex items-center gap-3">
-                                <span class="cora-nav-icon">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                                    </svg>
-                                </span>
-                                <span class="cora-nav-text">Site Showings</span>
-                            </div>
-                            <span class="cora-badge cora-badge-sidebar px-1.5 py-0.5 text-[10px] font-medium bg-zinc-200 text-zinc-800 rounded-full"><?php echo $dynamic_active_bookings_count; ?></span>
-                        </li>
-                        <li class="cora-nav-item <?php echo $sub_page === 'financials' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="financials">
-                            <div class="flex items-center gap-3">
-                                <span class="cora-nav-icon">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <line x1="18" y1="20" x2="18" y2="10"></line>
-                                        <line x1="12" y1="20" x2="12" y2="4"></line>
-                                        <line x1="6" y1="20" x2="6" y2="14"></line>
-                                    </svg>
-                                </span>
-                                <span class="cora-nav-text">Financial Overview</span>
-                            </div>
-                        </li>
-                        <li class="cora-nav-item <?php echo $sub_page === 'team-roles' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="team-roles">
-                            <div class="flex items-center gap-3">
-                                <span class="cora-nav-icon">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                        <circle cx="9" cy="7" r="4"></circle>
-                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                    </svg>
-                                </span>
-                                <span class="cora-nav-text">User & Roles</span>
-                            </div>
-                        </li>
+                        <?php endforeach; ?>
                     </ul>
                 </div>
-
-                <!-- Group 2: Property Portfolio -->
-                <div>
-                    <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase">Property Portfolio</div>
-                    <ul class="cora-nav-list space-y-0.5 mt-1">
-                        <li class="cora-nav-item <?php echo $sub_page === 'equipment' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="equipment">
-                            <div class="flex items-center gap-3">
-                                <span class="cora-nav-icon">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                                    </svg>
-                                </span>
-                                <span class="cora-nav-text">Property Listings</span>
-                            </div>
-                            <span class="cora-badge cora-badge-sidebar px-1.5 py-0.5 text-[10px] font-medium bg-zinc-200 text-zinc-800 rounded-full"><?php echo count( $cora_re_listings ); ?></span>
-                        </li>
-                        <li class="cora-nav-item <?php echo $sub_page === 'vault' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="vault">
-                            <div class="flex items-center gap-3">
-                                <span class="cora-nav-icon">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                                    </svg>
-                                </span>
-                                <span class="cora-nav-text">Secure Vault</span>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Group 3: Sales Channel -->
-                <div>
-                    <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase">Sales Channel</div>
-                    <ul class="cora-nav-list space-y-0.5 mt-1">
-                        <li class="cora-nav-item <?php echo $sub_page === 'canvas' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="canvas">
-                            <div class="flex items-center gap-3">
-                                <span class="cora-nav-icon">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                                        <polyline points="2 17 12 22 22 17"></polyline>
-                                        <polyline points="2 12 12 17 22 12"></polyline>
-                                    </svg>
-                                </span>
-                                <span class="cora-nav-text">Canvas</span>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Group 4: AI Marketing -->
-                <div>
-                    <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase">AI Marketing</div>
-                    <ul class="cora-nav-list space-y-0.5 mt-1">
-                        <li class="cora-nav-item <?php echo $sub_page === 'gbp' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="gbp">
-                            <div class="flex items-center gap-3">
-                                <span class="cora-nav-icon">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                        <circle cx="12" cy="10" r="3"></circle>
-                                    </svg>
-                                </span>
-                                <span class="cora-nav-text">Google Profile</span>
-                            </div>
-                        </li>
-                        <li class="cora-nav-item <?php echo $sub_page === 'mcp' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="mcp">
-                            <div class="flex items-center gap-3">
-                                <span class="cora-nav-icon">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
-                                        <rect x="9" y="9" width="6" height="6"></rect>
-                                        <line x1="9" y1="1" x2="9" y2="4"></line>
-                                        <line x1="15" y1="1" x2="15" y2="4"></line>
-                                        <line x1="9" y1="20" x2="9" y2="23"></line>
-                                        <line x1="15" y1="20" x2="15" y2="23"></line>
-                                        <line x1="20" y1="9" x2="23" y2="9"></line>
-                                        <line x1="20" y1="15" x2="23" y2="15"></line>
-                                        <line x1="1" y1="9" x2="4" y2="9"></line>
-                                        <line x1="1" y1="15" x2="4" y2="15"></line>
-                                    </svg>
-                                </span>
-                                <span class="cora-nav-text">AI Tools MCP</span>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Group 5: Settings -->
-                <div>
-                    <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase">Settings</div>
-                    <ul class="cora-nav-list space-y-0.5 mt-1">
-                        <li class="cora-nav-item <?php echo $sub_page === 'feature-hub' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="feature-hub">
-                            <div class="flex items-center gap-3">
-                                <span class="cora-nav-icon">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect x="3" y="3" width="7" height="7"></rect>
-                                        <rect x="14" y="3" width="7" height="7"></rect>
-                                        <rect x="14" y="14" width="7" height="7"></rect>
-                                        <rect x="3" y="14" width="7" height="7"></rect>
-                                    </svg>
-                                </span>
-                                <span class="cora-nav-text">App Modules</span>
-                            </div>
-                        </li>
-                        <li class="cora-nav-item <?php echo $sub_page === 'settings-suite' ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer" data-target="settings-suite">
-                            <div class="flex items-center gap-3">
-                                <span class="cora-nav-icon">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="12" cy="12" r="3"></circle>
-                                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                                    </svg>
-                                </span>
-                                <span class="cora-nav-text">Settings</span>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
+                <?php endforeach; ?>
             </nav>
         </div><!-- /.flex-1.overflow-y-auto -->
 
@@ -6418,12 +6254,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 <!-- Kanban Funnel Grid -->
                 <div class="flex overflow-x-auto gap-4 items-start mt-6 select-none pb-8" style="scrollbar-width: none;">
                     <?php
-                    $columns = array(
-                        'New Lead' => array( 'label' => 'New Leads', 'badge' => 'bg-blue-100 border border-blue-200/60', 'desc' => 'New inquiries to review' ),
-                        'Nurturing' => array( 'label' => 'Nurturing', 'badge' => 'bg-amber-100 border border-amber-200/60', 'desc' => 'Active communication' ),
-                        'Closing' => array( 'label' => 'Closing', 'badge' => 'bg-orange-100 border border-orange-200/60', 'desc' => 'Proposals and quotes sent' ),
-                        'Converted' => array( 'label' => 'Converted', 'badge' => 'bg-emerald-100 border border-emerald-200/60', 'desc' => 'Successfully booked' )
-                    );
+                    $active_industry = get_option( 'cora_workspace_industry', 'real_estate' );
+                    $module = Cora_Module_Registry::get_module( $active_industry );
+                    $columns = $module ? $module->get_crm_stages() : array();
 
                     foreach ($columns as $status_key => $column_info) :
                         $col_leads = array_filter($cora_re_leads, function($lead) use ($status_key) {
@@ -7695,10 +7528,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         <div class="cora-form-group flex flex-col gap-1">
                             <label class="text-[10px] font-bold text-zinc-405 uppercase tracking-wider">Funnel Status</label>
                             <select id="cora-lead-status" class="w-full border border-zinc-200 rounded-md px-2 py-2 text-sm bg-white focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer">
-                                <option value="New Lead">New Lead</option>
-                                <option value="Nurturing">Nurturing</option>
-                                <option value="Closing">Closing</option>
-                                <option value="Converted">Converted</option>
+                                <?php
+                                $active_industry = get_option( 'cora_workspace_industry', 'real_estate' );
+                                $module = Cora_Module_Registry::get_module( $active_industry );
+                                $stages = $module ? $module->get_crm_stages() : array();
+                                foreach ( $stages as $status_val => $stage_info ) {
+                                    echo '<option value="' . esc_attr( $status_val ) . '">' . esc_html( isset( $stage_info['label'] ) ? $stage_info['label'] : $status_val ) . '</option>';
+                                }
+                                ?>
                             </select>
                         </div>
                     </div>
@@ -9233,13 +9070,13 @@ wp_print_footer_scripts();
 </div>
 
 <!-- Cora Advanced Command Search Modal (Command Palette for CRM subpages) -->
-<div id="cora-re-command-palette" class="fixed inset-0 z-[999999] hidden items-start justify-center p-4 pt-[12vh] bg-zinc-950/40 backdrop-blur-sm transition-all duration-200">
+<div id="cora-command-palette" class="fixed inset-0 z-[999999] hidden items-start justify-center p-4 pt-[12vh] bg-zinc-950/40 backdrop-blur-sm transition-all duration-200">
     <div class="cora-command-container w-full max-w-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[380px] transition-transform transform scale-95 duration-200">
         
         <!-- Search Input Header -->
         <div class="flex items-center gap-3 px-4 border-b border-zinc-100 dark:border-zinc-800/40 py-3.5 shrink-0">
             <svg class="text-zinc-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="cora-re-command-input" placeholder="Search pages, settings, leads, or listings..." class="flex-1 text-sm bg-transparent border-0 outline-none focus:ring-0 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 py-0.5" autocomplete="off">
+            <input type="text" id="cora-command-input" placeholder="Search pages, settings, leads, or listings..." class="flex-1 text-sm bg-transparent border-0 outline-none focus:ring-0 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 py-0.5" autocomplete="off">
             <kbd class="text-[9px] font-mono bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-450 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-700/60 shadow-sm shrink-0">⌘K</kbd>
         </div>
 
@@ -9253,7 +9090,7 @@ wp_print_footer_scripts();
         </div>
 
         <!-- Results List Area -->
-        <div class="flex-1 overflow-y-auto p-2" id="cora-re-command-results">
+        <div class="flex-1 overflow-y-auto p-2" id="cora-command-results">
             <!-- Loading state / Suggestions list / Search results list -->
         </div>
 
@@ -9270,16 +9107,16 @@ wp_print_footer_scripts();
 </div>
 
 <style>
-#cora-re-command-palette {
+#cora-command-palette {
     display: none;
 }
-#cora-re-command-palette:not(.active) {
+#cora-command-palette:not(.active) {
     display: none !important;
 }
-#cora-re-command-palette.active {
+#cora-command-palette.active {
     display: flex !important;
 }
-#cora-re-command-palette.active .cora-command-container {
+#cora-command-palette.active .cora-command-container {
     transform: scale(1) !important;
 }
 .cora-command-item.selected {
@@ -9301,7 +9138,7 @@ wp_print_footer_scripts();
 }
 
 /* Dark mode overrides for search */
-.cora-dark-theme #cora-re-command-palette {
+.cora-dark-theme #cora-command-palette {
     background-color: rgba(9, 9, 11, 0.6) !important;
 }
 .cora-dark-theme .cora-command-container {
@@ -9309,7 +9146,7 @@ wp_print_footer_scripts();
     border-color: #27272a !important;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
 }
-.cora-dark-theme #cora-re-command-input {
+.cora-dark-theme #cora-command-input {
     color: #f4f4f5 !important;
 }
 .cora-dark-theme .cora-command-container div {
@@ -9328,7 +9165,7 @@ wp_print_footer_scripts();
 .cora-dark-theme .cora-search-pill:hover:not(.active) {
     background-color: #18181b;
 }
-.cora-dark-theme #cora-re-command-results .cora-command-item:hover:not(.selected) {
+.cora-dark-theme #cora-command-results .cora-command-item:hover:not(.selected) {
     background-color: #18181b !important;
 }
 .cora-dark-theme .cora-command-item.selected {
@@ -9414,8 +9251,8 @@ wp_print_footer_scripts();
     }
 
     function coraPerformCommandSearch(query, isInline = false) {
-        const parentPalette = document.getElementById(isInline ? 'cora-inline-command-palette' : 'cora-re-command-palette');
-        const resultsContainer = parentPalette ? parentPalette.querySelector(isInline ? '#cora-inline-command-results' : '#cora-re-command-results') : null;
+        const parentPalette = document.getElementById(isInline ? 'cora-inline-command-palette' : 'cora-command-palette');
+        const resultsContainer = parentPalette ? parentPalette.querySelector(isInline ? '#cora-inline-command-results' : '#cora-command-results') : null;
         if (!resultsContainer) return;
 
         resultsContainer.innerHTML = `
@@ -9460,7 +9297,7 @@ wp_print_footer_scripts();
                     <div class="flex flex-col items-center justify-center py-12 text-center">
                         <svg class="text-zinc-300 mb-2" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         <span class="text-xs font-semibold text-zinc-850">No results found</span>
-                        <p class="text-[10px] text-zinc-450 mt-0.5">Try searching with other filters or keywords</p>
+                        <p class="text-[10px] text-zinc-455 mt-0.5">Try searching with other filters or keywords</p>
                     </div>
                 `;
                 if (!isInline) selectedIndex = -1;
@@ -9482,26 +9319,26 @@ wp_print_footer_scripts();
         // Toggle Cmd+K / Ctrl+K
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
             e.preventDefault();
-            const palette = document.getElementById('cora-re-command-palette');
+            const palette = document.getElementById('cora-command-palette');
             if (palette && !palette.classList.contains('hidden')) {
-                coraCloseRECommandPalette();
+                coraCloseCommandPalette();
             } else {
-                coraOpenRECommandPalette();
+                coraOpenCommandPalette();
             }
             return;
         }
 
-        const palette = document.getElementById('cora-re-command-palette');
+        const palette = document.getElementById('cora-command-palette');
         if (!palette || palette.classList.contains('hidden')) return;
 
         // Escape closes
         if (e.key === 'Escape') {
             e.preventDefault();
-            coraCloseRECommandPalette();
+            coraCloseCommandPalette();
             return;
         }
 
-        const items = document.querySelectorAll('#cora-re-command-palette .cora-command-item');
+        const items = document.querySelectorAll('#cora-command-palette .cora-command-item');
         if (items.length === 0) return;
 
         // ArrowDown
@@ -9567,15 +9404,15 @@ wp_print_footer_scripts();
         })();
 
         // Input text focus/click listeners to toggle absolute dropdown or modal
-        const paletteContainer = document.getElementById('cora-re-command-palette');
-        const input = paletteContainer ? paletteContainer.querySelector('#cora-re-command-input') : null;
+        const paletteContainer = document.getElementById('cora-command-palette');
+        const input = paletteContainer ? paletteContainer.querySelector('#cora-command-input') : null;
         if (input) {
             input.addEventListener('focus', function() {
-                coraOpenRECommandPalette();
+                coraOpenCommandPalette();
             });
             input.addEventListener('click', function(e) {
                 e.stopPropagation();
-                coraOpenRECommandPalette();
+                coraOpenCommandPalette();
             });
             input.addEventListener('input', function() {
                 clearTimeout(searchDebounceTimeout);
@@ -9612,11 +9449,11 @@ wp_print_footer_scripts();
 
         // Close dropdown when clicking outside search container or modal
         document.addEventListener('click', function(e) {
-            if (e.target.closest('.cora-sidebar-search') || e.target.closest('[onclick*="coraOpenRECommandPalette"]')) return;
+            if (e.target.closest('.cora-sidebar-search') || e.target.closest('[onclick*="coraOpenCommandPalette"]')) return;
 
-            const palette = document.getElementById('cora-re-command-palette');
+            const palette = document.getElementById('cora-command-palette');
             if (palette && !palette.classList.contains('hidden') && !palette.contains(e.target)) {
-                coraCloseRECommandPalette();
+                coraCloseCommandPalette();
             }
 
             const inlinePalette = document.getElementById('cora-inline-command-palette');
@@ -9652,12 +9489,12 @@ wp_print_footer_scripts();
         });
 
         // Filter pills click listeners
-        const pills = document.querySelectorAll('#cora-re-command-palette .cora-search-pill, #cora-inline-command-palette .cora-search-pill');
+        const pills = document.querySelectorAll('#cora-command-palette .cora-search-pill, #cora-inline-command-palette .cora-search-pill');
         pills.forEach(pill => {
             pill.addEventListener('click', function(e) {
                 e.stopPropagation(); // Prevent dropdown closure
                 const isInlinePill = this.closest('#cora-inline-command-palette') !== null;
-                const parentPalette = isInlinePill ? document.getElementById('cora-inline-command-palette') : document.getElementById('cora-re-command-palette');
+                const parentPalette = isInlinePill ? document.getElementById('cora-inline-command-palette') : document.getElementById('cora-command-palette');
                 if (parentPalette) {
                     parentPalette.querySelectorAll('.cora-search-pill').forEach(p => {
                         p.classList.remove('active', 'bg-zinc-900', 'text-white', 'dark:bg-zinc-100', 'dark:text-zinc-950');
@@ -9671,7 +9508,7 @@ wp_print_footer_scripts();
                     const query = document.getElementById('cora-inline-command-input') ? document.getElementById('cora-inline-command-input').value.trim() : '';
                     coraPerformCommandSearch(query, true);
                 } else {
-                    const inputEl = parentPalette ? parentPalette.querySelector('#cora-re-command-input') : null;
+                    const inputEl = parentPalette ? parentPalette.querySelector('#cora-command-input') : null;
                     const query = inputEl ? inputEl.value.trim() : '';
                     coraPerformCommandSearch(query, false);
                 }
