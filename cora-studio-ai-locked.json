@@ -1,0 +1,10 @@
+{
+    "name": "Cora for Studio",
+    "slug": "cora-studio-ai-locked",
+    "version": "1.2.0",
+    "download_url": "https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-studio-ai-locked.zip",
+    "sections": {
+        "description": "The ultimate AI workspace and CRM for modern photography studios.",
+        "changelog": "<h4>1.2.0</h4><ul><li>Initial release with overview analytics and manual add support</li></ul>"
+    }
+}
