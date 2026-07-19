@@ -3734,6 +3734,9 @@ function cora_canvas_route_preview_pages( $query ) {
 
     if ( $canvas_page ) {
         $query->set( 'page_id', intval( $canvas_page['wp_post_id'] ) );
+        if ( current_user_can( 'edit_pages' ) || current_user_can( 'manage_options' ) ) {
+            $query->set( 'post_status', [ 'publish', 'draft', 'pending', 'private' ] );
+        }
         $query->is_404 = false;
     }
 }
@@ -8568,7 +8571,8 @@ function cora_real_estate_intercept_landing_page_template( $template ) {
         $wp_template = get_post_meta( $page_id, '_wp_page_template', true );
         global $wpdb;
         $cora_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE wp_post_id = %d LIMIT 1", $page_id ), ARRAY_A );
-        if ( $wp_template === 'template-landing-page.php' || ( $cora_page && $cora_page['template'] === 'landing-page' ) ) {
+        // Do NOT hijack the template if the page is a custom canvas page, as it needs to be rendered via Hello Elementor/Elementor layout.
+        if ( ( $wp_template === 'template-landing-page.php' || ( $cora_page && $cora_page['template'] === 'landing-page' ) ) && ! $cora_page ) {
             $landing_php = dirname( dirname( dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) ) ) . '/cora-platform/modules/trial/views/landing-page.php';
             if ( file_exists( $landing_php ) ) {
                 return $landing_php;
@@ -9041,10 +9045,130 @@ body {
 }
 add_action( 'wp_ajax_cora_generate_layout', 'cora_ajax_generate_layout' );
 
+/* ═══════════════════════════════════════════════════════════════════
+ * CORA ELEMENTOR WIDGETS MODULE
+ * Registers custom "Cora Sections" widgets: Hero and Dashboard Mockup.
+ * ═══════════════════════════════════════════════════════════════════ */
+
+/**
+ * 1. Register the "Cora Sections" widget category in the Elementor panel.
+ */
+function cora_register_elementor_widget_category( $elements_manager ) {
+    $elements_manager->add_category(
+        'cora-sections',
+        [
+            'title' => esc_html__( 'Cora Sections', 'cora-real-estate' ),
+            'icon'  => 'fa fa-plug',
+        ]
+    );
+}
+add_action( 'elementor/elements/categories_registered', 'cora_register_elementor_widget_category' );
+
+/**
+ * 2. Load widget class files and register widgets.
+ */
+function cora_register_elementor_widgets( $widgets_manager ) {
+    $widget_dir = plugin_dir_path( __FILE__ ) . 'includes/widgets/';
+
+    require_once $widget_dir . 'class-cora-hero-widget.php';
+    require_once $widget_dir . 'class-cora-dashboard-mockup-widget.php';
+    require_once $widget_dir . 'class-cora-header-widget.php';
+    require_once $widget_dir . 'class-cora-footer-widget.php';
+
+    $widgets_manager->register( new Cora_Hero_Widget() );
+    $widgets_manager->register( new Cora_Dashboard_Mockup_Widget() );
+    $widgets_manager->register( new Cora_Header_Widget() );
+    $widgets_manager->register( new Cora_Footer_Widget() );
+}
+
+add_action( 'elementor/widgets/register', 'cora_register_elementor_widgets' );
+
+/**
+ * 3. Enqueue landing-widgets CSS on the frontend and in editor preview.
+ */
+function cora_enqueue_landing_widget_styles() {
+    wp_enqueue_style(
+        'cora-landing-widgets-css',
+        plugin_dir_url( __FILE__ ) . 'assets/css/cora-landing-widgets.css',
+        [],
+        '1.0.0'
+    );
+}
+add_action( 'wp_enqueue_scripts',            'cora_enqueue_landing_widget_styles' );
+add_action( 'elementor/preview/enqueue_styles', 'cora_enqueue_landing_widget_styles' );
+add_action( 'elementor/editor/after_enqueue_styles', 'cora_enqueue_landing_widget_styles' );
+
+/**
+ * AJAX: Return a proper WordPress preview URL (with nonce) for any post.
+ * Used by the canvas editor's Preview button to open draft pages correctly
+ * instead of falling back to the homepage via the broken /?p=ID&preview=true pattern.
+ */
+function cora_ajax_get_preview_url() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( 'Insufficient permissions.', 403 );
+        return;
+    }
+
+    $post_id = intval( $_POST['post_id'] ?? 0 );
+    if ( ! $post_id ) {
+        wp_send_json_error( 'Invalid post ID.' );
+        return;
+    }
+
+    $post = get_post( $post_id );
+    if ( ! $post ) {
+        wp_send_json_error( 'Post not found.' );
+        return;
+    }
+
+    $theme_id = intval( $_POST['theme_id'] ?? 0 );
+    global $wpdb;
+    $is_draft_theme = false;
+    if ( $theme_id ) {
+        $theme_status = $wpdb->get_var( $wpdb->prepare( "SELECT status FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ) );
+        if ( $theme_status && $theme_status !== 'live' ) {
+            $is_draft_theme = true;
+        }
+    }
+
+    // get_permalink() returns the CORRECT page URL regardless of whether it is
+    // the front page or a sub-page. home_url('/') was the bug — it always pointed
+    // to the homepage instead of the actual page being edited.
+    $permalink = get_permalink( $post_id );
+
+    if ( $is_draft_theme ) {
+        $permalink = add_query_arg( 'cv_preview_theme', $theme_id, $permalink );
+    }
+
+    if ( 'publish' === $post->post_status ) {
+        // For published WP pages: open the live frontend URL so the user sees
+        // the actual page, not the homepage.
+        wp_send_json_success( [ 'url' => $permalink ] );
+        return;
+    }
+
+    // For draft / pending / private posts generate a nonce-signed preview URL.
+    $nonce       = wp_create_nonce( 'post_preview_' . $post_id );
+    $preview_url = add_query_arg(
+        [
+            'preview'       => 'true',
+            'preview_id'    => $post_id,
+            'preview_nonce' => $nonce,
+        ],
+        $permalink
+    );
+
+    wp_send_json_success( [ 'url' => $preview_url ] );
+}
+add_action( 'wp_ajax_cora_ajax_get_preview_url', 'cora_ajax_get_preview_url' );
+
 /**
  * Elementor Reskin Module
  */
 function cora_enqueue_elementor_reskin_styles() {
+
     // Core reskin
     wp_enqueue_style(
         'cora-elementor-reskin-css',

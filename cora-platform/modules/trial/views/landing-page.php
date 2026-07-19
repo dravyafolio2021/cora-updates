@@ -97,36 +97,41 @@ if ( ! defined( 'ABSPATH' ) ) {
             letter-spacing: 0.05em;
         }
 
-        .hero-section {
-            display: grid;
-            grid-template-cols: 1fr;
-            gap: 48px;
-            padding: 40px 0;
-            align-items: start;
-        }
-
-        @media (min-width: 768px) {
-            .hero-section {
-                grid-template-cols: 1.1fr 0.9fr;
-            }
-        }
-
-        .hero-info {
+        /* Centered Hero Section Layout */
+        .hero-centered {
+            text-align: center;
+            max-width: 800px;
+            margin: 60px auto 40px auto;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            align-items: center;
+            gap: 24px;
         }
 
-        .hero-tagline {
-            font-family: var(--font-serif);
-            font-style: italic;
-            font-size: 18px;
-            color: #71717a;
-            margin: 0;
+        .badge-india {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 550;
+            color: #52525b;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
         }
 
-        .hero-title {
-            font-size: 36px;
+        .dot-orange {
+            width: 6px;
+            height: 6px;
+            background-color: #f97316;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .hero-title-centered {
+            font-size: 48px;
             font-weight: 800;
             color: var(--primary-color);
             line-height: 1.15;
@@ -134,43 +139,531 @@ if ( ! defined( 'ABSPATH' ) ) {
             letter-spacing: -0.04em;
         }
 
-        .hero-desc {
-            font-size: 13.5px;
+        @media (max-width: 640px) {
+            .hero-title-centered {
+                font-size: 36px;
+            }
+        }
+
+        .serif-one {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-weight: 500;
+            color: #52525b;
+        }
+
+        .hero-desc-centered {
+            font-size: 15px;
             color: #52525b;
             line-height: 1.6;
             margin: 0;
+            max-width: 680px;
         }
 
-        /* Interactive Calculator Styles */
-        .calculator-card {
-            background-color: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(24, 24, 27, 0.02);
-            margin-top: 10px;
+        .cta-buttons {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 8px;
         }
 
-        .calculator-title {
+        @media (max-width: 480px) {
+            .cta-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+            .cta-buttons button {
+                width: 100%;
+            }
+        }
+
+        .btn-trial {
+            padding: 14px 28px;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 9999px;
             font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.15s ease, transform 0.1s ease;
+            box-shadow: 0 4px 10px rgba(24, 24, 27, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-trial:hover {
+            background-color: #27272a;
+        }
+
+        .btn-trial:active {
+            transform: scale(0.98);
+        }
+
+        .btn-demo {
+            padding: 14px 28px;
+            background-color: #ffffff;
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.15s ease, transform 0.1s ease;
+        }
+
+        .btn-demo:hover {
+            background-color: #fafafa;
+        }
+
+        .btn-demo:active {
+            transform: scale(0.98);
+        }
+
+        .cta-subtext {
+            font-size: 11px;
+            color: #a1a1aa;
+            margin: 0;
+        }
+
+        /* Premium Dashboard Mockup styling */
+        .dashboard-mockup {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(24, 24, 27, 0.05);
+            overflow: hidden;
+            margin: 40px auto 60px auto;
+            text-align: left;
+        }
+
+        .mock-header {
+            background: #fafafa;
+            border-bottom: 1px solid #e4e4e7;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mock-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .mock-dot-red { background: #ef4444; }
+        .mock-dot-yellow { background: #f59e0b; }
+        .mock-dot-green { background: #10b981; }
+
+        .mock-body {
+            display: flex;
+            min-height: 480px;
+            background: #fafafa;
+        }
+
+        @media (max-width: 768px) {
+            .mock-body {
+                flex-direction: column;
+            }
+            .mock-sidebar {
+                width: 100% !important;
+                border-right: none !important;
+                border-bottom: 1px solid #e4e4e7;
+            }
+        }
+
+        .mock-sidebar {
+            width: 180px;
+            background: #ffffff;
+            border-right: 1px solid #e4e4e7;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .mock-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+            font-size: 14px;
+            color: var(--primary-color);
+        }
+
+        .mock-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .mock-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #71717a;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .mock-item.active {
+            background: #fff7ed;
+            color: #f97316;
+        }
+
+        .mock-content {
+            flex: 1;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .mock-content-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .mock-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .mock-subtitle {
+            font-size: 11px;
+            color: #71717a;
+            margin: 2px 0 0 0;
+        }
+
+        .mock-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mock-search {
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 11px;
+            outline: none;
+            width: 140px;
+        }
+
+        .mock-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid #e4e4e7;
+            background: #ffffff;
+            color: #18181b;
+        }
+
+        .mock-btn-orange {
+            background: #f97316;
+            color: #ffffff;
+            border: none;
+        }
+
+        .mock-cols-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            flex: 1;
+        }
+
+        @media (max-width: 640px) {
+            .mock-cols-board {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mock-col {
+            background: #f4f4f5;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .mock-col-header {
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: #71717a;
-            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 4px;
+        }
+
+        .mock-col-badge {
+            background: #e4e4e7;
+            padding: 1px 5px;
+            border-radius: 10px;
+            font-size: 8.5px;
+        }
+
+        .mock-card {
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 6px;
+            padding: 8px 10px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.01);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .mock-card-name {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #18181b;
+        }
+        .mock-card-label {
+            font-size: 9.5px;
+            color: #71717a;
+        }
+
+        /* Floating WhatsApp AI Widget */
+        .mock-whatsapp-ai {
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 8px;
+            padding: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            margin-top: 10px;
+        }
+
+        .wa-ai-head {
+            font-size: 11px;
+            font-weight: 700;
+            color: #18181b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding-bottom: 8px;
             border-bottom: 1px solid #f4f4f5;
-            padding-bottom: 10px;
+        }
+
+        .wa-ai-dot {
+            width: 6px;
+            height: 6px;
+            background: #10b981;
+            border-radius: 50%;
+        }
+
+        .wa-ai-body {
+            font-size: 11px;
+            color: #52525b;
+            line-height: 1.4;
+            padding-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Sliding Signup Form Drawer */
+        .cora-drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(24, 24, 27, 0.4);
+            backdrop-filter: blur(1.5px);
+            z-index: 999998;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+        }
+
+        .cora-drawer-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .cora-drawer {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            width: 420px;
+            max-width: 95vw;
+            background: #ffffff;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.08);
+            z-index: 999999;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cora-drawer.show {
+            transform: translateX(0);
+        }
+
+        .drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid #f4f4f5;
+            background: #fafafa;
+        }
+
+        .drawer-title {
+            font-size: 16px;
+            font-weight: 750;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .drawer-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: #a1a1aa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .drawer-close:hover {
+            color: var(--primary-color);
+        }
+
+        .drawer-body {
+            padding: 24px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: #71717a;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 13px;
+            box-sizing: border-box;
+            background-color: #ffffff;
+            color: var(--primary-color);
+            font-family: var(--font-sans);
+            transition: border-color 0.15s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-input::placeholder {
+            color: #d4d4d8;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: 0;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.15s ease, transform 0.1s ease;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background-color: #27272a;
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+
+        .btn-submit:disabled {
+            background-color: #a1a1aa;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .drawer-subtext {
+            font-size: 10px;
+            color: #a1a1aa;
+            text-align: center;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        /* Tool Auditor cost calculator section styling */
+        .calculator-section {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.01);
+        }
+
+        .calculator-title {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #71717a;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #f4f4f5;
+            padding-bottom: 12px;
         }
 
         .calc-tool-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 0;
+            padding: 12px 0;
             border-bottom: 1px dashed #f4f4f5;
         }
 
-        .calc-tool-row:last-child {
+        .calc-tool-row:last-of-type {
             border-bottom: none;
         }
 
@@ -188,7 +681,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         }
 
         .calc-tool-label {
-            font-size: 12.5px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--text-color);
             cursor: pointer;
@@ -209,7 +702,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         }
 
         .calc-results-bar {
-            margin-top: 20px;
+            margin-top: 24px;
             background-color: #fef2f2;
             border: 1px solid #fca5a5;
             border-radius: 8px;
@@ -258,119 +751,13 @@ if ( ! defined( 'ABSPATH' ) ) {
             color: #065f46;
         }
 
-        /* Right Column Form */
-        .signup-card {
-            background-color: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: 0 10px 30px rgba(24, 24, 27, 0.03);
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-            position: sticky;
-            top: 40px;
-        }
-
-        .signup-header {
-            text-align: center;
-        }
-
-        .signup-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin: 0;
-            letter-spacing: -0.02em;
-        }
-
-        .signup-subtitle {
-            font-size: 11px;
-            color: #a1a1aa;
-            margin: 4px 0 0 0;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .form-label {
-            font-size: 10.5px;
-            font-weight: 600;
-            color: #71717a;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 13px;
-            box-sizing: border-box;
-            background-color: #ffffff;
-            color: var(--primary-color);
-            font-family: var(--font-sans);
-            transition: border-color 0.15s ease;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .form-input::placeholder {
-            color: #d4d4d8;
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--primary-color);
-            color: #ffffff;
-            border: 0;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background-color 0.15s ease, transform 0.1s ease;
-            box-sizing: border-box;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-submit:hover {
-            background-color: #27272a;
-        }
-
-        .btn-submit:active {
-            transform: scale(0.98);
-        }
-
-        .btn-submit:disabled {
-            background-color: #a1a1aa;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .form-footer {
-            font-size: 10px;
-            color: #a1a1aa;
-            text-align: center;
-            margin: 0;
-        }
-
         footer {
             text-align: center;
             padding-top: 40px;
             border-top: 1px solid rgba(24, 24, 27, 0.05);
             font-size: 11px;
             color: #a1a1aa;
+            margin-top: 40px;
         }
 
         /* Monochromatic Toast Notification styles */
@@ -408,125 +795,258 @@ if ( ! defined( 'ABSPATH' ) ) {
         <span class="badge-trial">Free Sandbox</span>
     </header>
 
-    <main class="hero-section">
-        <div class="hero-info">
-            <h2 class="hero-tagline">Stop the SaaS subscription bleed.</h2>
-            <h1 class="hero-title">Unified Workspace for High-Speed Real Estate Agencies</h1>
-            <p class="hero-desc">Indian brokerages lose ₹6 Lakhs annually to fragmented tools. Cora consolidates your listings, CRM, field GPS agent check-ins, social scheduling, and instant WhatsApp brochure routing into a single dashboard.</p>
-            
-            <!-- Interactive Stack Auditor Calculator -->
-            <div class="calculator-card">
-                <div class="calculator-title">Tool Subscription Cost Auditor</div>
-                
-                <div class="calc-tool-row">
-                    <div class="calc-tool-left">
-                        <input type="checkbox" id="calc-crm" class="calc-checkbox" value="25000" checked onchange="calculateSavings()" />
-                        <div>
-                            <label for="calc-crm" class="calc-tool-label">Lead CRM & Pipelines</label>
-                            <span class="calc-tool-desc">e.g. Sell.do / Salesforce (for 10 agents)</span>
+    <!-- Main Hero centered layout -->
+    <main class="hero-centered">
+        <div class="badge-india">
+            <span class="dot-orange"></span>
+            Built in India, for Indian real estate agencies
+        </div>
+        
+        <h1 class="hero-title-centered">
+            Run your entire agency.<br>On <span class="serif-one">one</span> platform.
+        </h1>
+        
+        <p class="hero-desc-centered">
+            Cora replaces the six tools your team juggles today — CRM, WhatsApp, listings, calling, payments and reports — with one AI-native system built for how Indian real estate actually works.
+        </p>
+        
+        <div class="cta-buttons">
+            <button class="btn-trial" onclick="openSignupDrawer()">
+                Start 30-day free trial &rarr;
+            </button>
+            <button class="btn-demo" onclick="openSignupDrawer('demo')">
+                Book a live demo
+            </button>
+        </div>
+        
+        <p class="cta-subtext">Full access. No credit card. Setup in under 10 minutes.</p>
+
+        <!-- Premium Dashboard Mockup -->
+        <div class="dashboard-mockup">
+            <div class="mock-header">
+                <span class="mock-dot mock-dot-red"></span>
+                <span class="mock-dot mock-dot-yellow"></span>
+                <span class="mock-dot mock-dot-green"></span>
+            </div>
+            <div class="mock-body">
+                <div class="mock-sidebar">
+                    <div class="mock-logo">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="#ea580c" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="inline-block"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+                        <span>cora</span>
+                    </div>
+                    <div class="mock-menu">
+                        <div class="mock-item active">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            <span>Leads</span>
+                        </div>
+                        <div class="mock-item">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="9" y1="9" x2="21" y2="9"></line></svg>
+                            <span>Inventory</span>
+                        </div>
+                        <div class="mock-item">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            <span>Bookings</span>
+                        </div>
+                        <div class="mock-item">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                            <span>Crew</span>
                         </div>
                     </div>
-                    <div class="calc-tool-cost">₹25,000/mo</div>
                 </div>
-
-                <div class="calc-tool-row">
-                    <div class="calc-tool-left">
-                        <input type="checkbox" id="calc-hr" class="calc-checkbox" value="7000" checked onchange="calculateSavings()" />
+                <div class="mock-content">
+                    <div class="mock-content-head">
                         <div>
-                            <label for="calc-hr" class="calc-tool-label">Field Agent GPS Attendance</label>
-                            <span class="calc-tool-desc">e.g. Keka HR / Spine HR</span>
+                            <h2 class="mock-title">Leads</h2>
+                            <p class="mock-subtitle">Manage and track your leads in one place.</p>
+                        </div>
+                        <div class="mock-actions">
+                            <input type="text" class="mock-search" placeholder="Search leads..." readonly />
+                            <button class="mock-btn">Filters</button>
+                            <button class="mock-btn mock-btn-orange">+ Add Lead</button>
                         </div>
                     </div>
-                    <div class="calc-tool-cost">₹7,000/mo</div>
-                </div>
-
-                <div class="calc-tool-row">
-                    <div class="calc-tool-left">
-                        <input type="checkbox" id="calc-wa" class="calc-checkbox" value="2000" checked onchange="calculateSavings()" />
-                        <div>
-                            <label for="calc-wa" class="calc-tool-label">WhatsApp Business API</label>
-                            <span class="calc-tool-desc">e.g. Wati / AiSensy / Interakt</span>
+                    <div class="mock-cols-board">
+                        <div class="mock-col">
+                            <div class="mock-col-header">
+                                <span>New</span>
+                                <span class="mock-col-badge">12</span>
+                            </div>
+                            <div class="mock-card">
+                                <span class="mock-card-name">Aarav Sharma</span>
+                                <span class="mock-card-label">DLF Phase 3</span>
+                            </div>
+                            <div class="mock-card">
+                                <span class="mock-card-name">Priya Patel</span>
+                                <span class="mock-card-label">Godrej Woods</span>
+                            </div>
+                        </div>
+                        <div class="mock-col">
+                            <div class="mock-col-header">
+                                <span>Contacted</span>
+                                <span class="mock-col-badge">8</span>
+                            </div>
+                            <div class="mock-card">
+                                <span class="mock-card-name">Rohan Verma</span>
+                                <span class="mock-card-label">M3M Golf Hills</span>
+                            </div>
+                        </div>
+                        <div class="mock-col">
+                            <div class="mock-col-header">
+                                <span>Site Visit</span>
+                                <span class="mock-col-badge">5</span>
+                            </div>
+                            <div class="mock-card">
+                                <span class="mock-card-name">Ananya Sen</span>
+                                <span class="mock-card-label">Shed scheduled</span>
+                            </div>
+                        </div>
+                        <div class="mock-col">
+                            <div class="mock-col-header">
+                                <span>Booked</span>
+                                <span class="mock-col-badge">3</span>
+                            </div>
+                            <div class="mock-card">
+                                <span class="mock-card-name">Kabir Mehta</span>
+                                <span class="mock-card-label">Booking Complete</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="calc-tool-cost">₹2,000/mo</div>
-                </div>
 
-                <div class="calc-tool-row">
-                    <div class="calc-tool-left">
-                        <input type="checkbox" id="calc-drive" class="calc-checkbox" value="13000" checked onchange="calculateSavings()" />
-                        <div>
-                            <label for="calc-drive" class="calc-tool-label">Google Drive Storage (10 Users)</label>
-                            <span class="calc-tool-desc">For heavy 4K site videos & KYC scans</span>
+                    <!-- AI Assistant floating widget -->
+                    <div class="mock-whatsapp-ai">
+                        <div class="wa-ai-head">
+                            <span class="wa-ai-dot"></span>
+                            <span>WhatsApp AI Assistant</span>
+                        </div>
+                        <div class="wa-ai-body">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="#10b981" stroke-width="2.5" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                            <span>This conversation is AI-powered. Cora AI is responding automatically.</span>
                         </div>
                     </div>
-                    <div class="calc-tool-cost">₹13,000/mo</div>
-                </div>
-
-                <div class="calc-tool-row">
-                    <div class="calc-tool-left">
-                        <input type="checkbox" id="calc-social" class="calc-checkbox" value="2500" checked onchange="calculateSavings()" />
-                        <div>
-                            <label for="calc-social" class="calc-tool-label">Social Media Scheduler</label>
-                            <span class="calc-tool-desc">e.g. Hootsuite / Buffer</span>
-                        </div>
-                    </div>
-                    <div class="calc-tool-cost">₹2,500/mo</div>
-                </div>
-
-                <!-- Monthly Spend Output -->
-                <div class="calc-results-bar">
-                    <div class="calc-results-left">Current Monthly Spend:</div>
-                    <div class="calc-results-value" id="calc-outflow">₹49,500</div>
-                </div>
-
-                <!-- Savings with Cora Output -->
-                <div class="calc-savings-box">
-                    <div class="calc-savings-left">Cora Annual Savings:</div>
-                    <div class="calc-savings-value" id="calc-savings">₹5,70,000</div>
                 </div>
             </div>
         </div>
 
-        <!-- Right Side Onboarding Form -->
-        <div class="signup-card">
-            <div class="signup-header">
-                <h3 class="signup-title">Launch Free Sandbox Site</h3>
-                <p class="signup-subtitle">Zero hosting setup. Pre-seeded demo database.</p>
+        <!-- Tool Auditor cost calculator section lower down -->
+        <div class="calculator-section" style="width: 100%;">
+            <div class="calculator-title">Tool Subscription Cost Auditor</div>
+            
+            <div class="calc-tool-row">
+                <div class="calc-tool-left">
+                    <input type="checkbox" id="calc-crm" class="calc-checkbox" value="25000" checked onchange="calculateSavings()" />
+                    <div>
+                        <label for="calc-crm" class="calc-tool-label">Lead CRM & Pipelines</label>
+                        <span class="calc-tool-desc">e.g. Sell.do / Salesforce (for 10 agents)</span>
+                    </div>
+                </div>
+                <div class="calc-tool-cost">₹25,000/mo</div>
             </div>
 
-            <form id="cora-signup-form" onsubmit="event.preventDefault(); handleCoraSignup();">
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" id="signup-name" class="form-input" placeholder="e.g. Dravya Bansal" required />
+            <div class="calc-tool-row">
+                <div class="calc-tool-left">
+                    <input type="checkbox" id="calc-hr" class="calc-checkbox" value="7000" checked onchange="calculateSavings()" />
+                    <div>
+                        <label for="calc-hr" class="calc-tool-label">Field Agent GPS Attendance</label>
+                        <span class="calc-tool-desc">e.g. Keka HR / Spine HR</span>
+                    </div>
                 </div>
+                <div class="calc-tool-cost">₹7,000/mo</div>
+            </div>
 
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <label class="form-label">Agency Name</label>
-                    <input type="text" id="signup-agency" class="form-input" placeholder="e.g. Apex Realty" required />
+            <div class="calc-tool-row">
+                <div class="calc-tool-left">
+                    <input type="checkbox" id="calc-wa" class="calc-checkbox" value="2000" checked onchange="calculateSavings()" />
+                    <div>
+                        <label for="calc-wa" class="calc-tool-label">WhatsApp Business API</label>
+                        <span class="calc-tool-desc">e.g. Wati / AiSensy / Interakt</span>
+                    </div>
                 </div>
+                <div class="calc-tool-cost">₹2,000/mo</div>
+            </div>
 
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <label class="form-label">WhatsApp Number</label>
-                    <input type="tel" id="signup-whatsapp" class="form-input" placeholder="e.g. +919876543210" required />
+            <div class="calc-tool-row">
+                <div class="calc-tool-left">
+                    <input type="checkbox" id="calc-drive" class="calc-checkbox" value="13000" checked onchange="calculateSavings()" />
+                    <div>
+                        <label for="calc-drive" class="calc-tool-label">Google Drive Storage (10 Users)</label>
+                        <span class="calc-tool-desc">For heavy 4K site videos & KYC scans</span>
+                    </div>
                 </div>
+                <div class="calc-tool-cost">₹13,000/mo</div>
+            </div>
 
-                <div class="form-group" style="margin-bottom: 18px;">
-                    <label class="form-label">City</label>
-                    <input type="text" id="signup-city" class="form-input" placeholder="e.g. Gurgaon" required />
+            <div class="calc-tool-row">
+                <div class="calc-tool-left">
+                    <input type="checkbox" id="calc-social" class="calc-checkbox" value="2500" checked onchange="calculateSavings()" />
+                    <div>
+                        <label for="calc-social" class="calc-tool-label">Social Media Scheduler</label>
+                        <span class="calc-tool-desc">e.g. Hootsuite / Buffer</span>
+                    </div>
                 </div>
+                <div class="calc-tool-cost">₹2,500/mo</div>
+            </div>
 
-                <button type="submit" id="submit-btn" class="btn-submit">
-                    Spin Up My Workspace
-                </button>
-            </form>
+            <!-- Monthly Spend Output -->
+            <div class="calc-results-bar">
+                <div class="calc-results-left">Current Monthly Spend:</div>
+                <div class="calc-results-value" id="calc-outflow">₹49,500</div>
+            </div>
 
-            <p class="form-footer">By launching, you get 30 days free access.</p>
+            <!-- Savings with Cora Output -->
+            <div class="calc-savings-box">
+                <div class="calc-savings-left">Cora Annual Savings:</div>
+                <div class="calc-savings-value" id="calc-savings">₹5,70,000</div>
+            </div>
         </div>
     </main>
 
     <footer>
         <p>&copy; <?php echo date('Y'); ?> Cora Platform. Built for Indian Real Estate Agencies.</p>
     </footer>
+</div>
+
+<!-- Right-sliding signup drawer sheet -->
+<div id="cora-drawer-overlay" class="cora-drawer-overlay" onclick="closeSignupDrawer()"></div>
+<div id="cora-drawer" class="cora-drawer">
+    <div class="drawer-header">
+        <h3 class="drawer-title" id="drawer-headline">Launch Free Sandbox Site</h3>
+        <button class="drawer-close" onclick="closeSignupDrawer()">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+    <div class="drawer-body">
+        <p id="drawer-description" style="font-size: 12.5px; color: #71717a; margin: 0 0 10px 0; line-height: 1.5;">
+            Zero hosting setup. Pre-seeded demo database. Get instant access to your admin workspace.
+        </p>
+
+        <form id="cora-signup-form" onsubmit="event.preventDefault(); handleCoraSignup();">
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label">Full Name</label>
+                <input type="text" id="signup-name" class="form-input" placeholder="e.g. Dravya Bansal" required />
+            </div>
+
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label">Agency Name</label>
+                <input type="text" id="signup-agency" class="form-input" placeholder="e.g. Apex Realty" required />
+            </div>
+
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label">WhatsApp Number</label>
+                <input type="tel" id="signup-whatsapp" class="form-input" placeholder="e.g. +919876543210" required />
+            </div>
+
+            <div class="form-group" style="margin-bottom: 18px;">
+                <label class="form-label">City</label>
+                <input type="text" id="signup-city" class="form-input" placeholder="e.g. Gurgaon" required />
+            </div>
+
+            <button type="submit" id="submit-btn" class="btn-submit">
+                Spin Up My Workspace
+            </button>
+        </form>
+
+        <p class="drawer-subtext">By launching, you get 30 days free access. No credit card required.</p>
+    </div>
 </div>
 
 <!-- Toast Overlay -->
@@ -568,6 +1088,28 @@ if ( ! defined( 'ABSPATH' ) ) {
         }, 3000);
     }
 
+    function openSignupDrawer(mode) {
+        if (mode === 'demo') {
+            document.getElementById('drawer-headline').innerText = "Book a Live Demo";
+            document.getElementById('drawer-description').innerText = "Schedule a 1-on-1 walkthrough session with our product experts to learn how Cora can run your agency on a single system.";
+            document.getElementById('submit-btn').innerText = "Request Demo Call";
+        } else {
+            document.getElementById('drawer-headline').innerText = "Launch Free Sandbox Site";
+            document.getElementById('drawer-description').innerText = "Zero hosting setup. Pre-seeded demo database. Get instant access to your admin workspace.";
+            document.getElementById('submit-btn').innerText = "Spin Up My Workspace";
+        }
+        document.getElementById('cora-drawer-overlay').classList.add('show');
+        document.getElementById('cora-drawer').classList.add('show');
+    }
+
+    // Export function to window
+    window.openSignupDrawer = openSignupDrawer;
+
+    function closeSignupDrawer() {
+        document.getElementById('cora-drawer-overlay').classList.remove('show');
+        document.getElementById('cora-drawer').classList.remove('show');
+    }
+
     function handleCoraSignup() {
         var name = document.getElementById('signup-name').value;
         var agency = document.getElementById('signup-agency').value;
@@ -575,10 +1117,15 @@ if ( ! defined( 'ABSPATH' ) ) {
         var city = document.getElementById('signup-city').value;
         var btn = document.getElementById('submit-btn');
 
-        btn.disabled = true;
-        btn.innerHTML = 'Provisioning Sandbox (5s)...';
+        var isDemoMode = document.getElementById('drawer-headline').innerText.includes("Demo");
 
-        showToast("Spinning up subsite databases and assets...");
+        btn.disabled = true;
+        if (isDemoMode) {
+            btn.innerHTML = 'Sending Request...';
+        } else {
+            btn.innerHTML = 'Provisioning Sandbox (5s)...';
+            showToast("Spinning up subsite databases and assets...");
+        }
 
         jQuery.post('<?php echo admin_url("admin-ajax.php"); ?>', {
             action: 'cora_trial_signup',
@@ -589,13 +1136,22 @@ if ( ! defined( 'ABSPATH' ) ) {
             _nonce: '<?php echo wp_create_nonce("cora_trial_signup"); ?>'
         }, function(response) {
             if (response.success) {
-                showToast("Workspace ready! Opening dashboard...");
-                setTimeout(function() {
-                    window.location.href = response.data.workspace_url;
-                }, 1000);
+                if (isDemoMode) {
+                    showToast("Demo request sent! We will contact you on WhatsApp.");
+                    setTimeout(function() {
+                        closeSignupDrawer();
+                        btn.disabled = false;
+                        btn.innerHTML = 'Request Demo Call';
+                    }, 2000);
+                } else {
+                    showToast("Workspace ready! Opening dashboard...");
+                    setTimeout(function() {
+                        window.location.href = response.data.workspace_url;
+                    }, 1000);
+                }
             } else {
                 btn.disabled = false;
-                btn.innerHTML = 'Spin Up My Workspace';
+                btn.innerHTML = isDemoMode ? 'Request Demo Call' : 'Spin Up My Workspace';
                 
                 if (response.data && response.data.redirect_url) {
                     showToast("Redirecting to existing active workspace...");
@@ -603,12 +1159,12 @@ if ( ! defined( 'ABSPATH' ) ) {
                         window.location.href = response.data.redirect_url;
                     }, 1500);
                 } else {
-                    showToast(response.data.message || "Failed to generate workspace.");
+                    showToast(response.data.message || "Failed to complete action.");
                 }
             }
         }).fail(function() {
             btn.disabled = false;
-            btn.innerHTML = 'Spin Up My Workspace';
+            btn.innerHTML = isDemoMode ? 'Request Demo Call' : 'Spin Up My Workspace';
             showToast("Server connection error. Please try again.");
         });
     }

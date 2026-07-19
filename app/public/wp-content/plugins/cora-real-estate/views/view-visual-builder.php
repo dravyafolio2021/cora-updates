@@ -305,6 +305,127 @@ jQuery(document).ready(function($) {
     });
 
     // 2. Define Custom Blocks
+    editor.BlockManager.add('cora-hero', {
+        label: `<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><div>Cora Hero</div>`,
+        content: `<section class="py-20 px-6 bg-[#FBFaf7] text-center flex flex-col items-center gap-6 border-b border-zinc-250 font-sans">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-200 rounded-full text-[11px] font-semibold text-zinc-500 bg-white shadow-sm">
+                <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+                Built in India, for Indian real estate agencies
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-zinc-950 tracking-tight leading-tight max-w-3xl mt-2">
+                Run your entire agency.<br>On <span class="font-serif italic font-normal text-zinc-500">one</span> platform.
+            </h1>
+            <p class="text-sm md:text-base text-zinc-500 leading-relaxed max-w-2xl mt-1">
+                Cora replaces the six tools your team juggles today — CRM, WhatsApp, listings, calling, payments and reports — with one AI-native system built for how Indian real estate actually works.
+            </p>
+            <div class="flex items-center gap-3 mt-4">
+                <button onclick="window.openSignupDrawer()" class="px-6 py-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-full font-bold text-xs uppercase tracking-wider transition shadow-md flex items-center gap-2">
+                    Start 30-day free trial &rarr;
+                </button>
+                <button onclick="window.openSignupDrawer('demo')" class="px-6 py-3 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-800 rounded-full font-bold text-xs uppercase tracking-wider transition">
+                    Book a live demo
+                </button>
+            </div>
+            <p class="text-[11px] text-zinc-400 mt-1">Full access. No credit card. Setup in under 10 minutes.</p>
+        </section>`,
+        category: 'Cora Templates'
+    });
+
+    editor.BlockManager.add('cora-dashboard-mockup', {
+        label: `<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line><path d="M12 17v4M8 21h8"></path></svg><div>Dashboard Mock</div>`,
+        content: `<div class="w-full bg-[#fbfbfb] border border-zinc-200 rounded-xl overflow-hidden shadow-xl max-w-5xl mx-auto my-12 font-sans text-left">
+            <div class="bg-zinc-50 border-b border-zinc-200 px-4 py-3 flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-green-400"></span>
+            </div>
+            <div class="flex flex-col md:flex-row min-h-[440px]">
+                <div class="w-full md:w-44 bg-white border-r border-zinc-200 p-5 flex flex-col gap-6">
+                    <div class="flex items-center gap-2 font-bold text-sm text-zinc-900">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="#ea580c" stroke-width="2.5" fill="none" class="inline-block"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+                        <span>cora</span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <div class="flex items-center gap-2.5 px-3 py-2 bg-orange-50 text-orange-600 rounded-md font-semibold text-xs cursor-pointer">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                            <span>Leads</span>
+                        </div>
+                        <div class="flex items-center gap-2.5 px-3 py-2 text-zinc-500 rounded-md font-semibold text-xs cursor-pointer hover:bg-zinc-50">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+                            <span>Inventory</span>
+                        </div>
+                        <div class="flex items-center gap-2.5 px-3 py-2 text-zinc-500 rounded-md font-semibold text-xs cursor-pointer hover:bg-zinc-50">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line></svg>
+                            <span>Bookings</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-1 p-6 flex flex-col gap-5">
+                    <div class="flex justify-between items-center flex-wrap gap-3">
+                        <div>
+                            <h2 class="text-lg font-bold text-zinc-900">Leads</h2>
+                            <p class="text-[11px] text-zinc-400 mt-0.5">Manage and track your leads in one place.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="text" class="border border-zinc-200 rounded-md px-2.5 py-1 text-[11px] w-32 bg-white" placeholder="Search leads..." readonly />
+                            <button class="border border-zinc-200 bg-white rounded-md px-2.5 py-1 text-[11px] font-semibold text-zinc-700">Filters</button>
+                            <button class="bg-orange-500 text-white rounded-md px-2.5 py-1 text-[11px] font-semibold border-none">+ Add Lead</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                        <div class="bg-zinc-100 rounded-lg p-2.5 flex flex-col gap-2">
+                            <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex justify-between">
+                                <span>New</span>
+                                <span class="bg-zinc-200 text-zinc-700 px-1.5 py-0.5 rounded-full text-[8px]">12</span>
+                            </div>
+                            <div class="bg-white border border-zinc-200 rounded p-2 flex flex-col gap-1 shadow-sm">
+                                <span class="text-xs font-bold text-zinc-950">Aarav Sharma</span>
+                                <span class="text-[10px] text-zinc-500">DLF Phase 3</span>
+                            </div>
+                            <div class="bg-white border border-zinc-200 rounded p-2 flex flex-col gap-1 shadow-sm">
+                                <span class="text-xs font-bold text-zinc-950">Priya Patel</span>
+                                <span class="text-[10px] text-zinc-500">Godrej Woods</span>
+                            </div>
+                        </div>
+                        <div class="bg-zinc-100 rounded-lg p-2.5 flex flex-col gap-2">
+                            <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex justify-between">
+                                <span>Contacted</span>
+                                <span class="bg-zinc-200 text-zinc-700 px-1.5 py-0.5 rounded-full text-[8px]">8</span>
+                            </div>
+                            <div class="bg-white border border-zinc-200 rounded p-2 flex flex-col gap-1 shadow-sm">
+                                <span class="text-xs font-bold text-zinc-950">Rohan Verma</span>
+                                <span class="text-[10px] text-zinc-500">M3M Golf Hills</span>
+                            </div>
+                        </div>
+                        <div class="bg-zinc-100 rounded-lg p-2.5 flex flex-col gap-2">
+                            <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex justify-between">
+                                <span>Site Visit</span>
+                                <span class="bg-zinc-200 text-zinc-700 px-1.5 py-0.5 rounded-full text-[8px]">5</span>
+                            </div>
+                        </div>
+                        <div class="bg-zinc-100 rounded-lg p-2.5 flex flex-col gap-2">
+                            <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex justify-between">
+                                <span>Booked</span>
+                                <span class="bg-zinc-200 text-zinc-700 px-1.5 py-0.5 rounded-full text-[8px]">3</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white border border-zinc-200 rounded-lg p-3.5 shadow-sm mt-2">
+                        <div class="text-xs font-bold text-zinc-950 flex items-center gap-2 border-b border-zinc-100 pb-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span>WhatsApp AI Assistant</span>
+                        </div>
+                        <div class="text-[11px] text-zinc-500 mt-2 flex items-center gap-2">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="#10b981" stroke-width="2.5" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                            <span>This conversation is AI-powered. Cora AI is responding automatically.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`,
+        category: 'Cora Templates'
+    });
+
     editor.BlockManager.add('section', {
         label: `<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg><div>Section</div>`,
         content: '<section class="py-16 px-8 bg-[#FBFaf7] border-b border-zinc-200"><div class="max-w-4xl mx-auto"><h2 class="text-3xl font-light tracking-tight mb-4">Section Heading</h2><p class="text-neutral-600 leading-relaxed text-sm">Add your custom text or details inside this section wrapper...</p></div></section>',

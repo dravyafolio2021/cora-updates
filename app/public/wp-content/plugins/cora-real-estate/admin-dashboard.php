@@ -4611,6 +4611,23 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             </select>
                             <span class="text-[10px] text-zinc-400">This affects how Cora writes captions, messages, and auto-replies on your behalf.</span>
                         </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Platform Language (Indian Regional)</label>
+                            <select id="cora-platform-language-select" class="w-full border border-zinc-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:border-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-200 transition-all appearance-none cursor-pointer">
+                                <option value="en">English</option>
+                                <option value="hi">Hindi (हिन्दी)</option>
+                                <option value="bn">Bengali (বাংলা)</option>
+                                <option value="te">Telugu (తెలుగు)</option>
+                                <option value="mr">Marathi (मराठी)</option>
+                                <option value="ta">Tamil (தமிழ்)</option>
+                                <option value="gu">Gujarati (ગુજરાતી)</option>
+                                <option value="kn">Kannada (ಕನ್ನಡ)</option>
+                                <option value="ml">Malayalam (മലയാളം)</option>
+                                <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+                                <option value="or">Odia (ଓଡ଼ିଆ)</option>
+                            </select>
+                            <span class="text-[10px] text-zinc-400">Change the display language of the entire platform to a regional Indian language.</span>
+                        </div>
                     </div>
                     <div class="px-5 py-3 bg-zinc-50/50 border-t border-zinc-100 flex justify-end">
                         <button class="text-xs font-semibold px-4 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-800 transition-all active:scale-[0.97] cursor-pointer inline-flex items-center gap-1.5" onclick="coraShowToast('Studio settings saved.')">
@@ -4618,6 +4635,36 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             Save
                         </button>
                     </div>
+                    <script type="text/javascript">
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const selectEl = document.getElementById('cora-platform-language-select');
+                        if (selectEl) {
+                            // Load persisted language
+                            const currentLang = localStorage.getItem('cora_platform_language') || 'en';
+                            selectEl.value = currentLang;
+                            
+                            // Save handler when settings form save button is clicked
+                            const saveBtn = selectEl.closest('.bg-white').querySelector('button');
+                            if (saveBtn) {
+                                saveBtn.removeAttribute('onclick'); // override standard onclick
+                                saveBtn.addEventListener('click', function() {
+                                    const newLang = selectEl.value;
+                                    const prevLang = localStorage.getItem('cora_platform_language') || 'en';
+                                    localStorage.setItem('cora_platform_language', newLang);
+                                    
+                                    window.coraShowToast('Studio settings saved.');
+                                    
+                                    // If language changed, reload page after a brief delay to apply translation
+                                    if (newLang !== prevLang) {
+                                        setTimeout(() => {
+                                            window.location.reload();
+                                        }, 800);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    </script>
                 </div>
 
                 <!-- ═══ SECTION 2: WhatsApp Gateway (Coming Soon) ═══ -->
@@ -9661,6 +9708,62 @@ wp_print_footer_scripts();
             });
         }
     });
+})();
+</script>
+
+<!-- Google Translate POC translation layer -->
+<div id="google_translate_element" style="display:none; visibility:hidden; position:absolute; top:-9999px;"></div>
+<style>
+/* Hide standard Google Translate headers and UI wrappers to match Cora monochrome branding */
+body {
+    top: 0 !important;
+}
+.skiptranslate, .goog-te-banner-frame, #goog-gt-tt, .goog-te-balloon-frame {
+    display: none !important;
+    visibility: hidden !important;
+}
+.goog-tooltip {
+    display: none !important;
+}
+.goog-tooltip:hover {
+    display: none !important;
+}
+.goog-text-highlight {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+</style>
+<script type="text/javascript">
+(function() {
+    const selectedLang = localStorage.getItem('cora_platform_language');
+    if (selectedLang && selectedLang !== 'en') {
+        // Load Google Translate script
+        window.googleTranslateElementInit = function() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+            
+            // Programmatically trigger translation
+            function autoTriggerTranslation() {
+                const select = document.querySelector('.goog-te-combo');
+                if (select) {
+                    select.value = selectedLang;
+                    select.dispatchEvent(new Event('change'));
+                } else {
+                    setTimeout(autoTriggerTranslation, 100);
+                }
+            }
+            autoTriggerTranslation();
+        };
+
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+        document.body.appendChild(script);
+    }
 })();
 </script>
 

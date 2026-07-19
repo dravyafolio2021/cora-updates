@@ -3950,7 +3950,7 @@ $wp_pages = get_pages();
                     </td>
                     <td class="px-3 py-2">
                         <div class="flex items-center flex-wrap gap-1">
-                            <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id})"
+                            <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id || 0}, '${p.status || 'draft'}', '${esc_js(p.slug || '')}')"
                                 class="text-xs font-semibold text-zinc-900 hover:underline text-left cursor-pointer leading-snug">
                                 ${esc_html(p.title)}
                             </button>
@@ -3969,7 +3969,7 @@ $wp_pages = get_pages();
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                             </a>
                             <!-- Edit/Pencil shortcut -->
-                            <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id})"
+                            <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id || 0}, '${p.status || 'draft'}', '${esc_js(p.slug || '')}')"
                                 class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900 cursor-pointer transition-all"
                                 title="Edit Page">
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
@@ -3982,7 +3982,7 @@ $wp_pages = get_pages();
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
                                 </button>
                                 <div id="page-menu-${p.id}" class="hidden absolute right-0 top-full mt-1 w-44 bg-white border border-zinc-200 rounded-xl shadow-lg py-1 z-20 text-left">
-                                <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
+                                <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id || 0}, '${p.status || 'draft'}', '${esc_js(p.slug || '')}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
                                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                     Edit page
                                 </button>
@@ -5417,10 +5417,12 @@ $wp_pages = get_pages();
     }
 
     // --- LEVEL 3 Elementor Iframe Page Editor Wrapper ---
-    function openPageEditor(pageId, title, wpPostId) {
+    function openPageEditor(pageId, title, wpPostId, pageStatus, pageSlug) {
         canvasState.level = 3;
         canvasState.activePageId = pageId;
         canvasState.activeWpPostId = wpPostId;
+        canvasState.activePageStatus = pageStatus || 'draft';
+        canvasState.activePageSlug   = pageSlug   || '';
 
         // Auto-sync global settings to Elementor active kit in background before loading editor
         jQuery.post(coraREData.ajaxUrl, {
@@ -5434,8 +5436,6 @@ $wp_pages = get_pages();
         jQuery('#cora-topbar-theme-name').text(canvasState.activeThemeName);
         jQuery('#cora-topbar-page-name').text(title);
         jQuery('#cora-topbar-page-selector').text(title);
-
-        jQuery('#editor-preview-link').attr('href', coraREData.siteUrl + '/?p=' + wpPostId + '&preview=true');
 
         // Collapse sidebar and hide header
         jQuery('body').addClass('cora-canvas-editor-active');
@@ -6561,7 +6561,7 @@ $wp_pages = get_pages();
                                 clearInterval(checkPagesLoaded);
                                 var pageObj = canvasState.pages.find(p => p.id == pageId);
                                 if (pageObj) {
-                                    openPageEditor(pageObj.id, pageObj.title, pageObj.wp_post_id);
+                                    openPageEditor(pageObj.id, pageObj.title, pageObj.wp_post_id, pageObj.status || 'draft', pageObj.slug || '');
                                 }
                             }
                         }, 100);
@@ -6802,15 +6802,31 @@ $wp_pages = get_pages();
 
 
     function previewPage() {
-        if (canvasState.activeWpPostId) {
-            window.open(coraREData.siteUrl + '/?p=' + canvasState.activeWpPostId + '&preview=true', '_blank');
-        } else {
-            const link = document.getElementById('editor-preview-link');
-            if (link && link.href) {
-                window.open(link.href, '_blank');
+        if (!canvasState.activeWpPostId) return;
+
+        // Always ask PHP for the correct permalink — avoids the homepage redirect
+        // bug that happened when home_url('/') was used as the base.
+        // Also pass theme_id so the handler can append ?cv_preview_theme for draft themes.
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_get_preview_url',
+            post_id: canvasState.activeWpPostId || 0,
+            page_id: canvasState.activePageId   || 0,  // Cora page ID as reliable fallback
+            theme_id: canvasState.activeThemeId  || 0,  // Pass theme so handler can attach draft param
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success && res.data && res.data.url) {
+                window.open(res.data.url, '_blank');
+            } else {
+                // Hard fallback: attach cv_preview_theme if editing a draft theme
+                var fallbackUrl = coraREData.siteUrl + '/?page_id=' + canvasState.activeWpPostId;
+                if (!canvasState.activeThemeIsLive && canvasState.activeThemeId) {
+                    fallbackUrl += '&cv_preview_theme=' + canvasState.activeThemeId;
+                }
+                window.open(fallbackUrl, '_blank');
             }
-        }
+        });
     }
+
 
     function publishPage() {
         window.coraShowToast('Publishing page layout to live site...');
@@ -6940,7 +6956,8 @@ $wp_pages = get_pages();
     function switchToPage(pageId, title, wpPostId) {
         const dd = document.getElementById('cora-page-switcher-dropdown');
         if (dd) dd.classList.add('hidden');
-        openPageEditor(pageId, title, wpPostId);
+        const pageObj = canvasState.pages.find(p => p.id == pageId);
+        openPageEditor(pageId, title, wpPostId, pageObj ? (pageObj.status || 'draft') : 'draft', pageObj ? (pageObj.slug || '') : '');
     }
 
     document.addEventListener('click', function(e) {
