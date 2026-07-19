@@ -16285,7 +16285,7 @@ if ( ! class_exists( 'Cora_Real_Estate_Plugin_Updater' ) ) {
     }
 }
 
-$cora_re_updates_url = get_option( 'cora_re_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-real-estate.json' );
+$cora_re_updates_url = get_option( 'cora_re_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-real-estate.json' );
 new Cora_Real_Estate_Plugin_Updater( __FILE__, $cora_re_updates_url );
 
 
