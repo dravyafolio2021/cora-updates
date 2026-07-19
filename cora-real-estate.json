@@ -2,7 +2,7 @@
     "name": "Cora for Real Estate",
     "slug": "cora-real-estate",
     "version": "1.6.0",
-    "download_url": "https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-real-estate.zip",
+    "download_url": "https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-real-estate.zip",
     "sections": {
         "description": "The ultimate white-label minimalist CRM for real estate agencies.",
         "changelog": "<h4>1.6.0</h4><ul><li>Released dummy test update v1.6.0 to verify auto-upgrade flows.</li></ul>"
