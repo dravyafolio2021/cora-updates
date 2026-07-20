@@ -1325,16 +1325,13 @@ add_action( 'init', 'cora_real_estate_ai_register_taxonomies' );
  * Retrieve active industry mode (supports Cookie fallback & WP Option).
  */
 function cora_get_active_industry() {
-    if ( ! empty( $_COOKIE['cora_workspace_industry'] ) ) {
+    $ind = get_option( 'cora_workspace_industry' );
+    if ( ! $ind && ! empty( $_COOKIE['cora_workspace_industry'] ) ) {
         $ind = sanitize_text_field( $_COOKIE['cora_workspace_industry'] );
-        if ( in_array( $ind, array( 'real_estate', 'photography', 'photography_studio' ), true ) ) {
-            if ( $ind === 'photography' ) {
-                $ind = 'photography_studio';
-            }
-            return $ind;
-        }
     }
-    $ind = get_option( 'cora_workspace_industry', 'real_estate' );
+    if ( ! $ind ) {
+        $ind = 'real_estate';
+    }
     if ( $ind === 'photography' ) {
         $ind = 'photography_studio';
     }
@@ -16911,7 +16908,7 @@ if ( ! class_exists( 'Cora_Workspace_Plugin_Updater' ) ) {
     }
 }
 
-$cora_workspace_updates_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-workspace.json' );
+$cora_workspace_updates_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-workspace.json' );
 new Cora_Workspace_Plugin_Updater( __FILE__, $cora_workspace_updates_url );
 
 /**
@@ -16921,7 +16918,7 @@ function cora_check_workspace_update_available() {
     $cache_key = 'cora_workspace_update_check';
     $update_info = get_transient( $cache_key );
     if ( false === $update_info ) {
-        $update_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-workspace.json' );
+        $update_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-workspace.json' );
         $response = wp_remote_get( $update_url, array( 'timeout' => 10 ) );
         if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
             $remote_data = json_decode( wp_remote_retrieve_body( $response ) );
@@ -16960,7 +16957,7 @@ function cora_ajax_trigger_workspace_update() {
         wp_send_json_error( array( 'message' => 'Target version required.' ) );
     }
     
-    $update_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-workspace.json' );
+    $update_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-workspace.json' );
     $response = wp_remote_get( $update_url, array( 'timeout' => 15 ) );
     if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
         wp_send_json_error( array( 'message' => 'Failed to reach updates server.' ) );
@@ -17940,10 +17937,11 @@ add_action( 'wp_ajax_cora_super_get_users', 'cora_ajax_super_get_users' );
  * AJAX — Switch Active Industry Mode (Shruti & Super Admin only).
  */
 function cora_ajax_switch_industry_mode() {
-    if ( isset( $_POST['security'] ) ) {
+    $nonce = $_POST['security'] ?? ($_POST['nonce'] ?? '');
+    if ( ! empty( $nonce ) ) {
         check_ajax_referer( 'cora_ajax_nonce', 'security', false );
     }
-    if ( ! cora_is_super_owner() ) {
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized access.' ) );
     }
 
@@ -17953,9 +17951,10 @@ function cora_ajax_switch_industry_mode() {
             $industry = 'photography_studio';
         }
         update_option( 'cora_workspace_industry', $industry );
+        setcookie( 'cora_workspace_industry', $industry, time() + 86400 * 365, '/' );
         cora_log_activity( 'Platform Management', "Industry mode switched to: {$industry}" );
         wp_send_json_success( array(
-            'message' => 'Industry mode updated successfully! Reloading view...',
+            'message' => 'Industry mode updated successfully!',
             'industry' => $industry
         ) );
     }
