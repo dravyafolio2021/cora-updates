@@ -185,14 +185,79 @@ jQuery(document).ready(function($) {
         $('#cora-sidebar-backdrop').addClass('hidden');
     });
 
+    window.coraCloseAllDrawers = function() {
+        $('aside[id$="-drawer"]').addClass('collapsed');
+        $('#cora-drawer-backdrop').addClass('hidden');
+        $('body').removeClass('cora-drawer-open');
+    };
+
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape' || e.keyCode === 27) {
+            window.coraCloseAllDrawers();
+        }
+    });
+
+    // Geofence Drawer Handlers
+    window.openGeofenceDrawer = function() {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        }
+        $('#cora-geofence-drawer').removeClass('collapsed');
+        $('#cora-drawer-backdrop').removeClass('hidden');
+    };
+
+    window.closeGeofenceDrawer = function() {
+        window.coraCloseAllDrawers();
+    };
+
+    // Create Custom Role Drawer Handlers
+    window.openCreateCustomRoleDrawer = function(baseTemplate) {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        }
+        if (baseTemplate && $('#custom-role-base-template').length) {
+            $('#custom-role-base-template').val(baseTemplate);
+            if (typeof handleApplyBaseTemplate === 'function') {
+                handleApplyBaseTemplate(baseTemplate);
+            }
+        }
+        $('#cora-create-custom-role-drawer').removeClass('collapsed');
+        $('#cora-drawer-backdrop').removeClass('hidden');
+    };
+
+    window.closeCreateCustomRoleDrawer = function() {
+        window.coraCloseAllDrawers();
+    };
+
+    // Attendance Reports & Sharing Drawer Handlers
+    window.openAttendanceReportsDrawer = function() {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        }
+        $('#cora-attendance-reports-drawer').removeClass('collapsed');
+        $('#cora-drawer-backdrop').removeClass('hidden');
+    };
+
+    window.closeAttendanceReportsDrawer = function() {
+        window.coraCloseAllDrawers();
+    };
+
     // 2. Add Booking Dialog Drawer Controllers
     window.coraToggleAddShowingDrawer = function(show) {
         const drawer = $('#cora-add-showing-drawer');
         if (show) {
+            if (typeof window.coraCloseAllDrawers === 'function') {
+                window.coraCloseAllDrawers();
+            }
             drawer.removeClass('collapsed');
+            $('#cora-drawer-backdrop').removeClass('hidden');
             $('#cora-drawer-client-name').focus();
         } else {
-            drawer.addClass('collapsed');
+            if (typeof window.coraCloseAllDrawers === 'function') {
+                window.coraCloseAllDrawers();
+            } else {
+                drawer.addClass('collapsed');
+            }
             // Reset input values
             $('#cora-drawer-client-name').val('');
             $('#cora-drawer-deal-type').val('Residential Buy');
@@ -941,9 +1006,10 @@ jQuery(document).ready(function($) {
 
     // 16. Sub-Tab Navigation for Team and Equipment Sections
     $('.cora-sub-tab').on('click', function(e) {
-        e.preventDefault();
         const tab = $(this);
         const target = tab.data('sub-target');
+        if (!target) return;
+        e.preventDefault();
         const parentSection = tab.closest('.cora-page-section');
         
         // Toggle tab classes

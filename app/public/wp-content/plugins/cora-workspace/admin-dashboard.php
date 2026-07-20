@@ -1466,10 +1466,43 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             border-left: 3px solid #09090b !important;
         }
 
-        #cora-ai-sidebar.collapsed,
-        aside[id$="-drawer"].collapsed {
+        #cora-ai-sidebar.collapsed {
             transform: translateX(100%) !important;
             box-shadow: none !important;
+        }
+
+        aside[id$="-drawer"] {
+            position: fixed !important;
+            top: 0 !important;
+            right: 0 !important;
+            z-index: 9999 !important;
+            height: 100vh !important;
+            width: 440px !important;
+            max-width: 90vw !important;
+            box-sizing: border-box !important;
+            transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1), visibility 250ms ease-in-out !important;
+            pointer-events: auto !important;
+        }
+
+        aside[id$="-drawer"].collapsed {
+            transform: translateX(100%) !important;
+            pointer-events: none !important;
+            box-shadow: none !important;
+            visibility: hidden !important;
+        }
+
+        aside[id$="-drawer"]:not(.collapsed) {
+            transform: translateX(0) !important;
+            pointer-events: auto !important;
+            visibility: visible !important;
+            box-shadow: -12px 0 35px rgba(0,0,0,0.18) !important;
+        }
+
+        /* Ensure main workspace content width remains 100% stable when drawer is open */
+        main, .cora-main-content, #cora-workspace-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            flex: 1 1 auto !important;
         }
 
         /* Switch toggle helpers */
@@ -10368,6 +10401,9 @@ if ( current_user_can( 'manage_options' ) ) :
     </div>
 </div>
 <?php endif; ?>
+
+<!-- Global Drawer Backdrop -->
+<div id="cora-drawer-backdrop" onclick="window.coraCloseAllDrawers()" class="hidden fixed inset-0 bg-black/30 dark:bg-black/60 z-[9990] backdrop-blur-[1.5px] transition-opacity duration-200 cursor-pointer"></div>
 
 </body>
 </html>

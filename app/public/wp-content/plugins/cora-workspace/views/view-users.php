@@ -164,6 +164,28 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             $u_joined = date( 'd M Y', strtotime( $u->user_registered ) );
                             $avatar = get_user_meta( $u->ID, 'cora_avatar_url', true );
                             
+                            $u_phone = get_user_meta( $u->ID, 'cora_phone', true );
+                            $u_specs = get_user_meta( $u->ID, 'cora_specializations', true ) ?: array();
+                            $u_split = get_user_meta( $u->ID, 'cora_commission_split', true ) ?: '70/30';
+                            $u_rate  = get_user_meta( $u->ID, 'cora_hourly_rate', true ) ?: '2500';
+                            $u_bank  = get_user_meta( $u->ID, 'cora_bank_upi', true ) ?: '';
+                            $u_bio   = get_user_meta( $u->ID, 'description', true ) ?: '';
+
+                            $user_payload = array(
+                                'id'         => $u->ID,
+                                'name'       => $u->display_name,
+                                'email'      => $u->user_email,
+                                'phone'      => $u_phone,
+                                'role'       => $u_role,
+                                'branch'     => $u_branch_id,
+                                'status'     => $u_status,
+                                'specs'      => (array) $u_specs,
+                                'split'      => $u_split,
+                                'rate'       => $u_rate,
+                                'bank'       => $u_bank,
+                                'bio'        => $u_bio
+                            );
+                            
                             $name_initials = '';
                             $words = explode( ' ', $u->display_name );
                             foreach ( $words as $w ) $name_initials .= strtoupper( substr( $w, 0, 1 ) );
@@ -195,7 +217,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 </td>
                                 <td class="px-5 py-3 text-zinc-400 font-medium"><?php echo esc_html($u_joined); ?></td>
                                 <td class="px-5 py-3 text-right">
-                                    <button onclick="openEditUserDrawer(<?php echo esc_attr( $u->ID ); ?>, '<?php echo esc_attr($u->display_name); ?>', '<?php echo esc_attr($u_role); ?>', '<?php echo esc_attr($u_branch_id); ?>', '<?php echo esc_attr($u_status); ?>')" class="px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-sm transition-colors">Edit</button>
+                                    <button data-user="<?php echo esc_attr( wp_json_encode( $user_payload ) ); ?>" onclick="openEditUserDrawer(this)" class="cora-edit-user-btn px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-sm transition-colors">Edit</button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -275,62 +297,151 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
     <!-- TAB 3: PERMISSIONS MATRIX -->
     <div id="tab-permissions-matrix" class="cora-tab-content space-y-4 hidden">
-        <div class="cora-card bg-white border border-zinc-200/85 rounded-xl p-5 shadow-sm space-y-4">
-            <div class="flex items-center justify-between border-b border-zinc-100 pb-2">
-                <h3 class="text-sm font-bold text-zinc-900">Granular Role Permissions Matrix</h3>
-                <div class="flex items-center gap-1.5 text-[10px] font-bold text-zinc-550 select-none">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Live Sync Active
+        <div class="cora-card bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-5 shadow-sm space-y-5">
+            <!-- Header & Toolbar Controls Bar -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-zinc-200/60 dark:border-zinc-800">
+                <div>
+                    <div class="flex items-center gap-2.5">
+                        <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-300"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                            Granular Role Permissions Matrix
+                        </h3>
+                        <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 dark:bg-emerald-950/30 border border-emerald-500/20 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 select-none">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Live Sync Active
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">Determine dashboard screen visibilities and feature access controls for each workspace role. Super Admin permissions are locked globally.</p>
+                </div>
+
+                <!-- Action Controls Toolbar -->
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <!-- Quick Search input -->
+                    <div class="relative w-full sm:w-52">
+                        <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-zinc-400 dark:text-zinc-500">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        </div>
+                        <input type="text" id="matrix-role-search" placeholder="Search roles..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/70 rounded-lg text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-950 dark:focus:ring-zinc-100 transition-all">
+                    </div>
+
+                    <!-- Reset Defaults Button -->
+                    <button type="button" id="matrix-reset-defaults-btn" onclick="coraResetMatrixDefaults()" class="px-3 py-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-750 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                        Reset Defaults
+                    </button>
+
+                    <!-- Grant All Button -->
+                    <button type="button" id="matrix-grant-all-btn" onclick="coraGrantAllSelectedRolePermissions()" class="px-3 py-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-750 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Grant All (Selected Role)
+                    </button>
+
+                    <!-- Save Matrix Button -->
+                    <button type="button" id="matrix-save-btn" onclick="coraSavePermissionsMatrix()" class="px-3.5 py-1.5 text-xs font-bold text-white dark:text-zinc-950 bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-2xs">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                        Save Matrix
+                    </button>
                 </div>
             </div>
-            <p class="text-[11px] text-zinc-400 -mt-2 leading-relaxed">Determine dashboard screen visibilities for each workspace role. Super Admin permissions are locked globally.</p>
             
             <?php
             $active_industry = cora_get_active_industry();
             if ( $active_industry === 'photography_studio' ) {
-                $matrix_columns = array(
-                    'dashboard'   => 'Dashboard',
-                    'bookings'    => 'Shoots',
-                    'team-roles'  => 'Team & Roles',
-                    'equipment'   => 'Camera Gear',
-                    'financials'  => 'Financials',
-                    'portfolio'   => 'Portfolio',
-                    'leads'       => 'Client Leads',
-                    'settings'    => 'Settings'
+                $categories = array(
+                    'CORE NAVIGATION' => array(
+                        'dashboard' => 'Dashboard',
+                        'bookings'  => 'Shoots',
+                        'portfolio' => 'Portfolio',
+                        'leads'     => 'Client Leads',
+                    ),
+                    'OPERATIONAL' => array(
+                        'team-roles' => 'Team & Roles',
+                        'equipment'  => 'Camera Gear',
+                    ),
+                    'ADMINISTRATIVE' => array(
+                        'financials' => 'Financials',
+                        'settings'   => 'Settings',
+                    ),
                 );
             } else {
-                $matrix_columns = array(
-                    'dashboard'   => 'Dashboard',
-                    'bookings'    => 'Showings CRM',
-                    'feature-hub' => 'Feature Hub',
-                    'team-roles'  => 'Team & Roles',
-                    'equipment'   => 'Equipment',
-                    'financials'  => 'Financials',
-                    'settings'    => 'Settings'
+                $categories = array(
+                    'CORE NAVIGATION' => array(
+                        'dashboard'   => 'Dashboard',
+                        'bookings'    => 'Showings CRM',
+                        'feature-hub' => 'Feature Hub',
+                    ),
+                    'OPERATIONAL' => array(
+                        'team-roles' => 'Team & Roles',
+                        'equipment'  => 'Equipment',
+                    ),
+                    'ADMINISTRATIVE' => array(
+                        'financials' => 'Financials',
+                        'settings'   => 'Settings',
+                    ),
                 );
             }
+
+            $matrix_columns = array();
+            foreach ( $categories as $cat_label => $cat_cols ) {
+                foreach ( $cat_cols as $col_key => $col_name ) {
+                    $matrix_columns[$col_key] = $col_name;
+                }
+            }
             ?>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-zinc-200 text-xs text-left" id="cora-permissions-matrix-table">
+
+            <!-- Matrix Table Container with Sticky Left Column -->
+            <div class="overflow-x-auto rounded-lg border border-zinc-200/80 dark:border-zinc-800 shadow-2xs">
+                <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-xs text-left select-none border-collapse" id="cora-permissions-matrix-table">
                     <thead>
-                        <tr class="bg-zinc-50/50">
-                            <th class="px-4 py-2.5 font-bold text-zinc-550 uppercase tracking-wider text-[10px]">Role Title</th>
+                        <!-- Row 1: Category Grouping Badges -->
+                        <tr class="bg-zinc-100/70 dark:bg-zinc-800/50 border-b border-zinc-200/80 dark:border-zinc-800">
+                            <th class="px-4 py-2 sticky left-0 z-20 bg-zinc-100/90 dark:bg-zinc-800/90 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider text-left shadow-[1px_0_0_0_rgba(0,0,0,0.06)] dark:shadow-[1px_0_0_0_rgba(255,255,255,0.08)]">
+                                CATEGORIES
+                            </th>
+                            <?php foreach ( $categories as $cat_label => $cat_cols ) : ?>
+                                <th colspan="<?php echo count($cat_cols); ?>" class="px-3 py-1.5 text-center border-r last:border-r-0 border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-200/40 dark:bg-zinc-800/80">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-extrabold tracking-wider bg-zinc-200/80 dark:bg-zinc-700/80 text-zinc-800 dark:text-zinc-200 shadow-2xs">
+                                        <?php echo esc_html( $cat_label ); ?>
+                                    </span>
+                                </th>
+                            <?php endforeach; ?>
+                        </tr>
+                        <!-- Row 2: Feature Labels -->
+                        <tr class="bg-zinc-50 dark:bg-zinc-850 border-b border-zinc-200 dark:border-zinc-800">
+                            <th class="px-4 py-2.5 sticky left-0 z-20 bg-zinc-50 dark:bg-zinc-850 font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider text-[10px] shadow-[1px_0_0_0_rgba(0,0,0,0.06)] dark:shadow-[1px_0_0_0_rgba(255,255,255,0.08)]">
+                                Role Title
+                            </th>
                             <?php foreach ( $matrix_columns as $col_key => $col_lbl ) : ?>
-                                <th class="px-3 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px] text-center"><?php echo esc_html( $col_lbl ); ?></th>
+                                <th class="px-3 py-2.5 font-bold text-zinc-600 dark:text-zinc-300 text-[10px] uppercase tracking-wider text-center border-r last:border-r-0 border-zinc-200/60 dark:border-zinc-800/60">
+                                    <?php echo esc_html( $col_lbl ); ?>
+                                </th>
                             <?php endforeach; ?>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-zinc-150">
-                        <!-- Super Admin row (Locked) -->
-                        <tr class="hover:bg-zinc-50/30">
-                            <td class="px-4 py-3 font-semibold text-zinc-900">Super Admin</td>
+                    <tbody class="divide-y divide-zinc-200/60 dark:divide-zinc-800/60 bg-white dark:bg-zinc-900">
+                        <!-- Super Admin / Owner Row (Locked) -->
+                        <tr class="group hover:bg-zinc-50/70 dark:hover:bg-zinc-850/50 transition-colors cora-matrix-row border-b border-zinc-100 dark:border-zinc-800/60" data-role="cora_super_admin" data-locked="true">
+                            <td class="px-4 py-3 sticky left-0 z-10 bg-white dark:bg-zinc-900 group-hover:bg-zinc-50/70 dark:group-hover:bg-zinc-850/50 transition-colors shadow-[1px_0_0_0_rgba(0,0,0,0.06)] dark:shadow-[1px_0_0_0_rgba(255,255,255,0.08)]">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="font-bold text-xs text-zinc-900 dark:text-zinc-100 cora-role-title-text">Super Admin</span>
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 shadow-2xs">
+                                        <svg class="w-2.5 h-2.5 text-zinc-500 dark:text-zinc-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                        Global System Lock
+                                    </span>
+                                </div>
+                            </td>
                             <?php foreach ( $matrix_columns as $col_key => $col_lbl ) : ?>
-                                <td class="text-center"><input type="checkbox" checked disabled class="accent-zinc-950"></td>
+                                <td class="text-center py-3 border-r last:border-r-0 border-zinc-100 dark:border-zinc-800/40">
+                                    <input type="checkbox" checked disabled class="accent-zinc-950 dark:accent-zinc-100 rounded cursor-not-allowed opacity-50 w-4 h-4">
+                                </td>
                             <?php endforeach; ?>
                         </tr>
-                        <!-- Custom & Industry roles -->
+                        <!-- Custom & Standard Roles -->
                         <?php 
                         $all_roles = cora_get_all_roles();
+                        $cora_permissions = get_option( 'cora_role_permissions', array() );
+                        $cora_custom_roles = get_option( 'cora_custom_roles', array() );
+
                         $target_roles = array();
                         foreach ( $all_roles as $rk => $rl ) {
                             if ( $rk !== 'administrator' && $rk !== 'cora_shruti' && $rk !== 'cora_super_admin' ) {
@@ -340,14 +451,47 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         
                         foreach ($target_roles as $role_key => $role_name): 
                             $allowed_features = isset($cora_permissions[$role_key]) ? $cora_permissions[$role_key] : array();
+                            
+                            // Determine Access Level Badge
+                            $access_badge_label = 'Contributor';
+                            $access_badge_class = 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 font-semibold';
+                            
+                            if ( isset( $cora_custom_roles[$role_key] ) ) {
+                                $cdef = $cora_custom_roles[$role_key];
+                                $lvl = isset($cdef['access_level']) ? $cdef['access_level'] : 'contributor';
+                                if ($lvl === 'manager') {
+                                    $access_badge_label = 'Manager';
+                                    $access_badge_class = 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 font-bold';
+                                } elseif ($lvl === 'read_only') {
+                                    $access_badge_label = 'Read-Only';
+                                    $access_badge_class = 'bg-zinc-100/80 text-zinc-600 dark:bg-zinc-800/60 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-750 font-semibold';
+                                } else {
+                                    $access_badge_label = 'Custom';
+                                }
+                            } else {
+                                if ( in_array($role_key, array('cora_branch_manager', 'editor')) ) {
+                                    $access_badge_label = 'Manager';
+                                    $access_badge_class = 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 font-bold';
+                                } elseif ( in_array($role_key, array('cora_viewer', 'subscriber')) ) {
+                                    $access_badge_label = 'Read-Only';
+                                    $access_badge_class = 'bg-zinc-100/80 text-zinc-600 dark:bg-zinc-800/60 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-750 font-semibold';
+                                }
+                            }
                         ?>
-                        <tr class="hover:bg-zinc-50/30 cora-matrix-row" data-role="<?php echo esc_attr($role_key); ?>">
-                            <td class="px-4 py-3 font-semibold text-zinc-800"><?php echo esc_html($role_name); ?></td>
+                        <tr class="group hover:bg-zinc-50/70 dark:hover:bg-zinc-850/50 transition-colors cora-matrix-row cursor-pointer border-b border-zinc-100 dark:border-zinc-800/60" data-role="<?php echo esc_attr($role_key); ?>">
+                            <td class="px-4 py-3 sticky left-0 z-10 bg-white dark:bg-zinc-900 group-hover:bg-zinc-50/70 dark:group-hover:bg-zinc-850/50 transition-colors shadow-[1px_0_0_0_rgba(0,0,0,0.06)] dark:shadow-[1px_0_0_0_rgba(255,255,255,0.08)]">
+                                <div class="flex items-center justify-between gap-3 pr-2">
+                                    <span class="font-semibold text-xs text-zinc-900 dark:text-zinc-100 cora-role-title-text"><?php echo esc_html($role_name); ?></span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] shadow-2xs <?php echo esc_attr($access_badge_class); ?>">
+                                        <?php echo esc_html($access_badge_label); ?>
+                                    </span>
+                                </div>
+                            </td>
                             <?php foreach ($matrix_columns as $feature_key => $feature_label): 
                                 $checked = in_array($feature_key, $allowed_features) ? 'checked' : '';
                             ?>
-                            <td class="text-center">
-                                <input type="checkbox" <?php echo $checked; ?> data-feature="<?php echo esc_attr($feature_key); ?>" class="cora-permission-checkbox accent-zinc-950 cursor-pointer">
+                            <td class="text-center py-3 border-r last:border-r-0 border-zinc-100 dark:border-zinc-800/40">
+                                <input type="checkbox" <?php echo $checked; ?> data-feature="<?php echo esc_attr($feature_key); ?>" class="cora-permission-checkbox accent-zinc-950 dark:accent-zinc-100 rounded cursor-pointer w-4 h-4 transition-transform hover:scale-110">
                             </td>
                             <?php endforeach; ?>
                         </tr>
@@ -359,84 +503,295 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     </div>
 
     <!-- TAB 4: CUSTOM ROLES -->
-    <div id="tab-custom-roles" class="cora-tab-content space-y-4 hidden">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Create custom role form -->
-            <div class="cora-card bg-white border border-zinc-200/85 rounded-xl p-5 shadow-sm space-y-4 h-fit">
-                <div class="border-b border-zinc-100 pb-2">
-                    <h3 class="text-sm font-bold text-zinc-900">Define Custom Role</h3>
-                    <p class="text-[11px] text-zinc-400 mt-0.5">Add a tailored role for your brokerage or studio departments.</p>
-                </div>
-                <form id="create-custom-role-form" onsubmit="handleCreateCustomRole(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-[10px] font-bold text-zinc-550 uppercase tracking-wider mb-1.5">Role Display Name</label>
-                        <input type="text" id="custom-role-name" required placeholder="e.g. Social Media Specialist" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
-                    </div>
-                    <button type="submit" id="create-role-submit-btn" class="w-full bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs py-2.5 rounded-lg transition-colors cursor-pointer active:scale-95 shadow-sm">
-                        Create Role
-                    </button>
-                </form>
+    <div id="tab-custom-roles" class="cora-tab-content space-y-6 hidden">
+        <!-- Header Bar with Title, Subtitle, and Primary CTA Button -->
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-700 dark:text-zinc-300"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    Custom Roles & Workspace Access
+                </h2>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Configure specialized team roles, assign module permission matrices, and set operational limits.</p>
             </div>
+            <div>
+                <button type="button" onclick="openCreateCustomRoleDrawer()" class="bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs px-4 py-2.5 rounded-lg transition-colors cursor-pointer active:scale-95 shadow-sm flex items-center gap-2 whitespace-nowrap">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    + Create Custom Role
+                </button>
+            </div>
+        </div>
 
-            <!-- Custom roles list table -->
-            <div class="cora-card bg-white border border-zinc-200/85 rounded-xl p-5 shadow-sm space-y-4 md:col-span-2">
-                <div class="border-b border-zinc-100 pb-2">
-                    <h3 class="text-sm font-bold text-zinc-900">Active Custom Roles</h3>
-                    <p class="text-[11px] text-zinc-400 mt-0.5">Roles currently registered in this workspace environment.</p>
+        <!-- Preset Role Quick-Clones / Template Cards Row -->
+        <div class="space-y-3">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xs font-bold text-zinc-550 dark:text-zinc-400 uppercase tracking-wider">Role Templates & Quick Starts</h3>
+                <span class="text-[11px] text-zinc-400">Click to launch pre-configured role drawer</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                <!-- Template 1: Branch Manager -->
+                <div onclick="openCreateCustomRoleDrawer('cora_branch_manager')" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm hover:border-zinc-400 dark:hover:border-zinc-600 transition-all cursor-pointer group flex flex-col justify-between">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            </span>
+                            <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Manager Access</span>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-zinc-950 dark:group-hover:text-white">Branch Manager</h4>
+                            <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-2">Full branch oversight, lead dispatch, team management, and financials.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-1 pt-1">
+                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">CRM</span>
+                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">Financials</span>
+                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">Team</span>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-zinc-300 group-hover:underline">
+                        <span>Use Template</span>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </div>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-zinc-200 text-xs text-left">
-                        <thead>
-                            <tr class="bg-zinc-50/50">
-                                <th class="px-4 py-2.5 font-bold text-zinc-550 uppercase tracking-wider text-[10px]">Role Name</th>
-                                <th class="px-4 py-2.5 font-bold text-zinc-550 uppercase tracking-wider text-[10px]">System Identifier</th>
-                                <th class="px-4 py-2.5 font-bold text-zinc-550 uppercase tracking-wider text-[10px] text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-zinc-150">
-                            <?php
-                            $my_custom_roles = get_option( 'cora_custom_roles', array() );
-                            if ( empty( $my_custom_roles ) ) :
-                            ?>
-                            <tr>
-                                <td colspan="3" class="px-4 py-8 text-center text-zinc-400">No custom roles defined yet.</td>
-                            </tr>
-                            <?php else : ?>
-                                <?php foreach ( $my_custom_roles as $cr ) : ?>
-                                <tr class="hover:bg-zinc-50/30">
-                                    <td class="px-4 py-3 font-semibold text-zinc-800"><?php echo esc_html( $cr['role_name'] ); ?></td>
-                                    <td class="px-4 py-3"><code class="text-zinc-500 font-mono"><?php echo esc_html( $cr['role_key'] ); ?></code></td>
-                                    <td class="px-4 py-3 text-right">
-                                        <button onclick="handleDeleteCustomRole('<?php echo esc_attr( $cr['role_key'] ); ?>', this)" class="text-red-650 hover:text-red-700 font-bold hover:underline cursor-pointer transition-all">Delete</button>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
+
+                <!-- Template 2: Photographer -->
+                <div onclick="openCreateCustomRoleDrawer('cora_photographer')" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm hover:border-zinc-400 dark:hover:border-zinc-600 transition-all cursor-pointer group flex flex-col justify-between">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                            </span>
+                            <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Contributor</span>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-zinc-950 dark:group-hover:text-white">Photographer</h4>
+                            <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-2">Shoot schedule access, equipment logs, media upload, & check-ins.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-1 pt-1">
+                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">Showings</span>
+                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">Media</span>
+                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">Gear</span>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-zinc-300 group-hover:underline">
+                        <span>Use Template</span>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </div>
+                </div>
+
+                <!-- Template 3: Editor -->
+                <div onclick="openCreateCustomRoleDrawer('cora_editor')" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm hover:border-zinc-400 dark:hover:border-zinc-600 transition-all cursor-pointer group flex flex-col justify-between">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>
+                            </span>
+                            <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Contributor</span>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-zinc-950 dark:group-hover:text-white">Editor</h4>
+                            <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-2">Media post-production, vault editing, and AI suite processing.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-1 pt-1">
+                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">Media</span>
+                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">AI Suite</span>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-zinc-300 group-hover:underline">
+                        <span>Use Template</span>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </div>
+                </div>
+
+                <!-- Template 4: Viewer -->
+                <div onclick="openCreateCustomRoleDrawer('cora_viewer')" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm hover:border-zinc-400 dark:hover:border-zinc-600 transition-all cursor-pointer group flex flex-col justify-between">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </span>
+                            <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Read-Only</span>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-zinc-950 dark:group-hover:text-white">Viewer</h4>
+                            <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-2">Read-only access for external clients, partners, or auditors.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-1 pt-1">
+                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">Showings</span>
+                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">Media</span>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-zinc-300 group-hover:underline">
+                        <span>Use Template</span>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- TAB 5: ATTENDANCE LOGS -->
+        <!-- Active Custom Roles Table (Full Width Overview) -->
+        <div class="cora-card bg-white dark:bg-zinc-900 border border-zinc-200/85 dark:border-zinc-800 rounded-xl p-5 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
+                <div>
+                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Active Custom Roles Overview</h3>
+                    <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">Manage custom roles registered in this workspace environment, update feature matrices, or duplicate configurations.</p>
+                </div>
+                <?php
+                $my_custom_roles = get_option( 'cora_custom_roles', array() );
+                ?>
+                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+                    <?php echo count($my_custom_roles); ?> Custom Roles Registered
+                </span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-xs text-left">
+                    <thead>
+                        <tr class="bg-zinc-50/50 dark:bg-zinc-950/50">
+                            <th class="px-4 py-2.5 font-bold text-zinc-550 dark:text-zinc-400 uppercase tracking-wider text-[10px]">Role Name & Identifier</th>
+                            <th class="px-4 py-2.5 font-bold text-zinc-550 dark:text-zinc-400 uppercase tracking-wider text-[10px]">Feature Permission Tags</th>
+                            <th class="px-4 py-2.5 font-bold text-zinc-550 dark:text-zinc-400 uppercase tracking-wider text-[10px]">Access Level & Quota</th>
+                            <th class="px-4 py-2.5 font-bold text-zinc-550 dark:text-zinc-400 uppercase tracking-wider text-[10px] text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-150 dark:divide-zinc-800">
+                        <?php if ( empty( $my_custom_roles ) ) : ?>
+                        <tr>
+                            <td colspan="4" class="px-4 py-8 text-center text-zinc-400">
+                                <div class="space-y-1">
+                                    <p class="font-medium text-xs">No custom roles defined yet.</p>
+                                    <p class="text-[11px] text-zinc-400">Click "+ Create Custom Role" above or choose a preset template to get started.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php else : ?>
+                            <?php foreach ( $my_custom_roles as $cr ) : 
+                                $role_key     = $cr['role_key'];
+                                $role_name    = $cr['role_name'];
+                                $base_tmpl    = ! empty( $cr['base_template'] ) ? $cr['base_template'] : 'Custom';
+                                $access_lbl   = ! empty( $cr['access_level'] ) ? ucfirst( str_replace( '_', ' ', $cr['access_level'] ) ) : 'Contributor';
+                                $quota_txt    = isset( $cr['max_quota'] ) && $cr['max_quota'] !== '' && $cr['max_quota'] !== null ? $cr['max_quota'] . '/mo' : 'Unlimited';
+                                $permissions  = ! empty( $cr['permissions'] ) && is_array( $cr['permissions'] ) ? $cr['permissions'] : ( isset( $cora_permissions[$role_key] ) ? $cora_permissions[$role_key] : array() );
+                                
+                                $json_payload = esc_attr( json_encode( array(
+                                    'role_key'      => $role_key,
+                                    'role_name'     => $role_name,
+                                    'base_template' => $base_tmpl,
+                                    'access_level'  => $cr['access_level'] ?? 'contributor',
+                                    'max_quota'     => $cr['max_quota'] ?? '',
+                                    'permissions'   => $permissions
+                                ) ) );
+
+                                // Feature tag mapping labels
+                                $perm_labels = array(
+                                    'crm_leads'         => 'CRM',
+                                    'crm'               => 'CRM',
+                                    'showings_bookings' => 'Showings',
+                                    'bookings'          => 'Showings',
+                                    'financials'        => 'Financials',
+                                    'media_vault'       => 'Media',
+                                    'media'             => 'Media',
+                                    'vault'             => 'Media',
+                                    'equipment'         => 'Equipment',
+                                    'ai_suite'          => 'AI Suite',
+                                    'attendance'        => 'Attendance'
+                                );
+                            ?>
+                            <tr class="hover:bg-zinc-50/30 dark:hover:bg-zinc-800/30">
+                                <td class="px-4 py-3">
+                                    <span class="font-semibold text-zinc-800 dark:text-zinc-200 block"><?php echo esc_html( $role_name ); ?></span>
+                                    <div class="flex items-center gap-1.5 mt-0.5">
+                                        <code class="text-zinc-500 dark:text-zinc-400 font-mono text-[10px] bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded"><?php echo esc_html( $role_key ); ?></code>
+                                        <span class="text-[10px] text-zinc-400">Template: <?php echo esc_html( ucfirst( str_replace( 'cora_', '', $base_tmpl ) ) ); ?></span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex flex-wrap gap-1 max-w-xs">
+                                        <?php if ( empty( $permissions ) ) : ?>
+                                            <span class="text-[10px] text-zinc-400 italic">None assigned</span>
+                                        <?php else : ?>
+                                            <?php foreach ( $permissions as $p_val ) : 
+                                                $tag_name = isset( $perm_labels[$p_val] ) ? $perm_labels[$p_val] : ucfirst( str_replace( '_', ' ', $p_val ) );
+                                            ?>
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60">
+                                                    <?php echo esc_html( $tag_name ); ?>
+                                                </span>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                                            <?php echo esc_html( $access_lbl ); ?>
+                                        </span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">
+                                            Quota: <?php echo esc_html( $quota_txt ); ?>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-right">
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <button type="button" data-custom-role="<?php echo $json_payload; ?>" class="cora-edit-custom-role-btn text-xs text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white font-semibold cursor-pointer transition-all flex items-center gap-1 px-2.5 py-1.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                            Edit Permissions
+                                        </button>
+                                        <button type="button" onclick="handleDuplicateCustomRole('<?php echo esc_attr( $role_key ); ?>')" title="Duplicate Role" class="cora-duplicate-custom-role-btn text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white cursor-pointer p-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                        </button>
+                                        <button type="button" onclick="handleDeleteCustomRole('<?php echo esc_attr( $role_key ); ?>', this)" title="Delete Role" class="text-red-650 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 cursor-pointer p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
+                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 5: ATTENDANCE LOGS -->
 <div id="tab-attendance-logs" class="cora-tab-content space-y-6 hidden">
     <?php
     $is_attendance_admin = in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager' ) );
     
     // Retrieve office location settings
-    $office_loc = get_option( 'cora_attendance_office_location', array(
-        'lat' => '',
-        'lng' => '',
-        'address' => '',
-        'radius' => 500
-    ) );
+    $office_address  = get_option( 'cora_office_address', '' );
+    $office_maps_url = get_option( 'cora_office_maps_url', '' );
+    $office_radius   = get_option( 'cora_geofence_radius', 500 );
+    $office_lat      = get_option( 'cora_office_lat', '' );
+    $office_lng      = get_option( 'cora_office_lng', '' );
+
+    $legacy_loc = get_option( 'cora_attendance_office_location', array() );
+    if ( empty( $office_address ) && ! empty( $legacy_loc['address'] ) ) {
+        $office_address = $legacy_loc['address'];
+    }
+    if ( empty( $office_maps_url ) && ! empty( $legacy_loc['maps_url'] ) ) {
+        $office_maps_url = $legacy_loc['maps_url'];
+    }
+    if ( empty( $office_lat ) && ! empty( $legacy_loc['lat'] ) ) {
+        $office_lat = $legacy_loc['lat'];
+    }
+    if ( empty( $office_lng ) && ! empty( $legacy_loc['lng'] ) ) {
+        $office_lng = $legacy_loc['lng'];
+    }
+    if ( empty( $office_radius ) && ! empty( $legacy_loc['radius'] ) ) {
+        $office_radius = $legacy_loc['radius'];
+    }
+
+    $office_loc = array(
+        'lat'      => $office_lat,
+        'lng'      => $office_lng,
+        'address'  => $office_address,
+        'maps_url' => $office_maps_url,
+        'radius'   => $office_radius ? intval( $office_radius ) : 500
+    );
     ?>
 
     <?php if ( $is_attendance_admin ) : ?>
         <!-- ANALYTICS CARDS (Admin only) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
             <!-- Card 1: Total Active Today -->
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex items-center justify-between">
                 <div class="space-y-1">
@@ -459,16 +814,43 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 </div>
             </div>
 
-            <!-- Card 3: Geofence radius Status -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex items-center justify-between">
-                <div class="space-y-1">
-                    <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Geofence Limit</span>
-                    <h3 class="text-xs font-bold text-zinc-800 dark:text-zinc-250 truncate max-w-[150px]" id="stat-geofence-status">
-                        <?php echo !empty($office_loc['lat']) ? esc_html($office_loc['radius']) . 'm Enforced' : 'Not Configured'; ?>
-                    </h3>
+            <!-- Card 3: Interactive Office Geofence & Location Control Card -->
+            <?php
+            $geofence_status_txt = 'Not Configured';
+            if ( ! empty( $office_loc['lat'] ) || ! empty( $office_loc['address'] ) || ! empty( $office_loc['maps_url'] ) ) {
+                $r_val = intval( $office_loc['radius'] );
+                $geofence_status_txt = ( $r_val >= 1000 ? ( $r_val / 1000 ) . 'km' : $r_val . 'm' ) . ' Enforced';
+            }
+
+            $current_address_txt = 'Not Configured';
+            if ( ! empty( $office_loc['address'] ) ) {
+                $current_address_txt = $office_loc['address'];
+            } elseif ( ! empty( $office_loc['maps_url'] ) ) {
+                $current_address_txt = $office_loc['maps_url'];
+            } elseif ( ! empty( $office_loc['lat'] ) ) {
+                $current_address_txt = $office_loc['lat'] . ', ' . $office_loc['lng'];
+            }
+            ?>
+            <div onclick="openGeofenceDrawer()" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex flex-col justify-between cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors group">
+                <div class="space-y-1 min-w-0">
+                    <div class="flex items-center justify-between gap-1">
+                        <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate">OFFICE GEOFENCING</span>
+                        <span id="stat-geofence-status" class="inline-flex items-center px-1.5 py-0.5 text-[9px] font-bold rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60 shrink-0">
+                            <?php echo esc_html( $geofence_status_txt ); ?>
+                        </span>
+                    </div>
+                    <p id="cora-geofence-current-address" class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate" title="<?php echo esc_attr( $current_address_txt ); ?>">
+                        <?php echo esc_html( $current_address_txt ); ?>
+                    </p>
                 </div>
-                <div class="p-2 bg-zinc-50 dark:bg-zinc-950 rounded-lg text-zinc-650 dark:text-zinc-350">
-                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path></svg>
+                <div class="mt-2.5 flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-zinc-850">
+                    <span class="text-[10px] font-bold text-zinc-900 dark:text-zinc-100 group-hover:underline flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        Map & Settings
+                    </span>
+                    <div class="p-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-700 transition-colors">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </div>
                 </div>
             </div>
 
@@ -485,291 +867,774 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         </div>
     <?php endif; ?>
 
-    <!-- Main Workspace Layout Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        
-        <!-- Left Side: User Punch In/Out & Office Settings -->
-        <div class="space-y-6">
-            
-            <!-- Card 1: Log Punch (Available to all users) -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-5 shadow-sm space-y-4">
-                <div>
-                    <h2 class="text-sm font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Log Punch</h2>
-                    <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">Register attendance with verified browser GPS verification.</p>
-                </div>
-                
-                <div class="space-y-2.5">
-                    <button id="cora-user-punch-in-btn" class="w-full bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-150 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 py-2.5 rounded-lg text-xs font-semibold shadow-sm transition-all cursor-pointer active:scale-95 flex items-center justify-center gap-2">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                        Punch In
-                    </button>
-                    <button id="cora-user-punch-out-btn" class="w-full bg-white hover:bg-zinc-50 border border-zinc-200 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-850 text-zinc-900 dark:text-zinc-100 py-2.5 rounded-lg text-xs font-semibold shadow-sm transition-all cursor-pointer active:scale-95 flex items-center justify-center gap-2">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                        Punch Out
-                    </button>
-                </div>
-                
-                <div id="cora-user-punch-status" class="text-[10px] text-center text-zinc-550 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-900 rounded-lg p-2.5 hidden"></div>
-            </div>
-
-            <?php if ( $is_attendance_admin ) : ?>
-                <!-- Card 2: Office Geofencing Settings (Admin only) -->
-                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-5 shadow-sm space-y-4">
-                    <div>
-                        <h2 class="text-sm font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Office Geofencing</h2>
-                        <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">Paste a Google Maps link to automatically calculate coordinates and enforce a 500m geofence.</p>
-                    </div>
-                    
-                    <form onsubmit="handleSaveOfficeLocation(event)" class="space-y-3">
-                        <div>
-                            <label class="block text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5">Google Maps URL</label>
-                            <input type="url" id="office-maps-url" required placeholder="https://maps.app.goo.gl/... or google.com/maps..." class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 px-3 text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none focus:ring-0">
+    <!-- Full-Width Punch Log History Section -->
+    <div class="space-y-4 w-full">
+        <!-- Enhanced Attendance Filter Toolbar -->
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm space-y-3">
+            <div class="flex flex-col xl:flex-row gap-3 items-stretch xl:items-center justify-between">
+                <!-- Left Section: Search & Filters -->
+                <div class="flex flex-wrap items-center gap-2.5 flex-1 min-w-0">
+                    <!-- Search Input -->
+                    <div class="relative w-full sm:w-56 shrink-0">
+                        <input type="text" id="attendance-log-search" oninput="fetchAttendanceLogs()" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 pl-8 pr-3 text-xs bg-white dark:bg-zinc-950 focus:border-zinc-400 focus:outline-none text-zinc-900 dark:text-zinc-100 transition-colors" placeholder="Search employee...">
+                        <div class="absolute left-2.5 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5">Latitude</label>
-                                <input type="text" id="office-lat" readonly value="<?php echo esc_attr( $office_loc['lat'] ); ?>" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 px-3 text-xs bg-zinc-50 dark:bg-zinc-900 text-zinc-500 focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5">Longitude</label>
-                                <input type="text" id="office-lng" readonly value="<?php echo esc_attr( $office_loc['lng'] ); ?>" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 px-3 text-xs bg-zinc-50 dark:bg-zinc-900 text-zinc-500 focus:outline-none">
-                            </div>
-                        </div>
-                        <button type="submit" id="save-office-loc-btn" class="w-full bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-150 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 py-2 rounded-lg text-xs font-semibold shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5">
-                            Verify & Update Location
-                        </button>
-                    </form>
-                    
-                    <?php if ( ! empty( $office_loc['lat'] ) ) : ?>
-                        <div class="text-[10px] text-zinc-500 border-t border-zinc-100 dark:border-zinc-800 pt-3 flex items-start gap-1">
-                            <svg class="w-3.5 h-3.5 text-zinc-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                            <div>
-                                <span class="font-bold text-zinc-700 dark:text-zinc-300">Enforced Location:</span>
-                                <a href="https://www.google.com/maps/search/?api=1&query=<?php echo urlencode($office_loc['lat'] . ',' . $office_loc['lng']); ?>" target="_blank" class="underline hover:text-zinc-800 dark:hover:text-zinc-100 block mt-0.5">
-                                    <?php echo esc_html( $office_loc['lat'] . ', ' . $office_loc['lng'] ); ?>
-                                </a>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
-
-        </div>
-        
-        <!-- Right Side: Recent Attendance History Logs -->
-        <div class="lg:col-span-2 space-y-4">
-            
-            <!-- Search & Control Header -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row gap-3 items-center justify-between">
-                <div class="relative w-full sm:w-64">
-                    <input type="text" id="attendance-log-search" oninput="filterAttendanceLogs()" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 pl-9 pr-3 text-xs bg-white dark:bg-zinc-950 focus:border-zinc-400 focus:outline-none focus:ring-0 text-zinc-900 dark:text-zinc-100 transition-colors" placeholder="Filter by employee name...">
-                    <div class="absolute left-3 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     </div>
-                </div>
-                
-                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-                    <?php if ( $is_attendance_admin ) : ?>
-                        <button onclick="exportAttendanceReport()" class="h-9 px-3 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg text-xs font-bold text-zinc-850 dark:text-zinc-300 transition-colors flex items-center gap-1.5 cursor-pointer">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                            Export CSV
-                        </button>
-                    <?php endif; ?>
-                    <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Punch Log History</span>
-                </div>
-            </div>
-            
-            <!-- Table card wrapper -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/85 dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-xs text-left">
-                        <thead class="bg-zinc-50/50 dark:bg-zinc-950">
-                            <tr>
-                                <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">User Name</th>
-                                <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Date & Time</th>
-                                <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Event Type</th>
-                                <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">GPS Coordinates</th>
-                                <?php if ( $is_attendance_admin ) : ?>
-                                    <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Geofence Status</th>
-                                <?php endif; ?>
-                            </tr>
-                        </thead>
-                        <tbody id="cora-user-attendance-table-body" class="divide-y divide-zinc-100 dark:divide-zinc-800 text-zinc-700 dark:text-zinc-300">
-                            <tr>
-                                <td colspan="<?php echo $is_attendance_admin ? '5' : '4'; ?>" class="px-5 py-8 text-center text-zinc-400 dark:text-zinc-500 font-medium">Loading punch records...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-        </div>
-        
-    </div>
-</div>
 
-<!-- ═══ INVITE USER DRAWER SHEET ═════════════════════════════════════════════ -->
-<div id="drawer-invite-user" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="absolute inset-0 bg-zinc-950/40" onclick="closeInviteDrawer()"></div>
-    <div class="relative z-10 bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-invite-card">
-        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
-            <h3 class="text-sm font-bold text-zinc-900">Invite Brokerage Member</h3>
-            <button class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeInviteDrawer()">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-        </div>
-        
-        <form onsubmit="handleSendInvite(event)" class="flex-1 overflow-y-auto p-6 space-y-5">
-            <div>
-                <label class="block text-xs font-bold text-zinc-800 mb-1.5">First Name</label>
-                <input type="text" id="invite-first-name" required placeholder="e.g. Vikas" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-zinc-800 mb-1.5">Last Name</label>
-                <input type="text" id="invite-last-name" required placeholder="e.g. Mehta" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-zinc-800 mb-1.5">Email Address</label>
-                <input type="email" id="invite-email" required placeholder="name@agency.com" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-zinc-800 mb-1.5">Operational Role</label>
-                <select id="invite-role" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
-                    <?php
-                    $active_industry = get_option( 'cora_workspace_industry', 'real_estate' );
-                    $module = Cora_Module_Registry::get_module( $active_industry );
-                    $roles_list = $module ? $module->get_industry_roles() : array();
-                    
-                    if ( $current_role === 'administrator' || $current_role === 'cora_manager' ) {
-                        echo '<option value="cora_branch_manager">Branch Manager</option>';
-                    }
-                    foreach ( $roles_list as $role_key => $role_label ) {
-                        if ( in_array( $role_key, array( 'administrator', 'cora_manager' ) ) ) {
-                            continue;
-                        }
-                        echo '<option value="' . esc_attr( $role_key ) . '">' . esc_html( $role_label ) . '</option>';
-                    }
-                    ?>
-                    <option value="cora_viewer">Viewer</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-zinc-800 mb-1.5">Assign Branch</label>
-                <select id="invite-branch" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer" <?php echo ! empty( $current_branch ) ? 'disabled' : ''; ?>>
-                    <?php foreach ( $agency_branches as $b_id => $b ) : ?>
-                        <option value="<?php echo esc_attr($b_id); ?>" <?php selected( $current_branch, $b_id ); ?>><?php echo esc_html($b['name']); ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            
-            <div class="pt-4">
-                <button type="submit" id="send-invite-btn" class="w-full py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm">Send Invitation Link</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- ═══ EDIT USER DRAWER SHEET ═══════════════════════════════════════════════ -->
-<div id="drawer-edit-user" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="absolute inset-0 bg-zinc-950/40" onclick="closeEditUserDrawer()"></div>
-    <div class="relative z-10 bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-edit-card">
-        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
-            <h3 class="text-sm font-bold text-zinc-900">Edit Crew Member</h3>
-            <button class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeEditUserDrawer()">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-        </div>
-        
-        <form onsubmit="handleSaveEditUser(event)" class="flex-1 overflow-y-auto p-6 space-y-5">
-            <input type="hidden" id="edit-user-id">
-            
-            <div>
-                <label class="block text-xs font-bold text-zinc-800 mb-1.5">Display Name</label>
-                <input type="text" id="edit-display-name" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
-            </div>
-            
-            <div>
-                <label class="block text-xs font-bold text-zinc-800 mb-1.5">Operational Role</label>
-                <select id="edit-role" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
-                    <?php
-                    $active_industry = get_option( 'cora_workspace_industry', 'real_estate' );
-                    $module = Cora_Module_Registry::get_module( $active_industry );
-                    $roles_list = $module ? $module->get_industry_roles() : array();
-                    
-                    if ( $current_role === 'administrator' || $current_role === 'cora_manager' ) {
-                        echo '<option value="cora_branch_manager">Branch Manager</option>';
-                    }
-                    foreach ( $roles_list as $role_key => $role_label ) {
-                        if ( in_array( $role_key, array( 'administrator', 'cora_manager' ) ) ) {
-                            continue;
-                        }
-                        echo '<option value="' . esc_attr( $role_key ) . '">' . esc_html( $role_label ) . '</option>';
-                    }
-                    ?>
-                    <option value="cora_viewer">Viewer</option>
-                </select>
-            </div>
-            
-            <div>
-                <label class="block text-xs font-bold text-zinc-800 mb-1.5">Assign Branch</label>
-                <select id="edit-branch" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
-                    <?php foreach ( $agency_branches as $b_id => $b ) : ?>
-                        <option value="<?php echo esc_attr($b_id); ?>"><?php echo esc_html($b['name']); ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <!-- Active / Inactive Status Switch -->
-            <div class="flex items-center justify-between border-t border-zinc-100 pt-4">
-                <div>
-                    <label class="block text-xs font-bold text-zinc-800">Account Status</label>
-                    <p class="text-[10px] text-zinc-400 mt-0.5">Deactivating instantly terminates all active sessions.</p>
-                </div>
-                <div class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="edit-status-toggle" onchange="handleStatusToggleChange(this)" class="sr-only peer">
-                    <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-950"></div>
-                </div>
-            </div>
-
-            <!-- Leads Reassignment Panel (Conditionally displayed when deactivating a user with leads) -->
-            <div id="leads-reassignment-panel" class="hidden bg-[#fafaf9] border border-zinc-200/80 rounded-xl p-4 space-y-3">
-                <div class="flex items-start gap-2 text-zinc-900">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 shrink-0 mt-0.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                    <div>
-                        <h4 class="text-xs font-bold" id="leads-warning-title">Active Leads Pending Reassignment</h4>
-                        <p class="text-[10px] text-zinc-550 mt-0.5">This agent currently manages <span id="leads-count-warning" class="font-bold">0</span> open leads. Choose a teammate to reassign them to.</p>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Reassign To</label>
-                    <select id="reassign-leads-to" class="w-full border border-zinc-200 rounded-lg px-2 py-1 text-xs bg-white text-zinc-800 outline-none">
-                        <option value="">Leave Unassigned (Mark as Unassigned)</option>
+                    <!-- Employee Picker Dropdown -->
+                    <select id="attendance-filter-user" onchange="fetchAttendanceLogs()" class="h-9 px-3 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0">
+                        <option value="">All Team Members</option>
                         <?php foreach ( $users as $u ) : ?>
                             <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
                         <?php endforeach; ?>
                     </select>
+
+                    <!-- Period Direction Dropdown -->
+                    <select id="attendance-filter-period" onchange="handlePeriodFilterChange()" class="h-9 px-3 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0">
+                        <option value="all">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="yesterday">Yesterday</option>
+                        <option value="this_week">This Week</option>
+                        <option value="this_month">This Month</option>
+                        <option value="custom">Custom Date Range</option>
+                    </select>
+
+                    <!-- Custom Date Range Inputs -->
+                    <div id="attendance-custom-date-container" class="hidden flex items-center gap-1.5 shrink-0">
+                        <input type="date" id="attendance-date-start" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors">
+                        <span class="text-xs font-medium text-zinc-400">to</span>
+                        <input type="date" id="attendance-date-end" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors">
+                    </div>
+
+                    <!-- Event Type Dropdown -->
+                    <select id="attendance-filter-event" onchange="fetchAttendanceLogs()" class="h-9 px-3 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0">
+                        <option value="all">All Event Types</option>
+                        <option value="in">Punch In</option>
+                        <option value="out">Punch Out</option>
+                    </select>
+                </div>
+
+                <!-- Right Section: CTAs -->
+                <div class="flex items-center gap-2 justify-end shrink-0 pt-2 xl:pt-0 border-t xl:border-t-0 border-zinc-100 dark:border-zinc-800">
+                    <button type="button" onclick="openAttendanceReportsDrawer()" class="h-9 px-3.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shrink-0 shadow-sm">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        Automated Reports & Share
+                    </button>
+                    <button type="button" onclick="exportAttendanceCSV()" class="h-9 px-3 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg text-xs font-bold text-zinc-800 dark:text-zinc-200 transition-colors flex items-center gap-1.5 cursor-pointer shrink-0">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Export CSV
+                    </button>
                 </div>
             </div>
-            
-            <div class="pt-4">
-                <button type="submit" id="save-edit-btn" class="w-full py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm">Save Changes</button>
+        </div>
+        
+        <!-- Table card wrapper -->
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/85 dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-xs text-left">
+                    <thead class="bg-zinc-50/50 dark:bg-zinc-950">
+                        <tr>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">User Name</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Date & Time</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Event Type</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">GPS Coordinates</th>
+                            <?php if ( $is_attendance_admin ) : ?>
+                                <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Geofence Status</th>
+                            <?php endif; ?>
+                        </tr>
+                    </thead>
+                    <tbody id="cora-user-attendance-table-body" class="divide-y divide-zinc-100 dark:divide-zinc-800 text-zinc-700 dark:text-zinc-300">
+                        <tr>
+                            <td colspan="<?php echo $is_attendance_admin ? '5' : '4'; ?>" class="px-5 py-8 text-center text-zinc-400 dark:text-zinc-500 font-medium">Loading punch records...</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
+<!-- ═══ OFFICE GEOFENCING DRAWER SHEET ═══════════════════════════════════════ -->
+<aside id="cora-geofence-drawer" class="collapsed fixed top-0 right-0 z-50 h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+    <!-- Header -->
+    <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0">
+        <div>
+            <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-300"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                Office Location & Geofencing
+            </h2>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Configure office address, map location link, and enforcement radius boundaries.</p>
+        </div>
+        <button onclick="closeGeofenceDrawer()" class="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" aria-label="Close drawer">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <!-- Drawer Body -->
+    <div class="p-5 overflow-y-auto flex-1 space-y-5">
+        <!-- Dual Mode Options -->
+        <div>
+            <label class="block text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2">Location Entry Mode</label>
+            <div class="grid grid-cols-2 gap-1.5 p-1 bg-zinc-100 dark:bg-zinc-950 rounded-lg border border-zinc-200/60 dark:border-zinc-800">
+                <button type="button" id="geofence-mode-address-btn" onclick="switchGeofenceMode('address')" class="geofence-mode-tab py-1.5 px-3 rounded-md text-xs font-semibold transition-all cursor-pointer text-center bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm">
+                    Address Search
+                </button>
+                <button type="button" id="geofence-mode-url-btn" onclick="switchGeofenceMode('url')" class="geofence-mode-tab py-1.5 px-3 rounded-md text-xs font-semibold transition-all cursor-pointer text-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100">
+                    Google Maps Link
+                </button>
+            </div>
+        </div>
+
+        <!-- Address Search Container -->
+        <div id="geofence-address-container" class="space-y-1.5">
+            <label class="block text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Office Address</label>
+            <div class="relative">
+                <input type="text" id="geofence-address-input" oninput="updateMapPreviewFromInput()" placeholder="Enter office street address, landmark, or city..." class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 pl-9 pr-3 text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors">
+                <div class="absolute left-3 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Google Maps Link Container -->
+        <div id="geofence-url-container" class="space-y-1.5 hidden">
+            <label class="block text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Google Maps Share URL</label>
+            <div class="relative">
+                <input type="url" id="geofence-maps-url-input" oninput="updateMapPreviewFromInput()" placeholder="https://maps.app.goo.gl/... or google.com/maps/@..." class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 pl-9 pr-3 text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors">
+                <div class="absolute left-3 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                </div>
+            </div>
+            <p class="text-[10px] text-zinc-400 dark:text-zinc-500">Paste any Google Maps link or coordinates URL.</p>
+        </div>
+
+        <!-- Radius Selector Pills -->
+        <div class="space-y-2">
+            <div class="flex items-center justify-between">
+                <label class="block text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Geofence Radius Boundary</label>
+                <span id="geofence-selected-radius-label" class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">500m</span>
+            </div>
+            <div class="grid grid-cols-4 gap-2" id="geofence-radius-pills">
+                <button type="button" data-radius="250" onclick="selectGeofenceRadius(250)" class="geofence-radius-pill py-2 px-3 rounded-lg border text-xs font-bold transition-all text-center cursor-pointer border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800">250m</button>
+                <button type="button" data-radius="500" onclick="selectGeofenceRadius(500)" class="geofence-radius-pill py-2 px-3 rounded-lg border text-xs font-bold transition-all text-center cursor-pointer bg-zinc-950 text-white dark:bg-zinc-100 dark:text-zinc-950 border-zinc-950 dark:border-zinc-100 shadow-sm">500m</button>
+                <button type="button" data-radius="1000" onclick="selectGeofenceRadius(1000)" class="geofence-radius-pill py-2 px-3 rounded-lg border text-xs font-bold transition-all text-center cursor-pointer border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800">1km</button>
+                <button type="button" data-radius="2000" onclick="selectGeofenceRadius(2000)" class="geofence-radius-pill py-2 px-3 rounded-lg border text-xs font-bold transition-all text-center cursor-pointer border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800">2km</button>
+            </div>
+            <input type="hidden" id="geofence-radius-input" value="500">
+        </div>
+
+        <!-- Interactive Map Preview Container -->
+        <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+                <label class="block text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Map Pin & Boundary Preview</label>
+                <span class="text-[10px] text-zinc-400 dark:text-zinc-500 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live Preview
+                </span>
+            </div>
+            <div class="w-full h-52 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-950 relative">
+                <iframe id="geofence-map-frame" class="w-full h-full border-0" loading="lazy" allowfullscreen src="about:blank"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Drawer Footer -->
+    <div class="p-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 flex items-center justify-end gap-2 shrink-0">
+        <button type="button" onclick="closeGeofenceDrawer()" class="px-4 py-2 rounded-lg text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+            Cancel
+        </button>
+        <button type="button" id="save-geofence-btn" onclick="handleSaveGeofence(event)" class="px-4 py-2 rounded-lg text-xs font-semibold bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-150 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 shadow-sm transition-all cursor-pointer flex items-center gap-1.5">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+            Save Location & Geofence
+        </button>
+    </div>
+</aside>
+
+<!-- ═══ AUTOMATED ATTENDANCE REPORT & SHARE SIDE DRAWER SHEET ═════════════════ -->
+<aside id="cora-attendance-reports-drawer" class="collapsed fixed top-0 right-0 z-50 h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+    <!-- Drawer Header -->
+    <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0">
+        <div>
+            <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-300"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Automated Attendance Reports & Share
+            </h2>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Configure report parameters, export documents, and dispatch automated summary emails.</p>
+        </div>
+        <button type="button" onclick="closeAttendanceReportsDrawer()" class="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" aria-label="Close drawer">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <!-- Drawer Body -->
+    <div class="p-5 overflow-y-auto flex-1 space-y-6">
+        <!-- Section: Report Scope Controls -->
+        <div class="space-y-4 bg-zinc-50/70 dark:bg-zinc-950/70 p-4 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Report Scope & Target</span>
+                <span class="text-[10px] font-bold text-zinc-500 bg-zinc-200/60 dark:bg-zinc-800 px-2 py-0.5 rounded">Configuration</span>
+            </div>
+
+            <!-- Time Horizon Control -->
+            <div class="space-y-1.5">
+                <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">Time Horizon</label>
+                <select id="attendance-report-horizon" onchange="handleReportHorizonChange()" class="w-full h-9 px-3 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer">
+                    <option value="daily">Daily Summary</option>
+                    <option value="weekly">Weekly Report</option>
+                    <option value="monthly">Monthly Payroll Sheet</option>
+                    <option value="custom">Custom Range</option>
+                </select>
+            </div>
+
+            <!-- Custom Date Inputs (Drawer) -->
+            <div id="attendance-report-custom-dates" class="hidden grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1">Start Date</label>
+                    <input type="date" id="attendance-report-start-date" class="w-full h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1">End Date</label>
+                    <input type="date" id="attendance-report-end-date" class="w-full h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none">
+                </div>
+            </div>
+
+            <!-- Employee Target Control -->
+            <div class="space-y-1.5">
+                <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">Employee Target</label>
+                <select id="attendance-report-target" class="w-full h-9 px-3 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer">
+                    <option value="all">Entire Workspace (All Members)</option>
+                    <?php foreach ( $users as $u ) : ?>
+                        <option value="<?php echo esc_attr( $u->ID ); ?>">Specific Employee: <?php echo esc_html( $u->display_name ); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+
+        <!-- Section: Export & Action Blocks -->
+        <div class="space-y-3">
+            <span class="block text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Export & Sharing Actions</span>
+
+            <!-- Action Block 1: CSV Export -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex items-center justify-between gap-3 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+                <div class="space-y-0.5 min-w-0">
+                    <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                        Download CSV Export
+                    </h4>
+                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Export raw timestamp logs and geofence data into a standard CSV file.</p>
+                </div>
+                <button type="button" onclick="exportAttendanceCSV()" class="h-8 px-3 border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-750 text-zinc-850 dark:text-zinc-200 rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0">
+                    Export
+                </button>
+            </div>
+
+            <!-- Action Block 2: Printable / PDF Summary -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex items-center justify-between gap-3 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+                <div class="space-y-0.5 min-w-0">
+                    <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                        Printable / PDF Summary
+                    </h4>
+                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Generate clean formatted print sheet with total hours and verification stats.</p>
+                </div>
+                <button type="button" onclick="generatePrintableAttendanceReport()" class="h-8 px-3 border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-750 text-zinc-850 dark:text-zinc-200 rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0">
+                    Print PDF
+                </button>
+            </div>
+
+            <!-- Action Block 3: Send Email Digest -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm space-y-3 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+                <div class="space-y-0.5">
+                    <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        Send Email Digest
+                    </h4>
+                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Send automated HTML summary email to team lead or administrator.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="email" id="attendance-report-email-recipient" value="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>" placeholder="recipient@agency.com" class="flex-1 h-8 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none">
+                    <button type="button" onclick="sendAttendanceEmailDigest()" class="h-8 px-3 bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0">
+                        Send Email
+                    </button>
+                </div>
+            </div>
+
+            <!-- Action Block 4: Copy Secure Share Link -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex items-center justify-between gap-3 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+                <div class="space-y-0.5 min-w-0">
+                    <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                        Copy Secure Share Link
+                    </h4>
+                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Generate read-only share token link for external payroll or audit access.</p>
+                </div>
+                <button type="button" onclick="copyAttendanceShareLink()" class="h-8 px-3 border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-750 text-zinc-850 dark:text-zinc-200 rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0">
+                    Copy Link
+                </button>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- ═══ INVITE USER DRAWER SHEET ═════════════════════════════════════════════ -->
+<aside id="cora-invite-user-drawer" class="collapsed fixed top-0 right-0 z-50 h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+    <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-950/50 shrink-0">
+        <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Invite Brokerage Member</h3>
+        <button type="button" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-1" onclick="closeInviteDrawer()">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+    
+    <form onsubmit="handleSendInvite(event)" class="flex-1 overflow-y-auto p-6 space-y-5">
+        <div>
+            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">First Name</label>
+            <input type="text" id="invite-first-name" required placeholder="e.g. Vikas" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
+        </div>
+        <div>
+            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Last Name</label>
+            <input type="text" id="invite-last-name" required placeholder="e.g. Mehta" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
+        </div>
+        <div>
+            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Email Address</label>
+            <input type="email" id="invite-email" required placeholder="name@agency.com" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
+        </div>
+        <div>
+            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Operational Role</label>
+            <select id="invite-role" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
+                <?php
+                $active_industry = get_option( 'cora_workspace_industry', 'real_estate' );
+                $module = Cora_Module_Registry::get_module( $active_industry );
+                $roles_list = $module ? $module->get_industry_roles() : array();
+                
+                if ( $current_role === 'administrator' || $current_role === 'cora_manager' ) {
+                    echo '<option value="cora_branch_manager">Branch Manager</option>';
+                }
+                foreach ( $roles_list as $role_key => $role_label ) {
+                    if ( in_array( $role_key, array( 'administrator', 'cora_manager' ) ) ) {
+                        continue;
+                    }
+                    echo '<option value="' . esc_attr( $role_key ) . '">' . esc_html( $role_label ) . '</option>';
+                }
+                ?>
+                <option value="cora_viewer">Viewer</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Assign Branch</label>
+            <select id="invite-branch" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer" <?php echo ! empty( $current_branch ) ? 'disabled' : ''; ?>>
+                <?php foreach ( $agency_branches as $b_id => $b ) : ?>
+                    <option value="<?php echo esc_attr($b_id); ?>" <?php selected( $current_branch, $b_id ); ?>><?php echo esc_html($b['name']); ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        
+        <div class="pt-4">
+            <button type="submit" id="send-invite-btn" class="w-full py-2 bg-zinc-950 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-950 font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm">Send Invitation Link</button>
+        </div>
+    </form>
+</aside>
+
+<!-- ═══ EDIT USER DRAWER SHEET ═══════════════════════════════════════════════ -->
+<aside id="cora-edit-user-drawer" class="collapsed fixed top-0 right-0 z-50 h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+        <!-- Header -->
+        <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-950/50">
+            <div>
+                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100" id="edit-user-title">Edit Team Member</h3>
+                <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5" id="edit-user-subtitle">Manage account details, role specializations, and compensation.</p>
+            </div>
+            <button class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-1" onclick="closeEditUserDrawer()">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+
+        <!-- Drawer Sub-Tabs -->
+        <div class="flex items-center gap-1 border-b border-zinc-200 dark:border-zinc-800 px-5 pt-2 bg-zinc-50/30 dark:bg-zinc-950/30 shrink-0 select-none">
+            <button type="button" class="drawer-edit-tab active px-3 py-2 text-xs font-bold border-b-2 border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 transition-colors cursor-pointer" data-drawer-tab="tab-edit-general">General</button>
+            <button type="button" class="drawer-edit-tab px-3 py-2 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors cursor-pointer" data-drawer-tab="tab-edit-specializations">Role & Tags</button>
+            <button type="button" class="drawer-edit-tab px-3 py-2 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors cursor-pointer" data-drawer-tab="tab-edit-financials">Financials</button>
+            <button type="button" class="drawer-edit-tab px-3 py-2 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors cursor-pointer" data-drawer-tab="tab-edit-actions">Actions</button>
+        </div>
+
+        <form onsubmit="handleSaveEditUser(event)" class="flex-1 overflow-y-auto flex flex-col justify-between">
+            <input type="hidden" id="edit-user-id">
+
+            <div class="p-6 space-y-5">
+                <!-- TAB 1: GENERAL PROFILE -->
+                <div id="tab-edit-general" class="drawer-tab-content space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Display Name</label>
+                        <input type="text" id="edit-display-name" required class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Phone Number</label>
+                        <input type="tel" id="edit-phone" placeholder="+91 98765 43210" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Operational Role</label>
+                        <select id="edit-role" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
+                            <?php
+                            $all_roles_map = cora_get_all_roles();
+                            foreach ( $all_roles_map as $r_key => $r_label ) {
+                                echo '<option value="' . esc_attr( $r_key ) . '">' . esc_html( $r_label ) . '</option>';
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Assign Branch</label>
+                        <select id="edit-branch" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
+                            <?php foreach ( $agency_branches as $b_id => $b ) : ?>
+                                <option value="<?php echo esc_attr($b_id); ?>"><?php echo esc_html($b['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <!-- Active / Inactive Status Switch -->
+                    <div class="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 pt-4">
+                        <div>
+                            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200">Account Status</label>
+                            <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">Deactivating instantly terminates all active sessions.</p>
+                        </div>
+                        <div class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="edit-status-toggle" onchange="handleStatusToggleChange(this)" class="sr-only peer">
+                            <div class="w-9 h-5 bg-zinc-200 dark:bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-950 dark:peer-checked:bg-zinc-150"></div>
+                        </div>
+                    </div>
+
+                    <!-- Leads Reassignment Panel -->
+                    <div id="leads-reassignment-panel" class="hidden bg-[#fafaf9] dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 space-y-3">
+                        <div class="flex items-start gap-2 text-zinc-900 dark:text-zinc-100">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400 shrink-0 mt-0.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            <div>
+                                <h4 class="text-xs font-bold" id="leads-warning-title">Active Leads Pending Reassignment</h4>
+                                <p class="text-[10px] text-zinc-550 dark:text-zinc-400 mt-0.5">This agent currently manages <span id="leads-count-warning" class="font-bold">0</span> open leads. Choose a teammate to reassign them to.</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Reassign To</label>
+                            <select id="reassign-leads-to" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2 py-1 text-xs bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 outline-none">
+                                <option value="">Leave Unassigned (Mark as Unassigned)</option>
+                                <?php foreach ( $users as $u ) : ?>
+                                    <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: SPECIALIZATIONS & TAGS -->
+                <div id="tab-edit-specializations" class="drawer-tab-content space-y-4 hidden">
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Operational Specializations</label>
+                        <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mb-3">Tag expertise areas for lead matching and shoot dispatching.</p>
+                        
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <?php
+                            $spec_options = $active_industry === 'photography_studio'
+                                ? array('Portrait & Fashion', 'Commercial Photography', 'Drone Specialist', 'Post-Production Colorist', 'Wedding Cinematography', 'Event Coverage')
+                                : array('Luxury Residential', 'Commercial Sales', 'Land Acquisition', 'Rental Management', 'Auction Specialist', 'Investment Advisory');
+                            
+                            foreach ($spec_options as $spec):
+                            ?>
+                                <label class="flex items-center gap-2 p-2 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-850 cursor-pointer text-zinc-800 dark:text-zinc-200 font-medium">
+                                    <input type="checkbox" name="edit-specs[]" value="<?php echo esc_attr($spec); ?>" class="edit-spec-checkbox accent-zinc-950 dark:accent-zinc-150">
+                                    <span class="text-[11px]"><?php echo esc_html($spec); ?></span>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Internal Bio & Operational Notes</label>
+                        <textarea id="edit-bio" rows="4" placeholder="Brief background, certifications, or internal brokerage notes..." class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100"></textarea>
+                    </div>
+                </div>
+
+                <!-- TAB 3: FINANCIALS & COMPENSATION -->
+                <div id="tab-edit-financials" class="drawer-tab-content space-y-4 hidden">
+                    <?php if ($active_industry === 'photography_studio') : ?>
+                        <div>
+                            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Base Shoot Rate (per assignment)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-xs text-zinc-400 font-bold">₹</span>
+                                <input type="number" id="edit-hourly-rate" placeholder="2500" class="w-full pl-7 pr-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
+                            </div>
+                            <p class="text-[10px] text-zinc-400 mt-1">Default payout rate per completed shoot.</p>
+                        </div>
+                    <?php else : ?>
+                        <div>
+                            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Commission Split Ratio (Agent % / Brokerage %)</label>
+                            <input type="text" id="edit-commission-split" placeholder="e.g. 75/25 or 80/20" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
+                            <p class="text-[10px] text-zinc-400 mt-1">Contractual split percentage applied on closed deals.</p>
+                        </div>
+                    <?php endif; ?>
+
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Bank Payout / UPI Details</label>
+                        <input type="text" id="edit-bank-upi" placeholder="e.g. name@upi or HDFC0001234 A/C 50100..." class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
+                    </div>
+                </div>
+
+                <!-- TAB 4: ACTIONS & SHORTCUTS -->
+                <div id="tab-edit-actions" class="drawer-tab-content space-y-4 hidden">
+                    <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 space-y-3 bg-zinc-50/50 dark:bg-zinc-950/50">
+                        <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Account Utility Actions</h4>
+                        <p class="text-[10px] text-zinc-400">Trigger automated security or credential updates for this crew member.</p>
+
+                        <div class="space-y-2 pt-1">
+                            <button type="button" onclick="triggerPasswordResetForUser()" class="w-full py-2 px-3 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold rounded-lg text-xs transition-colors flex items-center justify-between cursor-pointer">
+                                <span>Send Password Reset Email</span>
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-5 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0">
+                <button type="submit" id="save-edit-btn" class="w-full py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-zinc-200 font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm">Save Changes</button>
+        </form>
+</aside>
+
+<!-- ═══ EDIT CUSTOM ROLE DRAWER SHEET ════════════════════════════════════════ -->
+<aside id="cora-edit-custom-role-drawer" class="collapsed fixed top-0 right-0 z-50 h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+    <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-950/50 shrink-0">
+        <div>
+            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-300"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                Edit Custom Role Permissions
+            </h3>
+            <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">Modify access levels, quota caps, and feature permissions matrix.</p>
+        </div>
+        <button type="button" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-1" onclick="closeEditCustomRoleDrawer()">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <form id="edit-custom-role-form" onsubmit="handleSaveCustomRolePermissions(event)" class="flex-1 overflow-y-auto p-6 space-y-5">
+        <input type="hidden" id="edit-custom-role-key">
+
+        <div>
+            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Role Display Name</label>
+            <input type="text" id="edit-custom-role-name" required class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Operational Access Level</label>
+            <select id="edit-custom-role-access-level" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
+                <option value="read_only">Read-Only</option>
+                <option value="contributor">Standard Contributor</option>
+                <option value="manager">Manager / Admin</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Max Shoot/Booking Quota (Monthly)</label>
+            <input type="number" id="edit-custom-role-max-quota" min="0" placeholder="Unlimited (leave blank)" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
+        </div>
+
+        <div class="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200">Assigned Feature Permissions Matrix</label>
+            <div class="space-y-2 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 bg-zinc-50/50 dark:bg-zinc-950/50">
+                <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
+                    <input type="checkbox" value="crm_leads" class="edit-custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
+                    <span>CRM & Leads</span>
+                </label>
+                <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
+                    <input type="checkbox" value="showings_bookings" class="edit-custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
+                    <span>Showings & Bookings</span>
+                </label>
+                <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
+                    <input type="checkbox" value="financials" class="edit-custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
+                    <span>Financials</span>
+                </label>
+                <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
+                    <input type="checkbox" value="media_vault" class="edit-custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
+                    <span>Media & Vault</span>
+                </label>
+                <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
+                    <input type="checkbox" value="equipment" class="edit-custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
+                    <span>Equipment</span>
+                </label>
+                <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
+                    <input type="checkbox" value="ai_suite" class="edit-custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
+                    <span>AI Suite</span>
+                </label>
+                <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
+                    <input type="checkbox" value="attendance" class="edit-custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
+                    <span>Attendance</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="pt-4 flex items-center justify-end gap-2 border-t border-zinc-200 dark:border-zinc-800">
+            <button type="button" onclick="closeEditCustomRoleDrawer()" class="px-4 py-2 rounded-lg text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+                Cancel
+            </button>
+            <button type="submit" id="save-custom-role-btn" class="px-4 py-2 rounded-lg text-xs font-semibold bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 shadow-sm transition-all cursor-pointer flex items-center gap-1.5">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                Save Role & Permissions
+            </button>
+    </form>
+</aside>
+
+<!-- ═══ CREATE CUSTOM ROLE DRAWER SHEET ══════════════════════════════════════ -->
+<aside id="cora-create-custom-role-drawer" class="collapsed fixed top-0 right-0 z-50 h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+    <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-950/50 shrink-0">
+        <div>
+            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-300"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                Define Custom Role
+            </h3>
+            <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">Add a tailored role for your brokerage or studio departments.</p>
+        </div>
+        <button type="button" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-1" onclick="closeCreateCustomRoleDrawer()">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <form id="create-custom-role-form" onsubmit="handleCreateCustomRole(event)" class="flex-1 overflow-y-auto p-6 space-y-5">
+        <!-- 1. Role Display Name -->
+        <div>
+            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Role Display Name</label>
+            <input type="text" id="custom-role-name" required placeholder="e.g. Social Media Specialist" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
+        </div>
+
+        <!-- 2. Base Role Template Selector -->
+        <div>
+            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Base Role Template</label>
+            <select id="custom-role-base-template" onchange="handleApplyBaseTemplate(this.value)" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
+                <option value="">Custom (Blank Template)</option>
+                <option value="cora_branch_manager">Branch Manager</option>
+                <option value="cora_photographer">Photographer</option>
+                <option value="cora_editor">Editor</option>
+                <option value="cora_viewer">Viewer</option>
+            </select>
+            <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1">Clones default permissions and operational access level.</p>
+        </div>
+
+        <!-- 3. Operational Access Level -->
+        <div>
+            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Operational Access Level</label>
+            <select id="custom-role-access-level" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
+                <option value="read_only">Read-Only</option>
+                <option value="contributor" selected>Standard Contributor</option>
+                <option value="manager">Manager / Admin</option>
+            </select>
+        </div>
+
+        <!-- 4. Max Shoot/Booking Quota -->
+        <div>
+            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Max Shoot/Booking Quota (Monthly)</label>
+            <input type="number" id="custom-role-max-quota" min="0" placeholder="Unlimited (or e.g. 15)" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
+        </div>
+
+        <!-- 5. Feature Permissions Matrix checkboxes -->
+        <div class="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200">Feature Permissions Matrix</label>
+            <div class="space-y-2 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 bg-zinc-50/50 dark:bg-zinc-950/50 max-h-56 overflow-y-auto">
+                <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
+                    <input type="checkbox" value="crm_leads" class="custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
+                    <span>CRM & Leads</span>
+                </label>
+                <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
+                    <input type="checkbox" value="showings_bookings" class="custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded" checked>
+                    <span>Showings & Bookings</span>
+                </label>
+                <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
+                    <input type="checkbox" value="financials" class="custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
+                    <span>Financials</span>
+                </label>
+                <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
+                    <input type="checkbox" value="media_vault" class="custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded" checked>
+                    <span>Media & Vault</span>
+                </label>
+                <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
+                    <input type="checkbox" value="equipment" class="custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
+                    <span>Equipment</span>
+                </label>
+                <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
+                    <input type="checkbox" value="ai_suite" class="custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
+                    <span>AI Suite</span>
+                </label>
+                <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
+                    <input type="checkbox" value="attendance" class="custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded" checked>
+                    <span>Attendance</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="pt-4 flex items-center justify-end gap-2 border-t border-zinc-200 dark:border-zinc-800">
+            <button type="button" onclick="closeCreateCustomRoleDrawer()" class="px-4 py-2 rounded-lg text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition-colors cursor-pointer">
+                Cancel
+            </button>
+            <button type="submit" id="create-role-submit-btn" class="px-4 py-2 rounded-lg text-xs font-semibold bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 shadow-sm transition-all cursor-pointer flex items-center gap-1.5">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Create Role
+            </button>
+        </div>
+    </form>
+</aside>
+
 <script>
-    // Tab switching
-    $('.cora-sub-tab').on('click', function() {
-        $('.cora-sub-tab')
+    window.openGeofenceDrawer = openGeofenceDrawer;
+    window.closeGeofenceDrawer = closeGeofenceDrawer;
+    window.openCreateCustomRoleDrawer = openCreateCustomRoleDrawer;
+    window.closeCreateCustomRoleDrawer = closeCreateCustomRoleDrawer;
+    window.openAttendanceReportsDrawer = openAttendanceReportsDrawer;
+    window.closeAttendanceReportsDrawer = closeAttendanceReportsDrawer;
+
+    // Tab switching for User Management section
+    $(document).on('click', '.cora-sub-tabs-container .cora-sub-tab', function(e) {
+        e.preventDefault();
+        var targetId = $(this).data('target');
+        if (!targetId) return;
+
+        $('.cora-sub-tabs-container .cora-sub-tab')
             .removeClass('active border-zinc-950 dark:border-zinc-150 text-zinc-950 dark:text-zinc-150 font-semibold')
             .addClass('border-transparent text-zinc-550 dark:text-zinc-400 font-medium');
+        
         $(this)
             .addClass('active border-zinc-950 dark:border-zinc-150 text-zinc-950 dark:text-zinc-150 font-semibold')
             .removeClass('border-transparent text-zinc-550 dark:text-zinc-400 font-medium');
         
         $('.cora-tab-content').addClass('hidden');
-        $('#' + $(this).data('target')).removeClass('hidden');
+        $('#' + targetId).removeClass('hidden');
+
+        if (targetId === 'tab-attendance-logs' && typeof fetchAttendanceLogs === 'function') {
+            fetchAttendanceLogs();
+        }
+
+        // Update URL query string with ?tab=tab-slug
+        var tabSlug = targetId.replace(/^tab-/, '');
+        if (tabSlug === 'pending-invites') {
+            tabSlug = 'pending-invitations';
+        }
+        var newUrl = new URL(window.location.href);
+        newUrl.searchParams.set('tab', tabSlug);
+        history.replaceState(null, '', newUrl.toString());
+    });
+
+    $(document).ready(function() {
+        const params = new URLSearchParams(window.location.search);
+        const activeTab = params.get('tab');
+        if (activeTab) {
+            let $matchingTab = $('.cora-sub-tabs-container .cora-sub-tab').filter(function() {
+                var target = $(this).data('target') || '';
+                var slug = target.replace(/^tab-/, '');
+                return target === activeTab ||
+                       target === 'tab-' + activeTab ||
+                       slug === activeTab ||
+                       (activeTab === 'pending-invitations' && (slug === 'pending-invites' || target === 'tab-pending-invites')) ||
+                       (activeTab === 'pending-invites' && (slug === 'pending-invites' || target === 'tab-pending-invites'));
+            });
+            if ($matchingTab.length > 0) {
+                $matchingTab.trigger('click');
+            }
+        }
     });
 
     function filterActiveMembers() {
@@ -803,17 +1668,21 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
     // Invite user drawer
     function openInviteDrawer() {
-        $('#drawer-invite-user').removeClass('opacity-0 pointer-events-none');
-        $('#drawer-invite-user').css({'opacity': '1', 'pointer-events': 'auto'});
-        $('#drawer-invite-card').removeClass('translate-x-full').addClass('translate-x-0');
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        } else {
+            $('aside[id$="-drawer"]').addClass('collapsed');
+        }
+        $('#cora-invite-user-drawer').removeClass('collapsed');
+        $('#cora-drawer-backdrop').removeClass('hidden');
     }
 
     function closeInviteDrawer() {
-        $('#drawer-invite-card').removeClass('translate-x-0').addClass('translate-x-full');
-        setTimeout(function() {
-            $('#drawer-invite-user').addClass('opacity-0 pointer-events-none');
-            $('#drawer-invite-user').css({'opacity': '0', 'pointer-events': 'none'});
-        }, 300);
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        } else {
+            $('#cora-invite-user-drawer').addClass('collapsed');
+        }
         $('#invite-first-name').val('');
         $('#invite-last-name').val('');
         $('#invite-email').val('');
@@ -838,54 +1707,137 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             branch_id: branch,
             nonce: coraREData.ajaxNonce
         }, function(res) {
-            if (res.success) {
+            var msg = (res && res.data && (typeof res.data === 'string' ? res.data : res.data.message)) || 'Failed to send invitation.';
+            if (res && res.success) {
                 window.coraShowToast('Invitation sent successfully.');
                 closeInviteDrawer();
                 setTimeout(function() {
                     window.location.reload();
                 }, 1000);
             } else {
-                window.coraShowToast(res.data.message || 'Failed to send invitation.');
+                window.coraShowToast(msg);
                 $('#send-invite-btn').prop('disabled', false).text('Send Invitation Link');
             }
-        }).fail(function() {
-            window.coraShowToast('Network error.');
+        }, 'json').fail(function(xhr) {
+            var err = 'Failed to send invitation.';
+            try {
+                var parsed = typeof xhr.responseJSON === 'object' ? xhr.responseJSON : JSON.parse(xhr.responseText);
+                if (parsed && parsed.data) {
+                    err = typeof parsed.data === 'string' ? parsed.data : (parsed.data.message || err);
+                }
+            } catch(e) {}
+            window.coraShowToast(err);
             $('#send-invite-btn').prop('disabled', false).text('Send Invitation Link');
         });
     }
 
     // Edit user drawer
-    var currentEditingStatus = 'active';
-    
-    function openEditUserDrawer(userId, name, role, branch, status) {
-        $('#edit-user-id').val(userId);
-        $('#edit-display-name').val(name);
-        $('#edit-role').val(role);
-        $('#edit-branch').val(branch);
+    // Edit user drawer sub-tabs
+    $('.drawer-edit-tab').on('click', function() {
+        $('.drawer-edit-tab')
+            .removeClass('active border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 font-bold')
+            .addClass('border-transparent text-zinc-500 font-medium');
+        $(this)
+            .addClass('active border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 font-bold')
+            .removeClass('border-transparent text-zinc-500 font-medium');
         
-        currentEditingStatus = status;
-        var checked = (status === 'active');
+        $('.drawer-tab-content').addClass('hidden');
+        $('#' + $(this).data('drawer-tab')).removeClass('hidden');
+    });
+
+    $(document).on('click', '.cora-edit-user-btn', function(e) {
+        e.preventDefault();
+        var raw = $(this).attr('data-user');
+        if (!raw) return;
+        try {
+            var user = JSON.parse(raw);
+            openEditUserDrawer(user);
+        } catch(err) {
+            console.error('Error parsing user data:', err);
+        }
+    });
+
+    var currentEditingUser = null;
+    var currentEditingStatus = 'active';
+
+    function openEditUserDrawer(userPayload) {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        } else {
+            $('aside[id$="-drawer"]').addClass('collapsed');
+        }
+
+        var user = null;
+        if (userPayload && typeof userPayload === 'object') {
+            if (userPayload.nodeType || userPayload.jquery || $(userPayload).attr('data-user')) {
+                var raw = $(userPayload).attr('data-user');
+                try {
+                    user = JSON.parse(raw);
+                } catch(e) {
+                    console.error('Failed to parse user data from element:', e);
+                }
+            } else {
+                user = userPayload;
+            }
+        } else if (typeof userPayload === 'string') {
+            try {
+                user = JSON.parse(userPayload);
+            } catch(e) {
+                console.error('Failed to parse user string:', e);
+            }
+        }
+
+        if (!user) return;
+        currentEditingUser = user;
+
+        $('#edit-user-id').val(user.id || '');
+        $('#edit-display-name').val(user.name || '');
+        $('#edit-phone').val(user.phone || '');
+        $('#edit-role').val(user.role || '');
+        $('#edit-branch').val(user.branch || '');
+        $('#edit-bio').val(user.bio || '');
+        $('#edit-commission-split').val(user.split || '70/30');
+        $('#edit-hourly-rate').val(user.rate || '2500');
+        $('#edit-bank-upi').val(user.bank || '');
+
+        $('#edit-user-title').text('Edit ' + (user.name || 'Team Member'));
+
+        // Reset and populate specializations checkboxes
+        $('.edit-spec-checkbox').prop('checked', false);
+        if (Array.isArray(user.specs)) {
+            user.specs.forEach(function(s) {
+                $('.edit-spec-checkbox[value="' + s + '"]').prop('checked', true);
+            });
+        }
+
+        currentEditingStatus = user.status || 'active';
+        var checked = (currentEditingStatus === 'active');
         $('#edit-status-toggle').prop('checked', checked);
         $('#leads-reassignment-panel').addClass('hidden');
 
         // Hide self-deactivation option
-        if (userId === <?php echo $current_user_id; ?>) {
+        if (parseInt(user.id) === <?php echo $current_user_id; ?>) {
             $('#edit-status-toggle').prop('disabled', true);
         } else {
             $('#edit-status-toggle').prop('disabled', false);
         }
 
-        $('#drawer-edit-user').removeClass('opacity-0 pointer-events-none');
-        $('#drawer-edit-user').css({'opacity': '1', 'pointer-events': 'auto'});
-        $('#drawer-edit-card').removeClass('translate-x-full').addClass('translate-x-0');
+        // Reset to Tab 1
+        $('.drawer-edit-tab[data-drawer-tab="tab-edit-general"]').trigger('click');
+
+        $('#cora-edit-user-drawer').removeClass('collapsed');
+        $('#cora-drawer-backdrop').removeClass('hidden');
     }
+    window.openEditUserDrawer = openEditUserDrawer;
+    window.coraOpenEditUserDrawer = openEditUserDrawer;
+    window.closeEditUserDrawer = closeEditUserDrawer;
 
     function closeEditUserDrawer() {
-        $('#drawer-edit-card').removeClass('translate-x-0').addClass('translate-x-full');
-        setTimeout(function() {
-            $('#drawer-edit-user').addClass('opacity-0 pointer-events-none');
-            $('#drawer-edit-user').css({'opacity': '0', 'pointer-events': 'none'});
-        }, 300);
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        } else {
+            $('#cora-edit-user-drawer').addClass('collapsed');
+        }
     }
 
     function handleStatusToggleChange(el) {
@@ -918,33 +1870,85 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         e.preventDefault();
         var userId = $('#edit-user-id').val();
         var name = $('#edit-display-name').val().trim();
+        var phone = $('#edit-phone').val().trim();
         var role = $('#edit-role').val();
+        if (!role && currentEditingUser && currentEditingUser.role) {
+            role = currentEditingUser.role;
+        }
+        if (!role) {
+            role = 'administrator';
+        }
         var branch = $('#edit-branch').val();
         var active = $('#edit-status-toggle').is(':checked');
         var status = active ? 'active' : 'inactive';
         var reassignTo = $('#reassign-leads-to').val();
+        var bio = $('#edit-bio').val().trim();
+        var split = $('#edit-commission-split').length ? $('#edit-commission-split').val().trim() : '';
+        var rate = $('#edit-hourly-rate').length ? $('#edit-hourly-rate').val().trim() : '';
+        var bank = $('#edit-bank-upi').val().trim();
 
-        $('#save-edit-btn').prop('disabled', true).text('Saving shifts...');
+        var specs = [];
+        $('.edit-spec-checkbox:checked').each(function() {
+            specs.push($(this).val());
+        });
+
+        $('#save-edit-btn').prop('disabled', true).text('Saving profile...');
 
         $.post(coraREData.ajaxUrl, {
             action: 'cora_ajax_save_user_changes',
             user_id: userId,
             display_name: name,
+            phone: phone,
             role: role,
             branch_id: branch,
             status: status,
             reassign_to: reassignTo,
+            bio: bio,
+            specs: specs,
+            commission_split: split,
+            hourly_rate: rate,
+            bank_upi: bank,
             nonce: coraREData.ajaxNonce
         }, function(res) {
-            if (res.success) {
-                window.coraShowToast('User updated successfully.');
+            var msg = (res && res.data && (typeof res.data === 'string' ? res.data : res.data.message)) || 'Failed to update user.';
+            if (res && res.success) {
+                window.coraShowToast('Team member profile updated successfully.');
                 closeEditUserDrawer();
                 setTimeout(function() {
                     window.location.reload();
                 }, 1000);
             } else {
-                window.coraShowToast(res.data.message || 'Failed to update user.');
+                window.coraShowToast(msg);
                 $('#save-edit-btn').prop('disabled', false).text('Save Changes');
+            }
+        }, 'json').fail(function(xhr) {
+            var err = 'Failed to update user.';
+            try {
+                var parsed = typeof xhr.responseJSON === 'object' ? xhr.responseJSON : JSON.parse(xhr.responseText);
+                if (parsed && parsed.data) {
+                    err = typeof parsed.data === 'string' ? parsed.data : (parsed.data.message || err);
+                }
+            } catch(e) {}
+            window.coraShowToast(err);
+            $('#save-edit-btn').prop('disabled', false).text('Save Changes');
+        });
+    }
+
+    function triggerPasswordResetForUser() {
+        if (!currentEditingUser || !currentEditingUser.email) {
+            window.coraShowToast('Invalid user context.');
+            return;
+        }
+        window.coraShowToast('Sending password reset email to ' + currentEditingUser.email + '...');
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_resend_verification',
+            email: currentEditingUser.email,
+            nonce: '<?php echo wp_create_nonce( "cora_login_nonce" ); ?>'
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast('Password reset instructions dispatched.');
+            } else {
+                window.coraShowToast(res.data.message || 'Failed to dispatch reset email.');
             }
         });
     }
@@ -989,40 +1993,148 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         });
     }
 
-    // Live Sync Permissions Matrix
-    $('.cora-permission-checkbox').on('change', function() {
-        var tr = $(this).closest('.cora-matrix-row');
-        var role = tr.data('role');
-        
-        var allowed = [];
-        tr.find('.cora-permission-checkbox:checked').each(function() {
-            allowed.push($(this).data('feature'));
+    // ==========================================
+    // PERMISSIONS MATRIX TOOLBAR & ACTIONS HANDLERS
+    // ==========================================
+    window.coraSavePermissionsMatrix = function() {
+        var matrix = {};
+        $('#cora-permissions-matrix-table tbody tr.cora-matrix-row').each(function() {
+            var role = $(this).data('role');
+            if (!role) return;
+            var features = [];
+            $(this).find('.cora-permission-checkbox:checked').each(function() {
+                features.push($(this).data('feature'));
+            });
+            matrix[role] = features;
         });
 
         $.post(coraREData.ajaxUrl, {
-            action: 'cora_ajax_save_role_permissions',
-            role_key: role,
-            features: allowed,
-            nonce: coraREData.ajaxNonce
+            action: 'cora_ajax_save_permissions_matrix',
+            matrix: matrix,
+            security: coraREData.ajaxNonce
         }, function(res) {
             if (res.success) {
-                window.coraShowToast('Role permissions synchronized.');
+                window.coraShowToast(res.data && res.data.message ? res.data.message : 'Permissions matrix saved successfully.');
+            } else {
+                window.coraShowToast((res.data && res.data.message) ? res.data.message : 'Failed to save permissions matrix.');
+            }
+        }).fail(function() {
+            window.coraShowToast('Network error saving permissions matrix.');
+        });
+    };
+
+    window.coraResetMatrixDefaults = function() {
+        var defaultPermsMap = {
+            'cora_branch_manager': ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'portfolio', 'leads', 'settings'],
+            'cora_photographer': ['bookings', 'equipment', 'portfolio', 'leads'],
+            'cora_editor': ['bookings', 'feature-hub', 'portfolio'],
+            'cora_viewer': ['dashboard', 'bookings'],
+            'editor': ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings'],
+            'author': ['dashboard', 'bookings', 'equipment'],
+            'contributor': ['dashboard', 'bookings'],
+            'subscriber': ['dashboard']
+        };
+
+        $('#cora-permissions-matrix-table tbody tr.cora-matrix-row:not([data-locked="true"])').each(function() {
+            var role = $(this).data('role');
+            var defaultList = defaultPermsMap[role] || ['dashboard', 'bookings'];
+            
+            $(this).find('.cora-permission-checkbox').each(function() {
+                var feature = $(this).data('feature');
+                $(this).prop('checked', defaultList.indexOf(feature) !== -1);
+            });
+        });
+
+        window.coraSavePermissionsMatrix();
+        window.coraShowToast('Permissions matrix reset to default settings.');
+    };
+
+    window.coraGrantAllSelectedRolePermissions = function() {
+        var selectedRow = $('#cora-permissions-matrix-table tbody tr.selected-matrix-role');
+        
+        if (!selectedRow.length) {
+            selectedRow = $('#cora-permissions-matrix-table tbody tr.cora-matrix-row:visible:not([data-locked="true"])').first();
+        }
+        
+        if (!selectedRow.length || selectedRow.data('locked')) {
+            window.coraShowToast('Please click a role row first to select it for Grant All.');
+            return;
+        }
+
+        var roleName = selectedRow.find('.cora-role-title-text').text().trim();
+        selectedRow.find('.cora-permission-checkbox').prop('checked', true);
+        
+        window.coraSavePermissionsMatrix();
+        window.coraShowToast('Granted all permissions for role: ' + roleName);
+    };
+
+    $(document).on('click', '#cora-permissions-matrix-table tbody tr.cora-matrix-row', function(e) {
+        if ($(e.target).is('input[type="checkbox"]')) return;
+        if ($(this).data('locked')) return;
+        
+        $('#cora-permissions-matrix-table tbody tr.cora-matrix-row').removeClass('selected-matrix-role bg-zinc-100/80 dark:bg-zinc-800/80');
+        $(this).addClass('selected-matrix-role bg-zinc-100/80 dark:bg-zinc-800/80');
+    });
+
+    $(document).on('input', '#matrix-role-search', function() {
+        var query = $(this).val().toLowerCase().trim();
+        $('#cora-permissions-matrix-table tbody tr.cora-matrix-row').each(function() {
+            var roleName = $(this).find('.cora-role-title-text').text().toLowerCase();
+            var roleKey = $(this).data('role') ? $(this).data('role').toLowerCase() : '';
+            if (!query || roleName.indexOf(query) !== -1 || roleKey.indexOf(query) !== -1) {
+                $(this).show();
+            } else {
+                $(this).hide();
             }
         });
     });
 
+    $(document).on('change', '.cora-permission-checkbox', function() {
+        window.coraSavePermissionsMatrix();
+    });
+
     // Custom Roles Handlers
+    function handleApplyBaseTemplate(tmplKey) {
+        if (!tmplKey) return;
+        var permsMap = {
+            'cora_branch_manager': { access: 'manager', perms: ['crm_leads', 'showings_bookings', 'financials', 'media_vault', 'equipment', 'ai_suite', 'attendance'] },
+            'cora_photographer': { access: 'contributor', perms: ['showings_bookings', 'media_vault', 'equipment', 'attendance'] },
+            'cora_editor': { access: 'contributor', perms: ['showings_bookings', 'media_vault', 'ai_suite'] },
+            'cora_viewer': { access: 'read_only', perms: ['showings_bookings', 'media_vault'] }
+        };
+        var config = permsMap[tmplKey];
+        if (config) {
+            $('#custom-role-access-level').val(config.access);
+            $('.custom-role-perm-cb').each(function() {
+                var val = $(this).val();
+                $(this).prop('checked', config.perms.indexOf(val) !== -1);
+            });
+        }
+    }
+
     function handleCreateCustomRole(e) {
         e.preventDefault();
         var name = $('#custom-role-name').val().trim();
         if (!name) return;
 
+        var baseTmpl = $('#custom-role-base-template').val();
+        var accessLvl = $('#custom-role-access-level').val();
+        var maxQuota = $('#custom-role-max-quota').val();
+        var perms = [];
+        $('.custom-role-perm-cb:checked').each(function() {
+            perms.push($(this).val());
+        });
+
         var btn = $('#create-role-submit-btn');
         btn.prop('disabled', true).text('Creating role...');
 
         $.post(coraREData.ajaxUrl, {
-            action: 'cora_create_custom_role',
+            action: 'cora_ajax_add_custom_role',
             role_name: name,
+            base_template: baseTmpl,
+            access_level: accessLvl,
+            max_quota: maxQuota,
+            permissions: perms,
             nonce: coraREData.ajaxNonce
         }, function(res) {
             if (res.success) {
@@ -1032,6 +2144,137 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 window.coraShowToast(res.data.message || 'Failed to create role.');
                 btn.prop('disabled', false).text('Create Role');
             }
+        }).fail(function() {
+            window.coraShowToast('Network error creating custom role.');
+            btn.prop('disabled', false).text('Create Role');
+        });
+    }
+
+    function openCreateCustomRoleDrawer(baseTemplate) {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        } else {
+            $('aside[id$="-drawer"]').addClass('collapsed');
+        }
+
+        if (baseTemplate) {
+            $('#custom-role-base-template').val(baseTemplate);
+            if (typeof handleApplyBaseTemplate === 'function') {
+                handleApplyBaseTemplate(baseTemplate);
+            }
+        }
+
+        $('#cora-create-custom-role-drawer').removeClass('collapsed');
+        $('#cora-drawer-backdrop').removeClass('hidden');
+    }
+
+    function closeCreateCustomRoleDrawer() {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        } else {
+            $('#cora-create-custom-role-drawer').addClass('collapsed');
+        }
+    }
+
+    window.openCreateCustomRoleDrawer = openCreateCustomRoleDrawer;
+    window.closeCreateCustomRoleDrawer = closeCreateCustomRoleDrawer;
+
+    function openEditCustomRoleDrawer(roleData) {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        } else {
+            $('aside[id$="-drawer"]').addClass('collapsed');
+        }
+
+        $('#edit-custom-role-key').val(roleData.role_key || '');
+        $('#edit-custom-role-name').val(roleData.role_name || '');
+        $('#edit-custom-role-access-level').val(roleData.access_level || 'contributor');
+        $('#edit-custom-role-max-quota').val(roleData.max_quota !== null && roleData.max_quota !== undefined ? roleData.max_quota : '');
+
+        var perms = roleData.permissions || [];
+        $('.edit-custom-role-perm-cb').each(function() {
+            var val = $(this).val();
+            $(this).prop('checked', perms.indexOf(val) !== -1 || perms.indexOf(val.replace('_', '-')) !== -1);
+        });
+
+        $('#cora-edit-custom-role-drawer').removeClass('collapsed');
+        $('#cora-drawer-backdrop').removeClass('hidden');
+    }
+
+    function closeEditCustomRoleDrawer() {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        } else {
+            $('#cora-edit-custom-role-drawer').addClass('collapsed');
+        }
+    }
+
+    $(document).on('click', '.cora-edit-custom-role-btn', function(e) {
+        e.preventDefault();
+        var raw = $(this).attr('data-custom-role');
+        if (!raw) return;
+        try {
+            var roleData = JSON.parse(raw);
+            openEditCustomRoleDrawer(roleData);
+        } catch(err) {
+            console.error('Error parsing custom role payload:', err);
+        }
+    });
+
+    function handleSaveCustomRolePermissions(e) {
+        e.preventDefault();
+        var roleKey = $('#edit-custom-role-key').val();
+        var roleName = $('#edit-custom-role-name').val().trim();
+        var accessLvl = $('#edit-custom-role-access-level').val();
+        var maxQuota = $('#edit-custom-role-max-quota').val();
+        var perms = [];
+        $('.edit-custom-role-perm-cb:checked').each(function() {
+            perms.push($(this).val());
+        });
+
+        var btn = $('#save-custom-role-btn');
+        btn.prop('disabled', true).css('opacity', '0.7');
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_save_custom_role_permissions',
+            role_key: roleKey,
+            role_name: roleName,
+            access_level: accessLvl,
+            max_quota: maxQuota,
+            permissions: perms,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            btn.prop('disabled', false).css('opacity', '1');
+            if (res.success) {
+                window.coraShowToast(res.data.message || 'Permissions updated successfully.');
+                closeEditCustomRoleDrawer();
+                setTimeout(function() { window.location.reload(); }, 800);
+            } else {
+                window.coraShowToast(res.data.message || 'Failed to save role permissions.');
+            }
+        }).fail(function() {
+            btn.prop('disabled', false).css('opacity', '1');
+            window.coraShowToast('Network error saving custom role.');
+        });
+    }
+
+    function handleDuplicateCustomRole(roleKey) {
+        if (!roleKey) return;
+        window.coraShowToast('Duplicating custom role...');
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_duplicate_custom_role',
+            role_key: roleKey,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast(res.data.message || 'Custom role duplicated successfully.');
+                setTimeout(function() { window.location.reload(); }, 800);
+            } else {
+                window.coraShowToast(res.data.message || 'Failed to duplicate role.');
+            }
+        }).fail(function() {
+            window.coraShowToast('Network error duplicating custom role.');
         });
     }
 
@@ -1039,11 +2282,11 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     function handleDeleteCustomRole(roleKey, btn) {
         if (!coraPendingRoleDeletes[roleKey]) {
             coraPendingRoleDeletes[roleKey] = true;
-            if (btn) $(btn).text('Confirm Delete').addClass('text-red-700 underline font-extrabold');
+            if (btn) $(btn).text('Confirm Delete').addClass('text-red-700 dark:text-red-400 underline font-extrabold');
             window.coraShowToast('Click Confirm Delete to remove this custom role.', 'info');
             setTimeout(function() {
                 coraPendingRoleDeletes[roleKey] = false;
-                if (btn) $(btn).text('Delete').removeClass('text-red-700 underline font-extrabold');
+                if (btn) $(btn).text('Delete').removeClass('text-red-700 dark:text-red-400 underline font-extrabold');
             }, 4000);
             return;
         }
@@ -1059,6 +2302,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             } else {
                 window.coraShowToast(res.data.message || 'Failed to delete role.');
             }
+        }).fail(function() {
+            window.coraShowToast('Network error deleting role.');
         });
     }
 
@@ -1068,16 +2313,63 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     var isAttendanceAdmin = <?php echo $is_attendance_admin ? 'true' : 'false'; ?>;
     var loggedInUserName = <?php echo json_encode( wp_get_current_user()->display_name ); ?>;
 
+    function openAttendanceReportsDrawer() {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        } else {
+            $('aside[id$="-drawer"]').addClass('collapsed');
+        }
+        $('#cora-attendance-reports-drawer').removeClass('collapsed');
+        $('#cora-drawer-backdrop').removeClass('hidden');
+    }
+
+    function closeAttendanceReportsDrawer() {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        } else {
+            $('#cora-attendance-reports-drawer').addClass('collapsed');
+        }
+    }
+
+    function handlePeriodFilterChange() {
+        var val = $('#attendance-filter-period').val();
+        if (val === 'custom') {
+            $('#attendance-custom-date-container').removeClass('hidden');
+        } else {
+            $('#attendance-custom-date-container').addClass('hidden');
+        }
+        fetchAttendanceLogs();
+    }
+
+    function handleReportHorizonChange() {
+        var val = $('#attendance-report-horizon').val();
+        if (val === 'custom') {
+            $('#attendance-report-custom-dates').removeClass('hidden');
+        } else {
+            $('#attendance-report-custom-dates').addClass('hidden');
+        }
+    }
+
     function fetchAttendanceLogs() {
+        var userId    = $('#attendance-filter-user').val() || '';
+        var period    = $('#attendance-filter-period').val() || 'all';
+        var startDate = $('#attendance-date-start').val() || '';
+        var endDate   = $('#attendance-date-end').val() || '';
+        var eventType = $('#attendance-filter-event').val() || 'all';
+
         $.post(coraREData.ajaxUrl, { 
-            action: 'cora_fetch_attendance', 
-            nonce: coraREData.ajaxNonce 
+            action: 'cora_get_attendance_logs', 
+            nonce: coraREData.ajaxNonce,
+            user_id: userId,
+            period: period,
+            start_date: startDate,
+            end_date: endDate,
+            event_type: eventType
         }, function(res) {
             if (res.success && res.data.logs) {
                 var tbody = $('#cora-user-attendance-table-body');
                 tbody.empty();
                 
-                // Filter logs client-side if the user is not an admin/manager (privacy protection)
                 var displayLogs = res.data.logs;
                 if (!isAttendanceAdmin) {
                     displayLogs = res.data.logs.filter(function(log) {
@@ -1085,9 +2377,16 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     });
                 }
                 
+                var searchQuery = ($('#attendance-log-search').val() || '').toLowerCase().trim();
+                if (searchQuery) {
+                    displayLogs = displayLogs.filter(function(log) {
+                        return (log.user || '').toLowerCase().indexOf(searchQuery) !== -1;
+                    });
+                }
+
                 if (displayLogs.length === 0) {
                     var colCount = isAttendanceAdmin ? 5 : 4;
-                    tbody.append('<tr><td colspan="' + colCount + '" class="px-5 py-8 text-center text-zinc-400 dark:text-zinc-500">No attendance records found.</td></tr>');
+                    tbody.append('<tr><td colspan="' + colCount + '" class="px-5 py-8 text-center text-zinc-400 dark:text-zinc-500">No attendance records found for selected filters.</td></tr>');
                 } else {
                     displayLogs.slice().reverse().forEach(function(log) {
                         var dateObj = new Date(log.timestamp);
@@ -1195,40 +2494,158 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     }
 
     function filterAttendanceLogs() {
-        var q = $('#attendance-log-search').val().toLowerCase();
-        $('.cora-attendance-row').each(function() {
-            var user = $(this).data('user') || '';
-            if (!q || user.indexOf(q) !== -1) {
-                $(this).show();
+        fetchAttendanceLogs();
+    }
+
+    // ==========================================
+    // GEOFENCE DRAWER HANDLERS & PREVIEW
+    // ==========================================
+    var coraGeofenceMeta = {
+        address: <?php echo json_encode( $office_loc['address'] ); ?>,
+        maps_url: <?php echo json_encode( $office_loc['maps_url'] ); ?>,
+        radius: <?php echo json_encode( intval( $office_loc['radius'] ) ); ?>,
+        lat: <?php echo json_encode( $office_loc['lat'] ); ?>,
+        lng: <?php echo json_encode( $office_loc['lng'] ); ?>
+    };
+
+    var activeGeofenceMode = 'address';
+
+    function switchGeofenceMode(mode) {
+        activeGeofenceMode = mode;
+        if (mode === 'address') {
+            $('#geofence-mode-address-btn').addClass('bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm').removeClass('text-zinc-500 dark:text-zinc-400');
+            $('#geofence-mode-url-btn').removeClass('bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm').addClass('text-zinc-500 dark:text-zinc-400');
+            $('#geofence-address-container').removeClass('hidden');
+            $('#geofence-url-container').addClass('hidden');
+        } else {
+            $('#geofence-mode-url-btn').addClass('bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm').removeClass('text-zinc-500 dark:text-zinc-400');
+            $('#geofence-mode-address-btn').removeClass('bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm').addClass('text-zinc-500 dark:text-zinc-400');
+            $('#geofence-url-container').removeClass('hidden');
+            $('#geofence-address-container').addClass('hidden');
+        }
+        updateMapPreviewFromInput();
+    }
+
+    function selectGeofenceRadius(r) {
+        r = parseInt(r, 10) || 500;
+        $('#geofence-radius-input').val(r);
+        var label = r >= 1000 ? (r / 1000) + 'km' : r + 'm';
+        $('#geofence-selected-radius-label').text(label);
+
+        $('.geofence-radius-pill').each(function() {
+            var pillRadius = parseInt($(this).data('radius'), 10);
+            if (pillRadius === r) {
+                $(this).addClass('bg-zinc-950 text-white dark:bg-zinc-100 dark:text-zinc-950 border-zinc-950 dark:border-zinc-100 shadow-sm')
+                       .removeClass('border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800');
             } else {
-                $(this).hide();
+                $(this).removeClass('bg-zinc-950 text-white dark:bg-zinc-100 dark:text-zinc-950 border-zinc-950 dark:border-zinc-100 shadow-sm')
+                       .addClass('border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800');
             }
         });
     }
 
-    // Admin Geofence Settings Submit
-    function handleSaveOfficeLocation(e) {
-        e.preventDefault();
-        var url = $('#office-maps-url').val().trim();
-        if (!url) return;
-        
-        var btn = $('#save-office-loc-btn');
-        btn.prop('disabled', true).text('Resolving coordinates...');
-        
+    function updateMapPreviewFromInput() {
+        var query = '';
+        if (activeGeofenceMode === 'address') {
+            query = $('#geofence-address-input').val().trim();
+        } else {
+            query = $('#geofence-maps-url-input').val().trim();
+        }
+
+        if (!query) {
+            if (coraGeofenceMeta.address) {
+                query = coraGeofenceMeta.address;
+            } else if (coraGeofenceMeta.maps_url) {
+                query = coraGeofenceMeta.maps_url;
+            } else if (coraGeofenceMeta.lat && coraGeofenceMeta.lng) {
+                query = coraGeofenceMeta.lat + ',' + coraGeofenceMeta.lng;
+            } else {
+                query = 'New Delhi, India';
+            }
+        }
+
+        var mapUrl = 'https://maps.google.com/maps?q=' + encodeURIComponent(query) + '&t=&z=15&ie=UTF8&iwloc=&output=embed';
+        $('#geofence-map-frame').attr('src', mapUrl);
+    }
+
+    function openGeofenceDrawer() {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        }
+        $('#geofence-address-input').val(coraGeofenceMeta.address || '');
+        $('#geofence-maps-url-input').val(coraGeofenceMeta.maps_url || '');
+
+        var initialRadius = parseInt(coraGeofenceMeta.radius, 10) || 500;
+        selectGeofenceRadius(initialRadius);
+
+        if (coraGeofenceMeta.maps_url && !coraGeofenceMeta.address) {
+            switchGeofenceMode('url');
+        } else {
+            switchGeofenceMode('address');
+        }
+
+        $('#cora-geofence-drawer').removeClass('collapsed');
+        $('#cora-drawer-backdrop').removeClass('hidden');
+    }
+
+    function closeGeofenceDrawer() {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        } else {
+            $('#cora-geofence-drawer').addClass('collapsed');
+        }
+    }
+
+    function handleSaveGeofence(e) {
+        if (e && e.preventDefault) e.preventDefault();
+
+        var address = $('#geofence-address-input').val().trim();
+        var mapsUrl = $('#geofence-maps-url-input').val().trim();
+        var radius  = parseInt($('#geofence-radius-input').val(), 10) || 500;
+
+        if (!address && !mapsUrl) {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Please enter an address or Google Maps link.', 'error');
+            }
+            return;
+        }
+
+        var btn = $('#save-geofence-btn');
+        btn.prop('disabled', true).css('opacity', '0.7');
+
         $.post(coraREData.ajaxUrl, {
-            action: 'cora_save_office_location',
-            maps_url: url,
-            radius: 500,
+            action: 'cora_ajax_update_geofence',
+            address: address,
+            maps_url: mapsUrl,
+            radius: radius,
             nonce: coraREData.ajaxNonce
         }, function(res) {
-            btn.prop('disabled', false).text('Verify & Update Location');
+            btn.prop('disabled', false).css('opacity', '1');
             if (res.success) {
-                window.coraShowToast(res.data.message);
-                $('#office-lat').val(res.data.office_location.lat);
-                $('#office-lng').val(res.data.office_location.lng);
-                setTimeout(function() { window.location.reload(); }, 800);
+                coraGeofenceMeta.address = res.data.address;
+                coraGeofenceMeta.maps_url = res.data.maps_url;
+                coraGeofenceMeta.radius = res.data.radius;
+                coraGeofenceMeta.lat = res.data.lat;
+                coraGeofenceMeta.lng = res.data.lng;
+
+                var rDisplay = radius >= 1000 ? (radius / 1000) + 'km' : radius + 'm';
+                $('#cora-geofence-pill').text(rDisplay + ' Enforced');
+                $('#stat-geofence-status').text(rDisplay + ' Enforced');
+                $('#cora-geofence-current-address').text(res.data.address || res.data.maps_url || (res.data.lat + ', ' + res.data.lng) || 'Not Configured');
+
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast(res.data.message || 'Office location & geofence updated successfully.', 'success');
+                }
+                closeGeofenceDrawer();
             } else {
-                window.coraShowToast(res.data.message || 'Failed to update location.');
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast(res.data.message || 'Failed to update location.', 'error');
+                }
+            }
+        }).fail(function() {
+            btn.prop('disabled', false).css('opacity', '1');
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Network error while saving geofence.', 'error');
             }
         });
     }
@@ -1250,10 +2667,21 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     }
 
     // Export Table Records to CSV
-    function exportAttendanceReport() {
+    function exportAttendanceCSV() {
+        var userId    = $('#attendance-filter-user').val() || '';
+        var period    = $('#attendance-filter-period').val() || 'all';
+        var startDate = $('#attendance-date-start').val() || '';
+        var endDate   = $('#attendance-date-end').val() || '';
+        var eventType = $('#attendance-filter-event').val() || 'all';
+
         $.post(coraREData.ajaxUrl, {
-            action: 'cora_fetch_attendance',
-            nonce: coraREData.ajaxNonce
+            action: 'cora_get_attendance_logs',
+            nonce: coraREData.ajaxNonce,
+            user_id: userId,
+            period: period,
+            start_date: startDate,
+            end_date: endDate,
+            event_type: eventType
         }, function(res) {
             if (res.success && res.data.logs) {
                 var csv = 'User Name,Date & Time,Event Type,Latitude,Longitude,Geofence Status,Enforced Distance\n';
@@ -1282,18 +2710,112 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                window.coraShowToast("Report exported successfully.");
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast("Attendance CSV exported successfully");
+                }
             }
         });
     }
+    window.exportAttendanceCSV = exportAttendanceCSV;
+    window.exportAttendanceReport = exportAttendanceCSV;
+
+    function generatePrintableAttendanceReport() {
+        var horizon    = $('#attendance-report-horizon').val() || 'daily';
+        var targetUser = $('#attendance-report-target').val() || 'all';
+        var startDate  = $('#attendance-report-start-date').val() || '';
+        var endDate    = $('#attendance-report-end-date').val() || '';
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_generate_attendance_report',
+            nonce: coraREData.ajaxNonce,
+            report_type: 'printable',
+            horizon: horizon,
+            target_user: targetUser,
+            start_date: startDate,
+            end_date: endDate
+        }, function(res) {
+            if (res.success && res.data.logs) {
+                var printWindow = window.open('', '_blank', 'height=600,width=800');
+                var html = '<html><head><title>Cora Attendance Summary Report</title>';
+                html += '<style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:20px;color:#18181b;} h1{font-size:20px;} table{width:100%;border-collapse:collapse;margin-top:15px;font-size:12px;} th,td{border:1px solid #e4e4e7;padding:8px;text-align:left;} th{background:#f4f4f5;font-weight:bold;}</style>';
+                html += '</head><body>';
+                html += '<h1>Cora Attendance Report (' + horizon.toUpperCase() + ')</h1>';
+                html += '<p>Generated on: ' + new Date().toLocaleString() + '</p>';
+                html += '<table><thead><tr><th>User</th><th>Timestamp</th><th>Type</th><th>Geofence</th></tr></thead><tbody>';
+                
+                res.data.logs.forEach(function(l) {
+                    var d = new Date(l.timestamp).toLocaleString();
+                    html += '<tr><td>' + (l.user || '') + '</td><td>' + d + '</td><td>' + (l.type === 'in' ? 'Punch In' : 'Punch Out') + '</td><td>' + (l.geofence || 'Standard') + '</td></tr>';
+                });
+
+                html += '</tbody></table></body></html>';
+                printWindow.document.write(html);
+                printWindow.document.close();
+                printWindow.focus();
+                setTimeout(function(){ printWindow.print(); }, 250);
+
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast("Printable attendance report generated");
+                }
+            }
+        });
+    }
+    window.generatePrintableAttendanceReport = generatePrintableAttendanceReport;
+
+    function sendAttendanceEmailDigest() {
+        var horizon   = $('#attendance-report-horizon').val() || 'daily';
+        var targetUser = $('#attendance-report-target').val() || 'all';
+        var recipient = $('#attendance-report-email-recipient').val() || '';
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_generate_attendance_report',
+            nonce: coraREData.ajaxNonce,
+            report_type: 'email_digest',
+            horizon: horizon,
+            target_user: targetUser,
+            recipient_email: recipient
+        }, function(res) {
+            if (res.success) {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast(res.data.message || "Email digest sent successfully");
+                }
+            } else {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast(res.data.message || "Failed to send email digest");
+                }
+            }
+        });
+    }
+    window.sendAttendanceEmailDigest = sendAttendanceEmailDigest;
+
+    function copyAttendanceShareLink() {
+        var horizon    = $('#attendance-report-horizon').val() || 'daily';
+        var targetUser = $('#attendance-report-target').val() || 'all';
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_generate_attendance_report',
+            nonce: coraREData.ajaxNonce,
+            report_type: 'share_link',
+            horizon: horizon,
+            target_user: targetUser
+        }, function(res) {
+            if (res.success && res.data.share_url) {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(res.data.share_url).then(function() {
+                        if (typeof window.coraShowToast === 'function') {
+                            window.coraShowToast("Secure share link copied to clipboard");
+                        }
+                    });
+                } else {
+                    if (typeof window.coraShowToast === 'function') {
+                        window.coraShowToast("Share link generated: " + res.data.share_url);
+                    }
+                }
+            }
+        });
+    }
+    window.copyAttendanceShareLink = copyAttendanceShareLink;
 
     $('#cora-user-punch-in-btn').on('click', function() { logUserPunch('in'); });
     $('#cora-user-punch-out-btn').on('click', function() { logUserPunch('out'); });
-
-    // Hook tab switches to fetch logs dynamically
-    $('.cora-sub-tab').on('click', function() {
-        if ($(this).data('target') === 'tab-attendance-logs') {
-            fetchAttendanceLogs();
-        }
-    });
 </script>
