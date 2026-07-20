@@ -67,7 +67,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             </div>
         </div>
         
-        <?php if ( in_array( $current_role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) : ?>
+        <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager' ) ) ) : ?>
             <button onclick="openInviteDrawer()" class="bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs px-4 py-2 rounded-lg transition-colors cursor-pointer active:scale-95 shadow-sm flex items-center gap-2">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 Invite User
@@ -93,7 +93,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
             Attendance Logs
         </button>
-        <?php if ( in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin' ) ) ) : ?>
+        <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_re_broker_owner', 'cora_studio_owner' ) ) ) : ?>
             <button class="cora-sub-tab flex items-center gap-2 px-3 pb-2.5 pt-1 text-xs font-medium border-b-2 border-transparent text-zinc-550 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-all cursor-pointer whitespace-nowrap" data-target="tab-custom-roles">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 Custom Roles
@@ -260,7 +260,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                         <div class="flex items-center justify-end gap-2">
                                             <?php if ( $status === 'pending' ) : ?>
                                                 <button onclick="coraResendVerification('<?php echo esc_attr($inv['email']); ?>')" class="px-2 py-1 border border-zinc-200 rounded text-[10px] font-bold text-zinc-700 hover:bg-zinc-50 cursor-pointer">Resend</button>
-                                                <button onclick="coraCancelInvitation('<?php echo esc_attr($tok); ?>')" class="px-2 py-1 border border-zinc-200 rounded text-[10px] font-bold text-red-600 hover:bg-red-50 hover:border-red-200 cursor-pointer">Cancel</button>
+                                                <button onclick="coraCancelInvitation('<?php echo esc_attr($tok); ?>', this)" class="px-2 py-1 border border-zinc-200 rounded text-[10px] font-bold text-red-600 hover:bg-red-50 hover:border-red-200 cursor-pointer transition-all">Cancel</button>
                                             <?php endif; ?>
                                         </div>
                                     </td>
@@ -283,55 +283,71 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     Live Sync Active
                 </div>
             </div>
-            <p class="text-[11px] text-zinc-400 -mt-2 leading-relaxed">Determine dashboard screen visibilities for each brokerage role. Super Admin permissions are locked globally.</p>
+            <p class="text-[11px] text-zinc-400 -mt-2 leading-relaxed">Determine dashboard screen visibilities for each workspace role. Super Admin permissions are locked globally.</p>
             
+            <?php
+            $active_industry = cora_get_active_industry();
+            if ( $active_industry === 'photography_studio' ) {
+                $matrix_columns = array(
+                    'dashboard'   => 'Dashboard',
+                    'bookings'    => 'Shoots',
+                    'team-roles'  => 'Team & Roles',
+                    'equipment'   => 'Camera Gear',
+                    'financials'  => 'Financials',
+                    'portfolio'   => 'Portfolio',
+                    'leads'       => 'Client Leads',
+                    'settings'    => 'Settings'
+                );
+            } else {
+                $matrix_columns = array(
+                    'dashboard'   => 'Dashboard',
+                    'bookings'    => 'Showings CRM',
+                    'feature-hub' => 'Feature Hub',
+                    'team-roles'  => 'Team & Roles',
+                    'equipment'   => 'Equipment',
+                    'financials'  => 'Financials',
+                    'settings'    => 'Settings'
+                );
+            }
+            ?>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-zinc-200 text-xs text-left" id="cora-permissions-matrix-table">
                     <thead>
                         <tr class="bg-zinc-50/50">
-                            <th class="px-4 py-2.5 font-bold text-zinc-550 uppercase tracking-wider text-[10px]">Agent Role</th>
-                            <th class="px-3 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px] text-center">Dashboard</th>
-                            <th class="px-3 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px] text-center">Showings CRM</th>
-                            <th class="px-3 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px] text-center">Feature Hub</th>
-                            <th class="px-3 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px] text-center">Team & Roles</th>
-                            <th class="px-3 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px] text-center">Equipment</th>
-                            <th class="px-3 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px] text-center">Financials</th>
-                            <th class="px-3 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px] text-center">Settings</th>
+                            <th class="px-4 py-2.5 font-bold text-zinc-550 uppercase tracking-wider text-[10px]">Role Title</th>
+                            <?php foreach ( $matrix_columns as $col_key => $col_lbl ) : ?>
+                                <th class="px-3 py-2.5 font-bold text-zinc-500 uppercase tracking-wider text-[10px] text-center"><?php echo esc_html( $col_lbl ); ?></th>
+                            <?php endforeach; ?>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-150">
                         <!-- Super Admin row (Locked) -->
                         <tr class="hover:bg-zinc-50/30">
                             <td class="px-4 py-3 font-semibold text-zinc-900">Super Admin</td>
-                            <td class="text-center"><input type="checkbox" checked disabled class="accent-zinc-950"></td>
-                            <td class="text-center"><input type="checkbox" checked disabled class="accent-zinc-950"></td>
-                            <td class="text-center"><input type="checkbox" checked disabled class="accent-zinc-950"></td>
-                            <td class="text-center"><input type="checkbox" checked disabled class="accent-zinc-950"></td>
-                            <td class="text-center"><input type="checkbox" checked disabled class="accent-zinc-950"></td>
-                            <td class="text-center"><input type="checkbox" checked disabled class="accent-zinc-950"></td>
-                            <td class="text-center"><input type="checkbox" checked disabled class="accent-zinc-950"></td>
+                            <?php foreach ( $matrix_columns as $col_key => $col_lbl ) : ?>
+                                <td class="text-center"><input type="checkbox" checked disabled class="accent-zinc-950"></td>
+                            <?php endforeach; ?>
                         </tr>
-                        <!-- Custom roles -->
+                        <!-- Custom & Industry roles -->
                         <?php 
                         $all_roles = cora_get_all_roles();
                         $target_roles = array();
                         foreach ( $all_roles as $rk => $rl ) {
-                            if ( $rk !== 'administrator' && $rk !== 'cora_shruti' ) {
+                            if ( $rk !== 'administrator' && $rk !== 'cora_shruti' && $rk !== 'cora_super_admin' ) {
                                 $target_roles[$rk] = $rl;
                             }
                         }
-                        $features = array('dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings');
                         
                         foreach ($target_roles as $role_key => $role_name): 
                             $allowed_features = isset($cora_permissions[$role_key]) ? $cora_permissions[$role_key] : array();
                         ?>
                         <tr class="hover:bg-zinc-50/30 cora-matrix-row" data-role="<?php echo esc_attr($role_key); ?>">
                             <td class="px-4 py-3 font-semibold text-zinc-800"><?php echo esc_html($role_name); ?></td>
-                            <?php foreach ($features as $feature): 
-                                $checked = in_array($feature, $allowed_features) ? 'checked' : '';
+                            <?php foreach ($matrix_columns as $feature_key => $feature_label): 
+                                $checked = in_array($feature_key, $allowed_features) ? 'checked' : '';
                             ?>
                             <td class="text-center">
-                                <input type="checkbox" <?php echo $checked; ?> data-feature="<?php echo esc_attr($feature); ?>" class="cora-permission-checkbox accent-zinc-950 cursor-pointer">
+                                <input type="checkbox" <?php echo $checked; ?> data-feature="<?php echo esc_attr($feature_key); ?>" class="cora-permission-checkbox accent-zinc-950 cursor-pointer">
                             </td>
                             <?php endforeach; ?>
                         </tr>
@@ -349,7 +365,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             <div class="cora-card bg-white border border-zinc-200/85 rounded-xl p-5 shadow-sm space-y-4 h-fit">
                 <div class="border-b border-zinc-100 pb-2">
                     <h3 class="text-sm font-bold text-zinc-900">Define Custom Role</h3>
-                    <p class="text-[11px] text-zinc-400 mt-0.5">Add a tailored role for your brokerage departments.</p>
+                    <p class="text-[11px] text-zinc-400 mt-0.5">Add a tailored role for your brokerage or studio departments.</p>
                 </div>
                 <form id="create-custom-role-form" onsubmit="handleCreateCustomRole(event)" class="space-y-4">
                     <div>
@@ -391,7 +407,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                     <td class="px-4 py-3 font-semibold text-zinc-800"><?php echo esc_html( $cr['role_name'] ); ?></td>
                                     <td class="px-4 py-3"><code class="text-zinc-500 font-mono"><?php echo esc_html( $cr['role_key'] ); ?></code></td>
                                     <td class="px-4 py-3 text-right">
-                                        <button onclick="handleDeleteCustomRole('<?php echo esc_attr( $cr['role_key'] ); ?>')" class="text-red-650 hover:text-red-700 font-bold hover:underline cursor-pointer">Delete</button>
+                                        <button onclick="handleDeleteCustomRole('<?php echo esc_attr( $cr['role_key'] ); ?>', this)" class="text-red-650 hover:text-red-700 font-bold hover:underline cursor-pointer transition-all">Delete</button>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
@@ -931,15 +947,26 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         });
     }
 
-    function coraCancelInvitation(token) {
-        if (!confirm('Are you sure you want to cancel this invitation?')) return;
+    var coraPendingCancels = {};
+    function coraCancelInvitation(token, btn) {
+        if (!coraPendingCancels[token]) {
+            coraPendingCancels[token] = true;
+            if (btn) $(btn).text('Confirm Cancel').addClass('bg-red-50 text-red-700 border-red-300');
+            window.coraShowToast('Click Confirm Cancel to revoke this invitation.', 'info');
+            setTimeout(function() {
+                coraPendingCancels[token] = false;
+                if (btn) $(btn).text('Cancel').removeClass('bg-red-50 text-red-700 border-red-300');
+            }, 4000);
+            return;
+        }
+
         $.post(coraREData.ajaxUrl, {
             action: 'cora_ajax_cancel_invitation',
             token: token,
             nonce: coraREData.ajaxNonce
         }, function(res) {
             if (res.success) {
-                window.coraShowToast('Invitation cancelled.');
+                window.coraShowToast('Invitation cancelled successfully.');
                 setTimeout(function() { window.location.reload(); }, 800);
             }
         });
@@ -1006,8 +1033,18 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         });
     }
 
-    function handleDeleteCustomRole(roleKey) {
-        if (!confirm('Are you sure you want to delete this custom role? Users assigned to this role will lose access.')) return;
+    var coraPendingRoleDeletes = {};
+    function handleDeleteCustomRole(roleKey, btn) {
+        if (!coraPendingRoleDeletes[roleKey]) {
+            coraPendingRoleDeletes[roleKey] = true;
+            if (btn) $(btn).text('Confirm Delete').addClass('text-red-700 underline font-extrabold');
+            window.coraShowToast('Click Confirm Delete to remove this custom role.', 'info');
+            setTimeout(function() {
+                coraPendingRoleDeletes[roleKey] = false;
+                if (btn) $(btn).text('Delete').removeClass('text-red-700 underline font-extrabold');
+            }, 4000);
+            return;
+        }
 
         $.post(coraREData.ajaxUrl, {
             action: 'cora_delete_custom_role',

@@ -13094,8 +13094,8 @@ function cora_ajax_send_invitation() {
     // Check permission to invite (Agency Owner or Branch Manager)
     $user = wp_get_current_user();
     $role = ! empty( $user->roles ) ? $user->roles[0] : '';
-    if ( ! in_array( $role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! in_array( $role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager' ) ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized access to user invitations.' ) );
     }
 
     $email     = sanitize_email( $_POST['email'] ?? '' );
@@ -13324,8 +13324,8 @@ function cora_ajax_save_user_changes() {
 
     $user = wp_get_current_user();
     $role = ! empty( $user->roles ) ? $user->roles[0] : '';
-    if ( ! in_array( $role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! in_array( $role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager' ) ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized access to user management.' ) );
     }
 
     $target_user_id = intval( $_POST['user_id'] ?? 0 );
@@ -13436,8 +13436,8 @@ function cora_ajax_sync_role_permissions() {
 
     $user = wp_get_current_user();
     $role = ! empty( $user->roles ) ? $user->roles[0] : '';
-    if ( $role !== 'administrator' && $role !== 'cora_manager' ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! in_array( $role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_re_broker_owner', 'cora_studio_owner' ), true ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized access to role permissions matrix.' ) );
     }
 
     $role_key = sanitize_text_field( $_POST['role_key'] ?? '' );
@@ -17837,7 +17837,8 @@ function cora_ajax_create_custom_role() {
     
     $user = wp_get_current_user();
     $roles = (array) $user->roles;
-    if ( ! in_array( 'cora_shruti', $roles, true ) && ! in_array( 'administrator', $roles, true ) && ! in_array( 'cora_super_admin', $roles, true ) ) {
+    $main_role = ! empty( $roles[0] ) ? $roles[0] : '';
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! in_array( $main_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_re_broker_owner', 'cora_studio_owner' ), true ) ) {
         wp_send_json_error( array( 'message' => 'Insufficient permissions to manage custom roles.' ) );
     }
 
@@ -17882,7 +17883,8 @@ function cora_ajax_delete_custom_role() {
     
     $user = wp_get_current_user();
     $roles = (array) $user->roles;
-    if ( ! in_array( 'cora_shruti', $roles, true ) && ! in_array( 'administrator', $roles, true ) && ! in_array( 'cora_super_admin', $roles, true ) ) {
+    $main_role = ! empty( $roles[0] ) ? $roles[0] : '';
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! in_array( $main_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_re_broker_owner', 'cora_studio_owner' ), true ) ) {
         wp_send_json_error( array( 'message' => 'Insufficient permissions to delete custom roles.' ) );
     }
 
