@@ -16914,8 +16914,11 @@ new Cora_Workspace_Plugin_Updater( __FILE__, $cora_workspace_updates_url );
 /**
  * Check if a workspace update is available via the custom updates server
  */
-function cora_check_workspace_update_available() {
+function cora_check_workspace_update_available( $force = false ) {
     $cache_key = 'cora_workspace_update_check';
+    if ( $force || isset( $_GET['force_update_check'] ) || isset( $_GET['check_update'] ) ) {
+        delete_transient( $cache_key );
+    }
     $update_info = get_transient( $cache_key );
     if ( false === $update_info ) {
         $update_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-workspace.json' );
@@ -16928,7 +16931,7 @@ function cora_check_workspace_update_available() {
                     $update_info = array(
                         'version' => $remote_data->version,
                         'download_url' => $remote_data->download_url,
-                        'changelog' => $remote_data->sections->changelog ?? ''
+                        'changelog' => isset( $remote_data->sections->changelog ) ? $remote_data->sections->changelog : ''
                     );
                 } else {
                     $update_info = 'none';
@@ -16938,10 +16941,25 @@ function cora_check_workspace_update_available() {
         if ( ! $update_info ) {
             $update_info = 'none';
         }
-        set_transient( $cache_key, $update_info, HOUR_IN_SECONDS );
+        set_transient( $cache_key, $update_info, 300 );
     }
     return $update_info !== 'none' ? $update_info : false;
 }
+
+/**
+ * AJAX Callback: Force check for updates (bypassing transient cache).
+ */
+function cora_ajax_force_check_update() {
+    delete_transient( 'cora_workspace_update_check' );
+    $update = cora_check_workspace_update_available( true );
+    if ( $update ) {
+        wp_send_json_success( $update );
+    } else {
+        wp_send_json_success( array( 'version' => CORA_WORKSPACE_VERSION, 'up_to_date' => true ) );
+    }
+}
+add_action( 'wp_ajax_cora_force_check_update', 'cora_ajax_force_check_update' );
+add_action( 'wp_ajax_nopriv_cora_force_check_update', 'cora_ajax_force_check_update' );
 
 /**
  * AJAX handler to trigger workspace update automatically

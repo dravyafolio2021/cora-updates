@@ -2742,7 +2742,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     Update (v<?php echo esc_html($update['version']); ?>)
                 </button>
             <?php else : ?>
-                <span class="bg-zinc-850/90 text-zinc-350 border border-zinc-800/80 text-[10px] font-bold px-2.5 py-0.5 rounded-full tracking-wider select-none shrink-0 font-mono">v<?php echo esc_html( CORA_WORKSPACE_VERSION ); ?></span>
+                <button onclick="event.stopPropagation(); window.coraCheckForUpdatesNow();" class="bg-zinc-850/90 text-zinc-350 hover:bg-zinc-800 hover:text-white border border-zinc-800/80 text-[10px] font-bold px-2.5 py-0.5 rounded-full tracking-wider select-none shrink-0 font-mono transition-colors cursor-pointer" title="Click to check for platform updates">v<?php echo esc_html( CORA_WORKSPACE_VERSION ); ?></button>
             <?php endif; ?>
         </div>
 
@@ -9554,6 +9554,33 @@ wp_print_footer_scripts();
         }
     };
 
+    window.coraCheckForUpdatesNow = function() {
+        if (window.coraShowToast) window.coraShowToast('Checking for platform updates...', 'info');
+        const ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
+        const nonce = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : '';
+
+        jQuery.post(ajaxUrl, {
+            action: 'cora_force_check_update',
+            security: nonce
+        }, function(res) {
+            if (res.success && res.data && res.data.version && !res.data.up_to_date) {
+                const availElem = document.getElementById('cora-available-version-text');
+                const changelogElem = document.getElementById('cora-changelog-container');
+                const confirmBtn = document.getElementById('cora-update-confirm-btn');
+                if (availElem) availElem.innerText = 'v' + res.data.version;
+                if (changelogElem && res.data.changelog) changelogElem.innerHTML = res.data.changelog;
+                if (confirmBtn) confirmBtn.setAttribute('onclick', "window.coraExecuteWorkspaceUpdate('" + res.data.version + "');");
+
+                window.coraOpenUpdateDrawer();
+                if (window.coraShowToast) window.coraShowToast('New version v' + res.data.version + ' is available!', 'success');
+            } else {
+                if (window.coraShowToast) window.coraShowToast('Workspace platform is fully up to date!', 'success');
+            }
+        }).fail(function() {
+            if (window.coraShowToast) window.coraShowToast('Unable to connect to updates server.', 'error');
+        });
+    };
+
     window.coraOpenUpdateDrawer = function() {
         const overlay = document.getElementById('cora-update-overlay');
         const drawer = document.getElementById('cora-update-drawer');
@@ -10189,7 +10216,9 @@ body {
 
 <?php
 $update = cora_check_workspace_update_available();
-if ( $update && current_user_can( 'manage_options' ) ) :
+if ( current_user_can( 'manage_options' ) ) :
+    $avail_ver = is_array( $update ) && ! empty( $update['version'] ) ? $update['version'] : CORA_WORKSPACE_VERSION;
+    $changelog_content = is_array( $update ) && ! empty( $update['changelog'] ) ? $update['changelog'] : '<h4>v2.2.1 Release</h4><ul><li>Industry Mode Switcher with 1-click toggle.</li><li>Isolated workspace scoping per agency slug.</li><li>Seeded role capabilities for all Real Estate and Studio roles.</li></ul>';
 ?>
 <style>
 #cora-update-overlay {
@@ -10297,7 +10326,7 @@ if ( $update && current_user_can( 'manage_options' ) ) :
             </div>
             <div class="space-y-1 border-l border-zinc-200 dark:border-zinc-800 pl-4">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-500">Available version</span>
-                <p class="text-lg font-black font-mono text-emerald-600 dark:text-emerald-450">v<?php echo esc_html( $update['version'] ); ?></p>
+                <p id="cora-available-version-text" class="text-lg font-black font-mono text-emerald-600 dark:text-emerald-450">v<?php echo esc_html( $avail_ver ); ?></p>
             </div>
         </div>
 
@@ -10312,8 +10341,8 @@ if ( $update && current_user_can( 'manage_options' ) ) :
         <!-- Release Notes Changelog -->
         <div class="space-y-2">
             <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Release Notes</h4>
-            <div class="cora-changelog-content text-xs text-zinc-650 dark:text-zinc-300 space-y-4 border border-zinc-150 dark:border-zinc-800/80 rounded-xl p-4 bg-zinc-50/20 dark:bg-zinc-950/20 leading-relaxed">
-                <?php echo wp_kses_post( $update['changelog'] ); ?>
+            <div id="cora-changelog-container" class="cora-changelog-content text-xs text-zinc-650 dark:text-zinc-300 space-y-4 border border-zinc-150 dark:border-zinc-800/80 rounded-xl p-4 bg-zinc-50/20 dark:bg-zinc-950/20 leading-relaxed">
+                <?php echo wp_kses_post( $changelog_content ); ?>
             </div>
         </div>
 
@@ -10329,7 +10358,7 @@ if ( $update && current_user_can( 'manage_options' ) ) :
 
     <!-- Sticky Footer Actions -->
     <div class="p-6 border-t border-zinc-150 dark:border-zinc-800/80 bg-zinc-50 dark:bg-zinc-900/30 flex items-center gap-3 flex-shrink-0">
-        <button id="cora-update-confirm-btn" onclick="window.coraExecuteWorkspaceUpdate('<?php echo esc_js($update['version']); ?>');" class="flex-1 h-10 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-950 text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.98]">
+        <button id="cora-update-confirm-btn" onclick="window.coraExecuteWorkspaceUpdate('<?php echo esc_js($avail_ver); ?>');" class="flex-1 h-10 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-950 text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.98]">
             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
             Proceed with Update
         </button>
