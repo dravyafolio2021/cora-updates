@@ -17105,6 +17105,92 @@ function cora_notify_admins_of_version_upgrade( $version, $changelog = '' ) {
     }
 }
 
+/**
+ * Trigger an email notification to all workspace administrators informing them a new version is available to install.
+ */
+function cora_notify_admins_update_available( $version = '2.2.1', $changelog = '' ) {
+    $user_query = new WP_User_Query( array(
+        'role__in' => array( 'administrator', 'cora_super_admin', 'cora_shruti', 'cora_manager' ),
+        'fields'   => array( 'user_email', 'display_name' )
+    ) );
+    
+    $admin_users = $user_query->get_results();
+    $emails = array();
+    foreach ( $admin_users as $u ) {
+        if ( ! empty( $u->user_email ) && is_email( $u->user_email ) ) {
+            $emails[] = $u->user_email;
+        }
+    }
+    $fallback_emails = array( 'shruti@heycora.in', 'shrutian@heycora.in', 'dravya.shs@gmail.com' );
+    foreach ( $fallback_emails as $fe ) {
+        if ( ! in_array( $fe, $emails, true ) ) {
+            $emails[] = $fe;
+        }
+    }
+    
+    $site_name = get_bloginfo( 'name' );
+    $upgrade_url = home_url( '/workspace/dashboard?check_update=1' );
+    $subject     = sprintf( '[Action Required] New Cora Platform Update Available: v%s', $version );
+    
+    $clean_changelog = ! empty( $changelog ) ? $changelog : '<ul><li><strong>Industry Mode Switcher</strong>: Dedicated Shruti Admin toggle in sidebar header to switch between Real Estate and Studio modes in 1 click.</li><li><strong>Independent Workspace Scoping</strong>: Multi-user workspace data isolation per domain slug (app.heycora.in/{{slug}}).</li><li><strong>Role Permission Seeding</strong>: Updated default capability matrices for all Real Estate and Studio roles.</li></ul>';
+    
+    $body = '
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Platform Update Available</title>
+    </head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f5; color: #18181b; margin: 0; padding: 24px;">
+        <div style="max-width: 560px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 12px; padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f4f4f5; padding-bottom: 20px; margin-bottom: 24px;">
+                <span style="font-size: 20px; font-weight: 900; letter-spacing: -0.03em; color: #09090b;">cora</span>
+                <span style="background-color: #059669; color: #ffffff; font-size: 11px; font-weight: 700; font-family: monospace; padding: 4px 10px; border-radius: 9999px;">Update v' . esc_html( $version ) . ' Ready</span>
+            </div>
+            
+            <h2 style="font-size: 18px; font-weight: 700; color: #09090b; margin-top: 0; margin-bottom: 8px;">Action Required: Upgrade Your Workspace</h2>
+            <p style="font-size: 13px; color: #52525b; line-height: 1.5; margin-bottom: 20px;">
+                A new version (<strong>v' . esc_html( $version ) . '</strong>) of the Cora Workspace Platform is ready to install on <strong>' . esc_html( $site_name ) . '</strong>. Click below to open your workspace dashboard and apply the 1-click upgrade.
+            </p>
+            
+            <div style="background-color: #fafafa; border: 1px solid #f4f4f5; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                <h4 style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #71717a; margin-top: 0; margin-bottom: 8px;">What\'s New in v' . esc_html( $version ) . '</h4>
+                <div style="font-size: 12px; color: #3f3f46; line-height: 1.6;">
+                    ' . $clean_changelog . '
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 28px;">
+                <a href="' . esc_url( $upgrade_url ) . '" style="background-color: #059669; color: #ffffff; font-size: 13px; font-weight: 700; text-decoration: none; padding: 14px 28px; border-radius: 8px; display: inline-block; box-shadow: 0 2px 4px rgba(5,150,105,0.2);">Upgrade Workspace Now &rarr;</a>
+            </div>
+            
+            <p style="font-size: 11px; color: #a1a1aa; text-align: center; margin-top: 24px; margin-bottom: 0;">
+                Sent automatically by Cora Workspace Platform &bull; ' . esc_html( $site_name ) . '
+            </p>
+        </div>
+    </body>
+    </html>';
+    
+    $headers = array(
+        'Content-Type: text/html; charset=UTF-8',
+        'From: Cora Platform <noreply@heycora.in>'
+    );
+    
+    foreach ( $emails as $email ) {
+        wp_mail( $email, $subject, $body, $headers );
+    }
+}
+
+// Allow super admin to trigger update available broadcast email via URL parameter ?trigger_update_email=1
+add_action( 'init', function() {
+    if ( isset( $_GET['trigger_update_email'] ) && current_user_can( 'manage_options' ) ) {
+        cora_notify_admins_update_available( '2.2.1' );
+        if ( function_exists( 'wp_send_json_success' ) && wp_doing_ajax() ) {
+            wp_send_json_success( array( 'message' => 'Update notification emails sent to workspace admins.' ) );
+        }
+    }
+} );
+
 
 // ── Workspace Database & Files Backup System ─────────────────────────────────
 
