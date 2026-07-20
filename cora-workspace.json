@@ -1,11 +1,11 @@
 {
     "name": "Cora Workspace Platform",
     "slug": "cora-workspace",
-    "version": "2.0.1",
-    "download_url": "https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-workspace.zip",
-    "tested": "6.5",
+    "version": "2.2.1",
+    "download_url": "https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-workspace.zip",
+    "tested": "6.7",
     "sections": {
         "description": "A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.",
-        "changelog": "<h4>2.0.1 — Hotfix: Dashboard Update Drawer & AJAX Connection Stabilisation</h4><ul><li><strong>Detailed Release Drawer</strong>: Replaced the raw click-to-update trigger with a beautiful, slide-over drawer detailing update benefits and release changelogs.</li><li><strong>AJAX Timeout Stabilisation</strong>: Resolved the infinite buffering bug by shifting to a timeout-aware jQuery.ajax routine with proper error fallback alerts.</li></ul><h4>2.0.0 — Unified Workspace Platform Milestone</h4><ul><li><strong>Unified Architecture</strong>: Merged Cora for Real Estate and Cora for Studio into a single plugin with a modular industry registry. Users select their workspace type during onboarding.</li><li><strong>Module Registry</strong>: Introduced <code>Cora_Module_Registry</code> — a central class that dynamically loads sidebar navigation, roles, CRM stages, and dashboard widgets based on the active industry module.</li><li><strong>Auto-Updater</strong>: Added one-click workspace update system. Admins see a pulsing update button next to the logo.</li><li><strong>Performance</strong>: Transient-based caching for dashboard stats. Lazy loading for GrapesJS and CodeMirror assets.</li></ul>"
+        "changelog": "<h4>2.2.1 — Industry Mode Switcher & Workspace Scoping</h4><ul><li><strong>Industry Mode Switcher</strong>: Dedicated Shruti Admin toggle in sidebar header to switch between Real Estate and Studio modes in 1 click.</li><li><strong>Independent Workspace Scoping</strong>: Multi-user workspace data isolation per domain slug (app.heycora.in/{{slug}}).</li><li><strong>Role Permission Seeding</strong>: Updated default capability matrices for all Real Estate and Studio roles.</li></ul>"
     }
 }
