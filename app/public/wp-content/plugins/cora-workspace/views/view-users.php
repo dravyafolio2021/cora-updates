@@ -183,7 +183,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 </td>
                                 <td class="px-5 py-3 text-zinc-500 font-medium"><?php echo esc_html( $u->user_email ); ?></td>
                                 <td class="px-5 py-3">
-                                    <span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 text-zinc-700 select-none">
+                                    <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 text-zinc-700 whitespace-nowrap select-none">
                                         <?php echo esc_html($u_role_lbl); ?>
                                     </span>
                                 </td>
@@ -241,7 +241,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                     <td class="px-5 py-3 font-bold text-zinc-900"><?php echo esc_html( $inv['first_name'] . ' ' . $inv['last_name'] ); ?></td>
                                     <td class="px-5 py-3 text-zinc-500 font-medium"><?php echo esc_html( $inv['email'] ); ?></td>
                                     <td class="px-5 py-3">
-                                        <span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 text-zinc-700">
+                                        <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 text-zinc-700 whitespace-nowrap select-none">
                                             <?php echo esc_html($invite_role_lbl); ?>
                                         </span>
                                     </td>
@@ -609,8 +609,9 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 </div>
 
 <!-- ═══ INVITE USER DRAWER SHEET ═════════════════════════════════════════════ -->
-<div id="drawer-invite-user" class="fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-invite-card">
+<div id="drawer-invite-user" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="absolute inset-0 bg-zinc-950/40" onclick="closeInviteDrawer()"></div>
+    <div class="relative z-10 bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-invite-card">
         <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
             <h3 class="text-sm font-bold text-zinc-900">Invite Brokerage Member</h3>
             <button class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeInviteDrawer()">
@@ -669,8 +670,9 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 </div>
 
 <!-- ═══ EDIT USER DRAWER SHEET ═══════════════════════════════════════════════ -->
-<div id="drawer-edit-user" class="fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-edit-card">
+<div id="drawer-edit-user" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="absolute inset-0 bg-zinc-950/40" onclick="closeEditUserDrawer()"></div>
+    <div class="relative z-10 bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="drawer-edit-card">
         <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
             <h3 class="text-sm font-bold text-zinc-900">Edit Crew Member</h3>
             <button class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeEditUserDrawer()">
