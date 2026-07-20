@@ -17022,9 +17022,88 @@ function cora_ajax_trigger_workspace_update() {
     
     cora_log_activity( 'System', 'Workspace updated automatically to version v' . $target_version );
     
+    $changelog = isset( $remote_data->sections->changelog ) ? $remote_data->sections->changelog : '';
+    cora_notify_admins_of_version_upgrade( $target_version, $changelog );
+    
     wp_send_json_success( array( 'message' => 'Workspace updated successfully!' ) );
 }
 add_action( 'wp_ajax_cora_trigger_workspace_update', 'cora_ajax_trigger_workspace_update' );
+
+/**
+ * Trigger an email notification to all workspace administrators/super owners upon version upgrade.
+ */
+function cora_notify_admins_of_version_upgrade( $version, $changelog = '' ) {
+    $user_query = new WP_User_Query( array(
+        'role__in' => array( 'administrator', 'cora_super_admin', 'cora_shruti', 'cora_manager' ),
+        'fields'   => array( 'user_email', 'display_name' )
+    ) );
+    
+    $admin_users = $user_query->get_results();
+    $emails = array();
+    foreach ( $admin_users as $u ) {
+        if ( ! empty( $u->user_email ) && is_email( $u->user_email ) ) {
+            $emails[] = $u->user_email;
+        }
+    }
+    $fallback_emails = array( 'shruti@heycora.in', 'shrutian@heycora.in', 'dravya.shs@gmail.com' );
+    foreach ( $fallback_emails as $fe ) {
+        if ( ! in_array( $fe, $emails, true ) ) {
+            $emails[] = $fe;
+        }
+    }
+    
+    $site_name = get_bloginfo( 'name' );
+    $site_url  = home_url( '/workspace/dashboard' );
+    $subject   = sprintf( '[%s] Platform Version Upgrade Notification: v%s', $site_name, $version );
+    
+    $clean_changelog = ! empty( $changelog ) ? $changelog : '<p>The core workspace platform has been upgraded with the latest features, security patches, and UI enhancements.</p>';
+    
+    $body = '
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Version Upgrade Notification</title>
+    </head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f5; color: #18181b; margin: 0; padding: 24px;">
+        <div style="max-width: 560px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 12px; padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f4f4f5; padding-bottom: 20px; margin-bottom: 24px;">
+                <span style="font-size: 20px; font-weight: 900; letter-spacing: -0.03em; color: #09090b;">cora</span>
+                <span style="background-color: #09090b; color: #ffffff; font-size: 11px; font-weight: 700; font-family: monospace; padding: 4px 10px; border-radius: 9999px;">v' . esc_html( $version ) . '</span>
+            </div>
+            
+            <h2 style="font-size: 18px; font-weight: 700; color: #09090b; margin-top: 0; margin-bottom: 8px;">Workspace Platform Upgraded</h2>
+            <p style="font-size: 13px; color: #52525b; line-height: 1.5; margin-bottom: 20px;">
+                Your workspace instance on <strong>' . esc_html( $site_name ) . '</strong> has been upgraded to version <strong>v' . esc_html( $version ) . '</strong>.
+            </p>
+            
+            <div style="background-color: #fafafa; border: 1px solid #f4f4f5; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                <h4 style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #71717a; margin-top: 0; margin-bottom: 8px;">Release Notes</h4>
+                <div style="font-size: 12px; color: #3f3f46; line-height: 1.6;">
+                    ' . $clean_changelog . '
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 28px;">
+                <a href="' . esc_url( $site_url ) . '" style="background-color: #09090b; color: #ffffff; font-size: 13px; font-weight: 700; text-decoration: none; padding: 12px 24px; border-radius: 8px; display: inline-block;">Open Workspace Dashboard &rarr;</a>
+            </div>
+            
+            <p style="font-size: 11px; color: #a1a1aa; text-align: center; margin-top: 24px; margin-bottom: 0;">
+                Sent automatically by Cora Workspace Platform &bull; ' . esc_html( $site_name ) . '
+            </p>
+        </div>
+    </body>
+    </html>';
+    
+    $headers = array(
+        'Content-Type: text/html; charset=UTF-8',
+        'From: Cora Platform <noreply@heycora.in>'
+    );
+    
+    foreach ( $emails as $email ) {
+        wp_mail( $email, $subject, $body, $headers );
+    }
+}
 
 
 // ── Workspace Database & Files Backup System ─────────────────────────────────
