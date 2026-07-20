@@ -1,0 +1,1337 @@
+/* =============================================================================
+   Cora Landing Page Widgets — Elementor Frontend Styles
+   Monochromatic palette per platform rules: white/zinc/black only.
+   ============================================================================= */
+
+/* --- Shared Layout ---------------------------------------------------------- */
+.cora-hero-section,
+.cora-mockup-section {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* =============================================================================
+   CORA HERO WIDGET
+   ============================================================================= */
+
+.cora-hero-section {
+    background-color: #ffffff;
+    padding: 100px 24px 80px;
+}
+
+.cora-hero-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+/* Badge */
+.cora-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #f4f4f5;
+    border: 1px solid #e4e4e7;
+    color: #3f3f46;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 5px 14px 5px 10px;
+    border-radius: 999px;
+    text-transform: uppercase;
+}
+
+.cora-hero-badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #22c55e;
+    flex-shrink: 0;
+}
+
+/* Headline */
+.cora-hero-headline {
+    font-size: clamp(2.2rem, 5vw, 3.75rem);
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+    color: #09090b;
+    margin: 0;
+}
+
+.cora-hero-headline-highlight {
+    background-color: #09090b;
+    color: #ffffff;
+    padding: 0 6px 2px;
+    border-radius: 4px;
+}
+
+/* Sub headline */
+.cora-hero-sub {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: #71717a;
+    max-width: 600px;
+    margin: 0;
+}
+
+/* CTAs */
+.cora-hero-ctas {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.cora-hero-cta-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #09090b !important;
+    color: #ffffff !important;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 13px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: background 0.18s, color 0.18s, transform 0.18s;
+}
+
+.cora-hero-cta-primary svg {
+    width: 15px;
+    height: 15px;
+    transition: transform 0.18s;
+}
+
+.cora-hero-cta-primary:hover,
+.cora-hero-cta-primary:focus,
+.cora-hero-cta-primary:active {
+    background: #27272a !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+}
+
+.cora-hero-cta-primary:hover svg {
+    transform: translateX(3px);
+}
+
+.cora-hero-cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent !important;
+    color: #3f3f46 !important;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 13px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    border: 1.5px solid #e4e4e7 !important;
+    transition: border-color 0.18s, color 0.18s, background 0.18s;
+}
+
+.cora-hero-cta-secondary svg {
+    width: 15px;
+    height: 15px;
+}
+
+.cora-hero-cta-secondary:hover,
+.cora-hero-cta-secondary:focus,
+.cora-hero-cta-secondary:active {
+    border-color: #a1a1aa !important;
+    color: #09090b !important;
+    background: #f4f4f5 !important;
+}
+
+/* Feature badges row */
+.cora-hero-feature-badges {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.cora-hero-feature-badge {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: #71717a;
+}
+
+/* =============================================================================
+   CORA DASHBOARD MOCKUP WIDGET
+   ============================================================================= */
+
+.cora-mockup-section {
+    background: #fafafa;
+    padding: 80px 24px 100px;
+}
+
+.cora-mockup-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+}
+
+/* Header */
+.cora-mockup-header {
+    text-align: center;
+    max-width: 680px;
+}
+
+.cora-mockup-label {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: #a1a1aa;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.cora-mockup-headline {
+    font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: #09090b;
+    margin: 0 0 16px;
+    line-height: 1.2;
+}
+
+.cora-mockup-desc {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #71717a;
+    margin: 0;
+}
+
+/* Stats */
+.cora-mockup-stats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+}
+
+.cora-mockup-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.cora-mockup-stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #09090b;
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+
+.cora-mockup-stat-label {
+    font-size: 12px;
+    color: #71717a;
+    font-weight: 500;
+}
+
+.cora-mockup-stat-divider {
+    width: 1px;
+    height: 40px;
+    background: #e4e4e7;
+}
+
+/* Browser frame outer wrap */
+.cora-mockup-frame-wrap {
+    width: 100%;
+    max-width: 1000px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #e4e4e7;
+    box-shadow: 0 24px 64px -12px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04);
+}
+
+/* Browser chrome bar */
+.cora-mockup-browser-bar {
+    background: #f4f4f5;
+    border-bottom: 1px solid #e4e4e7;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+}
+
+.cora-mockup-browser-dots {
+    display: flex;
+    gap: 6px;
+}
+
+.cora-mockup-browser-dots span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #d4d4d8;
+}
+
+.cora-mockup-browser-dots span:first-child  { background: #f87171; }
+.cora-mockup-browser-dots span:nth-child(2) { background: #fbbf24; }
+.cora-mockup-browser-dots span:last-child   { background: #34d399; }
+
+.cora-mockup-browser-url {
+    flex: 1;
+    background: #e4e4e7;
+    border-radius: 6px;
+    height: 22px;
+    font-size: 10px;
+    color: #71717a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+}
+
+/* Dashboard frame body */
+.cora-mockup-frame {
+    display: flex;
+    background: #ffffff;
+    min-height: 440px;
+}
+
+/* Sidebar */
+.cora-mockup-sidebar {
+    width: 160px;
+    flex-shrink: 0;
+    background: #fafafa;
+    border-right: 1px solid #f0f0f0;
+    padding: 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cora-mockup-sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px 16px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #09090b;
+    letter-spacing: -0.02em;
+}
+
+.cora-mockup-logo-mark {
+    width: 20px;
+    height: 20px;
+    background: #09090b;
+    border-radius: 5px;
+    flex-shrink: 0;
+}
+
+.cora-mockup-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: #71717a;
+    border-radius: 0;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+}
+
+.cora-mockup-nav-item:hover,
+.cora-mockup-nav-item.active {
+    background: #f4f4f5;
+    color: #09090b;
+    font-weight: 600;
+}
+
+.cora-mockup-nav-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #d4d4d8;
+    flex-shrink: 0;
+}
+
+.cora-mockup-nav-item.active .cora-mockup-nav-dot {
+    background: #09090b;
+}
+
+/* Main content area */
+.cora-mockup-main {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow: hidden;
+}
+
+/* Metric cards */
+.cora-mockup-cards-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.cora-mockup-card {
+    background: #fafafa;
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cora-mockup-card-title {
+    font-size: 9px;
+    font-weight: 600;
+    color: #a1a1aa;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.cora-mockup-card-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: #09090b;
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+
+.cora-mockup-card-change {
+    font-size: 10px;
+    font-weight: 600;
+    color: #16a34a;
+}
+
+/* Chart area */
+.cora-mockup-chart-wrap {
+    background: #fafafa;
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    padding: 14px;
+    flex: 1;
+}
+
+.cora-mockup-chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.cora-mockup-chart-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #27272a;
+}
+
+.cora-mockup-chart-period {
+    font-size: 10px;
+    color: #a1a1aa;
+    font-weight: 500;
+}
+
+.cora-mockup-chart-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    height: 90px;
+    gap: 6px;
+}
+
+.cora-mockup-bar-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+}
+
+.cora-mockup-bar {
+    width: 100%;
+    background: #d4d4d8;
+    border-radius: 4px 4px 0 0;
+    transition: background 0.18s;
+}
+
+.cora-mockup-bar-col:last-child .cora-mockup-bar {
+    background: #09090b;
+}
+
+.cora-mockup-bar-col span {
+    font-size: 9px;
+    color: #a1a1aa;
+    font-weight: 500;
+}
+
+/* Activity list */
+.cora-mockup-activity {
+    background: #fafafa;
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    padding: 12px 14px;
+}
+
+.cora-mockup-activity-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: #a1a1aa;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 10px;
+}
+
+.cora-mockup-activity-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-top: 1px solid #f0f0f0;
+}
+
+.cora-mockup-activity-item:first-of-type {
+    border-top: none;
+}
+
+.cora-mockup-activity-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: #d4d4d8;
+}
+
+.cora-mockup-activity-dot.type-lead    { background: #a1a1aa; }
+.cora-mockup-activity-dot.type-shoot   { background: #71717a; }
+.cora-mockup-activity-dot.type-listing { background: #09090b; }
+
+.cora-mockup-activity-label {
+    flex: 1;
+    font-size: 11px;
+    color: #27272a;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cora-mockup-activity-time {
+    font-size: 10px;
+    color: #a1a1aa;
+    white-space: nowrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .cora-hero-section  { padding: 72px 20px 60px; }
+    .cora-mockup-section { padding: 60px 20px 72px; }
+
+    .cora-mockup-sidebar { display: none; }
+    .cora-mockup-cards-row { grid-template-columns: repeat(2, 1fr); }
+    .cora-mockup-stat-divider { display: none; }
+}
+
+/* =============================================================================
+   CORA HEADER WIDGET
+   ============================================================================= */
+
+.cora-header {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid transparent;
+    z-index: 1000;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.cora-header-sticky {
+    position: sticky;
+    top: 0;
+}
+
+.cora-header-scrolled {
+    border-bottom-color: #e4e4e7;
+    box-shadow: 0 1px 20px -4px rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.98);
+}
+
+.cora-header-inner {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 62px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Logo */
+.cora-header-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.cora-header-logo-mark {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.cora-header-logo-mark svg {
+    width: 22px;
+    height: 22px;
+    display: block;
+}
+
+.cora-header-logo-text {
+    font-size: 15px;
+    font-weight: 800;
+    color: #09090b;
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+
+/* Desktop nav */
+.cora-header-nav {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+
+.cora-header-nav-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #52525b !important;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: color 0.15s, background 0.15s;
+    white-space: nowrap;
+}
+
+.cora-header-nav-link:hover,
+.cora-header-nav-link:focus,
+.cora-header-nav-link:active {
+    color: #09090b !important;
+    background: #f4f4f5 !important;
+}
+
+/* Right actions */
+.cora-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.cora-header-login {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 14px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #3f3f46 !important;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: color 0.15s, background 0.15s;
+    white-space: nowrap;
+}
+
+.cora-header-login:hover,
+.cora-header-login:focus,
+.cora-header-login:active {
+    color: #09090b !important;
+    background: #f4f4f5 !important;
+}
+
+.cora-header-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #09090b !important;
+    color: #ffffff !important;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 9px 18px;
+    border-radius: 9px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s, transform 0.15s;
+}
+
+.cora-header-cta svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+    transition: transform 0.15s;
+}
+
+.cora-header-cta:hover,
+.cora-header-cta:focus,
+.cora-header-cta:active {
+    background: #27272a !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+}
+
+.cora-header-cta:hover svg {
+    transform: translateX(3px);
+}
+
+/* Hamburger */
+.cora-header-burger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 36px;
+    height: 36px;
+    padding: 6px;
+    background: transparent;
+    border: 1.5px solid #e4e4e7;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.cora-header-burger span {
+    display: block;
+    height: 1.5px;
+    background: #3f3f46;
+    border-radius: 2px;
+    width: 100%;
+    transition: transform 0.22s ease, opacity 0.22s ease;
+    transform-origin: center;
+}
+
+.cora-header-burger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.cora-header-burger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.cora-header-burger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+.cora-header-burger:hover {
+    border-color: #a1a1aa;
+    background: #f4f4f5;
+}
+
+/* Mobile nav drawer */
+.cora-mobile-nav {
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px 16px 20px;
+    border-top: 1px solid #f4f4f5;
+    background: #ffffff;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.28s ease, padding 0.28s ease;
+}
+
+.cora-mobile-nav.open {
+    max-height: 480px;
+}
+
+.cora-mobile-nav-link {
+    display: block;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #3f3f46;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background 0.12s, color 0.12s;
+}
+
+.cora-mobile-nav-link:hover {
+    background: #f4f4f5;
+    color: #09090b;
+}
+
+.cora-mobile-nav-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f4f4f5;
+}
+
+.cora-mobile-nav-actions .cora-header-cta {
+    justify-content: center;
+}
+
+.cora-mobile-nav-actions .cora-header-login {
+    justify-content: center;
+}
+
+@media (max-width: 820px) {
+    .cora-header-nav    { display: none; }
+    .cora-header-login  { display: none; }
+    .cora-header-cta    { display: none; }
+    .cora-header-burger { display: flex; }
+    .cora-mobile-nav    { display: flex; }
+}
+
+/* =============================================================================
+   CORA FOOTER WIDGET
+   ============================================================================= */
+
+/* Pre-footer CTA banner */
+.cora-footer-cta-banner {
+    background: #09090b;
+    padding: 64px 24px;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.cora-footer-cta-inner {
+    max-width: 1160px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    flex-wrap: wrap;
+}
+
+.cora-footer-cta-text {
+    flex: 1;
+    min-width: 260px;
+}
+
+.cora-footer-cta-heading {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.025em;
+    margin: 0 0 8px;
+    line-height: 1.2;
+}
+
+.cora-footer-cta-sub {
+    font-size: 14px;
+    color: #71717a;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Override CTA button inside dark banner */
+.cora-footer-cta-banner .cora-hero-cta-primary {
+    background: #ffffff !important;
+    color: #09090b !important;
+    flex-shrink: 0;
+}
+
+.cora-footer-cta-banner .cora-hero-cta-primary:hover,
+.cora-footer-cta-banner .cora-hero-cta-primary:focus,
+.cora-footer-cta-banner .cora-hero-cta-primary:active {
+    background: #f4f4f5 !important;
+    color: #09090b !important;
+}
+
+/* Main footer */
+.cora-footer {
+    background: #fafafa;
+    border-top: 1px solid #e4e4e7;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.cora-footer-inner {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 64px 24px 48px;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 48px;
+}
+
+/* Brand column */
+.cora-footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cora-footer-logo-link {
+    width: fit-content;
+}
+
+.cora-footer-tagline {
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: #71717a;
+    margin: 0;
+    max-width: 220px;
+}
+
+.cora-footer-social {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.cora-footer-social-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1.5px solid #e4e4e7;
+    color: #71717a;
+    text-decoration: none;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+    flex-shrink: 0;
+}
+
+.cora-footer-social-icon svg {
+    width: 14px;
+    height: 14px;
+}
+
+.cora-footer-social-icon:hover {
+    border-color: #a1a1aa;
+    color: #09090b;
+    background: #f4f4f5;
+}
+
+/* Link columns grid */
+.cora-footer-cols {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+}
+
+.cora-footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cora-footer-col-heading {
+    font-size: 11px;
+    font-weight: 700;
+    color: #09090b;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0 0 4px;
+}
+
+.cora-footer-link {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #71717a;
+    text-decoration: none;
+    line-height: 1;
+    transition: color 0.15s;
+}
+
+.cora-footer-link:hover {
+    color: #09090b;
+}
+
+/* Bottom bar */
+.cora-footer-bottom {
+    border-top: 1px solid #e4e4e7;
+}
+
+.cora-footer-bottom-inner {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.cora-footer-copy {
+    font-size: 12.5px;
+    color: #a1a1aa;
+    font-weight: 500;
+}
+
+.cora-footer-bottom-links {
+    display: flex;
+    gap: 20px;
+}
+
+.cora-footer-bottom-link {
+    font-size: 12.5px;
+    color: #a1a1aa;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s;
+}
+
+.cora-footer-bottom-link:hover {
+    color: #3f3f46;
+}
+
+/* Footer responsive */
+@media (max-width: 960px) {
+    .cora-footer-inner {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .cora-footer-tagline { max-width: 100%; }
+
+    .cora-footer-cols {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px 24px;
+    }
+}
+
+@media (max-width: 560px) {
+    .cora-footer-cta-inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cora-footer-cta-banner .cora-hero-cta-primary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .cora-footer-cols {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cora-footer-bottom-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+
+/* =============================================================================
+   CORA USER ONBOARDING MODAL OVERLAY
+   ============================================================================= */
+.cora-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(9, 9, 11, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cora-modal-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.cora-modal-card {
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 24px;
+    padding: 40px 32px 32px;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    position: relative;
+    transform: translateY(16px) scale(0.98);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #18181b;
+}
+
+.cora-modal-overlay.open .cora-modal-card {
+    transform: translateY(0) scale(1);
+}
+
+/* Close button */
+.cora-modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: #a1a1aa;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.cora-modal-close:hover {
+    background-color: #f4f4f5;
+    color: #18181b;
+}
+
+/* Header Text */
+.cora-modal-header {
+    margin-bottom: 24px;
+}
+.cora-modal-tagline {
+    font-size: 13px;
+    font-weight: 500;
+    color: #a1a1aa;
+    margin-bottom: 2px;
+}
+.cora-modal-title {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: #09090b;
+    margin: 0;
+}
+
+/* Social Buttons */
+.cora-modal-sso-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.cora-modal-sso-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 11px 16px;
+    background: #ffffff;
+    border: 1.5px solid #e4e4e7;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #18181b;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+    position: relative;
+}
+
+.cora-modal-sso-btn:hover {
+    background-color: #fcfcfc;
+    border-color: #a1a1aa;
+}
+
+/* Specific styling for Google button with "Last used" pill */
+.cora-modal-google-btn {
+    border-color: #2563eb; /* Blue border */
+}
+.cora-modal-google-btn:hover {
+    border-color: #1d4ed8;
+}
+
+.cora-google-pill {
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 1px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+    border: 1px solid #bfdbfe;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Divider */
+.cora-modal-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
+    color: #a1a1aa;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cora-modal-divider::before,
+.cora-modal-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e4e4e7;
+}
+
+/* Input Form */
+.cora-modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cora-modal-input {
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 14px;
+    border: 1px solid #e4e4e7;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #18181b;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.cora-modal-input:focus {
+    border-color: #18181b;
+    box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.07);
+}
+
+.cora-modal-btn-submit {
+    width: 100%;
+    padding: 11px;
+    background: #18181b;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.15s, transform 0.1s;
+}
+
+.cora-modal-btn-submit:hover {
+    background: #27272a;
+}
+
+.cora-modal-btn-submit:active {
+    transform: scale(0.98);
+}
+
+/* Footer / TOS */
+.cora-modal-footer-tos {
+    margin-top: 16px;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #71717a;
+    text-align: left;
+}
+
+.cora-modal-footer-tos a {
+    color: #18181b;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.cora-modal-footer-tos a:hover {
+    color: #000000;
+}
+
+.cora-modal-footer-separator {
+    height: 1px;
+    background: #f4f4f5;
+    margin: 20px 0;
+}
+
+/* SSO note */
+.cora-modal-sso-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 11.5px;
+    color: #71717a;
+}
+
+.cora-modal-sso-note a {
+    font-weight: 600;
+    color: #18181b;
+    text-decoration: underline;
+}
+
+.cora-modal-sso-note a:hover {
+    color: #000000;
+}
+
+/* Success/Inbox State */
+.cora-modal-success {
+    text-align: center;
+    display: none;
+}
+
+.cora-modal-success-icon {
+    width: 48px;
+    height: 48px;
+    background: #f4f4f5;
+    border: 1px solid #e4e4e7;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    color: #18181b;
+}
+
+.cora-modal-success-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #09090b;
+    margin-bottom: 8px;
+}
+
+.cora-modal-success-text {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #71717a;
+    margin-bottom: 20px;
+}
+
+.cora-modal-success-text strong {
+    color: #18181b;
+}
+
+.cora-modal-btn-resend {
+    background: none;
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
+    color: #71717a;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+}
+
+.cora-modal-btn-resend:hover {
+    color: #18181b;
+}
+
+

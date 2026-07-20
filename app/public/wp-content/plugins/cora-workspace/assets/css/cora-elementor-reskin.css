@@ -1,0 +1,196 @@
+/* 
+ * Cora Elementor Injected Top Bar Navigation Style
+ * Restores original Elementor editor UI/UX styles on all panels and controls, 
+ * keeping only the custom top bar navigation bar breadcrumbs and dashboard exit actions.
+ */
+
+.cora-editor-injected-nav {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin-right: 16px !important;
+    margin-left: 12px !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+.cora-injected-exit-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 5px 10px !important;
+    border: 1px solid #e4e4e7 !important;
+    background-color: #ffffff !important;
+    color: #18181b !important;
+    border-radius: 6px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    line-height: 1 !important;
+}
+
+.cora-injected-exit-btn svg {
+    width: 10px !important;
+    height: 10px !important;
+}
+
+.cora-injected-exit-btn:hover {
+    background-color: #fafafa !important;
+    border-color: #18181b !important;
+}
+
+.cora-injected-separator {
+    width: 1px !important;
+    height: 16px !important;
+    background-color: #e4e4e7 !important;
+}
+
+.cora-injected-breadcrumbs {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    color: #71717a !important;
+}
+
+.cora-injected-crumb-theme {
+    color: #18181b !important;
+}
+
+.cora-injected-crumb-page {
+    color: #18181b !important;
+    font-weight: 700 !important;
+}
+
+/* White-label Elementor: Hide Exit to WordPress options and branding */
+.elementor-panel-menu-item-exit,
+.elementor-panel-menu-item-exit-to-dashboard,
+#elementor-panel-footer-exit-to-dashboard,
+.elementor-panel-footer-sub-menu-item[href*="post.php"],
+a[href*="wp-admin/post.php"],
+.eicon-editor-close,
+.eicon-exit {
+    display: none !important;
+}
+
+/* Hide AI Angie, Checklist, and What's New features from Elementor Top Bar */
+[data-tooltip="Angie"],
+[aria-label="Angie"],
+[title="Angie"],
+[data-tooltip="Checklist"],
+[aria-label="Checklist"],
+[title="Checklist"],
+[data-tooltip="What's New"],
+[aria-label="What's New"],
+[title="What's New"] {
+    display: none !important;
+}
+
+/* Make the Elementor Top Bar visible but styled minimalistically */
+header.MuiAppBar-root,
+.e-top-bar,
+#e-top-bar,
+.elementor-editor-top-bar {
+    display: flex !important;
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #e4e4e7 !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 12px !important;
+    box-sizing: border-box !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+}
+
+/* Hide all native child elements of the top bar except our custom injected nav */
+header.MuiAppBar-root > *:not(.cora-editor-injected-nav),
+.e-top-bar > *:not(.cora-editor-injected-nav),
+#e-top-bar > *:not(.cora-editor-injected-nav),
+.elementor-editor-top-bar > *:not(.cora-editor-injected-nav) {
+    display: none !important;
+}
+
+/* Editor wrapper — fill the available viewport height, no overflow */
+#elementor-editor-wrapper-v2 {
+    top: 0 !important;
+    height: fit-content !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+}
+
+/* Side panel — stretch to fill the wrapper, no scroll leakage */
+#elementor-panel {
+    top: 0 !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+}
+
+/* Elementor canvas area — fill remaining space next to side panel */
+#elementor-preview,
+#elementor-preview-iframe,
+.elementor-editor-preview {
+    height: 100% !important;
+    min-height: 0 !important;
+    flex: 1 !important;
+}
+
+/* Hide Elementor onboarding toast alerts */
+#elementor-toast {
+    display: none !important;
+}
+
+/* ── Hide "Edit with AI" sparkle button on all controls ── */
+.e-ai-button,
+[class*="e-ai-button"],
+button.e-ai-button {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* ── Block all Elementor in-panel plugin install / upsell notice banners ──
+   This includes notices like "Accessible structure matters", "Install Ally",
+   and any other .elementor-control-notice that ships an install-plugin CTA.
+   Users must not be able to install plugins from inside the editor. */
+.elementor-control-notice,
+.elementor-control-notice-type-info,
+.elementor-control-notice-type-warning,
+.elementor-control-notice-type-danger,
+.elementor-control-notice-type-success,
+[class*="elementor-control-notice"] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Also hide any stray Elementor admin notice / Go Pro promo bars */
+.elementor-promotion,
+.elementor-panel-scheme-choose .elementor-panel-scheme-item[data-scheme="custom"],
+.e-notice,
+.e-notice-bar,
+[class*="e-notice"],
+.elementor-upgrade-notice,
+.elementor-go-pro,
+[class*="go-pro"],
+.elementor-button-go-pro,
+a[href*="elementor.com/pro"],
+a[href*="go.elementor.com"],
+a[href*="install-plugin"],
+button[data-event][data-settings*="install-plugin"] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
