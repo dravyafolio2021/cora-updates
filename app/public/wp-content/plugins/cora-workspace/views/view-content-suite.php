@@ -71,20 +71,25 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 
 <!-- Tabs Navigation -->
 <div class="flex items-center gap-1 border-b border-zinc-200 mb-6 select-none" id="cora-content-tabs">
-    <button class="cora-tab-btn px-4 py-2 border-b-2 text-sm font-semibold cursor-pointer transition-all border-zinc-950 text-zinc-900 flex items-center gap-1.5" data-tab="ct-library" onclick="switchContentTab('ct-library')">
-        📄 Content Library
+    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-zinc-950 text-zinc-900 flex items-center gap-1.5" data-tab="ct-library" onclick="switchContentTab('ct-library')">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        Content Library
     </button>
-    <button class="cora-tab-btn px-4 py-2 border-b-2 text-sm font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5" data-tab="ct-seo" onclick="switchContentTab('ct-seo')">
-        🔍 SEO Analyzer
+    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5" data-tab="ct-seo" onclick="switchContentTab('ct-seo')">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><polyline points="11 8 11 11 13 13"></polyline></svg>
+        SEO Analyzer
     </button>
-    <button class="cora-tab-btn px-4 py-2 border-b-2 text-sm font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5" data-tab="ct-geo" onclick="switchContentTab('ct-geo')">
-        🌐 GEO / AI Visibility
+    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5" data-tab="ct-geo" onclick="switchContentTab('ct-geo')">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+        GEO / AI Visibility
     </button>
-    <button class="cora-tab-btn px-4 py-2 border-b-2 text-sm font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5" data-tab="ct-keywords" onclick="switchContentTab('ct-keywords')">
-        🔑 Keyword Intelligence
+    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5" data-tab="ct-keywords" onclick="switchContentTab('ct-keywords')">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        Keyword Intelligence
     </button>
-    <button class="cora-tab-btn px-4 py-2 border-b-2 text-sm font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5" data-tab="ct-calendar" onclick="switchContentTab('ct-calendar')">
-        📅 Content Calendar
+    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5" data-tab="ct-calendar" onclick="switchContentTab('ct-calendar')">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        Content Calendar
     </button>
 </div>
 
@@ -212,7 +217,9 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                             <div class="flex items-center justify-end gap-3 text-xs font-medium">
                                 <button class="text-zinc-600 hover:text-zinc-900 cursor-pointer" onclick="coraEditArticle(<?php echo $post->ID; ?>)">Edit</button>
                                 <button class="text-zinc-600 hover:text-zinc-900 cursor-pointer" onclick="openSEODetailDrawer(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">SEO</button>
-                                <button class="text-zinc-400 hover:text-zinc-900 cursor-pointer">⋮</button>
+                                <button class="text-zinc-400 hover:text-zinc-900 cursor-pointer" title="More actions">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -440,40 +447,97 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 <!-- PANEL: Content Calendar -->
 <div id="panel-ct-calendar" class="cora-ct-panel hidden space-y-6">
     <div class="flex gap-4 overflow-x-auto pb-4">
-        <!-- Kanban Columns -->
-        <div class="w-72 shrink-0 flex flex-col bg-zinc-50 border border-zinc-200 rounded-xl h-[600px]">
-            <div class="p-3 border-b border-zinc-200 font-bold text-zinc-900 flex justify-between items-center">
-                Drafts <button class="text-zinc-500 hover:text-zinc-900" onclick="openCreateArticleDrawer()">+</button>
+        <?php
+        // Group articles into kanban columns by editorial status
+        $cal_draft = $cal_review = $cal_scheduled = $cal_published = [];
+        foreach($cora_posts as $p) {
+            $es = get_post_meta($p->ID, '_cora_editorial_status', true) ?: ($p->post_status === 'publish' ? 'published' : 'draft');
+            $p->_cal_status = $es;
+            $p->_cal_thumb = get_the_post_thumbnail_url($p->ID, 'thumbnail');
+            $p->_cal_date  = get_the_modified_date('M j', $p->ID);
+            $p->_cal_assignee = get_post_meta($p->ID, '_cora_assignee_id', true);
+            $p->_cal_assignee_name = $p->_cal_assignee ? (get_userdata($p->_cal_assignee)->display_name ?? 'Unassigned') : 'Unassigned';
+            $p->_cal_seo = get_post_meta($p->ID, '_cora_seo_score', true) ?: 75;
+            if ($es === 'published') $cal_published[] = $p;
+            elseif ($es === 'pending_review') $cal_review[] = $p;
+            elseif ($es === 'approved') $cal_scheduled[] = $p;
+            else $cal_draft[] = $p;
+        }
+        $kanban_cols = [
+            ['id'=>'draft','label'=>'Drafts','articles'=>$cal_draft],
+            ['id'=>'review','label'=>'In Review','articles'=>$cal_review],
+            ['id'=>'scheduled','label'=>'Scheduled','articles'=>$cal_scheduled],
+            ['id'=>'published','label'=>'Published','articles'=>$cal_published],
+        ];
+        foreach($kanban_cols as $col):
+        ?>
+        <div class="w-72 shrink-0 flex flex-col bg-zinc-50 border border-zinc-200 rounded-xl">
+            <div class="p-3 border-b border-zinc-200 font-bold text-xs text-zinc-700 uppercase tracking-wider flex justify-between items-center">
+                <?php echo esc_html($col['label']); ?>
+                <span class="text-zinc-400 text-[10px] font-semibold"><?php echo count($col['articles']); ?></span>
+                <button class="text-zinc-400 hover:text-zinc-900 ml-auto" onclick="openCreateArticleDrawer()">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
             </div>
-            <div class="p-2 space-y-2 overflow-y-auto flex-1">
-                <div class="bg-white border border-zinc-200 rounded p-3 shadow-sm">
-                    <div class="text-sm font-bold text-zinc-900 mb-1">Gurgaon Market Update</div>
-                    <div class="text-xs text-zinc-500">Unassigned</div>
+            <div class="p-2 space-y-2 overflow-y-auto" style="max-height:480px">
+                <?php if(empty($col['articles'])): ?>
+                <div class="text-center text-zinc-400 text-xs py-8">No articles</div>
+                <?php else: foreach($col['articles'] as $ca): ?>
+                <div class="bg-white border border-zinc-200 rounded-lg p-3 shadow-sm cursor-pointer hover:border-zinc-400 transition-colors" onclick="coraEditArticle(<?php echo $ca->ID; ?>)">
+                    <?php if($ca->_cal_thumb): ?>
+                    <img src="<?php echo esc_url($ca->_cal_thumb); ?>" class="w-full h-20 object-cover rounded mb-2">
+                    <?php endif; ?>
+                    <div class="text-xs font-bold text-zinc-900 line-clamp-2 mb-1"><?php echo esc_html($ca->post_title); ?></div>
+                    <div class="flex items-center justify-between mt-1.5">
+                        <span class="text-[10px] text-zinc-500"><?php echo esc_html($ca->_cal_assignee_name); ?></span>
+                        <span class="text-[10px] font-bold text-zinc-500"><?php echo esc_html($ca->_cal_date); ?></span>
+                        <span class="text-[10px] font-bold px-1.5 py-0.5 bg-zinc-100 rounded text-zinc-700"><?php echo (int)$ca->_cal_seo; ?></span>
+                    </div>
                 </div>
+                <?php endforeach; endif; ?>
             </div>
         </div>
-        <div class="w-72 shrink-0 flex flex-col bg-zinc-50 border border-zinc-200 rounded-xl h-[600px]">
-            <div class="p-3 border-b border-zinc-200 font-bold text-zinc-900 flex justify-between items-center">
-                In Review <button class="text-zinc-500 hover:text-zinc-900" onclick="openCreateArticleDrawer()">+</button>
-            </div>
-            <div class="p-2 space-y-2 overflow-y-auto flex-1"></div>
-        </div>
-        <div class="w-72 shrink-0 flex flex-col bg-zinc-50 border border-zinc-200 rounded-xl h-[600px]">
-            <div class="p-3 border-b border-zinc-200 font-bold text-zinc-900 flex justify-between items-center">
-                Scheduled <button class="text-zinc-500 hover:text-zinc-900" onclick="openCreateArticleDrawer()">+</button>
-            </div>
-            <div class="p-2 space-y-2 overflow-y-auto flex-1"></div>
-        </div>
-        <div class="w-72 shrink-0 flex flex-col bg-zinc-50 border border-zinc-200 rounded-xl h-[600px]">
-            <div class="p-3 border-b border-zinc-200 font-bold text-zinc-900 flex justify-between items-center">
-                Published <button class="text-zinc-500 hover:text-zinc-900" onclick="openCreateArticleDrawer()">+</button>
-            </div>
-            <div class="p-2 space-y-2 overflow-y-auto flex-1"></div>
-        </div>
+        <?php endforeach; ?>
     </div>
-    
-    <div class="bg-white border border-zinc-200 rounded-xl p-4 shadow-sm h-64 flex items-center justify-center text-zinc-500">
-        Month Calendar Grid (Visualization)
+
+    <!-- Month Calendar Grid -->
+    <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm">
+        <?php
+        $month_now = date('n');
+        $year_now  = date('Y');
+        $month_name = date('F Y');
+        $days_in_month = cal_days_in_month(CAL_GREGORIAN, $month_now, $year_now);
+        $first_dow = date('N', mktime(0,0,0,$month_now,1,$year_now)); // 1=Mon..7=Sun
+        // Build publish date map
+        $pub_dates = [];
+        foreach($cora_posts as $pp) {
+            $d = get_the_date('j', $pp->ID);
+            $m = get_the_date('n', $pp->ID);
+            if((int)$m === (int)$month_now) $pub_dates[(int)$d] = true;
+        }
+        ?>
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-zinc-900"><?php echo esc_html($month_name); ?></h3>
+            <div class="flex gap-2 text-xs text-zinc-500">
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-zinc-900 inline-block"></span>Published</span>
+            </div>
+        </div>
+        <div class="grid grid-cols-7 gap-1 text-center">
+            <?php foreach(['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] as $dn): ?>
+            <div class="text-[10px] font-bold text-zinc-400 uppercase py-1"><?php echo $dn; ?></div>
+            <?php endforeach; ?>
+            <?php for($pad=1; $pad < $first_dow; $pad++): ?>
+            <div></div>
+            <?php endfor; ?>
+            <?php for($d=1; $d<=$days_in_month; $d++): ?>
+            <div class="relative py-1.5 rounded text-xs <?php echo $d == date('j') ? 'bg-zinc-900 text-white font-bold' : 'text-zinc-700 hover:bg-zinc-50'; ?> cursor-default">
+                <?php echo $d; ?>
+                <?php if(isset($pub_dates[$d])): ?>
+                <span class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-zinc-400 <?php echo $d == date('j') ? 'bg-white' : ''; ?>"></span>
+                <?php endif; ?>
+            </div>
+            <?php endfor; ?>
+        </div>
     </div>
 </div>
 
@@ -482,7 +546,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 <div id="cora-drawer-backdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998] hidden transition-opacity" onclick="window.coraCloseAllDrawers()"></div>
 
 <!-- Create Article Drawer -->
-<aside id="cora-create-article-drawer" class="fixed top-0 right-0 z-[9999] h-full w-[480px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full">
+<aside id="cora-create-article-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[480px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
     <div class="px-6 py-4 border-b border-zinc-200 flex justify-between items-center">
         <div>
             <h2 class="text-lg font-bold text-zinc-900">New Article</h2>
@@ -537,7 +601,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 </aside>
 
 <!-- SEO Detail Drawer -->
-<aside id="cora-seo-detail-drawer" class="fixed top-0 right-0 z-[9999] h-full w-[500px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full">
+<aside id="cora-seo-detail-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[500px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
     <div class="px-6 py-4 border-b border-zinc-200 flex justify-between items-center">
         <div>
             <h2 class="text-lg font-bold text-zinc-900" id="seo-drawer-title">SEO Deep Analysis</h2>
@@ -597,18 +661,6 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 
 <script>
 (function() {
-    // Utilities
-    window.coraCloseAllDrawers = function() {
-        document.querySelectorAll('aside[id$="-drawer"]').forEach(el => {
-            el.classList.add('translate-x-full');
-            el.classList.add('collapsed');
-        });
-        const bd = document.getElementById('cora-drawer-backdrop');
-        if(bd) {
-            bd.classList.add('hidden');
-        }
-    };
-
     function showBackdrop() {
         const bd = document.getElementById('cora-drawer-backdrop');
         if(bd) bd.classList.remove('hidden');
@@ -644,16 +696,21 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     });
 
     // Drawers
-    window.openCreateArticleDrawer = function(prefillKeyword = '') {
-        window.coraCloseAllDrawers();
+    window.openCreateArticleDrawer = function(prefillKeyword) {
+        if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
         if(prefillKeyword) {
-            document.getElementById('ca-keyword').value = prefillKeyword;
-            document.getElementById('ca-title').value = "Guide to " + prefillKeyword;
+            const kwEl = document.getElementById('ca-keyword');
+            const ttEl = document.getElementById('ca-title');
+            if(kwEl) kwEl.value = prefillKeyword;
+            if(ttEl) ttEl.value = 'Guide to ' + prefillKeyword;
         } else {
-            document.getElementById('ca-keyword').value = '';
-            document.getElementById('ca-title').value = '';
+            const kwEl = document.getElementById('ca-keyword');
+            const ttEl = document.getElementById('ca-title');
+            if(kwEl) kwEl.value = '';
+            if(ttEl) ttEl.value = '';
         }
-        document.getElementById('cora-create-article-drawer').classList.remove('translate-x-full', 'collapsed');
+        const drawer = document.getElementById('cora-create-article-drawer');
+        if(drawer) { drawer.classList.remove('translate-x-full', 'collapsed'); }
         showBackdrop();
     };
 
@@ -662,10 +719,13 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     };
 
     window.openSEODetailDrawer = function(articleId, title) {
-        window.coraCloseAllDrawers();
-        document.getElementById('seo-drawer-title').innerText = title;
-        document.getElementById('seo-drawer-article-id').value = articleId;
-        document.getElementById('cora-seo-detail-drawer').classList.remove('translate-x-full', 'collapsed');
+        if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
+        const titleEl = document.getElementById('seo-drawer-title');
+        const idEl    = document.getElementById('seo-drawer-article-id');
+        if(titleEl) titleEl.innerText = title || 'SEO Analysis';
+        if(idEl) idEl.value = articleId;
+        const drawer = document.getElementById('cora-seo-detail-drawer');
+        if(drawer) { drawer.classList.remove('translate-x-full', 'collapsed'); }
         showBackdrop();
     };
     
@@ -674,7 +734,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     };
 
     window.closeSEODetailDrawer = function() {
-        window.coraCloseAllDrawers();
+        if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
     };
 
     // Library Filtering
@@ -841,11 +901,35 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     };
 
     window.exportContentCSV = function() {
-        if(window.coraShowToast) window.coraShowToast('Exporting CSV...', 'info');
-        // Mock export
-        setTimeout(() => {
-            if(window.coraShowToast) window.coraShowToast('CSV Downloaded', 'success');
-        }, 1000);
+        // Build CSV from table rows
+        const rows = document.querySelectorAll('#cora-content-table-body .ct-row');
+        if(!rows.length) {
+            if(window.coraShowToast) window.coraShowToast('No articles to export', 'error');
+            return;
+        }
+        let csv = 'Title,Author,Status,SEO Score,GEO Score,Leads,Modified\n';
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if(cells.length < 8) return;
+            const title  = (cells[1].querySelector('.font-bold')?.innerText || '').replace(/,/g,'').trim();
+            const author = (cells[2].innerText || '').replace(/,/g,'').trim();
+            const status = (cells[3].innerText || '').replace(/,/g,'').trim();
+            const seo    = (cells[4].querySelector('span')?.innerText || '').trim();
+            const geo    = (cells[5].querySelector('span')?.innerText || '').trim();
+            const leads  = (cells[6].innerText || '').trim().replace(/\n/g,' ');
+            const mod    = (cells[7].innerText || '').trim();
+            csv += `"${title}","${author}","${status}","${seo}","${geo}","${leads}","${mod}"\n`;
+        });
+        const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href = url;
+        a.download = 'content-library-' + new Date().toISOString().split('T')[0] + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        if(window.coraShowToast) window.coraShowToast('CSV exported successfully', 'success');
     };
 
 })();
