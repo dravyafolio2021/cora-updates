@@ -103,50 +103,50 @@ $financial_entries = function_exists( 'cora_db_get_ledger' ) ? cora_db_get_ledge
     <!-- 2. KPI METRIC CARDS ROW -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
-        <!-- Card 1: Gross Revenue (Inflows) -->
-        <div id="financial-kpi-revenue" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex flex-col justify-between space-y-3">
+        <!-- Card 1: Gross Revenue (Inflows) - Emerald Accent -->
+        <div id="financial-kpi-revenue" class="bg-white dark:bg-zinc-900 border border-emerald-200/90 dark:border-emerald-900/60 rounded-xl p-4 shadow-sm flex flex-col justify-between space-y-3">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Gross Revenue (Inflows)</span>
-                <span class="p-1.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <span class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Gross Revenue (Inflows)</span>
+                <span class="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/80">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
                         <polyline points="17 6 23 6 23 12"></polyline>
                     </svg>
                 </span>
             </div>
             <div>
-                <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight" id="kpi-val-revenue">₹485,000</div>
-                <div class="flex items-center gap-1.5 mt-1">
-                    <span class="inline-flex items-center text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded border border-zinc-200 dark:border-zinc-700">
+                <div class="text-2xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight" id="kpi-val-revenue">₹485,000</div>
+                <div class="flex items-center gap-1.5 mt-1.5">
+                    <span class="inline-flex items-center text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
                         +12.4% vs last period
                     </span>
                 </div>
             </div>
         </div>
 
-        <!-- Card 2: Total Expenses (Outflows) -->
-        <div id="financial-kpi-expenses" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex flex-col justify-between space-y-3">
+        <!-- Card 2: Total Expenses (Outflows) - Rose Accent -->
+        <div id="financial-kpi-expenses" class="bg-white dark:bg-zinc-900 border border-rose-200/90 dark:border-rose-900/60 rounded-xl p-4 shadow-sm flex flex-col justify-between space-y-3">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Total Expenses (Outflows)</span>
-                <span class="p-1.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <span class="text-[11px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider">Total Expenses (Outflows)</span>
+                <span class="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200/80 dark:border-rose-800/80">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
                         <polyline points="17 18 23 18 23 12"></polyline>
                     </svg>
                 </span>
             </div>
             <div>
-                <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight" id="kpi-val-expenses">₹162,400</div>
-                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">Operating, Production & Gear Costs</p>
+                <div class="text-2xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight" id="kpi-val-expenses">₹162,400</div>
+                <p class="text-[11px] font-medium text-rose-600/80 dark:text-rose-400/80 mt-1.5">Operating, Rent & Gear Outflows</p>
             </div>
         </div>
 
-        <!-- Card 3: Net Profit & Profit Margin % -->
-        <div id="financial-kpi-net-profit" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex flex-col justify-between space-y-3">
+        <!-- Card 3: Net Profit & Profit Margin % - Indigo Accent -->
+        <div id="financial-kpi-net-profit" class="bg-white dark:bg-zinc-900 border border-indigo-200/90 dark:border-indigo-900/60 rounded-xl p-4 shadow-sm flex flex-col justify-between space-y-3">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Net Profit</span>
-                <span class="p-1.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <span class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Net Profit Margin</span>
+                <span class="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/80 dark:border-indigo-800/80">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="20" x2="12" y2="10"></line>
                         <line x1="18" y1="20" x2="18" y2="4"></line>
                         <line x1="6" y1="20" x2="6" y2="16"></line>
@@ -154,30 +154,119 @@ $financial_entries = function_exists( 'cora_db_get_ledger' ) ? cora_db_get_ledge
                 </span>
             </div>
             <div>
-                <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight" id="kpi-val-net-profit">₹322,600</div>
-                <div class="flex items-center gap-1.5 mt-1">
-                    <span class="inline-flex items-center text-[11px] font-bold text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 px-2 py-0.5 rounded-full bg-zinc-50 dark:bg-zinc-800" id="kpi-val-margin-pill">
-                        66.5% Margin
+                <div class="text-2xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight" id="kpi-val-net-profit">₹322,600</div>
+                <div class="flex items-center gap-1.5 mt-1.5">
+                    <span class="inline-flex items-center text-[11px] font-bold text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60" id="kpi-val-margin-pill">
+                        66.5% Net Margin
                     </span>
                 </div>
             </div>
         </div>
 
-        <!-- Card 4: Pending Receivables & Client Dues -->
-        <div id="financial-kpi-pending" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex flex-col justify-between space-y-3">
+        <!-- Card 4: Pending Receivables & Client Dues - Amber Accent -->
+        <div id="financial-kpi-pending" class="bg-white dark:bg-zinc-900 border border-amber-200/90 dark:border-amber-900/60 rounded-xl p-4 shadow-sm flex flex-col justify-between space-y-3">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Pending Receivables</span>
-                <span class="p-1.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <span class="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Pending Receivables</span>
+                <span class="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200/80 dark:border-amber-800/80">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"></circle>
                         <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
                 </span>
             </div>
             <div>
-                <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight" id="kpi-val-pending">₹95,000</div>
-                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1" id="kpi-val-pending-count">4 Outstanding Client Invoices</p>
+                <div class="text-2xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight" id="kpi-val-pending">₹95,000</div>
+                <p class="text-[11px] font-medium text-amber-600/90 dark:text-amber-400/90 mt-1.5" id="kpi-val-pending-count">4 Outstanding Client Invoices</p>
             </div>
+        </div>
+    </div>
+
+    <!-- 3. REVENUE ANALYTICS & CASHFLOW GRAPH (SHIFTED ABOVE ALLOCATION BAR) -->
+    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/85 dark:border-zinc-800 rounded-xl p-5 shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3 flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+                <div class="p-1.5 rounded bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                </div>
+                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Revenue Analytics & Cashflow Graph</h3>
+            </div>
+
+            <!-- Color Psychology Legend -->
+            <div class="flex items-center gap-4 text-xs font-medium">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded-sm bg-emerald-500 inline-block shadow-2xs"></span>
+                    <span class="text-zinc-700 dark:text-zinc-300 font-semibold">Cash Inflows</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded-sm bg-rose-400 dark:bg-rose-500 inline-block shadow-2xs"></span>
+                    <span class="text-zinc-700 dark:text-zinc-300 font-semibold">Cash Outflows</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SVG Visual Visualization Container with Vibrantly Colored Bars & Curve -->
+        <div id="financial-analytics-chart-container" class="relative w-full h-[220px] pt-2 select-none">
+            <svg class="w-full h-full overflow-visible" viewBox="0 0 700 200" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="emeraldGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#10B981" stop-opacity="0.35"/>
+                        <stop offset="100%" stop-color="#10B981" stop-opacity="0.0"/>
+                    </linearGradient>
+                </defs>
+
+                <!-- Background Gridlines -->
+                <line x1="40" y1="20" x2="680" y2="20" stroke="currentColor" class="text-zinc-100 dark:text-zinc-800" stroke-dasharray="3 3"/>
+                <line x1="40" y1="60" x2="680" y2="60" stroke="currentColor" class="text-zinc-100 dark:text-zinc-800" stroke-dasharray="3 3"/>
+                <line x1="40" y1="100" x2="680" y2="100" stroke="currentColor" class="text-zinc-100 dark:text-zinc-800" stroke-dasharray="3 3"/>
+                <line x1="40" y1="140" x2="680" y2="140" stroke="currentColor" class="text-zinc-100 dark:text-zinc-800" stroke-dasharray="3 3"/>
+                <line x1="40" y1="170" x2="680" y2="170" stroke="currentColor" class="text-zinc-200 dark:text-zinc-700" stroke-width="1"/>
+
+                <!-- Translucent Area under Inflow Trend Line -->
+                <path d="M 60 140 Q 150 110, 250 90 T 450 40 T 650 30 L 650 170 L 60 170 Z" fill="url(#emeraldGradient)"/>
+
+                <!-- Monthly Inflow Line Path (Vibrant Emerald) -->
+                <path d="M 60 140 Q 150 110, 250 90 T 450 40 T 650 30" fill="none" stroke="#10B981" stroke-width="3" stroke-linecap="round"/>
+                
+                <!-- Monthly Outflow Line Path (Rose Accent) -->
+                <path d="M 60 160 Q 150 150, 250 130 T 450 110 T 650 120" fill="none" stroke="#F43F5E" stroke-width="2" stroke-dasharray="4 4" stroke-linecap="round"/>
+
+                <!-- Data Points & Colored Bars for Inflows/Outflows -->
+                <!-- Jan -->
+                <rect x="75" y="110" width="10" height="60" rx="2" class="fill-emerald-500 opacity-90 hover:opacity-100 transition-all cursor-pointer"><title>Jan Inflows: ₹320,000</title></rect>
+                <rect x="87" y="135" width="10" height="35" rx="2" class="fill-rose-400 dark:fill-rose-500 opacity-80 hover:opacity-100 transition-all cursor-pointer"><title>Jan Outflows: ₹110,000</title></rect>
+
+                <!-- Feb -->
+                <rect x="175" y="90" width="10" height="80" rx="2" class="fill-emerald-500 opacity-90 hover:opacity-100 transition-all cursor-pointer"><title>Feb Inflows: ₹390,000</title></rect>
+                <rect x="187" y="125" width="10" height="45" rx="2" class="fill-rose-400 dark:fill-rose-500 opacity-80 hover:opacity-100 transition-all cursor-pointer"><title>Feb Outflows: ₹140,000</title></rect>
+
+                <!-- Mar -->
+                <rect x="275" y="80" width="10" height="90" rx="2" class="fill-emerald-500 opacity-90 hover:opacity-100 transition-all cursor-pointer"><title>Mar Inflows: ₹420,000</title></rect>
+                <rect x="287" y="120" width="10" height="50" rx="2" class="fill-rose-400 dark:fill-rose-500 opacity-80 hover:opacity-100 transition-all cursor-pointer"><title>Mar Outflows: ₹150,000</title></rect>
+
+                <!-- Apr -->
+                <rect x="375" y="65" width="10" height="105" rx="2" class="fill-emerald-500 opacity-90 hover:opacity-100 transition-all cursor-pointer"><title>Apr Inflows: ₹450,000</title></rect>
+                <rect x="387" y="115" width="10" height="55" rx="2" class="fill-rose-400 dark:fill-rose-500 opacity-80 hover:opacity-100 transition-all cursor-pointer"><title>Apr Outflows: ₹155,000</title></rect>
+
+                <!-- May -->
+                <rect x="475" y="50" width="10" height="120" rx="2" class="fill-emerald-500 opacity-90 hover:opacity-100 transition-all cursor-pointer"><title>May Inflows: ₹470,000</title></rect>
+                <rect x="487" y="110" width="10" height="60" rx="2" class="fill-rose-400 dark:fill-rose-500 opacity-80 hover:opacity-100 transition-all cursor-pointer"><title>May Outflows: ₹160,000</title></rect>
+
+                <!-- Jun -->
+                <rect x="575" y="35" width="10" height="135" rx="2" class="fill-emerald-500 opacity-95 hover:opacity-100 transition-all cursor-pointer"><title>Jun Inflows: ₹485,000</title></rect>
+                <rect x="587" y="108" width="10" height="62" rx="2" class="fill-rose-400 dark:fill-rose-500 opacity-80 hover:opacity-100 transition-all cursor-pointer"><title>Jun Outflows: ₹162,400</title></rect>
+
+                <!-- X Axis Month Labels -->
+                <text x="85" y="190" text-anchor="middle" font-size="11" font-weight="600" class="fill-zinc-500 dark:fill-zinc-400">Jan</text>
+                <text x="185" y="190" text-anchor="middle" font-size="11" font-weight="600" class="fill-zinc-500 dark:fill-zinc-400">Feb</text>
+                <text x="285" y="190" text-anchor="middle" font-size="11" font-weight="600" class="fill-zinc-500 dark:fill-zinc-400">Mar</text>
+                <text x="385" y="190" text-anchor="middle" font-size="11" font-weight="600" class="fill-zinc-500 dark:fill-zinc-400">Apr</text>
+                <text x="485" y="190" text-anchor="middle" font-size="11" font-weight="600" class="fill-zinc-500 dark:fill-zinc-400">May</text>
+                <text x="585" y="190" text-anchor="middle" font-size="11" font-weight="600" class="fill-zinc-500 dark:fill-zinc-400">Jun</text>
+            </svg>
         </div>
     </div>
 
@@ -191,54 +280,54 @@ $financial_entries = function_exists( 'cora_db_get_ledger' ) ? cora_db_get_ledge
             <span class="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Gross Revenue: ₹485,000</span>
         </div>
 
-        <!-- Multi-segment visual stacked progress bar -->
-        <div class="w-full h-3 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden flex shadow-inner">
-            <div class="h-full bg-zinc-900 dark:bg-zinc-100 transition-all" style="width: 66.5%" title="Net Profit Margin: 66.5% (₹322,600)"></div>
-            <div class="h-full bg-zinc-600 transition-all" style="width: 15%" title="Operating Rent: 15% (₹72,750)"></div>
-            <div class="h-full bg-zinc-400 transition-all" style="width: 8%" title="Gear & Equipment: 8% (₹38,800)"></div>
-            <div class="h-full bg-zinc-300 dark:bg-zinc-500 transition-all" style="width: 5%" title="Food & Travel: 5% (₹24,250)"></div>
-            <div class="h-full bg-zinc-200 dark:bg-zinc-600 transition-all" style="width: 5.5%" title="Marketing: 5.5% (₹26,675)"></div>
+        <!-- Multi-segment visual stacked progress bar with rich color psychology -->
+        <div class="w-full h-3.5 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden flex shadow-inner">
+            <div class="h-full bg-emerald-500 transition-all" style="width: 66.5%" title="Net Profit Margin: 66.5% (₹322,600)"></div>
+            <div class="h-full bg-indigo-500 transition-all" style="width: 15%" title="Operating Rent: 15% (₹72,750)"></div>
+            <div class="h-full bg-sky-500 transition-all" style="width: 8%" title="Gear & Equipment: 8% (₹38,800)"></div>
+            <div class="h-full bg-amber-500 transition-all" style="width: 5%" title="Food & Travel: 5% (₹24,250)"></div>
+            <div class="h-full bg-purple-500 transition-all" style="width: 5.5%" title="Marketing: 5.5% (₹26,675)"></div>
         </div>
 
-        <!-- Legend Pills with icons and amounts -->
+        <!-- Legend Pills with distinct color psychology indicators -->
         <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs pt-1">
-            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800 shrink-0">
-                <span class="w-2.5 h-2.5 rounded-sm bg-zinc-900 dark:bg-zinc-100 shrink-0"></span>
+            <div class="flex items-center gap-2 p-2 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/40 shrink-0">
+                <span class="w-2.5 h-2.5 rounded-sm bg-emerald-500 shrink-0"></span>
                 <div>
-                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100">Net Profit Margin</div>
-                    <div class="text-[11px] font-bold text-zinc-800 dark:text-zinc-200 font-mono">66.5% · ₹322,600</div>
+                    <div class="text-[11px] font-bold text-emerald-900 dark:text-emerald-300">Net Profit Margin</div>
+                    <div class="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 font-mono">66.5% · ₹322,600</div>
                 </div>
             </div>
 
-            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800 shrink-0">
-                <span class="w-2.5 h-2.5 rounded-sm bg-zinc-600 shrink-0"></span>
+            <div class="flex items-center gap-2 p-2 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-900/40 shrink-0">
+                <span class="w-2.5 h-2.5 rounded-sm bg-indigo-500 shrink-0"></span>
                 <div>
-                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100">Operating Rent</div>
-                    <div class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 font-mono">15.0% · ₹72,750</div>
+                    <div class="text-[11px] font-bold text-indigo-900 dark:text-indigo-300">Operating Rent</div>
+                    <div class="text-[11px] font-bold text-indigo-700 dark:text-indigo-400 font-mono">15.0% · ₹72,750</div>
                 </div>
             </div>
 
-            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800 shrink-0">
-                <span class="w-2.5 h-2.5 rounded-sm bg-zinc-400 shrink-0"></span>
+            <div class="flex items-center gap-2 p-2 rounded-xl bg-sky-50/60 dark:bg-sky-950/30 border border-sky-200/80 dark:border-sky-900/40 shrink-0">
+                <span class="w-2.5 h-2.5 rounded-sm bg-sky-500 shrink-0"></span>
                 <div>
-                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100">Gear & Equipment</div>
-                    <div class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 font-mono">8.0% · ₹38,800</div>
+                    <div class="text-[11px] font-bold text-sky-900 dark:text-sky-300">Gear & Equipment</div>
+                    <div class="text-[11px] font-bold text-sky-700 dark:text-sky-400 font-mono">8.0% · ₹38,800</div>
                 </div>
             </div>
 
-            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800 shrink-0">
-                <span class="w-2.5 h-2.5 rounded-sm bg-zinc-300 dark:bg-zinc-500 shrink-0"></span>
+            <div class="flex items-center gap-2 p-2 rounded-xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/40 shrink-0">
+                <span class="w-2.5 h-2.5 rounded-sm bg-amber-500 shrink-0"></span>
                 <div>
-                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100">Food & Travel</div>
-                    <div class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 font-mono">5.0% · ₹24,250</div>
+                    <div class="text-[11px] font-bold text-amber-900 dark:text-amber-300">Food & Travel</div>
+                    <div class="text-[11px] font-bold text-amber-700 dark:text-amber-400 font-mono">5.0% · ₹24,250</div>
                 </div>
             </div>
 
-            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800 shrink-0">
-                <span class="w-2.5 h-2.5 rounded-sm bg-zinc-200 dark:bg-zinc-600 shrink-0"></span>
+            <div class="flex items-center gap-2 p-2 rounded-xl bg-purple-50/60 dark:bg-purple-950/30 border border-purple-200/80 dark:border-purple-900/40 shrink-0">
+                <span class="w-2.5 h-2.5 rounded-sm bg-purple-500 shrink-0"></span>
                 <div>
-                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100">Marketing</div>
-                    <div class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 font-mono">5.5% · ₹26,675</div>
+                    <div class="text-[11px] font-bold text-purple-900 dark:text-purple-300">Marketing</div>
+                    <div class="text-[11px] font-bold text-purple-700 dark:text-purple-400 font-mono">5.5% · ₹26,675</div>
                 </div>
             </div>
         </div>
