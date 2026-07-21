@@ -587,7 +587,6 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         </div>
         <?php endforeach; ?>
     </div>
-
     <!-- Month Calendar Grid -->
     <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm">
         <?php
@@ -596,38 +595,69 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         $month_name = date('F Y');
         $days_in_month = cal_days_in_month(CAL_GREGORIAN, $month_now, $year_now);
         $first_dow = date('N', mktime(0,0,0,$month_now,1,$year_now)); // 1=Mon..7=Sun
-        // Build publish date map
+        
+        // Group posts by day of month
         $pub_dates = [];
         foreach($cora_posts as $pp) {
-            $d = get_the_date('j', $pp->ID);
-            $m = get_the_date('n', $pp->ID);
-            if((int)$m === (int)$month_now) $pub_dates[(int)$d] = true;
+            $d = (int)get_the_date('j', $pp->ID);
+            $m = (int)get_the_date('n', $pp->ID);
+            if($m === (int)$month_now) {
+                if(!isset($pub_dates[$d])) $pub_dates[$d] = [];
+                $pub_dates[$d][] = $pp;
+            }
         }
         ?>
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-bold text-zinc-900"><?php echo esc_html($month_name); ?></h3>
-            <div class="flex gap-2 text-xs text-zinc-500">
-                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-zinc-900 inline-block"></span>Published</span>
+            <div>
+                <h3 class="text-sm font-bold text-zinc-900"><?php echo esc_html($month_name); ?></h3>
+                <p class="text-xs text-zinc-500">Scheduled and published content calendar overview.</p>
+            </div>
+            <div class="flex items-center gap-3 text-xs text-zinc-500">
+                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-zinc-900 inline-block"></span>Published</span>
+                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-zinc-400 inline-block"></span>Draft/Review</span>
             </div>
         </div>
-        <div class="grid grid-cols-7 gap-1 text-center">
+
+        <!-- Days of Week Header -->
+        <div style="display: grid !important; grid-template-columns: repeat(7, 1fr) !important; gap: 8px;" class="mb-2 text-center border-b border-zinc-100 pb-2">
             <?php foreach(['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] as $dn): ?>
-            <div class="text-[10px] font-bold text-zinc-400 uppercase py-1"><?php echo $dn; ?></div>
+                <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider"><?php echo $dn; ?></div>
             <?php endforeach; ?>
+        </div>
+
+        <!-- 7-Column Date Grid -->
+        <div style="display: grid !important; grid-template-columns: repeat(7, 1fr) !important; gap: 8px;">
             <?php for($pad=1; $pad < $first_dow; $pad++): ?>
-            <div></div>
+                <div class="min-h-[72px] bg-zinc-50/40 rounded-lg border border-dashed border-zinc-100"></div>
             <?php endfor; ?>
-            <?php for($d=1; $d<=$days_in_month; $d++): ?>
-            <div class="relative py-1.5 rounded text-xs <?php echo $d == date('j') ? 'bg-zinc-900 text-white font-bold' : 'text-zinc-700 hover:bg-zinc-50'; ?> cursor-default">
-                <?php echo $d; ?>
-                <?php if(isset($pub_dates[$d])): ?>
-                <span class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-zinc-400 <?php echo $d == date('j') ? 'bg-white' : ''; ?>"></span>
-                <?php endif; ?>
-            </div>
+
+            <?php for($d=1; $d<=$days_in_month; $d++): 
+                $is_today = ($d == date('j') && $month_now == date('n'));
+                $day_posts = $pub_dates[$d] ?? [];
+            ?>
+                <div class="min-h-[72px] p-2 rounded-lg border <?php echo $is_today ? 'bg-zinc-900/5 border-zinc-900' : 'bg-white border-zinc-200/80 hover:border-zinc-300'; ?> flex flex-col justify-between transition-all">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold <?php echo $is_today ? 'bg-zinc-900 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]' : 'text-zinc-700'; ?>">
+                            <?php echo $d; ?>
+                        </span>
+                        <?php if(!empty($day_posts)): ?>
+                            <span class="text-[9px] font-bold px-1.5 py-0.5 bg-zinc-100 text-zinc-700 rounded-full"><?php echo count($day_posts); ?></span>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <div class="mt-1 space-y-1 overflow-y-auto max-h-[44px]">
+                        <?php foreach($day_posts as $dp): 
+                            $status_color = ($dp->post_status === 'publish') ? 'bg-zinc-900 text-white' : 'bg-zinc-200 text-zinc-800';
+                        ?>
+                            <div class="text-[10px] font-bold truncate px-1.5 py-0.5 rounded <?php echo $status_color; ?> cursor-pointer hover:opacity-80 transition-opacity" title="<?php echo esc_attr($dp->post_title); ?>" onclick="coraEditArticle(<?php echo $dp->ID; ?>)">
+                                <?php echo esc_html($dp->post_title); ?>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
             <?php endfor; ?>
         </div>
     </div>
-</div>
 
 <!-- PANEL: Workflow Board -->
 <div id="panel-ct-workflow" class="cora-ct-panel hidden">
