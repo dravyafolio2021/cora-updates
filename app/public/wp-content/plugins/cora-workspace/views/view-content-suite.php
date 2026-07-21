@@ -203,19 +203,20 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         </div>
     </div>
 
-    <div class="border border-zinc-200 rounded-lg overflow-hidden bg-white shadow-sm overflow-x-auto">
-        <table class="w-full text-left border-collapse" style="min-width:900px">
+    <!-- Articles Table Container -->
+    <div class="border border-zinc-200 rounded-xl bg-white shadow-sm overflow-hidden overflow-x-auto">
+        <table class="w-full text-left border-collapse min-w-[960px]">
             <thead>
-                <tr class="border-b-2 border-zinc-100">
-                    <th class="py-3 px-4 w-10"><input type="checkbox" class="rounded border-zinc-300" id="ct-select-all" onclick="toggleSelectAll(this)"></th>
-                    <th class="py-3 px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Article</th>
-                    <th class="py-3 px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Author</th>
-                    <th class="py-3 px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Status</th>
-                    <th class="py-3 px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">SEO</th>
-                    <th class="py-3 px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">GEO</th>
-                    <th class="py-3 px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Leads/CR</th>
-                    <th class="py-3 px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Modified</th>
-                    <th class="py-3 px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-right">Actions</th>
+                <tr class="bg-zinc-50/70 border-b border-zinc-200 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+                    <th class="py-3 px-4 w-10 text-center"><input type="checkbox" class="rounded border-zinc-300 accent-zinc-900" id="ct-select-all" onclick="toggleSelectAll(this)"></th>
+                    <th class="py-3 px-4 min-w-[300px] max-w-[450px]">Article</th>
+                    <th class="py-3 px-4 min-w-[110px]">Author</th>
+                    <th class="py-3 px-4 min-w-[100px]">Status</th>
+                    <th class="py-3 px-4 min-w-[110px]">SEO</th>
+                    <th class="py-3 px-4 min-w-[110px]">GEO</th>
+                    <th class="py-3 px-4 min-w-[90px]">Leads/CR</th>
+                    <th class="py-3 px-4 min-w-[110px]">Modified</th>
+                    <th class="py-3 px-4 min-w-[130px] text-right pr-6">Actions</th>
                 </tr>
             </thead>
             <tbody id="cora-content-table-body" class="divide-y divide-zinc-100 text-sm text-zinc-700">
@@ -249,78 +250,64 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                         $modified = get_the_modified_date('M j, Y', $post->ID);
                         $pageviews = $is_published ? (120 + ($lead_count * 18)) : 0;
                         $conv_rate = $pageviews > 0 ? sprintf('%.1f%%', ($lead_count / $pageviews) * 100) : '0.0%';
-                        
-                        $seo_color = $seo_score >= 80 ? 'bg-zinc-900' : ($seo_score >= 60 ? 'bg-zinc-600' : 'bg-zinc-400');
-                        $geo_color = $geo_score >= 80 ? 'bg-zinc-900' : ($geo_score >= 60 ? 'bg-zinc-600' : 'bg-zinc-400');
                     ?>
-                    <tr class="group hover:bg-zinc-50/80 transition-colors ct-row border-b border-zinc-50 last:border-b-0" data-status="<?php echo esc_attr($editorial_status); ?>" data-author="<?php echo esc_attr($assignee_id); ?>" data-title="<?php echo esc_attr(strtolower($post->post_title)); ?>">
-                        <td class="py-3 px-4"><input type="checkbox" class="rounded border-zinc-300 ct-row-checkbox" value="<?php echo $post->ID; ?>" onchange="updateBulkActions()"></td>
-                        <td class="py-3 px-4">
+                    <tr class="group hover:bg-zinc-50/90 transition-colors ct-row border-b border-zinc-100 last:border-b-0" data-status="<?php echo esc_attr($editorial_status); ?>" data-author="<?php echo esc_attr($assignee_id); ?>" data-title="<?php echo esc_attr(strtolower($post->post_title)); ?>">
+                        <td class="py-3.5 px-4 text-center"><input type="checkbox" class="rounded border-zinc-300 ct-row-checkbox accent-zinc-900" value="<?php echo $post->ID; ?>" onchange="updateBulkActions()"></td>
+                        <td class="py-3.5 px-4">
                             <div class="flex items-center gap-3">
                                 <?php if($thumbnail_url): ?>
-                                    <img src="<?php echo esc_url($thumbnail_url); ?>" class="w-8 h-8 rounded object-cover bg-zinc-100">
+                                    <img src="<?php echo esc_url($thumbnail_url); ?>" class="w-9 h-9 rounded-lg object-cover bg-zinc-100 border border-zinc-200/60 shrink-0">
                                 <?php else: ?>
-                                    <div class="w-8 h-8 rounded bg-zinc-100 flex items-center justify-center text-zinc-400">
-                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                    <div class="w-9 h-9 rounded-lg bg-zinc-100 border border-zinc-200/60 flex items-center justify-center text-zinc-500 shrink-0">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                                     </div>
                                 <?php endif; ?>
-                                <div>
-                                    <div class="font-bold text-zinc-900 text-sm line-clamp-1"><?php echo esc_html($post->post_title); ?></div>
-                                    <div class="text-xs text-zinc-500"><?php echo number_format($word_count); ?> words</div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="font-bold text-zinc-900 text-sm line-clamp-2 hover:text-zinc-700 cursor-pointer" title="<?php echo esc_attr($post->post_title); ?>" onclick="openSEODetailDrawer(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')"><?php echo esc_html($post->post_title); ?></div>
+                                    <div class="text-[11px] text-zinc-400 font-medium mt-0.5"><?php echo number_format($word_count); ?> words</div>
                                 </div>
                             </div>
                         </td>
-                        <td class="py-3 px-4 text-xs font-medium"><?php echo esc_html($assignee_name); ?></td>
-                        <td class="py-3 px-4">
+                        <td class="py-3.5 px-4 text-xs font-semibold text-zinc-700"><?php echo esc_html($assignee_name); ?></td>
+                        <td class="py-3.5 px-4">
                             <?php if($editorial_status === 'published'): ?>
-                                <span class="px-2 py-0.5 bg-zinc-900 text-white rounded text-[10px] font-bold uppercase tracking-wide">Published</span>
+                                <span class="px-2.5 py-1 bg-zinc-900 text-white rounded-md text-[10px] font-bold uppercase tracking-wider">Published</span>
                             <?php elseif($editorial_status === 'pending_review'): ?>
-                                <span class="px-2 py-0.5 border border-zinc-300 text-zinc-700 bg-zinc-50 rounded text-[10px] font-bold uppercase tracking-wide">In Review</span>
+                                <span class="px-2.5 py-1 border border-zinc-300 text-zinc-700 bg-zinc-50 rounded-md text-[10px] font-bold uppercase tracking-wider">In Review</span>
                             <?php elseif($editorial_status === 'approved'): ?>
-                                <span class="px-2 py-0.5 bg-zinc-800 text-white rounded text-[10px] font-bold uppercase tracking-wide">Approved</span>
+                                <span class="px-2.5 py-1 bg-zinc-800 text-white rounded-md text-[10px] font-bold uppercase tracking-wider">Approved</span>
                             <?php else: ?>
-                                <span class="px-2 py-0.5 border border-zinc-200 text-zinc-500 rounded text-[10px] font-bold uppercase tracking-wide">Draft</span>
+                                <span class="px-2.5 py-1 border border-zinc-200 text-zinc-500 rounded-md text-[10px] font-bold uppercase tracking-wider">Draft</span>
                             <?php endif; ?>
                         </td>
-                        <td class="py-3 px-4">
-                            <div class="flex items-center gap-1.5">
-                                <span class="text-xs font-bold text-zinc-900 w-6 text-right"><?php echo $seo_score; ?></span>
-                                <div class="flex-1 h-1 bg-zinc-100 rounded-full overflow-hidden w-12">
-                                    <div class="h-full rounded-full <?php echo $seo_score >= 80 ? 'bg-zinc-900' : ($seo_score >= 60 ? 'bg-zinc-500' : 'bg-zinc-300'); ?>" style="width:<?php echo $seo_score; ?>%"></div>
+                        <td class="py-3.5 px-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-zinc-900 w-5 text-right"><?php echo $seo_score; ?></span>
+                                <div class="flex-1 h-1.5 bg-zinc-100 rounded-full overflow-hidden w-12">
+                                    <div class="h-full rounded-full <?php echo $seo_score >= 80 ? 'bg-zinc-900' : ($seo_score >= 60 ? 'bg-zinc-600' : 'bg-zinc-300'); ?>" style="width:<?php echo $seo_score; ?>%"></div>
                                 </div>
                             </div>
                         </td>
-                        <td class="py-3 px-4">
-                            <div class="flex items-center gap-1.5">
-                                <span class="text-xs font-bold text-zinc-900 w-6 text-right"><?php echo $geo_score; ?></span>
-                                <div class="flex-1 h-1 bg-zinc-100 rounded-full overflow-hidden w-12">
-                                    <div class="h-full rounded-full <?php echo $geo_score >= 80 ? 'bg-zinc-900' : ($geo_score >= 60 ? 'bg-zinc-500' : 'bg-zinc-300'); ?>" style="width:<?php echo $geo_score; ?>%"></div>
+                        <td class="py-3.5 px-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-zinc-900 w-5 text-right"><?php echo $geo_score; ?></span>
+                                <div class="flex-1 h-1.5 bg-zinc-100 rounded-full overflow-hidden w-12">
+                                    <div class="h-full rounded-full <?php echo $geo_score >= 80 ? 'bg-zinc-900' : ($geo_score >= 60 ? 'bg-zinc-600' : 'bg-zinc-300'); ?>" style="width:<?php echo $geo_score; ?>%"></div>
                                 </div>
                             </div>
                         </td>
-                        <td class="py-3 px-4 text-xs">
-                            <div class="font-medium"><?php echo $lead_count; ?></div>
-                            <div class="text-zinc-500"><?php echo $conv_rate; ?></div>
+                        <td class="py-3.5 px-4 text-xs">
+                            <div class="font-bold text-zinc-900"><?php echo $lead_count; ?></div>
+                            <div class="text-[10px] text-zinc-400 font-medium"><?php echo $conv_rate; ?></div>
                         </td>
-                        <td class="py-3 px-4 text-xs text-zinc-500"><?php echo $modified; ?></td>
-                        <td class="py-3 px-4 text-right">
-                            <div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <!-- Edit button: pencil icon -->
-                                <button class="p-1.5 rounded hover:bg-zinc-100 text-zinc-500 hover:text-zinc-900 transition-colors" title="Edit Article" onclick="coraEditArticle(<?php echo $post->ID; ?>)">
-                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                </button>
-                                <!-- SEO button: gauge icon -->
-                                <button class="p-1.5 rounded hover:bg-zinc-100 text-zinc-500 hover:text-zinc-900 transition-colors" title="SEO Analysis" onclick="openSEODetailDrawer(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
-                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                                </button>
-                                <!-- View live button -->
-                                <a href="<?php echo get_permalink($post->ID); ?>" target="_blank" class="p-1.5 rounded hover:bg-zinc-100 text-zinc-500 hover:text-zinc-900 transition-colors" title="View Live">
+                        <td class="py-3.5 px-4 text-xs text-zinc-500 font-medium"><?php echo $modified; ?></td>
+                        <td class="py-3.5 px-4 text-right pr-6">
+                            <div class="flex items-center justify-end gap-1.5">
+                                <button class="px-2 py-1 rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-bold transition-colors cursor-pointer" title="Edit Article" onclick="coraEditArticle(<?php echo $post->ID; ?>)">Edit</button>
+                                <button class="px-2 py-1 rounded border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-bold transition-colors cursor-pointer" title="SEO Analysis" onclick="openSEODetailDrawer(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">SEO</button>
+                                <a href="<?php echo get_permalink($post->ID); ?>" target="_blank" class="p-1 rounded hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 transition-colors" title="View Live">
                                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 0 0 2 2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                                 </a>
-                                <!-- More options -->
-                                <button class="p-1.5 rounded hover:bg-zinc-100 text-zinc-500 hover:text-zinc-900 transition-colors" title="More options">
-                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
-                                </button>
                             </div>
                         </td>
                     </tr>
