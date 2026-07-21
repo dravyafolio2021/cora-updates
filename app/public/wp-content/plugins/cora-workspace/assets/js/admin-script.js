@@ -7024,31 +7024,9 @@ jQuery(document).ready(function($) {
     
     // Recalculate canvas width depending on whether right-side drawers or AI sidebar are open
     function coraUpdateCanvasLayout() {
-        const workspace = $('#cora-workspace');
         const main = $('.cora-main');
-        if (!workspace.length || !main.length) return;
-        
-        // Disable layout shifting on mobile/tablet screens
-        if (window.innerWidth < 1024) {
-            main.css('margin-right', '');
-            return;
-        }
-        
-        let activeWidth = 0;
-        $('aside.fixed.right-0, aside[id$="-drawer"], aside.cora-drawer, #cora-ai-sidebar, #cora-media-library-drawer').each(function() {
-            const drawer = $(this);
-            // Check if drawer is currently expanded (doesn't have collapsed/translate-x-full classes)
-            if (!drawer.hasClass('collapsed') && !drawer.hasClass('translate-x-full') && drawer.css('display') !== 'none') {
-                const width = drawer.outerWidth() || 0;
-                if (width > activeWidth) {
-                    activeWidth = width;
-                }
-            }
-        });
-        
-        if (activeWidth > 0) {
-            main.css('margin-right', activeWidth + 'px');
-        } else {
+        if (main.length) {
+            // Keep main canvas 100% stable so side drawers float independently as fixed overlays without squeezing layout
             main.css('margin-right', '0px');
         }
     }

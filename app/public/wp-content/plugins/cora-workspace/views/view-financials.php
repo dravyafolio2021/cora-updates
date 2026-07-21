@@ -201,43 +201,43 @@ $financial_entries = function_exists( 'cora_db_get_ledger' ) ? cora_db_get_ledge
         </div>
 
         <!-- Legend Pills with icons and amounts -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 text-xs pt-1">
-            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800">
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs pt-1">
+            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800 shrink-0">
                 <span class="w-2.5 h-2.5 rounded-sm bg-zinc-900 dark:bg-zinc-100 shrink-0"></span>
-                <div class="min-w-0 flex-1">
-                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100 truncate">Net Profit Margin</div>
+                <div>
+                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100">Net Profit Margin</div>
                     <div class="text-[11px] font-bold text-zinc-800 dark:text-zinc-200 font-mono">66.5% · ₹322,600</div>
                 </div>
             </div>
 
-            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800">
+            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800 shrink-0">
                 <span class="w-2.5 h-2.5 rounded-sm bg-zinc-600 shrink-0"></span>
-                <div class="min-w-0 flex-1">
-                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100 truncate">Operating Rent</div>
+                <div>
+                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100">Operating Rent</div>
                     <div class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 font-mono">15.0% · ₹72,750</div>
                 </div>
             </div>
 
-            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800">
+            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800 shrink-0">
                 <span class="w-2.5 h-2.5 rounded-sm bg-zinc-400 shrink-0"></span>
-                <div class="min-w-0 flex-1">
-                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100 truncate">Gear & Equipment</div>
+                <div>
+                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100">Gear & Equipment</div>
                     <div class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 font-mono">8.0% · ₹38,800</div>
                 </div>
             </div>
 
-            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800">
+            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800 shrink-0">
                 <span class="w-2.5 h-2.5 rounded-sm bg-zinc-300 dark:bg-zinc-500 shrink-0"></span>
-                <div class="min-w-0 flex-1">
-                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100 truncate">Food & Travel</div>
+                <div>
+                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100">Food & Travel</div>
                     <div class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 font-mono">5.0% · ₹24,250</div>
                 </div>
             </div>
 
-            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800">
+            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800 shrink-0">
                 <span class="w-2.5 h-2.5 rounded-sm bg-zinc-200 dark:bg-zinc-600 shrink-0"></span>
-                <div class="min-w-0 flex-1">
-                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100 truncate">Marketing</div>
+                <div>
+                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100">Marketing</div>
                     <div class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 font-mono">5.5% · ₹26,675</div>
                 </div>
             </div>
