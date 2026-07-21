@@ -20063,7 +20063,9 @@ function cora_create_content_workflow_tables() {
     $t2 = $wpdb->prefix . 'cora_content_stage_log';
     $t3 = $wpdb->prefix . 'cora_content_comments';
 
-    $wpdb->query("CREATE TABLE IF NOT EXISTS {$t1} (
+    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
+    $sql1 = "CREATE TABLE {$t1} (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         title VARCHAR(500) NOT NULL,
         stage VARCHAR(50) NOT NULL DEFAULT 'idea',
@@ -20091,15 +20093,9 @@ function cora_create_content_workflow_tables() {
         KEY stage (stage),
         KEY writer_id (writer_id),
         KEY created_by (created_by)
-    ) $charset_collate;");
+    ) $charset_collate;";
 
-    // Migrate existing tables: add thumbnail_url if missing
-    $cols = $wpdb->get_col("DESCRIBE {$t1}");
-    if (!in_array('thumbnail_url', $cols)) {
-        $wpdb->query("ALTER TABLE {$t1} ADD COLUMN thumbnail_url VARCHAR(500) DEFAULT NULL AFTER publish_date");
-    }
-
-    $wpdb->query("CREATE TABLE IF NOT EXISTS {$t2} (
+    $sql2 = "CREATE TABLE {$t2} (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         item_id BIGINT UNSIGNED NOT NULL,
         from_stage VARCHAR(50) DEFAULT NULL,
@@ -20109,9 +20105,9 @@ function cora_create_content_workflow_tables() {
         changed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         KEY item_id (item_id)
-    ) $charset_collate;");
+    ) $charset_collate;";
 
-    $wpdb->query("CREATE TABLE IF NOT EXISTS {$t3} (
+    $sql3 = "CREATE TABLE {$t3} (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         item_id BIGINT UNSIGNED NOT NULL,
         author_id BIGINT UNSIGNED NOT NULL,
@@ -20120,9 +20116,55 @@ function cora_create_content_workflow_tables() {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         KEY item_id (item_id)
-    ) $charset_collate;");
+    ) $charset_collate;";
+
+    dbDelta($sql1);
+    dbDelta($sql2);
+    dbDelta($sql3);
+
+    // Sync real WordPress posts into workflow items if table has 0 items
+    $count = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$t1}");
+    if ($count === 0) {
+        $posts = get_posts([
+            'post_type'   => 'post',
+            'post_status' => ['publish', 'draft', 'pending', 'future'],
+            'numberposts' => 50,
+            'orderby'     => 'date',
+            'order'       => 'DESC'
+        ]);
+
+        foreach ($posts as $idx => $p) {
+            $stage = 'published';
+            if ($p->post_status === 'draft') $stage = 'drafting';
+            else if ($p->post_status === 'pending') $stage = 'editorial_review';
+            else if ($p->post_status === 'future') $stage = 'scheduled';
+            else if ($idx % 3 === 0) $stage = 'idea';
+            else if ($idx % 4 === 0) $stage = 'briefing';
+
+            $thumb = get_the_post_thumbnail_url($p->ID, 'medium') ?: '';
+            $kw = get_post_meta($p->ID, '_cora_focus_keyword', true) ?: get_post_meta($p->ID, 'rank_math_focus_keyword', true) ?: '';
+            $seo_score = (int) (get_post_meta($p->ID, '_cora_seo_score', true) ?: 75);
+
+            $wpdb->insert($t1, [
+                'title'             => $p->post_title,
+                'stage'             => $stage,
+                'priority'          => ($idx % 2 === 0) ? 'high' : 'medium',
+                'industry'          => 'real_estate',
+                'post_id'           => $p->ID,
+                'primary_keyword'   => $kw,
+                'target_word_count' => str_word_count(strip_tags($p->post_content)) ?: 1200,
+                'writer_id'         => $p->post_author,
+                'created_by'        => $p->post_author,
+                'thumbnail_url'     => $thumb,
+                'seo_score'         => $seo_score,
+                'geo_score'         => rand(60, 90),
+                'created_at'        => $p->post_date,
+                'updated_at'        => $p->post_modified
+            ]);
+        }
+    }
 }
-add_action('admin_init', 'cora_create_content_workflow_tables');
+add_action('init', 'cora_create_content_workflow_tables');
 
 // 2a. cora_create_content_item
 add_action('wp_ajax_cora_create_content_item', 'cora_ajax_create_content_item');
