@@ -667,6 +667,12 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     </div>
 </aside>
 
+<?php
+if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.php')) {
+    include CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.php';
+}
+?>
+
 <script>
 (function() {
     function showBackdrop() {

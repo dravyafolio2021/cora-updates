@@ -19931,3 +19931,352 @@ function cora_ajax_create_article() {
     wp_send_json_success( array( 'post_id' => $post_id, 'message' => 'Saved successfully.' ) );
 }
 add_action( 'wp_ajax_cora_create_article', 'cora_ajax_create_article' );
+
+/**
+ * AJAX Handler: Process Approval Action
+ */
+function cora_ajax_process_approval_action() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if (!current_user_can('edit_posts')) wp_send_json_error('Unauthorized.');
+    
+    global $wpdb;
+    $item_id  = intval($_POST['item_id']);
+    $decision = sanitize_text_field($_POST['decision']);
+    $notes    = sanitize_textarea_field($_POST['notes'] ?? '');
+    
+    if (!in_array($decision, ['approve', 'reject'])) wp_send_json_error('Invalid decision.');
+    
+    $table = $wpdb->prefix . 'cora_content_items';
+    $log_table = $wpdb->prefix . 'cora_content_stage_log';
+    
+    // Get current stage
+    $item = $wpdb->get_row($wpdb->prepare("SELECT stage FROM $table WHERE id = %d", $item_id));
+    if (!$item) wp_send_json_error('Item not found.');
+    
+    $new_stage = $decision === 'approve' ? 'scheduled' : 'revisions';
+    
+    // Update stage
+    $wpdb->update($table, [
+        'stage' => $new_stage,
+        'updated_at' => current_time('mysql')
+    ], ['id' => $item_id]);
+    
+    // Log stage change
+    $wpdb->insert($log_table, [
+        'item_id'    => $item_id,
+        'from_stage' => $item->stage,
+        'to_stage'   => $new_stage,
+        'changed_by' => get_current_user_id(),
+        'notes'      => $notes,
+        'changed_at' => current_time('mysql')
+    ]);
+    
+    wp_send_json_success(['message' => 'Decision processed.', 'new_stage' => $new_stage]);
+}
+add_action('wp_ajax_cora_process_approval_action', 'cora_ajax_process_approval_action');
+
+/**
+ * AJAX Handler: Sync to WordPress
+ */
+function cora_ajax_sync_to_wordpress() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if (!current_user_can('publish_posts')) wp_send_json_error('Unauthorized.');
+    
+    global $wpdb;
+    $item_id    = intval($_POST['item_id']);
+    $post_type  = sanitize_key($_POST['wp_post_type'] ?? 'post');
+    $pub_status = in_array($_POST['publish_status'] ?? 'draft', ['draft','publish','future','pending']) ? $_POST['publish_status'] : 'draft';
+    $pub_ts     = sanitize_text_field($_POST['publish_timestamp'] ?? '');
+    
+    $table = $wpdb->prefix . 'cora_content_items';
+    $item  = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE id = %d", $item_id));
+    if (!$item) wp_send_json_error('Content item not found.');
+    
+    // Parse brief for content
+    $brief = $item->brief_data ? json_decode($item->brief_data, true) : [];
+    $content = $brief['draft_content'] ?? '';
+    
+    $post_data = [
+        'post_title'   => $item->title,
+        'post_content' => wp_kses_post($content),
+        'post_status'  => $pub_status,
+        'post_type'    => $post_type,
+        'meta_input'   => [
+            '_cora_content_item_id'   => $item_id,
+            '_cora_seo_keyword'       => $item->primary_keyword,
+            '_cora_editorial_status'  => 'published',
+            '_yoast_wpseo_focuskw'    => $item->primary_keyword,
+        ]
+    ];
+    
+    if ($pub_status === 'future' && $pub_ts) {
+        $post_data['post_date']     = date('Y-m-d H:i:s', strtotime($pub_ts));
+        $post_data['post_date_gmt'] = get_gmt_from_date($post_data['post_date']);
+    }
+    
+    // Link or create WP post
+    $existing_post_id = intval($item->post_id);
+    if ($existing_post_id > 0) {
+        $post_data['ID'] = $existing_post_id;
+        $result = wp_update_post($post_data, true);
+    } else {
+        $result = wp_insert_post($post_data, true);
+    }
+    
+    if (is_wp_error($result)) wp_send_json_error($result->get_error_message());
+    
+    // Link back the post ID to the content item
+    $wpdb->update($table, ['post_id' => $result, 'stage' => 'published', 'updated_at' => current_time('mysql')], ['id' => $item_id]);
+    
+    wp_send_json_success([
+        'post_id'   => $result,
+        'permalink' => get_permalink($result),
+        'message'   => 'Published to WordPress successfully.'
+    ]);
+}
+add_action('wp_ajax_cora_sync_to_wordpress', 'cora_ajax_sync_to_wordpress');
+
+/**
+ * AJAX Handler: Resolve Comment
+ */
+function cora_ajax_resolve_comment() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if (!current_user_can('edit_posts')) wp_send_json_error('Unauthorized.');
+    
+    global $wpdb;
+    $comment_id = intval($_POST['comment_id']);
+    $table = $wpdb->prefix . 'cora_content_comments';
+    $wpdb->update($table, ['resolved' => 1], ['id' => $comment_id]);
+    
+    wp_send_json_success('Resolved.');
+}
+add_action('wp_ajax_cora_resolve_comment', 'cora_ajax_resolve_comment');
+
+
+// ── Content Workflow Engine v0.2 ─────────────────────────────────────────────
+
+function cora_create_content_workflow_tables() {
+    global $wpdb;
+    $charset_collate = $wpdb->get_charset_collate();
+    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+    // Content workflow items
+    $sql1 = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}cora_content_items (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        title VARCHAR(500) NOT NULL,
+        stage VARCHAR(50) NOT NULL DEFAULT 'idea',
+        priority ENUM('urgent','high','medium','low') DEFAULT 'medium',
+        industry VARCHAR(50) DEFAULT 'real_estate',
+        post_id BIGINT UNSIGNED DEFAULT NULL,
+        brief_data LONGTEXT DEFAULT NULL,
+        niche_meta LONGTEXT DEFAULT NULL,
+        primary_keyword VARCHAR(255) DEFAULT NULL,
+        secondary_keywords VARCHAR(500) DEFAULT NULL,
+        audience_persona VARCHAR(255) DEFAULT NULL,
+        target_word_count INT DEFAULT 1000,
+        writer_id BIGINT UNSIGNED DEFAULT NULL,
+        editor_id BIGINT UNSIGNED DEFAULT NULL,
+        approver_id BIGINT UNSIGNED DEFAULT NULL,
+        draft_due_date DATE DEFAULT NULL,
+        publish_date DATE DEFAULT NULL,
+        seo_score TINYINT UNSIGNED DEFAULT 0,
+        geo_score TINYINT UNSIGNED DEFAULT 0,
+        created_by BIGINT UNSIGNED NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY stage (stage),
+        KEY writer_id (writer_id),
+        KEY created_by (created_by)
+    ) $charset_collate;";
+    dbDelta($sql1);
+
+    // Stage audit log
+    $sql2 = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}cora_content_stage_log (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        item_id BIGINT UNSIGNED NOT NULL,
+        from_stage VARCHAR(50) DEFAULT NULL,
+        to_stage VARCHAR(50) NOT NULL,
+        changed_by BIGINT UNSIGNED NOT NULL,
+        notes TEXT DEFAULT NULL,
+        changed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY item_id (item_id)
+    ) $charset_collate;";
+    dbDelta($sql2);
+
+    // Content comments/feedback
+    $sql3 = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}cora_content_comments (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        item_id BIGINT UNSIGNED NOT NULL,
+        author_id BIGINT UNSIGNED NOT NULL,
+        comment TEXT NOT NULL,
+        resolved TINYINT DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY item_id (item_id)
+    ) $charset_collate;";
+    dbDelta($sql3);
+}
+add_action('admin_init', 'cora_create_content_workflow_tables');
+
+// 2a. cora_create_content_item
+add_action('wp_ajax_cora_create_content_item', 'cora_ajax_create_content_item');
+function cora_ajax_create_content_item() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    global $wpdb;
+    $title = sanitize_text_field($_POST['title']);
+    if(empty($title)) wp_send_json_error('Title required');
+    
+    $data = [
+        'title' => $title,
+        'stage' => 'idea',
+        'primary_keyword' => sanitize_text_field($_POST['primary_keyword'] ?? ''),
+        'industry' => sanitize_text_field($_POST['industry'] ?? 'real_estate'),
+        'priority' => sanitize_text_field($_POST['priority'] ?? 'medium'),
+        'writer_id' => intval($_POST['writer_id'] ?? 0) ?: null,
+        'draft_due_date' => !empty($_POST['draft_due_date']) ? sanitize_text_field($_POST['draft_due_date']) : null,
+        'publish_date' => !empty($_POST['publish_date']) ? sanitize_text_field($_POST['publish_date']) : null,
+        'created_by' => get_current_user_id(),
+        'created_at' => current_time('mysql')
+    ];
+    $wpdb->insert($wpdb->prefix.'cora_content_items', $data);
+    $id = $wpdb->insert_id;
+    wp_send_json_success(['id' => $id, 'title' => $title, 'stage' => 'idea', 'created_at' => $data['created_at']]);
+}
+
+// 2b. cora_save_content_brief
+add_action('wp_ajax_cora_save_content_brief', 'cora_ajax_save_content_brief');
+function cora_ajax_save_content_brief() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    global $wpdb;
+    $item_id = intval($_POST['item_id']);
+    if(!$item_id) wp_send_json_error('Item ID required');
+    
+    $data = [
+        'title' => sanitize_text_field($_POST['title'] ?? ''),
+        'primary_keyword' => sanitize_text_field($_POST['primary_keyword'] ?? ''),
+        'secondary_keywords' => sanitize_text_field($_POST['secondary_keywords'] ?? ''),
+        'audience_persona' => sanitize_text_field($_POST['audience_persona'] ?? ''),
+        'target_word_count' => intval($_POST['target_word_count'] ?? 1000),
+        'writer_id' => intval($_POST['writer_id'] ?? 0) ?: null,
+        'editor_id' => intval($_POST['editor_id'] ?? 0) ?: null,
+        'approver_id' => intval($_POST['approver_id'] ?? 0) ?: null,
+        'draft_due_date' => !empty($_POST['draft_due_date']) ? sanitize_text_field($_POST['draft_due_date']) : null,
+        'publish_date' => !empty($_POST['publish_date']) ? sanitize_text_field($_POST['publish_date']) : null,
+        'priority' => sanitize_text_field($_POST['priority'] ?? 'medium'),
+    ];
+    // Optionals
+    if(isset($_POST['outline'])) {
+        $brief_data = json_encode([
+            'outline' => $_POST['outline'],
+            'cta' => sanitize_text_field($_POST['cta'] ?? ''),
+            'tone' => sanitize_text_field($_POST['tone'] ?? ''),
+            'competitor_urls' => sanitize_text_field($_POST['competitor_urls'] ?? '')
+        ]);
+        $data['brief_data'] = $brief_data;
+    }
+    if(isset($_POST['niche_meta'])) {
+        $data['niche_meta'] = $_POST['niche_meta'];
+    }
+
+    $wpdb->update($wpdb->prefix.'cora_content_items', $data, ['id' => $item_id]);
+    wp_send_json_success();
+}
+
+// 2c. cora_update_content_stage
+add_action('wp_ajax_cora_update_content_stage', 'cora_ajax_update_content_stage');
+function cora_ajax_update_content_stage() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    global $wpdb;
+    $item_id = intval($_POST['item_id']);
+    $target_stage = sanitize_text_field($_POST['target_stage']);
+    
+    $allowed_stages = ['idea','briefing','research','drafting','editorial_review','revisions','seo_gate','approval','scheduled','published','performance'];
+    if(!in_array($target_stage, $allowed_stages)) wp_send_json_error('Invalid stage');
+    
+    $item = $wpdb->get_row($wpdb->prepare("SELECT stage FROM {$wpdb->prefix}cora_content_items WHERE id = %d", $item_id));
+    if(!$item) wp_send_json_error('Item not found');
+    $from_stage = $item->stage;
+    
+    $wpdb->update($wpdb->prefix.'cora_content_items', ['stage' => $target_stage], ['id' => $item_id]);
+    
+    $wpdb->insert($wpdb->prefix.'cora_content_stage_log', [
+        'item_id' => $item_id,
+        'from_stage' => $from_stage,
+        'to_stage' => $target_stage,
+        'changed_by' => get_current_user_id(),
+        'notes' => sanitize_text_field($_POST['notes'] ?? ''),
+        'changed_at' => current_time('mysql')
+    ]);
+    
+    wp_send_json_success(['item_id' => $item_id, 'new_stage' => $target_stage, 'logged_at' => current_time('mysql')]);
+}
+
+// 2d. cora_fetch_content_workspace
+add_action('wp_ajax_cora_fetch_content_workspace', 'cora_ajax_fetch_content_workspace');
+function cora_ajax_fetch_content_workspace() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    global $wpdb;
+    
+    $stage_filter = !empty($_POST['stage_filter']) ? sanitize_text_field($_POST['stage_filter']) : '';
+    $where = "1=1";
+    if($stage_filter) {
+        $where .= $wpdb->prepare(" AND c.stage = %s", $stage_filter);
+    }
+    
+    $query = "SELECT c.*, u.display_name as writer_name FROM {$wpdb->prefix}cora_content_items c LEFT JOIN {$wpdb->users} u ON c.writer_id = u.ID WHERE $where ORDER BY c.created_at DESC";
+    $items = $wpdb->get_results($query, ARRAY_A);
+    
+    $grouped = [];
+    $counts = [];
+    $total = 0;
+    foreach($items as $item) {
+        $st = $item['stage'];
+        if(!isset($grouped[$st])) $grouped[$st] = [];
+        $grouped[$st][] = $item;
+        $counts[$st] = ($counts[$st] ?? 0) + 1;
+        $total++;
+    }
+    wp_send_json_success(['stages' => $grouped, 'counts' => $counts, 'total' => $total]);
+}
+
+// 2e. cora_get_content_item
+add_action('wp_ajax_cora_get_content_item', 'cora_ajax_get_content_item');
+function cora_ajax_get_content_item() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    global $wpdb;
+    $item_id = intval($_POST['item_id']);
+    
+    $item = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}cora_content_items WHERE id = %d", $item_id), ARRAY_A);
+    if(!$item) wp_send_json_error('Not found');
+    
+    $item['comments'] = $wpdb->get_results($wpdb->prepare("
+        SELECT c.*, u.display_name as author_name 
+        FROM {$wpdb->prefix}cora_content_comments c 
+        LEFT JOIN {$wpdb->users} u ON c.author_id = u.ID 
+        WHERE c.item_id = %d ORDER BY c.created_at DESC
+    ", $item_id), ARRAY_A);
+    
+    wp_send_json_success($item);
+}
+
+// 2f. cora_add_content_comment
+add_action('wp_ajax_cora_add_content_comment', 'cora_ajax_add_content_comment');
+function cora_ajax_add_content_comment() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    global $wpdb;
+    $item_id = intval($_POST['item_id']);
+    $comment = sanitize_text_field($_POST['comment']);
+    if(!$item_id || empty($comment)) wp_send_json_error('Invalid input');
+    
+    $wpdb->insert($wpdb->prefix.'cora_content_comments', [
+        'item_id' => $item_id,
+        'author_id' => get_current_user_id(),
+        'comment' => $comment,
+        'created_at' => current_time('mysql')
+    ]);
+    $id = $wpdb->insert_id;
+    $user = get_userdata(get_current_user_id());
+    wp_send_json_success(['id' => $id, 'author_name' => $user->display_name, 'comment' => $comment, 'created_at' => current_time('mysql')]);
+}
