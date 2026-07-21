@@ -20058,10 +20058,12 @@ add_action('wp_ajax_cora_resolve_comment', 'cora_ajax_resolve_comment');
 function cora_create_content_workflow_tables() {
     global $wpdb;
     $charset_collate = $wpdb->get_charset_collate();
-    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
-    // Content workflow items
-    $sql1 = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}cora_content_items (
+    $t1 = $wpdb->prefix . 'cora_content_items';
+    $t2 = $wpdb->prefix . 'cora_content_stage_log';
+    $t3 = $wpdb->prefix . 'cora_content_comments';
+
+    $wpdb->query("CREATE TABLE IF NOT EXISTS {$t1} (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         title VARCHAR(500) NOT NULL,
         stage VARCHAR(50) NOT NULL DEFAULT 'idea',
@@ -20083,16 +20085,14 @@ function cora_create_content_workflow_tables() {
         geo_score TINYINT UNSIGNED DEFAULT 0,
         created_by BIGINT UNSIGNED NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         KEY stage (stage),
         KEY writer_id (writer_id),
         KEY created_by (created_by)
-    ) $charset_collate;";
-    dbDelta($sql1);
+    ) $charset_collate;");
 
-    // Stage audit log
-    $sql2 = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}cora_content_stage_log (
+    $wpdb->query("CREATE TABLE IF NOT EXISTS {$t2} (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         item_id BIGINT UNSIGNED NOT NULL,
         from_stage VARCHAR(50) DEFAULT NULL,
@@ -20102,11 +20102,9 @@ function cora_create_content_workflow_tables() {
         changed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         KEY item_id (item_id)
-    ) $charset_collate;";
-    dbDelta($sql2);
+    ) $charset_collate;");
 
-    // Content comments/feedback
-    $sql3 = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}cora_content_comments (
+    $wpdb->query("CREATE TABLE IF NOT EXISTS {$t3} (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         item_id BIGINT UNSIGNED NOT NULL,
         author_id BIGINT UNSIGNED NOT NULL,
@@ -20115,8 +20113,7 @@ function cora_create_content_workflow_tables() {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         KEY item_id (item_id)
-    ) $charset_collate;";
-    dbDelta($sql3);
+    ) $charset_collate;");
 }
 add_action('admin_init', 'cora_create_content_workflow_tables');
 
