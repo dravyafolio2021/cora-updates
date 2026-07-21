@@ -818,6 +818,21 @@ function cora_real_estate_ai_handle_workspace_route() {
             exit;
         }
 
+        // ── INDUSTRY MODE SWITCHER (Server-side, reliable) ──────────────────────
+        if ( ! empty( $_GET['set_industry'] ) && cora_is_super_owner() ) {
+            $requested = sanitize_text_field( $_GET['set_industry'] );
+            if ( in_array( $requested, array( 'real_estate', 'photography_studio' ), true ) ) {
+                update_option( 'cora_workspace_industry', $requested );
+                // Set cookie for 1 year
+                setcookie( 'cora_workspace_industry', $requested, time() + 86400 * 365, '/', '', is_ssl(), false );
+                $_COOKIE['cora_workspace_industry'] = $requested;
+            }
+            // Redirect to clean URL (remove set_industry param)
+            $clean_url = remove_query_arg( 'set_industry' );
+            wp_redirect( $clean_url );
+            exit;
+        }
+
         // Standalone presentation page intercept for Ecosystem Map
         if ( $sub_page === 'ecosystem' ) {
             nocache_headers();

@@ -3042,23 +3042,25 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
             <?php if ( cora_is_super_owner() ) :
                 $current_industry = cora_get_active_industry();
+                $re_url  = add_query_arg( 'set_industry', 'real_estate',       remove_query_arg( array('set_industry','industry') ) );
+                $stu_url = add_query_arg( 'set_industry', 'photography_studio', remove_query_arg( array('set_industry','industry') ) );
             ?>
             <!-- Industry Switcher Widget (Shruti Only) -->
             <div class="px-3 pb-1 pt-1 select-none">
                 <div class="bg-zinc-100/80 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-1.5 space-y-1">
                     <div class="flex items-center justify-between px-1">
                         <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Industry Mode</span>
-                        <span class="text-[8.5px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.2 rounded shrink-0">Shruti Only</span>
+                        <span class="text-[8.5px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded shrink-0">Shruti Only</span>
                     </div>
                     <div class="grid grid-cols-2 gap-1 bg-white dark:bg-zinc-950 p-1 rounded-lg border border-zinc-200/60 dark:border-zinc-800/60">
-                        <button onclick="coraSwitchIndustryMode('real_estate')" class="flex items-center justify-center gap-1 py-1 px-1.5 rounded-md text-[10.5px] font-bold transition-all cursor-pointer <?php echo ($current_industry === 'real_estate') ? 'bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 shadow-xs' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100'; ?>">
+                        <a href="<?php echo esc_url( $re_url ); ?>" class="flex items-center justify-center gap-1 py-1 px-1.5 rounded-md text-[10.5px] font-bold transition-all no-underline <?php echo ($current_industry === 'real_estate') ? 'bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 shadow-sm' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100'; ?>">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
                             Real Estate
-                        </button>
-                        <button onclick="coraSwitchIndustryMode('photography_studio')" class="flex items-center justify-center gap-1 py-1 px-1.5 rounded-md text-[10.5px] font-bold transition-all cursor-pointer <?php echo ($current_industry === 'photography_studio') ? 'bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 shadow-xs' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100'; ?>">
+                        </a>
+                        <a href="<?php echo esc_url( $stu_url ); ?>" class="flex items-center justify-center gap-1 py-1 px-1.5 rounded-md text-[10.5px] font-bold transition-all no-underline <?php echo ($current_industry === 'photography_studio') ? 'bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 shadow-sm' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100'; ?>">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
                             Studio
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
