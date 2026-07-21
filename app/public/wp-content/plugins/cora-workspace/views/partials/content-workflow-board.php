@@ -245,7 +245,7 @@ $stages = [
   // Open Content Brief Drawer
   window.openContentBriefDrawer = function(itemId) {
     if(typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
-    const drawer = document.getElementById('cora-content-brief-drawer');
+    const drawer = document.getElementById('cora-content-brief-sheet');
     if(!drawer) return;
     drawer.classList.remove('collapsed', 'translate-x-full');
     const bd = document.getElementById('cora-drawer-backdrop');

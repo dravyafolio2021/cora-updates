@@ -186,7 +186,7 @@ jQuery(document).ready(function($) {
     });
 
     window.coraCloseAllDrawers = function() {
-        $('aside[id$="-drawer"]').addClass('collapsed');
+        $('aside[id$="-drawer"], aside[id$="-sheet"]').addClass('collapsed');
         $('#cora-drawer-backdrop').addClass('hidden');
         $('body').removeClass('cora-drawer-open');
     };

@@ -666,7 +666,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 <div id="cora-drawer-backdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998] hidden transition-opacity" onclick="window.coraCloseAllDrawers()"></div>
 
 <!-- Create Article Bottom Sheet Drawer -->
-<aside id="cora-create-article-drawer" class="cora-bottom-sheet collapsed border-t border-x border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl flex flex-col">
+<aside id="cora-create-article-sheet" class="cora-bottom-sheet collapsed border-t border-x border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl flex flex-col">
     <div class="w-12 h-1.5 bg-zinc-300 dark:bg-zinc-700 rounded-full mx-auto my-2.5 shrink-0"></div>
     <div class="px-6 py-3 border-b border-zinc-200 flex justify-between items-center shrink-0">
         <div>
@@ -723,7 +723,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 </aside>
 
 <!-- SEO Detail Bottom Sheet Drawer -->
-<aside id="cora-seo-detail-drawer" class="cora-bottom-sheet collapsed border-t border-x border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl flex flex-col">
+<aside id="cora-seo-detail-sheet" class="cora-bottom-sheet collapsed border-t border-x border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl flex flex-col">
     <div class="w-12 h-1.5 bg-zinc-300 dark:bg-zinc-700 rounded-full mx-auto my-2.5 shrink-0"></div>
     <div class="px-6 py-3 border-b border-zinc-200 flex justify-between items-center shrink-0">
         <div>
@@ -870,7 +870,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             if(kwEl) kwEl.value = '';
             if(ttEl) ttEl.value = '';
         }
-        const drawer = document.getElementById('cora-create-article-drawer');
+        const drawer = document.getElementById('cora-create-article-sheet');
         if(drawer) { drawer.classList.remove('translate-x-full', 'collapsed'); }
         showBackdrop();
     };
@@ -885,7 +885,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         const idEl    = document.getElementById('seo-drawer-article-id');
         if(titleEl) titleEl.innerText = title || 'SEO Analysis';
         if(idEl) idEl.value = articleId;
-        const drawer = document.getElementById('cora-seo-detail-drawer');
+        const drawer = document.getElementById('cora-seo-detail-sheet');
         if(drawer) { drawer.classList.remove('translate-x-full', 'collapsed'); }
         showBackdrop();
 

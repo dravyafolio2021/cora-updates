@@ -1,6 +1,6 @@
 <?php if (!defined('ABSPATH')) exit; ?>
 
-<aside id="cora-approval-drawer" class="cora-bottom-sheet collapsed border-t border-x border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl flex flex-col">
+<aside id="cora-approval-sheet" class="cora-bottom-sheet collapsed border-t border-x border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl flex flex-col">
     <div class="w-12 h-1.5 bg-zinc-300 dark:bg-zinc-700 rounded-full mx-auto my-2.5 shrink-0"></div>
     <div class="px-6 py-3 border-b border-zinc-200 flex justify-between items-center shrink-0">
         <div>
@@ -136,7 +136,7 @@
 (function() {
     window.openApprovalDrawer = function(itemId) {
         if(typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
-        const drawer = document.getElementById('cora-approval-drawer');
+        const drawer = document.getElementById('cora-approval-sheet');
         if(!drawer) return;
         drawer.classList.remove('collapsed', 'translate-x-full');
         const bd = document.getElementById('cora-drawer-backdrop');
