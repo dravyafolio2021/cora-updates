@@ -20219,13 +20219,37 @@ function cora_ajax_fetch_content_workspace() {
     check_ajax_referer('cora_ajax_nonce', 'nonce');
     global $wpdb;
     
+    $table = $wpdb->prefix . 'cora_content_items';
+
+    // Auto-seed sample workflow items if table is empty
+    $count_items = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$table}");
+    if ($count_items === 0) {
+        $user_id = get_current_user_id();
+        $sample_items = [
+            ['title' => 'Corporate Commercial Lease Space Rates inside DLF CyberCity Gurgaon', 'stage' => 'editorial_review', 'priority' => 'urgent', 'primary_keyword' => 'commercial lease rates cyber city', 'draft_due_date' => date('Y-m-d', strtotime('+3 days'))],
+            ['title' => 'Luxury Villa Market Report 2026: Golf Course Extension Road', 'stage' => 'drafting', 'priority' => 'high', 'primary_keyword' => 'luxury villas gurgaon', 'draft_due_date' => date('Y-m-d', strtotime('+5 days'))],
+            ['title' => 'Complete Guide to Builder Floor Registration & Stamp Duty', 'stage' => 'briefing', 'priority' => 'medium', 'primary_keyword' => 'builder floor stamp duty', 'draft_due_date' => date('Y-m-d', strtotime('+7 days'))],
+            ['title' => 'Top 10 Architectural Photography Lighting Rigs for Interior Shoots', 'stage' => 'idea', 'priority' => 'low', 'primary_keyword' => 'interior photography lighting', 'draft_due_date' => date('Y-m-d', strtotime('+12 days'))],
+            ['title' => 'High-Yield Commercial Real Estate Investment Opportunities in Aerocity', 'stage' => 'published', 'priority' => 'high', 'primary_keyword' => 'commercial real estate aerocity', 'draft_due_date' => date('Y-m-d', strtotime('-2 days'))]
+        ];
+        foreach($sample_items as $si) {
+            $wpdb->insert($table, array_merge($si, [
+                'industry' => 'real_estate',
+                'target_word_count' => 1200,
+                'writer_id' => $user_id,
+                'created_by' => $user_id,
+                'created_at' => current_time('mysql')
+            ]));
+        }
+    }
+
     $stage_filter = !empty($_POST['stage_filter']) ? sanitize_text_field($_POST['stage_filter']) : '';
     $where = "1=1";
     if($stage_filter) {
         $where .= $wpdb->prepare(" AND c.stage = %s", $stage_filter);
     }
     
-    $query = "SELECT c.*, u.display_name as writer_name FROM {$wpdb->prefix}cora_content_items c LEFT JOIN {$wpdb->users} u ON c.writer_id = u.ID WHERE $where ORDER BY c.created_at DESC";
+    $query = "SELECT c.*, u.display_name as writer_name FROM {$table} c LEFT JOIN {$wpdb->users} u ON c.writer_id = u.ID WHERE $where ORDER BY c.created_at DESC";
     $items = $wpdb->get_results($query, ARRAY_A);
     
     $grouped = [];

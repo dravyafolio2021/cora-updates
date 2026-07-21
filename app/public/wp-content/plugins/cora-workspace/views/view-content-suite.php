@@ -826,14 +826,30 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         const url = new URL(window.location);
         url.searchParams.set('ct', tabId);
         window.history.pushState({}, '', url);
+
+        if (tabId === 'ct-workflow') {
+            if (typeof window.loadContentWorkspace === 'function') {
+                window.loadContentWorkspace();
+            } else {
+                setTimeout(function() {
+                    if (typeof window.loadContentWorkspace === 'function') window.loadContentWorkspace();
+                }, 100);
+            }
+        }
     };
 
-    // On Load
-    window.addEventListener('DOMContentLoaded', () => {
+    // Immediate & DOMReady Init
+    function initActiveTab() {
         const urlParams = new URLSearchParams(window.location.search);
         const ct = urlParams.get('ct') || 'ct-library';
         switchContentTab(ct);
-    });
+    }
+
+    if (document.readyState === 'loading') {
+        window.addEventListener('DOMContentLoaded', initActiveTab);
+    } else {
+        setTimeout(initActiveTab, 10);
+    }
 
     // Drawers
     window.openCreateArticleDrawer = function(prefillKeyword) {
