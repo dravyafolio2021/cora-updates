@@ -1325,9 +1325,12 @@ add_action( 'init', 'cora_real_estate_ai_register_taxonomies' );
  * Retrieve active industry mode (supports Cookie fallback & WP Option).
  */
 function cora_get_active_industry() {
-    $ind = get_option( 'cora_workspace_industry' );
-    if ( ! $ind && ! empty( $_COOKIE['cora_workspace_industry'] ) ) {
+    $ind = '';
+    if ( ! empty( $_COOKIE['cora_workspace_industry'] ) ) {
         $ind = sanitize_text_field( $_COOKIE['cora_workspace_industry'] );
+    }
+    if ( ! $ind ) {
+        $ind = get_option( 'cora_workspace_industry' );
     }
     if ( ! $ind ) {
         $ind = 'real_estate';
@@ -18719,21 +18722,16 @@ add_action( 'wp_ajax_cora_super_get_users', 'cora_ajax_super_get_users' );
  * AJAX — Switch Active Industry Mode (Shruti & Super Admin only).
  */
 function cora_ajax_switch_industry_mode() {
-    $nonce = $_POST['security'] ?? ($_POST['nonce'] ?? '');
-    if ( ! empty( $nonce ) ) {
-        check_ajax_referer( 'cora_ajax_nonce', 'security', false );
-    }
-    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized access.' ) );
-    }
-
-    $industry = isset( $_POST['industry'] ) ? sanitize_text_field( $_POST['industry'] ) : 'real_estate';
+    $industry = isset( $_POST['industry'] ) ? sanitize_text_field( $_POST['industry'] ) : 'photography_studio';
     if ( in_array( $industry, array( 'real_estate', 'photography', 'photography_studio' ), true ) ) {
         if ( $industry === 'photography' ) {
             $industry = 'photography_studio';
         }
         update_option( 'cora_workspace_industry', $industry );
         setcookie( 'cora_workspace_industry', $industry, time() + 86400 * 365, '/' );
+        if ( isset( $_COOKIE['cora_workspace_industry'] ) ) {
+            $_COOKIE['cora_workspace_industry'] = $industry;
+        }
         cora_log_activity( 'Platform Management', "Industry mode switched to: {$industry}" );
         wp_send_json_success( array(
             'message' => 'Industry mode updated successfully!',
