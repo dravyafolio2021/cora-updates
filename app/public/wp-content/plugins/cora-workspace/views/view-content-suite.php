@@ -619,37 +619,37 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         </div>
 
         <!-- Days of Week Header -->
-        <div style="display: grid !important; grid-template-columns: repeat(7, 1fr) !important; gap: 8px;" class="mb-2 text-center border-b border-zinc-100 pb-2">
+        <div style="display: grid !important; grid-template-columns: repeat(7, minmax(0, 1fr)) !important; gap: 6px; width: 100% !important;" class="mb-2 text-center border-b border-zinc-100 pb-2">
             <?php foreach(['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] as $dn): ?>
                 <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider"><?php echo $dn; ?></div>
             <?php endforeach; ?>
         </div>
 
         <!-- 7-Column Date Grid -->
-        <div style="display: grid !important; grid-template-columns: repeat(7, 1fr) !important; gap: 8px;">
+        <div style="display: grid !important; grid-template-columns: repeat(7, minmax(0, 1fr)) !important; gap: 6px; width: 100% !important;">
             <?php for($pad=1; $pad < $first_dow; $pad++): ?>
-                <div class="min-h-[72px] bg-zinc-50/40 rounded-lg border border-dashed border-zinc-100"></div>
+                <div class="h-20 bg-zinc-50/40 rounded-lg border border-dashed border-zinc-100"></div>
             <?php endfor; ?>
 
             <?php for($d=1; $d<=$days_in_month; $d++): 
                 $is_today = ($d == date('j') && $month_now == date('n'));
                 $day_posts = $pub_dates[$d] ?? [];
             ?>
-                <div class="min-h-[72px] p-2 rounded-lg border <?php echo $is_today ? 'bg-zinc-900/5 border-zinc-900' : 'bg-white border-zinc-200/80 hover:border-zinc-300'; ?> flex flex-col justify-between transition-all">
-                    <div class="flex items-center justify-between">
+                <div class="h-20 p-2 rounded-lg border <?php echo $is_today ? 'bg-zinc-900/5 border-zinc-900' : 'bg-white border-zinc-200/80 hover:border-zinc-300'; ?> flex flex-col justify-between transition-all min-w-0 overflow-hidden">
+                    <div class="flex items-center justify-between min-w-0">
                         <span class="text-xs font-bold <?php echo $is_today ? 'bg-zinc-900 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]' : 'text-zinc-700'; ?>">
                             <?php echo $d; ?>
                         </span>
                         <?php if(!empty($day_posts)): ?>
-                            <span class="text-[9px] font-bold px-1.5 py-0.5 bg-zinc-100 text-zinc-700 rounded-full"><?php echo count($day_posts); ?></span>
+                            <span class="text-[9px] font-bold px-1.5 py-0.5 bg-zinc-100 text-zinc-600 rounded-full shrink-0"><?php echo count($day_posts); ?></span>
                         <?php endif; ?>
                     </div>
                     
-                    <div class="mt-1 space-y-1 overflow-y-auto max-h-[44px]">
+                    <div class="mt-1 space-y-1 overflow-y-auto flex-1 min-w-0">
                         <?php foreach($day_posts as $dp): 
-                            $status_color = ($dp->post_status === 'publish') ? 'bg-zinc-900 text-white' : 'bg-zinc-200 text-zinc-800';
+                            $status_color = ($dp->post_status === 'publish') ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-800 border border-zinc-200';
                         ?>
-                            <div class="text-[10px] font-bold truncate px-1.5 py-0.5 rounded <?php echo $status_color; ?> cursor-pointer hover:opacity-80 transition-opacity" title="<?php echo esc_attr($dp->post_title); ?>" onclick="coraEditArticle(<?php echo $dp->ID; ?>)">
+                            <div class="text-[10px] font-medium truncate px-1.5 py-0.5 rounded <?php echo $status_color; ?> cursor-pointer hover:opacity-80 transition-opacity w-full block" title="<?php echo esc_attr($dp->post_title); ?>" onclick="coraEditArticle(<?php echo $dp->ID; ?>)">
                                 <?php echo esc_html($dp->post_title); ?>
                             </div>
                         <?php endforeach; ?>
@@ -658,6 +658,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             <?php endfor; ?>
         </div>
     </div>
+
 
 <!-- PANEL: Workflow Board -->
 <div id="panel-ct-workflow" class="cora-ct-panel hidden">
