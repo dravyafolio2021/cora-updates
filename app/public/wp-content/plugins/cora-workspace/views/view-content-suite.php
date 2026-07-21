@@ -624,21 +624,60 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     <?php include CORA_WORKSPACE_PATH . 'views/partials/content-workflow-board.php'; ?>
 </div>
 
+<!-- BOTTOM SHEET STYLING -->
+<style>
+.cora-bottom-sheet {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 56rem !important;
+    height: 90vh !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    border-top-left-radius: 1rem !important;
+    border-top-right-radius: 1rem !important;
+    z-index: 9999 !important;
+    box-sizing: border-box !important;
+    transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease, visibility 300ms ease !important;
+}
+
+.cora-bottom-sheet.collapsed {
+    transform: translateY(100%) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    box-shadow: none !important;
+}
+
+.cora-bottom-sheet:not(.collapsed) {
+    transform: translateY(0) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.25) !important;
+}
+</style>
+
 <!-- DRAWERS -->
 <!-- Drawer Backdrop -->
 <div id="cora-drawer-backdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998] hidden transition-opacity" onclick="window.coraCloseAllDrawers()"></div>
 
-<!-- Create Article Drawer -->
-<aside id="cora-create-article-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[480px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
-    <div class="px-6 py-4 border-b border-zinc-200 flex justify-between items-center">
+<!-- Create Article Bottom Sheet Drawer -->
+<aside id="cora-create-article-drawer" class="cora-bottom-sheet collapsed border-t border-x border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl flex flex-col">
+    <div class="w-12 h-1.5 bg-zinc-300 dark:bg-zinc-700 rounded-full mx-auto my-2.5 shrink-0"></div>
+    <div class="px-6 py-3 border-b border-zinc-200 flex justify-between items-center shrink-0">
         <div>
             <h2 class="text-lg font-bold text-zinc-900">New Article</h2>
             <p class="text-xs text-zinc-500">Draft a new SEO-optimized article.</p>
         </div>
-        <button class="text-zinc-400 hover:text-zinc-900" onclick="closeCreateArticleDrawer()">
+        <button class="text-zinc-400 hover:text-zinc-900 cursor-pointer" onclick="closeCreateArticleDrawer()">
             <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
+
     <div class="p-6 overflow-y-auto flex-1 space-y-4">
         <div>
             <label class="block text-xs font-bold text-zinc-700 mb-1">Article Title *</label>
@@ -678,19 +717,20 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             <label for="ca-ai-brief" class="text-sm text-zinc-700">AI Generate Outline Brief</label>
         </div>
     </div>
-    <div class="p-4 border-t border-zinc-200">
-        <button class="w-full bg-zinc-900 text-white font-bold py-2.5 rounded hover:bg-zinc-800 transition-colors" onclick="submitCreateArticle(event)">Create Article</button>
+    <div class="p-4 border-t border-zinc-200 shrink-0">
+        <button class="w-full bg-zinc-900 text-white font-bold py-2.5 rounded hover:bg-zinc-800 transition-colors cursor-pointer" onclick="submitCreateArticle(event)">Create Article</button>
     </div>
 </aside>
 
-<!-- SEO Detail Drawer -->
-<aside id="cora-seo-detail-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[500px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
-    <div class="px-6 py-4 border-b border-zinc-200 flex justify-between items-center">
+<!-- SEO Detail Bottom Sheet Drawer -->
+<aside id="cora-seo-detail-drawer" class="cora-bottom-sheet collapsed border-t border-x border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl flex flex-col">
+    <div class="w-12 h-1.5 bg-zinc-300 dark:bg-zinc-700 rounded-full mx-auto my-2.5 shrink-0"></div>
+    <div class="px-6 py-3 border-b border-zinc-200 flex justify-between items-center shrink-0">
         <div>
             <h2 class="text-lg font-bold text-zinc-900" id="seo-drawer-title">SEO Deep Analysis</h2>
             <p class="text-xs text-zinc-500">Analyze and optimize article performance.</p>
         </div>
-        <button class="text-zinc-400 hover:text-zinc-900" onclick="closeSEODetailDrawer()">
+        <button class="text-zinc-400 hover:text-zinc-900 cursor-pointer" onclick="closeSEODetailDrawer()">
             <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>

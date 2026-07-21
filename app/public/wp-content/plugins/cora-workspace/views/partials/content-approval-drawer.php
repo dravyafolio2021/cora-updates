@@ -1,12 +1,13 @@
 <?php if (!defined('ABSPATH')) exit; ?>
 
-<aside id="cora-approval-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[500px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
-    <div class="px-6 py-4 border-b border-zinc-200 flex justify-between items-center shrink-0">
+<aside id="cora-approval-drawer" class="cora-bottom-sheet collapsed border-t border-x border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl flex flex-col">
+    <div class="w-12 h-1.5 bg-zinc-300 dark:bg-zinc-700 rounded-full mx-auto my-2.5 shrink-0"></div>
+    <div class="px-6 py-3 border-b border-zinc-200 flex justify-between items-center shrink-0">
         <div>
             <h2 class="text-base font-bold text-zinc-900">Content Approval</h2>
             <p class="text-xs text-zinc-500 mt-0.5">Review and approve or request revisions.</p>
         </div>
-        <button onclick="closeApprovalDrawer()" class="text-zinc-400 hover:text-zinc-900">
+        <button onclick="closeApprovalDrawer()" class="text-zinc-400 hover:text-zinc-900 cursor-pointer">
             <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
