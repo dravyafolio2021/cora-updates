@@ -65,7 +65,7 @@ $stages = [
       <span class="text-xs font-bold text-zinc-700 uppercase tracking-wider"><?php echo $stage_label; ?></span>
       <span class="ct-stage-count text-[10px] font-bold text-zinc-400"><?php echo count($stage_cards); ?></span>
     </div>
-    <div class="p-2 space-y-2 overflow-y-auto flex-1 ct-stage-column" data-stage="<?php echo $stage_key; ?>" style="max-height:560px">
+    <div class="min-h-[600px] h-auto space-y-3 p-2.5 flex-1 ct-stage-column" data-stage="<?php echo $stage_key; ?>">
       <?php if (empty($stage_cards)): ?>
         <div class="text-center text-zinc-400 text-xs py-6">No items</div>
       <?php else: foreach($stage_cards as $item): 
@@ -73,6 +73,11 @@ $stages = [
         $pc = $p_colors[$item['priority']] ?? $p_colors['medium'];
       ?>
         <div class="bg-white border border-zinc-200 hover:border-zinc-400 rounded-xl p-3.5 shadow-sm hover:shadow-md transition-all space-y-2.5 cursor-pointer group" onclick="openContentBriefDrawer(<?php echo $item['id']; ?>)">
+          <?php if(!empty($item['thumbnail_url'])): ?>
+            <img src="<?php echo esc_url($item['thumbnail_url']); ?>" class="w-full h-28 object-cover rounded-lg mb-2">
+          <?php else: ?>
+            <div class="w-full h-20 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/60 flex items-center justify-center text-zinc-400 mb-2"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.5" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
+          <?php endif; ?>
           <!-- Row 1: Header Category & Priority -->
           <div class="flex items-center justify-between text-[9px]">
             <span class="font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 uppercase tracking-wider"><?php echo esc_html(strtoupper($item['industry'] ?? 'real_estate')); ?></span>
@@ -178,6 +183,10 @@ $stages = [
 
     return `
       <div class="bg-white border border-zinc-200 hover:border-zinc-400 rounded-xl p-3.5 shadow-sm hover:shadow-md transition-all space-y-2.5 cursor-pointer group" onclick="openContentBriefDrawer(${item.id})">
+        ${item.thumbnail_url ? 
+          `<img src="${escHtml(item.thumbnail_url)}" class="w-full h-28 object-cover rounded-lg mb-2">` : 
+          `<div class="w-full h-20 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/60 flex items-center justify-center text-zinc-400 mb-2"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.5" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>`
+        }
         <!-- Row 1: Category & Priority -->
         <div class="flex items-center justify-between text-[9px]">
           <span class="font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 uppercase tracking-wider">${escHtml(ind)}</span>
