@@ -2599,6 +2599,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             } catch(e) {}
             document.cookie = "cora_workspace_industry=" + encodeURIComponent(industry) + "; path=/; max-age=31536000";
 
+            const url = new URL(window.location.href);
+            url.searchParams.set('industry', industry);
+
             const ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
             const nonce = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : '';
 
@@ -2607,10 +2610,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 security: nonce,
                 industry: industry
             }).always(function() {
-                if (window.coraShowToast) window.coraShowToast('Industry mode updated!', 'success');
+                if (window.coraShowToast) window.coraShowToast('Switching to ' + (industry === 'photography_studio' ? 'Studio' : 'Real Estate') + ' mode...', 'success');
                 setTimeout(function() {
-                    window.location.reload();
-                }, 250);
+                    window.location.href = url.toString();
+                }, 100);
             });
         };
     </script>
