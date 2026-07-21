@@ -3295,11 +3295,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <div id="cora-sidebar-backdrop" class="fixed inset-0 bg-zinc-950/20 backdrop-blur-sm z-40 hidden lg:hidden"></div>
 
     <!-- Main Content Pane -->
-    <main class="cora-main flex-1 bg-white flex flex-col min-h-screen lg:min-h-0 lg:h-full lg:overflow-y-auto relative pb-16 lg:pb-0 min-w-0 w-full overflow-x-clip">
+    <main class="cora-main flex-1 bg-white flex flex-col min-h-screen lg:min-h-0 lg:h-full lg:overflow-y-auto relative pb-16 lg:pb-0 min-w-0 w-full">
 
 
         <!-- Dynamic Content Sections -->
-        <div class="cora-content-wrapper p-3.5 sm:p-6 md:p-8 max-w-full w-full flex-1 space-y-6 min-w-0 overflow-x-hidden">
+        <div class="cora-content-wrapper p-3.5 sm:p-6 md:p-8 max-w-full w-full flex-1 space-y-6 min-w-0">
             
             <!-- Floating Role Preview Active Notice Banner -->
             <div id="cora-role-preview-banner" class="hidden mb-4 p-3.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-950 rounded-xl shadow-md flex items-center justify-between gap-3 animate-in fade-in duration-200">

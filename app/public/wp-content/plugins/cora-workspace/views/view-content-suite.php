@@ -659,6 +659,11 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     visibility: visible !important;
     box-shadow: 0 -10px 40px rgba(0,0,0,0.25) !important;
 }
+/* Ensure parent containers never clip fixed bottom sheets */
+.cora-main, .cora-content-wrapper {
+    overflow: visible !important;
+    overflow-x: visible !important;
+}
 </style>
 
 <!-- DRAWERS -->
