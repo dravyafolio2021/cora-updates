@@ -26,92 +26,77 @@ $financial_entries = function_exists( 'cora_db_get_ledger' ) ? cora_db_get_ledge
                         <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                     </svg>
                 </div>
-                <h1 class="text-xl md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Financial Overview & Intelligence</h1>
+                <h1 class="text-xl md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Financial Control & Intelligence</h1>
             </div>
             <p class="text-xs text-zinc-500 dark:text-zinc-400 pl-11">
-                Track cash inflows, operating outflows, retainer billing, commission splits, and client receivables.
+                Unified financial workspace for cash inflows, operating outflows, retainer billing, and team payouts.
             </p>
         </div>
 
-        <!-- Primary CTA Buttons -->
-        <div class="flex flex-wrap items-center gap-2 shrink-0">
-            <button type="button" onclick="openAddLedgerDrawer()" class="px-3 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                + Add Ledger Entry
+        <!-- Primary Action Toolbar -->
+        <div class="flex items-center gap-2 shrink-0 relative">
+            <!-- Floating Popover Action Menu Button -->
+            <div class="relative">
+                <button type="button" onclick="toggleFinancialActionMenu()" class="px-3.5 py-2 bg-zinc-950 hover:bg-black dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-xs active:scale-95">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>+ New Action</span>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+
+                <!-- Popover Action Menu Dropdown -->
+                <div id="cora-fin-action-popover" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl z-50 p-1 space-y-0.5 animate-fade-in select-none">
+                    <button type="button" onclick="toggleFinancialActionMenu(); openAddLedgerDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2 transition-colors">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span>Add Ledger Entry</span>
+                    </button>
+                    <button type="button" onclick="toggleFinancialActionMenu(); openCreateInvoiceDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2 transition-colors">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                        <span>Create Client Invoice</span>
+                    </button>
+                    <button type="button" onclick="toggleFinancialActionMenu(); openProcessPayoutDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2 transition-colors">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                        <span>Process Payout</span>
+                    </button>
+                </div>
+            </div>
+
+            <button type="button" onclick="openFinancialReportsDrawer()" class="px-3 py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-750 text-xs font-semibold rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <span>Automated Reports</span>
             </button>
 
-            <button type="button" onclick="openCreateInvoiceDrawer()" class="px-3 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="12" y1="18" x2="12" y2="12"></line>
-                    <line x1="9" y1="15" x2="15" y2="15"></line>
-                </svg>
-                + Create Invoice
-            </button>
-
-            <button type="button" onclick="openProcessPayoutDrawer()" class="px-3 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                    <line x1="1" y1="10" x2="23" y2="10"></line>
-                </svg>
-                + Process Payout
-            </button>
-
-            <button type="button" onclick="openFinancialReportsDrawer()" class="px-3 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-                Automated Reports & Schedule
-            </button>
-
-            <button type="button" onclick="exportFinancialsCSV()" class="px-3 py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-750 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                Export CSV
+            <button type="button" onclick="exportFinancialsCSV()" class="p-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-750 rounded-xl transition-colors cursor-pointer shadow-2xs" title="Export Ledger CSV">
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
             </button>
         </div>
     </div>
 
-    <!-- MULTI-DIMENSIONAL TOOLBAR CONTROLS -->
-    <div class="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800 p-3 rounded-xl flex flex-wrap items-center justify-between gap-3">
-        <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-            <!-- Period Direction Dropdown -->
+    <!-- FILTER BAR -->
+    <div class="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800 p-2.5 rounded-xl flex items-center justify-between gap-3 text-xs select-none">
+        <div class="flex items-center gap-3">
             <div class="flex items-center gap-2">
-                <label for="financial-filter-period" class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Period:</label>
-                <select id="financial-filter-period" onchange="handlePeriodChange(this.value)" class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2.5 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 font-medium">
+                <label for="financial-filter-period" class="font-medium text-zinc-500">Period:</label>
+                <select id="financial-filter-period" onchange="handlePeriodChange(this.value)" class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2.5 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none font-medium">
                     <option value="this_month" selected>This Month</option>
                     <option value="all_time">All Time</option>
                     <option value="today">Today</option>
                     <option value="this_week">This Week</option>
                     <option value="this_quarter">This Quarter</option>
                     <option value="ytd">Year to Date (YTD)</option>
-                    <option value="custom">Custom Date Range</option>
+                    <option value="custom">Custom Range</option>
                 </select>
             </div>
 
-            <!-- Custom Date Inputs (hidden by default) -->
             <div id="financial-custom-date-container" class="hidden flex items-center gap-2">
-                <input type="date" id="financial-custom-start-date" onchange="handleCustomDateChange()" class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2.5 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none">
-                <span class="text-xs text-zinc-400">to</span>
-                <input type="date" id="financial-custom-end-date" onchange="handleCustomDateChange()" class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2.5 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none">
+                <input type="date" id="financial-custom-start-date" onchange="handleCustomDateChange()" class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 text-xs text-zinc-800 dark:text-zinc-200">
+                <span class="text-zinc-400">to</span>
+                <input type="date" id="financial-custom-end-date" onchange="handleCustomDateChange()" class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 text-xs text-zinc-800 dark:text-zinc-200">
             </div>
-
-            <div class="flex items-center gap-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-3 py-1.5 rounded-lg"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Workspace Financial Control</div>
         </div>
 
-        <div class="text-[11px] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5 ml-auto">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
-            Live Ledger Sync Enabled
+        <div class="flex items-center gap-2 text-[11px] text-zinc-500 font-medium">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Single Workspace Control</span>
         </div>
     </div>
 
@@ -934,6 +919,11 @@ $financial_entries = function_exists( 'cora_db_get_ledger' ) ? cora_db_get_ledge
 <script>
 (function() {
     // 6.1 DRAWER CONTROLLERS
+    window.toggleFinancialActionMenu = function() {
+        var pop = document.getElementById('cora-fin-action-popover');
+        if (pop) pop.classList.toggle('hidden');
+    };
+
     window.openFinancialReportsDrawer = function() {
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
