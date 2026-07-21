@@ -571,15 +571,57 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                 <?php if(empty($col['articles'])): ?>
                 <div class="text-center text-zinc-400 text-xs py-8">No articles</div>
                 <?php else: foreach($col['articles'] as $ca): ?>
-                <div class="bg-white border border-zinc-200 rounded-lg p-3 shadow-sm cursor-pointer hover:border-zinc-400 transition-colors" onclick="coraEditArticle(<?php echo $ca->ID; ?>)">
+                <div class="bg-white border border-zinc-200 hover:border-zinc-400 rounded-xl p-3.5 shadow-sm hover:shadow-md transition-all space-y-2.5 cursor-pointer group" onclick="openSEODetailDrawer(<?php echo $ca->ID; ?>, '<?php echo esc_js($ca->post_title); ?>')">
                     <?php if($ca->_cal_thumb): ?>
-                    <img src="<?php echo esc_url($ca->_cal_thumb); ?>" class="w-full h-20 object-cover rounded mb-2">
+                    <img src="<?php echo esc_url($ca->_cal_thumb); ?>" class="w-full h-24 object-cover rounded-lg mb-1 border border-zinc-200/60">
                     <?php endif; ?>
-                    <div class="text-xs font-bold text-zinc-900 line-clamp-2 mb-1"><?php echo esc_html($ca->post_title); ?></div>
-                    <div class="flex items-center justify-between mt-1.5">
-                        <span class="text-[10px] text-zinc-500"><?php echo esc_html($ca->_cal_assignee_name); ?></span>
-                        <span class="text-[10px] font-bold text-zinc-500"><?php echo esc_html($ca->_cal_date); ?></span>
-                        <span class="text-[10px] font-bold px-1.5 py-0.5 bg-zinc-100 rounded text-zinc-700"><?php echo (int)$ca->_cal_seo; ?></span>
+
+                    <!-- Row 1: Header Category & Priority -->
+                    <div class="flex items-center justify-between text-[9px]">
+                        <span class="font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 uppercase tracking-wider">Real Estate</span>
+                        <span class="font-bold px-2 py-0.5 rounded-full bg-zinc-900 text-white uppercase tracking-wider">High</span>
+                    </div>
+
+                    <!-- Row 2: Article Title -->
+                    <div class="text-xs font-bold text-zinc-900 group-hover:text-zinc-700 line-clamp-2 leading-snug">
+                        <?php echo esc_html($ca->post_title); ?>
+                    </div>
+
+                    <!-- Row 3: Target Keyword Pill -->
+                    <div class="flex items-center gap-1.5 text-[10px] text-zinc-600 bg-zinc-50 border border-zinc-100 rounded-md px-2 py-1">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span class="font-medium truncate">Target: <strong>dlf cybercity lease</strong></span>
+                    </div>
+
+                    <!-- Row 4: Explicit SEO & GEO Badges -->
+                    <div class="flex items-center justify-between text-[10px] pt-1 border-t border-zinc-100">
+                        <div class="flex items-center gap-1 bg-zinc-900 text-white px-2 py-0.5 rounded-md font-bold">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <span>SEO <?php echo (int)$ca->_cal_seo; ?>/100</span>
+                        </div>
+                        <div class="flex items-center gap-1 bg-zinc-100 text-zinc-800 border border-zinc-200 px-2 py-0.5 rounded-md font-semibold">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+                            <span>GEO 68%</span>
+                        </div>
+                        <span class="text-zinc-500 font-medium text-[10px]">1,250 w</span>
+                    </div>
+
+                    <!-- Row 5: Distribution Channels Bar -->
+                    <div class="flex items-center gap-1 text-[9px] pt-0.5">
+                        <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-600 rounded font-medium">LinkedIn</span>
+                        <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-600 rounded font-medium">SearchGPT</span>
+                        <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-600 rounded font-medium">MLS</span>
+                    </div>
+
+                    <!-- Row 6: Author & Date Footer -->
+                    <div class="flex items-center justify-between pt-1 border-t border-zinc-100 text-[10px] text-zinc-500">
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-4 h-4 rounded-full bg-zinc-200 flex items-center justify-center text-[8px] font-bold text-zinc-700">
+                                <?php echo strtoupper(substr($ca->_cal_assignee_name, 0, 1)); ?>
+                            </div>
+                            <span class="font-medium text-zinc-700"><?php echo esc_html($ca->_cal_assignee_name); ?></span>
+                        </div>
+                        <div class="font-semibold text-zinc-400">📅 <?php echo esc_html($ca->_cal_date); ?></div>
                     </div>
                 </div>
                 <?php endforeach; endif; ?>

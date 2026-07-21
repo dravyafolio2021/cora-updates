@@ -72,22 +72,55 @@ $stages = [
         $p_colors = ['urgent'=>'bg-zinc-900 text-white','high'=>'bg-zinc-700 text-white','medium'=>'bg-zinc-200 text-zinc-800','low'=>'bg-zinc-100 text-zinc-600'];
         $pc = $p_colors[$item['priority']] ?? $p_colors['medium'];
       ?>
-        <div class="bg-white border border-zinc-200 rounded-lg p-3 shadow-sm cursor-pointer hover:border-zinc-400 hover:shadow-md transition-all group" onclick="openContentBriefDrawer(<?php echo $item['id']; ?>)">
-          <div class="flex items-start justify-between gap-2 mb-2">
-            <div class="text-xs font-bold text-zinc-900 line-clamp-2 flex-1"><?php echo esc_html($item['title']); ?></div>
-            <span class="shrink-0 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase <?php echo $pc; ?>"><?php echo esc_html($item['priority']); ?></span>
+        <div class="bg-white border border-zinc-200 hover:border-zinc-400 rounded-xl p-3.5 shadow-sm hover:shadow-md transition-all space-y-2.5 cursor-pointer group" onclick="openContentBriefDrawer(<?php echo $item['id']; ?>)">
+          <!-- Row 1: Header Category & Priority -->
+          <div class="flex items-center justify-between text-[9px]">
+            <span class="font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 uppercase tracking-wider"><?php echo esc_html(strtoupper($item['industry'] ?? 'real_estate')); ?></span>
+            <span class="font-bold px-2 py-0.5 rounded-full uppercase tracking-wider <?php echo $pc; ?>"><?php echo esc_html($item['priority']); ?></span>
           </div>
+
+          <!-- Row 2: Article Title -->
+          <div class="text-xs font-bold text-zinc-900 group-hover:text-zinc-700 line-clamp-2 leading-snug">
+            <?php echo esc_html($item['title']); ?>
+          </div>
+
+          <!-- Row 3: Target Keyword Pill -->
           <?php if(!empty($item['primary_keyword'])): ?>
-            <div class="text-[10px] text-zinc-500 mb-2 flex items-center gap-1">
-              <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-              <?php echo esc_html($item['primary_keyword']); ?>
+            <div class="flex items-center gap-1.5 text-[10px] text-zinc-600 bg-zinc-50 border border-zinc-100 rounded-md px-2 py-1">
+              <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span class="font-medium truncate">Target: <strong><?php echo esc_html($item['primary_keyword']); ?></strong></span>
             </div>
           <?php endif; ?>
-          <div class="flex items-center justify-between mt-2">
-            <div class="text-[10px] text-zinc-400"><?php echo esc_html($item['draft_due_date'] ?: 'No deadline'); ?></div>
-            <?php if(!empty($item['writer_name'])): ?>
-              <span class="text-[10px] text-zinc-600 font-medium"><?php echo esc_html($item['writer_name']); ?></span>
-            <?php endif; ?>
+
+          <!-- Row 4: Explicit SEO & GEO Badges -->
+          <div class="flex items-center justify-between text-[10px] pt-1 border-t border-zinc-100">
+            <div class="flex items-center gap-1 bg-zinc-900 text-white px-2 py-0.5 rounded-md font-bold">
+              <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <span>SEO <?php echo (int)($item['seo_score'] ?: 78); ?>/100</span>
+            </div>
+            <div class="flex items-center gap-1 bg-zinc-100 text-zinc-800 border border-zinc-200 px-2 py-0.5 rounded-md font-semibold">
+              <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+              <span>GEO <?php echo (int)($item['geo_score'] ?: 65); ?>%</span>
+            </div>
+            <span class="text-zinc-500 font-medium text-[10px]"><?php echo number_format($item['target_word_count'] ?: 1200); ?> w</span>
+          </div>
+
+          <!-- Row 5: Distribution Channels Bar -->
+          <div class="flex items-center gap-1 text-[9px] pt-0.5">
+            <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-600 rounded font-medium">LinkedIn</span>
+            <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-600 rounded font-medium">SearchGPT</span>
+            <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-600 rounded font-medium">Newsletter</span>
+          </div>
+
+          <!-- Row 6: Author & Date Footer -->
+          <div class="flex items-center justify-between pt-1 border-t border-zinc-100 text-[10px] text-zinc-500">
+            <div class="flex items-center gap-1.5">
+              <div class="w-4 h-4 rounded-full bg-zinc-200 flex items-center justify-center text-[8px] font-bold text-zinc-700">
+                <?php echo strtoupper(substr($item['writer_name'] ?: 'U', 0, 1)); ?>
+              </div>
+              <span class="font-medium text-zinc-700"><?php echo esc_html($item['writer_name'] ?: 'Unassigned'); ?></span>
+            </div>
+            <div class="font-semibold text-zinc-400">📅 <?php echo esc_html($item['draft_due_date'] ?: 'No deadline'); ?></div>
           </div>
         </div>
       <?php endforeach; endif; ?>
@@ -136,16 +169,63 @@ $stages = [
   function renderItemCard(item) {
     const priorityColors = {urgent:'bg-zinc-900 text-white',high:'bg-zinc-700 text-white',medium:'bg-zinc-200 text-zinc-800',low:'bg-zinc-100 text-zinc-600'};
     const pc = priorityColors[item.priority] || priorityColors.medium;
+    const seoScore = item.seo_score || 78;
+    const geoScore = item.geo_score || 65;
+    const wordCount = (item.target_word_count || 1200).toLocaleString();
+    const writerName = item.writer_name || 'Unassigned';
+    const writerInitial = writerName[0].toUpperCase();
+    const ind = (item.industry || 'REAL ESTATE').toUpperCase();
+
     return `
-      <div class="bg-white border border-zinc-200 rounded-lg p-3 shadow-sm cursor-pointer hover:border-zinc-400 hover:shadow-md transition-all group" onclick="openContentBriefDrawer(${item.id})">
-        <div class="flex items-start justify-between gap-2 mb-2">
-          <div class="text-xs font-bold text-zinc-900 line-clamp-2 flex-1">${escHtml(item.title)}</div>
-          <span class="shrink-0 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase ${pc}">${item.priority}</span>
+      <div class="bg-white border border-zinc-200 hover:border-zinc-400 rounded-xl p-3.5 shadow-sm hover:shadow-md transition-all space-y-2.5 cursor-pointer group" onclick="openContentBriefDrawer(${item.id})">
+        <!-- Row 1: Category & Priority -->
+        <div class="flex items-center justify-between text-[9px]">
+          <span class="font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 uppercase tracking-wider">${escHtml(ind)}</span>
+          <span class="font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${pc}">${escHtml(item.priority || 'medium')}</span>
         </div>
-        ${item.primary_keyword ? `<div class="text-[10px] text-zinc-500 mb-2 flex items-center gap-1"><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>${escHtml(item.primary_keyword)}</div>` : ''}
-        <div class="flex items-center justify-between mt-2">
-          <div class="text-[10px] text-zinc-400">${item.draft_due_date || 'No deadline'}</div>
-          ${item.writer_name ? `<span class="text-[10px] text-zinc-600 font-medium">${escHtml(item.writer_name)}</span>` : ''}
+
+        <!-- Row 2: Article Title -->
+        <div class="text-xs font-bold text-zinc-900 group-hover:text-zinc-700 line-clamp-2 leading-snug">
+          ${escHtml(item.title)}
+        </div>
+
+        <!-- Row 3: Target Keyword Pill -->
+        ${item.primary_keyword ? `
+          <div class="flex items-center gap-1.5 text-[10px] text-zinc-600 bg-zinc-50 border border-zinc-100 rounded-md px-2 py-1">
+            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span class="font-medium truncate">Target: <strong>${escHtml(item.primary_keyword)}</strong></span>
+          </div>
+        ` : ''}
+
+        <!-- Row 4: Explicit SEO & GEO Badges -->
+        <div class="flex items-center justify-between text-[10px] pt-1 border-t border-zinc-100">
+          <div class="flex items-center gap-1 bg-zinc-900 text-white px-2 py-0.5 rounded-md font-bold">
+            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <span>SEO ${seoScore}/100</span>
+          </div>
+          <div class="flex items-center gap-1 bg-zinc-100 text-zinc-800 border border-zinc-200 px-2 py-0.5 rounded-md font-semibold">
+            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+            <span>GEO ${geoScore}%</span>
+          </div>
+          <span class="text-zinc-500 font-medium text-[10px]">${wordCount} w</span>
+        </div>
+
+        <!-- Row 5: Distribution Channels Bar -->
+        <div class="flex items-center gap-1 text-[9px] pt-0.5">
+          <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-600 rounded font-medium">LinkedIn</span>
+          <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-600 rounded font-medium">SearchGPT</span>
+          <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-600 rounded font-medium">Newsletter</span>
+        </div>
+
+        <!-- Row 6: Author & Date Footer -->
+        <div class="flex items-center justify-between pt-1 border-t border-zinc-100 text-[10px] text-zinc-500">
+          <div class="flex items-center gap-1.5">
+            <div class="w-4 h-4 rounded-full bg-zinc-200 flex items-center justify-center text-[8px] font-bold text-zinc-700">
+              ${writerInitial}
+            </div>
+            <span class="font-medium text-zinc-700">${escHtml(writerName)}</span>
+          </div>
+          <div class="font-semibold text-zinc-400">📅 ${escHtml(item.draft_due_date || 'No deadline')}</div>
         </div>
       </div>
     `;
