@@ -6372,23 +6372,9 @@ jQuery(document).ready(function($) {
     }
 
     window.coraGenerateArticleAI = function() {
-        const title = $('#cora-article-title').val();
-        if (!title) {
-            window.coraShowToast('Please enter an Article Title first so AI knows what to write about.', 'error');
-            return;
+        if (window.coraShowToast) {
+            window.coraShowToast('Coming Soon — AI Content Generation feature is in development.', 'info');
         }
-        
-        window.coraShowToast('AI is drafting the article... Please wait.', 'info');
-        $('#cora-editor-status').text('AI Drafting...');
-        
-        setTimeout(() => {
-            if (coraQuillListingCoordinator) {
-                coraQuillListingCoordinator.root.innerHTML = `<h2>Introduction</h2><p>Listings are magical, and capturing them perfectly requires a mix of technical skill and artistic vision. In this guide, we will walk you through the essential tips for ensuring your memories are preserved flawlessly.</p><h2>Key Focus Areas</h2><ol><li><strong>Lighting:</strong> Natural light is your best friend during golden hour.</li><li><strong>Posing:</strong> Keep it candid. Stiff poses often feel unnatural.</li><li><strong>Location:</strong> Choose a venue that resonates with your personal story.</li></ol><h2>Conclusion</h2><p>Remember, the best photos are the ones where you are truly in the moment. Let the photographer handle the technicalities while you enjoy your big day.</p>`;
-            }
-            window.coraShowToast('Article drafted successfully!', 'success');
-            $('#cora-editor-status').text('Unsaved changes');
-            coraAnalyzeSEO();
-        }, 1500);
     };
 
     window.coraAnalyzeSEO = function() {
