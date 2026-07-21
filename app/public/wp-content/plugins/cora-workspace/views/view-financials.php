@@ -106,13 +106,7 @@ $financial_entries = function_exists( 'cora_db_get_ledger' ) ? cora_db_get_ledge
                 <input type="date" id="financial-custom-end-date" onchange="handleCustomDateChange()" class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2.5 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none">
             </div>
 
-            <!-- Single Workspace Indicator -->
-            <div class="flex items-center gap-2">
-                <div class="flex items-center gap-1.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 shadow-2xs">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span>Single Workspace Financial Control</span>
-                </div>
-            </div>
+            <div class="flex items-center gap-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-3 py-1.5 rounded-lg"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Workspace Financial Control</div>
         </div>
 
         <div class="text-[11px] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5 ml-auto">
@@ -203,45 +197,64 @@ $financial_entries = function_exists( 'cora_db_get_ledger' ) ? cora_db_get_ledge
     </div>
 
     <!-- VISUAL CASH ALLOCATION & PROFIT MARGIN BAR -->
-    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm space-y-3 select-none">
+    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm space-y-3.5 select-none">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Cashflow Allocation & Expense Breakdown</span>
+                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Cash Allocation & Profit Margin Breakdown</span>
                 <span class="text-[10px] font-bold px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-full border border-zinc-200 dark:border-zinc-700">66.5% Net Margin</span>
             </div>
-            <span class="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Total Outflow: ₹162,400</span>
+            <span class="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Gross Revenue: ₹485,000</span>
         </div>
 
         <!-- Multi-segment visual stacked progress bar -->
         <div class="w-full h-3 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden flex shadow-inner">
-            <div class="h-full bg-zinc-950 dark:bg-zinc-100 transition-all" style="width: 66.5%" title="Net Profit Margin: 66.5% (₹322,600)"></div>
-            <div class="h-full bg-zinc-600 transition-all" style="width: 15%" title="Studio & Operating Rent: 15% (₹72,750)"></div>
-            <div class="h-full bg-zinc-400 transition-all" style="width: 8%" title="Gear & Tech Equipment: 8% (₹38,800)"></div>
-            <div class="h-full bg-zinc-300 dark:bg-zinc-500 transition-all" style="width: 5%" title="Food, Travel & Client Hospitality: 5% (₹24,250)"></div>
-            <div class="h-full bg-zinc-200 dark:bg-zinc-600 transition-all" style="width: 5.5%" title="Marketing & Listing Ads: 5.5% (₹26,600)"></div>
+            <div class="h-full bg-zinc-900 dark:bg-zinc-100 transition-all" style="width: 66.5%" title="Net Profit Margin: 66.5% (₹322,600)"></div>
+            <div class="h-full bg-zinc-600 transition-all" style="width: 15%" title="Operating Rent: 15% (₹72,750)"></div>
+            <div class="h-full bg-zinc-400 transition-all" style="width: 8%" title="Gear & Equipment: 8% (₹38,800)"></div>
+            <div class="h-full bg-zinc-300 dark:bg-zinc-500 transition-all" style="width: 5%" title="Food & Travel: 5% (₹24,250)"></div>
+            <div class="h-full bg-zinc-200 dark:bg-zinc-600 transition-all" style="width: 5.5%" title="Marketing: 5.5% (₹26,675)"></div>
         </div>
 
-        <!-- Legend Pills -->
-        <div class="flex flex-wrap items-center justify-between gap-3 text-xs pt-1">
-            <div class="flex items-center gap-1.5">
-                <span class="w-2.5 h-2.5 rounded-sm bg-zinc-950 dark:bg-zinc-100 inline-block"></span>
-                <span class="text-zinc-700 dark:text-zinc-300 font-semibold">Net Profit (66.5%)</span>
+        <!-- Legend Pills with icons and amounts -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 text-xs pt-1">
+            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800">
+                <span class="w-2.5 h-2.5 rounded-sm bg-zinc-900 dark:bg-zinc-100 shrink-0"></span>
+                <div class="min-w-0 flex-1">
+                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100 truncate">Net Profit Margin</div>
+                    <div class="text-[11px] font-bold text-zinc-800 dark:text-zinc-200 font-mono">66.5% · ₹322,600</div>
+                </div>
             </div>
-            <div class="flex items-center gap-1.5">
-                <span class="w-2.5 h-2.5 rounded-sm bg-zinc-600 inline-block"></span>
-                <span class="text-zinc-600 dark:text-zinc-400 font-medium">Rent & Ops (15%)</span>
+
+            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800">
+                <span class="w-2.5 h-2.5 rounded-sm bg-zinc-600 shrink-0"></span>
+                <div class="min-w-0 flex-1">
+                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100 truncate">Operating Rent</div>
+                    <div class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 font-mono">15.0% · ₹72,750</div>
+                </div>
             </div>
-            <div class="flex items-center gap-1.5">
-                <span class="w-2.5 h-2.5 rounded-sm bg-zinc-400 inline-block"></span>
-                <span class="text-zinc-600 dark:text-zinc-400 font-medium">Gear & Tech (8%)</span>
+
+            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800">
+                <span class="w-2.5 h-2.5 rounded-sm bg-zinc-400 shrink-0"></span>
+                <div class="min-w-0 flex-1">
+                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100 truncate">Gear & Equipment</div>
+                    <div class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 font-mono">8.0% · ₹38,800</div>
+                </div>
             </div>
-            <div class="flex items-center gap-1.5">
-                <span class="w-2.5 h-2.5 rounded-sm bg-zinc-300 dark:bg-zinc-500 inline-block"></span>
-                <span class="text-zinc-600 dark:text-zinc-400 font-medium">Food & Travel (5%)</span>
+
+            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800">
+                <span class="w-2.5 h-2.5 rounded-sm bg-zinc-300 dark:bg-zinc-500 shrink-0"></span>
+                <div class="min-w-0 flex-1">
+                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100 truncate">Food & Travel</div>
+                    <div class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 font-mono">5.0% · ₹24,250</div>
+                </div>
             </div>
-            <div class="flex items-center gap-1.5">
-                <span class="w-2.5 h-2.5 rounded-sm bg-zinc-200 dark:bg-zinc-600 inline-block"></span>
-                <span class="text-zinc-600 dark:text-zinc-400 font-medium">Marketing (5.5%)</span>
+
+            <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800">
+                <span class="w-2.5 h-2.5 rounded-sm bg-zinc-200 dark:bg-zinc-600 shrink-0"></span>
+                <div class="min-w-0 flex-1">
+                    <div class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100 truncate">Marketing</div>
+                    <div class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 font-mono">5.5% · ₹26,675</div>
+                </div>
             </div>
         </div>
     </div>
@@ -921,15 +934,95 @@ $financial_entries = function_exists( 'cora_db_get_ledger' ) ? cora_db_get_ledge
     };
 
     window.generateInstantReport = function(type) {
+        type = type || 'monthly';
         if (window.coraShowToast) window.coraShowToast('Generating ' + type.toUpperCase() + ' financial report...', 'info');
-        setTimeout(function() {
-            if (window.coraShowToast) window.coraShowToast(type.toUpperCase() + ' financial report generated & downloaded.', 'success');
-        }, 1000);
+
+        var ajaxUrl = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php';
+        var nonce   = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '';
+
+        var fd = new FormData();
+        fd.append('action', 'cora_generate_financial_report');
+        fd.append('security', nonce);
+        fd.append('nonce', nonce);
+        fd.append('report_type', type);
+
+        fetch(ajaxUrl, { method: 'POST', body: fd })
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+                if (res.success) {
+                    if (window.coraShowToast) window.coraShowToast(res.data.message || 'Report generated successfully.', 'success');
+                    var overlay = document.getElementById('cora-report-preview-overlay');
+                    if (!overlay) {
+                        overlay = document.createElement('div');
+                        overlay.id = 'cora-report-preview-overlay';
+                        overlay.className = 'fixed inset-0 z-[10000] bg-zinc-950/70 backdrop-blur-sm flex items-center justify-center p-4';
+                        overlay.innerHTML = `
+                            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+                                <div class="p-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-800/40">
+                                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                        Financial Report Summary
+                                    </h3>
+                                    <button type="button" onclick="document.getElementById('cora-report-preview-overlay').classList.add('hidden')" class="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    </button>
+                                </div>
+                                <div id="cora-report-preview-content" class="p-5 overflow-y-auto flex-1 text-xs"></div>
+                                <div class="p-3.5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/40 flex items-center justify-end gap-2">
+                                    <button type="button" onclick="window.print()" class="px-3 py-1.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-semibold text-xs rounded-lg hover:bg-zinc-800 transition-colors">Print Report</button>
+                                    <button type="button" onclick="document.getElementById('cora-report-preview-overlay').classList.add('hidden')" class="px-3 py-1.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold text-xs rounded-lg hover:bg-zinc-50 transition-colors">Close</button>
+                                </div>
+                            </div>
+                        `;
+                        document.body.appendChild(overlay);
+                    }
+                    var content = document.getElementById('cora-report-preview-content');
+                    if (content) content.innerHTML = res.data.report_html || '';
+                    overlay.classList.remove('hidden');
+                } else {
+                    if (window.coraShowToast) window.coraShowToast(res.data?.message || 'Report generation failed.', 'error');
+                }
+            })
+            .catch(function() {
+                if (window.coraShowToast) window.coraShowToast('Network error while generating report.', 'error');
+            });
     };
 
     window.saveFinancialSchedule = function() {
-        if (window.coraShowToast) window.coraShowToast('Automated financial report delivery schedule saved.', 'success');
-        closeFinancialReportsDrawer();
+        var ajaxUrl = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php';
+        var nonce   = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '';
+
+        var daily    = (document.getElementById('sched-daily') || document.getElementById('fin-sched-daily'))?.checked ? '1' : '0';
+        var weekly   = (document.getElementById('sched-weekly') || document.getElementById('fin-sched-weekly'))?.checked ? '1' : '0';
+        var monthly  = (document.getElementById('sched-monthly') || document.getElementById('fin-sched-monthly'))?.checked ? '1' : '0';
+        var quarterly= (document.getElementById('sched-quarterly') || document.getElementById('fin-sched-quarterly'))?.checked ? '1' : '0';
+        var email    = (document.getElementById('sched-recipient-email') || document.getElementById('fin-sched-email'))?.value || '';
+
+        if (window.coraShowToast) window.coraShowToast('Saving financial report schedule...', 'info');
+
+        var fd = new FormData();
+        fd.append('action', 'cora_save_financial_schedule');
+        fd.append('security', nonce);
+        fd.append('nonce', nonce);
+        fd.append('daily_digest', daily);
+        fd.append('weekly_summary', weekly);
+        fd.append('monthly_pnl', monthly);
+        fd.append('quarterly_tax', quarterly);
+        fd.append('recipient_email', email);
+
+        fetch(ajaxUrl, { method: 'POST', body: fd })
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+                if (res.success) {
+                    if (window.coraShowToast) window.coraShowToast(res.data.message || 'Report schedule settings saved successfully.', 'success');
+                    closeFinancialReportsDrawer();
+                } else {
+                    if (window.coraShowToast) window.coraShowToast(res.data?.message || 'Failed to save schedule.', 'error');
+                }
+            })
+            .catch(function() {
+                if (window.coraShowToast) window.coraShowToast('Network error while saving schedule.', 'error');
+            });
     };
 
     window.filterLedgerByPill = function(category) {

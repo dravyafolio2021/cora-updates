@@ -243,6 +243,130 @@ jQuery(document).ready(function($) {
         window.coraCloseAllDrawers();
     };
 
+    // Automated Financial Reports & Schedule Management Drawer Handlers
+    window.openFinancialReportsDrawer = function() {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        }
+        $('#cora-financial-reports-drawer').removeClass('collapsed');
+        $('#cora-drawer-backdrop').removeClass('hidden');
+    };
+
+    window.closeFinancialReportsDrawer = function() {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        } else {
+            $('#cora-financial-reports-drawer').addClass('collapsed');
+            $('#cora-drawer-backdrop').addClass('hidden');
+        }
+    };
+
+    window.generateInstantReport = function(type) {
+        type = type || 'monthly';
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast('Generating ' + type.toUpperCase() + ' financial report...', 'info');
+        }
+
+        const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php');
+        const nonce   = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+
+        $.post(ajaxUrl, {
+            action: 'cora_generate_financial_report',
+            security: nonce,
+            nonce: nonce,
+            report_type: type
+        }, function(response) {
+            if (response.success) {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast(response.data.message || 'Report generated successfully.', 'success');
+                }
+
+                let $overlay = $('#cora-report-preview-overlay');
+                if (!$overlay.length) {
+                    $overlay = $(`
+                        <div id="cora-report-preview-overlay" class="fixed inset-0 z-[10000] bg-zinc-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+                            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+                                <div class="p-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-800/40">
+                                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        </svg>
+                                        Financial Report Summary
+                                    </h3>
+                                    <button type="button" onclick="$('#cora-report-preview-overlay').addClass('hidden')" class="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    </button>
+                                </div>
+                                <div id="cora-report-preview-content" class="p-5 overflow-y-auto flex-1 text-xs"></div>
+                                <div class="p-3.5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/40 flex items-center justify-end gap-2">
+                                    <button type="button" onclick="window.print()" class="px-3 py-1.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-semibold text-xs rounded-lg hover:bg-zinc-800 transition-colors">Print Report</button>
+                                    <button type="button" onclick="$('#cora-report-preview-overlay').addClass('hidden')" class="px-3 py-1.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold text-xs rounded-lg hover:bg-zinc-50 transition-colors">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                    $('body').append($overlay);
+                }
+
+                $('#cora-report-preview-content').html(response.data.report_html || '');
+                $overlay.removeClass('hidden');
+            } else {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast(response.data?.message || 'Failed to generate financial report.', 'error');
+                }
+            }
+        }).fail(function() {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Network error while generating report.', 'error');
+            }
+        });
+    };
+
+    window.saveFinancialSchedule = function(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php');
+        const nonce   = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+
+        const dailyDigest   = ($('#sched-daily, #fin-sched-daily').is(':checked')) ? '1' : '0';
+        const weeklySummary = ($('#sched-weekly, #fin-sched-weekly').is(':checked')) ? '1' : '0';
+        const monthlyPnl    = ($('#sched-monthly, #fin-sched-monthly').is(':checked')) ? '1' : '0';
+        const quarterlyTax  = ($('#sched-quarterly, #fin-sched-quarterly').is(':checked')) ? '1' : '0';
+        const recipientEmail = $('#sched-recipient-email, #fin-sched-email').val() || '';
+
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast('Saving financial report schedule preferences...', 'info');
+        }
+
+        $.post(ajaxUrl, {
+            action: 'cora_save_financial_schedule',
+            security: nonce,
+            nonce: nonce,
+            daily_digest: dailyDigest,
+            weekly_summary: weeklySummary,
+            monthly_pnl: monthlyPnl,
+            quarterly_tax: quarterlyTax,
+            recipient_email: recipientEmail
+        }, function(response) {
+            if (response.success) {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast(response.data.message || 'Report schedule settings saved successfully.', 'success');
+                }
+                window.closeFinancialReportsDrawer();
+            } else {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast(response.data?.message || 'Failed to save financial schedule settings.', 'error');
+                }
+            }
+        }).fail(function() {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Network error while saving schedule preferences.', 'error');
+            }
+        });
+    };
+
     // 2. Add Booking Dialog Drawer Controllers
     window.coraToggleAddShowingDrawer = function(show) {
         const drawer = $('#cora-add-showing-drawer');
