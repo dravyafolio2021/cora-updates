@@ -2594,27 +2594,25 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
         window.coraSwitchIndustryMode = function(industry) {
             if (!industry) return;
-            try {
-                sessionStorage.removeItem('cora_preview_role');
-            } catch(e) {}
-            document.cookie = "cora_workspace_industry=" + encodeURIComponent(industry) + "; path=/; max-age=31536000";
+            try { sessionStorage.removeItem('cora_preview_role'); } catch(e) {}
 
-            const url = new URL(window.location.href);
+            // Set cookie directly — no AJAX dependency
+            var expires = new Date(Date.now() + 365*24*60*60*1000).toUTCString();
+            document.cookie = "cora_workspace_industry=" + encodeURIComponent(industry) + "; path=/; expires=" + expires;
+
+            // Also fire AJAX to update DB (best-effort, not blocking)
+            var ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
+            var nonce = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : '';
+            if (typeof $ !== 'undefined') {
+                $.post(ajaxUrl, { action: 'cora_switch_industry_mode', security: nonce, industry: industry });
+            }
+
+            // Build URL with industry param and navigate immediately
+            var url = new URL(window.location.href);
             url.searchParams.set('industry', industry);
-
-            const ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
-            const nonce = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : '';
-
-            $.post(ajaxUrl, {
-                action: 'cora_switch_industry_mode',
-                security: nonce,
-                industry: industry
-            }).always(function() {
-                if (window.coraShowToast) window.coraShowToast('Switching to ' + (industry === 'photography_studio' ? 'Studio' : 'Real Estate') + ' mode...', 'success');
-                setTimeout(function() {
-                    window.location.href = url.toString();
-                }, 100);
-            });
+            var label = (industry === 'photography_studio') ? 'Studio' : 'Real Estate';
+            if (window.coraShowToast) window.coraShowToast('Switching to ' + label + ' mode...', 'success');
+            setTimeout(function() { window.location.href = url.toString(); }, 200);
         };
     </script>
 
