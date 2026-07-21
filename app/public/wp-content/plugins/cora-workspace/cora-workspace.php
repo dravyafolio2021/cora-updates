@@ -19828,7 +19828,7 @@ add_action( 'init', 'cora_attendance_cron_initializer' );
  * AJAX Handler: Run SEO Analysis
  */
 function cora_ajax_run_seo_analysis() {
-    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
     if ( ! current_user_can( 'edit_posts' ) ) wp_send_json_error( 'Unauthorized.' );
 
     $content = isset( $_POST['content'] ) ? wp_unslash( $_POST['content'] ) : '';
@@ -19864,7 +19864,7 @@ add_action( 'wp_ajax_cora_run_seo_analysis', 'cora_ajax_run_seo_analysis' );
  * AJAX Handler: Save Article SEO Meta
  */
 function cora_ajax_save_article_seo_meta() {
-    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
     if ( ! current_user_can( 'edit_posts' ) ) wp_send_json_error( 'Unauthorized.' );
 
     $post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
@@ -19880,7 +19880,7 @@ add_action( 'wp_ajax_cora_save_article_seo_meta', 'cora_ajax_save_article_seo_me
  * AJAX Handler: Save GEO Signals
  */
 function cora_ajax_save_geo_signals() {
-    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
     if ( ! current_user_can( 'edit_posts' ) ) wp_send_json_error( 'Unauthorized.' );
 
     $post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
@@ -19896,7 +19896,7 @@ add_action( 'wp_ajax_cora_save_geo_signals', 'cora_ajax_save_geo_signals' );
  * AJAX Handler: Create/Update Article
  */
 function cora_ajax_create_article() {
-    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
     if ( ! current_user_can( 'edit_posts' ) ) wp_send_json_error( 'Unauthorized.' );
 
     $post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;

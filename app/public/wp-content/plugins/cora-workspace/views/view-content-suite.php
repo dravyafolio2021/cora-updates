@@ -121,8 +121,8 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         </select>
     </div>
 
-    <div class="border border-zinc-200 rounded-lg overflow-hidden bg-white shadow-sm">
-        <table class="w-full text-left border-collapse">
+    <div class="border border-zinc-200 rounded-lg overflow-hidden bg-white shadow-sm overflow-x-auto">
+        <table class="w-full text-left border-collapse" style="min-width:900px">
             <thead>
                 <tr class="bg-zinc-50 border-b border-zinc-200 text-xs font-bold text-zinc-500 uppercase tracking-wider">
                     <th class="py-3 px-4 w-10"><input type="checkbox" class="rounded border-zinc-300" id="ct-select-all" onclick="toggleSelectAll(this)"></th>
@@ -613,9 +613,17 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     </div>
     <div class="p-6 overflow-y-auto flex-1 space-y-6">
         <input type="hidden" id="seo-drawer-article-id">
-        <div class="flex justify-between items-center">
-            <button class="bg-zinc-900 text-white px-3 py-1.5 rounded text-sm font-bold" onclick="runSEOAnalysis(document.getElementById('seo-drawer-article-id').value)">Run Analysis</button>
-            <div class="w-16 h-16 rounded-full border-4 border-zinc-900 flex items-center justify-center text-xl font-bold" id="seo-drawer-score">--</div>
+        <div class="flex items-center gap-4 p-4 bg-zinc-50 rounded-xl border border-zinc-200">
+            <button class="bg-zinc-900 hover:bg-zinc-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors" onclick="runSEOAnalysis(document.getElementById('seo-drawer-article-id').value)">Run Analysis</button>
+            <div class="ml-auto flex flex-col items-center">
+                <svg width="64" height="64" viewBox="0 0 64 64" class="-rotate-90">
+                    <circle cx="32" cy="32" r="28" stroke="#e4e4e7" stroke-width="8" fill="none"/>
+                    <circle cx="32" cy="32" r="28" stroke="#18181b" stroke-width="8" fill="none"
+                        stroke-dasharray="175.9" stroke-dashoffset="175.9"
+                        id="seo-ring-progress" stroke-linecap="round" style="transition: stroke-dashoffset 0.6s ease"/>
+                </svg>
+                <span id="seo-drawer-score" class="text-xl font-bold text-zinc-900 -mt-14 relative z-10">--</span>
+            </div>
         </div>
 
         <div id="seo-drawer-results" class="space-y-4">
@@ -727,6 +735,25 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         const drawer = document.getElementById('cora-seo-detail-drawer');
         if(drawer) { drawer.classList.remove('translate-x-full', 'collapsed'); }
         showBackdrop();
+
+        // Load existing SEO meta for this article
+        $.post(coraREWPData.ajaxUrl, {
+            action: 'cora_get_article',
+            nonce: coraREWPData.ajaxNonce,
+            post_id: articleId
+        }, function(r) {
+            if(r.success) {
+                const d = r.data;
+                const kwEl = document.getElementById('seo-focus-keyword');
+                const ttEl = document.getElementById('seo-meta-title');
+                const descEl = document.getElementById('seo-meta-description');
+                const slugEl = document.getElementById('seo-slug');
+                if(kwEl) kwEl.value = d.keyword || '';
+                if(ttEl) { ttEl.value = d.meta_title || d.title || ''; document.getElementById('seo-title-count').innerText = ttEl.value.length + '/60'; }
+                if(descEl) { descEl.value = d.description || ''; document.getElementById('seo-desc-count').innerText = descEl.value.length + '/160'; }
+                if(slugEl && d.slug) slugEl.value = d.slug;
+            }
+        });
     };
     
     window.openSEOAnalysis = function(articleId, title) {
@@ -828,6 +855,12 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             if(response.success) {
                 const data = response.data;
                 document.getElementById('seo-drawer-score').innerText = data.overall_score;
+                const ring = document.getElementById('seo-ring-progress');
+                if(ring) {
+                    const pct = Math.min(100, Math.max(0, data.overall_score || 0));
+                    const circ = 175.9;
+                    ring.style.strokeDashoffset = circ - (pct / 100) * circ;
+                }
                 
                 let html = '<div class="space-y-2">';
                 
