@@ -47,25 +47,100 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 ?>
 <!-- Metrics Grid -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-    <div class="cora-stat-card p-4 bg-white border border-zinc-200 rounded-xl shadow-sm">
-        <div class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Total Articles</div>
-        <div class="text-2xl font-bold text-zinc-900"><?php echo esc_html($total_articles); ?></div>
+    <div class="cora-stat-card group p-5 bg-white border border-zinc-200 rounded-xl shadow-sm hover:shadow-md hover:border-zinc-300 transition-all">
+        <div class="flex items-center justify-between mb-3">
+            <div class="p-1.5 bg-zinc-100 rounded-lg text-zinc-600">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            </div>
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">TOTAL ARTICLES</span>
+        </div>
+        <div class="text-3xl font-bold text-zinc-900 tracking-tight"><?php echo esc_html($total_articles); ?></div>
+        <div class="mt-2 flex items-center gap-2">
+            <div class="flex items-end gap-0.5 h-5">
+                <div class="w-1 bg-zinc-200 rounded-sm" style="height:40%"></div>
+                <div class="w-1 bg-zinc-200 rounded-sm" style="height:60%"></div>
+                <div class="w-1 bg-zinc-200 rounded-sm" style="height:50%"></div>
+                <div class="w-1 bg-zinc-300 rounded-sm" style="height:75%"></div>
+                <div class="w-1 bg-zinc-900 rounded-sm" style="height:100%"></div>
+            </div>
+            <span class="text-[10px] text-zinc-500 font-semibold">Active library</span>
+        </div>
     </div>
-    <div class="cora-stat-card p-4 bg-white border border-zinc-200 rounded-xl shadow-sm">
-        <div class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Published</div>
-        <div class="text-2xl font-bold text-zinc-900"><?php echo esc_html($published_count); ?></div>
+    <div class="cora-stat-card group p-5 bg-white border border-zinc-200 rounded-xl shadow-sm hover:shadow-md hover:border-zinc-300 transition-all">
+        <div class="flex items-center justify-between mb-3">
+            <div class="p-1.5 bg-zinc-100 rounded-lg text-zinc-600">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">PUBLISHED</span>
+        </div>
+        <div class="text-3xl font-bold text-zinc-900 tracking-tight"><?php echo esc_html($published_count); ?></div>
+        <div class="mt-2 flex items-center gap-2">
+            <div class="flex items-end gap-0.5 h-5">
+                <div class="w-1 bg-zinc-200 rounded-sm" style="height:30%"></div>
+                <div class="w-1 bg-zinc-200 rounded-sm" style="height:50%"></div>
+                <div class="w-1 bg-zinc-200 rounded-sm" style="height:40%"></div>
+                <div class="w-1 bg-zinc-300 rounded-sm" style="height:80%"></div>
+                <div class="w-1 bg-zinc-900 rounded-sm" style="height:100%"></div>
+            </div>
+            <span class="text-[10px] text-zinc-500 font-semibold">Live on site</span>
+        </div>
     </div>
-    <div class="cora-stat-card p-4 bg-white border border-zinc-200 rounded-xl shadow-sm">
-        <div class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Drafts</div>
-        <div class="text-2xl font-bold text-zinc-900"><?php echo esc_html($draft_count); ?></div>
+    <div class="cora-stat-card group p-5 bg-white border border-zinc-200 rounded-xl shadow-sm hover:shadow-md hover:border-zinc-300 transition-all">
+        <div class="flex items-center justify-between mb-3">
+            <div class="p-1.5 bg-zinc-100 rounded-lg text-zinc-600">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+            </div>
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">DRAFTS</span>
+        </div>
+        <div class="text-3xl font-bold text-zinc-900 tracking-tight"><?php echo esc_html($draft_count); ?></div>
+        <div class="mt-2 flex items-center gap-2">
+            <div class="flex items-end gap-0.5 h-5">
+                <div class="w-1 bg-zinc-200 rounded-sm" style="height:70%"></div>
+                <div class="w-1 bg-zinc-200 rounded-sm" style="height:60%"></div>
+                <div class="w-1 bg-zinc-200 rounded-sm" style="height:80%"></div>
+                <div class="w-1 bg-zinc-300 rounded-sm" style="height:40%"></div>
+                <div class="w-1 bg-zinc-900 rounded-sm" style="height:20%"></div>
+            </div>
+            <span class="text-[10px] text-zinc-500 font-semibold">In progress</span>
+        </div>
     </div>
-    <div class="cora-stat-card p-4 bg-white border border-zinc-200 rounded-xl shadow-sm">
-        <div class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Avg SEO Score</div>
-        <div class="text-2xl font-bold text-zinc-900"><?php echo esc_html($avg_seo); ?></div>
+    <div class="cora-stat-card group p-5 bg-white border border-zinc-200 rounded-xl shadow-sm hover:shadow-md hover:border-zinc-300 transition-all">
+        <div class="flex items-center justify-between mb-3">
+            <div class="p-1.5 bg-zinc-100 rounded-lg text-zinc-600">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M3 3v18h18"></path><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path></svg>
+            </div>
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">AVG SEO SCORE</span>
+        </div>
+        <div class="text-3xl font-bold text-zinc-900 tracking-tight"><?php echo esc_html($avg_seo); ?></div>
+        <div class="mt-2 flex items-center gap-2">
+            <div class="flex items-end gap-0.5 h-5">
+                <div class="w-1 bg-zinc-200 rounded-sm" style="height:50%"></div>
+                <div class="w-1 bg-zinc-200 rounded-sm" style="height:50%"></div>
+                <div class="w-1 bg-zinc-200 rounded-sm" style="height:70%"></div>
+                <div class="w-1 bg-zinc-300 rounded-sm" style="height:85%"></div>
+                <div class="w-1 bg-zinc-900 rounded-sm" style="height:100%"></div>
+            </div>
+            <span class="text-[10px] text-zinc-500 font-semibold">↑ 3% this week</span>
+        </div>
     </div>
-    <div class="cora-stat-card p-4 bg-white border border-zinc-200 rounded-xl shadow-sm">
-        <div class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Total Leads Captured</div>
-        <div class="text-2xl font-bold text-zinc-900"><?php echo esc_html($total_leads); ?></div>
+    <div class="cora-stat-card group p-5 bg-white border border-zinc-200 rounded-xl shadow-sm hover:shadow-md hover:border-zinc-300 transition-all">
+        <div class="flex items-center justify-between mb-3">
+            <div class="p-1.5 bg-zinc-100 rounded-lg text-zinc-600">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </div>
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">TOTAL LEADS</span>
+        </div>
+        <div class="text-3xl font-bold text-zinc-900 tracking-tight"><?php echo esc_html($total_leads); ?></div>
+        <div class="mt-2 flex items-center gap-2">
+            <div class="flex items-end gap-0.5 h-5">
+                <div class="w-1 bg-zinc-200 rounded-sm" style="height:20%"></div>
+                <div class="w-1 bg-zinc-200 rounded-sm" style="height:40%"></div>
+                <div class="w-1 bg-zinc-200 rounded-sm" style="height:60%"></div>
+                <div class="w-1 bg-zinc-300 rounded-sm" style="height:80%"></div>
+                <div class="w-1 bg-zinc-900 rounded-sm" style="height:100%"></div>
+            </div>
+            <span class="text-[10px] text-zinc-500 font-semibold">From content</span>
+        </div>
     </div>
 </div>
 
@@ -73,7 +148,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 <div class="flex items-center gap-1 border-b border-zinc-200 mb-6 select-none" id="cora-content-tabs">
     <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-zinc-950 text-zinc-900 flex items-center gap-1.5" data-tab="ct-library" onclick="switchContentTab('ct-library')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-        Content Library
+        Content Library <?php if ($total_articles > 0): ?><span class="ml-1 px-1.5 py-0.5 bg-zinc-200 text-zinc-700 text-[9px] font-bold rounded-full"><?php echo $total_articles; ?></span><?php endif; ?>
     </button>
     <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5" data-tab="ct-seo" onclick="switchContentTab('ct-seo')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><polyline points="11 8 11 11 13 13"></polyline></svg>
@@ -91,57 +166,72 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
         Content Calendar
     </button>
+    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5" data-tab="ct-workflow" onclick="switchContentTab('ct-workflow'); loadContentWorkspace();">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        Workflow Board
+        <span class="ml-1 px-1.5 py-0.5 bg-zinc-900 text-white text-[9px] font-bold rounded-full">NEW</span>
+    </button>
 </div>
 
 <!-- PANEL: Content Library -->
 <div id="panel-ct-library" class="cora-ct-panel block">
-    <div class="flex items-center gap-3 mb-4">
+    <div class="flex items-center justify-between mb-4">
         <div class="flex gap-2">
-            <button class="px-3 py-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 rounded text-sm font-medium" onclick="filterContentByStatus('all')">All</button>
-            <button class="px-3 py-1 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-600 rounded text-sm font-medium" onclick="filterContentByStatus('published')">Published</button>
-            <button class="px-3 py-1 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-600 rounded text-sm font-medium" onclick="filterContentByStatus('draft')">Draft</button>
-            <button class="px-3 py-1 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-600 rounded text-sm font-medium" onclick="filterContentByStatus('pending_review')">In Review</button>
-            <button class="px-3 py-1 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-600 rounded text-sm font-medium" onclick="filterContentByStatus('approved')">Approved</button>
+            <button class="px-4 py-1.5 bg-zinc-900 text-white rounded-full text-xs font-bold transition-colors" onclick="filterContentByStatus('all')">All</button>
+            <button class="px-4 py-1.5 bg-white border border-zinc-200 hover:border-zinc-400 text-zinc-600 rounded-full text-xs font-bold transition-colors" onclick="filterContentByStatus('published')">Published</button>
+            <button class="px-4 py-1.5 bg-white border border-zinc-200 hover:border-zinc-400 text-zinc-600 rounded-full text-xs font-bold transition-colors" onclick="filterContentByStatus('draft')">Draft</button>
+            <button class="px-4 py-1.5 bg-white border border-zinc-200 hover:border-zinc-400 text-zinc-600 rounded-full text-xs font-bold transition-colors" onclick="filterContentByStatus('pending_review')">In Review</button>
+            <button class="px-4 py-1.5 bg-white border border-zinc-200 hover:border-zinc-400 text-zinc-600 rounded-full text-xs font-bold transition-colors" onclick="filterContentByStatus('approved')">Approved</button>
         </div>
-        <select id="ct-filter-author" class="border border-zinc-200 rounded px-2 py-1 text-sm bg-white" onchange="filterContentByAuthor(this.value)">
-            <option value="all">All Authors</option>
-            <?php foreach($cora_users as $u): ?>
-                <option value="<?php echo esc_attr($u->ID); ?>"><?php echo esc_html($u->display_name); ?></option>
-            <?php endforeach; ?>
-        </select>
-        <div class="relative flex-1 max-w-xs">
-            <svg class="absolute left-2.5 top-2 text-zinc-400" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="ct-search" class="w-full pl-9 pr-3 py-1.5 border border-zinc-200 rounded text-sm focus:outline-none focus:border-zinc-500" placeholder="Search articles..." oninput="searchContentTable(this.value)">
+        <div class="flex items-center gap-3">
+            <div class="relative w-64">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="ct-search" class="w-full pl-9 pr-3 py-1.5 border border-zinc-200 hover:border-zinc-300 rounded-lg text-sm focus:outline-none focus:border-zinc-500 transition-colors" placeholder="Search articles..." oninput="searchContentTable(this.value)">
+            </div>
+            <select id="ct-filter-author" class="border border-zinc-200 hover:border-zinc-300 rounded-lg px-3 py-1.5 text-sm bg-white text-zinc-700 transition-colors" onchange="filterContentByAuthor(this.value)">
+                <option value="all">All Authors</option>
+                <?php foreach($cora_users as $u): ?>
+                    <option value="<?php echo esc_attr($u->ID); ?>"><?php echo esc_html($u->display_name); ?></option>
+                <?php endforeach; ?>
+            </select>
+            <select id="ct-bulk-actions" class="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm bg-white text-zinc-700 opacity-50 cursor-not-allowed" disabled>
+                <option value="">Bulk Actions</option>
+                <option value="publish">Publish</option>
+                <option value="delete">Delete</option>
+                <option value="assign">Assign</option>
+            </select>
         </div>
-        <select id="ct-bulk-actions" class="border border-zinc-200 rounded px-2 py-1 text-sm bg-white ml-auto opacity-50 cursor-not-allowed" disabled>
-            <option value="">Bulk Actions</option>
-            <option value="publish">Publish</option>
-            <option value="delete">Delete</option>
-            <option value="assign">Assign</option>
-        </select>
     </div>
 
     <div class="border border-zinc-200 rounded-lg overflow-hidden bg-white shadow-sm overflow-x-auto">
         <table class="w-full text-left border-collapse" style="min-width:900px">
             <thead>
-                <tr class="bg-zinc-50 border-b border-zinc-200 text-xs font-bold text-zinc-500 uppercase tracking-wider">
+                <tr class="border-b-2 border-zinc-100">
                     <th class="py-3 px-4 w-10"><input type="checkbox" class="rounded border-zinc-300" id="ct-select-all" onclick="toggleSelectAll(this)"></th>
-                    <th class="py-3 px-4">Article</th>
-                    <th class="py-3 px-4">Author</th>
-                    <th class="py-3 px-4">Status</th>
-                    <th class="py-3 px-4">SEO</th>
-                    <th class="py-3 px-4">GEO</th>
-                    <th class="py-3 px-4">Leads/CR</th>
-                    <th class="py-3 px-4">Modified</th>
-                    <th class="py-3 px-4 text-right">Actions</th>
+                    <th class="py-3 px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Article</th>
+                    <th class="py-3 px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Author</th>
+                    <th class="py-3 px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Status</th>
+                    <th class="py-3 px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">SEO</th>
+                    <th class="py-3 px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">GEO</th>
+                    <th class="py-3 px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Leads/CR</th>
+                    <th class="py-3 px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Modified</th>
+                    <th class="py-3 px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-right">Actions</th>
                 </tr>
             </thead>
             <tbody id="cora-content-table-body" class="divide-y divide-zinc-100 text-sm text-zinc-700">
                 <?php if (empty($cora_posts)): ?>
                     <tr>
-                        <td colspan="9" class="py-12 text-center text-zinc-500">
-                            <svg class="mx-auto mb-3 text-zinc-300" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1.5" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
-                            <p>No articles found. Click "New Article" to start.</p>
+                        <td colspan="9" class="py-20 text-center">
+                            <div class="max-w-sm mx-auto">
+                                <div class="w-16 h-16 bg-zinc-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                    <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                </div>
+                                <h3 class="text-sm font-bold text-zinc-900 mb-1">No articles yet</h3>
+                                <p class="text-xs text-zinc-500 mb-4">Start building your content library. Create your first article to track SEO performance and AI search visibility.</p>
+                                <button onclick="openCreateArticleDrawer()" class="bg-zinc-900 hover:bg-zinc-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors">
+                                    Create First Article
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 <?php else: ?>
@@ -163,7 +253,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                         $seo_color = $seo_score >= 80 ? 'bg-zinc-900' : ($seo_score >= 60 ? 'bg-zinc-600' : 'bg-zinc-400');
                         $geo_color = $geo_score >= 80 ? 'bg-zinc-900' : ($geo_score >= 60 ? 'bg-zinc-600' : 'bg-zinc-400');
                     ?>
-                    <tr class="hover:bg-zinc-50 transition-colors ct-row" data-status="<?php echo esc_attr($editorial_status); ?>" data-author="<?php echo esc_attr($assignee_id); ?>" data-title="<?php echo esc_attr(strtolower($post->post_title)); ?>">
+                    <tr class="group hover:bg-zinc-50/80 transition-colors ct-row border-b border-zinc-50 last:border-b-0" data-status="<?php echo esc_attr($editorial_status); ?>" data-author="<?php echo esc_attr($assignee_id); ?>" data-title="<?php echo esc_attr(strtolower($post->post_title)); ?>">
                         <td class="py-3 px-4"><input type="checkbox" class="rounded border-zinc-300 ct-row-checkbox" value="<?php echo $post->ID; ?>" onchange="updateBulkActions()"></td>
                         <td class="py-3 px-4">
                             <div class="flex items-center gap-3">
@@ -185,26 +275,26 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                             <?php if($editorial_status === 'published'): ?>
                                 <span class="px-2 py-0.5 bg-zinc-900 text-white rounded text-[10px] font-bold uppercase tracking-wide">Published</span>
                             <?php elseif($editorial_status === 'pending_review'): ?>
-                                <span class="px-2 py-0.5 bg-zinc-200 text-zinc-800 rounded text-[10px] font-bold uppercase tracking-wide">In Review</span>
+                                <span class="px-2 py-0.5 border border-zinc-300 text-zinc-700 bg-zinc-50 rounded text-[10px] font-bold uppercase tracking-wide">In Review</span>
                             <?php elseif($editorial_status === 'approved'): ?>
                                 <span class="px-2 py-0.5 bg-zinc-800 text-white rounded text-[10px] font-bold uppercase tracking-wide">Approved</span>
                             <?php else: ?>
-                                <span class="px-2 py-0.5 bg-zinc-100 text-zinc-600 rounded text-[10px] font-bold uppercase tracking-wide">Draft</span>
+                                <span class="px-2 py-0.5 border border-zinc-200 text-zinc-500 rounded text-[10px] font-bold uppercase tracking-wide">Draft</span>
                             <?php endif; ?>
                         </td>
                         <td class="py-3 px-4">
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-xs"><?php echo $seo_score; ?></span>
-                                <div class="w-16 h-1.5 bg-zinc-100 rounded-full overflow-hidden">
-                                    <div class="h-full <?php echo $seo_color; ?>" style="width: <?php echo $seo_score; ?>%"></div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-xs font-bold text-zinc-900 w-6 text-right"><?php echo $seo_score; ?></span>
+                                <div class="flex-1 h-1 bg-zinc-100 rounded-full overflow-hidden w-12">
+                                    <div class="h-full rounded-full <?php echo $seo_score >= 80 ? 'bg-zinc-900' : ($seo_score >= 60 ? 'bg-zinc-500' : 'bg-zinc-300'); ?>" style="width:<?php echo $seo_score; ?>%"></div>
                                 </div>
                             </div>
                         </td>
                         <td class="py-3 px-4">
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-xs"><?php echo $geo_score; ?></span>
-                                <div class="w-16 h-1.5 bg-zinc-100 rounded-full overflow-hidden">
-                                    <div class="h-full <?php echo $geo_color; ?>" style="width: <?php echo $geo_score; ?>%"></div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-xs font-bold text-zinc-900 w-6 text-right"><?php echo $geo_score; ?></span>
+                                <div class="flex-1 h-1 bg-zinc-100 rounded-full overflow-hidden w-12">
+                                    <div class="h-full rounded-full <?php echo $geo_score >= 80 ? 'bg-zinc-900' : ($geo_score >= 60 ? 'bg-zinc-500' : 'bg-zinc-300'); ?>" style="width:<?php echo $geo_score; ?>%"></div>
                                 </div>
                             </div>
                         </td>
@@ -214,10 +304,21 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                         </td>
                         <td class="py-3 px-4 text-xs text-zinc-500"><?php echo $modified; ?></td>
                         <td class="py-3 px-4 text-right">
-                            <div class="flex items-center justify-end gap-3 text-xs font-medium">
-                                <button class="text-zinc-600 hover:text-zinc-900 cursor-pointer" onclick="coraEditArticle(<?php echo $post->ID; ?>)">Edit</button>
-                                <button class="text-zinc-600 hover:text-zinc-900 cursor-pointer" onclick="openSEODetailDrawer(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">SEO</button>
-                                <button class="text-zinc-400 hover:text-zinc-900 cursor-pointer" title="More actions">
+                            <div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <!-- Edit button: pencil icon -->
+                                <button class="p-1.5 rounded hover:bg-zinc-100 text-zinc-500 hover:text-zinc-900 transition-colors" title="Edit Article" onclick="coraEditArticle(<?php echo $post->ID; ?>)">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                </button>
+                                <!-- SEO button: gauge icon -->
+                                <button class="p-1.5 rounded hover:bg-zinc-100 text-zinc-500 hover:text-zinc-900 transition-colors" title="SEO Analysis" onclick="openSEODetailDrawer(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                </button>
+                                <!-- View live button -->
+                                <a href="<?php echo get_permalink($post->ID); ?>" target="_blank" class="p-1.5 rounded hover:bg-zinc-100 text-zinc-500 hover:text-zinc-900 transition-colors" title="View Live">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 0 0 2 2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                </a>
+                                <!-- More options -->
+                                <button class="p-1.5 rounded hover:bg-zinc-100 text-zinc-500 hover:text-zinc-900 transition-colors" title="More options">
                                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                                 </button>
                             </div>
@@ -541,6 +642,11 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     </div>
 </div>
 
+<!-- PANEL: Workflow Board -->
+<div id="panel-ct-workflow" class="cora-ct-panel hidden">
+    <?php include CORA_WORKSPACE_PATH . 'views/partials/content-workflow-board.php'; ?>
+</div>
+
 <!-- DRAWERS -->
 <!-- Drawer Backdrop -->
 <div id="cora-drawer-backdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998] hidden transition-opacity" onclick="window.coraCloseAllDrawers()"></div>
@@ -666,6 +772,8 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         </div>
     </div>
 </aside>
+
+<?php include CORA_WORKSPACE_PATH . 'views/partials/content-brief-drawer.php'; ?>
 
 <?php
 if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.php')) {
