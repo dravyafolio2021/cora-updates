@@ -356,13 +356,13 @@ $financial_entries = function_exists( 'cora_db_get_ledger' ) ? cora_db_get_ledge
         <div id="tab-fin-ledger" class="cora-fin-tab-content space-y-4">
             <!-- Expense Category Quick Pills -->
             <div class="flex items-center gap-1.5 overflow-x-auto pb-1 select-none">
-                <button type="button" onclick="filterLedgerByPill('all')" class="fin-pill-filter px-3 py-1 rounded-full text-xs font-semibold bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 transition-all cursor-pointer shrink-0">All Entries</button>
-                <button type="button" onclick="filterLedgerByPill('Food & Travel')" class="fin-pill-filter px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 transition-all cursor-pointer shrink-0">Food & Travel</button>
-                <button type="button" onclick="filterLedgerByPill('Gear')" class="fin-pill-filter px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 transition-all cursor-pointer shrink-0">Gear & Tech</button>
-                <button type="button" onclick="filterLedgerByPill('Studio Ops')" class="fin-pill-filter px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 transition-all cursor-pointer shrink-0">Studio & Ops</button>
-                <button type="button" onclick="filterLedgerByPill('Marketing')" class="fin-pill-filter px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 transition-all cursor-pointer shrink-0">Marketing</button>
-                <button type="button" onclick="filterLedgerByPill('Commission Split')" class="fin-pill-filter px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 transition-all cursor-pointer shrink-0">Payouts & Splits</button>
-                <button type="button" onclick="filterLedgerByPill('Retainer Fee')" class="fin-pill-filter px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 transition-all cursor-pointer shrink-0">Retainers & Inflows</button>
+                <button type="button" onclick="filterLedgerByPill('all', this)" class="fin-pill-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border border-zinc-900 dark:border-zinc-100 transition-all cursor-pointer shrink-0 shadow-xs">All Entries</button>
+                <button type="button" onclick="filterLedgerByPill('Food & Travel', this)" class="fin-pill-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 border border-zinc-200 dark:border-zinc-700 transition-all cursor-pointer shrink-0">Food & Travel</button>
+                <button type="button" onclick="filterLedgerByPill('Gear & Tech', this)" class="fin-pill-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 border border-zinc-200 dark:border-zinc-700 transition-all cursor-pointer shrink-0">Gear & Tech</button>
+                <button type="button" onclick="filterLedgerByPill('Studio Ops & Rent', this)" class="fin-pill-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 border border-zinc-200 dark:border-zinc-700 transition-all cursor-pointer shrink-0">Studio Ops & Rent</button>
+                <button type="button" onclick="filterLedgerByPill('Marketing & Listings', this)" class="fin-pill-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 border border-zinc-200 dark:border-zinc-700 transition-all cursor-pointer shrink-0">Marketing & Listings</button>
+                <button type="button" onclick="filterLedgerByPill('Agent / Crew Payouts', this)" class="fin-pill-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 border border-zinc-200 dark:border-zinc-700 transition-all cursor-pointer shrink-0">Agent / Crew Payouts</button>
+                <button type="button" onclick="filterLedgerByPill('Inflows & Retainers', this)" class="fin-pill-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 border border-zinc-200 dark:border-zinc-700 transition-all cursor-pointer shrink-0">Inflows & Retainers</button>
             </div>
 
             <!-- Filter Bar -->
@@ -644,14 +644,36 @@ $financial_entries = function_exists( 'cora_db_get_ledger' ) ? cora_db_get_ledge
         <div>
             <label for="ledger-entry-category" class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Category</label>
             <select id="ledger-entry-category" required class="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-2 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-400">
-                <option value="Retainer Fee">Retainer Fee</option>
-                <option value="Commission Split">Commission Split</option>
-                <option value="Gear Rental">Gear Rental</option>
+                <option value="Food & Travel">Food & Travel</option>
+                <option value="Gear & Equipment">Gear & Equipment</option>
+                <option value="Studio Ops & Rent">Studio Ops & Rent</option>
                 <option value="Software & SaaS">Software & SaaS</option>
-                <option value="Day Rate">Day Rate</option>
-                <option value="Studio Ops">Studio Ops</option>
-                <option value="Marketing">Marketing</option>
+                <option value="Marketing & Advertising">Marketing & Advertising</option>
+                <option value="Agent & Crew Payouts">Agent & Crew Payouts</option>
+                <option value="Client Retainer Fee" selected>Client Retainer Fee</option>
+                <option value="Deal Commission Inflow">Deal Commission Inflow</option>
             </select>
+        </div>
+
+        <div>
+            <label for="ledger-entry-payment-method" class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Payment Method</label>
+            <select id="ledger-entry-payment-method" required class="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-2 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-400">
+                <option value="Bank Transfer" selected>Bank Transfer</option>
+                <option value="Corporate Credit Card">Corporate Credit Card</option>
+                <option value="UPI / Digital Wallet">UPI / Digital Wallet</option>
+                <option value="Cash">Cash</option>
+            </select>
+        </div>
+
+        <div class="flex items-center justify-between p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-800">
+            <div>
+                <span class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">Tax Deductible Expense</span>
+                <span class="block text-[11px] text-zinc-500 dark:text-zinc-400">Mark entry for automated quarterly tax audit deduction.</span>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                <input type="checkbox" id="ledger-entry-tax-deductible" class="sr-only peer">
+                <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:after:border-zinc-600 peer-checked:bg-zinc-900 dark:peer-checked:bg-zinc-100"></div>
+            </label>
         </div>
 
         <div>
@@ -1434,8 +1456,26 @@ $financial_entries = function_exists( 'cora_db_get_ledger' ) ? cora_db_get_ledge
     };
 
     // 6.6 FILTER FUNCTIONS FOR TABLES
+    window.currentLedgerPill = 'all';
+
+    window.filterLedgerByPill = function(catKey, btnEl) {
+        window.currentLedgerPill = catKey || 'all';
+        
+        var pills = document.querySelectorAll('.fin-pill-filter');
+        pills.forEach(function(pill) {
+            pill.className = 'fin-pill-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 border border-zinc-200 dark:border-zinc-700 transition-all cursor-pointer shrink-0';
+        });
+
+        if (btnEl) {
+            btnEl.className = 'fin-pill-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border border-zinc-900 dark:border-zinc-100 transition-all cursor-pointer shrink-0 shadow-xs';
+        }
+
+        filterLedgerTable();
+    };
+
     window.filterLedgerTable = function() {
         var cat = document.getElementById('fin-ledger-category-filter')?.value.toLowerCase() || 'all';
+        var pill = window.currentLedgerPill ? window.currentLedgerPill.toLowerCase() : 'all';
         var type = document.getElementById('fin-ledger-type-filter')?.value.toLowerCase() || 'all';
         var query = document.getElementById('fin-ledger-search')?.value.toLowerCase() || '';
 
@@ -1443,10 +1483,22 @@ $financial_entries = function_exists( 'cora_db_get_ledger' ) ? cora_db_get_ledge
         rows.forEach(function(row) {
             var text = row.innerText.toLowerCase();
             var matchesCat = (cat === 'all') || text.includes(cat);
+
+            var matchesPill = true;
+            if (pill !== 'all') {
+                if (pill.includes('food')) matchesPill = text.includes('food') || text.includes('travel');
+                else if (pill.includes('gear')) matchesPill = text.includes('gear') || text.includes('tech') || text.includes('equipment');
+                else if (pill.includes('studio')) matchesPill = text.includes('ops') || text.includes('rent') || text.includes('studio');
+                else if (pill.includes('marketing')) matchesPill = text.includes('marketing') || text.includes('advertising') || text.includes('listing');
+                else if (pill.includes('agent') || pill.includes('crew') || pill.includes('payout')) matchesPill = text.includes('payout') || text.includes('split') || text.includes('commission') || text.includes('day rate');
+                else if (pill.includes('inflow') || pill.includes('retainer')) matchesPill = text.includes('inflow') || text.includes('retainer') || text.includes('income');
+                else matchesPill = text.includes(pill);
+            }
+
             var matchesType = (type === 'all') || text.includes(type);
             var matchesQuery = !query || text.includes(query);
 
-            if (matchesCat && matchesType && matchesQuery) {
+            if (matchesCat && matchesPill && matchesType && matchesQuery) {
                 row.style.display = '';
             } else {
                 row.style.display = 'none';
