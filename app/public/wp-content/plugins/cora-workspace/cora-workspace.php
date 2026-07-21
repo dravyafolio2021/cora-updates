@@ -19091,6 +19091,704 @@ add_action( 'wp_ajax_cora_super_switch_back', 'cora_ajax_super_switch_back' );
 add_action( 'wp_ajax_nopriv_cora_super_switch_back', 'cora_ajax_super_switch_back' );
 
 /**
+ * ══════════════════════════════════════════════════════════════════════════════
+ * FINANCIAL BACKEND AJAX HANDLERS & FINANCIAL INTELLIGENCE ENDPOINTS
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+
+/**
+ * Helper: Parse timestamp bounds based on period filter
+ */
+function cora_financial_get_period_bounds( $period, $start_date = '', $end_date = '' ) {
+    $start_ts = null;
+    $end_ts   = null;
+    $now      = time();
+
+    switch ( strtolower( trim( $period ) ) ) {
+        case 'today':
+            $start_ts = strtotime( 'today 00:00:00' );
+            $end_ts   = strtotime( 'today 23:59:59' );
+            break;
+        case 'this_week':
+            $start_ts = strtotime( 'monday this week 00:00:00' );
+            $end_ts   = strtotime( 'sunday this week 23:59:59' );
+            break;
+        case 'this_month':
+            $start_ts = strtotime( date( 'Y-m-01 00:00:00', $now ) );
+            $end_ts   = strtotime( date( 'Y-m-t 23:59:59', $now ) );
+            break;
+        case 'this_quarter':
+            $current_month = intval( date( 'n', $now ) );
+            $quarter_start_month = ( floor( ( $current_month - 1 ) / 3 ) * 3 ) + 1;
+            $quarter_start_str = date( 'Y', $now ) . '-' . sprintf( '%02d', $quarter_start_month ) . '-01 00:00:00';
+            $quarter_end_month = $quarter_start_month + 2;
+            $quarter_end_days = cal_days_in_month( CAL_GREGORIAN, $quarter_end_month, intval( date( 'Y', $now ) ) );
+            $quarter_end_str = date( 'Y', $now ) . '-' . sprintf( '%02d', $quarter_end_month ) . '-' . sprintf( '%02d', $quarter_end_days ) . ' 23:59:59';
+            $start_ts = strtotime( $quarter_start_str );
+            $end_ts   = strtotime( $quarter_end_str );
+            break;
+        case 'ytd':
+            $start_ts = strtotime( date( 'Y-01-01 00:00:00', $now ) );
+            $end_ts   = strtotime( date( 'Y-12-31 23:59:59', $now ) );
+            break;
+        case 'custom':
+            if ( ! empty( $start_date ) ) {
+                $start_ts = strtotime( $start_date . ' 00:00:00' );
+            }
+            if ( ! empty( $end_date ) ) {
+                $end_ts = strtotime( $end_date . ' 23:59:59' );
+            }
+            break;
+        case 'all':
+        default:
+            $start_ts = null;
+            $end_ts   = null;
+            break;
+    }
+
+    return array(
+        'start' => $start_ts,
+        'end'   => $end_ts,
+    );
+}
+
+/**
+ * Helper: Extract unix timestamp from financial item array
+ */
+function cora_financial_extract_item_timestamp( $item ) {
+    if ( isset( $item['timestamp'] ) && is_numeric( $item['timestamp'] ) && intval( $item['timestamp'] ) > 0 ) {
+        return intval( $item['timestamp'] );
+    }
+    if ( ! empty( $item['created_at'] ) ) {
+        $ts = strtotime( $item['created_at'] );
+        if ( $ts ) return $ts;
+    }
+    if ( ! empty( $item['date'] ) ) {
+        $ts = strtotime( $item['date'] );
+        if ( $ts ) return $ts;
+    }
+    if ( ! empty( $item['due_date'] ) ) {
+        $ts = strtotime( $item['due_date'] );
+        if ( $ts ) return $ts;
+    }
+    return 0;
+}
+
+/**
+ * AJAX Endpoint: cora_ajax_get_financial_data
+ */
+function cora_ajax_get_financial_data() {
+    $nonce = '';
+    if ( isset( $_REQUEST['security'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['security'] );
+    } elseif ( isset( $_REQUEST['nonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+    } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+    }
+    if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+    }
+
+    $period         = isset( $_REQUEST['period'] ) ? sanitize_text_field( $_REQUEST['period'] ) : 'all';
+    $start_date     = isset( $_REQUEST['start_date'] ) ? sanitize_text_field( $_REQUEST['start_date'] ) : '';
+    $end_date       = isset( $_REQUEST['end_date'] ) ? sanitize_text_field( $_REQUEST['end_date'] ) : '';
+    $industry_scope = isset( $_REQUEST['industry_scope'] ) ? sanitize_text_field( $_REQUEST['industry_scope'] ) : 'all';
+    $status         = isset( $_REQUEST['status'] ) ? sanitize_text_field( $_REQUEST['status'] ) : '';
+
+    $ledger   = get_option( 'cora_financial_ledger', array() );
+    $invoices = get_option( 'cora_invoices', array() );
+    $payouts  = get_option( 'cora_payouts', array() );
+
+    if ( ! is_array( $ledger ) )   $ledger   = array();
+    if ( ! is_array( $invoices ) ) $invoices = array();
+    if ( ! is_array( $payouts ) )  $payouts  = array();
+
+    $bounds   = cora_financial_get_period_bounds( $period, $start_date, $end_date );
+    $start_ts = $bounds['start'];
+    $end_ts   = $bounds['end'];
+
+    // Filter Ledger Entries
+    $filtered_ledger = array();
+    $total_inflow    = 0.0;
+    $total_outflow   = 0.0;
+
+    foreach ( $ledger as $entry ) {
+        if ( ! is_array( $entry ) ) continue;
+
+        $ts = cora_financial_extract_item_timestamp( $entry );
+        if ( null !== $start_ts && $ts > 0 && $ts < $start_ts ) continue;
+        if ( null !== $end_ts   && $ts > 0 && $ts > $end_ts )   continue;
+
+        $ind = strtolower( trim( $entry['industry'] ?? $entry['industry_scope'] ?? '' ) );
+        if ( $industry_scope !== 'all' && ! empty( $ind ) && $ind !== 'all' && $ind !== strtolower( $industry_scope ) ) {
+            continue;
+        }
+
+        $entry_status = strtolower( trim( $entry['payment_status'] ?? $entry['status'] ?? '' ) );
+        if ( ! empty( $status ) && $status !== 'all' && $entry_status !== strtolower( $status ) ) {
+            continue;
+        }
+
+        $filtered_ledger[] = $entry;
+
+        $amt  = floatval( $entry['amount'] ?? 0 );
+        $type = strtolower( trim( $entry['type'] ?? 'inflow' ) );
+        if ( $type === 'inflow' ) {
+            $total_inflow += $amt;
+        } elseif ( $type === 'outflow' ) {
+            $total_outflow += $amt;
+        }
+    }
+
+    // Filter Invoices
+    $filtered_invoices = array();
+    $pending_dues      = 0.0;
+
+    foreach ( $invoices as $inv ) {
+        if ( ! is_array( $inv ) ) continue;
+
+        $ts = cora_financial_extract_item_timestamp( $inv );
+        if ( null !== $start_ts && $ts > 0 && $ts < $start_ts ) continue;
+        if ( null !== $end_ts   && $ts > 0 && $ts > $end_ts )   continue;
+
+        $ind = strtolower( trim( $inv['industry'] ?? '' ) );
+        if ( $industry_scope !== 'all' && ! empty( $ind ) && $ind !== 'all' && $ind !== strtolower( $industry_scope ) ) {
+            continue;
+        }
+
+        $inv_status = strtolower( trim( $inv['status'] ?? 'unpaid' ) );
+        if ( ! empty( $status ) && $status !== 'all' && $inv_status !== strtolower( $status ) ) {
+            continue;
+        }
+
+        $filtered_invoices[] = $inv;
+
+        if ( in_array( $inv_status, array( 'unpaid', 'pending', 'partially_paid', 'draft' ) ) ) {
+            $due = floatval( $inv['due_balance'] ?? $inv['total_amount'] ?? 0 );
+            $pending_dues += $due;
+        }
+    }
+
+    // Filter Payouts
+    $filtered_payouts = array();
+    foreach ( $payouts as $pay ) {
+        if ( ! is_array( $pay ) ) continue;
+
+        $ts = cora_financial_extract_item_timestamp( $pay );
+        if ( null !== $start_ts && $ts > 0 && $ts < $start_ts ) continue;
+        if ( null !== $end_ts   && $ts > 0 && $ts > $end_ts )   continue;
+
+        $ind = strtolower( trim( $pay['industry'] ?? '' ) );
+        if ( $industry_scope !== 'all' && ! empty( $ind ) && $ind !== 'all' && $ind !== strtolower( $industry_scope ) ) {
+            continue;
+        }
+
+        $pay_status = strtolower( trim( $pay['status'] ?? 'processed' ) );
+        if ( ! empty( $status ) && $status !== 'all' && $pay_status !== strtolower( $status ) ) {
+            continue;
+        }
+
+        $filtered_payouts[] = $pay;
+    }
+
+    $net_profit = $total_inflow - $total_outflow;
+    $margin_pct = $total_inflow > 0 ? round( ( $net_profit / $total_inflow ) * 100, 2 ) : 0;
+
+    // Generate Chart Data (Monthly/Weekly Breakdown)
+    $chart_buckets = array();
+    foreach ( $filtered_ledger as $entry ) {
+        $ts = cora_financial_extract_item_timestamp( $entry );
+        $bucket_key = $ts > 0 ? date( 'M Y', $ts ) : 'Other';
+        if ( ! isset( $chart_buckets[ $bucket_key ] ) ) {
+            $chart_buckets[ $bucket_key ] = array( 'inflow' => 0.0, 'outflow' => 0.0 );
+        }
+        $amt  = floatval( $entry['amount'] ?? 0 );
+        $type = strtolower( trim( $entry['type'] ?? 'inflow' ) );
+        if ( $type === 'inflow' ) {
+            $chart_buckets[ $bucket_key ]['inflow'] += $amt;
+        } else {
+            $chart_buckets[ $bucket_key ]['outflow'] += $amt;
+        }
+    }
+
+    $chart_labels  = array();
+    $chart_inflow  = array();
+    $chart_outflow = array();
+    $chart_net     = array();
+
+    foreach ( $chart_buckets as $lbl => $vals ) {
+        $chart_labels[]  = $lbl;
+        $chart_inflow[]  = round( $vals['inflow'], 2 );
+        $chart_outflow[] = round( $vals['outflow'], 2 );
+        $chart_net[]     = round( $vals['inflow'] - $vals['outflow'], 2 );
+    }
+
+    $chart_data = array(
+        'labels'  => $chart_labels,
+        'inflow'  => $chart_inflow,
+        'outflow' => $chart_outflow,
+        'net'     => $chart_net,
+    );
+
+    wp_send_json_success( array(
+        'kpi' => array(
+            'inflow'          => round( $total_inflow, 2 ),
+            'outflow'         => round( $total_outflow, 2 ),
+            'net_profit'      => round( $net_profit, 2 ),
+            'margin_pct'      => $margin_pct,
+            'pending_dues'    => round( $pending_dues, 2 ),
+            'currency_symbol' => '₹',
+        ),
+        'ledger'   => array_values( $filtered_ledger ),
+        'invoices' => array_values( $filtered_invoices ),
+        'payouts'  => array_values( $filtered_payouts ),
+        'chart'    => $chart_data,
+    ) );
+}
+add_action( 'wp_ajax_cora_ajax_get_financial_data', 'cora_ajax_get_financial_data' );
+add_action( 'wp_ajax_cora_get_financial_data', 'cora_ajax_get_financial_data' );
+add_action( 'wp_ajax_cora_fetch_financials', 'cora_ajax_get_financial_data' );
+
+
+/**
+ * AJAX Endpoint: cora_ajax_add_ledger_entry
+ */
+function cora_ajax_add_ledger_entry() {
+    $nonce = '';
+    if ( isset( $_REQUEST['security'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['security'] );
+    } elseif ( isset( $_REQUEST['nonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+    } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+    }
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+    }
+
+    $type           = isset( $_POST['type'] ) ? sanitize_text_field( $_POST['type'] ) : 'inflow';
+    $category       = isset( $_POST['category'] ) ? sanitize_text_field( $_POST['category'] ) : 'General';
+    $description    = isset( $_POST['description'] ) ? sanitize_text_field( $_POST['description'] ) : '';
+    $amount         = isset( $_POST['amount'] ) ? floatval( $_POST['amount'] ) : 0.0;
+    $payment_status = isset( $_POST['payment_status'] ) ? sanitize_text_field( $_POST['payment_status'] ) : 'paid';
+    $property_tag   = isset( $_POST['property_tag'] ) ? sanitize_text_field( $_POST['property_tag'] ) : '';
+    $client_name    = isset( $_POST['client_name'] ) ? sanitize_text_field( $_POST['client_name'] ) : '';
+    $industry       = isset( $_POST['industry'] ) ? sanitize_text_field( $_POST['industry'] ) : 'real_estate';
+
+    $current_user = wp_get_current_user();
+
+    $new_entry = array(
+        'id'             => uniqid( 'led_' ),
+        'timestamp'      => time(),
+        'date'           => date( 'Y-m-d H:i:s' ),
+        'user_id'        => get_current_user_id(),
+        'user_name'      => $current_user->exists() ? $current_user->display_name : 'System',
+        'type'           => $type,
+        'category'       => $category,
+        'description'    => $description,
+        'amount'         => $amount,
+        'payment_status' => $payment_status,
+        'property_tag'   => $property_tag,
+        'client_name'    => $client_name,
+        'industry'       => $industry,
+    );
+
+    $ledger = get_option( 'cora_financial_ledger', array() );
+    if ( ! is_array( $ledger ) ) {
+        $ledger = array();
+    }
+
+    array_unshift( $ledger, $new_entry );
+    update_option( 'cora_financial_ledger', $ledger );
+
+    wp_send_json_success( array(
+        'message' => 'Ledger entry logged successfully.',
+        'entry'   => $new_entry,
+    ) );
+}
+add_action( 'wp_ajax_cora_ajax_add_ledger_entry', 'cora_ajax_add_ledger_entry' );
+add_action( 'wp_ajax_cora_add_ledger_entry', 'cora_ajax_add_ledger_entry' );
+
+
+/**
+ * AJAX Endpoint: cora_ajax_create_invoice
+ */
+function cora_ajax_create_invoice() {
+    $nonce = '';
+    if ( isset( $_REQUEST['security'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['security'] );
+    } elseif ( isset( $_REQUEST['nonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+    } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+    }
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+    }
+
+    $client_name  = isset( $_POST['client_name'] ) ? sanitize_text_field( $_POST['client_name'] ) : '';
+    $client_email = isset( $_POST['client_email'] ) ? sanitize_email( $_POST['client_email'] ) : '';
+    $package_name = isset( $_POST['package_name'] ) ? sanitize_text_field( $_POST['package_name'] ) : '';
+    $total_amount = isset( $_POST['total_amount'] ) ? floatval( $_POST['total_amount'] ) : 0.0;
+    $deposit_pct  = isset( $_POST['deposit_pct'] ) ? floatval( $_POST['deposit_pct'] ) : 0.0;
+    $tax_pct      = isset( $_POST['tax_pct'] ) ? floatval( $_POST['tax_pct'] ) : 0.0;
+    $due_date     = isset( $_POST['due_date'] ) ? sanitize_text_field( $_POST['due_date'] ) : date( 'Y-m-d', strtotime( '+14 days' ) );
+    $industry     = isset( $_POST['industry'] ) ? sanitize_text_field( $_POST['industry'] ) : 'real_estate';
+
+    $line_items_raw = $_POST['line_items'] ?? '[]';
+    if ( is_string( $line_items_raw ) ) {
+        $line_items = json_decode( wp_unslash( $line_items_raw ), true );
+    } else {
+        $line_items = (array) $line_items_raw;
+    }
+    if ( ! is_array( $line_items ) ) {
+        $line_items = array();
+    }
+
+    $deposit_amount = $total_amount * ( $deposit_pct / 100.0 );
+    $due_balance    = $total_amount;
+
+    $invoice_number = 'INV-' . date( 'Ymd' ) . '-' . rand( 1000, 9999 );
+    $share_token    = bin2hex( random_bytes( 16 ) );
+
+    $new_invoice = array(
+        'id'             => uniqid( 'inv_' ),
+        'invoice_number' => $invoice_number,
+        'share_token'    => $share_token,
+        'client_name'    => $client_name,
+        'client_email'   => $client_email,
+        'package_name'   => $package_name,
+        'total_amount'   => $total_amount,
+        'deposit_pct'    => $deposit_pct,
+        'deposit_amount' => round( $deposit_amount, 2 ),
+        'tax_pct'        => $tax_pct,
+        'due_date'       => $due_date,
+        'due_balance'    => round( $due_balance, 2 ),
+        'line_items'     => $line_items,
+        'status'         => 'unpaid',
+        'industry'       => $industry,
+        'timestamp'      => time(),
+        'created_at'     => date( 'Y-m-d H:i:s' ),
+    );
+
+    $invoices = get_option( 'cora_invoices', array() );
+    if ( ! is_array( $invoices ) ) {
+        $invoices = array();
+    }
+
+    array_unshift( $invoices, $new_invoice );
+    update_option( 'cora_invoices', $invoices );
+
+    wp_send_json_success( array(
+        'message' => 'Invoice created successfully.',
+        'invoice' => $new_invoice,
+    ) );
+}
+add_action( 'wp_ajax_cora_ajax_create_invoice', 'cora_ajax_create_invoice' );
+add_action( 'wp_ajax_cora_create_invoice', 'cora_ajax_create_invoice' );
+
+
+/**
+ * AJAX Endpoint: cora_ajax_process_payout
+ */
+function cora_ajax_process_payout() {
+    $nonce = '';
+    if ( isset( $_REQUEST['security'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['security'] );
+    } elseif ( isset( $_REQUEST['nonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+    } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+    }
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+    }
+
+    $recipient_name = isset( $_POST['recipient_name'] ) ? sanitize_text_field( $_POST['recipient_name'] ) : '';
+    $recipient_role = isset( $_POST['recipient_role'] ) ? sanitize_text_field( $_POST['recipient_role'] ) : 'agent';
+    $gross_amount   = isset( $_POST['gross_amount'] ) ? floatval( $_POST['gross_amount'] ) : 0.0;
+    $split_pct      = isset( $_POST['split_pct'] ) ? floatval( $_POST['split_pct'] ) : 100.0;
+    $tax_pct        = isset( $_POST['tax_pct'] ) ? floatval( $_POST['tax_pct'] ) : 0.0;
+    $notes          = isset( $_POST['notes'] ) ? sanitize_text_field( $_POST['notes'] ) : '';
+    $industry       = isset( $_POST['industry'] ) ? sanitize_text_field( $_POST['industry'] ) : 'studio';
+
+    $split_amount  = $gross_amount * ( $split_pct / 100.0 );
+    $tax_deduction = $split_amount * ( $tax_pct / 100.0 );
+    $net_payout    = $split_amount - $tax_deduction;
+
+    $payout_number = 'PAY-' . date( 'Ymd' ) . '-' . rand( 1000, 9999 );
+
+    $new_payout = array(
+        'id'             => uniqid( 'pay_' ),
+        'payout_number'  => $payout_number,
+        'recipient_name' => $recipient_name,
+        'recipient_role' => $recipient_role,
+        'gross_amount'   => $gross_amount,
+        'split_pct'      => $split_pct,
+        'split_amount'   => round( $split_amount, 2 ),
+        'tax_pct'        => $tax_pct,
+        'tax_deduction'  => round( $tax_deduction, 2 ),
+        'net_payout'     => round( $net_payout, 2 ),
+        'notes'          => $notes,
+        'status'         => 'processed',
+        'industry'       => $industry,
+        'timestamp'      => time(),
+        'created_at'     => date( 'Y-m-d H:i:s' ),
+    );
+
+    $payouts = get_option( 'cora_payouts', array() );
+    if ( ! is_array( $payouts ) ) {
+        $payouts = array();
+    }
+    array_unshift( $payouts, $new_payout );
+    update_option( 'cora_payouts', $payouts );
+
+    // Log Outflow Entry in Financial Ledger
+    $current_user = wp_get_current_user();
+
+    $ledger_entry = array(
+        'id'             => uniqid( 'led_' ),
+        'timestamp'      => time(),
+        'date'           => date( 'Y-m-d H:i:s' ),
+        'user_id'        => get_current_user_id(),
+        'user_name'      => $current_user->exists() ? $current_user->display_name : 'System',
+        'type'           => 'outflow',
+        'category'       => 'Payout',
+        'description'    => 'Payout to ' . $recipient_name . ' (' . ucfirst( $recipient_role ) . ')' . ( ! empty( $notes ) ? ' - ' . $notes : '' ),
+        'amount'         => round( $net_payout, 2 ),
+        'payment_status' => 'paid',
+        'property_tag'   => '',
+        'client_name'    => $recipient_name,
+        'industry'       => $industry,
+    );
+
+    $ledger = get_option( 'cora_financial_ledger', array() );
+    if ( ! is_array( $ledger ) ) {
+        $ledger = array();
+    }
+    array_unshift( $ledger, $ledger_entry );
+    update_option( 'cora_financial_ledger', $ledger );
+
+    wp_send_json_success( array(
+        'message' => 'Payout processed successfully.',
+        'payout'  => $new_payout,
+    ) );
+}
+add_action( 'wp_ajax_cora_ajax_process_payout', 'cora_ajax_process_payout' );
+add_action( 'wp_ajax_cora_process_payout', 'cora_ajax_process_payout' );
+
+
+/**
+ * AJAX Endpoint: cora_ajax_generate_financial_pdf_report
+ */
+function cora_ajax_generate_financial_pdf_report() {
+    $nonce = '';
+    if ( isset( $_REQUEST['security'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['security'] );
+    } elseif ( isset( $_REQUEST['nonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+    } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+    }
+    if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+    }
+
+    $period         = isset( $_REQUEST['period'] ) ? sanitize_text_field( $_REQUEST['period'] ) : 'all';
+    $start_date     = isset( $_REQUEST['start_date'] ) ? sanitize_text_field( $_REQUEST['start_date'] ) : '';
+    $end_date       = isset( $_REQUEST['end_date'] ) ? sanitize_text_field( $_REQUEST['end_date'] ) : '';
+    $industry_scope = isset( $_REQUEST['industry_scope'] ) ? sanitize_text_field( $_REQUEST['industry_scope'] ) : 'all';
+
+    $ledger   = get_option( 'cora_financial_ledger', array() );
+    $invoices = get_option( 'cora_invoices', array() );
+    $payouts  = get_option( 'cora_payouts', array() );
+
+    if ( ! is_array( $ledger ) )   $ledger   = array();
+    if ( ! is_array( $invoices ) ) $invoices = array();
+    if ( ! is_array( $payouts ) )  $payouts  = array();
+
+    $bounds   = cora_financial_get_period_bounds( $period, $start_date, $end_date );
+    $start_ts = $bounds['start'];
+    $end_ts   = $bounds['end'];
+
+    $filtered_ledger = array();
+    $total_inflow    = 0.0;
+    $total_outflow   = 0.0;
+
+    foreach ( $ledger as $entry ) {
+        if ( ! is_array( $entry ) ) continue;
+        $ts = cora_financial_extract_item_timestamp( $entry );
+        if ( null !== $start_ts && $ts > 0 && $ts < $start_ts ) continue;
+        if ( null !== $end_ts   && $ts > 0 && $ts > $end_ts )   continue;
+
+        $ind = strtolower( trim( $entry['industry'] ?? $entry['industry_scope'] ?? '' ) );
+        if ( $industry_scope !== 'all' && ! empty( $ind ) && $ind !== 'all' && $ind !== strtolower( $industry_scope ) ) {
+            continue;
+        }
+
+        $filtered_ledger[] = $entry;
+
+        $amt  = floatval( $entry['amount'] ?? 0 );
+        $type = strtolower( trim( $entry['type'] ?? 'inflow' ) );
+        if ( $type === 'inflow' ) {
+            $total_inflow += $amt;
+        } elseif ( $type === 'outflow' ) {
+            $total_outflow += $amt;
+        }
+    }
+
+    $filtered_invoices = array();
+    $pending_dues      = 0.0;
+    foreach ( $invoices as $inv ) {
+        if ( ! is_array( $inv ) ) continue;
+        $ts = cora_financial_extract_item_timestamp( $inv );
+        if ( null !== $start_ts && $ts > 0 && $ts < $start_ts ) continue;
+        if ( null !== $end_ts   && $ts > 0 && $ts > $end_ts )   continue;
+
+        $ind = strtolower( trim( $inv['industry'] ?? '' ) );
+        if ( $industry_scope !== 'all' && ! empty( $ind ) && $ind !== 'all' && $ind !== strtolower( $industry_scope ) ) {
+            continue;
+        }
+
+        $filtered_invoices[] = $inv;
+        $inv_status = strtolower( trim( $inv['status'] ?? 'unpaid' ) );
+        if ( in_array( $inv_status, array( 'unpaid', 'pending', 'partially_paid', 'draft' ) ) ) {
+            $pending_dues += floatval( $inv['due_balance'] ?? $inv['total_amount'] ?? 0 );
+        }
+    }
+
+    $filtered_payouts = array();
+    foreach ( $payouts as $pay ) {
+        if ( ! is_array( $pay ) ) continue;
+        $ts = cora_financial_extract_item_timestamp( $pay );
+        if ( null !== $start_ts && $ts > 0 && $ts < $start_ts ) continue;
+        if ( null !== $end_ts   && $ts > 0 && $ts > $end_ts )   continue;
+
+        $ind = strtolower( trim( $pay['industry'] ?? '' ) );
+        if ( $industry_scope !== 'all' && ! empty( $ind ) && $ind !== 'all' && $ind !== strtolower( $industry_scope ) ) {
+            continue;
+        }
+
+        $filtered_payouts[] = $pay;
+    }
+
+    $net_profit = $total_inflow - $total_outflow;
+    $margin_pct = $total_inflow > 0 ? round( ( $net_profit / $total_inflow ) * 100, 2 ) : 0;
+
+    // Generate CSV Output String
+    $csv_lines   = array();
+    $csv_lines[] = '"ID","Date","Type","Category","Description","Client","Amount","Status","Industry"';
+
+    foreach ( $filtered_ledger as $entry ) {
+        $csv_lines[] = sprintf(
+            '"%s","%s","%s","%s","%s","%s","%s","%s","%s"',
+            addslashes( $entry['id'] ?? '' ),
+            addslashes( $entry['date'] ?? '' ),
+            addslashes( ucfirst( $entry['type'] ?? 'inflow' ) ),
+            addslashes( $entry['category'] ?? '' ),
+            addslashes( $entry['description'] ?? '' ),
+            addslashes( $entry['client_name'] ?? '' ),
+            number_format( floatval( $entry['amount'] ?? 0 ), 2, '.', '' ),
+            addslashes( ucfirst( $entry['payment_status'] ?? 'paid' ) ),
+            addslashes( $entry['industry'] ?? '' )
+        );
+    }
+    $csv_data = implode( "\n", $csv_lines );
+
+    // Generate Printable HTML Summary Output
+    ob_start();
+    ?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <title>Cora Financial Statement & Ledger Report</title>
+        <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #18181b; padding: 24px; max-width: 900px; margin: 0 auto; }
+            h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+            .subtitle { font-size: 12px; color: #71717a; margin-bottom: 20px; }
+            .kpi-grid { display: flex; gap: 16px; margin-bottom: 24px; }
+            .kpi-card { flex: 1; border: 1px solid #e4e4e7; border-radius: 8px; padding: 12px 16px; background: #fafafa; }
+            .kpi-title { font-size: 11px; text-transform: uppercase; color: #71717a; font-weight: 600; }
+            .kpi-value { font-size: 18px; font-weight: 700; margin-top: 4px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 12px; }
+            th, td { padding: 8px 12px; border-bottom: 1px solid #e4e4e7; text-align: left; }
+            th { background: #f4f4f5; font-weight: 600; text-transform: uppercase; font-size: 10px; color: #52525b; }
+            .text-right { text-align: right; }
+            @media print { body { padding: 0; } }
+        </style>
+    </head>
+    <body>
+        <h1>Cora Financial Statement Report</h1>
+        <div class="subtitle">Scope: <?php echo esc_html( ucfirst( $industry_scope ) ); ?> | Period: <?php echo esc_html( ucfirst( $period ) ); ?> | Generated: <?php echo esc_html( date( 'F j, Y H:i' ) ); ?></div>
+        
+        <div class="kpi-grid">
+            <div class="kpi-card"><div class="kpi-title">Gross Inflow</div><div class="kpi-value">₹<?php echo number_format( $total_inflow, 2 ); ?></div></div>
+            <div class="kpi-card"><div class="kpi-title">Gross Outflow</div><div class="kpi-value">₹<?php echo number_format( $total_outflow, 2 ); ?></div></div>
+            <div class="kpi-card"><div class="kpi-title">Net Profit</div><div class="kpi-value">₹<?php echo number_format( $net_profit, 2 ); ?></div></div>
+            <div class="kpi-card"><div class="kpi-title">Margin %</div><div class="kpi-value"><?php echo $margin_pct; ?>%</div></div>
+        </div>
+
+        <h3>Ledger Transactions</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Client</th>
+                    <th class="text-right">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ( ! empty( $filtered_ledger ) ) : ?>
+                    <?php foreach ( $filtered_ledger as $row ) : ?>
+                        <tr>
+                            <td><?php echo esc_html( $row['date'] ?? '' ); ?></td>
+                            <td><?php echo esc_html( ucfirst( $row['type'] ?? '' ) ); ?></td>
+                            <td><?php echo esc_html( $row['category'] ?? '' ); ?></td>
+                            <td><?php echo esc_html( $row['description'] ?? '' ); ?></td>
+                            <td><?php echo esc_html( $row['client_name'] ?? '' ); ?></td>
+                            <td class="text-right">₹<?php echo number_format( floatval( $row['amount'] ?? 0 ), 2 ); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else : ?>
+                    <tr><td colspan="6">No ledger transactions found in this period.</td></tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </body>
+    </html>
+    <?php
+    $html_printable = ob_get_clean();
+
+    wp_send_json_success( array(
+        'message'        => 'Financial report generated successfully.',
+        'report_title'   => 'Cora Financial Statement Report',
+        'period'         => $period,
+        'industry_scope' => $industry_scope,
+        'generated_at'   => date( 'Y-m-d H:i:s' ),
+        'summary'        => array(
+            'inflow'          => round( $total_inflow, 2 ),
+            'outflow'         => round( $total_outflow, 2 ),
+            'net_profit'      => round( $net_profit, 2 ),
+            'margin_pct'      => $margin_pct,
+            'pending_dues'    => round( $pending_dues, 2 ),
+            'currency_symbol' => '₹',
+        ),
+        'ledger'         => array_values( $filtered_ledger ),
+        'invoices'       => array_values( $filtered_invoices ),
+        'payouts'        => array_values( $filtered_payouts ),
+        'csv_data'       => $csv_data,
+        'html_printable' => $html_printable,
+    ) );
+}
+add_action( 'wp_ajax_cora_ajax_generate_financial_pdf_report', 'cora_ajax_generate_financial_pdf_report' );
+add_action( 'wp_ajax_cora_generate_financial_pdf_report', 'cora_ajax_generate_financial_pdf_report' );
+
+/**
  * Initializes and schedules daily attendance cron reminders & admin summary reports.
  */
 function cora_attendance_cron_initializer() {
@@ -19125,3 +19823,111 @@ function cora_attendance_cron_initializer() {
     }
 }
 add_action( 'init', 'cora_attendance_cron_initializer' );
+
+/**
+ * AJAX Handler: Run SEO Analysis
+ */
+function cora_ajax_run_seo_analysis() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! current_user_can( 'edit_posts' ) ) wp_send_json_error( 'Unauthorized.' );
+
+    $content = isset( $_POST['content'] ) ? wp_unslash( $_POST['content'] ) : '';
+    
+    // Simulate SEO Analysis
+    $word_count = str_word_count( strip_tags( $content ) );
+    
+    $checks = array();
+    $score = 100;
+    
+    if ( $word_count < 300 ) {
+        $checks[] = array( 'status' => 'fail', 'text' => 'Content is less than 300 words.' );
+        $score -= 20;
+    } else {
+        $checks[] = array( 'status' => 'pass', 'text' => 'Good word count (' . $word_count . ' words).' );
+    }
+    
+    if ( strpos( $content, '<h2>' ) === false ) {
+        $checks[] = array( 'status' => 'fail', 'text' => 'No H2 tags found.' );
+        $score -= 10;
+    } else {
+        $checks[] = array( 'status' => 'pass', 'text' => 'H2 tags present.' );
+    }
+    
+    wp_send_json_success( array(
+        'score' => max(0, $score),
+        'checks' => $checks
+    ) );
+}
+add_action( 'wp_ajax_cora_run_seo_analysis', 'cora_ajax_run_seo_analysis' );
+
+/**
+ * AJAX Handler: Save Article SEO Meta
+ */
+function cora_ajax_save_article_seo_meta() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! current_user_can( 'edit_posts' ) ) wp_send_json_error( 'Unauthorized.' );
+
+    $post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
+    if ( !$post_id ) wp_send_json_error( 'Invalid post ID.' );
+
+    update_post_meta( $post_id, '_cora_seo_score', isset($_POST['score']) ? intval($_POST['score']) : 0 );
+    
+    wp_send_json_success( 'Saved successfully.' );
+}
+add_action( 'wp_ajax_cora_save_article_seo_meta', 'cora_ajax_save_article_seo_meta' );
+
+/**
+ * AJAX Handler: Save GEO Signals
+ */
+function cora_ajax_save_geo_signals() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! current_user_can( 'edit_posts' ) ) wp_send_json_error( 'Unauthorized.' );
+
+    $post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
+    if ( !$post_id ) wp_send_json_error( 'Invalid post ID.' );
+
+    update_post_meta( $post_id, '_cora_geo_signals', isset($_POST['signals']) ? wp_unslash($_POST['signals']) : '' );
+    
+    wp_send_json_success( 'Saved successfully.' );
+}
+add_action( 'wp_ajax_cora_save_geo_signals', 'cora_ajax_save_geo_signals' );
+
+/**
+ * AJAX Handler: Create/Update Article
+ */
+function cora_ajax_create_article() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! current_user_can( 'edit_posts' ) ) wp_send_json_error( 'Unauthorized.' );
+
+    $post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
+    $title = isset( $_POST['title'] ) ? sanitize_text_field( $_POST['title'] ) : 'Untitled';
+    $content = isset( $_POST['content'] ) ? wp_kses_post( wp_unslash($_POST['content']) ) : '';
+    $status = isset( $_POST['status'] ) ? sanitize_text_field( $_POST['status'] ) : 'draft';
+
+    $post_data = array(
+        'post_title' => $title,
+        'post_content' => $content,
+        'post_status' => $status,
+        'post_type' => 'post'
+    );
+
+    if ( $post_id > 0 ) {
+        $post_data['ID'] = $post_id;
+        $result = wp_update_post( $post_data, true );
+    } else {
+        $result = wp_insert_post( $post_data, true );
+        $post_id = $result;
+    }
+
+    if ( is_wp_error( $result ) ) {
+        wp_send_json_error( $result->get_error_message() );
+    }
+
+    // Save editorial status if provided
+    if ( isset($_POST['editorial_status']) ) {
+        update_post_meta( $post_id, '_cora_editorial_status', sanitize_text_field($_POST['editorial_status']) );
+    }
+
+    wp_send_json_success( array( 'post_id' => $post_id, 'message' => 'Saved successfully.' ) );
+}
+add_action( 'wp_ajax_cora_create_article', 'cora_ajax_create_article' );
