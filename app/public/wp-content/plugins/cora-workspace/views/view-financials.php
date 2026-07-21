@@ -37,7 +37,7 @@ $financial_entries = function_exists( 'cora_db_get_ledger' ) ? cora_db_get_ledge
         <div class="flex items-center gap-2 shrink-0 relative">
             <!-- Floating Popover Action Menu Button -->
             <div class="relative">
-                <button type="button" onclick="toggleFinancialActionMenu()" class="px-3.5 py-2 bg-zinc-950 hover:bg-black dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-xs active:scale-95">
+                <button type="button" onclick="toggleFinancialActionMenu(event)" class="px-3.5 py-2 bg-zinc-950 hover:bg-black dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-xs active:scale-95">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     <span>+ New Action</span>
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -921,10 +921,29 @@ $financial_entries = function_exists( 'cora_db_get_ledger' ) ? cora_db_get_ledge
 <script>
 (function() {
     // 6.1 DRAWER CONTROLLERS
-    window.toggleFinancialActionMenu = function() {
+    window.toggleFinancialActionMenu = function(e) {
+        if (e && e.stopPropagation) e.stopPropagation();
         var pop = document.getElementById('cora-fin-action-popover');
         if (pop) pop.classList.toggle('hidden');
     };
+
+    // Close + New Action popover when clicking anywhere outside
+    document.addEventListener('click', function(e) {
+        var pop = document.getElementById('cora-fin-action-popover');
+        var btn = e.target.closest('button[onclick*="toggleFinancialActionMenu"]');
+        if (pop && !pop.classList.contains('hidden')) {
+            if (!pop.contains(e.target) && !btn) {
+                pop.classList.add('hidden');
+            }
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' || e.keyCode === 27) {
+            var pop = document.getElementById('cora-fin-action-popover');
+            if (pop) pop.classList.add('hidden');
+        }
+    });
 
     window.openFinancialReportsDrawer = function() {
         if (typeof window.coraCloseAllDrawers === 'function') {
