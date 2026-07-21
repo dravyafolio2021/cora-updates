@@ -969,13 +969,13 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 
                     <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-4 flex flex-col justify-between">
                         <div class="text-xs font-bold text-zinc-900">GEO AI Visibility</div>
-                        <div class="text-2xl font-bold text-zinc-900 mt-1" id="inline-geo-score">68%</div>
-                        <div class="text-[10px] text-zinc-500">Google AI & Perplexity Cited</div>
+                        <div class="text-2xl font-bold text-zinc-900 mt-1" id="inline-geo-score">--</div>
+                        <div class="text-[10px] text-zinc-500" id="inline-geo-label">Loading article data...</div>
                     </div>
 
                     <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-4 flex flex-col justify-between">
                         <div class="text-xs font-bold text-zinc-900">Focus Keyword Density</div>
-                        <div class="text-2xl font-bold text-zinc-900 mt-1" id="inline-kw-density">2.4%</div>
+                        <div class="text-2xl font-bold text-zinc-900 mt-1" id="inline-kw-density">--</div>
                         <div class="text-[10px] text-zinc-500 truncate" id="inline-kw-label">Target: Loading...</div>
                     </div>
                 </div>
@@ -1038,11 +1038,21 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 const descEl = document.getElementById('inline-meta-description');
                 const slugEl = document.getElementById('inline-slug');
                 const kwLbl = document.getElementById('inline-kw-label');
+                const geoEl = document.getElementById('inline-geo-score');
+                const geoLbl = document.getElementById('inline-geo-label');
+                const densEl = document.getElementById('inline-kw-density');
                 if(kwEl) kwEl.value = d.keyword || '';
                 if(kwLbl) kwLbl.innerHTML = 'Target: <strong>' + (d.keyword || 'Not set') + '</strong>';
                 if(ttEl) { ttEl.value = d.meta_title || d.title || ''; document.getElementById('inline-title-count').innerText = ttEl.value.length + '/60'; }
                 if(descEl) { descEl.value = d.description || ''; document.getElementById('inline-desc-count').innerText = descEl.value.length + '/160'; }
                 if(slugEl && d.slug) slugEl.value = d.slug;
+                // Update GEO score from real meta
+                const geoScore = d.geo_score || d.cora_geo_score || null;
+                if(geoEl) geoEl.textContent = geoScore ? geoScore + '%' : 'N/A';
+                if(geoLbl) geoLbl.textContent = geoScore ? 'AI Engine Visibility Score' : 'Run audit to calculate';
+                // Update keyword density from real meta
+                const density = d.kw_density || d.keyword_density || null;
+                if(densEl) densEl.textContent = density ? density + '%' : 'Run audit';
             }
         });
 

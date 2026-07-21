@@ -20081,6 +20081,7 @@ function cora_create_content_workflow_tables() {
         approver_id BIGINT UNSIGNED DEFAULT NULL,
         draft_due_date DATE DEFAULT NULL,
         publish_date DATE DEFAULT NULL,
+        thumbnail_url VARCHAR(500) DEFAULT NULL,
         seo_score TINYINT UNSIGNED DEFAULT 0,
         geo_score TINYINT UNSIGNED DEFAULT 0,
         created_by BIGINT UNSIGNED NOT NULL,
@@ -20091,6 +20092,12 @@ function cora_create_content_workflow_tables() {
         KEY writer_id (writer_id),
         KEY created_by (created_by)
     ) $charset_collate;");
+
+    // Migrate existing tables: add thumbnail_url if missing
+    $cols = $wpdb->get_col("DESCRIBE {$t1}");
+    if (!in_array('thumbnail_url', $cols)) {
+        $wpdb->query("ALTER TABLE {$t1} ADD COLUMN thumbnail_url VARCHAR(500) DEFAULT NULL AFTER publish_date");
+    }
 
     $wpdb->query("CREATE TABLE IF NOT EXISTS {$t2} (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
