@@ -1178,12 +1178,17 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                     <div>
                         <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">SEO & AI Audit Workspace</div>
                         <h2 class="text-lg font-bold text-zinc-900 leading-snug">${escJsHtml(title)}</h2>
-                        <div class="text-xs text-zinc-500 mt-1 flex items-center gap-3">
+                        <div class="text-xs text-zinc-500 mt-1 flex items-center gap-3 flex-wrap">
                             <span>Article ID #${articleId}</span>
                             <span>&bull;</span>
                             <span id="inline-word-count">Word Count: --</span>
                             <span>&bull;</span>
                             <span id="inline-last-analyzed">Last Analyzed: --</span>
+                            <span>&bull;</span>
+                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                Google Cloud PageSpeed API Active (Hey Cora)
+                            </span>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
