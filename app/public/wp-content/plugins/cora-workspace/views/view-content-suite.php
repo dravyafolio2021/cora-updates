@@ -1278,28 +1278,28 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 </div>
 
                 <!-- Tabs Bar & Action Button -->
-                <div class="border-b border-zinc-200 flex items-center justify-between gap-2 pt-1 pb-1">
-                    <div class="flex items-center gap-1 bg-zinc-100/80 p-1 rounded-xl" id="seo-report-tabs">
-                        <button type="button" class="seo-report-tab-btn py-1.5 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer bg-white text-zinc-900 shadow-2xs border border-zinc-200 active" data-tab="tab-checklist" onclick="switchSEOReportTab('tab-checklist')">
+                <div class="border-b border-zinc-200/80 flex items-center justify-between gap-3 pt-1 pb-1">
+                    <div class="flex items-center gap-1 bg-zinc-100/80 p-1 rounded-xl overflow-x-auto scrollbar-hide flex-nowrap min-w-0" id="seo-report-tabs" style="scrollbar-width: none; -webkit-overflow-scrolling: touch;">
+                        <button type="button" class="seo-report-tab-btn py-1.5 px-3.5 rounded-lg text-xs font-bold transition-all cursor-pointer bg-white text-zinc-900 shadow-2xs border border-zinc-200/80 active whitespace-nowrap shrink-0" data-tab="tab-checklist" onclick="switchSEOReportTab('tab-checklist')">
                             SEO Checklist
                         </button>
-                        <button type="button" class="seo-report-tab-btn py-1.5 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 border border-transparent" data-tab="tab-cwv" onclick="switchSEOReportTab('tab-cwv')">
+                        <button type="button" class="seo-report-tab-btn py-1.5 px-3.5 rounded-lg text-xs font-semibold transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 border border-transparent whitespace-nowrap shrink-0" data-tab="tab-cwv" onclick="switchSEOReportTab('tab-cwv')">
                             Core Web Vitals
                         </button>
-                        <button type="button" class="seo-report-tab-btn py-1.5 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 border border-transparent" data-tab="tab-structure" onclick="switchSEOReportTab('tab-structure')">
+                        <button type="button" class="seo-report-tab-btn py-1.5 px-3.5 rounded-lg text-xs font-semibold transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 border border-transparent whitespace-nowrap shrink-0" data-tab="tab-structure" onclick="switchSEOReportTab('tab-structure')">
                             Content Structure
                         </button>
-                        <button type="button" class="seo-report-tab-btn py-1.5 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 border border-transparent" data-tab="tab-keywords" onclick="switchSEOReportTab('tab-keywords')">
+                        <button type="button" class="seo-report-tab-btn py-1.5 px-3.5 rounded-lg text-xs font-semibold transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 border border-transparent whitespace-nowrap shrink-0" data-tab="tab-keywords" onclick="switchSEOReportTab('tab-keywords')">
                             Keywords
                         </button>
-                        <button type="button" class="seo-report-tab-btn py-1.5 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 border border-transparent" data-tab="tab-backlinks" onclick="switchSEOReportTab('tab-backlinks')">
+                        <button type="button" class="seo-report-tab-btn py-1.5 px-3.5 rounded-lg text-xs font-semibold transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 border border-transparent whitespace-nowrap shrink-0" data-tab="tab-backlinks" onclick="switchSEOReportTab('tab-backlinks')">
                             Backlinks & Links
                         </button>
-                        <button type="button" class="seo-report-tab-btn py-1.5 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 border border-transparent" data-tab="tab-ai-insights" onclick="switchSEOReportTab('tab-ai-insights')">
+                        <button type="button" class="seo-report-tab-btn py-1.5 px-3.5 rounded-lg text-xs font-semibold transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 border border-transparent whitespace-nowrap shrink-0" data-tab="tab-ai-insights" onclick="switchSEOReportTab('tab-ai-insights')">
                             AI Insights
                         </button>
                     </div>
-                    <button type="button" class="text-xs font-semibold text-zinc-600 hover:text-zinc-900 flex items-center gap-1.5 px-3 py-1.5 border border-zinc-200 rounded-lg bg-white hover:bg-zinc-50 transition-colors shadow-2xs cursor-pointer" onclick="openSEODetailDrawer(${articleId}, '${escJsHtml(title)}')">
+                    <button type="button" class="text-xs font-semibold text-zinc-600 hover:text-zinc-900 flex items-center gap-1.5 px-3 py-1.5 border border-zinc-200/80 rounded-lg bg-white hover:bg-zinc-50 transition-colors shadow-2xs cursor-pointer whitespace-nowrap shrink-0" onclick="openSEODetailDrawer(${articleId}, '${escJsHtml(title)}')">
                         <span>View Full Report</span>
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                     </button>
