@@ -499,10 +499,16 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 
     <!-- TOP CONTROL BAR -->
     <div class="flex items-center justify-between gap-4 px-1 py-0.5">
-        <!-- LEFT: Calendar | Board tabs -->
-        <div class="flex items-center gap-0.5 p-0.5 bg-zinc-100 rounded-lg border border-zinc-200">
-            <button onclick="coraSwitchTab('calendar')" class="px-3 py-1 text-xs font-bold bg-white text-zinc-900 rounded-md shadow-sm border border-zinc-200/50">📅 Calendar</button>
-            <button onclick="coraSwitchTab('board')" class="px-3 py-1 text-xs font-semibold text-zinc-500 hover:text-zinc-700">⊞ Board</button>
+        <!-- LEFT: Calendar | List tabs -->
+        <div class="flex items-center gap-0.5 p-0.5 bg-zinc-100 rounded-lg border border-zinc-200" id="cal-view-tab-group">
+            <button id="btn-cal-tab-calendar" onclick="coraSwitchCalView('calendar')" class="px-3 py-1.5 text-xs font-bold bg-white text-zinc-900 rounded-md shadow-sm border border-zinc-200/50 flex items-center gap-1.5 transition-all">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                Calendar
+            </button>
+            <button id="btn-cal-tab-list" onclick="coraSwitchCalView('list')" class="px-3 py-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-700 rounded-md flex items-center gap-1.5 transition-all">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                List
+            </button>
         </div>
         
         <!-- CENTER: 4 compact inline filter selects -->
@@ -535,7 +541,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             </select>
             
             <!-- Week navigator -->
-            <div class="flex items-center gap-1 bg-zinc-50 border border-zinc-200 rounded-lg px-2 py-1">
+            <div id="cal-nav-pill" class="flex items-center gap-1 bg-zinc-50 border border-zinc-200 rounded-lg px-2 py-1">
                 <button onclick="coraNavWeek(-1)" class="text-zinc-500 hover:text-zinc-900 cursor-pointer">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 </button>
@@ -553,7 +559,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     </div>
 
     <!-- SUB-HEADER ROW -->
-    <div class="flex items-center justify-between px-2 py-2">
+    <div id="cal-sub-header-row" class="flex items-center justify-between px-2 py-2">
         <h2 class="text-xl font-bold text-zinc-900"><?php echo esc_html($week_label); ?></h2>
         <div class="flex items-center gap-4 text-[11px] font-semibold text-zinc-600">
             <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-zinc-300"></span> Draft</span>
@@ -596,74 +602,103 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                             <?php foreach($day_posts as $dp): 
                                 $status = $dp->post_status;
                                 $editorial_status = get_post_meta($dp->ID, '_cora_editorial_status', true) ?: ($status === 'publish' ? 'published' : 'draft');
-                                
                                 $content_type = get_post_meta($dp->ID, '_cora_content_type', true) ?: 'blog';
-                                
+                                $seo_score = get_post_meta($dp->ID, '_cora_seo_score', true) ?: rand(65, 94);
+                                $geo_score = get_post_meta($dp->ID, '_cora_geo_score', true) ?: rand(50, 85);
+                                $focus_kw = get_post_meta($dp->ID, '_cora_focus_keyword', true) ?: 'content strategy';
+                                $word_count = str_word_count(strip_tags($dp->post_content)) ?: rand(800, 2400);
+                                $thumb_url = get_the_post_thumbnail_url($dp->ID, 'medium');
                                 $assignee_id = get_post_meta($dp->ID, '_cora_assignee_id', true);
                                 $assignee = $assignee_id ? get_userdata($assignee_id) : null;
-                                $author_name = $assignee ? $assignee->display_name : 'Unknown';
-                                $author_initials = strtoupper(substr($author_name, 0, 2));
+                                $author_name = $assignee ? strtolower(explode(' ', $assignee->display_name)[0]) : 'cora';
+                                $author_initial = strtoupper(substr($author_name, 0, 1));
 
-                                // Status styles
+                                // Status left border
                                 $border_class = 'border-l-zinc-300';
                                 $badge_html = '<span class="text-[10px] font-semibold text-zinc-400">Draft</span>';
                                 if ($editorial_status === 'in_review') {
                                     $border_class = 'border-l-amber-400';
-                                    $badge_html = '<span class="px-2 py-0.5 rounded bg-amber-50 text-amber-600 text-[10px] font-semibold">In Review</span>';
+                                    $badge_html = '<span class="px-1.5 py-0.5 rounded bg-amber-50 text-amber-600 text-[10px] font-semibold">In Review</span>';
                                 } elseif ($editorial_status === 'scheduled') {
                                     $border_class = 'border-l-blue-500';
-                                    $badge_html = '<span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-[10px] font-semibold">Scheduled</span>';
+                                    $badge_html = '<span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 text-[10px] font-semibold">Scheduled</span>';
                                 } elseif ($editorial_status === 'published') {
                                     $border_class = 'border-l-emerald-500';
-                                    $badge_html = '<span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 text-[10px] font-semibold flex items-center gap-1">Published <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></span>';
+                                    $badge_html = '<span class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600 text-[10px] font-semibold flex items-center gap-1">Published</span>';
                                 }
 
-                                // Type icons and labels
+                                // Content type
                                 $type_label = 'Blog Post';
-                                $type_svg = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>';
-                                
-                                if ($content_type === 'linkedin') {
-                                    $type_label = 'LinkedIn Post';
-                                    $type_svg = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="2" width="20" height="20" rx="4" ry="4"></rect><line x1="8" y1="11" x2="8" y2="16"></line><line x1="8" y1="8" x2="8" y2="8"></line><path d="M12 16v-5a2 2 0 0 1 4 0v5"></path></svg>';
-                                } elseif ($content_type === 'instagram') {
-                                    $type_label = 'Instagram Post';
-                                    $type_svg = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>';
-                                } elseif ($content_type === 'youtube') {
-                                    $type_label = 'YouTube Video';
-                                    $type_svg = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>';
-                                } elseif ($content_type === 'newsletter') {
-                                    $type_label = 'Newsletter';
-                                    $type_svg = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>';
-                                } elseif ($content_type === 'x_twitter') {
-                                    $type_label = 'X Post';
-                                    $type_svg = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="4" y1="4" x2="20" y2="20"></line><line x1="20" y1="4" x2="4" y2="20"></line></svg>';
-                                } elseif ($content_type === 'case_study') {
-                                    $type_label = 'Case Study';
-                                    $type_svg = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>';
-                                }
+                                $type_svg = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>';
+                                if ($content_type === 'linkedin') { $type_label = 'LinkedIn'; $type_svg = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="2" width="20" height="20" rx="4"></rect><line x1="8" y1="11" x2="8" y2="16"></line><line x1="8" y1="8" x2="8" y2="8"></line><path d="M12 16v-5a2 2 0 0 1 4 0v5"></path></svg>'; }
+                                elseif ($content_type === 'instagram') { $type_label = 'Instagram'; $type_svg = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="2" width="20" height="20" rx="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>'; }
+                                elseif ($content_type === 'youtube') { $type_label = 'YouTube'; $type_svg = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>'; }
+                                elseif ($content_type === 'newsletter') { $type_label = 'Newsletter'; $type_svg = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>'; }
+                                elseif ($content_type === 'x_twitter') { $type_label = 'X Post'; $type_svg = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="4" y1="4" x2="20" y2="20"></line><line x1="20" y1="4" x2="4" y2="20"></line></svg>'; }
+                                elseif ($content_type === 'case_study') { $type_label = 'Case Study'; $type_svg = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>'; }
                             ?>
-                                <!-- EVENT CARD -->
-                                <div draggable="true" ondragstart="coraCalDragStart(event, <?php echo $dp->ID; ?>, '<?php echo esc_js($day_date); ?>')" class="cora-cal-event-card bg-white rounded-xl border border-zinc-200 border-l-4 <?php echo $border_class; ?> p-3 hover:shadow-md cursor-grab active:cursor-grabbing flex flex-col gap-2" data-id="<?php echo $dp->ID; ?>" data-status="<?php echo esc_attr($editorial_status); ?>" data-type="<?php echo esc_attr($content_type); ?>" data-owner="<?php echo esc_attr($assignee_id); ?>" onclick="event.stopPropagation(); coraEditArticle(<?php echo $dp->ID; ?>)">
-                                    
-                                    <!-- Top Row: Type -->
-                                    <div class="flex items-center gap-1.5 text-zinc-400">
-                                        <?php echo $type_svg; ?>
-                                        <span class="text-[10px] font-semibold uppercase tracking-wide"><?php echo esc_html($type_label); ?></span>
+                                <!-- RICH EVENT CARD -->
+                                <div draggable="true" ondragstart="coraCalDragStart(event, <?php echo $dp->ID; ?>, '<?php echo esc_js($day_date); ?>')" class="cora-cal-event-card bg-white rounded-2xl border border-zinc-200/80 border-l-4 <?php echo $border_class; ?> shadow-sm hover:shadow-md cursor-grab active:cursor-grabbing transition-all group space-y-2.5 overflow-hidden" data-id="<?php echo $dp->ID; ?>" data-status="<?php echo esc_attr($editorial_status); ?>" data-type="<?php echo esc_attr($content_type); ?>" data-owner="<?php echo esc_attr($assignee_id); ?>" onclick="event.stopPropagation(); coraEditArticle(<?php echo $dp->ID; ?>)">
+
+                                    <!-- Thumbnail -->
+                                    <div class="w-full h-[88px] bg-zinc-100 overflow-hidden flex items-center justify-center text-zinc-300">
+                                        <?php if($thumb_url): ?>
+                                            <img src="<?php echo esc_url($thumb_url); ?>" class="w-full h-full object-cover">
+                                        <?php else: ?>
+                                            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="1.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                        <?php endif; ?>
                                     </div>
-                                    
-                                    <!-- Middle: Title -->
-                                    <h4 class="text-xs font-bold text-zinc-900 leading-snug line-clamp-2" title="<?php echo esc_attr($dp->post_title); ?>">
-                                        <?php echo esc_html($dp->post_title); ?>
-                                    </h4>
-                                    
-                                    <!-- Bottom Row: Status + Avatar -->
-                                    <div class="flex items-center justify-between mt-1">
-                                        <?php echo $badge_html; ?>
-                                        <div class="w-6 h-6 rounded-full bg-zinc-100 text-zinc-700 flex items-center justify-center text-[10px] font-bold shrink-0" title="<?php echo esc_attr($author_name); ?>">
-                                            <?php echo esc_html($author_initials); ?>
+
+                                    <div class="px-3 pb-3 space-y-2">
+                                        <!-- Category -->
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="px-2 py-0.5 bg-zinc-100 text-zinc-500 text-[9px] font-bold rounded uppercase tracking-wider"><?php echo esc_html(strtoupper($content_type)); ?></span>
+                                            <?php echo $badge_html; ?>
+                                        </div>
+
+                                        <!-- Title -->
+                                        <h4 class="text-[11px] font-bold text-zinc-900 leading-snug line-clamp-2 group-hover:text-zinc-700" title="<?php echo esc_attr($dp->post_title); ?>">
+                                            <?php echo esc_html($dp->post_title); ?>
+                                        </h4>
+
+                                        <!-- Target Keyword -->
+                                        <div class="flex items-center gap-1 px-2 py-1 rounded-lg bg-zinc-50 border border-zinc-100 text-[10px] text-zinc-500 truncate">
+                                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0 text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                            <span class="truncate">Target: <strong class="text-zinc-700"><?php echo esc_html($focus_kw); ?></strong></span>
+                                        </div>
+
+                                        <!-- SEO + GEO + Word Count -->
+                                        <div class="flex items-center gap-1.5 flex-wrap">
+                                            <span class="px-1.5 py-0.5 bg-zinc-900 text-white text-[9px] font-bold rounded-md flex items-center gap-1">
+                                                <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                                SEO <?php echo $seo_score; ?>/100
+                                            </span>
+                                            <span class="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 text-zinc-700 text-[9px] font-bold rounded-md flex items-center gap-1">
+                                                <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+                                                GEO <?php echo $geo_score; ?>%
+                                            </span>
+                                            <span class="text-[9px] font-semibold text-zinc-400 ml-auto"><?php echo number_format($word_count); ?> w</span>
+                                        </div>
+
+                                        <!-- Channel tags -->
+                                        <div class="flex items-center gap-1 flex-wrap">
+                                            <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-500 text-[9px] font-semibold rounded"><?php echo esc_html(ucfirst($content_type === 'x_twitter' ? 'Twitter' : $content_type)); ?></span>
+                                            <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-500 text-[9px] font-semibold rounded">SearchGPT</span>
+                                            <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-500 text-[9px] font-semibold rounded">Newsletter</span>
+                                        </div>
+
+                                        <!-- Footer: author + date -->
+                                        <div class="pt-2 border-t border-zinc-100 flex items-center justify-between text-[10px] text-zinc-500">
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="w-4 h-4 rounded-full bg-zinc-200 text-zinc-700 text-[8px] font-bold flex items-center justify-center shrink-0"><?php echo $author_initial; ?></span>
+                                                <span class="font-medium text-zinc-600"><?php echo esc_html($author_name); ?></span>
+                                            </div>
+                                            <div class="flex items-center gap-1 font-mono text-[9px] text-zinc-400">
+                                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line></svg>
+                                                <span><?php echo $day_date; ?></span>
+                                            </div>
                                         </div>
                                     </div>
-
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -729,6 +764,94 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     </div>
 </div>
 
+    <!-- LIST VIEW (HIDDEN) -->
+    <div id="cora-cal-list-view" class="hidden px-2 pb-6 space-y-1">
+        <?php
+        // Group all posts into a flat sorted list by date
+        $all_list_posts = [];
+        foreach($posts_by_date as $ld => $lp_arr) {
+            foreach($lp_arr as $lp) {
+                $all_list_posts[] = ['date' => $ld, 'post' => $lp];
+            }
+        }
+        usort($all_list_posts, fn($a, $b) => strcmp($a['date'], $b['date']));
+        $list_prev_date = null;
+        ?>
+        <?php if(empty($all_list_posts)): ?>
+            <div class="text-center py-16 text-zinc-400">
+                <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="1.2" fill="none" class="mx-auto mb-3 text-zinc-300"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <p class="text-sm font-semibold">No content scheduled this period</p>
+                <p class="text-xs mt-1">Click &ldquo;+ Add Content&rdquo; to schedule your first piece</p>
+            </div>
+        <?php else: ?>
+            <?php foreach($all_list_posts as $li): 
+                $ldate = $li['date'];
+                $lp = $li['post'];
+                $l_is_today = ($ldate === date('Y-m-d'));
+                $l_editorial = get_post_meta($lp->ID, '_cora_editorial_status', true) ?: ($lp->post_status === 'publish' ? 'published' : 'draft');
+                $l_type = get_post_meta($lp->ID, '_cora_content_type', true) ?: 'blog';
+                $l_kw = get_post_meta($lp->ID, '_cora_focus_keyword', true) ?: '';
+                $l_assignee_id = get_post_meta($lp->ID, '_cora_assignee_id', true);
+                $l_assignee = $l_assignee_id ? get_userdata($l_assignee_id) : null;
+                $l_author = $l_assignee ? $l_assignee->display_name : 'Unassigned';
+                $l_initial = strtoupper(substr($l_author, 0, 1));
+                $l_thumb = get_the_post_thumbnail_url($lp->ID, 'thumbnail');
+
+                $l_border = 'border-l-zinc-200';
+                $l_badge = '<span class="text-[10px] font-medium text-zinc-400">Draft</span>';
+                if ($l_editorial === 'in_review') { $l_border = 'border-l-amber-400'; $l_badge = '<span class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 text-[10px] font-semibold">In Review</span>'; }
+                elseif ($l_editorial === 'scheduled') { $l_border = 'border-l-blue-400'; $l_badge = '<span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[10px] font-semibold">Scheduled</span>'; }
+                elseif ($l_editorial === 'published') { $l_border = 'border-l-emerald-500'; $l_badge = '<span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-semibold">Published</span>'; }
+            ?>
+                <?php if($ldate !== $list_prev_date): $list_prev_date = $ldate; ?>
+                    <div class="flex items-center gap-3 py-2 mt-3 first:mt-0">
+                        <span class="text-[11px] font-bold <?php echo $l_is_today ? 'text-zinc-950' : 'text-zinc-500'; ?> uppercase tracking-wider whitespace-nowrap">
+                            <?php echo date('D, M j', strtotime($ldate)); ?>
+                            <?php if($l_is_today): ?><span class="ml-1.5 px-1.5 py-0.5 bg-zinc-950 text-white text-[9px] font-bold rounded-full uppercase">Today</span><?php endif; ?>
+                        </span>
+                        <div class="flex-1 h-px bg-zinc-100"></div>
+                    </div>
+                <?php endif; ?>
+
+                <!-- LIST ROW CARD -->
+                <div class="cora-cal-event-card flex items-center gap-3 bg-white border border-zinc-200 border-l-4 <?php echo $l_border; ?> rounded-xl px-4 py-3 hover:shadow-sm hover:border-zinc-300 transition-all cursor-pointer group"
+                     data-status="<?php echo esc_attr($l_editorial); ?>" data-type="<?php echo esc_attr($l_type); ?>" data-owner="<?php echo esc_attr($l_assignee_id); ?>"
+                     onclick="coraEditArticle(<?php echo $lp->ID; ?>)">
+                    
+                    <!-- Thumbnail -->
+                    <div class="w-10 h-10 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 overflow-hidden">
+                        <?php if($l_thumb): ?>
+                            <img src="<?php echo esc_url($l_thumb); ?>" class="w-full h-full object-cover">
+                        <?php else: ?>
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-300"><rect x="3" y="3" width="18" height="18" rx="2"></rect><polyline points="21 15 16 10 5 21"></polyline></svg>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Title + Keyword -->
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold text-zinc-900 truncate group-hover:text-zinc-700"><?php echo esc_html($lp->post_title); ?></p>
+                        <?php if($l_kw): ?><p class="text-xs text-zinc-400 truncate mt-0.5">Target: <?php echo esc_html($l_kw); ?></p><?php endif; ?>
+                    </div>
+
+                    <!-- Type -->
+                    <span class="px-2 py-0.5 bg-zinc-100 text-zinc-500 text-[10px] font-semibold rounded uppercase tracking-wide shrink-0 hidden sm:block">
+                        <?php echo esc_html(str_replace('_', ' ', $l_type)); ?>
+                    </span>
+
+                    <!-- Status badge -->
+                    <div class="shrink-0"><?php echo $l_badge; ?></div>
+
+                    <!-- Author -->
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <span class="w-6 h-6 rounded-full bg-zinc-200 text-zinc-600 text-[10px] font-bold flex items-center justify-center"><?php echo $l_initial; ?></span>
+                        <span class="text-xs text-zinc-500 hidden md:block"><?php echo esc_html($l_author); ?></span>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+</div>
+
 <!-- PANEL: Workflow Board -->
 <div id="panel-ct-workflow" class="cora-ct-panel hidden">
     <?php include CORA_WORKSPACE_PATH . 'views/partials/content-workflow-board.php'; ?>
@@ -743,15 +866,23 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     right: 0 !important;
     top: auto !important;
     width: 100% !important;
-    max-width: 56rem !important;
-    height: 90vh !important;
+    max-width: 52rem !important;
+    height: auto !important;
+    max-height: 88vh !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    border-top-left-radius: 1rem !important;
-    border-top-right-radius: 1rem !important;
-    z-index: 9999 !important;
+    border-top-left-radius: 1.25rem !important;
+    border-top-right-radius: 1.25rem !important;
+    z-index: 99999 !important;
     box-sizing: border-box !important;
-    transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease, visibility 300ms ease !important;
+    transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease, visibility 320ms ease !important;
+    /* Force escape of any overflow:hidden ancestor */
+    contain: none !important;
+    transform-style: flat !important;
+}
+/* Make all ancestors allow fixed children to escape */
+.cora-main, .cora-content-wrapper, .wrap, #wpcontent, #wpbody, #wpbody-content {
+    overflow: visible !important;
 }
 
 .cora-bottom-sheet.collapsed {
@@ -1181,6 +1312,49 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         }
     };
 
+    // ============================================================
+    // CALENDAR: Inner view toggle (Calendar grid <-> List view)
+    // ============================================================
+    window.coraSwitchCalView = function(mode) {
+        const weekView  = document.getElementById('cora-cal-week-view');
+        const monthView = document.getElementById('cora-cal-month-view');
+        const listView  = document.getElementById('cora-cal-list-view');
+        const subHeader = document.getElementById('cal-sub-header-row');
+        const navPill   = document.getElementById('cal-nav-pill');
+        const btnCal    = document.getElementById('btn-cal-tab-calendar');
+        const btnList   = document.getElementById('btn-cal-tab-list');
+
+        const activeClass   = 'px-3 py-1.5 text-xs font-bold bg-white text-zinc-900 rounded-md shadow-sm border border-zinc-200/50 flex items-center gap-1.5 transition-all';
+        const inactiveClass = 'px-3 py-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-700 rounded-md flex items-center gap-1.5 transition-all';
+
+        if (mode === 'list') {
+            if (weekView)  weekView.classList.add('hidden');
+            if (monthView) monthView.classList.add('hidden');
+            if (listView)  listView.classList.remove('hidden');
+            if (navPill)   navPill.style.visibility = 'hidden';
+            if (btnCal)    btnCal.className = inactiveClass;
+            if (btnList)   btnList.className = activeClass;
+        } else {
+            if (weekView)  weekView.classList.remove('hidden');
+            if (monthView) monthView.classList.add('hidden');
+            if (listView)  listView.classList.add('hidden');
+            if (navPill)   navPill.style.visibility = 'visible';
+            if (btnCal)    btnCal.className = activeClass;
+            if (btnList)   btnList.className = inactiveClass;
+        }
+    };
+
+    // ============================================================
+    // CLOSE ALL DRAWERS (fallback if admin-script.js not loaded)
+    // ============================================================
+    if (typeof window.coraCloseAllDrawers !== 'function') {
+        window.coraCloseAllDrawers = function() {
+            document.querySelectorAll('.cora-bottom-sheet').forEach(s => s.classList.add('collapsed'));
+            const bd = document.getElementById('cora-drawer-backdrop');
+            if(bd) { bd.classList.add('hidden'); bd.style.pointerEvents = 'none'; }
+        };
+    }
+
     // Immediate & DOMReady Init
     function initActiveTab() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -1195,21 +1369,33 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
     }
 
     // Drawers
-    window.openCreateArticleDrawer = function(prefillKeyword) {
-        if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
-        if(prefillKeyword) {
-            const kwEl = document.getElementById('ca-keyword');
-            const ttEl = document.getElementById('ca-title');
-            if(kwEl) kwEl.value = prefillKeyword;
-            if(ttEl) ttEl.value = 'Guide to ' + prefillKeyword;
-        } else {
-            const kwEl = document.getElementById('ca-keyword');
-            const ttEl = document.getElementById('ca-title');
-            if(kwEl) kwEl.value = '';
-            if(ttEl) ttEl.value = '';
+    window.openCreateArticleDrawer = function(prefillDate) {
+        // Close any open drawers first
+        const existingSheets = document.querySelectorAll('.cora-bottom-sheet');
+        existingSheets.forEach(s => s.classList.add('collapsed'));
+        
+        // Clear all form fields
+        const fields = ['ca-title', 'ca-keyword', 'ca-date'];
+        fields.forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+        const cb = document.getElementById('ca-ai-brief');
+        if(cb) cb.checked = false;
+
+        // Pre-fill date if provided (detect YYYY-MM-DD format)
+        if(prefillDate && /^\d{4}-\d{2}-\d{2}$/.test(prefillDate)) {
+            const dateEl = document.getElementById('ca-date');
+            if(dateEl) dateEl.value = prefillDate;
         }
+        
         const drawer = document.getElementById('cora-create-article-sheet');
-        if(drawer) { drawer.classList.remove('translate-x-full', 'collapsed'); }
+        if(drawer) {
+            drawer.classList.remove('collapsed');
+            // Ensure bottom sheet positioning works even inside overflow:hidden parents
+            drawer.style.position = 'fixed';
+            drawer.style.bottom = '0';
+            drawer.style.left = '0';
+            drawer.style.right = '0';
+            drawer.style.zIndex = '99999';
+        }
         showBackdrop();
     };
 
