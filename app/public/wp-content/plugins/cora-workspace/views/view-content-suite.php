@@ -1228,22 +1228,55 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
     };
 
     window.triggerSEOAnalysis = function(articleId, btnEl) {
+        const targetId = articleId || window._currentSEOArticleId;
+        if (!targetId) {
+            if (window.coraShowToast) window.coraShowToast('Please select an article first', 'error');
+            return;
+        }
+
+        const origHtml = btnEl ? btnEl.innerHTML : '';
         if (btnEl) {
             btnEl.disabled = true;
-            btnEl.classList.add('opacity-70', 'cursor-not-allowed');
+            btnEl.innerHTML = `
+                <svg class="animate-spin shrink-0" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="12"></circle></svg>
+                <span>Analyzing...</span>
+            `;
+            btnEl.classList.add('opacity-80', 'cursor-not-allowed');
         }
+
         if (window.coraShowToast) window.coraShowToast('Running 11-point SEO audit...', 'info');
 
-        window.runInlineSEOAudit(articleId, function() {
+        // First save any meta edits if fields exist
+        if (typeof window.saveInlineSEOMeta === 'function') {
+            window.saveInlineSEOMeta(targetId);
+        }
+
+        if (typeof window.runInlineSEOAudit === 'function') {
+            window.runInlineSEOAudit(targetId, function() {
+                if (btnEl) {
+                    btnEl.disabled = false;
+                    btnEl.classList.remove('opacity-80', 'cursor-not-allowed');
+                    btnEl.innerHTML = `
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-500"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>Audit Complete!</span>
+                    `;
+                    setTimeout(() => {
+                        if (btnEl) btnEl.innerHTML = origHtml;
+                    }, 2000);
+                }
+                if (window.coraShowToast) window.coraShowToast('SEO audit completed successfully', 'success');
+            });
+        } else {
             if (btnEl) {
                 btnEl.disabled = false;
-                btnEl.classList.remove('opacity-70', 'cursor-not-allowed');
+                btnEl.classList.remove('opacity-80', 'cursor-not-allowed');
+                if (origHtml) btnEl.innerHTML = origHtml;
             }
-            if (window.coraShowToast) window.coraShowToast('SEO audit completed successfully', 'success');
-        });
+        }
     };
 
     window.openSEOAnalysis = function(articleId, title) {
+        window._currentSEOArticleId = articleId;
         // Highlight active item in left sidebar list
         document.querySelectorAll('.seo-article-btn').forEach(btn => {
             if(btn.dataset.id == articleId) {
