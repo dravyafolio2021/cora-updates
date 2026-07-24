@@ -475,7 +475,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white p-3.5 border border-zinc-200 rounded-xl shadow-2xs">
         <!-- Left Filters & Navigation -->
         <div class="flex items-center gap-2 flex-wrap">
-            <select id="cal-filter-type" class="h-8 px-2.5 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer">
+            <select id="cal-filter-type" class="h-8 px-2.5 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer" onchange="coraFilterCalendar()">
                 <option value="">All Types</option>
                 <option value="blog">Blog Post</option>
                 <option value="instagram">Instagram Post</option>
@@ -486,7 +486,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                 <option value="case_study">Case Study</option>
             </select>
 
-            <select id="cal-filter-status" class="h-8 px-2.5 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer">
+            <select id="cal-filter-status" class="h-8 px-2.5 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer" onchange="coraFilterCalendar()">
                 <option value="">All Status</option>
                 <option value="draft">Draft</option>
                 <option value="in_review">In Review</option>
@@ -494,14 +494,14 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                 <option value="publish">Published</option>
             </select>
 
-            <select id="cal-filter-channel" class="h-8 px-2.5 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer">
+            <select id="cal-filter-channel" class="h-8 px-2.5 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer" onchange="coraFilterCalendar()">
                 <option value="">All Channels</option>
                 <option value="blog">Website Blog</option>
                 <option value="social">Social Media</option>
                 <option value="email">Email Newsletter</option>
             </select>
 
-            <select id="cal-filter-owner" class="h-8 px-2.5 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer">
+            <select id="cal-filter-owner" class="h-8 px-2.5 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer" onchange="coraFilterCalendar()">
                 <option value="">All Owners</option>
                 <?php foreach($cora_users as $u): ?>
                     <option value="<?php echo esc_attr($u->ID); ?>"><?php echo esc_html($u->display_name); ?></option>
@@ -519,10 +519,10 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                 </button>
             </div>
 
-            <!-- Filters Button -->
-            <button class="h-8 px-3 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-700 flex items-center gap-1.5 cursor-pointer">
+            <!-- Filters Reset Button -->
+            <button onclick="coraResetCalendarFilters()" class="h-8 px-3 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-700 flex items-center gap-1.5 cursor-pointer">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-                Filters
+                Reset Filters
             </button>
         </div>
 
@@ -547,8 +547,9 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     <!-- Calendar Card Container -->
     <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-2xs">
         <!-- Title -->
-        <div class="mb-4">
+        <div class="mb-4 flex items-center justify-between">
             <h2 class="text-xl font-bold text-zinc-950 tracking-tight"><?php echo esc_html($month_name); ?></h2>
+            <span class="text-xs text-zinc-400 font-medium">Tip: Drag cards to reschedule • Click empty space to add article</span>
         </div>
 
         <!-- Days of Week Header -->
@@ -564,7 +565,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             <?php for($pad = $prev_days_fill; $pad >= 1; $pad--): 
                 $p_day = $prev_month_days - $pad + 1;
             ?>
-                <div class="min-h-[110px] p-2.5 rounded-xl border border-zinc-100 bg-zinc-50/40 text-zinc-300 text-xs font-bold">
+                <div class="h-[145px] p-2.5 rounded-xl border border-zinc-100 bg-zinc-50/40 text-zinc-300 text-xs font-bold">
                     <?php echo $p_day; ?>
                 </div>
             <?php endfor; ?>
@@ -573,25 +574,34 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             <?php for($d=1; $d<=$days_in_month; $d++): 
                 $is_today = ($d == (int)date('j') && $month_now == (int)date('n'));
                 $day_posts = $pub_dates[$d] ?? [];
+                $max_visible = 2; // Show at most 2 cards to prevent vertical overflow!
+                $total_day_posts = count($day_posts);
+                $visible_posts = array_slice($day_posts, 0, $max_visible);
+                $hidden_count = $total_day_posts - $max_visible;
+                $date_str = sprintf('%04d-%02d-%02d', $year_now, $month_now, $d);
             ?>
-                <div class="min-h-[110px] p-2.5 rounded-xl border <?php echo $is_today ? 'border-2 border-zinc-950 bg-white shadow-2xs' : 'border-zinc-200/80 bg-white hover:border-zinc-300'; ?> flex flex-col justify-between transition-all min-w-0">
+                <!-- Day Cell (Drop Target + Fixed Height) -->
+                <div class="h-[145px] p-2.5 rounded-xl border <?php echo $is_today ? 'border-2 border-zinc-950 bg-white shadow-2xs' : 'border-zinc-200/80 bg-white hover:border-zinc-300'; ?> flex flex-col justify-between transition-all min-w-0 cora-cal-day-cell cursor-pointer" data-day="<?php echo $d; ?>" data-date="<?php echo $date_str; ?>" ondragover="coraCalDragOver(event)" ondragenter="coraCalDragEnter(event)" ondragleave="coraCalDragLeave(event)" ondrop="coraCalDrop(event, '<?php echo $d; ?>', '<?php echo $date_str; ?>')" onclick="coraCalDayClick(event, '<?php echo $date_str; ?>')">
                     <!-- Day Number Header -->
-                    <div class="flex items-center justify-between mb-1.5">
-                        <span class="text-xs font-bold <?php echo $is_today ? 'w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[11px]' : 'text-zinc-700'; ?>">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-bold <?php echo $is_today ? 'w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[10px]' : 'text-zinc-700'; ?>">
                             <?php echo $d; ?>
                         </span>
+                        <?php if($total_day_posts > 0): ?>
+                            <span class="text-[9px] font-bold px-1.5 py-0.2 bg-zinc-100 text-zinc-600 rounded-full shrink-0"><?php echo $total_day_posts; ?></span>
+                        <?php endif; ?>
                     </div>
                     
                     <!-- Day Events Cards Container -->
-                    <div class="space-y-1.5 flex-1 min-w-0 overflow-y-auto max-h-[130px] no-scrollbar">
-                        <?php foreach($day_posts as $dp): 
+                    <div class="space-y-1 flex-1 min-w-0 overflow-hidden">
+                        <?php foreach($visible_posts as $dp): 
                             $status = $dp->post_status;
                             $editorial_status = get_post_meta($dp->ID, '_cora_editorial_status', true) ?: ($status === 'publish' ? 'published' : 'draft');
                             $assignee_id = get_post_meta($dp->ID, '_cora_assignee_id', true);
                             $assignee = $assignee_id ? get_userdata($assignee_id) : null;
-                            $initials = $assignee ? strtoupper(substr($assignee->display_name, 0, 2)) : 'DB';
+                            $initials = $assignee ? strtoupper(substr($assignee->display_name, 0, 2)) : 'SH';
                             
-                            // Badge & Colors
+                            // Border Accent & Colors
                             $border_accent = 'border-l-zinc-400';
                             $status_tag = 'Draft';
                             $tag_bg = 'bg-zinc-100 text-zinc-600';
@@ -610,33 +620,40 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                                 $tag_bg = 'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400';
                             }
                         ?>
-                            <!-- Event Card -->
-                            <div class="p-2 rounded-lg border border-zinc-200/90 border-l-3 <?php echo $border_accent; ?> bg-white hover:shadow-2xs transition-all cursor-pointer group" onclick="coraEditArticle(<?php echo $dp->ID; ?>)">
+                            <!-- Draggable Event Card -->
+                            <div draggable="true" ondragstart="coraCalDragStart(event, <?php echo $dp->ID; ?>)" class="cora-cal-event-card p-1.5 rounded-md border border-zinc-200/90 border-l-3 <?php echo $border_accent; ?> bg-white hover:shadow-2xs transition-all cursor-grab active:cursor-grabbing group" data-id="<?php echo $dp->ID; ?>" data-status="<?php echo esc_attr($editorial_status); ?>" data-owner="<?php echo esc_attr($assignee_id); ?>" onclick="event.stopPropagation(); coraEditArticle(<?php echo $dp->ID; ?>)">
                                 <!-- Type Icon & Label -->
-                                <div class="flex items-center justify-between text-[9.5px] font-semibold text-zinc-400 mb-0.5">
-                                    <span class="flex items-center gap-1">
-                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                <div class="flex items-center justify-between text-[9px] font-semibold text-zinc-400 mb-0.5">
+                                    <span class="flex items-center gap-1 truncate">
+                                        <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                                         Blog Post
                                     </span>
                                 </div>
                                 
                                 <!-- Article Title -->
-                                <div class="text-[11px] font-bold text-zinc-900 group-hover:text-zinc-700 truncate leading-snug mb-1.5" title="<?php echo esc_attr($dp->post_title); ?>">
+                                <div class="text-[10px] font-bold text-zinc-900 group-hover:text-zinc-700 truncate leading-tight mb-1" title="<?php echo esc_attr($dp->post_title); ?>">
                                     <?php echo esc_html($dp->post_title); ?>
                                 </div>
 
                                 <!-- Status Tag & Author Initials Circle -->
                                 <div class="flex items-center justify-between">
-                                    <span class="px-1.5 py-0.5 rounded text-[8.5px] font-bold uppercase tracking-wider <?php echo $tag_bg; ?>">
+                                    <span class="px-1 py-0.2 rounded text-[7.5px] font-bold uppercase tracking-wider <?php echo $tag_bg; ?>">
                                         <?php echo $status_tag; ?>
                                     </span>
-                                    <span class="w-4 h-4 rounded-full bg-zinc-100 border border-zinc-300 text-[7.5px] font-bold text-zinc-600 flex items-center justify-center shrink-0" title="<?php echo esc_attr($assignee ? $assignee->display_name : 'Owner'); ?>">
+                                    <span class="w-3.5 h-3.5 rounded-full bg-zinc-100 border border-zinc-300 text-[7px] font-bold text-zinc-600 flex items-center justify-center shrink-0" title="<?php echo esc_attr($assignee ? $assignee->display_name : 'Owner'); ?>">
                                         <?php echo $initials; ?>
                                     </span>
                                 </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
+
+                    <!-- Overflow Indicator Button (+ N more) -->
+                    <?php if($hidden_count > 0): ?>
+                        <button onclick="event.stopPropagation(); coraOpenDayEventsDrawer('<?php echo $d; ?>', '<?php echo esc_js($date_str); ?>', '<?php echo esc_js($month_name); ?>')" class="w-full text-center py-0.5 px-1 rounded bg-zinc-100 hover:bg-zinc-200 text-[9.5px] font-bold text-zinc-700 transition-colors cursor-pointer shrink-0 mt-1">
+                            + <?php echo $hidden_count; ?> more
+                        </button>
+                    <?php endif; ?>
                 </div>
             <?php endfor; ?>
 
@@ -646,7 +663,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             $next_days_fill = (7 - ($total_rendered % 7)) % 7;
             for($n = 1; $n <= $next_days_fill; $n++):
             ?>
-                <div class="min-h-[110px] p-2.5 rounded-xl border border-zinc-100 bg-zinc-50/40 text-zinc-300 text-xs font-bold">
+                <div class="h-[145px] p-2.5 rounded-xl border border-zinc-100 bg-zinc-50/40 text-zinc-300 text-xs font-bold">
                     <?php echo $n; ?>
                 </div>
             <?php endfor; ?>
@@ -847,6 +864,90 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
     }
 
     // Tabs
+
+    // --- Calendar Drag & Drop + Day Events Drawer Logic ---
+    window.coraCalDragStart = function(e, postId) {
+        e.dataTransfer.setData('text/plain', postId);
+        e.dataTransfer.effectAllowed = 'move';
+    };
+
+    window.coraCalDragOver = function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    };
+
+    window.coraCalDragEnter = function(e) {
+        e.preventDefault();
+        const cell = e.currentTarget;
+        if(cell) cell.classList.add('bg-zinc-100/80', 'border-zinc-950');
+    };
+
+    window.coraCalDragLeave = function(e) {
+        const cell = e.currentTarget;
+        if(cell) cell.classList.remove('bg-zinc-100/80', 'border-zinc-950');
+    };
+
+    window.coraCalDrop = function(e, dayNum, dateStr) {
+        e.preventDefault();
+        const cell = e.currentTarget;
+        if(cell) cell.classList.remove('bg-zinc-100/80', 'border-zinc-950');
+        
+        const postId = e.dataTransfer.getData('text/plain');
+        if(!postId) return;
+
+        // Perform AJAX reschedule
+        $.post(coraREWPData.ajaxUrl, {
+            action: 'cora_update_article_date',
+            nonce: coraREWPData.ajaxNonce,
+            post_id: postId,
+            target_date: dateStr
+        }, function(r) {
+            if(window.coraShowToast) {
+                window.coraShowToast("Article rescheduled to " + dateStr, "success");
+            }
+            setTimeout(function() { location.reload(); }, 600);
+        });
+    };
+
+    window.coraCalDayClick = function(e, dateStr) {
+        if(e.target.closest('.cora-cal-event-card') || e.target.closest('button')) return;
+        openCreateArticleDrawer();
+        const dateInput = document.getElementById('ca-date');
+        if(dateInput) dateInput.value = dateStr;
+    };
+
+    window.coraFilterCalendar = function() {
+        const statusFilter = (document.getElementById('cal-filter-status')?.value || '').toLowerCase();
+        const ownerFilter = document.getElementById('cal-filter-owner')?.value || '';
+
+        document.querySelectorAll('.cora-cal-event-card').forEach(card => {
+            const status = (card.dataset.status || '').toLowerCase();
+            const owner = card.dataset.owner || '';
+            
+            let show = true;
+            if(statusFilter && !status.includes(statusFilter)) show = false;
+            if(ownerFilter && owner !== ownerFilter) show = false;
+
+            if(show) card.classList.remove('hidden');
+            else card.classList.add('hidden');
+        });
+    };
+
+    window.coraResetCalendarFilters = function() {
+        ['cal-filter-type','cal-filter-status','cal-filter-channel','cal-filter-owner'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.value = '';
+        });
+        coraFilterCalendar();
+    };
+
+    window.coraOpenDayEventsDrawer = function(dayNum, dateStr, monthName) {
+        // Open day events list drawer or edit first
+        openCreateArticleDrawer();
+        const dateInput = document.getElementById('ca-date');
+        if(dateInput) dateInput.value = dateStr;
+    };
+
     window.switchContentTab = function(tabId) {
         document.querySelectorAll('.cora-ct-panel').forEach(p => p.classList.add('hidden'));
         document.querySelectorAll('.cora-tab-btn').forEach(b => {
