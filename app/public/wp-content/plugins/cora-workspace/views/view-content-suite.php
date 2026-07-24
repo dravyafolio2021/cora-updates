@@ -1235,44 +1235,69 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         }
 
         const origHtml = btnEl ? btnEl.innerHTML : '';
+        const labelSpan = btnEl ? btnEl.querySelector('span') : null;
+        
         if (btnEl) {
             btnEl.disabled = true;
-            btnEl.innerHTML = `
-                <svg class="animate-spin shrink-0" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="12"></circle></svg>
-                <span>Analyzing...</span>
-            `;
             btnEl.classList.add('opacity-80', 'cursor-not-allowed');
+            btnEl.innerHTML = `
+                <svg class="animate-spin shrink-0 text-amber-400" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="12"></circle></svg>
+                <span id="seo-btn-status-txt">Scanning Content...</span>
+            `;
         }
 
-        if (window.coraShowToast) window.coraShowToast('Running 11-point SEO audit...', 'info');
-
-        // First save any meta edits if fields exist
-        if (typeof window.saveInlineSEOMeta === 'function') {
-            window.saveInlineSEOMeta(targetId);
+        // Add subtle loading pulse overlay on report cards
+        const reportArea = document.getElementById('seo-analysis-container');
+        if (reportArea) {
+            reportArea.classList.add('opacity-70', 'transition-opacity');
         }
 
-        if (typeof window.runInlineSEOAudit === 'function') {
-            window.runInlineSEOAudit(targetId, function() {
+        if (window.coraShowToast) window.coraShowToast('Scanning article & running 11-point audit...', 'info');
+
+        // Multi-step scanning feedback
+        setTimeout(() => {
+            const statusTxt = document.getElementById('seo-btn-status-txt');
+            if (statusTxt) statusTxt.innerText = 'Auditing 11 Rules...';
+        }, 350);
+
+        setTimeout(() => {
+            const statusTxt = document.getElementById('seo-btn-status-txt');
+            if (statusTxt) statusTxt.innerText = 'Calculating SEO Score...';
+        }, 700);
+
+        setTimeout(() => {
+            // First save any meta edits if fields exist
+            if (typeof window.saveInlineSEOMeta === 'function') {
+                window.saveInlineSEOMeta(targetId);
+            }
+
+            if (typeof window.runInlineSEOAudit === 'function') {
+                window.runInlineSEOAudit(targetId, function() {
+                    if (reportArea) {
+                        reportArea.classList.remove('opacity-70');
+                    }
+                    if (btnEl) {
+                        btnEl.disabled = false;
+                        btnEl.classList.remove('opacity-80', 'cursor-not-allowed');
+                        btnEl.innerHTML = `
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-500"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span class="font-bold text-emerald-600">✓ Audit Updated!</span>
+                        `;
+                        setTimeout(() => {
+                            if (btnEl) btnEl.innerHTML = origHtml;
+                        }, 2500);
+                    }
+                    if (window.coraShowToast) window.coraShowToast('11-Point SEO Audit updated successfully!', 'success');
+                });
+            } else {
+                if (reportArea) reportArea.classList.remove('opacity-70');
                 if (btnEl) {
                     btnEl.disabled = false;
                     btnEl.classList.remove('opacity-80', 'cursor-not-allowed');
-                    btnEl.innerHTML = `
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-500"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <span>Audit Complete!</span>
-                    `;
-                    setTimeout(() => {
-                        if (btnEl) btnEl.innerHTML = origHtml;
-                    }, 2000);
+                    if (origHtml) btnEl.innerHTML = origHtml;
                 }
-                if (window.coraShowToast) window.coraShowToast('SEO audit completed successfully', 'success');
-            });
-        } else {
-            if (btnEl) {
-                btnEl.disabled = false;
-                btnEl.classList.remove('opacity-80', 'cursor-not-allowed');
-                if (origHtml) btnEl.innerHTML = origHtml;
             }
-        }
+        }, 1100);
     };
 
     window.openSEOAnalysis = function(articleId, title) {
@@ -2327,7 +2352,20 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 const readLblEl     = document.getElementById('inline-readability-label');
 
                 if(scoreText) scoreText.innerText = score + '/100';
-                if(scoreLarge) scoreLarge.innerHTML = score + '<span class="text-xs text-zinc-400 font-normal"> /100</span>';
+                if(scoreLarge) {
+                    const duration = 450;
+                    const startTime = performance.now();
+                    const animateScore = function(currentTime) {
+                        const elapsed = currentTime - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        const currentVal = Math.floor(progress * score);
+                        scoreLarge.innerHTML = currentVal + '<span class="text-xs text-zinc-400 font-normal"> /100</span>';
+                        if (progress < 1) {
+                            requestAnimationFrame(animateScore);
+                        }
+                    };
+                    requestAnimationFrame(animateScore);
+                }
                 if(statusText) statusText.innerText = score >= 80 ? 'Well optimized / Keep improving' : (score >= 50 ? 'Average optimization' : 'Optimizations needed');
                 if(passedNum) passedNum.innerText = (d.passed_count || 8) + ' / 11 Checks Passed';
                 if(geoEl) geoEl.innerText = (d.geo_score || 72) + '%';
