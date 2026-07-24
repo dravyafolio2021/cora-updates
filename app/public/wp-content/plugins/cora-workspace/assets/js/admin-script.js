@@ -8562,19 +8562,32 @@ jQuery(document).ready(function($) {
         // 3. Set Google Translate cookies for string translation
         if (newLang !== 'en') {
             document.cookie = "googtrans=/en/" + newLang + "; path=/";
-            document.cookie = "googtrans=/en/" + newLang + "; path=/; domain=" + window.location.hostname;
+            if (window.location.hostname.indexOf('.') !== -1) {
+                document.cookie = "googtrans=/en/" + newLang + "; path=/; domain=" + window.location.hostname;
+            }
         } else {
             document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + window.location.hostname;
+            if (window.location.hostname.indexOf('.') !== -1) {
+                document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + window.location.hostname;
+            }
         }
 
-        // 4. UI feedback toast
+        // 4. Save language to backend options
+        if (typeof coraREData !== 'undefined' && coraREData.ajaxUrl && coraREData.ajaxNonce) {
+            $.post(coraREData.ajaxUrl, {
+                action: 'cora_save_platform_language',
+                nonce: coraREData.ajaxNonce,
+                language: newLang
+            });
+        }
+
+        // 5. UI feedback toast
         if (triggerToast && typeof window.coraShowToast === 'function') {
             const langName = window.coraLanguages[newLang] || newLang;
             window.coraShowToast("Display language updated to " + langName + ".");
         }
 
-        // 5. Apply translation update via refresh if language actually changed
+        // 6. Apply translation update via refresh if language actually changed
         if (newLang !== prevLang) {
             setTimeout(function() {
                 window.location.reload();

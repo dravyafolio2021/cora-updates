@@ -9271,7 +9271,9 @@ body {
     if (selectedLang !== 'en') {
         // Set standard Google Translate cookie
         document.cookie = "googtrans=/en/" + selectedLang + "; path=/";
-        document.cookie = "googtrans=/en/" + selectedLang + "; path=/; domain=" + window.location.hostname;
+        if (window.location.hostname.indexOf('.') !== -1) {
+            document.cookie = "googtrans=/en/" + selectedLang + "; path=/; domain=" + window.location.hostname;
+        }
 
         // Load Google Translate script
         window.googleTranslateElementInit = function() {
@@ -9289,7 +9291,9 @@ body {
     } else {
         // Clear cookie if English
         document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + window.location.hostname;
+        if (window.location.hostname.indexOf('.') !== -1) {
+            document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + window.location.hostname;
+        }
     }
 })();
 </script>

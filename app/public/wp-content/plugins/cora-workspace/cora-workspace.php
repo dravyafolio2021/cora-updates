@@ -10082,6 +10082,22 @@ function cora_ajax_save_system_settings_suite() {
 add_action( 'wp_ajax_cora_save_system_settings_suite', 'cora_ajax_save_system_settings_suite' );
 
 /**
+ * AJAX Action: Save Platform Language
+ */
+function cora_ajax_save_platform_language() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+    }
+
+    $language = isset( $_POST['language'] ) ? sanitize_text_field( $_POST['language'] ) : 'en';
+    update_option( 'cora_workspace_language', $language );
+    wp_send_json_success( array( 'message' => 'Workspace language updated.' ) );
+}
+add_action( 'wp_ajax_cora_save_platform_language', 'cora_ajax_save_platform_language' );
+
+
+/**
  * AJAX Action: Trigger Git Sync
  */
 function cora_ajax_trigger_git_sync() {
