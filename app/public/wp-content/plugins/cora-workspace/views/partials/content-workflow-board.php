@@ -20,11 +20,14 @@ if (empty($all_items)) {
     ]);
     $user_id = get_current_user_id();
     foreach ($posts as $idx => $p) {
-        $st = 'published';
-        if ($p->post_status === 'draft') $st = 'drafting';
-        else if ($p->post_status === 'pending') $st = 'review';
-        else if ($p->post_status === 'future') $st = 'scheduled';
-        else if ($idx % 3 === 0) $st = 'idea';
+        $st = get_post_meta($p->ID, '_cora_workflow_stage', true);
+        if (!$st) {
+            if ($p->post_status === 'draft') $st = 'drafting';
+            else if ($p->post_status === 'pending') $st = 'review';
+            else if ($p->post_status === 'future') $st = 'scheduled';
+            else if ($idx % 3 === 0) $st = 'idea';
+            else $st = 'published';
+        }
 
         $wpdb->insert($table, [
             'title'             => $p->post_title,
@@ -80,6 +83,11 @@ $grouped_items = [
 if (!empty($all_items)) {
     foreach($all_items as $item) {
         $raw_stage = $item['stage'] ?? 'idea';
+        // Override with post meta if set for 100% persistent state
+        if (!empty($item['post_id'])) {
+            $pm_stage = get_post_meta($item['post_id'], '_cora_workflow_stage', true);
+            if ($pm_stage) $raw_stage = $pm_stage;
+        }
         $mapped_col = $stage_mapping[$raw_stage] ?? 'idea';
         $grouped_items[$mapped_col][] = $item;
     }
@@ -102,7 +110,7 @@ $stage_keys = array_keys($stages);
   </div>
 </div>
 
-<!-- SCROLLABLE KANBAN BOARD (LIGHT BG COLOR, NO OUTLINE) -->
+<!-- SCROLLABLE KANBAN BOARD (EXPLICIT INLINE WARM BG COLOR, NO HARSH OUTLINE) -->
 <div class="flex gap-4 overflow-x-auto pb-6 select-none opacity-100 scrollbar-hide" id="cora-workflow-kanban" style="-webkit-overflow-scrolling: touch; opacity: 1 !important;">
   <?php foreach($stages as $col_key => $col_label): 
     $col_cards = $grouped_items[$col_key] ?? [];
@@ -110,11 +118,11 @@ $stage_keys = array_keys($stages);
     $next_stage_key = ($current_idx !== false && $current_idx < count($stage_keys) - 1) ? $stage_keys[$current_idx + 1] : null;
     $next_stage_label = $next_stage_key ? $stages[$next_stage_key] : null;
   ?>
-  <!-- LIGHT BG COLOR, NO OUTLINE BORDER -->
-  <div class="w-80 shrink-0 bg-[#F4F1EA] rounded-2xl flex flex-col transition-all ct-stage-container opacity-100" data-stage="<?php echo $col_key; ?>">
+  <!-- EXPLICIT WARM BG COLOR INLINE: #f4f1ea (NO OUTLINE BORDER) -->
+  <div class="w-80 shrink-0 rounded-2xl flex flex-col transition-all ct-stage-container opacity-100" data-stage="<?php echo $col_key; ?>" style="background-color: #f4f1ea; border: none !important;">
     
     <!-- Column Header -->
-    <div class="p-3.5 flex items-center justify-between bg-transparent rounded-t-2xl">
+    <div class="p-3.5 flex items-center justify-between rounded-t-2xl" style="background-color: #ede9df; border-bottom: 1px solid #e2ddd3;">
       <div class="flex items-center gap-2">
         <span class="w-2.5 h-2.5 rounded-full bg-zinc-900"></span>
         <span class="text-xs font-bold text-zinc-900 uppercase tracking-wider"><?php echo $col_label; ?></span>
@@ -136,8 +144,8 @@ $stage_keys = array_keys($stages);
          ondrop="coraWbDrop(event, '<?php echo $col_key; ?>')">
       
       <?php if (empty($col_cards)): ?>
-        <div class="empty-stage-placeholder w-full h-36 rounded-xl border border-dashed border-zinc-300/80 flex flex-col items-center justify-center text-zinc-400 text-xs gap-1.5 bg-white/60 my-auto p-4 text-center">
-          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-300 mx-auto"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+        <div class="empty-stage-placeholder w-full h-36 rounded-xl flex flex-col items-center justify-center text-zinc-400 text-xs gap-1.5 my-auto p-4 text-center" style="background-color: rgba(255, 255, 255, 0.75); border: 1.5px dashed #d4d4d8;">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-400 mx-auto"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
           <span class="font-bold text-zinc-500 text-xs">No items in stage</span>
         </div>
       <?php else: foreach($col_cards as $item): 
@@ -145,11 +153,12 @@ $stage_keys = array_keys($stages);
         $pc = $p_colors[$item['priority']] ?? $p_colors['medium'];
         $post_id = intval($item['post_id'] ?? $item['id']);
       ?>
-        <!-- WORKFLOW CARD -->
+        <!-- WORKFLOW CARD (SOLID WHITE WITH CLEAN 1PX BORDER) -->
         <div draggable="true" 
              ondragstart="coraWbDragStart(event, <?php echo $item['id']; ?>)" 
              ondragend="coraWbDragEnd(event)"
-             class="cora-wb-card bg-white border border-zinc-200/80 hover:border-zinc-400 rounded-xl p-3.5 shadow-xs hover:shadow-md transition-all space-y-3 cursor-grab active:cursor-grabbing group relative opacity-100"
+             class="cora-wb-card rounded-xl p-3.5 shadow-xs hover:shadow-md transition-all space-y-3 cursor-grab active:cursor-grabbing group relative opacity-100"
+             style="background-color: #ffffff; border: 1px solid #e4e4e7;"
              data-id="<?php echo $item['id']; ?>"
              data-post-id="<?php echo $post_id; ?>"
              data-stage="<?php echo $col_key; ?>">
@@ -222,8 +231,8 @@ $stage_keys = array_keys($stages);
     </div>
 
     <!-- Column Footer Button -->
-    <div class="p-2 bg-transparent rounded-b-2xl">
-      <button class="w-full text-center text-xs font-semibold text-zinc-500 hover:text-zinc-900 py-1.5 hover:bg-white/60 rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer" onclick="openCreateArticleDrawer()">
+    <div class="p-2.5 rounded-b-2xl" style="background-color: #ede9df; border-top: 1px solid #e2ddd3;">
+      <button class="w-full text-center text-xs font-semibold text-zinc-600 hover:text-zinc-900 py-1 hover:bg-white/60 rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer" onclick="openCreateArticleDrawer()">
         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         Add to <?php echo $col_label; ?>
       </button>
@@ -407,7 +416,7 @@ window.renderWorkspaceBoard = function(data) {
     const items = grouped[colKey] || [];
     if(countEl) countEl.textContent = items.length;
     col.innerHTML = items.length === 0
-      ? '<div class="empty-stage-placeholder w-full h-36 rounded-xl border border-dashed border-zinc-300/80 flex flex-col items-center justify-center text-zinc-400 text-xs gap-1.5 bg-white/60 my-auto p-4 text-center"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-300 mx-auto"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg><span class="font-bold text-zinc-500 text-xs">No items in stage</span></div>'
+      ? '<div class="empty-stage-placeholder w-full h-36 rounded-xl flex flex-col items-center justify-center text-zinc-400 text-xs gap-1.5 my-auto p-4 text-center" style="background-color: rgba(255, 255, 255, 0.75); border: 1.5px dashed #d4d4d8;"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-400 mx-auto"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg><span class="font-bold text-zinc-500 text-xs">No items in stage</span></div>'
       : items.map(item => window.renderItemCard(item, colKey)).join('');
   });
 };
@@ -430,7 +439,8 @@ window.renderItemCard = function(item, currentColKey) {
     <div draggable="true" 
          ondragstart="coraWbDragStart(event, ${item.id})"
          ondragend="coraWbDragEnd(event)"
-         class="cora-wb-card bg-white border border-zinc-200/80 hover:border-zinc-400 rounded-xl p-3.5 shadow-xs hover:shadow-md transition-all space-y-3 cursor-grab active:cursor-grabbing group relative opacity-100"
+         class="cora-wb-card rounded-xl p-3.5 shadow-xs hover:shadow-md transition-all space-y-3 cursor-grab active:cursor-grabbing group relative opacity-100"
+         style="background-color: #ffffff; border: 1px solid #e4e4e7;"
          data-id="${item.id}"
          data-post-id="${postId}"
          data-stage="${currentColKey}">

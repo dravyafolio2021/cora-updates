@@ -21001,14 +21001,18 @@ function cora_ajax_update_content_stage() {
     $allowed_stages = ['idea','briefing','research','drafting','editorial_review','revisions','seo_gate','approval','scheduled','published','performance','review'];
     if(!in_array($target_stage, $allowed_stages)) wp_send_json_error('Invalid stage');
     
-    $item = $wpdb->get_row($wpdb->prepare("SELECT stage FROM {$wpdb->prefix}cora_content_items WHERE id = %d", $item_id));
+    $item = $wpdb->get_row($wpdb->prepare("SELECT id, post_id, stage FROM {$wpdb->prefix}cora_content_items WHERE id = %d OR post_id = %d", $item_id, $item_id));
     if(!$item) wp_send_json_error('Item not found');
     $from_stage = $item->stage;
     
-    $wpdb->update($wpdb->prefix.'cora_content_items', ['stage' => $target_stage], ['id' => $item_id]);
+    $wpdb->update($wpdb->prefix.'cora_content_items', ['stage' => $target_stage, 'updated_at' => current_time('mysql')], ['id' => $item->id]);
+    
+    if(!empty($item->post_id)) {
+        update_post_meta($item->post_id, '_cora_workflow_stage', $target_stage);
+    }
     
     $wpdb->insert($wpdb->prefix.'cora_content_stage_log', [
-        'item_id' => $item_id,
+        'item_id' => $item->id,
         'from_stage' => $from_stage,
         'to_stage' => $target_stage,
         'changed_by' => get_current_user_id(),
@@ -21016,7 +21020,7 @@ function cora_ajax_update_content_stage() {
         'changed_at' => current_time('mysql')
     ]);
     
-    wp_send_json_success(['item_id' => $item_id, 'new_stage' => $target_stage, 'logged_at' => current_time('mysql')]);
+    wp_send_json_success(['item_id' => $item->id, 'new_stage' => $target_stage, 'logged_at' => current_time('mysql')]);
 }
 
 // 2d. cora_fetch_content_workspace
