@@ -1259,9 +1259,9 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                             <span class="text-zinc-300">&bull;</span>
                             <span id="inline-last-analyzed">Last Analyzed: --</span>
                             <span class="text-zinc-300">&bull;</span>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-bold">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                Google Cloud PageSpeed API Active (Hey Cora)
+                                Google Verified
                             </span>
                         </div>
                     </div>
@@ -1308,36 +1308,36 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 <!-- 4-Metric Top Bar -->
                 <div class="grid grid-cols-4 gap-4">
                     <!-- Metric 1: Overall SEO Score -->
-                    <div class="bg-zinc-50/60 border border-zinc-100 rounded-xl p-4 flex flex-col justify-between shadow-2xs relative overflow-hidden">
+                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-4 flex flex-col justify-between shadow-2xs relative overflow-hidden">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-bold text-zinc-700">Overall SEO Score</span>
-                            <span id="inline-seo-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Good</span>
+                            <span class="text-xs font-bold text-zinc-900">Overall SEO Score</span>
+                            <span id="inline-seo-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">Good</span>
                         </div>
                         <div class="flex items-center gap-3 my-1">
                             <div class="relative w-12 h-12 shrink-0 flex items-center justify-center">
                                 <svg width="48" height="48" viewBox="0 0 64 64" class="-rotate-90">
-                                    <circle cx="32" cy="32" r="26" stroke="#e4e4e7" stroke-width="6" fill="none"/>
-                                    <circle cx="32" cy="32" r="26" stroke="#10b981" stroke-width="6" fill="none"
+                                    <circle cx="32" cy="32" r="26" stroke="#f4f4f5" stroke-width="5" fill="none"/>
+                                    <circle cx="32" cy="32" r="26" stroke="#10b981" stroke-width="5" fill="none"
                                         stroke-dasharray="163.3" stroke-dashoffset="30"
                                         id="inline-seo-ring" stroke-linecap="round" style="transition: stroke-dashoffset 0.6s ease"/>
                                 </svg>
                                 <span id="inline-seo-score-text" class="text-xs font-bold text-zinc-900 absolute">82/100</span>
                             </div>
                             <div>
-                                <div class="text-lg font-bold text-zinc-900 leading-none" id="inline-seo-score-large">82<span class="text-xs text-zinc-400 font-normal"> /100</span></div>
+                                <div class="text-xl font-bold text-zinc-900 leading-none" id="inline-seo-score-large">82<span class="text-xs text-zinc-400 font-normal"> /100</span></div>
                                 <div class="text-[11px] text-zinc-500 mt-1 font-medium leading-tight" id="inline-seo-status">Well optimized / Keep improving</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Metric 2: GEO AI Visibility -->
-                    <div class="bg-zinc-50/60 border border-zinc-100 rounded-xl p-4 flex flex-col justify-between shadow-2xs">
+                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-4 flex flex-col justify-between shadow-2xs">
                         <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-700">
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                                 GEO / AI Visibility
                             </div>
-                            <span id="inline-geo-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">Average</span>
+                            <span id="inline-geo-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200/60">Average</span>
                         </div>
                         <div>
                             <div class="text-2xl font-bold text-zinc-900" id="inline-geo-score">72%</div>
@@ -1346,13 +1346,13 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                     </div>
 
                     <!-- Metric 3: Focus Keyword Density -->
-                    <div class="bg-zinc-50/60 border border-zinc-100 rounded-xl p-4 flex flex-col justify-between shadow-2xs">
+                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-4 flex flex-col justify-between shadow-2xs">
                         <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-700">
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
                                 Focus Keyword Density
                             </div>
-                            <span id="inline-kw-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Good</span>
+                            <span id="inline-kw-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">Good</span>
                         </div>
                         <div>
                             <div class="text-2xl font-bold text-zinc-900" id="inline-kw-density">1.4%</div>
@@ -1361,13 +1361,13 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                     </div>
 
                     <!-- Metric 4: Readability & Depth -->
-                    <div class="bg-zinc-50/60 border border-zinc-100 rounded-xl p-4 flex flex-col justify-between shadow-2xs">
+                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-4 flex flex-col justify-between shadow-2xs">
                         <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-700">
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                                 Readability & Depth
                             </div>
-                            <span id="inline-read-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Good</span>
+                            <span id="inline-read-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">Good</span>
                         </div>
                         <div>
                             <div class="text-2xl font-bold text-zinc-900" id="inline-readability-score">78<span class="text-xs text-zinc-400 font-normal"> /100</span></div>
