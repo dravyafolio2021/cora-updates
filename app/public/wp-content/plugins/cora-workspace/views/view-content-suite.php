@@ -338,9 +338,9 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 </div>
 <!-- PANEL: SEO Analyzer -->
 <div id="panel-ct-seo" class="cora-ct-panel hidden">
-    <div class="flex flex-col md:flex-row gap-6 items-start">
+    <div class="flex gap-4 items-start">
         <!-- Left: Article List -->
-        <div id="seo-sidebar" class="w-full md:w-[260px] shrink-0 bg-white border border-zinc-200/80 rounded-xl shadow-2xs sticky top-4 max-h-80 md:max-h-[calc(100vh-140px)] flex flex-col overflow-hidden transition-all duration-300">
+        <div id="seo-sidebar" class="w-[260px] shrink-0 bg-white border border-zinc-200/80 rounded-xl shadow-2xs sticky top-4 max-h-[calc(100vh-180px)] flex flex-col overflow-hidden transition-all duration-300">
             <!-- Header -->
             <div id="seo-sidebar-header" class="p-3 border-b border-zinc-200/80 bg-zinc-50/70 flex items-center justify-between">
                 <div class="flex items-center gap-2 overflow-hidden seo-sidebar-text">
@@ -405,7 +405,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         </div>
         
         <!-- Right: Analysis Area -->
-        <div class="flex-1 bg-white border border-zinc-200/80 rounded-xl shadow-2xs p-4 sm:p-6 max-h-[calc(100vh-140px)] overflow-y-auto" id="seo-analysis-container">
+        <div class="flex-1 min-w-0 bg-white border border-zinc-200/80 rounded-xl shadow-2xs p-5 max-h-[calc(100vh-180px)] overflow-y-auto" id="seo-analysis-container">
             <div class="text-center text-zinc-500 py-28 max-w-sm mx-auto">
                 <div class="w-16 h-16 bg-zinc-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -2109,9 +2109,10 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         if (shouldCollapse) {
             sidebar.classList.remove('w-[260px]', 'w-[280px]', 'w-80', 'md:w-\[260px\]');
             sidebar.classList.add('w-[40px]');
-            // Remove md: responsive width so collapse works on all screens
             sidebar.style.minWidth = '40px';
             sidebar.style.maxWidth = '40px';
+            // Remove max-height constraint so it collapses to just the toggle button height
+            sidebar.style.maxHeight = 'none';
             contentEls.forEach(el => el.classList.add('hidden'));
             textEls.forEach(el => el.classList.add('hidden'));
             if (header) {
@@ -2130,6 +2131,8 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             sidebar.classList.remove('w-[40px]');
             sidebar.style.minWidth = '';
             sidebar.style.maxWidth = '';
+            // Restore viewport-relative max-height
+            sidebar.style.maxHeight = 'calc(100vh - 180px)';
             sidebar.classList.add('w-[260px]');
             contentEls.forEach(el => el.classList.remove('hidden'));
             textEls.forEach(el => el.classList.remove('hidden'));
