@@ -193,11 +193,14 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             elseif ($st === 'approved') $approved_cnt++;
         }
     ?>
-    <!-- Top Header Bar -->
-    <div class="flex items-center justify-between mb-5">
-        <div>
-            <h1 class="text-xl font-bold text-zinc-900 tracking-tight">Content Library</h1>
-            <p class="text-xs text-zinc-500 mt-0.5 font-normal">Manage and optimize your content at scale.</p>
+    <!-- Top Filter Controls Bar -->
+    <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2 select-none overflow-x-auto scrollbar-hide" id="ct-status-pills">
+            <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-zinc-900 text-white rounded-full text-xs font-bold transition-all shadow-2xs cursor-pointer active" data-status="all" onclick="filterContentByStatus('all', this)">All (<?php echo $total_cnt; ?>)</button>
+            <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-600 rounded-full text-xs font-medium transition-all cursor-pointer" data-status="published" onclick="filterContentByStatus('published', this)">Published (<?php echo $pub_cnt; ?>)</button>
+            <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-600 rounded-full text-xs font-medium transition-all cursor-pointer" data-status="draft" onclick="filterContentByStatus('draft', this)">Draft (<?php echo $draft_cnt; ?>)</button>
+            <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-600 rounded-full text-xs font-medium transition-all cursor-pointer" data-status="pending_review" onclick="filterContentByStatus('pending_review', this)">In Review (<?php echo $review_cnt; ?>)</button>
+            <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-600 rounded-full text-xs font-medium transition-all cursor-pointer" data-status="approved" onclick="filterContentByStatus('approved', this)">Approved (<?php echo $approved_cnt; ?>)</button>
         </div>
         <div class="flex items-center gap-2.5">
             <div class="relative w-56">
@@ -210,26 +213,11 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                     <option value="<?php echo esc_attr($u->ID); ?>"><?php echo esc_html($u->display_name); ?></option>
                 <?php endforeach; ?>
             </select>
-            <select id="ct-bulk-actions" class="border border-zinc-200 hover:border-zinc-300 rounded-lg px-3 py-1.5 text-xs bg-white text-zinc-700 transition-all cursor-pointer font-medium opacity-60 cursor-not-allowed" disabled>
-                <option value="">Bulk Actions</option>
-                <option value="publish">Publish</option>
-                <option value="delete">Delete</option>
-                <option value="assign">Assign</option>
-            </select>
             <button onclick="openCreateArticleDrawer()" class="bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 <span>New Article</span>
             </button>
         </div>
-    </div>
-
-    <!-- Status Filter Pills Row -->
-    <div class="flex items-center gap-2 mb-4 select-none overflow-x-auto scrollbar-hide" id="ct-status-pills">
-        <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-zinc-900 text-white rounded-full text-xs font-bold transition-all shadow-2xs cursor-pointer active" data-status="all" onclick="filterContentByStatus('all', this)">All (<?php echo $total_cnt; ?>)</button>
-        <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-600 rounded-full text-xs font-medium transition-all cursor-pointer" data-status="published" onclick="filterContentByStatus('published', this)">Published (<?php echo $pub_cnt; ?>)</button>
-        <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-600 rounded-full text-xs font-medium transition-all cursor-pointer" data-status="draft" onclick="filterContentByStatus('draft', this)">Draft (<?php echo $draft_cnt; ?>)</button>
-        <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-600 rounded-full text-xs font-medium transition-all cursor-pointer" data-status="pending_review" onclick="filterContentByStatus('pending_review', this)">In Review (<?php echo $review_cnt; ?>)</button>
-        <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-600 rounded-full text-xs font-medium transition-all cursor-pointer" data-status="approved" onclick="filterContentByStatus('approved', this)">Approved (<?php echo $approved_cnt; ?>)</button>
     </div>
 
     <!-- Articles Table Container -->
@@ -367,6 +355,10 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                                 <button type="button" class="px-2.5 py-1 rounded-lg border border-zinc-200/80 bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer shadow-2xs" title="Edit Article" onclick="coraEditArticle(<?php echo $post->ID; ?>)">
                                     <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                     Edit
+                                </button>
+                                <button type="button" class="px-2.5 py-1 rounded-lg border border-zinc-200/80 bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer shadow-2xs" title="SEO Analysis" onclick="openSEOAnalysisTab(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                    SEO
                                 </button>
                                 <button type="button" class="p-1 rounded-lg hover:bg-zinc-100 text-zinc-400 hover:text-zinc-700 transition-colors cursor-pointer" title="Options" onclick="openSEOAnalysisTab(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
                                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
