@@ -10170,6 +10170,79 @@ function cora_ajax_get_github_repositories() {
 }
 add_action( 'wp_ajax_cora_get_github_repositories', 'cora_ajax_get_github_repositories' );
 
+/**
+ * AJAX Action: Get GitHub Branches for a selected repository
+ */
+function cora_ajax_get_github_branches() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+    }
+
+    $token = get_option( 'cora_git_sync_token', '' );
+    if ( empty( $token ) ) {
+        wp_send_json_error( array( 'message' => 'GitHub is not connected.' ) );
+    }
+
+    $repo = isset( $_POST['repo'] ) ? sanitize_text_field( $_POST['repo'] ) : '';
+    if ( empty( $repo ) ) {
+        wp_send_json_error( array( 'message' => 'Repository path is required.' ) );
+    }
+
+    // Support both full URL and username/repo format
+    if ( preg_match( '/github\.com\/([^\/]+)\/([^\/\?#]+)/i', $repo, $matches ) ) {
+        $owner = $matches[1];
+        $repo_name = $matches[2];
+    } else {
+        $repo_parts = explode( '/', trim( $repo, '/' ) );
+        if ( count( $repo_parts ) !== 2 ) {
+            wp_send_json_error( array( 'message' => 'Invalid repository format.' ) );
+        }
+        $owner = $repo_parts[0];
+        $repo_name = $repo_parts[1];
+    }
+
+    // Force trailing extension removal if pasted as repo.git
+    if ( substr( strtolower( $repo_name ), -4 ) === '.git' ) {
+        $repo_name = substr( $repo_name, 0, -4 );
+    }
+
+    $response = wp_remote_get( sprintf( 'https://api.github.com/repos/%s/%s/branches?per_page=100', $owner, $repo_name ), array(
+        'timeout' => 15,
+        'headers' => array(
+            'User-Agent'    => 'Cora-Git-Sync-Plugin',
+            'Accept'        => 'application/vnd.github+json',
+            'Authorization' => 'Bearer ' . $token
+        )
+    ) );
+
+    if ( is_wp_error( $response ) ) {
+        wp_send_json_error( array( 'message' => $response->get_error_message() ) );
+    }
+
+    $code = wp_remote_retrieve_response_code( $response );
+    $body = wp_remote_retrieve_body( $response );
+
+    if ( $code !== 200 ) {
+        $data = json_decode( $body, true );
+        $msg = isset( $data['message'] ) ? $data['message'] : 'Failed to fetch branches.';
+        wp_send_json_error( array( 'message' => $msg ) );
+    }
+
+    $branches = json_decode( $body, true );
+    if ( ! is_array( $branches ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid response from GitHub.' ) );
+    }
+
+    $result = array();
+    foreach ( $branches as $b ) {
+        $result[] = $b['name'];
+    }
+
+    wp_send_json_success( $result );
+}
+add_action( 'wp_ajax_cora_get_github_branches', 'cora_ajax_get_github_branches' );
+
 
 /**
  * AJAX Action: Trigger Git Sync

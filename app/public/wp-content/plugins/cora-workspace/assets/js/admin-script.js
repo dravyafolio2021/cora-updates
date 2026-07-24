@@ -8925,6 +8925,10 @@ jQuery(document).ready(function($) {
                 $manualContainer.addClass('hidden');
                 $displayText.text(name).removeClass('text-zinc-500').addClass('text-zinc-800 dark:text-zinc-200');
                 $manualInput.val(url);
+                // Load branches for the selected repo
+                if (url && window.coraLoadGitHubBranches) {
+                    window.coraLoadGitHubBranches(url);
+                }
             }
 
             $dropdown.addClass('hidden');
@@ -8936,3 +8940,113 @@ jQuery(document).ready(function($) {
     if ($('#cora-git-repo-searchable-select-container').length > 0) {
         window.coraLoadGitHubRepositories();
     }
+
+    window.coraLoadGitHubBranches = function(repoUrl) {
+        var $container = $('#cora-git-branch-searchable-select-container');
+        if ($container.length === 0) return;
+
+        var $trigger = $('#cora-branch-select-trigger');
+        var $displayText = $('#cora-branch-select-display-text');
+        var $dropdown = $('#cora-branch-select-dropdown');
+        var $searchInput = $('#cora-git-branch-search-input');
+        var $optionsList = $('#cora-branch-options-list');
+        var $arrow = $('#cora-branch-select-arrow');
+        var $hiddenInput = $('#cora-git-branch-value');
+        var savedBranch = $container.attr('data-saved-branch') || 'main';
+
+        $displayText.text('Loading branches...');
+        $optionsList.html('<div class="px-3 py-2 text-xs text-zinc-400 italic">Loading...</div>');
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_get_github_branches',
+            nonce: coraREData.ajaxNonce,
+            repo: repoUrl
+        }, function(res) {
+            if (res && res.success && res.data.length > 0) {
+                var branches = res.data;
+                var html = '';
+                var foundSaved = false;
+
+                branches.forEach(function(branch) {
+                    var isSaved = (branch === savedBranch);
+                    if (isSaved) {
+                        foundSaved = true;
+                        $displayText.text(branch).removeClass('text-zinc-500').addClass('text-zinc-800 dark:text-zinc-200');
+                        $hiddenInput.val(branch);
+                    }
+                    html += '<div class="cora-branch-option-item px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors flex items-center gap-2' + (isSaved ? ' font-semibold' : '') + '" data-branch="' + branch + '">' +
+                        '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" class="text-zinc-350 flex-shrink-0"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>' +
+                        branch + (isSaved ? ' <span class="ml-auto text-[9px] text-zinc-400 font-normal">(current)</span>' : '') +
+                        '</div>';
+                });
+
+                $optionsList.html(html);
+
+                if (!foundSaved) {
+                    // Default to first branch
+                    $displayText.text(branches[0]).removeClass('text-zinc-500').addClass('text-zinc-800 dark:text-zinc-200');
+                    $hiddenInput.val(branches[0]);
+                }
+            } else {
+                $displayText.text('No branches found');
+                $optionsList.html('<div class="px-3 py-2 text-xs text-zinc-400 italic">No branches found.</div>');
+            }
+        }).fail(function() {
+            $displayText.text('Failed to load branches');
+            $optionsList.html('<div class="px-3 py-2 text-xs text-zinc-400 italic">Error loading branches.</div>');
+        });
+
+        // Toggle dropdown
+        $trigger.off('click').on('click', function(e) {
+            e.stopPropagation();
+            var isHidden = $dropdown.hasClass('hidden');
+            if (isHidden) {
+                $dropdown.removeClass('hidden');
+                $arrow.addClass('rotate-180');
+                $searchInput.val('').focus();
+                $optionsList.find('.cora-branch-option-item').show();
+            } else {
+                $dropdown.addClass('hidden');
+                $arrow.removeClass('rotate-180');
+            }
+        });
+
+        // Close on outside click
+        $(document).on('click.branchSelect', function(e) {
+            if (!$(e.target).closest('#cora-git-branch-searchable-select-container').length) {
+                $dropdown.addClass('hidden');
+                $arrow.removeClass('rotate-180');
+            }
+        });
+
+        // Live search filter
+        $searchInput.off('input').on('input', function() {
+            var q = $(this).val().toLowerCase().trim();
+            $optionsList.find('.cora-branch-option-item').each(function() {
+                $(this).toggle($(this).attr('data-branch').toLowerCase().indexOf(q) > -1);
+            });
+        });
+
+        // Select branch
+        $optionsList.off('click', '.cora-branch-option-item').on('click', '.cora-branch-option-item', function(e) {
+            e.stopPropagation();
+            var branch = $(this).attr('data-branch');
+            $displayText.text(branch).removeClass('text-zinc-500').addClass('text-zinc-800 dark:text-zinc-200');
+            $hiddenInput.val(branch);
+            $dropdown.addClass('hidden');
+            $arrow.removeClass('rotate-180');
+        });
+    };
+
+    // If a repo is already saved, auto-load branches on page load
+    (function() {
+        var $repoCont = $('#cora-git-repo-searchable-select-container');
+        var $branchCont = $('#cora-git-branch-searchable-select-container');
+        if ($repoCont.length && $branchCont.length) {
+            var savedRepo = $repoCont.attr('data-saved-url') || '';
+            if (savedRepo) {
+                // Delay slightly so repo loader finishes rendering display text first
+                setTimeout(function() { window.coraLoadGitHubBranches(savedRepo); }, 600);
+            }
+        }
+    }());

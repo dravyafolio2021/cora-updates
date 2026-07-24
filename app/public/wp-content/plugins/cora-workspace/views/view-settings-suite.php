@@ -1132,26 +1132,37 @@ $cora_settings_tabs = array(
             <div class="xl:col-span-7 space-y-6">
                 <!-- Card 1: GitHub Connection -->
                 <div class="cora-shopify-card space-y-4">
-                    <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between">
-                        <div>
-                            <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">1. GitHub Connection</h3>
-                            <p class="text-xs text-zinc-500">Connect your GitHub account to sync your website code.</p>
+                    <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <!-- GitHub Logo SVG (official mark) -->
+                            <div class="w-9 h-9 rounded-xl bg-zinc-950 dark:bg-zinc-900 border border-zinc-800 flex items-center justify-center flex-shrink-0 shadow-sm">
+                                <svg viewBox="0 0 98 96" width="20" height="20" fill="#ffffff" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">GitHub Connection</h3>
+                                <p class="text-xs text-zinc-500 mt-0.5">Sync your website code from a GitHub repository.</p>
+                            </div>
                         </div>
                         <?php $git_token = get_option('cora_git_sync_token', ''); ?>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold <?php echo $git_token ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400' : 'bg-zinc-100 text-zinc-650 dark:bg-zinc-850 dark:text-zinc-400'; ?>">
-                            <span class="w-1.5 h-1.5 rounded-full <?php echo $git_token ? 'bg-green-500' : 'bg-zinc-400'; ?>"></span>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold <?php echo $git_token ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400' : 'bg-zinc-100 text-zinc-650 dark:bg-zinc-850 dark:text-zinc-400'; ?>">
+                            <span class="w-1.5 h-1.5 rounded-full <?php echo $git_token ? 'bg-green-500 animate-pulse' : 'bg-zinc-400'; ?>"></span>
                             <?php echo $git_token ? 'Connected' : 'Not Connected'; ?>
                         </span>
                     </div>
 
                     <?php if ( empty( $git_token ) ) : ?>
                         <div class="space-y-3">
-                            <div>
-                                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">GitHub Personal Access Token</label>
-                                <input type="password" id="cora-git-token-input" placeholder="ghp_..." class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400 cora-credential-input" autocomplete="off">
-                                <p class="text-[10px] text-zinc-450 mt-1">To pull your private repositories. You can generate a token in your GitHub Developer Settings.</p>
+                            <!-- Token prompt hint box -->
+                            <div class="flex items-start gap-3 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" class="text-zinc-400 mt-0.5 flex-shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                <p class="text-[10px] text-zinc-500 leading-relaxed">Generate a <strong class="text-zinc-700 dark:text-zinc-300">Personal Access Token</strong> from <a href="https://github.com/settings/tokens" target="_blank" class="underline underline-offset-2 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900">GitHub Developer Settings</a> with <code class="text-[9px] bg-zinc-200 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono">repo</code> scope enabled.</p>
                             </div>
-                            <button type="button" onclick="coraConnectGitHub()" class="px-3.5 py-2 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-white text-xs font-bold rounded-lg transition-colors cursor-pointer shadow-3xs">
+                            <div>
+                                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Personal Access Token</label>
+                                <input type="password" id="cora-git-token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400 cora-credential-input font-mono tracking-widest" autocomplete="off">
+                            </div>
+                            <button type="button" onclick="coraConnectGitHub()" class="inline-flex items-center gap-2 px-4 py-2 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-white text-xs font-bold rounded-lg transition-colors cursor-pointer shadow-3xs">
+                                <svg viewBox="0 0 98 96" width="13" height="13" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"/></svg>
                                 Connect GitHub Account
                             </button>
                         </div>
@@ -1188,13 +1199,36 @@ $cora_settings_tabs = array(
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Branch (Usually "main")</label>
-                                    <input type="text" name="cora_git_sync_branch" value="<?php echo esc_attr( get_option('cora_git_sync_branch', 'main') ); ?>" placeholder="e.g. main">
+                                    <?php $saved_branch = get_option('cora_git_sync_branch', 'main'); ?>
+                                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Branch</label>
+                                    <div class="relative" id="cora-git-branch-searchable-select-container" data-saved-branch="<?php echo esc_attr($saved_branch); ?>">
+                                        <!-- Trigger -->
+                                        <div id="cora-branch-select-trigger" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none cursor-pointer flex items-center justify-between transition-all gap-2">
+                                            <div class="flex items-center gap-1.5 min-w-0">
+                                                <!-- Git branch icon -->
+                                                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" class="text-zinc-400 flex-shrink-0"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+                                                <span id="cora-branch-select-display-text" class="truncate text-zinc-500">Select branch...</span>
+                                            </div>
+                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 transition-transform duration-200 flex-shrink-0" id="cora-branch-select-arrow"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                        </div>
+                                        <!-- Dropdown -->
+                                        <div id="cora-branch-select-dropdown" class="absolute left-0 right-0 z-50 mt-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-lg hidden flex flex-col max-h-56 overflow-hidden">
+                                            <div class="p-2 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/40">
+                                                <input type="text" id="cora-git-branch-search-input" placeholder="Search branches..." class="w-full px-2.5 py-1.5 text-xs bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-md text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400">
+                                            </div>
+                                            <div id="cora-branch-options-list" class="flex-1 overflow-y-auto py-1 max-h-44">
+                                                <div class="px-3 py-2 text-xs text-zinc-400 italic">Select a repository first...</div>
+                                            </div>
+                                        </div>
+                                        <!-- Hidden input carries value on form submit -->
+                                        <input type="hidden" id="cora-git-branch-value" name="cora_git_sync_branch" value="<?php echo esc_attr($saved_branch); ?>">
+                                    </div>
                                 </div>
                             </div>
                             <input type="hidden" name="cora_git_sync_token" value="<?php echo esc_attr( $git_token ); ?>">
                             
-                            <button type="button" onclick="coraDisconnectGitHub()" class="px-3 py-1.5 border border-zinc-205 dark:border-zinc-805 hover:border-zinc-450 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 text-[10px] font-bold rounded transition-colors cursor-pointer">
+                            <button type="button" onclick="coraDisconnectGitHub()" class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 text-[10px] font-semibold rounded-lg transition-colors cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                                 Disconnect GitHub
                             </button>
                         </div>
