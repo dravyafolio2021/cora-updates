@@ -868,7 +868,8 @@ $cora_settings_tabs = array(
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label>Google Maps API Key</label>
-                        <input type="text" name="cora_gbp_maps_api_key" value="<?php echo esc_attr( get_option('cora_gbp_maps_api_key', '') ); ?>" placeholder="AIzaSy...">
+                        <?php $maps_key = get_option('cora_gbp_maps_api_key', ''); ?>
+                        <input type="password" name="cora_gbp_maps_api_key" value="<?php echo esc_attr( $maps_key ? str_repeat('•', 24) : '' ); ?>" placeholder="AIzaSy..." class="cora-credential-input" oncopy="return false;" oncut="return false;" ondragstart="return false;" ondrop="return false;" autocomplete="off">
                         <p class="text-[10px] text-zinc-400 mt-1">Required for geolocating listing properties.</p>
                     </div>
                     <div>
@@ -886,7 +887,8 @@ $cora_settings_tabs = array(
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-zinc-100 dark:border-zinc-800/40 pt-4">
                     <div>
                         <label>WhatsApp Cloud API Token</label>
-                        <input type="password" name="cora_whatsapp_api_token" value="<?php echo esc_attr( get_option('cora_whatsapp_api_token', '') ); ?>" placeholder="EAAW...">
+                        <?php $wa_token = get_option('cora_whatsapp_api_token', ''); ?>
+                        <input type="password" name="cora_whatsapp_api_token" value="<?php echo esc_attr( $wa_token ? str_repeat('•', 24) : '' ); ?>" placeholder="EAAW..." class="cora-credential-input" oncopy="return false;" oncut="return false;" ondragstart="return false;" ondrop="return false;" autocomplete="off">
                     </div>
                     <div>
                         <label>WhatsApp Business Phone ID</label>
@@ -1157,7 +1159,8 @@ $cora_settings_tabs = array(
                 <!-- GitHub Access Token -->
                 <div>
                     <label>GitHub Security Token (Only if repository is Private)</label>
-                    <input type="password" name="cora_git_sync_token" value="<?php echo esc_attr( get_option('cora_git_sync_token', '') ); ?>" placeholder="e.g. ghp_...">
+                    <?php $git_token = get_option('cora_git_sync_token', ''); ?>
+                    <input type="password" name="cora_git_sync_token" value="<?php echo esc_attr( $git_token ? str_repeat('•', 24) : '' ); ?>" placeholder="e.g. ghp_..." class="cora-credential-input" oncopy="return false;" oncut="return false;" ondragstart="return false;" ondrop="return false;" autocomplete="off">
                     <p class="text-[10px] text-zinc-450 mt-1">Leave empty if your repository is Public. Only paste a token if the repository is private.</p>
                 </div>
 
@@ -1340,7 +1343,7 @@ $cora_settings_tabs = array(
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Google Client Secret</label>
-                        <input type="password" name="cora_google_client_secret" value="<?php echo esc_attr( $ob_client_secret ? str_repeat('*', 20) : '' ); ?>" placeholder="Leave blank to keep current value" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400">
+                        <input type="password" name="cora_google_client_secret" value="<?php echo esc_attr( $ob_client_secret ? str_repeat('•', 24) : '' ); ?>" placeholder="Leave blank to keep current value" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400 cora-credential-input" oncopy="return false;" oncut="return false;" ondragstart="return false;" ondrop="return false;" autocomplete="off">
                     </div>
                     <div class="p-3 bg-zinc-50 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
                         <p class="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest mb-1.5">Authorized Redirect URI</p>

@@ -37,8 +37,12 @@ wp_enqueue_media();
 // Save Direct MCP Access Token
 if ( isset( $_POST['cora_save_mcp_token_direct_submit'] ) && check_admin_referer( 'cora_save_mcp_token_direct', 'cora_mcp_nonce' ) ) {
     $mcp_token = sanitize_text_field( $_POST['cora_mcp_access_token_direct'] );
-    update_option( 'cora_mcp_access_token', $mcp_token );
-    echo "<script>window.addEventListener('DOMContentLoaded', function() { window.coraShowToast('AI MCP server access token saved successfully.'); });</script>";
+    if ( ! empty( $mcp_token ) && preg_match( '/^[•\*]+$/u', $mcp_token ) ) {
+        echo "<script>window.addEventListener('DOMContentLoaded', function() { window.coraShowToast('AI MCP server access token saved successfully.'); });</script>";
+    } else {
+        update_option( 'cora_mcp_access_token', $mcp_token );
+        echo "<script>window.addEventListener('DOMContentLoaded', function() { window.coraShowToast('AI MCP server access token saved successfully.'); });</script>";
+    }
 }
 
 $cora_users = ( in_array( $sub_page, array( 'dashboard', 'bookings', 'team-roles', 'equipment', 'blogs' ) ) ) ? get_users() : array();
@@ -6247,7 +6251,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             <div class="space-y-2">
                                 <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300">Secure Bearer Access Token</label>
                                 <div class="flex gap-2">
-                                    <input type="password" id="cora-mcp-access-token-direct" name="cora_mcp_access_token_direct" value="<?php echo esc_attr( $mcp_token ); ?>" class="w-full font-mono bg-white dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs px-3 py-2 outline-none">
+                                    <input type="password" id="cora-mcp-access-token-direct" name="cora_mcp_access_token_direct" value="<?php echo esc_attr( $mcp_token ? str_repeat('•', 24) : '' ); ?>" class="w-full font-mono bg-white dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs px-3 py-2 outline-none cora-credential-input" oncopy="return false;" oncut="return false;" ondragstart="return false;" ondrop="return false;" autocomplete="off">
                                     <button type="button" class="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraToggleTokenVisibilityDirect()">Show</button>
                                     <button type="button" class="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraGenerateNewMCPTokenDirect()">Regenerate</button>
                                     <button type="submit" name="cora_save_mcp_token_direct_submit" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 shadow-sm">
@@ -6277,7 +6281,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
       "args": [
         "-X", "POST",
         "<?php echo esc_url( $mcp_url ); ?>",
-        "-H", "Authorization: Bearer <?php echo esc_attr( $mcp_token ); ?>",
+        "-H", "Authorization: Bearer <?php echo esc_attr( $mcp_token ? str_repeat('•', 24) : '' ); ?>",
         "-H", "Content-Type: application/json",
         "-d", "{\"jsonrpc\":\"2.0\",\"method\":\"tools/list\",\"id\":1}"
       ]
@@ -9257,7 +9261,13 @@ body {
 </style>
 <script type="text/javascript">
 (function() {
-    const selectedLang = localStorage.getItem('cora_platform_language') || localStorage.getItem('cora_workspace_language') || 'en';
+    // Synchronize the server-saved language preference directly to localStorage
+    const serverLang = '<?php echo esc_js( get_option( 'cora_workspace_language', 'en' ) ); ?>';
+    if (serverLang) {
+        localStorage.setItem('cora_platform_language', serverLang);
+        localStorage.setItem('cora_workspace_language', serverLang);
+    }
+    const selectedLang = serverLang || localStorage.getItem('cora_platform_language') || 'en';
     if (selectedLang !== 'en') {
         // Set standard Google Translate cookie
         document.cookie = "googtrans=/en/" + selectedLang + "; path=/";

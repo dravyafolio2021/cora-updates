@@ -10025,9 +10025,17 @@ function cora_ajax_save_system_settings_suite() {
             } else {
                 $val = sanitize_text_field( $val );
             }
-            // For Google Client Secret, only update if a new non-empty secret is provided
-            if ( $field === 'cora_google_client_secret' && empty( $val ) ) {
-                continue;
+            // Skip updating secure credentials if they match the mask pattern or are empty
+            $credential_fields = array(
+                'cora_google_client_secret',
+                'cora_gbp_maps_api_key',
+                'cora_whatsapp_api_token',
+                'cora_git_sync_token'
+            );
+            if ( in_array( $field, $credential_fields, true ) ) {
+                if ( empty( $val ) || preg_match( '/^[•\*]+$/u', $val ) ) {
+                    continue;
+                }
             }
             update_option( $field, $val );
         } elseif ( in_array( $field, array( 'users_can_register', 'blog_public', 'default_pingback_flag', 'comment_moderation', 'cora_workspace_allow_tours', 'cora_git_sync_enabled', 'cora_onboarding_enabled', 'cora_onboarding_google_enabled', 'cora_onboarding_email_enabled', 'cora_onboarding_require_verification', 'cora_backup_google_drive_enabled' ) ) ) {

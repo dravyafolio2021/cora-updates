@@ -8719,3 +8719,14 @@ jQuery(document).ready(function($) {
             window.coraShowToast("Server error occurred during Git sync.");
         });
     });
+
+    // Intercept clipboard and inspection events on secure credentials input fields
+    $(document).on('copy cut dragstart contextmenu selectstart', '.cora-credential-input', function(e) {
+        e.preventDefault();
+        if (e.type === 'copy' || e.type === 'cut') {
+            if (window.coraShowToast) {
+                window.coraShowToast("Copying/cutting credentials is disabled for security reasons.", "warning");
+            }
+        }
+        return false;
+    });
