@@ -374,150 +374,127 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             <div class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-0.5">Coming Soon — GEO / AI Visibility Engine</div>
             <div class="text-sm font-semibold text-white">Real-time AI citation tracking across Google AI Overviews, Perplexity, ChatGPT & SearchGPT is in development. This will show live data for your actual published articles.</div>
         </div>
-        <span class="shrink-0 px-3 py-1.5 bg-white/10 border border-white/20 rounded-full text-xs font-bold text-white uppercase tracking-wider">Locked</span>
+        <span class="shrink-0 px-3 py-1.5 bg-white/10 border border-white/20 rounded-full text-xs font-bold text-white uppercase tracking-wider">Coming Soon</span>
     </div>
 
-    <!-- Preview Layout (blurred/locked) -->
-    <div class="relative">
-        <div class="absolute inset-0 bg-white/80 backdrop-blur-[3px] z-10 rounded-xl flex items-center justify-center">
-            <div class="text-center px-6">
-                <div class="inline-flex items-center gap-2 px-4 py-2 bg-zinc-950 text-white rounded-full text-xs font-bold mb-3">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                    Coming Soon
+    <!-- Unified Single Block Preview with Blurred Overlay -->
+    <div class="relative min-h-[500px]">
+        <!-- Single Center Overlay Card -->
+        <div class="absolute inset-0 bg-white/70 backdrop-blur-md z-20 rounded-2xl flex items-center justify-center p-6">
+            <div class="text-center max-w-md p-8 bg-white border border-zinc-200 shadow-xl rounded-2xl">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-zinc-950 text-white rounded-full text-xs font-bold mb-3 shadow-xs">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-amber-400"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>Coming Soon</span>
                 </div>
-                <p class="text-xs text-zinc-500 max-w-xs">Live AI citation data will appear here once the GEO tracking engine is connected to your workspace.</p>
+                <h3 class="text-base font-bold text-zinc-900 mb-1">GEO / AI Visibility Tracking</h3>
+                <p class="text-xs text-zinc-500 leading-relaxed mb-4">Real-time AI citation tracking across Google AI Overviews, Perplexity, ChatGPT, and SearchGPT is currently under active development.</p>
+                <div class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-zinc-400">
+                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> In Development
+                </div>
             </div>
         </div>
-        <div class="grid grid-cols-4 gap-4 select-none pointer-events-none">
-            <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm text-center opacity-40">
-                <div class="font-bold text-zinc-600 mb-2">Google AI Overviews</div>
-                <div class="text-4xl font-bold text-zinc-300">--%</div>
-                <div class="text-xs text-zinc-400 mt-2">-- articles cited</div>
-                <div class="mt-2 h-5 w-24 bg-zinc-100 rounded-full mx-auto"></div>
-            </div>
-            <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm text-center opacity-40">
-                <div class="font-bold text-zinc-600 mb-2">ChatGPT / SearchGPT</div>
-                <div class="text-4xl font-bold text-zinc-300">--%</div>
-                <div class="text-xs text-zinc-400 mt-2">-- articles cited</div>
-                <div class="mt-2 h-5 w-24 bg-zinc-100 rounded-full mx-auto"></div>
-            </div>
-            <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm text-center opacity-40">
-                <div class="font-bold text-zinc-600 mb-2">Perplexity AI</div>
-                <div class="text-4xl font-bold text-zinc-300">--%</div>
-                <div class="text-xs text-zinc-400 mt-2">-- articles cited</div>
-                <div class="mt-2 h-5 w-24 bg-zinc-100 rounded-full mx-auto"></div>
-            </div>
-            <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm text-center opacity-40">
-                <div class="font-bold text-zinc-600 mb-2">Google Gemini</div>
-                <div class="text-4xl font-bold text-zinc-300">--%</div>
-                <div class="text-xs text-zinc-400 mt-2">-- articles cited</div>
-                <div class="mt-2 h-5 w-24 bg-zinc-100 rounded-full mx-auto"></div>
-            </div>
-        </div>
-    </div>
 
-    <!-- AI Query Intent Tracker — Locked -->
-    <div class="relative">
-        <div class="absolute inset-0 bg-white/80 backdrop-blur-[3px] z-10 rounded-xl flex items-center justify-center">
-            <div class="text-center px-6">
-                <div class="inline-flex items-center gap-2 px-4 py-2 bg-zinc-950 text-white rounded-full text-xs font-bold mb-3">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                    Coming Soon — AI Query Intent Tracker
+        <!-- Blurred Background Content -->
+        <div class="space-y-6 opacity-40 pointer-events-none select-none filter blur-[1px]">
+            <!-- AI Engine Citation Metrics Grid -->
+            <div class="grid grid-cols-4 gap-4">
+                <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm text-center">
+                    <div class="font-bold text-zinc-600 mb-2">Google AI Overviews</div>
+                    <div class="text-4xl font-bold text-zinc-300">--%</div>
+                    <div class="text-xs text-zinc-400 mt-2">-- articles cited</div>
+                    <div class="mt-2 h-5 w-24 bg-zinc-100 rounded-full mx-auto"></div>
                 </div>
-                <p class="text-xs text-zinc-500 max-w-xs">Track which AI engines are citing your articles and for which queries in real time.</p>
+                <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm text-center">
+                    <div class="font-bold text-zinc-600 mb-2">ChatGPT / SearchGPT</div>
+                    <div class="text-4xl font-bold text-zinc-300">--%</div>
+                    <div class="text-xs text-zinc-400 mt-2">-- articles cited</div>
+                    <div class="mt-2 h-5 w-24 bg-zinc-100 rounded-full mx-auto"></div>
+                </div>
+                <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm text-center">
+                    <div class="font-bold text-zinc-600 mb-2">Perplexity AI</div>
+                    <div class="text-4xl font-bold text-zinc-300">--%</div>
+                    <div class="text-xs text-zinc-400 mt-2">-- articles cited</div>
+                    <div class="mt-2 h-5 w-24 bg-zinc-100 rounded-full mx-auto"></div>
+                </div>
+                <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm text-center">
+                    <div class="font-bold text-zinc-600 mb-2">Google Gemini</div>
+                    <div class="text-4xl font-bold text-zinc-300">--%</div>
+                    <div class="text-xs text-zinc-400 mt-2">-- articles cited</div>
+                    <div class="mt-2 h-5 w-24 bg-zinc-100 rounded-full mx-auto"></div>
+                </div>
             </div>
-        </div>
-        <div class="bg-white border border-zinc-200 rounded-xl shadow-sm overflow-hidden opacity-40 pointer-events-none select-none">
-            <div class="px-5 py-4 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between">
-                <h3 class="font-bold text-zinc-900">AI Query Intent Tracker</h3>
-                <span class="text-[10px] font-bold px-2 py-0.5 bg-zinc-200 text-zinc-500 rounded-full uppercase">Coming Soon</span>
-            </div>
-            <table class="w-full text-left border-collapse text-sm">
-                <thead class="bg-zinc-50 border-b border-zinc-200 text-xs text-zinc-400 uppercase">
-                    <tr>
-                        <th class="px-5 py-3">Query</th>
-                        <th class="px-5 py-3">Engine</th>
-                        <th class="px-5 py-3">State</th>
-                        <th class="px-5 py-3">Visibility</th>
-                        <th class="px-5 py-3">Source Article</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-zinc-100">
-                    <?php for($i = 0; $i < 3; $i++): ?>
-                    <tr>
-                        <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-48"></div></td>
-                        <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-16"></div></td>
-                        <td class="px-5 py-3"><div class="h-5 bg-zinc-100 rounded w-14"></div></td>
-                        <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-10"></div></td>
-                        <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-32"></div></td>
-                    </tr>
-                    <?php endfor; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
 
-    <!-- AI Demand Alerts — Locked -->
-    <div class="relative">
-        <div class="absolute inset-0 bg-white/80 backdrop-blur-[3px] z-10 rounded-xl flex items-center justify-center">
-            <div class="text-center px-6">
-                <div class="inline-flex items-center gap-2 px-4 py-2 bg-zinc-950 text-white rounded-full text-xs font-bold mb-3">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                    Coming Soon — AI Demand Alerts
+            <!-- AI Query Intent Tracker Table -->
+            <div class="bg-white border border-zinc-200 rounded-xl shadow-sm overflow-hidden">
+                <div class="px-5 py-4 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between">
+                    <h3 class="font-bold text-zinc-900">AI Query Intent Tracker</h3>
+                    <span class="text-[10px] font-bold px-2 py-0.5 bg-zinc-200 text-zinc-500 rounded-full uppercase">Coming Soon</span>
                 </div>
-                <p class="text-xs text-zinc-500 max-w-xs">Get notified when a query surge is detected in AI engines so you can draft content at the right moment.</p>
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead class="bg-zinc-50 border-b border-zinc-200 text-xs text-zinc-400 uppercase">
+                        <tr>
+                            <th class="px-5 py-3">Query</th>
+                            <th class="px-5 py-3">Engine</th>
+                            <th class="px-5 py-3">State</th>
+                            <th class="px-5 py-3">Visibility</th>
+                            <th class="px-5 py-3">Source Article</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-100">
+                        <?php for($i = 0; $i < 3; $i++): ?>
+                        <tr>
+                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-48"></div></td>
+                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-16"></div></td>
+                            <td class="px-5 py-3"><div class="h-5 bg-zinc-100 rounded w-14"></div></td>
+                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-10"></div></td>
+                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-32"></div></td>
+                        </tr>
+                        <?php endfor; ?>
+                    </tbody>
+                </table>
             </div>
-        </div>
-        <div class="grid grid-cols-3 gap-4 opacity-40 pointer-events-none select-none">
-            <?php for($i = 0; $i < 3; $i++): ?>
-            <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-4">
-                <div class="h-4 bg-zinc-200 rounded w-3/4 mb-2"></div>
-                <div class="h-3 bg-zinc-100 rounded w-1/2 mb-4"></div>
-                <div class="h-8 bg-zinc-200 rounded w-full"></div>
-            </div>
-            <?php endfor; ?>
-        </div>
-    </div>
 
-    <!-- Team Attribution Leaderboard — Locked -->
-    <div class="relative">
-        <div class="absolute inset-0 bg-white/80 backdrop-blur-[3px] z-10 rounded-xl flex items-center justify-center">
-            <div class="text-center px-6">
-                <div class="inline-flex items-center gap-2 px-4 py-2 bg-zinc-950 text-white rounded-full text-xs font-bold mb-3">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                    Coming Soon — Team Attribution
+            <!-- AI Demand Alerts Grid -->
+            <div class="grid grid-cols-3 gap-4">
+                <?php for($i = 0; $i < 3; $i++): ?>
+                <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-4">
+                    <div class="h-4 bg-zinc-200 rounded w-3/4 mb-2"></div>
+                    <div class="h-3 bg-zinc-100 rounded w-1/2 mb-4"></div>
+                    <div class="h-8 bg-zinc-200 rounded w-full"></div>
                 </div>
-                <p class="text-xs text-zinc-500 max-w-xs">See which team members are generating the most leads and AI citations from their published articles.</p>
+                <?php endfor; ?>
             </div>
-        </div>
-        <div class="bg-white border border-zinc-200 rounded-xl shadow-sm overflow-hidden opacity-40 pointer-events-none select-none">
-            <div class="px-5 py-4 border-b border-zinc-200 bg-zinc-50">
-                <h3 class="font-bold text-zinc-900">Team Attribution Leaderboard</h3>
+
+            <!-- Team Attribution Table -->
+            <div class="bg-white border border-zinc-200 rounded-xl shadow-sm overflow-hidden">
+                <div class="px-5 py-4 border-b border-zinc-200 bg-zinc-50">
+                    <h3 class="font-bold text-zinc-900">Team Attribution Leaderboard</h3>
+                </div>
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead class="bg-zinc-50 border-b border-zinc-200 text-xs text-zinc-400 uppercase">
+                        <tr>
+                            <th class="px-5 py-3">Author</th>
+                            <th class="px-5 py-3">Articles</th>
+                            <th class="px-5 py-3">Avg SEO</th>
+                            <th class="px-5 py-3">Avg GEO</th>
+                            <th class="px-5 py-3">Leads</th>
+                            <th class="px-5 py-3">Avg CR%</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-100">
+                        <?php for($i = 0; $i < 3; $i++): ?>
+                        <tr>
+                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-28"></div></td>
+                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-6"></div></td>
+                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-8"></div></td>
+                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-8"></div></td>
+                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-8"></div></td>
+                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-10"></div></td>
+                        </tr>
+                        <?php endfor; ?>
+                    </tbody>
+                </table>
             </div>
-            <table class="w-full text-left border-collapse text-sm">
-                <thead class="bg-zinc-50 border-b border-zinc-200 text-xs text-zinc-400 uppercase">
-                    <tr>
-                        <th class="px-5 py-3">Author</th>
-                        <th class="px-5 py-3">Articles</th>
-                        <th class="px-5 py-3">Avg SEO</th>
-                        <th class="px-5 py-3">Avg GEO</th>
-                        <th class="px-5 py-3">Leads</th>
-                        <th class="px-5 py-3">Avg CR%</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-zinc-100">
-                    <?php for($i = 0; $i < 3; $i++): ?>
-                    <tr>
-                        <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-28"></div></td>
-                        <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-6"></div></td>
-                        <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-8"></div></td>
-                        <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-8"></div></td>
-                        <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-8"></div></td>
-                        <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-10"></div></td>
-                    </tr>
-                    <?php endfor; ?>
-                </tbody>
-            </table>
         </div>
     </div>
 </div>
@@ -534,67 +511,66 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             <div class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-0.5">Coming Soon — Keyword Intelligence Engine</div>
             <div class="text-sm font-semibold text-white">AI-powered keyword research with monthly query volumes, AI search competition, and content gap analysis is in development. This will surface live keyword opportunities specific to your industry and market.</div>
         </div>
-        <span class="shrink-0 px-3 py-1.5 bg-white/10 border border-white/20 rounded-full text-xs font-bold text-white uppercase tracking-wider">Locked</span>
+        <span class="shrink-0 px-3 py-1.5 bg-white/10 border border-white/20 rounded-full text-xs font-bold text-white uppercase tracking-wider">Coming Soon</span>
     </div>
 
-    <!-- Preview: Keyword Clusters — Locked -->
-    <div class="relative">
-        <div class="absolute inset-0 bg-white/80 backdrop-blur-[3px] z-10 rounded-xl flex items-center justify-center">
-            <div class="text-center px-6">
-                <div class="inline-flex items-center gap-2 px-4 py-2 bg-zinc-950 text-white rounded-full text-xs font-bold mb-3">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                    Coming Soon — Keyword Clusters
+    <!-- Unified Single Block Preview with Blurred Overlay -->
+    <div class="relative min-h-[500px]">
+        <!-- Single Center Overlay Card -->
+        <div class="absolute inset-0 bg-white/70 backdrop-blur-md z-20 rounded-2xl flex items-center justify-center p-6">
+            <div class="text-center max-w-md p-8 bg-white border border-zinc-200 shadow-xl rounded-2xl">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-zinc-950 text-white rounded-full text-xs font-bold mb-3 shadow-xs">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-amber-400"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>Coming Soon</span>
                 </div>
-                <p class="text-xs text-zinc-500 max-w-xs">Grouped keyword topics with opportunity scoring and volume estimates will appear here.</p>
+                <h3 class="text-base font-bold text-zinc-900 mb-1">Keyword Intelligence Engine</h3>
+                <p class="text-xs text-zinc-500 leading-relaxed mb-4">AI-powered keyword research with monthly query volumes, AI search competition, and content gap analysis is currently under active development.</p>
+                <div class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-zinc-400">
+                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> In Development
+                </div>
             </div>
         </div>
-        <div class="grid grid-cols-3 gap-4 opacity-40 pointer-events-none select-none">
-            <?php for($i = 0; $i < 3; $i++): ?>
-            <div class="bg-white border border-zinc-200 rounded-xl p-4 text-center shadow-sm">
-                <div class="h-4 bg-zinc-200 rounded w-3/4 mx-auto mb-2"></div>
-                <div class="h-3 bg-zinc-100 rounded w-1/2 mx-auto mb-3"></div>
-                <div class="h-5 bg-zinc-100 rounded w-16 mx-auto"></div>
-            </div>
-            <?php endfor; ?>
-        </div>
-    </div>
 
-    <!-- Preview: Keyword Table — Locked -->
-    <div class="relative">
-        <div class="absolute inset-0 bg-white/80 backdrop-blur-[3px] z-10 rounded-xl flex items-center justify-center">
-            <div class="text-center px-6">
-                <div class="inline-flex items-center gap-2 px-4 py-2 bg-zinc-950 text-white rounded-full text-xs font-bold mb-3">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                    Coming Soon — Keyword Opportunities Table
+        <!-- Blurred Background Content -->
+        <div class="space-y-6 opacity-40 pointer-events-none select-none filter blur-[1px]">
+            <!-- Keyword Clusters Grid -->
+            <div class="grid grid-cols-3 gap-4">
+                <?php for($i = 0; $i < 3; $i++): ?>
+                <div class="bg-white border border-zinc-200 rounded-xl p-4 text-center shadow-sm">
+                    <div class="h-4 bg-zinc-200 rounded w-3/4 mx-auto mb-2"></div>
+                    <div class="h-3 bg-zinc-100 rounded w-1/2 mx-auto mb-3"></div>
+                    <div class="h-5 bg-zinc-100 rounded w-16 mx-auto"></div>
                 </div>
-                <p class="text-xs text-zinc-500 max-w-xs">Monthly query volumes, AI engine competition score, and one-click draft action for every keyword gap.</p>
+                <?php endfor; ?>
             </div>
-        </div>
-        <div class="bg-white border border-zinc-200 rounded-xl shadow-sm overflow-hidden opacity-40 pointer-events-none select-none">
-            <table class="w-full text-left border-collapse text-sm">
-                <thead class="bg-zinc-50 border-b border-zinc-200 text-xs text-zinc-400 uppercase">
-                    <tr>
-                        <th class="px-5 py-3">Keyword Phrase</th>
-                        <th class="px-5 py-3">Monthly Queries</th>
-                        <th class="px-5 py-3">AI Competition</th>
-                        <th class="px-5 py-3">Opportunity</th>
-                        <th class="px-5 py-3">Content Gap</th>
-                        <th class="px-5 py-3 text-right">Action</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-zinc-100">
-                    <?php for($i = 0; $i < 4; $i++): ?>
-                    <tr>
-                        <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-48"></div></td>
-                        <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-12"></div></td>
-                        <td class="px-5 py-3"><div class="h-5 bg-zinc-100 rounded w-10"></div></td>
-                        <td class="px-5 py-3"><div class="h-5 bg-zinc-100 rounded w-12"></div></td>
-                        <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-20"></div></td>
-                        <td class="px-5 py-3 text-right"><div class="h-7 bg-zinc-200 rounded w-24 ml-auto"></div></td>
-                    </tr>
-                    <?php endfor; ?>
-                </tbody>
-            </table>
+
+            <!-- Keyword Opportunities Table -->
+            <div class="bg-white border border-zinc-200 rounded-xl shadow-sm overflow-hidden">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead class="bg-zinc-50 border-b border-zinc-200 text-xs text-zinc-400 uppercase">
+                        <tr>
+                            <th class="px-5 py-3">Keyword Phrase</th>
+                            <th class="px-5 py-3">Monthly Queries</th>
+                            <th class="px-5 py-3">AI Competition</th>
+                            <th class="px-5 py-3">Opportunity</th>
+                            <th class="px-5 py-3">Content Gap</th>
+                            <th class="px-5 py-3 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-100">
+                        <?php for($i = 0; $i < 4; $i++): ?>
+                        <tr>
+                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-48"></div></td>
+                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-12"></div></td>
+                            <td class="px-5 py-3"><div class="h-5 bg-zinc-100 rounded w-10"></div></td>
+                            <td class="px-5 py-3"><div class="h-5 bg-zinc-100 rounded w-12"></div></td>
+                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-20"></div></td>
+                            <td class="px-5 py-3 text-right"><div class="h-7 bg-zinc-200 rounded w-24 ml-auto"></div></td>
+                        </tr>
+                        <?php endfor; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

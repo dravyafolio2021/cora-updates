@@ -621,7 +621,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <div class="p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 space-y-1">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Google Sheets Sync</span>
-                            <span class="px-1.5 py-0.5 rounded text-[8.5px] font-bold uppercase bg-zinc-900 text-white font-mono">Locked</span>
+                            <span class="px-1.5 py-0.5 rounded text-[8.5px] font-bold uppercase bg-zinc-900 text-white font-mono">Soon</span>
                         </div>
                         <p class="text-[10.5px] text-zinc-500">Auto-export form entries to live spreadsheets.</p>
                     </div>
@@ -873,7 +873,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <button id="btn-connect-google-sheets" class="h-8 px-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-850 transition-all flex items-center gap-1.5 cursor-pointer shrink-0">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-emerald-600 dark:text-emerald-400"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line></svg>
                     <span>Google Sheets</span>
-                    <span class="px-1.5 py-0.2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-950 text-[8.5px] font-mono font-bold rounded uppercase tracking-wider">Locked</span>
+                    <span class="px-1.5 py-0.2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-950 text-[8.5px] font-mono font-bold rounded uppercase tracking-wider">Soon</span>
                 </button>
 
                 <!-- Close Button -->
