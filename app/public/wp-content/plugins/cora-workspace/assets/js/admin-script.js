@@ -8811,3 +8811,70 @@ jQuery(document).ready(function($) {
             window.coraShowToast("Server error disconnecting from GitHub.");
         });
     };
+
+    window.coraLoadGitHubRepositories = function() {
+        var $select = $('#cora-git-repo-select');
+        if ($select.length === 0) return;
+
+        var $manualInput = $('#cora-git-repo-manual-input');
+        var $manualContainer = $('#cora-git-repo-manual-container');
+        var savedUrl = $select.attr('data-saved-url') || '';
+
+        $select.html('<option value="">Loading repositories...</option>');
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_get_github_repositories',
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res && res.success) {
+                var repos = res.data;
+                var html = '<option value="">— Select Repository —</option>';
+                var foundSaved = false;
+
+                repos.forEach(function(repo) {
+                    var selected = (repo.url.toLowerCase() === savedUrl.toLowerCase()) ? 'selected' : '';
+                    if (selected) foundSaved = true;
+                    html += '<option value="' + repo.url + '" ' + selected + '>' + repo.name + '</option>';
+                });
+
+                html += '<option value="manual">— Enter Manually... —</option>';
+                $select.html(html);
+
+                if (savedUrl && !foundSaved) {
+                    var repoName = savedUrl.replace('https://github.com/', '');
+                    $select.prepend('<option value="' + savedUrl + '" selected>' + repoName + ' (Saved)</option>');
+                }
+
+                // Sync the initial view
+                if ($select.val() === 'manual' || ($select.val() === '' && savedUrl)) {
+                    $manualContainer.removeClass('hidden');
+                } else {
+                    $manualContainer.addClass('hidden');
+                    $manualInput.val($select.val());
+                }
+            } else {
+                $select.html('<option value="manual">Failed to load repos (Enter manually)</option>');
+                $manualContainer.removeClass('hidden');
+            }
+        }).fail(function() {
+            $select.html('<option value="manual">Error loading repos (Enter manually)</option>');
+            $manualContainer.removeClass('hidden');
+        });
+
+        // Handle change event
+        $select.off('change').on('change', function() {
+            var val = $(this).val();
+            if (val === 'manual') {
+                $manualContainer.removeClass('hidden');
+                $manualInput.val('');
+            } else {
+                $manualContainer.addClass('hidden');
+                $manualInput.val(val);
+            }
+        });
+    };
+
+    // Auto-run if element is present
+    if ($('#cora-git-repo-select').length > 0) {
+        window.coraLoadGitHubRepositories();
+    }

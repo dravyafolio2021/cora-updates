@@ -10117,6 +10117,59 @@ function cora_ajax_save_platform_language() {
 }
 add_action( 'wp_ajax_cora_save_platform_language', 'cora_ajax_save_platform_language' );
 
+/**
+ * AJAX Action: Get GitHub Repositories for the connected token
+ */
+function cora_ajax_get_github_repositories() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+    }
+
+    $token = get_option( 'cora_git_sync_token', '' );
+    if ( empty( $token ) ) {
+        wp_send_json_error( array( 'message' => 'GitHub is not connected.' ) );
+    }
+
+    $response = wp_remote_get( 'https://api.github.com/user/repos?per_page=100&sort=updated', array(
+        'timeout' => 15,
+        'headers' => array(
+            'User-Agent'    => 'Cora-Git-Sync-Plugin',
+            'Accept'        => 'application/vnd.github+json',
+            'Authorization' => 'Bearer ' . $token
+        )
+    ) );
+
+    if ( is_wp_error( $response ) ) {
+        wp_send_json_error( array( 'message' => $response->get_error_message() ) );
+    }
+
+    $code = wp_remote_retrieve_response_code( $response );
+    $body = wp_remote_retrieve_body( $response );
+
+    if ( $code !== 200 ) {
+        $data = json_decode( $body, true );
+        $msg = isset( $data['message'] ) ? $data['message'] : 'Failed to fetch repositories.';
+        wp_send_json_error( array( 'message' => $msg ) );
+    }
+
+    $repos = json_decode( $body, true );
+    if ( ! is_array( $repos ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid response from GitHub.' ) );
+    }
+
+    $result = array();
+    foreach ( $repos as $repo ) {
+        $result[] = array(
+            'name' => $repo['full_name'],
+            'url'  => $repo['html_url']
+        );
+    }
+
+    wp_send_json_success( $result );
+}
+add_action( 'wp_ajax_cora_get_github_repositories', 'cora_ajax_get_github_repositories' );
+
 
 /**
  * AJAX Action: Trigger Git Sync

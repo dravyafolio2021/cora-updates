@@ -1159,8 +1159,16 @@ $cora_settings_tabs = array(
                         <div class="space-y-4">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">GitHub Repository Link</label>
-                                    <input type="text" name="cora_git_sync_repo" value="<?php echo esc_attr( get_option('cora_git_sync_repo', '') ); ?>" placeholder="e.g. https://github.com/user/repo">
+                                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">GitHub Repository</label>
+                                    <?php $saved_repo = get_option('cora_git_sync_repo', ''); ?>
+                                    <select id="cora-git-repo-select" data-saved-url="<?php echo esc_url($saved_repo); ?>" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400 cursor-pointer">
+                                        <option value="">Loading repositories...</option>
+                                    </select>
+                                    
+                                    <div id="cora-git-repo-manual-container" class="mt-2.5 hidden">
+                                        <label class="block text-[9px] font-semibold text-zinc-400 mb-1">Repository URL</label>
+                                        <input type="text" id="cora-git-repo-manual-input" name="cora_git_sync_repo" value="<?php echo esc_attr( $saved_repo ); ?>" placeholder="e.g. https://github.com/user/repo" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400">
+                                    </div>
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Branch (Usually "main")</label>
