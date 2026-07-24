@@ -1283,6 +1283,9 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                         <button type="button" class="seo-report-tab-btn py-1.5 px-3.5 rounded-lg text-xs font-bold transition-all cursor-pointer bg-white text-zinc-900 shadow-2xs border border-zinc-200/80 active whitespace-nowrap shrink-0" data-tab="tab-checklist" onclick="switchSEOReportTab('tab-checklist')">
                             SEO Checklist
                         </button>
+                        <button type="button" class="seo-report-tab-btn py-1.5 px-3.5 rounded-lg text-xs font-semibold transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 border border-transparent whitespace-nowrap shrink-0" data-tab="tab-meta" onclick="switchSEOReportTab('tab-meta')">
+                            Meta & Permalinks
+                        </button>
                         <button type="button" class="seo-report-tab-btn py-1.5 px-3.5 rounded-lg text-xs font-semibold transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 border border-transparent whitespace-nowrap shrink-0" data-tab="tab-cwv" onclick="switchSEOReportTab('tab-cwv')">
                             Core Web Vitals
                         </button>
@@ -1377,433 +1380,116 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 </div>
 
                 <!-- Tab Panels Container -->
-                <div class="tab-panels-wrapper">
-                    <!-- Tab 1: 11-Point On-Page SEO Checklist -->
-                    <div id="panel-tab-checklist" class="seo-report-panel space-y-4">
-                        <div class="border border-zinc-200 rounded-xl p-5 bg-white shadow-2xs space-y-5">
-                            <div class="text-xs font-bold text-zinc-900 uppercase tracking-wider">11-POINT ON-PAGE SEO CHECKLIST</div>
-                            
-                            <div class="grid grid-cols-12 gap-6 items-center">
-                                <!-- Left side: Circular ring gauge -->
-                                <div class="col-span-4 bg-zinc-50 border border-zinc-200 rounded-xl p-5 flex flex-col items-center justify-center text-center">
-                                    <div class="relative w-24 h-24 flex items-center justify-center my-2">
-                                        <svg width="96" height="96" viewBox="0 0 64 64" class="-rotate-90">
-                                            <circle cx="32" cy="32" r="26" stroke="#e4e4e7" stroke-width="5" fill="none"/>
-                                            <circle cx="32" cy="32" r="26" stroke="#10b981" stroke-width="5" fill="none"
-                                                stroke-dasharray="163.3" stroke-dashoffset="44.5"
-                                                id="inline-checklist-ring" stroke-linecap="round" style="transition: stroke-dashoffset 0.6s ease"/>
-                                        </svg>
-                                        <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                            <div class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-0.5">
-                                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="text-base font-bold text-zinc-900 mt-1" id="inline-checklist-score-num">8 / 11 Checks Passed</div>
-                                    <p class="text-xs text-zinc-500 mt-1 max-w-[200px]" id="inline-checklist-subtext">Great job! Most of your on-page SEO looks good.</p>
-                                </div>
-
-                                <!-- Right side grid: 2-column grid of checklist summary categories -->
-                                <div class="col-span-8 grid grid-cols-2 gap-3" id="inline-seo-checklist-categories">
-                                    <!-- Category 1: Title & Meta -->
-                                    <div class="p-3 border border-zinc-200 rounded-xl bg-white hover:border-zinc-300 transition-all cursor-pointer flex items-center justify-between group" onclick="toggleChecklistCategory(this, 'cat-title-meta')">
-                                        <div class="flex items-center gap-2.5">
-                                            <div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
-                                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 7V4h16v3"></path><path d="M9 20h6"></path><path d="M12 4v16"></path></svg>
-                                            </div>
-                                            <div>
-                                                <div class="text-xs font-bold text-zinc-900">Title & Meta</div>
-                                                <div class="text-[10px] text-zinc-500 font-medium">Meta title & description</div>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">2/2</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                        </div>
-                                    </div>
-
-                                    <!-- Category 2: Headings -->
-                                    <div class="p-3 border border-zinc-200 rounded-xl bg-white hover:border-zinc-300 transition-all cursor-pointer flex items-center justify-between group" onclick="toggleChecklistCategory(this, 'cat-headings')">
-                                        <div class="flex items-center gap-2.5">
-                                            <div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
-                                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M6 12h12"></path><path d="M6 4v16"></path><path d="M18 4v16"></path></svg>
-                                            </div>
-                                            <div>
-                                                <div class="text-xs font-bold text-zinc-900">Headings</div>
-                                                <div class="text-[10px] text-zinc-500 font-medium">H1, H2, H3 hierarchy</div>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">1/2</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                        </div>
-                                    </div>
-
-                                    <!-- Category 3: Content -->
-                                    <div class="p-3 border border-zinc-200 rounded-xl bg-white hover:border-zinc-300 transition-all cursor-pointer flex items-center justify-between group" onclick="toggleChecklistCategory(this, 'cat-content')">
-                                        <div class="flex items-center gap-2.5">
-                                            <div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
-                                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                                            </div>
-                                            <div>
-                                                <div class="text-xs font-bold text-zinc-900">Content</div>
-                                                <div class="text-[10px] text-zinc-500 font-medium">Word count & depth</div>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">2/2</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                        </div>
-                                    </div>
-
-                                    <!-- Category 4: Images -->
-                                    <div class="p-3 border border-zinc-200 rounded-xl bg-white hover:border-zinc-300 transition-all cursor-pointer flex items-center justify-between group" onclick="toggleChecklistCategory(this, 'cat-images')">
-                                        <div class="flex items-center gap-2.5">
-                                            <div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
-                                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                            </div>
-                                            <div>
-                                                <div class="text-xs font-bold text-zinc-900">Images</div>
-                                                <div class="text-[10px] text-zinc-500 font-medium">Alt tags & compression</div>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">1/1</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                        </div>
-                                    </div>
-
-                                    <!-- Category 5: Internal Links -->
-                                    <div class="p-3 border border-zinc-200 rounded-xl bg-white hover:border-zinc-300 transition-all cursor-pointer flex items-center justify-between group" onclick="toggleChecklistCategory(this, 'cat-internal-links')">
-                                        <div class="flex items-center gap-2.5">
-                                            <div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
-                                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                                            </div>
-                                            <div>
-                                                <div class="text-xs font-bold text-zinc-900">Internal Links</div>
-                                                <div class="text-[10px] text-zinc-500 font-medium">Contextual internal links</div>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">1/2</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                        </div>
-                                    </div>
-
-                                    <!-- Category 6: External Links -->
-                                    <div class="p-3 border border-zinc-200 rounded-xl bg-white hover:border-zinc-300 transition-all cursor-pointer flex items-center justify-between group" onclick="toggleChecklistCategory(this, 'cat-external-links')">
-                                        <div class="flex items-center gap-2.5">
-                                            <div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
-                                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                                            </div>
-                                            <div>
-                                                <div class="text-xs font-bold text-zinc-900">External Links</div>
-                                                <div class="text-[10px] text-zinc-500 font-medium">Authority external sources</div>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">1/1</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                        </div>
-                                    </div>
-
-                                    <!-- Category 7: Schema / Structured Data -->
-                                    <div class="p-3 border border-zinc-200 rounded-xl bg-white hover:border-zinc-300 transition-all cursor-pointer flex items-center justify-between group" onclick="toggleChecklistCategory(this, 'cat-schema')">
-                                        <div class="flex items-center gap-2.5">
-                                            <div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
-                                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 18l6-6-6-6"></path><path d="M8 6l-6 6 6 6"></path></svg>
-                                            </div>
-                                            <div>
-                                                <div class="text-xs font-bold text-zinc-900">Schema / Structured Data</div>
-                                                <div class="text-[10px] text-zinc-500 font-medium">Article & FAQ JSON-LD</div>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">0/1</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                        </div>
-                                    </div>
-
-                                    <!-- Category 8: URL & Canonical -->
-                                    <div class="p-3 border border-zinc-200 rounded-xl bg-white hover:border-zinc-300 transition-all cursor-pointer flex items-center justify-between group" onclick="toggleChecklistCategory(this, 'cat-canonical')">
-                                        <div class="flex items-center gap-2.5">
-                                            <div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
-                                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                                            </div>
-                                            <div>
-                                                <div class="text-xs font-bold text-zinc-900">URL & Canonical</div>
-                                                <div class="text-[10px] text-zinc-500 font-medium">Clean slug & canonical tag</div>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">1/1</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                        </div>
-                                    </div>
-
-                                    <!-- Category 9: Mobile Friendliness -->
-                                    <div class="p-3 border border-zinc-200 rounded-xl bg-white hover:border-zinc-300 transition-all cursor-pointer flex items-center justify-between group" onclick="toggleChecklistCategory(this, 'cat-mobile')">
-                                        <div class="flex items-center gap-2.5">
-                                            <div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
-                                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
-                                            </div>
-                                            <div>
-                                                <div class="text-xs font-bold text-zinc-900">Mobile Friendliness</div>
-                                                <div class="text-[10px] text-zinc-500 font-medium">Viewport & responsive layout</div>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">1/1</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                        </div>
-                                    </div>
-
-                                    <!-- Category 10: Page Speed -->
-                                    <div class="p-3 border border-zinc-200 rounded-xl bg-white hover:border-zinc-300 transition-all cursor-pointer flex items-center justify-between group" onclick="toggleChecklistCategory(this, 'cat-speed')">
-                                        <div class="flex items-center gap-2.5">
-                                            <div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
-                                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                                            </div>
-                                            <div>
-                                                <div class="text-xs font-bold text-zinc-900">Page Speed</div>
-                                                <div class="text-[10px] text-zinc-500 font-medium">PageSpeed API score</div>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">1/1</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Detailed Checklist Item List -->
-                            <div class="pt-3 border-t border-zinc-100" id="inline-seo-checklist-grid">
-                                <div class="text-zinc-400 text-center py-3 text-xs font-medium">Evaluating checklist details...</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tab 2: Core Web Vitals -->
-                    <div id="panel-tab-cwv" class="seo-report-panel hidden space-y-4">
-                        <div class="border border-zinc-200 rounded-xl p-5 bg-white shadow-2xs space-y-4">
+                <div class="tab-panels-wrap                    <!-- Tab 2: Meta Fields & Permalinks -->
+                    <div id="panel-tab-meta" class="seo-report-panel hidden space-y-4">
+                        <div class="border border-zinc-200/80 rounded-xl p-5 space-y-5 shadow-2xs bg-white">
                             <div class="flex items-center justify-between">
-                                <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider flex items-center gap-2">
-                                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                                    Google Core Web Vitals & Speed Diagnostics
-                                </h3>
-                                <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold" id="inline-cwv-perf-badge">
-                                    92/100 (Fast)
-                                </span>
+                                <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Meta Fields & Permalinks</h3>
+                                <button type="button" class="text-[11px] font-semibold text-zinc-600 hover:text-zinc-900 flex items-center gap-1.5 px-2.5 py-1 border border-zinc-200 rounded-lg bg-zinc-50 hover:bg-white transition-colors cursor-pointer" onclick="toggleSerpPreviewModal()">
+                                    <span>Preview in SERP</span>
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                </button>
                             </div>
-                            <p class="text-xs text-zinc-500">Real-time user experience metrics measured via Chrome UX telemetry and PageSpeed API simulation.</p>
-                            <div class="grid grid-cols-4 gap-4 pt-2">
-                                <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50 flex flex-col justify-between">
-                                    <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Performance Score</div>
-                                    <div class="text-2xl font-bold text-zinc-900 mt-2" id="inline-cwv-perf">92%</div>
-                                    <div class="text-[10px] text-emerald-600 font-bold mt-1">✓ Fast Loading Speed</div>
-                                </div>
-                                <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50 flex flex-col justify-between">
-                                    <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Largest Contentful Paint (LCP)</div>
-                                    <div class="text-2xl font-bold text-zinc-900 mt-2" id="inline-cwv-lcp">1.2s - Fast</div>
-                                    <div class="text-[10px] text-emerald-600 font-bold mt-1">✓ Target: &lt; 2.5s</div>
-                                </div>
-                                <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50 flex flex-col justify-between">
-                                    <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Cumulative Layout Shift (CLS)</div>
-                                    <div class="text-2xl font-bold text-zinc-900 mt-2" id="inline-cwv-cls">0.02 - Good</div>
-                                    <div class="text-[10px] text-emerald-600 font-bold mt-1">✓ Target: &lt; 0.1</div>
-                                </div>
-                                <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50 flex flex-col justify-between">
-                                    <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">First Contentful Paint (FCP)</div>
-                                    <div class="text-2xl font-bold text-zinc-900 mt-2" id="inline-cwv-fcp">0.8s - Fast</div>
-                                    <div class="text-[10px] text-emerald-600 font-bold mt-1">✓ Target: &lt; 1.8s</div>
+
+                            <!-- SERP Preview Card -->
+                            <div id="serp-preview-card" class="hidden p-4 rounded-xl border border-zinc-200 bg-zinc-50/80 space-y-2">
+                                <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Google Search Result Preview</div>
+                                <div class="bg-white p-3.5 rounded-lg border border-zinc-200/80 shadow-2xs max-w-xl">
+                                    <div class="text-[11px] text-zinc-500 flex items-center gap-1.5 truncate">
+                                        <span class="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center text-[9px] font-bold text-zinc-600">G</span>
+                                        <span class="text-zinc-700 font-medium" id="serp-url-preview">https://example.com/commercial-lease-gurgaon</span>
+                                    </div>
+                                    <div class="text-sm font-semibold text-blue-700 hover:underline cursor-pointer mt-1 line-clamp-1" id="serp-title-preview">Commercial Lease Gurgaon: Complete Guide 2026</div>
+                                    <div class="text-xs text-zinc-600 mt-1 line-clamp-2 leading-relaxed" id="serp-desc-preview">Looking for commercial space for lease in Gurgaon? Explore top locations, lease terms, legal considerations, and market rates in this comprehensive 2026 guide.</div>
                                 </div>
                             </div>
+
+                            <div class="grid grid-cols-2 gap-5">
+                                <!-- Left Column -->
+                                <div class="space-y-4">
+                                    <!-- Focus Keyword -->
+                                    <div>
+                                        <label class="block text-xs font-bold text-zinc-700 mb-1 flex items-center gap-1">
+                                            <span>Focus Keyword</span>
+                                            <span class="text-zinc-400 hover:text-zinc-600 cursor-help" title="The primary keyword phrase you want this article to rank for in Google and AI engines.">
+                                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                            </span>
+                                        </label>
+                                        <input type="text" id="inline-focus-keyword" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-zinc-500 bg-white" placeholder="e.g. Commercial Lease Gurgaon">
+                                    </div>
+
+                                    <!-- URL Slug -->
+                                    <div>
+                                        <label class="block text-xs font-bold text-zinc-700 mb-1 flex items-center gap-1">
+                                            <span>URL Slug</span>
+                                            <span class="text-zinc-400 hover:text-zinc-600 cursor-help" title="The permalink path fragment for this article. Clean, keyword-focused URL slugs rank higher.">
+                                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                            </span>
+                                        </label>
+                                        <input type="text" id="inline-slug" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-zinc-500 bg-white" placeholder="commercial-lease-gurgaon" oninput="updateSerpUrlPreview(this.value)">
+                                    </div>
+
+                                    <!-- Canonical URL -->
+                                    <div>
+                                        <label class="block text-xs font-bold text-zinc-700 mb-1 flex items-center gap-1">
+                                            <span>Canonical URL</span>
+                                            <span class="text-zinc-400 hover:text-zinc-600 cursor-help" title="The authoritative URL of this page to prevent duplicate content penalties.">
+                                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                            </span>
+                                        </label>
+                                        <div class="relative flex items-center">
+                                            <input type="text" id="inline-canonical-url" class="w-full border border-zinc-200 rounded-lg pl-3 pr-9 py-2 text-xs focus:outline-none focus:border-zinc-500 bg-white" placeholder="https://yourdomain.com/article-slug">
+                                            <button type="button" class="absolute right-2 text-zinc-400 hover:text-zinc-700 p-1 transition-colors cursor-pointer" title="Copy Canonical URL" onclick="copyCanonicalUrl()">
+                                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right Column -->
+                                <div class="space-y-4">
+                                    <!-- Meta Title -->
+                                    <div>
+                                        <div class="flex items-center justify-between mb-1">
+                                            <label class="text-xs font-bold text-zinc-700 flex items-center gap-1">
+                                                <span>Meta Title</span>
+                                                <span class="text-zinc-400 hover:text-zinc-600 cursor-help" title="The title element displayed in Google SERPs. Recommended length: 50-60 characters.">
+                                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                                </span>
+                                            </label>
+                                            <span id="inline-title-count" class="text-xs font-medium text-zinc-500">51/60</span>
+                                        </div>
+                                        <input type="text" id="inline-meta-title" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-zinc-500 bg-white" oninput="updateTitleMetaProgress(this)">
+                                        <div class="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden mt-1.5">
+                                            <div id="inline-title-progress-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 85%"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Meta Description -->
+                                    <div>
+                                        <div class="flex items-center justify-between mb-1">
+                                            <label class="text-xs font-bold text-zinc-700 flex items-center gap-1">
+                                                <span>Meta Description</span>
+                                                <span class="text-zinc-400 hover:text-zinc-600 cursor-help" title="The summary description displayed under title in Google SERPs. Recommended length: 120-160 characters.">
+                                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                                </span>
+                                            </label>
+                                            <span id="inline-desc-count" class="text-xs font-medium text-zinc-500">136/160</span>
+                                        </div>
+                                        <textarea id="inline-meta-description" rows="3" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-zinc-500 bg-white" oninput="updateDescMetaProgress(this)"></textarea>
+                                        <div class="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden mt-1.5">
+                                            <div id="inline-desc-progress-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 85%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="bg-zinc-950 hover:bg-zinc-800 text-white font-bold px-4 py-2.5 rounded-lg text-xs transition-colors w-full cursor-pointer shadow-xs flex items-center justify-center gap-2 mt-2" onclick="saveInlineSEOMeta(${articleId})">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                                Save SEO Meta & Permalinks
+                            </button>
                         </div>
-                    </div>
-
-                    <!-- Tab 3: Content Structure -->
-                    <div id="panel-tab-structure" class="seo-report-panel hidden space-y-4">
-                        <div class="border border-zinc-200 rounded-xl p-5 bg-white shadow-2xs space-y-4">
-                            <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Content Structure & Media Analytics</h3>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50 space-y-1">
-                                    <div class="text-[10px] font-bold text-zinc-400 uppercase">Word Count & Reading Time</div>
-                                    <div class="text-xl font-bold text-zinc-900" id="inline-struct-words">1,842 words</div>
-                                    <div class="text-xs text-zinc-500" id="inline-struct-read-time">7 min estimated read time</div>
-                                </div>
-                                <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50 space-y-1">
-                                    <div class="text-[10px] font-bold text-zinc-400 uppercase">Subheading Structure (H2/H3)</div>
-                                    <div class="text-xl font-bold text-zinc-900" id="inline-struct-headers">8 subheadings</div>
-                                    <div class="text-xs text-zinc-500">Structural outline hierarchy check</div>
-                                </div>
-                                <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50 space-y-1">
-                                    <div class="text-[10px] font-bold text-zinc-400 uppercase">Media & Image Assets</div>
-                                    <div class="text-xl font-bold text-zinc-900" id="inline-struct-images">4 images</div>
-                                    <div class="text-xs text-zinc-500" id="inline-struct-alt">4 / 4 with Alt Tags</div>
-                                </div>
-                                <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50 space-y-1">
-                                    <div class="text-[10px] font-bold text-zinc-400 uppercase">Readability Index</div>
-                                    <div class="text-xl font-bold text-zinc-900" id="inline-struct-readability">78/100</div>
-                                    <div class="text-xs text-zinc-500">Flesch-Kincaid Ease metric</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tab 4: Keywords -->
-                    <div id="panel-tab-keywords" class="seo-report-panel hidden space-y-4">
-                        <div class="border border-zinc-200 rounded-xl p-5 bg-white shadow-2xs space-y-4">
-                            <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Keyword Intelligence & Term Frequency</h3>
-                            <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50 space-y-2">
-                                <div class="flex items-center justify-between text-xs font-bold text-zinc-900">
-                                    <span>Target Focus Keyword</span>
-                                    <span class="text-emerald-700 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 text-[10px]" id="tab-kw-target">Commercial Lease Gurgaon</span>
-                                </div>
-                                <p class="text-xs text-zinc-500">Optimized density: 1.4% (appears 26 times in 1,842 words). Appears in Title, H1, H2, and meta description.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tab 5: Backlinks & Links -->
-                    <div id="panel-tab-backlinks" class="seo-report-panel hidden space-y-4">
-                        <div class="border border-zinc-200 rounded-xl p-5 bg-white shadow-2xs space-y-4">
-                            <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Internal & External Link Profile</h3>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50 space-y-1">
-                                    <div class="text-[10px] font-bold text-zinc-400 uppercase">Internal Links</div>
-                                    <div class="text-xl font-bold text-zinc-900">4 contextual links</div>
-                                    <div class="text-xs text-zinc-500">Passes page rank internally</div>
-                                </div>
-                                <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50 space-y-1">
-                                    <div class="text-[10px] font-bold text-zinc-400 uppercase">External Links</div>
-                                    <div class="text-xl font-bold text-zinc-900">2 authoritative sources</div>
-                                    <div class="text-xs text-zinc-500">Cites reliable domain references</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tab 6: AI Insights -->
-                    <div id="panel-tab-ai-insights" class="seo-report-panel hidden space-y-4">
-                        <div class="border border-zinc-200 rounded-xl p-5 bg-white shadow-2xs space-y-4">
-                            <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">LLM & GEO Search Optimization</h3>
-                            <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50 space-y-2">
-                                <div class="text-xs font-bold text-zinc-900">Perplexity & ChatGPT Citation Readiness</div>
-                                <p class="text-xs text-zinc-500">Structured data JSON-LD schema is recommended to increase brand citation chance in AI Overviews and ChatGPT search responses.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Meta Fields & Permalinks Section -->
-                <div class="border border-zinc-200 rounded-xl p-5 space-y-5 shadow-2xs bg-white">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Meta Fields & Permalinks</h3>
-                        <button type="button" class="text-[11px] font-semibold text-zinc-600 hover:text-zinc-900 flex items-center gap-1.5 px-2.5 py-1 border border-zinc-200 rounded-lg bg-zinc-50 hover:bg-white transition-colors cursor-pointer" onclick="toggleSerpPreviewModal()">
-                            <span>Preview in SERP</span>
-                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        </button>
-                    </div>
-
-                    <!-- SERP Preview Card -->
-                    <div id="serp-preview-card" class="hidden p-4 rounded-xl border border-zinc-200 bg-zinc-50/80 space-y-2">
-                        <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Google Search Result Preview</div>
-                        <div class="bg-white p-3.5 rounded-lg border border-zinc-200/80 shadow-2xs max-w-xl">
-                            <div class="text-[11px] text-zinc-500 flex items-center gap-1.5 truncate">
-                                <span class="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center text-[9px] font-bold text-zinc-600">G</span>
-                                <span class="text-zinc-700 font-medium" id="serp-url-preview">https://example.com/commercial-lease-gurgaon</span>
-                            </div>
-                            <div class="text-sm font-semibold text-blue-700 hover:underline cursor-pointer mt-1 line-clamp-1" id="serp-title-preview">Commercial Lease Gurgaon: Complete Guide 2026</div>
-                            <div class="text-xs text-zinc-600 mt-1 line-clamp-2 leading-relaxed" id="serp-desc-preview">Looking for commercial space for lease in Gurgaon? Explore top locations, lease terms, legal considerations, and market rates in this comprehensive 2026 guide.</div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-5">
-                        <!-- Left Column -->
-                        <div class="space-y-4">
-                            <!-- Focus Keyword -->
-                            <div>
-                                <label class="block text-xs font-bold text-zinc-700 mb-1 flex items-center gap-1">
-                                    <span>Focus Keyword</span>
-                                    <span class="text-zinc-400 hover:text-zinc-600 cursor-help" title="The primary keyword phrase you want this article to rank for in Google and AI engines.">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                                    </span>
-                                </label>
-                                <input type="text" id="inline-focus-keyword" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-zinc-500 bg-white" placeholder="e.g. Commercial Lease Gurgaon">
-                            </div>
-
-                            <!-- URL Slug -->
-                            <div>
-                                <label class="block text-xs font-bold text-zinc-700 mb-1 flex items-center gap-1">
-                                    <span>URL Slug</span>
-                                    <span class="text-zinc-400 hover:text-zinc-600 cursor-help" title="The permalink path fragment for this article. Clean, keyword-focused URL slugs rank higher.">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                                    </span>
-                                </label>
-                                <input type="text" id="inline-slug" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-zinc-500 bg-white" placeholder="commercial-lease-gurgaon" oninput="updateSerpUrlPreview(this.value)">
-                            </div>
-
-                            <!-- Canonical URL -->
-                            <div>
-                                <label class="block text-xs font-bold text-zinc-700 mb-1 flex items-center gap-1">
-                                    <span>Canonical URL</span>
-                                    <span class="text-zinc-400 hover:text-zinc-600 cursor-help" title="The authoritative URL of this page to prevent duplicate content penalties.">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                                    </span>
-                                </label>
-                                <div class="relative flex items-center">
-                                    <input type="text" id="inline-canonical-url" class="w-full border border-zinc-200 rounded-lg pl-3 pr-9 py-2 text-xs focus:outline-none focus:border-zinc-500 bg-white" placeholder="https://yourdomain.com/article-slug">
-                                    <button type="button" class="absolute right-2 text-zinc-400 hover:text-zinc-700 p-1 transition-colors cursor-pointer" title="Copy Canonical URL" onclick="copyCanonicalUrl()">
-                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Right Column -->
-                        <div class="space-y-4">
-                            <!-- Meta Title -->
-                            <div>
-                                <div class="flex items-center justify-between mb-1">
-                                    <label class="text-xs font-bold text-zinc-700 flex items-center gap-1">
-                                        <span>Meta Title</span>
-                                        <span class="text-zinc-400 hover:text-zinc-600 cursor-help" title="The title element displayed in Google SERPs. Recommended length: 50-60 characters.">
-                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                                        </span>
-                                    </label>
-                                    <span id="inline-title-count" class="text-xs font-medium text-zinc-500">51/60</span>
-                                </div>
-                                <input type="text" id="inline-meta-title" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-zinc-500 bg-white" oninput="updateTitleMetaProgress(this)">
-                                <div class="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden mt-1.5">
-                                    <div id="inline-title-progress-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 85%"></div>
-                                </div>
-                            </div>
-
-                            <!-- Meta Description -->
-                            <div>
-                                <div class="flex items-center justify-between mb-1">
-                                    <label class="text-xs font-bold text-zinc-700 flex items-center gap-1">
-                                        <span>Meta Description</span>
-                                        <span class="text-zinc-400 hover:text-zinc-600 cursor-help" title="The summary description displayed under title in Google SERPs. Recommended length: 120-160 characters.">
-                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                                        </span>
-                                    </label>
-                                    <span id="inline-desc-count" class="text-xs font-medium text-zinc-500">136/160</span>
-                                </div>
-                                <textarea id="inline-meta-description" rows="3" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-zinc-500 bg-white" oninput="updateDescMetaProgress(this)"></textarea>
-                                <div class="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden mt-1.5">
-                                    <div id="inline-desc-progress-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 85%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button class="bg-zinc-950 hover:bg-zinc-800 text-white font-bold px-4 py-2.5 rounded-lg text-xs transition-colors w-full cursor-pointer shadow-xs flex items-center justify-center gap-2 mt-2" onclick="saveInlineSEOMeta(${articleId})">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                        Save SEO Meta & Permalinks
-                    </button>
-                </div>
+                    </div>        </div>
             </div>
         `;
 
@@ -1932,6 +1618,34 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
     window.toggleChecklistCategory = function(el, catId) {
         const chevron = el.querySelector('.cat-chevron');
         if (chevron) chevron.classList.toggle('rotate-180');
+        
+        const grid = document.getElementById('inline-seo-checklist-grid');
+        if (!grid) return;
+
+        const catItems = grid.querySelectorAll(`.checklist-item.${catId}`);
+        const allItems = grid.querySelectorAll('.checklist-item');
+
+        if (catItems.length === 0) {
+            allItems.forEach(item => item.classList.remove('hidden'));
+            return;
+        }
+
+        const isFilteringThis = el.classList.contains('border-zinc-900');
+        
+        // Reset all category cards highlight
+        document.querySelectorAll('#inline-seo-checklist-categories > div').forEach(card => {
+            card.classList.remove('border-zinc-900', 'shadow-xs', 'bg-zinc-50/70');
+        });
+
+        if (isFilteringThis) {
+            // Unset filter, show all items
+            allItems.forEach(item => item.classList.remove('hidden'));
+        } else {
+            // Set filter to this category
+            el.classList.add('border-zinc-900', 'shadow-xs', 'bg-zinc-50/70');
+            allItems.forEach(item => item.classList.add('hidden'));
+            catItems.forEach(item => item.classList.remove('hidden'));
+        }
     };
 
     // ============================================================
@@ -2217,6 +1931,18 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 if (grid) {
                     let html = '<div class="space-y-2 text-xs mt-2">';
                     (d.checklist || []).forEach(item => {
+                        let catClass = 'cat-title-meta';
+                        const catKey = (item.category || '').toLowerCase();
+                        if (catKey.includes('heading')) catClass = 'cat-headings';
+                        else if (catKey.includes('content') || catKey.includes('word')) catClass = 'cat-content';
+                        else if (catKey.includes('image') || catKey.includes('alt')) catClass = 'cat-images';
+                        else if (catKey.includes('internal')) catClass = 'cat-internal-links';
+                        else if (catKey.includes('external')) catClass = 'cat-external-links';
+                        else if (catKey.includes('schema') || catKey.includes('json')) catClass = 'cat-schema';
+                        else if (catKey.includes('url') || catKey.includes('slug') || catKey.includes('canonical')) catClass = 'cat-canonical';
+                        else if (catKey.includes('mobile') || catKey.includes('viewport')) catClass = 'cat-mobile';
+                        else if (catKey.includes('speed') || catKey.includes('lcp') || catKey.includes('perf')) catClass = 'cat-speed';
+
                         const icon = item.passed ? '✓' : '⚠';
                         const badge = item.passed ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-800 border border-amber-200';
                         const recText = item.actionable_recommendation || item.recommendation || '';
@@ -2227,7 +1953,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                             </div>
                         ` : '';
                         html += `
-                            <div class="p-3 rounded-xl border border-zinc-200/90 bg-zinc-50/50 hover:bg-white hover:border-zinc-300 transition-all">
+                            <div class="checklist-item ${catClass} p-3 rounded-xl border border-zinc-200/90 bg-zinc-50/50 hover:bg-white hover:border-zinc-300 transition-all" data-cat="${catClass}">
                                 <div class="flex items-start justify-between gap-2">
                                     <div>
                                         <div class="font-bold text-zinc-900 text-xs">${escJsHtml(item.label)}</div>
