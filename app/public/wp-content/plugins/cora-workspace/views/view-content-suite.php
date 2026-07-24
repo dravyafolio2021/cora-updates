@@ -2752,59 +2752,62 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         }
     };
 
-    // AJAX Submissions
+    // AJAX Submissions - using native fetch to avoid jQuery dependency issues
     window.submitCreateArticle = function(e) {
         if (e && e.preventDefault) e.preventDefault();
-        const title = document.getElementById('ca-title')?.value || '';
-        const keyword = document.getElementById('ca-keyword')?.value || '';
-        const industry = document.getElementById('ca-industry')?.value || '';
-        const category = document.getElementById('ca-category')?.value || '';
-        const assignee = document.getElementById('ca-assignee')?.value || '';
-        const date = document.getElementById('ca-date')?.value || '';
-        
-        if(!title) {
-            if(window.coraShowToast) window.coraShowToast('Article title is required', 'error');
+
+        const title    = (document.getElementById('ca-title')    || {}).value || '';
+        const keyword  = (document.getElementById('ca-keyword')  || {}).value || '';
+        const industry = (document.getElementById('ca-industry') || {}).value || '';
+        const category = (document.getElementById('ca-category') || {}).value || '';
+        const assignee = (document.getElementById('ca-assignee') || {}).value || '';
+        const date     = (document.getElementById('ca-date')     || {}).value || '';
+
+        if (!title.trim()) {
+            if (window.coraShowToast) window.coraShowToast('Article title is required', 'error');
             return;
         }
 
-        const targetAjaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'));
-        const targetNonce   = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '');
+        const ajaxUrl   = (window.coraREWPData && window.coraREWPData.ajaxUrl)   ? window.coraREWPData.ajaxUrl   :
+                          (window.coraREData   && window.coraREData.ajaxUrl)     ? window.coraREData.ajaxUrl     :
+                          (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php');
+        const ajaxNonce = (window.coraREWPData && window.coraREWPData.ajaxNonce) ? window.coraREWPData.ajaxNonce :
+                          (window.coraREData   && window.coraREData.ajaxNonce)   ? window.coraREData.ajaxNonce   : '';
 
-        const btn = (e && e.target) ? e.target : document.querySelector('#cora-create-article-sheet button[onclick="submitCreateArticle(event)"]');
-        const origTxt = btn ? btn.innerText : 'Create Article';
-        if (btn) {
-            btn.disabled = true;
-            btn.innerText = 'Creating Article...';
-            btn.classList.add('opacity-70', 'cursor-not-allowed');
-        }
+        const btn = e && e.target ? e.target : document.querySelector('#cora-create-article-sheet button');
+        const origTxt = btn ? btn.textContent : 'Create Article';
+        if (btn) { btn.disabled = true; btn.textContent = 'Creating...'; btn.style.opacity = '0.7'; }
 
-        $.post(targetAjaxUrl, {
-            action: 'cora_create_article',
-            nonce: targetNonce,
-            security: targetNonce,
-            title, keyword, industry, category_id: category, assignee_id: assignee, publish_date: date
-        }, function(response) {
-            if (btn) {
-                btn.disabled = false;
-                btn.innerText = origTxt;
-                btn.classList.remove('opacity-70', 'cursor-not-allowed');
-            }
-            if (response && response.success) {
-                if(window.coraShowToast) window.coraShowToast('Article created & added to Workflow Board!', 'success');
-                closeCreateArticleDrawer();
-                setTimeout(() => window.location.reload(), 600);
-            } else {
-                const errMsg = (response && response.data) ? response.data : 'Failed to create article';
-                if(window.coraShowToast) window.coraShowToast(errMsg, 'error');
-            }
-        }).fail(function() {
-            if (btn) {
-                btn.disabled = false;
-                btn.innerText = origTxt;
-                btn.classList.remove('opacity-70', 'cursor-not-allowed');
-            }
-            if(window.coraShowToast) window.coraShowToast('Server error while creating article', 'error');
-        });
+        const body = new URLSearchParams();
+        body.append('action',      'cora_create_article');
+        body.append('nonce',       ajaxNonce);
+        body.append('security',    ajaxNonce);
+        body.append('title',       title.trim());
+        body.append('keyword',     keyword.trim());
+        body.append('industry',    industry);
+        body.append('category_id', category);
+        body.append('assignee_id', assignee);
+        body.append('publish_date', date);
+
+        fetch(ajaxUrl, { method: 'POST', credentials: 'same-origin', body: body })
+            .then(function(res) { return res.json(); })
+            .then(function(response) {
+                if (btn) { btn.disabled = false; btn.textContent = origTxt; btn.style.opacity = ''; }
+                if (response && response.success) {
+                    if (window.coraShowToast) window.coraShowToast('Article created and added to Workflow Board!', 'success');
+                    if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
+                    setTimeout(function() { window.location.reload(); }, 700);
+                } else {
+                    var msg = (response && response.data) ? response.data : 'Failed to create article. Check console.';
+                    if (window.coraShowToast) window.coraShowToast(msg, 'error');
+                    console.error('[Cora] cora_create_article error:', response);
+                }
+            })
+            .catch(function(err) {
+                if (btn) { btn.disabled = false; btn.textContent = origTxt; btn.style.opacity = ''; }
+                if (window.coraShowToast) window.coraShowToast('Network error creating article', 'error');
+                console.error('[Cora] fetch error:', err);
+            });
     };
 
     window.runSEOAnalysis = function(articleId) {
