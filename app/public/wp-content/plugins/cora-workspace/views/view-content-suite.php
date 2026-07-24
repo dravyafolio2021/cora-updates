@@ -363,213 +363,86 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 
 
 <!-- PANEL: GEO / AI Visibility -->
-<div id="panel-ct-geo" class="cora-ct-panel hidden space-y-6">
-
-    <!-- Coming Soon Banner -->
-    <div class="flex items-center gap-4 p-4 bg-zinc-950 text-white rounded-xl border border-zinc-800">
-        <div class="p-2 bg-white/10 rounded-lg shrink-0">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-        </div>
-        <div class="flex-1">
-            <div class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-0.5">Coming Soon — GEO / AI Visibility Engine</div>
-            <div class="text-sm font-semibold text-white">Real-time AI citation tracking across Google AI Overviews, Perplexity, ChatGPT & SearchGPT is in development. This will show live data for your actual published articles.</div>
-        </div>
-        <span class="shrink-0 px-3 py-1.5 bg-white/10 border border-white/20 rounded-full text-xs font-bold text-white uppercase tracking-wider">Coming Soon</span>
-    </div>
-
-    <!-- Unified Single Block Preview with Blurred Overlay -->
-    <div class="relative min-h-[500px]">
-        <!-- Single Center Overlay Card -->
-        <div class="absolute inset-0 bg-white/70 backdrop-blur-md z-20 rounded-2xl flex items-center justify-center p-6">
-            <div class="text-center max-w-md p-8 bg-white border border-zinc-200 shadow-xl rounded-2xl">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-zinc-950 text-white rounded-full text-xs font-bold mb-3 shadow-xs">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-amber-400"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    <span>Coming Soon</span>
-                </div>
-                <h3 class="text-base font-bold text-zinc-900 mb-1">GEO / AI Visibility Tracking</h3>
-                <p class="text-xs text-zinc-500 leading-relaxed mb-4">Real-time AI citation tracking across Google AI Overviews, Perplexity, ChatGPT, and SearchGPT is currently under active development.</p>
-                <div class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-zinc-400">
-                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> In Development
-                </div>
-            </div>
-        </div>
-
-        <!-- Blurred Background Content -->
-        <div class="space-y-6 opacity-40 pointer-events-none select-none filter blur-[1px]">
-            <!-- AI Engine Citation Metrics Grid -->
+<div id="panel-ct-geo" class="cora-ct-panel hidden">
+    <div class="relative w-full rounded-2xl border border-zinc-200 bg-white overflow-hidden shadow-xs min-h-[360px] flex items-center justify-center p-8">
+        <!-- Blurred Background Graphic Placeholder -->
+        <div class="absolute inset-0 p-6 opacity-30 pointer-events-none select-none filter blur-[2px] flex flex-col justify-between">
             <div class="grid grid-cols-4 gap-4">
-                <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm text-center">
-                    <div class="font-bold text-zinc-600 mb-2">Google AI Overviews</div>
-                    <div class="text-4xl font-bold text-zinc-300">--%</div>
-                    <div class="text-xs text-zinc-400 mt-2">-- articles cited</div>
-                    <div class="mt-2 h-5 w-24 bg-zinc-100 rounded-full mx-auto"></div>
+                <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-center">
+                    <div class="font-bold text-xs text-zinc-500 mb-1">Google AI</div>
+                    <div class="text-2xl font-bold text-zinc-300">--%</div>
                 </div>
-                <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm text-center">
-                    <div class="font-bold text-zinc-600 mb-2">ChatGPT / SearchGPT</div>
-                    <div class="text-4xl font-bold text-zinc-300">--%</div>
-                    <div class="text-xs text-zinc-400 mt-2">-- articles cited</div>
-                    <div class="mt-2 h-5 w-24 bg-zinc-100 rounded-full mx-auto"></div>
+                <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-center">
+                    <div class="font-bold text-xs text-zinc-500 mb-1">ChatGPT</div>
+                    <div class="text-2xl font-bold text-zinc-300">--%</div>
                 </div>
-                <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm text-center">
-                    <div class="font-bold text-zinc-600 mb-2">Perplexity AI</div>
-                    <div class="text-4xl font-bold text-zinc-300">--%</div>
-                    <div class="text-xs text-zinc-400 mt-2">-- articles cited</div>
-                    <div class="mt-2 h-5 w-24 bg-zinc-100 rounded-full mx-auto"></div>
+                <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-center">
+                    <div class="font-bold text-xs text-zinc-500 mb-1">Perplexity</div>
+                    <div class="text-2xl font-bold text-zinc-300">--%</div>
                 </div>
-                <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm text-center">
-                    <div class="font-bold text-zinc-600 mb-2">Google Gemini</div>
-                    <div class="text-4xl font-bold text-zinc-300">--%</div>
-                    <div class="text-xs text-zinc-400 mt-2">-- articles cited</div>
-                    <div class="mt-2 h-5 w-24 bg-zinc-100 rounded-full mx-auto"></div>
+                <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-center">
+                    <div class="font-bold text-xs text-zinc-500 mb-1">Gemini</div>
+                    <div class="text-2xl font-bold text-zinc-300">--%</div>
                 </div>
             </div>
-
-            <!-- AI Query Intent Tracker Table -->
-            <div class="bg-white border border-zinc-200 rounded-xl shadow-sm overflow-hidden">
-                <div class="px-5 py-4 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between">
-                    <h3 class="font-bold text-zinc-900">AI Query Intent Tracker</h3>
-                    <span class="text-[10px] font-bold px-2 py-0.5 bg-zinc-200 text-zinc-500 rounded-full uppercase">Coming Soon</span>
-                </div>
-                <table class="w-full text-left border-collapse text-sm">
-                    <thead class="bg-zinc-50 border-b border-zinc-200 text-xs text-zinc-400 uppercase">
-                        <tr>
-                            <th class="px-5 py-3">Query</th>
-                            <th class="px-5 py-3">Engine</th>
-                            <th class="px-5 py-3">State</th>
-                            <th class="px-5 py-3">Visibility</th>
-                            <th class="px-5 py-3">Source Article</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-zinc-100">
-                        <?php for($i = 0; $i < 3; $i++): ?>
-                        <tr>
-                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-48"></div></td>
-                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-16"></div></td>
-                            <td class="px-5 py-3"><div class="h-5 bg-zinc-100 rounded w-14"></div></td>
-                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-10"></div></td>
-                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-32"></div></td>
-                        </tr>
-                        <?php endfor; ?>
-                    </tbody>
-                </table>
+            <div class="border border-zinc-200 rounded-xl bg-zinc-50 p-4 space-y-2 mt-4">
+                <div class="h-4 bg-zinc-200 rounded w-1/3"></div>
+                <div class="h-3 bg-zinc-100 rounded w-2/3"></div>
+                <div class="h-3 bg-zinc-100 rounded w-1/2"></div>
             </div>
+        </div>
 
-            <!-- AI Demand Alerts Grid -->
-            <div class="grid grid-cols-3 gap-4">
-                <?php for($i = 0; $i < 3; $i++): ?>
-                <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-4">
-                    <div class="h-4 bg-zinc-200 rounded w-3/4 mb-2"></div>
-                    <div class="h-3 bg-zinc-100 rounded w-1/2 mb-4"></div>
-                    <div class="h-8 bg-zinc-200 rounded w-full"></div>
-                </div>
-                <?php endfor; ?>
+        <!-- Center Card -->
+        <div class="relative z-10 text-center max-w-lg p-6 bg-white/95 backdrop-blur-md border border-zinc-200/80 shadow-lg rounded-2xl">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-zinc-950 text-white rounded-full text-xs font-bold mb-3 shadow-xs">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-amber-400"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg>
+                <span>Coming Soon</span>
             </div>
-
-            <!-- Team Attribution Table -->
-            <div class="bg-white border border-zinc-200 rounded-xl shadow-sm overflow-hidden">
-                <div class="px-5 py-4 border-b border-zinc-200 bg-zinc-50">
-                    <h3 class="font-bold text-zinc-900">Team Attribution Leaderboard</h3>
-                </div>
-                <table class="w-full text-left border-collapse text-sm">
-                    <thead class="bg-zinc-50 border-b border-zinc-200 text-xs text-zinc-400 uppercase">
-                        <tr>
-                            <th class="px-5 py-3">Author</th>
-                            <th class="px-5 py-3">Articles</th>
-                            <th class="px-5 py-3">Avg SEO</th>
-                            <th class="px-5 py-3">Avg GEO</th>
-                            <th class="px-5 py-3">Leads</th>
-                            <th class="px-5 py-3">Avg CR%</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-zinc-100">
-                        <?php for($i = 0; $i < 3; $i++): ?>
-                        <tr>
-                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-28"></div></td>
-                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-6"></div></td>
-                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-8"></div></td>
-                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-8"></div></td>
-                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-8"></div></td>
-                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-10"></div></td>
-                        </tr>
-                        <?php endfor; ?>
-                    </tbody>
-                </table>
+            <h3 class="text-lg font-bold text-zinc-900 mb-1.5">GEO / AI Search Visibility Engine</h3>
+            <p class="text-xs text-zinc-500 leading-relaxed mb-4">Real-time citation & brand visibility tracking across Google AI Overviews, Perplexity, ChatGPT, and SearchGPT is currently under active development.</p>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-100 rounded-full text-[11px] font-semibold text-zinc-600">
+                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Scheduled for Next Release
             </div>
         </div>
     </div>
 </div>
 
 <!-- PANEL: Keyword Intelligence -->
-<div id="panel-ct-keywords" class="cora-ct-panel hidden space-y-6">
-
-    <!-- Coming Soon Banner -->
-    <div class="flex items-center gap-4 p-4 bg-zinc-950 text-white rounded-xl border border-zinc-800">
-        <div class="p-2 bg-white/10 rounded-lg shrink-0">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-        </div>
-        <div class="flex-1">
-            <div class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-0.5">Coming Soon — Keyword Intelligence Engine</div>
-            <div class="text-sm font-semibold text-white">AI-powered keyword research with monthly query volumes, AI search competition, and content gap analysis is in development. This will surface live keyword opportunities specific to your industry and market.</div>
-        </div>
-        <span class="shrink-0 px-3 py-1.5 bg-white/10 border border-white/20 rounded-full text-xs font-bold text-white uppercase tracking-wider">Coming Soon</span>
-    </div>
-
-    <!-- Unified Single Block Preview with Blurred Overlay -->
-    <div class="relative min-h-[500px]">
-        <!-- Single Center Overlay Card -->
-        <div class="absolute inset-0 bg-white/70 backdrop-blur-md z-20 rounded-2xl flex items-center justify-center p-6">
-            <div class="text-center max-w-md p-8 bg-white border border-zinc-200 shadow-xl rounded-2xl">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-zinc-950 text-white rounded-full text-xs font-bold mb-3 shadow-xs">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-amber-400"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    <span>Coming Soon</span>
-                </div>
-                <h3 class="text-base font-bold text-zinc-900 mb-1">Keyword Intelligence Engine</h3>
-                <p class="text-xs text-zinc-500 leading-relaxed mb-4">AI-powered keyword research with monthly query volumes, AI search competition, and content gap analysis is currently under active development.</p>
-                <div class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-zinc-400">
-                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> In Development
-                </div>
-            </div>
-        </div>
-
-        <!-- Blurred Background Content -->
-        <div class="space-y-6 opacity-40 pointer-events-none select-none filter blur-[1px]">
-            <!-- Keyword Clusters Grid -->
+<div id="panel-ct-keywords" class="cora-ct-panel hidden">
+    <div class="relative w-full rounded-2xl border border-zinc-200 bg-white overflow-hidden shadow-xs min-h-[360px] flex items-center justify-center p-8">
+        <!-- Blurred Background Graphic Placeholder -->
+        <div class="absolute inset-0 p-6 opacity-30 pointer-events-none select-none filter blur-[2px] flex flex-col justify-between">
             <div class="grid grid-cols-3 gap-4">
-                <?php for($i = 0; $i < 3; $i++): ?>
-                <div class="bg-white border border-zinc-200 rounded-xl p-4 text-center shadow-sm">
-                    <div class="h-4 bg-zinc-200 rounded w-3/4 mx-auto mb-2"></div>
-                    <div class="h-3 bg-zinc-100 rounded w-1/2 mx-auto mb-3"></div>
-                    <div class="h-5 bg-zinc-100 rounded w-16 mx-auto"></div>
+                <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-center">
+                    <div class="h-3 bg-zinc-200 rounded w-1/2 mx-auto mb-2"></div>
+                    <div class="h-6 bg-zinc-300 rounded w-1/3 mx-auto"></div>
                 </div>
-                <?php endfor; ?>
+                <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-center">
+                    <div class="h-3 bg-zinc-200 rounded w-1/2 mx-auto mb-2"></div>
+                    <div class="h-6 bg-zinc-300 rounded w-1/3 mx-auto"></div>
+                </div>
+                <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-center">
+                    <div class="h-3 bg-zinc-200 rounded w-1/2 mx-auto mb-2"></div>
+                    <div class="h-6 bg-zinc-300 rounded w-1/3 mx-auto"></div>
+                </div>
             </div>
+            <div class="border border-zinc-200 rounded-xl bg-zinc-50 p-4 space-y-2 mt-4">
+                <div class="h-4 bg-zinc-200 rounded w-1/3"></div>
+                <div class="h-3 bg-zinc-100 rounded w-2/3"></div>
+                <div class="h-3 bg-zinc-100 rounded w-1/2"></div>
+            </div>
+        </div>
 
-            <!-- Keyword Opportunities Table -->
-            <div class="bg-white border border-zinc-200 rounded-xl shadow-sm overflow-hidden">
-                <table class="w-full text-left border-collapse text-sm">
-                    <thead class="bg-zinc-50 border-b border-zinc-200 text-xs text-zinc-400 uppercase">
-                        <tr>
-                            <th class="px-5 py-3">Keyword Phrase</th>
-                            <th class="px-5 py-3">Monthly Queries</th>
-                            <th class="px-5 py-3">AI Competition</th>
-                            <th class="px-5 py-3">Opportunity</th>
-                            <th class="px-5 py-3">Content Gap</th>
-                            <th class="px-5 py-3 text-right">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-zinc-100">
-                        <?php for($i = 0; $i < 4; $i++): ?>
-                        <tr>
-                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-48"></div></td>
-                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-12"></div></td>
-                            <td class="px-5 py-3"><div class="h-5 bg-zinc-100 rounded w-10"></div></td>
-                            <td class="px-5 py-3"><div class="h-5 bg-zinc-100 rounded w-12"></div></td>
-                            <td class="px-5 py-3"><div class="h-3 bg-zinc-100 rounded w-20"></div></td>
-                            <td class="px-5 py-3 text-right"><div class="h-7 bg-zinc-200 rounded w-24 ml-auto"></div></td>
-                        </tr>
-                        <?php endfor; ?>
-                    </tbody>
-                </table>
+        <!-- Center Card -->
+        <div class="relative z-10 text-center max-w-lg p-6 bg-white/95 backdrop-blur-md border border-zinc-200/80 shadow-lg rounded-2xl">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-zinc-950 text-white rounded-full text-xs font-bold mb-3 shadow-xs">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-amber-400"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg>
+                <span>Coming Soon</span>
+            </div>
+            <h3 class="text-lg font-bold text-zinc-900 mb-1.5">Keyword Intelligence Engine</h3>
+            <p class="text-xs text-zinc-500 leading-relaxed mb-4">AI-powered keyword research with monthly query volumes, AI search competition, and content gap analysis is currently under active development.</p>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-100 rounded-full text-[11px] font-semibold text-zinc-600">
+                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Scheduled for Next Release
             </div>
         </div>
     </div>
