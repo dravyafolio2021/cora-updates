@@ -480,64 +480,75 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     }
     ?>
 
-    <!-- Top Rich Control Bar -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white p-3.5 border border-zinc-200 rounded-xl shadow-2xs">
-        <!-- Left Filters & Navigation -->
-        <div class="flex items-center gap-2 flex-wrap">
-            <select id="cal-filter-type" class="h-8 px-2.5 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer" onchange="coraFilterCalendar()">
-                <option value="">All Types</option>
-                <option value="blog">Blog Post</option>
-                <option value="instagram">Instagram Post</option>
-                <option value="youtube">YouTube Video</option>
-                <option value="linkedin">LinkedIn Post</option>
-                <option value="newsletter">Newsletter</option>
-            </select>
-
-            <select id="cal-filter-status" class="h-8 px-2.5 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer" onchange="coraFilterCalendar()">
-                <option value="">All Status</option>
-                <option value="draft">Draft</option>
-                <option value="in_review">In Review</option>
-                <option value="scheduled">Scheduled</option>
-                <option value="publish">Published</option>
-            </select>
-
-            <select id="cal-filter-owner" class="h-8 px-2.5 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer" onchange="coraFilterCalendar()">
-                <option value="">All Owners</option>
-                <?php foreach($cora_users as $u): ?>
-                    <option value="<?php echo esc_attr($u->ID); ?>"><?php echo esc_html($u->display_name); ?></option>
-                <?php endforeach; ?>
-            </select>
-
-            <!-- Week Navigator Controls -->
-            <div class="flex items-center gap-1 border border-zinc-200 rounded-lg p-0.5 bg-zinc-50/50">
-                <button class="h-7 w-7 rounded-md hover:bg-white flex items-center justify-center text-zinc-600 transition-colors cursor-pointer" title="Previous Week">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                </button>
-                <span class="text-xs font-bold text-zinc-900 px-2 min-w-[130px] text-center" id="cal-week-label"><?php echo esc_html($week_label); ?></span>
-                <button class="h-7 w-7 rounded-md hover:bg-white flex items-center justify-center text-zinc-600 transition-colors cursor-pointer" title="Next Week">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    <!-- Top Control Bar (Structured 2 Rows Layout) -->
+    <div class="bg-white border border-zinc-200 rounded-xl p-4 shadow-2xs space-y-3">
+        <!-- Row 1: Primary Navigation & Date Range Controls -->
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-100 pb-3">
+            <!-- Left: Date Navigator -->
+            <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1 bg-zinc-50 border border-zinc-200/90 rounded-lg p-0.5 shadow-2xs">
+                    <button onclick="coraNavWeek(-1)" class="h-7 w-7 rounded-md hover:bg-white flex items-center justify-center text-zinc-700 transition-all cursor-pointer" title="Previous Week">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    </button>
+                    <span class="text-xs font-bold text-zinc-900 px-3 min-w-[140px] text-center" id="cal-date-range-label"><?php echo esc_html($week_label); ?></span>
+                    <button onclick="coraNavWeek(1)" class="h-7 w-7 rounded-md hover:bg-white flex items-center justify-center text-zinc-700 transition-all cursor-pointer" title="Next Week">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                </div>
+                <button onclick="coraNavWeek(0)" class="h-8 px-3 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-700 transition-colors cursor-pointer">
+                    Today
                 </button>
             </div>
 
-            <!-- Reset Filters -->
-            <button onclick="coraResetCalendarFilters()" class="h-8 px-3 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-700 flex items-center gap-1.5 cursor-pointer">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-                Reset
-            </button>
+            <!-- Right: View Toggle (Week | Month) & Reset -->
+            <div class="flex items-center gap-2">
+                <div class="flex items-center p-0.5 rounded-lg border border-zinc-200 bg-zinc-100/80 text-zinc-600">
+                    <button id="btn-cal-view-week" onclick="coraToggleCalendarView('week')" class="h-7 px-3.5 rounded-md text-xs font-bold bg-white text-zinc-950 shadow-2xs transition-all cursor-pointer">Week View</button>
+                    <button id="btn-cal-view-month" onclick="coraToggleCalendarView('month')" class="h-7 px-3.5 rounded-md text-xs font-semibold text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer">Month View</button>
+                </div>
+                <button onclick="coraResetCalendarFilters()" class="h-8 px-3 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-700 flex items-center gap-1.5 cursor-pointer transition-colors">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                    Reset Filters
+                </button>
+            </div>
         </div>
 
-        <!-- Right View Mode Switcher -->
-        <div class="flex items-center gap-4 shrink-0 flex-wrap">
-            <div class="flex items-center p-0.5 rounded-lg border border-zinc-200 bg-zinc-100 text-zinc-600">
-                <button id="btn-cal-view-week" onclick="coraToggleCalendarView('week')" class="h-7 px-3 rounded-md text-xs font-bold bg-white text-zinc-950 shadow-2xs transition-all">Week</button>
-                <button id="btn-cal-view-month" onclick="coraToggleCalendarView('month')" class="h-7 px-3 rounded-md text-xs font-semibold text-zinc-500 hover:text-zinc-900 transition-all">Month</button>
+        <!-- Row 2: Filter Selects & Status Color Indicators -->
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <!-- Left: Filters Row -->
+            <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Filter By:</span>
+                <select id="cal-filter-type" class="h-8 px-3 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer" onchange="coraFilterCalendar()">
+                    <option value="">All Types</option>
+                    <option value="blog">Blog Post</option>
+                    <option value="instagram">Instagram Post</option>
+                    <option value="youtube">YouTube Video</option>
+                    <option value="linkedin">LinkedIn Post</option>
+                    <option value="newsletter">Newsletter</option>
+                </select>
+
+                <select id="cal-filter-status" class="h-8 px-3 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer" onchange="coraFilterCalendar()">
+                    <option value="">All Status</option>
+                    <option value="draft">Draft</option>
+                    <option value="in_review">In Review</option>
+                    <option value="scheduled">Scheduled</option>
+                    <option value="publish">Published</option>
+                </select>
+
+                <select id="cal-filter-owner" class="h-8 px-3 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer" onchange="coraFilterCalendar()">
+                    <option value="">All Owners</option>
+                    <?php foreach($cora_users as $u): ?>
+                        <option value="<?php echo esc_attr($u->ID); ?>"><?php echo esc_html($u->display_name); ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
 
-            <div class="hidden sm:flex items-center gap-3 text-xs font-medium text-zinc-600">
-                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-zinc-400"></span> Draft</span>
-                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-500"></span> In Review</span>
-                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Scheduled</span>
-                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Published</span>
+            <!-- Right: Status Indicators -->
+            <div class="flex items-center gap-3.5 text-xs font-medium text-zinc-600 bg-zinc-50/80 px-3 py-1.5 rounded-lg border border-zinc-100">
+                <span class="flex items-center gap-1.5 text-[11px] font-semibold"><span class="w-2 h-2 rounded-full bg-zinc-400"></span> Draft</span>
+                <span class="flex items-center gap-1.5 text-[11px] font-semibold"><span class="w-2 h-2 rounded-full bg-amber-500"></span> In Review</span>
+                <span class="flex items-center gap-1.5 text-[11px] font-semibold"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Scheduled</span>
+                <span class="flex items-center gap-1.5 text-[11px] font-semibold"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Published</span>
             </div>
         </div>
     </div>
@@ -955,6 +966,36 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         if (bd) {
             bd.classList.add('hidden');
             bd.style.pointerEvents = 'none';
+        }
+    };
+
+
+    // --- Calendar Week Navigation & Filter Logic ---
+    let currentWeekOffset = 0;
+    
+    window.coraNavWeek = function(delta) {
+        if (delta === 0) {
+            currentWeekOffset = 0;
+        } else {
+            currentWeekOffset += delta;
+        }
+        if (window.coraShowToast) {
+            const msg = currentWeekOffset === 0 ? "Showing current week" : (currentWeekOffset < 0 ? `Showing week (${currentWeekOffset})` : `Showing week (+${currentWeekOffset})`);
+            window.coraShowToast(msg, "info");
+        }
+    };
+
+    window.coraToggleCalendarView = function(mode) {
+        const weekBtn = document.getElementById('btn-cal-view-week');
+        const monthBtn = document.getElementById('btn-cal-view-month');
+        if(mode === 'week') {
+            if(weekBtn) { weekBtn.className = 'h-7 px-3.5 rounded-md text-xs font-bold bg-white text-zinc-950 shadow-2xs transition-all cursor-pointer'; }
+            if(monthBtn) { monthBtn.className = 'h-7 px-3.5 rounded-md text-xs font-semibold text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer'; }
+            if(window.coraShowToast) window.coraShowToast("Switched to Weekly View", "info");
+        } else {
+            if(monthBtn) { monthBtn.className = 'h-7 px-3.5 rounded-md text-xs font-bold bg-white text-zinc-950 shadow-2xs transition-all cursor-pointer'; }
+            if(weekBtn) { weekBtn.className = 'h-7 px-3.5 rounded-md text-xs font-semibold text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer'; }
+            if(window.coraShowToast) window.coraShowToast("Switched to Monthly View", "info");
         }
     };
 
