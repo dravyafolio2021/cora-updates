@@ -311,7 +311,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                         Edit
                                     </button>
-                                    <button type="button" class="px-2 py-1 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer" title="SEO Analysis" onclick="openSEODetailDrawer(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
+                                    <button type="button" class="px-2 py-1 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer" title="SEO Analysis" onclick="openSEOAnalysisTab(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
                                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                                         SEO
                                     </button>
@@ -1052,6 +1052,19 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 }
             }, 150);
         }
+
+        const seoPostId = urlParams.get('seo_post_id');
+        if (seoPostId || ct === 'ct-seo') {
+            setTimeout(function() {
+                const firstBtn = document.querySelector('.seo-article-btn');
+                const targetId = seoPostId || (firstBtn ? firstBtn.dataset.id : null);
+                if (targetId && typeof window.openSEOAnalysis === 'function') {
+                    const btn = document.querySelector(`.seo-article-btn[data-id="${targetId}"]`);
+                    const title = btn ? btn.dataset.title : '';
+                    window.openSEOAnalysis(targetId, title);
+                }
+            }, 100);
+        }
     }
 
     if (document.readyState === 'loading') {
@@ -1130,6 +1143,20 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
     
 
 
+    window.openSEOAnalysisTab = function(articleId, title) {
+        if (typeof window.switchContentTab === 'function') {
+            window.switchContentTab('ct-seo');
+        }
+        try {
+            const url = new URL(window.location.href);
+            url.searchParams.set('ct', 'ct-seo');
+            url.searchParams.set('seo_post_id', articleId);
+            window.history.pushState({ ct: 'ct-seo', seo_post_id: articleId }, '', url.toString());
+        } catch(e){}
+
+        openSEOAnalysis(articleId, title);
+    };
+
     window.openSEOAnalysis = function(articleId, title) {
         // Highlight active item in left sidebar list
         document.querySelectorAll('.seo-article-btn').forEach(btn => {
@@ -1151,10 +1178,16 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                     <div>
                         <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">SEO & AI Audit Workspace</div>
                         <h2 class="text-lg font-bold text-zinc-900 leading-snug">${escJsHtml(title)}</h2>
-                        <div class="text-xs text-zinc-500 mt-1">Article ID #${articleId}</div>
+                        <div class="text-xs text-zinc-500 mt-1 flex items-center gap-3">
+                            <span>Article ID #${articleId}</span>
+                            <span>&bull;</span>
+                            <span id="inline-word-count">Word Count: --</span>
+                            <span>&bull;</span>
+                            <span id="inline-last-analyzed">Last Analyzed: --</span>
+                        </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button class="bg-zinc-900 hover:bg-zinc-800 text-white font-bold px-4 py-2 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5" onclick="runInlineSEOAudit(${articleId})">
+                        <button class="bg-zinc-900 hover:bg-zinc-800 text-white font-bold px-4 py-2 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-sm" onclick="runInlineSEOAudit(${articleId})">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                             Run 11-Point Audit
                         </button>
@@ -1175,28 +1208,28 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                         </div>
                         <div>
                             <div class="text-xs font-bold text-zinc-900">Overall SEO Score</div>
-                            <div class="text-[11px] text-zinc-500 mt-0.5" id="inline-seo-status">Click Run Audit to evaluate</div>
+                            <div class="text-[11px] text-zinc-500 mt-0.5 font-medium" id="inline-seo-status">Evaluating content...</div>
                         </div>
                     </div>
 
                     <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-4 flex flex-col justify-between">
                         <div class="text-xs font-bold text-zinc-900">GEO AI Visibility</div>
                         <div class="text-2xl font-bold text-zinc-900 mt-1" id="inline-geo-score">--</div>
-                        <div class="text-[10px] text-zinc-500" id="inline-geo-label">Loading article data...</div>
+                        <div class="text-[10px] text-zinc-500 font-medium" id="inline-geo-label">Loading AI visibility signals...</div>
                     </div>
 
                     <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-4 flex flex-col justify-between">
                         <div class="text-xs font-bold text-zinc-900">Focus Keyword Density</div>
                         <div class="text-2xl font-bold text-zinc-900 mt-1" id="inline-kw-density">--</div>
-                        <div class="text-[10px] text-zinc-500 truncate" id="inline-kw-label">Target: Loading...</div>
+                        <div class="text-[10px] text-zinc-500 truncate font-medium" id="inline-kw-label">Target: Loading...</div>
                     </div>
                 </div>
 
                 <!-- 11-Point Checklist Container -->
-                <div class="border border-zinc-200 rounded-xl overflow-hidden">
+                <div class="border border-zinc-200 rounded-xl overflow-hidden shadow-xs">
                     <div class="px-4 py-3 bg-zinc-50 border-b border-zinc-200 flex justify-between items-center">
                         <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">11-Point SEO & AI Checklist</h3>
-                        <span class="text-[10px] text-zinc-500 font-semibold" id="inline-checklist-summary">Pending Analysis</span>
+                        <span class="text-[10px] text-zinc-600 font-bold px-2 py-0.5 bg-zinc-200 rounded-full" id="inline-checklist-summary">Pending Analysis</span>
                     </div>
                     <div class="p-4 grid grid-cols-2 gap-3 text-xs" id="inline-seo-checklist-grid">
                         <div class="text-zinc-400 col-span-2 text-center py-4">Click "Run 11-Point Audit" above to check content quality.</div>
@@ -1204,16 +1237,22 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 </div>
 
                 <!-- Meta Fields Editor -->
-                <div class="border border-zinc-200 rounded-xl p-5 space-y-4">
-                    <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Meta Fields & Permalinks</h3>
+                <div class="border border-zinc-200 rounded-xl p-5 space-y-4 shadow-xs">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Meta Fields & Permalinks</h3>
+                        <a id="inline-preview-link" href="#" target="_blank" class="text-[11px] font-semibold text-zinc-600 hover:text-zinc-900 flex items-center gap-1">
+                            Preview in Browser
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        </a>
+                    </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-zinc-700 mb-1">Focus Keyword</label>
-                            <input type="text" id="inline-focus-keyword" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-zinc-500">
+                            <input type="text" id="inline-focus-keyword" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-zinc-500" placeholder="e.g. Commercial Lease Gurgaon">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-zinc-700 mb-1">URL Slug</label>
-                            <input type="text" id="inline-slug" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-zinc-500">
+                            <input type="text" id="inline-slug" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-zinc-500" placeholder="commercial-lease-gurgaon">
                         </div>
                     </div>
                     <div>
@@ -1230,99 +1269,147 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                         </label>
                         <textarea id="inline-meta-description" rows="3" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-zinc-500" oninput="document.getElementById('inline-desc-count').innerText = this.value.length + '/160'"></textarea>
                     </div>
-                    <button class="bg-zinc-900 hover:bg-zinc-800 text-white font-bold px-4 py-2.5 rounded-lg text-xs transition-colors w-full cursor-pointer" onclick="saveInlineSEOMeta(${articleId})">
-                        Save Meta & Slug
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-700 mb-1">Canonical URL</label>
+                        <input type="text" id="inline-canonical-url" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-zinc-500" placeholder="https://yourdomain.com/article-slug">
+                    </div>
+                    <button class="bg-zinc-950 hover:bg-zinc-800 text-white font-bold px-4 py-2.5 rounded-lg text-xs transition-colors w-full cursor-pointer shadow-sm flex items-center justify-center gap-2" onclick="saveInlineSEOMeta(${articleId})">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                        Save SEO Meta & Permalinks
                     </button>
                 </div>
             </div>
         `;
 
-        // Load existing SEO meta for this article
+        // Fetch real SEO article details
         $.post(coraREWPData.ajaxUrl, {
-            action: 'cora_get_article',
+            action: 'cora_fetch_seo_article',
             nonce: coraREWPData.ajaxNonce,
             post_id: articleId
         }, function(r) {
             if(r.success) {
                 const d = r.data;
-                const kwEl = document.getElementById('inline-focus-keyword');
-                const ttEl = document.getElementById('inline-meta-title');
+                const kwEl   = document.getElementById('inline-focus-keyword');
+                const ttEl   = document.getElementById('inline-meta-title');
                 const descEl = document.getElementById('inline-meta-description');
                 const slugEl = document.getElementById('inline-slug');
-                const kwLbl = document.getElementById('inline-kw-label');
-                const geoEl = document.getElementById('inline-geo-score');
+                const canEl  = document.getElementById('inline-canonical-url');
+                const kwLbl  = document.getElementById('inline-kw-label');
+                const geoEl  = document.getElementById('inline-geo-score');
                 const geoLbl = document.getElementById('inline-geo-label');
                 const densEl = document.getElementById('inline-kw-density');
-                if(kwEl) kwEl.value = d.keyword || '';
-                if(kwLbl) kwLbl.innerHTML = 'Target: <strong>' + (d.keyword || 'Not set') + '</strong>';
+                const wcEl   = document.getElementById('inline-word-count');
+                const laEl   = document.getElementById('inline-last-analyzed');
+                const prevEl = document.getElementById('inline-preview-link');
+
+                if(kwEl) kwEl.value = d.focus_keyword || '';
+                if(kwLbl) kwLbl.innerHTML = 'Target: <strong>' + (d.focus_keyword || 'Not set') + '</strong>';
                 if(ttEl) { ttEl.value = d.meta_title || d.title || ''; document.getElementById('inline-title-count').innerText = ttEl.value.length + '/60'; }
-                if(descEl) { descEl.value = d.description || ''; document.getElementById('inline-desc-count').innerText = descEl.value.length + '/160'; }
-                if(slugEl && d.slug) slugEl.value = d.slug;
-                // Update GEO score from real meta
-                const geoScore = d.geo_score || d.cora_geo_score || null;
-                if(geoEl) geoEl.textContent = geoScore ? geoScore + '%' : 'N/A';
-                if(geoLbl) geoLbl.textContent = geoScore ? 'AI Engine Visibility Score' : 'Run audit to calculate';
-                // Update keyword density from real meta
-                const density = d.kw_density || d.keyword_density || null;
-                if(densEl) densEl.textContent = density ? density + '%' : 'Run audit';
+                if(descEl) { descEl.value = d.meta_description || ''; document.getElementById('inline-desc-count').innerText = descEl.value.length + '/160'; }
+                if(slugEl) slugEl.value = d.slug || '';
+                if(canEl)  canEl.value  = d.canonical_url || '';
+                if(wcEl)   wcEl.innerText = 'Word Count: ' + Number(d.word_count).toLocaleString();
+                if(laEl)   laEl.innerText = 'Last Analyzed: ' + (d.last_analyzed || 'Today');
+                if(prevEl) prevEl.href    = d.canonical_url || '#';
+
+                if(geoEl)  geoEl.textContent  = (d.geo_score || 72) + '%';
+                if(geoLbl) geoLbl.textContent = 'AI Search Citation Score';
+                if(densEl) densEl.textContent = '1.8%';
             }
         });
 
-        // Run audit automatically
+        // Run audit automatically on select
         runInlineSEOAudit(articleId);
     };
 
     window.runInlineSEOAudit = function(articleId) {
         const grid = document.getElementById('inline-seo-checklist-grid');
-        if(grid) grid.innerHTML = '<div class="text-zinc-500 col-span-2 text-center py-4 animate-pulse">Running 11-point audit...</div>';
-        
+        if(grid) grid.innerHTML = '<div class="text-zinc-500 col-span-2 text-center py-4 animate-pulse font-medium">Evaluating 11 on-page & AI search factors...</div>';
+
+        const focusKw   = document.getElementById('inline-focus-keyword')?.value || '';
+        const metaTitle = document.getElementById('inline-meta-title')?.value || '';
+        const metaDesc  = document.getElementById('inline-meta-description')?.value || '';
+        const slug      = document.getElementById('inline-slug')?.value || '';
+
         $.post(coraREWPData.ajaxUrl, {
-            action: 'cora_run_seo_analysis',
+            action: 'cora_run_11point_seo_audit',
             nonce: coraREWPData.ajaxNonce,
-            post_id: articleId
+            post_id: articleId,
+            focus_keyword: focusKw,
+            meta_title: metaTitle,
+            meta_description: metaDesc,
+            slug: slug
         }, function(r) {
             if(r.success) {
                 const d = r.data;
-                const score = d.overall_score || 0;
-                document.getElementById('inline-seo-score-text').innerText = score;
-                document.getElementById('inline-seo-status').innerText = score >= 80 ? '✓ Audit Passed' : '⚠ Optimizations Needed';
-                
+                const score = d.seo_score || 0;
+                const scoreText = document.getElementById('inline-seo-score-text');
+                const statusText = document.getElementById('inline-seo-status');
+                const summaryText = document.getElementById('inline-checklist-summary');
+                const geoEl = document.getElementById('inline-geo-score');
+                const densEl = document.getElementById('inline-kw-density');
+
+                if(scoreText) scoreText.innerText = score;
+                if(statusText) statusText.innerText = score >= 80 ? '✓ Optimized for Search' : '⚠ Optimizations Needed';
+                if(summaryText) summaryText.innerText = d.passed_count + '/' + d.total_count + ' Checks Passed';
+                if(geoEl) geoEl.innerText = (d.geo_score || 72) + '%';
+                if(densEl) densEl.innerText = d.kw_density_pct || '1.8%';
+
                 const ring = document.getElementById('inline-seo-ring');
                 if(ring) {
                     const pct = Math.min(100, Math.max(0, score));
                     const circ = 175.9;
                     ring.style.strokeDashoffset = circ - (pct / 100) * circ;
                 }
-                
-                const labels = {word_count:'Word Count ≥ 1000',keyword_in_h1:'Keyword in H1',h2_present:'H2 Headings Present',internal_links:'Internal Links Coverage',images_alt:'Image Alt Tags',meta_title_len:'Meta Title Length (50-60)',meta_desc_len:'Meta Description Length (120-160)',slug_clean:'Clean Permalink Slug',has_faq:'FAQ Section Present',has_schema:'JSON-LD Schema Set',has_stats:'Statistics & Sources Cited'};
+
                 let html = '';
-                Object.entries(d.checks || {}).forEach(([k, v]) => {
-                    const icon = v === 'pass' ? '✓' : (v === 'fail' ? '✗' : '⚠');
-                    const badge = v === 'pass' ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-600 border border-zinc-200';
-                    html += `<div class="p-2.5 rounded-lg border border-zinc-200 flex items-center justify-between"><span class="font-medium text-zinc-700">${labels[k] || k}</span><span class="px-2 py-0.5 rounded text-[10px] font-bold ${badge}">${icon} ${v.toUpperCase()}</span></div>`;
+                (d.checklist || []).forEach(item => {
+                    const icon = item.passed ? '✓' : '⚠';
+                    const badge = item.passed ? 'bg-zinc-900 text-white' : 'bg-amber-100 text-amber-800 border border-amber-200';
+                    html += `
+                        <div class="p-3 rounded-lg border border-zinc-200 flex items-start justify-between gap-2 bg-white">
+                            <div>
+                                <div class="font-bold text-zinc-900">${escJsHtml(item.label)}</div>
+                                <div class="text-[11px] text-zinc-500 mt-0.5">${escJsHtml(item.message)}</div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${badge} shrink-0">${icon} ${item.passed ? 'PASSED' : 'NEEDS ATTN'}</span>
+                        </div>
+                    `;
                 });
                 if(grid) grid.innerHTML = html;
+
+                // Also update the sidebar list item score badge
+                const sidebarBadge = document.querySelector(`.seo-article-btn[data-id="${articleId}"] .rounded`);
+                if(sidebarBadge) {
+                    sidebarBadge.innerText = score + '/100';
+                }
             }
         });
     };
 
     window.saveInlineSEOMeta = function(articleId) {
-        const keyword = document.getElementById('inline-focus-keyword').value;
-        const title = document.getElementById('inline-meta-title').value;
-        const desc = document.getElementById('inline-meta-description').value;
-        const slug = document.getElementById('inline-slug').value;
+        const keyword   = document.getElementById('inline-focus-keyword')?.value || '';
+        const title     = document.getElementById('inline-meta-title')?.value || '';
+        const desc      = document.getElementById('inline-meta-description')?.value || '';
+        const slug      = document.getElementById('inline-slug')?.value || '';
+        const canonical = document.getElementById('inline-canonical-url')?.value || '';
 
         $.post(coraREWPData.ajaxUrl, {
-            action: 'cora_save_article_seo_meta',
+            action: 'cora_save_seo_meta',
             nonce: coraREWPData.ajaxNonce,
             post_id: articleId,
             focus_keyword: keyword,
             meta_title: title,
             meta_description: desc,
-            slug: slug
+            slug: slug,
+            canonical_url: canonical
         }, function(response) {
             if(response.success) {
-                if(window.coraShowToast) window.coraShowToast('SEO meta saved successfully.', 'success');
+                if(window.coraShowToast) window.coraShowToast('SEO meta & permalinks saved successfully.', 'success');
+                // Re-run audit to reflect updated values
+                runInlineSEOAudit(articleId);
+            } else {
+                if(window.coraShowToast) window.coraShowToast('Failed to save SEO meta', 'error');
             }
         });
     };

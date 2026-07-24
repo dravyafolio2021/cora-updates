@@ -7373,6 +7373,340 @@ function cora_ajax_analyze_seo() {
 add_action( 'wp_ajax_cora_analyze_seo', 'cora_ajax_analyze_seo' );
 
 /**
+ * AJAX Action: Fetch SEO Article Data
+ */
+function cora_ajax_fetch_seo_article() {
+    if ( ! current_user_can( 'edit_posts' ) && ! current_user_can( 'edit_pages' ) ) {
+        wp_send_json_error( 'Permission denied.' );
+    }
+
+    $post_id = isset( $_REQUEST['post_id'] ) ? intval( $_REQUEST['post_id'] ) : 0;
+    if ( ! $post_id ) {
+        wp_send_json_error( 'Invalid Post ID.' );
+    }
+
+    $post = get_post( $post_id );
+    if ( ! $post ) {
+        wp_send_json_error( 'Post not found.' );
+    }
+
+    $focus_keyword    = get_post_meta( $post->ID, '_cora_focus_keyword', true );
+    $meta_title       = get_post_meta( $post->ID, '_cora_seo_title', true );
+    $meta_description = get_post_meta( $post->ID, '_cora_meta_description', true );
+    $seo_score        = get_post_meta( $post->ID, '_cora_seo_score', true );
+    $canonical_url    = get_post_meta( $post->ID, '_cora_canonical_url', true );
+    $geo_score        = get_post_meta( $post->ID, '_cora_geo_score', true );
+
+    $clean_content = wp_strip_all_tags( $post->post_content );
+    $word_count    = str_word_count( $clean_content );
+    $last_analyzed = get_the_modified_date( 'Y-m-d H:i:s', $post->ID );
+
+    wp_send_json_success( array(
+        'post_id'          => $post->ID,
+        'title'            => $post->post_title,
+        'content'          => $post->post_content,
+        'slug'             => $post->post_name,
+        'word_count'       => $word_count,
+        'focus_keyword'    => $focus_keyword ? $focus_keyword : '',
+        'meta_title'       => $meta_title ? $meta_title : '',
+        'meta_description' => $meta_description ? $meta_description : '',
+        'canonical_url'    => $canonical_url ? $canonical_url : '',
+        'seo_score'        => ( $seo_score !== '' ) ? intval( $seo_score ) : 0,
+        'geo_score'        => ( $geo_score !== '' ) ? intval( $geo_score ) : 0,
+        'last_analyzed'    => $last_analyzed ? $last_analyzed : '',
+    ) );
+}
+add_action( 'wp_ajax_cora_fetch_seo_article', 'cora_ajax_fetch_seo_article' );
+
+/**
+ * AJAX Action: Run 11-Point SEO Audit
+ */
+function cora_ajax_run_11point_seo_audit() {
+    if ( ! current_user_can( 'edit_posts' ) && ! current_user_can( 'edit_pages' ) ) {
+        wp_send_json_error( 'Permission denied.' );
+    }
+
+    $post_id          = isset( $_REQUEST['post_id'] ) ? intval( $_REQUEST['post_id'] ) : 0;
+    $focus_keyword    = isset( $_REQUEST['focus_keyword'] ) ? sanitize_text_field( $_REQUEST['focus_keyword'] ) : '';
+    $meta_title       = isset( $_REQUEST['meta_title'] ) ? sanitize_text_field( $_REQUEST['meta_title'] ) : '';
+    $meta_description = isset( $_REQUEST['meta_description'] ) ? sanitize_textarea_field( $_REQUEST['meta_description'] ) : '';
+    $slug             = isset( $_REQUEST['slug'] ) ? sanitize_title( $_REQUEST['slug'] ) : '';
+
+    if ( ! $post_id ) {
+        wp_send_json_error( 'Invalid Post ID.' );
+    }
+
+    $post = get_post( $post_id );
+    if ( ! $post ) {
+        wp_send_json_error( 'Post not found.' );
+    }
+
+    $content    = $post->post_content;
+    $post_title = $post->post_title;
+    $post_slug  = $slug ? $slug : $post->post_name;
+
+    if ( empty( $focus_keyword ) ) {
+        $focus_keyword = get_post_meta( $post_id, '_cora_focus_keyword', true );
+    }
+    if ( empty( $meta_title ) ) {
+        $meta_title = get_post_meta( $post_id, '_cora_seo_title', true );
+        if ( empty( $meta_title ) ) {
+            $meta_title = $post_title;
+        }
+    }
+    if ( empty( $meta_description ) ) {
+        $meta_description = get_post_meta( $post_id, '_cora_meta_description', true );
+    }
+
+    $clean_content = wp_strip_all_tags( $content );
+    $word_count    = str_word_count( $clean_content );
+    $kw_lower      = mb_strtolower( trim( $focus_keyword ) );
+
+    // 1. word_count: Word count >= 1000 (Pass/Fail)
+    $passed_1 = ( $word_count >= 1000 );
+    $msg_1    = $passed_1
+        ? sprintf( 'Word count is %d (meets 1,000+ recommendation)', $word_count )
+        : sprintf( 'Word count is %d (recommended minimum: 1,000 words)', $word_count );
+
+    // 2. keyword_in_title: Focus keyword present in Meta Title or Post Title
+    $passed_2 = ( $kw_lower !== '' && ( mb_stripos( $meta_title, $kw_lower ) !== false || mb_stripos( $post_title, $kw_lower ) !== false ) );
+    $msg_2    = $passed_2
+        ? 'Focus keyword is present in the page or meta title'
+        : 'Focus keyword missing from page title or meta title';
+
+    // 3. keyword_in_h1: Focus keyword present in H1 / Title
+    $passed_3 = false;
+    if ( $kw_lower !== '' ) {
+        if ( mb_stripos( $post_title, $kw_lower ) !== false ) {
+            $passed_3 = true;
+        } elseif ( preg_match_all( '/<h1[^>]*>(.*?)<\/h1>/is', $content, $h1_matches ) ) {
+            foreach ( $h1_matches[1] as $h1_text ) {
+                if ( mb_stripos( wp_strip_all_tags( $h1_text ), $kw_lower ) !== false ) {
+                    $passed_3 = true;
+                    break;
+                }
+            }
+        }
+    }
+    $msg_3 = $passed_3
+        ? 'Focus keyword present in H1 heading or post title'
+        : 'Focus keyword not found in H1 header tag';
+
+    // 4. h2_present: Post content contains <h2> or <h3> tags
+    $passed_4 = ( preg_match( '/<h[23][^>]*>/i', $content ) === 1 );
+    $msg_4    = $passed_4
+        ? 'Post content contains H2 or H3 heading tags'
+        : 'No H2 or H3 heading tags found in content';
+
+    // 5. keyword_first_paragraph: Focus keyword appears in first 150 words of content
+    $words_array     = preg_split( '/\s+/', $clean_content, 151 );
+    $first_150_words = implode( ' ', array_slice( $words_array, 0, 150 ) );
+    $passed_5        = ( $kw_lower !== '' && mb_stripos( $first_150_words, $kw_lower ) !== false );
+    $msg_5           = $passed_5
+        ? 'Focus keyword appears in the first 150 words of content'
+        : 'Focus keyword does not appear in the opening paragraph (first 150 words)';
+
+    // 6. keyword_density: Focus keyword density between 0.8% and 2.5%
+    $kw_density_pct = 0.0;
+    if ( $word_count > 0 && $kw_lower !== '' ) {
+        $kw_occurrences = mb_substr_count( mb_strtolower( $clean_content ), $kw_lower );
+        $kw_word_len    = max( 1, count( preg_split( '/\s+/', $kw_lower ) ) );
+        $kw_density_pct = round( ( ( $kw_occurrences * $kw_word_len ) / $word_count ) * 100, 2 );
+    }
+    $passed_6 = ( $kw_density_pct >= 0.8 && $kw_density_pct <= 2.5 );
+    $msg_6    = $passed_6
+        ? sprintf( 'Focus keyword density is optimal at %.2f%%', $kw_density_pct )
+        : sprintf( 'Focus keyword density is %.2f%% (target range: 0.8%% - 2.5%%)', $kw_density_pct );
+
+    // 7. meta_title_len: Meta Title length between 45 and 65 chars
+    $meta_title_len = mb_strlen( trim( $meta_title ) );
+    $passed_7       = ( $meta_title_len >= 45 && $meta_title_len <= 65 );
+    $msg_7          = $passed_7
+        ? sprintf( 'Meta Title length is %d chars (45-65 chars)', $meta_title_len )
+        : sprintf( 'Meta Title length is %d chars (recommended: 45-65 chars)', $meta_title_len );
+
+    // 8. meta_desc_len: Meta Description length between 120 and 165 chars
+    $meta_desc_len = mb_strlen( trim( $meta_description ) );
+    $passed_8      = ( $meta_desc_len >= 120 && $meta_desc_len <= 165 );
+    $msg_8         = $passed_8
+        ? sprintf( 'Meta Description length is %d chars (120-165 chars)', $meta_desc_len )
+        : sprintf( 'Meta Description length is %d chars (recommended: 120-165 chars)', $meta_desc_len );
+
+    // 9. slug_clean: URL slug contains hyphens and focus keyword
+    $sanitized_kw   = sanitize_title( $focus_keyword );
+    $has_hyphen     = ( strpos( $post_slug, '-' ) !== false );
+    $has_kw_in_slug = ( ! empty( $sanitized_kw ) && strpos( $post_slug, $sanitized_kw ) !== false );
+    $passed_9       = ( $has_hyphen && $has_kw_in_slug );
+    $msg_9          = $passed_9
+        ? 'URL slug contains hyphens and focus keyword'
+        : 'URL slug should contain hyphens and the focus keyword';
+
+    // 10. internal_links: Content contains <a href="..."> links
+    $passed_10 = ( preg_match( '/<a\s+[^>]*href=["\'][^"\']+["\'][^>]*>/i', $content ) === 1 );
+    $msg_10    = $passed_10
+        ? 'Content contains internal or external links'
+        : 'No links (<a href="...">) found in content';
+
+    // 11. has_schema: Schema markup or structured JSON-LD present
+    $has_json_ld      = ( preg_match( '/<script[^>]*type=["\']application\/ld\+json["\'][^>]*>/i', $content ) === 1 );
+    $has_itemscope    = ( strpos( $content, 'itemscope' ) !== false );
+    $has_meta_schema  = ! empty( get_post_meta( $post_id, '_cora_schema_markup', true ) );
+    $passed_11        = ( $has_json_ld || $has_itemscope || $has_meta_schema );
+    $msg_11           = $passed_11
+        ? 'Schema markup or structured JSON-LD detected'
+        : 'No schema markup or structured JSON-LD present';
+
+    $checklist = array(
+        array(
+            'id'      => 'word_count',
+            'label'   => 'Word Count (>= 1000 words)',
+            'passed'  => $passed_1,
+            'message' => $msg_1,
+        ),
+        array(
+            'id'      => 'keyword_in_title',
+            'label'   => 'Focus Keyword in Meta Title or Post Title',
+            'passed'  => $passed_2,
+            'message' => $msg_2,
+        ),
+        array(
+            'id'      => 'keyword_in_h1',
+            'label'   => 'Focus Keyword in H1 / Title',
+            'passed'  => $passed_3,
+            'message' => $msg_3,
+        ),
+        array(
+            'id'      => 'h2_present',
+            'label'   => 'Subheadings (H2 or H3 tags present)',
+            'passed'  => $passed_4,
+            'message' => $msg_4,
+        ),
+        array(
+            'id'      => 'keyword_first_paragraph',
+            'label'   => 'Focus Keyword in First 150 Words',
+            'passed'  => $passed_5,
+            'message' => $msg_5,
+        ),
+        array(
+            'id'      => 'keyword_density',
+            'label'   => 'Keyword Density (0.8% - 2.5%)',
+            'passed'  => $passed_6,
+            'message' => $msg_6,
+        ),
+        array(
+            'id'      => 'meta_title_len',
+            'label'   => 'Meta Title Length (45-65 chars)',
+            'passed'  => $passed_7,
+            'message' => $msg_7,
+        ),
+        array(
+            'id'      => 'meta_desc_len',
+            'label'   => 'Meta Description Length (120-165 chars)',
+            'passed'  => $passed_8,
+            'message' => $msg_8,
+        ),
+        array(
+            'id'      => 'slug_clean',
+            'label'   => 'URL Slug Formatting & Focus Keyword',
+            'passed'  => $passed_9,
+            'message' => $msg_9,
+        ),
+        array(
+            'id'      => 'internal_links',
+            'label'   => 'Content Links (<a href="...">)',
+            'passed'  => $passed_10,
+            'message' => $msg_10,
+        ),
+        array(
+            'id'      => 'has_schema',
+            'label'   => 'Schema Markup or Structured JSON-LD',
+            'passed'  => $passed_11,
+            'message' => $msg_11,
+        ),
+    );
+
+    $passed_count = 0;
+    foreach ( $checklist as $item ) {
+        if ( $item['passed'] ) {
+            $passed_count++;
+        }
+    }
+
+    $seo_score = intval( round( ( $passed_count / 11 ) * 100 ) );
+
+    // Calculate GEO AI Visibility Score dynamically based on search engine factors
+    $geo_weights = 0;
+    if ( $passed_1 )  $geo_weights += 20; // 1000+ words depth
+    if ( $passed_4 )  $geo_weights += 20; // H2/H3 structural hierarchy
+    if ( $passed_11 ) $geo_weights += 20; // Schema JSON-LD structured data
+    if ( $passed_5 )  $geo_weights += 15; // KW in opening paragraph
+    if ( $passed_8 )  $geo_weights += 15; // Optimal meta description
+    if ( $passed_10 ) $geo_weights += 10; // Outbound / internal context links
+    $geo_score = min( 100, $geo_weights );
+
+    // Update post meta with calculated scores
+    update_post_meta( $post_id, '_cora_seo_score', $seo_score );
+    update_post_meta( $post_id, '_cora_geo_score', $geo_score );
+
+    wp_send_json_success( array(
+        'seo_score'      => $seo_score,
+        'geo_score'      => $geo_score,
+        'kw_density_pct' => $kw_density_pct,
+        'passed_count'   => $passed_count,
+        'checklist'      => $checklist,
+    ) );
+}
+add_action( 'wp_ajax_cora_run_11point_seo_audit', 'cora_ajax_run_11point_seo_audit' );
+
+/**
+ * AJAX Action: Save SEO Meta
+ */
+function cora_ajax_save_seo_meta() {
+    if ( ! current_user_can( 'edit_posts' ) && ! current_user_can( 'edit_pages' ) ) {
+        wp_send_json_error( 'Permission denied.' );
+    }
+
+    $post_id          = isset( $_REQUEST['post_id'] ) ? intval( $_REQUEST['post_id'] ) : 0;
+    $focus_keyword    = isset( $_REQUEST['focus_keyword'] ) ? sanitize_text_field( $_REQUEST['focus_keyword'] ) : '';
+    $meta_title       = isset( $_REQUEST['meta_title'] ) ? sanitize_text_field( $_REQUEST['meta_title'] ) : '';
+    $meta_description = isset( $_REQUEST['meta_description'] ) ? sanitize_textarea_field( $_REQUEST['meta_description'] ) : '';
+    $slug             = isset( $_REQUEST['slug'] ) ? sanitize_title( $_REQUEST['slug'] ) : '';
+    $canonical_url    = isset( $_REQUEST['canonical_url'] ) ? esc_url_raw( $_REQUEST['canonical_url'] ) : '';
+
+    if ( ! $post_id ) {
+        wp_send_json_error( 'Invalid Post ID.' );
+    }
+
+    $post = get_post( $post_id );
+    if ( ! $post ) {
+        wp_send_json_error( 'Post not found.' );
+    }
+
+    update_post_meta( $post_id, '_cora_focus_keyword', $focus_keyword );
+    update_post_meta( $post_id, '_cora_seo_title', $meta_title );
+    update_post_meta( $post_id, '_cora_meta_description', $meta_description );
+    update_post_meta( $post_id, '_cora_canonical_url', $canonical_url );
+
+    if ( ! empty( $slug ) ) {
+        global $wpdb;
+        $sanitized_slug = sanitize_title( $slug );
+        $wpdb->update(
+            $wpdb->posts,
+            array( 'post_name' => $sanitized_slug ),
+            array( 'ID' => $post_id ),
+            array( '%s' ),
+            array( '%d' )
+        );
+        clean_post_cache( $post_id );
+    }
+
+    wp_send_json_success( array(
+        'message' => 'SEO Meta saved successfully!',
+    ) );
+}
+add_action( 'wp_ajax_cora_save_seo_meta', 'cora_ajax_save_seo_meta' );
+
+/**
  * AJAX Action: Fetch Media Library
  */
 function cora_ajax_get_media() {
