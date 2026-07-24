@@ -447,8 +447,9 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         </div>
     </div>
 </div>
+
 <!-- PANEL: Content Calendar -->
-<div id="panel-ct-calendar" class="cora-ct-panel hidden space-y-0">
+<div id="panel-ct-calendar" class="cora-ct-panel hidden space-y-4">
     <?php
     // Calculate current week (Monday to Sunday)
     $ts_now = time();
@@ -496,50 +497,64 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     }
     ?>
 
-    <!-- TOP CONTROL BAR (Single Row, Compact) -->
-    <div class="single-row toolbar flex items-center justify-between border-b border-zinc-200 bg-white px-4 py-2">
-        <!-- Left: Calendar/Board tab buttons -->
-        <div class="flex items-center gap-4">
-            <button class="text-sm font-semibold text-zinc-900 border-b-2 border-zinc-900 pb-1 -mb-[9px]">Calendar</button>
-            <button class="text-sm font-medium text-zinc-500 hover:text-zinc-700 pb-1 -mb-[9px]" onclick="coraSwitchTab('board')">Board</button>
+    <!-- TOP CONTROL BAR -->
+    <div class="flex items-center justify-between gap-4 px-1 py-0.5">
+        <!-- LEFT: Calendar | Board tabs -->
+        <div class="flex items-center gap-0.5 p-0.5 bg-zinc-100 rounded-lg border border-zinc-200">
+            <button onclick="coraSwitchTab('calendar')" class="px-3 py-1 text-xs font-bold bg-white text-zinc-900 rounded-md shadow-sm border border-zinc-200/50">📅 Calendar</button>
+            <button onclick="coraSwitchTab('board')" class="px-3 py-1 text-xs font-semibold text-zinc-500 hover:text-zinc-700">⊞ Board</button>
         </div>
         
-        <!-- Center: Inline filter dropdowns -->
-        <div class="flex items-center gap-3">
-            <select class="text-xs font-medium text-zinc-700 bg-transparent outline-none cursor-pointer">
-                <option>All Types</option>
+        <!-- CENTER: 4 compact inline filter selects -->
+        <div class="flex items-center gap-2">
+            <select id="cal-filter-type" class="h-8 px-2 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer">
+                <option value="">All Types</option>
+                <option value="blog">Blog</option>
+                <option value="linkedin">LinkedIn</option>
+                <option value="instagram">Instagram</option>
+                <option value="youtube">YouTube</option>
+                <option value="newsletter">Newsletter</option>
+                <option value="x_twitter">X / Twitter</option>
+                <option value="case_study">Case Study</option>
             </select>
-            <select class="text-xs font-medium text-zinc-700 bg-transparent outline-none cursor-pointer">
-                <option>All Status</option>
+            <select id="cal-filter-status" class="h-8 px-2 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer">
+                <option value="">All Status</option>
+                <option value="draft">Draft</option>
+                <option value="in_review">In Review</option>
+                <option value="scheduled">Scheduled</option>
+                <option value="published">Published</option>
             </select>
-            <select class="text-xs font-medium text-zinc-700 bg-transparent outline-none cursor-pointer">
-                <option>All Channels</option>
+            <select id="cal-filter-channel" class="h-8 px-2 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer">
+                <option value="">All Channels</option>
             </select>
-            <select class="text-xs font-medium text-zinc-700 bg-transparent outline-none cursor-pointer">
-                <option>All Owners</option>
+            <select id="cal-filter-owner" class="h-8 px-2 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer">
+                <option value="">All Owners</option>
+                <?php foreach($cora_users as $u): ?>
+                    <option value="<?php echo esc_attr($u->ID); ?>"><?php echo esc_html($u->display_name); ?></option>
+                <?php endforeach; ?>
             </select>
-        </div>
-
-        <!-- Nav: compact pill -->
-        <div class="flex items-center gap-2 bg-zinc-50 border border-zinc-200 rounded-full px-3 py-1">
-            <button onclick="coraNavWeek(-1)" class="text-zinc-500 hover:text-zinc-900 cursor-pointer">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            
+            <!-- Week navigator -->
+            <div class="flex items-center gap-1 bg-zinc-50 border border-zinc-200 rounded-lg px-2 py-1">
+                <button onclick="coraNavWeek(-1)" class="text-zinc-500 hover:text-zinc-900 cursor-pointer">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <span class="text-xs font-bold text-zinc-900 min-w-[130px] text-center"><?php echo esc_html($week_label); ?></span>
+                <button onclick="coraNavWeek(1)" class="text-zinc-500 hover:text-zinc-900 cursor-pointer">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
+            
+            <!-- Filters icon button -->
+            <button id="btn-cal-toggle-filters" onclick="coraToggleFilterBar()" class="h-8 w-8 flex items-center justify-center rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-500 hover:text-zinc-900 cursor-pointer transition-colors" title="Toggle Filters">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
             </button>
-            <span class="text-xs font-bold text-zinc-900 min-w-[130px] text-center"><?php echo esc_html($week_label); ?></span>
-            <button onclick="coraNavWeek(1)" class="text-zinc-500 hover:text-zinc-900 cursor-pointer">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </button>
         </div>
-
-        <!-- Right: Filters icon button -->
-        <button class="text-zinc-500 hover:text-zinc-900 cursor-pointer">
-            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-        </button>
     </div>
 
     <!-- SUB-HEADER ROW -->
-    <div class="flex items-center justify-between px-6 py-4 bg-white">
-        <h2 class="text-2xl font-bold text-zinc-900"><?php echo esc_html($week_label); ?></h2>
+    <div class="flex items-center justify-between px-2 py-2">
+        <h2 class="text-xl font-bold text-zinc-900"><?php echo esc_html($week_label); ?></h2>
         <div class="flex items-center gap-4 text-[11px] font-semibold text-zinc-600">
             <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-zinc-300"></span> Draft</span>
             <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400"></span> In Review</span>
@@ -548,8 +563,11 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         </div>
     </div>
 
+    <!-- COLLAPSIBLE FILTER BAR -->
+    <div id="cal-filters-collapsible-bar" class="hidden"></div>
+
     <!-- WEEKLY CALENDAR VIEW (DEFAULT) -->
-    <div id="cora-cal-week-view" class="px-6 pb-6">
+    <div id="cora-cal-week-view" class="px-2 pb-6">
         <!-- 7-Column Weekly Grid -->
         <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; width: 100%;">
             <?php foreach($week_days as $wd): 
@@ -562,7 +580,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                     
                     <!-- Day Column Header -->
                     <div class="p-3 border-b border-zinc-200 bg-white flex items-center gap-1.5">
-                        <span class="text-xs font-bold text-zinc-500"><?php echo $wd['dow_name']; ?></span>
+                        <span class="text-xs font-bold text-zinc-500 uppercase tracking-wider"><?php echo substr($wd['dow_name'], 0, 3); ?></span>
                         <span class="text-sm font-bold <?php echo $is_today ? 'w-6 h-6 rounded-full bg-zinc-900 text-white flex items-center justify-center' : 'text-zinc-900'; ?>">
                             <?php echo $wd['day_num']; ?>
                         </span>
@@ -571,7 +589,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                     <!-- Event Cards Column Container -->
                     <div class="flex-1 p-2 flex flex-col gap-2 min-h-[300px]">
                         <?php if(empty($day_posts)): ?>
-                            <div class="cora-cal-empty-placeholder rounded-lg border border-dashed border-zinc-300 flex items-center justify-center py-4 text-zinc-400 hover:border-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer" onclick="coraCalDayClick(event, '<?php echo $day_date; ?>')">                                
+                            <div class="cora-cal-empty-placeholder rounded-lg border border-dashed border-zinc-300 flex items-center justify-center py-4 text-zinc-400 hover:border-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer" onclick="openCreateArticleDrawer('<?php echo $day_date; ?>')">
                                 <span class="text-xs font-semibold">+ Add Content</span>
                             </div>
                         <?php else: ?>
@@ -588,7 +606,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 
                                 // Status styles
                                 $border_class = 'border-l-zinc-300';
-                                $badge_html = '<span class="text-[10px] font-semibold text-zinc-500">Draft</span>';
+                                $badge_html = '<span class="text-[10px] font-semibold text-zinc-400">Draft</span>';
                                 if ($editorial_status === 'in_review') {
                                     $border_class = 'border-l-amber-400';
                                     $badge_html = '<span class="px-2 py-0.5 rounded bg-amber-50 text-amber-600 text-[10px] font-semibold">In Review</span>';
@@ -625,7 +643,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                                 }
                             ?>
                                 <!-- EVENT CARD -->
-                                <div draggable="true" ondragstart="coraCalDragStart(event, <?php echo $dp->ID; ?>, '<?php echo $day_date; ?>')" ondragend="coraCalDragEnd(event)" class="cora-cal-event-card bg-white rounded-xl border border-zinc-200 border-l-4 <?php echo $border_class; ?> p-3 hover:shadow-md cursor-grab active:cursor-grabbing flex flex-col gap-2" data-id="<?php echo $dp->ID; ?>" data-status="<?php echo esc_attr($editorial_status); ?>" data-type="<?php echo esc_attr($content_type); ?>" data-owner="<?php echo esc_attr($assignee_id); ?>" onclick="event.stopPropagation(); coraEditArticle(<?php echo $dp->ID; ?>)">
+                                <div draggable="true" ondragstart="coraCalDragStart(event, <?php echo $dp->ID; ?>, '<?php echo esc_js($day_date); ?>')" class="cora-cal-event-card bg-white rounded-xl border border-zinc-200 border-l-4 <?php echo $border_class; ?> p-3 hover:shadow-md cursor-grab active:cursor-grabbing flex flex-col gap-2" data-id="<?php echo $dp->ID; ?>" data-status="<?php echo esc_attr($editorial_status); ?>" data-type="<?php echo esc_attr($content_type); ?>" data-owner="<?php echo esc_attr($assignee_id); ?>" onclick="event.stopPropagation(); coraEditArticle(<?php echo $dp->ID; ?>)">
                                     
                                     <!-- Top Row: Type -->
                                     <div class="flex items-center gap-1.5 text-zinc-400">
@@ -707,6 +725,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                     </div>
                 </div>
             <?php endfor; ?>
+        </div>
     </div>
 </div>
 
