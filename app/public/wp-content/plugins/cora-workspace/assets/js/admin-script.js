@@ -6311,12 +6311,22 @@ jQuery(document).ready(function($) {
             $('.cora-stat-card').parent().hide();
             $('#cora-articles-table-body').closest('div').hide();
             $('.cora-page-header').hide();
-            $('#cora-full-page-editor').removeClass('hidden');
+            $('#cora-full-page-editor').removeClass('hidden').css('display', 'flex');
         } else {
-            $('#cora-full-page-editor').addClass('hidden');
+            $('#cora-full-page-editor').addClass('hidden').css('display', 'none');
             $('.cora-stat-card').parent().show();
             $('#cora-articles-table-body').closest('div').show();
             $('.cora-page-header').show();
+            
+            // Remove edit & post_id query params from URL when closing editor
+            try {
+                const url = new URL(window.location.href);
+                url.searchParams.delete('action');
+                url.searchParams.delete('post_id');
+                url.searchParams.delete('edit_post');
+                url.searchParams.delete('article_id');
+                window.history.pushState({}, '', url.toString());
+            } catch(e){}
         }
     };
 
@@ -6352,6 +6362,14 @@ jQuery(document).ready(function($) {
     };
 
     window.coraEditArticle = function(id) {
+        // Sync URL parameters so page refresh restores this exact article editor
+        try {
+            const url = new URL(window.location.href);
+            url.searchParams.set('action', 'edit');
+            url.searchParams.set('post_id', id);
+            window.history.pushState({ action: 'edit', post_id: id }, '', url.toString());
+        } catch(e){}
+
         coraToggleContentDrawer(true);
         $('#cora-editor-status').text('Loading...');
         $('#cora-article-id').val(id);

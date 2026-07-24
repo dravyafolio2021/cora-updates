@@ -350,6 +350,17 @@ window.coraWbMoveToNextStage = function(itemId, currentStage) {
 };
 
 window.coraEditArticle = function(postId, title) {
+  // 1. Update browser URL so page refresh restores this exact article editor
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.set('action', 'edit');
+    url.searchParams.set('post_id', postId);
+    window.history.pushState({ action: 'edit', post_id: postId }, '', url.toString());
+  } catch(e){}
+
+  if (typeof window.coraToggleContentDrawer === 'function') {
+    window.coraToggleContentDrawer(true);
+  }
   const fullEditor = document.getElementById('cora-full-page-editor');
   if (fullEditor) {
     fullEditor.classList.remove('hidden');

@@ -1043,6 +1043,15 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         const urlParams = new URLSearchParams(window.location.search);
         const ct = urlParams.get('ct') || 'ct-library';
         switchContentTab(ct);
+
+        const postId = urlParams.get('post_id') || urlParams.get('article_id') || urlParams.get('edit_post');
+        if (postId) {
+            setTimeout(function() {
+                if (typeof window.coraEditArticle === 'function') {
+                    window.coraEditArticle(postId);
+                }
+            }, 150);
+        }
     }
 
     if (document.readyState === 'loading') {
