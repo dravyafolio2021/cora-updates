@@ -355,6 +355,27 @@ add_filter( 'user_has_cap', function( $allcaps, $caps, $args, $user ) {
     return $allcaps;
 }, 999, 4 );
 
+/**
+ * Grant Elementor library and kit edit capabilities to Workspace Super Owners
+ * to prevent "Access denied" exceptions during options/settings saves.
+ */
+add_filter( 'user_has_cap', function( $allcaps, $caps, $args, $user ) {
+    if ( ! empty( $args ) && ( $args[0] === 'edit_post' || $args[0] === 'edit_others_posts' || $args[0] === 'edit_published_posts' ) ) {
+        $post_id = isset( $args[2] ) ? intval( $args[2] ) : 0;
+        if ( $post_id > 0 ) {
+            $post = get_post( $post_id );
+            if ( $post && $post->post_type === 'elementor_library' ) {
+                if ( cora_is_super_owner( $user ) ) {
+                    foreach ( $caps as $cap ) {
+                        $allcaps[ $cap ] = true;
+                    }
+                }
+            }
+        }
+    }
+    return $allcaps;
+}, 10, 4 );
+
 // Also hard-block the wp-admin/update.php install-plugin action via a redirect
 add_action( 'admin_init', function() {
     if (
@@ -10033,7 +10054,7 @@ function cora_ajax_save_system_settings_suite() {
                 'cora_git_sync_token'
             );
             if ( in_array( $field, $credential_fields, true ) ) {
-                if ( empty( $val ) || preg_match( '/^[•\*]+$/u', $val ) ) {
+                if ( empty( $val ) || str_replace( array('•', '*'), '', $val ) === '' ) {
                     continue;
                 }
             }

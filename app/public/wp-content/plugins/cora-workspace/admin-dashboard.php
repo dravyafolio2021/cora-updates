@@ -37,7 +37,7 @@ wp_enqueue_media();
 // Save Direct MCP Access Token
 if ( isset( $_POST['cora_save_mcp_token_direct_submit'] ) && check_admin_referer( 'cora_save_mcp_token_direct', 'cora_mcp_nonce' ) ) {
     $mcp_token = sanitize_text_field( $_POST['cora_mcp_access_token_direct'] );
-    if ( ! empty( $mcp_token ) && preg_match( '/^[•\*]+$/u', $mcp_token ) ) {
+    if ( ! empty( $mcp_token ) && str_replace( array('•', '*'), '', $mcp_token ) === '' ) {
         echo "<script>window.addEventListener('DOMContentLoaded', function() { window.coraShowToast('AI MCP server access token saved successfully.'); });</script>";
     } else {
         update_option( 'cora_mcp_access_token', $mcp_token );
