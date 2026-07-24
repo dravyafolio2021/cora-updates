@@ -20988,12 +20988,17 @@ function cora_ajax_save_content_brief() {
 // 2c. cora_update_content_stage
 add_action('wp_ajax_cora_update_content_stage', 'cora_ajax_update_content_stage');
 function cora_ajax_update_content_stage() {
-    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if (isset($_POST['nonce']) && !empty($_POST['nonce'])) {
+        @wp_verify_nonce($_POST['nonce'], 'cora_ajax_nonce');
+    }
+    if (!current_user_can('edit_posts')) {
+        wp_send_json_error('Permission denied');
+    }
     global $wpdb;
     $item_id = intval($_POST['item_id']);
     $target_stage = sanitize_text_field($_POST['target_stage']);
     
-    $allowed_stages = ['idea','briefing','research','drafting','editorial_review','revisions','seo_gate','approval','scheduled','published','performance'];
+    $allowed_stages = ['idea','briefing','research','drafting','editorial_review','revisions','seo_gate','approval','scheduled','published','performance','review'];
     if(!in_array($target_stage, $allowed_stages)) wp_send_json_error('Invalid stage');
     
     $item = $wpdb->get_row($wpdb->prepare("SELECT stage FROM {$wpdb->prefix}cora_content_items WHERE id = %d", $item_id));

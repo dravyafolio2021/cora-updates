@@ -102,15 +102,15 @@ $stage_keys = array_keys($stages);
   </div>
 </div>
 
-<!-- 5-COLUMN KANBAN BOARD GRID (EXPANDED FIT) -->
-<div class="flex gap-4 overflow-x-auto pb-6 scrollbar-hide select-none" id="cora-workflow-kanban">
+<!-- HORIZONTALLY SCROLLABLE KANBAN BOARD CONTAINER -->
+<div class="flex gap-4 overflow-x-auto pb-6 select-none opacity-100 scrollbar-hide" id="cora-workflow-kanban" style="-webkit-overflow-scrolling: touch; opacity: 1 !important;">
   <?php foreach($stages as $col_key => $col_label): 
     $col_cards = $grouped_items[$col_key] ?? [];
     $current_idx = array_search($col_key, $stage_keys);
     $next_stage_key = ($current_idx !== false && $current_idx < count($stage_keys) - 1) ? $stage_keys[$current_idx + 1] : null;
     $next_stage_label = $next_stage_key ? $stages[$next_stage_key] : null;
   ?>
-  <div class="w-80 shrink-0 bg-zinc-100/60 rounded-2xl flex flex-col ct-stage-container" data-stage="<?php echo $col_key; ?>">
+  <div class="w-80 shrink-0 bg-zinc-100/60 rounded-2xl flex flex-col transition-all ct-stage-container opacity-100" data-stage="<?php echo $col_key; ?>">
     
     <!-- Column Header -->
     <div class="p-3.5 border-b border-zinc-200 flex items-center justify-between bg-white rounded-t-2xl">
@@ -144,7 +144,7 @@ $stage_keys = array_keys($stages);
         $pc = $p_colors[$item['priority']] ?? $p_colors['medium'];
         $post_id = intval($item['post_id'] ?? $item['id']);
       ?>
-        <!-- WORKFLOW CARD (100% OPACITY SOLID WHITE) -->
+        <!-- WORKFLOW CARD (SOLID WHITE NO HARSH OUTLINE) -->
         <div draggable="true" 
              ondragstart="coraWbDragStart(event, <?php echo $item['id']; ?>)" 
              ondragend="coraWbDragEnd(event)"
@@ -187,7 +187,7 @@ $stage_keys = array_keys($stages);
 
           <!-- EXACT 2 CTAs ONLY: EDIT & MOVE TO NEXT STAGE -->
           <div class="flex items-center gap-1.5 pt-2 border-t border-zinc-100">
-            <!-- CTA 1: Edit Article -->
+            <!-- CTA 1: Edit Article (Opens Content Editor) -->
             <button type="button" 
                     onclick="event.stopPropagation(); coraEditArticle(<?php echo $post_id; ?>, '<?php echo esc_js($item['title']); ?>')" 
                     class="flex-1 px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-sm">
@@ -264,6 +264,7 @@ window.coraWbDragEnd = function(e) {
 window.coraWbDragOver = function(e) {
   e.preventDefault();
   e.dataTransfer.dropEffect = 'move';
+  return false;
 };
 
 window.coraWbDragEnter = function(e, stageKey) {
@@ -290,7 +291,18 @@ window.coraWbDrop = function(e, targetStage) {
   if(!itemId) return;
 
   const cardEl = document.querySelector(`.cora-wb-card[data-id="${itemId}"]`);
-  if(cardEl) cardEl.style.opacity = '1';
+  if(cardEl) {
+    cardEl.style.opacity = '1';
+    // OPTIMISTIC DOM MOVEMENT: Move card instantly into target column DOM
+    const targetColEl = document.querySelector(`.ct-stage-column[data-stage="${targetStage}"]`);
+    if(targetColEl) {
+      // Remove "Drop card here" placeholder if present
+      const placeholder = targetColEl.querySelector('.h-32');
+      if(placeholder) placeholder.remove();
+      targetColEl.appendChild(cardEl);
+      cardEl.setAttribute('data-stage', targetStage);
+    }
+  }
 
   window.moveToStage(itemId, targetStage);
 };
@@ -300,6 +312,17 @@ window.coraWbMoveToNextStage = function(itemId, currentStage) {
   const idx = window.STAGE_ORDER.indexOf(mappedCurrent);
   if(idx !== -1 && idx < window.STAGE_ORDER.length - 1) {
     const nextStage = window.STAGE_ORDER[idx + 1];
+    
+    // OPTIMISTIC DOM MOVEMENT
+    const cardEl = document.querySelector(`.cora-wb-card[data-id="${itemId}"]`);
+    const targetColEl = document.querySelector(`.ct-stage-column[data-stage="${nextStage}"]`);
+    if(cardEl && targetColEl) {
+      const placeholder = targetColEl.querySelector('.h-32');
+      if(placeholder) placeholder.remove();
+      targetColEl.appendChild(cardEl);
+      cardEl.setAttribute('data-stage', nextStage);
+    }
+    
     window.moveToStage(itemId, nextStage);
   } else {
     if(typeof window.coraShowToast === 'function') {
@@ -312,7 +335,7 @@ window.coraEditArticle = function(postId, title) {
   const fullEditor = document.getElementById('cora-full-page-editor');
   if (fullEditor) {
     fullEditor.classList.remove('hidden');
-    fullEditor.style.display = 'block';
+    fullEditor.style.display = 'flex';
   } else if (typeof window.openSEODetailDrawer === 'function') {
     window.openSEODetailDrawer(postId, title || '');
   } else if (typeof window.coraShowToast === 'function') {
@@ -322,8 +345,8 @@ window.coraEditArticle = function(postId, title) {
 
 window.moveToStage = function(itemId, targetStage) {
   const $ = window.jQuery || window.$;
-  const ajaxUrl = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '');
-  const nonce = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '';
+  const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : ''));
+  const nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '');
   if (!ajaxUrl || !$) return;
 
   $.post(ajaxUrl, {
@@ -346,140 +369,5 @@ window.moveToStage = function(itemId, targetStage) {
       }
     }
   });
-};
-
-window.loadContentWorkspace = function(stageFilter) {
-  const $ = window.jQuery || window.$;
-  const kanban = document.getElementById('cora-workflow-kanban');
-  if(kanban) kanban.style.opacity = '1';
-  if (!$) return;
-
-  const ajaxUrl = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '');
-  const nonce = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '';
-  if (!ajaxUrl) return;
-
-  $.post(ajaxUrl, {
-    action: 'cora_fetch_content_workspace',
-    nonce: nonce,
-    stage_filter: stageFilter || ''
-  }, function(r) {
-    if(r && r.success) {
-      window.renderWorkspaceBoard(r.data);
-    }
-    if(kanban) kanban.style.opacity = '1';
-  });
-};
-
-window.renderWorkspaceBoard = function(data) {
-  const grouped = {'idea':[], 'drafting':[], 'review':[], 'scheduled':[], 'published':[]};
-  if(data.stages) {
-    Object.keys(data.stages).forEach(st => {
-      const mapped = window.STAGE_MAPPING[st] || 'idea';
-      const items = data.stages[st] || [];
-      grouped[mapped] = grouped[mapped].concat(items);
-    });
-  }
-  window.STAGE_ORDER.forEach(colKey => {
-    const col = document.querySelector(`.ct-stage-column[data-stage="${colKey}"]`);
-    const countEl = document.querySelector(`[data-stage="${colKey}"] .ct-stage-count`);
-    if(!col) return;
-    const items = grouped[colKey] || [];
-    if(countEl) countEl.textContent = items.length;
-    col.innerHTML = items.length === 0
-      ? '<div class="h-32 rounded-xl border border-dashed border-zinc-300 flex flex-col items-center justify-center text-zinc-400 text-xs gap-1 bg-white/60"><span class="font-medium text-[11px]">Drop card here</span></div>'
-      : items.map(item => window.renderItemCard(item, colKey)).join('');
-  });
-};
-
-window.renderItemCard = function(item, currentColKey) {
-  const priorityColors = {urgent:'bg-zinc-950 text-white',high:'bg-zinc-800 text-white',medium:'bg-zinc-200 text-zinc-900',low:'bg-zinc-100 text-zinc-600'};
-  const pc = priorityColors[item.priority] || priorityColors.medium;
-  const seoScore = item.seo_score || 78;
-  const geoScore = item.geo_score || 65;
-  const wordCount = (item.target_word_count || 1200).toLocaleString();
-  const writerName = item.writer_name || 'Unassigned';
-  const writerInitial = writerName[0].toUpperCase();
-  const ind = (item.industry || 'REAL ESTATE').toUpperCase();
-  const postId = item.post_id || item.id;
-  const idx = window.STAGE_ORDER.indexOf(currentColKey);
-  const nextStageKey = (idx !== -1 && idx < window.STAGE_ORDER.length - 1) ? window.STAGE_ORDER[idx + 1] : null;
-  const safeTitle = window.escHtml(item.title || '');
-  const jsSafeTitle = safeTitle.replace(/'/g, "\\'");
-
-  return `
-    <div draggable="true" 
-         ondragstart="coraWbDragStart(event, ${item.id})"
-         ondragend="coraWbDragEnd(event)"
-         class="cora-wb-card bg-white border border-zinc-200 hover:border-zinc-400 rounded-xl p-3.5 shadow-sm hover:shadow-md transition-all space-y-3 cursor-grab active:cursor-grabbing group relative opacity-100"
-         data-id="${item.id}"
-         data-post-id="${postId}"
-         data-stage="${currentColKey}">
-
-      ${item.thumbnail_url ? 
-        `<div class="w-full h-24 rounded-lg bg-zinc-100 overflow-hidden cursor-pointer" onclick="coraEditArticle(${postId}, '${jsSafeTitle}')">
-          <img src="${window.escHtml(item.thumbnail_url)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-         </div>` : ''
-      }
-
-      <!-- Category & Priority -->
-      <div class="flex items-center justify-between text-[9px]">
-        <span class="font-bold px-2 py-0.5 rounded bg-zinc-100 text-zinc-700 uppercase tracking-wider">${window.escHtml(ind)}</span>
-        <span class="font-bold px-2 py-0.5 rounded uppercase tracking-wider ${pc}">${window.escHtml(item.priority || 'medium')}</span>
-      </div>
-
-      <!-- Title -->
-      <h4 class="text-xs font-bold text-zinc-900 group-hover:text-zinc-700 line-clamp-2 leading-snug cursor-pointer" onclick="coraEditArticle(${postId}, '${jsSafeTitle}')">
-        ${safeTitle}
-      </h4>
-
-      <!-- Keyword -->
-      ${item.primary_keyword ? `
-        <div class="flex items-center gap-1.5 text-[10px] text-zinc-600 bg-zinc-50 border border-zinc-200/70 rounded-md px-2 py-1">
-          <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-          <span class="font-medium truncate">Target: <strong>${window.escHtml(item.primary_keyword)}</strong></span>
-        </div>
-      ` : ''}
-
-      <!-- Metrics Row -->
-      <div class="flex items-center justify-between text-[10px] pt-1.5 border-t border-zinc-100">
-        <span class="px-2 py-0.5 bg-zinc-900 text-white rounded font-bold text-[9px]">SEO ${seoScore}/100</span>
-        <span class="px-2 py-0.5 bg-zinc-100 text-zinc-800 border border-zinc-200 rounded font-semibold text-[9px]">GEO ${geoScore}%</span>
-        <span class="text-zinc-500 font-medium text-[10px]">${wordCount} w</span>
-      </div>
-
-      <!-- EXACT 2 CTAs ONLY: EDIT & MOVE TO NEXT STAGE -->
-      <div class="flex items-center gap-1.5 pt-2 border-t border-zinc-100">
-        <button type="button" 
-                onclick="event.stopPropagation(); coraEditArticle(${postId}, '${jsSafeTitle}')" 
-                class="flex-1 px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-sm">
-          <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-          Edit
-        </button>
-        ${nextStageKey ? `
-          <button type="button" 
-                  onclick="event.stopPropagation(); coraWbMoveToNextStage(${item.id}, '${currentColKey}')" 
-                  class="px-2.5 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border border-zinc-200 text-xs font-semibold rounded-lg flex items-center gap-1 transition-colors cursor-pointer shadow-sm"
-                  title="Move to next stage">
-            Next Stage &rarr;
-          </button>
-        ` : ''}
-      </div>
-
-      <!-- Author & Date Footer -->
-      <div class="flex items-center justify-between text-[10px] text-zinc-500 pt-1">
-        <div class="flex items-center gap-1.5">
-          <div class="w-4 h-4 rounded-full bg-zinc-200 flex items-center justify-center text-[8px] font-bold text-zinc-700">
-            ${writerInitial}
-          </div>
-          <span class="font-medium text-zinc-700 truncate max-w-[90px]">${window.escHtml(writerName)}</span>
-        </div>
-        <div class="font-mono text-[9px] text-zinc-400">${window.escHtml(item.draft_due_date || 'No date')}</div>
-      </div>
-    </div>
-  `;
-};
-
-window.escHtml = function(s) { 
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); 
 };
 </script>
