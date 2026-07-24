@@ -303,13 +303,29 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                             <div class="text-[10px] text-zinc-400 font-medium"><?php echo $conv_rate; ?></div>
                         </td>
                         <td class="py-3.5 px-4 text-xs text-zinc-500 font-medium"><?php echo $modified; ?></td>
-                        <td class="py-3.5 px-4 text-right pr-6">
-                            <div class="flex items-center justify-end gap-1.5">
-                                <button class="px-2 py-1 rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-bold transition-colors cursor-pointer" title="Edit Article" onclick="coraEditArticle(<?php echo $post->ID; ?>)">Edit</button>
-                                <button class="px-2 py-1 rounded border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-bold transition-colors cursor-pointer" title="SEO Analysis" onclick="openSEODetailDrawer(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">SEO</button>
-                                <a href="<?php echo get_permalink($post->ID); ?>" target="_blank" class="p-1 rounded hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 transition-colors" title="View Live">
-                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 0 0 2 2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                                </a>
+                        <td class="py-2.5 px-4 text-right pr-6">
+                            <div class="flex flex-col gap-1.5 items-end justify-center min-w-[130px]">
+                                <div class="flex items-center gap-1.5">
+                                    <button type="button" class="px-2 py-1 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer" title="Edit Article" onclick="coraEditArticle(<?php echo $post->ID; ?>)">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                        Edit
+                                    </button>
+                                    <button type="button" class="px-2 py-1 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer" title="SEO Analysis" onclick="openSEODetailDrawer(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                        SEO
+                                    </button>
+                                </div>
+                                <div class="flex items-center gap-2 pr-0.5">
+                                    <button type="button" class="text-[10px] font-semibold text-zinc-500 hover:text-zinc-900 flex items-center gap-1 transition-colors cursor-pointer" title="Content Brief" onclick="openContentBriefDrawer(<?php echo $post->ID; ?>)">
+                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                        Brief
+                                    </button>
+                                    <span class="text-zinc-300">&bull;</span>
+                                    <a href="<?php echo get_permalink($post->ID); ?>" target="_blank" class="text-[10px] font-semibold text-zinc-500 hover:text-zinc-900 flex items-center gap-1 transition-colors" title="View Live">
+                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 0 0 2 2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                        View
+                                    </a>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -1337,15 +1353,43 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
     };
 
     // ============================================================
-    // CLOSE ALL DRAWERS (fallback if admin-script.js not loaded)
+    // CLOSE ALL DRAWERS (global handler)
     // ============================================================
-    if (typeof window.coraCloseAllDrawers !== 'function') {
-        window.coraCloseAllDrawers = function() {
-            document.querySelectorAll('.cora-bottom-sheet').forEach(s => s.classList.add('collapsed'));
-            const bd = document.getElementById('cora-drawer-backdrop');
-            if(bd) { bd.classList.add('hidden'); bd.style.pointerEvents = 'none'; }
-        };
-    }
+    window.coraCloseAllDrawers = function() {
+        document.querySelectorAll('.cora-bottom-sheet').forEach(s => s.classList.add('collapsed'));
+        const bd = document.getElementById('cora-drawer-backdrop');
+        if(bd) { bd.classList.add('hidden'); bd.style.pointerEvents = 'none'; }
+    };
+
+    window.openContentBriefDrawer = function(itemId) {
+        if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
+        const drawer = document.getElementById('cora-content-brief-sheet');
+        const backdrop = document.getElementById('cora-drawer-backdrop');
+        if(drawer) {
+            if(drawer.parentNode !== document.body) document.body.appendChild(drawer);
+            if(backdrop && backdrop.parentNode !== document.body) document.body.appendChild(backdrop);
+            drawer.classList.remove('collapsed', 'translate-x-full');
+        }
+        showBackdrop();
+
+        if(itemId) {
+            const idEl = document.getElementById('cb-item-id');
+            if(idEl) idEl.value = itemId;
+            if(typeof window.coraREWPData !== 'undefined') {
+                $.post(coraREWPData.ajaxUrl, {
+                    action: 'cora_get_content_item',
+                    nonce: coraREWPData.ajaxNonce,
+                    item_id: itemId
+                }, function(r) {
+                    if(r && r.success && typeof populateBriefDrawer === 'function') populateBriefDrawer(r.data);
+                });
+            }
+        }
+    };
+
+    window.closeContentBriefDrawer = function() {
+        window.coraCloseAllDrawers();
+    };
 
     // Immediate & DOMReady Init
     function initActiveTab() {
