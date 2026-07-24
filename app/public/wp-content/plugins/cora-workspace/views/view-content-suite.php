@@ -338,20 +338,25 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 </div>
 <!-- PANEL: SEO Analyzer -->
 <div id="panel-ct-seo" class="cora-ct-panel hidden">
-    <div class="flex gap-6">
+    <div class="flex gap-6 items-start">
         <!-- Left: Article List -->
-        <div class="w-80 shrink-0 bg-white border border-zinc-200 rounded-xl shadow-2xs h-[780px] flex flex-col overflow-hidden">
+        <div id="seo-sidebar" class="w-[280px] shrink-0 bg-white border border-zinc-200 rounded-xl shadow-2xs sticky top-4 max-h-[calc(100vh-140px)] flex flex-col overflow-hidden transition-all duration-200">
             <!-- Header -->
-            <div class="p-3.5 border-b border-zinc-200 bg-zinc-50/70 flex items-center justify-between">
-                <span class="text-[11px] font-bold text-zinc-900 uppercase tracking-wider">ARTICLES</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 bg-zinc-200 text-zinc-700 rounded-full"><?php echo count($cora_posts); ?></span>
+            <div id="seo-sidebar-header" class="p-3.5 border-b border-zinc-200 bg-zinc-50/70 flex items-center justify-between">
+                <div class="flex items-center gap-2 overflow-hidden seo-sidebar-text">
+                    <span class="text-[11px] font-bold text-zinc-900 uppercase tracking-wider whitespace-nowrap">ARTICLES</span>
+                    <span id="seo-article-count-badge" class="text-[10px] font-bold px-2 py-0.5 bg-zinc-200 text-zinc-700 rounded-full"><?php echo count($cora_posts); ?></span>
+                </div>
+                <button id="seo-sidebar-toggle-btn" class="p-1 rounded-md hover:bg-zinc-200 text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer shrink-0" onclick="toggleSEOSidebar()" title="Collapse Sidebar">
+                    <svg id="seo-sidebar-toggle-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
             </div>
             
             <!-- Search & Filter Bar -->
-            <div class="p-3 border-b border-zinc-100 flex items-center gap-2">
+            <div class="p-3 border-b border-zinc-100 flex items-center gap-2 seo-sidebar-content">
                 <div class="relative flex-1">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" id="seo-search" class="w-full pl-8 pr-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-500 bg-zinc-50/50 focus:bg-white transition-all" placeholder="Search articles..." oninput="filterSEOArticleList(this.value)">
+                    <input type="text" id="seo-search" class="w-full pl-8 pr-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-500 bg-zinc-50/50 focus:bg-white transition-all" placeholder="Search title or ID..." oninput="filterSEOArticleList(this.value)">
                 </div>
                 <button class="p-1.5 border border-zinc-200 rounded-lg hover:bg-zinc-50 text-zinc-500 hover:text-zinc-900 transition-colors shrink-0" title="Filter Articles">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
@@ -359,7 +364,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             </div>
 
             <!-- Sort dropdown line -->
-            <div class="px-3.5 py-2 border-b border-zinc-100 bg-zinc-50/40 text-[11px] text-zinc-500 flex items-center justify-between">
+            <div class="px-3.5 py-2 border-b border-zinc-100 bg-zinc-50/40 text-[11px] text-zinc-500 flex items-center justify-between seo-sidebar-content">
                 <span class="font-medium text-zinc-500">Sort by:</span>
                 <select class="text-xs border-0 font-medium bg-transparent text-zinc-700 focus:outline-none cursor-pointer pr-2" onchange="sortSEOArticles(this.value)">
                     <option value="recent">Recently Analyzed</option>
@@ -370,7 +375,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             </div>
 
             <!-- Article list -->
-            <div class="flex-1 overflow-y-auto p-2 space-y-1.5" id="seo-article-list-container">
+            <div class="flex-1 overflow-y-auto p-2 space-y-1.5 seo-sidebar-content" id="seo-article-list-container">
                 <?php foreach($cora_posts as $idx => $post): 
                     $score = get_post_meta($post->ID, '_cora_seo_score', true) ?: rand(65, 92);
                     $modified_time = human_time_diff(get_the_modified_time('U', $post->ID), current_time('timestamp'));
@@ -383,18 +388,19 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                     </div>
                 </button>
                 <?php endforeach; ?>
+
+                <div id="seo-no-results" class="hidden py-8 text-center text-zinc-400 text-xs flex flex-col items-center justify-center gap-2">
+                    <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <span class="font-medium text-zinc-500">No matching articles found</span>
+                </div>
             </div>
 
             <!-- Bottom Pagination Bar -->
-            <div class="p-2.5 border-t border-zinc-200 bg-zinc-50/70 flex items-center justify-center gap-1 text-xs text-zinc-500 font-medium select-none">
-                <button class="px-2 py-1 rounded hover:bg-zinc-200 text-zinc-600 transition-colors disabled:opacity-40" title="Previous Page">&lt;</button>
-                <button class="w-6 h-6 rounded bg-zinc-900 text-white font-bold flex items-center justify-center text-[11px]">1</button>
-                <button class="w-6 h-6 rounded hover:bg-zinc-200 text-zinc-700 flex items-center justify-center text-[11px] transition-colors">2</button>
-                <button class="w-6 h-6 rounded hover:bg-zinc-200 text-zinc-700 flex items-center justify-center text-[11px] transition-colors">3</button>
-                <button class="w-6 h-6 rounded hover:bg-zinc-200 text-zinc-700 flex items-center justify-center text-[11px] transition-colors">4</button>
-                <span class="text-zinc-400 px-0.5">...</span>
-                <button class="w-6 h-6 rounded hover:bg-zinc-200 text-zinc-700 flex items-center justify-center text-[11px] transition-colors">6</button>
-                <button class="px-2 py-1 rounded hover:bg-zinc-200 text-zinc-700 flex items-center justify-center text-[11px] transition-colors" title="Next Page">&gt;</button>
+            <div id="seo-pagination-container" class="p-2.5 border-t border-zinc-200 bg-zinc-50/70 flex flex-col items-center gap-1.5 text-xs text-zinc-500 font-medium select-none seo-sidebar-content">
+                <div id="seo-pagination-info" class="text-[11px] text-zinc-500 font-normal">Showing 1-5 of <?php echo count($cora_posts); ?></div>
+                <div id="seo-pagination-controls" class="flex items-center justify-center gap-1">
+                    <!-- Pagination buttons rendered dynamically in JS -->
+                </div>
             </div>
         </div>
         
@@ -1099,6 +1105,10 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 }
             }, 100);
         }
+
+        if (typeof window.initSEOSidebarState === 'function') {
+            window.initSEOSidebarState();
+        }
     }
 
     if (document.readyState === 'loading') {
@@ -1219,6 +1229,20 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 btn.classList.remove('active', 'bg-zinc-50', 'border-zinc-200', 'shadow-2xs');
             }
         });
+
+        if (typeof window.getFilteredSEOArticles === 'function') {
+            const filtered = window.getFilteredSEOArticles();
+            const itemIdx = filtered.findIndex(btn => btn.dataset.id == articleId);
+            if (itemIdx !== -1) {
+                const targetPage = Math.floor(itemIdx / _seoPageSize) + 1;
+                if (targetPage !== _seoCurrentPage) {
+                    _seoCurrentPage = targetPage;
+                    if (typeof window.renderSEOPagination === 'function') {
+                        window.renderSEOPagination();
+                    }
+                }
+            }
+        }
 
         const container = document.getElementById('seo-analysis-container');
         if(!container) return;
@@ -1913,6 +1937,145 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         if (chevron) chevron.classList.toggle('rotate-180');
     };
 
+    // ============================================================
+    // SEO ANALYZER: Sidebar Pagination, Search & Collapse
+    // ============================================================
+    let _seoCurrentPage = 1;
+    const _seoPageSize = 5;
+    let _seoSearchQuery = '';
+
+    window.getFilteredSEOArticles = function() {
+        const container = document.getElementById('seo-article-list-container');
+        if (!container) return [];
+        const buttons = Array.from(container.querySelectorAll('.seo-article-btn'));
+        if (!_seoSearchQuery) return buttons;
+        
+        return buttons.filter(btn => {
+            const title = (btn.dataset.title || '').toLowerCase();
+            const id = String(btn.dataset.id || '');
+            return title.includes(_seoSearchQuery) || id.includes(_seoSearchQuery);
+        });
+    };
+
+    window.renderSEOPagination = function() {
+        const container = document.getElementById('seo-article-list-container');
+        if (!container) return;
+        
+        const allButtons = Array.from(container.querySelectorAll('.seo-article-btn'));
+        const filteredButtons = window.getFilteredSEOArticles();
+        const totalCount = filteredButtons.length;
+        const totalPages = Math.max(1, Math.ceil(totalCount / _seoPageSize));
+        
+        if (_seoCurrentPage > totalPages) _seoCurrentPage = totalPages;
+        if (_seoCurrentPage < 1) _seoCurrentPage = 1;
+
+        // Hide all article buttons first
+        allButtons.forEach(btn => btn.style.display = 'none');
+
+        // No results state handling
+        const noResults = document.getElementById('seo-no-results');
+        if (totalCount === 0) {
+            if (noResults) noResults.classList.remove('hidden');
+        } else {
+            if (noResults) noResults.classList.add('hidden');
+            // Show current page slice
+            const start = (_seoCurrentPage - 1) * _seoPageSize;
+            const end = Math.min(start + _seoPageSize, totalCount);
+            for (let i = start; i < end; i++) {
+                if (filteredButtons[i]) filteredButtons[i].style.display = '';
+            }
+        }
+
+        // Update count badge
+        const badge = document.getElementById('seo-article-count-badge');
+        if (badge) badge.innerText = totalCount;
+
+        // Update pagination info text
+        const info = document.getElementById('seo-pagination-info');
+        if (info) {
+            if (totalCount === 0) {
+                info.innerText = 'Showing 0 of 0';
+            } else {
+                const start = (_seoCurrentPage - 1) * _seoPageSize + 1;
+                const end = Math.min(_seoCurrentPage * _seoPageSize, totalCount);
+                info.innerText = `Showing ${start}-${end} of ${totalCount}`;
+            }
+        }
+
+        // Update pagination controls
+        const controls = document.getElementById('seo-pagination-controls');
+        if (controls) {
+            controls.innerHTML = '';
+
+            // Prev button
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'px-2 py-1 rounded hover:bg-zinc-200 text-zinc-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-xs font-semibold cursor-pointer';
+            prevBtn.innerHTML = '&lt;';
+            prevBtn.title = 'Previous Page';
+            prevBtn.disabled = _seoCurrentPage === 1 || totalCount === 0;
+            prevBtn.onclick = function() { window.changeSEOPage(_seoCurrentPage - 1); };
+            controls.appendChild(prevBtn);
+
+            if (totalCount > 0) {
+                const pages = [];
+                if (totalPages <= 5) {
+                    for (let p = 1; p <= totalPages; p++) pages.push(p);
+                } else {
+                    pages.push(1);
+                    if (_seoCurrentPage > 3) pages.push('...');
+                    
+                    const startP = Math.max(2, _seoCurrentPage - 1);
+                    const endP = Math.min(totalPages - 1, _seoCurrentPage + 1);
+                    for (let p = startP; p <= endP; p++) {
+                        if (!pages.includes(p)) pages.push(p);
+                    }
+                    
+                    if (_seoCurrentPage < totalPages - 2) pages.push('...');
+                    if (!pages.includes(totalPages)) pages.push(totalPages);
+                }
+
+                pages.forEach(p => {
+                    if (p === '...') {
+                        const span = document.createElement('span');
+                        span.className = 'text-zinc-400 px-0.5 text-xs';
+                        span.innerText = '...';
+                        controls.appendChild(span);
+                    } else {
+                        const btn = document.createElement('button');
+                        if (p === _seoCurrentPage) {
+                            btn.className = 'w-6 h-6 rounded bg-zinc-900 text-white font-bold flex items-center justify-center text-[11px]';
+                        } else {
+                            btn.className = 'w-6 h-6 rounded hover:bg-zinc-200 text-zinc-700 flex items-center justify-center text-[11px] transition-colors cursor-pointer font-medium';
+                        }
+                        btn.innerText = p;
+                        btn.onclick = function() { window.changeSEOPage(p); };
+                        controls.appendChild(btn);
+                    }
+                });
+            }
+
+            // Next button
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'px-2 py-1 rounded hover:bg-zinc-200 text-zinc-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-xs font-semibold cursor-pointer';
+            nextBtn.innerHTML = '&gt;';
+            nextBtn.title = 'Next Page';
+            nextBtn.disabled = _seoCurrentPage === totalPages || totalCount === 0;
+            nextBtn.onclick = function() { window.changeSEOPage(_seoCurrentPage + 1); };
+            controls.appendChild(nextBtn);
+        }
+    };
+
+    window.changeSEOPage = function(page) {
+        _seoCurrentPage = page;
+        window.renderSEOPagination();
+    };
+
+    window.filterSEOArticleList = function(q) {
+        _seoSearchQuery = (q || '').toLowerCase().trim();
+        _seoCurrentPage = 1;
+        window.renderSEOPagination();
+    };
+
     window.sortSEOArticles = function(criterion) {
         const container = document.getElementById('seo-article-list-container');
         if(!container) return;
@@ -1924,11 +2087,64 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             return parseInt(b.dataset.id || 0) - parseInt(a.dataset.id || 0);
         });
         items.forEach(item => container.appendChild(item));
+        const noResults = document.getElementById('seo-no-results');
+        if (noResults) container.appendChild(noResults);
+        
+        window.renderSEOPagination();
+    };
+
+    window.toggleSEOSidebar = function(forceState) {
+        const sidebar = document.getElementById('seo-sidebar');
+        const toggleIcon = document.getElementById('seo-sidebar-toggle-icon');
+        const toggleBtn = document.getElementById('seo-sidebar-toggle-btn');
+        const header = document.getElementById('seo-sidebar-header');
+        if (!sidebar) return;
+
+        const isCurrentlyCollapsed = sidebar.classList.contains('w-[48px]');
+        const shouldCollapse = (typeof forceState === 'boolean') ? forceState : !isCurrentlyCollapsed;
+
+        const contentEls = sidebar.querySelectorAll('.seo-sidebar-content');
+        const textEls = sidebar.querySelectorAll('.seo-sidebar-text');
+
+        if (shouldCollapse) {
+            sidebar.classList.remove('w-[280px]', 'w-80');
+            sidebar.classList.add('w-[48px]');
+            contentEls.forEach(el => el.classList.add('hidden'));
+            textEls.forEach(el => el.classList.add('hidden'));
+            if (header) {
+                header.classList.remove('justify-between');
+                header.classList.add('justify-center');
+            }
+            if (toggleIcon) {
+                toggleIcon.innerHTML = '<polyline points="9 18 15 12 9 6"></polyline>';
+            }
+            if (toggleBtn) toggleBtn.title = 'Expand Sidebar';
+            localStorage.setItem('cora_seo_sidebar_collapsed', 'true');
+        } else {
+            sidebar.classList.remove('w-[48px]');
+            sidebar.classList.add('w-[280px]');
+            contentEls.forEach(el => el.classList.remove('hidden'));
+            textEls.forEach(el => el.classList.remove('hidden'));
+            if (header) {
+                header.classList.remove('justify-center');
+                header.classList.add('justify-between');
+            }
+            if (toggleIcon) {
+                toggleIcon.innerHTML = '<polyline points="15 18 9 12 15 6"></polyline>';
+            }
+            if (toggleBtn) toggleBtn.title = 'Collapse Sidebar';
+            localStorage.setItem('cora_seo_sidebar_collapsed', 'false');
+        }
+    };
+
+    window.initSEOSidebarState = function() {
+        const collapsed = localStorage.getItem('cora_seo_sidebar_collapsed') === 'true';
+        window.toggleSEOSidebar(collapsed);
+        window.renderSEOPagination();
     };
 
     window.runInlineSEOAudit = function(articleId) {
         const targetAjaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'));
-        const targetNonce   = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '');
 
         const focusKw   = document.getElementById('inline-focus-keyword')?.value || '';
         const metaTitle = document.getElementById('inline-meta-title')?.value || '';
@@ -2057,16 +2273,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 
     function escJsHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-    function filterSEOArticleList(q) {
-        const query = q.toLowerCase();
-        document.querySelectorAll('.seo-article-btn').forEach(btn => {
-            if(btn.dataset.title.toLowerCase().includes(query)) {
-                btn.style.display = '';
-            } else {
-                btn.style.display = 'none';
-            }
-        });
-    }
+
 
     window.closeSEODetailDrawer = function() {
         if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
