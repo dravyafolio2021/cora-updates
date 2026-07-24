@@ -5,6 +5,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 
+<script>
+window.coraREWPData = window.coraREWPData || {
+    ajaxUrl: '<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>',
+    ajaxNonce: '<?php echo wp_create_nonce( 'cora_ajax_nonce' ); ?>'
+};
+window.coraREData = window.coraREData || window.coraREWPData;
+</script>
+
 <div class="cora-page-header flex items-center justify-between mb-6">
     <div class="flex items-center gap-3">
         <span class="cora-page-emoji text-zinc-900 flex shrink-0">

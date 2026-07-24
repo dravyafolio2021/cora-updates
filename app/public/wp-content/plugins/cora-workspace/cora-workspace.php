@@ -21133,6 +21133,9 @@ add_action( 'wp_ajax_cora_save_geo_signals', 'cora_ajax_save_geo_signals' );
  * AJAX Handler: Create/Update Article
  */
 function cora_ajax_create_article() {
+    if ( isset($_REQUEST['security']) && !isset($_REQUEST['nonce']) ) {
+        $_REQUEST['nonce'] = $_REQUEST['security'];
+    }
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
     if ( ! current_user_can( 'edit_posts' ) ) wp_send_json_error( 'Unauthorized.' );
 
@@ -21163,7 +21166,24 @@ function cora_ajax_create_article() {
     // Save editorial status if provided
     if ( isset($_POST['editorial_status']) ) {
         update_post_meta( $post_id, '_cora_editorial_status', sanitize_text_field($_POST['editorial_status']) );
+    } else {
+        update_post_meta( $post_id, '_cora_editorial_status', 'draft' );
     }
+
+    if ( isset($_POST['keyword']) ) {
+        update_post_meta( $post_id, '_cora_focus_keyword', sanitize_text_field($_POST['keyword']) );
+    }
+
+    if ( isset($_POST['assignee_id']) && $_POST['assignee_id'] !== '' ) {
+        update_post_meta( $post_id, '_cora_assignee_id', intval($_POST['assignee_id']) );
+    }
+
+    if ( isset($_POST['industry']) ) {
+        update_post_meta( $post_id, '_cora_industry', sanitize_text_field($_POST['industry']) );
+    }
+
+    update_post_meta( $post_id, '_cora_seo_score', 65 );
+    update_post_meta( $post_id, '_cora_geo_score', 50 );
 
     wp_send_json_success( array( 'post_id' => $post_id, 'message' => 'Saved successfully.' ) );
 }
