@@ -1441,7 +1441,6 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                         </div>
                                         <div class="flex items-center gap-1.5">
                                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">2/2</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </div>
                                     </div>
 
@@ -1458,7 +1457,6 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                         </div>
                                         <div class="flex items-center gap-1.5">
                                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">1/2</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </div>
                                     </div>
 
@@ -1475,7 +1473,6 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                         </div>
                                         <div class="flex items-center gap-1.5">
                                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">2/2</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </div>
                                     </div>
 
@@ -1492,7 +1489,6 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                         </div>
                                         <div class="flex items-center gap-1.5">
                                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">1/1</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </div>
                                     </div>
 
@@ -1509,7 +1505,6 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                         </div>
                                         <div class="flex items-center gap-1.5">
                                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">1/2</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </div>
                                     </div>
 
@@ -1526,7 +1521,6 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                         </div>
                                         <div class="flex items-center gap-1.5">
                                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">1/1</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </div>
                                     </div>
 
@@ -1543,7 +1537,6 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                         </div>
                                         <div class="flex items-center gap-1.5">
                                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">0/1</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </div>
                                     </div>
 
@@ -1560,7 +1553,6 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                         </div>
                                         <div class="flex items-center gap-1.5">
                                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">1/1</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </div>
                                     </div>
 
@@ -1577,7 +1569,6 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                         </div>
                                         <div class="flex items-center gap-1.5">
                                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">1/1</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </div>
                                     </div>
 
@@ -1594,7 +1585,6 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                         </div>
                                         <div class="flex items-center gap-1.5">
                                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">1/1</span>
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 transition-transform cat-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </div>
                                     </div>
                                 </div>

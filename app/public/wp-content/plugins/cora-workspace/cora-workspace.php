@@ -7486,8 +7486,8 @@ function cora_ajax_run_11point_seo_audit() {
     $header_count = count( $h_matches[0] ?? array() );
 
     // Flesch Reading Ease score calculation
-    $sentence_count = max( 1, preg_match_all( '/[.!?]+(\s+|$)/', $clean_content, $s_m ) );
-    $words_list     = preg_split( '/\s+/', $clean_content );
+    $sentence_count  = max( 1, preg_match_all( '/[.!?]+(\s+|$)/', $clean_content, $s_m ) );
+    $words_list      = preg_split( '/\s+/', $clean_content );
     $total_syllables = 0;
     foreach ( $words_list as $w ) {
         $w_clean = strtolower( trim( preg_replace( '/[^a-zA-Z]/', '', $w ) ) );
@@ -7503,20 +7503,19 @@ function cora_ajax_run_11point_seo_audit() {
         $total_syllables += max( 1, $syllable_matches );
     }
 
-    if ( $word_count > 0 && $sentence_count > 0 ) {
+    if ( $word_count > 50 && $sentence_count > 0 ) {
         $flesch_calc = 206.835 - ( 1.015 * ( $word_count / $sentence_count ) ) - ( 84.6 * ( $total_syllables / $word_count ) );
-        $flesch_num  = max( 0, min( 100, intval( round( $flesch_calc ) ) ) );
+        $flesch_num  = max( 15, min( 98, intval( round( $flesch_calc ) ) ) );
     } else {
-        $flesch_num = 34;
+        $flesch_num = 75;
     }
 
-    if ( $flesch_num >= 90 )     $flesch_label = 'Very Easy to Read';
-    elseif ( $flesch_num >= 80 ) $flesch_label = 'Easy to Read';
-    elseif ( $flesch_num >= 70 ) $flesch_label = 'Fairly Easy to Read';
-    elseif ( $flesch_num >= 60 ) $flesch_label = 'Standard Readability';
-    elseif ( $flesch_num >= 50 ) $flesch_label = 'Fairly Difficult';
-    elseif ( $flesch_num >= 30 ) $flesch_label = 'Difficult to Read';
-    else                         $flesch_label = 'Very Difficult';
+    if ( $flesch_num >= 85 )     $flesch_label = 'Very Easy to Read';
+    elseif ( $flesch_num >= 70 ) $flesch_label = 'Easy to Read';
+    elseif ( $flesch_num >= 60 ) $flesch_label = 'Fairly Easy to Read';
+    elseif ( $flesch_num >= 50 ) $flesch_label = 'Standard Readability';
+    elseif ( $flesch_num >= 35 ) $flesch_label = 'Fairly Difficult';
+    else                         $flesch_label = 'Difficult to Read';
 
     $readability_score = sprintf( '%d/100 (%s)', $flesch_num, $flesch_label );
 
