@@ -1237,31 +1237,42 @@ $cora_settings_tabs = array(
 
                 <!-- Card 2: Lovable Integration -->
                 <div class="cora-shopify-card space-y-4">
-                    <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between">
-                        <div>
-                            <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">2. Lovable Integration</h3>
-                            <p class="text-xs text-zinc-500">Connect your Lovable live URL to preview and sync updates.</p>
+                    <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <!-- Lovable Logo Badge -->
+                            <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm" style="background:linear-gradient(135deg,#f97316 0%,#ef4444 60%,#ec4899 100%);">
+                                <!-- Lovable "heart spark" icon approximation -->
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Lovable Integration</h3>
+                                <p class="text-xs text-zinc-500 mt-0.5">Connect your live Lovable URL to preview and sync updates.</p>
+                            </div>
                         </div>
                         <?php $live_url = get_option('cora_git_sync_live_url', ''); ?>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold <?php echo $live_url ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400' : 'bg-zinc-100 text-zinc-650 dark:bg-zinc-850 dark:text-zinc-400'; ?>">
-                            <span class="w-1.5 h-1.5 rounded-full <?php echo $live_url ? 'bg-green-500' : 'bg-zinc-400'; ?>"></span>
-                            <?php echo $live_url ? 'Connected & Live' : 'Not Connected'; ?>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold <?php echo $live_url ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400' : 'bg-zinc-100 text-zinc-650 dark:bg-zinc-850 dark:text-zinc-400'; ?>">
+                            <span class="w-1.5 h-1.5 rounded-full <?php echo $live_url ? 'bg-green-500 animate-pulse' : 'bg-zinc-400'; ?>"></span>
+                            <?php echo $live_url ? 'Connected &amp; Live' : 'Not Connected'; ?>
                         </span>
                     </div>
 
-                    <div class="space-y-4">
+                    <div class="space-y-3">
                         <div>
-                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Lovable Live URL (Alternative Deploy URL)</label>
-                            <input type="text" name="cora_git_sync_live_url" id="cora-lovable-live-url" value="<?php echo esc_attr( $live_url ); ?>" placeholder="e.g. https://app-name.lovable.app">
-                            <p class="text-[10px] text-zinc-455 mt-1">Optional. If your repository contains React source code rather than compiled static files, enter your live Lovable website link here.</p>
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Lovable Live URL</label>
+                            <input type="text" name="cora_git_sync_live_url" id="cora-lovable-live-url" value="<?php echo esc_attr( $live_url ); ?>" placeholder="https://your-app.lovable.app" style="width:100%;padding:7px 10px;font-size:11px;font-family:inherit;background:#fafafa;border:1px solid #e4e4e7;border-radius:8px;color:#18181b;outline:none;box-shadow:none;box-sizing:border-box;">
+                            <p class="text-[10px] text-zinc-450 mt-1.5 leading-relaxed">Optional. If your repository contains React source code rather than compiled static files, enter your live Lovable deployment URL here.</p>
                         </div>
                         <?php if ( ! empty( $live_url ) ) : ?>
-                            <button type="button" onclick="document.getElementById('cora-lovable-live-url').value=''; jQuery('#cora-lovable-live-url').trigger('change');" class="px-3 py-1.5 border border-zinc-205 dark:border-zinc-805 hover:border-zinc-450 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 text-[10px] font-bold rounded transition-colors cursor-pointer">
+                            <button type="button" onclick="document.getElementById('cora-lovable-live-url').value=''; jQuery('#cora-lovable-live-url').trigger('change');" class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 text-[10px] font-semibold rounded-lg transition-colors cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                                 Disconnect Lovable Project
                             </button>
                         <?php endif; ?>
                     </div>
                 </div>
+
 
                 <!-- Card 3: Hosting & Mappings -->
                 <div class="cora-shopify-card space-y-4">
