@@ -8766,3 +8766,48 @@ jQuery(document).ready(function($) {
             preview.html('<span class="text-[9px] text-zinc-450 uppercase font-semibold">No Icon</span>');
         }
     });
+
+    window.coraConnectGitHub = function() {
+        var token = $('#cora-git-token-input').val().trim();
+        if (!token) {
+            window.coraShowToast("Please enter a valid GitHub token.", "error");
+            return;
+        }
+        var data = {
+            action: 'cora_save_system_settings_suite',
+            nonce: coraREData.ajaxNonce,
+            cora_git_sync_token: token
+        };
+        $.post(coraREData.ajaxUrl, data, function(res) {
+            if (res && res.success) {
+                window.coraShowToast("GitHub account connected successfully!", "success");
+                setTimeout(function() {
+                    location.reload();
+                }, 1000);
+            } else {
+                window.coraShowToast("Failed to connect GitHub account.");
+            }
+        }).fail(function() {
+            window.coraShowToast("Server error connecting to GitHub.");
+        });
+    };
+
+    window.coraDisconnectGitHub = function() {
+        var data = {
+            action: 'cora_save_system_settings_suite',
+            nonce: coraREData.ajaxNonce,
+            cora_git_sync_token: ''
+        };
+        $.post(coraREData.ajaxUrl, data, function(res) {
+            if (res && res.success) {
+                window.coraShowToast("GitHub account disconnected.", "success");
+                setTimeout(function() {
+                    location.reload();
+                }, 1000);
+            } else {
+                window.coraShowToast("Failed to disconnect GitHub.");
+            }
+        }).fail(function() {
+            window.coraShowToast("Server error disconnecting from GitHub.");
+        });
+    };
