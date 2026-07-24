@@ -145,7 +145,7 @@ $stages = [
               </div>
               <span class="font-medium text-zinc-700"><?php echo esc_html($item['writer_name'] ?: 'Unassigned'); ?></span>
             </div>
-            <div class="font-semibold text-zinc-400">📅 <?php echo esc_html($item['draft_due_date'] ?: 'No deadline'); ?></div>
+            <div class="font-semibold text-zinc-400"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="inline-block mr-1 -mt-0.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> <?php echo esc_html($item['draft_due_date'] ?: 'No deadline'); ?></div>
           </div>
         </div>
       <?php endforeach; endif; ?>
@@ -254,7 +254,7 @@ $stages = [
             </div>
             <span class="font-medium text-zinc-700">${escHtml(writerName)}</span>
           </div>
-          <div class="font-semibold text-zinc-400">📅 ${escHtml(item.draft_due_date || 'No deadline')}</div>
+          <div class="font-semibold text-zinc-400"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="inline-block mr-1 -mt-0.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> ${escHtml(item.draft_due_date || 'No deadline')}</div>
         </div>
       </div>
     `;

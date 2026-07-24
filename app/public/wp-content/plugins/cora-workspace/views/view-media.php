@@ -12,25 +12,16 @@ $leads           = cora_db_get_leads();
 $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'Floor Plan', 'NOC / Approval', 'Invoice', 'Other' );
 ?>
 <style>
-/* ─── Escape parent wrapper padding so media is truly full-bleed ─────────── */
-/* The .cora-content-wrapper has p-3.5/p-6/p-8 & space-y-6 — we negate that */
-#cora-page-media { margin: -1.5rem -1.5rem -1.5rem -1.5rem !important; padding: 0 !important; }
-@media (min-width: 640px)  { #cora-page-media { margin: -1.5rem -1.5rem -1.5rem -1.5rem !important; } }
-@media (min-width: 768px)  { #cora-page-media { margin: -2rem -2rem -2rem -2rem !important; } }
-/* Also neutralize the space-y-6 gap from parent flex */
-#cora-page-media + * { margin-top: 0 !important; }
+#cora-page-media { margin: 0 !important; padding: 0 !important; width: 100% !important; }
 
-/* ─── Reset & full-bleed canvas ─────────────────────────────────────────── */
-/* Height = full viewport minus the Cora topnav (~56px) + any extra wrapper chrome */
+/* ─── Reset & Clean Layout Canvas ─────────────────────────────────────────── */
 #cm-root {
     display: flex;
     flex-direction: column;
-    height: calc(100dvh - 56px);
-    max-height: calc(100dvh - 56px);
-    overflow: hidden;
+    width: 100%;
+    min-height: calc(100vh - 80px);
     background: #fff;
     position: relative;
-    /* Ensure cm-root takes exactly the right height regardless of parent padding */
     margin: 0;
     border-radius: 0;
 }
@@ -84,16 +75,16 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 .cm-ubar.err { background:#ef4444; }
 
 /* ─── Grid canvas ────────────────────────────────────────────────────────── */
-#cm-canvas { flex:1; overflow-y:auto; padding:16px 18px; }
-#cm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; }
-.cm-cell { position:relative; border:1px solid #e4e4e7; border-radius:10px; overflow:hidden; cursor:pointer; transition:box-shadow .15s,border-color .15s; background:#fafafa; }
-.cm-cell:hover { box-shadow:0 4px 16px rgba(0,0,0,.08); border-color:#a1a1aa; }
+#cm-canvas { flex:1; overflow-y:auto; padding:20px 22px; }
+#cm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; }
+.cm-cell { position:relative; border:1px solid #e4e4e7; border-radius:12px; overflow:hidden; cursor:pointer; transition:all .18s ease; background:#fafafa; }
+.cm-cell:hover { box-shadow:0 8px 24px rgba(0,0,0,.08); border-color:#a1a1aa; transform:translateY(-1px); }
 .cm-cell.sel { border-color:#09090b; box-shadow:0 0 0 2px #09090b; }
-.cm-thumb { width:100%; aspect-ratio:4/3; object-fit:cover; display:block; }
-.cm-cell-icon { width:100%; aspect-ratio:4/3; display:flex; align-items:center; justify-content:center; background:#f4f4f5; }
-.cm-cell-name { padding:6px 8px; font-size:11px; font-weight:500; color:#52525b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; border-top:1px solid #f4f4f5; background:#fff; }
-.cm-cell-type { position:absolute; top:7px; right:7px; background:rgba(0,0,0,.55); color:#fff; font-size:9px; font-weight:700; padding:2px 6px; border-radius:999px; text-transform:uppercase; letter-spacing:.04em; }
-.cm-chk { position:absolute; top:7px; left:7px; width:16px; height:16px; border-radius:5px; border:2px solid rgba(255,255,255,.8); background:rgba(0,0,0,.2); display:none; align-items:center; justify-content:center; cursor:pointer; transition:background .1s; }
+.cm-thumb { width:100%; aspect-ratio:16/10; object-fit:cover; display:block; }
+.cm-cell-icon { width:100%; aspect-ratio:16/10; display:flex; align-items:center; justify-content:center; background:#f4f4f5; }
+.cm-cell-name { padding:10px 12px; font-size:12px; font-weight:600; color:#18181b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; border-top:1px solid #f4f4f5; background:#fff; }
+.cm-cell-type { position:absolute; top:9px; right:9px; background:rgba(0,0,0,.65); backdrop-filter:blur(4px); color:#fff; font-size:9.5px; font-weight:700; padding:3px 8px; border-radius:999px; text-transform:uppercase; letter-spacing:.04em; }
+.cm-chk { position:absolute; top:9px; left:9px; width:18px; height:18px; border-radius:6px; border:2px solid rgba(255,255,255,.9); background:rgba(0,0,0,.25); display:none; align-items:center; justify-content:center; cursor:pointer; transition:background .1s; }
 .cm-bulk-mode .cm-chk { display:flex; }
 .cm-chk.checked { background:#09090b; border-color:#09090b; }
 .cm-chk svg { display:none; }
@@ -126,11 +117,11 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 .cm-drop-box { border:2px dashed rgba(255,255,255,.5); border-radius:16px; padding:40px 64px; text-align:center; color:#fff; }
 
 /* ─── Detail overlay (right slide-in) ───────────────────────────────────── */
-#cm-detail { position:fixed; top:0; right:0; bottom:0; width:360px; background:#fff; border-left:1px solid #e4e4e7; box-shadow:-8px 0 32px rgba(0,0,0,.08); display:flex; flex-direction:column; transform:translateX(100%); transition:transform .25s cubic-bezier(.4,0,.2,1); z-index:500; }
+#cm-detail { position:fixed; top:0; right:0; bottom:0; width:60vw; max-width:90vw; background:#fff; border-left:1px solid #e4e4e7; box-shadow:-8px 0 32px rgba(0,0,0,.15); display:flex; flex-direction:column; transform:translateX(100%); transition:transform .25s cubic-bezier(.4,0,.2,1); z-index:9999; }
 #cm-detail.open { transform:translateX(0); }
 #cm-detail-header { flex-shrink:0; padding:13px 16px; border-bottom:1px solid #e4e4e7; display:flex; align-items:center; gap:8px; }
 #cm-detail-header h3 { flex:1; font-size:13px; font-weight:700; color:#09090b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0; }
-.cm-preview { flex-shrink:0; height:180px; background:#09090b; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.cm-preview { flex-shrink:0; height:380px; background:#09090b; display:flex; align-items:center; justify-content:center; overflow:hidden; }
 .cm-preview img,.cm-preview video { max-height:100%; max-width:100%; object-fit:contain; }
 .cm-detail-tabs { display:flex; border-bottom:1px solid #e4e4e7; flex-shrink:0; }
 .cm-dtab { padding:8px 14px; font-size:11px; font-weight:600; color:#a1a1aa; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:color .12s; }
@@ -201,11 +192,13 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 #cm-confirm-card p { margin:0 0 20px; font-size:12px; color:#71717a; }
 #cm-confirm-card .btns { display:flex; gap:8px; justify-content:flex-end; }
 
-/* ─── New folder drawer ──────────────────────────────────────────────────── */
-#cm-folder-dlg { position:fixed; inset:0; z-index:99999; background:rgba(9,9,11,.4); backdrop-filter:blur(2px); display:flex; justify-content:flex-end; opacity:0; pointer-events:none; transition:opacity .25s ease; }
-#cm-folder-dlg.open { opacity:1; pointer-events:auto; }
-#cm-folder-card { background:#fff; border-left:1px solid #e4e4e7; height:100%; width:100%; max-width:420px; box-shadow:-10px 0 30px rgba(0,0,0,.15); display:flex; flex-direction:column; transform:translateX(100%); transition:transform .25s ease; }
-#cm-folder-dlg.open #cm-folder-card { transform:translateX(0); }
+/* ─── Drawer Overlays ─────────────────────────────────────────────────── */
+#cm-folder-dlg, #cm-gallery-dlg, #cm-folder-settings-dlg { position:fixed; inset:0; z-index:99999; background:rgba(9,9,11,.4); backdrop-filter:blur(2px); display:flex; justify-content:flex-end; opacity:0; pointer-events:none; transition:opacity .25s ease; }
+#cm-folder-dlg.open, #cm-gallery-dlg.open, #cm-folder-settings-dlg.open { opacity:1; pointer-events:auto; }
+#cm-folder-card, #cm-gallery-card, #cm-folder-settings-card { background:#fff; border-left:1px solid #e4e4e7; height:100%; width:100%; max-width:440px; box-shadow:-10px 0 30px rgba(0,0,0,.15); display:flex; flex-direction:column; transform:translateX(100%); transition:transform .25s ease; }
+#cm-folder-dlg.open #cm-folder-card,
+#cm-gallery-dlg.open #cm-gallery-card,
+#cm-folder-settings-dlg.open #cm-folder-settings-card { transform:translateX(0) !important; }
 .cm-drawer-header { padding:20px; border-bottom:1px solid #e4e4e7; display:flex; align-items:center; justify-content:space-between; background:#fafafa; }
 .cora-dark-theme .cm-drawer-header { border-color:#27272a; background:#1c1c1e; }
 .cm-drawer-body { flex:1; overflow-y:auto; padding:24px; }
@@ -291,7 +284,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <input type="file" id="cm-file-input" multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.zip" style="display:none" onchange="cmHandleFiles(this.files)">
         </div>
 
-        <!-- ─ FOLDER TAB BAR ──────────────────────────────────── -->
+        <!-- ─ FOLDER & GALLERY TAB BAR ──────────────────────────── -->
         <div id="cm-tab-bar">
             <div class="cm-ftab active" id="cm-ftab-all" onclick="cmSelectFolder(null,this)" data-folder-id="">
                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
@@ -300,8 +293,10 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <div class="cm-ftab" id="cm-ftab-none" onclick="cmSelectFolder(-1,this)" data-folder-id="-1">
                 Unorganised <span class="ct" id="cm-ftab-none-ct">—</span>
             </div>
-            <!-- Dynamic folder tabs injected by JS -->
-            <div id="cm-folder-tabs"></div>
+            <!-- Dynamic folder tabs -->
+            <div id="cm-folder-tabs" style="display:inline-flex;align-items:center;gap:0"></div>
+            <!-- Client Galleries tabs -->
+            <div id="cm-gallery-tabs" style="display:inline-flex;align-items:center;gap:0"></div>
             <button class="cm-ftab-add" onclick="cmPromptFolder(null)" title="New folder">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             </button>
@@ -317,6 +312,13 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
         <select id="cm-ft" class="cm-sel" onchange="cmFilter()">
             <option value="all">All Types</option><option value="image">Images</option><option value="video">Videos</option><option value="audio">Audio</option><option value="document">Documents</option>
         </select>
+        <select id="cm-fculling" class="cm-sel" onchange="cmFilter()">
+            <option value="">All Culling</option>
+            <option value="starred">Starred (4+ Stars)</option>
+            <option value="green">Approved</option>
+            <option value="yellow">In Review</option>
+            <option value="red">Rejected</option>
+        </select>
         <select id="cm-fd" class="cm-sel" onchange="cmFilter()"><option value="">All Dates</option></select>
         <?php if ($is_admin): ?><select id="cm-fa" class="cm-sel" onchange="cmFilter()"><option value="">All Uploaders</option></select><?php endif; ?>
 
@@ -325,6 +327,8 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <span id="cm-bulk-ct" style="font-size:11px;font-weight:700;color:#3f3f46">0 selected</span>
             <select id="cm-bulk-folder" class="cm-sel" style="font-size:11px"><option value="">Move to folder…</option></select>
             <button onclick="cmBulkMove()" class="cm-hbtn" style="font-size:11px;padding:4px 9px">Move</button>
+            <button onclick="cmBulkAddGallery()" class="cm-hbtn" style="font-size:11px;padding:4px 9px"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" style="display:inline;vertical-align:-2px;margin-right:2px"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> Add to Gallery</button>
+            <button onclick="cmBulkZip()" class="cm-hbtn" style="font-size:11px;padding:4px 9px"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" style="display:inline;vertical-align:-2px;margin-right:2px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download ZIP</button>
             <button onclick="cmBulkDelete()" class="cm-hbtn" style="font-size:11px;padding:4px 9px;color:#dc2626;border-color:#fecaca">Delete</button>
         </div>
     </div>
@@ -336,7 +340,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
     <div id="cm-canvas">
         <!-- Skeleton -->
         <div id="cm-loading" style="display:none">
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">
                 <?php for($i=0;$i<8;$i++): ?><div class="cm-sk"></div><?php endfor; ?>
             </div>
         </div>
@@ -423,6 +427,24 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <div class="cm-meta-row" style="padding:5px 10px;border-bottom:none"><span class="mk">By</span><span class="mv" id="cm-m-author"></span></div>
         </div>
 
+        <!-- Culling & Photography Tags -->
+        <div class="cm-field">
+            <label>Culling Star Rating</label>
+            <div id="cm-d-stars" style="display:flex;gap:4px;padding:4px 0">
+                <!-- 5 clickable stars injected dynamically by JS -->
+            </div>
+        </div>
+        <div class="cm-field">
+            <label>Color Label</label>
+            <div id="cm-d-labels" style="display:flex;gap:6px;padding:4px 0">
+                <!-- Color dots injected dynamically by JS -->
+            </div>
+        </div>
+        <div class="cm-field">
+            <label>Shoot / Collection Tags</label>
+            <input type="text" id="cm-d-shoot-tags" placeholder="e.g. Meera Wedding 2025, Pre-Shoot..." onchange="cmSaveShootTags(this.value)">
+        </div>
+
         <div class="cm-field"><label>Title</label><input type="text" id="cm-d-title" placeholder="File title…"></div>
         <div class="cm-field" id="cm-d-alt-wrap"><label>Alt Text</label><input type="text" id="cm-d-alt" placeholder="Describe image for accessibility…"></div>
         <div class="cm-field"><label>Caption</label><textarea id="cm-d-caption" rows="2" placeholder="Short caption…"></textarea></div>
@@ -438,6 +460,15 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
                 <optgroup label="Properties"><?php foreach ($listings as $l): ?><option value="property:<?php echo esc_attr($l['id']??''); ?>"><?php echo esc_html($l['title']??($l['property_name']??'Listing')); ?></option><?php endforeach; ?></optgroup>
                 <optgroup label="Clients"><?php foreach ($clients as $c): ?><option value="client:<?php echo esc_attr($c['id']??''); ?>"><?php echo esc_html($c['client_name']??($c['name']??'Client')); ?></option><?php endforeach; ?></optgroup>
             </select>
+        </div>
+
+        <!-- AI Auto-Tag Placeholder -->
+        <div style="margin-top:12px;padding:12px;border:1px solid #e4e4e7;border-radius:8px;background:#fafafa;opacity:0.7">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                <span style="font-size:11px;font-weight:700;color:#18181b">Smart Auto-Tagging</span>
+                <span style="font-size:9px;font-weight:700;background:#e4e4e7;color:#52525b;padding:1px 6px;border-radius:4px;text-transform:uppercase">Coming Soon</span>
+            </div>
+            <p style="font-size:10px;color:#71717a;margin:0">AI vision auto-detects subjects, lighting, and duplicates across shoot sessions.</p>
         </div>
         <!-- Watermark -->
         <div id="cm-d-wm" style="display:none;padding-top:10px;border-top:1px solid #f4f4f5;margin-top:4px">
@@ -552,10 +583,32 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             </button>
         </div>
         <div class="cm-drawer-body">
+            <!-- Folder Name -->
             <div style="margin-bottom:18px">
-                <label style="display:block;font-size:11px;font-weight:700;color:#27272a;margin-bottom:6px">Folder Name</label>
-                <input type="text" id="cm-folder-name" placeholder="e.g. Exterior & Façade" maxlength="60" style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;box-sizing:border-box">
-                <input type="hidden" id="cm-folder-parent" value="0">
+                <label style="display:block;font-size:11px;font-weight:700;color:#27272a;margin-bottom:6px">Folder Name *</label>
+                <input type="text" id="cm-folder-name" placeholder="e.g. Rahul & Neha Pre-Shoot..." maxlength="60" style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;box-sizing:border-box">
+            </div>
+
+            <!-- Parent Folder -->
+            <div style="margin-bottom:18px">
+                <label style="display:block;font-size:11px;font-weight:700;color:#27272a;margin-bottom:6px">Parent Folder</label>
+                <select id="cm-folder-parent" style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:12px;outline:none;background:#fff;box-sizing:border-box">
+                    <option value="0">Root (Main Workspace)</option>
+                </select>
+            </div>
+
+            <!-- Description / Notes -->
+            <div style="margin-bottom:18px">
+                <label style="display:block;font-size:11px;font-weight:700;color:#27272a;margin-bottom:6px">Notes / Description (Optional)</label>
+                <textarea id="cm-folder-desc" placeholder="Add internal notes or client instructions..." rows="3" style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:12px;outline:none;box-sizing:border-box;resize:vertical"></textarea>
+            </div>
+
+            <!-- Auto Share Link -->
+            <div style="margin-bottom:18px;border-top:1px solid #f4f4f5;padding-top:14px">
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#27272a;cursor:pointer">
+                    <input type="checkbox" id="cm-folder-autoshare" style="width:16px;height:16px;accent-color:#09090b">
+                    Auto-generate public share link for this folder
+                </label>
             </div>
         </div>
         <div class="cm-drawer-footer">
@@ -565,14 +618,115 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
     </div>
 </div>
 
+<!-- ═══ CLIENT GALLERY DRAWER ════════════════════════════════════════════════ -->
+<div id="cm-gallery-dlg" onclick="if(event.target===this)document.getElementById('cm-gallery-dlg').classList.remove('open')">
+    <div id="cm-gallery-card" style="background:#fff;border-left:1px solid #e4e4e7;height:100%;width:100%;max-width:420px;box-shadow:-10px 0 30px rgba(0,0,0,.15);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease">
+        <div class="cm-drawer-header">
+            <h3 style="margin:0;font-size:15px;font-weight:800;letter-spacing:-.02em">Add to Client Gallery</h3>
+            <button style="background:none;border:none;color:#a1a1aa;cursor:pointer;padding:4px" onclick="document.getElementById('cm-gallery-dlg').classList.remove('open')">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="cm-drawer-body" style="padding:20px;flex:1;overflow-y:auto">
+            <p style="font-size:11px;color:#71717a;margin:0 0 12px">Select an existing gallery or create a new gallery to add selected files.</p>
+            <div id="cm-gallery-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+                <!-- Injected via JS -->
+            </div>
+            <div style="border-top:1px solid #f4f4f5;padding-top:14px">
+                <label style="display:block;font-size:11px;font-weight:700;color:#27272a;margin-bottom:6px">Create New Gallery</label>
+                <div style="display:flex;gap:6px">
+                    <input type="text" id="cm-new-gallery-name" placeholder="Gallery title (e.g. Rahul & Neha Shoot)..." style="flex:1;border:1px solid #e4e4e7;border-radius:8px;padding:7px 10px;font-size:12px;outline:none">
+                    <button onclick="cmCreateGalleryFromPicker()" class="cm-hbtn primary" style="font-size:11px">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ FOLDER SETTINGS & SHARING DRAWER ══════════════════════════════════ -->
+<div id="cm-folder-settings-dlg" onclick="if(event.target===this)document.getElementById('cm-folder-settings-dlg').classList.remove('open')">
+    <div id="cm-folder-settings-card">
+        <div class="cm-drawer-header">
+            <h3 style="margin:0;font-size:15px;font-weight:800;letter-spacing:-.02em" id="cm-fs-title">Folder Settings</h3>
+            <button style="background:none;border:none;color:#a1a1aa;cursor:pointer;padding:4px" onclick="document.getElementById('cm-folder-settings-dlg').classList.remove('open')">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="cm-drawer-body" style="padding:20px;flex:1;overflow-y:auto">
+            <input type="hidden" id="cm-fs-id">
+            
+            <!-- Folder Rename -->
+            <div style="margin-bottom:18px">
+                <label style="display:block;font-size:11px;font-weight:700;color:#27272a;margin-bottom:6px">Folder Name</label>
+                <div style="display:flex;gap:6px">
+                    <input type="text" id="cm-fs-name-input" style="flex:1;border:1px solid #e4e4e7;border-radius:8px;padding:7px 10px;font-size:13px;outline:none">
+                    <button onclick="cmSaveRenameFolder()" class="cm-hbtn primary" style="font-size:11px">Save</button>
+                </div>
+            </div>
+
+            <!-- Folder Share Link -->
+            <div style="margin-bottom:18px;border-top:1px solid #f4f4f5;padding-top:16px">
+                <label style="display:block;font-size:11px;font-weight:700;color:#27272a;margin-bottom:4px">Public Share Link</label>
+                <p style="font-size:11px;color:#71717a;margin:0 0 8px">Generate a link to share all media assets in this folder with clients.</p>
+                <div style="display:flex;gap:6px;margin-bottom:8px">
+                    <input type="text" id="cm-fs-url-input" readonly placeholder="Click Generate to create share link..." style="flex:1;border:1px solid #e4e4e7;border-radius:8px;padding:7px 10px;font-size:11px;background:#fafafa;outline:none;color:#52525b">
+                    <button onclick="cmGenerateFolderShare()" class="cm-hbtn" style="font-size:11px">Generate</button>
+                    <button onclick="cmCopyFolderShareUrl()" class="cm-hbtn primary" style="font-size:11px">Copy</button>
+                </div>
+            </div>
+
+            <!-- Email Folder Share -->
+            <div style="margin-bottom:18px;border-top:1px solid #f4f4f5;padding-top:16px">
+                <label style="display:block;font-size:11px;font-weight:700;color:#27272a;margin-bottom:4px">Email Folder to Client</label>
+                <p style="font-size:11px;color:#71717a;margin:0 0 8px">Send an email invitation directly to your client with the secure folder access link.</p>
+                <div style="display:flex;gap:6px">
+                    <input type="email" id="cm-fs-email-input" placeholder="client@example.com" style="flex:1;border:1px solid #e4e4e7;border-radius:8px;padding:7px 10px;font-size:11px;outline:none">
+                    <button onclick="cmEmailFolderShare()" class="cm-hbtn primary" style="font-size:11px">Send Email</button>
+                </div>
+            </div>
+
+            <!-- Folder Actions -->
+            <div style="border-top:1px solid #f4f4f5;padding-top:16px">
+                <label style="display:block;font-size:11px;font-weight:700;color:#dc2626;margin-bottom:6px">Danger Zone</label>
+                <button onclick="cmDeleteFolderFromSettings()" class="cm-hbtn" style="width:100%;justify-content:center;color:#dc2626;border-color:#fecaca;font-size:12px">Delete Folder</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ RIGHT-CLICK CONTEXT MENU ═════════════════════════════════════════════ -->
+<div id="cm-ctx-menu" style="display:none;position:fixed;z-index:99999;width:200px;background:#fff;border:1px solid #e4e4e7;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.15);padding:6px 0;font-size:12px">
+    <div style="padding:6px 12px;border-bottom:1px solid #f4f4f5;font-weight:700;font-size:10px;color:#a1a1aa;text-transform:uppercase;letter-spacing:.05em" id="cm-ctx-title">Media Options</div>
+    <div onclick="cmCtxAction('detail')" style="padding:6px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#27272a" class="cm-ctx-item"><span><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></span> Open Details</div>
+    <div onclick="cmCtxAction('copy')" style="padding:6px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#27272a" class="cm-ctx-item"><span><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></span> Copy Share Link</div>
+    <div onclick="cmCtxAction('gallery')" style="padding:6px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#27272a" class="cm-ctx-item"><span><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></span> Add to Gallery</div>
+    <div style="height:1px;background:#f4f4f5;margin:4px 0"></div>
+    <div style="padding:6px 12px;font-size:10px;font-weight:700;color:#a1a1aa;text-transform:uppercase">Star Rating</div>
+    <div style="padding:4px 12px;display:flex;gap:4px" id="cm-ctx-stars"></div>
+    <div style="padding:6px 12px;font-size:10px;font-weight:700;color:#a1a1aa;text-transform:uppercase">Color Label</div>
+    <div style="padding:4px 12px;display:flex;gap:6px" id="cm-ctx-labels"></div>
+    <div style="height:1px;background:#f4f4f5;margin:4px 0"></div>
+    <div onclick="cmCtxAction('download')" style="padding:6px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#27272a" class="cm-ctx-item"><span><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></span> Download File</div>
+    <div onclick="cmCtxAction('delete')" style="padding:6px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#dc2626" class="cm-ctx-item"><span><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span> Delete Permanently</div>
+</div>
+
 <script>
 (function(){
 'use strict';
 var CM = {
-    view:'grid', files:[], folders:[], folder:null, selIds:[], bulk:false,
+    view:'grid', files:[], folders:[], galleries:[], activeGallery:null, folder:null, selIds:[], bulk:false,
     page:1, pages:1, total:0, perPage:40,
-    filters:{q:'',type:'all',date:'',author:''},
-    sortBy:'date', sortDir:'DESC', active:null, searchT:null, confirmCb:null, upQ:0
+    filters:{q:'',type:'all',culling:'',date:'',author:''},
+    sortBy:'date', sortDir:'DESC', active:null, ctxFile:null, searchT:null, confirmCb:null, upQ:0
+};
+
+var LABEL_MAP = {
+    none:   { hex: '#d4d4d8', label: 'None' },
+    red:    { hex: '#ef4444', label: 'Rejected' },
+    yellow: { hex: '#facc15', label: 'In Review' },
+    green:  { hex: '#10b981', label: 'Approved' },
+    blue:   { hex: '#3b82f6', label: 'Selected' },
+    purple: { hex: '#a855f7', label: 'Exported' }
 };
 
 // ── INIT ────────────────────────────────────────────────────────────────────
@@ -580,6 +734,7 @@ window.cmInit = function() {
     CM.view = localStorage.getItem('cora_media_view') || 'grid';
     cmSetView(CM.view, true);
     cmLoadFolders();
+    cmLoadGalleries();
     cmLoadFiles();
     cmLoadStorage();
     cmLoadFilterOpts();
@@ -588,9 +743,230 @@ window.cmInit = function() {
         document.getElementById('cm-confirm-modal').classList.remove('open');
         if (CM.confirmCb) { CM.confirmCb(); CM.confirmCb = null; }
     });
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('#cm-ctx-menu')) cmHideContextMenu();
+    });
     var op = document.getElementById('cm-wm-op');
     if (op) op.addEventListener('input', function() { document.getElementById('cm-wm-op-v').textContent = this.value + '%'; });
 };
+
+// ── GALLERIES ───────────────────────────────────────────────────────────────
+window.cmLoadGalleries = function() {
+    $.ajax({ url: coraREData.ajaxUrl, type: 'POST', data: {
+        action: 'cora_get_galleries', nonce: coraREData.ajaxNonce
+    }, success: function(r) {
+        if (r.success) {
+            CM.galleries = r.data || [];
+            cmRenderGalleries();
+        }
+    }});
+};
+
+window.cmRenderGalleries = function() {
+    var el = document.getElementById('cm-gallery-list');
+    if (el) {
+        if (!CM.galleries.length) {
+            el.innerHTML = '<p style="font-size:11px;color:#a1a1aa">No galleries created yet.</p>';
+        } else {
+            el.innerHTML = CM.galleries.map(function(g) {
+                var count = (g.file_ids || []).length;
+                return '<div onclick="cmAddToGallery(\'' + g.id + '\')" style="padding:8px 12px;border:1px solid #e4e4e7;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:#fff">' +
+                    '<div><strong style="display:block;font-size:12px;color:#18181b">' + esc(g.name) + '</strong><span style="font-size:10px;color:#71717a">' + count + ' items</span></div>' +
+                    '<span style="font-size:12px;color:#a1a1aa">+ Add</span>' +
+                '</div>';
+            }).join('');
+        }
+    }
+
+    var tabsEl = document.getElementById('cm-gallery-tabs');
+    if (tabsEl) {
+        tabsEl.innerHTML = CM.galleries.map(function(g) {
+            var count = (g.file_ids || []).length;
+            var active = CM.activeGallery === g.id ? ' active' : '';
+            return '<div class="cm-ftab' + active + '" onclick="cmSelectGallery(\'' + g.id + '\', this)">' +
+                '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" style="display:inline;vertical-align:-1px;margin-right:2px"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> ' + esc(g.name) + ' <span class="ct">' + count + '</span>' +
+            '</div>';
+        }).join('');
+    }
+};
+
+window.cmSelectGallery = function(galleryId, el) {
+    document.querySelectorAll('.cm-ftab').forEach(function(t) { t.classList.remove('active'); });
+    if (el) el.classList.add('active');
+    CM.activeGallery = CM.activeGallery === galleryId ? null : galleryId;
+    cmRender();
+};
+
+window.cmBulkAddGallery = function() {
+    if (!CM.selIds.length) { coraShowToast('Select files first.'); return; }
+    cmRenderGalleries();
+    document.getElementById('cm-gallery-dlg').classList.add('open');
+};
+
+window.cmCreateGalleryFromPicker = function() {
+    var name = document.getElementById('cm-new-gallery-name').value.trim();
+    if (!name) { coraShowToast('Enter gallery name.'); return; }
+    $.ajax({ url: coraREData.ajaxUrl, type: 'POST', data: {
+        action: 'cora_create_gallery', nonce: coraREData.ajaxNonce, name: name
+    }, success: function(r) {
+        if (r.success) {
+            CM.galleries.push(r.data);
+            document.getElementById('cm-new-gallery-name').value = '';
+            if (CM.selIds.length) {
+                cmAddToGallery(r.data.id);
+            } else {
+                cmRenderGalleries();
+                coraShowToast('Gallery created.');
+            }
+        }
+    }});
+};
+
+window.cmAddToGallery = function(galleryId) {
+    if (!CM.selIds.length) return;
+    $.ajax({ url: coraREData.ajaxUrl, type: 'POST', data: {
+        action: 'cora_add_to_gallery', nonce: coraREData.ajaxNonce, gallery_id: galleryId, file_ids: CM.selIds.join(',')
+    }, success: function(r) {
+        if (r.success) {
+            document.getElementById('cm-gallery-dlg').classList.remove('open');
+            coraShowToast('Added to gallery!');
+            cmLoadGalleries();
+        }
+    }});
+};
+
+// ── BATCH ZIP ───────────────────────────────────────────────────────────────
+window.cmBulkZip = function() {
+    if (!CM.selIds.length) { coraShowToast('Select files first.'); return; }
+    coraShowToast('Compressing ZIP archive...');
+    $.ajax({ url: coraREData.ajaxUrl, type: 'POST', data: {
+        action: 'cora_batch_download_zip', nonce: coraREData.ajaxNonce, ids: CM.selIds.join(',')
+    }, success: function(r) {
+        if (r.success && r.data && r.data.url) {
+            coraShowToast(r.data.count + ' files compressed. Downloading...');
+            var a = document.createElement('a'); a.href = r.data.url; a.download = 'cora_media.zip'; a.click();
+        } else {
+            coraShowToast(r.data || 'ZIP creation failed.');
+        }
+    }});
+};
+
+// ── CONTEXT MENU ────────────────────────────────────────────────────────────
+window.cmShowContextMenu = function(e, f) {
+    e.preventDefault();
+    CM.ctxFile = f;
+    document.getElementById('cm-ctx-title').textContent = f.title || f.filename;
+
+    // Stars
+    var sEl = document.getElementById('cm-ctx-stars');
+    var rating = f.rating || 0;
+    var sHtml = '';
+    for (var i = 1; i <= 5; i++) {
+        sHtml += '<span onclick="cmSetRating(' + f.id + ',' + i + ');cmHideContextMenu()" style="cursor:pointer;font-size:14px;color:' + (i <= rating ? '#facc15' : '#d4d4d8') + '">★</span>';
+    }
+    sEl.innerHTML = sHtml;
+
+    // Color labels
+    var lEl = document.getElementById('cm-ctx-labels');
+    var curLabel = f.label || 'none';
+    var lHtml = '';
+    Object.keys(LABEL_MAP).forEach(function(k) {
+        var active = k === curLabel ? 'box-shadow:0 0 0 2px #09090b' : '';
+        lHtml += '<div onclick="cmSetLabel(' + f.id + ',\'' + k + '\');cmHideContextMenu()" style="width:12px;height:12px;border-radius:50%;background:' + LABEL_MAP[k].hex + ';cursor:pointer;' + active + '" title="' + LABEL_MAP[k].label + '"></div>';
+    });
+    lEl.innerHTML = lHtml;
+
+    var menu = document.getElementById('cm-ctx-menu');
+    menu.style.display = 'block';
+    var x = e.clientX, y = e.clientY;
+    if (x + 210 > window.innerWidth) x = window.innerWidth - 215;
+    if (y + 280 > window.innerHeight) y = window.innerHeight - 285;
+    menu.style.left = x + 'px';
+    menu.style.top = y + 'px';
+};
+
+window.cmHideContextMenu = function() {
+    document.getElementById('cm-ctx-menu').style.display = 'none';
+};
+
+window.cmCtxAction = function(act) {
+    var f = CM.ctxFile;
+    cmHideContextMenu();
+    if (!f) return;
+    if (act === 'detail') cmOpenDetail(f);
+    else if (act === 'copy') { navigator.clipboard.writeText(f.url); coraShowToast('Link copied.'); }
+    else if (act === 'gallery') { CM.selIds = [f.id]; cmBulkAddGallery(); }
+    else if (act === 'download') { var a = document.createElement('a'); a.href = f.url; a.download = f.filename; a.click(); }
+    else if (act === 'delete') { cmDeletePrompt([f.id]); }
+};
+
+// ── CULLING / RATING / LABELS ──────────────────────────────────────────────
+window.cmSetRating = function(id, rating) {
+    var f = CM.files.find(function(x) { return x.id === id; });
+    if (f && f.rating === rating) rating = 0; // toggle off
+    $.ajax({ url: coraREData.ajaxUrl, type: 'POST', data: {
+        action: 'cora_save_media_rating', nonce: coraREData.ajaxNonce, id: id, rating: rating
+    }, success: function(r) {
+        if (r.success) {
+            if (f) f.rating = rating;
+            cmRender();
+            if (CM.active && CM.active.id === id) cmRenderDetailCulling(f);
+        }
+    }});
+};
+
+window.cmSetLabel = function(id, label) {
+    $.ajax({ url: coraREData.ajaxUrl, type: 'POST', data: {
+        action: 'cora_save_media_label', nonce: coraREData.ajaxNonce, id: id, label: label
+    }, success: function(r) {
+        if (r.success) {
+            var f = CM.files.find(function(x) { return x.id === id; });
+            if (f) f.label = label;
+            cmRender();
+            if (CM.active && CM.active.id === id) cmRenderDetailCulling(f);
+            coraShowToast('Label: ' + (LABEL_MAP[label] ? LABEL_MAP[label].label : label));
+        }
+    }});
+};
+
+window.cmSaveShootTags = function(tags) {
+    if (!CM.active) return;
+    $.ajax({ url: coraREData.ajaxUrl, type: 'POST', data: {
+        action: 'cora_save_media_shoot_tags', nonce: coraREData.ajaxNonce, id: CM.active.id, shoot_tags: tags
+    }, success: function(r) {
+        if (r.success) {
+            CM.active.shoot_tags = tags;
+            coraShowToast('Shoot tags updated.');
+        }
+    }});
+};
+
+function cmRenderDetailCulling(f) {
+    if (!f) return;
+    // Stars
+    var sEl = document.getElementById('cm-d-stars');
+    if (sEl) {
+        var sHtml = '';
+        for (var i = 1; i <= 5; i++) {
+            sHtml += '<span onclick="cmSetRating(' + f.id + ',' + i + ')" style="cursor:pointer;font-size:18px;color:' + (i <= (f.rating||0) ? '#facc15' : '#d4d4d8') + '">★</span>';
+        }
+        sEl.innerHTML = sHtml;
+    }
+    // Labels
+    var lEl = document.getElementById('cm-d-labels');
+    if (lEl) {
+        var curLabel = f.label || 'none';
+        var lHtml = '';
+        Object.keys(LABEL_MAP).forEach(function(k) {
+            var active = k === curLabel ? 'box-shadow:0 0 0 2px #09090b' : '';
+            lHtml += '<div onclick="cmSetLabel(' + f.id + ',\'' + k + '\')" style="width:16px;height:16px;border-radius:50%;background:' + LABEL_MAP[k].hex + ';cursor:pointer;' + active + '" title="' + LABEL_MAP[k].label + '"></div>';
+        });
+        lEl.innerHTML = lHtml;
+    }
+    // Shoot tags
+    var tEl = document.getElementById('cm-d-shoot-tags');
+    if (tEl) tEl.value = f.shoot_tags || '';
+}
 
 // ── VIEW TOGGLE ──────────────────────────────────────────────────────────────
 window.cmSetView = function(v, silent) {
@@ -627,27 +1003,52 @@ window.cmLoadFiles = function() {
 };
 
 // ── RENDER ───────────────────────────────────────────────────────────────────
-window.cmRender = function() { CM.view === 'grid' ? cmRenderGrid() : cmRenderList(); };
+window.cmRender = function() {
+    var culling = document.getElementById('cm-fculling') ? document.getElementById('cm-fculling').value : '';
+    var galleryFileIds = null;
+    if (CM.activeGallery) {
+        var g = CM.galleries.find(function(x) { return x.id === CM.activeGallery; });
+        galleryFileIds = g ? (g.file_ids || []).map(Number) : [];
+    }
+    var filtered = CM.files.filter(function(f) {
+        if (galleryFileIds !== null && galleryFileIds.indexOf(parseInt(f.id)) === -1) return false;
+        if (culling === 'starred') return (f.rating || 0) >= 4;
+        if (culling === 'green' || culling === 'yellow' || culling === 'red') return (f.label || 'none') === culling;
+        return true;
+    });
+    if (!filtered.length && CM.files.length) {
+        document.getElementById('cm-empty').style.display = 'flex';
+    } else {
+        document.getElementById('cm-empty').style.display = 'none';
+    }
+    CM.view === 'grid' ? cmRenderGrid(filtered) : cmRenderList(filtered);
+};
 
-window.cmRenderGrid = function() {
+window.cmRenderGrid = function(files) {
+    files = files || CM.files;
     var g = document.getElementById('cm-grid'); g.innerHTML = '';
-    if (!CM.files.length) return;
+    if (!files.length) return;
     var frag = document.createDocumentFragment();
-    CM.files.forEach(function(f) {
+    files.forEach(function(f) {
         var d = document.createElement('div');
         d.className = 'cm-cell' + (CM.selIds.indexOf(f.id) > -1 ? ' sel' : '');
         d.dataset.id = f.id;
         var chkClass = 'cm-chk' + (CM.selIds.indexOf(f.id) > -1 ? ' checked' : '');
         var thumb = f.type_category === 'image' && f.thumbnail
             ? '<img class="cm-thumb" src="' + f.thumbnail + '" alt="" loading="lazy">'
-            : '<div class="cm-cell-icon">' + cmIcon(f.type_category, 28) + '</div>';
+            : '<div class="cm-cell-icon">' + cmIcon(f.type_category, 36) + '</div>';
+        
+        var stars = f.rating ? ' <span style="color:#facc15">★' + f.rating + '</span>' : '';
+        var dot = (f.label && f.label !== 'none' && LABEL_MAP[f.label]) ? '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:' + LABEL_MAP[f.label].hex + ';margin-right:4px"></span>' : '';
+
         d.innerHTML =
             '<div class="' + chkClass + '" data-id="' + f.id + '">' +
                 '<svg viewBox="0 0 24 24" width="10" height="10" stroke="#fff" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>' +
             '</div>' +
             thumb +
             '<span class="cm-cell-type">' + esc(f.type_category) + '</span>' +
-            '<div class="cm-cell-name" title="' + esc(f.filename) + '">' + esc(f.title || f.filename) + '</div>';
+            '<div class="cm-cell-name" title="' + esc(f.filename) + '">' + dot + esc(f.title || f.filename) + stars + '</div>';
+        
         d.querySelector('.cm-chk').addEventListener('click', function(e) {
             e.stopPropagation(); cmToggleSel(f.id, CM.selIds.indexOf(f.id) === -1);
         });
@@ -655,25 +1056,33 @@ window.cmRenderGrid = function() {
             if (CM.bulk) { cmToggleSel(f.id, CM.selIds.indexOf(f.id) === -1); }
             else { cmOpenDetail(f); }
         });
+        d.addEventListener('contextmenu', function(e) {
+            cmShowContextMenu(e, f);
+        });
         frag.appendChild(d);
     });
     g.appendChild(frag);
     if (CM.bulk) g.classList.add('cm-bulk-mode'); else g.classList.remove('cm-bulk-mode');
 };
 
-window.cmRenderList = function() {
+window.cmRenderList = function(files) {
+    files = files || CM.files;
     var tb = document.getElementById('cm-list-body'); tb.innerHTML = '';
     document.getElementById('cm-list-all').style.display = CM.bulk ? '' : 'none';
-    CM.files.forEach(function(f) {
+    files.forEach(function(f) {
         var tr = document.createElement('tr');
         tr.className = CM.selIds.indexOf(f.id) > -1 ? 'sel' : ''; tr.dataset.id = f.id;
         var lthumb = f.type_category === 'image' && f.thumbnail
             ? '<img class="cm-lthumb" src="' + f.thumbnail + '" alt="">'
             : '<div class="cm-lthumb" style="display:flex;align-items:center;justify-content:center;background:#f4f4f5">' + cmIcon(f.type_category, 14) + '</div>';
+        
+        var stars = f.rating ? ' <span style="color:#facc15">★' + f.rating + '</span>' : '';
+        var dot = (f.label && f.label !== 'none' && LABEL_MAP[f.label]) ? '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:' + LABEL_MAP[f.label].hex + ';margin-right:4px"></span>' : '';
+
         tr.innerHTML =
             '<td><input type="checkbox" style="accent-color:#09090b;' + (CM.bulk ? '' : 'display:none') + '"' + (CM.selIds.indexOf(f.id) > -1 ? ' checked' : '') + '></td>' +
             '<td><div style="display:flex;align-items:center;gap:9px">' + lthumb +
-                '<div><div style="font-weight:600;color:#18181b;font-size:12px">' + esc(f.title || f.filename) + '</div>' +
+                '<div><div style="font-weight:600;color:#18181b;font-size:12px">' + dot + esc(f.title || f.filename) + stars + '</div>' +
                 '<div style="font-size:10px;color:#a1a1aa">' + esc(f.filename) + '</div></div></div></td>' +
             '<td>' + esc(f.author_name) + '</td>' +
             '<td>' + (f.folder_name ? '<span style="background:#f4f4f5;color:#52525b;border-radius:4px;padding:2px 7px;font-size:10px">' + esc(f.folder_name) + '</span>' : '<span style="color:#d4d4d8">—</span>') + '</td>' +
@@ -682,6 +1091,7 @@ window.cmRenderList = function() {
             '<td><span style="background:#f4f4f5;color:#52525b;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;text-transform:capitalize">' + esc(f.type_category) + '</span></td>';
         tr.querySelector('input[type=checkbox]').addEventListener('change', function(e) { cmToggleSel(f.id, e.target.checked); e.stopPropagation(); });
         tr.addEventListener('click', function(e) { if (e.target.type === 'checkbox') return; if (CM.bulk) { cmToggleSel(f.id, CM.selIds.indexOf(f.id) === -1); } else { cmOpenDetail(f); } });
+        tr.addEventListener('contextmenu', function(e) { cmShowContextMenu(e, f); });
         tb.appendChild(tr);
     });
 };
@@ -748,6 +1158,7 @@ window.cmOpenDetail = function(f) {
         for (var i = 0; i < rs.options.length; i++) { if (rs.options[i].value === val) { rs.selectedIndex = i; break; } }
     }
 
+    cmRenderDetailCulling(f);
     cmRenderShareLinks(f.share_links || []);
     cmDTab('details', document.querySelector('.cm-dtab'));
 };
@@ -885,14 +1296,26 @@ window.cmRenderFolderTabs = function() {
     CM.folders.forEach(function(folder) {
         var tab = document.createElement('div'); tab.className = 'cm-ftab' + (CM.folder == folder.id ? ' active' : '');
         tab.dataset.folderId = folder.id;
-        tab.innerHTML = esc(folder.name) + ' <span class="ct">' + folder.count + '</span>';
+        tab.title = 'Click ⋮ or right-click for Folder Settings & Sharing';
+        tab.innerHTML = esc(folder.name) + ' <span class="ct">' + folder.count + '</span><span class="cm-ftab-opt" onclick="event.stopPropagation();cmOpenFolderSettings(' + folder.id + ',\'' + esc(folder.name) + '\')" style="margin-left:5px;cursor:pointer;opacity:.6;padding:0 3px" title="Folder Settings & Share">⋮</span>';
         tab.addEventListener('click', function() { cmSelectFolder(folder.id, tab); });
+        tab.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            cmOpenFolderSettings(folder.id, folder.name);
+        });
         container.appendChild(tab);
         (folder.children || []).forEach(function(s) {
             var st = document.createElement('div'); st.className = 'cm-ftab' + (CM.folder == s.id ? ' active' : '');
             st.dataset.folderId = s.id;
-            st.innerHTML = '↳ ' + esc(s.name) + ' <span class="ct">' + s.count + '</span>';
+            st.title = 'Click ⋮ or right-click for Folder Settings & Sharing';
+            st.innerHTML = '↳ ' + esc(s.name) + ' <span class="ct">' + s.count + '</span><span class="cm-ftab-opt" onclick="event.stopPropagation();cmOpenFolderSettings(' + s.id + ',\'' + esc(s.name) + '\')" style="margin-left:5px;cursor:pointer;opacity:.6;padding:0 3px" title="Folder Settings & Share">⋮</span>';
             st.addEventListener('click', function() { cmSelectFolder(s.id, st); });
+            st.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                cmOpenFolderSettings(s.id, s.name);
+            });
             container.appendChild(st);
         });
     });
@@ -908,15 +1331,42 @@ window.cmSelectFolder = function(id, el) {
 };
 window.cmPromptFolder = function() {
     document.getElementById('cm-folder-name').value = '';
-    document.getElementById('cm-folder-parent').value = '0';
+    var parentSel = document.getElementById('cm-folder-parent');
+    if (parentSel) {
+        parentSel.innerHTML = '<option value="0">Root (Main Workspace)</option>';
+        CM.folders.forEach(function(f) {
+            parentSel.innerHTML += '<option value="' + f.id + '">' + esc(f.name) + '</option>';
+        });
+    }
+    if (document.getElementById('cm-folder-desc')) document.getElementById('cm-folder-desc').value = '';
+    if (document.getElementById('cm-folder-autoshare')) document.getElementById('cm-folder-autoshare').checked = false;
     document.getElementById('cm-folder-dlg').classList.add('open');
-    setTimeout(function(){document.getElementById('cm-folder-name').focus();},80);
+    setTimeout(function() { document.getElementById('cm-folder-name').focus(); }, 80);
 };
+
 window.cmCreateFolder = function() {
     var name = document.getElementById('cm-folder-name').value.trim();
+    var parent_id = document.getElementById('cm-folder-parent') ? document.getElementById('cm-folder-parent').value : 0;
+    var desc = document.getElementById('cm-folder-desc') ? document.getElementById('cm-folder-desc').value.trim() : '';
+    var auto_share = document.getElementById('cm-folder-autoshare') ? (document.getElementById('cm-folder-autoshare').checked ? 1 : 0) : 0;
+
     if (!name) { coraShowToast('Enter a folder name.'); return; }
-    $.ajax({url:coraREData.ajaxUrl,type:'POST',data:{action:'cora_media_library_create_folder',nonce:coraREData.ajaxNonce,name:name,parent_id:0},
-    success:function(r){document.getElementById('cm-folder-dlg').classList.remove('open'); if(r.success){coraShowToast(r.data.message||'Folder created.');cmLoadFolders();}else coraShowToast('Could not create folder.');}});
+    coraShowToast('Creating folder...');
+    $.ajax({ url: coraREData.ajaxUrl, type: 'POST', data: {
+        action: 'cora_media_library_create_folder', nonce: coraREData.ajaxNonce,
+        name: name, parent_id: parent_id, description: desc, auto_share: auto_share
+    }, success: function(r) {
+        document.getElementById('cm-folder-dlg').classList.remove('open');
+        if (r.success) {
+            coraShowToast(r.data.message || 'Folder created.');
+            cmLoadFolders();
+            if (r.data && r.data.id) {
+                setTimeout(function() { cmOpenFolderSettings(r.data.id, name); }, 300);
+            }
+        } else {
+            coraShowToast(r.data.message || r.data || 'Could not create folder.');
+        }
+    }});
 };
 
 // ── FILTERS / SORT / PAGINATION ───────────────────────────────────────────────
@@ -1099,6 +1549,104 @@ window.cmAddWatermark = function() {
     if(!CM.active)return;
     $.ajax({url:coraREData.ajaxUrl,type:'POST',data:{action:'cora_media_library_watermark',nonce:coraREData.ajaxNonce,attachment_id:CM.active.id,position:document.getElementById('cm-wm-pos').value,opacity:document.getElementById('cm-wm-op').value},
     success:function(r){if(r.success){coraShowToast('Watermarked copy created.');cmLoadFiles();}else coraShowToast('Watermark failed.');}});
+};
+
+// ── FOLDER SETTINGS & SHARING ──────────────────────────────────────────────────
+window.cmOpenFolderSettings = function(folderId, name) {
+    if (!folderId) return;
+    if (!name) {
+        var f = (CM.folders || []).find(function(x){ return x.id == folderId; });
+        if (f) name = f.name;
+    }
+    document.getElementById('cm-fs-id').value = folderId;
+    document.getElementById('cm-fs-name-input').value = name || '';
+    document.getElementById('cm-fs-title').textContent = 'Folder Settings: ' + (name || '');
+    document.getElementById('cm-fs-url-input').value = '';
+    if (typeof cmHideContextMenu === 'function') cmHideContextMenu();
+    document.getElementById('cm-folder-settings-dlg').classList.add('open');
+};
+
+window.cmSaveRenameFolder = function() {
+    var id = document.getElementById('cm-fs-id').value;
+    var name = document.getElementById('cm-fs-name-input').value.trim();
+    if (!id || !name) { coraShowToast('Folder name required.'); return; }
+    $.ajax({ url: coraREData.ajaxUrl, type: 'POST', data: {
+        action: 'cora_media_library_rename_folder', nonce: coraREData.ajaxNonce, term_id: id, name: name
+    }, success: function(r) {
+        if (r.success) {
+            coraShowToast('Folder renamed!');
+            document.getElementById('cm-folder-settings-dlg').classList.remove('open');
+            cmLoadFolders();
+        } else coraShowToast(r.data || 'Rename failed.');
+    }});
+};
+
+window.cmGenerateFolderShare = function() {
+    var id = document.getElementById('cm-fs-id').value;
+    if (!id) return;
+    $.ajax({ url: coraREData.ajaxUrl, type: 'POST', data: {
+        action: 'cora_media_library_share_folder', nonce: coraREData.ajaxNonce, folder_id: id
+    }, success: function(r) {
+        if (r.success && r.data && r.data.share_url) {
+            document.getElementById('cm-fs-url-input').value = r.data.share_url;
+            coraShowToast('Folder share link generated!');
+        } else coraShowToast(r.data || 'Share link generation failed.');
+    }});
+};
+
+window.cmCopyFolderShareUrl = function() {
+    var url = document.getElementById('cm-fs-url-input').value;
+    if (!url) { cmGenerateFolderShare(); return; }
+    navigator.clipboard.writeText(url);
+    coraShowToast('Folder link copied to clipboard!');
+};
+
+window.cmEmailFolderShare = function() {
+    var id = document.getElementById('cm-fs-id').value;
+    var email = document.getElementById('cm-fs-email-input').value.trim();
+    var shareUrl = document.getElementById('cm-fs-url-input').value;
+
+    if (!email) { coraShowToast('Please enter client email.'); return; }
+    if (!shareUrl) {
+        $.ajax({ url: coraREData.ajaxUrl, type: 'POST', data: {
+            action: 'cora_media_library_share_folder', nonce: coraREData.ajaxNonce, folder_id: id
+        }, success: function(r) {
+            if (r.success && r.data && r.data.share_url) {
+                document.getElementById('cm-fs-url-input').value = r.data.share_url;
+                cmSendFolderEmail(id, email, r.data.share_url);
+            } else coraShowToast(r.data || 'Could not generate share link.');
+        }});
+    } else {
+        cmSendFolderEmail(id, email, shareUrl);
+    }
+};
+
+function cmSendFolderEmail(id, email, shareUrl) {
+    coraShowToast('Sending email invitation...');
+    $.ajax({ url: coraREData.ajaxUrl, type: 'POST', data: {
+        action: 'cora_media_library_email_folder', nonce: coraREData.ajaxNonce, folder_id: id, email: email, share_url: shareUrl
+    }, success: function(r) {
+        if (r.success) {
+            coraShowToast('Folder access emailed to ' + email);
+            document.getElementById('cm-fs-email-input').value = '';
+        } else {
+            coraShowToast(r.data || 'Email failed.');
+        }
+    }});
+}
+
+window.cmDeleteFolderFromSettings = function() {
+    var id = document.getElementById('cm-fs-id').value;
+    if (!id) return;
+    $.ajax({ url: coraREData.ajaxUrl, type: 'POST', data: {
+        action: 'cora_media_library_delete_folder', nonce: coraREData.ajaxNonce, term_id: id
+    }, success: function(r) {
+        if (r.success) {
+            coraShowToast('Folder deleted.');
+            document.getElementById('cm-folder-settings-dlg').classList.remove('open');
+            cmLoadFolders();
+        }
+    }});
 };
 
 // ── STORAGE ───────────────────────────────────────────────────────────────────

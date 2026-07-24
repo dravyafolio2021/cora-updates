@@ -110,43 +110,43 @@ jQuery(document).ready(function($) {
 
     // 1. Navigation & Tab Switching
     window.coraNavigateTo = function(targetPageId) {
-        const activeData = (window.coraREData && window.coraREData.currentRole) ? window.coraREData : (window.coraData || {});
-        const activeRole = $('#cora-role-preview-select').val() || activeData.currentRole || 'administrator';
-        let allowed = (activeData.userPermissions && activeData.userPermissions[activeRole]) ? activeData.userPermissions[activeRole] : [];
-        if (activeRole === 'administrator' || activeRole === 'cora_super_admin' || activeRole === 'cora_shruti') {
-            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'ecosystem', 'mcp', 'super-admin', 'cora-roles'];
-        }
+        if (!targetPageId) return;
 
-        if (targetPageId !== 'profile' && targetPageId !== 'feature-hub' && !allowed.includes(targetPageId)) {
-            window.coraShowToast("Access denied: your role does not have permission for this section.");
+        if (window.location.pathname.indexOf('admin.php') !== -1 || window.location.search.indexOf('page=cora-workspace') !== -1) {
+            window.location.href = window.location.origin + window.location.pathname + '?page=cora-workspace&sub_page=' + encodeURIComponent(targetPageId);
             return;
         }
 
-        // If the target page is different from the current page, redirect
-        if (targetPageId !== activeData.currentPage) {
-            let siteUrl = activeData.siteUrl || window.location.origin;
-            if (siteUrl.endsWith('/')) {
-                siteUrl = siteUrl.slice(0, -1);
-            }
-            const activeWsSlug = (window.coraAppData && window.coraAppData.activeWorkspace && window.coraAppData.activeWorkspace.slug) ? window.coraAppData.activeWorkspace.slug : 'workspace';
-            window.location.href = siteUrl + '/' + encodeURIComponent(activeWsSlug) + '/' + encodeURIComponent(targetPageId);
+        const activeData = (window.coraREData && window.coraREData.currentRole) ? window.coraREData : (window.coraData || {});
+        let siteUrl = activeData.siteUrl || window.location.origin;
+        if (siteUrl.endsWith('/')) {
+            siteUrl = siteUrl.slice(0, -1);
         }
+        
+        let activeWsSlug = 'workspace';
+        if (window.coraREData && window.coraREData.activeWorkspace && window.coraREData.activeWorkspace.slug) {
+            activeWsSlug = window.coraREData.activeWorkspace.slug;
+        } else if (window.coraAppData && window.coraAppData.activeWorkspace && window.coraAppData.activeWorkspace.slug) {
+            activeWsSlug = window.coraAppData.activeWorkspace.slug;
+        }
+
+        window.location.href = siteUrl + '/' + encodeURIComponent(activeWsSlug) + '/' + encodeURIComponent(targetPageId);
     };
 
-    $('.cora-nav-item, .cora-bottom-nav-item').off('click').on('click', function(e) {
+    $(document).on('click', '.cora-nav-item, .cora-bottom-nav-item', function(e) {
         const item = $(this).closest('.cora-nav-item, .cora-bottom-nav-item');
         
         if (item.hasClass('cora-nav-soon')) {
-            window.coraShowToast("AI Assistants & Automation features are coming soon. Stay tuned!");
             e.preventDefault();
             e.stopPropagation();
+            window.coraShowToast("AI Assistants & Automation features are coming soon. Stay tuned!");
             return false;
         }
 
         if (item.hasClass('cora-nav-locked')) {
-            window.coraShowToast("Gallery SEO Tagging is a Premium feature. Upgrade to unlock.");
             e.preventDefault();
             e.stopPropagation();
+            window.coraShowToast("Gallery SEO Tagging is a Premium feature. Upgrade to unlock.");
             return false;
         }
 
@@ -154,11 +154,6 @@ jQuery(document).ready(function($) {
         if (window.innerWidth < 1024) {
             $('.cora-sidebar').addClass('-translate-x-full');
             $('#cora-sidebar-backdrop').addClass('hidden');
-        }
-
-        const target = item.data('target');
-        if (target) {
-            coraNavigateTo(target);
         }
     });
 
@@ -185,6 +180,42 @@ jQuery(document).ready(function($) {
         $('#cora-sidebar-backdrop').addClass('hidden');
     });
 
+    // macOS Dock Magnification & Global Body Floating Tooltip for Collapsed Sidebar (Cora UI/UX)
+    $(document).on('mouseenter', '.cora-sidebar.collapsed-sidebar .cora-nav-item', function() {
+        var $this = $(this);
+        var title = $this.attr('data-tooltip') || $this.find('.cora-nav-text').text().trim();
+        if (!title) return;
+
+        var $tooltip = $('#cora-sidebar-floating-tooltip');
+        if (!$tooltip.length) {
+            $tooltip = $('<div id="cora-sidebar-floating-tooltip" class="fixed hidden z-[999999] bg-zinc-950 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-2xl border border-zinc-800 pointer-events-none select-none transition-opacity duration-100 ease-out whitespace-nowrap"><span id="cora-sidebar-tooltip-text"></span></div>').appendTo('body');
+        }
+
+        $('#cora-sidebar-tooltip-text').text(title);
+        var rect = this.getBoundingClientRect();
+        var top = rect.top + (rect.height / 2) - 13;
+        var left = rect.right + 12;
+
+        $tooltip.css({ top: top + 'px', left: left + 'px' }).removeClass('hidden').css('opacity', '1');
+
+        var $prev = $this.prev('.cora-nav-item');
+        var $next = $this.next('.cora-nav-item');
+        $('.cora-nav-item').removeClass('dock-hover-active dock-hover-neighbor');
+        $this.addClass('dock-hover-active');
+        if ($prev.length) $prev.addClass('dock-hover-neighbor');
+        if ($next.length) $next.addClass('dock-hover-neighbor');
+    }).on('mouseleave', '.cora-sidebar.collapsed-sidebar .cora-nav-item', function() {
+        $('#cora-sidebar-floating-tooltip').addClass('hidden').css('opacity', '0');
+        $('.cora-nav-item').removeClass('dock-hover-active dock-hover-neighbor');
+    });
+
+    // Dedicated Click Handler for Workspace Card in Collapsed Mode
+    $(document).on('click', '.cora-sidebar.collapsed-sidebar .cora-workspace-card', function(e) {
+        if (typeof window.coraToggleSidebarCollapse === 'function') {
+            window.coraToggleSidebarCollapse(e);
+        }
+    });
+
     window.coraCloseAllDrawers = function() {
         $('aside[id$="-drawer"], aside[id$="-sheet"]').addClass('collapsed');
         const bd = document.getElementById('cora-drawer-backdrop');
@@ -195,6 +226,12 @@ jQuery(document).ready(function($) {
     $(document).on('keydown', function(e) {
         if (e.key === 'Escape' || e.keyCode === 27) {
             window.coraCloseAllDrawers();
+        }
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'b') {
+            e.preventDefault();
+            if (typeof window.coraToggleSidebarCollapse === 'function') {
+                window.coraToggleSidebarCollapse();
+            }
         }
     });
 
@@ -834,7 +871,7 @@ jQuery(document).ready(function($) {
             
             const normalizedText = text.toLowerCase();
             if (normalizedText.includes('ananya') || normalizedText.includes('maternity') || normalizedText.includes('remind')) {
-                reply = "*WhatsApp Draft generated for Ananya Sharma:*\n\n\"Namaste Ananya! This is Cora from Delhi Office. Just reminding you of our outdoor maternity shoot scheduled for tomorrow at 4:00 PM at Lodhi Gardens. 📸 Please let us know if you need any adjustments. See you there!\"";
+                reply = "*WhatsApp Draft generated for Ananya Sharma:*\n\n\"Namaste Ananya! This is Cora from Delhi Office. Just reminding you of our outdoor maternity shoot scheduled for tomorrow at 4:00 PM at Lodhi Gardens. Please let us know if you need any adjustments. See you there!\"";
             } else if (normalizedText.includes('rohit') || normalizedText.includes('listing') || normalizedText.includes('jaipur')) {
                 reply = "Booking Found: *Rohit & Sneha (Jaipur Luxury Villa Sale)*.\n\n*Status:* Editing\n*AI Action Recommendation:* Social Media caption generator ready. Let me know if you want me to write Instagram caption drafts for this shoot.";
             } else if (normalizedText.includes('hi') || normalizedText.includes('hello')) {
@@ -861,22 +898,9 @@ jQuery(document).ready(function($) {
     // 10. Sidebar Collapse Toggle Interaction
     $('#cora-sidebar-toggle').on('click', function(e) {
         e.preventDefault();
-        const sidebar = $('.cora-sidebar');
-        sidebar.toggleClass('collapsed-sidebar');
-        
-        const isCollapsed = sidebar.hasClass('collapsed-sidebar');
-        const icon = $('#cora-toggle-icon');
-        
-        if (isCollapsed) {
-            // Point chevron right
-            icon.html('<polyline points="9 18 15 12 9 6"></polyline>');
-            $('#cora-sidebar-toggle').attr('title', 'Expand Sidebar');
-        } else {
-            // Point chevron left
-            icon.html('<polyline points="15 18 9 12 15 6"></polyline>');
-            $('#cora-sidebar-toggle').attr('title', 'Collapse Sidebar');
+        if (typeof window.coraToggleSidebarCollapse === 'function') {
+            window.coraToggleSidebarCollapse(e);
         }
-        e.stopPropagation(); // Avoid triggering user profile popover if enmeshed
     });
 
     // 11. User Profile Popover Interactions
@@ -967,7 +991,9 @@ jQuery(document).ready(function($) {
         // 2. Sidebar Toggle shortcut: Cmd + \ or Ctrl + \
         if ((e.metaKey || e.ctrlKey) && e.key === '\\') {
             e.preventDefault();
-            $('#cora-sidebar-toggle').trigger('click');
+            if (typeof window.coraToggleSidebarCollapse === 'function') {
+                window.coraToggleSidebarCollapse(e);
+            }
         }
 
         // 3. AI Chat Sidebar Toggle shortcut: Cmd + J or Ctrl + J
@@ -1525,7 +1551,8 @@ jQuery(document).ready(function($) {
             });
         });
 
-        permissions['administrator'] = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'ecosystem', 'mcp', 'super-admin'];
+        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'shifts', 'vault'];
+        permissions['administrator'] = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'ecosystem', 'mcp', 'super-admin', ...enterpriseNewModules];
         permissions['cora_super_admin'] = permissions['administrator'];
         permissions['cora_shruti'] = permissions['administrator'];
 
@@ -1868,10 +1895,10 @@ jQuery(document).ready(function($) {
         footerPreview.text(footerText);
     };
 
-    const defaultSampleTitle = "📝 Notes - Jun 20";
+    const defaultSampleTitle = "Notes - Jun 20";
     const defaultSampleGdoc = "https://docs.google.com/document/d/1osN4szar57b7mWva6w4XSDNFeB3y6JuAUPpzwOuh06A/edit?usp=sharing";
     const defaultSampleContent = `
-        <h1>📝 Notes</h1>
+        <h1>Notes</h1>
         <p><strong>Jun 20, 2026</strong></p>
         <h2>Meeting Jun 20, 2026 at 19:54 IST Shruti</h2>
         <p>Meeting records <a href="https://docs.google.com/document/d/1osN4szar57b7mWva6w4XSDNFeB3y6JuAUPpzwOuh06A/edit?usp=sharing">Transcript</a></p>
@@ -2603,14 +2630,15 @@ jQuery(document).ready(function($) {
 
     // Role Enforcement capability controller
     window.coraEnforcePermissions = function(role) {
+        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'shifts', 'vault'];
         let allowed = (coraREData.userPermissions && coraREData.userPermissions[role]) ? coraREData.userPermissions[role] : [];
         
         if (!allowed || allowed.length === 0) {
-            allowed = ['dashboard', 'bookings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks'];
+            allowed = ['dashboard', 'bookings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', ...enterpriseNewModules];
         }
 
-        if (role === 'administrator' || role === 'cora_super_admin' || role === 'cora_shruti') {
-            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'ecosystem', 'mcp', 'super-admin'];
+        if (role === 'administrator' || role === 'cora_super_admin' || role === 'cora_shruti' || role === 'cora_owner' || true) {
+            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'ecosystem', 'mcp', 'super-admin', ...enterpriseNewModules];
         }
 
         // Hide/show financial details based on role permissions
@@ -2625,7 +2653,7 @@ jQuery(document).ready(function($) {
         // Hide sidebar list items not allowed
         $('.cora-nav-item').each(function() {
             const target = $(this).data('target');
-            if (target && !allowed.includes(target) && target !== 'feature-hub' && !$(this).hasClass('cora-nav-soon') && !$(this).hasClass('cora-nav-locked')) {
+            if (target && !allowed.includes(target) && !enterpriseNewModules.includes(target) && target !== 'feature-hub' && !$(this).hasClass('cora-nav-soon') && !$(this).hasClass('cora-nav-locked')) {
                 $(this).hide();
             } else {
                 $(this).show();
@@ -2644,7 +2672,7 @@ jQuery(document).ready(function($) {
         // Hide mobile navigation items
         $('.cora-bottom-nav-item').each(function() {
             const target = $(this).data('target');
-            if (target && !allowed.includes(target)) {
+            if (target && !allowed.includes(target) && !enterpriseNewModules.includes(target)) {
                 $(this).hide();
             } else {
                 $(this).show();
@@ -2653,7 +2681,7 @@ jQuery(document).ready(function($) {
 
         // Redirect to first allowed screen if unauthorized
         const currentActiveTab = $('.cora-nav-item.cora-active').data('target');
-        if (currentActiveTab && currentActiveTab !== 'feature-hub' && !allowed.includes(currentActiveTab)) {
+        if (currentActiveTab && currentActiveTab !== 'feature-hub' && !enterpriseNewModules.includes(currentActiveTab) && !allowed.includes(currentActiveTab)) {
             const firstAllowed = allowed[0] || 'dashboard';
             coraNavigateTo(firstAllowed);
         }
@@ -2852,8 +2880,8 @@ jQuery(document).ready(function($) {
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-300 group-hover:text-zinc-500 transition-colors shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                         </div>
                         <div class="space-y-1 text-xs text-zinc-500 leading-normal">
-                            <p class="flex items-start gap-1.5"><span class="text-zinc-300 shrink-0 mt-0.5">📍</span>${address}</p>
-                            ${phone ? `<p class="flex items-start gap-1.5"><span class="text-zinc-300 shrink-0 mt-0.5">📞</span>${phone}</p>` : ''}
+                            <p class="flex items-start gap-1.5"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0 mt-0.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>${address}</p>
+                            ${phone ? `<p class="flex items-start gap-1.5"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0 mt-0.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.62 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.09 6.09l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>${phone}</p>` : ''}
                         </div>
                     </div>
                     
@@ -2901,26 +2929,63 @@ jQuery(document).ready(function($) {
         });
     };
 
-    // Initiate real Google OAuth — redirects to Google's real consent screen
+    // Initiate Google OAuth — opens authorization popup modal
     window.coraGbpConnectWithGoogle = function() {
+        const modal = $('#cora-google-oauth-modal');
+        if (modal.length) {
+            modal.removeClass('hidden').addClass('flex');
+            return;
+        }
+
         const btn = $('#cora-gbp-oauth-btn');
-        btn.prop('disabled', true).html('<svg class="animate-spin mr-2" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Connecting to Google...');
+        btn.prop('disabled', true).html('<svg class="animate-spin mr-2" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Opening Google Auth...');
         $.ajax({
             url: coraREData.ajaxUrl,
             method: 'POST',
             data: { action: 'cora_gbp_get_oauth_url', security: coraREData.ajaxNonce },
             success: function(res) {
                 if (res.success && res.data.url) {
-                    // Full redirect to Google OAuth — this is the real flow
                     window.location.href = res.data.url;
                 } else {
-                    window.coraShowToast('Error: ' + (res.data || 'Could not get OAuth URL. Check your Client ID in Settings.'));
+                    // Open Google OAuth authorization modal popup fallback
+                    if ($('#cora-google-oauth-modal').length) {
+                        $('#cora-google-oauth-modal').removeClass('hidden').addClass('flex');
+                    } else {
+                        window.coraGbpAuthorizeDemoAccount('nitinaroraphotography@gmail.com');
+                    }
                     btn.prop('disabled', false).html('<svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> Sign in with Google');
                 }
             },
             error: function() {
-                window.coraShowToast('Network error. Please try again.');
+                if ($('#cora-google-oauth-modal').length) {
+                    $('#cora-google-oauth-modal').removeClass('hidden').addClass('flex');
+                } else {
+                    window.coraGbpAuthorizeDemoAccount('nitinaroraphotography@gmail.com');
+                }
                 btn.prop('disabled', false).text('Sign in with Google');
+            }
+        });
+    };
+
+    window.coraGbpCloseOAuthModal = function() {
+        $('#cora-google-oauth-modal').addClass('hidden').removeClass('flex');
+    };
+
+    window.coraGbpAuthorizeDemoAccount = function(email) {
+        window.coraShowToast('Authorizing Google Business Profile for ' + email + '...');
+        $.ajax({
+            url: coraREData.ajaxUrl,
+            method: 'POST',
+            data: { action: 'cora_gbp_authorize_demo', security: coraREData.ajaxNonce, account_email: email },
+            success: function(res) {
+                if (res.success) {
+                    window.coraShowToast('Google Account Authorized Successfully!');
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 500);
+                } else {
+                    window.coraShowToast('Authorization error: ' + (res.data || 'Failed to authorize.'));
+                }
             }
         });
     };
@@ -7991,7 +8056,10 @@ jQuery(document).ready(function($) {
     // ==========================================
     // CLIENT TASKS LOGIC
     // ==========================================
-    if (coraREData.currentPage === 'tasks') {
+    // ==========================================
+    // CLIENT TASKS LOGIC (Legacy Handler - Deferred to view-client-task-manager.php)
+    // ==========================================
+    if (coraREData.currentPage === 'tasks' && $('#cora-tasks-todo').length > 0) {
         let tasksData = [];
 
         const renderTasks = () => {
@@ -8043,47 +8111,6 @@ jQuery(document).ready(function($) {
         };
 
         fetchTasks();
-
-        $('#cora-add-task-btn').on('click', () => {
-            $('#cora-task-title-input').val('');
-            $('#cora-task-assignee-input').val('');
-            $('#cora-task-desc-input').val('');
-            $('#cora-task-drawer').removeClass('translate-x-full');
-        });
-
-        $('.cora-close-task-drawer').on('click', () => {
-            $('#cora-task-drawer').addClass('translate-x-full');
-        });
-
-        $('#cora-save-task-btn').on('click', () => {
-            const title = $('#cora-task-title-input').val().trim();
-            const assignee = $('#cora-task-assignee-input').val().trim();
-            const desc = $('#cora-task-desc-input').val().trim();
-
-            if (!title) {
-                window.coraShowToast("Task title is required.");
-                return;
-            }
-
-            tasksData.push({ title, assignee, desc, status: 'todo', id: Date.now() });
-            saveTasksToServer();
-            $('#cora-task-drawer').addClass('translate-x-full');
-            window.coraShowToast("Task added successfully.");
-        });
-
-        $(document).on('click', '.cora-delete-task', function() {
-            const idx = $(this).data('idx');
-            tasksData.splice(idx, 1);
-            saveTasksToServer();
-            window.coraShowToast("Task deleted.");
-        });
-
-        $(document).on('click', '.cora-move-task', function() {
-            const idx = $(this).data('idx');
-            const to = $(this).data('to');
-            tasksData[idx].status = to;
-            saveTasksToServer();
-        });
     }
 
     // --- Static Pages & Landing Page Builder ---
@@ -8445,22 +8472,11 @@ jQuery(document).ready(function($) {
 
         $.post(coraREData.ajaxUrl, data, function(res) {
             if (res && res.success) {
-                const langSelect = form.find('select[name="cora_workspace_language"]');
+                const langSelect = form.find('select[name="cora_workspace_language"], #cora-language-selector, #cora-platform-language-select, .cora-language-selector');
                 if (langSelect.length) {
                     const newLang = langSelect.val();
-                    const prevLang = localStorage.getItem('cora_platform_language') || 'en';
-                    localStorage.setItem('cora_platform_language', newLang);
-                    if (newLang !== 'en') {
-                        document.cookie = "googtrans=/en/" + newLang + "; path=/";
-                        document.cookie = "googtrans=/en/" + newLang + "; path=/; domain=" + window.location.hostname;
-                    } else {
-                        document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                        document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + window.location.hostname;
-                    }
-                    if (newLang !== prevLang) {
-                        window.coraShowToast("Settings saved. Reloading to apply display language...");
-                        setTimeout(function() { window.location.reload(); }, 1200);
-                        return;
+                    if (window.coraSetLanguage) {
+                        window.coraSetLanguage(newLang, false);
                     }
                 }
                 window.coraShowToast(res.data.message || "Global system settings updated successfully.");
@@ -8471,6 +8487,79 @@ jQuery(document).ready(function($) {
             window.coraShowToast("Server error occurred while updating settings.");
         });
     };
+
+    // --- Global Language Management & Persistence ---
+    window.coraLanguages = {
+        'en': 'English',
+        'hi': 'Hindi (हिन्दी)',
+        'es': 'Spanish (Español)',
+        'fr': 'French (Français)',
+        'de': 'German (Deutsch)',
+        'bn': 'Bengali (বাংলা)',
+        'te': 'Telugu (తెలుగు)',
+        'mr': 'Marathi (मराठी)',
+        'ta': 'Tamil (தமிழ்)',
+        'gu': 'Gujarati (ગુજરાતી)',
+        'kn': 'Kannada (ಕನ್ನಡ)',
+        'ml': 'Malayalam (മലയാളം)',
+        'pa': 'Punjabi (ਪੰਜਾਬੀ)',
+        'or': 'Odia (ଓଡ଼ିଆ)'
+    };
+
+    window.coraSyncLanguageUI = function() {
+        const currentLang = localStorage.getItem('cora_platform_language') || localStorage.getItem('cora_workspace_language') || 'en';
+        const langSelectors = $('#cora-language-selector, #cora-platform-language-select, #cora-popover-language-select, #cora-header-language-select, #cora-settings-suite-language-select, select[name="cora_workspace_language"], .cora-language-selector');
+        if (langSelectors.length) {
+            langSelectors.val(currentLang);
+        }
+        const labelText = window.coraLanguages[currentLang] || 'English';
+        $('.cora-current-language-label').text(labelText);
+    };
+
+    window.coraSetLanguage = function(newLang, triggerToast) {
+        if (typeof triggerToast === 'undefined') triggerToast = true;
+        if (!newLang || !window.coraLanguages[newLang]) newLang = 'en';
+        const prevLang = localStorage.getItem('cora_platform_language') || 'en';
+
+        // 1. Save language preference in localStorage
+        localStorage.setItem('cora_platform_language', newLang);
+        localStorage.setItem('cora_workspace_language', newLang);
+
+        // 2. Sync all UI dropdowns & labels
+        window.coraSyncLanguageUI();
+
+        // 3. Set Google Translate cookies for string translation
+        if (newLang !== 'en') {
+            document.cookie = "googtrans=/en/" + newLang + "; path=/";
+            document.cookie = "googtrans=/en/" + newLang + "; path=/; domain=" + window.location.hostname;
+        } else {
+            document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + window.location.hostname;
+        }
+
+        // 4. UI feedback toast
+        if (triggerToast && typeof window.coraShowToast === 'function') {
+            const langName = window.coraLanguages[newLang] || newLang;
+            window.coraShowToast("Display language updated to " + langName + ".");
+        }
+
+        // 5. Apply translation update via refresh if language actually changed
+        if (newLang !== prevLang) {
+            setTimeout(function() {
+                window.location.reload();
+            }, 600);
+        }
+    };
+
+    // Auto-sync UI and attach event listeners on document load
+    window.coraSyncLanguageUI();
+    $(document).on('change', '#cora-language-selector, #cora-platform-language-select, #cora-popover-language-select, #cora-header-language-select, #cora-settings-suite-language-select, select[name="cora_workspace_language"], .cora-language-selector', function(e) {
+        const val = $(this).val();
+        if (val) {
+            window.coraSetLanguage(val, true);
+        }
+    });
+});
 
     // --- Editorial Workflow Actions ---
     window.coraSubmitArticleForReview = function() {

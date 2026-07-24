@@ -2439,7 +2439,7 @@ $wp_pages = get_pages();
                     <span id="seo-title-char-count">0/60</span>
                 </div>
                 <input type="text" id="seo-title-input" onkeyup="countChars(this, 'seo-title-char-count', 60)" placeholder="e.g. Luxury Villas in Gurgaon | PropOS Agency" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
-                <p id="seo-title-warn" class="text-[9px] text-amber-600 hidden font-semibold">⚠️ Recommended length exceeded (60 chars max).</p>
+                <p id="seo-title-warn" class="text-[9px] text-amber-600 hidden font-semibold">Recommended length exceeded (60 chars max).</p>
             </div>
 
             <div class="space-y-2">
@@ -2448,7 +2448,7 @@ $wp_pages = get_pages();
                     <span id="seo-desc-char-count">0/160</span>
                 </div>
                 <textarea id="seo-desc-input" onkeyup="countChars(this, 'seo-desc-char-count', 160)" rows="4" placeholder="Brief search snippet description..." class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400"></textarea>
-                <p id="seo-desc-warn" class="text-[9px] text-amber-600 hidden font-semibold">⚠️ Recommended length exceeded (160 chars max).</p>
+                <p id="seo-desc-warn" class="text-[9px] text-amber-600 hidden font-semibold">Recommended length exceeded (160 chars max).</p>
             </div>
 
             <div class="space-y-2">
@@ -3062,7 +3062,7 @@ $wp_pages = get_pages();
                     <div style="display:grid;grid-template-cols:1fr 1fr;gap:14px;">
                         <div style="background:white;border:1.5px solid #e4e4e7;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.03);display:flex;flex-direction:column;justify-content:space-between;">
                             <div style="height:100px;background:#fbfaf7;border-bottom:1px solid #e4e4e7;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-                                <div style="font-size:24px;">🏡</div>
+                                <div class="flex items-center justify-center"><svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>
                             </div>
                             <div style="padding:14px;">
                                 <h4 style="font-size:12px;font-weight:700;color:#18181b;margin-bottom:4px;">Apex Luxury Real Estate</h4>
@@ -3072,7 +3072,7 @@ $wp_pages = get_pages();
                         </div>
                         <div style="background:white;border:1.5px solid #e4e4e7;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.03);display:flex;flex-direction:column;justify-content:space-between;">
                             <div style="height:100px;background:#fff5f7;border-bottom:1px solid #e4e4e7;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-                                <div style="font-size:24px;">💅</div>
+                                <div class="flex items-center justify-center"><svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg></div>
                             </div>
                             <div style="padding:14px;">
                                 <h4 style="font-size:12px;font-weight:700;color:#18181b;margin-bottom:4px;">Cosmetics Blush Shop</h4>

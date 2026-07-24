@@ -290,7 +290,7 @@ $role_labels['guest'] = 'Guest / System';
     <!-- Tips / Next Step Callout -->
     <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div class="space-y-1">
-            <h4 class="text-sm font-bold text-zinc-900">💡 Video Presentation Simulation Tip</h4>
+            <h4 class="text-sm font-bold text-zinc-900"><svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.5 4.7-3.5 6L15 17H9l-.5-2C6.5 13.7 5 11.5 5 9a7 7 0 0 1 7-7z"></path></svg> Video Presentation Simulation Tip</h4>
             <p class="text-xs text-zinc-500 leading-relaxed">Edit any subscription value above. Cora will automatically recalculate the values live on-screen, ideal for demonstration and presentations.</p>
         </div>
         <div class="flex items-center gap-2 shrink-0">

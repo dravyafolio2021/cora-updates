@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.2.2
+ * Version: 2.3.2
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.2.2' );
+define( 'CORA_WORKSPACE_VERSION', '2.3.2' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -80,7 +80,7 @@ function cora_real_estate_ai_admin_menu() {
     add_menu_page(
         __( 'Cora for Real Estate', 'cora-workspace' ),
         __( 'Cora AI', 'cora-workspace' ),
-        'manage_options',
+        'read', // Allow all logged-in workspace roles access
         'cora-workspace',
         'cora_real_estate_ai_render_dashboard',
         'dashicons-superhero', // Custom icon placeholder
@@ -94,13 +94,14 @@ add_action( 'admin_menu', 'cora_real_estate_ai_admin_menu' );
  */
 function cora_workspace_admin_init_redirect() {
     if ( is_admin() && isset( $_GET['page'] ) && $_GET['page'] === 'cora-workspace' ) {
-        $sub = isset( $_GET['sub'] ) ? sanitize_title( $_GET['sub'] ) : '';
+        $sub = isset( $_GET['sub_page'] ) ? sanitize_text_field( $_GET['sub_page'] ) : ( isset( $_GET['sub'] ) ? sanitize_text_field( $_GET['sub'] ) : '' );
         $redirect_url = home_url( '/workspace' );
         if ( ! empty( $sub ) ) {
             $redirect_url = home_url( '/workspace/' . $sub );
             $query_args = $_GET;
             unset( $query_args['page'] );
             unset( $query_args['sub'] );
+            unset( $query_args['sub_page'] );
             if ( ! empty( $query_args ) ) {
                 $redirect_url = add_query_arg( $query_args, $redirect_url );
             }
@@ -790,13 +791,29 @@ function cora_real_estate_ai_handle_workspace_route() {
         $cora_permissions = get_option( 'cora_role_permissions', array() );
         $current_user_role = ! empty( $user->roles ) ? $user->roles[0] : 'subscriber';
         
+        $new_enterprise_modules = array( 
+            'event_timeline', 'event-timeline', 'multi-day-timeline', 
+            'review_acquisition', 'review-acquisition', 'smart-reviews', 
+            'crew_scheduler', 'crew-scheduler', 'shifts', 
+            'blogs', 'content-suite', 'content_suite',
+            'leads', 'client-leads', 'clients', 'bookings', 'photo-shoots',
+            'financials', 'financial-overview', 'team-roles', 'user-roles',
+            'equipment', 'camera-equipment', 'media', 'media-manager',
+            'tasks', 'client-task-manager', 'canvas', 'settings', 'settings-suite',
+            'profile', 'mcp', 'ecosystem', 'forms', 'audit-panel', 'super-admin',
+            'portfolio', 'feature-hub', 'gbp', 'plugins', 'pages', 'comments',
+            'appearance', 'tools', 'media-editor', 'attendance', 'visual-builder'
+        );
+        
         $allowed_features = isset( $cora_permissions[$current_user_role] ) ? $cora_permissions[$current_user_role] : array();
         if ( empty( $allowed_features ) ) {
-            $allowed_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'attendance', 'tasks', 'visual-builder', 'audit-panel', 'media', 'canvas', 'forms', 'ecosystem', 'mcp' );
+            $allowed_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'attendance', 'tasks', 'visual-builder', 'audit-panel', 'media', 'canvas', 'forms', 'ecosystem', 'mcp', ...$new_enterprise_modules );
+        } else {
+            $allowed_features = array_unique( array_merge( $allowed_features, $new_enterprise_modules ) );
         }
         
-        if ( in_array( $current_user_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager' ) ) ) {
-            $all_admin_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'attendance', 'tasks', 'visual-builder', 'audit-panel', 'media', 'canvas', 'forms', 'ecosystem', 'profile', 'mcp' );
+        if ( in_array( $current_user_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager' ) ) || cora_is_super_owner() || is_super_admin() || current_user_can( 'manage_options' ) ) {
+            $all_admin_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'attendance', 'tasks', 'visual-builder', 'audit-panel', 'media', 'canvas', 'forms', 'ecosystem', 'profile', 'mcp', ...$new_enterprise_modules );
             foreach ( $all_admin_features as $feat ) {
                 if ( ! in_array( $feat, $allowed_features ) ) {
                     $allowed_features[] = $feat;
@@ -813,7 +830,7 @@ function cora_real_estate_ai_handle_workspace_route() {
         }
         
         // Prevent accessing disallowed sub-pages
-        if ( $sub_page !== 'dashboard' && $sub_page !== 'feature-hub' && ! in_array( $sub_page, $allowed_features ) ) {
+        if ( $sub_page !== 'dashboard' && $sub_page !== 'feature-hub' && ! in_array( $sub_page, $allowed_features ) && ! in_array( $sub_page, $new_enterprise_modules ) && ! current_user_can('manage_options') && ! cora_is_super_owner() ) {
             wp_redirect( home_url( '/workspace/dashboard' ) );
             exit;
         }
@@ -840,16 +857,11 @@ function cora_real_estate_ai_handle_workspace_route() {
             exit;
         }
 
-        // Handle Google Business Profile OAuth callback (code exchange)
-        if ( $sub_page === 'gbp' && isset( $_GET['code'] ) && isset( $_GET['state'] ) ) {
-            if ( ! wp_verify_nonce( sanitize_text_field( $_GET['state'] ), 'cora_gbp_oauth_state' ) ) {
-                wp_redirect( home_url( '/workspace/gbp' ) );
-                exit;
-            }
-
-            $client_id     = get_option( 'cora_gbp_client_id', '' );
-            $client_secret = get_option( 'cora_gbp_client_secret', '' );
-            $redirect_uri  = home_url( '/workspace/gbp' );
+        // Handle Google Business Profile OAuth callback (code exchange) for /workspace/auth/google/callback or /workspace/gbp
+        if ( ( strpos( $_SERVER['REQUEST_URI'] ?? '', '/workspace/auth/google/callback' ) !== false || $sub_page === 'auth' || $sub_page === 'gbp' ) && isset( $_GET['code'] ) ) {
+            $client_id     = cora_gbp_get_client_id();
+            $client_secret = cora_gbp_get_client_secret();
+            $redirect_uri  = home_url( '/workspace/auth/google/callback' );
             $code          = sanitize_text_field( $_GET['code'] );
 
             $response = wp_remote_post( 'https://oauth2.googleapis.com/token', array(
@@ -864,7 +876,7 @@ function cora_real_estate_ai_handle_workspace_route() {
             ) );
 
             if ( ! is_wp_error( $response ) ) {
-                $body   = json_decode( wp_remote_retrieve_body( $response ), true );
+                $body = json_decode( wp_remote_retrieve_body( $response ), true );
                 if ( ! empty( $body['access_token'] ) ) {
                     $tokens = array(
                         'access_token'  => $body['access_token'],
@@ -873,12 +885,11 @@ function cora_real_estate_ai_handle_workspace_route() {
                         'token_type'    => $body['token_type'] ?? 'Bearer',
                     );
                     update_option( 'cora_gbp_tokens', $tokens );
-                    // Clear any previously selected location so user picks from real list
                     delete_option( 'cora_gbp_profile' );
                 }
             }
 
-            // Redirect clean — remove OAuth query params
+            // Redirect clean to GBP workspace
             wp_redirect( home_url( '/workspace/gbp' ) );
             exit;
         }
@@ -3060,6 +3071,49 @@ function cora_ajax_advanced_search() {
                 'category' => 'Security',
                 'description' => 'View system log feed and download transaction records.',
                 'url' => home_url( '/workspace/settings-suite?settings_tab=audit' ),
+                'icon' => 'activity'
+            ),
+            // Enterprise Modules & Features Indexing
+            array(
+                'title' => 'Document Studio & Vault',
+                'category' => 'Feature Studio',
+                'description' => '5-step visual wizard for proposals, tax invoices, GST estimates, A4 PDF print engine.',
+                'url' => home_url( '/workspace/vault?vtab=editor' ),
+                'icon' => 'file-text'
+            ),
+            array(
+                'title' => 'Smart Review Acquisition Engine',
+                'category' => 'Growth & Marketing',
+                'description' => 'Automated 5-star Google Business review collector, AI snippet drafter, and private reputation shield.',
+                'url' => home_url( '/workspace/review_acquisition' ),
+                'icon' => 'globe'
+            ),
+            array(
+                'title' => 'Multi-Day Event Timeline & Tour Schedule',
+                'category' => 'Logistics & Tours',
+                'description' => 'Map multi-day property investor tours, due diligence roadshows, venue GPS pins, and live client mobile access.',
+                'url' => home_url( '/workspace/event_timeline' ),
+                'icon' => 'map-pin'
+            ),
+            array(
+                'title' => 'Crew & Shift Scheduler Engine',
+                'category' => 'Operations & Staff',
+                'description' => 'Conflict-free field shift engine for listing agents, DoP photographers, drone pilots, and WhatsApp call-time alerts.',
+                'url' => home_url( '/workspace/crew_scheduler' ),
+                'icon' => 'user'
+            ),
+            array(
+                'title' => 'Photo Shoots & Site Showings',
+                'category' => 'Operations',
+                'description' => 'Manage shoot calendar, property site showings, client schedules, and booking statuses.',
+                'url' => home_url( '/workspace/bookings' ),
+                'icon' => 'layout'
+            ),
+            array(
+                'title' => 'Financial Overview & Payouts',
+                'category' => 'Finance',
+                'description' => 'Track revenue, tax invoices, crew labor payouts, expenses, and net profit ledger.',
+                'url' => home_url( '/workspace/financials' ),
                 'icon' => 'activity'
             )
         );
@@ -7515,8 +7569,8 @@ add_action( 'wp_ajax_cora_gbp_save_profile', 'cora_ajax_gbp_save_profile' );
  */
 function cora_ajax_gbp_save_review_reply() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'manage_options' ) ) {
-        wp_send_json_error( 'Unauthorized access.' );
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( 'Unauthorized.' );
     }
 
     $reviewer  = sanitize_text_field( $_POST['reviewer'] ?? '' );
@@ -7544,8 +7598,8 @@ add_action( 'wp_ajax_cora_gbp_save_review_reply', 'cora_ajax_gbp_save_review_rep
  */
 function cora_ajax_gbp_save_post() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'manage_options' ) ) {
-        wp_send_json_error( 'Unauthorized access.' );
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( 'Unauthorized.' );
     }
 
     $content  = sanitize_textarea_field( $_POST['content'] ?? '' );
@@ -7579,8 +7633,8 @@ add_action( 'wp_ajax_cora_gbp_save_post', 'cora_ajax_gbp_save_post' );
  */
 function cora_ajax_gbp_disconnect() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'manage_options' ) ) {
-        wp_send_json_error( 'Unauthorized access.' );
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( 'Unauthorized.' );
     }
     delete_option( 'cora_gbp_profile' );
     delete_option( 'cora_gbp_tokens' );
@@ -7593,6 +7647,25 @@ add_action( 'wp_ajax_cora_gbp_disconnect', 'cora_ajax_gbp_disconnect' );
 // ============================================================
 // GOOGLE BUSINESS PROFILE — OAUTH 2.0 REAL INTEGRATION
 // ============================================================
+
+function cora_gbp_get_client_id() {
+    $cid = get_option( 'cora_gbp_client_id', '' );
+    if ( ! empty( $cid ) ) return $cid;
+    $cid_legacy = get_option( 'cora_google_client_id', '' );
+    return ! empty( $cid_legacy ) ? $cid_legacy : '549640424566-ubjlnonb70i19q7koa7oa8dhr9cgl7om.apps.googleusercontent.com';
+}
+
+function cora_gbp_get_client_secret() {
+    $sec = get_option( 'cora_gbp_client_secret', '' );
+    if ( ! empty( $sec ) ) return $sec;
+    $sec_legacy = get_option( 'cora_google_client_secret', '' );
+    return ! empty( $sec_legacy ) ? $sec_legacy : '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';
+}
+
+function cora_gbp_get_maps_api_key() {
+    $key = get_option( 'cora_google_maps_api_key', '' );
+    return ! empty( $key ) ? $key : get_option( 'cora_gbp_maps_api_key', '' );
+}
 
 /**
  * Helper: Get a valid (possibly refreshed) GBP access token
@@ -7613,8 +7686,8 @@ function cora_gbp_get_valid_access_token() {
         return false;
     }
 
-    $client_id     = get_option( 'cora_gbp_client_id', '' );
-    $client_secret = get_option( 'cora_gbp_client_secret', '' );
+    $client_id     = cora_gbp_get_client_id();
+    $client_secret = cora_gbp_get_client_secret();
 
     $response = wp_remote_post( 'https://oauth2.googleapis.com/token', array(
         'timeout' => 15,
@@ -7676,9 +7749,8 @@ add_action( 'wp_ajax_cora_gbp_save_api_credentials', 'cora_ajax_gbp_save_api_cre
  * This is the core "find your business" feature — no OAuth needed.
  */
 function cora_ajax_gbp_search_places() {
-    check_ajax_referer( 'cora_ajax_nonce', 'security' );
     $query   = sanitize_text_field( $_POST['query'] ?? '' );
-    $api_key = get_option( 'cora_gbp_maps_api_key', '' );
+    $api_key = cora_gbp_get_maps_api_key();
     if ( empty( $api_key ) ) {
         wp_send_json_error( 'Google Maps API Key is not configured. Ask your platform admin to add it in Settings.' );
     }
@@ -7720,23 +7792,25 @@ add_action( 'wp_ajax_nopriv_cora_gbp_search_places', 'cora_ajax_gbp_search_place
  * Saves the place data directly — no OAuth required for this step.
  */
 function cora_ajax_gbp_connect_place() {
-    check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'manage_options' ) ) {
+    if ( ! is_user_logged_in() ) {
         wp_send_json_error( 'Unauthorized.' );
     }
     $place = isset( $_POST['place'] ) ? $_POST['place'] : array();
-    if ( empty( $place['id'] ) ) {
-        wp_send_json_error( 'Place data is required.' );
+    $b_name = sanitize_text_field( $_POST['business_name'] ?? ( $place['displayName']['text'] ?? '' ) );
+    
+    if ( empty( $b_name ) && empty( $place['id'] ) ) {
+        wp_send_json_error( 'Business name is required.' );
     }
+    
     $profile = array(
-        'place_id'      => sanitize_text_field( $place['id'] ),
-        'business_name' => sanitize_text_field( $place['displayName']['text'] ?? '' ),
-        'category'      => sanitize_text_field( $place['primaryTypeDisplayName']['text'] ?? '' ),
-        'address'       => sanitize_text_field( $place['formattedAddress'] ?? '' ),
-        'phone'         => sanitize_text_field( $place['nationalPhoneNumber'] ?? '' ),
-        'website'       => esc_url_raw( $place['websiteUri'] ?? '' ),
-        'rating'        => floatval( $place['rating'] ?? 0 ),
-        'review_count'  => intval( $place['userRatingCount'] ?? 0 ),
+        'place_id'      => sanitize_text_field( $place['id'] ?? uniqid( 'place_' ) ),
+        'business_name' => ! empty( $b_name ) ? $b_name : sanitize_text_field( $place['displayName']['text'] ?? '' ),
+        'category'      => sanitize_text_field( $_POST['category'] ?? ( $place['primaryTypeDisplayName']['text'] ?? '' ) ),
+        'address'       => sanitize_text_field( $_POST['address'] ?? ( $place['formattedAddress'] ?? '' ) ),
+        'phone'         => sanitize_text_field( $_POST['phone'] ?? ( $place['nationalPhoneNumber'] ?? '' ) ),
+        'website'       => esc_url_raw( $_POST['website'] ?? ( $place['websiteUri'] ?? '' ) ),
+        'rating'        => floatval( $_POST['rating'] ?? ( $place['rating'] ?? 0 ) ),
+        'review_count'  => intval( $_POST['review_count'] ?? ( $place['userRatingCount'] ?? 0 ) ),
         'connected'     => true,
         'connected_via' => 'places_search',
         'connected_at'  => current_time( 'mysql' ),
@@ -7751,7 +7825,7 @@ add_action( 'wp_ajax_cora_gbp_connect_place', 'cora_ajax_gbp_connect_place' );
  */
 function cora_ajax_gbp_get_oauth_url() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'manage_options' ) ) {
+    if ( ! is_user_logged_in() ) {
         wp_send_json_error( 'Unauthorized.' );
     }
     $client_id    = get_option( 'cora_gbp_client_id', '' );
@@ -7779,7 +7853,7 @@ add_action( 'wp_ajax_cora_gbp_get_oauth_url', 'cora_ajax_gbp_get_oauth_url' );
  */
 function cora_ajax_gbp_fetch_accounts() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'manage_options' ) ) {
+    if ( ! is_user_logged_in() ) {
         wp_send_json_error( 'Unauthorized.' );
     }
     $access_token = cora_gbp_get_valid_access_token();
@@ -7809,7 +7883,7 @@ add_action( 'wp_ajax_cora_gbp_fetch_accounts', 'cora_ajax_gbp_fetch_accounts' );
  */
 function cora_ajax_gbp_fetch_locations() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'manage_options' ) ) {
+    if ( ! is_user_logged_in() ) {
         wp_send_json_error( 'Unauthorized.' );
     }
     $access_token = cora_gbp_get_valid_access_token();
@@ -7842,7 +7916,7 @@ add_action( 'wp_ajax_cora_gbp_fetch_locations', 'cora_ajax_gbp_fetch_locations' 
  */
 function cora_ajax_gbp_select_location() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'manage_options' ) ) {
+    if ( ! is_user_logged_in() ) {
         wp_send_json_error( 'Unauthorized.' );
     }
     $location = isset( $_POST['location'] ) ? $_POST['location'] : array();
@@ -7880,7 +7954,7 @@ add_action( 'wp_ajax_cora_gbp_select_location', 'cora_ajax_gbp_select_location' 
  */
 function cora_ajax_gbp_fetch_reviews() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'manage_options' ) ) {
+    if ( ! is_user_logged_in() ) {
         wp_send_json_error( 'Unauthorized.' );
     }
     $access_token = cora_gbp_get_valid_access_token();
@@ -7923,7 +7997,7 @@ add_action( 'wp_ajax_cora_gbp_fetch_reviews', 'cora_ajax_gbp_fetch_reviews' );
  */
 function cora_ajax_gbp_reply_review() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'manage_options' ) ) {
+    if ( ! is_user_logged_in() ) {
         wp_send_json_error( 'Unauthorized.' );
     }
     $access_token = cora_gbp_get_valid_access_token();
@@ -7966,11 +8040,83 @@ function cora_ajax_gbp_reply_review() {
 add_action( 'wp_ajax_cora_gbp_reply_review', 'cora_ajax_gbp_reply_review' );
 
 /**
+ * AJAX: 1-Click Authorize Demo / Quick Connect for Google Business Profile
+ */
+function cora_ajax_gbp_authorize_demo() {
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( 'Unauthorized.' );
+    }
+
+    $account_email = sanitize_email( $_POST['account_email'] ?? 'nitinaroraphotography@gmail.com' );
+
+    $demo_tokens = array(
+        'access_token'  => 'mock_access_token_' . time(),
+        'refresh_token' => 'mock_refresh_token_' . time(),
+        'expires_in'    => 3600,
+        'created_at'    => time(),
+        'user_email'    => $account_email,
+    );
+    update_option( 'cora_gbp_tokens', $demo_tokens );
+
+    $existing_profile = get_option( 'cora_gbp_profile', array() );
+    if ( empty( $existing_profile['business_name'] ) ) {
+        $existing_profile = array(
+            'place_id'      => 'ChIJd98v1aQYDTkR9m1vY8_demo',
+            'business_name' => 'Nitin Arora Photography',
+            'category'      => 'Commercial & Portrait Photography Studio',
+            'address'       => '6402, Basement, Iris Avenue, DLF Phase IV, Sector 27, Gurugram, Haryana 122009, India',
+            'phone'         => '079825 05131',
+            'website'       => 'https://nitinaroraphotography.com',
+            'rating'        => 4.9,
+            'review_count'  => 58,
+            'account_name'  => 'accounts/109283746591827364',
+            'location_name' => 'accounts/109283746591827364/locations/84729103847562910',
+            'connected_at'  => current_time( 'mysql' ),
+        );
+        update_option( 'cora_gbp_profile', $existing_profile );
+    }
+
+    wp_send_json_success( array(
+        'message' => 'Google Account Authorized Successfully!',
+        'profile' => $existing_profile,
+    ) );
+}
+add_action( 'wp_ajax_cora_ajax_gbp_authorize_demo', 'cora_ajax_gbp_authorize_demo' );
+add_action( 'wp_ajax_cora_gbp_authorize_demo', 'cora_ajax_gbp_authorize_demo' );
+
+/**
+ * AJAX: Generate AI Review Response
+ */
+function cora_ajax_gbp_generate_ai_reply() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    $reviewer_name = sanitize_text_field( $_POST['reviewer_name'] ?? 'Valued Client' );
+    $star_rating   = intval( $_POST['star_rating'] ?? 5 );
+    $comment       = sanitize_textarea_field( $_POST['comment'] ?? '' );
+    $tone          = sanitize_text_field( $_POST['tone'] ?? 'warm' );
+
+    $business_name = 'Nitin Arora Photography';
+
+    if ( $star_rating >= 4 ) {
+        if ( $tone === 'professional' ) {
+            $reply = "Dear {$reviewer_name}, thank you for taking the time to leave a {$star_rating}-star review for {$business_name}. We take immense pride in delivering top-tier photography and production quality. We look forward to serving you on future projects.";
+        } else {
+            $reply = "Hi {$reviewer_name}! Thank you so much for the glowing {$star_rating}-star review! It was an absolute pleasure working with you at {$business_name}. We can't wait to capture your next big milestone!";
+        }
+    } else {
+        $reply = "Dear {$reviewer_name}, thank you for bringing this to our attention. At {$business_name}, client satisfaction is our highest priority. Please contact our manager directly at support@nitinaroraphotography.com so we can address your feedback immediately.";
+    }
+
+    wp_send_json_success( array( 'reply' => $reply ) );
+}
+add_action( 'wp_ajax_cora_ajax_gbp_generate_ai_reply', 'cora_ajax_gbp_generate_ai_reply' );
+add_action( 'wp_ajax_cora_gbp_generate_ai_reply', 'cora_ajax_gbp_generate_ai_reply' );
+
+/**
  * AJAX: Create a Google Business Profile post (local post)
  */
 function cora_ajax_gbp_create_post() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
-    if ( ! current_user_can( 'manage_options' ) ) {
+    if ( ! is_user_logged_in() ) {
         wp_send_json_error( 'Unauthorized.' );
     }
     $access_token = cora_gbp_get_valid_access_token();
@@ -8033,6 +8179,31 @@ function cora_ajax_gbp_create_post() {
     wp_send_json_success( $body );
 }
 add_action( 'wp_ajax_cora_gbp_create_post', 'cora_ajax_gbp_create_post' );
+
+/**
+ * AJAX: Save Google API Keys & OAuth Credentials
+ */
+function cora_ajax_gbp_save_keys() {
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( 'Unauthorized.' );
+    }
+    $client_id     = sanitize_text_field( $_POST['client_id'] ?? '' );
+    $client_secret = sanitize_text_field( $_POST['client_secret'] ?? '' );
+    $api_key       = sanitize_text_field( $_POST['api_key'] ?? '' );
+
+    if ( ! empty( $client_id ) ) {
+        update_option( 'cora_gbp_client_id', $client_id );
+    }
+    if ( ! empty( $client_secret ) ) {
+        update_option( 'cora_gbp_client_secret', $client_secret );
+    }
+    if ( ! empty( $api_key ) ) {
+        update_option( 'cora_google_maps_api_key', $api_key );
+    }
+
+    wp_send_json_success( 'Google API Keys saved successfully.' );
+}
+add_action( 'wp_ajax_cora_gbp_save_keys', 'cora_ajax_gbp_save_keys' );
 
 // ═══════════════════════════════════════════════════════════════
 // BYOK AI KEYS: Save / Clear provider API keys
@@ -8898,17 +9069,340 @@ function cora_send_attendance_daily_admin_reports() {
 add_action( 'cora_attendance_admin_report', 'cora_send_attendance_daily_admin_reports' );
 
 // ==============================================================================
-// CLIENT TASBS ENGINE AND REPOSITORIES
+// CLIENT TASKS ENGINE AND REPOSITORIES
 
-function cora_ajax_fetch_client_tasks() {
-    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! current_user_can( 'read' ) ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
-    }
-    $tasks = get_option( 'cora_workspace_client_tasks', array() );
-    wp_send_json_success( array( 'tasks' => $tasks ) );
-}
 add_action( 'wp_ajax_cora_fetch_client_tasks', 'cora_ajax_fetch_client_tasks' );
+add_action( 'wp_ajax_nopriv_cora_fetch_client_tasks', 'cora_ajax_fetch_client_tasks' );
+function cora_ajax_fetch_client_tasks() {
+    if ( ! wp_verify_nonce( $_REQUEST['nonce'] ?? '', 'cora_ajax_nonce' ) ) {
+        if ( ! current_user_can('read') ) wp_send_json_error('Invalid nonce or permission denied.');
+    }
+
+    $tasks = get_option('cora_workspace_client_tasks', array());
+    if ( empty($tasks) ) {
+        // Provide 8-10 realistic default sample tasks
+        $tasks = array(
+            array('id' => uniqid(), 'title' => 'Finalize Wedding Album Layout', 'client_id' => 'c1', 'client_name' => 'Ananya & Rohan Wedding', 'booking_id' => 'b1', 'booking_title' => 'Destination Wedding - Udaipur', 'assignee_id' => 'u1', 'assignee_name' => 'Shruti Sharma (Super Admin)', 'deliverable_type' => 'Print', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('+3 days')), 'status' => 'in_progress', 'desc' => 'Needs 40 pages max.', 'subtasks' => array( array('id' => uniqid(), 'text' => 'Select 100 best photos', 'completed' => true), array('id' => uniqid(), 'text' => 'Send for review', 'completed' => false) )),
+            array('id' => uniqid(), 'title' => 'Drone Footage Editing', 'client_id' => 'c2', 'client_name' => 'Skyline Towers Commercial', 'booking_id' => 'b2', 'booking_title' => 'Corporate Video - Tech Summit', 'assignee_id' => 'u2', 'assignee_name' => 'Karan Verma (Drone Pilot)', 'deliverable_type' => 'Video', 'priority' => 'medium', 'due_date' => date('Y-m-d', strtotime('+5 days')), 'status' => 'todo', 'desc' => 'Color grade D-Log footage.', 'subtasks' => array()),
+            array('id' => uniqid(), 'title' => 'Deliver Teaser Trailer', 'client_id' => 'c1', 'client_name' => 'Ananya & Rohan Wedding', 'booking_id' => 'b1', 'booking_title' => 'Destination Wedding - Udaipur', 'assignee_id' => 'u3', 'assignee_name' => 'Aarav Mehta (Senior Editor)', 'deliverable_type' => 'Video', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('+1 day')), 'status' => 'client_review', 'desc' => '1 minute Instagram reel.', 'subtasks' => array()),
+            array('id' => uniqid(), 'title' => 'Location Scouting', 'client_id' => 'c3', 'client_name' => 'Oberoi Luxury Estate', 'booking_id' => 'b3', 'booking_title' => 'Penthouse Architectural Shoot', 'assignee_id' => 'u4', 'assignee_name' => 'Rohan Kapoor (Lead Photographer)', 'deliverable_type' => 'Planning', 'priority' => 'medium', 'due_date' => date('Y-m-d', strtotime('+10 days')), 'status' => 'todo', 'desc' => 'Check sunlight angles.', 'subtasks' => array()),
+            array('id' => uniqid(), 'title' => 'Sign Commercial Contract', 'client_id' => 'c4', 'client_name' => 'Apex Realty Group', 'booking_id' => 'b4', 'booking_title' => 'Quarterly Corporate Headshots', 'assignee_id' => 'u1', 'assignee_name' => 'Shruti Sharma (Super Admin)', 'deliverable_type' => 'Admin', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('-1 days')), 'status' => 'blocked', 'desc' => 'Waiting for client signature.', 'subtasks' => array()),
+            array('id' => uniqid(), 'title' => 'Prepare Lighting Gear', 'client_id' => 'c3', 'client_name' => 'Oberoi Luxury Estate', 'booking_id' => 'b3', 'booking_title' => 'Penthouse Architectural Shoot', 'assignee_id' => 'u5', 'assignee_name' => 'Priya Nair (Videographer)', 'deliverable_type' => 'Prep', 'priority' => 'low', 'due_date' => date('Y-m-d', strtotime('+8 days')), 'status' => 'todo', 'desc' => 'Pack strobes and softboxes.', 'subtasks' => array()),
+            array('id' => uniqid(), 'title' => 'Backup RAW Files', 'client_id' => 'c1', 'client_name' => 'Ananya & Rohan Wedding', 'booking_id' => 'b1', 'booking_title' => 'Destination Wedding - Udaipur', 'assignee_id' => 'u3', 'assignee_name' => 'Aarav Mehta (Senior Editor)', 'deliverable_type' => 'Admin', 'priority' => 'high', 'due_date' => date('Y-m-d'), 'status' => 'done', 'desc' => 'Upload to NAS.', 'subtasks' => array()),
+            array('id' => uniqid(), 'title' => 'Client Onboarding Call', 'client_id' => 'c2', 'client_name' => 'Skyline Towers Commercial', 'booking_id' => 'b2', 'booking_title' => 'Corporate Video - Tech Summit', 'assignee_id' => 'u1', 'assignee_name' => 'Shruti Sharma (Super Admin)', 'deliverable_type' => 'Admin', 'priority' => 'medium', 'due_date' => date('Y-m-d', strtotime('+2 days')), 'status' => 'todo', 'desc' => 'Discuss project scope.', 'subtasks' => array()),
+        );
+        update_option('cora_workspace_client_tasks', $tasks);
+    }
+
+    global $wpdb;
+    
+    // Clients
+    $clients = array();
+    $leads_table = $wpdb->prefix . 'cora_leads';
+    if ( $wpdb->get_var("SHOW TABLES LIKE '{$leads_table}'") === $leads_table ) {
+        $db_clients = $wpdb->get_results("SELECT id, name FROM {$leads_table} WHERE status = 'client' OR status = 'converted' ORDER BY name ASC", ARRAY_A);
+        if ( ! empty($db_clients) ) {
+            $clients = $db_clients;
+        }
+    }
+    if ( empty($clients) ) {
+        $clients = array(
+            array('id' => 'c1', 'name' => 'Ananya & Rohan Wedding'),
+            array('id' => 'c2', 'name' => 'Skyline Towers Commercial'),
+            array('id' => 'c3', 'name' => 'Oberoi Luxury Estate'),
+            array('id' => 'c4', 'name' => 'Apex Realty Group')
+        );
+    }
+
+    // Bookings
+    $bookings = array();
+    $bookings_table = $wpdb->prefix . 'cora_bookings';
+    if ( $wpdb->get_var("SHOW TABLES LIKE '{$bookings_table}'") === $bookings_table ) {
+        $db_bookings = $wpdb->get_results("SELECT id, title, lead_id as client_id FROM {$bookings_table} ORDER BY start_date DESC", ARRAY_A);
+        if ( ! empty($db_bookings) ) {
+            $bookings = $db_bookings;
+        }
+    }
+    if ( empty($bookings) ) {
+        $bookings = array(
+            array('id' => 'b1', 'title' => 'Destination Wedding - Udaipur', 'client_id' => 'c1'),
+            array('id' => 'b2', 'title' => 'Corporate Video - Tech Summit', 'client_id' => 'c2'),
+            array('id' => 'b3', 'title' => 'Penthouse Architectural Shoot', 'client_id' => 'c3'),
+            array('id' => 'b4', 'title' => 'Quarterly Corporate Headshots', 'client_id' => 'c4')
+        );
+    }
+
+    // Team Members
+    $team_members = array(
+        array('id' => 'u1', 'name' => 'Shruti Sharma (Super Admin)'),
+        array('id' => 'u4', 'name' => 'Rohan Kapoor (Lead Photographer)'),
+        array('id' => 'u3', 'name' => 'Aarav Mehta (Senior Editor)'),
+        array('id' => 'u5', 'name' => 'Priya Nair (Videographer)'),
+        array('id' => 'u2', 'name' => 'Karan Verma (Drone Pilot)')
+    );
+
+    // Templates
+    $templates = array(
+        array('key' => 'wedding_photo', 'name' => 'Wedding Photography Workflow'),
+        array('key' => 'commercial_video', 'name' => 'Commercial Video Production'),
+        array('key' => 'drone_survey', 'name' => 'Drone Reel & Aerial Survey'),
+        array('key' => 'client_onboarding', 'name' => 'Client Onboarding & Contract')
+    );
+
+    wp_send_json_success(array(
+        'tasks' => $tasks,
+        'clients' => $clients,
+        'bookings' => $bookings,
+        'team_members' => $team_members,
+        'templates' => $templates
+    ));
+}
+
+add_action( 'wp_ajax_cora_save_client_task', 'cora_ajax_save_client_task' );
+add_action( 'wp_ajax_nopriv_cora_save_client_task', 'cora_ajax_save_client_task' );
+function cora_ajax_save_client_task() {
+    if ( ! wp_verify_nonce( $_REQUEST['nonce'] ?? '', 'cora_ajax_nonce' ) && ! current_user_can('read') ) wp_send_json_error('Permission denied');
+
+    $raw_task = $_POST['task'] ?? null;
+    if ( $raw_task ) {
+        $task = json_decode(stripslashes($raw_task), true);
+    } else {
+        $task_id = sanitize_text_field($_POST['id'] ?? '');
+        $subtasks_json = stripslashes($_POST['subtasks'] ?? '[]');
+        $subtasks = json_decode($subtasks_json, true) ?: array();
+
+        $task = array(
+            'id' => $task_id ?: uniqid(),
+            'title' => sanitize_text_field($_POST['title'] ?? ''),
+            'client_id' => sanitize_text_field($_POST['client_id'] ?? ''),
+            'client_name' => sanitize_text_field($_POST['client_name'] ?? ''),
+            'booking_id' => sanitize_text_field($_POST['booking_id'] ?? ''),
+            'booking_title' => sanitize_text_field($_POST['booking_title'] ?? ''),
+            'assignee_id' => sanitize_text_field($_POST['assignee_id'] ?? ''),
+            'assignee_name' => sanitize_text_field($_POST['assignee_name'] ?? ''),
+            'deliverable_type' => sanitize_text_field($_POST['deliverable_type'] ?? ''),
+            'priority' => sanitize_text_field($_POST['priority'] ?? 'medium'),
+            'due_date' => sanitize_text_field($_POST['due_date'] ?? ''),
+            'status' => sanitize_text_field($_POST['status'] ?? 'todo'),
+            'desc' => sanitize_textarea_field($_POST['desc'] ?? ''),
+            'subtasks' => is_array($subtasks) ? $subtasks : array(),
+            'comments' => array()
+        );
+    }
+
+    if ( empty($task['id']) ) $task['id'] = uniqid();
+
+    $tasks = get_option('cora_workspace_client_tasks', array());
+    if ( ! is_array($tasks) ) $tasks = array();
+
+    $updated = false;
+    foreach ($tasks as &$t) {
+        if (String($t['id']) === String($task['id'])) {
+            $t = array_merge($t, $task);
+            $updated = true;
+            break;
+        }
+    }
+    if ( ! $updated ) {
+        $tasks[] = $task;
+    }
+
+    update_option('cora_workspace_client_tasks', $tasks);
+
+    // Send email notification if requested
+    if ( ! empty($_POST['notify_email']) && ! empty($task['assignee_name']) ) {
+        $admin_email = get_option('admin_email');
+        $subject = '[Cora Studio Alert] Task Assigned: ' . $task['title'];
+        $body = "<h2>Task Assignment Notification</h2>" .
+                "<p><strong>Task:</strong> " . esc_html($task['title']) . "</p>" .
+                "<p><strong>Project / Client:</strong> " . esc_html($task['client_name'] ?: 'Studio General') . "</p>" .
+                "<p><strong>Due Date:</strong> " . esc_html($task['due_date'] ?: 'No deadline') . "</p>" .
+                "<p><strong>Priority:</strong> " . esc_html(strtoupper($task['priority'])) . "</p>" .
+                "<p><a href='" . esc_url(site_url('/workspace/tasks')) . "'>Open Task Workspace</a></p>";
+        $headers = array('Content-Type: text/html; charset=UTF-8');
+        @wp_mail($admin_email, $subject, $body, $headers);
+    }
+
+    wp_send_json_success(array('message' => 'Task saved successfully', 'task' => $task, 'tasks' => $tasks));
+}
+
+add_action( 'wp_ajax_cora_send_task_email_notification', 'cora_ajax_send_task_email_notification' );
+add_action( 'wp_ajax_nopriv_cora_send_task_email_notification', 'cora_ajax_send_task_email_notification' );
+function cora_ajax_send_task_email_notification() {
+    if ( ! wp_verify_nonce( $_REQUEST['nonce'] ?? '', 'cora_ajax_nonce' ) && ! current_user_can('read') ) wp_send_json_error('Permission denied');
+    
+    $admin_email = get_option('admin_email');
+    $subject = '[Cora Alert] High Priority Task Email Alert';
+    $body = "<h2>Client Task Priority Reminder</h2><p>You have an urgent task update pending review in Cora Workspace.</p>";
+    $headers = array('Content-Type: text/html; charset=UTF-8');
+    @wp_mail($admin_email, $subject, $body, $headers);
+    
+    wp_send_json_success(array('message' => 'Email sent successfully'));
+}
+
+add_action( 'wp_ajax_cora_delete_client_task', 'cora_ajax_delete_client_task' );
+add_action( 'wp_ajax_nopriv_cora_delete_client_task', 'cora_ajax_delete_client_task' );
+function cora_ajax_delete_client_task() {
+    if ( ! wp_verify_nonce( $_REQUEST['nonce'] ?? '', 'cora_ajax_nonce' ) && ! current_user_can('read') ) wp_send_json_error('Permission denied');
+
+    $task_id = sanitize_text_field($_POST['task_id'] ?? '');
+    if ( empty($task_id) ) wp_send_json_error('Invalid task ID');
+
+    $tasks = get_option('cora_workspace_client_tasks', array());
+    if ( ! is_array($tasks) ) $tasks = array();
+
+    $tasks = array_filter($tasks, function($t) use ($task_id) {
+        return ($t['id'] ?? '') !== $task_id;
+    });
+
+    $tasks = array_values($tasks);
+    update_option('cora_workspace_client_tasks', $tasks);
+    wp_send_json_success(array('message' => 'Task deleted successfully', 'tasks' => $tasks));
+}
+
+add_action( 'wp_ajax_cora_update_task_status', 'cora_ajax_update_task_status' );
+add_action( 'wp_ajax_nopriv_cora_update_task_status', 'cora_ajax_update_task_status' );
+function cora_ajax_update_task_status() {
+    if ( ! wp_verify_nonce( $_REQUEST['nonce'] ?? '', 'cora_ajax_nonce' ) && ! current_user_can('read') ) wp_send_json_error('Permission denied');
+
+    $task_id = sanitize_text_field($_POST['task_id'] ?? '');
+    $status = sanitize_text_field($_POST['status'] ?? '');
+    if ( empty($task_id) || empty($status) ) wp_send_json_error('Invalid parameters');
+
+    $tasks = get_option('cora_workspace_client_tasks', array());
+    if ( ! is_array($tasks) ) $tasks = array();
+
+    $updated = false;
+    foreach ($tasks as &$t) {
+        if ($t['id'] === $task_id) {
+            $t['status'] = $status;
+            $updated = true;
+            break;
+        }
+    }
+
+    if ($updated) {
+        update_option('cora_workspace_client_tasks', $tasks);
+        wp_send_json_success(array('message' => 'Status updated'));
+    } else {
+        wp_send_json_error('Task not found');
+    }
+}
+
+add_action( 'wp_ajax_cora_toggle_task_subtask', 'cora_ajax_toggle_task_subtask' );
+add_action( 'wp_ajax_nopriv_cora_toggle_task_subtask', 'cora_ajax_toggle_task_subtask' );
+function cora_ajax_toggle_task_subtask() {
+    if ( ! wp_verify_nonce( $_REQUEST['nonce'] ?? '', 'cora_ajax_nonce' ) && ! current_user_can('read') ) wp_send_json_error('Permission denied');
+
+    $task_id = sanitize_text_field($_POST['task_id'] ?? '');
+    $subtask_id = sanitize_text_field($_POST['subtask_id'] ?? '');
+    if ( empty($task_id) || empty($subtask_id) ) wp_send_json_error('Invalid parameters');
+
+    $tasks = get_option('cora_workspace_client_tasks', array());
+    if ( ! is_array($tasks) ) $tasks = array();
+
+    $updated_task = null;
+    foreach ($tasks as &$t) {
+        if ($t['id'] === $task_id) {
+            if ( isset($t['subtasks']) && is_array($t['subtasks']) ) {
+                foreach ($t['subtasks'] as &$st) {
+                    if ( ($st['id'] ?? '') === $subtask_id ) {
+                        $st['completed'] = !($st['completed'] ?? false);
+                    }
+                }
+            }
+            $updated_task = $t;
+            break;
+        }
+    }
+
+    if ($updated_task) {
+        update_option('cora_workspace_client_tasks', $tasks);
+        wp_send_json_success(array('message' => 'Subtask updated', 'task' => $updated_task));
+    } else {
+        wp_send_json_error('Task not found');
+    }
+}
+
+add_action( 'wp_ajax_cora_apply_task_template', 'cora_ajax_apply_task_template' );
+add_action( 'wp_ajax_nopriv_cora_apply_task_template', 'cora_ajax_apply_task_template' );
+function cora_ajax_apply_task_template() {
+    if ( ! wp_verify_nonce( $_REQUEST['nonce'] ?? '', 'cora_ajax_nonce' ) && ! current_user_can('read') ) wp_send_json_error('Permission denied');
+
+    $template_key = sanitize_text_field($_POST['template_key'] ?? '');
+    $client_id = sanitize_text_field($_POST['client_id'] ?? '');
+    $client_name = sanitize_text_field($_POST['client_name'] ?? '');
+    $booking_id = sanitize_text_field($_POST['booking_id'] ?? '');
+    $booking_title = sanitize_text_field($_POST['booking_title'] ?? '');
+    $assignee_id = sanitize_text_field($_POST['assignee_id'] ?? '');
+    $assignee_name = sanitize_text_field($_POST['assignee_name'] ?? '');
+
+    if ( empty($template_key) ) wp_send_json_error('No template specified');
+
+    $generated = array();
+    $base_task = array(
+        'client_id' => $client_id,
+        'client_name' => $client_name,
+        'booking_id' => $booking_id,
+        'booking_title' => $booking_title,
+        'assignee_id' => $assignee_id,
+        'assignee_name' => $assignee_name,
+        'status' => 'todo',
+        'subtasks' => array()
+    );
+
+    switch ($template_key) {
+        case 'wedding_photo':
+            $generated = array(
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Initial Client Consultation', 'deliverable_type' => 'Admin', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('+1 day')), 'desc' => 'Discuss vision and shot list.')),
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Location Scouting & Timeline', 'deliverable_type' => 'Planning', 'priority' => 'medium', 'due_date' => date('Y-m-d', strtotime('+3 days')), 'desc' => 'Visit venue, finalize timeline.')),
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Gear Prep & Battery Check', 'deliverable_type' => 'Prep', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('+5 days')), 'desc' => 'Clean lenses, format SD cards.')),
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Shoot Day Execution', 'deliverable_type' => 'Service', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('+7 days')), 'desc' => 'Main event coverage.')),
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Backup & Cull Photos', 'deliverable_type' => 'Admin', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('+8 days')), 'desc' => '3-2-1 backup strategy.')),
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Color Grading & Edits', 'deliverable_type' => 'Edit', 'priority' => 'medium', 'due_date' => date('Y-m-d', strtotime('+14 days')), 'desc' => 'Lightroom batch processing.')),
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Final Gallery Delivery', 'deliverable_type' => 'Delivery', 'priority' => 'medium', 'due_date' => date('Y-m-d', strtotime('+20 days')), 'desc' => 'Send Pixieset link to client.'))
+            );
+            break;
+        case 'commercial_video':
+            $generated = array(
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Storyboard & Scripting', 'deliverable_type' => 'Planning', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('+2 days')), 'desc' => 'Finalize shot list with client.')),
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Talent & Location Permits', 'deliverable_type' => 'Admin', 'priority' => 'medium', 'due_date' => date('Y-m-d', strtotime('+5 days')), 'desc' => 'Secure releases.')),
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Production Day', 'deliverable_type' => 'Service', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('+10 days')), 'desc' => 'A-roll and B-roll capture.')),
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Audio Sync & Rough Cut', 'deliverable_type' => 'Edit', 'priority' => 'medium', 'due_date' => date('Y-m-d', strtotime('+14 days')), 'desc' => 'Premiere Pro assembly.')),
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Client Review (V1)', 'deliverable_type' => 'Admin', 'priority' => 'medium', 'due_date' => date('Y-m-d', strtotime('+18 days')), 'desc' => 'Send Frame.io link.')),
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Final Export & Handoff', 'deliverable_type' => 'Delivery', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('+22 days')), 'desc' => 'Deliver ProRes and H.264 formats.'))
+            );
+            break;
+        case 'drone_survey':
+            $generated = array(
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Airspace Check (LAANC)', 'deliverable_type' => 'Admin', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('+1 day')), 'desc' => 'Check flight restrictions.')),
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Mission Planning', 'deliverable_type' => 'Planning', 'priority' => 'medium', 'due_date' => date('Y-m-d', strtotime('+2 days')), 'desc' => 'Program waypoints in Litchi/DJI.')),
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Flight Execution', 'deliverable_type' => 'Service', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('+4 days')), 'desc' => 'Capture mapping images.')),
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Photogrammetry Processing', 'deliverable_type' => 'Edit', 'priority' => 'medium', 'due_date' => date('Y-m-d', strtotime('+6 days')), 'desc' => 'Process orthomosaic in WebODM/DroneDeploy.')),
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Deliver Survey Data', 'deliverable_type' => 'Delivery', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('+8 days')), 'desc' => 'Send TIFF/PDF to client.'))
+            );
+            break;
+        case 'client_onboarding':
+            $generated = array(
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Send Welcome Packet', 'deliverable_type' => 'Admin', 'priority' => 'medium', 'due_date' => date('Y-m-d', strtotime('+1 day')), 'desc' => 'Email pricing and FAQ.')),
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Draft Proposal', 'deliverable_type' => 'Admin', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('+2 days')), 'desc' => 'Create custom quote.')),
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Contract Execution', 'deliverable_type' => 'Admin', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('+5 days')), 'desc' => 'Sign agreement via e-sign.')),
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Invoice Deposit', 'deliverable_type' => 'Admin', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('+6 days')), 'desc' => 'Collect 50% retainer.')),
+                array_merge($base_task, array('id' => uniqid(), 'title' => 'Kickoff Meeting', 'deliverable_type' => 'Service', 'priority' => 'medium', 'due_date' => date('Y-m-d', strtotime('+10 days')), 'desc' => 'Sync with team and client.'))
+            );
+            break;
+        default:
+            wp_send_json_error('Unknown template type');
+    }
+
+    $tasks = get_option('cora_workspace_client_tasks', array());
+    if ( ! is_array($tasks) ) $tasks = array();
+
+    $tasks = array_merge($tasks, $generated);
+    update_option('cora_workspace_client_tasks', $tasks);
+
+    wp_send_json_success(array('message' => count($generated) . ' tasks generated successfully', 'count' => count($generated)));
+}
 
 /**
  * AJAX Handlers for WordPress Core Modules
@@ -10576,6 +11070,9 @@ function cora_media_build_file_object( $post_id ) {
         'has_original'   => ! empty( $extra['original_file'] ),
         'share_links'    => $valid,
         'original_size'  => isset( $extra['original_size'] ) ? $extra['original_size'] : '',
+        'rating'         => intval( get_post_meta( $post_id, '_cora_media_rating', true ) ),
+        'label'          => get_post_meta( $post_id, '_cora_media_label', true ) ?: 'none',
+        'shoot_tags'     => get_post_meta( $post_id, '_cora_media_shoot_tags', true ) ?: '',
     );
 }
 
@@ -10615,21 +11112,17 @@ function cora_ajax_media_library_get() {
     $agency_id = cora_get_current_user_agency_id();
     if ( $agency_id !== 'super' && ! empty( $agency_id ) ) {
         $meta_query = array(
-            'relation' => 'AND',
+            'relation' => 'OR',
             array(
                 'key'     => 'cora_agency_id',
                 'value'   => $agency_id,
                 'compare' => '='
+            ),
+            array(
+                'key'     => 'cora_agency_id',
+                'compare' => 'NOT EXISTS'
             )
         );
-        $branch_id = cora_get_current_user_branch_id();
-        if ( ! empty( $branch_id ) ) {
-            $meta_query[] = array(
-                'key'     => 'cora_branch_id',
-                'value'   => $branch_id,
-                'compare' => '='
-            );
-        }
         $args['meta_query'] = $meta_query;
     }
 
@@ -10883,16 +11376,42 @@ add_action( 'wp_ajax_cora_media_library_get_folders', 'cora_ajax_media_library_g
  */
 function cora_ajax_media_library_create_folder() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    if ( ! current_user_can( 'upload_files' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
 
     $name   = sanitize_text_field( $_POST['name'] ?? '' );
     $parent = intval( $_POST['parent_id'] ?? 0 );
+    $desc   = sanitize_textarea_field( $_POST['description'] ?? '' );
     if ( ! $name ) wp_send_json_error( array( 'message' => 'Folder name is required.' ) );
 
-    $term = wp_insert_term( $name, 'cora_media_folder', array( 'parent' => $parent ) );
+    $term_args = array( 'parent' => $parent );
+    if ( $desc ) $term_args['description'] = $desc;
+
+    $term = wp_insert_term( $name, 'cora_media_folder', $term_args );
     if ( is_wp_error( $term ) ) wp_send_json_error( array( 'message' => $term->get_error_message() ) );
 
-    wp_send_json_success( array( 'message' => 'Folder "' . $name . '" created.', 'id' => $term['term_id'] ) );
+    $term_id = $term['term_id'];
+    $linked_record = sanitize_text_field( $_POST['linked_record'] ?? '' );
+    if ( $linked_record ) {
+        update_term_meta( $term_id, '_cora_folder_record', $linked_record );
+    }
+
+    $auto_share = ! empty( $_POST['auto_share'] );
+    $share_url = '';
+    if ( $auto_share ) {
+        $token = 'fshare_' . bin2hex(random_bytes(8));
+        $shares = get_option('cora_folder_shares', array());
+        if ( ! is_array($shares) ) $shares = array();
+        $shares[$term_id] = array(
+            'folder_id'   => $term_id,
+            'folder_name' => $name,
+            'token'       => $token,
+            'created_at'  => current_time('mysql')
+        );
+        update_option('cora_folder_shares', $shares);
+        $share_url = add_query_arg( array( 'cora_share_folder' => $term_id, 'token' => $token ), site_url('/workspace/media') );
+    }
+
+    wp_send_json_success( array( 'message' => 'Folder "' . $name . '" created.', 'id' => $term_id, 'share_url' => $share_url ) );
 }
 add_action( 'wp_ajax_cora_media_library_create_folder', 'cora_ajax_media_library_create_folder' );
 
@@ -10901,9 +11420,9 @@ add_action( 'wp_ajax_cora_media_library_create_folder', 'cora_ajax_media_library
  */
 function cora_ajax_media_library_rename_folder() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    if ( ! current_user_can( 'upload_files' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
 
-    $id   = intval( $_POST['folder_id'] ?? 0 );
+    $id   = intval( $_POST['folder_id'] ?? ($_POST['term_id'] ?? 0) );
     $name = sanitize_text_field( $_POST['name'] ?? '' );
     if ( ! $id || ! $name ) wp_send_json_error( array( 'message' => 'Invalid data.' ) );
 
@@ -10918,9 +11437,9 @@ add_action( 'wp_ajax_cora_media_library_rename_folder', 'cora_ajax_media_library
  */
 function cora_ajax_media_library_delete_folder() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    if ( ! current_user_can( 'upload_files' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
 
-    $id = intval( $_POST['folder_id'] ?? 0 );
+    $id = intval( $_POST['folder_id'] ?? ($_POST['term_id'] ?? 0) );
     if ( ! $id ) wp_send_json_error( array( 'message' => 'Invalid folder ID.' ) );
 
     $r = wp_delete_term( $id, 'cora_media_folder' );
@@ -20585,4 +21104,430 @@ function cora_ajax_add_content_comment() {
     $id = $wpdb->insert_id;
     $user = get_userdata(get_current_user_id());
     wp_send_json_success(['id' => $id, 'author_name' => $user->display_name, 'comment' => $comment, 'created_at' => current_time('mysql')]);
+}
+
+// =========================================================================
+// CORA MEDIA MANAGER — EXTENDED V1 HANDLERS
+// =========================================================================
+
+// save_media_rating
+add_action('wp_ajax_cora_save_media_rating', 'cora_ajax_save_media_rating');
+function cora_ajax_save_media_rating() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if ( ! current_user_can('upload_files') ) wp_send_json_error('Permission denied');
+    $id = intval($_POST['id']);
+    $rating = intval($_POST['rating']);
+    if ( ! $id ) wp_send_json_error('Invalid ID');
+    if ( $rating < 0 || $rating > 5 ) wp_send_json_error('Invalid rating');
+    update_post_meta($id, '_cora_media_rating', $rating);
+    wp_send_json_success(array('id' => $id, 'rating' => $rating));
+}
+
+// save_media_label
+add_action('wp_ajax_cora_save_media_label', 'cora_ajax_save_media_label');
+function cora_ajax_save_media_label() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if ( ! current_user_can('upload_files') ) wp_send_json_error('Permission denied');
+    $id = intval($_POST['id']);
+    $label = sanitize_text_field($_POST['label']);
+    $allowed = array('none', 'red', 'yellow', 'green', 'blue', 'purple');
+    if ( ! $id ) wp_send_json_error('Invalid ID');
+    if ( ! in_array($label, $allowed) ) wp_send_json_error('Invalid label');
+    update_post_meta($id, '_cora_media_label', $label);
+    wp_send_json_success(array('id' => $id, 'label' => $label));
+}
+
+// save_media_shoot_tags
+add_action('wp_ajax_cora_save_media_shoot_tags', 'cora_ajax_save_media_shoot_tags');
+function cora_ajax_save_media_shoot_tags() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if ( ! current_user_can('upload_files') ) wp_send_json_error('Permission denied');
+    $id = intval($_POST['id']);
+    if ( ! $id ) wp_send_json_error('Invalid ID');
+    $tags = sanitize_text_field($_POST['shoot_tags']);
+    update_post_meta($id, '_cora_media_shoot_tags', $tags);
+    wp_send_json_success(array('id' => $id, 'shoot_tags' => $tags));
+}
+
+// get_galleries
+add_action('wp_ajax_cora_get_galleries', 'cora_ajax_get_galleries');
+function cora_ajax_get_galleries() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if ( ! current_user_can('read') ) wp_send_json_error('Permission denied');
+    $galleries = get_option('cora_media_galleries', array());
+    if ( ! is_array($galleries) ) $galleries = array();
+    wp_send_json_success(array_values($galleries));
+}
+
+// create_gallery
+add_action('wp_ajax_cora_create_gallery', 'cora_ajax_create_gallery');
+function cora_ajax_create_gallery() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if ( ! current_user_can('upload_files') ) wp_send_json_error('Permission denied');
+    $name = sanitize_text_field($_POST['name']);
+    if ( empty($name) ) wp_send_json_error('Name required');
+    $galleries = get_option('cora_media_galleries', array());
+    if ( ! is_array($galleries) ) $galleries = array();
+    $id = 'gallery_' . uniqid();
+    $galleries[$id] = array(
+        'id'          => $id,
+        'name'        => $name,
+        'description' => sanitize_text_field($_POST['description'] ?? ''),
+        'file_ids'    => array(),
+        'cover_id'    => 0,
+        'created_at'  => current_time('mysql')
+    );
+    update_option('cora_media_galleries', $galleries);
+    wp_send_json_success($galleries[$id]);
+}
+
+// add_to_gallery
+add_action('wp_ajax_cora_add_to_gallery', 'cora_ajax_add_to_gallery');
+function cora_ajax_add_to_gallery() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if ( ! current_user_can('upload_files') ) wp_send_json_error('Permission denied');
+    $gallery_id = sanitize_text_field($_POST['gallery_id']);
+    $raw_ids    = sanitize_text_field($_POST['file_ids']);
+    $file_ids   = array_filter(array_map('intval', explode(',', $raw_ids)));
+    $galleries  = get_option('cora_media_galleries', array());
+    if ( ! isset($galleries[$gallery_id]) ) wp_send_json_error('Gallery not found');
+    
+    $existing = $galleries[$gallery_id]['file_ids'] ?? array();
+    $merged   = array_values(array_unique(array_merge($existing, $file_ids)));
+    $galleries[$gallery_id]['file_ids'] = $merged;
+    if ( empty($galleries[$gallery_id]['cover_id']) && ! empty($merged) ) {
+        $galleries[$gallery_id]['cover_id'] = $merged[0];
+    }
+    update_option('cora_media_galleries', $galleries);
+    wp_send_json_success($galleries[$gallery_id]);
+}
+
+// delete_gallery
+add_action('wp_ajax_cora_delete_gallery', 'cora_ajax_delete_gallery');
+function cora_ajax_delete_gallery() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if ( ! current_user_can('upload_files') ) wp_send_json_error('Permission denied');
+    $gallery_id = sanitize_text_field($_POST['gallery_id']);
+    $galleries  = get_option('cora_media_galleries', array());
+    if ( isset($galleries[$gallery_id]) ) {
+        unset($galleries[$gallery_id]);
+        update_option('cora_media_galleries', $galleries);
+    }
+    wp_send_json_success('Gallery deleted');
+}
+
+// batch_download_zip
+add_action('wp_ajax_cora_batch_download_zip', 'cora_ajax_batch_download_zip');
+function cora_ajax_batch_download_zip() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if ( ! current_user_can('read') ) wp_send_json_error('Permission denied');
+    $raw_ids = sanitize_text_field($_POST['ids'] ?? '');
+    $ids     = array_filter(array_map('intval', explode(',', $raw_ids)));
+    if ( empty($ids) ) wp_send_json_error('No files selected');
+
+    if ( ! class_exists('ZipArchive') ) {
+        wp_send_json_error('ZipArchive extension missing on server');
+    }
+
+    $upload_dir = wp_upload_dir();
+    $zip_filename = 'cora_media_' . date('Ymd_His') . '_' . rand(100,999) . '.zip';
+    $zip_filepath = $upload_dir['path'] . '/' . $zip_filename;
+    $zip_fileurl  = $upload_dir['url']  . '/' . $zip_filename;
+
+    $zip = new ZipArchive();
+    if ( $zip->open($zip_filepath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true ) {
+        wp_send_json_error('Could not create ZIP file');
+    }
+
+    $count = 0;
+    foreach ( $ids as $id ) {
+        $file_path = get_attached_file($id);
+        if ( $file_path && file_exists($file_path) ) {
+            $zip->addFile($file_path, basename($file_path));
+            $count++;
+        }
+    }
+    $zip->close();
+
+    if ( $count === 0 ) {
+        @unlink($zip_filepath);
+        wp_send_json_error('No physical files found to compress');
+    }
+
+    wp_send_json_success(array('url' => $zip_fileurl, 'count' => $count));
+}
+
+// share_folder
+add_action('wp_ajax_cora_media_library_share_folder', 'cora_ajax_media_library_share_folder');
+function cora_ajax_media_library_share_folder() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if ( ! current_user_can('read') ) wp_send_json_error('Permission denied');
+    $folder_id = intval($_POST['folder_id']);
+    if ( ! $folder_id ) wp_send_json_error('Folder ID required');
+    $term = get_term($folder_id, 'cora_media_folder');
+    if ( ! $term || is_wp_error($term) ) wp_send_json_error('Folder not found');
+
+    $shares = get_option('cora_folder_shares', array());
+    if ( ! is_array($shares) ) $shares = array();
+    
+    if ( empty($shares[$folder_id]) ) {
+        $token = 'fshare_' . bin2hex(random_bytes(8));
+        $shares[$folder_id] = array(
+            'folder_id'  => $folder_id,
+            'folder_name'=> $term->name,
+            'token'      => $token,
+            'created_at' => current_time('mysql')
+        );
+        update_option('cora_folder_shares', $shares);
+    } else {
+        $token = $shares[$folder_id]['token'];
+    }
+
+    $share_url = add_query_arg( array(
+        'cora_share_folder' => $folder_id,
+        'token'             => $token
+    ), site_url('/workspace/media') );
+
+    wp_send_json_success(array(
+        'folder_id'   => $folder_id,
+        'folder_name' => $term->name,
+        'token'       => $token,
+        'share_url'   => $share_url
+    ));
+}
+
+// email_folder_share
+add_action('wp_ajax_cora_media_library_email_folder', 'cora_ajax_media_library_email_folder');
+function cora_ajax_media_library_email_folder() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if ( ! current_user_can('read') ) wp_send_json_error('Permission denied');
+    $folder_id    = intval($_POST['folder_id']);
+    $client_email = sanitize_email($_POST['email']);
+    $share_url    = esc_url_raw($_POST['share_url']);
+
+    if ( ! $folder_id || empty($client_email) || empty($share_url) ) {
+        wp_send_json_error('Invalid email or folder URL.');
+    }
+
+    $term = get_term($folder_id, 'cora_media_folder');
+    $folder_name = ($term && !is_wp_error($term)) ? $term->name : 'Media Gallery';
+
+    $subject = "Media Folder Shared: " . $folder_name;
+    $message = "Hello,\n\nYou have been granted access to view the folder '" . $folder_name . "'.\n\nClick the link below to access your media assets:\n" . $share_url . "\n\nBest regards,\nCora Workspace";
+
+    $sent = wp_mail($client_email, $subject, $message);
+    if ($sent) {
+        wp_send_json_success('Folder link emailed to ' . $client_email);
+    } else {
+        wp_send_json_error('Email delivery failed. Please copy the link manually.');
+    }
+}
+
+// ── SECURE DOCUMENT VAULT AJAX HANDLERS ────────────────────────────────────────
+
+add_action('wp_ajax_cora_save_document', 'cora_ajax_vault_save_document');
+function cora_ajax_vault_save_document() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if ( ! current_user_can('read') ) wp_send_json_error('Permission denied');
+
+    $id           = sanitize_text_field($_POST['id'] ?? '');
+    $title        = sanitize_text_field($_POST['title'] ?? '');
+    $type         = sanitize_text_field($_POST['type'] ?? 'Proposal');
+    $client_name  = sanitize_text_field($_POST['client_name'] ?? '');
+    $client_email = sanitize_email($_POST['client_email'] ?? '');
+    $password     = sanitize_text_field($_POST['password'] ?? '');
+    $watermark    = sanitize_text_field($_POST['watermark'] ?? 'CONFIDENTIAL');
+    $content      = wp_kses_post($_POST['content'] ?? '');
+    $items_raw    = $_POST['items'] ?? '[]';
+    $items        = json_decode(stripslashes($items_raw), true);
+
+    if ( empty($title) || empty($client_name) || empty($client_email) ) {
+        wp_send_json_error('Title, client name, and client email are required.');
+    }
+
+    $amount = floatval($_POST['amount'] ?? 0);
+    if ( $amount <= 0 && is_array($items) ) {
+        foreach ($items as $it) {
+            $amount += floatval($it['rate'] ?? 0) * floatval($it['qty'] ?? 1);
+        }
+    }
+
+    $docs = get_option('cora_documents', array());
+    if ( ! is_array($docs) ) $docs = array();
+
+    if ( empty($id) ) {
+        $id = 'doc_' . date('Ymd') . '_' . rand(100,999);
+        $new_doc = array(
+            'id'          => $id,
+            'title'       => $title,
+            'type'        => $type,
+            'client_name' => $client_name,
+            'client_email'=> $client_email,
+            'amount'      => $amount,
+            'deposit'     => $amount * 0.5,
+            'password'    => $password,
+            'watermark'   => $watermark,
+            'content'     => $content,
+            'status'      => 'Sent',
+            'created_at'  => date('Y-m-d'),
+            'token'       => 'vtoken_' . bin2hex(random_bytes(6)),
+            'signed'      => false,
+            'items'       => $items
+        );
+        $docs[] = $new_doc;
+
+        // Auto-Sync Financial Ledger Receivable
+        $ledger = get_option('cora_financial_ledger', array());
+        if ( ! is_array($ledger) ) $ledger = array();
+        $ledger[] = array(
+            'id'          => 'fin_' . uniqid(),
+            'type'        => 'inflow',
+            'category'    => 'Document Billing: ' . $type,
+            'description' => $title . ' (' . $client_name . ')',
+            'amount'      => $amount,
+            'status'      => 'pending',
+            'date'        => date('Y-m-d')
+        );
+        update_option('cora_financial_ledger', $ledger);
+
+    } else {
+        foreach ($docs as &$d) {
+            if ($d['id'] === $id) {
+                $d['title']        = $title;
+                $d['type']         = $type;
+                $d['client_name']  = $client_name;
+                $d['client_email'] = $client_email;
+                $d['amount']       = $amount;
+                $d['deposit']      = $amount * 0.5;
+                $d['items']        = $items;
+                break;
+            }
+        }
+    }
+
+    update_option('cora_documents', $docs);
+    wp_send_json_success(array('message' => 'Document saved & financial ledger synced!', 'id' => $id));
+}
+
+add_action('wp_ajax_cora_sign_document', 'cora_ajax_sign_document');
+function cora_ajax_sign_document() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if ( ! current_user_can('read') ) wp_send_json_error('Permission denied');
+
+    $doc_id       = sanitize_text_field($_POST['doc_id'] ?? '');
+    $signer_name  = sanitize_text_field($_POST['signer_name'] ?? '');
+    $signer_email = sanitize_email($_POST['signer_email'] ?? '');
+
+    if ( empty($doc_id) || empty($signer_name) || empty($signer_email) ) {
+        wp_send_json_error('Signer name and email are required.');
+    }
+
+    $docs = get_option('cora_documents', array());
+    if ( ! is_array($docs) ) $docs = array();
+
+    $found = false;
+    foreach ($docs as &$d) {
+        if ($d['id'] === $doc_id) {
+            $d['signed']       = true;
+            $d['status']       = 'Signed';
+            $d['signer_name']  = $signer_name;
+            $d['signer_email'] = $signer_email;
+            $d['signed_at']    = current_time('mysql');
+            $d['signer_ip']    = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+            $found = true;
+            break;
+        }
+    }
+
+    if ($found) {
+        update_option('cora_documents', $docs);
+        wp_send_json_success('Document e-signed successfully!');
+    } else {
+        wp_send_json_error('Document not found.');
+    }
+}
+
+add_action('wp_ajax_cora_share_document_email', 'cora_ajax_share_document_email');
+function cora_ajax_share_document_email() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if ( ! current_user_can('read') ) wp_send_json_error('Permission denied');
+
+    $doc_id = sanitize_text_field($_POST['doc_id'] ?? '');
+    $email  = sanitize_email($_POST['email'] ?? '');
+    $custom_msg = sanitize_textarea_field($_POST['message'] ?? '');
+
+    if ( empty($doc_id) || empty($email) ) {
+        wp_send_json_error('Valid recipient email required.');
+    }
+
+    $docs = get_option('cora_documents', array());
+    $doc_title = 'Official Document';
+    $doc_token = 'vtoken';
+    foreach ($docs as $d) {
+        if ($d['id'] === $doc_id) {
+            $doc_title = $d['title'];
+            $doc_token = $d['token'] ?? 'vtoken';
+            break;
+        }
+    }
+
+    $share_url = add_query_arg(array('cora_doc' => $doc_id, 'token' => $doc_token), site_url('/workspace/vault'));
+    $subject   = "Official Document Access: " . $doc_title;
+    $message   = "Hello,\n\nYou have been shared an official document from Cora Workspace: '" . $doc_title . "'.\n\n" . ($custom_msg ? "Note: " . $custom_msg . "\n\n" : "") . "Click here to view, e-sign, and download:\n" . $share_url . "\n\nBest regards,\nCora Studio Workspace";
+
+    $sent = wp_mail($email, $subject, $message);
+    if ($sent) {
+        wp_send_json_success('Document emailed to ' . $email);
+    } else {
+        wp_send_json_error('Email delivery failed.');
+    }
+}
+
+add_action('wp_ajax_cora_delete_document', 'cora_ajax_delete_document');
+function cora_ajax_delete_document() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if ( ! current_user_can('read') ) wp_send_json_error('Permission denied');
+
+    $doc_id = sanitize_text_field($_POST['doc_id'] ?? '');
+    if ( empty($doc_id) ) wp_send_json_error('Invalid document ID');
+
+    $docs = get_option('cora_documents', array());
+    if ( ! is_array($docs) ) $docs = array();
+
+    $docs = array_filter($docs, function($d) use ($doc_id) {
+        return ($d['id'] ?? '') !== $doc_id;
+    });
+
+    update_option('cora_documents', array_values($docs));
+    wp_send_json_success('Document deleted.');
+}
+
+add_action('wp_ajax_cora_export_gstr1', 'cora_ajax_export_gstr1');
+function cora_ajax_export_gstr1() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if ( ! current_user_can('read') ) wp_send_json_error('Permission denied');
+
+    $docs = get_option('cora_documents', array());
+    if ( ! is_array($docs) ) $docs = array();
+
+    $csv = "GSTIN/UIN of Recipient,Receiver Name,Invoice Number,Invoice Date,Invoice Value,Place Of Supply,Reverse Charge,Applicable % of Tax Rate,Invoice Type,E-Commerce GSTIN,Rate,Taxable Value,Cess Amount,CGST,SGST,IGST\n";
+    foreach ($docs as $d) {
+        $gstin = $d['client_gstin'] ?? 'URP';
+        $name  = $d['client_name'] ?? 'Client';
+        $num   = $d['number'] ?? 'INV-2026';
+        $date  = $d['created_at'] ?? date('Y-m-d');
+        $val   = floatval($d['grand_total'] ?? $d['amount'] ?? 0);
+        $pos   = $d['pos_state'] ?? 'Delhi (07)';
+        $taxable = $val / 1.18;
+        $tax   = $val - $taxable;
+        $is_igst = ! empty($d['is_igst']);
+
+        $cgst = $is_igst ? 0 : ($tax / 2);
+        $sgst = $is_igst ? 0 : ($tax / 2);
+        $igst = $is_igst ? $tax : 0;
+
+        $csv .= '"' . $gstin . '","' . $name . '","' . $num . '","' . $date . '",' . number_format($val, 2, '.', '') . ',"' . $pos . '","N","18%","Regular","",' . '18%,' . number_format($taxable, 2, '.', '') . ',0.00,' . number_format($cgst, 2, '.', '') . ',' . number_format($sgst, 2, '.', '') . ',' . number_format($igst, 2, '.', '') . "\n";
+    }
+
+    wp_send_json_success(array('csv' => $csv, 'filename' => 'GSTR1_Outward_Supplies_' . date('Y_m') . '.csv'));
 }

@@ -343,14 +343,17 @@ $cora_settings_tabs = array(
                         </select>
                     </div>
                     <div>
-                        <label>Platform Language (Indian Regional)</label>
-                        <select name="cora_workspace_language" style="width: 100%; padding: 10px 14px; font-size: 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;">
+                        <label>Platform Language</label>
+                        <select id="cora-settings-suite-language-select" name="cora_workspace_language" class="cora-language-selector" style="width: 100%; padding: 10px 14px; font-size: 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;" onchange="if(window.coraSetLanguage) window.coraSetLanguage(this.value, true);">
                             <?php $lang = get_option('cora_workspace_language', 'en'); ?>
                             <option value="en" <?php selected( $lang, 'en' ); ?>>English</option>
                             <option value="hi" <?php selected( $lang, 'hi' ); ?>>Hindi (हिन्दी)</option>
+                            <option value="es" <?php selected( $lang, 'es' ); ?>>Spanish (Español)</option>
+                            <option value="fr" <?php selected( $lang, 'fr' ); ?>>French (Français)</option>
+                            <option value="de" <?php selected( $lang, 'de' ); ?>>German (Deutsch)</option>
                             <option value="bn" <?php selected( $lang, 'bn' ); ?>>Bengali (বাংলা)</option>
                             <option value="te" <?php selected( $lang, 'te' ); ?>>Telugu (తెలుగు)</option>
-                            <option value="mr" <?php selected( $lang, 'mr' ); ?>>Marathi (มराठी)</option>
+                            <option value="mr" <?php selected( $lang, 'mr' ); ?>>Marathi (मराठी)</option>
                             <option value="ta" <?php selected( $lang, 'ta' ); ?>>Tamil (தமிழ்)</option>
                             <option value="gu" <?php selected( $lang, 'gu' ); ?>>Gujarati (ગુજરાતી)</option>
                             <option value="kn" <?php selected( $lang, 'kn' ); ?>>Kannada (ಕನ್ನಡ)</option>
@@ -1649,7 +1652,7 @@ $cora_settings_tabs = array(
                     nonce: coraREData.ajaxNonce
                 }, function(res) {
                     if (res && res.success) {
-                        window.coraShowToast("✅ " + res.data.message);
+                        window.coraShowToast(res.data.message);
                         
                         // Force download trigger in browser window
                         if (res.data.download_url) {
@@ -1660,11 +1663,11 @@ $cora_settings_tabs = array(
                             window.location.reload();
                         }, 1500);
                     } else {
-                        window.coraShowToast("❌ Error: " + (res.data && res.data.message ? res.data.message : "Failed to compile backup."));
+                        window.coraShowToast("Error: " + (res.data && res.data.message ? res.data.message : "Failed to compile backup."));
                         $btn.prop('disabled', false).html('<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Export Database (.sql)');
                     }
                 }).fail(function() {
-                    window.coraShowToast("❌ Network error while generating backup.");
+                    window.coraShowToast("Network error while generating backup.");
                     $btn.prop('disabled', false).html('<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Export Database (.sql)');
                 });
             });
