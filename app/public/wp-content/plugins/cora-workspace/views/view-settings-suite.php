@@ -1161,13 +1161,30 @@ $cora_settings_tabs = array(
                                 <div>
                                     <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">GitHub Repository</label>
                                     <?php $saved_repo = get_option('cora_git_sync_repo', ''); ?>
-                                    <select id="cora-git-repo-select" data-saved-url="<?php echo esc_url($saved_repo); ?>" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400 cursor-pointer">
-                                        <option value="">Loading repositories...</option>
-                                    </select>
-                                    
-                                    <div id="cora-git-repo-manual-container" class="mt-2.5 hidden">
-                                        <label class="block text-[9px] font-semibold text-zinc-400 mb-1">Repository URL</label>
-                                        <input type="text" id="cora-git-repo-manual-input" name="cora_git_sync_repo" value="<?php echo esc_attr( $saved_repo ); ?>" placeholder="e.g. https://github.com/user/repo" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400">
+                                    <div class="relative" id="cora-git-repo-searchable-select-container" data-saved-url="<?php echo esc_url($saved_repo); ?>">
+                                        <!-- Display Trigger Button -->
+                                        <div id="cora-repo-select-trigger" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400 cursor-pointer flex items-center justify-between transition-all">
+                                            <span id="cora-repo-select-display-text" class="truncate text-zinc-500">Loading repositories...</span>
+                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 transition-transform duration-200" id="cora-repo-select-arrow"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                        </div>
+
+                                        <!-- Dropdown Panel (Initially Hidden) -->
+                                        <div id="cora-repo-select-dropdown" class="absolute left-0 right-0 z-50 mt-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-lg hidden flex flex-col max-h-64 overflow-hidden">
+                                            <!-- Search Input -->
+                                            <div class="p-2 border-b border-zinc-150 dark:border-zinc-850 bg-zinc-50/50 dark:bg-zinc-950/40">
+                                                <input type="text" id="cora-git-repo-search-input" placeholder="Search repositories..." class="w-full px-2.5 py-1.5 text-xs bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-750 rounded-md text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400">
+                                            </div>
+                                            <!-- Options List -->
+                                            <div id="cora-repo-options-list" class="flex-1 overflow-y-auto divide-y divide-zinc-50 dark:divide-zinc-800/40 py-1 max-h-48">
+                                                <div class="px-3 py-2 text-xs text-zinc-400 italic">Loading...</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Manual entry input container (initially hidden) -->
+                                        <div id="cora-git-repo-manual-container" class="mt-2.5 hidden">
+                                            <label class="block text-[9px] font-semibold text-zinc-400 mb-1">Repository URL</label>
+                                            <input type="text" id="cora-git-repo-manual-input" name="cora_git_sync_repo" value="<?php echo esc_attr( $saved_repo ); ?>" placeholder="e.g. https://github.com/user/repo" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400">
+                                        </div>
                                     </div>
                                 </div>
                                 <div>

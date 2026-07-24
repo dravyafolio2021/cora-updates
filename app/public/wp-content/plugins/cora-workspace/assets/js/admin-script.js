@@ -8813,14 +8813,21 @@ jQuery(document).ready(function($) {
     };
 
     window.coraLoadGitHubRepositories = function() {
-        var $select = $('#cora-git-repo-select');
-        if ($select.length === 0) return;
+        var $container = $('#cora-git-repo-searchable-select-container');
+        if ($container.length === 0) return;
 
+        var $trigger = $('#cora-repo-select-trigger');
+        var $displayText = $('#cora-repo-select-display-text');
+        var $dropdown = $('#cora-repo-select-dropdown');
+        var $searchInput = $('#cora-git-repo-search-input');
+        var $optionsList = $('#cora-repo-options-list');
         var $manualInput = $('#cora-git-repo-manual-input');
         var $manualContainer = $('#cora-git-repo-manual-container');
-        var savedUrl = $select.attr('data-saved-url') || '';
+        var $arrow = $('#cora-repo-select-arrow');
+        
+        var savedUrl = $container.attr('data-saved-url') || '';
 
-        $select.html('<option value="">Loading repositories...</option>');
+        $displayText.text('Loading repositories...');
 
         $.post(coraREData.ajaxUrl, {
             action: 'cora_get_github_repositories',
@@ -8828,53 +8835,104 @@ jQuery(document).ready(function($) {
         }, function(res) {
             if (res && res.success) {
                 var repos = res.data;
-                var html = '<option value="">— Select Repository —</option>';
+                var html = '<div class="cora-repo-option-item px-3 py-2 text-xs text-zinc-400 italic cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors" data-url="" data-name="— Select Repository —">— Select Repository —</div>';
                 var foundSaved = false;
 
                 repos.forEach(function(repo) {
-                    var selected = (repo.url.toLowerCase() === savedUrl.toLowerCase()) ? 'selected' : '';
-                    if (selected) foundSaved = true;
-                    html += '<option value="' + repo.url + '" ' + selected + '>' + repo.name + '</option>';
+                    var selected = (repo.url.toLowerCase() === savedUrl.toLowerCase());
+                    if (selected) {
+                        foundSaved = true;
+                        $displayText.text(repo.name).removeClass('text-zinc-500').addClass('text-zinc-800 dark:text-zinc-200');
+                    }
+                    html += '<div class="cora-repo-option-item px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors truncate" data-url="' + repo.url + '" data-name="' + repo.name + '">' + repo.name + '</div>';
                 });
 
-                html += '<option value="manual">— Enter Manually... —</option>';
-                $select.html(html);
+                html += '<div class="cora-repo-option-item px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 font-semibold border-t border-zinc-150 dark:border-zinc-800/80 bg-zinc-50/40 dark:bg-zinc-950/20 transition-colors" data-url="manual" data-name="— Enter Manually... —">— Enter Manually... —</div>';
+                $optionsList.html(html);
 
                 if (savedUrl && !foundSaved) {
                     var repoName = savedUrl.replace('https://github.com/', '');
-                    $select.prepend('<option value="' + savedUrl + '" selected>' + repoName + ' (Saved)</option>');
+                    $displayText.text(repoName + ' (Saved)').removeClass('text-zinc-500').addClass('text-zinc-800 dark:text-zinc-200');
+                    $optionsList.prepend('<div class="cora-repo-option-item px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors truncate" data-url="' + savedUrl + '" data-name="' + repoName + ' (Saved)">' + repoName + ' (Saved)</div>');
                 }
 
-                // Sync the initial view
-                if ($select.val() === 'manual' || ($select.val() === '' && savedUrl)) {
+                if (!savedUrl) {
+                    $displayText.text('— Select Repository —');
+                }
+
+                // Initial view setup
+                if (savedUrl && !foundSaved && savedUrl.indexOf('github.com') === -1) {
                     $manualContainer.removeClass('hidden');
-                } else {
-                    $manualContainer.addClass('hidden');
-                    $manualInput.val($select.val());
+                    $displayText.text('Enter Manually...');
                 }
             } else {
-                $select.html('<option value="manual">Failed to load repos (Enter manually)</option>');
-                $manualContainer.removeClass('hidden');
+                $displayText.text('Failed to load repositories.');
+                $optionsList.html('<div class="cora-repo-option-item px-3 py-2 text-xs text-red-650 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-850" data-url="manual" data-name="Enter Manually...">Failed to load (Click to enter manually)</div>');
             }
         }).fail(function() {
-            $select.html('<option value="manual">Error loading repos (Enter manually)</option>');
-            $manualContainer.removeClass('hidden');
+            $displayText.text('Error loading repositories.');
+            $optionsList.html('<div class="cora-repo-option-item px-3 py-2 text-xs text-red-650 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-850" data-url="manual" data-name="Enter Manually...">Error loading (Click to enter manually)</div>');
         });
 
-        // Handle change event
-        $select.off('change').on('change', function() {
-            var val = $(this).val();
-            if (val === 'manual') {
+        // Toggle dropdown open/close
+        $trigger.off('click').on('click', function(e) {
+            e.stopPropagation();
+            var isHidden = $dropdown.hasClass('hidden');
+            $('.cora-repo-select-dropdown').addClass('hidden'); // Close others if any
+            if (isHidden) {
+                $dropdown.removeClass('hidden');
+                $arrow.addClass('rotate-180');
+                $searchInput.focus();
+            } else {
+                $dropdown.addClass('hidden');
+                $arrow.removeClass('rotate-180');
+            }
+        });
+
+        // Close dropdown when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('#cora-git-repo-searchable-select-container').length) {
+                $dropdown.addClass('hidden');
+                $arrow.removeClass('rotate-180');
+            }
+        });
+
+        // Handle typing in search input
+        $searchInput.off('input').on('input', function() {
+            var searchVal = $(this).val().toLowerCase().trim();
+            $optionsList.find('.cora-repo-option-item').each(function() {
+                var text = $(this).text().toLowerCase();
+                var url = $(this).attr('data-url');
+                if (url === 'manual' || text.indexOf(searchVal) > -1) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+
+        // Handle item selection click
+        $optionsList.off('click', '.cora-repo-option-item').on('click', '.cora-repo-option-item', function(e) {
+            e.stopPropagation();
+            var url = $(this).attr('data-url');
+            var name = $(this).attr('data-name');
+
+            if (url === 'manual') {
                 $manualContainer.removeClass('hidden');
-                $manualInput.val('');
+                $displayText.text('Enter Manually...').removeClass('text-zinc-500').addClass('text-zinc-800 dark:text-zinc-200');
+                $manualInput.val('').focus();
             } else {
                 $manualContainer.addClass('hidden');
-                $manualInput.val(val);
+                $displayText.text(name).removeClass('text-zinc-500').addClass('text-zinc-800 dark:text-zinc-200');
+                $manualInput.val(url);
             }
+
+            $dropdown.addClass('hidden');
+            $arrow.removeClass('rotate-180');
         });
     };
 
     // Auto-run if element is present
-    if ($('#cora-git-repo-select').length > 0) {
+    if ($('#cora-git-repo-searchable-select-container').length > 0) {
         window.coraLoadGitHubRepositories();
     }
