@@ -340,7 +340,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 <div id="panel-ct-seo" class="cora-ct-panel hidden">
     <div class="flex gap-4 items-start">
         <!-- Left: Article List -->
-        <div id="seo-sidebar" class="w-[260px] shrink-0 bg-white border border-zinc-200/80 rounded-xl shadow-2xs sticky top-4 max-h-[calc(100vh-180px)] flex flex-col overflow-hidden transition-all duration-300">
+        <div id="seo-sidebar" class="w-[260px] shrink-0 bg-white border border-zinc-200/80 rounded-xl shadow-2xs sticky top-4 max-h-[calc(100vh-140px)] flex flex-col overflow-hidden transition-all duration-300" style="width: 260px; min-width: 260px;">
             <!-- Header -->
             <div id="seo-sidebar-header" class="p-3 border-b border-zinc-200/80 bg-zinc-50/70 flex items-center justify-between">
                 <div class="flex items-center gap-2 overflow-hidden seo-sidebar-text">
@@ -2129,10 +2129,11 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             localStorage.setItem('cora_seo_sidebar_collapsed', 'true');
         } else {
             sidebar.classList.remove('w-[40px]');
-            sidebar.style.minWidth = '';
-            sidebar.style.maxWidth = '';
+            sidebar.style.width = '260px';
+            sidebar.style.minWidth = '260px';
+            sidebar.style.maxWidth = '260px';
             // Restore viewport-relative max-height
-            sidebar.style.maxHeight = 'calc(100vh - 180px)';
+            sidebar.style.maxHeight = 'calc(100vh - 140px)';
             sidebar.classList.add('w-[260px]');
             contentEls.forEach(el => el.classList.remove('hidden'));
             textEls.forEach(el => el.classList.remove('hidden'));
