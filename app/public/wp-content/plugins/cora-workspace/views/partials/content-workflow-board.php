@@ -55,104 +55,149 @@ if (!empty($all_items)) {
 }
 
 $stages = [
-    'idea' => 'Idea',
-    'briefing' => 'Briefing',
-    'research' => 'Research',
-    'drafting' => 'Drafting',
+    'idea'             => 'Idea',
+    'briefing'         => 'Briefing',
+    'research'         => 'Research',
+    'drafting'         => 'Drafting',
     'editorial_review' => 'Editorial Review',
-    'revisions' => 'Revisions',
-    'seo_gate' => 'SEO Gate',
-    'approval' => 'Approval',
-    'scheduled' => 'Scheduled',
-    'published' => 'Published',
-    'performance' => 'Performance'
+    'revisions'        => 'Revisions',
+    'seo_gate'         => 'SEO Gate',
+    'approval'         => 'Approval',
+    'scheduled'        => 'Scheduled',
+    'published'        => 'Published',
+    'performance'      => 'Performance'
 ];
 ?>
 
-<div class="flex items-center gap-3 mb-4">
-  <button class="cora-btn-primary px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold rounded-md text-sm transition-colors cursor-pointer flex items-center gap-2 ml-auto" onclick="openContentBriefDrawer()">
-      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-      New Content Brief
-  </button>
+<!-- WORKFLOW BOARD TOOLBAR -->
+<div class="flex items-center justify-between gap-4 mb-4 pt-2">
+  <div class="flex items-center gap-2">
+    <span class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Workflow Stages</span>
+    <span class="px-2 py-0.5 bg-zinc-100 border border-zinc-200 rounded-full text-[10px] font-bold text-zinc-600"><?php echo count($stages); ?> Columns</span>
+  </div>
+  <div class="flex items-center gap-2">
+    <button class="cora-btn-primary px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm" onclick="openContentBriefDrawer()">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        New Content Brief
+    </button>
+  </div>
 </div>
 
-<div class="flex gap-4 overflow-x-auto pb-4" id="cora-workflow-kanban">
+<!-- KANBAN BOARD CONTAINER (SCROLLABLE) -->
+<div class="flex gap-3.5 overflow-x-auto pb-6 scrollbar-hide select-none" id="cora-workflow-kanban" style="-webkit-overflow-scrolling: touch;">
   <?php foreach($stages as $stage_key => $stage_label): 
     $stage_cards = $grouped_items[$stage_key] ?? [];
   ?>
-  <div class="w-72 shrink-0 bg-zinc-50 border border-zinc-200 rounded-xl flex flex-col" data-stage="<?php echo $stage_key; ?>">
-    <div class="p-3 border-b border-zinc-200 flex items-center justify-between">
-      <span class="text-xs font-bold text-zinc-700 uppercase tracking-wider"><?php echo $stage_label; ?></span>
-      <span class="ct-stage-count text-[10px] font-bold text-zinc-400"><?php echo count($stage_cards); ?></span>
+  <div class="w-72 shrink-0 bg-zinc-50/80 border border-zinc-200/80 rounded-2xl flex flex-col transition-all ct-stage-container" data-stage="<?php echo $stage_key; ?>">
+    
+    <!-- Stage Column Header -->
+    <div class="p-3 border-b border-zinc-200/70 flex items-center justify-between bg-white rounded-t-2xl">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-zinc-900"></span>
+        <span class="text-xs font-bold text-zinc-900 uppercase tracking-wide"><?php echo $stage_label; ?></span>
+      </div>
+      <div class="flex items-center gap-1">
+        <span class="ct-stage-count px-2 py-0.5 rounded-full bg-zinc-100 text-[10px] font-bold text-zinc-700"><?php echo count($stage_cards); ?></span>
+        <button class="p-1 text-zinc-400 hover:text-zinc-900 rounded hover:bg-zinc-100 transition-colors" title="Add brief to <?php echo $stage_label; ?>" onclick="openContentBriefDrawer()">
+          <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+      </div>
     </div>
-    <div class="min-h-[600px] h-auto space-y-3 p-2.5 flex-1 ct-stage-column" data-stage="<?php echo $stage_key; ?>">
+
+    <!-- Stage Cards Column (Drop Target) -->
+    <div class="min-h-[550px] space-y-3 p-2.5 flex-1 ct-stage-column transition-all" 
+         data-stage="<?php echo $stage_key; ?>"
+         ondragover="coraWbDragOver(event)"
+         ondragenter="coraWbDragEnter(event, '<?php echo $stage_key; ?>')"
+         ondragleave="coraWbDragLeave(event, '<?php echo $stage_key; ?>')"
+         ondrop="coraWbDrop(event, '<?php echo $stage_key; ?>')">
+      
       <?php if (empty($stage_cards)): ?>
-        <div class="text-center text-zinc-400 text-xs py-6">No items</div>
+        <div class="h-32 rounded-xl border border-dashed border-zinc-200 flex flex-col items-center justify-center text-zinc-400 text-xs gap-1">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-300"><rect x="3" y="3" width="18" height="18" rx="2"></rect><polyline points="12 8 12 16"></polyline><polyline points="8 12 16 12"></polyline></svg>
+          <span class="font-medium text-[11px]">Drop item here</span>
+        </div>
       <?php else: foreach($stage_cards as $item): 
-        $p_colors = ['urgent'=>'bg-zinc-900 text-white','high'=>'bg-zinc-700 text-white','medium'=>'bg-zinc-200 text-zinc-800','low'=>'bg-zinc-100 text-zinc-600'];
+        $p_colors = ['urgent'=>'bg-zinc-950 text-white','high'=>'bg-zinc-800 text-white','medium'=>'bg-zinc-200 text-zinc-900','low'=>'bg-zinc-100 text-zinc-600'];
         $pc = $p_colors[$item['priority']] ?? $p_colors['medium'];
+        $post_id = intval($item['post_id'] ?? $item['id']);
       ?>
-        <div class="bg-white border border-zinc-200 hover:border-zinc-400 rounded-xl p-3.5 shadow-sm hover:shadow-md transition-all space-y-2.5 cursor-pointer group" onclick="openContentBriefDrawer(<?php echo $item['id']; ?>)">
+        <!-- WORKFLOW CARD -->
+        <div draggable="true" 
+             ondragstart="coraWbDragStart(event, <?php echo $item['id']; ?>)" 
+             class="cora-wb-card bg-white border border-zinc-200/90 hover:border-zinc-400 rounded-xl p-3.5 shadow-sm hover:shadow-md transition-all space-y-3 cursor-grab active:cursor-grabbing group relative"
+             data-id="<?php echo $item['id']; ?>"
+             data-post-id="<?php echo $post_id; ?>">
+          
           <?php if(!empty($item['thumbnail_url'])): ?>
-            <img src="<?php echo esc_url($item['thumbnail_url']); ?>" class="w-full h-28 object-cover rounded-lg mb-2">
-          <?php else: ?>
-            <div class="w-full h-20 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/60 flex items-center justify-center text-zinc-400 mb-2"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.5" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
+            <div class="w-full h-24 rounded-lg bg-zinc-100 overflow-hidden cursor-pointer" onclick="coraEditArticle(<?php echo $post_id; ?>)">
+              <img src="<?php echo esc_url($item['thumbnail_url']); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+            </div>
           <?php endif; ?>
-          <!-- Row 1: Header Category & Priority -->
+
+          <!-- Category & Priority -->
           <div class="flex items-center justify-between text-[9px]">
-            <span class="font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 uppercase tracking-wider"><?php echo esc_html(strtoupper($item['industry'] ?? 'real_estate')); ?></span>
-            <span class="font-bold px-2 py-0.5 rounded-full uppercase tracking-wider <?php echo $pc; ?>"><?php echo esc_html($item['priority']); ?></span>
+            <span class="font-bold px-2 py-0.5 rounded bg-zinc-100 text-zinc-700 uppercase tracking-wider"><?php echo esc_html(strtoupper($item['industry'] ?? 'real_estate')); ?></span>
+            <span class="font-bold px-2 py-0.5 rounded uppercase tracking-wider <?php echo $pc; ?>"><?php echo esc_html($item['priority']); ?></span>
           </div>
 
-          <!-- Row 2: Article Title -->
-          <div class="text-xs font-bold text-zinc-900 group-hover:text-zinc-700 line-clamp-2 leading-snug">
+          <!-- Title -->
+          <h4 class="text-xs font-bold text-zinc-900 group-hover:text-zinc-700 line-clamp-2 leading-snug cursor-pointer" onclick="coraEditArticle(<?php echo $post_id; ?>)">
             <?php echo esc_html($item['title']); ?>
-          </div>
+          </h4>
 
-          <!-- Row 3: Target Keyword Pill -->
+          <!-- Keyword -->
           <?php if(!empty($item['primary_keyword'])): ?>
             <div class="flex items-center gap-1.5 text-[10px] text-zinc-600 bg-zinc-50 border border-zinc-100 rounded-md px-2 py-1">
-              <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
               <span class="font-medium truncate">Target: <strong><?php echo esc_html($item['primary_keyword']); ?></strong></span>
             </div>
           <?php endif; ?>
 
-          <!-- Row 4: Explicit SEO & GEO Badges -->
-          <div class="flex items-center justify-between text-[10px] pt-1 border-t border-zinc-100">
-            <div class="flex items-center gap-1 bg-zinc-900 text-white px-2 py-0.5 rounded-md font-bold">
-              <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <!-- Metrics Row -->
+          <div class="flex items-center justify-between text-[10px] pt-1.5 border-t border-zinc-100">
+            <button type="button" class="flex items-center gap-1 bg-zinc-900 hover:bg-zinc-800 text-white px-2 py-0.5 rounded-md font-bold transition-colors cursor-pointer" onclick="event.stopPropagation(); openSEODetailDrawer(<?php echo $post_id; ?>, '<?php echo esc_js($item['title']); ?>')">
+              <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
               <span>SEO <?php echo (int)($item['seo_score'] ?: 78); ?>/100</span>
-            </div>
+            </button>
             <div class="flex items-center gap-1 bg-zinc-100 text-zinc-800 border border-zinc-200 px-2 py-0.5 rounded-md font-semibold">
-              <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+              <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
               <span>GEO <?php echo (int)($item['geo_score'] ?: 65); ?>%</span>
             </div>
             <span class="text-zinc-500 font-medium text-[10px]"><?php echo number_format($item['target_word_count'] ?: 1200); ?> w</span>
           </div>
 
-          <!-- Row 5: Distribution Channels Bar -->
-          <div class="flex items-center gap-1 text-[9px] pt-0.5">
-            <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-600 rounded font-medium">LinkedIn</span>
-            <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-600 rounded font-medium">SearchGPT</span>
-            <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-600 rounded font-medium">Newsletter</span>
+          <!-- CTAs Row -->
+          <div class="flex items-center justify-between pt-1.5 border-t border-zinc-100 gap-1.5">
+            <button type="button" onclick="event.stopPropagation(); coraEditArticle(<?php echo $post_id; ?>)" class="flex-1 px-2 py-1 bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-bold rounded-md flex items-center justify-center gap-1 transition-colors cursor-pointer">
+              <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              Edit Article
+            </button>
+            <button type="button" onclick="event.stopPropagation(); openContentBriefDrawer(<?php echo $item['id']; ?>)" class="px-2 py-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold rounded-md flex items-center gap-1 transition-colors cursor-pointer">
+              <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+              Brief
+            </button>
           </div>
 
-          <!-- Row 6: Author & Date Footer -->
-          <div class="flex items-center justify-between pt-1 border-t border-zinc-100 text-[10px] text-zinc-500">
+          <!-- Author & Date Footer -->
+          <div class="flex items-center justify-between text-[10px] text-zinc-500 pt-1">
             <div class="flex items-center gap-1.5">
               <div class="w-4 h-4 rounded-full bg-zinc-200 flex items-center justify-center text-[8px] font-bold text-zinc-700">
                 <?php echo strtoupper(substr($item['writer_name'] ?: 'U', 0, 1)); ?>
               </div>
-              <span class="font-medium text-zinc-700"><?php echo esc_html($item['writer_name'] ?: 'Unassigned'); ?></span>
+              <span class="font-medium text-zinc-700 truncate max-w-[90px]"><?php echo esc_html($item['writer_name'] ?: 'Unassigned'); ?></span>
             </div>
-            <div class="font-semibold text-zinc-400"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="inline-block mr-1 -mt-0.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> <?php echo esc_html($item['draft_due_date'] ?: 'No deadline'); ?></div>
+            <div class="font-mono text-[9px] text-zinc-400"><?php echo esc_html($item['draft_due_date'] ?: 'No date'); ?></div>
           </div>
         </div>
       <?php endforeach; endif; ?>
     </div>
-    <div class="p-2 border-t border-zinc-100">
-      <button class="w-full text-left text-xs text-zinc-400 hover:text-zinc-700 py-1 flex items-center gap-1 ct-add-item-btn" data-stage="<?php echo $stage_key; ?>" onclick="openContentBriefDrawer()">
-        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Add item
+
+    <!-- Column Footer Button -->
+    <div class="p-2 border-t border-zinc-200/70 bg-white rounded-b-2xl">
+      <button class="w-full text-center text-xs font-semibold text-zinc-500 hover:text-zinc-900 py-1.5 hover:bg-zinc-100 rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer" onclick="openContentBriefDrawer()">
+        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        Add to <?php echo $stage_label; ?>
       </button>
     </div>
   </div>
@@ -161,6 +206,48 @@ $stages = [
 
 <script>
 (function() {
+  // Drag & Drop Handlers
+  let _draggedItemId = null;
+
+  window.coraWbDragStart = function(e, itemId) {
+    _draggedItemId = itemId;
+    e.dataTransfer.setData('text/plain', itemId);
+    e.dataTransfer.effectAllowed = 'move';
+    if(e.currentTarget) e.currentTarget.style.opacity = '0.4';
+  };
+
+  window.coraWbDragOver = function(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  window.coraWbDragEnter = function(e, stageKey) {
+    e.preventDefault();
+    const col = e.currentTarget;
+    if(col) col.classList.add('bg-zinc-100', 'ring-2', 'ring-zinc-900', 'rounded-xl');
+  };
+
+  window.coraWbDragLeave = function(e, stageKey) {
+    const col = e.currentTarget;
+    if(col) col.classList.remove('bg-zinc-100', 'ring-2', 'ring-zinc-900', 'rounded-xl');
+  };
+
+  window.coraWbDrop = function(e, targetStage) {
+    e.preventDefault();
+    const col = e.currentTarget;
+    if(col) col.classList.remove('bg-zinc-100', 'ring-2', 'ring-zinc-900', 'rounded-xl');
+
+    const itemId = _draggedItemId || e.dataTransfer.getData('text/plain');
+    if(!itemId) return;
+
+    // Reset card opacity
+    const cardEl = document.querySelector(`.cora-wb-card[data-id="${itemId}"]`);
+    if(cardEl) cardEl.style.opacity = '1';
+
+    // Call stage update AJAX
+    window.moveToStage(itemId, targetStage);
+  };
+
   // Load workspace data
   window.loadContentWorkspace = function(stageFilter) {
     const kanban = document.getElementById('cora-workflow-kanban');
@@ -170,7 +257,7 @@ $stages = [
       nonce: coraREWPData.ajaxNonce,
       stage_filter: stageFilter || ''
     }, function(r) {
-      if(r.success) {
+      if(r && r.success) {
         renderWorkspaceBoard(r.data);
       }
       if(kanban) kanban.style.opacity = '1';
@@ -183,16 +270,16 @@ $stages = [
       const col = document.querySelector(`.ct-stage-column[data-stage="${stage}"]`);
       const countEl = document.querySelector(`[data-stage="${stage}"] .ct-stage-count`);
       if(!col) return;
-      const items = data.stages[stage] || [];
+      const items = data.stages ? (data.stages[stage] || []) : [];
       if(countEl) countEl.textContent = items.length;
       col.innerHTML = items.length === 0
-        ? '<div class="text-center text-zinc-400 text-xs py-6">No items</div>'
+        ? '<div class="h-32 rounded-xl border border-dashed border-zinc-200 flex flex-col items-center justify-center text-zinc-400 text-xs gap-1"><span class="font-medium text-[11px]">Drop item here</span></div>'
         : items.map(item => renderItemCard(item)).join('');
     });
   }
 
   function renderItemCard(item) {
-    const priorityColors = {urgent:'bg-zinc-900 text-white',high:'bg-zinc-700 text-white',medium:'bg-zinc-200 text-zinc-800',low:'bg-zinc-100 text-zinc-600'};
+    const priorityColors = {urgent:'bg-zinc-950 text-white',high:'bg-zinc-800 text-white',medium:'bg-zinc-200 text-zinc-900',low:'bg-zinc-100 text-zinc-600'};
     const pc = priorityColors[item.priority] || priorityColors.medium;
     const seoScore = item.seo_score || 78;
     const geoScore = item.geo_score || 65;
@@ -200,225 +287,102 @@ $stages = [
     const writerName = item.writer_name || 'Unassigned';
     const writerInitial = writerName[0].toUpperCase();
     const ind = (item.industry || 'REAL ESTATE').toUpperCase();
+    const postId = item.post_id || item.id;
 
     return `
-      <div class="bg-white border border-zinc-200 hover:border-zinc-400 rounded-xl p-3.5 shadow-sm hover:shadow-md transition-all space-y-2.5 cursor-pointer group" onclick="openContentBriefDrawer(${item.id})">
+      <div draggable="true" 
+           ondragstart="coraWbDragStart(event, ${item.id})"
+           class="cora-wb-card bg-white border border-zinc-200/90 hover:border-zinc-400 rounded-xl p-3.5 shadow-sm hover:shadow-md transition-all space-y-3 cursor-grab active:cursor-grabbing group relative"
+           data-id="${item.id}"
+           data-post-id="${postId}">
+
         ${item.thumbnail_url ? 
-          `<img src="${escHtml(item.thumbnail_url)}" class="w-full h-28 object-cover rounded-lg mb-2">` : 
-          `<div class="w-full h-20 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/60 flex items-center justify-center text-zinc-400 mb-2"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.5" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>`
+          `<div class="w-full h-24 rounded-lg bg-zinc-100 overflow-hidden cursor-pointer" onclick="coraEditArticle(${postId})">
+            <img src="${escHtml(item.thumbnail_url)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+           </div>` : ''
         }
-        <!-- Row 1: Category & Priority -->
+
+        <!-- Category & Priority -->
         <div class="flex items-center justify-between text-[9px]">
-          <span class="font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 uppercase tracking-wider">${escHtml(ind)}</span>
-          <span class="font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${pc}">${escHtml(item.priority || 'medium')}</span>
+          <span class="font-bold px-2 py-0.5 rounded bg-zinc-100 text-zinc-700 uppercase tracking-wider">${escHtml(ind)}</span>
+          <span class="font-bold px-2 py-0.5 rounded uppercase tracking-wider ${pc}">${escHtml(item.priority || 'medium')}</span>
         </div>
 
-        <!-- Row 2: Article Title -->
-        <div class="text-xs font-bold text-zinc-900 group-hover:text-zinc-700 line-clamp-2 leading-snug">
+        <!-- Title -->
+        <h4 class="text-xs font-bold text-zinc-900 group-hover:text-zinc-700 line-clamp-2 leading-snug cursor-pointer" onclick="coraEditArticle(${postId})">
           ${escHtml(item.title)}
-        </div>
+        </h4>
 
-        <!-- Row 3: Target Keyword Pill -->
+        <!-- Keyword -->
         ${item.primary_keyword ? `
           <div class="flex items-center gap-1.5 text-[10px] text-zinc-600 bg-zinc-50 border border-zinc-100 rounded-md px-2 py-1">
-            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
             <span class="font-medium truncate">Target: <strong>${escHtml(item.primary_keyword)}</strong></span>
           </div>
         ` : ''}
 
-        <!-- Row 4: Explicit SEO & GEO Badges -->
-        <div class="flex items-center justify-between text-[10px] pt-1 border-t border-zinc-100">
-          <div class="flex items-center gap-1 bg-zinc-900 text-white px-2 py-0.5 rounded-md font-bold">
-            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <!-- Metrics Row -->
+        <div class="flex items-center justify-between text-[10px] pt-1.5 border-t border-zinc-100">
+          <button type="button" class="flex items-center gap-1 bg-zinc-900 hover:bg-zinc-800 text-white px-2 py-0.5 rounded-md font-bold transition-colors cursor-pointer" onclick="event.stopPropagation(); openSEODetailDrawer(${postId}, '${escHtml(item.title).replace(/'/g,"\\'")}')">
+            <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <span>SEO ${seoScore}/100</span>
-          </div>
+          </button>
           <div class="flex items-center gap-1 bg-zinc-100 text-zinc-800 border border-zinc-200 px-2 py-0.5 rounded-md font-semibold">
-            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+            <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
             <span>GEO ${geoScore}%</span>
           </div>
           <span class="text-zinc-500 font-medium text-[10px]">${wordCount} w</span>
         </div>
 
-        <!-- Row 5: Distribution Channels Bar -->
-        <div class="flex items-center gap-1 text-[9px] pt-0.5">
-          <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-600 rounded font-medium">LinkedIn</span>
-          <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-600 rounded font-medium">SearchGPT</span>
-          <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-600 rounded font-medium">Newsletter</span>
+        <!-- CTAs Row -->
+        <div class="flex items-center justify-between pt-1.5 border-t border-zinc-100 gap-1.5">
+          <button type="button" onclick="event.stopPropagation(); coraEditArticle(${postId})" class="flex-1 px-2 py-1 bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-bold rounded-md flex items-center justify-center gap-1 transition-colors cursor-pointer">
+            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            Edit Article
+          </button>
+          <button type="button" onclick="event.stopPropagation(); openContentBriefDrawer(${item.id})" class="px-2 py-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold rounded-md flex items-center gap-1 transition-colors cursor-pointer">
+            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            Brief
+          </button>
         </div>
 
-        <!-- Row 6: Author & Date Footer -->
-        <div class="flex items-center justify-between pt-1 border-t border-zinc-100 text-[10px] text-zinc-500">
+        <!-- Author & Date Footer -->
+        <div class="flex items-center justify-between text-[10px] text-zinc-500 pt-1">
           <div class="flex items-center gap-1.5">
             <div class="w-4 h-4 rounded-full bg-zinc-200 flex items-center justify-center text-[8px] font-bold text-zinc-700">
               ${writerInitial}
             </div>
-            <span class="font-medium text-zinc-700">${escHtml(writerName)}</span>
+            <span class="font-medium text-zinc-700 truncate max-w-[90px]">${escHtml(writerName)}</span>
           </div>
-          <div class="font-semibold text-zinc-400"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="inline-block mr-1 -mt-0.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> ${escHtml(item.draft_due_date || 'No deadline')}</div>
+          <div class="font-mono text-[9px] text-zinc-400">${escHtml(item.draft_due_date || 'No date')}</div>
         </div>
       </div>
     `;
   }
 
-  function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-  // Open Content Brief Drawer
-  window.openContentBriefDrawer = function(itemId) {
-    if(typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
-    const drawer = document.getElementById('cora-content-brief-sheet');
-    if(!drawer) return;
-    drawer.classList.remove('collapsed', 'translate-x-full');
-    const bd = document.getElementById('cora-drawer-backdrop');
-    if(bd) bd.classList.remove('hidden');
-    
-    if(itemId) {
-      // Load item data
-      document.getElementById('cb-item-id').value = itemId;
-      $.post(coraREWPData.ajaxUrl, {
-        action: 'cora_get_content_item',
-        nonce: coraREWPData.ajaxNonce,
-        item_id: itemId
-      }, function(r) {
-        if(r.success) populateBriefDrawer(r.data);
-      });
-    } else {
-      // New item
-      document.getElementById('cb-item-id').value = '';
-      document.getElementById('cb-title').value = '';
-      document.getElementById('cb-keyword').value = '';
-      document.getElementById('cb-comments-list').innerHTML = '<div class="text-xs text-zinc-400 py-2">No comments yet.</div>';
-    }
-  };
-
-  window.closeContentBriefDrawer = function() {
-    if(typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
-  };
-
-  function populateBriefDrawer(data) {
-    const set = (id, val) => { const el = document.getElementById(id); if(el) el.value = val || ''; };
-    set('cb-title', data.title);
-    set('cb-keyword', data.primary_keyword);
-    set('cb-secondary-keywords', data.secondary_keywords);
-    set('cb-persona', data.audience_persona);
-    set('cb-word-count', data.target_word_count);
-    set('cb-writer', data.writer_id);
-    set('cb-editor', data.editor_id);
-    set('cb-approver', data.approver_id);
-    set('cb-draft-due', data.draft_due_date);
-    set('cb-publish-date', data.publish_date);
-    // Highlight current stage
-    document.querySelectorAll('.cb-stage-pill').forEach(p => {
-      p.classList.toggle('bg-zinc-900', p.dataset.stage === data.stage);
-      p.classList.toggle('text-white', p.dataset.stage === data.stage);
-      p.classList.toggle('bg-zinc-100', p.dataset.stage !== data.stage);
-      p.classList.toggle('text-zinc-600', p.dataset.stage !== data.stage);
-    });
-    // Load comments
-    if(data.comments) renderComments(data.comments);
-  }
-
-  window.saveBriefData = function(e) {
-    e.preventDefault();
-    const itemId = document.getElementById('cb-item-id').value;
-    const action = itemId ? 'cora_save_content_brief' : 'cora_create_content_item';
-    const payload = {
-      action,
-      nonce: coraREWPData.ajaxNonce,
-      item_id: itemId,
-      title: document.getElementById('cb-title').value,
-      primary_keyword: document.getElementById('cb-keyword').value,
-      secondary_keywords: document.getElementById('cb-secondary-keywords').value,
-      audience_persona: document.getElementById('cb-persona').value,
-      target_word_count: document.getElementById('cb-word-count').value,
-      writer_id: document.getElementById('cb-writer').value,
-      editor_id: document.getElementById('cb-editor').value,
-      approver_id: document.getElementById('cb-approver').value,
-      draft_due_date: document.getElementById('cb-draft-due').value,
-      publish_date: document.getElementById('cb-publish-date').value,
-      priority: document.querySelector('.cb-priority-btn.active')?.dataset.priority || 'medium'
-    };
-    $.post(coraREWPData.ajaxUrl, payload, function(r) {
-      if(r.success) {
-        window.coraShowToast('Content brief saved', 'success');
-        window.loadContentWorkspace();
-        if(!itemId && r.data.id) document.getElementById('cb-item-id').value = r.data.id;
-      } else {
-        window.coraShowToast(r.data || 'Save failed', 'error');
-      }
-    });
-  };
+  function escHtml(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   window.moveToStage = function(itemId, targetStage) {
+    if(typeof coraREWPData === 'undefined') return;
     $.post(coraREWPData.ajaxUrl, {
       action: 'cora_update_content_stage',
       nonce: coraREWPData.ajaxNonce,
       item_id: itemId,
       target_stage: targetStage
     }, function(r) {
-      if(r.success) {
-        window.coraShowToast('Moved to ' + targetStage.replace(/_/g,' '), 'success');
+      if(r && r.success) {
+        const stageNames = {'idea':'Idea','briefing':'Briefing','research':'Research','drafting':'Drafting','editorial_review':'Editorial Review','revisions':'Revisions','seo_gate':'SEO Gate','approval':'Approval','scheduled':'Scheduled','published':'Published','performance':'Performance'};
+        const label = stageNames[targetStage] || targetStage;
+        if(typeof window.coraShowToast === 'function') {
+          window.coraShowToast('Moved to ' + label, 'success');
+        }
         window.loadContentWorkspace();
       } else {
-        window.coraShowToast('Stage update failed', 'error');
+        if(typeof window.coraShowToast === 'function') {
+          window.coraShowToast('Stage update failed', 'error');
+        }
       }
     });
   };
-
-  function renderComments(comments) {
-    const container = document.getElementById('cb-comments-list');
-    if(!container) return;
-    if(!comments || !comments.length) { container.innerHTML = '<div class="text-xs text-zinc-400 py-2">No comments yet.</div>'; return; }
-    container.innerHTML = comments.map(c => `
-      <div class="flex gap-2 py-2 border-b border-zinc-100">
-        <div class="w-6 h-6 rounded-full bg-zinc-200 flex items-center justify-center text-[9px] font-bold text-zinc-700 shrink-0">${(c.author_name||'?')[0].toUpperCase()}</div>
-        <div class="flex-1">
-          <div class="text-[10px] font-bold text-zinc-700">${escHtml(c.author_name || 'User')}</div>
-          <div class="text-xs text-zinc-600 mt-0.5">${escHtml(c.comment)}</div>
-          <div class="text-[9px] text-zinc-400 mt-1">${c.created_at || ''}</div>
-        </div>
-        ${!c.resolved ? `<button onclick="resolveComment(${c.id})" class="text-[9px] text-zinc-400 hover:text-zinc-700 shrink-0">Resolve</button>` : '<span class="text-[9px] text-zinc-300">Resolved</span>'}
-      </div>
-    `).join('');
-  }
-
-  window.submitComment = function(itemId) {
-    if(!itemId) {
-      window.coraShowToast('Save brief first before commenting.', 'error');
-      return;
-    }
-    const input = document.getElementById('cb-comment-input');
-    if(!input || !input.value.trim()) return;
-    $.post(coraREWPData.ajaxUrl, {
-      action: 'cora_add_content_comment',
-      nonce: coraREWPData.ajaxNonce,
-      item_id: itemId,
-      comment: input.value.trim()
-    }, function(r) {
-      if(r.success) {
-        input.value = '';
-        // Reload comments
-        $.post(coraREWPData.ajaxUrl, {action:'cora_get_content_item',nonce:coraREWPData.ajaxNonce,item_id:itemId}, function(res) {
-          if(res.success) renderComments(res.data.comments);
-        });
-      }
-    });
-  };
-
-  window.resolveComment = function(commentId) {
-    $.post(coraREWPData.ajaxUrl, {
-      action: 'cora_resolve_comment',
-      nonce: coraREWPData.ajaxNonce,
-      comment_id: commentId
-    }, function(r) {
-      if(r.success) window.coraShowToast('Comment resolved', 'success');
-    });
-  };
-
-  // Init
-  document.addEventListener('DOMContentLoaded', function() {
-    // Load workspace on tab open
-    const tab = document.querySelector('[data-tab="ct-workflow"]');
-    if(tab) tab.addEventListener('click', function() { window.loadContentWorkspace(); });
-  });
 })();
 </script>
