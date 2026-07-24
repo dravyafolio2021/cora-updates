@@ -565,6 +565,16 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 
 <!-- BOTTOM SHEET STYLING -->
 <style>
+.checklist-item, .checklist-item * {
+    outline: none !important;
+}
+.checklist-item {
+    border: 1px solid rgba(228, 228, 231, 0.7) !important;
+}
+.checklist-item:hover {
+    border-color: rgba(212, 212, 216, 1) !important;
+}
+
 /* Bottom sheet: always attached to viewport via JS body-append */
 .cora-bottom-sheet {
     position: fixed !important;
@@ -2241,16 +2251,16 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 else if (catKey.includes('speed') || catKey.includes('lcp') || catKey.includes('perf')) catClass = 'cat-speed';
 
                 const icon = item.passed ? '✓' : '⚠';
-                const badge = item.passed ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-800 border border-amber-200';
+                const badge = item.passed ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80' : 'bg-amber-50 text-amber-800 border border-amber-200/80';
                 const recText = item.actionable_recommendation || item.recommendation || '';
                 const tipBox = recText ? `
-                    <div class="mt-2 p-2 rounded-lg bg-zinc-50 border border-zinc-200/90 text-[11px] text-zinc-700 flex items-start gap-2">
-                        <svg class="shrink-0 mt-0.5 text-zinc-500" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
-                        <div><strong class="text-zinc-900">Recommendation:</strong> ${escJsHtml(recText)}</div>
+                    <div class="mt-2.5 p-2.5 rounded-lg bg-zinc-100/80 text-[11px] text-zinc-600 flex items-start gap-2 shadow-2xs">
+                        <svg class="shrink-0 mt-0.5 text-zinc-400" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                        <div><strong class="text-zinc-800 font-semibold">Recommendation:</strong> ${escJsHtml(recText)}</div>
                     </div>
                 ` : '';
                 html += `
-                    <div class="checklist-item ${catClass} p-3 rounded-xl border border-zinc-200/90 bg-zinc-50/50 hover:bg-white hover:border-zinc-300 transition-all" data-cat="${catClass}">
+                    <div class="checklist-item ${catClass} p-3 rounded-xl border border-zinc-200/70 bg-zinc-50/40 hover:bg-white hover:border-zinc-300 transition-all shadow-2xs" data-cat="${catClass}">
                         <div class="flex items-start justify-between gap-2">
                             <div>
                                 <div class="font-bold text-zinc-900 text-xs">${escJsHtml(item.label)}</div>
@@ -2293,13 +2303,77 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 
                 if(scoreText) scoreText.innerText = score + '/100';
                 if(scoreLarge) scoreLarge.innerHTML = score + '<span class="text-xs text-zinc-400 font-normal"> /100</span>';
-                if(statusText) statusText.innerText = score >= 80 ? 'Well optimized / Keep improving' : 'Optimizations needed';
+                if(statusText) statusText.innerText = score >= 80 ? 'Well optimized / Keep improving' : (score >= 50 ? 'Average optimization' : 'Optimizations needed');
                 if(passedNum) passedNum.innerText = (d.passed_count || 8) + ' / 11 Checks Passed';
                 if(geoEl) geoEl.innerText = (d.geo_score || 72) + '%';
                 if(densEl) densEl.innerText = (d.kw_density_pct ? (typeof d.kw_density_pct === 'number' ? d.kw_density_pct.toFixed(1) + '%' : d.kw_density_pct) : '1.4%');
 
                 if(readScoreEl) readScoreEl.innerHTML = (d.flesch_score || '78') + '<span class="text-xs text-zinc-400 font-normal"> /100</span>';
                 if(readLblEl)   readLblEl.innerText   = d.flesch_label || 'Easy to read and well structured';
+
+                // Update 4 Metric Card Badges & Colors dynamically
+                const seoBadge = document.getElementById('inline-seo-badge');
+                const seoRing = document.getElementById('inline-seo-ring');
+                if (seoBadge) {
+                    if (score >= 80) {
+                        seoBadge.innerText = 'Good';
+                        seoBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60';
+                        if (seoRing) seoRing.setAttribute('stroke', '#10b981');
+                    } else if (score >= 50) {
+                        seoBadge.innerText = 'Average';
+                        seoBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/60';
+                        if (seoRing) seoRing.setAttribute('stroke', '#f59e0b');
+                    } else {
+                        seoBadge.innerText = 'Poor';
+                        seoBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200/60';
+                        if (seoRing) seoRing.setAttribute('stroke', '#ef4444');
+                    }
+                }
+
+                const geoBadge = document.getElementById('inline-geo-badge');
+                const geoVal = d.geo_score || 0;
+                if (geoBadge) {
+                    if (geoVal >= 75) {
+                        geoBadge.innerText = 'High';
+                        geoBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60';
+                    } else if (geoVal >= 45) {
+                        geoBadge.innerText = 'Average';
+                        geoBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/60';
+                    } else {
+                        geoBadge.innerText = 'Low';
+                        geoBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200/60';
+                    }
+                }
+
+                const kwBadge = document.getElementById('inline-kw-badge');
+                const kwDensityVal = typeof d.kw_density_pct === 'number' ? d.kw_density_pct : parseFloat(d.kw_density_pct || 0);
+                if (kwBadge) {
+                    if (kwDensityVal >= 0.8 && kwDensityVal <= 2.5) {
+                        kwBadge.innerText = 'Good';
+                        kwBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60';
+                    } else if (kwDensityVal < 0.8) {
+                        kwBadge.innerText = 'Low';
+                        kwBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/60';
+                    } else {
+                        kwBadge.innerText = 'High';
+                        kwBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200/60';
+                    }
+                }
+
+                const readBadge = document.getElementById('inline-read-badge');
+                const fleschVal = d.flesch_score || 0;
+                if (readBadge) {
+                    if (fleschVal >= 70) {
+                        readBadge.innerText = 'Good';
+                        readBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60';
+                    } else if (fleschVal >= 50) {
+                        readBadge.innerText = 'Fair';
+                        readBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/60';
+                    } else {
+                        readBadge.innerText = 'Poor';
+                        readBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200/60';
+                    }
+                }
 
                 const ring = document.getElementById('inline-seo-ring');
                 if(ring) {
