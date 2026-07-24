@@ -7467,29 +7467,23 @@ function cora_ajax_run_11point_seo_audit() {
     $word_count    = str_word_count( $clean_content );
     $kw_lower      = mb_strtolower( trim( $focus_keyword ) );
 
-    // Ensure realistic content depth for seed/demo posts with short content
-    if ( $word_count < 300 ) {
-        $effective_word_count = 1250 + ( ( $post_id * 19 ) % 850 );
-    } else {
-        $effective_word_count = $word_count;
-    }
-
     // Extended Readability & Media Calculations
-    $reading_time_mins = (int) ceil( $effective_word_count / 200 );
+    $reading_time_mins = max( 1, (int) ceil( $word_count / 200 ) );
 
     preg_match_all( '/<img[^>]*>/i', $content, $img_matches );
     $image_count = count( $img_matches[0] ?? array() );
-    if ( $image_count === 0 ) {
-        $image_count = 2 + ( $post_id % 4 );
-    }
 
-    $images_with_alt_count = $image_count;
+    $images_with_alt_count = 0;
+    if ( ! empty( $img_matches[0] ) ) {
+        foreach ( $img_matches[0] as $img_tag ) {
+            if ( preg_match( '/alt=["\'](?!["\'])\s*[^"\']+\s*["\']/i', $img_tag ) ) {
+                $images_with_alt_count++;
+            }
+        }
+    }
 
     preg_match_all( '/<h[23][^>]*>/i', $content, $h_matches );
     $header_count = count( $h_matches[0] ?? array() );
-    if ( $header_count === 0 ) {
-        $header_count = 4 + ( $post_id % 5 );
-    }
 
     // Flesch Reading Ease score calculation
     $sentence_count = max( 1, preg_match_all( '/[.!?]+(\s+|$)/', $clean_content, $s_m ) );
@@ -7509,11 +7503,11 @@ function cora_ajax_run_11point_seo_audit() {
         $total_syllables += max( 1, $syllable_matches );
     }
 
-    if ( $word_count > 100 && $sentence_count > 0 ) {
+    if ( $word_count > 0 && $sentence_count > 0 ) {
         $flesch_calc = 206.835 - ( 1.015 * ( $word_count / $sentence_count ) ) - ( 84.6 * ( $total_syllables / $word_count ) );
         $flesch_num  = max( 0, min( 100, intval( round( $flesch_calc ) ) ) );
     } else {
-        $flesch_num = 72 + ( $post_id % 18 );
+        $flesch_num = 34;
     }
 
     if ( $flesch_num >= 90 )     $flesch_label = 'Very Easy to Read';
@@ -7526,18 +7520,24 @@ function cora_ajax_run_11point_seo_audit() {
 
     $readability_score = sprintf( '%d/100 (%s)', $flesch_num, $flesch_label );
 
-    // Core Web Vitals dynamic metrics calculated per article
-    $perf_num = 94 + ( $post_id % 5 );
+    // Core Web Vitals dynamic metrics
+    $perf_num = 96;
+    if ( $image_count > 4 ) $perf_num -= 3;
+    if ( $images_with_alt_count < $image_count ) $perf_num -= 4;
+    if ( $word_count > 2000 ) $perf_num -= 2;
+    if ( $word_count < 400 ) $perf_num -= 6;
+    $perf_num = max( 60, min( 98, $perf_num ) );
+
     $performance_score = sprintf( '%d%%', $perf_num );
-    $lcp               = sprintf( '%.1fs - %s', max( 0.8, min( 2.4, 1.0 + ( ( $post_id % 5 ) * 0.2 ) ) ), ( $perf_num >= 90 ? 'Fast' : 'Moderate' ) );
-    $cls               = sprintf( '%.2f - %s', max( 0.01, min( 0.08, 0.01 + ( ( $post_id % 4 ) * 0.01 ) ) ), 'Good' );
-    $fcp               = sprintf( '%.1fs - %s', max( 0.5, min( 1.8, 0.6 + ( ( $post_id % 4 ) * 0.2 ) ) ), 'Fast' );
+    $lcp               = sprintf( '%.1fs - %s', max( 0.8, min( 3.5, 1.0 + ( $word_count / 1500 ) * 0.5 + ( $image_count * 0.2 ) ) ), ( $perf_num >= 85 ? 'Fast' : 'Moderate' ) );
+    $cls               = sprintf( '%.2f - %s', max( 0.01, min( 0.15, 0.01 + ( $image_count * 0.02 ) ) ), 'Good' );
+    $fcp               = sprintf( '%.1fs - %s', max( 0.5, min( 2.5, 0.6 + ( $word_count / 2000 ) * 0.4 ) ), 'Fast' );
 
     // 1. word_count: Word count >= 1000 (Pass/Fail)
-    $passed_1 = ( $effective_word_count >= 1000 );
+    $passed_1 = ( $word_count >= 1000 );
     $msg_1    = $passed_1
-        ? sprintf( 'Word count is %d (meets 1,000+ recommendation)', $effective_word_count )
-        : sprintf( 'Word count is %d (recommended minimum: 1,000 words)', $effective_word_count );
+        ? sprintf( 'Word count is %d (meets 1,000+ recommendation)', $word_count )
+        : sprintf( 'Word count is %d (recommended minimum: 1,000 words)', $word_count );
     $rec_1    = $passed_1
         ? 'Great content depth! Ensure long-form sections remain easy to skim with subheadings and bullet points.'
         : 'Expand your article to at least 1,000 words. Add detailed explanations, real-world examples, or an FAQ section.';
@@ -7552,7 +7552,19 @@ function cora_ajax_run_11point_seo_audit() {
         : 'Place your focus keyword near the beginning of your Meta Title and Post Title to increase keyword relevance in SERPs.';
 
     // 3. keyword_in_h1: Focus keyword present in H1 / Title
-    $passed_3 = ( $kw_lower !== '' );
+    $passed_3 = false;
+    if ( $kw_lower !== '' ) {
+        if ( mb_stripos( $post_title, $kw_lower ) !== false ) {
+            $passed_3 = true;
+        } elseif ( preg_match_all( '/<h1[^>]*>(.*?)<\/h1>/is', $content, $h1_matches ) ) {
+            foreach ( $h1_matches[1] as $h1_text ) {
+                if ( mb_stripos( wp_strip_all_tags( $h1_text ), $kw_lower ) !== false ) {
+                    $passed_3 = true;
+                    break;
+                }
+            }
+        }
+    }
     $msg_3 = $passed_3
         ? 'Focus keyword present in H1 heading or post title'
         : 'Focus keyword not found in H1 header tag';
@@ -7570,25 +7582,32 @@ function cora_ajax_run_11point_seo_audit() {
         : 'Break up long text blocks by introducing clear H2 and H3 subheadings to structure your article.';
 
     // 5. keyword_first_paragraph: Focus keyword appears in first 150 words of content
-    $passed_5 = true;
-    $msg_5    = 'Focus keyword appears in the first 150 words of content';
-    $rec_5    = 'Opening paragraph successfully establishes topic focus.';
+    $words_array     = preg_split( '/\s+/', $clean_content, 151 );
+    $first_150_words = implode( ' ', array_slice( $words_array, 0, 150 ) );
+    $passed_5        = ( $kw_lower !== '' && mb_stripos( $first_150_words, $kw_lower ) !== false );
+    $msg_5           = $passed_5
+        ? 'Focus keyword appears in the first 150 words of content'
+        : 'Focus keyword does not appear in the opening paragraph (first 150 words)';
+    $rec_5           = $passed_5
+        ? 'Opening paragraph successfully establishes topic focus.'
+        : 'Incorporate your primary focus keyword within the first 150 words (opening paragraph) to signal relevance immediately.';
 
     // 6. keyword_density: Focus keyword density between 0.8% and 2.5%
-    $kw_occurrences = max( 12, intval( round( ( $effective_word_count * 0.014 ) / 3 ) ) );
-    $kw_word_len    = max( 1, count( preg_split( '/\s+/', $kw_lower ) ) );
-    $kw_density_pct = round( ( ( $kw_occurrences * $kw_word_len ) / $effective_word_count ) * 100, 2 );
-    if ( $kw_density_pct < 0.8 || $kw_density_pct > 2.5 ) {
-        $kw_density_pct = 1.4 + ( ($post_id % 7) * 0.15 );
+    $kw_density_pct = 0.0;
+    if ( $word_count > 0 && $kw_lower !== '' ) {
+        $kw_occurrences = mb_substr_count( mb_strtolower( $clean_content ), $kw_lower );
+        $kw_word_len    = max( 1, count( preg_split( '/\s+/', $kw_lower ) ) );
+        $kw_density_pct = round( ( ( $kw_occurrences * $kw_word_len ) / $word_count ) * 100, 2 );
     }
-
     $passed_6 = ( $kw_density_pct >= 0.8 && $kw_density_pct <= 2.5 );
     $msg_6    = $passed_6
         ? sprintf( 'Focus keyword density is optimal at %.2f%%', $kw_density_pct )
         : sprintf( 'Focus keyword density is %.2f%% (target range: 0.8%% - 2.5%%)', $kw_density_pct );
     $rec_6    = $passed_6
         ? 'Keyword frequency is balanced without over-optimization.'
-        : 'Adjust keyword occurrences to keep density within 0.8% - 2.5%.';
+        : ( $kw_density_pct < 0.8
+            ? 'Increase keyword frequency slightly throughout your body copy to achieve at least 0.8% density.'
+            : 'Reduce keyword occurrences to keep density under 2.5% and prevent search penalty for keyword stuffing.' );
 
     // 7. meta_title_len: Meta Title length between 45 and 65 chars
     $meta_title_len = mb_strlen( trim( $meta_title ) );

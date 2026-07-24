@@ -374,14 +374,16 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             <!-- Article list -->
             <div class="flex-1 overflow-y-auto p-2 space-y-1.5 seo-sidebar-content" id="seo-article-list-container">
                 <?php foreach($cora_posts as $idx => $post): 
-                    $score = get_post_meta($post->ID, '_cora_seo_score', true) ?: rand(65, 92);
+                    $score = intval(get_post_meta($post->ID, '_cora_seo_score', true));
+                    if (!$score) $score = 75;
+                    $score_cls = ($score >= 80) ? 'bg-emerald-50 text-emerald-700 border-emerald-200/60' : (($score >= 50) ? 'bg-amber-50 text-amber-700 border-amber-200/60' : 'bg-red-50 text-red-700 border-red-200/60');
                     $modified_time = human_time_diff(get_the_modified_time('U', $post->ID), current_time('timestamp'));
                 ?>
                 <button class="seo-article-btn w-full text-left p-3 hover:bg-zinc-50 rounded-lg border border-transparent hover:border-zinc-200/80 transition-all cursor-pointer flex flex-col gap-1.5 group <?php echo $idx === 0 ? 'active bg-zinc-50 border-zinc-200/80 shadow-2xs' : ''; ?>" data-id="<?php echo $post->ID; ?>" data-title="<?php echo esc_attr($post->post_title); ?>" data-score="<?php echo $score; ?>" onclick="openSEOAnalysis(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
                     <div class="text-xs font-bold text-zinc-900 group-hover:text-zinc-700 line-clamp-2 leading-snug"><?php echo esc_html($post->post_title); ?></div>
                     <div class="flex items-center justify-between mt-0.5 text-[10px] text-zinc-400">
                         <span>ID #<?php echo $post->ID; ?> &bull; <?php echo $modified_time; ?> ago</span>
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60"><?php echo $score; ?>/100</span>
+                        <span class="seo-badge-pill px-2 py-0.5 rounded text-[10px] font-bold border <?php echo $score_cls; ?>"><?php echo $score; ?>/100</span>
                     </div>
                 </button>
                 <?php endforeach; ?>
@@ -2421,9 +2423,18 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 renderChecklistGrid(d.checklist);
 
                 // Update sidebar badge
-                const sidebarBadge = document.querySelector(`.seo-article-btn[data-id="${articleId}"] .rounded`);
-                if(sidebarBadge) {
+                const sidebarBtn = document.querySelector(`.seo-article-btn[data-id="${articleId}"]`);
+                const sidebarBadge = sidebarBtn ? sidebarBtn.querySelector('.seo-badge-pill') : null;
+                if (sidebarBtn) sidebarBtn.dataset.score = score;
+                if (sidebarBadge) {
                     sidebarBadge.innerText = score + '/100';
+                    if (score >= 80) {
+                        sidebarBadge.className = 'seo-badge-pill px-2 py-0.5 rounded text-[10px] font-bold border bg-emerald-50 text-emerald-700 border-emerald-200/60';
+                    } else if (score >= 50) {
+                        sidebarBadge.className = 'seo-badge-pill px-2 py-0.5 rounded text-[10px] font-bold border bg-amber-50 text-amber-700 border-amber-200/60';
+                    } else {
+                        sidebarBadge.className = 'seo-badge-pill px-2 py-0.5 rounded text-[10px] font-bold border bg-red-50 text-red-700 border-red-200/60';
+                    }
                 }
             } else {
                 renderChecklistGrid(defaultChecklist);
