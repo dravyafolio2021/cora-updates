@@ -8816,94 +8816,123 @@ jQuery(document).ready(function($) {
         var $container = $('#cora-git-repo-searchable-select-container');
         if ($container.length === 0) return;
 
-        var $trigger = $('#cora-repo-select-trigger');
-        var $displayText = $('#cora-repo-select-display-text');
-        var $dropdown = $('#cora-repo-select-dropdown');
-        var $searchInput = $('#cora-git-repo-search-input');
-        var $optionsList = $('#cora-repo-options-list');
-        var $manualInput = $('#cora-git-repo-manual-input');
-        var $manualContainer = $('#cora-git-repo-manual-container');
-        var $arrow = $('#cora-repo-select-arrow');
-        
-        var savedUrl = $container.attr('data-saved-url') || '';
+        var $trigger    = $('#cora-repo-select-trigger');
+        var $displayText= $('#cora-repo-select-display-text');
+        var $dropdown   = $('#cora-repo-select-dropdown');
+        var $searchInput= $('#cora-git-repo-search-input');
+        var $optionsList= $('#cora-repo-options-list');
+        var $manualInput= $('#cora-git-repo-manual-input');
+        var $manualCont = $('#cora-git-repo-manual-container');
+        var $arrow      = $('#cora-repo-select-arrow');
+        var savedUrl    = ($container.attr('data-saved-url') || '').replace(/\/$/, '');
+        var isOpen      = false;
 
-        $displayText.text('Loading repositories...');
+        function openDropdown() {
+            $dropdown.show();
+            $arrow.css('transform', 'rotate(180deg)');
+            $trigger.css('border-color', '#a1a1aa');
+            $searchInput.val('').trigger('input').focus();
+            isOpen = true;
+        }
+        function closeDropdown() {
+            $dropdown.hide();
+            $arrow.css('transform', 'rotate(0deg)');
+            $trigger.css('border-color', '#e4e4e7');
+            isOpen = false;
+        }
+
+        function setTriggerLabel(text, isPlaceholder) {
+            $displayText.text(text).css('color', isPlaceholder ? '#a1a1aa' : '#18181b');
+        }
+
+        function renderRepoItem(url, owner, repo, isCurrent) {
+            var checkSvg = isCurrent
+                ? '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#18181b" stroke-width="2.5" style="flex-shrink:0;margin-left:auto;"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+                : '';
+            return '<div class="cora-repo-option-item" data-url="' + url + '" data-name="' + owner + '/' + repo + '" style="display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;font-size:11px;font-family:inherit;">' +
+                '<div style="flex:1;min-width:0;">' +
+                    '<span style="color:#71717a;font-size:10px;">' + owner + '/</span>' +
+                    '<span style="color:#18181b;font-weight:500;">' + repo + '</span>' +
+                '</div>' + checkSvg +
+            '</div>';
+        }
+
+        $optionsList.html('<div style="padding:8px 12px;font-size:11px;color:#a1a1aa;font-style:italic;">Loading...</div>');
 
         $.post(coraREData.ajaxUrl, {
             action: 'cora_get_github_repositories',
-            nonce: coraREData.ajaxNonce
+            nonce:  coraREData.ajaxNonce
         }, function(res) {
             if (res && res.success) {
-                var repos = res.data;
-                var html = '<div class="cora-repo-option-item px-3 py-2 text-xs text-zinc-400 italic cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors" data-url="" data-name="— Select Repository —">— Select Repository —</div>';
-                var foundSaved = false;
+                var repos     = res.data;
+                var html      = '';
+                var foundSaved= false;
 
                 repos.forEach(function(repo) {
-                    var selected = (repo.url.toLowerCase() === savedUrl.toLowerCase());
-                    if (selected) {
+                    var url    = (repo.url || '').replace(/\/$/, '');
+                    var parts  = (repo.name || '').split('/');
+                    var owner  = parts[0] || '';
+                    var rname  = parts[1] || parts[0] || '';
+                    var isCur  = url.toLowerCase() === savedUrl.toLowerCase();
+                    if (isCur) {
                         foundSaved = true;
-                        $displayText.text(repo.name).removeClass('text-zinc-500').addClass('text-zinc-800 dark:text-zinc-200');
+                        setTriggerLabel(repo.name, false);
+                        $manualInput.val(url);
                     }
-                    html += '<div class="cora-repo-option-item px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors truncate" data-url="' + repo.url + '" data-name="' + repo.name + '">' + repo.name + '</div>';
+                    html += renderRepoItem(url, owner, rname, isCur);
                 });
 
-                html += '<div class="cora-repo-option-item px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 font-semibold border-t border-zinc-150 dark:border-zinc-800/80 bg-zinc-50/40 dark:bg-zinc-950/20 transition-colors" data-url="manual" data-name="— Enter Manually... —">— Enter Manually... —</div>';
+                // "Enter manually" footer option
+                html += '<div class="cora-repo-option-item" data-url="manual" data-name="manual" style="display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;font-size:11px;font-family:inherit;border-top:1px solid #f4f4f5;color:#71717a;">' +
+                    '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
+                    'Enter URL manually...' +
+                '</div>';
+
                 $optionsList.html(html);
 
                 if (savedUrl && !foundSaved) {
-                    var repoName = savedUrl.replace('https://github.com/', '');
-                    $displayText.text(repoName + ' (Saved)').removeClass('text-zinc-500').addClass('text-zinc-800 dark:text-zinc-200');
-                    $optionsList.prepend('<div class="cora-repo-option-item px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors truncate" data-url="' + savedUrl + '" data-name="' + repoName + ' (Saved)">' + repoName + ' (Saved)</div>');
+                    var parts2 = savedUrl.replace('https://github.com/', '').split('/');
+                    setTriggerLabel((parts2[0] || '') + '/' + (parts2[1] || ''), false);
+                    $manualInput.val(savedUrl);
                 }
-
                 if (!savedUrl) {
-                    $displayText.text('— Select Repository —');
-                }
-
-                // Initial view setup
-                if (savedUrl && !foundSaved && savedUrl.indexOf('github.com') === -1) {
-                    $manualContainer.removeClass('hidden');
-                    $displayText.text('Enter Manually...');
+                    setTriggerLabel('Select a repository...', true);
                 }
             } else {
-                $displayText.text('Failed to load repositories.');
-                $optionsList.html('<div class="cora-repo-option-item px-3 py-2 text-xs text-red-650 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-850" data-url="manual" data-name="Enter Manually...">Failed to load (Click to enter manually)</div>');
+                setTriggerLabel('Failed to load', true);
+                $optionsList.html('<div style="padding:8px 12px;font-size:11px;color:#f43f5e;">Could not load repositories.</div>');
             }
         }).fail(function() {
-            $displayText.text('Error loading repositories.');
-            $optionsList.html('<div class="cora-repo-option-item px-3 py-2 text-xs text-red-650 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-850" data-url="manual" data-name="Enter Manually...">Error loading (Click to enter manually)</div>');
+            setTriggerLabel('Error — try again', true);
+            $optionsList.html('<div style="padding:8px 12px;font-size:11px;color:#f43f5e;">Network error loading repositories.</div>');
         });
 
-        // Toggle dropdown open/close
+        // Hover style
+        $optionsList.off('mouseenter', '.cora-repo-option-item').on('mouseenter', '.cora-repo-option-item', function() {
+            $(this).css('background', '#f9f9f9');
+        });
+        $optionsList.off('mouseleave', '.cora-repo-option-item').on('mouseleave', '.cora-repo-option-item', function() {
+            $(this).css('background', '');
+        });
+
+        // Toggle
         $trigger.off('click').on('click', function(e) {
             e.stopPropagation();
-            var isHidden = $dropdown.hasClass('hidden');
-            $('.cora-repo-select-dropdown').addClass('hidden'); // Close others if any
-            if (isHidden) {
-                $dropdown.removeClass('hidden');
-                $arrow.addClass('rotate-180');
-                $searchInput.focus();
-            } else {
-                $dropdown.addClass('hidden');
-                $arrow.removeClass('rotate-180');
-            }
+            if (isOpen) { closeDropdown(); } else { openDropdown(); }
         });
 
-        // Close dropdown when clicking outside
-        $(document).on('click', function(e) {
-            if (!$(e.target).closest('#cora-git-repo-searchable-select-container').length) {
-                $dropdown.addClass('hidden');
-                $arrow.removeClass('rotate-180');
-            }
+        // Close outside
+        $(document).off('click.repoSelect').on('click.repoSelect', function(e) {
+            if (!$(e.target).closest('#cora-git-repo-searchable-select-container').length) { closeDropdown(); }
         });
 
-        // Handle typing in search input
+        // Search
         $searchInput.off('input').on('input', function() {
-            var searchVal = $(this).val().toLowerCase().trim();
+            var q = $(this).val().toLowerCase().trim();
             $optionsList.find('.cora-repo-option-item').each(function() {
-                var text = $(this).text().toLowerCase();
-                var url = $(this).attr('data-url');
-                if (url === 'manual' || text.indexOf(searchVal) > -1) {
+                var url  = $(this).attr('data-url');
+                var name = $(this).attr('data-name') || '';
+                if (url === 'manual' || name.toLowerCase().indexOf(q) > -1) {
                     $(this).show();
                 } else {
                     $(this).hide();
@@ -8911,115 +8940,129 @@ jQuery(document).ready(function($) {
             });
         });
 
-        // Handle item selection click
+        // Select
         $optionsList.off('click', '.cora-repo-option-item').on('click', '.cora-repo-option-item', function(e) {
             e.stopPropagation();
-            var url = $(this).attr('data-url');
+            var url  = $(this).attr('data-url');
             var name = $(this).attr('data-name');
 
             if (url === 'manual') {
-                $manualContainer.removeClass('hidden');
-                $displayText.text('Enter Manually...').removeClass('text-zinc-500').addClass('text-zinc-800 dark:text-zinc-200');
+                $manualCont.show();
                 $manualInput.val('').focus();
+                setTriggerLabel('Enter URL manually...', true);
             } else {
-                $manualContainer.addClass('hidden');
-                $displayText.text(name).removeClass('text-zinc-500').addClass('text-zinc-800 dark:text-zinc-200');
+                $manualCont.hide();
                 $manualInput.val(url);
-                // Load branches for the selected repo
+                setTriggerLabel(name, false);
                 if (url && window.coraLoadGitHubBranches) {
                     window.coraLoadGitHubBranches(url);
                 }
             }
-
-            $dropdown.addClass('hidden');
-            $arrow.removeClass('rotate-180');
+            closeDropdown();
         });
     };
 
-    // Auto-run if element is present
+    // Auto-run
     if ($('#cora-git-repo-searchable-select-container').length > 0) {
         window.coraLoadGitHubRepositories();
     }
 
     window.coraLoadGitHubBranches = function(repoUrl) {
-        var $container = $('#cora-git-branch-searchable-select-container');
+        var $container  = $('#cora-git-branch-searchable-select-container');
         if ($container.length === 0) return;
 
-        var $trigger = $('#cora-branch-select-trigger');
-        var $displayText = $('#cora-branch-select-display-text');
-        var $dropdown = $('#cora-branch-select-dropdown');
-        var $searchInput = $('#cora-git-branch-search-input');
-        var $optionsList = $('#cora-branch-options-list');
-        var $arrow = $('#cora-branch-select-arrow');
-        var $hiddenInput = $('#cora-git-branch-value');
+        var $trigger    = $('#cora-branch-select-trigger');
+        var $displayText= $('#cora-branch-select-display-text');
+        var $dropdown   = $('#cora-branch-select-dropdown');
+        var $searchInput= $('#cora-git-branch-search-input');
+        var $optionsList= $('#cora-branch-options-list');
+        var $arrow      = $('#cora-branch-select-arrow');
+        var $hiddenInput= $('#cora-git-branch-value');
         var savedBranch = $container.attr('data-saved-branch') || 'main';
+        var isOpen      = false;
 
-        $displayText.text('Loading branches...');
-        $optionsList.html('<div class="px-3 py-2 text-xs text-zinc-400 italic">Loading...</div>');
+        function openBranchDropdown() {
+            $dropdown.show();
+            $arrow.css('transform', 'rotate(180deg)');
+            $trigger.css('border-color', '#a1a1aa');
+            $searchInput.val('').trigger('input').focus();
+            isOpen = true;
+        }
+        function closeBranchDropdown() {
+            $dropdown.hide();
+            $arrow.css('transform', 'rotate(0deg)');
+            $trigger.css('border-color', '#e4e4e7');
+            isOpen = false;
+        }
+        function setBranchLabel(text, isPlaceholder) {
+            $displayText.text(text).css('color', isPlaceholder ? '#a1a1aa' : '#18181b');
+        }
+
+        setBranchLabel('Loading branches...', true);
+        $optionsList.html('<div style="padding:8px 12px;font-size:11px;color:#a1a1aa;font-style:italic;">Loading...</div>');
 
         $.post(coraREData.ajaxUrl, {
             action: 'cora_get_github_branches',
-            nonce: coraREData.ajaxNonce,
-            repo: repoUrl
+            nonce:  coraREData.ajaxNonce,
+            repo:   repoUrl
         }, function(res) {
             if (res && res.success && res.data.length > 0) {
-                var branches = res.data;
-                var html = '';
-                var foundSaved = false;
+                var branches    = res.data;
+                var html        = '';
+                var foundSaved  = false;
 
                 branches.forEach(function(branch) {
-                    var isSaved = (branch === savedBranch);
-                    if (isSaved) {
+                    var isCur = (branch === savedBranch);
+                    if (isCur) {
                         foundSaved = true;
-                        $displayText.text(branch).removeClass('text-zinc-500').addClass('text-zinc-800 dark:text-zinc-200');
+                        setBranchLabel(branch, false);
                         $hiddenInput.val(branch);
                     }
-                    html += '<div class="cora-branch-option-item px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors flex items-center gap-2' + (isSaved ? ' font-semibold' : '') + '" data-branch="' + branch + '">' +
-                        '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" class="text-zinc-350 flex-shrink-0"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>' +
-                        branch + (isSaved ? ' <span class="ml-auto text-[9px] text-zinc-400 font-normal">(current)</span>' : '') +
-                        '</div>';
+                    var checkSvg = isCur
+                        ? '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#18181b" stroke-width="2.5" style="flex-shrink:0;margin-left:auto;"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+                        : '';
+                    html += '<div class="cora-branch-option-item" data-branch="' + branch + '" style="display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;font-size:11px;font-family:inherit;">' +
+                        '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#a1a1aa" stroke-width="2" style="flex-shrink:0;"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>' +
+                        '<span style="color:' + (isCur ? '#18181b' : '#3f3f46') + ';font-weight:' + (isCur ? '600' : '400') + ';">' + branch + '</span>' +
+                        checkSvg +
+                    '</div>';
                 });
 
                 $optionsList.html(html);
 
-                if (!foundSaved) {
-                    // Default to first branch
-                    $displayText.text(branches[0]).removeClass('text-zinc-500').addClass('text-zinc-800 dark:text-zinc-200');
+                if (!foundSaved && branches.length > 0) {
+                    setBranchLabel(branches[0], false);
                     $hiddenInput.val(branches[0]);
                 }
             } else {
-                $displayText.text('No branches found');
-                $optionsList.html('<div class="px-3 py-2 text-xs text-zinc-400 italic">No branches found.</div>');
+                setBranchLabel('No branches found', true);
+                $optionsList.html('<div style="padding:8px 12px;font-size:11px;color:#a1a1aa;">No branches found.</div>');
             }
         }).fail(function() {
-            $displayText.text('Failed to load branches');
-            $optionsList.html('<div class="px-3 py-2 text-xs text-zinc-400 italic">Error loading branches.</div>');
+            setBranchLabel('Error loading', true);
+            $optionsList.html('<div style="padding:8px 12px;font-size:11px;color:#f43f5e;">Network error loading branches.</div>');
         });
 
-        // Toggle dropdown
+        // Hover
+        $optionsList.off('mouseenter', '.cora-branch-option-item').on('mouseenter', '.cora-branch-option-item', function() {
+            $(this).css('background', '#f9f9f9');
+        });
+        $optionsList.off('mouseleave', '.cora-branch-option-item').on('mouseleave', '.cora-branch-option-item', function() {
+            $(this).css('background', '');
+        });
+
+        // Toggle
         $trigger.off('click').on('click', function(e) {
             e.stopPropagation();
-            var isHidden = $dropdown.hasClass('hidden');
-            if (isHidden) {
-                $dropdown.removeClass('hidden');
-                $arrow.addClass('rotate-180');
-                $searchInput.val('').focus();
-                $optionsList.find('.cora-branch-option-item').show();
-            } else {
-                $dropdown.addClass('hidden');
-                $arrow.removeClass('rotate-180');
-            }
+            if (isOpen) { closeBranchDropdown(); } else { openBranchDropdown(); }
         });
 
-        // Close on outside click
-        $(document).on('click.branchSelect', function(e) {
-            if (!$(e.target).closest('#cora-git-branch-searchable-select-container').length) {
-                $dropdown.addClass('hidden');
-                $arrow.removeClass('rotate-180');
-            }
+        // Close outside
+        $(document).off('click.branchSelect').on('click.branchSelect', function(e) {
+            if (!$(e.target).closest('#cora-git-branch-searchable-select-container').length) { closeBranchDropdown(); }
         });
 
-        // Live search filter
+        // Search
         $searchInput.off('input').on('input', function() {
             var q = $(this).val().toLowerCase().trim();
             $optionsList.find('.cora-branch-option-item').each(function() {
@@ -9027,26 +9070,23 @@ jQuery(document).ready(function($) {
             });
         });
 
-        // Select branch
+        // Select
         $optionsList.off('click', '.cora-branch-option-item').on('click', '.cora-branch-option-item', function(e) {
             e.stopPropagation();
             var branch = $(this).attr('data-branch');
-            $displayText.text(branch).removeClass('text-zinc-500').addClass('text-zinc-800 dark:text-zinc-200');
+            setBranchLabel(branch, false);
             $hiddenInput.val(branch);
-            $dropdown.addClass('hidden');
-            $arrow.removeClass('rotate-180');
+            closeBranchDropdown();
         });
     };
 
-    // If a repo is already saved, auto-load branches on page load
+    // Auto-load branches if repo is already saved
     (function() {
-        var $repoCont = $('#cora-git-repo-searchable-select-container');
-        var $branchCont = $('#cora-git-branch-searchable-select-container');
-        if ($repoCont.length && $branchCont.length) {
-            var savedRepo = $repoCont.attr('data-saved-url') || '';
-            if (savedRepo) {
-                // Delay slightly so repo loader finishes rendering display text first
-                setTimeout(function() { window.coraLoadGitHubBranches(savedRepo); }, 600);
-            }
+        var savedRepo = ($('#cora-git-repo-searchable-select-container').attr('data-saved-url') || '').trim();
+        if (savedRepo && $('#cora-git-branch-searchable-select-container').length) {
+            setTimeout(function() { window.coraLoadGitHubBranches(savedRepo); }, 700);
         }
     }());
+
+
+
