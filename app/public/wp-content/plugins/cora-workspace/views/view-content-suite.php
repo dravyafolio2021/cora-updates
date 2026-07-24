@@ -449,7 +449,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 </div>
 
 <!-- PANEL: Content Calendar -->
-<div id="panel-ct-calendar" class="cora-ct-panel hidden space-y-4">
+<div id="panel-ct-calendar" class="cora-ct-panel hidden pb-8">
     <?php
     // Calculate current week (Monday to Sunday)
     $ts_now = time();
@@ -498,7 +498,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     ?>
 
     <!-- TOP CONTROL BAR -->
-    <div class="flex items-center justify-between gap-4 px-1 py-0.5">
+    <div class="flex items-center justify-between gap-4 px-1 pt-4 pb-2">
         <!-- LEFT: Calendar | List tabs -->
         <div class="flex items-center gap-0.5 p-0.5 bg-zinc-100 rounded-lg border border-zinc-200" id="cal-view-tab-group">
             <button id="btn-cal-tab-calendar" onclick="coraSwitchCalView('calendar')" class="px-3 py-1.5 text-xs font-bold bg-white text-zinc-900 rounded-md shadow-sm border border-zinc-200/50 flex items-center gap-1.5 transition-all">
@@ -559,13 +559,19 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     </div>
 
     <!-- SUB-HEADER ROW -->
-    <div id="cal-sub-header-row" class="flex items-center justify-between px-2 py-2">
+    <div id="cal-sub-header-row" class="flex items-center justify-between px-2 py-3">
         <h2 class="text-xl font-bold text-zinc-900"><?php echo esc_html($week_label); ?></h2>
-        <div class="flex items-center gap-4 text-[11px] font-semibold text-zinc-600">
-            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-zinc-300"></span> Draft</span>
-            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400"></span> In Review</span>
-            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Scheduled</span>
-            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Published</span>
+        <div class="flex items-center gap-5">
+            <div class="hidden sm:flex items-center gap-3.5 text-[11px] font-semibold text-zinc-500">
+                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-zinc-300"></span> Draft</span>
+                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400"></span> In Review</span>
+                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Scheduled</span>
+                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Published</span>
+            </div>
+            <button onclick="openCreateArticleDrawer()" class="h-8 px-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Add Content
+            </button>
         </div>
     </div>
 
@@ -573,7 +579,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     <div id="cal-filters-collapsible-bar" class="hidden"></div>
 
     <!-- WEEKLY CALENDAR VIEW (DEFAULT) -->
-    <div id="cora-cal-week-view" class="px-2 pb-6">
+    <div id="cora-cal-week-view" class="px-2 pb-4 mt-4">
         <!-- 7-Column Weekly Grid -->
         <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; width: 100%;">
             <?php foreach($week_days as $wd): 
@@ -593,7 +599,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                     </div>
 
                     <!-- Event Cards Column Container -->
-                    <div class="flex-1 p-2 flex flex-col gap-2 min-h-[300px]">
+                    <div class="flex-1 p-2 flex flex-col gap-2 min-h-[200px]">
                         <?php if(empty($day_posts)): ?>
                             <div class="cora-cal-empty-placeholder rounded-lg border border-dashed border-zinc-300 flex items-center justify-center py-4 text-zinc-400 hover:border-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer" onclick="openCreateArticleDrawer('<?php echo $day_date; ?>')">
                                 <span class="text-xs font-semibold">+ Add Content</span>
@@ -765,7 +771,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 </div>
 
     <!-- LIST VIEW (HIDDEN) -->
-    <div id="cora-cal-list-view" class="hidden px-2 pb-6 space-y-1">
+    <div id="cora-cal-list-view" class="hidden px-2 pb-8 mt-1 space-y-1">
         <?php
         // Group all posts into a flat sorted list by date
         $all_list_posts = [];
@@ -859,53 +865,39 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 
 <!-- BOTTOM SHEET STYLING -->
 <style>
+/* Bottom sheet: always attached to viewport via JS body-append */
 .cora-bottom-sheet {
     position: fixed !important;
     bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    top: auto !important;
+    left: 50% !important;
+    transform: translateX(-50%) translateY(0) !important;
     width: 100% !important;
     max-width: 52rem !important;
     height: auto !important;
     max-height: 88vh !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
     border-top-left-radius: 1.25rem !important;
     border-top-right-radius: 1.25rem !important;
     z-index: 99999 !important;
     box-sizing: border-box !important;
-    transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease, visibility 320ms ease !important;
-    /* Force escape of any overflow:hidden ancestor */
-    contain: none !important;
-    transform-style: flat !important;
+    transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1), opacity 220ms ease, visibility 320ms ease !important;
 }
-/* Make all ancestors allow fixed children to escape */
-.cora-main, .cora-content-wrapper, .wrap, #wpcontent, #wpbody, #wpbody-content {
-    overflow: visible !important;
-}
-
 .cora-bottom-sheet.collapsed {
-    transform: translateY(100%) !important;
+    transform: translateX(-50%) translateY(110%) !important;
     opacity: 0 !important;
     pointer-events: none !important;
     visibility: hidden !important;
     box-shadow: none !important;
 }
-
 .cora-bottom-sheet:not(.collapsed) {
-    transform: translateY(0) !important;
+    transform: translateX(-50%) translateY(0) !important;
     opacity: 1 !important;
     pointer-events: auto !important;
     visibility: visible !important;
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.25) !important;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.18) !important;
 }
-/* Ensure parent containers never clip fixed bottom sheets (only x-axis) */
-.cora-main {
-    overflow-x: visible !important;
-}
-.cora-content-wrapper {
-    overflow-x: visible !important;
+/* Backdrop always on top */
+#cora-drawer-backdrop {
+    z-index: 99998 !important;
 }
 </style>
 
@@ -1385,16 +1377,14 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             const dateEl = document.getElementById('ca-date');
             if(dateEl) dateEl.value = prefillDate;
         }
-        
+
         const drawer = document.getElementById('cora-create-article-sheet');
+        const backdrop = document.getElementById('cora-drawer-backdrop');
         if(drawer) {
+            // Move to body so it escapes any overflow:hidden ancestor (WordPress admin)
+            if(drawer.parentNode !== document.body) document.body.appendChild(drawer);
+            if(backdrop && backdrop.parentNode !== document.body) document.body.appendChild(backdrop);
             drawer.classList.remove('collapsed');
-            // Ensure bottom sheet positioning works even inside overflow:hidden parents
-            drawer.style.position = 'fixed';
-            drawer.style.bottom = '0';
-            drawer.style.left = '0';
-            drawer.style.right = '0';
-            drawer.style.zIndex = '99999';
         }
         showBackdrop();
     };
@@ -1410,7 +1400,12 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         if(titleEl) titleEl.innerText = title || 'SEO Analysis';
         if(idEl) idEl.value = articleId;
         const drawer = document.getElementById('cora-seo-detail-sheet');
-        if(drawer) { drawer.classList.remove('translate-x-full', 'collapsed'); }
+        const backdrop = document.getElementById('cora-drawer-backdrop');
+        if(drawer) {
+            if(drawer.parentNode !== document.body) document.body.appendChild(drawer);
+            if(backdrop && backdrop.parentNode !== document.body) document.body.appendChild(backdrop);
+            drawer.classList.remove('translate-x-full', 'collapsed');
+        }
         showBackdrop();
 
         // Load existing SEO meta for this article
