@@ -447,9 +447,8 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         </div>
     </div>
 </div>
-
 <!-- PANEL: Content Calendar -->
-<div id="panel-ct-calendar" class="cora-ct-panel hidden space-y-4">
+<div id="panel-ct-calendar" class="cora-ct-panel hidden space-y-0">
     <?php
     // Calculate current week (Monday to Sunday)
     $ts_now = time();
@@ -478,203 +477,175 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         if(!isset($posts_by_date[$p_date])) $posts_by_date[$p_date] = [];
         $posts_by_date[$p_date][] = $pp;
     }
+
+    // Month Data for the hidden view
+    $month_now = date('n');
+    $year_now = date('Y');
+    $month_name = date('F');
+    $days_in_month = cal_days_in_month(CAL_GREGORIAN, $month_now, $year_now);
+    $first_dow = date('N', strtotime("$year_now-$month_now-01"));
+    $prev_days_fill = $first_dow - 1;
+    $prev_month_days = cal_days_in_month(CAL_GREGORIAN, $month_now == 1 ? 12 : $month_now - 1, $month_now == 1 ? $year_now - 1 : $year_now);
+    
+    $pub_dates = [];
+    foreach ($posts_by_date as $d_str => $pst_arr) {
+        $d_num = (int)date('j', strtotime($d_str));
+        if (date('n', strtotime($d_str)) == $month_now && date('Y', strtotime($d_str)) == $year_now) {
+            $pub_dates[$d_num] = $pst_arr;
+        }
+    }
     ?>
 
-    <!-- Top Control Bar with Centered Status Info & Collapsible Filters -->
-    <div class="bg-white border border-zinc-200 rounded-xl p-4 shadow-2xs space-y-3">
-        <!-- Row 1: Primary Controls (Left: Date Nav | Center: Status Legend | Right: View Switcher & Filter Toggle) -->
-        <div class="flex flex-wrap items-center justify-between gap-3">
-            <!-- Left: Date Navigator -->
-            <div class="flex items-center gap-2 shrink-0">
-                <div class="flex items-center gap-1 bg-zinc-50 border border-zinc-200/90 rounded-lg p-0.5 shadow-2xs">
-                    <button onclick="coraNavWeek(-1)" class="h-7 w-7 rounded-md hover:bg-white flex items-center justify-center text-zinc-700 transition-all cursor-pointer" title="Previous Week">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                    </button>
-                    <span class="text-xs font-bold text-zinc-900 px-3 min-w-[140px] text-center" id="cal-date-range-label"><?php echo esc_html($week_label); ?></span>
-                    <button onclick="coraNavWeek(1)" class="h-7 w-7 rounded-md hover:bg-white flex items-center justify-center text-zinc-700 transition-all cursor-pointer" title="Next Week">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                    </button>
-                </div>
-                <button onclick="coraNavWeek(0)" class="h-8 px-3 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-700 transition-colors cursor-pointer">
-                    Today
-                </button>
-            </div>
-
-            <!-- Center: Status Color Legend -->
-            <div class="hidden md:flex items-center gap-3.5 text-xs font-medium text-zinc-600 bg-zinc-50/80 px-4 py-1.5 rounded-lg border border-zinc-100/90 shadow-2xs mx-auto">
-                <span class="flex items-center gap-1.5 text-[11px] font-semibold"><span class="w-2 h-2 rounded-full bg-zinc-400"></span> Draft</span>
-                <span class="flex items-center gap-1.5 text-[11px] font-semibold"><span class="w-2 h-2 rounded-full bg-amber-500"></span> In Review</span>
-                <span class="flex items-center gap-1.5 text-[11px] font-semibold"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Scheduled</span>
-                <span class="flex items-center gap-1.5 text-[11px] font-semibold"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Published</span>
-            </div>
-
-            <!-- Right: View Toggle (Week | Month) & Filter Button -->
-            <div class="flex items-center gap-2 shrink-0">
-                <div class="flex items-center p-0.5 rounded-lg border border-zinc-200 bg-zinc-100/80 text-zinc-600">
-                    <button id="btn-cal-view-week" onclick="coraToggleCalendarView('week')" class="h-7 px-3.5 rounded-md text-xs font-bold bg-white text-zinc-950 shadow-2xs transition-all cursor-pointer">Week View</button>
-                    <button id="btn-cal-view-month" onclick="coraToggleCalendarView('month')" class="h-7 px-3.5 rounded-md text-xs font-semibold text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer">Month View</button>
-                </div>
-                
-                <button id="btn-cal-toggle-filters" onclick="coraToggleFilterBar()" class="h-8 px-3 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-700 flex items-center gap-1.5 cursor-pointer transition-colors">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-                    Filters
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-            </div>
+    <!-- TOP CONTROL BAR (Single Row, Compact) -->
+    <div class="single-row toolbar flex items-center justify-between border-b border-zinc-200 bg-white px-4 py-2">
+        <!-- Left: Calendar/Board tab buttons -->
+        <div class="flex items-center gap-4">
+            <button class="text-sm font-semibold text-zinc-900 border-b-2 border-zinc-900 pb-1 -mb-[9px]">Calendar</button>
+            <button class="text-sm font-medium text-zinc-500 hover:text-zinc-700 pb-1 -mb-[9px]" onclick="coraSwitchTab('board')">Board</button>
+        </div>
+        
+        <!-- Center: Inline filter dropdowns -->
+        <div class="flex items-center gap-3">
+            <select class="text-xs font-medium text-zinc-700 bg-transparent outline-none cursor-pointer">
+                <option>All Types</option>
+            </select>
+            <select class="text-xs font-medium text-zinc-700 bg-transparent outline-none cursor-pointer">
+                <option>All Status</option>
+            </select>
+            <select class="text-xs font-medium text-zinc-700 bg-transparent outline-none cursor-pointer">
+                <option>All Channels</option>
+            </select>
+            <select class="text-xs font-medium text-zinc-700 bg-transparent outline-none cursor-pointer">
+                <option>All Owners</option>
+            </select>
         </div>
 
-        <!-- Collapsible Filters Bar (Hidden by Default) -->
-        <div id="cal-filters-collapsible-bar" class="hidden pt-3 border-t border-zinc-100 flex flex-wrap items-center justify-between gap-3 transition-all">
-            <div class="flex items-center gap-2 flex-wrap">
-                <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Filter By:</span>
-                <select id="cal-filter-type" class="h-8 px-3 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer" onchange="coraFilterCalendar()">
-                    <option value="">All Types</option>
-                    <option value="blog">Blog Post</option>
-                    <option value="instagram">Instagram Post</option>
-                    <option value="youtube">YouTube Video</option>
-                    <option value="linkedin">LinkedIn Post</option>
-                    <option value="newsletter">Newsletter</option>
-                </select>
-
-                <select id="cal-filter-status" class="h-8 px-3 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer" onchange="coraFilterCalendar()">
-                    <option value="">All Status</option>
-                    <option value="draft">Draft</option>
-                    <option value="in_review">In Review</option>
-                    <option value="scheduled">Scheduled</option>
-                    <option value="publish">Published</option>
-                </select>
-
-                <select id="cal-filter-owner" class="h-8 px-3 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer" onchange="coraFilterCalendar()">
-                    <option value="">All Owners</option>
-                    <?php foreach($cora_users as $u): ?>
-                        <option value="<?php echo esc_attr($u->ID); ?>"><?php echo esc_html($u->display_name); ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <button onclick="coraResetCalendarFilters()" class="h-8 px-3 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-700 flex items-center gap-1 cursor-pointer">
-                Reset
+        <!-- Nav: compact pill -->
+        <div class="flex items-center gap-2 bg-zinc-50 border border-zinc-200 rounded-full px-3 py-1">
+            <button onclick="coraNavWeek(-1)" class="text-zinc-500 hover:text-zinc-900 cursor-pointer">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
             </button>
+            <span class="text-xs font-bold text-zinc-900 min-w-[130px] text-center"><?php echo esc_html($week_label); ?></span>
+            <button onclick="coraNavWeek(1)" class="text-zinc-500 hover:text-zinc-900 cursor-pointer">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+        </div>
+
+        <!-- Right: Filters icon button -->
+        <button class="text-zinc-500 hover:text-zinc-900 cursor-pointer">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+        </button>
+    </div>
+
+    <!-- SUB-HEADER ROW -->
+    <div class="flex items-center justify-between px-6 py-4 bg-white">
+        <h2 class="text-2xl font-bold text-zinc-900"><?php echo esc_html($week_label); ?></h2>
+        <div class="flex items-center gap-4 text-[11px] font-semibold text-zinc-600">
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-zinc-300"></span> Draft</span>
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400"></span> In Review</span>
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Scheduled</span>
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Published</span>
         </div>
     </div>
 
     <!-- WEEKLY CALENDAR VIEW (DEFAULT) -->
-    <div id="cora-cal-week-view" class="bg-white border border-zinc-200 rounded-xl p-5 shadow-2xs">
-        <div class="mb-4 flex items-center justify-between">
-            <div>
-                <h2 class="text-xl font-bold text-zinc-950 tracking-tight"><?php echo esc_html($week_label); ?></h2>
-                <p class="text-xs text-zinc-500 mt-0.5">Drag cards between days to reschedule • Click any day column to draft an article</p>
-            </div>
-            <button onclick="openCreateArticleDrawer()" class="h-8 px-3 rounded-lg bg-zinc-950 text-white text-xs font-bold hover:bg-zinc-800 transition-all cursor-pointer flex items-center gap-1">
-                <span>+</span> Add Content
-            </button>
-        </div>
-
+    <div id="cora-cal-week-view" class="px-6 pb-6">
         <!-- 7-Column Weekly Grid -->
-        <div style="display: grid !important; grid-template-columns: repeat(7, minmax(0, 1fr)) !important; gap: 12px; width: 100% !important;">
+        <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; width: 100%;">
             <?php foreach($week_days as $wd): 
                 $day_date = $wd['date_str'];
                 $day_posts = $posts_by_date[$day_date] ?? [];
                 $is_today = $wd['is_today'];
             ?>
                 <!-- Weekly Day Column -->
-                <div class="flex flex-col min-h-[560px] rounded-2xl border <?php echo $is_today ? 'border-2 border-zinc-950 bg-zinc-50/40 shadow-xs' : 'border-zinc-200/80 bg-zinc-50/20 hover:border-zinc-300'; ?> p-2.5 transition-all cora-cal-day-cell" data-date="<?php echo esc_attr($day_date); ?>" ondragover="coraCalDragOver(event)" ondragenter="coraCalDragEnter(event)" ondragleave="coraCalDragLeave(event)" ondrop="coraCalDrop(event, '<?php echo $wd['day_num']; ?>', '<?php echo $day_date; ?>')" onclick="coraCalDayClick(event, '<?php echo $day_date; ?>')">
+                <div class="flex flex-col bg-zinc-50 border border-zinc-100 rounded-xl overflow-hidden cora-cal-day-cell" data-date="<?php echo esc_attr($day_date); ?>" ondragover="coraCalDragOver(event)" ondragenter="coraCalDragEnter(event)" ondragleave="coraCalDragLeave(event)" ondrop="coraCalDrop(event, '<?php echo $wd['day_num']; ?>', '<?php echo $day_date; ?>')">
                     
                     <!-- Day Column Header -->
-                    <div class="pb-2.5 mb-2 border-b border-zinc-200/70 flex items-center justify-between shrink-0">
-                        <div class="flex items-center gap-1.5">
-                            <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider"><?php echo $wd['dow_name']; ?></span>
-                            <span class="text-sm font-bold <?php echo $is_today ? 'w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center text-xs' : 'text-zinc-900'; ?>">
-                                <?php echo $wd['day_num']; ?>
-                            </span>
-                        </div>
-                        <?php if(count($day_posts) > 0): ?>
-                            <span class="px-1.5 py-0.2 bg-zinc-200 text-zinc-700 rounded-full text-[9px] font-bold"><?php echo count($day_posts); ?></span>
-                        <?php endif; ?>
+                    <div class="p-3 border-b border-zinc-200 bg-white flex items-center gap-1.5">
+                        <span class="text-xs font-bold text-zinc-500"><?php echo $wd['dow_name']; ?></span>
+                        <span class="text-sm font-bold <?php echo $is_today ? 'w-6 h-6 rounded-full bg-zinc-900 text-white flex items-center justify-center' : 'text-zinc-900'; ?>">
+                            <?php echo $wd['day_num']; ?>
+                        </span>
                     </div>
 
                     <!-- Event Cards Column Container -->
-                    <div class="flex-1 space-y-3 overflow-y-auto min-h-[480px]">
+                    <div class="flex-1 p-2 flex flex-col gap-2 min-h-[300px]">
                         <?php if(empty($day_posts)): ?>
-                            <div class="h-full min-h-[120px] rounded-xl border border-dashed border-zinc-200/80 flex flex-col items-center justify-center p-3 text-center text-zinc-300 hover:border-zinc-400 hover:text-zinc-500 transition-all cursor-pointer">
-                                <span class="text-xs font-semibold">+ Add Post</span>
+                            <div class="cora-cal-empty-placeholder rounded-lg border border-dashed border-zinc-300 flex items-center justify-center py-4 text-zinc-400 hover:border-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer" onclick="coraCalDayClick(event, '<?php echo $day_date; ?>')">                                
+                                <span class="text-xs font-semibold">+ Add Content</span>
                             </div>
                         <?php else: ?>
                             <?php foreach($day_posts as $dp): 
                                 $status = $dp->post_status;
                                 $editorial_status = get_post_meta($dp->ID, '_cora_editorial_status', true) ?: ($status === 'publish' ? 'published' : 'draft');
-                                $seo_score = get_post_meta($dp->ID, '_cora_seo_score', true) ?: rand(70, 94);
-                                $geo_score = get_post_meta($dp->ID, '_cora_geo_score', true) ?: rand(50, 85);
-                                $word_count = str_word_count(strip_tags($dp->post_content)) ?: 1200;
-                                $focus_kw = get_post_meta($dp->ID, '_cora_focus_keyword', true) ?: 'real estate strategy';
+                                
+                                $content_type = get_post_meta($dp->ID, '_cora_content_type', true) ?: 'blog';
+                                
                                 $assignee_id = get_post_meta($dp->ID, '_cora_assignee_id', true);
                                 $assignee = $assignee_id ? get_userdata($assignee_id) : null;
-                                $author_name = $assignee ? strtolower(explode(' ', $assignee->display_name)[0]) : 'cora';
-                                $author_initial = strtoupper(substr($author_name, 0, 1));
-                                $thumb_url = get_the_post_thumbnail_url($dp->ID, 'medium');
+                                $author_name = $assignee ? $assignee->display_name : 'Unknown';
+                                $author_initials = strtoupper(substr($author_name, 0, 2));
+
+                                // Status styles
+                                $border_class = 'border-l-zinc-300';
+                                $badge_html = '<span class="text-[10px] font-semibold text-zinc-500">Draft</span>';
+                                if ($editorial_status === 'in_review') {
+                                    $border_class = 'border-l-amber-400';
+                                    $badge_html = '<span class="px-2 py-0.5 rounded bg-amber-50 text-amber-600 text-[10px] font-semibold">In Review</span>';
+                                } elseif ($editorial_status === 'scheduled') {
+                                    $border_class = 'border-l-blue-500';
+                                    $badge_html = '<span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-[10px] font-semibold">Scheduled</span>';
+                                } elseif ($editorial_status === 'published') {
+                                    $border_class = 'border-l-emerald-500';
+                                    $badge_html = '<span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 text-[10px] font-semibold flex items-center gap-1">Published <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></span>';
+                                }
+
+                                // Type icons and labels
+                                $type_label = 'Blog Post';
+                                $type_svg = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>';
+                                
+                                if ($content_type === 'linkedin') {
+                                    $type_label = 'LinkedIn Post';
+                                    $type_svg = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="2" width="20" height="20" rx="4" ry="4"></rect><line x1="8" y1="11" x2="8" y2="16"></line><line x1="8" y1="8" x2="8" y2="8"></line><path d="M12 16v-5a2 2 0 0 1 4 0v5"></path></svg>';
+                                } elseif ($content_type === 'instagram') {
+                                    $type_label = 'Instagram Post';
+                                    $type_svg = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>';
+                                } elseif ($content_type === 'youtube') {
+                                    $type_label = 'YouTube Video';
+                                    $type_svg = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>';
+                                } elseif ($content_type === 'newsletter') {
+                                    $type_label = 'Newsletter';
+                                    $type_svg = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>';
+                                } elseif ($content_type === 'x_twitter') {
+                                    $type_label = 'X Post';
+                                    $type_svg = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="4" y1="4" x2="20" y2="20"></line><line x1="20" y1="4" x2="4" y2="20"></line></svg>';
+                                } elseif ($content_type === 'case_study') {
+                                    $type_label = 'Case Study';
+                                    $type_svg = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>';
+                                }
                             ?>
-                                <!-- DETAILED CARD (EXACT MATCH FOR SCREENSHOT 2) -->
-                                <div draggable="true" ondragstart="coraCalDragStart(event, <?php echo $dp->ID; ?>)" class="cora-cal-event-card bg-white border border-zinc-200/90 rounded-2xl p-3.5 shadow-2xs hover:shadow-md hover:border-zinc-400 transition-all cursor-grab active:cursor-grabbing space-y-3 group" data-id="<?php echo $dp->ID; ?>" data-status="<?php echo esc_attr($editorial_status); ?>" data-owner="<?php echo esc_attr($assignee_id); ?>" onclick="event.stopPropagation(); coraEditArticle(<?php echo $dp->ID; ?>)">
+                                <!-- EVENT CARD -->
+                                <div draggable="true" ondragstart="coraCalDragStart(event, <?php echo $dp->ID; ?>, '<?php echo $day_date; ?>')" ondragend="coraCalDragEnd(event)" class="cora-cal-event-card bg-white rounded-xl border border-zinc-200 border-l-4 <?php echo $border_class; ?> p-3 hover:shadow-md cursor-grab active:cursor-grabbing flex flex-col gap-2" data-id="<?php echo $dp->ID; ?>" data-status="<?php echo esc_attr($editorial_status); ?>" data-type="<?php echo esc_attr($content_type); ?>" data-owner="<?php echo esc_attr($assignee_id); ?>" onclick="event.stopPropagation(); coraEditArticle(<?php echo $dp->ID; ?>)">
                                     
-                                    <!-- 1. Featured Image Header -->
-                                    <div class="w-full h-24 rounded-xl bg-zinc-100 border border-zinc-200/60 overflow-hidden flex items-center justify-center text-zinc-300">
-                                        <?php if($thumb_url): ?>
-                                            <img src="<?php echo esc_url($thumb_url); ?>" class="w-full h-full object-cover">
-                                        <?php else: ?>
-                                            <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-300"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                        <?php endif; ?>
+                                    <!-- Top Row: Type -->
+                                    <div class="flex items-center gap-1.5 text-zinc-400">
+                                        <?php echo $type_svg; ?>
+                                        <span class="text-[10px] font-semibold uppercase tracking-wide"><?php echo esc_html($type_label); ?></span>
                                     </div>
-
-                                    <!-- 2. Category & Difficulty Tags -->
-                                    <div class="flex items-center justify-between gap-1 flex-wrap">
-                                        <span class="px-2 py-0.5 bg-zinc-100 text-zinc-600 text-[9px] font-bold rounded-md uppercase tracking-wider">REAL_ESTATE</span>
-                                        <span class="px-2 py-0.5 bg-zinc-100 text-zinc-500 text-[9px] font-bold rounded-md uppercase tracking-wider">MEDIUM</span>
-                                    </div>
-
-                                    <!-- 3. Article Title -->
-                                    <h4 class="text-xs font-bold text-zinc-900 leading-snug group-hover:text-zinc-700 line-clamp-2" title="<?php echo esc_attr($dp->post_title); ?>">
+                                    
+                                    <!-- Middle: Title -->
+                                    <h4 class="text-xs font-bold text-zinc-900 leading-snug line-clamp-2" title="<?php echo esc_attr($dp->post_title); ?>">
                                         <?php echo esc_html($dp->post_title); ?>
                                     </h4>
-
-                                    <!-- 4. Target Keyword Badge -->
-                                    <div class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-50 border border-zinc-100 text-[10px] text-zinc-500 truncate">
-                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0 text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                        <span class="truncate">Target: <strong class="text-zinc-700"><?php echo esc_html($focus_kw); ?></strong></span>
-                                    </div>
-
-                                    <!-- 5. SEO & GEO Metric Badges -->
-                                    <div class="flex items-center gap-1.5 flex-wrap">
-                                        <span class="px-2 py-1 bg-zinc-800 text-white text-[9.5px] font-bold rounded-lg flex items-center gap-1">
-                                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                                            SEO <?php echo $seo_score; ?>/100
-                                        </span>
-                                        <span class="px-2 py-1 bg-zinc-100 border border-zinc-200 text-zinc-700 text-[9.5px] font-bold rounded-lg flex items-center gap-1">
-                                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
-                                            GEO <?php echo $geo_score; ?>%
-                                        </span>
-                                        <span class="text-[10px] font-semibold text-zinc-400 ml-auto"><?php echo number_format($word_count); ?> w</span>
-                                    </div>
-
-                                    <!-- 6. Distribution Channel Tags -->
-                                    <div class="flex items-center gap-1 flex-wrap">
-                                        <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-500 text-[8.5px] font-semibold rounded">LinkedIn</span>
-                                        <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-500 text-[8.5px] font-semibold rounded">SearchGPT</span>
-                                        <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-500 text-[8.5px] font-semibold rounded">Newsletter</span>
-                                    </div>
-
-                                    <!-- 7. Footer Row (Author + Date) -->
-                                    <div class="pt-2 border-t border-zinc-100 flex items-center justify-between text-[10.5px] text-zinc-500">
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="w-4 h-4 rounded-full bg-zinc-200 text-zinc-700 text-[8px] font-bold flex items-center justify-center shrink-0">
-                                                <?php echo $author_initial; ?>
-                                            </span>
-                                            <span class="font-medium text-zinc-700"><?php echo esc_html($author_name); ?></span>
-                                        </div>
-                                        <div class="flex items-center gap-1 font-mono text-[10px] text-zinc-400">
-                                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line></svg>
-                                            <span><?php echo $day_date; ?></span>
+                                    
+                                    <!-- Bottom Row: Status + Avatar -->
+                                    <div class="flex items-center justify-between mt-1">
+                                        <?php echo $badge_html; ?>
+                                        <div class="w-6 h-6 rounded-full bg-zinc-100 text-zinc-700 flex items-center justify-center text-[10px] font-bold shrink-0" title="<?php echo esc_attr($author_name); ?>">
+                                            <?php echo esc_html($author_initials); ?>
                                         </div>
                                     </div>
+
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -683,68 +654,61 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             <?php endforeach; ?>
         </div>
     </div>
-</div>
 
-    <!-- MONTHLY CALENDAR VIEW -->
-    <div id="cora-cal-month-view" class="bg-white border border-zinc-200 rounded-xl p-5 shadow-2xs hidden">
-        <div class="mb-4 flex items-center justify-between">
-            <div>
-                <h2 class="text-xl font-bold text-zinc-950 tracking-tight"><?php echo esc_html($month_name); ?> Overview</h2>
-                <p class="text-xs text-zinc-500 mt-0.5">Monthly content calendar overview</p>
-            </div>
-        </div>
-
-        <div style="display: grid !important; grid-template-columns: repeat(7, minmax(0, 1fr)) !important; gap: 8px; width: 100% !important;" class="mb-3 text-center border-b border-zinc-100 pb-2">
+    <!-- MONTHLY VIEW (HIDDEN) -->
+    <div id="cora-cal-month-view" class="hidden px-6 pb-6">
+        <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; width: 100%;" class="mb-2 text-center">
             <?php foreach(['MON','TUE','WED','THU','FRI','SAT','SUN'] as $dn): ?>
-                <div class="text-[11px] font-bold text-zinc-400 tracking-wider"><?php echo $dn; ?></div>
+                <div class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider"><?php echo $dn; ?></div>
             <?php endforeach; ?>
         </div>
 
-        <div style="display: grid !important; grid-template-columns: repeat(7, minmax(0, 1fr)) !important; gap: 8px; width: 100% !important;">
+        <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; width: 100%;">
             <?php for($pad = $prev_days_fill; $pad >= 1; $pad--): 
                 $p_day = $prev_month_days - $pad + 1;
             ?>
-                <div class="h-[145px] p-2.5 rounded-xl border border-zinc-100 bg-zinc-50/40 text-zinc-300 text-xs font-bold">
+                <div class="h-24 p-2 rounded-xl border border-zinc-100 bg-zinc-50/50 text-zinc-300 text-xs font-bold">
                     <?php echo $p_day; ?>
                 </div>
             <?php endfor; ?>
 
             <?php for($d=1; $d<=$days_in_month; $d++): 
                 $is_today = ($d == (int)date('j') && $month_now == (int)date('n'));
-                $day_posts = $pub_dates[sprintf('%04d-%02d-%02d', $year_now, $month_now, $d)] ?? [];
+                $day_posts = $pub_dates[$d] ?? [];
                 $max_visible = 2;
                 $total_day_posts = count($day_posts);
                 $visible_posts = array_slice($day_posts, 0, $max_visible);
                 $hidden_count = $total_day_posts - $max_visible;
                 $date_str = sprintf('%04d-%02d-%02d', $year_now, $month_now, $d);
             ?>
-                <div class="h-[145px] p-2.5 rounded-xl border <?php echo $is_today ? 'border-2 border-zinc-950 bg-white shadow-2xs' : 'border-zinc-200/80 bg-white hover:border-zinc-300'; ?> flex flex-col justify-between transition-all min-w-0 cora-cal-day-cell cursor-pointer" data-day="<?php echo $d; ?>" data-date="<?php echo $date_str; ?>" ondragover="coraCalDragOver(event)" ondrop="coraCalDrop(event, '<?php echo $d; ?>', '<?php echo $date_str; ?>')" onclick="coraCalDayClick(event, '<?php echo $date_str; ?>')">
+                <div class="h-24 p-2 rounded-xl border <?php echo $is_today ? 'border-zinc-900 bg-zinc-50' : 'border-zinc-200 bg-white'; ?> flex flex-col transition-all min-w-0">
                     <div class="flex items-center justify-between mb-1">
-                        <span class="text-xs font-bold <?php echo $is_today ? 'w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[10px]' : 'text-zinc-700'; ?>">
+                        <span class="text-xs font-bold <?php echo $is_today ? 'w-5 h-5 rounded-full bg-zinc-900 text-white flex items-center justify-center text-[10px]' : 'text-zinc-700'; ?>">
                             <?php echo $d; ?>
                         </span>
-                        <?php if($total_day_posts > 0): ?>
-                            <span class="text-[9px] font-bold px-1.5 py-0.2 bg-zinc-100 text-zinc-600 rounded-full shrink-0"><?php echo $total_day_posts; ?></span>
-                        <?php endif; ?>
                     </div>
                     
                     <div class="space-y-1 flex-1 min-w-0 overflow-hidden">
                         <?php foreach($visible_posts as $dp): 
                             $editorial_status = get_post_meta($dp->ID, '_cora_editorial_status', true) ?: ($dp->post_status === 'publish' ? 'published' : 'draft');
+                            $border_class = 'border-l-zinc-300';
+                            if ($editorial_status === 'in_review') $border_class = 'border-l-amber-400';
+                            elseif ($editorial_status === 'scheduled') $border_class = 'border-l-blue-500';
+                            elseif ($editorial_status === 'published') $border_class = 'border-l-emerald-500';
                         ?>
-                            <div class="p-1.5 rounded bg-zinc-50 border border-zinc-200 text-[10px] font-bold text-zinc-900 truncate group" onclick="event.stopPropagation(); coraEditArticle(<?php echo $dp->ID; ?>)">
+                            <div class="px-1.5 py-1 rounded bg-zinc-50 border border-zinc-100 border-l-2 <?php echo $border_class; ?> text-[9px] font-bold text-zinc-900 truncate" title="<?php echo esc_attr($dp->post_title); ?>">
                                 <?php echo esc_html($dp->post_title); ?>
                             </div>
                         <?php endforeach; ?>
+                        
+                        <?php if($hidden_count > 0): ?>
+                            <div class="text-[9px] font-bold text-zinc-500 px-1">+ <?php echo $hidden_count; ?> more</div>
+                        <?php endif; ?>
                     </div>
-
-                    <?php if($hidden_count > 0): ?>
-                        <button class="w-full text-center py-0.5 px-1 rounded bg-zinc-100 text-[9.5px] font-bold text-zinc-700 mt-1">+ <?php echo $hidden_count; ?> more</button>
-                    <?php endif; ?>
                 </div>
             <?php endfor; ?>
-        </div>
     </div>
+</div>
 
 <!-- PANEL: Workflow Board -->
 <div id="panel-ct-workflow" class="cora-ct-panel hidden">
@@ -941,10 +905,139 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 
     // Tabs
 
-    // --- Calendar Drag & Drop + Day Events Drawer Logic ---
-    window.coraCalDragStart = function(e, postId) {
+    // ============================================================
+    // CALENDAR: Week Navigation (client-side, no page reload)
+    // ============================================================
+    let _calWeekOffset = 0;
+
+    window.coraNavWeek = function(delta) {
+        // delta: -1 = prev, +1 = next, 0 = reset to today
+        if (delta === 0) {
+            _calWeekOffset = 0;
+        } else {
+            _calWeekOffset += delta;
+        }
+        _coraRebuildWeekGrid();
+    };
+
+    // Rebuild the week columns based on _calWeekOffset
+    function _coraRebuildWeekGrid() {
+        const weekView = document.getElementById('cora-cal-week-view');
+        if (!weekView) return;
+
+        // Get current PHP-rendered dates from data attributes (already rendered server-side)
+        // The grid just slides: show the columns for the right week offset
+        // Since we are PHP-rendered, week navigation triggers a URL param update + page reload
+        const url = new URL(window.location);
+        url.searchParams.set('cal_week_offset', _calWeekOffset);
+        window.location.href = url.toString();
+    }
+
+    // ============================================================
+    // CALENDAR: View Toggle (Week <-> Month)
+    // ============================================================
+    window.coraToggleCalendarView = function(mode) {
+        const weekView = document.getElementById('cora-cal-week-view');
+        const monthView = document.getElementById('cora-cal-month-view');
+        const weekBtn = document.getElementById('btn-cal-view-week');
+        const monthBtn = document.getElementById('btn-cal-view-month');
+
+        const activeClass = 'h-7 px-3.5 rounded-md text-xs font-bold bg-white text-zinc-950 shadow-sm transition-all cursor-pointer';
+        const inactiveClass = 'h-7 px-3.5 rounded-md text-xs font-semibold text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer';
+
+        if (mode === 'week') {
+            if (weekView) weekView.classList.remove('hidden');
+            if (monthView) monthView.classList.add('hidden');
+            if (weekBtn) weekBtn.className = activeClass;
+            if (monthBtn) monthBtn.className = inactiveClass;
+        } else {
+            if (weekView) weekView.classList.add('hidden');
+            if (monthView) monthView.classList.remove('hidden');
+            if (monthBtn) monthBtn.className = activeClass;
+            if (weekBtn) weekBtn.className = inactiveClass;
+        }
+    };
+
+    // ============================================================
+    // CALENDAR: Collapsible Filter Bar Toggle
+    // ============================================================
+    window.coraToggleFilterBar = function() {
+        const bar = document.getElementById('cal-filters-collapsible-bar');
+        const btn = document.getElementById('btn-cal-toggle-filters');
+        if (!bar) return;
+        const isHidden = bar.classList.contains('hidden');
+        if (isHidden) {
+            bar.classList.remove('hidden');
+            bar.style.display = 'flex';
+            if (btn) btn.classList.add('bg-zinc-100', 'border-zinc-400');
+        } else {
+            bar.classList.add('hidden');
+            bar.style.display = 'none';
+            if (btn) btn.classList.remove('bg-zinc-100', 'border-zinc-400');
+        }
+    };
+
+    // ============================================================
+    // CALENDAR: Live Client-Side Filtering
+    // ============================================================
+    window.coraFilterCalendar = function() {
+        const statusFilter = (document.getElementById('cal-filter-status')?.value || '').toLowerCase();
+        const typeFilter = (document.getElementById('cal-filter-type')?.value || '').toLowerCase();
+        const channelFilter = (document.getElementById('cal-filter-channel')?.value || '').toLowerCase();
+        const ownerFilter = document.getElementById('cal-filter-owner')?.value || '';
+
+        document.querySelectorAll('.cora-cal-event-card').forEach(card => {
+            const status = (card.dataset.status || '').toLowerCase();
+            const type = (card.dataset.type || '').toLowerCase();
+            const owner = card.dataset.owner || '';
+            
+            let show = true;
+            if (statusFilter && !status.includes(statusFilter)) show = false;
+            if (typeFilter && !type.includes(typeFilter)) show = false;
+            if (ownerFilter && owner !== ownerFilter) show = false;
+
+            card.style.display = show ? '' : 'none';
+        });
+
+        // Hide entire empty columns after filter
+        document.querySelectorAll('.cora-cal-day-cell').forEach(cell => {
+            const visibleCards = [...cell.querySelectorAll('.cora-cal-event-card')].filter(c => c.style.display !== 'none');
+            const emptyPlaceholder = cell.querySelector('.cora-cal-empty-placeholder');
+            if (emptyPlaceholder) {
+                emptyPlaceholder.style.display = visibleCards.length === 0 ? '' : 'none';
+            }
+        });
+    };
+
+    window.coraResetCalendarFilters = function() {
+        ['cal-filter-type', 'cal-filter-status', 'cal-filter-channel', 'cal-filter-owner'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        document.querySelectorAll('.cora-cal-event-card').forEach(card => {
+            card.style.display = '';
+        });
+        document.querySelectorAll('.cora-cal-empty-placeholder').forEach(ph => {
+            ph.style.display = '';
+        });
+    };
+
+    // ============================================================
+    // CALENDAR: Drag & Drop Rescheduling
+    // ============================================================
+    let _calDragPostId = null;
+    let _calDragOriginDate = null;
+
+    window.coraCalDragStart = function(e, postId, originDate) {
+        _calDragPostId = postId;
+        _calDragOriginDate = originDate;
         e.dataTransfer.setData('text/plain', postId);
         e.dataTransfer.effectAllowed = 'move';
+        e.currentTarget.classList.add('opacity-50', 'scale-95');
+    };
+
+    window.coraCalDragEnd = function(e) {
+        e.currentTarget.classList.remove('opacity-50', 'scale-95');
     };
 
     window.coraCalDragOver = function(e) {
@@ -955,154 +1048,81 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
     window.coraCalDragEnter = function(e) {
         e.preventDefault();
         const cell = e.currentTarget;
-        if(cell) cell.classList.add('bg-zinc-100/80', 'border-zinc-950');
+        cell.classList.add('ring-2', 'ring-zinc-900', 'ring-inset', 'bg-zinc-50');
     };
 
     window.coraCalDragLeave = function(e) {
         const cell = e.currentTarget;
-        if(cell) cell.classList.remove('bg-zinc-100/80', 'border-zinc-950');
+        if (!cell.contains(e.relatedTarget)) {
+            cell.classList.remove('ring-2', 'ring-zinc-900', 'ring-inset', 'bg-zinc-50');
+        }
     };
 
     window.coraCalDrop = function(e, dayNum, dateStr) {
         e.preventDefault();
         const cell = e.currentTarget;
-        if(cell) cell.classList.remove('bg-zinc-100/80', 'border-zinc-950');
-        
-        const postId = e.dataTransfer.getData('text/plain');
-        if(!postId) return;
+        cell.classList.remove('ring-2', 'ring-zinc-900', 'ring-inset', 'bg-zinc-50');
 
-        // Perform AJAX reschedule
-        $.post(coraREWPData.ajaxUrl, {
-            action: 'cora_update_article_date',
-            nonce: coraREWPData.ajaxNonce,
-            post_id: postId,
-            target_date: dateStr
-        }, function(r) {
-            if(window.coraShowToast) {
-                window.coraShowToast("Article rescheduled to " + dateStr, "success");
-            }
-            setTimeout(function() { location.reload(); }, 600);
-        });
+        const postId = e.dataTransfer.getData('text/plain') || _calDragPostId;
+        if (!postId) return;
+        if (dateStr === _calDragOriginDate) return; // dropped on same day, no-op
+
+        // AJAX reschedule
+        if (typeof $ !== 'undefined' && window.coraREWPData) {
+            $.post(coraREWPData.ajaxUrl, {
+                action: 'cora_update_article_date',
+                nonce: coraREWPData.ajaxNonce,
+                post_id: postId,
+                target_date: dateStr
+            }, function(r) {
+                if (window.coraShowToast) {
+                    if (r.success) {
+                        window.coraShowToast('Article rescheduled to ' + dateStr, 'success');
+                    } else {
+                        window.coraShowToast('Failed to reschedule article', 'error');
+                    }
+                }
+                if (r.success) {
+                    setTimeout(() => window.location.reload(), 400);
+                }
+            }).fail(function() {
+                if (window.coraShowToast) window.coraShowToast('Network error while rescheduling', 'error');
+            });
+        }
     };
 
+    // ============================================================
+    // CALENDAR: Click Empty Day Cell -> Open Create Drawer w/ Date Pre-filled
+    // ============================================================
     window.coraCalDayClick = function(e, dateStr) {
-        if(e.target.closest('.cora-cal-event-card') || e.target.closest('button')) return;
-        openCreateArticleDrawer();
+        if (e.target.closest('.cora-cal-event-card') || e.target.closest('button')) return;
+        if (typeof window.openCreateArticleDrawer === 'function') {
+            window.openCreateArticleDrawer();
+        }
         const dateInput = document.getElementById('ca-date');
-        if(dateInput) dateInput.value = dateStr;
+        if (dateInput) dateInput.value = dateStr;
     };
 
-    window.coraFilterCalendar = function() {
-        const statusFilter = (document.getElementById('cal-filter-status')?.value || '').toLowerCase();
-        const ownerFilter = document.getElementById('cal-filter-owner')?.value || '';
-
-        document.querySelectorAll('.cora-cal-event-card').forEach(card => {
-            const status = (card.dataset.status || '').toLowerCase();
-            const owner = card.dataset.owner || '';
-            
-            let show = true;
-            if(statusFilter && !status.includes(statusFilter)) show = false;
-            if(ownerFilter && owner !== ownerFilter) show = false;
-
-            if(show) card.classList.remove('hidden');
-            else card.classList.add('hidden');
-        });
+    // ============================================================
+    // CALENDAR: Board Tab -> Switch to Workflow View
+    // ============================================================
+    window.coraCalSwitchToBoard = function() {
+        if (typeof window.switchContentTab === 'function') {
+            window.switchContentTab('ct-workflow');
+        }
     };
 
-    window.coraResetCalendarFilters = function() {
-        ['cal-filter-type','cal-filter-status','cal-filter-channel','cal-filter-owner'].forEach(id => {
-            const el = document.getElementById(id);
-            if(el) el.value = '';
-        });
-        coraFilterCalendar();
-    };
-
-    window.coraOpenDayEventsDrawer = function(dayNum, dateStr, monthName) {
-        // Open day events list drawer or edit first
-        openCreateArticleDrawer();
-        const dateInput = document.getElementById('ca-date');
-        if(dateInput) dateInput.value = dateStr;
-    };
-
-
-    window.coraCloseAllDrawers = function() {
-        document.querySelectorAll('.cora-bottom-sheet, .cora-drawer-sheet, #cora-create-article-sheet, #cora-seo-detail-sheet').forEach(sheet => {
-            sheet.classList.add('collapsed', 'translate-x-full');
-        });
+    // ============================================================
+    // DRAWER CLOSE (scoped to content-suite drawers only)
+    // ============================================================
+    window.closeCreateArticleDrawer = function() {
+        const sheet = document.getElementById('cora-create-article-sheet');
+        if (sheet) sheet.classList.add('collapsed');
+        const seoSheet = document.getElementById('cora-seo-detail-sheet');
+        if (seoSheet) seoSheet.classList.add('collapsed');
         const bd = document.getElementById('cora-drawer-backdrop');
-        if (bd) {
-            bd.classList.add('hidden');
-            bd.style.pointerEvents = 'none';
-        }
-    };
-
-
-    // --- Calendar Week Navigation & Filter Logic ---
-    let currentWeekOffset = 0;
-    
-    window.coraNavWeek = function(delta) {
-        if (delta === 0) {
-            currentWeekOffset = 0;
-        } else {
-            currentWeekOffset += delta;
-        }
-        if (window.coraShowToast) {
-            const msg = currentWeekOffset === 0 ? "Showing current week" : (currentWeekOffset < 0 ? `Showing week (${currentWeekOffset})` : `Showing week (+${currentWeekOffset})`);
-            window.coraShowToast(msg, "info");
-        }
-    };
-
-
-    window.coraToggleFilterBar = function() {
-        const bar = document.getElementById('cal-filters-collapsible-bar');
-        if(bar) {
-            bar.classList.toggle('hidden');
-        }
-    };
-
-    window.coraToggleCalendarView = function(mode) {
-        const weekView = document.getElementById('cora-cal-week-view');
-        const monthView = document.getElementById('cora-cal-month-view');
-        const weekBtn = document.getElementById('btn-cal-view-week');
-        const monthBtn = document.getElementById('btn-cal-view-month');
-
-        if(mode === 'week') {
-            if(weekView) weekView.classList.remove('hidden');
-            if(monthView) monthView.classList.add('hidden');
-            if(weekBtn) { weekBtn.className = 'h-7 px-3.5 rounded-md text-xs font-bold bg-white text-zinc-950 shadow-2xs transition-all cursor-pointer'; }
-            if(monthBtn) { monthBtn.className = 'h-7 px-3.5 rounded-md text-xs font-semibold text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer'; }
-        } else {
-            if(weekView) weekView.classList.add('hidden');
-            if(monthView) monthView.classList.remove('hidden');
-            if(monthBtn) { monthBtn.className = 'h-7 px-3.5 rounded-md text-xs font-bold bg-white text-zinc-950 shadow-2xs transition-all cursor-pointer'; }
-            if(weekBtn) { weekBtn.className = 'h-7 px-3.5 rounded-md text-xs font-semibold text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer'; }
-        }
-    };
-
-    window.coraToggleCalendarView = function(mode) {
-        const weekBtn = document.getElementById('btn-cal-view-week');
-        const monthBtn = document.getElementById('btn-cal-view-month');
-        if(mode === 'week') {
-            if(weekBtn) { weekBtn.className = 'h-7 px-3.5 rounded-md text-xs font-bold bg-white text-zinc-950 shadow-2xs transition-all cursor-pointer'; }
-            if(monthBtn) { monthBtn.className = 'h-7 px-3.5 rounded-md text-xs font-semibold text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer'; }
-            if(window.coraShowToast) window.coraShowToast("Switched to Weekly View", "info");
-        } else {
-            if(monthBtn) { monthBtn.className = 'h-7 px-3.5 rounded-md text-xs font-bold bg-white text-zinc-950 shadow-2xs transition-all cursor-pointer'; }
-            if(weekBtn) { weekBtn.className = 'h-7 px-3.5 rounded-md text-xs font-semibold text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer'; }
-            if(window.coraShowToast) window.coraShowToast("Switched to Monthly View", "info");
-        }
-    };
-
-    window.coraToggleCalendarView = function(mode) {
-        const weekBtn = document.getElementById('btn-cal-view-week');
-        const monthBtn = document.getElementById('btn-cal-view-month');
-        if(mode === 'week') {
-            if(weekBtn) { weekBtn.className = 'h-7 px-3 rounded-md text-xs font-bold bg-white text-zinc-950 shadow-2xs transition-all'; }
-            if(monthBtn) { monthBtn.className = 'h-7 px-3 rounded-md text-xs font-semibold text-zinc-500 hover:text-zinc-900 transition-all'; }
-        } else {
-            if(monthBtn) { monthBtn.className = 'h-7 px-3 rounded-md text-xs font-bold bg-white text-zinc-950 shadow-2xs transition-all'; }
-            if(weekBtn) { weekBtn.className = 'h-7 px-3 rounded-md text-xs font-semibold text-zinc-500 hover:text-zinc-900 transition-all'; }
-        }
+        if (bd) { bd.classList.add('hidden'); }
+        if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
     };
 
     window.switchContentTab = function(tabId) {
