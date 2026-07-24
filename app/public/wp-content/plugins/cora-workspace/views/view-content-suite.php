@@ -249,26 +249,26 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         }
     ?>
     <!-- Top Filter Controls Bar -->
-    <div class="flex items-center justify-between mb-4">
-        <div class="flex items-center gap-2 select-none overflow-x-auto scrollbar-hide" id="ct-status-pills">
-            <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-zinc-900 text-white rounded-full text-xs font-bold transition-all shadow-2xs cursor-pointer active" data-status="all" onclick="filterContentByStatus('all', this)">All (<?php echo $total_cnt; ?>)</button>
-            <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-600 rounded-full text-xs font-medium transition-all cursor-pointer" data-status="published" onclick="filterContentByStatus('published', this)">Published (<?php echo $pub_cnt; ?>)</button>
-            <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-600 rounded-full text-xs font-medium transition-all cursor-pointer" data-status="draft" onclick="filterContentByStatus('draft', this)">Draft (<?php echo $draft_cnt; ?>)</button>
-            <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-600 rounded-full text-xs font-medium transition-all cursor-pointer" data-status="pending_review" onclick="filterContentByStatus('pending_review', this)">In Review (<?php echo $review_cnt; ?>)</button>
-            <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-600 rounded-full text-xs font-medium transition-all cursor-pointer" data-status="approved" onclick="filterContentByStatus('approved', this)">Approved (<?php echo $approved_cnt; ?>)</button>
+    <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 mb-5">
+        <div class="flex items-center gap-2 select-none overflow-x-auto pb-1.5 xl:pb-0 scrollbar-hide shrink-0" id="ct-status-pills">
+            <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-zinc-900 text-white rounded-full text-xs font-bold transition-all shadow-2xs cursor-pointer active whitespace-nowrap" data-status="all" onclick="filterContentByStatus('all', this)">All (<?php echo $total_cnt; ?>)</button>
+            <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-600 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap" data-status="published" onclick="filterContentByStatus('published', this)">Published (<?php echo $pub_cnt; ?>)</button>
+            <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-600 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap" data-status="draft" onclick="filterContentByStatus('draft', this)">Draft (<?php echo $draft_cnt; ?>)</button>
+            <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-600 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap" data-status="pending_review" onclick="filterContentByStatus('pending_review', this)">In Review (<?php echo $review_cnt; ?>)</button>
+            <button type="button" class="ct-status-btn px-3.5 py-1.5 bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-600 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap" data-status="approved" onclick="filterContentByStatus('approved', this)">Approved (<?php echo $approved_cnt; ?>)</button>
         </div>
-        <div class="flex items-center gap-2.5">
-            <div class="relative w-56">
+        <div class="flex flex-wrap items-center gap-2 sm:gap-2.5 w-full xl:w-auto">
+            <div class="relative flex-1 min-w-[140px] sm:flex-none sm:w-56">
                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 <input type="text" id="ct-search" class="w-full pl-8 pr-3 py-1.5 border border-zinc-200 hover:border-zinc-300 rounded-lg text-xs bg-white text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 transition-all" placeholder="Search articles..." oninput="searchContentTable(this.value)">
             </div>
-            <select id="ct-filter-author" class="border border-zinc-200 hover:border-zinc-300 rounded-lg px-3 py-1.5 text-xs bg-white text-zinc-700 focus:outline-none transition-all cursor-pointer font-medium" onchange="filterContentByAuthor(this.value)">
+            <select id="ct-filter-author" class="flex-1 min-w-[110px] sm:flex-none border border-zinc-200 hover:border-zinc-300 rounded-lg px-3 py-1.5 text-xs bg-white text-zinc-700 focus:outline-none transition-all cursor-pointer font-medium" onchange="filterContentByAuthor(this.value)">
                 <option value="all">All Authors</option>
                 <?php foreach($cora_users as $u): ?>
                     <option value="<?php echo esc_attr($u->ID); ?>"><?php echo esc_html($u->display_name); ?></option>
                 <?php endforeach; ?>
             </select>
-            <button onclick="openCreateArticleDrawer()" class="bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
+            <button onclick="openCreateArticleDrawer()" class="flex-1 justify-center sm:flex-none bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all shadow-xs flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 <span>New Article</span>
             </button>

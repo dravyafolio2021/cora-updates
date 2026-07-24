@@ -8719,4 +8719,3 @@ jQuery(document).ready(function($) {
             window.coraShowToast("Server error occurred during Git sync.");
         });
     });
-});
