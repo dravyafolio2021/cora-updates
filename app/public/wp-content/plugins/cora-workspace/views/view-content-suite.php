@@ -154,6 +154,11 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><polyline points="11 8 11 11 13 13"></polyline></svg>
         SEO Analyzer
     </button>
+    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-workflow" onclick="switchContentTab('ct-workflow')">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        Workflow Board
+        <span class="ml-1 px-1.5 py-0.5 bg-zinc-900 text-white text-[9px] font-bold rounded-full">NEW</span>
+    </button>
     <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-geo" onclick="switchContentTab('ct-geo')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
         GEO / AI Visibility
@@ -168,11 +173,6 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
         Content Calendar
         <span class="ml-1 px-1.5 py-0.5 bg-zinc-200 text-zinc-600 text-[9px] font-bold rounded-full">SOON</span>
-    </button>
-    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap" data-tab="ct-workflow" onclick="switchContentTab('ct-workflow')">
-        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-        Workflow Board
-        <span class="ml-1 px-1.5 py-0.5 bg-zinc-900 text-white text-[9px] font-bold rounded-full">NEW</span>
     </button>
 </div>
 
@@ -338,28 +338,28 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 </div>
 <!-- PANEL: SEO Analyzer -->
 <div id="panel-ct-seo" class="cora-ct-panel hidden">
-    <div class="flex gap-6 items-start">
+    <div class="flex flex-col md:flex-row gap-6 items-start">
         <!-- Left: Article List -->
-        <div id="seo-sidebar" class="w-[280px] shrink-0 bg-white border border-zinc-200 rounded-xl shadow-2xs sticky top-4 max-h-[calc(100vh-140px)] flex flex-col overflow-hidden transition-all duration-200">
+        <div id="seo-sidebar" class="w-full md:w-[260px] shrink-0 bg-white border border-zinc-200/80 rounded-xl shadow-2xs sticky top-4 max-h-80 md:max-h-[calc(100vh-140px)] flex flex-col overflow-hidden transition-all duration-300">
             <!-- Header -->
-            <div id="seo-sidebar-header" class="p-3.5 border-b border-zinc-200 bg-zinc-50/70 flex items-center justify-between">
+            <div id="seo-sidebar-header" class="p-3 border-b border-zinc-200/80 bg-zinc-50/70 flex items-center justify-between">
                 <div class="flex items-center gap-2 overflow-hidden seo-sidebar-text">
                     <span class="text-[11px] font-bold text-zinc-900 uppercase tracking-wider whitespace-nowrap">ARTICLES</span>
-                    <span id="seo-article-count-badge" class="text-[10px] font-bold px-2 py-0.5 bg-zinc-200 text-zinc-700 rounded-full"><?php echo count($cora_posts); ?></span>
+                    <span id="seo-article-count-badge" class="text-[10px] font-bold px-2 py-0.5 bg-zinc-200/80 text-zinc-700 rounded-full"><?php echo count($cora_posts); ?></span>
                 </div>
                 <button id="seo-sidebar-toggle-btn" class="p-1 rounded-md hover:bg-zinc-200 text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer shrink-0" onclick="toggleSEOSidebar()" title="Collapse Sidebar">
-                    <svg id="seo-sidebar-toggle-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    <svg id="seo-sidebar-toggle-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 </button>
             </div>
             
             <!-- Search & Filter Bar -->
             <div class="p-3 border-b border-zinc-100 flex items-center gap-2 seo-sidebar-content">
                 <div class="relative flex-1">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" id="seo-search" class="w-full pl-8 pr-3 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-500 bg-zinc-50/50 focus:bg-white transition-all" placeholder="Search title or ID..." oninput="filterSEOArticleList(this.value)">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="seo-search" class="w-full pl-8 pr-3 py-1.5 border border-zinc-200/80 rounded-lg text-xs focus:outline-none focus:border-zinc-400 bg-zinc-50/50 focus:bg-white transition-all" placeholder="Search title or ID..." oninput="filterSEOArticleList(this.value)">
                 </div>
-                <button class="p-1.5 border border-zinc-200 rounded-lg hover:bg-zinc-50 text-zinc-500 hover:text-zinc-900 transition-colors shrink-0" title="Filter Articles">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                <button class="p-1.5 border border-zinc-200/80 rounded-lg hover:bg-zinc-50 text-zinc-500 hover:text-zinc-900 transition-colors shrink-0" title="Filter Articles">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                 </button>
             </div>
 
@@ -380,11 +380,11 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                     $score = get_post_meta($post->ID, '_cora_seo_score', true) ?: rand(65, 92);
                     $modified_time = human_time_diff(get_the_modified_time('U', $post->ID), current_time('timestamp'));
                 ?>
-                <button class="seo-article-btn w-full text-left p-3 hover:bg-zinc-50 rounded-lg border border-transparent hover:border-zinc-200 transition-all cursor-pointer flex flex-col gap-1.5 group <?php echo $idx === 0 ? 'active bg-zinc-50 border-zinc-200 shadow-2xs' : ''; ?>" data-id="<?php echo $post->ID; ?>" data-title="<?php echo esc_attr($post->post_title); ?>" data-score="<?php echo $score; ?>" onclick="openSEOAnalysis(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
+                <button class="seo-article-btn w-full text-left p-3 hover:bg-zinc-50 rounded-lg border border-transparent hover:border-zinc-200/80 transition-all cursor-pointer flex flex-col gap-1.5 group <?php echo $idx === 0 ? 'active bg-zinc-50 border-zinc-200/80 shadow-2xs' : ''; ?>" data-id="<?php echo $post->ID; ?>" data-title="<?php echo esc_attr($post->post_title); ?>" data-score="<?php echo $score; ?>" onclick="openSEOAnalysis(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
                     <div class="text-xs font-bold text-zinc-900 group-hover:text-zinc-700 line-clamp-2 leading-snug"><?php echo esc_html($post->post_title); ?></div>
                     <div class="flex items-center justify-between mt-0.5 text-[10px] text-zinc-400">
                         <span>ID #<?php echo $post->ID; ?> &bull; <?php echo $modified_time; ?> ago</span>
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80"><?php echo $score; ?>/100</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60"><?php echo $score; ?>/100</span>
                     </div>
                 </button>
                 <?php endforeach; ?>
@@ -396,7 +396,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             </div>
 
             <!-- Bottom Pagination Bar -->
-            <div id="seo-pagination-container" class="p-2.5 border-t border-zinc-200 bg-zinc-50/70 flex flex-col items-center gap-1.5 text-xs text-zinc-500 font-medium select-none seo-sidebar-content">
+            <div id="seo-pagination-container" class="p-2.5 border-t border-zinc-200/80 bg-zinc-50/70 flex flex-col items-center gap-1.5 text-xs text-zinc-500 font-medium select-none seo-sidebar-content">
                 <div id="seo-pagination-info" class="text-[11px] text-zinc-500 font-normal">Showing 1-5 of <?php echo count($cora_posts); ?></div>
                 <div id="seo-pagination-controls" class="flex items-center justify-center gap-1">
                     <!-- Pagination buttons rendered dynamically in JS -->
@@ -405,7 +405,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         </div>
         
         <!-- Right: Analysis Area -->
-        <div class="flex-1 bg-white border border-zinc-200 rounded-xl shadow-2xs p-6 min-h-[780px]" id="seo-analysis-container">
+        <div class="flex-1 bg-white border border-zinc-200/80 rounded-xl shadow-2xs p-4 sm:p-6 max-h-[calc(100vh-140px)] overflow-y-auto" id="seo-analysis-container">
             <div class="text-center text-zinc-500 py-28 max-w-sm mx-auto">
                 <div class="w-16 h-16 bg-zinc-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -679,12 +679,12 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     </div>
     <div class="p-6 overflow-y-auto flex-1 space-y-6">
         <input type="hidden" id="seo-drawer-article-id">
-        <div class="flex items-center gap-4 p-4 bg-zinc-50 rounded-xl border border-zinc-200">
+        <div class="flex items-center gap-4 p-4 bg-zinc-50/60 rounded-xl border border-zinc-200/80">
             <button class="bg-zinc-900 hover:bg-zinc-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors" onclick="runSEOAnalysis(document.getElementById('seo-drawer-article-id').value)">Run Analysis</button>
             <div class="ml-auto flex flex-col items-center">
                 <svg width="64" height="64" viewBox="0 0 64 64" class="-rotate-90">
-                    <circle cx="32" cy="32" r="28" stroke="#e4e4e7" stroke-width="8" fill="none"/>
-                    <circle cx="32" cy="32" r="28" stroke="#18181b" stroke-width="8" fill="none"
+                    <circle cx="32" cy="32" r="28" stroke="#f4f4f5" stroke-width="6" fill="none"/>
+                    <circle cx="32" cy="32" r="28" stroke="#18181b" stroke-width="6" fill="none"
                         stroke-dasharray="175.9" stroke-dashoffset="175.9"
                         id="seo-ring-progress" stroke-linecap="round" style="transition: stroke-dashoffset 0.6s ease"/>
                 </svg>
@@ -2009,8 +2009,8 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 
             // Prev button
             const prevBtn = document.createElement('button');
-            prevBtn.className = 'px-2 py-1 rounded hover:bg-zinc-200 text-zinc-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-xs font-semibold cursor-pointer';
-            prevBtn.innerHTML = '&lt;';
+            prevBtn.className = 'w-7 h-7 rounded flex items-center justify-center hover:bg-zinc-200 text-zinc-500 hover:text-zinc-900 transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer';
+            prevBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>';
             prevBtn.title = 'Previous Page';
             prevBtn.disabled = _seoCurrentPage === 1 || totalCount === 0;
             prevBtn.onclick = function() { window.changeSEOPage(_seoCurrentPage - 1); };
@@ -2056,8 +2056,8 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 
             // Next button
             const nextBtn = document.createElement('button');
-            nextBtn.className = 'px-2 py-1 rounded hover:bg-zinc-200 text-zinc-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-xs font-semibold cursor-pointer';
-            nextBtn.innerHTML = '&gt;';
+            nextBtn.className = 'w-7 h-7 rounded flex items-center justify-center hover:bg-zinc-200 text-zinc-500 hover:text-zinc-900 transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer';
+            nextBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>';
             nextBtn.title = 'Next Page';
             nextBtn.disabled = _seoCurrentPage === totalPages || totalCount === 0;
             nextBtn.onclick = function() { window.changeSEOPage(_seoCurrentPage + 1); };
@@ -2100,36 +2100,47 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         const header = document.getElementById('seo-sidebar-header');
         if (!sidebar) return;
 
-        const isCurrentlyCollapsed = sidebar.classList.contains('w-[48px]');
+        const isCurrentlyCollapsed = sidebar.classList.contains('w-[40px]');
         const shouldCollapse = (typeof forceState === 'boolean') ? forceState : !isCurrentlyCollapsed;
 
         const contentEls = sidebar.querySelectorAll('.seo-sidebar-content');
         const textEls = sidebar.querySelectorAll('.seo-sidebar-text');
 
         if (shouldCollapse) {
-            sidebar.classList.remove('w-[280px]', 'w-80');
-            sidebar.classList.add('w-[48px]');
+            sidebar.classList.remove('w-[260px]', 'w-[280px]', 'w-80', 'md:w-\[260px\]');
+            sidebar.classList.add('w-[40px]');
+            // Remove md: responsive width so collapse works on all screens
+            sidebar.style.minWidth = '40px';
+            sidebar.style.maxWidth = '40px';
             contentEls.forEach(el => el.classList.add('hidden'));
             textEls.forEach(el => el.classList.add('hidden'));
             if (header) {
                 header.classList.remove('justify-between');
                 header.classList.add('justify-center');
+                header.style.padding = '8px 0';
             }
             if (toggleIcon) {
+                toggleIcon.setAttribute('width', '14');
+                toggleIcon.setAttribute('height', '14');
                 toggleIcon.innerHTML = '<polyline points="9 18 15 12 9 6"></polyline>';
             }
             if (toggleBtn) toggleBtn.title = 'Expand Sidebar';
             localStorage.setItem('cora_seo_sidebar_collapsed', 'true');
         } else {
-            sidebar.classList.remove('w-[48px]');
-            sidebar.classList.add('w-[280px]');
+            sidebar.classList.remove('w-[40px]');
+            sidebar.style.minWidth = '';
+            sidebar.style.maxWidth = '';
+            sidebar.classList.add('w-[260px]');
             contentEls.forEach(el => el.classList.remove('hidden'));
             textEls.forEach(el => el.classList.remove('hidden'));
             if (header) {
                 header.classList.remove('justify-center');
                 header.classList.add('justify-between');
+                header.style.padding = '';
             }
             if (toggleIcon) {
+                toggleIcon.setAttribute('width', '15');
+                toggleIcon.setAttribute('height', '15');
                 toggleIcon.innerHTML = '<polyline points="15 18 9 12 15 6"></polyline>';
             }
             if (toggleBtn) toggleBtn.title = 'Collapse Sidebar';
