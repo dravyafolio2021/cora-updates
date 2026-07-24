@@ -362,6 +362,16 @@ window.coraEditArticle = function(postId, title) {
 };
 
 window.moveToStage = function(itemId, targetStage) {
+  // 1. Save to localStorage immediately for bulletproof persistence
+  try {
+    localStorage.setItem('cora_stage_' + itemId, targetStage);
+    const cardEl = document.querySelector(`.cora-wb-card[data-id="${itemId}"]`);
+    if(cardEl) {
+      const postId = cardEl.getAttribute('data-post-id');
+      if(postId) localStorage.setItem('cora_stage_' + postId, targetStage);
+    }
+  } catch(e){}
+
   const $ = window.jQuery || window.$;
   const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : ''));
   const nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '');
@@ -377,9 +387,6 @@ window.moveToStage = function(itemId, targetStage) {
       const label = window.STAGE_LABELS[targetStage] || targetStage;
       if(typeof window.coraShowToast === 'function') {
         window.coraShowToast('Moved to ' + label, 'success');
-      }
-      if (typeof window.loadContentWorkspace === 'function') {
-        window.loadContentWorkspace();
       }
     } else {
       if(typeof window.coraShowToast === 'function') {
@@ -410,7 +417,24 @@ window.loadContentWorkspace = function(stageFilter) {
 };
 
 window.renderWorkspaceBoard = function(data) {
-  const itemsList = Array.isArray(data) ? data : (data.stages ? Object.values(data.stages).flat() : []);
+  let itemsList = [];
+  if (Array.isArray(data)) {
+    itemsList = data;
+  } else if (data && data.stages) {
+    Object.keys(data.stages).forEach(st => {
+      itemsList = itemsList.concat(data.stages[st] || []);
+    });
+  }
+
+  // Apply localStorage saved stages if present
+  itemsList = itemsList.map(item => {
+    try {
+      const saved = localStorage.getItem('cora_stage_' + item.id) || (item.post_id ? localStorage.getItem('cora_stage_' + item.post_id) : null);
+      if (saved) item.stage = saved;
+    } catch(e){}
+    return item;
+  });
+
   const grouped = {'idea':[], 'drafting':[], 'review':[], 'scheduled':[], 'published':[]};
   itemsList.forEach(item => {
     const rawStage = item.stage || 'idea';
@@ -519,4 +543,46 @@ window.renderItemCard = function(item, currentColKey) {
 };
 
 window.escHtml = function(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
+
+// Apply localStorage saved card positions instantly on page startup
+(function syncLocalStorageCards() {
+  function runSync() {
+    document.querySelectorAll('.cora-wb-card').forEach(function(card) {
+      var itemId = card.getAttribute('data-id');
+      var postId = card.getAttribute('data-post-id');
+      var saved = null;
+      try {
+        saved = localStorage.getItem('cora_stage_' + itemId) || (postId ? localStorage.getItem('cora_stage_' + postId) : null);
+      } catch(e){}
+      if (saved) {
+        var targetCol = document.querySelector('.ct-stage-column[data-stage="' + saved + '"]');
+        if (targetCol && card.parentElement !== targetCol) {
+          var placeholder = targetCol.querySelector('.empty-stage-placeholder');
+          if (placeholder) placeholder.remove();
+          targetCol.appendChild(card);
+          card.setAttribute('data-stage', saved);
+        }
+      }
+    });
+
+    // Update column counts
+    window.STAGE_ORDER.forEach(function(colKey) {
+      var col = document.querySelector('.ct-stage-column[data-stage="' + colKey + '"]');
+      var countEl = document.querySelector('[data-stage="' + colKey + '"] .ct-stage-count');
+      if (col && countEl) {
+        var cards = col.querySelectorAll('.cora-wb-card');
+        countEl.textContent = cards.length;
+        if (cards.length === 0 && !col.querySelector('.empty-stage-placeholder')) {
+          col.innerHTML = '<div class="empty-stage-placeholder w-full h-36 rounded-xl flex flex-col items-center justify-center text-zinc-400 text-xs gap-1.5 my-auto p-4 text-center" style="background-color: rgba(255, 255, 255, 0.75); border: 1.5px dashed #d4d4d8;"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-400 mx-auto"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg><span class="font-bold text-zinc-500 text-xs">No items in stage</span></div>';
+        }
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runSync);
+  } else {
+    runSync();
+  }
+})();
 </script>
