@@ -449,80 +449,210 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 </div>
 
 <!-- PANEL: Content Calendar -->
-<div id="panel-ct-calendar" class="cora-ct-panel hidden space-y-6">
-    <!-- Month Calendar Grid -->
-    <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm">
-        <?php
-        $month_now = date('n');
-        $year_now  = date('Y');
-        $month_name = date('F Y');
-        $days_in_month = cal_days_in_month(CAL_GREGORIAN, $month_now, $year_now);
-        $first_dow = date('N', mktime(0,0,0,$month_now,1,$year_now)); // 1=Mon..7=Sun
-        
-        // Group posts by day of month
-        $pub_dates = [];
-        foreach($cora_posts as $pp) {
-            $d = (int)get_the_date('j', $pp->ID);
-            $m = (int)get_the_date('n', $pp->ID);
-            if($m === (int)$month_now) {
-                if(!isset($pub_dates[$d])) $pub_dates[$d] = [];
-                $pub_dates[$d][] = $pp;
-            }
+<div id="panel-ct-calendar" class="cora-ct-panel hidden space-y-4">
+    <?php
+    $month_now = date('n');
+    $year_now  = date('Y');
+    $month_name = date('F Y');
+    $days_in_month = cal_days_in_month(CAL_GREGORIAN, $month_now, $year_now);
+    $first_dow = date('N', mktime(0,0,0,$month_now,1,$year_now)); // 1=Mon..7=Sun
+    $prev_days_fill = $first_dow - 1;
+    $prev_month_days = cal_days_in_month(CAL_GREGORIAN, $month_now == 1 ? 12 : $month_now - 1, $month_now == 1 ? $year_now - 1 : $year_now);
+    
+    // Group posts by day of month
+    $pub_dates = [];
+    foreach($cora_posts as $pp) {
+        $d = (int)get_the_date('j', $pp->ID);
+        $m = (int)get_the_date('n', $pp->ID);
+        if($m === (int)$month_now) {
+            if(!isset($pub_dates[$d])) $pub_dates[$d] = [];
+            $pub_dates[$d][] = $pp;
         }
-        ?>
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <h3 class="text-sm font-bold text-zinc-900"><?php echo esc_html($month_name); ?></h3>
-                <p class="text-xs text-zinc-500">Scheduled and published content calendar overview.</p>
+    }
+    ?>
+
+    <!-- Top Rich Control Bar -->
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white p-3.5 border border-zinc-200 rounded-xl shadow-2xs">
+        <!-- Left Filters & Navigation -->
+        <div class="flex items-center gap-2 flex-wrap">
+            <select id="cal-filter-type" class="h-8 px-2.5 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer">
+                <option value="">All Types</option>
+                <option value="blog">Blog Post</option>
+                <option value="instagram">Instagram Post</option>
+                <option value="youtube">YouTube Video</option>
+                <option value="linkedin">LinkedIn Post</option>
+                <option value="newsletter">Newsletter</option>
+                <option value="x">X (Twitter)</option>
+                <option value="case_study">Case Study</option>
+            </select>
+
+            <select id="cal-filter-status" class="h-8 px-2.5 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer">
+                <option value="">All Status</option>
+                <option value="draft">Draft</option>
+                <option value="in_review">In Review</option>
+                <option value="scheduled">Scheduled</option>
+                <option value="publish">Published</option>
+            </select>
+
+            <select id="cal-filter-channel" class="h-8 px-2.5 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer">
+                <option value="">All Channels</option>
+                <option value="blog">Website Blog</option>
+                <option value="social">Social Media</option>
+                <option value="email">Email Newsletter</option>
+            </select>
+
+            <select id="cal-filter-owner" class="h-8 px-2.5 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 bg-white hover:border-zinc-300 outline-none cursor-pointer">
+                <option value="">All Owners</option>
+                <?php foreach($cora_users as $u): ?>
+                    <option value="<?php echo esc_attr($u->ID); ?>"><?php echo esc_html($u->display_name); ?></option>
+                <?php endforeach; ?>
+            </select>
+
+            <!-- Month Controls -->
+            <div class="flex items-center gap-1 border border-zinc-200 rounded-lg p-0.5 bg-zinc-50/50">
+                <button class="h-7 w-7 rounded-md hover:bg-white flex items-center justify-center text-zinc-600 transition-colors cursor-pointer" title="Previous Month">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <span class="text-xs font-bold text-zinc-900 px-2 min-w-[90px] text-center"><?php echo esc_html($month_name); ?></span>
+                <button class="h-7 w-7 rounded-md hover:bg-white flex items-center justify-center text-zinc-600 transition-colors cursor-pointer" title="Next Month">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
             </div>
-            <div class="flex items-center gap-3 text-xs text-zinc-500">
-                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-zinc-900 inline-block"></span>Published</span>
-                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-zinc-400 inline-block"></span>Draft/Review</span>
+
+            <!-- Filters Button -->
+            <button class="h-8 px-3 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-700 flex items-center gap-1.5 cursor-pointer">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                Filters
+            </button>
+        </div>
+
+        <!-- Right View Mode & Color Legend -->
+        <div class="flex items-center gap-4 shrink-0 flex-wrap">
+            <!-- View Mode Switcher -->
+            <div class="flex items-center p-0.5 rounded-lg border border-zinc-200 bg-zinc-100 text-zinc-600">
+                <button class="h-7 px-3 rounded-md text-xs font-bold bg-white text-zinc-950 shadow-2xs">Month</button>
+                <button class="h-7 px-3 rounded-md text-xs font-semibold text-zinc-500 hover:text-zinc-900">Week</button>
             </div>
+
+            <!-- Color Status Legend -->
+            <div class="hidden sm:flex items-center gap-3 text-xs font-medium text-zinc-600">
+                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-zinc-400"></span> Draft</span>
+                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-500"></span> In Review</span>
+                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Scheduled</span>
+                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Published</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Card Container -->
+    <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-2xs">
+        <!-- Title -->
+        <div class="mb-4">
+            <h2 class="text-xl font-bold text-zinc-950 tracking-tight"><?php echo esc_html($month_name); ?></h2>
         </div>
 
         <!-- Days of Week Header -->
-        <div style="display: grid !important; grid-template-columns: repeat(7, minmax(0, 1fr)) !important; gap: 6px; width: 100% !important;" class="mb-2 text-center border-b border-zinc-100 pb-2">
-            <?php foreach(['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] as $dn): ?>
-                <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider"><?php echo $dn; ?></div>
+        <div style="display: grid !important; grid-template-columns: repeat(7, minmax(0, 1fr)) !important; gap: 8px; width: 100% !important;" class="mb-3 text-center border-b border-zinc-100 pb-2">
+            <?php foreach(['MON','TUE','WED','THU','FRI','SAT','SUN'] as $dn): ?>
+                <div class="text-[11px] font-bold text-zinc-400 tracking-wider"><?php echo $dn; ?></div>
             <?php endforeach; ?>
         </div>
 
         <!-- 7-Column Date Grid -->
-        <div style="display: grid !important; grid-template-columns: repeat(7, minmax(0, 1fr)) !important; gap: 6px; width: 100% !important;">
-            <?php for($pad=1; $pad < $first_dow; $pad++): ?>
-                <div class="h-20 bg-zinc-50/40 rounded-lg border border-dashed border-zinc-100"></div>
+        <div style="display: grid !important; grid-template-columns: repeat(7, minmax(0, 1fr)) !important; gap: 8px; width: 100% !important;">
+            <!-- Previous Month Filler Days -->
+            <?php for($pad = $prev_days_fill; $pad >= 1; $pad--): 
+                $p_day = $prev_month_days - $pad + 1;
+            ?>
+                <div class="min-h-[110px] p-2.5 rounded-xl border border-zinc-100 bg-zinc-50/40 text-zinc-300 text-xs font-bold">
+                    <?php echo $p_day; ?>
+                </div>
             <?php endfor; ?>
 
+            <!-- Current Month Days -->
             <?php for($d=1; $d<=$days_in_month; $d++): 
-                $is_today = ($d == date('j') && $month_now == date('n'));
+                $is_today = ($d == (int)date('j') && $month_now == (int)date('n'));
                 $day_posts = $pub_dates[$d] ?? [];
             ?>
-                <div class="h-20 p-2 rounded-lg border <?php echo $is_today ? 'bg-zinc-900/5 border-zinc-900' : 'bg-white border-zinc-200/80 hover:border-zinc-300'; ?> flex flex-col justify-between transition-all min-w-0 overflow-hidden">
-                    <div class="flex items-center justify-between min-w-0">
-                        <span class="text-xs font-bold <?php echo $is_today ? 'bg-zinc-900 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]' : 'text-zinc-700'; ?>">
+                <div class="min-h-[110px] p-2.5 rounded-xl border <?php echo $is_today ? 'border-2 border-zinc-950 bg-white shadow-2xs' : 'border-zinc-200/80 bg-white hover:border-zinc-300'; ?> flex flex-col justify-between transition-all min-w-0">
+                    <!-- Day Number Header -->
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-xs font-bold <?php echo $is_today ? 'w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[11px]' : 'text-zinc-700'; ?>">
                             <?php echo $d; ?>
                         </span>
-                        <?php if(!empty($day_posts)): ?>
-                            <span class="text-[9px] font-bold px-1.5 py-0.5 bg-zinc-100 text-zinc-600 rounded-full shrink-0"><?php echo count($day_posts); ?></span>
-                        <?php endif; ?>
                     </div>
                     
-                    <div class="mt-1 space-y-1 overflow-y-auto flex-1 min-w-0">
+                    <!-- Day Events Cards Container -->
+                    <div class="space-y-1.5 flex-1 min-w-0 overflow-y-auto max-h-[130px] no-scrollbar">
                         <?php foreach($day_posts as $dp): 
-                            $status_color = ($dp->post_status === 'publish') ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-800 border border-zinc-200';
+                            $status = $dp->post_status;
+                            $editorial_status = get_post_meta($dp->ID, '_cora_editorial_status', true) ?: ($status === 'publish' ? 'published' : 'draft');
+                            $assignee_id = get_post_meta($dp->ID, '_cora_assignee_id', true);
+                            $assignee = $assignee_id ? get_userdata($assignee_id) : null;
+                            $initials = $assignee ? strtoupper(substr($assignee->display_name, 0, 2)) : 'DB';
+                            
+                            // Badge & Colors
+                            $border_accent = 'border-l-zinc-400';
+                            $status_tag = 'Draft';
+                            $tag_bg = 'bg-zinc-100 text-zinc-600';
+                            
+                            if ($editorial_status === 'published' || $status === 'publish') {
+                                $border_accent = 'border-l-emerald-500';
+                                $status_tag = 'Published';
+                                $tag_bg = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400';
+                            } elseif ($editorial_status === 'scheduled') {
+                                $border_accent = 'border-l-blue-500';
+                                $status_tag = 'Scheduled';
+                                $tag_bg = 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-400';
+                            } elseif ($editorial_status === 'pending_review' || $editorial_status === 'in_review') {
+                                $border_accent = 'border-l-amber-500';
+                                $status_tag = 'In Review';
+                                $tag_bg = 'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400';
+                            }
                         ?>
-                            <div class="text-[10px] font-medium truncate px-1.5 py-0.5 rounded <?php echo $status_color; ?> cursor-pointer hover:opacity-80 transition-opacity w-full block" title="<?php echo esc_attr($dp->post_title); ?>" onclick="coraEditArticle(<?php echo $dp->ID; ?>)">
-                                <?php echo esc_html($dp->post_title); ?>
+                            <!-- Event Card -->
+                            <div class="p-2 rounded-lg border border-zinc-200/90 border-l-3 <?php echo $border_accent; ?> bg-white hover:shadow-2xs transition-all cursor-pointer group" onclick="coraEditArticle(<?php echo $dp->ID; ?>)">
+                                <!-- Type Icon & Label -->
+                                <div class="flex items-center justify-between text-[9.5px] font-semibold text-zinc-400 mb-0.5">
+                                    <span class="flex items-center gap-1">
+                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                        Blog Post
+                                    </span>
+                                </div>
+                                
+                                <!-- Article Title -->
+                                <div class="text-[11px] font-bold text-zinc-900 group-hover:text-zinc-700 truncate leading-snug mb-1.5" title="<?php echo esc_attr($dp->post_title); ?>">
+                                    <?php echo esc_html($dp->post_title); ?>
+                                </div>
+
+                                <!-- Status Tag & Author Initials Circle -->
+                                <div class="flex items-center justify-between">
+                                    <span class="px-1.5 py-0.5 rounded text-[8.5px] font-bold uppercase tracking-wider <?php echo $tag_bg; ?>">
+                                        <?php echo $status_tag; ?>
+                                    </span>
+                                    <span class="w-4 h-4 rounded-full bg-zinc-100 border border-zinc-300 text-[7.5px] font-bold text-zinc-600 flex items-center justify-center shrink-0" title="<?php echo esc_attr($assignee ? $assignee->display_name : 'Owner'); ?>">
+                                        <?php echo $initials; ?>
+                                    </span>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
                 </div>
             <?php endfor; ?>
+
+            <!-- Next Month Filler Days -->
+            <?php 
+            $total_rendered = $prev_days_fill + $days_in_month;
+            $next_days_fill = (7 - ($total_rendered % 7)) % 7;
+            for($n = 1; $n <= $next_days_fill; $n++):
+            ?>
+                <div class="min-h-[110px] p-2.5 rounded-xl border border-zinc-100 bg-zinc-50/40 text-zinc-300 text-xs font-bold">
+                    <?php echo $n; ?>
+                </div>
+            <?php endfor; ?>
         </div>
     </div>
-
-
+</div>
 <!-- PANEL: Workflow Board -->
 <div id="panel-ct-workflow" class="cora-ct-panel hidden">
     <?php include CORA_WORKSPACE_PATH . 'views/partials/content-workflow-board.php'; ?>
