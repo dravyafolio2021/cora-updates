@@ -67,6 +67,8 @@ $stages = [
     'published'        => 'Published',
     'performance'      => 'Performance'
 ];
+
+$stage_order_keys = array_keys($stages);
 ?>
 
 <!-- WORKFLOW BOARD TOOLBAR -->
@@ -76,36 +78,39 @@ $stages = [
     <span class="px-2 py-0.5 bg-zinc-100 border border-zinc-200 rounded-full text-[10px] font-bold text-zinc-600"><?php echo count($stages); ?> Columns</span>
   </div>
   <div class="flex items-center gap-2">
-    <button class="cora-btn-primary px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm" onclick="openContentBriefDrawer()">
+    <button class="cora-btn-primary px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm" onclick="openCreateArticleDrawer()">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         New Content Brief
     </button>
   </div>
 </div>
 
-<!-- KANBAN BOARD CONTAINER (SCROLLABLE) -->
-<div class="flex gap-3.5 overflow-x-auto pb-6 scrollbar-hide select-none" id="cora-workflow-kanban" style="-webkit-overflow-scrolling: touch;">
+<!-- KANBAN BOARD CONTAINER (100% SOLID OPACITY) -->
+<div class="flex gap-4 overflow-x-auto pb-6 select-none opacity-100" id="cora-workflow-kanban" style="-webkit-overflow-scrolling: touch; opacity: 1 !important;">
   <?php foreach($stages as $stage_key => $stage_label): 
     $stage_cards = $grouped_items[$stage_key] ?? [];
+    $current_stage_idx = array_search($stage_key, $stage_order_keys);
+    $next_stage_key = ($current_stage_idx !== false && $current_stage_idx < count($stage_order_keys) - 1) ? $stage_order_keys[$current_stage_idx + 1] : null;
+    $next_stage_label = $next_stage_key ? $stages[$next_stage_key] : null;
   ?>
-  <div class="w-72 shrink-0 bg-zinc-50/80 border border-zinc-200/80 rounded-2xl flex flex-col transition-all ct-stage-container" data-stage="<?php echo $stage_key; ?>">
+  <div class="w-72 shrink-0 bg-zinc-100/90 border border-zinc-200 rounded-2xl flex flex-col transition-all ct-stage-container opacity-100" data-stage="<?php echo $stage_key; ?>">
     
     <!-- Stage Column Header -->
-    <div class="p-3 border-b border-zinc-200/70 flex items-center justify-between bg-white rounded-t-2xl">
+    <div class="p-3 border-b border-zinc-200 flex items-center justify-between bg-white rounded-t-2xl">
       <div class="flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-zinc-900"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-zinc-900"></span>
         <span class="text-xs font-bold text-zinc-900 uppercase tracking-wide"><?php echo $stage_label; ?></span>
       </div>
       <div class="flex items-center gap-1">
-        <span class="ct-stage-count px-2 py-0.5 rounded-full bg-zinc-100 text-[10px] font-bold text-zinc-700"><?php echo count($stage_cards); ?></span>
-        <button class="p-1 text-zinc-400 hover:text-zinc-900 rounded hover:bg-zinc-100 transition-colors" title="Add brief to <?php echo $stage_label; ?>" onclick="openContentBriefDrawer()">
+        <span class="ct-stage-count px-2 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-[10px] font-bold text-zinc-800"><?php echo count($stage_cards); ?></span>
+        <button class="p-1 text-zinc-400 hover:text-zinc-900 rounded hover:bg-zinc-100 transition-colors" title="Add to <?php echo $stage_label; ?>" onclick="openCreateArticleDrawer()">
           <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         </button>
       </div>
     </div>
 
     <!-- Stage Cards Column (Drop Target) -->
-    <div class="min-h-[550px] space-y-3 p-2.5 flex-1 ct-stage-column transition-all" 
+    <div class="min-h-[550px] space-y-3 p-2.5 flex-1 ct-stage-column transition-all opacity-100" 
          data-stage="<?php echo $stage_key; ?>"
          ondragover="coraWbDragOver(event)"
          ondragenter="coraWbDragEnter(event, '<?php echo $stage_key; ?>')"
@@ -113,7 +118,7 @@ $stages = [
          ondrop="coraWbDrop(event, '<?php echo $stage_key; ?>')">
       
       <?php if (empty($stage_cards)): ?>
-        <div class="h-32 rounded-xl border border-dashed border-zinc-200 flex flex-col items-center justify-center text-zinc-400 text-xs gap-1">
+        <div class="h-32 rounded-xl border border-dashed border-zinc-300 flex flex-col items-center justify-center text-zinc-400 text-xs gap-1 bg-white/50">
           <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-300"><rect x="3" y="3" width="18" height="18" rx="2"></rect><polyline points="12 8 12 16"></polyline><polyline points="8 12 16 12"></polyline></svg>
           <span class="font-medium text-[11px]">Drop item here</span>
         </div>
@@ -122,12 +127,14 @@ $stages = [
         $pc = $p_colors[$item['priority']] ?? $p_colors['medium'];
         $post_id = intval($item['post_id'] ?? $item['id']);
       ?>
-        <!-- WORKFLOW CARD -->
+        <!-- WORKFLOW CARD (100% OPACITY SOLID WHITE) -->
         <div draggable="true" 
              ondragstart="coraWbDragStart(event, <?php echo $item['id']; ?>)" 
-             class="cora-wb-card bg-white border border-zinc-200/90 hover:border-zinc-400 rounded-xl p-3.5 shadow-sm hover:shadow-md transition-all space-y-3 cursor-grab active:cursor-grabbing group relative"
+             ondragend="coraWbDragEnd(event)"
+             class="cora-wb-card bg-white border border-zinc-200 hover:border-zinc-400 rounded-xl p-3.5 shadow-sm hover:shadow-md transition-all space-y-3 cursor-grab active:cursor-grabbing group relative opacity-100"
              data-id="<?php echo $item['id']; ?>"
-             data-post-id="<?php echo $post_id; ?>">
+             data-post-id="<?php echo $post_id; ?>"
+             data-stage="<?php echo $stage_key; ?>">
           
           <?php if(!empty($item['thumbnail_url'])): ?>
             <div class="w-full h-24 rounded-lg bg-zinc-100 overflow-hidden cursor-pointer" onclick="coraEditArticle(<?php echo $post_id; ?>)">
@@ -148,7 +155,7 @@ $stages = [
 
           <!-- Keyword -->
           <?php if(!empty($item['primary_keyword'])): ?>
-            <div class="flex items-center gap-1.5 text-[10px] text-zinc-600 bg-zinc-50 border border-zinc-100 rounded-md px-2 py-1">
+            <div class="flex items-center gap-1.5 text-[10px] text-zinc-600 bg-zinc-50 border border-zinc-200/70 rounded-md px-2 py-1">
               <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
               <span class="font-medium truncate">Target: <strong><?php echo esc_html($item['primary_keyword']); ?></strong></span>
             </div>
@@ -156,27 +163,30 @@ $stages = [
 
           <!-- Metrics Row -->
           <div class="flex items-center justify-between text-[10px] pt-1.5 border-t border-zinc-100">
-            <button type="button" class="flex items-center gap-1 bg-zinc-900 hover:bg-zinc-800 text-white px-2 py-0.5 rounded-md font-bold transition-colors cursor-pointer" onclick="event.stopPropagation(); openSEODetailDrawer(<?php echo $post_id; ?>, '<?php echo esc_js($item['title']); ?>')">
-              <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              <span>SEO <?php echo (int)($item['seo_score'] ?: 78); ?>/100</span>
-            </button>
-            <div class="flex items-center gap-1 bg-zinc-100 text-zinc-800 border border-zinc-200 px-2 py-0.5 rounded-md font-semibold">
-              <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
-              <span>GEO <?php echo (int)($item['geo_score'] ?: 65); ?>%</span>
-            </div>
+            <span class="px-2 py-0.5 bg-zinc-900 text-white rounded font-bold text-[9px]">SEO <?php echo (int)($item['seo_score'] ?: 78); ?>/100</span>
+            <span class="px-2 py-0.5 bg-zinc-100 text-zinc-800 border border-zinc-200 rounded font-semibold text-[9px]">GEO <?php echo (int)($item['geo_score'] ?: 65); ?>%</span>
             <span class="text-zinc-500 font-medium text-[10px]"><?php echo number_format($item['target_word_count'] ?: 1200); ?> w</span>
           </div>
 
-          <!-- CTAs Row -->
-          <div class="flex items-center justify-between pt-1.5 border-t border-zinc-100 gap-1.5">
-            <button type="button" onclick="event.stopPropagation(); coraEditArticle(<?php echo $post_id; ?>)" class="flex-1 px-2 py-1 bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-bold rounded-md flex items-center justify-center gap-1 transition-colors cursor-pointer">
-              <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-              Edit Article
+          <!-- EXACT 2 CTAs ONLY: EDIT & MOVE TO NEXT STAGE -->
+          <div class="flex items-center gap-1.5 pt-2 border-t border-zinc-100">
+            <!-- CTA 1: Edit Article (Opens Content Editor) -->
+            <button type="button" 
+                    onclick="event.stopPropagation(); coraEditArticle(<?php echo $post_id; ?>)" 
+                    class="flex-1 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-sm">
+              <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              Edit
             </button>
-            <button type="button" onclick="event.stopPropagation(); openContentBriefDrawer(<?php echo $item['id']; ?>)" class="px-2 py-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold rounded-md flex items-center gap-1 transition-colors cursor-pointer">
-              <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-              Brief
-            </button>
+
+            <!-- CTA 2: Move to Next Stage -->
+            <?php if($next_stage_key): ?>
+              <button type="button" 
+                      onclick="event.stopPropagation(); coraWbMoveToNextStage(<?php echo $item['id']; ?>, '<?php echo $stage_key; ?>')" 
+                      class="px-2.5 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-200/80 text-xs font-semibold rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
+                      title="Move to <?php echo esc_attr($next_stage_label); ?>">
+                Next Stage &rarr;
+              </button>
+            <?php endif; ?>
           </div>
 
           <!-- Author & Date Footer -->
@@ -194,8 +204,8 @@ $stages = [
     </div>
 
     <!-- Column Footer Button -->
-    <div class="p-2 border-t border-zinc-200/70 bg-white rounded-b-2xl">
-      <button class="w-full text-center text-xs font-semibold text-zinc-500 hover:text-zinc-900 py-1.5 hover:bg-zinc-100 rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer" onclick="openContentBriefDrawer()">
+    <div class="p-2 border-t border-zinc-200 bg-white rounded-b-2xl">
+      <button class="w-full text-center text-xs font-semibold text-zinc-500 hover:text-zinc-900 py-1.5 hover:bg-zinc-100 rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer" onclick="openCreateArticleDrawer()">
         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         Add to <?php echo $stage_label; ?>
       </button>
@@ -206,14 +216,24 @@ $stages = [
 
 <script>
 (function() {
-  // Drag & Drop Handlers
+  const STAGE_ORDER = ['idea','briefing','research','drafting','editorial_review','revisions','seo_gate','approval','scheduled','published','performance'];
+  const STAGE_LABELS = {
+    'idea': 'Idea', 'briefing': 'Briefing', 'research': 'Research', 'drafting': 'Drafting',
+    'editorial_review': 'Editorial Review', 'revisions': 'Revisions', 'seo_gate': 'SEO Gate',
+    'approval': 'Approval', 'scheduled': 'Scheduled', 'published': 'Published', 'performance': 'Performance'
+  };
+
   let _draggedItemId = null;
 
   window.coraWbDragStart = function(e, itemId) {
     _draggedItemId = itemId;
     e.dataTransfer.setData('text/plain', itemId);
     e.dataTransfer.effectAllowed = 'move';
-    if(e.currentTarget) e.currentTarget.style.opacity = '0.4';
+    if(e.currentTarget) e.currentTarget.style.opacity = '0.5';
+  };
+
+  window.coraWbDragEnd = function(e) {
+    if(e.currentTarget) e.currentTarget.style.opacity = '1';
   };
 
   window.coraWbDragOver = function(e) {
@@ -224,34 +244,43 @@ $stages = [
   window.coraWbDragEnter = function(e, stageKey) {
     e.preventDefault();
     const col = e.currentTarget;
-    if(col) col.classList.add('bg-zinc-100', 'ring-2', 'ring-zinc-900', 'rounded-xl');
+    if(col) col.classList.add('bg-zinc-200/60', 'ring-2', 'ring-zinc-900');
   };
 
   window.coraWbDragLeave = function(e, stageKey) {
     const col = e.currentTarget;
-    if(col) col.classList.remove('bg-zinc-100', 'ring-2', 'ring-zinc-900', 'rounded-xl');
+    if(col) col.classList.remove('bg-zinc-200/60', 'ring-2', 'ring-zinc-900');
   };
 
   window.coraWbDrop = function(e, targetStage) {
     e.preventDefault();
     const col = e.currentTarget;
-    if(col) col.classList.remove('bg-zinc-100', 'ring-2', 'ring-zinc-900', 'rounded-xl');
+    if(col) col.classList.remove('bg-zinc-200/60', 'ring-2', 'ring-zinc-900');
 
     const itemId = _draggedItemId || e.dataTransfer.getData('text/plain');
     if(!itemId) return;
 
-    // Reset card opacity
     const cardEl = document.querySelector(`.cora-wb-card[data-id="${itemId}"]`);
     if(cardEl) cardEl.style.opacity = '1';
 
-    // Call stage update AJAX
     window.moveToStage(itemId, targetStage);
   };
 
-  // Load workspace data
+  window.coraWbMoveToNextStage = function(itemId, currentStage) {
+    const idx = STAGE_ORDER.indexOf(currentStage);
+    if(idx !== -1 && idx < STAGE_ORDER.length - 1) {
+      const nextStage = STAGE_ORDER[idx + 1];
+      window.moveToStage(itemId, nextStage);
+    } else {
+      if(typeof window.coraShowToast === 'function') {
+        window.coraShowToast('Already in final stage', 'info');
+      }
+    }
+  };
+
   window.loadContentWorkspace = function(stageFilter) {
     const kanban = document.getElementById('cora-workflow-kanban');
-    if(kanban) kanban.style.opacity = '0.5';
+    if(kanban) kanban.style.opacity = '1';
     $.post(coraREWPData.ajaxUrl, {
       action: 'cora_fetch_content_workspace',
       nonce: coraREWPData.ajaxNonce,
@@ -265,15 +294,14 @@ $stages = [
   };
 
   function renderWorkspaceBoard(data) {
-    const stages = ['idea','briefing','research','drafting','editorial_review','revisions','seo_gate','approval','scheduled','published','performance'];
-    stages.forEach(stage => {
+    STAGE_ORDER.forEach(stage => {
       const col = document.querySelector(`.ct-stage-column[data-stage="${stage}"]`);
       const countEl = document.querySelector(`[data-stage="${stage}"] .ct-stage-count`);
       if(!col) return;
       const items = data.stages ? (data.stages[stage] || []) : [];
       if(countEl) countEl.textContent = items.length;
       col.innerHTML = items.length === 0
-        ? '<div class="h-32 rounded-xl border border-dashed border-zinc-200 flex flex-col items-center justify-center text-zinc-400 text-xs gap-1"><span class="font-medium text-[11px]">Drop item here</span></div>'
+        ? '<div class="h-32 rounded-xl border border-dashed border-zinc-300 flex flex-col items-center justify-center text-zinc-400 text-xs gap-1 bg-white/50"><span class="font-medium text-[11px]">Drop item here</span></div>'
         : items.map(item => renderItemCard(item)).join('');
     });
   }
@@ -288,13 +316,18 @@ $stages = [
     const writerInitial = writerName[0].toUpperCase();
     const ind = (item.industry || 'REAL ESTATE').toUpperCase();
     const postId = item.post_id || item.id;
+    const currentStage = item.stage || 'idea';
+    const idx = STAGE_ORDER.indexOf(currentStage);
+    const nextStageKey = (idx !== -1 && idx < STAGE_ORDER.length - 1) ? STAGE_ORDER[idx + 1] : null;
 
     return `
       <div draggable="true" 
            ondragstart="coraWbDragStart(event, ${item.id})"
-           class="cora-wb-card bg-white border border-zinc-200/90 hover:border-zinc-400 rounded-xl p-3.5 shadow-sm hover:shadow-md transition-all space-y-3 cursor-grab active:cursor-grabbing group relative"
+           ondragend="coraWbDragEnd(event)"
+           class="cora-wb-card bg-white border border-zinc-200 hover:border-zinc-400 rounded-xl p-3.5 shadow-sm hover:shadow-md transition-all space-y-3 cursor-grab active:cursor-grabbing group relative opacity-100"
            data-id="${item.id}"
-           data-post-id="${postId}">
+           data-post-id="${postId}"
+           data-stage="${currentStage}">
 
         ${item.thumbnail_url ? 
           `<div class="w-full h-24 rounded-lg bg-zinc-100 overflow-hidden cursor-pointer" onclick="coraEditArticle(${postId})">
@@ -315,7 +348,7 @@ $stages = [
 
         <!-- Keyword -->
         ${item.primary_keyword ? `
-          <div class="flex items-center gap-1.5 text-[10px] text-zinc-600 bg-zinc-50 border border-zinc-100 rounded-md px-2 py-1">
+          <div class="flex items-center gap-1.5 text-[10px] text-zinc-600 bg-zinc-50 border border-zinc-200/70 rounded-md px-2 py-1">
             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
             <span class="font-medium truncate">Target: <strong>${escHtml(item.primary_keyword)}</strong></span>
           </div>
@@ -323,27 +356,27 @@ $stages = [
 
         <!-- Metrics Row -->
         <div class="flex items-center justify-between text-[10px] pt-1.5 border-t border-zinc-100">
-          <button type="button" class="flex items-center gap-1 bg-zinc-900 hover:bg-zinc-800 text-white px-2 py-0.5 rounded-md font-bold transition-colors cursor-pointer" onclick="event.stopPropagation(); openSEODetailDrawer(${postId}, '${escHtml(item.title).replace(/'/g,"\\'")}')">
-            <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <span>SEO ${seoScore}/100</span>
-          </button>
-          <div class="flex items-center gap-1 bg-zinc-100 text-zinc-800 border border-zinc-200 px-2 py-0.5 rounded-md font-semibold">
-            <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
-            <span>GEO ${geoScore}%</span>
-          </div>
+          <span class="px-2 py-0.5 bg-zinc-900 text-white rounded font-bold text-[9px]">SEO ${seoScore}/100</span>
+          <span class="px-2 py-0.5 bg-zinc-100 text-zinc-800 border border-zinc-200 rounded font-semibold text-[9px]">GEO ${geoScore}%</span>
           <span class="text-zinc-500 font-medium text-[10px]">${wordCount} w</span>
         </div>
 
-        <!-- CTAs Row -->
-        <div class="flex items-center justify-between pt-1.5 border-t border-zinc-100 gap-1.5">
-          <button type="button" onclick="event.stopPropagation(); coraEditArticle(${postId})" class="flex-1 px-2 py-1 bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-bold rounded-md flex items-center justify-center gap-1 transition-colors cursor-pointer">
-            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-            Edit Article
+        <!-- EXACT 2 CTAs ONLY: EDIT & MOVE TO NEXT STAGE -->
+        <div class="flex items-center gap-1.5 pt-2 border-t border-zinc-100">
+          <button type="button" 
+                  onclick="event.stopPropagation(); coraEditArticle(${postId})" 
+                  class="flex-1 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-sm">
+            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            Edit
           </button>
-          <button type="button" onclick="event.stopPropagation(); openContentBriefDrawer(${item.id})" class="px-2 py-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-semibold rounded-md flex items-center gap-1 transition-colors cursor-pointer">
-            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-            Brief
-          </button>
+          ${nextStageKey ? `
+            <button type="button" 
+                    onclick="event.stopPropagation(); coraWbMoveToNextStage(${item.id}, '${currentStage}')" 
+                    class="px-2.5 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-200/80 text-xs font-semibold rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
+                    title="Move to next stage">
+              Next Stage &rarr;
+            </button>
+          ` : ''}
         </div>
 
         <!-- Author & Date Footer -->
@@ -371,8 +404,7 @@ $stages = [
       target_stage: targetStage
     }, function(r) {
       if(r && r.success) {
-        const stageNames = {'idea':'Idea','briefing':'Briefing','research':'Research','drafting':'Drafting','editorial_review':'Editorial Review','revisions':'Revisions','seo_gate':'SEO Gate','approval':'Approval','scheduled':'Scheduled','published':'Published','performance':'Performance'};
-        const label = stageNames[targetStage] || targetStage;
+        const label = STAGE_LABELS[targetStage] || targetStage;
         if(typeof window.coraShowToast === 'function') {
           window.coraShowToast('Moved to ' + label, 'success');
         }
