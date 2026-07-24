@@ -358,9 +358,6 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <input type="text" id="seo-search" class="w-full pl-8 pr-3 py-1.5 border border-zinc-200/80 rounded-lg text-xs focus:outline-none focus:border-zinc-400 bg-zinc-50/50 focus:bg-white transition-all" placeholder="Search title or ID..." oninput="filterSEOArticleList(this.value)">
                 </div>
-                <button class="p-1.5 border border-zinc-200/80 rounded-lg hover:bg-zinc-50 text-zinc-500 hover:text-zinc-900 transition-colors shrink-0" title="Filter Articles">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-                </button>
             </div>
 
             <!-- Sort dropdown line -->
