@@ -6,11 +6,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <script>
-window.coraREWPData = window.coraREWPData || {
-    ajaxUrl: '<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>',
-    ajaxNonce: '<?php echo wp_create_nonce( 'cora_ajax_nonce' ); ?>'
-};
-window.coraREData = window.coraREData || window.coraREWPData;
+window.coraREWPData = window.coraREWPData || {};
+window.coraREWPData.ajaxUrl = window.coraREWPData.ajaxUrl || '<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>';
+window.coraREWPData.ajaxNonce = '<?php echo wp_create_nonce( 'cora_ajax_nonce' ); ?>';
+
+if (typeof window.coraREData !== 'undefined') {
+    window.coraREData.ajaxNonce = window.coraREData.ajaxNonce || window.coraREWPData.ajaxNonce;
+    window.coraREData.ajaxUrl   = window.coraREData.ajaxUrl || window.coraREWPData.ajaxUrl;
+} else {
+    window.coraREData = window.coraREWPData;
+}
 </script>
 
 <div class="cora-page-header flex items-center justify-between mb-6">

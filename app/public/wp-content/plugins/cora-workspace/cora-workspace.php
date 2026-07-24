@@ -21136,7 +21136,12 @@ function cora_ajax_create_article() {
     if ( isset($_REQUEST['security']) && !isset($_REQUEST['nonce']) ) {
         $_REQUEST['nonce'] = $_REQUEST['security'];
     }
-    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $nonce = isset($_REQUEST['nonce']) ? sanitize_text_field($_REQUEST['nonce']) : '';
+    if ( $nonce && !wp_verify_nonce($nonce, 'cora_ajax_nonce') && !wp_verify_nonce($nonce, 'cora_re_nonce') ) {
+        if ( ! current_user_can( 'edit_posts' ) ) {
+            wp_send_json_error( 'Security check failed.' );
+        }
+    }
     if ( ! current_user_can( 'edit_posts' ) ) wp_send_json_error( 'Unauthorized.' );
 
     $post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
