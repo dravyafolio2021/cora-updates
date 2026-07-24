@@ -21022,7 +21022,12 @@ function cora_ajax_update_content_stage() {
 // 2d. cora_fetch_content_workspace
 add_action('wp_ajax_cora_fetch_content_workspace', 'cora_ajax_fetch_content_workspace');
 function cora_ajax_fetch_content_workspace() {
-    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if (isset($_POST['nonce']) && !empty($_POST['nonce'])) {
+        @wp_verify_nonce($_POST['nonce'], 'cora_ajax_nonce');
+    }
+    if (!current_user_can('edit_posts')) {
+        wp_send_json_error('Permission denied');
+    }
     global $wpdb;
     
     $table = $wpdb->prefix . 'cora_content_items';
@@ -21032,9 +21037,9 @@ function cora_ajax_fetch_content_workspace() {
     if ($count_items === 0) {
         $user_id = get_current_user_id();
         $sample_items = [
-            ['title' => 'Corporate Commercial Lease Space Rates inside DLF CyberCity Gurgaon', 'stage' => 'editorial_review', 'priority' => 'urgent', 'primary_keyword' => 'commercial lease rates cyber city', 'draft_due_date' => date('Y-m-d', strtotime('+3 days'))],
+            ['title' => 'Corporate Commercial Lease Space Rates inside DLF CyberCity Gurgaon', 'stage' => 'review', 'priority' => 'urgent', 'primary_keyword' => 'commercial lease rates cyber city', 'draft_due_date' => date('Y-m-d', strtotime('+3 days'))],
             ['title' => 'Luxury Villa Market Report 2026: Golf Course Extension Road', 'stage' => 'drafting', 'priority' => 'high', 'primary_keyword' => 'luxury villas gurgaon', 'draft_due_date' => date('Y-m-d', strtotime('+5 days'))],
-            ['title' => 'Complete Guide to Builder Floor Registration & Stamp Duty', 'stage' => 'briefing', 'priority' => 'medium', 'primary_keyword' => 'builder floor stamp duty', 'draft_due_date' => date('Y-m-d', strtotime('+7 days'))],
+            ['title' => 'Complete Guide to Builder Floor Registration & Stamp Duty', 'stage' => 'idea', 'priority' => 'medium', 'primary_keyword' => 'builder floor stamp duty', 'draft_due_date' => date('Y-m-d', strtotime('+7 days'))],
             ['title' => 'Top 10 Architectural Photography Lighting Rigs for Interior Shoots', 'stage' => 'idea', 'priority' => 'low', 'primary_keyword' => 'interior photography lighting', 'draft_due_date' => date('Y-m-d', strtotime('+12 days'))],
             ['title' => 'High-Yield Commercial Real Estate Investment Opportunities in Aerocity', 'stage' => 'published', 'priority' => 'high', 'primary_keyword' => 'commercial real estate aerocity', 'draft_due_date' => date('Y-m-d', strtotime('-2 days'))]
         ];

@@ -102,7 +102,7 @@ $stage_keys = array_keys($stages);
   </div>
 </div>
 
-<!-- SCROLLABLE KANBAN BOARD (WARM BG COLOR, NO HARSH OUTER OUTLINE) -->
+<!-- SCROLLABLE KANBAN BOARD (LIGHT BG COLOR, NO OUTLINE) -->
 <div class="flex gap-4 overflow-x-auto pb-6 select-none opacity-100 scrollbar-hide" id="cora-workflow-kanban" style="-webkit-overflow-scrolling: touch; opacity: 1 !important;">
   <?php foreach($stages as $col_key => $col_label): 
     $col_cards = $grouped_items[$col_key] ?? [];
@@ -110,7 +110,7 @@ $stage_keys = array_keys($stages);
     $next_stage_key = ($current_idx !== false && $current_idx < count($stage_keys) - 1) ? $stage_keys[$current_idx + 1] : null;
     $next_stage_label = $next_stage_key ? $stages[$next_stage_key] : null;
   ?>
-  <!-- NO HARSH OUTLINE: bg-[#F4F1EA], no outer border -->
+  <!-- LIGHT BG COLOR, NO OUTLINE BORDER -->
   <div class="w-80 shrink-0 bg-[#F4F1EA] rounded-2xl flex flex-col transition-all ct-stage-container opacity-100" data-stage="<?php echo $col_key; ?>">
     
     <!-- Column Header -->
@@ -136,9 +136,9 @@ $stage_keys = array_keys($stages);
          ondrop="coraWbDrop(event, '<?php echo $col_key; ?>')">
       
       <?php if (empty($col_cards)): ?>
-        <div class="empty-stage-placeholder h-36 rounded-xl border border-dashed border-zinc-300/80 flex flex-col items-center justify-center text-zinc-400 text-xs gap-1.5 bg-white/50 my-auto p-4 text-center">
+        <div class="empty-stage-placeholder w-full h-36 rounded-xl border border-dashed border-zinc-300/80 flex flex-col items-center justify-center text-zinc-400 text-xs gap-1.5 bg-white/60 my-auto p-4 text-center">
           <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-300 mx-auto"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
-          <span class="font-semibold text-zinc-400 text-xs">No items in stage</span>
+          <span class="font-bold text-zinc-500 text-xs">No items in stage</span>
         </div>
       <?php else: foreach($col_cards as $item): 
         $p_colors = ['urgent'=>'bg-zinc-950 text-white','high'=>'bg-zinc-800 text-white','medium'=>'bg-zinc-200 text-zinc-900','low'=>'bg-zinc-100 text-zinc-600'];
@@ -407,7 +407,7 @@ window.renderWorkspaceBoard = function(data) {
     const items = grouped[colKey] || [];
     if(countEl) countEl.textContent = items.length;
     col.innerHTML = items.length === 0
-      ? '<div class="empty-stage-placeholder h-36 rounded-xl border border-dashed border-zinc-300/80 flex flex-col items-center justify-center text-zinc-400 text-xs gap-1.5 bg-white/50 my-auto p-4 text-center"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-300 mx-auto"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg><span class="font-semibold text-zinc-400 text-xs">No items in stage</span></div>'
+      ? '<div class="empty-stage-placeholder w-full h-36 rounded-xl border border-dashed border-zinc-300/80 flex flex-col items-center justify-center text-zinc-400 text-xs gap-1.5 bg-white/60 my-auto p-4 text-center"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-300 mx-auto"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg><span class="font-bold text-zinc-500 text-xs">No items in stage</span></div>'
       : items.map(item => window.renderItemCard(item, colKey)).join('');
   });
 };
