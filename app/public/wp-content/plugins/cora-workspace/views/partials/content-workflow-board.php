@@ -110,10 +110,10 @@ $stage_keys = array_keys($stages);
     $next_stage_key = ($current_idx !== false && $current_idx < count($stage_keys) - 1) ? $stage_keys[$current_idx + 1] : null;
     $next_stage_label = $next_stage_key ? $stages[$next_stage_key] : null;
   ?>
-  <div class="w-80 shrink-0 bg-zinc-100/60 rounded-2xl flex flex-col transition-all ct-stage-container opacity-100" data-stage="<?php echo $col_key; ?>">
+  <div class="w-80 shrink-0 bg-[#F8F6F0] border border-[#E8E4DC] rounded-2xl flex flex-col transition-all ct-stage-container opacity-100" data-stage="<?php echo $col_key; ?>">
     
     <!-- Column Header -->
-    <div class="p-3.5 border-b border-zinc-200 flex items-center justify-between bg-white rounded-t-2xl">
+    <div class="p-3.5 border-b border-[#E8E4DC] flex items-center justify-between bg-[#F4F0E6] rounded-t-2xl">
       <div class="flex items-center gap-2">
         <span class="w-2.5 h-2.5 rounded-full bg-zinc-900"></span>
         <span class="text-xs font-bold text-zinc-900 uppercase tracking-wider"><?php echo $col_label; ?></span>
@@ -221,7 +221,7 @@ $stage_keys = array_keys($stages);
     </div>
 
     <!-- Column Footer Button -->
-    <div class="p-2 border-t border-zinc-200 bg-white rounded-b-2xl">
+    <div class="p-2 border-t border-[#E8E4DC] bg-[#F4F0E6] rounded-b-2xl">
       <button class="w-full text-center text-xs font-semibold text-zinc-500 hover:text-zinc-900 py-1.5 hover:bg-zinc-100 rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer" onclick="openCreateArticleDrawer()">
         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         Add to <?php echo $col_label; ?>
