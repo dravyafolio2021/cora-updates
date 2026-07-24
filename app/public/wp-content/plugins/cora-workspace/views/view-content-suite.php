@@ -637,35 +637,38 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     border-color: rgba(212, 212, 216, 1) !important;
 }
 
-/* Bottom sheet: always attached to viewport via JS body-append */
+/* Side Drawer Sheet (Right-sliding per Global Rule #1) */
 .cora-bottom-sheet {
     position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
     bottom: 0 !important;
-    left: 50% !important;
-    transform: translateX(-50%) translateY(0) !important;
+    left: auto !important;
     width: 100% !important;
-    max-width: 52rem !important;
-    height: auto !important;
-    max-height: 88vh !important;
+    max-width: 480px !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
     border-top-left-radius: 1.25rem !important;
-    border-top-right-radius: 1.25rem !important;
+    border-bottom-left-radius: 1.25rem !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
     z-index: 99999 !important;
     box-sizing: border-box !important;
     transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1), opacity 220ms ease, visibility 320ms ease !important;
 }
 .cora-bottom-sheet.collapsed {
-    transform: translateX(-50%) translateY(110%) !important;
+    transform: translateX(110%) !important;
     opacity: 0 !important;
     pointer-events: none !important;
     visibility: hidden !important;
     box-shadow: none !important;
 }
 .cora-bottom-sheet:not(.collapsed) {
-    transform: translateX(-50%) translateY(0) !important;
+    transform: translateX(0) !important;
     opacity: 1 !important;
     pointer-events: auto !important;
     visibility: visible !important;
-    box-shadow: 0 -8px 40px rgba(0,0,0,0.18) !important;
+    box-shadow: -8px 0 40px rgba(0,0,0,0.18) !important;
 }
 /* Backdrop always on top */
 #cora-drawer-backdrop {
@@ -677,10 +680,9 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 <!-- Drawer Backdrop -->
 <div id="cora-drawer-backdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998] hidden transition-opacity cursor-pointer" onclick="window.coraCloseAllDrawers()"></div>
 
-<!-- Create Article Bottom Sheet Drawer -->
-<aside id="cora-create-article-sheet" class="cora-bottom-sheet collapsed border-t border-x border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl flex flex-col">
-    <div class="w-12 h-1.5 bg-zinc-300 dark:bg-zinc-700 rounded-full mx-auto my-2.5 shrink-0"></div>
-    <div class="px-6 py-3 border-b border-zinc-200 flex justify-between items-center shrink-0">
+<!-- Create Article Side Drawer -->
+<aside id="cora-create-article-sheet" class="cora-bottom-sheet collapsed border-l border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl flex flex-col">
+    <div class="px-6 py-4 border-b border-zinc-200/80 flex justify-between items-center shrink-0">
         <div>
             <h2 class="text-lg font-bold text-zinc-900">New Article</h2>
             <p class="text-xs text-zinc-500">Draft a new SEO-optimized article.</p>
@@ -2739,31 +2741,56 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 
     // AJAX Submissions
     window.submitCreateArticle = function(e) {
-        e.preventDefault();
-        const title = document.getElementById('ca-title').value;
-        const keyword = document.getElementById('ca-keyword').value;
-        const industry = document.getElementById('ca-industry').value;
-        const category = document.getElementById('ca-category').value;
-        const assignee = document.getElementById('ca-assignee').value;
-        const date = document.getElementById('ca-date').value;
+        if (e && e.preventDefault) e.preventDefault();
+        const title = document.getElementById('ca-title')?.value || '';
+        const keyword = document.getElementById('ca-keyword')?.value || '';
+        const industry = document.getElementById('ca-industry')?.value || '';
+        const category = document.getElementById('ca-category')?.value || '';
+        const assignee = document.getElementById('ca-assignee')?.value || '';
+        const date = document.getElementById('ca-date')?.value || '';
         
         if(!title) {
             if(window.coraShowToast) window.coraShowToast('Article title is required', 'error');
             return;
         }
 
-        $.post(coraREWPData.ajaxUrl, {
+        const targetAjaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'));
+        const targetNonce   = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '');
+
+        const btn = (e && e.target) ? e.target : document.querySelector('#cora-create-article-sheet button[onclick="submitCreateArticle(event)"]');
+        const origTxt = btn ? btn.innerText : 'Create Article';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerText = 'Creating Article...';
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
+        }
+
+        $.post(targetAjaxUrl, {
             action: 'cora_create_article',
-            nonce: coraREWPData.ajaxNonce,
+            nonce: targetNonce,
+            security: targetNonce,
             title, keyword, industry, category_id: category, assignee_id: assignee, publish_date: date
         }, function(response) {
-            if(response.success) {
-                if(window.coraShowToast) window.coraShowToast('Article drafted successfully', 'success');
-                closeCreateArticleDrawer();
-                setTimeout(() => window.location.reload(), 1000);
-            } else {
-                if(window.coraShowToast) window.coraShowToast(response.data || 'Failed to create article', 'error');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = origTxt;
+                btn.classList.remove('opacity-70', 'cursor-not-allowed');
             }
+            if (response && response.success) {
+                if(window.coraShowToast) window.coraShowToast('Article created & added to Workflow Board!', 'success');
+                closeCreateArticleDrawer();
+                setTimeout(() => window.location.reload(), 600);
+            } else {
+                const errMsg = (response && response.data) ? response.data : 'Failed to create article';
+                if(window.coraShowToast) window.coraShowToast(errMsg, 'error');
+            }
+        }).fail(function() {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = origTxt;
+                btn.classList.remove('opacity-70', 'cursor-not-allowed');
+            }
+            if(window.coraShowToast) window.coraShowToast('Server error while creating article', 'error');
         });
     };
 
