@@ -798,13 +798,16 @@ $cora_settings_tabs = array(
                         </div>
                         <p class="text-[11px] text-zinc-400">Upload your real estate group's official logo. This will be used on all shared portfolios and custom client portals.</p>
                     </div>
-                    <div class="flex items-center justify-center border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 p-3 h-28">
+                    <div class="flex items-center justify-center border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 p-3 h-28 cursor-pointer hover:border-zinc-400 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-900/60 transition-all group" onclick="coraOpenMediaSelector('cora-brand-logo-url-suite')" title="Click to upload logo">
                         <?php $logo_url = get_option('cora_brand_logo_url', ''); ?>
                         <div id="cora-suite-logo-preview" class="w-full h-full flex items-center justify-center overflow-hidden">
                             <?php if ( ! empty( $logo_url ) ) : ?>
-                                <img src="<?php echo esc_url( $logo_url ); ?>" class="max-h-full max-w-full object-contain" alt="Logo Preview">
+                                <img src="<?php echo esc_url( $logo_url ); ?>" class="max-h-full max-w-full object-contain transition-transform group-hover:scale-105" alt="Logo Preview">
                             <?php else : ?>
-                                <span class="text-[10px] text-zinc-400 uppercase font-semibold">No Logo Set</span>
+                                <div class="text-center space-y-1">
+                                    <svg class="mx-auto h-5 w-5 text-zinc-400 group-hover:text-zinc-650 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                    <span class="block text-[9px] text-zinc-400 font-bold uppercase tracking-wider">Upload Logo</span>
+                                </div>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -843,15 +846,15 @@ $cora_settings_tabs = array(
                         </script>
                         <p class="text-[11px] text-zinc-400">Configure your website browser tab favicon.</p>
                     </div>
-                    <div class="flex flex-col items-center justify-center border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 p-3 h-28 space-y-1.5">
-                        <span class="text-[9px] text-zinc-400 uppercase font-bold tracking-wider">Tab Favicon</span>
+                    <div class="flex flex-col items-center justify-center border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 p-3 h-28 space-y-1.5 cursor-pointer hover:border-zinc-400 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-900/60 transition-all group" onclick="coraOpenMediaSelector('cora-brand-favicon-url-suite')" title="Click to upload favicon">
+                        <span class="text-[9px] text-zinc-450 dark:text-zinc-500 uppercase font-bold tracking-wider group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors">Tab Favicon</span>
                         <?php 
                         $favicon_url = get_option('cora_brand_favicon_url', ''); 
                         if ( empty( $favicon_url ) ) {
                             $favicon_url = CORA_WORKSPACE_URL . 'assets/images/cora-favicon.png';
                         }
                         ?>
-                        <div id="cora-suite-favicon-preview" class="w-12 h-12 flex items-center justify-center border border-zinc-100 dark:border-zinc-850 rounded-md bg-zinc-50 dark:bg-zinc-900">
+                        <div id="cora-suite-favicon-preview" class="w-12 h-12 flex items-center justify-center border border-zinc-100 dark:border-zinc-850 rounded-md bg-zinc-50 dark:bg-zinc-900 transition-transform group-hover:scale-105">
                             <img src="<?php echo esc_url( $favicon_url ); ?>" class="w-8 h-8 object-contain" alt="Favicon Preview">
                         </div>
                     </div>

@@ -8743,3 +8743,26 @@ jQuery(document).ready(function($) {
         }
         return false;
     });
+
+    // Real-time Brand Assets settings previews
+    $(document).on('input change', '#cora-brand-logo-url-suite', function() {
+        var url = $(this).val().trim();
+        var preview = $('#cora-suite-logo-preview');
+        if (url) {
+            preview.html('<img src="' + url + '" class="max-h-full max-w-full object-contain transition-transform group-hover:scale-105" alt="Logo Preview">');
+        } else {
+            preview.html('<div class="text-center space-y-1"><svg class="mx-auto h-5 w-5 text-zinc-400 group-hover:text-zinc-650 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg><span class="block text-[9px] text-zinc-400 font-bold uppercase tracking-wider">Upload Logo</span></div>');
+        }
+    });
+
+    $(document).on('input change', '#cora-brand-favicon-url-suite', function() {
+        var url = $(this).val().trim();
+        var preview = $('#cora-suite-favicon-preview');
+        var defaultUrl = (window.coraREData && window.coraREData.pluginsUrl) ? window.coraREData.pluginsUrl + 'assets/images/cora-favicon.png' : '';
+        var displayUrl = url ? url : defaultUrl;
+        if (displayUrl) {
+            preview.html('<img src="' + displayUrl + '" class="w-8 h-8 object-contain" alt="Favicon Preview">');
+        } else {
+            preview.html('<span class="text-[9px] text-zinc-450 uppercase font-semibold">No Icon</span>');
+        }
+    });
