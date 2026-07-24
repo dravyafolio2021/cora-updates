@@ -351,17 +351,14 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                             <div class="text-[10px] text-zinc-400 font-normal block mt-0.5"><?php echo $modified_diff; ?></div>
                         </td>
                         <td class="py-2.5 px-3.5 text-right pr-5">
-                            <div class="flex items-center justify-end gap-1">
-                                <button type="button" class="px-2.5 py-1 rounded-lg border border-zinc-200/80 bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer shadow-2xs" title="Edit Article" onclick="coraEditArticle(<?php echo $post->ID; ?>)">
+                            <div class="flex items-center justify-end gap-1.5">
+                                <button type="button" class="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer shadow-xs" title="Edit Article" onclick="coraEditArticle(<?php echo $post->ID; ?>)">
                                     <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                     Edit
                                 </button>
                                 <button type="button" class="px-2.5 py-1 rounded-lg border border-zinc-200/80 bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer shadow-2xs" title="SEO Analysis" onclick="openSEOAnalysisTab(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
                                     <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                                     SEO
-                                </button>
-                                <button type="button" class="p-1 rounded-lg hover:bg-zinc-100 text-zinc-400 hover:text-zinc-700 transition-colors cursor-pointer" title="Options" onclick="openSEOAnalysisTab(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
-                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                                 </button>
                             </div>
                             <div class="flex items-center justify-end gap-2 text-[10px] font-medium text-zinc-400 mt-1">
@@ -2653,22 +2650,22 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         if (controlsEl) {
             let btnsHtml = '';
             btnsHtml += `
-                <button type="button" class="w-6 h-6 rounded border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600 flex items-center justify-center text-xs ${_ctCurrentPage <= 1 ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}" onclick="navigateCTPage(${_ctCurrentPage - 1})" ${_ctCurrentPage <= 1 ? 'disabled' : ''}>
-                    &lt;
+                <button type="button" class="w-7 h-7 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600 flex items-center justify-center text-xs transition-colors ${_ctCurrentPage <= 1 ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}" onclick="navigateCTPage(${_ctCurrentPage - 1})" ${_ctCurrentPage <= 1 ? 'disabled' : ''} aria-label="Previous Page">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 </button>
             `;
 
             for (let i = 1; i <= maxPage; i++) {
                 if (i === _ctCurrentPage) {
-                    btnsHtml += `<button type="button" class="w-6 h-6 rounded bg-zinc-900 text-white font-bold flex items-center justify-center text-xs">${i}</button>`;
+                    btnsHtml += `<button type="button" class="w-7 h-7 rounded-lg bg-zinc-900 text-white font-bold flex items-center justify-center text-xs shadow-2xs">${i}</button>`;
                 } else {
-                    btnsHtml += `<button type="button" class="w-6 h-6 rounded border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 font-medium flex items-center justify-center text-xs cursor-pointer" onclick="navigateCTPage(${i})">${i}</button>`;
+                    btnsHtml += `<button type="button" class="w-7 h-7 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 font-medium flex items-center justify-center text-xs cursor-pointer transition-colors" onclick="navigateCTPage(${i})">${i}</button>`;
                 }
             }
 
             btnsHtml += `
-                <button type="button" class="w-6 h-6 rounded border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600 flex items-center justify-center text-xs ${_ctCurrentPage >= maxPage ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}" onclick="navigateCTPage(${_ctCurrentPage + 1})" ${_ctCurrentPage >= maxPage ? 'disabled' : ''}>
-                    &gt;
+                <button type="button" class="w-7 h-7 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600 flex items-center justify-center text-xs transition-colors ${_ctCurrentPage >= maxPage ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}" onclick="navigateCTPage(${_ctCurrentPage + 1})" ${_ctCurrentPage >= maxPage ? 'disabled' : ''} aria-label="Next Page">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </button>
             `;
 
