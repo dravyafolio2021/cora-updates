@@ -9955,7 +9955,7 @@ add_action( 'wp_ajax_cora_save_media_metadata', 'cora_ajax_save_media_metadata' 
 
 function cora_ajax_save_system_settings_suite() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! current_user_can( 'manage_options' ) ) {
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized' ) );
     }
 
@@ -10086,7 +10086,7 @@ add_action( 'wp_ajax_cora_save_system_settings_suite', 'cora_ajax_save_system_se
  */
 function cora_ajax_save_platform_language() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! current_user_can( 'manage_options' ) ) {
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
     }
 
@@ -10102,7 +10102,7 @@ add_action( 'wp_ajax_cora_save_platform_language', 'cora_ajax_save_platform_lang
  */
 function cora_ajax_trigger_git_sync() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! current_user_can( 'manage_options' ) ) {
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
     }
 
