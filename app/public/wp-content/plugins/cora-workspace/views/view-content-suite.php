@@ -1415,13 +1415,21 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             </div>
         `;
 
+        // Safe AJAX resolver
+        const targetAjaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'));
+        const targetNonce   = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '');
+
         // Fetch real SEO article details
-        $.post(coraREWPData.ajaxUrl, {
+        $.post(targetAjaxUrl, {
             action: 'cora_fetch_seo_article',
-            nonce: coraREWPData.ajaxNonce,
+            nonce: targetNonce,
+            security: targetNonce,
             post_id: articleId
         }, function(r) {
-            if(r.success) {
+            if (typeof r === 'string') {
+                try { r = JSON.parse(r); } catch(e){}
+            }
+            if (r && r.success && r.data) {
                 const d = r.data;
                 const kwEl   = document.getElementById('inline-focus-keyword');
                 const ttEl   = document.getElementById('inline-meta-title');
@@ -1438,11 +1446,11 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 
                 if(kwEl) kwEl.value = d.focus_keyword || '';
                 if(kwLbl) kwLbl.innerHTML = 'Target: <strong>' + (d.focus_keyword || 'Not set') + '</strong>';
-                if(ttEl) { ttEl.value = d.meta_title || d.title || ''; document.getElementById('inline-title-count').innerText = ttEl.value.length + '/60'; }
-                if(descEl) { descEl.value = d.meta_description || ''; document.getElementById('inline-desc-count').innerText = descEl.value.length + '/160'; }
+                if(ttEl) { ttEl.value = d.meta_title || d.title || ''; const ttCount = document.getElementById('inline-title-count'); if(ttCount) ttCount.innerText = ttEl.value.length + '/60'; }
+                if(descEl) { descEl.value = d.meta_description || ''; const descCount = document.getElementById('inline-desc-count'); if(descCount) descCount.innerText = descEl.value.length + '/160'; }
                 if(slugEl) slugEl.value = d.slug || '';
                 if(canEl)  canEl.value  = d.canonical_url || '';
-                if(wcEl)   wcEl.innerText = 'Word Count: ' + Number(d.word_count).toLocaleString();
+                if(wcEl)   wcEl.innerText = 'Word Count: ' + Number(d.word_count || 0).toLocaleString();
                 if(laEl)   laEl.innerText = 'Last Analyzed: ' + (d.last_analyzed || 'Today');
                 if(prevEl) prevEl.href    = d.canonical_url || '#';
 
@@ -1450,13 +1458,18 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 if(geoLbl) geoLbl.textContent = 'AI Search Citation Score';
                 if(densEl) densEl.textContent = '1.8%';
             }
+            // Run audit after fields are populated
+            runInlineSEOAudit(articleId);
+        }).fail(function() {
+            // Fallback audit execution on error
+            runInlineSEOAudit(articleId);
         });
-
-        // Run audit automatically on select
-        runInlineSEOAudit(articleId);
     };
 
     window.runInlineSEOAudit = function(articleId) {
+        const targetAjaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'));
+        const targetNonce   = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '');
+
         const grid = document.getElementById('inline-seo-checklist-grid');
         if(grid) grid.innerHTML = '<div class="text-zinc-500 text-center py-4 animate-pulse font-medium">Evaluating 11 on-page & AI search factors...</div>';
 
@@ -1465,16 +1478,20 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         const metaDesc  = document.getElementById('inline-meta-description')?.value || '';
         const slug      = document.getElementById('inline-slug')?.value || '';
 
-        $.post(coraREWPData.ajaxUrl, {
+        $.post(targetAjaxUrl, {
             action: 'cora_run_11point_seo_audit',
-            nonce: coraREWPData.ajaxNonce,
+            nonce: targetNonce,
+            security: targetNonce,
             post_id: articleId,
             focus_keyword: focusKw,
             meta_title: metaTitle,
             meta_description: metaDesc,
             slug: slug
         }, function(r) {
-            if(r.success) {
+            if (typeof r === 'string') {
+                try { r = JSON.parse(r); } catch(e){}
+            }
+            if (r && r.success && r.data) {
                 const d = r.data;
                 const score = d.seo_score || 0;
                 const scoreText   = document.getElementById('inline-seo-score-text');
@@ -1571,15 +1588,19 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
     };
 
     window.saveInlineSEOMeta = function(articleId) {
+        const targetAjaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'));
+        const targetNonce   = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '');
+
         const keyword   = document.getElementById('inline-focus-keyword')?.value || '';
         const title     = document.getElementById('inline-meta-title')?.value || '';
         const desc      = document.getElementById('inline-meta-description')?.value || '';
         const slug      = document.getElementById('inline-slug')?.value || '';
         const canonical = document.getElementById('inline-canonical-url')?.value || '';
 
-        $.post(coraREWPData.ajaxUrl, {
+        $.post(targetAjaxUrl, {
             action: 'cora_save_seo_meta',
-            nonce: coraREWPData.ajaxNonce,
+            nonce: targetNonce,
+            security: targetNonce,
             post_id: articleId,
             focus_keyword: keyword,
             meta_title: title,

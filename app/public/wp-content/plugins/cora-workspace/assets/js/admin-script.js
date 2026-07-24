@@ -6469,6 +6469,19 @@ jQuery(document).ready(function($) {
         });
     };
 
+    // Auto-restore article editor if post_id or article_id is present in URL query parameters
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoPostId = urlParams.get('post_id') || urlParams.get('article_id') || urlParams.get('edit_post');
+        if (autoPostId) {
+            setTimeout(function() {
+                if (typeof window.coraEditArticle === 'function') {
+                    window.coraEditArticle(autoPostId);
+                }
+            }, 150);
+        }
+    } catch(e){}
+
     window.coraToggleMediaDrawer = function(show) {
         if (show) {
             $('#cora-media-library-drawer').removeClass('translate-x-full');

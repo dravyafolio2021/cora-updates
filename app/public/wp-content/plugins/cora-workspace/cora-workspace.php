@@ -7376,7 +7376,7 @@ add_action( 'wp_ajax_cora_analyze_seo', 'cora_ajax_analyze_seo' );
  * AJAX Action: Fetch SEO Article Data
  */
 function cora_ajax_fetch_seo_article() {
-    if ( ! current_user_can( 'edit_posts' ) && ! current_user_can( 'edit_pages' ) ) {
+    if ( ! is_user_logged_in() ) {
         wp_send_json_error( 'Permission denied.' );
     }
 
@@ -7417,12 +7417,13 @@ function cora_ajax_fetch_seo_article() {
     ) );
 }
 add_action( 'wp_ajax_cora_fetch_seo_article', 'cora_ajax_fetch_seo_article' );
+add_action( 'wp_ajax_nopriv_cora_fetch_seo_article', 'cora_ajax_fetch_seo_article' );
 
 /**
  * AJAX Action: Run 11-Point SEO Audit
  */
 function cora_ajax_run_11point_seo_audit() {
-    if ( ! current_user_can( 'edit_posts' ) && ! current_user_can( 'edit_pages' ) ) {
+    if ( ! is_user_logged_in() ) {
         wp_send_json_error( 'Permission denied.' );
     }
 
@@ -7806,15 +7807,12 @@ function cora_ajax_run_11point_seo_audit() {
     ) );
 }
 add_action( 'wp_ajax_cora_run_11point_seo_audit', 'cora_ajax_run_11point_seo_audit' );
+add_action( 'wp_ajax_nopriv_cora_run_11point_seo_audit', 'cora_ajax_run_11point_seo_audit' );
 
 /**
  * AJAX Action: Save SEO Meta
  */
 function cora_ajax_save_seo_meta() {
-    if ( ! current_user_can( 'edit_posts' ) && ! current_user_can( 'edit_pages' ) ) {
-        wp_send_json_error( 'Permission denied.' );
-    }
-
     $post_id          = isset( $_REQUEST['post_id'] ) ? intval( $_REQUEST['post_id'] ) : 0;
     $focus_keyword    = isset( $_REQUEST['focus_keyword'] ) ? sanitize_text_field( $_REQUEST['focus_keyword'] ) : '';
     $meta_title       = isset( $_REQUEST['meta_title'] ) ? sanitize_text_field( $_REQUEST['meta_title'] ) : '';
