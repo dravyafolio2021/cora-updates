@@ -99,17 +99,18 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
                 <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 m-0 leading-relaxed">Automated 5-star review collector, multi-channel dispatch engine, and private reputation shield.</p>
             </div>
 
+            <!-- Top Header Action Buttons -->
             <div class="flex items-center gap-2 flex-wrap pt-0.5">
-                <button type="button" onclick="coraOpenSendReviewDrawer()" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-97">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <button type="button" onclick="coraOpenSendReviewDrawer()" class="px-4 py-2.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-97">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     + Request Review
                 </button>
-                <button type="button" onclick="coraOpenReportDrawer()" class="px-3.5 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                <button type="button" onclick="coraOpenReportDrawer()" class="px-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                     Automated Reports
                 </button>
-                <button type="button" onclick="coraOpenReceptionQRModal()" class="px-3.5 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                <button type="button" onclick="coraOpenReceptionQRDrawer()" class="px-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                     Reception QR Card
                 </button>
             </div>
@@ -122,30 +123,30 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
         </div>
     </div>
 
-    <!-- 4 KPI Metrics Cards Grid with Official Brand Logos & Compact Spacing -->
+    <!-- 4 KPI Metrics Cards Grid with Subtle Color Background Tint/Shading -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <!-- Card 1: Total Requests Sent -->
-        <div class="cora-shopify-card p-4 space-y-2.5 relative overflow-hidden shadow-2xs">
+        <!-- Card 1: Total Requests Sent (Blue Tinted Background) -->
+        <div class="bg-blue-50/60 dark:bg-blue-955/40 border border-blue-100 dark:border-blue-900/40 rounded-2xl p-4.5 space-y-2.5 relative overflow-hidden shadow-2xs">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400">Total Requests Sent</span>
-                <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                <span class="text-xs font-bold text-blue-900 dark:text-blue-200">Total Requests Sent</span>
+                <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-300 flex items-center justify-center shrink-0 shadow-2xs">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                 </div>
             </div>
             <div>
-                <div class="text-2xl font-bold text-zinc-950 dark:text-zinc-100 font-mono tracking-tight"><?php echo $total_requests; ?></div>
-                <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Multi-channel post-handover automation</div>
+                <div class="text-3xl font-extrabold text-zinc-950 dark:text-white font-mono tracking-tight"><?php echo $total_requests; ?></div>
+                <div class="text-[10px] text-blue-700 dark:text-blue-300 font-medium mt-0.5">Multi-channel post-handover automation</div>
             </div>
-            <div class="h-1 rounded-full bg-blue-100 dark:bg-blue-950 overflow-hidden">
-                <div class="h-full bg-blue-500 rounded-full w-3/4"></div>
+            <div class="h-1 rounded-full bg-blue-200/80 dark:bg-blue-950 overflow-hidden">
+                <div class="h-full bg-blue-600 rounded-full w-3/4"></div>
             </div>
         </div>
 
-        <!-- Card 2: Google 5-Star Reviews with Official Google Logo -->
-        <div class="cora-shopify-card p-4 space-y-2.5 relative overflow-hidden shadow-2xs">
+        <!-- Card 2: Google 5-Star Reviews (Emerald Tinted Background) -->
+        <div class="bg-emerald-50/60 dark:bg-emerald-955/40 border border-emerald-100 dark:border-emerald-900/40 rounded-2xl p-4.5 space-y-2.5 relative overflow-hidden shadow-2xs">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400">Google 5-Star Reviews</span>
-                <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center shrink-0 p-1.5">
+                <span class="text-xs font-bold text-emerald-900 dark:text-emerald-200">Google 5-Star Reviews</span>
+                <div class="w-8 h-8 rounded-lg bg-white dark:bg-emerald-900/60 flex items-center justify-center shrink-0 p-1.5 shadow-2xs border border-emerald-100 dark:border-emerald-800">
                     <!-- Official Google G SVG -->
                     <svg viewBox="0 0 24 24" width="18" height="18">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -156,45 +157,45 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
                 </div>
             </div>
             <div>
-                <div class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-mono tracking-tight"><?php echo $google_reviews; ?></div>
-                <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">100% Verified Public Rating</div>
+                <div class="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono tracking-tight"><?php echo $google_reviews; ?></div>
+                <div class="text-[10px] text-emerald-700 dark:text-emerald-300 font-bold mt-0.5">100% Verified Public Rating</div>
             </div>
-            <div class="h-1 rounded-full bg-emerald-100 dark:bg-emerald-950 overflow-hidden">
+            <div class="h-1 rounded-full bg-emerald-200/80 dark:bg-emerald-950 overflow-hidden">
                 <div class="h-full bg-emerald-500 rounded-full w-2/3"></div>
             </div>
         </div>
 
-        <!-- Card 3: Private Shield Intercepts -->
-        <div class="cora-shopify-card p-4 space-y-2.5 relative overflow-hidden shadow-2xs">
+        <!-- Card 3: Private Shield Intercepts (Amber Tinted Background) -->
+        <div class="bg-amber-50/60 dark:bg-amber-955/40 border border-amber-100 dark:border-amber-900/40 rounded-2xl p-4.5 space-y-2.5 relative overflow-hidden shadow-2xs">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400">Private Shield Intercepts</span>
-                <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                <span class="text-xs font-bold text-amber-900 dark:text-amber-200">Private Shield Intercepts</span>
+                <div class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/60 text-amber-600 dark:text-amber-300 flex items-center justify-center shrink-0 shadow-2xs">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 </div>
             </div>
             <div>
-                <div class="text-2xl font-bold text-amber-600 dark:text-amber-400 font-mono tracking-tight"><?php echo $private_intercepts; ?></div>
-                <div class="text-[10px] text-amber-600 dark:text-amber-400 font-semibold mt-0.5">Resolved 1-3★ Risks Privately</div>
+                <div class="text-3xl font-extrabold text-amber-600 dark:text-amber-400 font-mono tracking-tight"><?php echo $private_intercepts; ?></div>
+                <div class="text-[10px] text-amber-700 dark:text-amber-300 font-bold mt-0.5">Resolved 1-3★ Risks Privately</div>
             </div>
-            <div class="h-1 rounded-full bg-amber-100 dark:bg-amber-950 overflow-hidden">
+            <div class="h-1 rounded-full bg-amber-200/80 dark:bg-amber-950 overflow-hidden">
                 <div class="h-full bg-amber-500 rounded-full w-1/3"></div>
             </div>
         </div>
 
-        <!-- Card 4: Overall Score Impact -->
-        <div class="cora-shopify-card p-4 space-y-2.5 relative overflow-hidden shadow-2xs">
+        <!-- Card 4: Overall Score Impact (Purple Tinted Background) -->
+        <div class="bg-purple-50/60 dark:bg-purple-955/40 border border-purple-100 dark:border-purple-900/40 rounded-2xl p-4.5 space-y-2.5 relative overflow-hidden shadow-2xs">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400">Overall Score Impact</span>
-                <div class="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                <span class="text-xs font-bold text-purple-900 dark:text-purple-200">Overall Score Impact</span>
+                <div class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/60 text-purple-600 dark:text-purple-300 flex items-center justify-center shrink-0 shadow-2xs">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                 </div>
             </div>
             <div>
-                <div class="text-2xl font-bold text-zinc-950 dark:text-zinc-100 font-mono tracking-tight"><?php echo $avg_rating; ?> / 5.0</div>
-                <div class="text-[10px] text-purple-600 dark:text-purple-400 font-bold mt-0.5">+0.8 Star Surge Index</div>
+                <div class="text-3xl font-extrabold text-zinc-950 dark:text-white font-mono tracking-tight"><?php echo $avg_rating; ?> / 5.0</div>
+                <div class="text-[10px] text-purple-700 dark:text-purple-300 font-bold mt-0.5">+0.8 Star Surge Index</div>
             </div>
-            <div class="h-1 rounded-full bg-purple-100 dark:bg-purple-950 overflow-hidden">
-                <div class="h-full bg-purple-500 rounded-full w-4/5"></div>
+            <div class="h-1 rounded-full bg-purple-200/80 dark:bg-purple-950 overflow-hidden">
+                <div class="h-full bg-purple-600 rounded-full w-4/5"></div>
             </div>
         </div>
     </div>
@@ -665,6 +666,46 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
     </div>
 </div>
 
+<!-- ═══ SIDE DRAWER 4: RECEPTION DESK QR CARD GENERATOR ═════════════════════ -->
+<div id="cora-reception-qr-drawer" class="fixed inset-y-0 right-0 z-[9999] w-full max-w-md bg-white dark:bg-zinc-955 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl transition-transform duration-250 translate-x-full" style="display:none;">
+    <div class="flex flex-col h-full">
+        <div class="p-5 border-b border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-between">
+            <div>
+                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Reception QR Card Stand</h3>
+                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 m-0">Printable counter stand for walk-in clients.</p>
+            </div>
+            <button type="button" onclick="coraCloseReceptionQRDrawer()" class="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer">✕</button>
+        </div>
+
+        <div class="p-6 flex-1 overflow-y-auto space-y-5 text-xs">
+            <!-- Printable Card Preview -->
+            <div class="p-6 bg-gradient-to-b from-zinc-900 to-zinc-950 text-white rounded-2xl border border-zinc-800 text-center space-y-4 shadow-xl">
+                <div class="text-xs font-bold tracking-widest uppercase text-emerald-400">CORA STUDIO & REAL ESTATE</div>
+                <div class="flex justify-center text-amber-400 text-sm tracking-widest">★★★★★</div>
+                <h4 class="text-sm font-bold m-0 text-white">Loved Your Experience With Us?</h4>
+                <p class="text-[11px] text-zinc-400 m-0">Scan below with your phone camera to leave a 5-Star Google Review!</p>
+                
+                <!-- QR Code SVG Graphic -->
+                <div class="p-4 bg-white rounded-xl inline-block shadow-md">
+                    <svg viewBox="0 0 100 100" width="130" height="130" fill="none">
+                        <rect width="100" height="100" fill="white"/>
+                        <!-- QR Code Elements -->
+                        <path fill="#09090b" d="M10 10h30v30H10zM15 15h20v20H15zM20 20h10v10H20zM60 10h30v30H60zM65 15h20v20H65zM70 20h10v10H70zM10 60h30v30H10zM15 65h20v20H15zM20 70h10v10H20zM50 10h5v10h-5zM45 25h10v5h-10zM50 40h15v5h-15zM60 50h10v10h-10zM75 55h15v5h-15zM50 65h10v10h-10zM70 70h20v20H70zM80 75h5v5h-5z"/>
+                    </svg>
+                </div>
+                <div class="text-[10px] text-zinc-500 font-mono">https://g.page/r/cora_studio/review</div>
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-between gap-3">
+            <button type="button" onclick="coraCloseReceptionQRDrawer()" class="px-4 py-2 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900">Close</button>
+            <button type="button" onclick="window.print()" class="px-5 py-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5">
+                🖨️ Print Desk Stand Card
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
 window.coraSwitchReviewTab = function(tabKey) {
     document.getElementById('cora-rev-panel-tracker').classList.add('hidden');
@@ -713,6 +754,30 @@ window.coraOpenSendReviewDrawer = function() {
 
 window.coraCloseSendReviewDrawer = function() {
     var drawer = document.getElementById('cora-send-review-drawer');
+    drawer.style.transform = 'translateX(100%)';
+    setTimeout(function() { drawer.style.display = 'none'; }, 250);
+};
+
+window.coraOpenReportDrawer = function() {
+    var drawer = document.getElementById('cora-report-generator-drawer');
+    drawer.style.display = 'block';
+    setTimeout(function() { drawer.style.transform = 'translateX(0)'; }, 10);
+};
+
+window.coraCloseReportDrawer = function() {
+    var drawer = document.getElementById('cora-report-generator-drawer');
+    drawer.style.transform = 'translateX(100%)';
+    setTimeout(function() { drawer.style.display = 'none'; }, 250);
+};
+
+window.coraOpenReceptionQRDrawer = function() {
+    var drawer = document.getElementById('cora-reception-qr-drawer');
+    drawer.style.display = 'block';
+    setTimeout(function() { drawer.style.transform = 'translateX(0)'; }, 10);
+};
+
+window.coraCloseReceptionQRDrawer = function() {
+    var drawer = document.getElementById('cora-reception-qr-drawer');
     drawer.style.transform = 'translateX(100%)';
     setTimeout(function() { drawer.style.display = 'none'; }, 250);
 };
@@ -798,18 +863,6 @@ window.coraResolvePrivateTicketAJAX = function() {
     });
 };
 
-window.coraOpenReportDrawer = function() {
-    var drawer = document.getElementById('cora-report-generator-drawer');
-    drawer.style.display = 'block';
-    setTimeout(function() { drawer.style.transform = 'translateX(0)'; }, 10);
-};
-
-window.coraCloseReportDrawer = function() {
-    var drawer = document.getElementById('cora-report-generator-drawer');
-    drawer.style.transform = 'translateX(100%)';
-    setTimeout(function() { drawer.style.display = 'none'; }, 250);
-};
-
 window.coraGenerateReviewReportAJAX = function(period) {
     jQuery.post(coraREData.ajaxUrl, {
         action: 'cora_generate_review_report',
@@ -837,11 +890,6 @@ window.coraGenerateCustomAISnippet = function() {
     out.textContent = text;
     out.classList.remove('hidden');
     if (window.coraShowToast) window.coraShowToast('Custom AI snippet generated!', 'success');
-};
-
-window.coraOpenReceptionQRModal = function() {
-    if (window.coraShowToast) window.coraShowToast('Opening Reception QR Card Print Preview...', 'info');
-    window.print();
 };
 
 window.coraSaveReviewSettings = function() {
