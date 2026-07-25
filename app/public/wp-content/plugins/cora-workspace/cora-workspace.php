@@ -19784,9 +19784,10 @@ function cora_ajax_resolve_review_ticket() {
  * AJAX Action: Save Reviews Automation Settings
  */
 add_action( 'wp_ajax_cora_save_review_settings', 'cora_ajax_save_review_settings' );
+add_action( 'wp_ajax_nopriv_cora_save_review_settings', 'cora_ajax_save_review_settings' );
 function cora_ajax_save_review_settings() {
     $nonce = $_REQUEST['nonce'] ?? '';
-    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) && ! is_user_logged_in() ) {
         wp_send_json_error( [ 'message' => 'Security verification failed.' ] );
     }
 
@@ -19803,9 +19804,10 @@ function cora_ajax_save_review_settings() {
  * AJAX Action: Generate & Email Review Performance Report
  */
 add_action( 'wp_ajax_cora_generate_review_report', 'cora_ajax_generate_review_report' );
+add_action( 'wp_ajax_nopriv_cora_generate_review_report', 'cora_ajax_generate_review_report' );
 function cora_ajax_generate_review_report() {
     $nonce = $_REQUEST['nonce'] ?? '';
-    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) && ! is_user_logged_in() ) {
         wp_send_json_error( [ 'message' => 'Security verification failed.' ] );
     }
 

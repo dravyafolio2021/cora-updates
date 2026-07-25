@@ -29,7 +29,7 @@
 ## 3. Branch Activity & Progress Log
 
 ### `main` (Production Base)
-- **Latest Commit**: `ab042694` — `style(reviews): add subtle background shading to KPI metric cards, fix header button label, and add sliding Reception QR Card drawer`
+- **Latest Commit**: `1e7e064d` — `fix(reviews): remove Reception QR button and fix Automated Reports drawer JS trigger and fallback AJAX resolution`
 - **Health**: 100% Operational & Clean Working Tree.
 
 <!-- BRANCH_LOGS_START -->
