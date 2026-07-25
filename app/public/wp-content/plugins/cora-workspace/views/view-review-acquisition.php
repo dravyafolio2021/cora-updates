@@ -84,74 +84,80 @@ $wa_template = get_option( 'cora_wa_review_template', 'Hi {client_name}! Thank y
 $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, we appreciate your business! Please leave us a review on Google.' );
 ?>
 
-<div id="cora-reviews-feedback-wrapper" class="space-y-6 font-sans text-zinc-900 dark:text-zinc-100">
+<div id="cora-reviews-feedback-wrapper" class="space-y-5 font-sans text-zinc-900 dark:text-zinc-100">
     <!-- Header Bar with Title, Verified Badge, Action Controls, & Clean Right Rating Badge -->
-    <div class="cora-shopify-card p-6 md:p-8 flex items-center justify-between flex-wrap gap-4 shadow-sm">
-        <div class="space-y-4 max-w-2xl">
+    <div class="cora-shopify-card p-5 md:p-6 flex items-center justify-between flex-wrap gap-4 shadow-sm">
+        <div class="space-y-3 max-w-2xl">
             <div>
                 <div class="flex items-center gap-2.5 flex-wrap">
-                    <h1 class="text-2xl font-extrabold text-zinc-950 dark:text-white tracking-tight m-0">Reviews & Feedback</h1>
-                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5 shadow-2xs">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
+                    <h1 class="text-xl font-extrabold text-zinc-950 dark:text-white tracking-tight m-0">Reviews & Feedback</h1>
+                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5 shadow-2xs">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
                         Verified Shield Active
                     </span>
                 </div>
-                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1.5 m-0 leading-relaxed">Automated 5-star review collector, multi-channel dispatch engine, and private reputation shield.</p>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 m-0 leading-relaxed">Automated 5-star review collector, multi-channel dispatch engine, and private reputation shield.</p>
             </div>
 
-            <div class="flex items-center gap-2.5 flex-wrap pt-1">
-                <button type="button" onclick="coraOpenSendReviewDrawer()" class="px-5 py-2.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold rounded-xl transition-all flex items-center gap-2 shadow-sm cursor-pointer active:scale-97">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <div class="flex items-center gap-2 flex-wrap pt-0.5">
+                <button type="button" onclick="coraOpenSendReviewDrawer()" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-97">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     + Request Review
                 </button>
-                <button type="button" onclick="coraOpenReportDrawer()" class="px-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                <button type="button" onclick="coraOpenReportDrawer()" class="px-3.5 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                     Automated Reports
                 </button>
-                <button type="button" onclick="coraOpenReceptionQRModal()" class="px-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                <button type="button" onclick="coraOpenReceptionQRModal()" class="px-3.5 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                     Reception QR Card
                 </button>
             </div>
         </div>
 
         <!-- Clean Right Rating Badge Card -->
-        <div class="hidden sm:flex items-center gap-2.5 px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-2xs shrink-0">
-            <div class="flex text-amber-400 text-sm tracking-wider">★★★★★</div>
+        <div class="hidden sm:flex items-center gap-2 px-3.5 py-2 bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-2xs shrink-0">
+            <div class="flex text-amber-400 text-xs tracking-wider">★★★★★</div>
             <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono"><?php echo $avg_rating; ?> Rating</span>
         </div>
     </div>
 
-    <!-- 4 KPI Metrics Cards Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- 4 KPI Metrics Cards Grid with Official Icons & Compact Spacing -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         <!-- Card 1: Total Requests Sent -->
-        <div class="cora-shopify-card p-5 space-y-3 relative overflow-hidden shadow-2xs">
+        <div class="cora-shopify-card p-4 space-y-2.5 relative overflow-hidden shadow-2xs">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400">Total Requests Sent</span>
-                <div class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                 </div>
             </div>
             <div>
-                <div class="text-3xl font-bold text-zinc-950 dark:text-zinc-100 font-mono tracking-tight"><?php echo $total_requests; ?></div>
-                <div class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">Multi-channel post-handover automation</div>
+                <div class="text-2xl font-bold text-zinc-950 dark:text-zinc-100 font-mono tracking-tight"><?php echo $total_requests; ?></div>
+                <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Multi-channel post-handover automation</div>
             </div>
             <div class="h-1 rounded-full bg-blue-100 dark:bg-blue-950 overflow-hidden">
                 <div class="h-full bg-blue-500 rounded-full w-3/4"></div>
             </div>
         </div>
 
-        <!-- Card 2: Google 5-Star Reviews -->
-        <div class="cora-shopify-card p-5 space-y-3 relative overflow-hidden shadow-2xs">
+        <!-- Card 2: Google 5-Star Reviews with Official Google Logo -->
+        <div class="cora-shopify-card p-4 space-y-2.5 relative overflow-hidden shadow-2xs">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400">Google 5-Star Reviews</span>
-                <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 font-bold text-sm font-sans">
-                    G
+                <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center shrink-0 p-1.5">
+                    <!-- Official Google G SVG -->
+                    <svg viewBox="0 0 24 24" width="18" height="18">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                    </svg>
                 </div>
             </div>
             <div>
-                <div class="text-3xl font-bold text-emerald-600 dark:text-emerald-400 font-mono tracking-tight"><?php echo $google_reviews; ?></div>
-                <div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">100% Verified Public Rating</div>
+                <div class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-mono tracking-tight"><?php echo $google_reviews; ?></div>
+                <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">100% Verified Public Rating</div>
             </div>
             <div class="h-1 rounded-full bg-emerald-100 dark:bg-emerald-950 overflow-hidden">
                 <div class="h-full bg-emerald-500 rounded-full w-2/3"></div>
@@ -159,16 +165,16 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
         </div>
 
         <!-- Card 3: Private Shield Intercepts -->
-        <div class="cora-shopify-card p-5 space-y-3 relative overflow-hidden shadow-2xs">
+        <div class="cora-shopify-card p-4 space-y-2.5 relative overflow-hidden shadow-2xs">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400">Private Shield Intercepts</span>
-                <div class="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 </div>
             </div>
             <div>
-                <div class="text-3xl font-bold text-amber-600 dark:text-amber-400 font-mono tracking-tight"><?php echo $private_intercepts; ?></div>
-                <div class="text-[11px] text-amber-600 dark:text-amber-400 font-semibold mt-0.5">Resolved 1-3★ Risks Privately</div>
+                <div class="text-2xl font-bold text-amber-600 dark:text-amber-400 font-mono tracking-tight"><?php echo $private_intercepts; ?></div>
+                <div class="text-[10px] text-amber-600 dark:text-amber-400 font-semibold mt-0.5">Resolved 1-3★ Risks Privately</div>
             </div>
             <div class="h-1 rounded-full bg-amber-100 dark:bg-amber-950 overflow-hidden">
                 <div class="h-full bg-amber-500 rounded-full w-1/3"></div>
@@ -176,16 +182,16 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
         </div>
 
         <!-- Card 4: Overall Score Impact -->
-        <div class="cora-shopify-card p-5 space-y-3 relative overflow-hidden shadow-2xs">
+        <div class="cora-shopify-card p-4 space-y-2.5 relative overflow-hidden shadow-2xs">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400">Overall Score Impact</span>
-                <div class="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
-                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <div class="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                 </div>
             </div>
             <div>
-                <div class="text-3xl font-bold text-zinc-950 dark:text-zinc-100 font-mono tracking-tight"><?php echo $avg_rating; ?> / 5.0</div>
-                <div class="text-[11px] text-purple-600 dark:text-purple-400 font-bold mt-0.5">+0.8 Star Surge Index</div>
+                <div class="text-2xl font-bold text-zinc-950 dark:text-zinc-100 font-mono tracking-tight"><?php echo $avg_rating; ?> / 5.0</div>
+                <div class="text-[10px] text-purple-600 dark:text-purple-400 font-bold mt-0.5">+0.8 Star Surge Index</div>
             </div>
             <div class="h-1 rounded-full bg-purple-100 dark:bg-purple-950 overflow-hidden">
                 <div class="h-full bg-purple-500 rounded-full w-4/5"></div>
@@ -194,29 +200,29 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
     </div>
 
     <!-- SUB-NAVIGATION TABS BAR -->
-    <div class="bg-white dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-2 shadow-2xs flex items-center gap-1.5 overflow-x-auto">
-        <button type="button" onclick="coraSwitchReviewTab('tracker')" id="rev-tab-btn-tracker" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 cursor-pointer transition-all shrink-0 flex items-center gap-2">
-            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+    <div class="bg-white dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-1.5 shadow-2xs flex items-center gap-1 overflow-x-auto">
+        <button type="button" onclick="coraSwitchReviewTab('tracker')" id="rev-tab-btn-tracker" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 cursor-pointer transition-all shrink-0 flex items-center gap-1.5">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
             Requests & Feedback Feed
         </button>
-        <button type="button" onclick="coraSwitchReviewTab('snippets')" id="rev-tab-btn-snippets" class="px-4 py-2 rounded-xl text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-all shrink-0 flex items-center gap-2">
-            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        <button type="button" onclick="coraSwitchReviewTab('snippets')" id="rev-tab-btn-snippets" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-all shrink-0 flex items-center gap-1.5">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
             AI Review Snippet Generator
         </button>
-        <button type="button" onclick="coraSwitchReviewTab('automation')" id="rev-tab-btn-automation" class="px-4 py-2 rounded-xl text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-all shrink-0 flex items-center gap-2">
-            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+        <button type="button" onclick="coraSwitchReviewTab('automation')" id="rev-tab-btn-automation" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-all shrink-0 flex items-center gap-1.5">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
             Multi-Channel Triggers
         </button>
-        <button type="button" onclick="coraSwitchReviewTab('reports')" id="rev-tab-btn-reports" class="px-4 py-2 rounded-xl text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-all shrink-0 flex items-center gap-2">
-            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        <button type="button" onclick="coraSwitchReviewTab('reports')" id="rev-tab-btn-reports" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-all shrink-0 flex items-center gap-1.5">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
             Automated Reports & Sentiment
         </button>
     </div>
 
     <!-- ═════════════════════════════════════════════════════════════════════
-         TAB 1: REVIEW REQUESTS & REPUTATION FEED
+         TAB 1: REVIEW REQUESTS & REPUTATION FEED (COMPACT & SPACE SAVING)
          ═════════════════════════════════════════════════════════════════════ -->
-    <div id="cora-rev-panel-tracker" class="cora-shopify-card space-y-5">
+    <div id="cora-rev-panel-tracker" class="cora-shopify-card space-y-4 p-5">
         <!-- Top Title & Filter Bar -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
@@ -225,26 +231,26 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
             </div>
 
             <!-- Category Filter Pills -->
-            <div class="flex items-center gap-2 overflow-x-auto">
-                <button type="button" onclick="coraFilterReviewFeed('all')" id="rev-filter-all" class="px-3.5 py-1 rounded-full text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 cursor-pointer shadow-2xs transition-all shrink-0">All (<?php echo $total_requests; ?>)</button>
-                <button type="button" onclick="coraFilterReviewFeed('published')" id="rev-filter-published" class="px-3.5 py-1 rounded-full text-xs font-bold bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 hover:bg-zinc-200 cursor-pointer transition-all shrink-0">5-Star Published</button>
-                <button type="button" onclick="coraFilterReviewFeed('intercepted')" id="rev-filter-intercepted" class="px-3.5 py-1 rounded-full text-xs font-bold bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 hover:bg-zinc-200 cursor-pointer transition-all shrink-0">Private Shield Intercepts</button>
+            <div class="flex items-center gap-1.5 overflow-x-auto">
+                <button type="button" onclick="coraFilterReviewFeed('all')" id="rev-filter-all" class="px-3 py-1 rounded-full text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 cursor-pointer shadow-2xs transition-all shrink-0">All (<?php echo $total_requests; ?>)</button>
+                <button type="button" onclick="coraFilterReviewFeed('published')" id="rev-filter-published" class="px-3 py-1 rounded-full text-xs font-bold bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 hover:bg-zinc-200 cursor-pointer transition-all shrink-0">5-Star Published</button>
+                <button type="button" onclick="coraFilterReviewFeed('intercepted')" id="rev-filter-intercepted" class="px-3 py-1 rounded-full text-xs font-bold bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 hover:bg-zinc-200 cursor-pointer transition-all shrink-0">Private Shield Intercepts</button>
             </div>
         </div>
 
-        <!-- Feed Table Container -->
-        <div class="border border-zinc-200/80 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-2xs bg-white dark:bg-zinc-955">
+        <!-- Feed Table Container — Compact Space Saving Design -->
+        <div class="border border-zinc-200/80 dark:border-zinc-800 rounded-xl overflow-hidden shadow-2xs bg-white dark:bg-zinc-955">
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs min-w-[850px]">
+                <table class="w-full text-left border-collapse text-xs min-w-[780px]">
                     <thead>
                         <tr class="bg-zinc-50/80 dark:bg-zinc-900/60 border-b border-zinc-200/80 dark:border-zinc-800 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                            <th class="py-4 px-4 w-[240px]">CLIENT & PROJECT</th>
-                            <th class="py-4 px-4 w-[150px]">CATEGORY</th>
-                            <th class="py-4 px-4 w-[120px]">CHANNEL</th>
-                            <th class="py-4 px-4 w-[110px]">RATING</th>
-                            <th class="py-4 px-4 w-[170px]">STATUS</th>
-                            <th class="py-4 px-4">REVIEW SNIPPET / NOTE</th>
-                            <th class="py-4 px-4 text-right w-[150px]">ACTIONS</th>
+                            <th class="py-3 px-3.5 w-[220px]">CLIENT & PROJECT</th>
+                            <th class="py-3 px-3.5 w-[140px]">CATEGORY</th>
+                            <th class="py-3 px-3.5 w-[110px]">CHANNEL</th>
+                            <th class="py-3 px-3.5 w-[90px]">RATING</th>
+                            <th class="py-3 px-3.5 w-[150px]">STATUS</th>
+                            <th class="py-3 px-3.5">REVIEW SNIPPET / NOTE</th>
+                            <th class="py-3 px-3.5 text-right w-[140px]">ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800/60" id="cora-review-feed-tbody">
@@ -256,77 +262,82 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
                             $status_label = $is_private ? 'Private Shield Intercepted' : 'Google 5-Star Published';
                             $initial = strtoupper( substr( $req['client_name'], 0, 1 ) );
                             $avatar_bg = $is_private ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' : 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300';
+                            $channel_type = strtolower( $req['channel'] ?? 'whatsapp' );
                         ?>
                         <tr class="hover:bg-zinc-50/70 dark:hover:bg-zinc-900/40 transition-colors <?php echo $filter_class; ?>">
-                            <!-- CLIENT & PROJECT -->
-                            <td class="py-4 px-4 align-top">
-                                <div class="flex items-start gap-3">
-                                    <div class="w-9 h-9 rounded-full <?php echo $avatar_bg; ?> font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                            <!-- CLIENT & PROJECT (Compact 2-line layout) -->
+                            <td class="py-3 px-3.5 align-middle">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-full <?php echo $avatar_bg; ?> font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
                                         <?php echo esc_html( $initial ); ?>
                                     </div>
-                                    <div class="space-y-0.5">
-                                        <div class="font-bold text-sm text-zinc-900 dark:text-zinc-100 leading-snug"><?php echo esc_html( $req['client_name'] ); ?></div>
-                                        <div class="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium"><?php echo esc_html( $req['project_title'] ); ?></div>
-                                        <div class="text-[10px] text-zinc-400 font-mono"><?php echo esc_html( $req['client_phone'] ?: $req['client_email'] ); ?></div>
+                                    <div class="space-y-0.5 truncate">
+                                        <div class="font-bold text-xs text-zinc-900 dark:text-zinc-100 truncate"><?php echo esc_html( $req['client_name'] ); ?></div>
+                                        <div class="text-[10px] text-zinc-400 font-mono truncate"><?php echo esc_html( $req['client_phone'] ?: $req['client_email'] ); ?></div>
                                     </div>
                                 </div>
                             </td>
 
                             <!-- CATEGORY -->
-                            <td class="py-4 px-4 align-top font-semibold text-zinc-700 dark:text-zinc-300">
+                            <td class="py-3 px-3.5 align-middle font-medium text-xs text-zinc-700 dark:text-zinc-300">
                                 <?php echo esc_html( $req['category'] ); ?>
                             </td>
 
-                            <!-- CHANNEL -->
-                            <td class="py-4 px-4 align-top">
-                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5 w-max">
-                                    <?php if ( strtolower( $req['channel'] ) === 'whatsapp' ) : ?>
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
-                                    <?php elseif ( strtolower( $req['channel'] ) === 'sms' ) : ?>
-                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
+                            <!-- CHANNEL (Official Brand SVG Icons) -->
+                            <td class="py-3 px-3.5 align-middle">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5 w-max">
+                                    <?php if ( $channel_type === 'whatsapp' ) : ?>
+                                        <!-- Official WhatsApp SVG Icon -->
+                                        <svg viewBox="0 0 24 24" width="12" height="12" class="text-emerald-500 fill-current shrink-0">
+                                            <path d="M12.031 2c-5.517 0-9.985 4.468-9.985 9.985 0 1.763.459 3.483 1.332 5.003l-1.417 5.176 5.297-1.388c1.472.803 3.134 1.226 4.773 1.226 5.517 0 9.986-4.468 9.986-9.986 0-5.517-4.469-9.985-9.986-9.985zm0 18.283c-1.498 0-2.966-.402-4.244-1.162l-.305-.181-3.156.827.842-3.076-.199-.316c-.836-1.328-1.278-2.868-1.278-4.39 0-4.568 3.717-8.285 8.285-8.285 4.567 0 8.285 3.717 8.285 8.285 0 4.568-3.718 8.285-8.285 8.285z"/>
+                                        </svg>
+                                    <?php elseif ( $channel_type === 'sms' ) : ?>
+                                        <!-- Official SMS Icon -->
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-amber-500 shrink-0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                                     <?php else : ?>
-                                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span>
+                                        <!-- Official Email Icon -->
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-blue-500 shrink-0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                                     <?php endif; ?>
                                     <?php echo esc_html( $req['channel'] ?? 'WhatsApp' ); ?>
                                 </span>
                             </td>
 
-                            <!-- RATING -->
-                            <td class="py-4 px-4 align-top font-bold">
-                                <div>
-                                    <span class="<?php echo $rating >= 4 ? 'text-emerald-500' : 'text-amber-500'; ?> text-xs tracking-wider">
+                            <!-- RATING (Compact Stars) -->
+                            <td class="py-3 px-3.5 align-middle font-bold">
+                                <div class="flex items-center gap-1">
+                                    <span class="<?php echo $rating >= 4 ? 'text-emerald-500' : 'text-amber-500'; ?> text-xs tracking-tight">
                                         <?php echo str_repeat( '★', $rating ); ?>
                                     </span>
-                                    <div class="text-[11px] text-zinc-600 dark:text-zinc-400 font-mono font-bold mt-0.5"><?php echo $rating; ?>/5</div>
+                                    <span class="text-[10px] text-zinc-500 font-mono font-bold"><?php echo $rating; ?>/5</span>
                                 </div>
                             </td>
 
-                            <!-- STATUS -->
-                            <td class="py-4 px-4 align-top">
-                                <span class="px-3 py-1 rounded-full text-[11px] font-bold <?php echo $status_bg; ?> inline-flex items-center gap-1.5">
+                            <!-- STATUS (Single Line Non-wrapping Pill) -->
+                            <td class="py-3 px-3.5 align-middle">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold <?php echo $status_bg; ?> inline-flex items-center gap-1.5 whitespace-nowrap">
                                     <span class="w-1.5 h-1.5 rounded-full <?php echo $is_private ? 'bg-amber-500' : 'bg-emerald-500'; ?> shrink-0"></span>
                                     <?php echo esc_html( $status_label ); ?>
                                 </span>
                             </td>
 
                             <!-- REVIEW SNIPPET / NOTE -->
-                            <td class="py-4 px-4 align-top text-zinc-600 dark:text-zinc-300 leading-relaxed text-xs max-w-sm" title="<?php echo esc_attr( $req['review_text'] ); ?>">
+                            <td class="py-3 px-3.5 align-middle text-zinc-600 dark:text-zinc-300 leading-normal text-xs max-w-xs" title="<?php echo esc_attr( $req['review_text'] ); ?>">
                                 <span class="text-zinc-400 font-serif mr-1">“</span><?php echo esc_html( $req['review_text'] ); ?>
                             </td>
 
-                            <!-- ACTIONS -->
-                            <td class="py-4 px-4 align-top text-right">
-                                <div class="flex items-center justify-end gap-2">
+                            <!-- ACTIONS (Compact Action Buttons) -->
+                            <td class="py-3 px-3.5 align-middle text-right">
+                                <div class="flex items-center justify-end gap-1.5">
                                     <?php if ( $is_private ) : ?>
-                                        <button type="button" onclick="coraOpenPrivateTicketDrawer('<?php echo esc_js( $req['id'] ); ?>')" class="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs">
+                                        <button type="button" onclick="coraOpenPrivateTicketDrawer('<?php echo esc_js( $req['id'] ); ?>')" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold transition-all cursor-pointer shadow-2xs whitespace-nowrap">
                                             Inspect Ticket
                                         </button>
                                     <?php else : ?>
-                                        <button type="button" onclick="coraResendWhatsAppReview('<?php echo esc_js( $req['client_phone'] ); ?>', '<?php echo esc_js( $req['client_name'] ); ?>')" class="w-8 h-8 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition-all cursor-pointer shadow-2xs shrink-0" title="Resend via WhatsApp">
-                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                                        <button type="button" onclick="coraResendWhatsAppReview('<?php echo esc_js( $req['client_phone'] ); ?>', '<?php echo esc_js( $req['client_name'] ); ?>')" class="w-7 h-7 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition-all cursor-pointer shadow-2xs shrink-0" title="Resend via WhatsApp">
+                                            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12.031 2c-5.517 0-9.985 4.468-9.985 9.985 0 1.763.459 3.483 1.332 5.003l-1.417 5.176 5.297-1.388c1.472.803 3.134 1.226 4.773 1.226 5.517 0 9.986-4.468 9.986-9.986 0-5.517-4.469-9.985-9.986-9.985zm0 18.283c-1.498 0-2.966-.402-4.244-1.162l-.305-.181-3.156.827.842-3.076-.199-.316c-.836-1.328-1.278-2.868-1.278-4.39 0-4.568 3.717-8.285 8.285-8.285 4.567 0 8.285 3.717 8.285 8.285 0 4.568-3.718 8.285-8.285 8.285z"/></svg>
                                         </button>
-                                        <button type="button" onclick="coraCopyGoogleReviewUrl()" class="px-3 py-1.5 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs shrink-0">
-                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                                        <button type="button" onclick="coraCopyGoogleReviewUrl()" class="px-2.5 py-1 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs shrink-0 whitespace-nowrap">
+                                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                                             Copy Link
                                         </button>
                                     <?php endif; ?>
@@ -340,9 +351,9 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
         </div>
 
         <!-- Bottom Reputation Shield Info Banner inside Card -->
-        <div class="p-4 bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800 rounded-xl flex items-center justify-between flex-wrap gap-2 text-xs">
+        <div class="p-3.5 bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800 rounded-xl flex items-center justify-between flex-wrap gap-2 text-xs">
             <div class="flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 <span>Your reputation is protected. 1–3★ feedback is handled privately and used to improve customer experience.</span>
             </div>
             <a href="#" onclick="coraSwitchReviewTab('automation'); return false;" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 hover:underline flex items-center gap-1">
@@ -638,12 +649,12 @@ window.coraSwitchReviewTab = function(tabKey) {
     document.getElementById('cora-rev-panel-reports').classList.add('hidden');
 
     document.querySelectorAll('[id^="rev-tab-btn-"]').forEach(function(b){
-        b.className = 'px-4 py-2 rounded-xl text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-all shrink-0 flex items-center gap-2';
+        b.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-all shrink-0 flex items-center gap-1.5';
     });
 
     var activeBtn = document.getElementById('rev-tab-btn-' + tabKey);
     if (activeBtn) {
-        activeBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 cursor-pointer transition-all shrink-0 flex items-center gap-2';
+        activeBtn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 cursor-pointer transition-all shrink-0 flex items-center gap-1.5';
     }
 
     document.getElementById('cora-rev-panel-' + tabKey).classList.remove('hidden');
@@ -651,11 +662,11 @@ window.coraSwitchReviewTab = function(tabKey) {
 
 window.coraFilterReviewFeed = function(type) {
     document.querySelectorAll('[id^="rev-filter-"]').forEach(function(b){
-        b.className = 'px-3.5 py-1 rounded-full text-xs font-bold bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 hover:bg-zinc-200 cursor-pointer transition-all shrink-0';
+        b.className = 'px-3 py-1 rounded-full text-xs font-bold bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 hover:bg-zinc-200 cursor-pointer transition-all shrink-0';
     });
     var activeFilterBtn = document.getElementById('rev-filter-' + type);
     if (activeFilterBtn) {
-        activeFilterBtn.className = 'px-3.5 py-1 rounded-full text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 cursor-pointer shadow-2xs transition-all shrink-0';
+        activeFilterBtn.className = 'px-3 py-1 rounded-full text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 cursor-pointer shadow-2xs transition-all shrink-0';
     }
 
     var rows = document.querySelectorAll('#cora-review-feed-tbody tr');
