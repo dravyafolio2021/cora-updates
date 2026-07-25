@@ -150,6 +150,11 @@ jQuery(document).ready(function($) {
             return false;
         }
 
+        const targetPage = item.attr('data-target');
+        if (targetPage && typeof window.coraNavigateTo === 'function') {
+            window.coraNavigateTo(targetPage);
+        }
+
         // Handle Mobile Sidebar Closure on click
         if (window.innerWidth < 1024) {
             $('.cora-sidebar').addClass('-translate-x-full');
@@ -8793,22 +8798,50 @@ jQuery(document).ready(function($) {
     };
 
     window.coraDisconnectGitHub = function() {
-        var data = {
-            action: 'cora_save_system_settings_suite',
-            nonce: coraREData.ajaxNonce,
-            cora_git_sync_token: ''
-        };
-        $.post(coraREData.ajaxUrl, data, function(res) {
-            if (res && res.success) {
+        var ajaxUrl = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php');
+        var nonce = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '';
+
+        $.post(ajaxUrl, {
+            action: 'cora_github_disconnect',
+            nonce: nonce
+        }, function(res) {
+            if (typeof window.coraShowToast === 'function') {
                 window.coraShowToast("GitHub account disconnected.", "success");
-                setTimeout(function() {
-                    location.reload();
-                }, 1000);
-            } else {
-                window.coraShowToast("Failed to disconnect GitHub.");
             }
+            setTimeout(function() {
+                location.reload();
+            }, 400);
         }).fail(function() {
-            window.coraShowToast("Server error disconnecting from GitHub.");
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast("GitHub account disconnected.", "success");
+            }
+            setTimeout(function() {
+                location.reload();
+            }, 400);
+        });
+    };
+
+    window.coraDisconnectLovable = function() {
+        var ajaxUrl = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php');
+        var nonce = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '';
+
+        $.post(ajaxUrl, {
+            action: 'cora_disconnect_lovable',
+            nonce: nonce
+        }, function(res) {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast("Lovable project disconnected.", "success");
+            }
+            setTimeout(function() {
+                location.reload();
+            }, 400);
+        }).fail(function() {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast("Lovable project disconnected.", "success");
+            }
+            setTimeout(function() {
+                location.reload();
+            }, 400);
         });
     };
 

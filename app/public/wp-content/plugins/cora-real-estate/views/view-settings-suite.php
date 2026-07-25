@@ -227,7 +227,11 @@ $cora_settings_tabs = array(
         </div>
     </div>
     <div class="flex items-center gap-2">
-        <button class="cora-btn-primary px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold rounded-md text-xs transition-colors cursor-pointer flex items-center gap-2 shadow-sm" onclick="coraSaveSystemSettingsSuite()">
+        <button type="button" class="px-3 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold rounded-md text-xs transition-colors flex items-center gap-1.5 border border-zinc-200 dark:border-zinc-700 shadow-2xs cursor-pointer" onclick="coraClearSystemCache()">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+            Clear Cache
+        </button>
+        <button type="button" class="cora-btn-primary px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold rounded-md text-xs transition-colors cursor-pointer flex items-center gap-2 shadow-sm" onclick="coraSaveSystemSettingsSuite()">
             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
             Save All Settings
         </button>
@@ -1095,152 +1099,294 @@ $cora_settings_tabs = array(
                 </div>
             </div>
         </div>
-        <?php elseif ( $active_tab === 'git-sync' ) : ?>
+        <?php elseif ( $active_tab === 'git-sync' ) :
+            $cora_repo     = get_option( 'cora_git_sync_repo', '' );
+            $cora_branch   = get_option( 'cora_git_sync_branch', 'main' );
+            $cora_token    = get_option( 'cora_git_sync_token', '' );
+            $cora_live_url = get_option( 'cora_git_sync_live_url', '' );
+            $cora_enabled  = get_option( 'cora_git_sync_enabled', '0' );
+            $cora_page_id  = get_option( 'cora_git_sync_page_id', 0 );
+
+            $is_github_connected  = ! empty( $cora_repo );
+            $is_lovable_connected = ! empty( $cora_live_url );
+        ?>
         <!-- TAB 7: GIT SYNC (LOVABLE & GITHUB) -->
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start max-w-full">
-            <!-- Left side: Form Settings Card -->
-            <div class="xl:col-span-7 space-y-6 cora-shopify-card">
-                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Git Sync Integration</h3>
-                    <p class="text-xs text-zinc-500">Deploy custom frontends built in Lovable or other vibe-coding platforms directly to WordPress pages using GitHub.</p>
-                </div>
-                
-                <!-- Enable toggle -->
-                <div class="flex items-center justify-between p-3.5 bg-zinc-50/50 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg">
-                    <div class="flex flex-col gap-0.5">
-                        <span class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Enable Git Sync Hosting</span>
-                        <span class="text-[10px] text-zinc-550 dark:text-zinc-400">Route requests on the mapped page to load files from the Git repository.</span>
+        <div class="space-y-6 max-w-4xl">
+            <!-- Card 1: GitHub Connection -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl p-6 shadow-2xs space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-800/60 gap-4">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-12 h-12 rounded-2xl bg-zinc-950 dark:bg-zinc-100 flex items-center justify-center text-white dark:text-zinc-950 shrink-0 shadow-2xs">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100">GitHub Connection</h3>
+                            <p class="text-xs text-zinc-500 mt-0.5">Sync your website code from a GitHub repository.</p>
+                        </div>
                     </div>
-                    <label class="cora-switch relative inline-flex items-center cursor-pointer scale-[0.8] shrink-0">
-                        <input type="checkbox" name="cora_git_sync_enabled" value="1" <?php checked( get_option('cora_git_sync_enabled'), '1' ); ?> class="sr-only peer">
-                        <div class="w-9 h-5 bg-zinc-200 dark:bg-zinc-850 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 dark:after:border-zinc-800 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-950 dark:peer-checked:bg-zinc-100"></div>
-                    </label>
+                    <div id="cora-github-status-container">
+                        <?php if ( $is_github_connected ) : ?>
+                            <span id="cora-github-status-pill" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/40 shrink-0">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Connected
+                            </span>
+                        <?php else : ?>
+                            <span id="cora-github-status-pill" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 shrink-0">
+                                <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Not Connected
+                            </span>
+                        <?php endif; ?>
+                    </div>
                 </div>
 
-                <!-- GitHub Repo Input -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label>GitHub Repository Link</label>
-                        <input type="text" name="cora_git_sync_repo" value="<?php echo esc_attr( get_option('cora_git_sync_repo', '') ); ?>" placeholder="e.g. https://github.com/user/repo">
+                        <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">GitHub Repository</label>
+                        <div class="relative flex items-center">
+                            <span class="absolute left-3.5 text-zinc-400 pointer-events-none flex items-center">
+                                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                            </span>
+                            <select id="cora_git_sync_repo" name="cora_git_sync_repo" class="w-full pl-10 pr-10 py-2.5 bg-zinc-50/50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-medium text-zinc-900 dark:text-zinc-100 appearance-none outline-none focus:border-zinc-400">
+                                <option value="" <?php selected( empty( $cora_repo ) ); ?>>-- Select GitHub Repository --</option>
+                                <option value="dravyafolio2021/heycora-bd4d41fb.git" <?php selected( $cora_repo, 'dravyafolio2021/heycora-bd4d41fb.git' ); ?>>dravyafolio2021/heycora-bd4d41fb.git</option>
+                                <?php if ( ! empty( $cora_repo ) && $cora_repo !== 'dravyafolio2021/heycora-bd4d41fb.git' ) : ?>
+                                    <option value="<?php echo esc_attr( $cora_repo ); ?>" selected><?php echo esc_html( $cora_repo ); ?></option>
+                                <?php endif; ?>
+                            </select>
+                            <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </span>
+                        </div>
                     </div>
                     <div>
-                        <label>Branch (Usually "main")</label>
-                        <input type="text" name="cora_git_sync_branch" value="<?php echo esc_attr( get_option('cora_git_sync_branch', 'main') ); ?>" placeholder="e.g. main">
+                        <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Branch</label>
+                        <div class="relative flex items-center">
+                            <span class="absolute left-3.5 text-zinc-400 pointer-events-none flex items-center">
+                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>
+                            </span>
+                            <select id="cora_git_sync_branch" name="cora_git_sync_branch" class="w-full pl-10 pr-10 py-2.5 bg-zinc-50/50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-medium text-zinc-900 dark:text-zinc-100 appearance-none outline-none focus:border-zinc-400">
+                                <option value="main" <?php selected( $cora_branch, 'main' ); ?>>main</option>
+                                <option value="master" <?php selected( $cora_branch, 'master' ); ?>>master</option>
+                                <option value="dev" <?php selected( $cora_branch, 'dev' ); ?>>dev</option>
+                            </select>
+                            <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- GitHub Access Token -->
-                <div>
-                    <label>GitHub Security Token (Only if repository is Private)</label>
-                    <input type="password" name="cora_git_sync_token" value="<?php echo esc_attr( get_option('cora_git_sync_token', '') ); ?>" placeholder="e.g. ghp_...">
-                    <p class="text-[10px] text-zinc-450 mt-1">Leave empty if your repository is Public. Only paste a token if the repository is private.</p>
-                </div>
-
-                <!-- Lovable Live URL -->
-                <div>
-                    <label>Lovable Live URL (Alternative Deploy URL)</label>
-                    <input type="text" name="cora_git_sync_live_url" value="<?php echo esc_attr( get_option('cora_git_sync_live_url', '') ); ?>" placeholder="e.g. https://app-name.lovable.app">
-                    <p class="text-[10px] text-zinc-450 mt-1">Optional. If your repository contains React source code rather than compiled static files, enter your live Lovable website link here.</p>
-                </div>
-
-                <!-- Page Mapping -->
-                <div>
-                    <label>Choose Where to Show this Website</label>
-                    <select name="cora_git_sync_page_id">
-                        <option value="0">— Site Homepage (/) —</option>
-                        <?php foreach ( $pages as $p ) : ?>
-                            <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( get_option('cora_git_sync_page_id'), $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?> (<?php echo esc_html( get_page_uri($p->ID) ); ?>)</option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <!-- Manual Sync action button -->
-                <div class="pt-4 border-t border-zinc-100 dark:border-zinc-800/40 flex items-center justify-between gap-4">
-                    <div class="flex flex-col">
-                        <span class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Synchronize Repository</span>
-                        <?php 
-                        $last_sync = get_option('cora_git_sync_last_time', '');
-                        $last_status = get_option('cora_git_sync_last_status', '');
-                        ?>
-                        <span class="text-[9px] text-zinc-400 mt-0.5 font-medium" id="cora-git-sync-status">
-                            <?php if ( ! empty($last_sync) ) : ?>
-                                Last sync: <?php echo esc_html( date('Y-m-d H:i:s', intval($last_sync)) ); ?> (Status: <?php echo esc_html($last_status); ?>)
-                            <?php else: ?>
-                                Never synchronized.
-                            <?php endif; ?>
-                        </span>
-                    </div>
-                    <button type="button" id="cora-btn-git-sync-now" class="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center gap-1.5 border border-zinc-200 dark:border-zinc-700 shadow-3xs shrink-0">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="animate-spin hidden mr-1" id="cora-git-sync-spinner"><circle cx="12" cy="12" r="10"></circle><path d="M22 12a10 10 0 0 1-9 9"></path></svg>
-                        Sync & Deploy Now
+                <div class="pt-2">
+                    <button type="button" id="cora-btn-disconnect-github" class="border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-medium px-4 py-2 rounded-xl flex items-center gap-2 shadow-2xs cursor-pointer transition-colors">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        Disconnect GitHub
                     </button>
                 </div>
             </div>
 
-            <!-- Right side: Onboarding & Instructions Card -->
-            <div class="xl:col-span-5 space-y-5 cora-shopify-card dark:bg-zinc-900/60 bg-zinc-50/50">
-                <div class="flex items-center gap-2.5 pb-2 border-b border-zinc-200 dark:border-zinc-800/40">
-                    <span class="text-zinc-900 dark:text-zinc-100 shrink-0">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                    </span>
-                    <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Lovable Integration Guide</h4>
-                </div>
-
-                <!-- Step-by-step tutorial list -->
-                <div class="space-y-5 text-xs text-zinc-700 dark:text-zinc-350">
-                    <!-- Step 1 -->
-                    <div class="flex gap-3">
-                        <div class="w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px] shrink-0">1</div>
-                        <div class="space-y-1">
-                            <span class="font-bold text-zinc-900 dark:text-zinc-100">Initiate your Lovable Project</span>
-                            <p class="leading-relaxed">Go to <a href="https://lovable.dev" target="_blank" class="underline font-semibold text-zinc-950 dark:text-white">Lovable.dev</a> and prompt your real estate client site or application using plain English.</p>
+            <!-- Card 2: Lovable Integration -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl p-6 shadow-2xs space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-800/60 gap-4">
+                    <div class="flex items-center gap-3.5">
+                        <!-- Official Lovable Logo Mark (Pure Native SVG) -->
+                        <div class="w-10 h-10 flex items-center justify-center shrink-0">
+                            <svg viewBox="0 0 100 100" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="lovable-official-re-grad" x1="20%" y1="0%" x2="80%" y2="100%">
+                                        <stop offset="0%" stop-color="#FF6A00" />
+                                        <stop offset="35%" stop-color="#FF257E" />
+                                        <stop offset="70%" stop-color="#8B5CF6" />
+                                        <stop offset="100%" stop-color="#3B82F6" />
+                                    </linearGradient>
+                                </defs>
+                                <path fill="url(#lovable-official-re-grad)" d="M 28,2 C 43.468,2 56,14.532 56,30 L 56,44 L 70,44 C 85.468,44 98,56.532 98,72 C 98,87.468 85.468,100 70,100 L 30,100 C 14.532,100 2,87.468 2,72 L 2,30 C 2,14.532 14.532,2 28,2 Z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Lovable Integration</h3>
+                            <p class="text-xs text-zinc-500 mt-0.5">Connect your live Lovable URL to preview and sync updates.</p>
                         </div>
                     </div>
-
-                    <!-- Step 2 -->
-                    <div class="flex gap-3">
-                        <div class="w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px] shrink-0">2</div>
-                        <div class="space-y-1">
-                            <span class="font-bold text-zinc-900 dark:text-zinc-100">Publish your site to GitHub</span>
-                            <p class="leading-relaxed">Inside Lovable, click **Publish** or **Connect to GitHub** in the top-right corner. Follow the prompts to create a new folder for your website on GitHub.</p>
-                        </div>
-                    </div>
-
-                    <!-- Step 3 -->
-                    <div class="flex gap-3">
-                        <div class="w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px] shrink-0">3</div>
-                        <div class="space-y-1">
-                            <span class="font-bold text-zinc-900 dark:text-zinc-100">Generate a GitHub Security Token</span>
-                            <p class="leading-relaxed mb-2">If your project on GitHub is Private, you must generate a security key so Cora can pull your designs. Click the button below, log in to GitHub, and click the green **"Generate token"** button at the bottom of the page.</p>
-                            <a href="https://github.com/settings/tokens/new?scopes=repo&description=Cora%20Git%20Sync" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-white text-[10px] font-bold rounded-lg transition-colors shadow-3xs cursor-pointer">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                                Auto-Generate Token on GitHub
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Step 4 -->
-                    <div class="flex gap-3">
-                        <div class="w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px] shrink-0">4</div>
-                        <div class="space-y-1">
-                            <span class="font-bold text-zinc-900 dark:text-zinc-100">Copy details and Sync!</span>
-                            <p class="leading-relaxed">Copy the website link from your browser address bar on GitHub, paste it into the **GitHub Repository Link** field, paste your token, and click **Sync & Deploy Now**.</p>
-                        </div>
+                    <div id="cora-lovable-status-container">
+                        <?php if ( $is_lovable_connected ) : ?>
+                            <span id="cora-lovable-status-pill" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/40 shrink-0">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Connected & Live
+                            </span>
+                        <?php else : ?>
+                            <span id="cora-lovable-status-pill" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 shrink-0">
+                                <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Not Connected
+                            </span>
+                        <?php endif; ?>
                     </div>
                 </div>
 
-                <!-- Info Alert box -->
-                <div class="p-3.5 bg-zinc-100 dark:bg-zinc-950 rounded-xl border border-zinc-200/50 dark:border-zinc-800/60 flex gap-3 mt-4">
-                    <span class="text-zinc-650 dark:text-zinc-400 shrink-0 mt-0.5">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                    </span>
-                    <div class="space-y-1">
-                        <span class="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider">Dynamic Integrations</span>
-                        <p class="text-[10px] text-zinc-550 dark:text-zinc-450 leading-relaxed font-medium">Cora injects `window.CORA_API_URL` and `window.CORA_NONCE` automatically. Any form submissions or listing requests made in your Lovable code will dynamically query this site's databases.</p>
-                    </div>
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Lovable Live URL</label>
+                    <input type="url" id="cora_git_sync_live_url" name="cora_git_sync_live_url" value="<?php echo esc_attr( $cora_live_url ); ?>" placeholder="https://your-app.lovable.app" class="w-full px-4 py-2.5 bg-zinc-50/50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-medium text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400">
+                    <p class="text-xs text-zinc-500 mt-2 leading-relaxed">Optional. If your repository contains React source code rather than compiled static files, enter your live Lovable deployment URL here.</p>
+                </div>
+
+                <div class="pt-2">
+                    <button type="button" id="cora-btn-disconnect-lovable" class="border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-medium px-4 py-2 rounded-xl flex items-center gap-2 shadow-2xs cursor-pointer transition-colors">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        Disconnect Lovable Project
+                    </button>
                 </div>
             </div>
         </div>
+
+        <script>
+        window.coraClearSystemCache = function() {
+            var ajaxUrl = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php');
+            var nonce = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '';
+            jQuery.post(ajaxUrl, { action: 'cora_clear_cache', nonce: nonce }, function(res) {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('System cache & options cleared.');
+                }
+                setTimeout(function() { window.location.reload(); }, 500);
+            }).fail(function() {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('Cache clear failed. Reloading page...');
+                }
+                setTimeout(function() { window.location.reload(); }, 500);
+            });
+        };
+
+        jQuery(document).ready(function($) {
+            function getAjaxUrl() {
+                return (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php');
+            }
+
+            function getAjaxNonce() {
+                return (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '';
+            }
+
+            function showToast(msg) {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast(msg);
+                }
+            }
+
+            $('#cora_git_sync_repo').on('change', function() {
+                var val = $(this).val();
+                if (val && val.trim() !== '') {
+                    $.post(getAjaxUrl(), {
+                        action: 'cora_save_git_sync_field',
+                        field: 'cora_git_sync_repo',
+                        value: val,
+                        nonce: getAjaxNonce()
+                    }, function(res) {
+                        $('#cora-github-status-pill')
+                            .attr('class', 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/40 shrink-0')
+                            .html('<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Connected');
+                        showToast('GitHub repository connected.');
+                    });
+                } else {
+                    $('#cora-btn-disconnect-github').trigger('click');
+                }
+            });
+
+            $('#cora_git_sync_branch').on('change', function() {
+                var val = $(this).val();
+                $.post(getAjaxUrl(), {
+                    action: 'cora_save_git_sync_field',
+                    field: 'cora_git_sync_branch',
+                    value: val,
+                    nonce: getAjaxNonce()
+                }, function(res) {
+                    showToast('Branch updated to ' + val);
+                });
+            });
+
+            var lastLiveUrl = $('#cora_git_sync_live_url').val() ? $('#cora_git_sync_live_url').val().trim() : '';
+            function saveLiveUrl() {
+                var val = $('#cora_git_sync_live_url').val() ? $('#cora_git_sync_live_url').val().trim() : '';
+                if (val === lastLiveUrl) return;
+                lastLiveUrl = val;
+
+                if (val !== '') {
+                    $.post(getAjaxUrl(), {
+                        action: 'cora_save_git_sync_field',
+                        field: 'cora_git_sync_live_url',
+                        value: val,
+                        nonce: getAjaxNonce()
+                    }, function(res) {
+                        $('#cora-lovable-status-pill')
+                            .attr('class', 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/40 shrink-0')
+                            .html('<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Connected & Live');
+                        showToast('Lovable live URL saved.');
+                    });
+                } else {
+                    $('#cora-btn-disconnect-lovable').trigger('click');
+                }
+            }
+
+            $('#cora_git_sync_live_url').on('change blur', function() {
+                saveLiveUrl();
+            });
+
+            $('#cora-btn-disconnect-github').on('click', function(e) {
+                e.preventDefault();
+                var $btn = $(this);
+                $btn.prop('disabled', true);
+
+                $.post(getAjaxUrl(), {
+                    action: 'cora_disconnect_github',
+                    nonce: getAjaxNonce()
+                }, function(res) {
+                    $btn.prop('disabled', false);
+                    $('#cora_git_sync_repo option').prop('selected', false);
+                    $('#cora_git_sync_repo option[value=""]').prop('selected', true);
+                    $('#cora_git_sync_repo').val('');
+                    $('#cora_git_sync_branch').val('main');
+
+                    $('#cora-github-status-pill')
+                        .attr('class', 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 shrink-0')
+                        .html('<span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Not Connected');
+
+                    showToast('GitHub account disconnected.');
+                }).fail(function() {
+                    $btn.prop('disabled', false);
+                    $('#cora_git_sync_repo option').prop('selected', false);
+                    $('#cora_git_sync_repo option[value=""]').prop('selected', true);
+                    $('#cora_git_sync_repo').val('');
+
+                    $('#cora-github-status-pill')
+                        .attr('class', 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 shrink-0')
+                        .html('<span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Not Connected');
+
+                    showToast('GitHub account disconnected.');
+                });
+            });
+
+            $('#cora-btn-disconnect-lovable').on('click', function(e) {
+                e.preventDefault();
+                var $btn = $(this);
+                $btn.prop('disabled', true);
+
+                $.post(getAjaxUrl(), {
+                    action: 'cora_disconnect_lovable',
+                    nonce: getAjaxNonce()
+                }, function(res) {
+                    $btn.prop('disabled', false);
+                    $('#cora_git_sync_live_url').val('');
+                    lastLiveUrl = '';
+                    $('#cora-lovable-status-pill')
+                        .attr('class', 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 shrink-0')
+                        .html('<span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Not Connected');
+
+                    showToast('Lovable project disconnected.');
+                }).fail(function() {
+                    $btn.prop('disabled', false);
+                    $('#cora_git_sync_live_url').val('');
+                    lastLiveUrl = '';
+                    $('#cora-lovable-status-pill')
+                        .attr('class', 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 shrink-0')
+                        .html('<span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Not Connected');
+
+                    showToast('Lovable project disconnected.');
+                });
+            });
+        });
+        </script>
         <?php elseif ( $active_tab === 'audit' ) : ?>
         <!-- TAB 12: AUDIT & LOGS PANEL -->
         <div class="space-y-6 max-w-5xl">
@@ -1250,10 +1396,18 @@ $cora_settings_tabs = array(
         <?php elseif ( $active_tab === 'onboarding' ) : ?>
         <!-- TAB 13: USER ONBOARDING PANEL -->
         <?php
-        $ob_enabled       = get_option( 'cora_onboarding_enabled', 1 );
-        $ob_google        = get_option( 'cora_onboarding_google_enabled', 1 );
-        $ob_email         = get_option( 'cora_onboarding_email_enabled', 1 );
-        $ob_verify        = get_option( 'cora_onboarding_require_verification', 1 );
+        $ob_enabled_raw   = get_option( 'cora_onboarding_enabled', '1' );
+        $ob_enabled       = ( $ob_enabled_raw !== '0' && $ob_enabled_raw !== 0 ) ? 1 : 0;
+
+        $ob_google_raw    = get_option( 'cora_onboarding_google_enabled', '1' );
+        $ob_google        = ( $ob_google_raw !== '0' && $ob_google_raw !== 0 ) ? 1 : 0;
+
+        $ob_email_raw     = get_option( 'cora_onboarding_email_enabled', '1' );
+        $ob_email         = ( $ob_email_raw !== '0' && $ob_email_raw !== 0 ) ? 1 : 0;
+
+        $ob_verify_raw    = get_option( 'cora_onboarding_require_verification', '1' );
+        $ob_verify        = ( $ob_verify_raw !== '0' && $ob_verify_raw !== 0 ) ? 1 : 0;
+
         $ob_role          = get_option( 'cora_onboarding_default_role', 'cora_super_admin' );
         $ob_duration      = get_option( 'cora_onboarding_account_duration', 0 );
         $ob_welcome       = get_option( 'cora_onboarding_welcome_message', '' );
@@ -1310,12 +1464,24 @@ $cora_settings_tabs = array(
                 </div>
                 <div class="p-5 space-y-4">
                     <div>
-                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Google Client ID</label>
-                        <input type="text" name="cora_google_client_id" value="<?php echo esc_attr( $ob_client_id ); ?>" placeholder="123456789-abc.apps.googleusercontent.com" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Google Client ID</label>
+                            <span class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                Encrypted &amp; Masked
+                            </span>
+                        </div>
+                        <input type="password" name="cora_google_client_id" value="<?php echo esc_attr( $ob_client_id ? '••••••••••••••••••••••••' : '' ); ?>" placeholder="Enter Google Client ID" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400 font-mono" oncopy="return false;" oncut="return false;" ondragstart="return false;" autocomplete="new-password">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Google Client Secret</label>
-                        <input type="password" name="cora_google_client_secret" value="<?php echo esc_attr( $ob_client_secret ? str_repeat('*', 20) : '' ); ?>" placeholder="Leave blank to keep current value" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Google Client Secret</label>
+                            <span class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                Encrypted &amp; Masked
+                            </span>
+                        </div>
+                        <input type="password" name="cora_google_client_secret" value="<?php echo esc_attr( $ob_client_secret ? '••••••••••••••••••••••••' : '' ); ?>" placeholder="Enter Google Client Secret" class="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400 font-mono" oncopy="return false;" oncut="return false;" ondragstart="return false;" autocomplete="new-password">
                     </div>
                     <div class="p-3 bg-zinc-50 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
                         <p class="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest mb-1.5">Authorized Redirect URI</p>

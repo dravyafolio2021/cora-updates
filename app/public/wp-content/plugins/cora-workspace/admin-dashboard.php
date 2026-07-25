@@ -1456,13 +1456,30 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             height: 15px !important;
         }
 
-        /* Mobile bottom nav active link styling */
+        /* Shopify Reference Styling for Mobile Navigation */
+        .cora-mobile-bottom-bar-wrapper {
+            display: flex !important;
+        }
+        @media (min-width: 1024px) {
+            .cora-mobile-bottom-bar-wrapper {
+                display: none !important;
+            }
+        }
+        .cora-bottom-nav-item {
+            color: #71717a !important;
+            transition: all 0.15s ease !important;
+        }
+        .cora-bottom-nav-item:hover {
+            color: #18181b !important;
+        }
         .cora-bottom-nav-item.cora-active {
-            color: #09090b !important;
-            font-weight: 600 !important;
+            background-color: #f4f4f5 !important;
+            color: #18181b !important;
+            font-weight: 700 !important;
+            border-radius: 9999px !important;
         }
         .cora-bottom-nav-item.cora-active svg {
-            stroke: #09090b !important;
+            stroke: #18181b !important;
             stroke-width: 2.2 !important;
         }
 
@@ -2483,6 +2500,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             justify-content: center !important;
         }
 
+        .cora-sidebar.collapsed-sidebar .cora-sidebar-header-actions {
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            width: 100% !important;
+        }
+
+        .cora-sidebar.collapsed-sidebar #cora-sidebar-search-btn,
         .cora-sidebar.collapsed-sidebar #cora-sidebar-toggle {
             display: flex !important;
             padding: 0.4rem !important;
@@ -3150,13 +3175,15 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     </div>
                 </div>
 
-                <!-- Collapse Toggle Button (layout-sidebar icon) -->
-                <button id="cora-sidebar-toggle" onclick="return window.coraToggleSidebarCollapse(event);" class="text-zinc-500 hover:text-black dark:text-zinc-450 dark:hover:text-white bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2 rounded-lg transition-colors cursor-pointer select-none shadow-2xs" title="Collapse / Expand Sidebar">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="9" y1="3" x2="9" y2="21"></line>
-                    </svg>
-                </button>
+                <div class="cora-sidebar-header-actions flex items-center gap-1.5 shrink-0">
+                    <!-- Collapse Toggle Button (layout-sidebar icon) -->
+                    <button id="cora-sidebar-toggle" onclick="return window.coraToggleSidebarCollapse(event);" class="text-zinc-500 hover:text-black dark:text-zinc-450 dark:hover:text-white bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2 rounded-lg transition-colors cursor-pointer select-none shadow-2xs" title="Collapse / Expand Sidebar">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="9" y1="3" x2="9" y2="21"></line>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <?php if ( cora_is_super_owner() ) :
@@ -7344,55 +7371,74 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         </div>
     </aside>
 
-    <!-- Mobile Bottom Navigation (Shopify style) -->
-    <nav class="cora-bottom-nav fixed bottom-0 left-0 w-full h-14 bg-white/95 backdrop-blur-sm border-t border-zinc-200 flex justify-around items-center z-45 px-2 lg:hidden shadow-[0_-2px_10px_rgba(0,0,0,0.03)]">
-        <div class="cora-bottom-nav-item <?php echo $sub_page === 'dashboard' ? 'cora-active' : ''; ?> flex flex-col items-center justify-center text-[10px] font-medium text-zinc-400 cursor-pointer py-1 flex-1 transition-colors duration-150" data-target="dashboard">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="mb-0.5">
-                <rect x="3" y="3" width="7" height="9" rx="1"></rect>
-                <rect x="14" y="3" width="7" height="5" rx="1"></rect>
-                <rect x="14" y="12" width="7" height="9" rx="1"></rect>
-                <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+    <!-- Mobile Floating Bottom Navigation (Shopify Reference Floating Pill Bar) -->
+    <div class="cora-mobile-bottom-bar-wrapper lg:hidden" style="position: fixed !important; bottom: 16px !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 99999 !important; align-items: center !important; justify-content: center !important; gap: 8px !important; width: 94vw !important; max-width: 480px !important; box-sizing: border-box !important;">
+        <!-- 1. Floating Circular Search Button (Left) -->
+        <button id="cora-mobile-search-trigger" type="button" onclick="const sInput = document.querySelector('input[type=&quot;search&quot;], #cora-header-search, .cora-search-input'); if(sInput){ sInput.focus(); sInput.scrollIntoView({behavior:'smooth'}); } else if(typeof coraOpenSearch === 'function'){ coraOpenSearch(); }" style="width: 46px !important; height: 46px !important; border-radius: 50% !important; background: #ffffff !important; border: 1px solid #e4e4e7 !important; color: #18181b !important; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1), 0 4px 12px -2px rgba(0,0,0,0.05) !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; flex-shrink: 0 !important; cursor: pointer !important; outline: none !important;" title="Search">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <span>Home</span>
-        </div>
-        <div class="cora-bottom-nav-item <?php echo $sub_page === 'bookings' ? 'cora-active' : ''; ?> flex flex-col items-center justify-center text-[10px] font-medium text-zinc-400 cursor-pointer py-1 flex-1 transition-colors duration-150" data-target="bookings">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="mb-0.5">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
+        </button>
+
+        <!-- 2. Main Floating Capsule Bar (5 equal 20% tabs) -->
+        <nav class="cora-bottom-nav" style="flex: 1 1 auto !important; min-width: 0 !important; background: #ffffff !important; border: 1px solid #e4e4e7 !important; border-radius: 9999px !important; padding: 4px 4px !important; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1), 0 4px 12px -2px rgba(0,0,0,0.05) !important; display: flex !important; align-items: center !important; justify-content: space-between !important; width: 100% !important;">
+            <!-- Home -->
+            <div class="cora-bottom-nav-item <?php echo in_array($sub_page, array('dashboard', 'home', '')) ? 'cora-active' : ''; ?>" data-target="dashboard" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('dashboard');}" style="flex: 1 1 20% !important; width: 20% !important; max-width: 20% !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; padding: 6px 0 !important; border-radius: 9999px !important; cursor: pointer !important; text-decoration: none !important; box-sizing: border-box !important;">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 2px;">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span style="font-size: 10px !important; font-weight: 600 !important; line-height: 1 !important;">Home</span>
+            </div>
+
+            <!-- CRM -->
+            <div class="cora-bottom-nav-item <?php echo in_array($sub_page, array('crm', 'bookings', 'contacts')) ? 'cora-active' : ''; ?>" data-target="bookings" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('bookings');}" style="flex: 1 1 20% !important; width: 20% !important; max-width: 20% !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; padding: 6px 0 !important; border-radius: 9999px !important; cursor: pointer !important; text-decoration: none !important; box-sizing: border-box !important;">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 2px;">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span style="font-size: 10px !important; font-weight: 600 !important; line-height: 1 !important;">CRM</span>
+            </div>
+
+            <!-- Finance (Official INR Rupee Icon) -->
+            <div class="cora-bottom-nav-item <?php echo in_array($sub_page, array('financials', 'finance', 'invoices', 'saas-calculator')) ? 'cora-active' : ''; ?>" data-target="financials" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('financials');}" style="flex: 1 1 20% !important; width: 20% !important; max-width: 20% !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; padding: 6px 0 !important; border-radius: 9999px !important; cursor: pointer !important; text-decoration: none !important; box-sizing: border-box !important;">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 2px;">
+                    <path d="M6 3h12M6 8h12M6 13h5a3.5 3.5 0 0 0 0-5H6M9 13l6.5 8"></path>
+                </svg>
+                <span style="font-size: 10px !important; font-weight: 600 !important; line-height: 1 !important;">Finance</span>
+            </div>
+
+            <!-- User -->
+            <div class="cora-bottom-nav-item <?php echo in_array($sub_page, array('users', 'team', 'profile', 'onboarding')) ? 'cora-active' : ''; ?>" data-target="users" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('users');}" style="flex: 1 1 20% !important; width: 20% !important; max-width: 20% !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; padding: 6px 0 !important; border-radius: 9999px !important; cursor: pointer !important; text-decoration: none !important; box-sizing: border-box !important;">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 2px;">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span style="font-size: 10px !important; font-weight: 600 !important; line-height: 1 !important;">User</span>
+            </div>
+
+            <!-- More -->
+            <div class="cora-bottom-nav-item" id="cora-mobile-more-btn" onclick="const sb=document.querySelector('.cora-sidebar'); if(sb){ sb.classList.toggle('mobile-open'); sb.classList.toggle('hidden'); }" style="flex: 1 1 20% !important; width: 20% !important; max-width: 20% !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; padding: 6px 0 !important; border-radius: 9999px !important; cursor: pointer !important; text-decoration: none !important; box-sizing: border-box !important;">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 2px;">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+                <span style="font-size: 10px !important; font-weight: 600 !important; line-height: 1 !important;">More</span>
+            </div>
+        </nav>
+
+        <!-- 3. Floating Circular AI Action Button (Right) -->
+        <button id="cora-mobile-ai-trigger" type="button" onclick="if(typeof coraOpenSidebarChat==='function'){coraOpenSidebarChat();}else{const sb=document.querySelector('#cora-ai-sidebar'); if(sb){sb.classList.toggle('hidden');}}" style="width: 46px !important; height: 46px !important; border-radius: 50% !important; background: #ffffff !important; border: 1px solid #e4e4e7 !important; color: #18181b !important; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1), 0 4px 12px -2px rgba(0,0,0,0.05) !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; flex-shrink: 0 !important; cursor: pointer !important; outline: none !important;" title="Ask Cora AI">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1px;">
+                <path d="M12 2l2.4 4.86L19.8 8l-3.9 3.8 0.9 5.36L12 14.6l-4.8 2.56 0.9-5.36L4.2 8l5.4-1.14L12 2z"></path>
             </svg>
-            <span>CRM</span>
-        </div>
-        <div class="cora-bottom-nav-item flex flex-col items-center justify-center text-[10px] font-medium text-zinc-400 cursor-pointer py-1 flex-1 transition-colors duration-150" id="cora-mobile-ai-trigger">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="mb-0.5">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-            </svg>
-            <span>Cora AI</span>
-        </div>
-        <div class="cora-bottom-nav-item <?php echo $sub_page === 'portfolio' ? 'cora-active' : ''; ?> flex flex-col items-center justify-center text-[10px] font-medium text-zinc-400 cursor-pointer py-1 flex-1 transition-colors duration-150" data-target="portfolio">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="mb-0.5">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                <polyline points="21 15 16 10 5 21"></polyline>
-            </svg>
-            <span>Gallery</span>
-        </div>
-        <div class="cora-bottom-nav-item <?php echo $sub_page === 'vault' ? 'cora-active' : ''; ?> flex flex-col items-center justify-center text-[10px] font-medium text-zinc-400 cursor-pointer py-1 flex-1 transition-colors duration-150" data-target="vault">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="mb-0.5">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-            </svg>
-            <span>Vault</span>
-        </div>
-        <div class="cora-bottom-nav-item <?php echo $sub_page === 'settings' ? 'cora-active' : ''; ?> flex flex-col items-center justify-center text-[10px] font-medium text-zinc-400 cursor-pointer py-1 flex-1 transition-colors duration-150" data-target="settings">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="mb-0.5">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1.82-.33H15a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 16 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H15a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-            </svg>
-            <span>Settings</span>
-        </div>
-    </nav>
+            <span style="font-size: 9px !important; font-weight: 700 !important; line-height: 1 !important;">AI</span>
+        </button>
+    </div>
 
     <!-- Modals -->
     <!-- Share Gallery Modal -->
@@ -8473,8 +8519,8 @@ wp_print_footer_scripts();
 </div>
 
 <!-- Cora Advanced Command Search Modal (Command Palette for CRM subpages) -->
-<div id="cora-command-palette" class="fixed inset-0 z-[999999] hidden items-start justify-center p-4 pt-[12vh] bg-zinc-950/40 backdrop-blur-sm transition-all duration-200">
-    <div class="cora-command-container w-full max-w-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[380px] transition-transform transform scale-95 duration-200">
+<div id="cora-command-palette" class="fixed inset-0 z-[999999] hidden items-start justify-center p-4 pt-[6vh] md:pt-[10vh] bg-zinc-950/40 backdrop-blur-sm transition-all duration-200">
+    <div class="cora-command-container w-full max-w-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[82vh] h-[540px] transition-transform transform scale-95 duration-200">
         
         <!-- Search Input Header -->
         <div class="flex items-center gap-3 px-4 border-b border-zinc-100 dark:border-zinc-800/40 py-3.5 shrink-0">
@@ -8493,7 +8539,9 @@ wp_print_footer_scripts();
         </div>
 
         <!-- Results List Area -->
-        <div class="flex-1 overflow-y-auto p-2" id="cora-command-results">
+        <div class="flex-1 overflow-y-auto p-2 min-h-0 space-y-1" id="cora-command-results" style="max-height: calc(82vh - 120px); scrollbar-width: thin;">
+            <!-- Loading state / Suggestions list / Search results list -->
+        </div>
             <!-- Loading state / Suggestions list / Search results list -->
         </div>
 

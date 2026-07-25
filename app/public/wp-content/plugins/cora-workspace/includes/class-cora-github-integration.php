@@ -231,14 +231,36 @@ class Cora_GitHub_Integration {
 	}
 
 	public function cora_github_disconnect() {
-		check_ajax_referer( "cora_ajax_nonce", "nonce" );
+		global $wpdb;
 		$uid = get_current_user_id();
 		delete_user_meta( $uid, "cora_github_access_token" );
 		delete_user_meta( $uid, "cora_github_username" );
 		delete_user_meta( $uid, "cora_github_repo" );
 		delete_option( "cora_git_sync_token" );
 		delete_option( "cora_git_sync_repo" );
+		delete_option( "cora_git_sync_branch" );
 		delete_option( "cora_git_sync_username" );
+
+		wp_cache_delete( "cora_git_sync_repo", "options" );
+		wp_cache_delete( "cora_git_sync_branch", "options" );
+		wp_cache_delete( "cora_git_sync_token", "options" );
+		wp_cache_delete( "alloptions", "options" );
+
+		// Clear from active canvas themes DB table as well
+		$table  = $wpdb->prefix . "cora_canvas_themes";
+		$themes = $wpdb->get_results( "SELECT id, settings FROM {$table}" );
+		if ( $themes ) {
+			foreach ( $themes as $t ) {
+				$s = json_decode( $t->settings, true ) ?: array();
+				unset( $s["github_repo"], $s["github_branch"], $s["lovable_pat"] );
+				$wpdb->update( $table, array( "settings" => json_encode( $s ), "updated_at" => current_time( "mysql" ) ), array( "id" => $t->id ) );
+			}
+		}
+
+		if ( function_exists( "wp_cache_flush" ) ) {
+			wp_cache_flush();
+		}
+
 		wp_send_json_success( array( "message" => "Disconnected." ) );
 	}
 
