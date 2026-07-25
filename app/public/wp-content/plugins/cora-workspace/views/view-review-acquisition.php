@@ -80,7 +80,7 @@ foreach ( $cora_review_requests as $req ) {
 
 $avg_rating = $total_requests > 0 ? sprintf( '%.1f', $avg_rating_sum / $total_requests ) : '4.3';
 $google_link = get_option( 'cora_google_business_url', 'https://g.page/r/cora_studio/review' );
-$wa_template = get_option( 'cora_wa_review_template', 'Hi {client_name}! Thank you for choosing Cora. Could you take 5 seconds to rate us on Google? Tap here: {review_url}' );
+$wa_template = get_option( 'cora_wa_review_template', 'Namaste {client_name} ji! 🙏 Thank you for choosing Cora Studio. Could you take 5 seconds to rate us on Google? Tap here to post: {review_url}' );
 $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, we appreciate your business! Please leave us a review on Google.' );
 ?>
 
@@ -196,7 +196,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
         </div>
     </div>
 
-    <!-- SUB-NAVIGATION TABS BAR -->
+    <!-- SUB-NAVIGATION TABS BAR WITH PERSISTENT URL STATE & DEEP LINKING -->
     <div class="bg-white dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-1.5 shadow-2xs flex items-center gap-1 overflow-x-auto">
         <button type="button" onclick="coraSwitchReviewTab('tracker')" id="rev-tab-btn-tracker" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 cursor-pointer transition-all shrink-0 flex items-center gap-1.5">
             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
@@ -440,9 +440,24 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
     </div>
 
     <!-- ═════════════════════════════════════════════════════════════════════
-         TAB 3: MULTI-CHANNEL AUTOMATION TRIGGERS
+         TAB 3: MULTI-CHANNEL AUTOMATION TRIGGERS (OPTIMIZED FOR INDIAN MARKET)
          ═════════════════════════════════════════════════════════════════════ -->
-    <div id="cora-rev-panel-automation" class="hidden cora-shopify-card space-y-6 max-w-3xl">
+    <div id="cora-rev-panel-automation" class="hidden cora-shopify-card space-y-6 max-w-4xl">
+        <!-- Indian Market Insights Banner -->
+        <div class="p-4 bg-[#25D366]/10 border border-[#25D366]/30 rounded-2xl flex items-start gap-3 text-xs">
+            <div class="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.285-.143-1.687-.832-1.947-.927-.26-.095-.45-.143-.64.143-.19.285-.735.927-.9 1.117-.165.19-.33.214-.615.071-.285-.143-1.204-.444-2.294-1.416-.848-.756-1.421-1.69-1.587-1.975-.166-.285-.018-.439.125-.581.128-.128.285-.333.428-.5.143-.167.19-.285.285-.476.095-.19.047-.357-.024-.5-.071-.143-.64-1.545-.877-2.116-.231-.557-.466-.481-.64-.49-.165-.008-.356-.01-.547-.01-.19 0-.5.071-.76.357-.26.285-.999.976-.999 2.38 0 1.404 1.023 2.76 1.165 2.951.143.19 2.013 3.074 4.877 4.31.682.295 1.214.471 1.629.603.685.218 1.309.187 1.802.114.549-.081 1.687-.689 1.924-1.355.237-.666.237-1.237.166-1.355-.07-.119-.26-.19-.545-.333z"/></svg>
+            </div>
+            <div class="space-y-1">
+                <div class="font-bold text-zinc-950 dark:text-white flex items-center gap-1.5">
+                    <span>🇮🇳 Tailored for Indian Businesses (WhatsApp-First Strategy)</span>
+                </div>
+                <p class="text-zinc-600 dark:text-zinc-300 leading-relaxed m-0 text-[11px]">
+                    In India, review emails are rarely opened (&lt;8% open rate), while <strong>WhatsApp messages have a 98% open rate</strong>. Our engine sends personalized Hinglish messages directly to client WhatsApp numbers right after photo/video delivery or final invoice payment!
+                </p>
+            </div>
+        </div>
+
         <div class="space-y-1">
             <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Multi-Channel Automation Triggers</h3>
             <p class="text-xs text-zinc-500 dark:text-zinc-400 m-0">Configure automated post-handover review requests across WhatsApp, Email, SMS, and Social channels.</p>
@@ -455,8 +470,15 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
                 <p class="text-[10px] text-zinc-400 mt-1">Found under 'Ask for reviews' in your Google Business Profile dashboard.</p>
             </div>
 
+            <!-- Hinglish Presets Selector -->
             <div>
-                <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">WhatsApp Automation Template</label>
+                <div class="flex items-center justify-between mb-1.5">
+                    <label class="font-bold text-zinc-800 dark:text-zinc-200">WhatsApp Automation Message (Hinglish/English)</label>
+                    <div class="flex gap-1">
+                        <button type="button" onclick="coraApplyHinglishPreset('hinglish_warm')" class="px-2 py-0.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-[10px] font-semibold rounded hover:bg-zinc-300 cursor-pointer">Hinglish Warm</button>
+                        <button type="button" onclick="coraApplyHinglishPreset('english_prof')" class="px-2 py-0.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-[10px] font-semibold rounded hover:bg-zinc-300 cursor-pointer">English Prof</button>
+                    </div>
+                </div>
                 <textarea id="cora-wa-review-template" rows="3" class="w-full font-sans text-xs"><?php echo esc_textarea( $wa_template ); ?></textarea>
             </div>
 
@@ -472,9 +494,23 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
                 </label>
             </div>
 
-            <div class="pt-2">
+            <div class="pt-3 border-t border-zinc-200/60 dark:border-zinc-800 flex items-center justify-between flex-wrap gap-3">
                 <button type="button" onclick="coraSaveReviewSettings()" class="px-5 py-2.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold text-xs rounded-xl transition-all cursor-pointer">
                     Save Multi-Channel Rules
+                </button>
+            </div>
+        </div>
+
+        <!-- Direct WhatsApp Test Dispatch Box for Indian Owners -->
+        <div class="p-5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl space-y-3">
+            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 m-0 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#25D366]"></span>
+                Test Instant WhatsApp Review Link Dispatch
+            </h4>
+            <div class="flex items-center gap-2">
+                <input type="text" id="test-wa-phone" placeholder="Enter WhatsApp Number (e.g. 9876543210)" class="w-full text-xs font-mono">
+                <button type="button" onclick="coraDispatchTestWhatsApp()" class="px-4 py-2 bg-[#25D366] hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition-all shrink-0 cursor-pointer flex items-center gap-1">
+                    Send WhatsApp Test
                 </button>
             </div>
         </div>
@@ -560,7 +596,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
                 <div>
                     <label class="block font-semibold text-zinc-800 dark:text-zinc-200 mb-1">Dispatch Channel</label>
                     <select id="req-dispatch-channel" style="width:100%;padding:8px 12px;font-size:12px;background:var(--input-bg);border:1px solid var(--border-color);border-radius:10px;color:var(--text-primary);outline:none;">
-                        <option value="WhatsApp">WhatsApp</option>
+                        <option value="WhatsApp" selected>WhatsApp (Recommended for India)</option>
                         <option value="Email">Email</option>
                         <option value="SMS">SMS</option>
                         <option value="Social DM">Social DM</option>
@@ -677,7 +713,13 @@ function coraGetAJAXNonce() {
     return '';
 }
 
-window.coraSwitchReviewTab = function(tabKey) {
+// ═══════════════════════════════════════════════════════════════════════════
+// URL ARCHITECTURE & ACTIVE TAB PERSISTENCE ENGINE
+// ═══════════════════════════════════════════════════════════════════════════
+window.coraSwitchReviewTab = function(tabKey, skipStateUpdate) {
+    var validTabs = ['tracker', 'snippets', 'automation', 'reports'];
+    if (validTabs.indexOf(tabKey) === -1) tabKey = 'tracker';
+
     document.getElementById('cora-rev-panel-tracker').classList.add('hidden');
     document.getElementById('cora-rev-panel-snippets').classList.add('hidden');
     document.getElementById('cora-rev-panel-automation').classList.add('hidden');
@@ -692,7 +734,54 @@ window.coraSwitchReviewTab = function(tabKey) {
         activeBtn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 cursor-pointer transition-all shrink-0 flex items-center gap-1.5';
     }
 
-    document.getElementById('cora-rev-panel-' + tabKey).classList.remove('hidden');
+    var activePanel = document.getElementById('cora-rev-panel-' + tabKey);
+    if (activePanel) activePanel.classList.remove('hidden');
+
+    // Update URL state and localStorage so refreshing never resets the tab
+    if (!skipStateUpdate) {
+        try {
+            localStorage.setItem('cora_active_review_tab', tabKey);
+            if (window.history && window.history.replaceState) {
+                var newUrl = new URL(window.location.href);
+                newUrl.searchParams.set('review_tab', tabKey);
+                window.history.replaceState(null, '', newUrl.toString());
+            }
+        } catch(e) {}
+    }
+};
+
+// On DOM Ready: Restore active tab from URL query param `review_tab`, URL hash, or localStorage
+document.addEventListener('DOMContentLoaded', function() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var queryTab = urlParams.get('review_tab') || urlParams.get('tab');
+    var hashTab = window.location.hash ? window.location.hash.replace('#', '').replace('tab=', '') : null;
+    var savedTab = null;
+    try { savedTab = localStorage.getItem('cora_active_review_tab'); } catch(e) {}
+
+    var targetTab = queryTab || hashTab || savedTab || 'tracker';
+    coraSwitchReviewTab(targetTab, true);
+});
+
+// Hinglish Presets for Indian Market
+window.coraApplyHinglishPreset = function(type) {
+    var area = document.getElementById('cora-wa-review-template');
+    var googleUrl = document.getElementById('cora-google-url-input') ? document.getElementById('cora-google-url-input').value : 'https://g.page/r/cora_studio/review';
+
+    if (type === 'hinglish_warm') {
+        area.value = "Namaste {client_name} ji! 🙏 Thank you for choosing Cora Studio. Shoot photos & video pasand aaye? Agar aapko hamaara kaam accha laga, toh please 5 seconds nikal kar Google par 5-Star review de dijiye: " + googleUrl;
+    } else if (type === 'english_prof') {
+        area.value = "Hi {client_name} ji! Thank you for choosing Cora Studio. It was a pleasure working on your project. Could you kindly leave us a 5-star rating on Google? Tap here: " + googleUrl;
+    }
+    if (window.coraShowToast) window.coraShowToast('Hinglish WhatsApp template applied!', 'info');
+};
+
+window.coraDispatchTestWhatsApp = function() {
+    var phone = document.getElementById('test-wa-phone').value.trim();
+    if (!phone) {
+        if (window.coraShowToast) window.coraShowToast('Please enter a phone number to test WhatsApp dispatch.', 'error');
+        return;
+    }
+    coraResendWhatsAppReview(phone, 'Valued Client');
 };
 
 window.coraFilterReviewFeed = function(type) {
@@ -785,7 +874,7 @@ window.coraSubmitSendReviewRequest = function() {
 
 window.coraResendWhatsAppReview = function(phone, name) {
     var googleUrl = document.getElementById('cora-google-url-input') ? document.getElementById('cora-google-url-input').value : 'https://g.page/r/cora_studio/review';
-    var text = encodeURIComponent('Hi ' + name + '! Thank you for choosing Cora. Could you take 5 seconds to rate us on Google? Tap here to post: ' + googleUrl);
+    var text = encodeURIComponent('Namaste ' + name + ' ji! 🙏 Thank you for choosing Cora. Could you take 5 seconds to rate us on Google? Tap here to post: ' + googleUrl);
     window.open('https://wa.me/' + (phone.length === 10 ? '91' + phone : phone) + '?text=' + text, '_blank');
 };
 

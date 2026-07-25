@@ -29,7 +29,7 @@
 ## 3. Branch Activity & Progress Log
 
 ### `main` (Production Base)
-- **Latest Commit**: `1e7e064d` — `fix(reviews): remove Reception QR button and fix Automated Reports drawer JS trigger and fallback AJAX resolution`
+- **Latest Commit**: `01a0f9a0` — `fix(reviews): add nopriv AJAX actions and fallback logged-in verification for multi-channel review settings`
 - **Health**: 100% Operational & Clean Working Tree.
 
 <!-- BRANCH_LOGS_START -->
