@@ -19334,53 +19334,230 @@ function cora_ajax_restore_workspace_backup() {
 }
 
 /**
- * AJAX Action: Sync Full Backup to Google Drive Now
+ * Returns the OAuth 2.0 redirect URI for Google auth callback.
+ */
+function cora_get_google_oauth_redirect_uri() {
+    return add_query_arg('cora_google_oauth', 'callback', admin_url('admin.php'));
+}
+
+/**
+ * Builds the Google OAuth 2.0 authorization URL.
+ * Scope: drive.file (only files created by this app).
+ */
+function cora_get_google_oauth_url() {
+    $client_id = get_option('cora_google_client_id', '');
+    if (empty($client_id)) return '';
+    return 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query([
+        'client_id'     => $client_id,
+        'redirect_uri'  => cora_get_google_oauth_redirect_uri(),
+        'response_type' => 'code',
+        'scope'         => 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email',
+        'access_type'   => 'offline',
+        'prompt'        => 'consent',
+        'state'         => wp_create_nonce('cora_google_oauth_state'),
+    ]);
+}
+
+/**
+ * Exchanges an auth code for access + refresh tokens and stores them.
+ * Returns true on success, WP_Error on failure.
+ */
+function cora_exchange_google_auth_code($code) {
+    $client_id     = get_option('cora_google_client_id', '');
+    $client_secret = get_option('cora_google_client_secret', '');
+    $response = wp_remote_post('https://oauth2.googleapis.com/token', [
+        'body' => [
+            'code'          => $code,
+            'client_id'     => $client_id,
+            'client_secret' => $client_secret,
+            'redirect_uri'  => cora_get_google_oauth_redirect_uri(),
+            'grant_type'    => 'authorization_code',
+        ],
+        'timeout' => 20,
+    ]);
+    if (is_wp_error($response)) return $response;
+    $body = json_decode(wp_remote_retrieve_body($response), true);
+    if (empty($body['access_token'])) {
+        return new WP_Error('google_oauth', $body['error_description'] ?? 'Failed to get access token.');
+    }
+    update_option('cora_google_access_token',  $body['access_token'], false);
+    update_option('cora_google_token_expiry',   time() + intval($body['expires_in']) - 60, false);
+    if (!empty($body['refresh_token'])) {
+        update_option('cora_google_refresh_token', $body['refresh_token'], false);
+    }
+    // Fetch user email
+    $user_res = wp_remote_get('https://www.googleapis.com/oauth2/v2/userinfo', [
+        'headers' => ['Authorization' => 'Bearer ' . $body['access_token']],
+        'timeout' => 15,
+    ]);
+    if (!is_wp_error($user_res)) {
+        $user = json_decode(wp_remote_retrieve_body($user_res), true);
+        if (!empty($user['email'])) update_option('cora_google_account_email', sanitize_email($user['email']), false);
+    }
+    update_option('cora_backup_google_drive_enabled', 1);
+    return true;
+}
+
+/**
+ * Returns a valid Google access token, refreshing if expired.
+ * Returns the token string or false on failure.
+ */
+function cora_get_valid_google_access_token() {
+    $access_token  = get_option('cora_google_access_token', '');
+    $expiry        = intval(get_option('cora_google_token_expiry', 0));
+    $refresh_token = get_option('cora_google_refresh_token', '');
+    if (!empty($access_token) && time() < $expiry) {
+        return $access_token;
+    }
+    if (empty($refresh_token)) return false;
+    $client_id     = get_option('cora_google_client_id', '');
+    $client_secret = get_option('cora_google_client_secret', '');
+    $response = wp_remote_post('https://oauth2.googleapis.com/token', [
+        'body' => [
+            'client_id'     => $client_id,
+            'client_secret' => $client_secret,
+            'refresh_token' => $refresh_token,
+            'grant_type'    => 'refresh_token',
+        ],
+        'timeout' => 20,
+    ]);
+    if (is_wp_error($response)) return false;
+    $body = json_decode(wp_remote_retrieve_body($response), true);
+    if (empty($body['access_token'])) return false;
+    update_option('cora_google_access_token', $body['access_token'], false);
+    update_option('cora_google_token_expiry',  time() + intval($body['expires_in']) - 60, false);
+    return $body['access_token'];
+}
+
+/**
+ * Uploads a local file to Google Drive using multipart upload.
+ * Returns the Drive file ID on success, WP_Error on failure.
+ */
+function cora_google_drive_upload_file($filepath, $filename, $folder_id = '') {
+    $access_token = cora_get_valid_google_access_token();
+    if (!$access_token) {
+        return new WP_Error('no_token', 'No valid Google access token. Please reconnect your Drive account.');
+    }
+    if (!file_exists($filepath)) {
+        return new WP_Error('no_file', 'Backup file not found on server.');
+    }
+    $mime_type = strpos($filename, '.zip') !== false ? 'application/zip' : 'application/sql';
+    $metadata  = ['name' => $filename];
+    if (!empty($folder_id)) $metadata['parents'] = [$folder_id];
+    $file_data = file_get_contents($filepath);
+    $boundary  = '---CораDriveUpload' . uniqid();
+    $body  = "--{$boundary}\r\n";
+    $body .= "Content-Type: application/json; charset=UTF-8\r\n\r\n";
+    $body .= json_encode($metadata) . "\r\n";
+    $body .= "--{$boundary}\r\n";
+    $body .= "Content-Type: {$mime_type}\r\n\r\n";
+    $body .= $file_data . "\r\n";
+    $body .= "--{$boundary}--";
+    $response = wp_remote_post(
+        'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+        [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $access_token,
+                'Content-Type'  => 'multipart/related; boundary=' . $boundary,
+            ],
+            'body'    => $body,
+            'timeout' => 120,
+        ]
+    );
+    if (is_wp_error($response)) return $response;
+    $res_body = json_decode(wp_remote_retrieve_body($response), true);
+    $http_code = wp_remote_retrieve_response_code($response);
+    if ($http_code !== 200 || empty($res_body['id'])) {
+        $err = $res_body['error']['message'] ?? 'Unknown Drive API error';
+        return new WP_Error('drive_upload_failed', $err);
+    }
+    return $res_body['id'];
+}
+
+/**
+ * Handle Google OAuth 2.0 callback — exchanges code for tokens.
+ */
+add_action('init', 'cora_backup_handle_google_oauth_callback');
+function cora_backup_handle_google_oauth_callback() {
+    if (!is_admin()) return;
+    if (empty($_GET['cora_google_oauth']) || $_GET['cora_google_oauth'] !== 'callback') return;
+    if (!current_user_can('manage_options') && !cora_is_super_owner()) {
+        wp_die('Unauthorized.');
+    }
+    if (empty($_GET['code'])) {
+        wp_redirect(admin_url('admin.php?page=cora-workspace&sub=settings&settings_tab=backup&google_error=no_code'));
+        exit;
+    }
+    $result = cora_exchange_google_auth_code(sanitize_text_field($_GET['code']));
+    if (is_wp_error($result)) {
+        wp_redirect(admin_url('admin.php?page=cora-workspace&sub=settings&settings_tab=backup&google_error=' . urlencode($result->get_error_message())));
+    } else {
+        wp_redirect(admin_url('admin.php?page=cora-workspace&sub=settings&settings_tab=backup&google_connected=1'));
+    }
+    exit;
+}
+
+add_action('wp_ajax_cora_get_google_auth_url', 'cora_ajax_get_google_auth_url');
+function cora_ajax_get_google_auth_url() {
+    check_ajax_referer('cora_ajax_nonce', 'nonce');
+    if (!current_user_can('manage_options') && !cora_is_super_owner()) {
+        wp_send_json_error(['message' => 'Unauthorized.']);
+    }
+    // Save credentials if passed
+    $client_id = sanitize_text_field($_POST['client_id'] ?? '');
+    $client_secret = sanitize_text_field($_POST['client_secret'] ?? '');
+    if (!empty($client_id)) update_option('cora_google_client_id', $client_id);
+    if (!empty($client_secret)) update_option('cora_google_client_secret', $client_secret);
+    $url = cora_get_google_oauth_url();
+    if (empty($url)) {
+        wp_send_json_error(['message' => 'Please enter your Google Client ID first.']);
+    }
+    wp_send_json_success(['auth_url' => $url]);
+}
+
+/**
+ * AJAX Action: Sync Full Backup to Google Drive (Real Upload)
  */
 add_action( 'wp_ajax_cora_sync_google_drive_now', 'cora_ajax_sync_google_drive_now' );
 function cora_ajax_sync_google_drive_now() {
     $nonce = $_REQUEST['nonce'] ?? '';
     if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-        if ( ! is_user_logged_in() || ( ! current_user_can( 'manage_options' ) && ! cora_is_super_owner() ) ) {
-            wp_send_json_error( array( 'message' => 'Security verification failed.' ) );
-        }
+        wp_send_json_error( [ 'message' => 'Security verification failed.' ] );
     }
     if ( ! is_user_logged_in() || ( ! current_user_can( 'manage_options' ) && ! cora_is_super_owner() ) ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+        wp_send_json_error( [ 'message' => 'Unauthorized capability.' ] );
     }
 
-    $folder_id = sanitize_text_field( $_POST['folder_id'] ?? '' );
-    if ( ! empty( $folder_id ) ) {
-        update_option( 'cora_backup_google_folder_id', $folder_id );
-        update_option( 'cora_backup_google_drive_enabled', 1 );
-    } else {
-        $folder_id = get_option( 'cora_backup_google_folder_id', '' );
+    // Verify Google OAuth is actually set up
+    $refresh_token = get_option( 'cora_google_refresh_token', '' );
+    if ( empty( $refresh_token ) ) {
+        wp_send_json_error( [ 'message' => 'Google Drive is not connected. Please authenticate your Google account first in Settings > Backup.' ] );
     }
 
-    if ( empty( $folder_id ) ) {
-        $folder_id = 'cora-backup-folder-' . substr( md5( get_option('siteurl') ), 0, 12 );
-        update_option( 'cora_backup_google_folder_id', $folder_id );
-        update_option( 'cora_backup_google_drive_enabled', 1 );
-    }
+    $folder_id = sanitize_text_field( $_POST['folder_id'] ?? get_option( 'cora_backup_google_folder_id', '' ) );
+    if ( ! empty( $folder_id ) ) update_option( 'cora_backup_google_folder_id', $folder_id );
 
-    // Trigger full system snapshot for Drive sync
+    // Generate local snapshot first
     $upload_dir = wp_upload_dir();
     $backup_dir = $upload_dir['basedir'] . '/cora-backups';
     if ( ! file_exists( $backup_dir ) ) {
         wp_mkdir_p( $backup_dir );
+        file_put_contents( $backup_dir . '/index.php', '<?php // Silence' );
+        file_put_contents( $backup_dir . '/.htaccess', 'deny from all' );
     }
 
     $timestamp = date('Y-m-d-His');
     $filename  = 'cora-full-snapshot-v' . CORA_WORKSPACE_VERSION . '-' . $timestamp . '.zip';
     $filepath  = $backup_dir . '/' . $filename;
-    
-    $sql_data  = cora_generate_db_backup();
-    $manifest  = array(
-        'platform'   => 'Cora Workspace Platform',
-        'version'    => CORA_WORKSPACE_VERSION,
-        'timestamp'  => time(),
-        'site_url'   => home_url(),
-        'backup_type'=> 'Google Drive Snapshot'
-    );
+
+    $sql_data = cora_generate_db_backup();
+    $manifest = [
+        'platform'    => 'Cora Workspace Platform',
+        'version'     => CORA_WORKSPACE_VERSION,
+        'timestamp'   => time(),
+        'site_url'    => home_url(),
+        'backup_type' => 'Google Drive Snapshot',
+    ];
 
     if ( class_exists( 'ZipArchive' ) ) {
         $zip = new ZipArchive();
@@ -19389,37 +19566,53 @@ function cora_ajax_sync_google_drive_now() {
             $zip->addFromString( 'manifest.json', json_encode( $manifest, JSON_PRETTY_PRINT ) );
             $zip->close();
         } else {
-            $filename = 'cora-full-snapshot-v' . CORA_WORKSPACE_VERSION . '-' . $timestamp . '.sql';
+            $filename = str_replace('.zip', '.sql', $filename);
             $filepath = $backup_dir . '/' . $filename;
-            file_put_contents( $filepath, "-- Cora Full System Snapshot\n" . json_encode($manifest) . "\n\n" . $sql_data );
+            file_put_contents( $filepath, "-- Cora Snapshot\n" . json_encode($manifest) . "\n\n" . $sql_data );
         }
     } else {
-        $filename = 'cora-full-snapshot-v' . CORA_WORKSPACE_VERSION . '-' . $timestamp . '.sql';
+        $filename = str_replace('.zip', '.sql', $filename);
         $filepath = $backup_dir . '/' . $filename;
-        file_put_contents( $filepath, "-- Cora Full System Snapshot\n" . json_encode($manifest) . "\n\n" . $sql_data );
+        file_put_contents( $filepath, "-- Cora Snapshot\n" . json_encode($manifest) . "\n\n" . $sql_data );
+    }
+
+    // Upload to Google Drive
+    $drive_file_id = cora_google_drive_upload_file( $filepath, $filename, $folder_id );
+
+    if ( is_wp_error( $drive_file_id ) ) {
+        // Local file was created — log it as local only
+        $filesize_fmt = size_format( filesize( $filepath ) );
+        $history = get_option( 'cora_workspace_backup_history', [] );
+        array_unshift( $history, [
+            'filename' => $filename,
+            'time'     => time(),
+            'size'     => $filesize_fmt,
+            'type'     => 'Local Only (Drive upload failed)',
+        ] );
+        if ( count($history) > 10 ) array_pop($history);
+        update_option( 'cora_workspace_backup_history', $history );
+        wp_send_json_error( [ 'message' => 'Snapshot saved locally, but Google Drive upload failed: ' . $drive_file_id->get_error_message() ] );
     }
 
     $filesize_fmt = size_format( filesize( $filepath ) );
-
-    $history = get_option( 'cora_workspace_backup_history', array() );
-    array_unshift( $history, array(
-        'filename' => $filename,
-        'time'     => time(),
-        'size'     => $filesize_fmt,
-        'type'     => 'Local & Google Drive'
-    ) );
-    if ( count( $history ) > 10 ) {
-        array_pop( $history );
-    }
+    $history = get_option( 'cora_workspace_backup_history', [] );
+    array_unshift( $history, [
+        'filename'      => $filename,
+        'time'          => time(),
+        'size'          => $filesize_fmt,
+        'type'          => 'Local & Google Drive',
+        'drive_file_id' => $drive_file_id,
+    ] );
+    if ( count($history) > 10 ) array_pop($history);
     update_option( 'cora_workspace_backup_history', $history );
     update_option( 'cora_last_drive_sync_time', time() );
 
-    cora_log_activity( 'Drive Sync', 'Google Drive backup sync completed: ' . $filename . ' (Folder: ' . $folder_id . ')' );
+    cora_log_activity( 'Drive Sync', 'Uploaded snapshot to Google Drive: ' . $filename . ' (File ID: ' . $drive_file_id . ')' );
 
-    wp_send_json_success( array(
-        'message'   => 'Full platform snapshot (' . $filename . ') successfully generated & synced to Google Drive (Folder: ' . esc_html($folder_id) . ')!',
-        'folder_id' => $folder_id
-    ) );
+    wp_send_json_success( [
+        'message'       => 'Snapshot (' . $filename . ') uploaded to Google Drive successfully!',
+        'drive_file_id' => $drive_file_id,
+    ] );
 }
 
 /**
@@ -19465,32 +19658,38 @@ function cora_ajax_delete_workspace_backup() {
 }
 
 /**
- * AJAX Action: Disconnect Google Drive Integration
- * Clears all Drive credentials & connection state — user can reconnect at any time.
+ * AJAX Action: Disconnect Google Drive — revokes token at Google and clears all stored credentials.
  */
 add_action( 'wp_ajax_cora_disconnect_google_drive', 'cora_ajax_disconnect_google_drive' );
 function cora_ajax_disconnect_google_drive() {
     $nonce = $_REQUEST['nonce'] ?? '';
     if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-        if ( ! is_user_logged_in() || ( ! current_user_can( 'manage_options' ) && ! cora_is_super_owner() ) ) {
-            wp_send_json_error( array( 'message' => 'Security verification failed.' ) );
-        }
+        wp_send_json_error( [ 'message' => 'Security verification failed.' ] );
     }
     if ( ! is_user_logged_in() || ( ! current_user_can( 'manage_options' ) && ! cora_is_super_owner() ) ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+        wp_send_json_error( [ 'message' => 'Unauthorized capability.' ] );
     }
 
-    // Clear all Google Drive connection state
+    // Revoke at Google
+    $refresh_token = get_option( 'cora_google_refresh_token', '' );
+    if ( ! empty( $refresh_token ) ) {
+        wp_remote_post( 'https://oauth2.googleapis.com/revoke?token=' . urlencode( $refresh_token ), [
+            'headers' => [ 'Content-Type' => 'application/x-www-form-urlencoded' ],
+            'timeout' => 15,
+        ] );
+    }
+
+    // Clear all Drive credentials
+    delete_option( 'cora_google_access_token' );
+    delete_option( 'cora_google_refresh_token' );
+    delete_option( 'cora_google_token_expiry' );
+    delete_option( 'cora_google_account_email' );
     delete_option( 'cora_backup_google_folder_id' );
     delete_option( 'cora_backup_google_drive_enabled' );
-    delete_option( 'cora_google_client_id' );
     delete_option( 'cora_last_drive_sync_time' );
 
-    cora_log_activity( 'Drive Sync', 'Google Drive integration disconnected by user.' );
-
-    wp_send_json_success( array(
-        'message' => 'Google Drive has been disconnected successfully. Your local backups are still safe.'
-    ) );
+    cora_log_activity( 'Drive Sync', 'Google Drive disconnected and token revoked.' );
+    wp_send_json_success( [ 'message' => 'Google Drive disconnected. Your local backups are still safe.' ] );
 }
 
 

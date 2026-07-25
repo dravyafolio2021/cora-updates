@@ -1630,13 +1630,22 @@ $cora_settings_tabs = array(
         </script>
         <?php // end onboarding tab ?>
 
-        <?php elseif ( $active_tab === 'backup' ) : ?>
+        <?php elseif ( $active_tab === 'backup' ) : 
+            $google_client_id     = get_option('cora_google_client_id', '');
+            $google_client_secret = get_option('cora_google_client_secret', '');
+            $google_refresh_token = get_option('cora_google_refresh_token', '');
+            $google_account_email = get_option('cora_google_account_email', '');
+            $google_folder_id     = get_option('cora_backup_google_folder_id', '');
+            $google_has_creds     = (!empty($google_client_id) && !empty($google_client_secret));
+            $is_google_connected  = (!empty($google_refresh_token)); // ONLY true if OAuth token exists
+            $history = get_option( 'cora_workspace_backup_history', array() );
+        ?>
         <!-- TAB 14: PROMINENT BACKUP & RECOVERY PANEL -->
         <div class="space-y-6">
             
             <!-- Top Metric & Status Summary Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="p-4 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-2xs">
+                <div class="cora-shopify-card border-l-2 border-l-emerald-500 shadow-2xs">
                     <div class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1">System Health</div>
                     <div class="text-sm font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -1645,35 +1654,31 @@ $cora_settings_tabs = array(
                     <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1">24h Automation Active</div>
                 </div>
 
-                <div class="p-4 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-2xs">
+                <div class="cora-shopify-card border-l-2 border-l-zinc-400 dark:border-l-zinc-600 shadow-2xs">
                     <div class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1">Last Snapshot Taken</div>
                     <div class="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">
                         <?php 
-                        $history = get_option( 'cora_workspace_backup_history', array() );
                         echo !empty($history) ? esc_html(date('M j, Y H:i', $history[0]['time'])) : 'No backups yet';
                         ?>
                     </div>
                     <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1">Full System (.zip) & SQL</div>
                 </div>
 
-                <?php 
-                $google_client_id = get_option('cora_google_client_id', '');
-                $google_folder_id = get_option('cora_backup_google_folder_id', '');
-                $is_google_connected = ( ! empty($google_folder_id) || ! empty($google_client_id) );
-                ?>
-                <div class="p-4 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-2xs">
+                <div class="cora-shopify-card border-l-2 <?php echo $is_google_connected ? 'border-l-emerald-500' : 'border-l-zinc-400 dark:border-l-zinc-600'; ?> shadow-2xs">
                     <div class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1">Google Drive Storage</div>
                     <div class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
                         <?php if ( $is_google_connected ) : ?>
-                            <span class="text-emerald-600 dark:text-emerald-400">• Connected & Active</span>
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span class="text-emerald-600 dark:text-emerald-400">Connected & Active</span>
                         <?php else : ?>
-                            <span class="text-zinc-500 dark:text-zinc-400">• Not Connected</span>
+                            <span class="w-2 h-2 rounded-full bg-zinc-400 dark:bg-zinc-600"></span>
+                            <span class="text-zinc-500 dark:text-zinc-400">Not Connected</span>
                         <?php endif; ?>
                     </div>
-                    <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1">Folder: <?php echo esc_html($google_folder_id ?: 'Click 1-Click Connect'); ?></div>
+                    <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 truncate" title="<?php echo esc_attr($google_folder_id ?: 'Click 1-Click Connect'); ?>">Folder: <?php echo esc_html($google_folder_id ?: 'Click 1-Click Connect'); ?></div>
                 </div>
 
-                <div class="p-4 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-2xs">
+                <div class="cora-shopify-card border-l-2 border-l-indigo-500 shadow-2xs">
                     <div class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1">Restore Guard</div>
                     <div class="text-sm font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
@@ -1689,18 +1694,18 @@ $cora_settings_tabs = array(
                     
                     <!-- Card 1: Full System Snapshot & Export Generator -->
                     <div class="cora-shopify-card space-y-4">
-                        <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between">
-                            <div>
+                        <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                            <div class="flex items-center gap-2 mb-0.5">
                                 <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 m-0">Full System Snapshot & Export</h3>
-                                <p class="text-xs text-zinc-500 dark:text-zinc-400 m-0">Generate full system backup archives (.zip) or lightweight database SQL files.</p>
+                                <span class="text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full">v2.1.0 Ready</span>
                             </div>
-                            <span class="text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full">v2.1.0 Ready</span>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 m-0">Generate full system backup archives (.zip) or lightweight database SQL files.</p>
                         </div>
                         <div class="p-4 bg-zinc-50 dark:bg-zinc-900/30 border border-zinc-150 dark:border-zinc-800/50 rounded-xl space-y-3">
                             <p class="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
                                 <strong class="text-zinc-900 dark:text-zinc-100">Full System Snapshot (.zip)</strong> packages the complete database schema, row records, environment manifest, active module states, and asset indexes into a single compressed backup archive. Standard database export (.sql) exports table structures and rows only.
                             </p>
-                            <div class="flex flex-wrap gap-2.5 pt-2">
+                            <div class="border-t border-zinc-200/60 dark:border-zinc-700/60 pt-3 flex flex-wrap gap-2.5">
                                 <!-- Primary: Full System Snapshot Zip Button -->
                                 <button type="button" id="cora-trigger-full-snapshot-backup" class="px-5 py-2.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-sm active:scale-97">
                                     <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
@@ -1708,7 +1713,7 @@ $cora_settings_tabs = array(
                                 </button>
 
                                 <!-- Secondary: Database Only SQL Button -->
-                                <button type="button" id="cora-trigger-manual-db-backup" class="px-4 py-2.5 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-850 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs">
+                                <button type="button" id="cora-trigger-manual-db-backup" class="px-4 py-2.5 bg-transparent hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm">
                                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
                                     Export Database Only (.sql)
                                 </button>
@@ -1717,72 +1722,106 @@ $cora_settings_tabs = array(
                     </div>
 
                     <!-- Card 2: 24h Automated Google Drive Sync -->
-                    <div class="cora-shopify-card space-y-4">
-                        <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between">
-                            <div>
-                                <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 m-0">24-Hour Automated Google Drive Sync</h3>
-                                <p class="text-xs text-zinc-500 dark:text-zinc-400 m-0">Automate daily platform snapshot uploads directly to your connected Google Drive storage.</p>
+                    <div class="cora-shopify-card space-y-4" id="cora-google-drive-card">
+                        <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                            <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 m-0">24-Hour Automated Google Drive Sync</h3>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 m-0">Automatically upload daily platform snapshots to your personal Google Drive.</p>
+                        </div>
+
+                        <?php if ( $is_google_connected ) : ?>
+                        <!-- STATE: Fully connected -->
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-zinc-50/50 dark:bg-zinc-900/10 border border-zinc-150 dark:border-zinc-800/40 border-l-2 border-l-emerald-500 rounded-xl gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-emerald-600 dark:text-emerald-400"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-zinc-900 dark:text-white leading-none m-0">Google Drive — Connected</h4>
+                                    <p class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5 m-0"><?php echo esc_html($google_account_email ?: 'Google Account'); ?></p>
+                                </div>
                             </div>
-                            <button type="button" id="cora-trigger-drive-sync-now" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Connected & Active
+                                </span>
+                                <button type="button" id="cora-disconnect-google-drive" class="px-2.5 py-1 bg-white dark:bg-zinc-900 hover:bg-red-50 dark:hover:bg-red-950/40 text-zinc-500 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 text-[11px] font-semibold rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-red-200 dark:hover:border-red-800 transition-all flex items-center gap-1.5 cursor-pointer">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+                                    Disconnect
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-zinc-800 dark:text-zinc-200 mb-0.5">Automation Schedule</label>
+                                <select name="cora_backup_schedule" style="width:100%;padding:10px 14px;font-size:13px;background:var(--input-bg);border:1px solid var(--border-color);border-radius:10px;color:var(--text-primary);outline:none;font-family:inherit;">
+                                    <?php $schedule = get_option('cora_backup_schedule', 'daily'); ?>
+                                    <option value="daily" <?php selected($schedule, 'daily'); ?>>Every 24 Hours (Daily at 00:00 UTC)</option>
+                                    <option value="weekly" <?php selected($schedule, 'weekly'); ?>>Every 7 Days (Weekly)</option>
+                                    <option value="monthly" <?php selected($schedule, 'monthly'); ?>>Every 30 Days (Monthly)</option>
+                                    <option value="manual" <?php selected($schedule, 'manual'); ?>>Manual Only</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-zinc-800 dark:text-zinc-200 mb-0.5">Drive Folder ID <span class="font-normal text-zinc-400">(optional)</span></label>
+                                <p class="text-[10px] text-zinc-500 mb-1.5">Leave empty to save to your Drive root folder</p>
+                                <input type="text" name="cora_backup_google_folder_id" value="<?php echo esc_attr($google_folder_id); ?>" placeholder="e.g. 1A2b3C4d5E_xyz..." class="w-full">
+                            </div>
+                        </div>
+
+                        <div class="pt-2">
+                            <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-300 font-semibold cursor-pointer">
+                                <input type="checkbox" name="cora_backup_google_drive_enabled" value="1" <?php checked(get_option('cora_backup_google_drive_enabled', 1), 1); ?> class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
+                                <span>Automatically upload a 24-hour snapshot to your connected Drive</span>
+                            </label>
+                        </div>
+
+                        <div class="pt-1">
+                            <button type="button" id="cora-trigger-drive-sync-now" class="w-full py-2.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
                                 Sync to Drive Now
                             </button>
                         </div>
 
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between p-3.5 bg-zinc-50/50 dark:bg-zinc-900/10 border border-zinc-150 dark:border-zinc-800/40 rounded-xl">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-800 dark:text-zinc-200">
-                                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                                    </div>
-                                    <div>
-                                        <h4 class="text-xs font-bold text-zinc-900 dark:text-white leading-none m-0">Google Drive Integration Status</h4>
-                                        <p class="text-[10px] text-zinc-400 mt-1">Google Workspace client connection status</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <?php if ( $is_google_connected ) : ?>
-                                        <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Connected & Active
-                                        </span>
-                                        <button type="button" id="cora-disconnect-google-drive" class="px-2.5 py-1 bg-white dark:bg-zinc-900 hover:bg-red-50 dark:hover:bg-red-950/40 text-zinc-500 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 text-[11px] font-semibold rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-red-200 dark:hover:border-red-800 transition-all flex items-center gap-1.5 cursor-pointer">
-                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
-                                            Disconnect
-                                        </button>
-                                    <?php else : ?>
-                                        <button type="button" id="cora-connect-google-drive" onclick="coraAutoConnectGoogleDrive()" class="px-3 py-1 bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-[11px] font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs">
-                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                                            Connect Google Drive
-                                        </button>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-semibold text-zinc-800 dark:text-zinc-200 mb-1">Automation Schedule</label>
-                                    <select name="cora_backup_schedule" style="width: 100%; padding: 10px 14px; font-size: 13px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-primary); outline: none; font-family: inherit;">
-                                        <?php $schedule = get_option('cora_backup_schedule', 'daily'); ?>
-                                        <option value="daily" <?php selected( $schedule, 'daily' ); ?>>Every 24 Hours (Daily at 00:00 UTC)</option>
-                                        <option value="weekly" <?php selected( $schedule, 'weekly' ); ?>>Every 7 Days (Weekly Automated Sync)</option>
-                                        <option value="monthly" <?php selected( $schedule, 'monthly' ); ?>>Every 30 Days (Monthly Snapshot)</option>
-                                        <option value="manual" <?php selected( $schedule, 'manual' ); ?>>Manual Only</option>
-                                    </select>
+                        <?php elseif ( $google_has_creds ) : ?>
+                        <!-- STATE: Platform credentials configured — ready to connect -->
+                        <div class="p-5 bg-zinc-50 dark:bg-zinc-900/30 border border-zinc-200/80 dark:border-zinc-800/60 rounded-xl space-y-4">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-zinc-900 dark:bg-white flex items-center justify-center shrink-0">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" class="dark:stroke-zinc-900" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-zinc-800 dark:text-zinc-200 mb-1">Google Drive Folder ID</label>
-                                    <input type="text" name="cora_backup_google_folder_id" value="<?php echo esc_attr( get_option('cora_backup_google_folder_id', '') ); ?>" placeholder="e.g. 1A2b3C4d5E_xyz..." class="w-full">
+                                    <p class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Connect your Google Drive</p>
+                                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">Click below and sign in with your Google account. Cora will request access to store backup snapshots in your Drive. No data is shared or read — only backups are written.</p>
                                 </div>
                             </div>
+                            <button type="button" id="cora-connect-google-drive" class="w-full py-3 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold text-sm rounded-xl transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-sm">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+                                Connect with Google
+                            </button>
+                            <p class="text-[10px] text-zinc-400 text-center">You will be redirected to Google to authorise access. You can disconnect at any time.</p>
+                        </div>
 
-                            <div class="pt-2">
-                                <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-300 font-semibold cursor-pointer">
-                                    <input type="checkbox" name="cora_backup_google_drive_enabled" value="1" <?php checked( get_option('cora_backup_google_drive_enabled', 1), 1 ); ?> class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
-                                    <span class="cora-label-raw">Enable automated 24-hour Google Drive backup uploads</span>
-                                </label>
+                        <?php else : ?>
+                        <!-- STATE: Coming Soon — platform credentials not yet configured -->
+                        <div class="p-6 flex flex-col items-center justify-center text-center space-y-3">
+                            <div class="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 dark:text-zinc-500"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Google Drive Sync</p>
+                                <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 text-[10px] font-bold rounded-full border border-zinc-200 dark:border-zinc-700">
+                                    <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                    Coming Soon
+                                </span>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-2 leading-relaxed">Automated 24-hour backup uploads directly to your Google Drive will be available in the next platform update.</p>
                             </div>
                         </div>
+                        <?php endif; ?>
+
                     </div>
+
+
 
                 </div>
 
@@ -1794,40 +1833,47 @@ $cora_settings_tabs = array(
                                 <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Backup Logs & Restore Center</h3>
                                 <p class="text-xs text-zinc-500 dark:text-zinc-400 m-0">Stored system restore points & archives.</p>
                             </div>
-                            <span class="text-[10px] font-mono text-zinc-400">cora-backups/</span>
+                            <span class="text-[10px] font-mono text-zinc-500 dark:text-zinc-400">cora-backups/</span>
                         </div>
 
-                        <div id="cora-backups-history-list" class="space-y-2.5">
+                        <div id="cora-backups-history-list" class="space-y-3">
                             <?php 
-                            $history = get_option( 'cora_workspace_backup_history', array() );
                             if ( ! empty( $history ) ) :
                                 foreach ( $history as $item ) :
                                     $is_zip = ( strpos( $item['filename'], '.zip' ) !== false );
+                                    $display_name = strlen($item['filename']) > 24 ? substr($item['filename'], 0, 24) . '...' : $item['filename'];
                             ?>
-                                <div class="p-3.5 bg-zinc-50/70 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800 rounded-xl space-y-2">
+                                <div class="cora-shopify-card !p-3 flex flex-col gap-3">
                                     <div class="flex items-start justify-between gap-2">
-                                        <div class="space-y-0.5 min-w-0 flex-1">
-                                            <div class="flex items-center gap-1.5">
-                                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                                <p class="font-bold text-xs text-zinc-900 dark:text-zinc-100 truncate m-0" title="<?php echo esc_attr( $item['filename'] ); ?>"><?php echo esc_html( $item['filename'] ); ?></p>
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 text-zinc-600 dark:text-zinc-400">
+                                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                                             </div>
-                                            <p class="text-[10px] text-zinc-400 m-0"><?php echo esc_html( date( 'M j, Y H:i IST', $item['time'] ) ); ?> &bull; <?php echo esc_html( $item['size'] ); ?></p>
+                                            <div class="min-w-0">
+                                                <p class="font-bold text-xs text-zinc-900 dark:text-zinc-100 truncate m-0" title="<?php echo esc_attr( $item['filename'] ); ?>"><?php echo esc_html( $display_name ); ?></p>
+                                                <div class="flex items-center gap-1.5 mt-0.5">
+                                                    <span class="text-[10px] text-zinc-500 dark:text-zinc-400"><?php echo esc_html( date( 'M j, Y &bull; H:i IST', $item['time'] ) ); ?></span>
+                                                    <span class="text-[10px] text-zinc-400">&bull;</span>
+                                                    <span class="text-[10px] text-zinc-500 dark:text-zinc-400 px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded"><?php echo esc_html( $item['size'] ); ?></span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <span class="text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0 <?php echo $is_zip ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800' : 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'; ?>">
-                                            <?php echo $is_zip ? 'Full Snapshot (.zip)' : 'SQL Dump'; ?>
+                                        <span class="text-[9px] font-bold px-2 py-1 rounded-md shrink-0 <?php echo $is_zip ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300'; ?>">
+                                            <?php echo $is_zip ? '.zip' : 'SQL'; ?>
                                         </span>
                                     </div>
 
-                                    <div class="flex items-center justify-between pt-1 border-t border-zinc-200/50 dark:border-zinc-800/60">
-                                        <button type="button" onclick="coraRestoreBackup('<?php echo esc_js($item['filename']); ?>')" class="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 font-bold text-[10px] rounded-lg transition-colors cursor-pointer flex items-center gap-1">
-                                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M3 2v6h6"></path><path d="M3 13a9 9 0 1 0 3-7.7L3 8"></path></svg>
-                                            Restore Snapshot
+                                    <div class="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
+                                        <button type="button" onclick="coraRestoreBackup('<?php echo esc_js($item['filename']); ?>')" class="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 font-bold text-[10px] rounded-lg transition-colors cursor-pointer flex items-center gap-1.5">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M3 2v6h6"></path><path d="M3 13a9 9 0 1 0 3-7.7L3 8"></path></svg>
+                                            Restore
                                         </button>
-                                        <div class="flex items-center gap-1.5">
-                                            <a href="<?php echo admin_url('admin-ajax.php?action=cora_download_backup&file=' . urlencode( $item['filename'] ) . '&nonce=' . wp_create_nonce('cora_download_backup_nonce')); ?>" class="p-1 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors" title="Download Archive">
+                                        <div class="flex items-center gap-2">
+                                            <a href="<?php echo admin_url('admin-ajax.php?action=cora_download_backup&file=' . urlencode( $item['filename'] ) . '&nonce=' . wp_create_nonce('cora_download_backup_nonce')); ?>" class="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/50 dark:hover:bg-zinc-800 rounded-md transition-colors" title="Download Archive">
                                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                                             </a>
-                                            <button type="button" onclick="coraDeleteBackup('<?php echo esc_js($item['filename']); ?>')" class="p-1 text-rose-500 hover:text-rose-700 transition-colors cursor-pointer" title="Delete Log">
+                                            <div class="w-[1px] h-3 bg-zinc-200 dark:bg-zinc-700"></div>
+                                            <button type="button" onclick="coraDeleteBackup('<?php echo esc_js($item['filename']); ?>')" class="p-1.5 text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-950/20 dark:hover:bg-red-950/40 rounded-md transition-colors cursor-pointer" title="Delete Log">
                                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                             </button>
                                         </div>
@@ -1837,9 +1883,14 @@ $cora_settings_tabs = array(
                                 endforeach;
                             else :
                             ?>
-                                <div class="p-6 text-center text-xs text-zinc-400 select-none border border-dashed border-zinc-200 dark:border-zinc-800/80 rounded-xl space-y-1">
-                                    <p class="font-bold text-zinc-700 dark:text-zinc-300">No Backup Snapshots Stored</p>
-                                    <p class="text-[10px]">Click "Generate Full Snapshot (.zip)" above to create your first restore point.</p>
+                                <div class="p-8 text-center flex flex-col items-center justify-center space-y-3">
+                                    <div class="w-12 h-12 rounded-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 flex items-center justify-center text-zinc-300 dark:text-zinc-600">
+                                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.5" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <p class="font-bold text-sm text-zinc-900 dark:text-zinc-100 m-0">No snapshots yet</p>
+                                        <p class="text-xs text-zinc-500 dark:text-zinc-400 m-0">Generate your first backup above.</p>
+                                    </div>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -1930,12 +1981,63 @@ $cora_settings_tabs = array(
                 });
             });
 
-            window.coraAutoConnectGoogleDrive = function() {
-                if (window.coraShowToast) window.coraShowToast('Connecting Google Drive & Generating Backup Folder...', 'info');
-                var autoFolder = 'cora-backup-folder-' + Math.random().toString(36).substring(2, 10);
-                $('input[name="cora_backup_google_folder_id"]').val(autoFolder);
-                $('#cora-trigger-drive-sync-now').trigger('click');
-            };
+            // Google Drive: Save credentials and redirect to Google OAuth
+            $('#cora-save-google-creds').on('click', function(e) {
+                e.preventDefault();
+                var clientId = $('#cora-google-client-id-input').val().trim();
+                var clientSecret = $('#cora-google-client-secret-input').val().trim();
+                if (!clientId || !clientSecret) {
+                    if (window.coraShowToast) window.coraShowToast('Please enter both your Google Client ID and Client Secret.', 'error');
+                    return;
+                }
+                var $btn = $(this);
+                $btn.prop('disabled', true).text('Saving...');
+                $.post(coraREData.ajaxUrl, {
+                    action: 'cora_get_google_auth_url',
+                    client_id: clientId,
+                    client_secret: clientSecret,
+                    nonce: coraREData.ajaxNonce
+                }, function(res) {
+                    if (res && res.success && res.data.auth_url) {
+                        if (window.coraShowToast) window.coraShowToast('Redirecting to Google sign-in...', 'info');
+                        setTimeout(function() { window.location.href = res.data.auth_url; }, 600);
+                    } else {
+                        $btn.prop('disabled', false).text('Save Credentials & Connect Google Drive');
+                        if (window.coraShowToast) window.coraShowToast(res.data ? res.data.message : 'Failed to generate auth URL.', 'error');
+                    }
+                }).fail(function() {
+                    $btn.prop('disabled', false).text('Save Credentials & Connect Google Drive');
+                    if (window.coraShowToast) window.coraShowToast('Network error. Please try again.', 'error');
+                });
+            });
+
+            // Google Drive: Redirect to Google OAuth (State 2 button)
+            $('#cora-connect-google-drive').on('click', function(e) {
+                e.preventDefault();
+                var $btn = $(this);
+                $btn.prop('disabled', true).text('Redirecting to Google...');
+                $.post(coraREData.ajaxUrl, {
+                    action: 'cora_get_google_auth_url',
+                    nonce: coraREData.ajaxNonce
+                }, function(res) {
+                    if (res && res.success && res.data.auth_url) {
+                        window.location.href = res.data.auth_url;
+                    } else {
+                        $btn.prop('disabled', false).text('Connect with Google');
+                        if (window.coraShowToast) window.coraShowToast('Failed to get auth URL. Check your credentials.', 'error');
+                    }
+                });
+            });
+
+            // Show toast on Google OAuth success/error redirect
+            (function() {
+                var urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('google_connected') === '1') {
+                    if (window.coraShowToast) window.coraShowToast('Google Drive connected successfully!', 'success');
+                } else if (urlParams.get('google_error')) {
+                    if (window.coraShowToast) window.coraShowToast('Google Drive error: ' + decodeURIComponent(urlParams.get('google_error')), 'error');
+                }
+            })();
 
             // Disconnect Google Drive
             $('#cora-disconnect-google-drive').on('click', function(e) {
@@ -1960,40 +2062,93 @@ $cora_settings_tabs = array(
             });
         });
 
+        <!-- Custom Confirmation Drawer (replaces all browser confirm() dialogs) -->
+        <div id="cora-confirm-drawer" class="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center" style="display:none !important;">
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" id="cora-confirm-backdrop"></div>
+            <div class="relative w-full max-w-sm mx-4 mb-4 sm:mb-0 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden" style="animation: slideUpFade 0.18s ease;">
+                <div class="p-5">
+                    <div class="flex items-start gap-3 mb-4">
+                        <div id="cora-confirm-icon-wrap" class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-zinc-100 dark:bg-zinc-800">
+                            <svg id="cora-confirm-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0" id="cora-confirm-title">Confirm Action</p>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed" id="cora-confirm-message"></p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2.5">
+                        <button type="button" id="cora-confirm-cancel" class="flex-1 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-xl transition-all cursor-pointer">Cancel</button>
+                        <button type="button" id="cora-confirm-ok" class="flex-1 py-2 text-xs font-bold text-white bg-zinc-900 hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white rounded-xl transition-all cursor-pointer" id="cora-confirm-ok">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <style>
+        @keyframes slideUpFade { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+        </style>
+        <script>
+        // Custom Confirm Utility — replaces all browser confirm() calls
+        window.coraConfirm = function(opts, onConfirm) {
+            var drawer = document.getElementById('cora-confirm-drawer');
+            document.getElementById('cora-confirm-title').textContent   = opts.title   || 'Confirm';
+            document.getElementById('cora-confirm-message').textContent = opts.message || '';
+            var okBtn = document.getElementById('cora-confirm-ok');
+            okBtn.textContent = opts.okLabel || 'Confirm';
+            if (opts.danger) {
+                okBtn.className = 'flex-1 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-all cursor-pointer';
+            } else {
+                okBtn.className = 'flex-1 py-2 text-xs font-bold text-white bg-zinc-900 hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white rounded-xl transition-all cursor-pointer';
+            }
+            drawer.style.cssText = 'display:flex !important; position:fixed; inset:0; z-index:9999; align-items:center; justify-content:center;';
+            var close = function() { drawer.style.cssText = 'display:none !important;'; };
+            document.getElementById('cora-confirm-cancel').onclick   = close;
+            document.getElementById('cora-confirm-backdrop').onclick = close;
+            okBtn.onclick = function() { close(); onConfirm(); };
+        };
+        </script>
+
+        <script>
         // Restore Backup Handler
         function coraRestoreBackup(filename) {
-            if (!confirm('Are you sure you want to restore platform snapshot (' + filename + ')?\n\nA pre-restore safety snapshot will be automatically created before restoring.')) {
-                return;
-            }
-            if (window.coraShowToast) window.coraShowToast('Restoring platform snapshot...', 'info');
-            jQuery.post(coraREData.ajaxUrl, {
-                action: 'cora_restore_workspace_backup',
-                file: filename,
-                nonce: coraREData.ajaxNonce
-            }, function(res) {
-                if (res && res.success) {
-                    if (window.coraShowToast) window.coraShowToast(res.data.message, 'success');
-                    setTimeout(function() { window.location.reload(); }, 2000);
-                } else {
-                    if (window.coraShowToast) window.coraShowToast('Restore Error: ' + (res.data ? res.data.message : 'Unknown error'), 'error');
-                }
+            window.coraConfirm({
+                title:   'Restore Platform Snapshot',
+                message: 'Restore to "' + filename + '"? A pre-restore safety snapshot will be created automatically before restoring.',
+                okLabel: 'Yes, Restore'
+            }, function() {
+                if (window.coraShowToast) window.coraShowToast('Restoring platform snapshot...', 'info');
+                jQuery.post(coraREData.ajaxUrl, {
+                    action: 'cora_restore_workspace_backup',
+                    file: filename,
+                    nonce: coraREData.ajaxNonce
+                }, function(res) {
+                    if (res && res.success) {
+                        if (window.coraShowToast) window.coraShowToast(res.data.message, 'success');
+                        setTimeout(function() { window.location.reload(); }, 2000);
+                    } else {
+                        if (window.coraShowToast) window.coraShowToast('Restore Error: ' + (res.data ? res.data.message : 'Unknown error'), 'error');
+                    }
+                });
             });
         }
 
         // Delete Backup Handler
         function coraDeleteBackup(filename) {
-            if (!confirm('Delete backup snapshot log (' + filename + ')?')) {
-                return;
-            }
-            jQuery.post(coraREData.ajaxUrl, {
-                action: 'cora_delete_workspace_backup',
-                file: filename,
-                nonce: coraREData.ajaxNonce
-            }, function(res) {
-                if (res && res.success) {
-                    if (window.coraShowToast) window.coraShowToast(res.data.message);
-                    setTimeout(function() { window.location.reload(); }, 1000);
-                }
+            window.coraConfirm({
+                title:   'Delete Snapshot',
+                message: 'Permanently delete "' + filename + '"? This cannot be undone.',
+                okLabel: 'Delete',
+                danger:  true
+            }, function() {
+                jQuery.post(coraREData.ajaxUrl, {
+                    action: 'cora_delete_workspace_backup',
+                    file: filename,
+                    nonce: coraREData.ajaxNonce
+                }, function(res) {
+                    if (res && res.success) {
+                        if (window.coraShowToast) window.coraShowToast(res.data.message);
+                        setTimeout(function() { window.location.reload(); }, 1000);
+                    }
+                });
             });
         }
         </script>
