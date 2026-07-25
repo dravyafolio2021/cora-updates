@@ -84,7 +84,7 @@ $wa_template = get_option( 'cora_wa_review_template', 'Namaste {client_name} ji!
 $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, we appreciate your business! Please leave us a review on Google.' );
 ?>
 
-<div id="cora-reviews-feedback-wrapper" class="space-y-5 font-sans text-zinc-900 dark:text-zinc-100">
+<div id="cora-reviews-feedback-wrapper" class="space-y-5 font-sans text-zinc-900 dark:text-zinc-100 relative">
     <!-- Header Bar with Title, Verified Badge, & Clean Essential Action Controls -->
     <div class="cora-shopify-card p-5 md:p-6 flex items-center justify-between flex-wrap gap-4 shadow-sm">
         <div class="space-y-3 max-w-2xl">
@@ -103,7 +103,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
             <div class="flex items-center gap-2.5 flex-wrap pt-0.5">
                 <button type="button" onclick="coraOpenSendReviewDrawer()" class="px-4 py-2.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-97">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    + Request Review
+                    Request Review
                 </button>
                 <button type="button" onclick="coraOpenReportDrawer()" class="px-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
@@ -429,8 +429,8 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
         <div class="p-6 border border-zinc-200 dark:border-zinc-800 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/20 space-y-4">
             <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 m-0">Generate Custom AI Snippet</h4>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <input type="text" id="custom-ai-client-name" placeholder="Client Name (e.g. Rahul Kapoor)" class="w-full text-xs">
-                <input type="text" id="custom-ai-service" placeholder="Key Highlight (e.g. Fast turnaround, great lighting)" class="w-full text-xs">
+                <input type="text" id="custom-ai-client-name" placeholder="Client Name (e.g. Rahul Kapoor)" class="w-full px-3.5 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-sans text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-white focus:ring-2 focus:ring-zinc-950/10">
+                <input type="text" id="custom-ai-service" placeholder="Key Highlight (e.g. Fast turnaround, great lighting)" class="w-full px-3.5 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-sans text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-white focus:ring-2 focus:ring-zinc-950/10">
             </div>
             <button type="button" onclick="coraGenerateCustomAISnippet()" class="py-2.5 px-5 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold text-xs rounded-xl transition-all cursor-pointer">
                 ⚡ Generate Snippet with AI
@@ -440,7 +440,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
     </div>
 
     <!-- ═════════════════════════════════════════════════════════════════════
-         TAB 3: MULTI-CHANNEL AUTOMATION TRIGGERS (OPTIMIZED FOR INDIAN MARKET)
+         TAB 3: MULTI-CHANNEL AUTOMATION TRIGGERS (PREMIUM NOTION/SHOPIFY STYLED INPUTS)
          ═════════════════════════════════════════════════════════════════════ -->
     <div id="cora-rev-panel-automation" class="hidden cora-shopify-card space-y-6 max-w-4xl">
         <!-- Indian Market Insights Banner -->
@@ -450,7 +450,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
             </div>
             <div class="space-y-1">
                 <div class="font-bold text-zinc-950 dark:text-white flex items-center gap-1.5">
-                    <span>🇮🇳 Tailored for Indian Businesses (WhatsApp-First Strategy)</span>
+                    <span>🇮🇳 WhatsApp-First Strategy for Indian Businesses</span>
                 </div>
                 <p class="text-zinc-600 dark:text-zinc-300 leading-relaxed m-0 text-[11px]">
                     In India, review emails are rarely opened (&lt;8% open rate), while <strong>WhatsApp messages have a 98% open rate</strong>. Our engine sends personalized Hinglish messages directly to client WhatsApp numbers right after photo/video delivery or final invoice payment!
@@ -463,31 +463,41 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
             <p class="text-xs text-zinc-500 dark:text-zinc-400 m-0">Configure automated post-handover review requests across WhatsApp, Email, SMS, and Social channels.</p>
         </div>
 
-        <div class="space-y-4 p-6 bg-zinc-50/60 dark:bg-zinc-900/30 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 text-xs">
-            <div>
-                <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Official Google Business Review URL *</label>
-                <input type="text" id="cora-google-url-input" value="<?php echo esc_attr( $google_link ); ?>" class="w-full font-mono">
-                <p class="text-[10px] text-zinc-400 mt-1">Found under 'Ask for reviews' in your Google Business Profile dashboard.</p>
+        <div class="space-y-5 p-6 bg-zinc-50/60 dark:bg-zinc-900/30 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 text-xs shadow-2xs">
+            <!-- Official Google Business Review URL Input -->
+            <div class="space-y-1.5">
+                <div class="flex items-center justify-between">
+                    <label class="block font-bold text-xs text-zinc-900 dark:text-zinc-100 m-0">Official Google Business Review URL *</label>
+                    <span class="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200/60">Live Connected</span>
+                </div>
+                <div class="relative rounded-xl overflow-hidden shadow-2xs">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                    </div>
+                    <input type="text" id="cora-google-url-input" value="<?php echo esc_attr( $google_link ); ?>" class="w-full pl-9 pr-3.5 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-white focus:ring-2 focus:ring-zinc-950/10 transition-all">
+                </div>
+                <p class="text-[10px] text-zinc-400 m-0">Found under 'Ask for reviews' in your Google Business Profile dashboard.</p>
             </div>
 
-            <!-- Hinglish Presets Selector -->
-            <div>
-                <div class="flex items-center justify-between mb-1.5">
-                    <label class="font-bold text-zinc-800 dark:text-zinc-200">WhatsApp Automation Message (Hinglish/English)</label>
-                    <div class="flex gap-1">
-                        <button type="button" onclick="coraApplyHinglishPreset('hinglish_warm')" class="px-2 py-0.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-[10px] font-semibold rounded hover:bg-zinc-300 cursor-pointer">Hinglish Warm</button>
-                        <button type="button" onclick="coraApplyHinglishPreset('english_prof')" class="px-2 py-0.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-[10px] font-semibold rounded hover:bg-zinc-300 cursor-pointer">English Prof</button>
+            <!-- WhatsApp Automation Message (Hinglish/English) -->
+            <div class="space-y-1.5">
+                <div class="flex items-center justify-between">
+                    <label class="font-bold text-xs text-zinc-900 dark:text-zinc-100 m-0">WhatsApp Automation Message (Hinglish/English)</label>
+                    <div class="flex gap-1.5">
+                        <button type="button" onclick="coraApplyHinglishPreset('hinglish_warm')" class="px-2.5 py-1 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 text-zinc-800 dark:text-zinc-200 text-[10px] font-bold rounded-lg cursor-pointer transition-all border border-zinc-200 dark:border-zinc-700">Hinglish Warm</button>
+                        <button type="button" onclick="coraApplyHinglishPreset('english_prof')" class="px-2.5 py-1 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 text-zinc-800 dark:text-zinc-200 text-[10px] font-bold rounded-lg cursor-pointer transition-all border border-zinc-200 dark:border-zinc-700">English Prof</button>
                     </div>
                 </div>
-                <textarea id="cora-wa-review-template" rows="3" class="w-full font-sans text-xs"><?php echo esc_textarea( $wa_template ); ?></textarea>
+                <textarea id="cora-wa-review-template" rows="3" class="w-full px-3.5 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-sans text-zinc-900 dark:text-zinc-100 leading-relaxed focus:outline-none focus:border-zinc-900 dark:focus:border-white focus:ring-2 focus:ring-zinc-950/10 transition-all resize-y"><?php echo esc_textarea( $wa_template ); ?></textarea>
             </div>
 
-            <div>
-                <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Email Review Request Template</label>
-                <textarea id="cora-email-review-template" rows="3" class="w-full font-sans text-xs"><?php echo esc_textarea( $email_template ); ?></textarea>
+            <!-- Email Review Request Template -->
+            <div class="space-y-1.5">
+                <label class="block font-bold text-xs text-zinc-900 dark:text-zinc-100 m-0">Email Review Request Template</label>
+                <textarea id="cora-email-review-template" rows="3" class="w-full px-3.5 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-sans text-zinc-900 dark:text-zinc-100 leading-relaxed focus:outline-none focus:border-zinc-900 dark:focus:border-white focus:ring-2 focus:ring-zinc-950/10 transition-all resize-y"><?php echo esc_textarea( $email_template ); ?></textarea>
             </div>
 
-            <div class="pt-2">
+            <div class="pt-1">
                 <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-300 font-semibold cursor-pointer">
                     <input type="checkbox" id="auto-trigger-check" checked class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
                     <span>Auto-trigger WhatsApp & Email 2 hours after project deal status is set to 'Handed Over' or 'Invoice Paid'</span>
@@ -495,21 +505,25 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
             </div>
 
             <div class="pt-3 border-t border-zinc-200/60 dark:border-zinc-800 flex items-center justify-between flex-wrap gap-3">
-                <button type="button" onclick="coraSaveReviewSettings()" class="px-5 py-2.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold text-xs rounded-xl transition-all cursor-pointer">
+                <button type="button" onclick="coraSaveReviewSettings()" class="px-5 py-2.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold text-xs rounded-xl transition-all cursor-pointer shadow-sm active:scale-97">
                     Save Multi-Channel Rules
                 </button>
             </div>
         </div>
 
         <!-- Direct WhatsApp Test Dispatch Box for Indian Owners -->
-        <div class="p-5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl space-y-3">
-            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 m-0 flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-[#25D366]"></span>
-                Test Instant WhatsApp Review Link Dispatch
-            </h4>
+        <div class="p-5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl space-y-3 shadow-2xs">
+            <div class="flex items-center justify-between">
+                <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 m-0 flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#25D366] animate-pulse"></span>
+                    Test Instant WhatsApp Review Link Dispatch
+                </h4>
+                <span class="text-[10px] font-bold text-zinc-400">1-Tap Live WhatsApp Test</span>
+            </div>
             <div class="flex items-center gap-2">
-                <input type="text" id="test-wa-phone" placeholder="Enter WhatsApp Number (e.g. 9876543210)" class="w-full text-xs font-mono">
-                <button type="button" onclick="coraDispatchTestWhatsApp()" class="px-4 py-2 bg-[#25D366] hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition-all shrink-0 cursor-pointer flex items-center gap-1">
+                <input type="text" id="test-wa-phone" placeholder="Enter WhatsApp Phone Number (e.g. 9876543210)" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/20 transition-all">
+                <button type="button" onclick="coraDispatchTestWhatsApp()" class="px-5 py-2.5 bg-[#25D366] hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition-all shrink-0 cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-97">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.285-.143-1.687-.832-1.947-.927-.26-.095-.45-.143-.64.143-.19.285-.735.927-.9 1.117-.165.19-.33.214-.615.071-.285-.143-1.204-.444-2.294-1.416-.848-.756-1.421-1.69-1.587-1.975-.166-.285-.018-.439.125-.581.128-.128.285-.333.428-.5.143-.167.19-.285.285-.476.095-.19.047-.357-.024-.5-.071-.143-.64-1.545-.877-2.116-.231-.557-.466-.481-.64-.49-.165-.008-.356-.01-.547-.01-.19 0-.5.071-.76.357-.26.285-.999.976-.999 2.38 0 1.404 1.023 2.76 1.165 2.951.143.19 2.013 3.074 4.877 4.31.682.295 1.214.471 1.629.603.685.218 1.309.187 1.802.114.549-.081 1.687-.689 1.924-1.355.237-.666.237-1.237.166-1.355-.07-.119-.26-.19-.545-.333z"/></svg>
                     Send WhatsApp Test
                 </button>
             </div>
@@ -557,8 +571,11 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
     </div>
 </div>
 
+<!-- GLOBAL DRAWER BACKDROP OVERLAY -->
+<div id="cora-drawer-backdrop" onclick="coraCloseAllReviewDrawers()" class="fixed inset-0 z-[9998] bg-black/40 backdrop-blur-xs transition-opacity duration-250 opacity-0 hidden"></div>
+
 <!-- ═══ SIDE DRAWER 1: SEND REVIEW REQUEST ═══════════════════════════════════ -->
-<div id="cora-send-review-drawer" class="fixed inset-y-0 right-0 z-[9999] w-full max-w-md bg-white dark:bg-zinc-955 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl transition-transform duration-250 translate-x-full" style="display:none;">
+<div id="cora-send-review-drawer" class="fixed inset-y-0 right-0 z-[9999] w-full max-w-md bg-white dark:bg-zinc-955 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl transition-transform duration-250 translate-x-full hidden">
     <div class="flex flex-col h-full">
         <div class="p-5 border-b border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-between">
             <div>
@@ -571,23 +588,23 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
         <div class="p-6 flex-1 overflow-y-auto space-y-4 text-xs">
             <div>
                 <label class="block font-semibold text-zinc-800 dark:text-zinc-200 mb-1">Client Full Name *</label>
-                <input type="text" id="req-client-name" placeholder="Client Name..." class="w-full">
+                <input type="text" id="req-client-name" placeholder="Client Name..." class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-white">
             </div>
 
             <div>
                 <label class="block font-semibold text-zinc-800 dark:text-zinc-200 mb-1">Phone Number (WhatsApp/SMS)</label>
-                <input type="text" id="req-client-phone" placeholder="9876543210" class="w-full font-mono">
+                <input type="text" id="req-client-phone" placeholder="9876543210" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-white">
             </div>
 
             <div>
                 <label class="block font-semibold text-zinc-800 dark:text-zinc-200 mb-1">Email Address</label>
-                <input type="email" id="req-client-email" placeholder="client@example.com" class="w-full">
+                <input type="email" id="req-client-email" placeholder="client@example.com" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-white">
             </div>
 
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block font-semibold text-zinc-800 dark:text-zinc-200 mb-1">Project Category</label>
-                    <select id="req-project-category" style="width:100%;padding:8px 12px;font-size:12px;background:var(--input-bg);border:1px solid var(--border-color);border-radius:10px;color:var(--text-primary);outline:none;">
+                    <select id="req-project-category" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
                         <option value="Studio Photography">Studio Photography & Film</option>
                         <option value="Real Estate Media">Real Estate 4K Media</option>
                         <option value="Real Estate Brokerage">Real Estate Commercial Lease</option>
@@ -595,8 +612,8 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
                 </div>
                 <div>
                     <label class="block font-semibold text-zinc-800 dark:text-zinc-200 mb-1">Dispatch Channel</label>
-                    <select id="req-dispatch-channel" style="width:100%;padding:8px 12px;font-size:12px;background:var(--input-bg);border:1px solid var(--border-color);border-radius:10px;color:var(--text-primary);outline:none;">
-                        <option value="WhatsApp" selected>WhatsApp (Recommended for India)</option>
+                    <select id="req-dispatch-channel" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+                        <option value="WhatsApp" selected>WhatsApp (Recommended)</option>
                         <option value="Email">Email</option>
                         <option value="SMS">SMS</option>
                         <option value="Social DM">Social DM</option>
@@ -606,7 +623,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
 
             <div>
                 <label class="block font-semibold text-zinc-800 dark:text-zinc-200 mb-1">AI Review Snippet / Message</label>
-                <textarea id="req-snippet-message" rows="3" class="w-full text-xs" placeholder="AI preset snippet text..."></textarea>
+                <textarea id="req-snippet-message" rows="3" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none" placeholder="AI preset snippet text..."></textarea>
             </div>
         </div>
 
@@ -618,7 +635,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
 </div>
 
 <!-- ═══ SIDE DRAWER 2: PRIVATE SHIELD TICKET INSPECTOR ═══════════════════════ -->
-<div id="cora-private-ticket-drawer" class="fixed inset-y-0 right-0 z-[9999] w-full max-w-md bg-white dark:bg-zinc-955 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl transition-transform duration-250 translate-x-full" style="display:none;">
+<div id="cora-private-ticket-drawer" class="fixed inset-y-0 right-0 z-[9999] w-full max-w-md bg-white dark:bg-zinc-955 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl transition-transform duration-250 translate-x-full hidden">
     <div class="flex flex-col h-full">
         <div class="p-5 border-b border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-between">
             <div>
@@ -639,7 +656,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
 
             <div>
                 <label class="block font-semibold text-zinc-800 dark:text-zinc-200 mb-1">Resolution Action Note</label>
-                <textarea id="ticket-resolution-note" rows="3" placeholder="Enter resolution notes (e.g. Spoke with client, offered priority delivery next shoot)..." class="w-full text-xs"></textarea>
+                <textarea id="ticket-resolution-note" rows="3" placeholder="Enter resolution notes (e.g. Spoke with client, offered priority delivery next shoot)..." class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none"></textarea>
             </div>
 
             <div class="pt-2">
@@ -658,7 +675,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
 </div>
 
 <!-- ═══ SIDE DRAWER 3: AUTOMATED REPORT GENERATOR ═══════════════════════════ -->
-<div id="cora-report-generator-drawer" class="fixed inset-y-0 right-0 z-[9999] w-full max-w-md bg-white dark:bg-zinc-955 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl transition-transform duration-250 translate-x-full" style="display:none;">
+<div id="cora-report-generator-drawer" class="fixed inset-y-0 right-0 z-[9999] w-full max-w-md bg-white dark:bg-zinc-955 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl transition-transform duration-250 translate-x-full hidden">
     <div class="flex flex-col h-full">
         <div class="p-5 border-b border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-between">
             <div>
@@ -671,7 +688,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
         <div class="p-6 flex-1 overflow-y-auto space-y-4 text-xs">
             <div>
                 <label class="block font-semibold text-zinc-800 dark:text-zinc-200 mb-1">Report Timeframe</label>
-                <select id="report-period-select" style="width:100%;padding:9px 12px;font-size:12px;background:var(--input-bg);border:1px solid var(--border-color);border-radius:10px;color:var(--text-primary);outline:none;">
+                <select id="report-period-select" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
                     <option value="7_days">Last 7 Days</option>
                     <option value="30_days" selected>Last 30 Days</option>
                     <option value="ytd">Year to Date (YTD)</option>
@@ -712,6 +729,107 @@ function coraGetAJAXNonce() {
     if (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) return coraREWPData.ajaxNonce;
     return '';
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DRAWER SHEET SLIDING ENGINE & OVERLAY BACKDROP CONTROLLER
+// ═══════════════════════════════════════════════════════════════════════════
+window.coraOpenSendReviewDrawer = function() {
+    var backdrop = document.getElementById('cora-drawer-backdrop');
+    var drawer = document.getElementById('cora-send-review-drawer');
+    if (backdrop) {
+        backdrop.classList.remove('hidden');
+        setTimeout(function() { backdrop.classList.remove('opacity-0'); }, 10);
+    }
+    if (drawer) {
+        drawer.classList.remove('hidden');
+        setTimeout(function() {
+            drawer.classList.remove('translate-x-full');
+            drawer.classList.add('translate-x-0');
+        }, 10);
+    }
+};
+
+window.coraCloseSendReviewDrawer = function() {
+    var backdrop = document.getElementById('cora-drawer-backdrop');
+    var drawer = document.getElementById('cora-send-review-drawer');
+    if (drawer) {
+        drawer.classList.remove('translate-x-0');
+        drawer.classList.add('translate-x-full');
+        setTimeout(function() { drawer.classList.add('hidden'); }, 250);
+    }
+    if (backdrop) {
+        backdrop.classList.add('opacity-0');
+        setTimeout(function() { backdrop.classList.add('hidden'); }, 250);
+    }
+};
+
+window.coraOpenReportDrawer = function() {
+    coraSwitchReviewTab('reports');
+    var backdrop = document.getElementById('cora-drawer-backdrop');
+    var drawer = document.getElementById('cora-report-generator-drawer');
+    if (backdrop) {
+        backdrop.classList.remove('hidden');
+        setTimeout(function() { backdrop.classList.remove('opacity-0'); }, 10);
+    }
+    if (drawer) {
+        drawer.classList.remove('hidden');
+        setTimeout(function() {
+            drawer.classList.remove('translate-x-full');
+            drawer.classList.add('translate-x-0');
+        }, 10);
+    }
+};
+
+window.coraCloseReportDrawer = function() {
+    var backdrop = document.getElementById('cora-drawer-backdrop');
+    var drawer = document.getElementById('cora-report-generator-drawer');
+    if (drawer) {
+        drawer.classList.remove('translate-x-0');
+        drawer.classList.add('translate-x-full');
+        setTimeout(function() { drawer.classList.add('hidden'); }, 250);
+    }
+    if (backdrop) {
+        backdrop.classList.add('opacity-0');
+        setTimeout(function() { backdrop.classList.add('hidden'); }, 250);
+    }
+};
+
+window.coraOpenPrivateTicketDrawer = function(ticketId) {
+    document.getElementById('ticket-active-id').value = ticketId;
+    var backdrop = document.getElementById('cora-drawer-backdrop');
+    var drawer = document.getElementById('cora-private-ticket-drawer');
+    if (backdrop) {
+        backdrop.classList.remove('hidden');
+        setTimeout(function() { backdrop.classList.remove('opacity-0'); }, 10);
+    }
+    if (drawer) {
+        drawer.classList.remove('hidden');
+        setTimeout(function() {
+            drawer.classList.remove('translate-x-full');
+            drawer.classList.add('translate-x-0');
+        }, 10);
+    }
+};
+
+window.coraClosePrivateTicketDrawer = function() {
+    var backdrop = document.getElementById('cora-drawer-backdrop');
+    var drawer = document.getElementById('cora-private-ticket-drawer');
+    if (drawer) {
+        drawer.classList.remove('translate-x-0');
+        drawer.classList.add('translate-x-full');
+        setTimeout(function() { drawer.classList.add('hidden'); }, 250);
+    }
+    if (backdrop) {
+        backdrop.classList.add('opacity-0');
+        setTimeout(function() { backdrop.classList.add('hidden'); }, 250);
+    }
+};
+
+window.coraCloseAllReviewDrawers = function() {
+    coraCloseSendReviewDrawer();
+    coraCloseReportDrawer();
+    coraClosePrivateTicketDrawer();
+};
 
 // ═══════════════════════════════════════════════════════════════════════════
 // URL ARCHITECTURE & ACTIVE TAB PERSISTENCE ENGINE
@@ -805,39 +923,6 @@ window.coraFilterReviewFeed = function(type) {
     });
 };
 
-window.coraOpenSendReviewDrawer = function() {
-    var drawer = document.getElementById('cora-send-review-drawer');
-    if (drawer) {
-        drawer.style.display = 'block';
-        setTimeout(function() { drawer.style.transform = 'translateX(0)'; }, 10);
-    }
-};
-
-window.coraCloseSendReviewDrawer = function() {
-    var drawer = document.getElementById('cora-send-review-drawer');
-    if (drawer) {
-        drawer.style.transform = 'translateX(100%)';
-        setTimeout(function() { drawer.style.display = 'none'; }, 250);
-    }
-};
-
-window.coraOpenReportDrawer = function() {
-    coraSwitchReviewTab('reports');
-    var drawer = document.getElementById('cora-report-generator-drawer');
-    if (drawer) {
-        drawer.style.display = 'block';
-        setTimeout(function() { drawer.style.transform = 'translateX(0)'; }, 10);
-    }
-};
-
-window.coraCloseReportDrawer = function() {
-    var drawer = document.getElementById('cora-report-generator-drawer');
-    if (drawer) {
-        drawer.style.transform = 'translateX(100%)';
-        setTimeout(function() { drawer.style.display = 'none'; }, 250);
-    }
-};
-
 window.coraSubmitSendReviewRequest = function() {
     var name = document.getElementById('req-client-name').value.trim();
     var phone = document.getElementById('req-client-phone').value.trim();
@@ -882,23 +967,6 @@ window.coraCopyGoogleReviewUrl = function() {
     var googleUrl = document.getElementById('cora-google-url-input') ? document.getElementById('cora-google-url-input').value : 'https://g.page/r/cora_studio/review';
     navigator.clipboard.writeText(googleUrl);
     if (window.coraShowToast) window.coraShowToast('Google Business Review URL copied to clipboard!', 'success');
-};
-
-window.coraOpenPrivateTicketDrawer = function(ticketId) {
-    document.getElementById('ticket-active-id').value = ticketId;
-    var drawer = document.getElementById('cora-private-ticket-drawer');
-    if (drawer) {
-        drawer.style.display = 'block';
-        setTimeout(function() { drawer.style.transform = 'translateX(0)'; }, 10);
-    }
-};
-
-window.coraClosePrivateTicketDrawer = function() {
-    var drawer = document.getElementById('cora-private-ticket-drawer');
-    if (drawer) {
-        drawer.style.transform = 'translateX(100%)';
-        setTimeout(function() { drawer.style.display = 'none'; }, 250);
-    }
 };
 
 window.coraResolvePrivateTicketAJAX = function() {
