@@ -220,7 +220,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
     </div>
 
     <!-- ═════════════════════════════════════════════════════════════════════
-         TAB 1: REVIEW REQUESTS & REPUTATION FEED (COMPACT & SPACE SAVING)
+         TAB 1: REVIEW REQUESTS & REPUTATION FEED (ULTRA-COMPACT & ICON-ONLY ACTIONS)
          ═════════════════════════════════════════════════════════════════════ -->
     <div id="cora-rev-panel-tracker" class="cora-shopify-card space-y-4 p-5">
         <!-- Top Title & Filter Bar -->
@@ -238,19 +238,19 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
             </div>
         </div>
 
-        <!-- Feed Table Container — Compact Space Saving Design -->
+        <!-- Feed Table Container — Ultra Compact & Icon-Only Buttons -->
         <div class="border border-zinc-200/80 dark:border-zinc-800 rounded-xl overflow-hidden shadow-2xs bg-white dark:bg-zinc-955">
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs min-w-[780px]">
+                <table class="w-full text-left border-collapse text-xs min-w-[720px]">
                     <thead>
                         <tr class="bg-zinc-50/80 dark:bg-zinc-900/60 border-b border-zinc-200/80 dark:border-zinc-800 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                            <th class="py-3 px-3.5 w-[220px]">CLIENT & PROJECT</th>
-                            <th class="py-3 px-3.5 w-[140px]">CATEGORY</th>
-                            <th class="py-3 px-3.5 w-[110px]">CHANNEL</th>
-                            <th class="py-3 px-3.5 w-[90px]">RATING</th>
-                            <th class="py-3 px-3.5 w-[150px]">STATUS</th>
-                            <th class="py-3 px-3.5">REVIEW SNIPPET / NOTE</th>
-                            <th class="py-3 px-3.5 text-right w-[140px]">ACTIONS</th>
+                            <th class="py-2.5 px-3 w-[200px]">CLIENT & PROJECT</th>
+                            <th class="py-2.5 px-3 w-[130px]">CATEGORY</th>
+                            <th class="py-2.5 px-3 w-[60px] text-center">CHANNEL</th>
+                            <th class="py-2.5 px-3 w-[85px]">RATING</th>
+                            <th class="py-2.5 px-3 w-[145px]">STATUS</th>
+                            <th class="py-2.5 px-3">REVIEW SNIPPET / NOTE</th>
+                            <th class="py-2.5 px-3 text-right w-[90px]">ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800/60" id="cora-review-feed-tbody">
@@ -266,46 +266,44 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
                         ?>
                         <tr class="hover:bg-zinc-50/70 dark:hover:bg-zinc-900/40 transition-colors <?php echo $filter_class; ?>">
                             <!-- CLIENT & PROJECT (Compact 2-line layout) -->
-                            <td class="py-3 px-3.5 align-middle">
-                                <div class="flex items-center gap-2.5">
-                                    <div class="w-8 h-8 rounded-full <?php echo $avatar_bg; ?> font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                            <td class="py-2.5 px-3 align-middle">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-full <?php echo $avatar_bg; ?> font-bold text-[11px] flex items-center justify-center shrink-0 shadow-2xs">
                                         <?php echo esc_html( $initial ); ?>
                                     </div>
-                                    <div class="space-y-0.5 truncate">
-                                        <div class="font-bold text-xs text-zinc-900 dark:text-zinc-100 truncate"><?php echo esc_html( $req['client_name'] ); ?></div>
+                                    <div class="space-y-0 truncate">
+                                        <div class="font-bold text-xs text-zinc-900 dark:text-zinc-100 truncate leading-tight"><?php echo esc_html( $req['client_name'] ); ?></div>
                                         <div class="text-[10px] text-zinc-400 font-mono truncate"><?php echo esc_html( $req['client_phone'] ?: $req['client_email'] ); ?></div>
                                     </div>
                                 </div>
                             </td>
 
                             <!-- CATEGORY -->
-                            <td class="py-3 px-3.5 align-middle font-medium text-xs text-zinc-700 dark:text-zinc-300">
+                            <td class="py-2.5 px-3 align-middle font-medium text-xs text-zinc-700 dark:text-zinc-300">
                                 <?php echo esc_html( $req['category'] ); ?>
                             </td>
 
-                            <!-- CHANNEL (Official Brand SVG Icons) -->
-                            <td class="py-3 px-3.5 align-middle">
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5 w-max">
-                                    <?php if ( $channel_type === 'whatsapp' ) : ?>
-                                        <!-- Official WhatsApp SVG Icon -->
-                                        <svg viewBox="0 0 24 24" width="12" height="12" class="text-emerald-500 fill-current shrink-0">
-                                            <path d="M12.031 2c-5.517 0-9.985 4.468-9.985 9.985 0 1.763.459 3.483 1.332 5.003l-1.417 5.176 5.297-1.388c1.472.803 3.134 1.226 4.773 1.226 5.517 0 9.986-4.468 9.986-9.986 0-5.517-4.469-9.985-9.986-9.985zm0 18.283c-1.498 0-2.966-.402-4.244-1.162l-.305-.181-3.156.827.842-3.076-.199-.316c-.836-1.328-1.278-2.868-1.278-4.39 0-4.568 3.717-8.285 8.285-8.285 4.567 0 8.285 3.717 8.285 8.285 0 4.568-3.718 8.285-8.285 8.285z"/>
-                                        </svg>
-                                    <?php elseif ( $channel_type === 'sms' ) : ?>
-                                        <!-- Official SMS Icon -->
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-amber-500 shrink-0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                                    <?php else : ?>
-                                        <!-- Official Email Icon -->
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-blue-500 shrink-0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                                    <?php endif; ?>
-                                    <?php echo esc_html( $req['channel'] ?? 'WhatsApp' ); ?>
-                                </span>
+                            <!-- CHANNEL (Official Brand Icon Badge - Space Saving Icon Only) -->
+                            <td class="py-2.5 px-3 align-middle text-center">
+                                <?php if ( $channel_type === 'whatsapp' ) : ?>
+                                    <div class="w-7 h-7 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-2xs" title="WhatsApp Channel">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12.031 2c-5.517 0-9.985 4.468-9.985 9.985 0 1.763.459 3.483 1.332 5.003l-1.417 5.176 5.297-1.388c1.472.803 3.134 1.226 4.773 1.226 5.517 0 9.986-4.468 9.986-9.986 0-5.517-4.469-9.985-9.986-9.985zm0 18.283c-1.498 0-2.966-.402-4.244-1.162l-.305-.181-3.156.827.842-3.076-.199-.316c-.836-1.328-1.278-2.868-1.278-4.39 0-4.568 3.717-8.285 8.285-8.285 4.567 0 8.285 3.717 8.285 8.285 0 4.568-3.718 8.285-8.285 8.285z"/></svg>
+                                    </div>
+                                <?php elseif ( $channel_type === 'sms' ) : ?>
+                                    <div class="w-7 h-7 rounded-full bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto shadow-2xs" title="SMS Channel">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                    </div>
+                                <?php else : ?>
+                                    <div class="w-7 h-7 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto shadow-2xs" title="Email Channel">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                    </div>
+                                <?php endif; ?>
                             </td>
 
                             <!-- RATING (Compact Stars) -->
-                            <td class="py-3 px-3.5 align-middle font-bold">
+                            <td class="py-2.5 px-3 align-middle font-bold">
                                 <div class="flex items-center gap-1">
-                                    <span class="<?php echo $rating >= 4 ? 'text-emerald-500' : 'text-amber-500'; ?> text-xs tracking-tight">
+                                    <span class="<?php echo $rating >= 4 ? 'text-emerald-500' : 'text-amber-500'; ?> text-xs tracking-tighter">
                                         <?php echo str_repeat( '★', $rating ); ?>
                                     </span>
                                     <span class="text-[10px] text-zinc-500 font-mono font-bold"><?php echo $rating; ?>/5</span>
@@ -313,32 +311,36 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
                             </td>
 
                             <!-- STATUS (Single Line Non-wrapping Pill) -->
-                            <td class="py-3 px-3.5 align-middle">
+                            <td class="py-2.5 px-3 align-middle">
                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold <?php echo $status_bg; ?> inline-flex items-center gap-1.5 whitespace-nowrap">
                                     <span class="w-1.5 h-1.5 rounded-full <?php echo $is_private ? 'bg-amber-500' : 'bg-emerald-500'; ?> shrink-0"></span>
                                     <?php echo esc_html( $status_label ); ?>
                                 </span>
                             </td>
 
-                            <!-- REVIEW SNIPPET / NOTE -->
-                            <td class="py-3 px-3.5 align-middle text-zinc-600 dark:text-zinc-300 leading-normal text-xs max-w-xs" title="<?php echo esc_attr( $req['review_text'] ); ?>">
-                                <span class="text-zinc-400 font-serif mr-1">“</span><?php echo esc_html( $req['review_text'] ); ?>
+                            <!-- REVIEW SNIPPET / NOTE (2-Line Clamped Snippet to prevent row ballooning) -->
+                            <td class="py-2.5 px-3 align-middle text-zinc-600 dark:text-zinc-300 leading-snug text-xs" title="<?php echo esc_attr( $req['review_text'] ); ?>">
+                                <div class="line-clamp-2">
+                                    <span class="text-zinc-400 font-serif mr-1">“</span><?php echo esc_html( $req['review_text'] ); ?>
+                                </div>
                             </td>
 
-                            <!-- ACTIONS (Compact Action Buttons) -->
-                            <td class="py-3 px-3.5 align-middle text-right">
+                            <!-- ACTIONS (Icon-Only Buttons for Space Saving) -->
+                            <td class="py-2.5 px-3 align-middle text-right">
                                 <div class="flex items-center justify-end gap-1.5">
                                     <?php if ( $is_private ) : ?>
-                                        <button type="button" onclick="coraOpenPrivateTicketDrawer('<?php echo esc_js( $req['id'] ); ?>')" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold transition-all cursor-pointer shadow-2xs whitespace-nowrap">
-                                            Inspect Ticket
+                                        <!-- Icon-Only Inspect Ticket Button -->
+                                        <button type="button" onclick="coraOpenPrivateTicketDrawer('<?php echo esc_js( $req['id'] ); ?>')" class="w-7 h-7 rounded-lg bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center transition-all cursor-pointer shadow-2xs shrink-0" title="Inspect Private Reputation Ticket">
+                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                         </button>
                                     <?php else : ?>
-                                        <button type="button" onclick="coraResendWhatsAppReview('<?php echo esc_js( $req['client_phone'] ); ?>', '<?php echo esc_js( $req['client_name'] ); ?>')" class="w-7 h-7 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition-all cursor-pointer shadow-2xs shrink-0" title="Resend via WhatsApp">
-                                            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12.031 2c-5.517 0-9.985 4.468-9.985 9.985 0 1.763.459 3.483 1.332 5.003l-1.417 5.176 5.297-1.388c1.472.803 3.134 1.226 4.773 1.226 5.517 0 9.986-4.468 9.986-9.986 0-5.517-4.469-9.985-9.986-9.985zm0 18.283c-1.498 0-2.966-.402-4.244-1.162l-.305-.181-3.156.827.842-3.076-.199-.316c-.836-1.328-1.278-2.868-1.278-4.39 0-4.568 3.717-8.285 8.285-8.285 4.567 0 8.285 3.717 8.285 8.285 0 4.568-3.718 8.285-8.285 8.285z"/></svg>
+                                        <!-- Icon-Only Resend WhatsApp Button -->
+                                        <button type="button" onclick="coraResendWhatsAppReview('<?php echo esc_js( $req['client_phone'] ); ?>', '<?php echo esc_js( $req['client_name'] ); ?>')" class="w-7 h-7 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition-all cursor-pointer shadow-2xs shrink-0" title="Resend WhatsApp Review Request">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12.031 2c-5.517 0-9.985 4.468-9.985 9.985 0 1.763.459 3.483 1.332 5.003l-1.417 5.176 5.297-1.388c1.472.803 3.134 1.226 4.773 1.226 5.517 0 9.986-4.468 9.986-9.986 0-5.517-4.469-9.985-9.986-9.985zm0 18.283c-1.498 0-2.966-.402-4.244-1.162l-.305-.181-3.156.827.842-3.076-.199-.316c-.836-1.328-1.278-2.868-1.278-4.39 0-4.568 3.717-8.285 8.285-8.285 4.567 0 8.285 3.717 8.285 8.285 0 4.568-3.718 8.285-8.285 8.285z"/></svg>
                                         </button>
-                                        <button type="button" onclick="coraCopyGoogleReviewUrl()" class="px-2.5 py-1 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs shrink-0 whitespace-nowrap">
-                                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                                            Copy Link
+                                        <!-- Icon-Only Copy Review URL Button -->
+                                        <button type="button" onclick="coraCopyGoogleReviewUrl()" class="w-7 h-7 rounded-lg bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-200 flex items-center justify-center transition-all cursor-pointer shadow-2xs shrink-0" title="Copy Google Business Review Link">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                                         </button>
                                     <?php endif; ?>
                                 </div>
@@ -351,7 +353,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
         </div>
 
         <!-- Bottom Reputation Shield Info Banner inside Card -->
-        <div class="p-3.5 bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800 rounded-xl flex items-center justify-between flex-wrap gap-2 text-xs">
+        <div class="p-3 bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800 rounded-xl flex items-center justify-between flex-wrap gap-2 text-xs">
             <div class="flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 <span>Your reputation is protected. 1–3★ feedback is handled privately and used to improve customer experience.</span>

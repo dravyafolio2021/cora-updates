@@ -29,7 +29,7 @@
 ## 3. Branch Activity & Progress Log
 
 ### `main` (Production Base)
-- **Latest Commit**: `b9ac7642` — `fix(reviews): clean up header layout, replace broken floating graphic with sleek rating card, and enforce structured responsive table column alignment`
+- **Latest Commit**: `3bfff0f1` — `style(reviews): integrate official Google & WhatsApp SVG icons, compact table row spacing, and enforce single-line status badge wrapping`
 - **Health**: 100% Operational & Clean Working Tree.
 
 <!-- BRANCH_LOGS_START -->
