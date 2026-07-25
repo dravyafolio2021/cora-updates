@@ -19692,6 +19692,149 @@ function cora_ajax_disconnect_google_drive() {
     wp_send_json_success( [ 'message' => 'Google Drive disconnected. Your local backups are still safe.' ] );
 }
 
+/**
+ * AJAX Action: Save New Review Request
+ */
+add_action( 'wp_ajax_cora_save_review_request', 'cora_ajax_save_review_request' );
+function cora_ajax_save_review_request() {
+    $nonce = $_REQUEST['nonce'] ?? '';
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+        wp_send_json_error( [ 'message' => 'Security verification failed.' ] );
+    }
+    if ( ! is_user_logged_in() ) wp_send_json_error( [ 'message' => 'Unauthorized.' ] );
+
+    $name    = sanitize_text_field( $_POST['client_name'] ?? '' );
+    $phone   = sanitize_text_field( $_POST['client_phone'] ?? '' );
+    $email   = sanitize_email( $_POST['client_email'] ?? '' );
+    $cat     = sanitize_text_field( $_POST['category'] ?? 'Studio Photography' );
+    $channel = sanitize_text_field( $_POST['channel'] ?? 'WhatsApp' );
+    $snippet = sanitize_textarea_field( $_POST['snippet'] ?? '' );
+
+    if ( empty( $name ) || ( empty( $phone ) && empty( $email ) ) ) {
+        wp_send_json_error( [ 'message' => 'Client name and at least phone or email are required.' ] );
+    }
+
+    $requests = get_option( 'cora_review_requests', [] );
+    $new_id   = 'rev_' . time() . '_' . wp_rand( 100, 999 );
+
+    $entry = [
+        'id'            => $new_id,
+        'client_name'   => $name,
+        'client_phone'  => $phone,
+        'client_email'  => $email,
+        'project_title' => $cat . ' Service',
+        'category'      => $cat,
+        'status'        => 'Pending Dispatch',
+        'rating'        => 5,
+        'review_text'   => $snippet ?: 'Automated review request sent.',
+        'is_private'    => false,
+        'sent_at'       => current_time( 'Y-m-d H:i' ),
+        'responded_at'  => '',
+        'channel'       => $channel,
+    ];
+
+    array_unshift( $requests, $entry );
+    update_option( 'cora_review_requests', $requests );
+    cora_log_activity( 'Reviews & Feedback', 'Created new review request for ' . $name . ' via ' . $channel );
+
+    wp_send_json_success( [ 'message' => 'Review request created successfully!', 'entry' => $entry ] );
+}
+
+/**
+ * AJAX Action: Resolve Private Reputation Ticket
+ */
+add_action( 'wp_ajax_cora_resolve_review_ticket', 'cora_ajax_resolve_review_ticket' );
+function cora_ajax_resolve_review_ticket() {
+    $nonce = $_REQUEST['nonce'] ?? '';
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+        wp_send_json_error( [ 'message' => 'Security verification failed.' ] );
+    }
+
+    $ticket_id = sanitize_text_field( $_POST['ticket_id'] ?? '' );
+    $note      = sanitize_textarea_field( $_POST['note'] ?? '' );
+    $convert   = ! empty( $_POST['convert_to_public'] );
+
+    $requests = get_option( 'cora_review_requests', [] );
+    $updated  = false;
+
+    foreach ( $requests as &$req ) {
+        if ( ( $req['id'] ?? '' ) === $ticket_id ) {
+            $req['ticket_status']   = 'Resolved Internally';
+            $req['resolution_note'] = $note;
+            if ( $convert ) {
+                $req['is_private'] = false;
+                $req['status']     = 'Google 5-Star Published';
+                $req['rating']     = 5;
+            }
+            $updated = true;
+            break;
+        }
+    }
+
+    if ( $updated ) {
+        update_option( 'cora_review_requests', $requests );
+        cora_log_activity( 'Reviews & Feedback', 'Resolved private reputation ticket: ' . $ticket_id );
+        wp_send_json_success( [ 'message' => 'Private reputation ticket resolved successfully!' ] );
+    }
+
+    wp_send_json_error( [ 'message' => 'Ticket not found.' ] );
+}
+
+/**
+ * AJAX Action: Save Reviews Automation Settings
+ */
+add_action( 'wp_ajax_cora_save_review_settings', 'cora_ajax_save_review_settings' );
+function cora_ajax_save_review_settings() {
+    $nonce = $_REQUEST['nonce'] ?? '';
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+        wp_send_json_error( [ 'message' => 'Security verification failed.' ] );
+    }
+
+    if ( isset( $_POST['google_url'] ) ) update_option( 'cora_google_business_url', esc_url_raw( $_POST['google_url'] ) );
+    if ( isset( $_POST['wa_template'] ) ) update_option( 'cora_wa_review_template', sanitize_textarea_field( $_POST['wa_template'] ) );
+    if ( isset( $_POST['email_template'] ) ) update_option( 'cora_email_review_template', sanitize_textarea_field( $_POST['email_template'] ) );
+    if ( isset( $_POST['auto_trigger'] ) ) update_option( 'cora_review_auto_trigger', intval( $_POST['auto_trigger'] ) );
+
+    cora_log_activity( 'Reviews & Feedback', 'Updated Google Business URL & multi-channel triggers' );
+    wp_send_json_success( [ 'message' => 'Automation settings saved successfully!' ] );
+}
+
+/**
+ * AJAX Action: Generate & Email Review Performance Report
+ */
+add_action( 'wp_ajax_cora_generate_review_report', 'cora_ajax_generate_review_report' );
+function cora_ajax_generate_review_report() {
+    $nonce = $_REQUEST['nonce'] ?? '';
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+        wp_send_json_error( [ 'message' => 'Security verification failed.' ] );
+    }
+
+    $period   = sanitize_text_field( $_POST['period'] ?? '30_days' );
+    $requests = get_option( 'cora_review_requests', [] );
+    $total    = count( $requests );
+    $published = 0;
+    $intercepted = 0;
+
+    foreach ( $requests as $r ) {
+        if ( ( $r['status'] ?? '' ) === 'Google Reviewed' || ( $r['rating'] ?? 0 ) >= 4 ) $published++;
+        else $intercepted++;
+    }
+
+    $conv_rate = $total > 0 ? round( ( $published / $total ) * 100, 1 ) : 100;
+    $summary = [
+        'period'           => $period,
+        'total_requests'   => $total,
+        'published_5star'  => $published,
+        'private_shield'   => $intercepted,
+        'conversion_rate'  => $conv_rate . '%',
+        'generated_at'     => current_time( 'Y-m-d H:i:s' ),
+    ];
+
+    cora_log_activity( 'Reviews & Feedback', 'Generated review performance report (' . $period . ')' );
+    wp_send_json_success( [ 'message' => 'Review performance report generated successfully!', 'report' => $summary ] );
+}
+
+
 
 // ══════════════════════════════════════════════════════════════════════════════
 // ██  USER ONBOARDING MODULE — v1.1.0
