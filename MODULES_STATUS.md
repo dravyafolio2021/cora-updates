@@ -29,7 +29,7 @@
 ## 3. Branch Activity & Progress Log
 
 ### `main` (Production Base)
-- **Latest Commit**: `3bfff0f1` — `style(reviews): integrate official Google & WhatsApp SVG icons, compact table row spacing, and enforce single-line status badge wrapping`
+- **Latest Commit**: `16da1cf4` — `style(reviews): replace text buttons with icon-only actions, channel text with SVG icon badges, and line-clamp review snippets for compact row height`
 - **Health**: 100% Operational & Clean Working Tree.
 
 <!-- BRANCH_LOGS_START -->

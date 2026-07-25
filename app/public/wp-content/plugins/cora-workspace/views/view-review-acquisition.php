@@ -122,7 +122,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
         </div>
     </div>
 
-    <!-- 4 KPI Metrics Cards Grid with Official Icons & Compact Spacing -->
+    <!-- 4 KPI Metrics Cards Grid with Official Brand Logos & Compact Spacing -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         <!-- Card 1: Total Requests Sent -->
         <div class="cora-shopify-card p-4 space-y-2.5 relative overflow-hidden shadow-2xs">
@@ -220,7 +220,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
     </div>
 
     <!-- ═════════════════════════════════════════════════════════════════════
-         TAB 1: REVIEW REQUESTS & REPUTATION FEED (ULTRA-COMPACT & ICON-ONLY ACTIONS)
+         TAB 1: REVIEW REQUESTS & REPUTATION FEED (ULTRA-COMPACT WITH OFFICIAL BRAND LOGOS)
          ═════════════════════════════════════════════════════════════════════ -->
     <div id="cora-rev-panel-tracker" class="cora-shopify-card space-y-4 p-5">
         <!-- Top Title & Filter Bar -->
@@ -238,7 +238,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
             </div>
         </div>
 
-        <!-- Feed Table Container — Ultra Compact & Icon-Only Buttons -->
+        <!-- Feed Table Container — Ultra Compact with Official Brand Logos -->
         <div class="border border-zinc-200/80 dark:border-zinc-800 rounded-xl overflow-hidden shadow-2xs bg-white dark:bg-zinc-955">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs min-w-[720px]">
@@ -248,7 +248,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
                             <th class="py-2.5 px-3 w-[130px]">CATEGORY</th>
                             <th class="py-2.5 px-3 w-[60px] text-center">CHANNEL</th>
                             <th class="py-2.5 px-3 w-[85px]">RATING</th>
-                            <th class="py-2.5 px-3 w-[145px]">STATUS</th>
+                            <th class="py-2.5 px-3 w-[155px]">STATUS</th>
                             <th class="py-2.5 px-3">REVIEW SNIPPET / NOTE</th>
                             <th class="py-2.5 px-3 text-right w-[90px]">ACTIONS</th>
                         </tr>
@@ -283,19 +283,26 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
                                 <?php echo esc_html( $req['category'] ); ?>
                             </td>
 
-                            <!-- CHANNEL (Official Brand Icon Badge - Space Saving Icon Only) -->
+                            <!-- CHANNEL (Official Brand WhatsApp & SMS Logos) -->
                             <td class="py-2.5 px-3 align-middle text-center">
                                 <?php if ( $channel_type === 'whatsapp' ) : ?>
-                                    <div class="w-7 h-7 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-2xs" title="WhatsApp Channel">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12.031 2c-5.517 0-9.985 4.468-9.985 9.985 0 1.763.459 3.483 1.332 5.003l-1.417 5.176 5.297-1.388c1.472.803 3.134 1.226 4.773 1.226 5.517 0 9.986-4.468 9.986-9.986 0-5.517-4.469-9.985-9.986-9.985zm0 18.283c-1.498 0-2.966-.402-4.244-1.162l-.305-.181-3.156.827.842-3.076-.199-.316c-.836-1.328-1.278-2.868-1.278-4.39 0-4.568 3.717-8.285 8.285-8.285 4.567 0 8.285 3.717 8.285 8.285 0 4.568-3.718 8.285-8.285 8.285z"/></svg>
+                                    <!-- Official WhatsApp Brand Icon Badge -->
+                                    <div class="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center mx-auto shadow-sm cursor-pointer hover:scale-105 transition-all" title="WhatsApp Channel">
+                                        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+                                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.285-.143-1.687-.832-1.947-.927-.26-.095-.45-.143-.64.143-.19.285-.735.927-.9 1.117-.165.19-.33.214-.615.071-.285-.143-1.204-.444-2.294-1.416-.848-.756-1.421-1.69-1.587-1.975-.166-.285-.018-.439.125-.581.128-.128.285-.333.428-.5.143-.167.19-.285.285-.476.095-.19.047-.357-.024-.5-.071-.143-.64-1.545-.877-2.116-.231-.557-.466-.481-.64-.49-.165-.008-.356-.01-.547-.01-.19 0-.5.071-.76.357-.26.285-.999.976-.999 2.38 0 1.404 1.023 2.76 1.165 2.951.143.19 2.013 3.074 4.877 4.31.682.295 1.214.471 1.629.603.685.218 1.309.187 1.802.114.549-.081 1.687-.689 1.924-1.355.237-.666.237-1.237.166-1.355-.07-.119-.26-.19-.545-.333z"/>
+                                        </svg>
                                     </div>
                                 <?php elseif ( $channel_type === 'sms' ) : ?>
-                                    <div class="w-7 h-7 rounded-full bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto shadow-2xs" title="SMS Channel">
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                    <!-- Official SMS Text Icon Badge -->
+                                    <div class="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center mx-auto shadow-sm cursor-pointer hover:scale-105 transition-all" title="SMS Text Channel">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                                            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 11H7V9h2v2zm4 0h-2V9h2v2zm4 0h-2V9h2v2z"/>
+                                        </svg>
                                     </div>
                                 <?php else : ?>
-                                    <div class="w-7 h-7 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto shadow-2xs" title="Email Channel">
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                    <!-- Official Email Icon Badge -->
+                                    <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center mx-auto shadow-sm cursor-pointer hover:scale-105 transition-all" title="Email Channel">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                                     </div>
                                 <?php endif; ?>
                             </td>
@@ -310,37 +317,52 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
                                 </div>
                             </td>
 
-                            <!-- STATUS (Single Line Non-wrapping Pill) -->
+                            <!-- STATUS (With Official Google 4-Color Logo & Official Shield) -->
                             <td class="py-2.5 px-3 align-middle">
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold <?php echo $status_bg; ?> inline-flex items-center gap-1.5 whitespace-nowrap">
-                                    <span class="w-1.5 h-1.5 rounded-full <?php echo $is_private ? 'bg-amber-500' : 'bg-emerald-500'; ?> shrink-0"></span>
-                                    <?php echo esc_html( $status_label ); ?>
-                                </span>
+                                <?php if ( ! $is_private ) : ?>
+                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/70 dark:border-emerald-800/60 inline-flex items-center gap-1.5 whitespace-nowrap shadow-2xs">
+                                        <!-- Official Google G Logo -->
+                                        <svg viewBox="0 0 24 24" width="12" height="12" class="shrink-0">
+                                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                                        </svg>
+                                        Google 5-Star Published
+                                    </span>
+                                <?php else : ?>
+                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200/70 dark:border-amber-800/60 inline-flex items-center gap-1.5 whitespace-nowrap shadow-2xs">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-amber-500 shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                        Private Shield Intercepted
+                                    </span>
+                                <?php endif; ?>
                             </td>
 
-                            <!-- REVIEW SNIPPET / NOTE (2-Line Clamped Snippet to prevent row ballooning) -->
+                            <!-- REVIEW SNIPPET / NOTE (2-Line Clamped Snippet) -->
                             <td class="py-2.5 px-3 align-middle text-zinc-600 dark:text-zinc-300 leading-snug text-xs" title="<?php echo esc_attr( $req['review_text'] ); ?>">
                                 <div class="line-clamp-2">
                                     <span class="text-zinc-400 font-serif mr-1">“</span><?php echo esc_html( $req['review_text'] ); ?>
                                 </div>
                             </td>
 
-                            <!-- ACTIONS (Icon-Only Buttons for Space Saving) -->
+                            <!-- ACTIONS (Official Brand WhatsApp Button & Link Button) -->
                             <td class="py-2.5 px-3 align-middle text-right">
                                 <div class="flex items-center justify-end gap-1.5">
                                     <?php if ( $is_private ) : ?>
                                         <!-- Icon-Only Inspect Ticket Button -->
-                                        <button type="button" onclick="coraOpenPrivateTicketDrawer('<?php echo esc_js( $req['id'] ); ?>')" class="w-7 h-7 rounded-lg bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center transition-all cursor-pointer shadow-2xs shrink-0" title="Inspect Private Reputation Ticket">
-                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                        <button type="button" onclick="coraOpenPrivateTicketDrawer('<?php echo esc_js( $req['id'] ); ?>')" class="w-8 h-8 rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center transition-all cursor-pointer shadow-sm shrink-0" title="Inspect Private Reputation Ticket">
+                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                         </button>
                                     <?php else : ?>
-                                        <!-- Icon-Only Resend WhatsApp Button -->
-                                        <button type="button" onclick="coraResendWhatsAppReview('<?php echo esc_js( $req['client_phone'] ); ?>', '<?php echo esc_js( $req['client_name'] ); ?>')" class="w-7 h-7 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition-all cursor-pointer shadow-2xs shrink-0" title="Resend WhatsApp Review Request">
-                                            <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12.031 2c-5.517 0-9.985 4.468-9.985 9.985 0 1.763.459 3.483 1.332 5.003l-1.417 5.176 5.297-1.388c1.472.803 3.134 1.226 4.773 1.226 5.517 0 9.986-4.468 9.986-9.986 0-5.517-4.469-9.985-9.986-9.985zm0 18.283c-1.498 0-2.966-.402-4.244-1.162l-.305-.181-3.156.827.842-3.076-.199-.316c-.836-1.328-1.278-2.868-1.278-4.39 0-4.568 3.717-8.285 8.285-8.285 4.567 0 8.285 3.717 8.285 8.285 0 4.568-3.718 8.285-8.285 8.285z"/></svg>
+                                        <!-- Official WhatsApp Brand Icon Button -->
+                                        <button type="button" onclick="coraResendWhatsAppReview('<?php echo esc_js( $req['client_phone'] ); ?>', '<?php echo esc_js( $req['client_name'] ); ?>')" class="w-8 h-8 rounded-full bg-[#25D366] hover:bg-emerald-600 text-white flex items-center justify-center transition-all cursor-pointer shadow-sm shrink-0" title="Resend WhatsApp Review Request">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+                                                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.285-.143-1.687-.832-1.947-.927-.26-.095-.45-.143-.64.143-.19.285-.735.927-.9 1.117-.165.19-.33.214-.615.071-.285-.143-1.204-.444-2.294-1.416-.848-.756-1.421-1.69-1.587-1.975-.166-.285-.018-.439.125-.581.128-.128.285-.333.428-.5.143-.167.19-.285.285-.476.095-.19.047-.357-.024-.5-.071-.143-.64-1.545-.877-2.116-.231-.557-.466-.481-.64-.49-.165-.008-.356-.01-.547-.01-.19 0-.5.071-.76.357-.26.285-.999.976-.999 2.38 0 1.404 1.023 2.76 1.165 2.951.143.19 2.013 3.074 4.877 4.31.682.295 1.214.471 1.629.603.685.218 1.309.187 1.802.114.549-.081 1.687-.689 1.924-1.355.237-.666.237-1.237.166-1.355-.07-.119-.26-.19-.545-.333z"/>
+                                            </svg>
                                         </button>
-                                        <!-- Icon-Only Copy Review URL Button -->
-                                        <button type="button" onclick="coraCopyGoogleReviewUrl()" class="w-7 h-7 rounded-lg bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-200 flex items-center justify-center transition-all cursor-pointer shadow-2xs shrink-0" title="Copy Google Business Review Link">
-                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                                        <!-- Official Copy Link Icon Button -->
+                                        <button type="button" onclick="coraCopyGoogleReviewUrl()" class="w-8 h-8 rounded-full bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-200 flex items-center justify-center transition-all cursor-pointer shadow-sm shrink-0" title="Copy Google Business Review Link">
+                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                                         </button>
                                     <?php endif; ?>
                                 </div>
