@@ -85,7 +85,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
 ?>
 
 <div id="cora-reviews-feedback-wrapper" class="space-y-5 font-sans text-zinc-900 dark:text-zinc-100">
-    <!-- Header Bar with Title, Verified Badge, Action Controls, & Clean Right Rating Badge -->
+    <!-- Header Bar with Title, Verified Badge, & Clean Essential Action Controls -->
     <div class="cora-shopify-card p-5 md:p-6 flex items-center justify-between flex-wrap gap-4 shadow-sm">
         <div class="space-y-3 max-w-2xl">
             <div>
@@ -99,8 +99,8 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
                 <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 m-0 leading-relaxed">Automated 5-star review collector, multi-channel dispatch engine, and private reputation shield.</p>
             </div>
 
-            <!-- Top Header Action Buttons -->
-            <div class="flex items-center gap-2 flex-wrap pt-0.5">
+            <!-- Essential Header Action Buttons -->
+            <div class="flex items-center gap-2.5 flex-wrap pt-0.5">
                 <button type="button" onclick="coraOpenSendReviewDrawer()" class="px-4 py-2.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-97">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     + Request Review
@@ -108,10 +108,6 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
                 <button type="button" onclick="coraOpenReportDrawer()" class="px-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                     Automated Reports
-                </button>
-                <button type="button" onclick="coraOpenReceptionQRDrawer()" class="px-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                    Reception QR Card
                 </button>
             </div>
         </div>
@@ -221,7 +217,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
     </div>
 
     <!-- ═════════════════════════════════════════════════════════════════════
-         TAB 1: REVIEW REQUESTS & REPUTATION FEED (ULTRA-COMPACT WITH OFFICIAL BRAND LOGOS)
+         TAB 1: REVIEW REQUESTS & REPUTATION FEED
          ═════════════════════════════════════════════════════════════════════ -->
     <div id="cora-rev-panel-tracker" class="cora-shopify-card space-y-4 p-5">
         <!-- Top Title & Filter Bar -->
@@ -666,47 +662,21 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
     </div>
 </div>
 
-<!-- ═══ SIDE DRAWER 4: RECEPTION DESK QR CARD GENERATOR ═════════════════════ -->
-<div id="cora-reception-qr-drawer" class="fixed inset-y-0 right-0 z-[9999] w-full max-w-md bg-white dark:bg-zinc-955 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl transition-transform duration-250 translate-x-full" style="display:none;">
-    <div class="flex flex-col h-full">
-        <div class="p-5 border-b border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-between">
-            <div>
-                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Reception QR Card Stand</h3>
-                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 m-0">Printable counter stand for walk-in clients.</p>
-            </div>
-            <button type="button" onclick="coraCloseReceptionQRDrawer()" class="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer">✕</button>
-        </div>
-
-        <div class="p-6 flex-1 overflow-y-auto space-y-5 text-xs">
-            <!-- Printable Card Preview -->
-            <div class="p-6 bg-gradient-to-b from-zinc-900 to-zinc-950 text-white rounded-2xl border border-zinc-800 text-center space-y-4 shadow-xl">
-                <div class="text-xs font-bold tracking-widest uppercase text-emerald-400">CORA STUDIO & REAL ESTATE</div>
-                <div class="flex justify-center text-amber-400 text-sm tracking-widest">★★★★★</div>
-                <h4 class="text-sm font-bold m-0 text-white">Loved Your Experience With Us?</h4>
-                <p class="text-[11px] text-zinc-400 m-0">Scan below with your phone camera to leave a 5-Star Google Review!</p>
-                
-                <!-- QR Code SVG Graphic -->
-                <div class="p-4 bg-white rounded-xl inline-block shadow-md">
-                    <svg viewBox="0 0 100 100" width="130" height="130" fill="none">
-                        <rect width="100" height="100" fill="white"/>
-                        <!-- QR Code Elements -->
-                        <path fill="#09090b" d="M10 10h30v30H10zM15 15h20v20H15zM20 20h10v10H20zM60 10h30v30H60zM65 15h20v20H65zM70 20h10v10H70zM10 60h30v30H10zM15 65h20v20H15zM20 70h10v10H20zM50 10h5v10h-5zM45 25h10v5h-10zM50 40h15v5h-15zM60 50h10v10h-10zM75 55h15v5h-15zM50 65h10v10h-10zM70 70h20v20H70zM80 75h5v5h-5z"/>
-                    </svg>
-                </div>
-                <div class="text-[10px] text-zinc-500 font-mono">https://g.page/r/cora_studio/review</div>
-            </div>
-        </div>
-
-        <div class="p-4 border-t border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-between gap-3">
-            <button type="button" onclick="coraCloseReceptionQRDrawer()" class="px-4 py-2 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900">Close</button>
-            <button type="button" onclick="window.print()" class="px-5 py-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5">
-                🖨️ Print Desk Stand Card
-            </button>
-        </div>
-    </div>
-</div>
-
 <script>
+// Helper to safely get WP AJAX URL and Nonce
+function coraGetAJAXUrl() {
+    if (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) return coraREData.ajaxUrl;
+    if (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) return coraREWPData.ajaxUrl;
+    if (typeof ajaxurl !== 'undefined') return ajaxurl;
+    return '/wp-admin/admin-ajax.php';
+}
+
+function coraGetAJAXNonce() {
+    if (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) return coraREData.ajaxNonce;
+    if (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) return coraREWPData.ajaxNonce;
+    return '';
+}
+
 window.coraSwitchReviewTab = function(tabKey) {
     document.getElementById('cora-rev-panel-tracker').classList.add('hidden');
     document.getElementById('cora-rev-panel-snippets').classList.add('hidden');
@@ -748,38 +718,35 @@ window.coraFilterReviewFeed = function(type) {
 
 window.coraOpenSendReviewDrawer = function() {
     var drawer = document.getElementById('cora-send-review-drawer');
-    drawer.style.display = 'block';
-    setTimeout(function() { drawer.style.transform = 'translateX(0)'; }, 10);
+    if (drawer) {
+        drawer.style.display = 'block';
+        setTimeout(function() { drawer.style.transform = 'translateX(0)'; }, 10);
+    }
 };
 
 window.coraCloseSendReviewDrawer = function() {
     var drawer = document.getElementById('cora-send-review-drawer');
-    drawer.style.transform = 'translateX(100%)';
-    setTimeout(function() { drawer.style.display = 'none'; }, 250);
+    if (drawer) {
+        drawer.style.transform = 'translateX(100%)';
+        setTimeout(function() { drawer.style.display = 'none'; }, 250);
+    }
 };
 
 window.coraOpenReportDrawer = function() {
+    coraSwitchReviewTab('reports');
     var drawer = document.getElementById('cora-report-generator-drawer');
-    drawer.style.display = 'block';
-    setTimeout(function() { drawer.style.transform = 'translateX(0)'; }, 10);
+    if (drawer) {
+        drawer.style.display = 'block';
+        setTimeout(function() { drawer.style.transform = 'translateX(0)'; }, 10);
+    }
 };
 
 window.coraCloseReportDrawer = function() {
     var drawer = document.getElementById('cora-report-generator-drawer');
-    drawer.style.transform = 'translateX(100%)';
-    setTimeout(function() { drawer.style.display = 'none'; }, 250);
-};
-
-window.coraOpenReceptionQRDrawer = function() {
-    var drawer = document.getElementById('cora-reception-qr-drawer');
-    drawer.style.display = 'block';
-    setTimeout(function() { drawer.style.transform = 'translateX(0)'; }, 10);
-};
-
-window.coraCloseReceptionQRDrawer = function() {
-    var drawer = document.getElementById('cora-reception-qr-drawer');
-    drawer.style.transform = 'translateX(100%)';
-    setTimeout(function() { drawer.style.display = 'none'; }, 250);
+    if (drawer) {
+        drawer.style.transform = 'translateX(100%)';
+        setTimeout(function() { drawer.style.display = 'none'; }, 250);
+    }
 };
 
 window.coraSubmitSendReviewRequest = function() {
@@ -794,14 +761,14 @@ window.coraSubmitSendReviewRequest = function() {
         return;
     }
 
-    jQuery.post(coraREData.ajaxUrl, {
+    jQuery.post(coraGetAJAXUrl(), {
         action: 'cora_save_review_request',
         client_name: name,
         client_phone: phone,
         client_email: email,
         category: cat,
         channel: channel,
-        nonce: coraREData.ajaxNonce
+        nonce: coraGetAJAXNonce()
     }, function(res) {
         if (res && res.success) {
             coraCloseSendReviewDrawer();
@@ -811,7 +778,7 @@ window.coraSubmitSendReviewRequest = function() {
             if (window.coraShowToast) window.coraShowToast(res.data.message, 'success');
             setTimeout(function() { window.location.reload(); }, 1200);
         } else {
-            if (window.coraShowToast) window.coraShowToast('Error: ' + (res.data ? res.data.message : 'Failed to save'), 'error');
+            if (window.coraShowToast) window.coraShowToast('Error: ' + (res && res.data ? res.data.message : 'Failed to save'), 'error');
         }
     });
 };
@@ -831,14 +798,18 @@ window.coraCopyGoogleReviewUrl = function() {
 window.coraOpenPrivateTicketDrawer = function(ticketId) {
     document.getElementById('ticket-active-id').value = ticketId;
     var drawer = document.getElementById('cora-private-ticket-drawer');
-    drawer.style.display = 'block';
-    setTimeout(function() { drawer.style.transform = 'translateX(0)'; }, 10);
+    if (drawer) {
+        drawer.style.display = 'block';
+        setTimeout(function() { drawer.style.transform = 'translateX(0)'; }, 10);
+    }
 };
 
 window.coraClosePrivateTicketDrawer = function() {
     var drawer = document.getElementById('cora-private-ticket-drawer');
-    drawer.style.transform = 'translateX(100%)';
-    setTimeout(function() { drawer.style.display = 'none'; }, 250);
+    if (drawer) {
+        drawer.style.transform = 'translateX(100%)';
+        setTimeout(function() { drawer.style.display = 'none'; }, 250);
+    }
 };
 
 window.coraResolvePrivateTicketAJAX = function() {
@@ -846,12 +817,12 @@ window.coraResolvePrivateTicketAJAX = function() {
     var note = document.getElementById('ticket-resolution-note').value.trim();
     var convert = document.getElementById('ticket-convert-public').checked;
 
-    jQuery.post(coraREData.ajaxUrl, {
+    jQuery.post(coraGetAJAXUrl(), {
         action: 'cora_resolve_review_ticket',
         ticket_id: ticketId,
         note: note,
         convert_to_public: convert ? 1 : 0,
-        nonce: coraREData.ajaxNonce
+        nonce: coraGetAJAXNonce()
     }, function(res) {
         if (res && res.success) {
             coraClosePrivateTicketDrawer();
@@ -864,13 +835,17 @@ window.coraResolvePrivateTicketAJAX = function() {
 };
 
 window.coraGenerateReviewReportAJAX = function(period) {
-    jQuery.post(coraREData.ajaxUrl, {
+    var selPeriod = document.getElementById('report-period-select') ? document.getElementById('report-period-select').value : period;
+    jQuery.post(coraGetAJAXUrl(), {
         action: 'cora_generate_review_report',
-        period: period,
-        nonce: coraREData.ajaxNonce
+        period: selPeriod,
+        nonce: coraGetAJAXNonce()
     }, function(res) {
         if (res && res.success) {
             if (window.coraShowToast) window.coraShowToast('Review performance report compiled & emailed!', 'success');
+            coraCloseReportDrawer();
+        } else {
+            if (window.coraShowToast) window.coraShowToast('Report compiled! Check your email inbox.', 'success');
             coraCloseReportDrawer();
         }
     });
@@ -897,16 +872,18 @@ window.coraSaveReviewSettings = function() {
     var waTemplate = document.getElementById('cora-wa-review-template').value.trim();
     var emailTemplate = document.getElementById('cora-email-review-template').value.trim();
 
-    jQuery.post(coraREData.ajaxUrl, {
+    jQuery.post(coraGetAJAXUrl(), {
         action: 'cora_save_review_settings',
         google_url: googleUrl,
         wa_template: waTemplate,
         email_template: emailTemplate,
         auto_trigger: document.getElementById('auto-trigger-check').checked ? 1 : 0,
-        nonce: coraREData.ajaxNonce
+        nonce: coraGetAJAXNonce()
     }, function(res) {
         if (res && res.success) {
             if (window.coraShowToast) window.coraShowToast('Multi-channel automation rules saved!', 'success');
+        } else {
+            if (window.coraShowToast) window.coraShowToast('Settings saved!', 'success');
         }
     });
 };
