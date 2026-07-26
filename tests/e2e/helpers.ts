@@ -3,7 +3,11 @@ import { Page } from '@playwright/test';
 export async function login(page: Page) {
   await page.goto('/wp-login.php');
   // If already logged in and redirected to wp-admin or workspace, return immediately
-  if (page.url().includes('/wp-admin') || page.url().includes('/workspace')) {
+  const isDocWorkspace = (urlStr: string) => {
+    return urlStr.includes('/wp-admin') || (urlStr.includes('/workspace') && !urlStr.includes('/login') && !urlStr.includes('/register') && !urlStr.includes('/forgot-password') && !urlStr.includes('/reset-password'));
+  };
+
+  if (isDocWorkspace(page.url())) {
     await page.evaluate(() => {
       localStorage.setItem('cora_re_tour_completed', 'true');
       localStorage.setItem('cora_studio_tour_completed', 'true');
@@ -11,16 +15,26 @@ export async function login(page: Page) {
     return;
   }
   try {
-    await page.waitForSelector('#user_login', { timeout: 5000 });
-    await page.evaluate(() => {
-      const u = document.querySelector('#user_login') as HTMLInputElement;
-      const p = document.querySelector('#user_pass') as HTMLInputElement;
-      if (u) u.value = 'cora_admin';
-      if (p) p.value = 'cora_secure_pass_123';
-    });
-    await page.click('#wp-submit');
+    // Wait for either the custom login input or default WordPress login input to appear
+    await Promise.race([
+      page.waitForSelector('#login-email', { timeout: 10000 }),
+      page.waitForSelector('#user_login', { timeout: 10000 })
+    ]);
+    
+    const customEmail = await page.$('#login-email');
+    if (customEmail) {
+      // Custom login page
+      await page.fill('#login-email', 'admin@cora.local');
+      await page.fill('#login-password', 'cora_secure_pass_123');
+      await page.click('#login-btn');
+    } else {
+      // Default WordPress login page
+      await page.fill('#user_login', 'cora_admin');
+      await page.fill('#user_pass', 'cora_secure_pass_123');
+      await page.click('#wp-submit');
+    }
   } catch (e) {
-    if (page.url().includes('/wp-admin') || page.url().includes('/workspace')) {
+    if (isDocWorkspace(page.url())) {
       await page.evaluate(() => {
         localStorage.setItem('cora_re_tour_completed', 'true');
         localStorage.setItem('cora_studio_tour_completed', 'true');
@@ -29,7 +43,7 @@ export async function login(page: Page) {
     }
     throw e;
   }
-  await page.waitForURL(url => url.pathname.includes('/wp-admin') || url.pathname.includes('/workspace'));
+  await page.waitForURL(url => isDocWorkspace(url.href), { timeout: 20000 });
   await page.evaluate(() => {
     localStorage.setItem('cora_re_tour_completed', 'true');
     localStorage.setItem('cora_studio_tour_completed', 'true');

@@ -23,12 +23,15 @@ test.describe('Cora Forms Security & AI Compatibility E2E tests', () => {
     await page.fill('#editor-form-title', testFormTitle);
     await page.selectOption('#editor-form-status', 'published');
 
-    // Save initial form to generate database records (saves & auto-redirects to #list)
+    // Save initial form to generate database records (saves & keeps editor open)
     await page.click('#btn-save-form');
-    await expect(page.locator('#cora-toast-container')).toContainText('Form saved');
+    await expect(page.locator('#cora-toast-container')).toContainText('Form published successfully');
     await page.waitForLoadState('networkidle');
 
-    // Verify we are back on the forms list state automatically
+    // Go back to the forms list manually
+    await page.click('#btn-back-to-list');
+
+    // Verify we are back on the forms list state
     await page.waitForSelector('#forms-list-state:not(.hidden)', { state: 'visible' });
 
     // Fetch the form ID from table row list card to test REST endpoints

@@ -1558,8 +1558,8 @@ jQuery(document).ready(function($) {
             });
         });
 
-        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'shifts', 'vault'];
-        permissions['administrator'] = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'ecosystem', 'mcp', 'super-admin', ...enterpriseNewModules];
+        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'shifts', 'vault', 'emails'];
+        permissions['administrator'] = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'emails', 'ecosystem', 'mcp', 'super-admin', ...enterpriseNewModules];
         permissions['cora_super_admin'] = permissions['administrator'];
         permissions['cora_shruti'] = permissions['administrator'];
 
@@ -2637,7 +2637,7 @@ jQuery(document).ready(function($) {
 
     // Role Enforcement capability controller
     window.coraEnforcePermissions = function(role) {
-        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'shifts', 'vault'];
+        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'shifts', 'vault', 'emails'];
         let allowed = (coraREData.userPermissions && coraREData.userPermissions[role]) ? coraREData.userPermissions[role] : [];
         
         if (!allowed || allowed.length === 0) {
@@ -2645,7 +2645,7 @@ jQuery(document).ready(function($) {
         }
 
         if (role === 'administrator' || role === 'cora_super_admin' || role === 'cora_shruti' || role === 'cora_owner' || true) {
-            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'ecosystem', 'mcp', 'super-admin', ...enterpriseNewModules];
+            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'emails', 'ecosystem', 'mcp', 'super-admin', ...enterpriseNewModules];
         }
 
         // Hide/show financial details based on role permissions
@@ -8517,6 +8517,7 @@ jQuery(document).ready(function($) {
                         window.coraSetLanguage(newLang, false);
                     }
                 }
+                if (window.coraApplyBrandingLive) window.coraApplyBrandingLive();
                 window.coraShowToast(res.data.message || "Global system settings updated successfully.");
             } else {
                 window.coraShowToast("Error: " + (res.data && res.data.message ? res.data.message : "Failed to update settings."));
@@ -8525,6 +8526,48 @@ jQuery(document).ready(function($) {
             window.coraShowToast("Server error occurred while updating settings.");
         });
     };
+
+    window.coraApplyBrandingLive = function() {
+        const form = $('#cora-settings-suite-form');
+        const blogname = form.find('input[name="blogname"]').val();
+        const faviconUrl = form.find('input[name="cora_brand_favicon_url"]').val();
+        const logoUrl = form.find('input[name="cora_brand_logo_url"]').val();
+        const sidebarTitle = form.find('input[name="cora_sidebar_title"]').val();
+
+        if (blogname !== undefined) {
+            document.title = document.title.split(' - ')[0] + ' - ' + blogname;
+            const template = form.find('input[disabled]');
+            if(template.length) {
+                template.val('[Page Name] - ' + blogname);
+            }
+        }
+        
+        if (faviconUrl) {
+            let link = document.querySelector('link[rel="shortcut icon"]');
+            if (!link) {
+                link = document.createElement('link');
+                link.id = 'cora-dynamic-favicon';
+                link.rel = 'shortcut icon';
+                document.head.appendChild(link);
+            }
+            link.href = faviconUrl;
+        }
+
+        if (logoUrl) {
+            const logoImg = $('#cora-sidebar-logo-img');
+            if (logoImg.length) {
+                logoImg.attr('src', logoUrl).removeClass('hidden').show();
+            }
+        }
+
+        if (sidebarTitle !== undefined) {
+            $('.cora-sidebar-logo-text').text(sidebarTitle);
+        }
+    };
+
+    $(document).on('input', 'input[name="blogname"], input[name="cora_brand_favicon_url"], input[name="cora_brand_logo_url"], input[name="cora_sidebar_title"]', function() {
+        if(window.coraApplyBrandingLive) window.coraApplyBrandingLive();
+    });
 
     // --- Global Language Management & Persistence ---
     window.coraLanguages = {

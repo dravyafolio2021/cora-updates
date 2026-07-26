@@ -31,6 +31,10 @@ if ( ! function_exists( 'cora_is_super_owner' ) ) {
     }
 }
 
+// Define workspace context early to avoid undefined variable warnings in the JS data injection block
+$cora_active_workspace = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array( 'id' => 1, 'name' => 'Apex Realty Group', 'slug' => 'apex-realty', 'plan' => 'enterprise', 'status' => 'active' );
+$cora_user_workspaces   = function_exists( 'cora_get_user_workspaces' ) ? cora_get_user_workspaces( get_current_user_id() ) : array( $cora_active_workspace );
+
 // Enqueue WordPress media libraries
 wp_enqueue_media();
 
@@ -49,7 +53,7 @@ $cora_users = ( in_array( $sub_page, array( 'dashboard', 'bookings', 'team-roles
 $cora_workspace_listings = ( in_array( $sub_page, array( 'dashboard', 'equipment', 'leads', 'bookings' ) ) ) ? cora_db_get_properties() : array();
 $cora_permissions = get_option( 'cora_role_permissions', array() );
 // Auto-grant access to new enterprise modules for all active roles
-$cora_new_module_keys = array('event_timeline', 'event-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'vault');
+$cora_new_module_keys = array('event_timeline', 'event-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'vault', 'emails');
 if ( is_array( $cora_permissions ) ) {
     foreach ( $cora_permissions as $r_key => $r_perms ) {
         if ( is_array( $r_perms ) ) {
@@ -212,10 +216,15 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     if ( empty( $favicon_url ) ) {
         $favicon_url = CORA_WORKSPACE_URL . 'assets/images/cora-favicon.png';
     }
+    $page_title_format = get_option( 'cora_tab_title_format', 'Cora for Real Estate - Workspace' );
+    if ( empty( $page_title_format ) ) {
+        $page_title_format = get_option( 'blogname', 'Cora for Real Estate' ) . ' - Workspace';
+    }
     ?>
     <link rel="icon" type="image/png" href="<?php echo esc_url( $favicon_url ); ?>" />
+    <link rel="shortcut icon" id="cora-dynamic-favicon" href="<?php echo esc_url( $favicon_url ); ?>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cora for Real Estate - Workspace</title>
+    <title><?php echo esc_html( $page_title_format ); ?></title>
     
     <!-- Compiled Tailwind CSS -->
     <link rel="stylesheet" href="<?php echo CORA_WORKSPACE_URL . 'assets/css/tailwind-built.css'; ?>" />
@@ -282,6 +291,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             }
             .cora-sidebar {
                 height: calc(100vh - 52px) !important;
+            }
+            .admin-bar .cora-sidebar {
+                top: 84px !important;
+                height: calc(100vh - 84px) !important;
+            }
+            .admin-bar .cora-main {
+                height: calc(100vh - 84px) !important;
             }
         }
 
@@ -3108,6 +3124,12 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             $cora_ws_name           = ! empty( $cora_active_workspace['name'] ) ? $cora_active_workspace['name'] : 'Apex Realty Group';
             $cora_ws_slug           = ! empty( $cora_active_workspace['slug'] ) ? $cora_active_workspace['slug'] : 'apex-realty';
             $cora_ws_initial        = ! empty( $cora_ws_name ) ? strtoupper( substr( $cora_ws_name, 0, 1 ) ) : 'C';
+            
+            $sidebar_brand_logo = get_option( 'cora_brand_logo_url', '' );
+            $sidebar_brand_title = get_option( 'cora_sidebar_title', 'cora' );
+            if ( empty( $sidebar_brand_title ) ) {
+                $sidebar_brand_title = 'cora';
+            }
             ?>
             <div class="cora-sidebar-top-container flex items-center justify-between gap-2 px-3 pt-4 pb-2 shrink-0 select-none">
                 <!-- Workspace Switcher Card + Dropdown -->
@@ -3115,10 +3137,16 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <!-- Trigger Card -->
                     <div class="cora-workspace-card flex items-center justify-between gap-2 px-2.5 py-1.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900/50 dark:hover:bg-zinc-850 border border-zinc-200 dark:border-zinc-850 rounded-lg cursor-pointer transition-all select-none" onclick="event.stopPropagation(); if($('.cora-sidebar').hasClass('collapsed-sidebar')){ window.coraToggleSidebarCollapse(); } else { $('#cora-workspace-popover').toggleClass('hidden'); $('#cora-profile-popover').addClass('hidden'); }">
                         <div class="flex items-center gap-2 min-w-0">
-                            <div class="w-6 h-6 rounded bg-black dark:bg-white text-white dark:text-black font-bold text-[13px] flex items-center justify-center shrink-0 leading-none">
-                                <?php echo esc_html( $cora_ws_initial ); ?>
+                            <?php if ( ! empty( $sidebar_brand_logo ) ) : ?>
+                            <div class="w-6 h-6 rounded flex items-center justify-center shrink-0">
+                                <img src="<?php echo esc_url( $sidebar_brand_logo ); ?>" alt="Logo" class="w-full h-full object-contain rounded">
                             </div>
-                            <span class="cora-studio-info text-zinc-900 dark:text-zinc-100 font-bold text-xs truncate"><?php echo esc_html( $cora_ws_name ); ?></span>
+                            <?php else : ?>
+                            <div class="w-6 h-6 rounded bg-black dark:bg-white text-white dark:text-black font-bold text-[13px] flex items-center justify-center shrink-0 leading-none">
+                                <?php echo esc_html( strtoupper( substr( $sidebar_brand_title, 0, 1 ) ) ); ?>
+                            </div>
+                            <?php endif; ?>
+                            <span class="cora-studio-info text-zinc-900 dark:text-zinc-100 font-bold text-xs truncate"><?php echo esc_html( $sidebar_brand_title ); ?></span>
                         </div>
                         <svg class="cora-switcher-arrow text-zinc-500 shrink-0" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </div>
@@ -6345,8 +6373,86 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
             <!-- SECTION: CORA FORMS -->
             <?php if ( $sub_page === 'forms' ) : ?>
-            <section id="cora-page-forms" class="cora-page-section cora-active space-y-6">
+            <?php
+            // Inject a style override to strip the wrapper padding and force viewport fill for forms editor
+            echo '<style>
+                .cora-main {
+                    overflow: hidden !important;
+                    height: calc(100vh - 52px) !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                }
+                .admin-bar .cora-main {
+                    height: calc(100vh - 84px) !important;
+                }
+                #editor-center-canvas {
+                    height: calc(100vh - 200px) !important;
+                    max-height: calc(100vh - 200px) !important;
+                    overflow-y: auto !important;
+                }
+                .admin-bar #editor-center-canvas {
+                    height: calc(100vh - 232px) !important;
+                    max-height: calc(100vh - 232px) !important;
+                }
+                #left-panel-content, #left-tab-settings, #left-tab-form, #left-tab-integ {
+                    height: calc(100vh - 160px) !important;
+                    max-height: calc(100vh - 160px) !important;
+                    overflow-y: auto !important;
+                }
+                .admin-bar #left-panel-content, .admin-bar #left-tab-settings, .admin-bar #left-tab-form, .admin-bar #left-tab-integ {
+                    height: calc(100vh - 192px) !important;
+                    max-height: calc(100vh - 192px) !important;
+                }
+                .cora-main {
+                    overflow: hidden !important;
+                    height: 100vh !important;
+                    max-height: 100vh !important;
+                }
+                .cora-content-wrapper {
+                    padding: 0 !important;
+                    gap: 0 !important;
+                    overflow: hidden !important;
+                    flex: 1 !important;
+                    min-height: 0 !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                }
+                #cora-page-forms.cora-page-section.cora-active {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    flex: 1 !important;
+                    min-height: 0 !important;
+                    overflow: hidden !important;
+                }
+                #cora-forms-module {
+                    flex: 1 !important;
+                    min-height: 0 !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    overflow: hidden !important;
+                }
+                #forms-list-state {
+                    flex: 1 !important;
+                    min-height: 0 !important;
+                    overflow-y: auto !important;
+                }
+                #form-editor-state {
+                    flex: 1 !important;
+                    min-height: 0 !important;
+                }
+                /* Remove Tailwind space-y-6 between sections */
+                .cora-content-wrapper > * + * { margin-top: 0 !important; }
+            </style>';
+            ?>
+            <section id="cora-page-forms" class="cora-page-section cora-active" style="padding:0;margin:0;overflow:hidden;flex:1;min-height:0;display:flex;flex-direction:column;">
                 <?php include CORA_WORKSPACE_PATH . 'views/view-forms.php'; ?>
+            </section>
+            <?php endif; ?>
+
+            <!-- SECTION: EMAILS COMPOSER -->
+            <?php if ( $sub_page === 'emails' ) : ?>
+            <section id="cora-page-emails" class="cora-page-section cora-active" style="padding:0;margin:0;overflow:hidden;flex:1;min-height:0;display:flex;flex-direction:column;">
+                <?php include CORA_WORKSPACE_PATH . 'views/view-emails.php'; ?>
             </section>
             <?php endif; ?>
 

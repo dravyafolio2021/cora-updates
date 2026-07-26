@@ -16,6 +16,7 @@ if ( $blocks_row ) {
 
 $styling = json_decode( $form['styling'], true ) ?: array();
 $settings = json_decode( $form['settings'], true ) ?: array();
+$description = isset( $settings['description'] ) ? $settings['description'] : ( isset( $settings['subtitle'] ) ? $settings['subtitle'] : 'Fill out details below to submit request.' );
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,21 +29,28 @@ $settings = json_decode( $form['settings'], true ) ?: array();
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #faf9f6;
-            color: #1c1917;
-        }
-        .form-card {
-            background-color: #ffffff;
-            border: 1px solid #e7e5e4;
+            background-color: #FAFAFA;
+            color: #09090b;
         }
         <?php echo isset( $styling['custom_css'] ) ? esc_html( $styling['custom_css'] ) : ''; ?>
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-2xl form-card rounded-2xl p-8 md:p-12 shadow-sm relative">
+<body class="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center p-0 sm:p-6 md:p-10">
+    <div class="w-full sm:max-w-2xl bg-white dark:bg-zinc-900 border-0 sm:border border-zinc-200/80 dark:border-zinc-800/80 rounded-none sm:rounded-2xl p-6 sm:p-10 shadow-none sm:shadow-[0_8px_30px_rgb(0,0,0,0.01)] relative flex flex-col min-h-screen sm:min-h-0">
         <!-- Progress bar indicator -->
-        <div class="absolute top-0 left-0 w-full h-1 bg-zinc-100 rounded-t-2xl overflow-hidden">
-            <div id="form-progress-indicator" class="h-full bg-zinc-900 transition-all duration-300" style="width: 0%"></div>
+        <div class="absolute top-0 left-0 w-full h-1 bg-zinc-100 dark:bg-zinc-800 rounded-t-none sm:rounded-t-2xl overflow-hidden">
+            <div id="form-progress-indicator" class="h-full bg-zinc-950 transition-all duration-300" style="width: 0%"></div>
+        </div>
+
+        <!-- Exit/Close Button -->
+        <button type="button" class="absolute top-6 right-6 w-8 h-8 rounded-full bg-zinc-50 hover:bg-zinc-100 flex items-center justify-center text-zinc-400 hover:text-zinc-600 transition-colors border-0 cursor-pointer" onclick="if (window.opener) { window.close(); } else { window.history.back(); }">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+
+        <!-- Form Header -->
+        <div class="mb-6 pr-8">
+            <h1 class="text-xl font-bold text-zinc-950 tracking-tight mb-1"><?php echo esc_html( $form['title'] ); ?></h1>
+            <p class="text-xs text-zinc-500 font-medium"><?php echo esc_html( $description ); ?></p>
         </div>
 
         <form id="public-cora-form" class="space-y-6" data-form-id="<?php echo esc_attr( $form['id'] ); ?>">
@@ -51,27 +59,31 @@ $settings = json_decode( $form['settings'], true ) ?: array();
                 <input type="text" name="cora_hp_verify" id="cora-hp-verify" tabindex="-1" value="" autocomplete="off" />
             </div>
 
-            <div id="form-steps-container">
+            <div id="form-steps-container" class="space-y-5">
                 <!-- Inputs injected dynamically here -->
             </div>
 
             <!-- Navigation Actions -->
-            <div class="flex items-center justify-between pt-6 border-t border-stone-100">
-                <button type="button" id="btn-prev-step" class="hidden px-4 h-9 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-xs font-semibold transition-all">
-                    Previous
+            <div class="flex items-center justify-between pt-6 border-t border-zinc-100">
+                <button type="button" id="btn-prev-step" class="hidden h-10 px-4 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-700 flex items-center gap-1.5 transition-all cursor-pointer">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Back
                 </button>
                 <div class="flex-1"></div>
-                <button type="button" id="btn-next-step" class="px-5 h-9 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold transition-all">
+                <button type="button" id="btn-next-step" class="h-10 px-5 rounded-xl bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer">
                     Next
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
             </div>
         </form>
 
         <!-- Success view -->
         <div id="form-success-container" class="hidden flex-col items-center justify-center text-center py-12 space-y-4">
-            <div class="h-12 w-12 rounded-full bg-stone-100 flex items-center justify-center text-zinc-900 text-xl font-bold">✓</div>
-            <h2 class="text-lg font-bold text-zinc-900">Response Submitted</h2>
-            <p class="text-xs text-zinc-500 max-w-sm" id="success-msg-text">
+            <div class="h-12 w-12 rounded-full bg-zinc-50 border border-zinc-200 flex items-center justify-center text-zinc-950 text-xl font-bold">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <h2 class="text-base font-bold text-zinc-950">Response Submitted</h2>
+            <p class="text-xs text-zinc-500 max-w-sm leading-relaxed" id="success-msg-text">
                 <?php echo esc_html( isset($settings['success_message']) ? $settings['success_message'] : 'Thank you for your response!' ); ?>
             </p>
         </div>
@@ -81,6 +93,7 @@ $settings = json_decode( $form['settings'], true ) ?: array();
     <script>
         const formBlocks = <?php echo json_encode( $blocks ); ?>;
         const formLogic = <?php echo json_encode( $logic ); ?>;
+        const formSettings = <?php echo json_encode( $settings ); ?>;
         const redirectUrl = "<?php echo esc_url( isset($settings['redirect_url']) ? $settings['redirect_url'] : '' ); ?>";
         const coraRestNonce = "<?php echo esc_attr( wp_create_nonce( 'wp_rest' ) ); ?>";
     </script>
@@ -96,6 +109,36 @@ $settings = json_decode( $form['settings'], true ) ?: array();
             let steps = [];
             let currentStepIdx = 0;
             let submittedAnswers = {};
+
+            function recalculateDynamicPricing() {
+                let servicesTotal = 0;
+                document.querySelectorAll('.cora-service-check:checked').forEach(c => {
+                    servicesTotal += parseFloat(c.dataset.price) || 0;
+                });
+
+                const paymentBlock = formBlocks.find(b => ['payment', 'stripe_payment', 'upi_id', 'upi_qr'].includes(b.type));
+                if (paymentBlock) {
+                    const basePrice = parseFloat(paymentBlock.price) || 100;
+                    const finalTotal = basePrice + servicesTotal;
+
+                    const totalEl = document.getElementById('checkout-total-amount');
+                    if (totalEl) {
+                        totalEl.textContent = finalTotal;
+                    }
+                    
+                    const qrLinkEl = document.querySelector('a[href^="upi://pay"]');
+                    if (qrLinkEl) {
+                        const upiId = paymentBlock.upi_id_value || 'yourname@upi';
+                        const newUpiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&am=${finalTotal}&cu=INR`;
+                        qrLinkEl.href = newUpiLink;
+                    }
+                    
+                    const textPrice = document.querySelector('.cora-upi-price-text');
+                    if (textPrice) {
+                        textPrice.textContent = `₹${finalTotal}`;
+                    }
+                }
+            }
 
             // Split blocks list into visual steps / pages
             function partitionBlocks() {
@@ -118,6 +161,336 @@ $settings = json_decode( $form['settings'], true ) ?: array();
                 }
             }
 
+            function initCustomFieldsLogic(container) {
+                // Initialize Signature Pads
+                container.querySelectorAll('.signature-canvas').forEach(canvas => {
+                    const ctx = canvas.getContext('2d');
+                    let drawing = false;
+                    
+                    canvas.width = canvas.offsetWidth || 300;
+                    canvas.height = canvas.offsetHeight || 96;
+
+                    ctx.lineWidth = 2;
+                    ctx.lineCap = 'round';
+                    ctx.strokeStyle = '#09090b';
+
+                    const getPos = (e) => {
+                        const rect = canvas.getBoundingClientRect();
+                        return {
+                            x: (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left,
+                            y: (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top
+                        };
+                    };
+
+                    const startDraw = (e) => {
+                        drawing = true;
+                        const pos = getPos(e);
+                        ctx.beginPath();
+                        ctx.moveTo(pos.x, pos.y);
+                    };
+
+                    const draw = (e) => {
+                        if (!drawing) return;
+                        e.preventDefault();
+                        const pos = getPos(e);
+                        ctx.lineTo(pos.x, pos.y);
+                        ctx.stroke();
+                    };
+
+                    const stopDraw = () => {
+                        if (!drawing) return;
+                        drawing = false;
+                        const hiddenInput = canvas.closest('.cora-signature-pad').querySelector('.signature-data-input');
+                        if (hiddenInput) {
+                            hiddenInput.value = canvas.toDataURL();
+                            hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    };
+
+                    canvas.addEventListener('mousedown', startDraw);
+                    canvas.addEventListener('mousemove', draw);
+                    canvas.addEventListener('mouseup', stopDraw);
+                    canvas.addEventListener('mouseleave', stopDraw);
+
+                    canvas.addEventListener('touchstart', startDraw);
+                    canvas.addEventListener('touchmove', draw, { passive: false });
+                    canvas.addEventListener('touchend', stopDraw);
+
+                    const clearBtn = canvas.closest('.cora-signature-pad').querySelector('.btn-clear-sig');
+                    if (clearBtn) {
+                        clearBtn.addEventListener('click', () => {
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            const hiddenInput = canvas.closest('.cora-signature-pad').querySelector('.signature-data-input');
+                            if (hiddenInput) {
+                                hiddenInput.value = '';
+                                hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+                            }
+                        });
+                    }
+                });
+
+                // Initialize Ratings
+                container.querySelectorAll('.cora-rating-container').forEach(ratingDiv => {
+                    const hiddenInput = ratingDiv.querySelector('input[type="hidden"]');
+                    const stars = ratingDiv.querySelectorAll('.star');
+
+                    const updateStars = (val) => {
+                        stars.forEach(s => {
+                            const sVal = parseInt(s.dataset.val);
+                            if (sVal <= val) {
+                                s.classList.remove('text-zinc-300');
+                                s.classList.add('text-amber-400');
+                            } else {
+                                s.classList.remove('text-amber-400');
+                                s.classList.add('text-zinc-300');
+                            }
+                        });
+                    };
+
+                    stars.forEach(star => {
+                        star.addEventListener('click', () => {
+                            const val = parseInt(star.dataset.val);
+                            if (hiddenInput) {
+                                hiddenInput.value = val;
+                                hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+                            }
+                            updateStars(val);
+                        });
+                        star.addEventListener('mouseenter', () => {
+                            updateStars(parseInt(star.dataset.val));
+                        });
+                    });
+
+                    ratingDiv.addEventListener('mouseleave', () => {
+                        updateStars(parseInt(hiddenInput ? hiddenInput.value : 0));
+                    });
+
+                    if (hiddenInput && hiddenInput.value) {
+                        updateStars(parseInt(hiddenInput.value));
+                    }
+                });
+
+                // Initialize File Upload Dropzones
+                container.querySelectorAll('.cora-file-dropzone').forEach(dropzone => {
+                    const hiddenInp = dropzone.querySelector('.cora-file-hidden-input');
+                    const textEl = dropzone.querySelector('.dropzone-text');
+
+                    // Click triggers file open
+                    dropzone.addEventListener('click', (e) => {
+                        if (e.target !== hiddenInp) {
+                            hiddenInp.click();
+                        }
+                    });
+
+                    // Update UI when file selected
+                    hiddenInp.addEventListener('change', () => {
+                        if (hiddenInp.files && hiddenInp.files.length > 0) {
+                            textEl.textContent = hiddenInp.files[0].name;
+                            textEl.classList.remove('text-zinc-900');
+                            textEl.classList.add('text-emerald-600', 'font-bold');
+                            
+                            // Save file name in submittedAnswers
+                            const label = hiddenInp.dataset.label;
+                            const fieldName = hiddenInp.dataset.fieldName;
+                            submittedAnswers[label] = hiddenInp.files[0].name;
+                            submittedAnswers[fieldName] = hiddenInp.files[0].name;
+                            
+                            evaluateLogic();
+                            evaluateCalculations();
+                            savePartialResponse();
+                        } else {
+                            textEl.textContent = 'Drag & drop an image or video';
+                            textEl.classList.remove('text-emerald-600', 'font-bold');
+                            textEl.classList.add('text-zinc-900');
+                        }
+                    });
+
+                    // Drag and Drop behaviors
+                    ['dragenter', 'dragover'].forEach(eventName => {
+                        dropzone.addEventListener(eventName, (e) => {
+                            e.preventDefault();
+                            dropzone.classList.remove('border-zinc-200');
+                            dropzone.classList.add('border-zinc-400', 'bg-zinc-50/50');
+                        }, false);
+                    });
+
+                    ['dragleave', 'drop'].forEach(eventName => {
+                        dropzone.addEventListener(eventName, (e) => {
+                            e.preventDefault();
+                            dropzone.classList.remove('border-zinc-400', 'bg-zinc-50/50');
+                            dropzone.classList.add('border-zinc-200');
+                        }, false);
+                    });
+
+                    dropzone.addEventListener('drop', (e) => {
+                        const dt = e.dataTransfer;
+                        const files = dt.files;
+                        if (files && files.length > 0) {
+                            hiddenInp.files = files;
+                            // Trigger change event to trigger update UI & save
+                            hiddenInp.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    }, false);
+                });
+
+                // Initialize Booking Slots selection
+                container.querySelectorAll('.cora-booking-slots').forEach(slotsDiv => {
+                    const blockDiv = slotsDiv.closest('.form-block-item');
+                    const hiddenVal = blockDiv.querySelector('.cora-booking-hidden-val');
+                    const dateInp = blockDiv.querySelector('.cora-booking-date');
+                    const btns = slotsDiv.querySelectorAll('.cora-slot-btn');
+
+                    let selectedDate = dateInp ? dateInp.value : '';
+                    let selectedTime = '';
+
+                    const updateBookingValue = () => {
+                        if (selectedDate && selectedTime) {
+                            const combined = `${selectedDate} at ${selectedTime}`;
+                            hiddenVal.value = combined;
+                            hiddenVal.dispatchEvent(new Event('change', { bubbles: true }));
+                            
+                            const label = hiddenVal.dataset.label;
+                            const fieldName = hiddenVal.dataset.fieldName;
+                            submittedAnswers[label] = combined;
+                            submittedAnswers[fieldName] = combined;
+
+                            evaluateLogic();
+                            evaluateCalculations();
+                            savePartialResponse();
+                        }
+                    };
+
+                    dateInp?.addEventListener('change', (e) => {
+                        selectedDate = e.target.value;
+                        updateBookingValue();
+                    });
+
+                    btns.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            btns.forEach(b => b.classList.remove('bg-zinc-950', 'text-white', 'border-zinc-950'));
+                            btn.classList.add('bg-zinc-950', 'text-white', 'border-zinc-950');
+                            selectedTime = btn.dataset.time;
+                            updateBookingValue();
+                        });
+                    });
+                });
+
+                // Initialize Address multi-fields
+                container.querySelectorAll('.address-group').forEach(addrDiv => {
+                    const blockDiv = addrDiv.closest('.form-block-item');
+                    const hiddenVal = blockDiv.querySelector('.cora-address-hidden-val');
+                    const street = addrDiv.querySelector('.addr-street');
+                    const city = addrDiv.querySelector('.addr-city');
+                    const state = addrDiv.querySelector('.addr-state');
+                    const zip = addrDiv.querySelector('.addr-zip');
+
+                    const updateAddressValue = () => {
+                        const sVal = street.value.trim();
+                        const cVal = city.value.trim();
+                        const stVal = state.value.trim();
+                        const zVal = zip.value.trim();
+
+                        if (sVal || cVal || stVal || zVal) {
+                            const formatted = `${sVal}, ${cVal}, ${stVal} ${zVal}`;
+                            hiddenVal.value = formatted;
+                            hiddenVal.dispatchEvent(new Event('change', { bubbles: true }));
+                            const label = hiddenVal.dataset.label;
+                            const fieldName = hiddenVal.dataset.fieldName;
+                            submittedAnswers[label] = formatted;
+                            submittedAnswers[fieldName] = formatted;
+
+                            evaluateLogic();
+                            evaluateCalculations();
+                            savePartialResponse();
+                        }
+                    };
+
+                    [street, city, state, zip].forEach(inp => {
+                        inp?.addEventListener('input', updateAddressValue);
+                    });
+                });
+
+                // Initialize Services/Pricing checklist
+                container.querySelectorAll('.cora-service-check').forEach(chk => {
+                    chk.addEventListener('change', () => {
+                        const blockDiv = chk.closest('.form-block-item');
+                        const hiddenVal = blockDiv.querySelector('.cora-services-hidden-val');
+                        const label = hiddenVal.dataset.label;
+                        const fieldName = hiddenVal.dataset.fieldName;
+
+                        const checked = blockDiv.querySelectorAll('.cora-service-check:checked');
+                        const list = [];
+                        checked.forEach(c => list.push(c.value));
+                        
+                        const combined = list.join(', ');
+                        hiddenVal.value = combined;
+                        hiddenVal.dispatchEvent(new Event('change', { bubbles: true }));
+                        submittedAnswers[label] = combined;
+                        submittedAnswers[fieldName] = combined;
+
+                        recalculateDynamicPricing();
+
+                        evaluateLogic();
+                        evaluateCalculations();
+                        savePartialResponse();
+                    });
+                });
+
+                // Restore custom field displays
+                container.querySelectorAll('.cora-booking-slots').forEach(slotsDiv => {
+                    const blockDiv = slotsDiv.closest('.form-block-item');
+                    const hiddenVal = blockDiv.querySelector('.cora-booking-hidden-val');
+                    const dateInp = blockDiv.querySelector('.cora-booking-date');
+                    const label = hiddenVal.dataset.label;
+
+                    if (submittedAnswers[label]) {
+                        const parts = submittedAnswers[label].split(' at ');
+                        if (parts[0] && dateInp) dateInp.value = parts[0];
+                        if (parts[1]) {
+                            const btn = slotsDiv.querySelector(`button[data-time="${parts[1]}"]`);
+                            if (btn) btn.classList.add('bg-zinc-950', 'text-white', 'border-zinc-950');
+                        }
+                    }
+                });
+
+                container.querySelectorAll('.address-group').forEach(addrDiv => {
+                    const blockDiv = addrDiv.closest('.form-block-item');
+                    const hiddenVal = blockDiv.querySelector('.cora-address-hidden-val');
+                    const label = hiddenVal.dataset.label;
+                    const street = addrDiv.querySelector('.addr-street');
+                    const city = addrDiv.querySelector('.addr-city');
+                    const state = addrDiv.querySelector('.addr-state');
+                    const zip = addrDiv.querySelector('.addr-zip');
+
+                    if (submittedAnswers[label]) {
+                        const val = submittedAnswers[label];
+                        const parts = val.split(', ');
+                        if (parts[0] && street) street.value = parts[0];
+                        if (parts[1] && city) city.value = parts[1];
+                        if (parts[2]) {
+                            const zipParts = parts[2].split(' ');
+                            if (zipParts[0] && state) state.value = zipParts[0];
+                            if (zipParts[1] && zip) zip.value = zipParts[1];
+                        }
+                    }
+                });
+
+                container.querySelectorAll('.cora-service-check').forEach(chk => {
+                    const blockDiv = chk.closest('.form-block-item');
+                    const hiddenVal = blockDiv.querySelector('.cora-services-hidden-val');
+                    const label = hiddenVal.dataset.label;
+
+                    if (submittedAnswers[label]) {
+                        const selectedServices = submittedAnswers[label].split(', ');
+                        if (selectedServices.includes(chk.value)) {
+                            chk.checked = true;
+                        }
+                    }
+                });
+
+                recalculateDynamicPricing();
+            }
+
             // Create step layouts and render form
             function renderStep(idx) {
                 stepsContainer.innerHTML = '';
@@ -136,13 +509,52 @@ $settings = json_decode( $form['settings'], true ) ?: array();
                         const cleanLabel = block.label || 'Stripe Checkout';
                         blockDiv.id = 'field-wrapper-stripe_payment';
                         blockDiv.innerHTML = `
-                            <label class="text-xs font-semibold text-zinc-800">${cleanLabel}</label>
-                            <div class="border border-zinc-200 rounded-xl p-4 bg-zinc-50/50 flex flex-col gap-3">
+                            <label class="block text-xs font-semibold text-zinc-700 mb-1.5">${cleanLabel}</label>
+                            <div class="border border-zinc-200 rounded-2xl p-4 bg-zinc-50/20 flex flex-col gap-3">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-xs text-zinc-500 font-medium">Amount to Pay:</span>
-                                    <span class="text-sm font-bold text-zinc-900">${block.currency === 'USD' ? '$' : '₹'}${block.price || 0}</span>
+                                    <span class="text-xs font-semibold text-zinc-800">Amount to Pay:</span>
+                                    <span class="text-sm font-bold text-zinc-950">${block.currency === 'USD' ? '$' : '₹'}${block.price || 0}</span>
                                 </div>
-                                <div class="text-[10px] text-zinc-400">Checkout is powered securely by Stripe. Clicking submit will redirect you to secure payment portal.</div>
+                                <div class="text-[10px] text-zinc-400 leading-normal">Checkout is powered securely by Stripe. Clicking submit will redirect you to secure payment portal.</div>
+                            </div>
+                        `;
+                    } else if (block.type === 'upi_id') {
+                        const cleanLabel = block.label || 'UPI Payment';
+                        blockDiv.id = 'field-wrapper-' + cleanLabel.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                        blockDiv.innerHTML = `
+                            <label class="block text-xs font-semibold text-zinc-700 mb-1.5">${cleanLabel}</label>
+                            <div class="border border-zinc-200 rounded-2xl p-4 bg-zinc-50/20 flex flex-col gap-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs text-zinc-500 font-medium">Pay via UPI:</span>
+                                    <span class="text-xs font-bold text-zinc-950 font-mono">${block.upi_id_value || 'yourname@upi'}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-zinc-450 font-semibold">Amount:</span>
+                                    <span class="text-xs font-bold text-zinc-950">₹${block.price || 0}</span>
+                                </div>
+                                <div class="text-[10px] text-zinc-400 leading-normal">Open any UPI app, scan or type the UPI ID above, and pay the amount.</div>
+                                <input type="text" name="upi_ref" placeholder="Enter UPI transaction reference ID" class="w-full h-11 px-4 rounded-xl border border-zinc-200 text-xs font-semibold focus:border-zinc-400 outline-none bg-white transition-all" data-label="${cleanLabel} - UPI Reference" data-field-name="upi_ref" />
+                            </div>
+                        `;
+                    } else if (block.type === 'upi_qr') {
+                        const cleanLabel = block.label || 'UPI QR Payment';
+                        blockDiv.id = 'field-wrapper-' + cleanLabel.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                        const upiLink = `upi://pay?pa=${encodeURIComponent(block.upi_id_value || 'yourname@upi')}&am=${block.price || 0}&cu=INR`;
+                        blockDiv.innerHTML = `
+                            <label class="block text-xs font-semibold text-zinc-700 mb-1.5">${cleanLabel}</label>
+                            <div class="border border-zinc-200 rounded-2xl p-4 bg-zinc-50/20 flex flex-col items-center gap-3">
+                                <div class="w-28 h-28 bg-white border border-zinc-200 rounded-xl flex items-center justify-center shadow-2xs">
+                                    <div class="text-center">
+                                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#09090b" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><path d="M14 14h1v1h-1zm3 0h1v1h-1zm0 3h1v1h-1zm-3 3h1v1h-1zm3 0h1v1h-1z"></path></svg>
+                                        <div class="text-[8.5px] text-zinc-400 mt-1 uppercase font-bold tracking-wider">QR Code</div>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-xs font-bold text-zinc-955">₹${block.price || 0}</div>
+                                    <div class="text-[10px] text-zinc-550 font-mono">${block.upi_id_value || 'yourname@upi'}</div>
+                                </div>
+                                <a href="${upiLink}" target="_blank" class="w-full py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold text-center transition-all">Open UPI App</a>
+                                <input type="text" name="upi_ref" placeholder="Enter UPI transaction ID after payment" class="w-full h-11 px-4 rounded-xl border border-zinc-200 text-xs font-semibold focus:border-zinc-400 outline-none bg-white transition-all" data-label="${cleanLabel} - UPI Ref" data-field-name="upi_ref" />
                             </div>
                         `;
                     } else if (block.type === 'formula') {
@@ -150,7 +562,7 @@ $settings = json_decode( $form['settings'], true ) ?: array();
                         const fieldName = cleanLabel.toLowerCase().replace(/[^a-z0-9]/g, '_');
                         blockDiv.id = 'field-wrapper-' + fieldName;
                         blockDiv.innerHTML = `
-                            <div class="border border-zinc-200 rounded-xl p-4 bg-zinc-50/50 flex items-center justify-between">
+                            <div class="border border-zinc-200 rounded-2xl p-4 bg-zinc-50/20 flex items-center justify-between">
                                 <span class="text-xs font-semibold text-zinc-800">${cleanLabel}</span>
                                 <span class="cora-calculated-value text-sm font-bold text-zinc-950" 
                                       data-expression="${block.expression || ''}" 
@@ -160,15 +572,56 @@ $settings = json_decode( $form['settings'], true ) ?: array();
                                       data-label="${cleanLabel}">0</span>
                             </div>
                         `;
+                    } else if (block.type === 'columns') {
+                        const colCount = block.columns_count || 2;
+                        blockDiv.className = 'form-block-item w-full';
+                        
+                        let gridHtml = `<div class="grid gap-4 w-full" style="grid-template-columns: repeat(${colCount}, minmax(0, 1fr))">`;
+                        
+                        (block.column_fields || []).slice(0, colCount).forEach((colFields, colIdx) => {
+                            gridHtml += `<div class="flex flex-col gap-4">`;
+                            (colFields || []).forEach(subField => {
+                                const subCleanLabel = subField.label || 'Input Field';
+                                const subFieldName = subCleanLabel.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                                
+                                let subInputHtml = '';
+                                if (subField.type === 'long_text' || subField.type === 'textarea') {
+                                    subInputHtml = `<textarea name="${subFieldName}" data-label="${subCleanLabel}" data-field-name="${subFieldName}" rows="2" placeholder="Type answer..." class="w-full p-3 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-900 placeholder-zinc-400 focus:border-zinc-400 outline-none transition-all"></textarea>`;
+                                } else if (subField.type === 'dropdown') {
+                                    let subOpts = '<option value="">Choose...</option>';
+                                    (subField.choices || []).forEach(cOpt => {
+                                        let lbl = typeof cOpt === 'object' ? cOpt.label : cOpt;
+                                        subOpts += `<option value="${lbl}">${lbl}</option>`;
+                                    });
+                                    subInputHtml = `<div class="relative w-full"><select name="${subFieldName}" data-label="${subCleanLabel}" data-field-name="${subFieldName}" class="w-full h-11 pl-3 pr-8 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-900 focus:border-zinc-400 outline-none appearance-none cursor-pointer">${subOpts}</select></div>`;
+                                } else if (subField.type === 'date') {
+                                    subInputHtml = `<input type="date" name="${subFieldName}" data-label="${subCleanLabel}" data-field-name="${subFieldName}" class="w-full h-11 px-3 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-900 focus:border-zinc-400 outline-none" />`;
+                                } else {
+                                    const subInpType = subField.type === 'number' ? 'number' : (subField.type === 'email' ? 'email' : 'text');
+                                    subInputHtml = `<input type="${subInpType}" name="${subFieldName}" data-label="${subCleanLabel}" data-field-name="${subFieldName}" placeholder="Type answer..." class="w-full h-11 px-3 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-900 placeholder-zinc-400 focus:border-zinc-400 outline-none transition-all" />`;
+                                }
+                                
+                                gridHtml += `
+                                    <div class="flex flex-col gap-1.5 w-full">
+                                        <label class="block text-xs font-semibold text-zinc-700 mb-1.5">${subCleanLabel}</label>
+                                        ${subInputHtml}
+                                    </div>
+                                `;
+                            });
+                            gridHtml += `</div>`;
+                        });
+                        
+                        gridHtml += `</div>`;
+                        blockDiv.innerHTML = gridHtml;
                     } else {
                         // Render standard inputs
                         const cleanLabel = block.label || 'Input Field';
                         const fieldName = cleanLabel.toLowerCase().replace(/[^a-z0-9]/g, '_');
                         blockDiv.id = 'field-wrapper-' + fieldName;
                         let inputHtml = '';
-
+ 
                         if (block.type === 'long_text') {
-                            inputHtml = `<textarea name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" rows="3" placeholder="Type answer..." class="w-full p-3 rounded-lg border border-zinc-200 text-xs focus:ring-1 focus:ring-zinc-400 outline-none transition-all"></textarea>`;
+                            inputHtml = `<textarea name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" rows="3" placeholder="Type answer..." class="w-full p-4 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-900 placeholder-zinc-400 focus:border-zinc-400 outline-none transition-all"></textarea>`;
                         } else if (block.type === 'dropdown') {
                             let optsHtml = '<option value="">Choose option...</option>';
                             const bChoices = block.choices || [];
@@ -178,9 +631,14 @@ $settings = json_decode( $form['settings'], true ) ?: array();
                                 optsHtml += `<option value="${val}">${label}</option>`;
                             });
                             inputHtml = `
-                                <select name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="w-full h-10 px-3 rounded-lg border border-zinc-200 text-xs focus:ring-1 focus:ring-zinc-400 outline-none bg-white transition-all">
-                                    ${optsHtml}
-                                </select>
+                                <div class="relative w-full">
+                                    <select name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="w-full h-11 pl-4 pr-10 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-900 focus:border-zinc-400 outline-none transition-all appearance-none cursor-pointer">
+                                        ${optsHtml}
+                                    </select>
+                                    <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-zinc-400">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </div>
+                                </div>
                             `;
                         } else if (block.type === 'checkbox') {
                             let checkboxesHtml = '';
@@ -189,21 +647,156 @@ $settings = json_decode( $form['settings'], true ) ?: array();
                                 let label = typeof cOpt === 'object' ? cOpt.label : cOpt;
                                 let val = typeof cOpt === 'object' ? cOpt.label : cOpt;
                                 checkboxesHtml += `
-                                    <div class="flex items-center gap-2 mt-1">
-                                        <input type="checkbox" name="${fieldName}[]" data-label="${cleanLabel}" data-field-name="${fieldName}" data-option-index="${cIdx}" value="${val}" class="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-400" />
-                                        <span class="text-xs text-stone-600">${label}</span>
+                                    <div class="flex items-center gap-3 py-2.5 px-3.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50/50 transition-all cursor-pointer relative" onclick="const cb = this.querySelector('input'); if (event.target !== cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change', { bubbles: true })); }">
+                                        <input type="checkbox" name="${fieldName}[]" data-label="${cleanLabel}" data-field-name="${fieldName}" data-option-index="${cIdx}" value="${val}" class="h-4 w-4 rounded border-zinc-300 text-zinc-950 focus:ring-0 focus:ring-offset-0 focus:outline-none accent-zinc-950 cursor-pointer" />
+                                        <span class="text-xs font-semibold text-zinc-800">${label}</span>
                                     </div>
                                 `;
                             });
-                            inputHtml = `<div class="flex flex-col gap-1.5">${checkboxesHtml}</div>`;
+                            inputHtml = `<div class="flex flex-col gap-2">${checkboxesHtml}</div>`;
+                        } else if (block.type === 'multiple_choice' || block.type === 'radio') {
+                            let radioHtml = '';
+                            const bChoices = block.choices || [];
+                            bChoices.forEach((cOpt, cIdx) => {
+                                let label = typeof cOpt === 'object' ? cOpt.label : cOpt;
+                                let val = typeof cOpt === 'object' ? cOpt.label : cOpt;
+                                radioHtml += `
+                                    <div class="flex items-center gap-3 py-2.5 px-3.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50/50 transition-all cursor-pointer relative" onclick="const rb = this.querySelector('input'); rb.checked = true; rb.dispatchEvent(new Event('change', { bubbles: true }));">
+                                        <input type="radio" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" value="${val}" class="h-4 w-4 rounded-full border-zinc-300 text-zinc-950 focus:ring-0 focus:ring-offset-0 focus:outline-none accent-zinc-950 cursor-pointer" />
+                                        <span class="text-xs font-semibold text-zinc-800">${label}</span>
+                                    </div>
+                                `;
+                            });
+                            inputHtml = `<div class="flex flex-col gap-2">${radioHtml}</div>`;
+                        } else if (block.type === 'matrix') {
+                            const rows = block.rows || ['Service Quality', 'Speed of Service', 'Overall Value'];
+                            const cols = block.columns || ['Poor', 'Average', 'Excellent'];
+                            
+                            let matrixTableHtml = `<div class="overflow-x-auto border border-zinc-200 rounded-xl bg-white"><table class="w-full text-left border-collapse text-xs">`;
+                            matrixTableHtml += `<thead class="bg-zinc-50 border-b border-zinc-200 text-zinc-500 font-bold uppercase tracking-wider"><tr><th class="p-3"></th>`;
+                            cols.forEach(col => {
+                                matrixTableHtml += `<th class="p-3 text-center">${col}</th>`;
+                            });
+                            matrixTableHtml += `</tr></thead><tbody>`;
+                            
+                            rows.forEach((row, rIdx) => {
+                                const rowFieldName = `${fieldName}_row_${rIdx}`;
+                                matrixTableHtml += `<tr class="border-b border-zinc-100 hover:bg-zinc-50/30"><td class="p-3 font-semibold text-zinc-700">${row}</td>`;
+                                cols.forEach(col => {
+                                    matrixTableHtml += `
+                                        <td class="p-3 text-center">
+                                            <input type="radio" name="${rowFieldName}" data-label="${cleanLabel} - ${row}" data-field-name="${rowFieldName}" value="${col}" class="h-4 w-4 accent-zinc-950 cursor-pointer" />
+                                        </td>
+                                    `;
+                                });
+                                matrixTableHtml += `</tr>`;
+                            });
+                            matrixTableHtml += `</tbody></table></div>`;
+                            inputHtml = matrixTableHtml;
+                        } else if (block.type === 'file') {
+                            inputHtml = `
+                                <div class="cora-file-dropzone border border-dashed border-zinc-200 rounded-2xl py-8 px-4 bg-white flex flex-col items-center justify-center gap-3 cursor-pointer transition-all text-center relative" data-field-name="${fieldName}">
+                                    <div class="w-12 h-12 rounded-full bg-zinc-50 flex items-center justify-center text-zinc-700 border border-zinc-200/60 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+                                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><polyline points="9 15 12 12 15 15"></polyline></svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-zinc-900 dropzone-text">Drag &amp; drop an image or video</p>
+                                        <p class="text-[9.5px] text-zinc-450 mt-1">or click to browse (4 MB max)</p>
+                                    </div>
+                                    <input type="file" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="hidden cora-file-hidden-input" />
+                                </div>
+                            `;
+                        } else if (block.type === 'date') {
+                            inputHtml = `<input type="date" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="w-full h-11 px-4 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-900 focus:border-zinc-400 outline-none transition-all" />`;
+                        } else if (block.type === 'slider') {
+                            inputHtml = `
+                                <div class="flex items-center gap-3 w-full bg-zinc-50/50 border border-zinc-150 p-3 rounded-xl">
+                                    <input type="range" name="${fieldName}" min="0" max="100" value="50" data-label="${cleanLabel}" data-field-name="${fieldName}" class="flex-1 h-1.5 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-zinc-950" oninput="this.nextElementSibling.textContent = this.value" />
+                                    <span class="text-xs font-mono font-bold text-zinc-700 w-8 text-right">50</span>
+                                </div>
+                            `;
+                        } else if (block.type === 'signature') {
+                            inputHtml = `
+                                <div class="cora-signature-pad border border-zinc-200 rounded-2xl p-3 bg-zinc-50/10 flex flex-col gap-2.5">
+                                    <canvas class="signature-canvas w-full h-24 bg-white border border-zinc-200 rounded-xl" style="touch-action: none;"></canvas>
+                                    <div class="flex justify-between items-center px-1">
+                                        <button type="button" class="btn-clear-sig px-2.5 h-7 rounded-lg text-[10px] font-bold text-zinc-500 hover:text-zinc-800 bg-white border border-zinc-200 transition-all hover:bg-zinc-50 cursor-pointer">Clear</button>
+                                        <span class="text-[10px] font-bold text-zinc-400 tracking-wider">Sign here</span>
+                                    </div>
+                                    <input type="hidden" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="signature-data-input" />
+                                </div>
+                            `;
+                        } else if (block.type === 'rating') {
+                            inputHtml = `
+                                <div class="flex items-center gap-1.5 text-2xl cursor-pointer cora-rating-container py-2.5 px-4 bg-zinc-50/10 border border-zinc-200 rounded-xl w-fit" data-field-name="${fieldName}">
+                                    <input type="hidden" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" value="0" />
+                                    <span class="star text-zinc-300 hover:text-amber-400 transition-colors duration-150" data-val="1">★</span>
+                                    <span class="star text-zinc-300 hover:text-amber-400 transition-colors duration-150" data-val="2">★</span>
+                                    <span class="star text-zinc-300 hover:text-amber-400 transition-colors duration-150" data-val="3">★</span>
+                                    <span class="star text-zinc-300 hover:text-amber-400 transition-colors duration-150" data-val="4">★</span>
+                                    <span class="star text-zinc-300 hover:text-amber-400 transition-colors duration-150" data-val="5">★</span>
+                                </div>
+                            `;
+                        } else if (block.type === 'booking') {
+                            inputHtml = `
+                                <div class="border border-zinc-200 rounded-2xl p-4 bg-zinc-50/20 flex flex-col gap-3">
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-[10.5px] font-semibold text-zinc-500 mb-1">Select Date</span>
+                                        <input type="date" class="cora-booking-date w-full h-11 px-4 rounded-xl border border-zinc-200 text-xs font-semibold focus:border-zinc-400 outline-none bg-white transition-all" min="${new Date().toISOString().split('T')[0]}" />
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-[10.5px] font-semibold text-zinc-500 mb-1">Available Time Slots</span>
+                                        <div class="grid grid-cols-3 gap-2 cora-booking-slots mt-1.5">
+                                            <button type="button" class="cora-slot-btn py-2.5 px-3 border border-zinc-200 bg-white rounded-xl text-xs font-semibold text-center hover:bg-zinc-50 transition-all cursor-pointer" data-time="10:00 AM">10:00 AM</button>
+                                            <button type="button" class="cora-slot-btn py-2.5 px-3 border border-zinc-200 bg-white rounded-xl text-xs font-semibold text-center hover:bg-zinc-50 transition-all cursor-pointer" data-time="11:30 AM">11:30 AM</button>
+                                            <button type="button" class="cora-slot-btn py-2.5 px-3 border border-zinc-200 bg-white rounded-xl text-xs font-semibold text-center hover:bg-zinc-50 transition-all cursor-pointer" data-time="01:00 PM">01:00 PM</button>
+                                            <button type="button" class="cora-slot-btn py-2.5 px-3 border border-zinc-200 bg-white rounded-xl text-xs font-semibold text-center hover:bg-zinc-50 transition-all cursor-pointer" data-time="02:30 PM">02:30 PM</button>
+                                            <button type="button" class="cora-slot-btn py-2.5 px-3 border border-zinc-200 bg-white rounded-xl text-xs font-semibold text-center hover:bg-zinc-50 transition-all cursor-pointer" data-time="04:00 PM">04:00 PM</button>
+                                            <button type="button" class="cora-slot-btn py-2.5 px-3 border border-zinc-200 bg-white rounded-xl text-xs font-semibold text-center hover:bg-zinc-50 transition-all cursor-pointer" data-time="05:30 PM">05:30 PM</button>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="cora-booking-hidden-val" ${block.required ? 'required' : ''} />
+                                </div>
+                            `;
+                        } else if (block.type === 'address') {
+                            inputHtml = `
+                                <div class="border border-zinc-200 rounded-2xl p-4 bg-zinc-50/20 flex flex-col gap-3 address-group">
+                                    <input type="text" class="addr-street w-full h-11 px-4 rounded-xl border border-zinc-200 text-xs font-semibold focus:border-zinc-400 outline-none bg-white transition-all" placeholder="Street Address" />
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <input type="text" class="addr-city text-xs p-2.5 bg-white border border-zinc-200 rounded-lg focus:border-zinc-400 outline-none" placeholder="City" />
+                                        <input type="text" class="addr-state text-xs p-2.5 bg-white border border-zinc-200 rounded-lg focus:border-zinc-400 outline-none" placeholder="State" />
+                                        <input type="text" class="addr-zip text-xs p-2.5 bg-white border border-zinc-200 rounded-lg focus:border-zinc-400 outline-none" placeholder="ZIP Code" />
+                                    </div>
+                                    <input type="hidden" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="cora-address-hidden-val" ${block.required ? 'required' : ''} />
+                                </div>
+                            `;
+                        } else if (block.type === 'services_checklist') {
+                            const choices = block.choices || [];
+                            let checklistHtml = `<div class="flex flex-col gap-2 w-full">`;
+                            choices.forEach((c, cIdx) => {
+                                checklistHtml += `
+                                    <label class="flex items-center justify-between p-3.5 bg-white border border-zinc-200 rounded-xl text-xs font-semibold cursor-pointer hover:bg-zinc-50/50 transition-all select-none">
+                                        <div class="flex items-center gap-3">
+                                            <input type="checkbox" class="cora-service-check h-4 w-4 accent-zinc-950 rounded cursor-pointer" data-price="${c.price || 0}" data-service="${c.label}" value="${c.label}" />
+                                            <span class="text-zinc-800">${c.label}</span>
+                                        </div>
+                                        <span class="text-zinc-500 font-mono">₹${c.price || 0}</span>
+                                    </label>
+                                `;
+                            });
+                            checklistHtml += `
+                                <input type="hidden" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="cora-services-hidden-val" ${block.required ? 'required' : ''} />
+                                </div>
+                            `;
+                            inputHtml = checklistHtml;
                         } else {
                             // Text, number, email, phone
                             const inpType = block.type === 'number' ? 'number' : (block.type === 'email' ? 'email' : 'text');
-                            inputHtml = `<input type="${inpType}" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" placeholder="Type answer..." class="w-full h-10 px-3 rounded-lg border border-zinc-200 text-xs focus:ring-1 focus:ring-zinc-400 outline-none transition-all" />`;
+                            inputHtml = `<input type="${inpType}" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" placeholder="Type answer..." class="w-full h-11 px-4 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-900 placeholder-zinc-400 focus:border-zinc-400 outline-none transition-all" />`;
                         }
-
+ 
                         blockDiv.innerHTML = `
-                            <label class="text-xs font-semibold text-zinc-800">${cleanLabel}</label>
+                            <label class="block text-xs font-semibold text-zinc-700 mb-1.5">${cleanLabel}</label>
                             ${inputHtml}
                         `;
                     }
@@ -221,6 +814,8 @@ $settings = json_decode( $form['settings'], true ) ?: array();
                             } else {
                                 inp.checked = submittedAnswers[label] === 'true';
                             }
+                        } else if (inp.type === 'radio') {
+                            inp.checked = (inp.value === submittedAnswers[label]);
                         } else {
                             inp.value = submittedAnswers[label];
                         }
@@ -229,6 +824,13 @@ $settings = json_decode( $form['settings'], true ) ?: array();
                     // Attach change listeners for real-time saving and drop-off analytics
                     ['input', 'change'].forEach(evtType => {
                         inp.addEventListener(evtType, function() {
+                            // Clear validation error inline
+                            const parentBlock = inp.closest('.form-block-item');
+                            if (parentBlock) {
+                                const errorDiv = parentBlock.querySelector('.cora-field-error');
+                                if (errorDiv) errorDiv.remove();
+                            }
+
                             const fieldName = inp.dataset.fieldName;
                             if (inp.type === 'checkbox') {
                                 if (inp.name.endsWith('[]')) {
@@ -253,6 +855,7 @@ $settings = json_decode( $form['settings'], true ) ?: array();
 
                 evaluateLogic();
                 evaluateCalculations();
+                initCustomFieldsLogic(stepsContainer);
 
                 // Update progress percentage
                 const progressPct = steps.length > 1 ? (idx / (steps.length - 1)) * 100 : 100;
@@ -266,10 +869,129 @@ $settings = json_decode( $form['settings'], true ) ?: array();
                 }
 
                 if (idx === steps.length - 1) {
-                    btnNext.textContent = 'Submit';
+                    btnNext.textContent = (formSettings && formSettings.submit_button_text) || 'Submit';
                 } else {
                     btnNext.textContent = 'Next';
                 }
+            }
+
+            // Client-side validations for current step
+            function validateCurrentStep() {
+                let isValid = true;
+                let firstInvalidEl = null;
+
+                // Clear all existing errors
+                stepsContainer.querySelectorAll('.cora-field-error').forEach(el => el.remove());
+
+                const blocksOnStep = steps[currentStepIdx] || [];
+                blocksOnStep.forEach((block, bIdx) => {
+                    const blockDiv = stepsContainer.querySelector(`[data-block-id="block_${currentStepIdx}_${bIdx}"]`);
+                    if (!blockDiv) return;
+
+                    const cleanLabel = block.label || 'Input Field';
+                    const fieldName = cleanLabel.toLowerCase().replace(/[^a-z0-9]/g, '_');
+
+                    let blockError = '';
+
+                    // 1. Required field checks
+                    if (block.required) {
+                        if (block.type === 'checkbox' || block.type === 'multiple_choice' || block.type === 'radio') {
+                            const checked = blockDiv.querySelectorAll('input:checked');
+                            if (checked.length === 0) {
+                                blockError = 'Please select at least one option.';
+                            }
+                        } else if (block.type === 'signature') {
+                            const sigVal = blockDiv.querySelector('.signature-data-input')?.value;
+                            if (!sigVal) {
+                                blockError = 'Please sign before submitting.';
+                            }
+                        } else if (block.type === 'booking') {
+                            const bookingVal = blockDiv.querySelector('.cora-booking-hidden-val')?.value;
+                            if (!bookingVal) {
+                                blockError = 'Please select a date and time slot.';
+                            }
+                        } else if (block.type === 'address') {
+                            const street = blockDiv.querySelector('.addr-street')?.value.trim();
+                            const city = blockDiv.querySelector('.addr-city')?.value.trim();
+                            const state = blockDiv.querySelector('.addr-state')?.value.trim();
+                            const zip = blockDiv.querySelector('.addr-zip')?.value.trim();
+                            if (!street || !city || !state || !zip) {
+                                blockError = 'Please fill out all address fields.';
+                            }
+                        } else if (block.type === 'services_checklist') {
+                            const checked = blockDiv.querySelectorAll('.cora-service-check:checked');
+                            if (checked.length === 0) {
+                                blockError = 'Please select at least one service.';
+                            }
+                        } else if (block.type === 'dropdown') {
+                            const selVal = blockDiv.querySelector('select')?.value;
+                            if (!selVal) {
+                                blockError = 'Please select an option.';
+                            }
+                        } else if (block.type === 'columns') {
+                            (block.column_fields || []).forEach(colFields => {
+                                (colFields || []).forEach(subField => {
+                                    if (subField.required) {
+                                        const subCleanLabel = subField.label || 'Input Field';
+                                        const subFieldName = subCleanLabel.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                                        const subEl = blockDiv.querySelector(`[name="${subFieldName}"]`);
+                                        if (subEl && !subEl.value.trim()) {
+                                            blockError = `Field "${subCleanLabel}" is required.`;
+                                        }
+                                    }
+                                });
+                            });
+                        } else if (!['header', 'paragraph', 'divider', 'formula'].includes(block.type)) {
+                            const val = blockDiv.querySelector('input, textarea')?.value.trim();
+                            if (!val) {
+                                blockError = 'This field is required.';
+                            }
+                        }
+                    }
+
+                    // 2. Email format validation
+                    if (!blockError && block.type === 'email') {
+                        const emailVal = blockDiv.querySelector('input')?.value.trim();
+                        if (emailVal) {
+                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                            if (!emailRegex.test(emailVal)) {
+                                blockError = 'Please enter a valid email address.';
+                            }
+                        }
+                    }
+
+                    // 3. Phone format validation
+                    if (!blockError && block.type === 'phone') {
+                        const phoneVal = blockDiv.querySelector('input')?.value.trim();
+                        if (phoneVal) {
+                            const phoneRegex = /^\+?[\d\s\-()]{7,}$/;
+                            if (!phoneRegex.test(phoneVal)) {
+                                blockError = 'Please enter a valid phone number.';
+                            }
+                        }
+                    }
+
+                    // Show inline error
+                    if (blockError) {
+                        isValid = false;
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'cora-field-error text-red-500 text-[10.5px] mt-1 font-semibold';
+                        errorDiv.textContent = blockError;
+                        blockDiv.appendChild(errorDiv);
+
+                        if (!firstInvalidEl) {
+                            firstInvalidEl = blockDiv;
+                        }
+                    }
+                });
+
+                if (!isValid && firstInvalidEl) {
+                    firstInvalidEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    const inp = firstInvalidEl.querySelector('input, select, textarea');
+                    if (inp) inp.focus();
+                }
+
+                return isValid;
             }
 
             // Sync partial entry to server
@@ -303,12 +1025,32 @@ $settings = json_decode( $form['settings'], true ) ?: array();
                 // Collect current values
                 stepsContainer.querySelectorAll('input, select, textarea').forEach(inp => {
                     const label = inp.dataset.label;
+                    if (!label) return;
+                    const fieldName = inp.dataset.fieldName;
                     if (inp.type === 'checkbox') {
-                        submittedAnswers[label] = inp.checked ? 'true' : 'false';
+                        if (inp.name.endsWith('[]')) {
+                            const checkedBoxes = Array.from(stepsContainer.querySelectorAll(`input[name="${inp.name}"]:checked`));
+                            const values = checkedBoxes.map(cb => cb.value);
+                            submittedAnswers[label] = values;
+                            if (fieldName) submittedAnswers[fieldName] = values;
+                        } else {
+                            submittedAnswers[label] = inp.checked ? 'true' : 'false';
+                            if (fieldName) submittedAnswers[fieldName] = inp.checked ? 1 : 0;
+                        }
+                    } else if (inp.type === 'radio') {
+                        if (inp.checked) {
+                            submittedAnswers[label] = inp.value;
+                            if (fieldName) submittedAnswers[fieldName] = inp.value;
+                        }
                     } else {
                         submittedAnswers[label] = inp.value;
+                        if (fieldName) submittedAnswers[fieldName] = inp.value;
                     }
                 });
+
+                if (!validateCurrentStep()) {
+                    return;
+                }
 
                 if (currentStepIdx < steps.length - 1) {
                     currentStepIdx++;
@@ -368,14 +1110,14 @@ $settings = json_decode( $form['settings'], true ) ?: array();
                         } else {
                             showErrorBanner("Payment configuration setup failed. Please contact the administrator.");
                             btnNext.disabled = false;
-                            btnNext.textContent = 'Submit';
+                            btnNext.textContent = (formSettings && formSettings.submit_button_text) || 'Submit';
                         }
                     })
                     .catch(err => {
                         console.error("Payment error:", err);
                         showErrorBanner("Checkout connection failed. Please check your network and try again.");
                         btnNext.disabled = false;
-                        btnNext.textContent = 'Submit';
+                        btnNext.textContent = (formSettings && formSettings.submit_button_text) || 'Submit';
                     });
                     return;
                 }
@@ -405,16 +1147,16 @@ $settings = json_decode( $form['settings'], true ) ?: array();
                             }, 1500);
                         }
                     } else {
-                        alert("Submission failed. Please try again.");
+                        showErrorBanner("Submission failed. Please try again.");
                         btnNext.disabled = false;
-                        btnNext.textContent = 'Submit';
+                        btnNext.textContent = (formSettings && formSettings.submit_button_text) || 'Submit';
                     }
                 })
                 .catch(err => {
                     console.error("Submit error:", err);
-                    alert("Submission error.");
+                    showErrorBanner("Submission error. Please check your internet connection.");
                     btnNext.disabled = false;
-                    btnNext.textContent = 'Submit';
+                    btnNext.textContent = (formSettings && formSettings.submit_button_text) || 'Submit';
                 });
             }
 
@@ -555,26 +1297,28 @@ $settings = json_decode( $form['settings'], true ) ?: array();
                 const fid = urlParams.get('form_id') || '0';
                 
                 document.body.innerHTML = `
-                    <div class="min-h-screen flex items-center justify-center p-4 bg-[#faf9f6]" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
-                        <div class="w-full max-w-md bg-white border border-stone-200 rounded-2xl p-8 shadow-sm flex flex-col gap-6 text-stone-900">
-                            <div class="flex items-center justify-between border-b border-stone-100 pb-4">
+                    <div class="min-h-screen flex items-center justify-center p-4 bg-[#F9F6F0]" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                        <div class="w-full max-w-md bg-white border border-zinc-200 rounded-[24px] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.015)] flex flex-col gap-6 text-zinc-900">
+                            <div class="flex items-center justify-between border-b border-zinc-100 pb-4">
                                 <div class="flex items-center gap-2">
-                                    <span class="text-lg">💳</span>
-                                    <span class="text-xs font-bold uppercase tracking-wider text-stone-400">Secure Stripe Simulation</span>
+                                    <div class="text-zinc-650 shrink-0">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                    </div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-zinc-400">Secure Stripe Simulation</span>
                                 </div>
-                                <span class="text-xs text-stone-400">Sandbox Mode</span>
+                                <span class="text-xs text-zinc-400">Sandbox Mode</span>
                             </div>
                             
                             <div class="flex flex-col gap-1.5">
-                                <span class="text-[10px] uppercase font-bold text-stone-400">Payment Amount</span>
+                                <span class="text-[10px] uppercase font-bold text-zinc-400">Payment Amount</span>
                                 <span class="text-3xl font-bold">${cur === 'USD' ? '$' : '₹'}${amt}</span>
                             </div>
 
                             <div class="space-y-3">
-                                <button onclick="window.location.href='/shared-form/\${fid}?payment_success=1'" class="w-full h-10 rounded-lg bg-stone-950 text-white font-semibold text-xs hover:bg-stone-800 transition-all">
+                                <button onclick="window.location.href='/shared-form/\${fid}?payment_success=1'" class="w-full h-10 rounded-xl bg-zinc-950 text-white font-semibold text-xs hover:bg-zinc-900 transition-all cursor-pointer">
                                     Simulate Successful Payment (Authorize)
                                 </button>
-                                <button onclick="window.location.href='/shared-form/\${fid}?payment_cancel=1'" class="w-full h-10 rounded-lg border border-stone-200 text-stone-600 font-semibold text-xs hover:bg-stone-50 transition-all">
+                                <button onclick="window.location.href='/shared-form/\${fid}?payment_cancel=1'" class="w-full h-10 rounded-xl border border-zinc-200 text-zinc-600 font-semibold text-xs hover:bg-zinc-50 transition-all cursor-pointer">
                                     Simulate Cancel
                                 </button>
                             </div>

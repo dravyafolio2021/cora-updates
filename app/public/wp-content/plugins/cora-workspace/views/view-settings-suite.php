@@ -306,12 +306,25 @@ $cora_settings_tabs = array(
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label>Site Title</label>
+                        <label class="flex items-center gap-1.5" title="This title appears on your browser tab and platform header.">
+                            Site Title
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        </label>
                         <input type="text" name="blogname" value="<?php echo esc_attr( get_option('blogname') ); ?>">
                     </div>
                     <div>
-                        <label>Tagline / Subtitle</label>
+                        <label class="flex items-center gap-1.5" title="This title appears on your browser tab and platform header.">
+                            Tagline / Subtitle
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        </label>
                         <input type="text" name="blogdescription" value="<?php echo esc_attr( get_option('blogdescription') ); ?>">
+                    </div>
+                    <div>
+                        <label class="flex items-center gap-1.5" title="Changes the top-left sidebar title text">
+                            Sidebar Brand Title
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        </label>
+                        <input type="text" name="cora_sidebar_title" value="<?php echo esc_attr( get_option('cora_sidebar_title', 'cora') ); ?>">
                     </div>
                     <div>
                         <label>Administration Email Address</label>
@@ -342,7 +355,10 @@ $cora_settings_tabs = array(
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label>Workspace Name</label>
+                        <label class="flex items-center gap-1.5" title="This title appears on your browser tab and platform header.">
+                            Workspace Name
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        </label>
                         <input type="text" name="cora_workspace_name" value="<?php echo esc_attr( get_option('cora_workspace_name', 'Cora Studio') ); ?>" placeholder="e.g. Mumbai Main Office">
                     </div>
                     <div>
@@ -845,6 +861,9 @@ $cora_settings_tabs = array(
                             <button type="button" class="px-2.5 py-1.5 border border-zinc-200 dark:border-zinc-850 hover:border-zinc-450 bg-white dark:bg-zinc-900 text-zinc-750 dark:text-zinc-300 font-semibold text-[10px] rounded transition-colors cursor-pointer" onclick="document.getElementById('cora-brand-favicon-url-suite').value='';">
                                 Clear Favicon
                             </button>
+                            <button type="button" class="px-2.5 py-1.5 border border-zinc-200 dark:border-zinc-850 hover:border-zinc-450 bg-zinc-950 text-white font-semibold text-[10px] rounded transition-colors cursor-pointer" onclick="if(window.coraApplyBrandingLive) window.coraApplyBrandingLive();">
+                                Apply to Browser Tab Now
+                            </button>
                         </div>
                         <script>
                             function coraSetDefaultPremiumFavicon() {
@@ -871,6 +890,28 @@ $cora_settings_tabs = array(
                         ?>
                         <div id="cora-suite-favicon-preview" class="w-12 h-12 flex items-center justify-center border border-zinc-100 dark:border-zinc-850 rounded-md bg-zinc-50 dark:bg-zinc-900 transition-transform group-hover:scale-105">
                             <img src="<?php echo esc_url( $favicon_url ); ?>" class="w-8 h-8 object-contain" alt="Favicon Preview">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Browser Tab & Sidebar Title Settings -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/40">
+                    <div class="md:col-span-3 space-y-3">
+                        <h4 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Browser Tab & Sidebar Title Settings</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label>Site Title</label>
+                                <input type="text" name="blogname" value="<?php echo esc_attr( get_option('blogname') ); ?>">
+                            </div>
+                            <div>
+                                <label>Sidebar Brand Title</label>
+                                <input type="text" name="cora_sidebar_title" value="<?php echo esc_attr( get_option('cora_sidebar_title', 'cora') ); ?>">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label>Browser Tab Title Template</label>
+                                <input type="text" disabled value="[Page Name] - <?php echo esc_attr( get_option('blogname') ); ?>" class="bg-zinc-100 dark:bg-zinc-800 text-zinc-500 cursor-not-allowed">
+                                <p class="text-[11px] text-zinc-400 mt-1">This is how your tab titles will appear across the workspace.</p>
+                            </div>
                         </div>
                     </div>
                 </div>

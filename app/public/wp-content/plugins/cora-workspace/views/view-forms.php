@@ -4,10 +4,11 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 ?>
+<style>#cora-forms-module { position: relative; } @keyframes spin { to { transform: rotate(360deg); } }</style>
 
-<div id="cora-forms-module" class="w-full h-full flex flex-col gap-6" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+<div id="cora-forms-module" class="w-full flex-1 min-h-0 flex flex-col overflow-hidden" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
     <!-- STATE 1: FORMS LIST VIEW -->
-    <div id="forms-list-state" class="flex flex-col gap-6">
+    <div id="forms-list-state" class="flex-1 flex flex-col overflow-y-auto p-6 md:p-8 gap-6">
         <!-- Header -->
         <div class="flex items-center justify-between border-b border-zinc-200/60 pb-5">
             <div>
@@ -21,17 +22,21 @@ if ( ! defined( 'ABSPATH' ) ) {
         </div>
 
         <!-- Sub-page Tab Bar -->
-        <div class="flex items-center gap-1 border-b border-zinc-200/60 pb-px mb-4">
-            <button id="tab-forms-list" class="cora-forms-tab px-4 py-2.5 text-xs font-semibold border-b-2 border-zinc-950 text-zinc-950 -mb-px transition-all border-none bg-transparent cursor-pointer">
+        <div class="flex items-center gap-1 border-b border-zinc-200/60 dark:border-zinc-800/60 pb-px mb-4">
+            <button id="tab-forms-list" class="cora-forms-tab flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50 -mb-px transition-all bg-transparent cursor-pointer">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                 Forms List
             </button>
-            <button id="tab-funnel-analytics" class="cora-forms-tab px-4 py-2.5 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 -mb-px transition-all border-none bg-transparent cursor-pointer">
+            <button id="tab-funnel-analytics" class="cora-forms-tab flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 -mb-px transition-all bg-transparent cursor-pointer">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                 Funnel Analytics
             </button>
-            <button id="tab-clauses-library" class="cora-forms-tab px-4 py-2.5 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 -mb-px transition-all border-none bg-transparent cursor-pointer">
+            <button id="tab-clauses-library" class="cora-forms-tab flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 -mb-px transition-all bg-transparent cursor-pointer">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                 Clause Library
             </button>
-            <button id="tab-audit-logs" class="cora-forms-tab px-4 py-2.5 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 -mb-px transition-all border-none bg-transparent cursor-pointer">
+            <button id="tab-audit-logs" class="cora-forms-tab flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 -mb-px transition-all bg-transparent cursor-pointer">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 Compliance Audit Log
             </button>
         </div>
@@ -162,7 +167,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                                     <span id="funnel-started-pct">0%</span>
                                 </div>
                                 <div class="h-6 w-full bg-zinc-100 rounded-lg overflow-hidden border border-zinc-200/30">
-                                    <div id="funnel-started-progress" class="h-full bg-zinc-650 flex items-center pl-3 text-[10px] font-bold text-white transition-all duration-500" style="width: 0%">0%</div>
+                                    <div id="funnel-started-progress" class="h-full bg-zinc-600 flex items-center pl-3 text-[10px] font-bold text-white transition-all duration-500" style="width: 0%">0%</div>
                                 </div>
                             </div>
                         </div>
@@ -271,7 +276,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     </div>
 
     <!-- STATE 2: FULL-PAGE INTERACTIVE FORM BUILDER VIEW -->
-    <div id="form-editor-state" class="hidden flex-col h-[calc(100vh-85px)] min-h-[600px] border-0 rounded-none bg-white dark:bg-zinc-950 overflow-hidden font-sans">
+    <div id="form-editor-state" class="hidden flex-col flex-1 h-full min-h-0 border-0 rounded-none bg-white dark:bg-zinc-950 overflow-hidden font-sans">
         <!-- TOP TOOLBAR HEADER -->
         <div class="px-5 py-3 border-b border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between gap-4 shrink-0 bg-white dark:bg-zinc-950">
             <!-- Left: Back & Title -->
@@ -313,13 +318,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
             <!-- Right: Publish & Status Controls -->
             <div class="flex items-center gap-2 shrink-0">
-                <button id="btn-editor-view-live" class="hidden h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-all items-center gap-1.5 cursor-pointer">
+                <button id="btn-view-form" class="h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                    View Form
-                </button>
-                <button id="btn-editor-share" class="hidden h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-all items-center gap-1.5 cursor-pointer">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-                    Share
+                    View
                 </button>
                 <select id="editor-form-status" class="h-8 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs font-semibold text-zinc-700 dark:text-zinc-300 outline-none">
                     <option value="published">Published</option>
@@ -338,12 +339,12 @@ if ( ! defined( 'ABSPATH' ) ) {
             <!-- COLUMN 1: UNIFIED DYNAMIC LEFT SIDEBAR -->
             <div id="editor-left-panel" class="w-[320px] shrink-0 border-r border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-950 flex flex-col font-sans transition-all duration-300 ease-in-out" style="width:320px;">
                 <!-- Top Header Tabs -->
-                <div class="px-3 py-2.5 border-b border-zinc-200/80 dark:border-zinc-800 flex items-center gap-1 bg-white dark:bg-zinc-900 shrink-0">
-                    <div id="left-panel-tabs" class="flex-1 flex items-center gap-1 overflow-x-auto no-scrollbar">
-                        <button id="btn-left-tab-fields" class="py-1.5 px-2 rounded-md text-xs font-bold text-zinc-950 dark:text-zinc-50 border-b-2 border-zinc-950 dark:border-zinc-50 whitespace-nowrap cursor-pointer">Add Fields</button>
-                        <button id="btn-left-tab-settings" class="py-1.5 px-2 rounded-md text-xs font-semibold text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 border-b-2 border-transparent whitespace-nowrap cursor-pointer">Field Settings</button>
-                        <button id="btn-left-tab-form" class="py-1.5 px-2 rounded-md text-xs font-semibold text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 border-b-2 border-transparent whitespace-nowrap cursor-pointer">Form Settings</button>
-                        <button id="btn-left-tab-integ" class="py-1.5 px-2 rounded-md text-xs font-semibold text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 border-b-2 border-transparent whitespace-nowrap cursor-pointer">Integrations</button>
+                <div class="px-3 py-2 border-b border-zinc-200/80 dark:border-zinc-800 flex items-center bg-white dark:bg-zinc-900 shrink-0">
+                    <div id="left-panel-tabs" class="flex-1 flex items-center p-0.5 bg-zinc-100 dark:bg-zinc-800/80 rounded-lg gap-0.5">
+                        <button id="btn-left-tab-fields" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-bold bg-white dark:bg-zinc-700 text-zinc-950 dark:text-zinc-50 shadow-2xs whitespace-nowrap cursor-pointer transition-all border-0 outline-none">Add Fields</button>
+                        <button id="btn-left-tab-settings" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 whitespace-nowrap cursor-pointer transition-all bg-transparent border-0 outline-none">Fields</button>
+                        <button id="btn-left-tab-form" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 whitespace-nowrap cursor-pointer transition-all bg-transparent border-0 outline-none">Form</button>
+                        <button id="btn-left-tab-integ" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 whitespace-nowrap cursor-pointer transition-all bg-transparent border-0 outline-none">Integ</button>
                     </div>
                 </div>
 
@@ -408,9 +409,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
                         <!-- ADVANCED FIELDS -->
                         <div>
-                            <div class="flex items-center justify-between mb-2">
+                            <div class="mb-2">
                                 <span class="text-[9.5px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Advanced Fields</span>
-                                <span class="px-1.5 py-0.5 bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 text-[8px] font-bold rounded font-mono uppercase">PRO</span>
                             </div>
                             <div class="grid grid-cols-2 gap-1.5">
                                 <button draggable="true" class="p-2 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-400 hover:bg-zinc-50 text-left flex items-center gap-2 cursor-grab active:cursor-grabbing text-[11px] font-medium text-zinc-800 dark:text-zinc-200 transition-all" data-add-type="signature">
@@ -425,9 +425,13 @@ if ( ! defined( 'ABSPATH' ) ) {
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0 text-zinc-500"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
                                     Slider
                                 </button>
-                                <button draggable="true" class="p-2 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-400 hover:bg-zinc-50 text-left flex items-center gap-2 cursor-grab active:cursor-grabbing text-[11px] font-medium text-zinc-800 dark:text-zinc-200 transition-all" data-add-type="payment">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0 text-zinc-500"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                                    Stripe Payment
+                                <button draggable="true" class="p-2 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-400 hover:bg-zinc-50 text-left flex items-center gap-2 cursor-grab active:cursor-grabbing text-[11px] font-medium text-zinc-800 dark:text-zinc-200 transition-all" data-add-type="upi_id">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0 text-zinc-500"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line><line x1="6" y1="15" x2="10" y2="15"></line></svg>
+                                    UPI ID
+                                </button>
+                                <button draggable="true" class="p-2 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-400 hover:bg-zinc-50 text-left flex items-center gap-2 cursor-grab active:cursor-grabbing text-[11px] font-medium text-zinc-800 dark:text-zinc-200 transition-all" data-add-type="upi_qr">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0 text-zinc-500"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><path d="M14 14h1v1h-1zm3 0h1v1h-1zm0 3h1v1h-1zm-3 3h1v1h-1zm3 0h1v1h-1z"></path></svg>
+                                    UPI QR
                                 </button>
                                 <button draggable="true" class="p-2 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-400 hover:bg-zinc-50 text-left flex items-center gap-2 cursor-grab active:cursor-grabbing text-[11px] font-medium text-zinc-800 dark:text-zinc-200 transition-all" data-add-type="rich_text">
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0 text-zinc-500"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
@@ -444,6 +448,18 @@ if ( ! defined( 'ABSPATH' ) ) {
                                 <button draggable="true" class="p-2 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-400 hover:bg-zinc-50 text-left flex items-center gap-2 cursor-grab active:cursor-grabbing text-[11px] font-medium text-zinc-800 dark:text-zinc-200 transition-all" data-add-type="hidden">
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0 text-zinc-500"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
                                     Hidden Field
+                                </button>
+                                <button draggable="true" class="p-2 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-400 hover:bg-zinc-50 text-left flex items-center gap-2 cursor-grab active:cursor-grabbing text-[11px] font-medium text-zinc-800 dark:text-zinc-200 transition-all" data-add-type="booking">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0 text-zinc-500"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                    Booking Slots
+                                </button>
+                                <button draggable="true" class="p-2 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-400 hover:bg-zinc-50 text-left flex items-center gap-2 cursor-grab active:cursor-grabbing text-[11px] font-medium text-zinc-800 dark:text-zinc-200 transition-all" data-add-type="address">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0 text-zinc-500"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                    Address Field
+                                </button>
+                                <button draggable="true" class="p-2 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-400 hover:bg-zinc-50 text-left flex items-center gap-2 cursor-grab active:cursor-grabbing text-[11px] font-medium text-zinc-800 dark:text-zinc-200 transition-all" data-add-type="services_checklist">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0 text-zinc-500"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                    Pricing List
                                 </button>
                             </div>
                         </div>
@@ -485,7 +501,9 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <!-- Selected Field Banner -->
                     <div class="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between">
                         <div class="flex items-center gap-2">
-                            <span class="text-base" id="inspector-field-icon">💳</span>
+                            <div id="inspector-field-icon" class="text-zinc-500 dark:text-zinc-400">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="13" y2="17"></line></svg>
+                            </div>
                             <div>
                                 <h4 class="text-xs font-bold text-zinc-950 dark:text-zinc-50" id="inspector-field-type-title">Field Settings</h4>
                                 <span class="text-[9.5px] text-zinc-400 font-mono" id="inspector-field-id">Select a field on canvas</span>
@@ -529,14 +547,18 @@ if ( ! defined( 'ABSPATH' ) ) {
                     </div>
 
                     <!-- Price Configuration (for payment fields) -->
-                    <div class="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                    <div id="inspector-price-container" class="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
                         <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Price Configuration</label>
                         <div class="flex items-center gap-2">
                             <input id="inspector-price-amount" type="number" value="100" class="h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs font-semibold text-zinc-900 dark:text-zinc-100 outline-none w-full" />
-                            <select class="h-9 px-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs font-bold text-zinc-800 dark:text-zinc-200">
-                                <option>INR (₹)</option>
-                                <option>USD ($)</option>
+                            <select id="inspector-price-currency" class="h-9 px-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs font-bold text-zinc-800 dark:text-zinc-200">
+                                <option value="INR">INR (₹)</option>
+                                <option value="USD">USD ($)</option>
                             </select>
+                        </div>
+                        <div id="inspector-upi-container" class="space-y-1 mt-2">
+                            <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">UPI ID / VPA</label>
+                            <input id="inspector-upi-id-value" type="text" placeholder="yourname@paytm" class="h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs font-medium text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 w-full" />
                         </div>
                     </div>
 
@@ -553,7 +575,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </div>
 
                 <!-- 3. #left-tab-content-form: Form Level Settings -->
-                <div id="left-tab-content-form" class="hidden flex-1 overflow-y-auto p-4 space-y-4">
+                <div id="left-tab-form" class="hidden flex-1 overflow-y-auto p-4 space-y-4">
                     <div class="space-y-1">
                         <label class="text-[10px] font-bold text-zinc-400 uppercase">Form Title</label>
                         <input id="settings-form-title" type="text" placeholder="Form Title" class="h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 outline-none w-full" />
@@ -573,6 +595,75 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <div class="space-y-1">
                         <label class="text-[10px] font-bold text-zinc-400 uppercase">Redirect URL</label>
                         <input id="settings-redirect-url" type="text" placeholder="https://example.com/thank-you" class="h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 outline-none w-full" />
+                    </div>
+
+                    <!-- Footer Buttons (CTA) Customization -->
+                    <div class="space-y-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Footer Actions (CTAs)</label>
+                        
+                        <div class="space-y-1">
+                            <span class="text-[9.5px] font-bold text-zinc-500 uppercase">Primary CTA Text</span>
+                            <input id="settings-submit-text" type="text" placeholder="Submit" class="h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 outline-none w-full" />
+                        </div>
+
+                        <div class="space-y-1">
+                            <span class="text-[9.5px] font-bold text-zinc-500 uppercase">Submit Action</span>
+                            <select id="settings-submit-action" class="h-9 px-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs font-semibold text-zinc-700 dark:text-zinc-300 outline-none w-full">
+                                <option value="message">Show Success Message</option>
+                                <option value="redirect">Redirect to URL</option>
+                            </select>
+                        </div>
+
+                        <div class="flex items-center justify-between py-1.5">
+                            <span class="text-xs font-medium text-zinc-700 dark:text-zinc-300">Show Secondary Button</span>
+                            <input type="checkbox" id="settings-sec-show" class="w-4 h-4 rounded accent-zinc-950 cursor-pointer" />
+                        </div>
+
+                        <div id="settings-sec-text-wrapper" class="space-y-1">
+                            <span class="text-[9.5px] font-bold text-zinc-500 uppercase">Secondary CTA Text</span>
+                            <input id="settings-sec-text" type="text" placeholder="Save as draft" class="h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 outline-none w-full" />
+                        </div>
+                    </div>
+
+                    <!-- Automated Email Notifications -->
+                    <div class="space-y-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Email Notifications</label>
+                        
+                        <!-- Admin Notification -->
+                        <div class="space-y-2 border border-zinc-150 dark:border-zinc-800/85 rounded-xl p-3 bg-zinc-50/20">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Admin Notification</span>
+                                <input type="checkbox" id="settings-email-admin-enable" class="w-4 h-4 rounded accent-zinc-950 cursor-pointer" />
+                            </div>
+                            <div id="settings-email-admin-details" class="space-y-2 mt-1 hidden">
+                                <div class="space-y-1">
+                                    <span class="text-[9px] font-bold text-zinc-500 uppercase">Send to Email(s)</span>
+                                    <input id="settings-email-admin-to" type="text" placeholder="admin@example.com" class="h-8 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 outline-none w-full" />
+                                </div>
+                                <div class="space-y-1">
+                                    <span class="text-[9px] font-bold text-zinc-500 uppercase">Subject Line</span>
+                                    <input id="settings-email-admin-subject" type="text" placeholder="New Submission: [Form Title]" class="h-8 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 outline-none w-full" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submitter Confirmation -->
+                        <div class="space-y-2 border border-zinc-150 dark:border-zinc-800/85 rounded-xl p-3 bg-zinc-50/20">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Submitter Receipt</span>
+                                <input type="checkbox" id="settings-email-submitter-enable" class="w-4 h-4 rounded accent-zinc-950 cursor-pointer" />
+                            </div>
+                            <div id="settings-email-submitter-details" class="space-y-2 mt-1 hidden">
+                                <div class="space-y-1">
+                                    <span class="text-[9px] font-bold text-zinc-500 uppercase">Subject Line</span>
+                                    <input id="settings-email-submitter-subject" type="text" placeholder="Submission Received: [Form Title]" class="h-8 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 outline-none w-full" />
+                                </div>
+                                <div class="space-y-1">
+                                    <span class="text-[9px] font-bold text-zinc-500 uppercase">Body Header Message</span>
+                                    <textarea id="settings-email-submitter-message" rows="2" placeholder="Thank you for your submission. A summary of your answers is below." class="p-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 outline-none w-full resize-none"></textarea>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
                         <div class="flex items-center justify-between">
@@ -596,7 +687,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </div>
 
                 <!-- 4. #left-tab-content-integ: Integrations Settings -->
-                <div id="left-tab-content-integ" class="hidden flex-1 overflow-y-auto p-4 space-y-4">
+                <div id="left-tab-integ" class="hidden flex-1 overflow-y-auto p-4 space-y-4">
                     <div class="space-y-1">
                         <label class="text-[10px] font-bold text-zinc-400 uppercase">Webhook Endpoint URL</label>
                         <input id="settings-webhook-url" type="text" placeholder="https://yourdomain.com/webhook" class="h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 outline-none w-full" />
@@ -630,42 +721,54 @@ if ( ! defined( 'ABSPATH' ) ) {
             <!-- /LEFT PANEL -->
 
             <!-- COLUMN 2: MAIN CONTENT AREA (FLEX-1) -->
-            <div class="flex-1 flex flex-col overflow-hidden">
+            <div class="flex-1 flex flex-col overflow-hidden min-h-0">
 
                 <!-- BUILD VIEW -->
-                <div id="editor-build-view" class="flex-1 flex flex-col overflow-hidden">
+                <div id="editor-build-view" class="flex-1 flex flex-col overflow-hidden min-h-0">
                     <!-- Steps Bar -->
                     <div id="editor-steps-bar" class="flex items-center gap-2 px-6 pt-4 pb-2 overflow-x-auto shrink-0"></div>
 
                     <!-- Canvas Scroll Area -->
-                    <div id="editor-center-canvas" class="flex-1 bg-zinc-50 dark:bg-zinc-950 overflow-y-auto p-6 flex flex-col items-center">
+                    <div id="editor-center-canvas" class="flex-1 bg-zinc-50 dark:bg-zinc-950 overflow-y-auto p-6 flex flex-col items-center min-h-0">
                         <!-- CANVAS SHEET -->
-                        <div id="editor-document-sheet" class="w-full max-w-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm flex flex-col overflow-hidden relative min-h-[600px]">
-                            <!-- Cover Banner Dropzone -->
-                            <div class="w-full h-36 border-b border-dashed border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/50 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-zinc-100/60 transition-all" id="editor-header-dropzone">
-                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                <span class="text-xs font-semibold text-zinc-500">Add header logo or cover image</span>
-                                <span class="text-[10px] text-zinc-400">Recommended: 1200 x 400px</span>
-                            </div>
+                        <div id="editor-document-sheet" class="w-full max-w-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm flex flex-col overflow-hidden relative h-full">
+
 
                             <!-- Form Header Info -->
-                            <div class="px-10 pt-6 pb-2 space-y-1">
-                                <h2 class="text-2xl font-bold text-zinc-950 dark:text-zinc-50 outline-none border-none bg-transparent" contenteditable="true" id="canvas-form-name">Cora Survey Form</h2>
-                                <p class="text-sm text-zinc-500 dark:text-zinc-400 outline-none" contenteditable="true" id="canvas-form-subtitle">Fill out details below to submit request.</p>
+                            <div class="px-8 pb-6 border-b border-zinc-100 shrink-0" style="padding-top: 60px !important;">
+                                <h2 class="text-2xl font-bold text-zinc-950 dark:text-zinc-50 outline-none border-none bg-transparent leading-tight" contenteditable="true" id="canvas-form-name">Cora Survey Form</h2>
+                                <p class="text-sm text-zinc-500 dark:text-zinc-400 outline-none mt-1" contenteditable="true" id="canvas-form-subtitle">Fill out details below to submit request.</p>
                             </div>
 
                             <!-- Block List Container -->
-                            <div class="px-6 pb-4 pt-2 flex flex-col gap-3 min-h-[200px]" id="editor-blocks-container">
+                            <div class="flex flex-col flex-1 overflow-y-auto min-h-0" id="editor-blocks-container">
                                 <!-- Dynamic blocks injected here -->
                             </div>
 
-                            <!-- Bottom Add Dropzone -->
-                            <div id="editor-drop-zone" class="mx-6 mb-6 py-8 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/40 dark:bg-zinc-900/30 flex flex-col items-center justify-center gap-2">
-                                <span class="text-xs font-medium text-zinc-400">+ Drag &amp; drop a field here</span>
-                                <span class="text-[10px] text-zinc-300">or</span>
-                                <button id="btn-add-element-bottom" class="h-8 px-4 rounded-lg bg-zinc-950 text-white dark:bg-zinc-100 dark:text-zinc-950 text-xs font-bold hover:bg-zinc-800 cursor-pointer transition-all">
-                                    + Add Form Field
+                            <!-- Bottom Add Field Row -->
+                            <div id="editor-drop-zone" class="border-t border-zinc-100 px-8 py-4 flex items-center gap-3 shrink-0"
+                                ondragover="event.preventDefault()" ondrop="event.preventDefault(); const d=event.dataTransfer.getData('text/plain'); if(d.startsWith('new:')){addFieldToForm(d.replace('new:',''));}">
+                                <button id="btn-add-element-bottom" class="flex items-center gap-2 h-8 px-4 rounded-lg border border-zinc-200 bg-white text-zinc-600 text-xs font-semibold hover:bg-zinc-50 hover:border-zinc-300 cursor-pointer transition-all">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                    Add Field
                                 </button>
+                                <span class="text-[10px] text-zinc-400">or drag & drop from sidebar</span>
+                            </div>
+
+                            <!-- Bottom CTA Preview Row -->
+                            <div id="canvas-cta-preview-row" class="border-t border-zinc-100 bg-zinc-50/20 dark:bg-zinc-900/10 px-8 py-5 flex items-center justify-between mt-auto shrink-0 cursor-pointer hover:bg-zinc-100/10 transition-all" title="Click to customize submit buttons">
+                                <button id="canvas-sec-btn" type="button" class="h-9 px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer transition-all">
+                                    Save as draft
+                                </button>
+                                <div class="flex items-center gap-2">
+                                    <button type="button" class="h-9 px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer transition-all">
+                                        Schedule
+                                    </button>
+                                    <button id="canvas-submit-btn" type="button" class="h-9 px-5 rounded-xl bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-semibold hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all flex items-center gap-1.5 shadow-sm cursor-pointer">
+                                        Submit
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1029,23 +1132,25 @@ document.addEventListener('DOMContentLoaded', function() {
         input:          { label: 'Short Text',     badge: 'Text',     icon: 'T' },
         long_text:      { label: 'Long Text',      badge: 'Text',     icon: '\u2261' },
         textarea:       { label: 'Long Text',      badge: 'Text',     icon: '\u2261' },
-        email:          { label: 'Email',          badge: 'Email',    icon: '\u2709' },
-        phone:          { label: 'Phone',          badge: 'Phone',    icon: '\u260e' },
-        tel:            { label: 'Phone',          badge: 'Phone',    icon: '\u260e' },
+        email:          { label: 'Email',          badge: 'Email',    icon: '@' },
+        phone:          { label: 'Phone',          badge: 'Phone',    icon: 'P' },
+        tel:            { label: 'Phone',          badge: 'Phone',    icon: 'P' },
         number:         { label: 'Number',         badge: 'Number',   icon: '#' },
-        dropdown:       { label: 'Dropdown',       badge: 'Dropdown', icon: '\u2228' },
-        select:         { label: 'Dropdown',       badge: 'Dropdown', icon: '\u2228' },
-        multiple_choice:{ label: 'Multiple Choice',badge: 'Choice',   icon: '\u25ce' },
-        radio:          { label: 'Multiple Choice',badge: 'Choice',   icon: '\u25ce' },
-        multiselect:    { label: 'Multi-Select',   badge: 'Choice',   icon: '\u25ce' },
-        checkbox:       { label: 'Checkboxes',     badge: 'Check',    icon: '\u2611' },
-        date:           { label: 'Date',           badge: 'Date',     icon: '\ud83d\udcc5' },
-        file:           { label: 'File Upload',    badge: 'File',     icon: '\u2191' },
-        signature:      { label: 'Signature',      badge: 'Sign',     icon: '\u270d' },
-        rating:         { label: 'Rating',         badge: 'Rating',   icon: '\u2605' },
-        slider:         { label: 'Slider',         badge: 'Slider',   icon: '\u27fa' },
-        payment:        { label: 'Stripe Payment', badge: 'Payment',  icon: '\ud83d\udcb3' },
-        stripe_payment: { label: 'Stripe Payment', badge: 'Payment',  icon: '\ud83d\udcb3' },
+        dropdown:       { label: 'Dropdown',       badge: 'Dropdown', icon: 'v' },
+        select:         { label: 'Dropdown',       badge: 'Dropdown', icon: 'v' },
+        multiple_choice:{ label: 'Multiple Choice',badge: 'Choice',   icon: 'o' },
+        radio:          { label: 'Multiple Choice',badge: 'Choice',   icon: 'o' },
+        multiselect:    { label: 'Multi-Select',   badge: 'Choice',   icon: 'o' },
+        checkbox:       { label: 'Checkboxes',     badge: 'Check',    icon: '[x]' },
+        date:           { label: 'Date',           badge: 'Date',     icon: 'D' },
+        file:           { label: 'File Upload',    badge: 'File',     icon: '^' },
+        signature:      { label: 'Signature',      badge: 'Sign',     icon: 'S' },
+        rating:         { label: 'Rating',         badge: 'Rating',   icon: '*' },
+        slider:         { label: 'Slider',         badge: 'Slider',   icon: '-' },
+        payment:        { label: 'UPI ID',         badge: 'Payment',  icon: '₹' },
+        stripe_payment: { label: 'UPI ID',         badge: 'Payment',  icon: '₹' },
+        upi_id:         { label: 'UPI ID',         badge: 'Payment',  icon: '₹' },
+        upi_qr:         { label: 'UPI QR Code',    badge: 'Payment',  icon: '▦' },
         rich_text:      { label: 'Rich Text',      badge: 'RTE',      icon: '\u270e' },
         matrix:         { label: 'Matrix Field',   badge: 'Matrix',   icon: '\u229e' },
         repeatable:     { label: 'Repeatable',     badge: 'Repeat',   icon: '\u2261' },
@@ -1056,6 +1161,9 @@ document.addEventListener('DOMContentLoaded', function() {
         columns:        { label: 'Columns',        badge: 'Layout',   icon: '\u229f' },
         divider:        { label: 'Divider',        badge: 'Layout',   icon: '\u2014' },
         spacer:         { label: 'Spacer',         badge: 'Layout',   icon: '\u283f' },
+        booking:        { label: 'Booking Slots',  badge: 'Booking',  icon: '\ud83d\udcc5' },
+        address:        { label: 'Address Field',  badge: 'Address',  icon: '\ud83d\udccd' },
+        services_checklist: { label: 'Pricing List',   badge: 'Pricing',  icon: '\ud83d\udcb0' },
         formula:        { label: 'Formula',        badge: 'Calc',     icon: '\u0192' },
     };
 
@@ -1203,6 +1311,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // View States selectors
     const listState = document.getElementById('forms-list-state');
     const editorState = document.getElementById('form-editor-state');
+    const confirmDrawer = document.getElementById('cora-confirm-drawer');
+    let confirmCallback = null;
+
+    document.getElementById('btn-close-confirm')?.addEventListener('click', () => {
+        confirmDrawer?.classList.add('translate-x-full');
+    });
+    document.getElementById('btn-cancel-confirm')?.addEventListener('click', () => {
+        confirmDrawer?.classList.add('translate-x-full');
+    });
+    document.getElementById('btn-confirm-action')?.addEventListener('click', () => {
+        if (typeof confirmCallback === 'function') {
+            confirmCallback();
+        }
+        confirmDrawer?.classList.add('translate-x-full');
+    });
     
     jQuery('#funnel-form-selector').on('change', updateAdvancedFunnelData);
 
@@ -1334,37 +1457,116 @@ function updateAdvancedFunnelData() {
         });
 
         if (selectedId === 'all') {
-            const views = Math.round(Math.max(formsData.length * 15, totalSubmissions * 1.6));
-            const started = Math.round(Math.max(formsData.length * 8, totalSubmissions * 1.2));
-            const completed = totalSubmissions;
-            const abRate = started > 0 ? Math.round(((started - completed) / started) * 100) : 0;
-            
-            document.getElementById('funnel-metric-views').textContent = views;
-            document.getElementById('funnel-metric-started').textContent = started;
-            document.getElementById('funnel-metric-completed').textContent = completed;
-            document.getElementById('funnel-metric-abandonment').textContent = abRate + "%";
-            
-            document.getElementById('funnel-views-count').textContent = views;
-            document.getElementById('funnel-started-count').textContent = started;
-            
-            const startedPct = views > 0 ? Math.round((started / views) * 100) : 0;
-            document.getElementById('funnel-started-pct').textContent = startedPct + "%";
-            document.getElementById('funnel-started-progress').style.width = startedPct + "%";
-            document.getElementById('funnel-started-progress').textContent = startedPct + "%";
-            
-            document.getElementById('funnel-completed-count').textContent = completed;
-            const completedPct = views > 0 ? Math.round((completed / views) * 100) : 0;
-            document.getElementById('funnel-completed-pct').textContent = completedPct + "%";
-            document.getElementById('funnel-completed-progress').style.width = completedPct + "%";
-            document.getElementById('funnel-completed-progress').textContent = completedPct + "%";
-            
-            // Loss badges
-            updateFunnelLossBadge('funnel-loss-1', views, started);
-            updateFunnelLossBadge('funnel-loss-2', started, completed);
+            jQuery.ajax({
+                url: `/wp-json/cora/v1/forms/submissions`,
+                method: 'GET',
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-WP-Nonce', wpNonce);
+                },
+                success: function(submissions) {
+                    const started = submissions.length;
+                    const completed = submissions.filter(s => s.is_partial == '0').length;
+                    const views = Math.round(Math.max(formsData.length * 15, totalSubmissions * 1.6));
+                    const abRate = started > 0 ? Math.round(((started - completed) / started) * 100) : 0;
+                    
+                    document.getElementById('funnel-metric-views').textContent = views;
+                    document.getElementById('funnel-metric-started').textContent = started;
+                    document.getElementById('funnel-metric-completed').textContent = completed;
+                    document.getElementById('funnel-metric-abandonment').textContent = abRate + "%";
+                    
+                    document.getElementById('funnel-views-count').textContent = views;
+                    document.getElementById('funnel-started-count').textContent = started;
+                    
+                    const startedPct = views > 0 ? Math.round((started / views) * 100) : 0;
+                    document.getElementById('funnel-started-pct').textContent = startedPct + "%";
+                    document.getElementById('funnel-started-progress').style.width = startedPct + "%";
+                    document.getElementById('funnel-started-progress').textContent = startedPct + "%";
+                    
+                    document.getElementById('funnel-completed-count').textContent = completed;
+                    const completedPct = views > 0 ? Math.round((completed / views) * 100) : 0;
+                    document.getElementById('funnel-completed-pct').textContent = completedPct + "%";
+                    document.getElementById('funnel-completed-progress').style.width = completedPct + "%";
+                    document.getElementById('funnel-completed-progress').textContent = completedPct + "%";
+                    
+                    // Loss badges
+                    updateFunnelLossBadge('funnel-loss-1', views, started);
+                    updateFunnelLossBadge('funnel-loss-2', started, completed);
 
-            document.getElementById('funnel-friction-list').innerHTML = `
-                <div class="text-[10px] text-zinc-400 text-center py-4">Select a specific form to view field friction analytics.</div>
-            `;
+                    // Friction Analysis
+                    const frictionContainer = document.getElementById('funnel-friction-list');
+                    
+                    let allInputBlocks = [];
+                    formsData.forEach(form => {
+                        const inputs = (form.blocks || []).filter(b => 
+                            b.type !== 'header' && b.type !== 'paragraph' && b.type !== 'divider' && b.type !== 'page_break' && b.type !== 'stripe_payment'
+                        );
+                        allInputBlocks = allInputBlocks.concat(inputs);
+                    });
+
+                    const uniqueLabels = [...new Set(allInputBlocks.map(b => b.label).filter(l => l))];
+
+                    if (uniqueLabels.length === 0) {
+                        frictionContainer.innerHTML = `<div class="text-[10px] text-zinc-400 text-center py-4">No input fields found across any forms.</div>`;
+                        return;
+                    }
+
+                    const fieldStats = uniqueLabels.map(label => {
+                        let fillCount = 0;
+                        let relevantForms = formsData.filter(form => {
+                            return (form.blocks || []).some(b => 
+                                b.type !== 'header' && b.type !== 'paragraph' && b.type !== 'divider' && b.type !== 'page_break' && b.type !== 'stripe_payment' && b.label === label
+                            );
+                        }).map(f => f.id);
+
+                        // Use string match or direct type match based on what form_id is
+                        let relevantSubmissions = submissions.filter(sub => relevantForms.includes(String(sub.form_id)) || relevantForms.includes(Number(sub.form_id)));
+
+                        relevantSubmissions.forEach(sub => {
+                            const val = sub.submitted_data[label];
+                            if (val !== undefined && val !== null && val !== '') {
+                                fillCount++;
+                            }
+                        });
+                        
+                        const relevantStarted = relevantSubmissions.length;
+                        const rate = relevantStarted > 0 ? Math.round((fillCount / relevantStarted) * 100) : 0;
+                        return {
+                            label: label,
+                            count: fillCount,
+                            rate: rate,
+                            started: relevantStarted
+                        };
+                    });
+
+                    // Sort by completion rate ascending
+                    fieldStats.sort((a, b) => a.rate - b.rate);
+                    
+                    frictionContainer.innerHTML = '';
+                    fieldStats.forEach(fStat => {
+                        const row = document.createElement('div');
+                        row.className = 'space-y-1 bg-zinc-50/50 border border-zinc-200/60 p-2.5 rounded-xl flex flex-col gap-1';
+                        
+                        const frictionLabel = fStat.rate < 60 
+                            ? `<span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-red-50 border border-red-100 text-red-650 uppercase leading-none">High Loss</span>`
+                            : `<span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-zinc-100 border border-zinc-200 text-zinc-500 uppercase leading-none">Stable</span>`;
+                        
+                        row.innerHTML = `
+                            <div class="flex items-center justify-between text-[11px] font-semibold text-zinc-800">
+                                <span class="truncate max-w-[110px]">${fStat.label}</span>
+                                <span>${fStat.rate}% filled</span>
+                            </div>
+                            <div class="h-2 w-full bg-zinc-100 rounded-full overflow-hidden">
+                                <div class="h-full ${fStat.rate < 60 ? 'bg-zinc-850' : 'bg-zinc-500'} transition-all" style="width: ${fStat.rate}%"></div>
+                            </div>
+                            <div class="flex items-center justify-between mt-0.5">
+                                <span class="text-[9px] text-zinc-400 font-medium">${fStat.count} of ${fStat.started} respondents</span>
+                                ${frictionLabel}
+                            </div>
+                        `;
+                        frictionContainer.appendChild(row);
+                    });
+                }
+            });
         } else {
             const formObj = formsData.find(f => f.id == selectedId);
             if (!formObj) return;
@@ -1576,6 +1778,173 @@ function deleteForm(id) {
         });
     }
 
+    window.openSubmissionsDrawer = function(formId) {
+        const formObj = formsData.find(f => f.id == formId);
+        if (!formObj) return;
+
+        const titleEl = document.getElementById('drawer-form-title');
+        if (titleEl) titleEl.textContent = formObj.title;
+        
+        // Show backdrop and drawer
+        const backdrop = document.getElementById('cora-submissions-backdrop');
+        const drawer = document.getElementById('cora-submissions-drawer');
+        if (backdrop) backdrop.classList.remove('hidden');
+        if (drawer) {
+            drawer.classList.remove('hidden');
+            // Force redraw/reflow for transition
+            drawer.offsetHeight;
+            drawer.classList.remove('translate-y-full');
+        }
+
+        const content = document.getElementById('submissions-drawer-content');
+        if (content) content.innerHTML = '<div class="text-xs text-zinc-400 text-center py-8">Loading submissions...</div>';
+
+        jQuery.ajax({
+            url: `/wp-json/cora/v1/forms/${formId}/submissions`,
+            method: 'GET',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-WP-Nonce', wpNonce);
+            },
+            success: function(submissions) {
+                const countEl = document.getElementById('drawer-responses-count');
+                if (countEl) countEl.textContent = submissions.length + ' Entries';
+                
+                if (submissions.length === 0) {
+                    if (content) content.innerHTML = '<div class="text-xs text-zinc-400 text-center py-8">No submissions recorded for this form yet.</div>';
+                    return;
+                }
+
+                // Render submissions table
+                let html = `
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="border-b border-zinc-200 dark:border-zinc-800 text-zinc-400 font-semibold bg-zinc-50 dark:bg-zinc-900/30">
+                                    <th class="px-4 py-3">ID</th>
+                                    <th class="px-4 py-3">IP Address</th>
+                                    <th class="px-4 py-3">Status</th>
+                                    <th class="px-4 py-3">Submitted At</th>
+                                    <th class="px-4 py-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-zinc-150 dark:divide-zinc-800">
+                `;
+
+                submissions.forEach((sub, idx) => {
+                    const label = sub.is_partial == '1' ? 'Partial' : 'Completed';
+                    const badgeClass = sub.is_partial == '1' 
+                        ? 'bg-zinc-100 text-zinc-650 dark:bg-zinc-800 dark:text-zinc-350' 
+                        : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400';
+                    
+                    html += `
+                        <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/30 transition-all">
+                            <td class="px-4 py-3.5 font-semibold text-zinc-900 dark:text-zinc-50">Entry #${submissions.length - idx}</td>
+                            <td class="px-4 py-3.5 font-mono text-zinc-500">${sub.ip_address || 'Unknown'}</td>
+                            <td class="px-4 py-3.5">
+                                <span class="px-2.5 py-0.5 rounded text-[9px] font-bold uppercase ${badgeClass}">${label}</span>
+                            </td>
+                            <td class="px-4 py-3.5 text-zinc-500">${sub.created_at}</td>
+                            <td class="px-4 py-3.5 text-right">
+                                <button class="btn-inspect-entry h-7 px-2.5 rounded-lg border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-500 hover:text-zinc-950 dark:hover:text-zinc-50 cursor-pointer transition-all" data-idx="${idx}">
+                                    Inspect
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                if (content) content.innerHTML = html;
+
+                // Attach entry inspectors click
+                jQuery('.btn-inspect-entry').on('click', function() {
+                    const idx = jQuery(this).data('idx');
+                    const sub = submissions[idx];
+                    openEntryInspector(sub, submissions.length - idx);
+                });
+            },
+            error: function() {
+                if (content) content.innerHTML = '<div class="text-xs text-red-500 text-center py-8">Failed to load submissions.</div>';
+            }
+        });
+    };
+
+    window.closeSubmissionsDrawer = function() {
+        const backdrop = document.getElementById('cora-submissions-backdrop');
+        const drawer = document.getElementById('cora-submissions-drawer');
+        const inspector = document.getElementById('cora-entry-inspector');
+        
+        if (drawer) {
+            drawer.classList.add('translate-y-full');
+            setTimeout(() => {
+                drawer.classList.add('hidden');
+            }, 300);
+        }
+        if (backdrop) backdrop.classList.add('hidden');
+        if (inspector) inspector.classList.add('translate-x-full');
+    };
+
+    window.openEntryInspector = function(sub, entryNumber) {
+        const idEl = document.getElementById('inspector-entry-id');
+        if (idEl) idEl.textContent = `Entry #${entryNumber}`;
+        const timeEl = document.getElementById('inspector-submitted-at');
+        if (timeEl) timeEl.textContent = `Submitted ${sub.created_at} (${sub.ip_address || 'no IP'})`;
+        
+        const badge = document.getElementById('inspector-status-badge');
+        if (badge) {
+            if (sub.is_partial == '1') {
+                badge.textContent = 'Partial';
+                badge.className = 'px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-zinc-100 text-zinc-650 dark:bg-zinc-800 dark:text-zinc-350';
+            } else {
+                badge.textContent = 'Completed';
+                badge.className = 'px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400';
+            }
+        }
+
+        const bodyContent = document.getElementById('inspector-body-content');
+        if (bodyContent) {
+            bodyContent.innerHTML = '';
+            
+            const data = sub.submitted_data || {};
+            const keys = Object.keys(data);
+            
+            if (keys.length === 0) {
+                bodyContent.innerHTML = '<div class="text-xs text-zinc-400 text-center py-6">No data fields submitted in this entry.</div>';
+            } else {
+                keys.forEach(k => {
+                    const val = data[k];
+                    const card = document.createElement('div');
+                    card.className = 'p-3.5 bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-150 dark:border-zinc-800 rounded-xl flex flex-col gap-1';
+                    card.innerHTML = `
+                        <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">${k}</span>
+                        <span class="text-xs font-medium text-zinc-800 dark:text-zinc-200 leading-relaxed whitespace-pre-wrap">${val !== undefined && val !== null && val !== '' ? val : '<span class="text-zinc-300 italic">Empty</span>'}</span>
+                    `;
+                    bodyContent.appendChild(card);
+                });
+            }
+        }
+
+        const inspector = document.getElementById('cora-entry-inspector');
+        if (inspector) {
+            inspector.classList.remove('hidden');
+            // Force redraw/reflow for transition
+            inspector.offsetHeight;
+            inspector.classList.remove('translate-x-full');
+        }
+    };
+
+    window.closeEntryInspector = function() {
+        const inspector = document.getElementById('cora-entry-inspector');
+        if (inspector) {
+            inspector.classList.add('translate-x-full');
+        }
+    };
+
 function renderFormsList() {
         const body = document.getElementById('forms-list-body');
         if (formsData.length === 0) {
@@ -1593,8 +1962,8 @@ function renderFormsList() {
             tr.innerHTML = `
                 <td class="px-6 py-4 text-xs font-medium text-zinc-900">${form.title}</td>
                 <td class="px-6 py-4 text-xs">
-                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${form.status === 'published' ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-500'}">
-                        ${form.status.toUpperCase()}
+                    <span class="px-2.5 py-0.5 rounded-full text-[9px] font-bold ${(form.status || 'draft') === 'published' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400' : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400'}">
+                        ${(form.status || 'draft').toUpperCase()}
                     </span>
                 </td>
                 <td class="px-6 py-4 text-xs text-zinc-500">${form.submission_count || 0} responses</td>
@@ -1675,21 +2044,21 @@ function renderFormsList() {
         const tabs = [tabFormsList, tabFunnel, tabClauses, tabAuditLogs];
         tabs.forEach(t => {
             if (t) {
-                t.classList.remove('font-semibold', 'border-zinc-950', 'text-zinc-950');
+                t.classList.remove('font-semibold', 'border-zinc-950', 'dark:border-zinc-50', 'text-zinc-950', 'dark:text-zinc-50');
                 t.classList.add('font-medium', 'border-transparent', 'text-zinc-500');
             }
         });
 
         if (hash === '#list') {
             if (tabFormsList) {
-                tabFormsList.classList.add('font-semibold', 'border-zinc-950', 'text-zinc-950');
+                tabFormsList.classList.add('font-semibold', 'border-zinc-950', 'dark:border-zinc-50', 'text-zinc-950', 'dark:text-zinc-50');
                 tabFormsList.classList.remove('font-medium', 'border-transparent', 'text-zinc-500');
             }
             if (listTabContent) { listTabContent.classList.remove('hidden'); listTabContent.classList.add('flex'); }
             if (listState) listState.classList.remove('hidden');
         } else if (hash === '#funnel') {
             if (tabFunnel) {
-                tabFunnel.classList.add('font-semibold', 'border-zinc-950', 'text-zinc-950');
+                tabFunnel.classList.add('font-semibold', 'border-zinc-950', 'dark:border-zinc-50', 'text-zinc-950', 'dark:text-zinc-50');
                 tabFunnel.classList.remove('font-medium', 'border-transparent', 'text-zinc-500');
             }
             if (funnelTabContent) { funnelTabContent.classList.remove('hidden'); funnelTabContent.classList.add('flex'); }
@@ -1698,7 +2067,7 @@ function renderFormsList() {
             updateAdvancedFunnelData();
         } else if (hash === '#clauses') {
             if (tabClauses) {
-                tabClauses.classList.add('font-semibold', 'border-zinc-950', 'text-zinc-950');
+                tabClauses.classList.add('font-semibold', 'border-zinc-950', 'dark:border-zinc-50', 'text-zinc-950', 'dark:text-zinc-50');
                 tabClauses.classList.remove('font-medium', 'border-transparent', 'text-zinc-500');
             }
             if (clausesTabContent) { clausesTabContent.classList.remove('hidden'); clausesTabContent.classList.add('flex'); }
@@ -1706,7 +2075,7 @@ function renderFormsList() {
             fetchClauses();
         } else if (hash === '#audit-log') {
             if (tabAuditLogs) {
-                tabAuditLogs.classList.add('font-semibold', 'border-zinc-950', 'text-zinc-950');
+                tabAuditLogs.classList.add('font-semibold', 'border-zinc-950', 'dark:border-zinc-50', 'text-zinc-950', 'dark:text-zinc-50');
                 tabAuditLogs.classList.remove('font-medium', 'border-transparent', 'text-zinc-500');
             }
             if (auditTabContent) { auditTabContent.classList.remove('hidden'); auditTabContent.classList.add('flex'); }
@@ -1714,6 +2083,17 @@ function renderFormsList() {
             fetchAuditLogs();
         } else if (hash.startsWith('#edit/')) {
             const id = hash.split('/')[1];
+            // Show a subtle loading state while the form loads (prevents blank screen)
+            // Show a non-destructive loading overlay (doesn't replace listState DOM)
+            const existingOverlay = document.getElementById('forms-loading-overlay');
+            if (!existingOverlay) {
+                const overlay = document.createElement('div');
+                overlay.id = 'forms-loading-overlay';
+                overlay.style.cssText = 'position:absolute;inset:0;background:rgba(255,255,255,0.85);z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;';
+                overlay.innerHTML = '<div style="width:28px;height:28px;border:2px solid #e4e4e7;border-top-color:#18181b;border-radius:50%;animation:spin 0.7s linear infinite;"></div><span style="font-size:11px;color:#71717a;font-weight:500;">Loading form editor...</span>';
+                const module = document.getElementById('cora-forms-module');
+                if (module) { module.style.position = 'relative'; module.appendChild(overlay); }
+            }
             loadFormIntoEditor(id);
         } else if (hash === '#new') {
             createNewForm();
@@ -1772,6 +2152,8 @@ function renderFormsList() {
         const dz = document.getElementById('editor-header-dropzone');
         if (!dz) return;
         const imgUrl = currentEditingForm.settings?.cover_image;
+        const formCoverInp = document.getElementById('settings-cover-url');
+        if (formCoverInp) formCoverInp.value = imgUrl || '';
         if (imgUrl) {
             dz.style.backgroundImage = `url('${imgUrl}')`;
             dz.style.backgroundSize = 'cover';
@@ -1833,15 +2215,32 @@ function renderFormsList() {
     function renderStepsBar() {
         const container = document.getElementById('editor-steps-bar');
         if (!container) return;
-        const steps = currentEditingForm.settings?.steps || ['Step 1'];
+        
+        // Compute steps dynamically from page_break blocks
+        const pageBreaks = (currentEditingForm.blocks || []).filter(b => b.type === 'page_break');
+        const stepCount = pageBreaks.length + 1;
+        const steps = [];
+        for (let i = 1; i <= stepCount; i++) {
+            steps.push(`Step ${i}`);
+        }
+
         let html = '';
         steps.forEach((step, idx) => {
             const active = (currentEditingForm.currentStepIndex || 0) === idx;
-            const activeClasses = active ? 'border-2 border-zinc-950 dark:border-zinc-100 bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 font-bold' : 'border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 font-medium hover:border-zinc-400';
+            const activeClasses = active 
+                ? 'border-2 border-zinc-950 dark:border-zinc-100 bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 font-bold' 
+                : 'border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 font-medium hover:border-zinc-400';
+            
+            // Delete button for step (except the first step!)
+            const deleteBtn = idx > 0 ? `
+                <span class="step-delete-btn hover:text-red-500 ml-1.5 cursor-pointer text-[10px]" data-step-idx="${idx}">✕</span>
+            ` : '';
+
             html += `
                 <button class="step-tab-btn h-8 px-3 rounded-lg ${activeClasses} text-xs flex items-center gap-2 shrink-0 cursor-pointer" data-step-idx="${idx}">
                     <span class="w-4 h-4 rounded bg-zinc-100 dark:bg-zinc-800 text-[10px] flex items-center justify-center">${idx + 1}</span>
                     <span>${step}</span>
+                    ${deleteBtn}
                 </button>
             `;
         });
@@ -1853,18 +2252,52 @@ function renderFormsList() {
         container.innerHTML = html;
 
         container.querySelectorAll('.step-tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', (e) => {
+                if (e.target.classList.contains('step-delete-btn')) return;
                 currentEditingForm.currentStepIndex = parseInt(btn.dataset.stepIdx);
                 renderStepsBar();
+                renderEditorBlocks();
+            });
+        });
+
+        container.querySelectorAll('.step-delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const deleteIdx = parseInt(btn.dataset.stepIdx);
+                coraConfirmAction("Are you sure you want to delete this step? This will merge its fields with the previous step.", function() {
+                    let pbCount = 0;
+                    let targetBlockIdx = -1;
+                    for (let i = 0; i < currentEditingForm.blocks.length; i++) {
+                        if (currentEditingForm.blocks[i].type === 'page_break') {
+                            pbCount++;
+                            if (pbCount === deleteIdx) {
+                                targetBlockIdx = i;
+                                break;
+                            }
+                        }
+                    }
+                    if (targetBlockIdx !== -1) {
+                        currentEditingForm.blocks.splice(targetBlockIdx, 1);
+                        currentEditingForm.currentStepIndex = Math.max(0, deleteIdx - 1);
+                        renderStepsBar();
+                        renderEditorBlocks();
+                        triggerAutoSave();
+                    }
+                });
             });
         });
 
         document.getElementById('btn-add-step')?.addEventListener('click', () => {
-            if (!currentEditingForm.settings) currentEditingForm.settings = {};
-            if (!currentEditingForm.settings.steps) currentEditingForm.settings.steps = ['Step 1'];
-            currentEditingForm.settings.steps.push(`Step ${currentEditingForm.settings.steps.length + 1}`);
-            currentEditingForm.currentStepIndex = currentEditingForm.settings.steps.length - 1;
+            if (!currentEditingForm.blocks) currentEditingForm.blocks = [];
+            currentEditingForm.blocks.push({
+                id: 'field_' + Math.random().toString(36).substr(2, 6),
+                type: 'page_break',
+                label: 'Page Break'
+            });
+            const pBreaks = currentEditingForm.blocks.filter(b => b.type === 'page_break');
+            currentEditingForm.currentStepIndex = pBreaks.length;
             renderStepsBar();
+            renderEditorBlocks();
             triggerAutoSave();
         });
     }
@@ -1877,14 +2310,12 @@ function renderFormsList() {
             if (t === tab) {
                 if (contentEl) contentEl.classList.remove('hidden');
                 if (btnEl) {
-                    btnEl.classList.add('text-zinc-950', 'dark:text-zinc-50', 'border-zinc-950', 'dark:border-zinc-50', 'font-bold');
-                    btnEl.classList.remove('text-zinc-400', 'border-transparent', 'font-semibold');
+                    btnEl.className = "flex-1 py-1.5 px-1 rounded-md text-[10px] font-bold bg-white dark:bg-zinc-700 text-zinc-950 dark:text-zinc-50 shadow-2xs whitespace-nowrap cursor-pointer transition-all border-0 outline-none";
                 }
             } else {
                 if (contentEl) contentEl.classList.add('hidden');
                 if (btnEl) {
-                    btnEl.classList.remove('text-zinc-950', 'dark:text-zinc-50', 'border-zinc-950', 'dark:border-zinc-50', 'font-bold');
-                    btnEl.classList.add('text-zinc-400', 'border-transparent', 'font-semibold');
+                    btnEl.className = "flex-1 py-1.5 px-1 rounded-md text-[10px] font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 whitespace-nowrap cursor-pointer transition-all bg-transparent border-0 outline-none";
                 }
             }
         });
@@ -1896,7 +2327,8 @@ function renderFormsList() {
             title: 'Untitled Form',
             status: 'draft',
             settings: { steps: ['Step 1'] },
-            blocks: []
+            blocks: [],
+            logic: []
         };
         const titleInp = document.getElementById('editor-form-title');
         if (titleInp) titleInp.value = currentEditingForm.title;
@@ -1912,6 +2344,7 @@ function renderFormsList() {
         renderStepsBar();
         switchEditorView('build');
         switchLeftTab('fields');
+        if (typeof renderLogicRules === 'function') renderLogicRules();
         
         if (listState) listState.classList.add('hidden');
         if (editorState) { editorState.classList.remove('hidden'); editorState.classList.add('flex'); }
@@ -1930,29 +2363,128 @@ function renderFormsList() {
                 if (!currentEditingForm.blocks) currentEditingForm.blocks = [];
                 if (!currentEditingForm.settings.steps) currentEditingForm.settings.steps = ['Step 1'];
 
-                const titleInp = document.getElementById('editor-form-title');
-                if (titleInp) titleInp.value = form.title || '';
+                // ── Remove loading overlay immediately so UI never gets stuck ──
+                const loadingOverlay = document.getElementById('forms-loading-overlay');
+                if (loadingOverlay) loadingOverlay.remove();
 
-                const canvasName = document.getElementById('canvas-form-name');
-                if (canvasName) canvasName.innerText = form.title || 'Untitled Form';
-
-                const canvasSub = document.getElementById('canvas-form-subtitle');
-                if (canvasSub) canvasSub.innerText = form.description || form.subtitle || 'Fill out details below to submit request.';
-                
-                const statusSel = document.getElementById('editor-form-status');
-                if (statusSel) statusSel.value = form.status || 'draft';
-
-                renderCoverImage();
-                renderEditorBlocks();
-                renderStepsBar();
-                switchEditorView('build');
-                switchLeftTab('fields');
-                
+                // Transition: hide list, show editor
                 if (listState) listState.classList.add('hidden');
                 if (editorState) { editorState.classList.remove('hidden'); editorState.classList.add('flex'); }
+
+                // Populate all inputs
+                const titleInp = document.getElementById('editor-form-title');
+                if (titleInp) titleInp.value = form.title || '';
+                const canvasName = document.getElementById('canvas-form-name');
+                if (canvasName) canvasName.innerText = form.title || 'Untitled Form';
+                const canvasSub = document.getElementById('canvas-form-subtitle');
+                if (canvasSub) canvasSub.innerText = form.description || form.subtitle || 'Fill out details below to submit request.';
+                const statusSel = document.getElementById('editor-form-status');
+                if (statusSel) statusSel.value = form.status || 'draft';
+                const formTitleInp = document.getElementById('settings-form-title');
+                if (formTitleInp) formTitleInp.value = form.title || '';
+                const formSubInp = document.getElementById('settings-form-subtitle');
+                if (formSubInp) formSubInp.value = form.description || form.subtitle || '';
+                const formCoverInp = document.getElementById('settings-cover-url');
+                if (formCoverInp) formCoverInp.value = (form.settings && form.settings.cover_image) || '';
+                const successMsgInp = document.getElementById('settings-success-msg');
+                if (successMsgInp) successMsgInp.value = (form.settings && form.settings.success_message) || '';
+                const redirectUrlInp = document.getElementById('settings-redirect-url');
+                if (redirectUrlInp) redirectUrlInp.value = (form.settings && form.settings.redirect_url) || '';
+                const customCssInp = document.getElementById('settings-custom-css');
+                if (customCssInp) customCssInp.value = (form.styling && form.styling.custom_css) || '';
+                const webhookUrlInp = document.getElementById('settings-webhook-url');
+                if (webhookUrlInp) webhookUrlInp.value = (form.settings && form.settings.webhook_url) || '';
+                const stripeKeyInp = document.getElementById('settings-stripe-key');
+                if (stripeKeyInp) stripeKeyInp.value = (form.settings && form.settings.stripe_key) || '';
+                const crmNameInp = document.getElementById('map-crm-name');
+                if (crmNameInp) crmNameInp.value = (form.settings && form.settings.map_crm_name) || '';
+                const crmEmailInp = document.getElementById('map-crm-email');
+                if (crmEmailInp) crmEmailInp.value = (form.settings && form.settings.map_crm_email) || '';
+                const crmPhoneInp = document.getElementById('map-crm-phone');
+                if (crmPhoneInp) crmPhoneInp.value = (form.settings && form.settings.map_crm_phone) || '';
+                const crmNotesInp = document.getElementById('map-crm-notes');
+                if (crmNotesInp) crmNotesInp.value = (form.settings && form.settings.map_crm_notes) || '';
+
+                // Populate CTA inputs
+                if (!form.settings) form.settings = {};
+                if (form.settings.submit_button_text === undefined) form.settings.submit_button_text = "Submit";
+                if (form.settings.submit_button_action === undefined) form.settings.submit_button_action = "message";
+                if (form.settings.secondary_button_show === undefined) form.settings.secondary_button_show = true;
+                if (form.settings.secondary_button_text === undefined) form.settings.secondary_button_text = "Save as draft";
+
+                const subTxtInp = document.getElementById('settings-submit-text');
+                if (subTxtInp) subTxtInp.value = form.settings.submit_button_text;
+                const subActInp = document.getElementById('settings-submit-action');
+                if (subActInp) subActInp.value = form.settings.submit_button_action;
+                const secShowInp = document.getElementById('settings-sec-show');
+                if (secShowInp) secShowInp.checked = !!form.settings.secondary_button_show;
+                const secTxtInp = document.getElementById('settings-sec-text');
+                if (secTxtInp) secTxtInp.value = form.settings.secondary_button_text;
+
+                // Sync CTA buttons on canvas
+                const canvSubBtn = document.getElementById('canvas-submit-btn');
+                if (canvSubBtn) canvSubBtn.innerHTML = `${form.settings.submit_button_text} <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
+                const canvSecBtn = document.getElementById('canvas-sec-btn');
+                if (canvSecBtn) {
+                    canvSecBtn.innerText = form.settings.secondary_button_text;
+                    if (form.settings.secondary_button_show) canvSecBtn.classList.remove('hidden');
+                    else canvSecBtn.classList.add('hidden');
+                }
+                const secTextWrap = document.getElementById('settings-sec-text-wrapper');
+                if (secTextWrap) {
+                    if (form.settings.secondary_button_show) secTextWrap.classList.remove('hidden');
+                    else secTextWrap.classList.add('hidden');
+                }
+
+                // Populate Email settings
+                const emailAdminEnableInp = document.getElementById('settings-email-admin-enable');
+                if (emailAdminEnableInp) emailAdminEnableInp.checked = !!form.settings.email_admin_enable;
+                const emailAdminToInp = document.getElementById('settings-email-admin-to');
+                if (emailAdminToInp) emailAdminToInp.value = form.settings.email_admin_to || '';
+                const emailAdminSubjectInp = document.getElementById('settings-email-admin-subject');
+                if (emailAdminSubjectInp) emailAdminSubjectInp.value = form.settings.email_admin_subject || '';
+
+                const emailSubmitterEnableInp = document.getElementById('settings-email-submitter-enable');
+                if (emailSubmitterEnableInp) emailSubmitterEnableInp.checked = !!form.settings.email_submitter_enable;
+                const emailSubmitterSubjectInp = document.getElementById('settings-email-submitter-subject');
+                if (emailSubmitterSubjectInp) emailSubmitterSubjectInp.value = form.settings.email_submitter_subject || '';
+                const emailSubmitterMessageInp = document.getElementById('settings-email-submitter-message');
+                if (emailSubmitterMessageInp) emailSubmitterMessageInp.value = form.settings.email_submitter_message || '';
+
+                // Expand/collapse email details accordingly
+                const emailAdminDetails = document.getElementById('settings-email-admin-details');
+                if (emailAdminDetails) {
+                    if (form.settings.email_admin_enable) emailAdminDetails.classList.remove('hidden');
+                    else emailAdminDetails.classList.add('hidden');
+                }
+                const emailSubmitterDetails = document.getElementById('settings-email-submitter-details');
+                if (emailSubmitterDetails) {
+                    if (form.settings.email_submitter_enable) emailSubmitterDetails.classList.remove('hidden');
+                    else emailSubmitterDetails.classList.add('hidden');
+                }
+
+                // Render editor – wrapped so a crash doesn't leave user stuck
+                try {
+                    renderCoverImage();
+                    renderEditorBlocks();
+                    renderStepsBar();
+                    switchEditorView('build');
+                    switchLeftTab('fields');
+                    if (!currentEditingForm.logic) currentEditingForm.logic = [];
+                    if (typeof renderLogicRules === 'function') renderLogicRules();
+                } catch(renderErr) {
+                    // Rendering failed but editor is still visible – show a non-blocking warning
+                    window.coraShowToast && window.coraShowToast('Form loaded but some UI elements may not render correctly.', 'error');
+                }
             },
-            error: function() {
-                window.coraShowToast && window.coraShowToast("Failed to load form.", "error");
+            error: function(xhr) {
+                window.coraShowToast && window.coraShowToast("Form not found or failed to load.", "error");
+                // Remove loading overlay and fall back to list view
+                const overlay = document.getElementById('forms-loading-overlay');
+                if (overlay) overlay.remove();
+                if (listState) { listState.classList.remove('hidden'); }
+                if (editorState) { editorState.classList.add('hidden'); editorState.classList.remove('flex'); }
+                window.location.hash = '#list';
             }
         });
     }
@@ -1961,12 +2493,17 @@ function renderFormsList() {
         const statusEl = document.getElementById('editor-save-status');
         if (!statusEl) return;
         
+        statusEl.className = "px-2.5 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1.5 shrink-0 transition-all duration-300";
+        
         if (status === 'saving') {
-            statusEl.innerHTML = `<svg class="animate-spin h-3 w-3 text-zinc-400 mr-1" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...`;
+            statusEl.classList.add('bg-zinc-100', 'text-zinc-500', 'dark:bg-zinc-800', 'dark:text-zinc-400');
+            statusEl.innerHTML = `<svg class="animate-spin h-3.5 w-3.5 text-zinc-400 mr-0.5" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...`;
         } else if (status === 'saved') {
-            statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span> Saved`;
+            statusEl.classList.add('bg-emerald-50', 'text-emerald-700', 'dark:bg-emerald-950/60', 'dark:text-emerald-400');
+            statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-0.5 animate-pulse"></span> Autosaved`;
         } else if (status === 'error') {
-            statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span> Error`;
+            statusEl.classList.add('bg-red-50', 'text-red-700', 'dark:bg-red-950/60', 'dark:text-red-400');
+            statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-0.5"></span> Error`;
         }
     }
 
@@ -2001,7 +2538,10 @@ function renderFormsList() {
                 }
                 setAutoSaveStatus('saved');
                 if (publish) {
-                    window.coraShowToast && window.coraShowToast("Form saved and published!", "success");
+                    currentEditingForm.status = 'published';
+                    const statusSel = document.getElementById('editor-form-status');
+                    if (statusSel) statusSel.value = 'published';
+                    window.coraShowToast && window.coraShowToast("Form published successfully!", "success");
                     fetchForms();
                 }
             },
@@ -2018,6 +2558,27 @@ function renderFormsList() {
         if (!currentEditingForm) return;
         if (!currentEditingForm.blocks) currentEditingForm.blocks = [];
         
+        // If user clicked "+ Add field" inside a column slot, route field to that column
+        if (window._addToColumn) {
+            const { blockIdx, colIdx } = window._addToColumn;
+            window._addToColumn = null;
+            const colBlock = currentEditingForm.blocks[blockIdx];
+            if (colBlock && colBlock.type === 'columns') {
+                if (!colBlock.column_fields) colBlock.column_fields = [[], []];
+                if (!colBlock.column_fields[colIdx]) colBlock.column_fields[colIdx] = [];
+                const subMeta = TYPE_META[type] || { label: type };
+                colBlock.column_fields[colIdx].push({ id: 'sf_' + Math.random().toString(36).substr(2,5), type, label: subMeta.label, required: false });
+                renderEditorBlocks();
+                triggerAutoSave();
+                return; // Don't add to main form
+            }
+        }
+
+        if (insertAfterIdx === null && typeof window._insertAfterIdx !== 'undefined' && window._insertAfterIdx !== null) {
+            insertAfterIdx = window._insertAfterIdx;
+            window._insertAfterIdx = null;
+        }
+
         const meta = TYPE_META[type] || { label: type };
         const newBlock = {
             id: 'field_' + Math.random().toString(36).substr(2, 6),
@@ -2026,17 +2587,33 @@ function renderFormsList() {
             description: '',
             required: false,
             visibility: 'always',
-            choices: ['dropdown', 'multiple_choice', 'checkbox'].includes(type) ? [{label:'Option 1'}, {label:'Option 2'}] : undefined,
-            price: type === 'payment' || type === 'stripe_payment' ? 100 : undefined,
-            currency: 'INR'
+            choices: ['dropdown', 'multiple_choice', 'checkbox'].includes(type) ? [{label:'Option 1'}, {label:'Option 2'}] : (type === 'services_checklist' ? [{label:'Deep Cleaning', price: 1500}, {label:'Express Cleaning', price: 800}] : undefined),
+            price: ['payment', 'stripe_payment', 'upi_id', 'upi_qr'].includes(type) ? 100 : undefined,
+            upi_id_value: ['upi_id', 'upi_qr'].includes(type) ? 'yourname@upi' : undefined,
+            currency: 'INR',
+            // Columns-specific defaults
+            columns_count: type === 'columns' ? 2 : undefined,
+            column_fields: type === 'columns' ? [[], []] : undefined,
         };
 
         if (insertAfterIdx !== null && insertAfterIdx >= 0) {
             currentEditingForm.blocks.splice(insertAfterIdx + 1, 0, newBlock);
             selectedBlockIndex = insertAfterIdx + 1;
         } else {
-            currentEditingForm.blocks.push(newBlock);
-            selectedBlockIndex = currentEditingForm.blocks.length - 1;
+            const activeStepIndex = currentEditingForm.currentStepIndex || 0;
+            let stepCounter = 0;
+            let insertIdx = currentEditingForm.blocks.length;
+            for (let i = 0; i < currentEditingForm.blocks.length; i++) {
+                if (currentEditingForm.blocks[i].type === 'page_break') {
+                    if (stepCounter === activeStepIndex) {
+                        insertIdx = i;
+                        break;
+                    }
+                    stepCounter++;
+                }
+            }
+            currentEditingForm.blocks.splice(insertIdx, 0, newBlock);
+            selectedBlockIndex = insertIdx;
         }
 
         renderEditorBlocks();
@@ -2045,34 +2622,292 @@ function renderFormsList() {
     }
 
     function renderEditorBlocks() {
+        if (!currentEditingForm) return; // guard: don't crash if no form loaded
         const container = document.getElementById('editor-blocks-container');
         if (!container) return;
         container.innerHTML = '';
 
+        const activeStepIndex = currentEditingForm.currentStepIndex || 0;
+        let stepCounter = 0;
+        const activeBlocksInfo = [];
+
         (currentEditingForm.blocks || []).forEach((block, idx) => {
+            if (block.type === 'page_break') {
+                stepCounter++;
+            } else {
+                if (stepCounter === activeStepIndex) {
+                    activeBlocksInfo.push({ block, originalIndex: idx });
+                }
+            }
+        });
+
+        const dropEnd = document.getElementById('editor-drop-zone');
+        if (activeBlocksInfo.length === 0) {
+            if (dropEnd) dropEnd.classList.add('hidden');
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = "flex flex-col items-center justify-center px-8 py-12 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-zinc-50/30 dark:bg-zinc-900/10 mx-8 my-6 text-center gap-3";
+            emptyDiv.innerHTML = `
+                <div class="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 dark:text-zinc-500">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Click a field in the sidebar to add it</p>
+                    <p class="text-[10px] text-zinc-400 mt-0.5">or drag & drop a field here</p>
+                </div>
+                <button id="btn-empty-add-field" class="h-8 px-4 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 rounded-lg text-xs font-semibold hover:bg-zinc-800 cursor-pointer shadow-sm">+ Add Form Field</button>
+            `;
+            container.appendChild(emptyDiv);
+
+            emptyDiv.querySelector('#btn-empty-add-field')?.addEventListener('click', () => {
+                switchLeftTab('fields');
+            });
+
+            // Make it drop-aware!
+            emptyDiv.addEventListener('dragover', (e) => e.preventDefault());
+            emptyDiv.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const data = e.dataTransfer.getData('text/plain');
+                if (data.startsWith('new:')) {
+                    const type = data.replace('new:', '');
+                    addFieldToForm(type);
+                }
+            });
+            return;
+        } else {
+            if (dropEnd) dropEnd.classList.remove('hidden');
+        }
+
+        activeBlocksInfo.forEach(({ block, originalIndex }) => {
             const meta = TYPE_META[block.type] || { label: block.type, badge: 'Unknown' };
+
+            // ── COLUMNS BLOCK: special two/three-column grid rendering ──
+            if (block.type === 'columns') {
+                const colCount = block.columns_count || 2;
+                if (!block.column_fields) block.column_fields = Array.from({length: colCount}, () => []);
+                while (block.column_fields.length < colCount) block.column_fields.push([]);
+
+                const colDiv = document.createElement('div');
+                const isSelected = originalIndex === selectedBlockIndex;
+                colDiv.className = `group relative px-8 py-4 cursor-pointer transition-all border-b border-zinc-100 border-l-[3px] ${isSelected ? 'border-l-zinc-950 bg-zinc-50/50' : 'border-l-transparent hover:bg-zinc-50/30 hover:border-l-zinc-300'}`;
+                colDiv.dataset.index = originalIndex;
+
+                // Top action bar
+                const actionBar = document.createElement('div');
+                actionBar.className = `flex items-center justify-between mb-3`;
+                actionBar.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="text-[9px] font-bold uppercase tracking-wider text-zinc-400">Layout — ${colCount} Columns</span>
+                        <div class="flex items-center gap-1">
+                            <button class="btn-col-set-2 text-[9px] font-bold px-1.5 h-4 rounded ${colCount===2?'bg-zinc-950 text-white':'bg-zinc-100 text-zinc-500 hover:bg-zinc-200'} border-0 cursor-pointer transition-all">2</button>
+                            <button class="btn-col-set-3 text-[9px] font-bold px-1.5 h-4 rounded ${colCount===3?'bg-zinc-950 text-white':'bg-zinc-100 text-zinc-500 hover:bg-zinc-200'} border-0 cursor-pointer transition-all">3</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button class="btn-delete-col-block text-[9px] px-1.5 h-5 rounded bg-transparent hover:bg-red-50 text-zinc-400 hover:text-red-500 border-0 cursor-pointer transition-all flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>
+                            Remove
+                        </button>
+                    </div>
+                `;
+                colDiv.appendChild(actionBar);
+
+                // Grid of columns
+                const grid = document.createElement('div');
+                grid.className = `grid gap-3`;
+                grid.style.gridTemplateColumns = `repeat(${colCount}, 1fr)`;
+
+                block.column_fields.slice(0, colCount).forEach((colFields, colIdx) => {
+                    const colSlot = document.createElement('div');
+                    colSlot.className = 'rounded-xl border border-dashed border-zinc-200 bg-white min-h-[80px] flex flex-col overflow-hidden';
+                    colSlot.dataset.colIdx = colIdx;
+
+                    // Render each sub-field in this column
+                    (colFields || []).forEach((subField, subIdx) => {
+                        const subMeta = TYPE_META[subField.type] || { label: subField.type };
+                        let subPreview = '';
+                        if (['text','email','phone','number','hidden','input'].includes(subField.type)) {
+                            subPreview = `<input type="text" class="w-full h-8 px-2.5 rounded-lg border border-zinc-200 bg-zinc-50/50 text-[11px]" placeholder="${subField.label}..." disabled />`;
+                        } else if (subField.type === 'long_text' || subField.type === 'textarea') {
+                            subPreview = `<textarea class="w-full text-[11px] p-2.5 bg-zinc-50/50 border border-zinc-200 rounded-lg resize-none" rows="2" disabled placeholder="${subField.label}..."></textarea>`;
+                        } else if (subField.type === 'dropdown') {
+                            subPreview = `<select class="w-full h-8 pl-2.5 pr-6 rounded-lg border border-zinc-200 bg-zinc-50/50 text-[11px] appearance-none" disabled><option>Select...</option></select>`;
+                        } else if (subField.type === 'date') {
+                            subPreview = `<input type="date" class="w-full h-8 px-2.5 border border-zinc-200 rounded-lg bg-zinc-50/50 text-[11px]" disabled />`;
+                        } else {
+                            subPreview = `<input type="text" class="w-full h-8 px-2.5 rounded-lg border border-zinc-200 bg-zinc-50/50 text-[11px]" placeholder="${subField.label}..." disabled />`;
+                        }
+                        const subDiv = document.createElement('div');
+                        subDiv.className = 'px-3 py-2 border-b border-zinc-100 group/sub flex flex-col gap-1 relative';
+                        subDiv.innerHTML = `
+                            <div class="flex items-center justify-between mb-0.5">
+                                <label class="text-[11px] font-semibold text-zinc-800 outline-none cursor-text border-b border-transparent hover:border-zinc-200 focus:border-zinc-400" contenteditable="true">${subField.label || subMeta.label}</label>
+                                <button class="btn-del-subfld text-zinc-300 hover:text-red-500 border-0 bg-transparent cursor-pointer p-0.5 opacity-0 group-hover/sub:opacity-100 transition-opacity" data-col="${colIdx}" data-sub="${subIdx}">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                </button>
+                            </div>
+                            <div class="pointer-events-none">${subPreview}</div>
+                        `;
+                        subDiv.querySelector('label[contenteditable]').addEventListener('input', (e) => {
+                            const val = e.target.innerText.trim();
+                            subField.label = val;
+                            const inputPreview = subDiv.querySelector('input, textarea');
+                            if (inputPreview) inputPreview.placeholder = val + '...';
+                            triggerAutoSave();
+                        });
+                        subDiv.querySelector('.btn-del-subfld').addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            block.column_fields[colIdx].splice(subIdx, 1);
+                            renderEditorBlocks();
+                            triggerAutoSave();
+                        });
+                        colSlot.appendChild(subDiv);
+                    });
+
+                    // + Add field to column button
+                    const addBtn = document.createElement('button');
+                    addBtn.className = 'text-[10px] font-semibold text-zinc-400 hover:text-zinc-700 hover:bg-zinc-50 flex items-center gap-1 px-3 py-2 border-0 bg-transparent cursor-pointer transition-all w-full text-left mt-auto';
+                    addBtn.innerHTML = `<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Add field`;
+                    addBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        window._addToColumn = { blockIdx: originalIndex, colIdx: colIdx };
+                        switchLeftTab('fields');
+                        window.coraShowToast && window.coraShowToast(`Select a field to add to Column ${colIdx + 1}`, 'info');
+                    });
+
+                    // Drop zone for this column slot
+                    colSlot.addEventListener('dragover', (e) => { e.preventDefault(); colSlot.classList.add('border-zinc-400', 'bg-zinc-50'); });
+                    colSlot.addEventListener('dragleave', () => colSlot.classList.remove('border-zinc-400', 'bg-zinc-50'));
+                    colSlot.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        colSlot.classList.remove('border-zinc-400', 'bg-zinc-50');
+                        const data = e.dataTransfer.getData('text/plain');
+                        if (data.startsWith('new:')) {
+                            const type = data.replace('new:', '');
+                            const subMeta2 = TYPE_META[type] || { label: type };
+                            if (!block.column_fields[colIdx]) block.column_fields[colIdx] = [];
+                            block.column_fields[colIdx].push({ id: 'sf_' + Math.random().toString(36).substr(2,5), type, label: subMeta2.label, required: false });
+                            renderEditorBlocks();
+                            triggerAutoSave();
+                        }
+                    });
+
+                    colSlot.appendChild(addBtn);
+                    grid.appendChild(colSlot);
+                });
+
+                colDiv.appendChild(grid);
+
+                // Column count buttons
+                colDiv.querySelector('.btn-col-set-2').addEventListener('click', (e) => { e.stopPropagation(); block.columns_count = 2; renderEditorBlocks(); triggerAutoSave(); });
+                colDiv.querySelector('.btn-col-set-3').addEventListener('click', (e) => { e.stopPropagation(); block.columns_count = 3; renderEditorBlocks(); triggerAutoSave(); });
+                colDiv.querySelector('.btn-delete-col-block').addEventListener('click', (e) => { e.stopPropagation(); currentEditingForm.blocks.splice(originalIndex, 1); if (selectedBlockIndex === originalIndex) selectedBlockIndex = null; renderEditorBlocks(); triggerAutoSave(); });
+                colDiv.addEventListener('click', () => selectBlock(originalIndex));
+
+                container.appendChild(colDiv);
+
+                // Insert row after column block
+                const insertRow2 = document.createElement('div');
+                insertRow2.className = 'insert-between-row relative flex items-center gap-2 px-8 opacity-0 hover:opacity-100 focus-within:opacity-100 transition-all h-4 group cursor-pointer';
+                insertRow2.dataset.insertAfter = originalIndex;
+                insertRow2.innerHTML = `<div class="flex-1 h-px bg-zinc-200"></div><button class="btn-insert-between text-[9px] font-bold bg-white border border-zinc-200 text-zinc-400 hover:text-zinc-700 hover:border-zinc-400 px-2.5 h-4 rounded-full cursor-pointer transition-all flex items-center gap-1">+ field</button><div class="flex-1 h-px bg-zinc-200"></div>`;
+                insertRow2.querySelector('.btn-insert-between').addEventListener('click', (e) => { e.stopPropagation(); switchLeftTab('fields'); window._insertAfterIdx = originalIndex; window.coraShowToast && window.coraShowToast('Select a field type to insert here', 'info'); });
+                container.appendChild(insertRow2);
+                return; // Skip default block rendering for columns
+            }
+
+            // ── STANDARD BLOCK RENDERING ──
             const div = document.createElement('div');
             
-            let classStr = "group relative bg-white border border-zinc-200 rounded-xl p-4 cursor-pointer hover:border-zinc-300 hover:shadow-sm transition-all mb-4";
-            if (idx === selectedBlockIndex) {
-                classStr = "group relative bg-white border ring-2 ring-zinc-950 border-zinc-950 rounded-xl p-4 cursor-pointer transition-all mb-4";
+            let classStr;
+            if (originalIndex === selectedBlockIndex) {
+                // Selected: left accent strip, soft highlight
+                classStr = "group relative px-8 py-4 cursor-pointer transition-all border-b border-zinc-100 border-l-[3px] border-l-zinc-950 bg-zinc-50/50";
+            } else {
+                // Unselected: flat row with bottom separator only
+                classStr = "group relative px-8 py-4 cursor-pointer transition-all border-b border-zinc-100 border-l-[3px] border-l-transparent hover:bg-zinc-50/40 hover:border-l-zinc-300";
             }
             div.className = classStr;
-            div.dataset.index = idx;
+            div.dataset.index = originalIndex;
             div.draggable = true;
 
             let previewHtml = '';
-            if (['text','email','phone','number','hidden'].includes(block.type)) previewHtml = `<input type="text" class="w-full text-xs p-2 bg-zinc-50 border border-zinc-200 rounded" placeholder="Placeholder..." disabled />`;
-            else if (block.type === 'long_text') previewHtml = `<textarea class="w-full text-xs p-2 bg-zinc-50 border border-zinc-200 rounded" placeholder="Enter text..." disabled rows="2"></textarea>`;
-            else if (['dropdown'].includes(block.type)) previewHtml = `<select class="w-full text-xs p-2 bg-zinc-50 border border-zinc-200 rounded" disabled><option>Select option</option></select>`;
+            if (['text','email','phone','number','hidden'].includes(block.type)) previewHtml = `<input type="text" class="w-full h-9 px-3 rounded-lg border border-zinc-200 bg-zinc-50/50 text-xs" placeholder="Placeholder..." disabled />`;
+            else if (block.type === 'long_text') previewHtml = `<textarea class="w-full text-xs p-3 bg-zinc-50/50 border border-zinc-200 rounded-lg" placeholder="Enter text..." disabled rows="2"></textarea>`;
+            else if (['dropdown'].includes(block.type)) previewHtml = `<div class="relative w-full"><select class="w-full h-9 pl-3 pr-8 rounded-lg border border-zinc-200 bg-zinc-50/50 text-xs appearance-none" disabled><option>Select option...</option></select><div class="absolute inset-y-0 right-3 flex items-center text-zinc-400 pointer-events-none"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg></div></div>`;
             else if (['multiple_choice', 'checkbox'].includes(block.type)) {
-                previewHtml = `<div class="flex gap-2">` + (block.choices || []).slice(0,3).map(c => `<span class="px-2 py-1 bg-zinc-100 rounded text-[10px] text-zinc-600 border border-zinc-200">${c.label}</span>`).join('') + `</div>`;
-            } else if (block.type === 'date') previewHtml = `<input type="date" class="w-full text-xs p-2 bg-zinc-50 border border-zinc-200 rounded" disabled />`;
-            else if (block.type === 'file') previewHtml = `<button class="px-3 py-1.5 bg-zinc-100 rounded text-xs border border-zinc-200 text-zinc-600" disabled>Upload File</button>`;
-            else if (block.type === 'signature') previewHtml = `<div class="w-full h-16 border border-dashed border-zinc-300 bg-zinc-50 flex items-center justify-center text-xs text-zinc-400">Draw Signature</div>`;
-            else if (block.type === 'rating') previewHtml = `<div class="flex gap-1 text-zinc-300">★★★★★</div>`;
-            else if (block.type === 'slider') previewHtml = `<input type="range" class="w-full" disabled />`;
+                previewHtml = `<div class="flex flex-col gap-1.5 text-xs font-semibold text-zinc-700">` + (block.choices || [{label: 'Option 1'}, {label: 'Option 2'}]).slice(0, 3).map(c => `
+                    <div class="flex items-center gap-2 py-2 px-3 border border-zinc-200 rounded-lg bg-zinc-50/30">
+                        <input type="checkbox" class="h-3.5 w-3.5 rounded border-zinc-300 accent-zinc-950" disabled />
+                        <span>${c.label || c}</span>
+                    </div>
+                `).join('') + `</div>`;
+            } else if (block.type === 'date') previewHtml = `<input type="date" class="w-full h-9 px-3 border border-zinc-200 rounded-lg bg-zinc-50/50 text-xs" disabled />`;
+            else if (block.type === 'file') previewHtml = `
+                <div class="border border-dashed border-zinc-200 rounded-2xl py-6 px-4 bg-white text-center flex flex-col items-center justify-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-zinc-50 flex items-center justify-center text-zinc-700 border border-zinc-200/60 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><polyline points="9 15 12 12 15 15"></polyline></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-zinc-900 leading-normal">Drag &amp; drop an image or video</p>
+                        <p class="text-[9.5px] text-zinc-400 mt-0.5">or click to browse (4 MB max)</p>
+                    </div>
+                </div>
+            `;
+            else if (block.type === 'signature') previewHtml = `
+                <div class="border border-zinc-200 rounded-xl p-2.5 bg-zinc-50/20 flex flex-col gap-2">
+                    <div class="w-full h-12 bg-white border border-zinc-200 rounded-lg flex items-center justify-center text-[10px] text-zinc-300">Draw Signature</div>
+                    <div class="flex justify-between items-center px-0.5">
+                        <button type="button" class="px-2 h-5 rounded text-[8px] font-bold text-zinc-400 bg-white border border-zinc-200" disabled>Clear</button>
+                        <span class="text-[8px] font-bold text-zinc-400 uppercase tracking-wider">Sign here</span>
+                    </div>
+                </div>
+            `;
+            else if (block.type === 'rating') previewHtml = `<div class="flex items-center gap-1 py-1.5 px-3 border border-zinc-200 rounded-lg bg-zinc-50/20 w-fit text-lg text-zinc-300">★★★★★</div>`;
+            else if (block.type === 'slider') previewHtml = `
+                <div class="flex items-center gap-2 bg-zinc-50/30 border border-zinc-200 p-2 rounded-lg">
+                    <input type="range" class="flex-1 accent-zinc-950" disabled />
+                    <span class="text-[10px] font-mono font-bold text-zinc-500">50</span>
+                </div>
+            `;
             else if (block.type === 'payment' || block.type === 'stripe_payment') previewHtml = `<div class="flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg> <span class="text-sm font-semibold">${block.price || 100} ${block.currency || 'INR'}</span></div>`;
+            else if (block.type === 'upi_id') previewHtml = `<div class="flex items-center gap-2 py-1"><span class="text-xs font-mono bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded px-2 py-1 text-zinc-700 dark:text-zinc-300">${block.upi_id_value || 'yourname@upi'}</span><span class="text-[10px] text-zinc-400">UPI ID (₹${block.price || 100})</span></div>`;
+            else if (block.type === 'upi_qr') previewHtml = `<div class="flex items-center gap-2 py-1"><div class="w-10 h-10 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div><span class="text-[10px] text-zinc-400">UPI QR Code (₹${block.price || 100})</span></div>`;
+            else if (block.type === 'booking') previewHtml = `
+                <div class="flex flex-col gap-2 p-3 bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 rounded-xl">
+                    <div class="flex items-center gap-2 text-xs font-semibold text-zinc-650 dark:text-zinc-400">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <span>Choose booking slot (Date & Time)</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-1.5 mt-1">
+                        <div class="py-1 px-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-[10px] font-bold text-center text-zinc-400 rounded-lg">10:00 AM</div>
+                        <div class="py-1 px-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-[10px] font-bold text-center text-zinc-400 rounded-lg">12:30 PM</div>
+                        <div class="py-1 px-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-[10px] font-bold text-center text-zinc-400 rounded-lg">03:00 PM</div>
+                    </div>
+                </div>
+            `;
+            else if (block.type === 'address') previewHtml = `
+                <div class="flex flex-col gap-2 p-3 bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 rounded-xl">
+                    <input type="text" class="w-full text-xs p-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg" placeholder="Street Address" disabled />
+                    <div class="grid grid-cols-3 gap-2">
+                        <input type="text" class="text-xs p-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg" placeholder="City" disabled />
+                        <input type="text" class="text-xs p-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg" placeholder="State" disabled />
+                        <input type="text" class="text-xs p-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg" placeholder="ZIP Code" disabled />
+                    </div>
+                </div>
+            `;
+            else if (block.type === 'services_checklist') {
+                const choices = block.choices || [{label: 'Deep Cleaning', price: 1500}, {label: 'Express Cleaning', price: 800}];
+                previewHtml = `<div class="flex flex-col gap-2">` + 
+                    choices.map(c => `
+                        <div class="flex items-center justify-between p-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-semibold">
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" class="h-3.5 w-3.5 accent-zinc-950 rounded" disabled />
+                                <span class="text-zinc-800 dark:text-zinc-200">${c.label}</span>
+                            </div>
+                            <span class="text-zinc-500 font-mono text-[11px]">₹${c.price || 0}</span>
+                        </div>
+                    `).join('') + `</div>`;
+            }
             else if (block.type === 'header') previewHtml = `<h3 class="text-base font-bold text-zinc-900">${block.content || block.label || 'Section Heading'}</h3>`;
             else if (block.type === 'paragraph') previewHtml = `<p class="text-xs text-zinc-500 leading-relaxed">${block.content || block.label || 'Paragraph text...'}</p>`;
             else if (block.type === 'page_break') previewHtml = `<div class="flex items-center gap-2"><div class="flex-1 border-t-2 border-dashed border-zinc-300"></div><span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-2">Page Break</span><div class="flex-1 border-t-2 border-dashed border-zinc-300"></div></div>`;
@@ -2089,62 +2924,59 @@ function renderFormsList() {
             } else previewHtml = `<input type="text" class="w-full text-xs p-2 bg-zinc-50 border border-zinc-200 rounded" placeholder="${block.placeholder || block.label || 'Enter value...'}" disabled />`;
 
             div.innerHTML = `
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-2.5">
-                        <div class="text-zinc-300 cursor-grab hover:text-zinc-500 drag-handle" draggable="true">
-                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="none" fill="currentColor"><circle cx="8" cy="6" r="1.5"></circle><circle cx="8" cy="12" r="1.5"></circle><circle cx="8" cy="18" r="1.5"></circle><circle cx="14" cy="6" r="1.5"></circle><circle cx="14" cy="12" r="1.5"></circle><circle cx="14" cy="18" r="1.5"></circle></svg>
-                        </div>
-                        <span class="text-sm font-medium text-zinc-800">${block.label}</span>
-                        <span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-zinc-100 text-zinc-600">${meta.badge}</span>
+                <!-- Floating Edit/Action Bar (visible on hover or when selected) -->
+                <div class="absolute -top-3.5 right-3 flex items-center gap-1 opacity-0 ${originalIndex === selectedBlockIndex ? 'opacity-100' : 'group-hover:opacity-100'} transition-opacity bg-white dark:bg-zinc-900 p-1 rounded-lg border border-zinc-200 dark:border-zinc-800 shadow-sm z-10 select-none">
+                    <div class="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-grab drag-handle p-1 flex items-center justify-center" draggable="true" title="Drag to reorder">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="none" fill="currentColor"><circle cx="8" cy="6" r="1.5"></circle><circle cx="8" cy="12" r="1.5"></circle><circle cx="8" cy="18" r="1.5"></circle><circle cx="14" cy="6" r="1.5"></circle><circle cx="14" cy="12" r="1.5"></circle><circle cx="14" cy="18" r="1.5"></circle></svg>
                     </div>
-                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button class="btn-duplicate-block h-7 w-7 rounded-lg border border-zinc-200 hover:bg-zinc-50 flex items-center justify-center text-zinc-400 hover:text-zinc-700">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                        </button>
-                        <button class="btn-block-settings h-7 w-7 rounded-lg border border-zinc-200 hover:bg-zinc-50 flex items-center justify-center text-zinc-400 hover:text-zinc-700">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                        </button>
-                        <button class="btn-delete-block h-7 w-7 rounded-lg border border-zinc-200 hover:bg-red-50 hover:border-red-200 flex items-center justify-center text-zinc-400 hover:text-red-500">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>
-                        </button>
-                    </div>
+                    <span class="px-1.5 py-0.5 text-[9px] font-bold rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">${meta.label}</span>
+                    <div class="w-px h-3 bg-zinc-200 dark:bg-zinc-700 mx-0.5"></div>
+                    <button class="btn-duplicate-block p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 border-0 bg-transparent cursor-pointer flex items-center justify-center" title="Duplicate">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    </button>
+                    <button class="btn-delete-block p-1 rounded hover:bg-red-50 dark:hover:bg-red-950/30 text-zinc-500 hover:text-red-600 dark:hover:text-red-400 border-0 bg-transparent cursor-pointer flex items-center justify-center" title="Delete">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>
+                    </button>
                 </div>
-                <div class="content-preview">
+                
+                <!-- Native-Looking Field Label -->
+                <div class="mb-1.5 flex items-center justify-between">
+                    <label class="text-xs font-bold text-zinc-800 dark:text-zinc-200">${block.label || meta.label}</label>
+                    ${block.required ? '<span class="text-[10px] text-red-500 font-bold">*</span>' : ''}
+                </div>
+
+                <!-- Input Preview Area -->
+                <div class="content-preview pointer-events-none">
                     ${previewHtml}
                 </div>
             `;
 
             div.addEventListener('click', (e) => {
                 if (e.target.closest('button')) return;
-                selectBlock(idx);
+                selectBlock(originalIndex);
             });
 
-            div.querySelector('.btn-delete-block').addEventListener('click', (e) => {
+            div.querySelector('.btn-delete-block')?.addEventListener('click', (e) => {
                 e.stopPropagation();
-                currentEditingForm.blocks.splice(idx, 1);
-                if (selectedBlockIndex === idx) selectedBlockIndex = null;
-                else if (selectedBlockIndex > idx) selectedBlockIndex--;
+                currentEditingForm.blocks.splice(originalIndex, 1);
+                if (selectedBlockIndex === originalIndex) selectedBlockIndex = null;
+                else if (selectedBlockIndex > originalIndex) selectedBlockIndex--;
                 renderEditorBlocks();
                 switchLeftTab('fields');
                 triggerAutoSave();
             });
 
-            div.querySelector('.btn-duplicate-block').addEventListener('click', (e) => {
+            div.querySelector('.btn-duplicate-block')?.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const clone = JSON.parse(JSON.stringify(block));
                 clone.id = 'field_' + Math.random().toString(36).substr(2, 6);
-                currentEditingForm.blocks.splice(idx + 1, 0, clone);
-                selectBlock(idx + 1);
+                currentEditingForm.blocks.splice(originalIndex + 1, 0, clone);
+                selectBlock(originalIndex + 1);
                 triggerAutoSave();
             });
 
-            div.querySelector('.btn-block-settings').addEventListener('click', (e) => {
-                e.stopPropagation();
-                selectBlock(idx);
-            });
-
             div.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('text/plain', 'reorder:' + idx);
+                e.dataTransfer.setData('text/plain', 'reorder:' + originalIndex);
             });
 
             div.addEventListener('dragover', (e) => {
@@ -2162,7 +2994,7 @@ function renderFormsList() {
                 const data = e.dataTransfer.getData('text/plain');
                 if (data.startsWith('reorder:')) {
                     const fromIdx = parseInt(data.replace('reorder:', ''));
-                    const toIdx = idx;
+                    const toIdx = originalIndex;
                     if (fromIdx !== toIdx) {
                         const moved = currentEditingForm.blocks.splice(fromIdx, 1)[0];
                         currentEditingForm.blocks.splice(toIdx, 0, moved);
@@ -2173,22 +3005,60 @@ function renderFormsList() {
                     }
                 } else if (data.startsWith('new:')) {
                     const type = data.replace('new:', '');
-                    addFieldToForm(type, idx);
+                    addFieldToForm(type, originalIndex);
                 }
             });
 
             container.appendChild(div);
+
+            // Slim insertion divider — invisible by default, shown on hover as a hairline
+            const insertRow = document.createElement('div');
+            insertRow.className = "insert-between-row relative flex items-center gap-2 px-8 opacity-0 hover:opacity-100 focus-within:opacity-100 transition-all h-5 group cursor-pointer";
+            insertRow.dataset.insertAfter = originalIndex;
+            insertRow.innerHTML = `
+                <div class="flex-1 h-px bg-zinc-200 group-hover:bg-zinc-300 transition-colors"></div>
+                <button class="btn-insert-between text-[9px] font-bold bg-white border border-zinc-200 text-zinc-400 hover:text-zinc-700 hover:border-zinc-400 px-2.5 h-5 rounded-full cursor-pointer transition-all shadow-2xs flex items-center gap-1 whitespace-nowrap">+ field</button>
+                <div class="flex-1 h-px bg-zinc-200 group-hover:bg-zinc-300 transition-colors"></div>
+            `;
+            insertRow.querySelector('.btn-insert-between').addEventListener('click', (e) => {
+                e.stopPropagation();
+                switchLeftTab('fields');
+                window._insertAfterIdx = originalIndex;
+                window.coraShowToast && window.coraShowToast("Select a field type in the sidebar to insert here", "info");
+            });
+            container.appendChild(insertRow);
         });
 
         // Dropzone at end
-        const dropEnd = document.getElementById('editor-drop-zone');
         if (dropEnd) {
             dropEnd.addEventListener('dragover', (e) => e.preventDefault());
             dropEnd.addEventListener('drop', (e) => {
                 const data = e.dataTransfer.getData('text/plain');
                 if (data.startsWith('new:')) {
                     const type = data.replace('new:', '');
-                    addFieldToForm(type, currentEditingForm.blocks.length - 1);
+                    addFieldToForm(type);
+                } else if (data.startsWith('reorder:')) {
+                    const fromIdx = parseInt(data.replace('reorder:', ''));
+                    const activeStepIndex = currentEditingForm.currentStepIndex || 0;
+                    let stepCounter = 0;
+                    let targetIdx = currentEditingForm.blocks.length;
+                    for (let i = 0; i < currentEditingForm.blocks.length; i++) {
+                        if (currentEditingForm.blocks[i].type === 'page_break') {
+                            if (stepCounter === activeStepIndex) {
+                                targetIdx = i;
+                                break;
+                            }
+                            stepCounter++;
+                        }
+                    }
+                    if (fromIdx !== targetIdx && fromIdx !== targetIdx - 1) {
+                        const moved = currentEditingForm.blocks.splice(fromIdx, 1)[0];
+                        const destIdx = fromIdx < targetIdx ? targetIdx - 1 : targetIdx;
+                        currentEditingForm.blocks.splice(destIdx, 0, moved);
+                        selectedBlockIndex = destIdx;
+                        renderEditorBlocks();
+                        triggerAutoSave();
+                    }
                 }
             });
         }
@@ -2199,6 +3069,87 @@ function renderFormsList() {
         renderEditorBlocks();
         switchLeftTab('settings');
         populateInspectorSettings(idx);
+    }
+
+    function renderLogicRules() {
+        if (!currentEditingForm) return; // guard: don't crash if no form loaded
+        const container = document.getElementById('settings-logic-rules-container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (!currentEditingForm.logic) {
+            currentEditingForm.logic = [];
+        }
+
+        const logic = currentEditingForm.logic;
+        const blocks = currentEditingForm.blocks || [];
+        const inputBlocks = blocks.filter(b => !['header','paragraph','divider','spacer','page_break'].includes(b.type));
+
+        const buildFieldOptions = (selectedLabel = '') => 
+            inputBlocks.map(b => `<option value="${b.label}" ${b.label === selectedLabel ? 'selected' : ''}>${b.label}</option>`).join('');
+
+        if (logic.length === 0) {
+            container.innerHTML = '<p class="text-[10px] text-zinc-400 dark:text-zinc-500 italic">No rules yet. Click + Add Rule to create one.</p>';
+            return;
+        }
+
+        logic.forEach((rule, ruleIdx) => {
+            const card = document.createElement('div');
+            card.className = 'bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 space-y-2';
+            card.dataset.ruleIdx = ruleIdx;
+            card.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Rule ${ruleIdx + 1}</span>
+                    <button class="btn-delete-logic-rule text-zinc-400 hover:text-red-500 text-xs border-0 bg-transparent cursor-pointer" data-rule-idx="${ruleIdx}">✕</button>
+                </div>
+                <div class="space-y-1.5">
+                    <div class="flex items-center gap-1 text-[10px] text-zinc-500 font-semibold">IF</div>
+                    <select class="logic-field-select w-full h-8 px-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-[11px] font-medium text-zinc-800 dark:text-zinc-200 outline-none" data-rule-idx="${ruleIdx}" data-field="field">
+                        <option value="">-- Select field --</option>
+                        ${buildFieldOptions(rule.field)}
+                    </select>
+                    <select class="logic-condition-select w-full h-8 px-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-[11px] font-medium text-zinc-800 dark:text-zinc-200 outline-none" data-rule-idx="${ruleIdx}" data-field="condition">
+                        <option value="equals" ${rule.condition === 'equals' ? 'selected' : ''}>equals</option>
+                        <option value="not_equals" ${rule.condition === 'not_equals' ? 'selected' : ''}>does not equal</option>
+                        <option value="contains" ${rule.condition === 'contains' ? 'selected' : ''}>contains</option>
+                        <option value="not_empty" ${rule.condition === 'not_empty' ? 'selected' : ''}>is not empty</option>
+                        <option value="is_empty" ${rule.condition === 'is_empty' ? 'selected' : ''}>is empty</option>
+                    </select>
+                    <input type="text" class="logic-value-input w-full h-8 px-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-[11px] font-medium text-zinc-800 dark:text-zinc-200 outline-none" placeholder="Value..." value="${rule.value || ''}" data-rule-idx="${ruleIdx}" data-field="value" />
+                    <div class="flex items-center gap-1 text-[10px] text-zinc-500 font-semibold mt-1">THEN</div>
+                    <select class="logic-action-select w-full h-8 px-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-[11px] font-medium text-zinc-800 dark:text-zinc-200 outline-none" data-rule-idx="${ruleIdx}" data-field="action">
+                        <option value="show" ${rule.action === 'show' ? 'selected' : ''}>Show field</option>
+                        <option value="hide" ${rule.action === 'hide' ? 'selected' : ''}>Hide field</option>
+                        <option value="require" ${rule.action === 'require' ? 'selected' : ''}>Make required</option>
+                    </select>
+                    <select class="logic-target-select w-full h-8 px-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-[11px] font-medium text-zinc-800 dark:text-zinc-200 outline-none" data-rule-idx="${ruleIdx}" data-field="target">
+                        <option value="">-- Target field --</option>
+                        ${buildFieldOptions(rule.target)}
+                    </select>
+                </div>
+            `;
+            container.appendChild(card);
+
+            card.querySelectorAll('select, input').forEach(el => {
+                el.addEventListener('change', updateLogicRule);
+                el.addEventListener('input', updateLogicRule);
+            });
+
+            card.querySelector('.btn-delete-logic-rule').addEventListener('click', (e) => {
+                const idx = parseInt(e.target.dataset.ruleIdx);
+                currentEditingForm.logic.splice(idx, 1);
+                renderLogicRules();
+                triggerAutoSave();
+            });
+        });
+    }
+
+    function updateLogicRule(e) {
+        const ruleIdx = parseInt(e.target.dataset.ruleIdx);
+        const fieldKey = e.target.dataset.field;
+        if (!currentEditingForm.logic || !currentEditingForm.logic[ruleIdx]) return;
+        currentEditingForm.logic[ruleIdx][fieldKey] = e.target.value;
+        triggerAutoSave();
     }
 
     function populateInspectorSettings(idx) {
@@ -2225,23 +3176,38 @@ function renderFormsList() {
         if (reqInp) reqInp.checked = !!block.required;
 
         if (priceContainer) {
-            if (block.type === 'payment' || block.type === 'stripe_payment') {
+            if (['payment', 'stripe_payment', 'upi_id', 'upi_qr'].includes(block.type)) {
                 priceContainer.classList.remove('hidden');
                 if (priceAmount) priceAmount.value = block.price || 100;
                 if (priceCurrency) priceCurrency.value = block.currency || 'INR';
+
+                const upiContainer = document.getElementById('inspector-upi-container');
+                const upiInput = document.getElementById('inspector-upi-id-value');
+                if (upiContainer) {
+                    if (['upi_id', 'upi_qr'].includes(block.type)) {
+                        upiContainer.classList.remove('hidden');
+                        if (upiInput) upiInput.value = block.upi_id_value || 'yourname@upi';
+                    } else {
+                        upiContainer.classList.add('hidden');
+                    }
+                }
             } else {
                 priceContainer.classList.add('hidden');
             }
         }
 
         if (choicesWrapper) {
-            if (['dropdown', 'multiple_choice', 'checkbox'].includes(block.type)) {
+            if (['dropdown', 'multiple_choice', 'checkbox', 'services_checklist'].includes(block.type)) {
                 choicesWrapper.classList.remove('hidden');
                 let choicesHtml = '';
                 (block.choices || []).forEach((c, cIdx) => {
+                    const priceInput = block.type === 'services_checklist' 
+                        ? `<input type="number" class="inspector-choice-price w-20 text-xs px-2 py-1.5 border border-zinc-200 rounded font-semibold text-right" placeholder="Price" value="${c.price || 0}" data-cidx="${cIdx}">`
+                        : '';
                     choicesHtml += `
                         <div class="flex items-center gap-2 mb-2">
                             <input type="text" class="inspector-choice-input flex-1 text-xs px-2 py-1.5 border border-zinc-200 rounded" value="${c.label}" data-cidx="${cIdx}">
+                            ${priceInput}
                             <button class="btn-delete-choice p-1 text-zinc-400 hover:text-red-500" data-cidx="${cIdx}">✕</button>
                         </div>
                     `;
@@ -2257,6 +3223,14 @@ function renderFormsList() {
                         renderEditorBlocks();
                     });
                 });
+                choicesWrapper.querySelectorAll('.inspector-choice-price').forEach(inp => {
+                    inp.addEventListener('input', (e) => {
+                        const ci = parseInt(e.target.dataset.cidx);
+                        currentEditingForm.blocks[selectedBlockIndex].choices[ci].price = parseFloat(e.target.value) || 0;
+                        triggerAutoSave();
+                        renderEditorBlocks();
+                    });
+                });
                 choicesWrapper.querySelectorAll('.btn-delete-choice').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         const ci = parseInt(e.target.dataset.cidx);
@@ -2267,7 +3241,8 @@ function renderFormsList() {
                     });
                 });
                 document.getElementById('btn-add-choice')?.addEventListener('click', () => {
-                    currentEditingForm.blocks[selectedBlockIndex].choices.push({label: 'New Option'});
+                    const newOpt = block.type === 'services_checklist' ? {label: 'New Service', price: 100} : {label: 'New Option'};
+                    currentEditingForm.blocks[selectedBlockIndex].choices.push(newOpt);
                     triggerAutoSave();
                     renderEditorBlocks();
                     populateInspectorSettings(selectedBlockIndex);
@@ -2276,6 +3251,11 @@ function renderFormsList() {
             } else {
                 choicesWrapper.classList.add('hidden');
             }
+        }
+
+        // Render logic rules for this field settings context
+        if (typeof renderLogicRules === 'function') {
+            renderLogicRules();
         }
     }
 
@@ -2328,6 +3308,68 @@ function renderFormsList() {
         }
     });
 
+    document.getElementById('btn-add-logic-rule')?.addEventListener('click', () => {
+        if (!currentEditingForm) return;
+        if (!currentEditingForm.logic) currentEditingForm.logic = [];
+        currentEditingForm.logic.push({ field: '', condition: 'equals', value: '', action: 'show', target: '' });
+        renderLogicRules();
+        triggerAutoSave();
+    });
+
+    document.getElementById('inspector-upi-id-value')?.addEventListener('input', (e) => {
+        if (selectedBlockIndex !== null) {
+            currentEditingForm.blocks[selectedBlockIndex].upi_id_value = e.target.value;
+            triggerAutoSave();
+            renderEditorBlocks();
+        }
+    });
+
+    // Form Settings & Integrations Sync Binders
+    const formSettingsBindings = [
+        { id: 'settings-form-title', key: 'title', parent: 'root', syncTo: ['editor-form-title', 'canvas-form-name'] },
+        { id: 'settings-form-subtitle', key: 'description', parent: 'root', syncTo: ['canvas-form-subtitle'] },
+        { id: 'settings-cover-url', key: 'cover_image', parent: 'settings', syncAction: renderCoverImage },
+        { id: 'settings-success-msg', key: 'success_message', parent: 'settings' },
+        { id: 'settings-redirect-url', key: 'redirect_url', parent: 'settings' },
+        { id: 'settings-custom-css', key: 'custom_css', parent: 'styling' },
+        { id: 'settings-webhook-url', key: 'webhook_url', parent: 'settings' },
+        { id: 'settings-stripe-key', key: 'stripe_key', parent: 'settings' },
+        { id: 'map-crm-name', key: 'map_crm_name', parent: 'settings' },
+        { id: 'map-crm-email', key: 'map_crm_email', parent: 'settings' },
+        { id: 'map-crm-phone', key: 'map_crm_phone', parent: 'settings' },
+        { id: 'map-crm-notes', key: 'map_crm_notes', parent: 'settings' }
+    ];
+
+    formSettingsBindings.forEach(binding => {
+        document.getElementById(binding.id)?.addEventListener('input', (e) => {
+            if (!currentEditingForm) return;
+            const val = e.target.value;
+            
+            if (binding.parent === 'root') {
+                currentEditingForm[binding.key] = val;
+            } else {
+                if (!currentEditingForm[binding.parent]) currentEditingForm[binding.parent] = {};
+                currentEditingForm[binding.parent][binding.key] = val;
+            }
+
+            if (binding.syncTo) {
+                binding.syncTo.forEach(targetId => {
+                    const el = document.getElementById(targetId);
+                    if (el) {
+                        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.value = val;
+                        else el.innerText = val;
+                    }
+                });
+            }
+
+            if (binding.syncAction) {
+                binding.syncAction();
+            }
+
+            triggerAutoSave();
+        });
+    });
+
     // Title & Subtitle Sync
     document.getElementById('editor-form-title')?.addEventListener('input', (e) => {
         const val = e.target.value;
@@ -2335,6 +3377,13 @@ function renderFormsList() {
         const cn = document.getElementById('canvas-form-name');
         if (cn) cn.innerText = val;
         triggerAutoSave();
+    });
+
+    document.getElementById('editor-form-status')?.addEventListener('change', (e) => {
+        if (currentEditingForm) {
+            currentEditingForm.status = e.target.value;
+            triggerAutoSave();
+        }
     });
 
     document.getElementById('canvas-form-name')?.addEventListener('input', (e) => {
@@ -2349,6 +3398,122 @@ function renderFormsList() {
         const val = e.target.innerText.trim();
         if (currentEditingForm) currentEditingForm.description = val;
         triggerAutoSave();
+    });
+
+    // Footer actions (CTA) bindings
+    document.getElementById('settings-submit-text')?.addEventListener('input', (e) => {
+        if (!currentEditingForm) return;
+        if (!currentEditingForm.settings) currentEditingForm.settings = {};
+        const val = e.target.value || 'Submit';
+        currentEditingForm.settings.submit_button_text = val;
+        
+        const btn = document.getElementById('canvas-submit-btn');
+        if (btn) {
+            btn.innerHTML = `${val} <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
+        }
+        triggerAutoSave();
+    });
+
+    document.getElementById('settings-submit-action')?.addEventListener('change', (e) => {
+        if (!currentEditingForm) return;
+        if (!currentEditingForm.settings) currentEditingForm.settings = {};
+        currentEditingForm.settings.submit_button_action = e.target.value;
+        triggerAutoSave();
+    });
+
+    document.getElementById('settings-sec-text')?.addEventListener('input', (e) => {
+        if (!currentEditingForm) return;
+        if (!currentEditingForm.settings) currentEditingForm.settings = {};
+        const val = e.target.value || 'Save as draft';
+        currentEditingForm.settings.secondary_button_text = val;
+        
+        const btn = document.getElementById('canvas-sec-btn');
+        if (btn) btn.innerText = val;
+        triggerAutoSave();
+    });
+
+    document.getElementById('settings-sec-show')?.addEventListener('change', (e) => {
+        if (!currentEditingForm) return;
+        if (!currentEditingForm.settings) currentEditingForm.settings = {};
+        const show = e.target.checked;
+        currentEditingForm.settings.secondary_button_show = show;
+        
+        const btn = document.getElementById('canvas-sec-btn');
+        if (btn) {
+            if (show) btn.classList.remove('hidden');
+            else btn.classList.add('hidden');
+        }
+        const textWrapper = document.getElementById('settings-sec-text-wrapper');
+        if (textWrapper) {
+            if (show) textWrapper.classList.remove('hidden');
+            else textWrapper.classList.add('hidden');
+        }
+        triggerAutoSave();
+    });
+
+    // Email Notifications settings listeners
+    document.getElementById('settings-email-admin-enable')?.addEventListener('change', (e) => {
+        if (!currentEditingForm) return;
+        if (!currentEditingForm.settings) currentEditingForm.settings = {};
+        const enable = e.target.checked;
+        currentEditingForm.settings.email_admin_enable = enable;
+        
+        const details = document.getElementById('settings-email-admin-details');
+        if (details) {
+            if (enable) details.classList.remove('hidden');
+            else details.classList.add('hidden');
+        }
+        triggerAutoSave();
+    });
+
+    document.getElementById('settings-email-admin-to')?.addEventListener('input', (e) => {
+        if (!currentEditingForm) return;
+        if (!currentEditingForm.settings) currentEditingForm.settings = {};
+        currentEditingForm.settings.email_admin_to = e.target.value;
+        triggerAutoSave();
+    });
+
+    document.getElementById('settings-email-admin-subject')?.addEventListener('input', (e) => {
+        if (!currentEditingForm) return;
+        if (!currentEditingForm.settings) currentEditingForm.settings = {};
+        currentEditingForm.settings.email_admin_subject = e.target.value;
+        triggerAutoSave();
+    });
+
+    document.getElementById('settings-email-submitter-enable')?.addEventListener('change', (e) => {
+        if (!currentEditingForm) return;
+        if (!currentEditingForm.settings) currentEditingForm.settings = {};
+        const enable = e.target.checked;
+        currentEditingForm.settings.email_submitter_enable = enable;
+        
+        const details = document.getElementById('settings-email-submitter-details');
+        if (details) {
+            if (enable) details.classList.remove('hidden');
+            else details.classList.add('hidden');
+        }
+        triggerAutoSave();
+    });
+
+    document.getElementById('settings-email-submitter-subject')?.addEventListener('input', (e) => {
+        if (!currentEditingForm) return;
+        if (!currentEditingForm.settings) currentEditingForm.settings = {};
+        currentEditingForm.settings.email_submitter_subject = e.target.value;
+        triggerAutoSave();
+    });
+
+    document.getElementById('settings-email-submitter-message')?.addEventListener('input', (e) => {
+        if (!currentEditingForm) return;
+        if (!currentEditingForm.settings) currentEditingForm.settings = {};
+        currentEditingForm.settings.email_submitter_message = e.target.value;
+        triggerAutoSave();
+    });
+
+    document.getElementById('canvas-cta-preview-row')?.addEventListener('click', () => {
+        switchLeftTab('form');
+        setTimeout(() => {
+            document.getElementById('settings-submit-text')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('settings-submit-text')?.focus();
+        }, 100);
     });
 
     // Cover Image Header Dropzone & Picker
@@ -2385,9 +3550,26 @@ function renderFormsList() {
         saveFormInternal(true);
     });
 
+    document.getElementById('btn-view-form')?.addEventListener('click', () => {
+        if (!currentEditingForm || !currentEditingForm.id) {
+            window.coraShowToast && window.coraShowToast("Please save/publish the form first before viewing", "warning");
+            return;
+        }
+        window.open(coraREData.siteUrl + '/shared-form/' + currentEditingForm.id, '_blank');
+    });
+
     document.getElementById('btn-back-to-list')?.addEventListener('click', () => {
         window.location.hash = '#list';
     });
+
+    // Use delegated event listeners on the stable module root so they survive listState.innerHTML replacement
+    const formsModuleRoot = document.getElementById('cora-forms-module');
+    if (formsModuleRoot) {
+        formsModuleRoot.addEventListener('click', (e) => {
+            const target = e.target.closest('#btn-create-form');
+            if (target) { window.location.hash = '#new'; }
+        });
+    }
 
     // Palette Items (Add & Drag)
     document.querySelectorAll('[data-add-type]').forEach(item => {

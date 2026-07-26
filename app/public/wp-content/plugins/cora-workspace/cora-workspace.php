@@ -139,9 +139,12 @@ add_action( 'wp_head', function() {
  * 2. FAVICON — Replace the WordPress "W" favicon with the Cora logo on all pages.
  */
 function cora_whitelabel_favicon() {
-    $favicon_url = CORA_WORKSPACE_URL . 'assets/images/cora-favicon.png';
+    $favicon_url = get_option( 'cora_brand_favicon_url', '' );
+    if ( empty( $favicon_url ) ) {
+        $favicon_url = CORA_WORKSPACE_URL . 'assets/images/cora-favicon.png';
+    }
     echo '<link rel="icon" type="image/png" href="' . esc_url( $favicon_url ) . '" sizes="32x32">' . "\n";
-    echo '<link rel="shortcut icon" href="' . esc_url( $favicon_url ) . '">' . "\n";
+    echo '<link rel="shortcut icon" id="cora-dynamic-favicon" href="' . esc_url( $favicon_url ) . '">' . "\n";
     echo '<link rel="apple-touch-icon" href="' . esc_url( $favicon_url ) . '">' . "\n";
 }
 add_action( 'wp_head',    'cora_whitelabel_favicon', 1 );
@@ -821,7 +824,7 @@ function cora_real_estate_ai_handle_workspace_route() {
             'financials', 'financial-overview', 'team-roles', 'user-roles',
             'equipment', 'camera-equipment', 'media', 'media-manager',
             'tasks', 'client-task-manager', 'canvas', 'settings', 'settings-suite',
-            'profile', 'mcp', 'ecosystem', 'forms', 'audit-panel', 'super-admin',
+            'profile', 'mcp', 'ecosystem', 'forms', 'emails', 'audit-panel', 'super-admin',
             'portfolio', 'feature-hub', 'gbp', 'plugins', 'pages', 'comments',
             'appearance', 'tools', 'media-editor', 'attendance', 'visual-builder'
         );
@@ -993,6 +996,10 @@ function cora_real_estate_ai_admin_assets( $hook ) {
         'geminiKeySaved'   => $cora_gemini_key_saved,
         'openaiKeySaved'   => $cora_openai_key_saved,
         'activeAiModel'    => $cora_active_ai_model,
+        'site_title'       => get_option( 'blogname', 'Cora Workspace' ),
+        'favicon_url'      => get_option( 'cora_brand_favicon_url', '' ),
+        'logo_url'         => get_option( 'cora_brand_logo_url', '' ),
+        'sidebar_title'    => get_option( 'cora_sidebar_title', 'cora' ),
     ) );
 }
 add_action( 'admin_enqueue_scripts', 'cora_real_estate_ai_admin_assets' );
@@ -2681,6 +2688,12 @@ add_action( 'rest_api_init', function () {
         )
     ) );
 
+    register_rest_route( 'cora/v1', '/forms/submissions', array(
+        'methods'             => 'GET',
+        'callback'            => 'cora_rest_get_all_form_submissions',
+        'permission_callback' => 'is_user_logged_in',
+    ) );
+
     register_rest_route( 'cora/v1', '/forms/(?P<id>\d+)', array(
         array(
             'methods'             => 'GET',
@@ -2710,6 +2723,18 @@ add_action( 'rest_api_init', function () {
         'methods'             => 'POST',
         'callback'            => 'cora_rest_submit_form',
         'permission_callback' => '__return_true',
+    ) );
+
+    register_rest_route( 'cora/v1', '/emails/send', array(
+        'methods'             => 'POST',
+        'callback'            => 'cora_rest_send_email',
+        'permission_callback' => 'is_user_logged_in',
+    ) );
+
+    register_rest_route( 'cora/v1', '/emails/logs', array(
+        'methods'             => 'GET',
+        'callback'            => 'cora_rest_get_email_logs',
+        'permission_callback' => 'is_user_logged_in',
     ) );
 
     register_rest_route( 'cora/v1', '/forms/clauses', array(
@@ -10001,6 +10026,8 @@ function cora_ajax_save_system_settings_suite() {
         'wp_page_for_privacy_policy',
         'cora_brand_favicon_url',
         'cora_brand_logo_url',
+        'cora_sidebar_title',
+        'cora_tab_title_format',
         'cora_gbp_maps_api_key',
         'cora_whatsapp_api_token',
         'cora_whatsapp_phone_number',
@@ -18330,7 +18357,7 @@ function cora_get_bip_problems_html() {
 
 function cora_rest_get_forms( $request ) {
     global $wpdb;
-    $forms = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_forms ORDER BY id DESC", ARRAY_A );
+    $forms = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_forms ORDER BY id DESC LIMIT 4", ARRAY_A );
     if ( is_array( $forms ) ) {
         foreach ( $forms as &$form ) {
             $form['styling'] = json_decode( $form['styling'], true ) ?: array();
@@ -18340,6 +18367,13 @@ function cora_rest_get_forms( $request ) {
             $blocks_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_form_blocks WHERE form_id = %d", $form['id'] ), ARRAY_A );
             $form['blocks'] = $blocks_row ? (json_decode( $blocks_row['blocks_json'], true ) ?: array()) : array();
             $form['logic'] = $blocks_row ? (json_decode( $blocks_row['logic_json'], true ) ?: array()) : array();
+
+            // Fetch completed submission count
+            $sub_count = $wpdb->get_var( $wpdb->prepare(
+                "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_submissions WHERE form_id = %d AND is_partial = 0",
+                $form['id']
+            ) );
+            $form['submission_count'] = intval( $sub_count );
         }
     } else {
         $forms = array();
@@ -18479,6 +18513,19 @@ function cora_rest_get_form_submissions( $request ) {
     return rest_ensure_response( $subs );
 }
 
+function cora_rest_get_all_form_submissions( $request ) {
+    global $wpdb;
+    $subs = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_form_submissions ORDER BY id DESC", ARRAY_A );
+    if ( is_array( $subs ) ) {
+        foreach ( $subs as &$sub ) {
+            $sub['submitted_data'] = json_decode( $sub['submitted_data'], true ) ?: array();
+        }
+    } else {
+        $subs = array();
+    }
+    return rest_ensure_response( $subs );
+}
+
 function cora_rest_get_form_ai_schema( $request ) {
     global $wpdb;
     $id = intval( $request->get_param('id') );
@@ -18538,10 +18585,56 @@ function cora_rest_submit_form( $request ) {
         return new WP_Error( 'rate_limited', 'Too many requests. Please wait before submitting again.', array( 'status' => 429 ) );
     }
 
-    // 3. Save Submission
+    // Fetch Form & Blocks for validation
+    $form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_forms WHERE id = %d", $id ), ARRAY_A );
+    if ( ! $form ) {
+        return new WP_Error( 'not_found', 'Form not found.', array( 'status' => 404 ) );
+    }
+
     $submitted_data = isset( $params['submitted_data'] ) ? $params['submitted_data'] : array();
     $is_partial = isset( $params['is_partial'] ) ? intval( $params['is_partial'] ) : 0;
 
+    // Server-side validation check (only for final/completed submissions)
+    if ( ! $is_partial ) {
+        $blocks_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_form_blocks WHERE form_id = %d", $id ), ARRAY_A );
+        if ( $blocks_row ) {
+            $form_blocks = json_decode( $blocks_row['blocks_json'], true ) ?: array();
+            foreach ( $form_blocks as $block ) {
+                $label = $block['label'] ?? 'Input Field';
+                $required = ! empty( $block['required'] );
+                $type = $block['type'] ?? 'text';
+
+                $val = '';
+                if ( isset( $submitted_data[$label] ) ) {
+                    $val = $submitted_data[$label];
+                }
+
+                // Required check
+                if ( $required ) {
+                    if ( $type === 'checkbox' || $type === 'services_checklist' ) {
+                        if ( empty( $val ) || ( is_array( $val ) && count( $val ) === 0 ) || $val === 'false' || $val === '' ) {
+                            return new WP_Error( 'validation_failed', "Field '{$label}' is required.", array( 'status' => 400 ) );
+                        }
+                    } else if ( $type === 'address' ) {
+                        if ( empty( $val ) || count( explode( ',', $val ) ) < 3 ) {
+                            return new WP_Error( 'validation_failed', "Field '{$label}' must have a complete address.", array( 'status' => 400 ) );
+                        }
+                    } else if ( empty( $val ) || $val === '' ) {
+                        return new WP_Error( 'validation_failed', "Field '{$label}' is required.", array( 'status' => 400 ) );
+                    }
+                }
+
+                // Email validation format check
+                if ( $type === 'email' && ! empty( $val ) ) {
+                    if ( ! is_email( $val ) ) {
+                        return new WP_Error( 'validation_failed', "Field '{$label}' must be a valid email address.", array( 'status' => 400 ) );
+                    }
+                }
+            }
+        }
+    }
+
+    // 3. Save Submission
     $wpdb->insert(
         $wpdb->prefix . 'cora_form_submissions',
         array(
@@ -18552,8 +18645,272 @@ function cora_rest_submit_form( $request ) {
             'created_at'     => current_time('mysql')
         )
     );
+    $submission_id = $wpdb->insert_id;
 
-    return rest_ensure_response( array( 'success' => true, 'submission_id' => $wpdb->insert_id ) );
+    // 4. Fetch Form Settings for CRM Sync & Webhook Dispatch
+    if ( $form ) {
+        $settings = ! empty( $form['settings'] ) ? json_decode( $form['settings'], true ) : array();
+
+        // 4a. CRM Sync mapping (Only for completed/non-partial submissions)
+        if ( ! $is_partial && is_array( $submitted_data ) ) {
+            $map_name_key  = $settings['map_crm_name'] ?? '';
+            $map_email_key = $settings['map_crm_email'] ?? '';
+            $map_phone_key = $settings['map_crm_phone'] ?? '';
+            $map_notes_key = $settings['map_crm_notes'] ?? '';
+
+            $name_val  = '';
+            $email_val = '';
+            $phone_val = '';
+            $notes_val = '';
+
+            // Extract mapped values case-insensitively or exactly
+            foreach ( $submitted_data as $key => $val ) {
+                $trimmed_key = trim( $key );
+                if ( ! empty( $map_name_key ) && strcasecmp( $trimmed_key, trim( $map_name_key ) ) === 0 ) {
+                    $name_val = $val;
+                }
+                if ( ! empty( $map_email_key ) && strcasecmp( $trimmed_key, trim( $map_email_key ) ) === 0 ) {
+                    $email_val = $val;
+                }
+                if ( ! empty( $map_phone_key ) && strcasecmp( $trimmed_key, trim( $map_phone_key ) ) === 0 ) {
+                    $phone_val = $val;
+                }
+                if ( ! empty( $map_notes_key ) && strcasecmp( $trimmed_key, trim( $map_notes_key ) ) === 0 ) {
+                    $notes_val = $val;
+                }
+            }
+
+            // Sync lead to database if at least name or email is mapped and provided
+            if ( ! empty( $name_val ) || ! empty( $email_val ) ) {
+                $first_name = $name_val;
+                $last_name  = '';
+                if ( ! empty( $name_val ) ) {
+                    $name_parts = explode( ' ', trim( $name_val ), 2 );
+                    $first_name = $name_parts[0];
+                    $last_name  = $name_parts[1] ?? '';
+                }
+
+                // Retrieve branch ID for agency
+                $branch_id = $wpdb->get_var( $wpdb->prepare(
+                    "SELECT id FROM {$wpdb->prefix}cora_branches WHERE agency_id = %d LIMIT 1",
+                    $form['agency_id']
+                ) );
+                if ( ! $branch_id ) {
+                    $branch_id = 1;
+                }
+
+                $wpdb->insert(
+                    $wpdb->prefix . 'cora_leads',
+                    array(
+                        'agency_id'  => $form['agency_id'],
+                        'branch_id'  => $branch_id,
+                        'first_name' => sanitize_text_field( $first_name ),
+                        'last_name'  => sanitize_text_field( $last_name ),
+                        'email'      => sanitize_email( $email_val ),
+                        'phone'      => sanitize_text_field( $phone_val ),
+                        'notes'      => sanitize_textarea_field( $notes_val ),
+                        'source'     => sanitize_text_field( $form['title'] ),
+                        'status'     => 'new',
+                        'created_at' => current_time('mysql'),
+                        'updated_at' => current_time('mysql')
+                    )
+                );
+            }
+        }
+
+        // 4b. Webhook Dispatch (Async)
+        $webhook_url = $settings['webhook_url'] ?? '';
+        if ( ! empty( $webhook_url ) && filter_var( $webhook_url, FILTER_VALIDATE_URL ) ) {
+            wp_remote_post( $webhook_url, array(
+                'method'      => 'POST',
+                'timeout'     => 15,
+                'redirection' => 5,
+                'httpversion' => '1.0',
+                'blocking'    => false,
+                'headers'     => array( 'Content-Type' => 'application/json; charset=utf-8' ),
+                'body'        => json_encode( array(
+                    'event'          => 'form.submitted',
+                    'form_id'        => $id,
+                    'form_title'     => $form['title'],
+                    'submission_id'  => $submission_id,
+                    'is_partial'     => $is_partial,
+                    'submitted_data' => $submitted_data,
+                    'ip_address'     => $ip,
+                    'timestamp'      => current_time('mysql')
+                ) ),
+                'cookies'     => array()
+            ) );
+        }
+
+        // 4c. Email Notifications (Only for completed/non-partial submissions)
+        if ( ! $is_partial && is_array( $submitted_data ) ) {
+            $email_admin_enable      = ! empty( $settings['email_admin_enable'] );
+            $email_admin_to          = $settings['email_admin_to'] ?? '';
+            $email_admin_subject     = $settings['email_admin_subject'] ?? '';
+            $email_submitter_enable  = ! empty( $settings['email_submitter_enable'] );
+            $email_submitter_subject = $settings['email_submitter_subject'] ?? '';
+            $email_submitter_message = $settings['email_submitter_message'] ?? '';
+
+            // Find submitter's email address
+            $submitter_email = '';
+            // Method A: Check mapped CRM email key
+            $crm_email_key = $settings['map_crm_email'] ?? '';
+            if ( ! empty( $crm_email_key ) && isset( $submitted_data[$crm_email_key] ) && is_email( $submitted_data[$crm_email_key] ) ) {
+                $submitter_email = $submitted_data[$crm_email_key];
+            }
+            // Method B: Scan fields for email type value
+            if ( empty( $submitter_email ) ) {
+                $blocks_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_form_blocks WHERE form_id = %d", $id ), ARRAY_A );
+                if ( $blocks_row ) {
+                    $form_blocks = json_decode( $blocks_row['blocks_json'], true ) ?: array();
+                    foreach ( $form_blocks as $block ) {
+                        if ( isset($block['type']) && $block['type'] === 'email' ) {
+                            $lbl = $block['label'] ?? '';
+                            if ( ! empty( $lbl ) && isset( $submitted_data[$lbl] ) && is_email( $submitted_data[$lbl] ) ) {
+                                $submitter_email = $submitted_data[$lbl];
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Build monochromatic Zinc themed table summary HTML
+            $table_rows_html = '';
+            foreach ( $submitted_data as $label => $value ) {
+                if ( is_array( $value ) ) {
+                    $value_display = implode( ', ', $value );
+                } else {
+                    $value_display = strval( $value );
+                }
+                $table_rows_html .= '
+                <tr style="border-bottom: 1px solid #f4f4f5;">
+                    <td style="padding: 12px 8px; font-weight: 600; color: #3f3f46; vertical-align: top; width: 35%;">' . esc_html( $label ) . '</td>
+                    <td style="padding: 12px 8px; color: #09090b; vertical-align: top;">' . nl2br( esc_html( $value_display ) ) . '</td>
+                </tr>';
+            }
+
+            $email_template_start = '
+            <div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.015); box-sizing: border-box;">
+                <div style="border-bottom: 1px solid #f4f4f5; padding-bottom: 20px; margin-bottom: 24px;">
+                    <h2 style="font-size: 20px; font-weight: 700; color: #09090b; margin: 0; letter-spacing: -0.02em;">' . esc_html( $form['title'] ) . '</h2>
+            ';
+
+            $email_template_end = '
+                </div>
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; line-height: 1.5; box-sizing: border-box;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #e4e4e7; color: #71717a; font-size: 11px; font-weight: 700; text-transform: uppercase;">
+                            <th style="padding: 8px 8px 12px 8px; text-align: left;">Field</th>
+                            <th style="padding: 8px 8px 12px 8px; text-align: left;">Response</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ' . $table_rows_html . '
+                    </tbody>
+                </table>
+                <div style="margin-top: 32px; border-top: 1px solid #f4f4f5; padding-top: 20px; text-align: center; font-size: 11px; color: #a1a1aa; box-sizing: border-box;">
+                    Powered by Cora Forms
+                </div>
+            </div>';
+
+            $headers = array('Content-Type: text/html; charset=UTF-8');
+
+            // 1. Send Admin Email
+            if ( $email_admin_enable ) {
+                $to = ! empty( $email_admin_to ) ? $email_admin_to : get_option( 'admin_email' );
+                $subject = ! empty( $email_admin_subject ) ? $email_admin_subject : "New Submission: " . $form['title'];
+                
+                $admin_html = $email_template_start . '
+                    <p style="font-size: 13px; color: #71717a; margin: 6px 0 0 0; line-height: 1.5;">A new response has been submitted to your form.</p>
+                ' . $email_template_end;
+                
+                wp_mail( $to, $subject, $admin_html, $headers );
+            }
+
+            // 2. Send Submitter Receipt Email
+            if ( $email_submitter_enable && ! empty( $submitter_email ) ) {
+                $subject = ! empty( $email_submitter_subject ) ? $email_submitter_subject : "Submission Received: " . $form['title'];
+                $msg_header = ! empty( $email_submitter_message ) ? $email_submitter_message : "Thank you for your submission. A summary of your answers is below.";
+                
+                $submitter_html = $email_template_start . '
+                    <p style="font-size: 13px; color: #3f3f46; margin: 12px 0 0 0; line-height: 1.5;">' . nl2br( esc_html( $msg_header ) ) . '</p>
+                ' . $email_template_end;
+                
+                wp_mail( $submitter_email, $subject, $submitter_html, $headers );
+            }
+        }
+    }
+
+    return rest_ensure_response( array( 'success' => true, 'submission_id' => $submission_id ) );
+}
+
+function cora_rest_send_email( $request ) {
+    $params = $request->get_json_params();
+    if ( empty( $params ) ) {
+        $params = $request->get_params();
+    }
+
+    $to      = isset( $params['to'] ) ? sanitize_email( $params['to'] ) : '';
+    $subject = isset( $params['subject'] ) ? sanitize_text_field( $params['subject'] ) : '';
+    $message = isset( $params['message'] ) ? wp_kses_post( $params['message'] ) : '';
+
+    if ( empty( $to ) || ! is_email( $to ) ) {
+        return new WP_Error( 'invalid_recipient', 'Please specify a valid recipient email.', array( 'status' => 400 ) );
+    }
+    if ( empty( $subject ) ) {
+        return new WP_Error( 'missing_subject', 'Please enter a subject.', array( 'status' => 400 ) );
+    }
+    if ( empty( $message ) ) {
+        return new WP_Error( 'missing_message', 'Please write a message.', array( 'status' => 400 ) );
+    }
+
+    // Build a premium HTML template for the email body (Monochromatic Zinc)
+    $email_html = '
+    <div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.015); box-sizing: border-box;">
+        <div style="border-bottom: 1px solid #f4f4f5; padding-bottom: 20px; margin-bottom: 24px;">
+            <h2 style="font-size: 18px; font-weight: 700; color: #09090b; margin: 0; letter-spacing: -0.02em;">Official Business Communication</h2>
+        </div>
+        <div style="font-size: 14px; line-height: 1.6; color: #18181b;">
+            ' . wpautop( $message ) . '
+        </div>
+        <div style="margin-top: 32px; border-top: 1px solid #f4f4f5; padding-top: 20px; text-align: center; font-size: 11px; color: #a1a1aa; box-sizing: border-box;">
+            Sent officially via ' . esc_html( get_bloginfo('name') ) . '
+        </div>
+    </div>';
+
+    $headers = array('Content-Type: text/html; charset=UTF-8');
+
+    // Send the email!
+    $sent = wp_mail( $to, $subject, $email_html, $headers );
+
+    if ( ! $sent ) {
+        return new WP_Error( 'send_failed', 'Mail delivery failed. Please check Hostinger SMTP settings.', array( 'status' => 500 ) );
+    }
+
+    // Log the sent email in the options
+    $sent_log = get_option( 'cora_sent_emails', array() );
+    if ( ! is_array( $sent_log ) ) {
+        $sent_log = array();
+    }
+    
+    array_unshift( $sent_log, array(
+        'to'        => $to,
+        'subject'   => $subject,
+        'message'   => $message,
+        'sent_at'   => current_time('mysql'),
+        'status'    => 'delivered'
+    ) );
+    
+    $sent_log = array_slice( $sent_log, 0, 50 );
+    update_option( 'cora_sent_emails', $sent_log );
+
+    return rest_ensure_response( array( 'success' => true, 'sent_logs' => $sent_log ) );
+}
+
+function cora_rest_get_email_logs( $request ) {
+    $sent_log = get_option( 'cora_sent_emails', array() );
+    return rest_ensure_response( is_array( $sent_log ) ? $sent_log : array() );
 }
 
 function cora_rest_get_clauses( $request ) {
