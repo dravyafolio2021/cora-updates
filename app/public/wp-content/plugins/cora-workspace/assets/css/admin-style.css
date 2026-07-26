@@ -5,13 +5,15 @@
     background: rgba(9, 9, 11, 0.45); /* zinc-950 at 45% opacity */
     z-index: 999998;
     opacity: 0;
-    pointer-events: none;
+    pointer-events: none !important;
+    display: none;
     transition: opacity 0.25s ease-in-out;
 }
 
 .cora-tour-backdrop.active {
     opacity: 1;
-    pointer-events: auto;
+    pointer-events: auto !important;
+    display: block !important;
 }
 
 /* Force element to highlight relative to backdrop */
@@ -22,7 +24,7 @@
     outline: 1px solid #d4d4d8 !important; /* zinc-300 */
     border-color: #d4d4d8 !important;
     background-color: #ffffff !important;
-    pointer-events: none !important; /* Prevent interaction while touring */
+    pointer-events: auto !important; /* Allow interaction while touring */
     transition: box-shadow 0.25s ease-in-out;
 }
 
@@ -82,5 +84,27 @@
 /* Ensure utility class .hidden strictly overrides flex or grid defaults when applied */
 .hidden {
     display: none !important;
+}
+
+/* =====================================================================
+   COLLAPSED DRAWER / SHEET STATE
+   All sliding drawers use class="collapsed" to indicate closed state.
+   Without this rule, they sit at full-screen size blocking all clicks.
+   ===================================================================== */
+aside.collapsed,
+div.collapsed[id$="-drawer"],
+div.collapsed[id$="-sheet"],
+div.collapsed[id$="-modal"] {
+    transform: translateX(100%) !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+}
+
+/* Ensure open drawers are always interactive */
+aside:not(.collapsed),
+div:not(.collapsed)[id$="-drawer"]:not(.hidden),
+div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
+    pointer-events: auto;
+    visibility: visible;
 }
 

@@ -222,10 +222,12 @@ jQuery(document).ready(function($) {
     });
 
     window.coraCloseAllDrawers = function() {
-        $('aside[id$="-drawer"], aside[id$="-sheet"]').addClass('collapsed');
+        $('aside[id$="-drawer"], aside[id$="-sheet"], div[id$="-drawer"], div[id$="-sheet"], div[id$="-modal"]').addClass('collapsed hidden');
         const bd = document.getElementById('cora-drawer-backdrop');
-        if(bd) { bd.classList.add('hidden'); bd.style.pointerEvents = 'none'; }
-        $('body').removeClass('cora-drawer-open');
+        if(bd) { bd.classList.add('hidden'); bd.style.pointerEvents = 'none'; bd.style.display = 'none'; }
+        $('.cora-tour-backdrop').removeClass('active').addClass('hidden').css({'pointer-events': 'none', 'display': 'none'});
+        $('.cora-tour-highlight').removeClass('cora-tour-highlight');
+        $('body').removeClass('cora-drawer-open overflow-hidden');
     };
 
     $(document).on('keydown', function(e) {
@@ -6489,10 +6491,10 @@ jQuery(document).ready(function($) {
 
     window.coraToggleMediaDrawer = function(show) {
         if (show) {
-            $('#cora-media-library-drawer').removeClass('translate-x-full');
+            $('#cora-media-library-drawer').removeClass('translate-x-full pointer-events-none collapsed');
             coraFetchMediaLibrary();
         } else {
-            $('#cora-media-library-drawer').addClass('translate-x-full');
+            $('#cora-media-library-drawer').addClass('translate-x-full pointer-events-none collapsed');
         }
     };
 

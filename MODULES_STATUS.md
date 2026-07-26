@@ -11,7 +11,7 @@
 |---|---|---|---|---|
 | **Core Platform** | `main` | 🟢 Stable Base | `cora-workspace.php`, `view-settings-suite.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
-| **Document Studio & Vault** | `feature/document-studio-vault` | 🟡 Active Development | `views/view-vault.php`, `cora-workspace.php` | Dedicated Vault Agent |
+| **File Manager** | `feature/document-studio-vault` | 🟡 Active Development | `views/view-vault.php`, `cora-workspace.php` | Dedicated Vault Agent |
 <!-- MODULE_ROWS_END -->
 
 ---
@@ -35,8 +35,8 @@
 
 <!-- BRANCH_LOGS_START -->
 ### `feature/document-studio-vault` (Active Feature Branch)
-- **Status**: Branch initialized from `main`. Ready for Document Studio & Vault module enhancements.
-- **Main Touchpoint**: `views/view-vault.php` (Document Studio Wizard, E-Sign Audit, Invoices & Tax Invoices, Quotation Converter).
+- **Status**: ⚡ In Active Development — Redesigning Document Vault Dashboard, 5-Step Guided Document Studio Wizard, E-Sign Audit Registry, and Right-Sliding Side Drawers.
+- **Main Touchpoint**: `views/view-vault.php`, `cora-workspace.php` (Document Studio Wizard, E-Sign Audit, Invoices & Tax Invoices, Quotation Converter, AJAX Handlers).
 <!-- BRANCH_LOGS_END -->
 
 ---
