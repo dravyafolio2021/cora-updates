@@ -2699,6 +2699,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             return false;
         };
 
+        window.coraAutoCollapseDashboardSidebar = function() {
+            var sidebar = document.querySelector('.cora-sidebar');
+            if (sidebar && !sidebar.classList.contains('collapsed-sidebar')) {
+                sidebar.classList.add('collapsed-sidebar');
+                try { localStorage.setItem('cora_sidebar_collapsed', 'true'); } catch(e) {}
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', function() {
             if (localStorage.getItem('cora_sidebar_collapsed') === 'true') {
                 var sidebar = document.querySelector('.cora-sidebar');
@@ -7291,7 +7299,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     </aside>
 
     <!-- Sliding Drawer: Article Captured Leads -->
-    <aside id="drawer-article-leads" class="fixed top-0 right-0 h-full w-[450px] bg-white border-l border-zinc-200 shadow-2xl z-[150] transform translate-x-full transition-transform duration-300 ease-out flex flex-col overflow-hidden">
+    <aside id="drawer-article-leads" class="collapsed fixed top-0 right-0 h-full w-[450px] bg-white border-l border-zinc-200 shadow-2xl z-[150] transform translate-x-full transition-transform duration-300 ease-out flex flex-col overflow-hidden pointer-events-none">
         <header class="p-5 border-b border-zinc-100 flex items-center justify-between shrink-0">
             <div class="flex items-center gap-2">
                 <span class="p-1.5 bg-zinc-100 rounded text-zinc-800 flex items-center">
@@ -8237,7 +8245,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     </div>
 
     <!-- Custom Media Library Drawer -->
-    <aside id="cora-media-library-drawer" class="translate-x-full fixed top-0 right-0 z-[150] h-full w-[450px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+    <aside id="cora-media-library-drawer" class="collapsed translate-x-full fixed top-0 right-0 z-[150] h-full w-[450px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out pointer-events-none">
         <header class="flex items-center justify-between px-5 py-3 border-b border-zinc-200 bg-white shrink-0">
             <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-2">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>

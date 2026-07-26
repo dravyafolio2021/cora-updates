@@ -3096,7 +3096,7 @@ function cora_ajax_advanced_search() {
             ),
             // Enterprise Modules & Features Indexing
             array(
-                'title' => 'Document Studio & Vault',
+                'title' => 'File Manager',
                 'category' => 'Feature Studio',
                 'description' => '5-step visual wizard for proposals, tax invoices, GST estimates, A4 PDF print engine.',
                 'url' => home_url( '/workspace/vault?vtab=editor' ),
@@ -22881,48 +22881,84 @@ function cora_ajax_vault_save_document() {
     if ( ! current_user_can('read') ) wp_send_json_error('Permission denied');
 
     $id           = sanitize_text_field($_POST['id'] ?? '');
+    $number       = sanitize_text_field($_POST['number'] ?? '');
     $title        = sanitize_text_field($_POST['title'] ?? '');
     $type         = sanitize_text_field($_POST['type'] ?? 'Proposal');
+    $status       = sanitize_text_field($_POST['status'] ?? 'Sent');
     $client_name  = sanitize_text_field($_POST['client_name'] ?? '');
     $client_email = sanitize_email($_POST['client_email'] ?? '');
+    $client_phone = sanitize_text_field($_POST['client_phone'] ?? '');
+    $client_gstin = sanitize_text_field($_POST['client_gstin'] ?? '');
+    $pos_state    = sanitize_text_field($_POST['pos_state'] ?? 'Delhi (07)');
+    $upi_vpa      = sanitize_text_field($_POST['upi_vpa'] ?? 'cora@icici');
     $password     = sanitize_text_field($_POST['password'] ?? '');
     $watermark    = sanitize_text_field($_POST['watermark'] ?? 'CONFIDENTIAL');
     $content      = wp_kses_post($_POST['content'] ?? '');
     $items_raw    = $_POST['items'] ?? '[]';
     $items        = json_decode(stripslashes($items_raw), true);
 
-    if ( empty($title) || empty($client_name) || empty($client_email) ) {
-        wp_send_json_error('Title, client name, and client email are required.');
+    if ( empty($title) || empty($client_name) ) {
+        wp_send_json_error('Title and client name are required.');
     }
 
     $amount = floatval($_POST['amount'] ?? 0);
-    if ( $amount <= 0 && is_array($items) ) {
+    $tax_total = 0;
+    if ( is_array($items) ) {
+        $calc_amount = 0;
         foreach ($items as $it) {
-            $amount += floatval($it['rate'] ?? 0) * floatval($it['qty'] ?? 1);
+            $r = floatval($it['rate'] ?? 0);
+            $q = floatval($it['qty'] ?? 1);
+            $t = floatval($it['tax'] ?? 18);
+            $line = $r * $q;
+            $calc_amount += $line;
+            $tax_total += $line * ($t / 100);
         }
+        if ($amount <= 0) $amount = $calc_amount;
     }
+
+    $is_igst = ( strpos( $pos_state, 'Delhi' ) === false );
+    $grand_total = $amount + $tax_total;
+    $cgst_amount = $is_igst ? 0 : ($tax_total / 2);
+    $sgst_amount = $is_igst ? 0 : ($tax_total / 2);
+    $igst_amount = $is_igst ? $tax_total : 0;
 
     $docs = get_option('cora_documents', array());
     if ( ! is_array($docs) ) $docs = array();
 
     if ( empty($id) ) {
         $id = 'doc_' . date('Ymd') . '_' . rand(100,999);
+        if ( empty($number) ) {
+            $prefix = strtoupper(substr($type, 0, 3));
+            $number = $prefix . '-' . date('Y') . '-' . rand(1000, 9999);
+        }
         $new_doc = array(
-            'id'          => $id,
-            'title'       => $title,
-            'type'        => $type,
-            'client_name' => $client_name,
-            'client_email'=> $client_email,
-            'amount'      => $amount,
-            'deposit'     => $amount * 0.5,
-            'password'    => $password,
-            'watermark'   => $watermark,
-            'content'     => $content,
-            'status'      => 'Sent',
-            'created_at'  => date('Y-m-d'),
-            'token'       => 'vtoken_' . bin2hex(random_bytes(6)),
-            'signed'      => false,
-            'items'       => $items
+            'id'             => $id,
+            'number'         => $number,
+            'title'          => $title,
+            'type'           => $type,
+            'status'         => $status,
+            'client_name'    => $client_name,
+            'client_email'   => $client_email,
+            'client_phone'   => $client_phone,
+            'client_gstin'   => $client_gstin,
+            'pos_state'      => $pos_state,
+            'is_igst'        => $is_igst,
+            'amount'         => $amount,
+            'tax_amount'     => $tax_total,
+            'cgst_amount'    => $cgst_amount,
+            'sgst_amount'    => $sgst_amount,
+            'igst_amount'    => $igst_amount,
+            'grand_total'    => $grand_total,
+            'deposit'        => $grand_total * 0.5,
+            'currency'       => 'INR',
+            'upi_vpa'        => $upi_vpa,
+            'password'       => $password,
+            'watermark'      => $watermark,
+            'content'        => $content,
+            'created_at'     => date('Y-m-d'),
+            'token'          => 'vtoken_' . bin2hex(random_bytes(6)),
+            'signed'         => false,
+            'items'          => $items
         );
         $docs[] = $new_doc;
 
@@ -22934,7 +22970,7 @@ function cora_ajax_vault_save_document() {
             'type'        => 'inflow',
             'category'    => 'Document Billing: ' . $type,
             'description' => $title . ' (' . $client_name . ')',
-            'amount'      => $amount,
+            'amount'      => $grand_total,
             'status'      => 'pending',
             'date'        => date('Y-m-d')
         );
@@ -22943,12 +22979,24 @@ function cora_ajax_vault_save_document() {
     } else {
         foreach ($docs as &$d) {
             if ($d['id'] === $id) {
+                if ( ! empty($number) ) $d['number'] = $number;
                 $d['title']        = $title;
                 $d['type']         = $type;
+                $d['status']       = $status;
                 $d['client_name']  = $client_name;
                 $d['client_email'] = $client_email;
+                $d['client_phone'] = $client_phone;
+                $d['client_gstin'] = $client_gstin;
+                $d['pos_state']    = $pos_state;
+                $d['is_igst']      = $is_igst;
+                $d['upi_vpa']      = $upi_vpa;
                 $d['amount']       = $amount;
-                $d['deposit']      = $amount * 0.5;
+                $d['tax_amount']   = $tax_total;
+                $d['cgst_amount']  = $cgst_amount;
+                $d['sgst_amount']  = $sgst_amount;
+                $d['igst_amount']  = $igst_amount;
+                $d['grand_total']  = $grand_total;
+                $d['deposit']      = $grand_total * 0.5;
                 $d['items']        = $items;
                 break;
             }
@@ -22964,9 +23012,10 @@ function cora_ajax_sign_document() {
     check_ajax_referer('cora_ajax_nonce', 'nonce');
     if ( ! current_user_can('read') ) wp_send_json_error('Permission denied');
 
-    $doc_id       = sanitize_text_field($_POST['doc_id'] ?? '');
-    $signer_name  = sanitize_text_field($_POST['signer_name'] ?? '');
-    $signer_email = sanitize_email($_POST['signer_email'] ?? '');
+    $doc_id         = sanitize_text_field($_POST['doc_id'] ?? '');
+    $signer_name    = sanitize_text_field($_POST['signer_name'] ?? '');
+    $signer_email   = sanitize_email($_POST['signer_email'] ?? '');
+    $signature_data = sanitize_textarea_field($_POST['signature_data'] ?? '');
 
     if ( empty($doc_id) || empty($signer_name) || empty($signer_email) ) {
         wp_send_json_error('Signer name and email are required.');
@@ -22978,12 +23027,14 @@ function cora_ajax_sign_document() {
     $found = false;
     foreach ($docs as &$d) {
         if ($d['id'] === $doc_id) {
-            $d['signed']       = true;
-            $d['status']       = 'Signed';
-            $d['signer_name']  = $signer_name;
-            $d['signer_email'] = $signer_email;
-            $d['signed_at']    = current_time('mysql');
-            $d['signer_ip']    = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+            $d['signed']           = true;
+            $d['status']           = 'Signed';
+            $d['signer_name']      = $signer_name;
+            $d['signer_email']     = $signer_email;
+            $d['signature_data']   = $signature_data;
+            $d['signed_at']        = current_time('mysql');
+            $d['signer_ip']        = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+            $d['verification_hash'] = 'ESIGN-HASH-' . strtoupper(substr(md5($doc_id . $signer_name . time()), 0, 12));
             $found = true;
             break;
         }
