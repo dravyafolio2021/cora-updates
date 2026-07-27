@@ -461,7 +461,8 @@ if ( is_array( $cora_gear_maintenance ) ) {
 
                             $img_html = '';
                             if ( ! empty( $gear['image'] ) ) {
-                                $img_url = '/wp-content/plugins/cora-workspace/assets/images/' . $gear['image'];
+                                $is_upload = ( strpos( $gear['image'], '/' ) !== false );
+                                $img_url = $is_upload ? '/wp-content/' . $gear['image'] : '/wp-content/plugins/cora-workspace/assets/images/' . $gear['image'];
                                 $img_html = '<img src="' . esc_url( $img_url ) . '" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-zinc-200" alt="' . esc_attr( $gear['name'] ) . '">';
                             } else {
                                 $img_html = '<div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-800 border border-zinc-200 flex items-center justify-center shrink-0">' . $cat_icon . '</div>';
@@ -512,6 +513,9 @@ if ( is_array( $cora_gear_maintenance ) ) {
                                         Log Repair
                                     </button>
                                 <?php endif; ?>
+                                <button onclick="openEditGearDrawer('<?php echo esc_attr( $gear['id'] ); ?>')" title="Edit gear item" class="w-7 h-7 inline-flex items-center justify-center border border-zinc-200 rounded-lg text-zinc-400 hover:text-zinc-950 hover:border-zinc-300 transition-all cursor-pointer">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                </button>
                                 <button onclick="coraDeleteGearItem('<?php echo esc_attr( $gear['id'] ); ?>')" title="Delete gear item" class="w-7 h-7 inline-flex items-center justify-center border border-zinc-200 rounded-lg text-zinc-400 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition-all cursor-pointer">
                                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                 </button>
@@ -766,20 +770,165 @@ if ( is_array( $cora_gear_maintenance ) ) {
                 <label class="block text-xs font-bold text-zinc-800 mb-1">Initial Status *</label>
                 <select id="add-gear-status" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
                     <option value="Available" selected>Available in Studio</option>
-                    <option value="In Use">Checked Out / In Use</option>
-                    <option value="Maintenance">In Maintenance</option>
+                    <option value="On Shoot">On Shoot</option>
+                    <option value="In Repair">In Repair</option>
                 </select>
             </div>
         </div>
 
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-bold text-zinc-800 mb-1">Storage Location</label>
+                <input type="text" id="add-gear-storage-location" placeholder="e.g. Shelf A-3" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-zinc-800 mb-1">Next Service Due</label>
+                <input type="date" id="add-gear-next-service" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-bold text-zinc-800 mb-1">Insurance Expiry</label>
+                <input type="date" id="add-gear-insurance" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-zinc-800 mb-1">Assigned Crew / Shoot</label>
+                <input type="text" id="add-gear-assigned" placeholder="e.g. Unassigned (Studio Vault)" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+            </div>
+        </div>
+
         <div>
-            <label class="block text-xs font-bold text-zinc-800 mb-1">Assigned Location / Operator</label>
-            <input type="text" id="add-gear-assigned" placeholder="e.g. Unassigned (Studio Vault)" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+            <label class="block text-xs font-bold text-zinc-800 mb-1">Included Accessories</label>
+            <textarea id="add-gear-accessories" rows="2" placeholder="e.g. Charger, 2x Batteries, Lens Cap" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 resize-none"></textarea>
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-zinc-800 mb-1">Equipment Image</label>
+            <div class="flex items-center gap-3">
+                <input type="file" id="add-gear-image-file" onchange="coraUploadGearImage(this, 'add-gear-image-preview', 'add-gear-image-path')" accept="image/*" class="text-xs text-zinc-650 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-zinc-100 file:text-zinc-800 hover:file:bg-zinc-200 file:cursor-pointer">
+                <input type="hidden" id="add-gear-image-path" value="">
+                <img id="add-gear-image-preview" src="" class="w-8 h-8 rounded-lg object-cover border border-zinc-200 hidden">
+            </div>
         </div>
 
         <div class="pt-4 border-t border-zinc-100 flex items-center justify-end gap-2">
             <button type="button" onclick="closeGearDrawers()" class="px-4 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-bold rounded-xl hover:bg-zinc-50 cursor-pointer">Cancel</button>
             <button type="submit" class="px-5 py-2 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 cursor-pointer shadow-xs">Save & Register Gear</button>
+        </div>
+    </form>
+</aside>
+
+<!-- 1.1 EDIT EXISTING GEAR DRAWER -->
+<aside id="cora-edit-gear-drawer" class="cora-drawer-sheet hidden fixed top-0 right-0 z-50 h-full w-[460px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
+        <div>
+            <h3 class="text-sm font-bold text-zinc-950 flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                Edit Equipment Information
+            </h3>
+            <p class="text-[11px] text-zinc-500 mt-0.5">Modify camera gear, location, specifications, and active status.</p>
+        </div>
+        <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeGearDrawers()">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <form id="cora-edit-gear-form" onsubmit="coraSubmitEditGearForm(event)" class="flex-1 overflow-y-auto p-6 space-y-4">
+        <input type="hidden" id="edit-gear-id">
+        <div>
+            <label class="block text-xs font-bold text-zinc-800 mb-1">Equipment Name / Model *</label>
+            <input type="text" id="edit-gear-name" required placeholder="e.g. Sony Alpha a7 IV Cinema Camera" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-bold text-zinc-800 mb-1">Serial Number # *</label>
+                <input type="text" id="edit-gear-serial" required placeholder="SN-774921" class="w-full px-3 py-2 text-xs font-mono border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-zinc-800 mb-1">Category *</label>
+                <select id="edit-gear-category" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
+                    <option value="Camera">Camera</option>
+                    <option value="Lens">Lens</option>
+                    <option value="Lighting">Lighting</option>
+                    <option value="Drone">Drone</option>
+                    <option value="Audio">Audio</option>
+                    <option value="Accessories">Accessories</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-bold text-zinc-800 mb-1">CapEx Valuation (₹) *</label>
+                <input type="number" id="edit-gear-capex" required placeholder="245000" class="w-full px-3 py-2 text-xs font-mono border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-zinc-800 mb-1">Purchase Date</label>
+                <input type="date" id="edit-gear-date" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-bold text-zinc-800 mb-1">Condition Rating *</label>
+                <select id="edit-gear-condition" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
+                    <option value="Mint">Mint</option>
+                    <option value="Excellent">Excellent</option>
+                    <option value="Good">Good</option>
+                    <option value="Needs Repair">Needs Repair</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-zinc-800 mb-1">Status *</label>
+                <select id="edit-gear-status" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
+                    <option value="Available">Available in Studio</option>
+                    <option value="On Shoot">On Shoot</option>
+                    <option value="In Repair">In Repair</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-bold text-zinc-800 mb-1">Storage Location</label>
+                <input type="text" id="edit-gear-storage-location" placeholder="e.g. Shelf A-3" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-zinc-800 mb-1">Next Service Due</label>
+                <input type="date" id="edit-gear-next-service" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-bold text-zinc-800 mb-1">Insurance Expiry</label>
+                <input type="date" id="edit-gear-insurance" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-zinc-800 mb-1">Assigned Crew / Shoot</label>
+                <input type="text" id="edit-gear-assigned" placeholder="e.g. Unassigned (Studio Vault)" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-zinc-800 mb-1">Included Accessories</label>
+            <textarea id="edit-gear-accessories" rows="2" placeholder="e.g. Charger, 2x Batteries, Lens Cap" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 resize-none"></textarea>
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-zinc-800 mb-1">Equipment Image</label>
+            <div class="flex items-center gap-3">
+                <input type="file" id="edit-gear-image-file" onchange="coraUploadGearImage(this, 'edit-gear-image-preview', 'edit-gear-image-path')" accept="image/*" class="text-xs text-zinc-650 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-zinc-100 file:text-zinc-800 hover:file:bg-zinc-200 file:cursor-pointer">
+                <input type="hidden" id="edit-gear-image-path" value="">
+                <img id="edit-gear-image-preview" src="" class="w-8 h-8 rounded-lg object-cover border border-zinc-200 hidden">
+            </div>
+        </div>
+
+        <div class="pt-4 border-t border-zinc-100 flex items-center justify-end gap-2">
+            <button type="button" onclick="closeGearDrawers()" class="px-4 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-bold rounded-xl hover:bg-zinc-50 cursor-pointer">Cancel</button>
+            <button type="submit" class="px-5 py-2 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 cursor-pointer shadow-xs">Save Changes</button>
         </div>
     </form>
 </aside>
@@ -975,10 +1124,33 @@ if ( is_array( $cora_gear_maintenance ) ) {
     </div>
 </aside>
 
+<!-- 5. CUSTOM CONFIRMATION DELETE MODAL (No Browser Defaults) -->
+<div id="cora-delete-confirm-modal" class="hidden fixed inset-0 z-55 flex items-center justify-center bg-zinc-950/40 backdrop-blur-xs p-4" style="z-index: 9999;">
+    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-155">
+        <div class="flex items-center gap-3">
+            <span class="w-9 h-9 rounded-full bg-rose-50 dark:bg-rose-950/20 text-rose-700 dark:text-rose-450 border border-rose-100/50 dark:border-rose-900/30 flex items-center justify-center shrink-0">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </span>
+            <div>
+                <h3 class="text-sm font-bold text-zinc-950 dark:text-zinc-50">Delete Inventory Item</h3>
+                <p class="text-[11px] text-zinc-500 mt-0.5">Are you sure you want to delete this gear item from the inventory? This action is permanent.</p>
+            </div>
+        </div>
+        
+        <input type="hidden" id="cora-delete-target-id">
+
+        <div class="flex items-center justify-end gap-2.5 pt-2">
+            <button type="button" onclick="closeCoraDeleteModal()" class="px-4 py-2 bg-white border border-zinc-200 hover:bg-zinc-100 hover:border-zinc-300 text-zinc-800 text-xs font-bold rounded-xl transition-all cursor-pointer shadow-2xs">Cancel</button>
+            <button type="button" onclick="executeCoraDeleteGearItem()" class="px-4.5 py-2 bg-rose-650 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm">Delete Item</button>
+        </div>
+    </div>
+</div>
+
 <!-- ═══ 6. INLINE DYNAMIC JAVASCRIPT ENGINE & REAL BACKEND AJAX INTEGRATION ═════════════════════════════════════ -->
 <script>
 // Initial Repair Data for View Repair details
 window.coraRepairData = <?php echo json_encode( $initial_repair_data ); ?>;
+window.coraStudioGearList = <?php echo json_encode( $cora_studio_gear ); ?>;
 
 // Standardized Sub-Tab Switching Functionality
 window.coraSwitchEquipmentTab = function(tabId) {
@@ -1118,6 +1290,59 @@ window.openViewRepairDrawer = function(gearId) {
     }
 };
 
+window.openEditGearDrawer = function(gearId) {
+    if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
+    var backdrop = document.getElementById('cora-drawer-backdrop');
+    if (backdrop) backdrop.classList.remove('hidden');
+
+    var drawer = document.getElementById('cora-edit-gear-drawer');
+    if (!drawer) return;
+
+    var item = null;
+    if (window.coraStudioGearList) {
+        for (var i = 0; i < window.coraStudioGearList.length; i++) {
+            if (window.coraStudioGearList[i].id === gearId) {
+                item = window.coraStudioGearList[i];
+                break;
+            }
+        }
+    }
+
+    if (item) {
+        document.getElementById('edit-gear-id').value = item.id;
+        document.getElementById('edit-gear-name').value = item.name || '';
+        document.getElementById('edit-gear-serial').value = item.serial || item.serial_no || '';
+        document.getElementById('edit-gear-category').value = item.category || 'Camera';
+        document.getElementById('edit-gear-capex').value = item.capex || item.purchase_price || 0;
+        document.getElementById('edit-gear-date').value = item.purchase_date || '';
+        document.getElementById('edit-gear-condition').value = item.condition || 'Excellent';
+        document.getElementById('edit-gear-status').value = item.status || 'Available';
+        document.getElementById('edit-gear-storage-location').value = item.storage_location || '';
+        document.getElementById('edit-gear-next-service').value = item.next_service_due || '';
+        document.getElementById('edit-gear-insurance').value = item.insurance_expiry || '';
+        document.getElementById('edit-gear-assigned').value = item.assigned || item.assigned_to || '';
+        document.getElementById('edit-gear-accessories').value = item.accessories_included || '';
+
+        var pathInput = document.getElementById('edit-gear-image-path');
+        var preview = document.getElementById('edit-gear-image-preview');
+
+        if (pathInput) pathInput.value = item.image || '';
+        if (preview) {
+            if (item.image) {
+                var isUpload = item.image.indexOf('/') !== -1;
+                preview.src = isUpload ? '/wp-content/' + item.image : '/wp-content/plugins/cora-workspace/assets/images/' + item.image;
+                preview.classList.remove('hidden');
+            } else {
+                preview.src = '';
+                preview.classList.add('hidden');
+            }
+        }
+
+        drawer.classList.remove('hidden');
+        drawer.classList.remove('collapsed');
+    }
+};
+
 window.closeGearDrawers = function() {
     window.coraCloseAllDrawers();
 };
@@ -1141,15 +1366,68 @@ window.coraFilterGearTable = function() {
 };
 
 // Live Dynamic Form Handlers with Real AJAX Submission
+// Upload Gear Image via AJAX
+window.coraUploadGearImage = function(input, previewId, pathId) {
+    if (!input.files || !input.files[0]) return;
+    var file = input.files[0];
+    var formData = new FormData();
+    formData.append('action', 'cora_ajax_upload_gear_image');
+    formData.append('security', (typeof coraData !== 'undefined' && coraData.nonce) ? coraData.nonce : '');
+    formData.append('gear_image', file);
+
+    var preview = document.getElementById(previewId);
+    var pathInput = document.getElementById(pathId);
+
+    if (typeof jQuery !== 'undefined') {
+        jQuery.ajax({
+            url: (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'),
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(res) {
+                if (res.success && res.data) {
+                    if (preview) {
+                        preview.src = res.data.url;
+                        preview.classList.remove('hidden');
+                    }
+                    if (pathInput) {
+                        pathInput.value = res.data.relative_path;
+                    }
+                    if (typeof window.coraShowToast === 'function') {
+                        window.coraShowToast('Image uploaded successfully.', 'success');
+                    }
+                } else {
+                    if (typeof window.coraShowToast === 'function') {
+                        window.coraShowToast(res.data.message || 'Upload failed.', 'error');
+                    }
+                }
+            },
+            error: function() {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('Error uploading image.', 'error');
+                }
+            }
+        });
+    }
+};
+
+// Live Dynamic Form Handlers with Real AJAX Submission
 window.coraSubmitAddGearForm = function(e) {
     e.preventDefault();
     var name = document.getElementById('add-gear-name').value.trim();
     var serial = document.getElementById('add-gear-serial').value.trim();
     var category = document.getElementById('add-gear-category').value;
     var capex = document.getElementById('add-gear-capex').value;
+    var date = document.getElementById('add-gear-date').value;
     var condition = document.getElementById('add-gear-condition').value;
     var status = document.getElementById('add-gear-status').value;
+    var locationVal = document.getElementById('add-gear-storage-location').value.trim();
+    var nextService = document.getElementById('add-gear-next-service').value;
+    var insurance = document.getElementById('add-gear-insurance').value;
     var assigned = document.getElementById('add-gear-assigned').value.trim() || 'Unassigned (Studio Vault)';
+    var accessories = document.getElementById('add-gear-accessories').value.trim();
+    var image = document.getElementById('add-gear-image-path').value;
 
     if (!name || !serial) return;
 
@@ -1160,10 +1438,66 @@ window.coraSubmitAddGearForm = function(e) {
         serial_no: serial,
         category: category,
         purchase_price: capex,
+        purchase_date: date,
         current_value: capex,
         condition: condition,
-        status: status === 'In Repair' ? 'In Repair' : (status === 'On Shoot' ? 'On Shoot' : status),
-        assigned_to: assigned
+        status: status,
+        assigned_to: assigned,
+        storage_location: locationVal,
+        next_service_due: nextService,
+        insurance_expiry: insurance,
+        accessories_included: accessories,
+        image: image
+    };
+
+    if (typeof jQuery !== 'undefined') {
+        jQuery.post((typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'), payload, function(res) {
+            console.log('AJAX save gear response:', res);
+            location.reload();
+        });
+    } else {
+        location.reload();
+    }
+};
+
+// Submit Edit Gear Form
+window.coraSubmitEditGearForm = function(e) {
+    e.preventDefault();
+    var id = document.getElementById('edit-gear-id').value;
+    var name = document.getElementById('edit-gear-name').value.trim();
+    var serial = document.getElementById('edit-gear-serial').value.trim();
+    var category = document.getElementById('edit-gear-category').value;
+    var capex = document.getElementById('edit-gear-capex').value;
+    var date = document.getElementById('edit-gear-date').value;
+    var condition = document.getElementById('edit-gear-condition').value;
+    var status = document.getElementById('edit-gear-status').value;
+    var locationVal = document.getElementById('edit-gear-storage-location').value.trim();
+    var nextService = document.getElementById('edit-gear-next-service').value;
+    var insurance = document.getElementById('edit-gear-insurance').value;
+    var assigned = document.getElementById('edit-gear-assigned').value.trim() || 'Unassigned (Studio Vault)';
+    var accessories = document.getElementById('edit-gear-accessories').value.trim();
+    var image = document.getElementById('edit-gear-image-path').value;
+
+    if (!id || !name || !serial) return;
+
+    var payload = {
+        action: 'cora_ajax_save_gear_item',
+        security: (typeof coraData !== 'undefined' && coraData.nonce) ? coraData.nonce : '',
+        gear_id: id,
+        name: name,
+        serial_no: serial,
+        category: category,
+        purchase_price: capex,
+        purchase_date: date,
+        current_value: capex,
+        condition: condition,
+        status: status,
+        assigned_to: assigned,
+        storage_location: locationVal,
+        next_service_due: nextService,
+        insurance_expiry: insurance,
+        accessories_included: accessories,
+        image: image
     };
 
     if (typeof jQuery !== 'undefined') {
@@ -1271,11 +1605,26 @@ window.coraReturnCheckoutItem = function(chkId, gearName, gearId) {
     }
 };
 
-// Handle Delete Gear Item
+// Handle Delete Gear Item (Opens Custom Modal instead of confirm)
 window.coraDeleteGearItem = function(gearId) {
-    if (!confirm('Are you sure you want to delete this gear item from the inventory?')) {
-        return;
+    var modal = document.getElementById('cora-delete-confirm-modal');
+    var targetInput = document.getElementById('cora-delete-target-id');
+    if (modal && targetInput) {
+        targetInput.value = gearId;
+        modal.classList.remove('hidden');
     }
+};
+
+window.closeCoraDeleteModal = function() {
+    var modal = document.getElementById('cora-delete-confirm-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+};
+
+window.executeCoraDeleteGearItem = function() {
+    var gearId = document.getElementById('cora-delete-target-id').value;
+    if (!gearId) return;
 
     var payload = {
         action: 'cora_ajax_delete_studio_gear',
@@ -1286,9 +1635,11 @@ window.coraDeleteGearItem = function(gearId) {
     if (typeof jQuery !== 'undefined') {
         jQuery.post((typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'), payload, function(res) {
             console.log('AJAX delete response:', res);
+            closeCoraDeleteModal();
             location.reload();
         });
     } else {
+        closeCoraDeleteModal();
         location.reload();
     }
 };

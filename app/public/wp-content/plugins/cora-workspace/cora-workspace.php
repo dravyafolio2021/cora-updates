@@ -23931,6 +23931,12 @@ function cora_ajax_save_gear_item() {
     $status         = sanitize_text_field( $_POST['status'] ?? 'Available' );
     $assigned_to    = sanitize_text_field( $_POST['assigned_to'] ?? '' );
 
+    $storage_location     = sanitize_text_field( $_POST['storage_location'] ?? '' );
+    $next_service_due     = sanitize_text_field( $_POST['next_service_due'] ?? '' );
+    $accessories_included = sanitize_textarea_field( $_POST['accessories_included'] ?? '' );
+    $insurance_expiry     = sanitize_text_field( $_POST['insurance_expiry'] ?? '' );
+    $image                = sanitize_text_field( $_POST['image'] ?? '' );
+
     if ( empty( $name ) ) {
         wp_send_json_error( array( 'message' => 'Gear item name is required.' ) );
     }
@@ -23954,37 +23960,55 @@ function cora_ajax_save_gear_item() {
 
     if ( $found_index >= 0 ) {
         // Update existing item
-        $gear_list[$found_index]['name']           = $name;
-        $gear_list[$found_index]['category']       = $category;
-        $gear_list[$found_index]['brand_model']    = $brand_model;
-        $gear_list[$found_index]['serial_no']      = $serial_no;
-        $gear_list[$found_index]['purchase_date']  = $purchase_date;
-        $gear_list[$found_index]['purchase_price'] = $purchase_price;
-        $gear_list[$found_index]['current_value']  = $current_value;
-        $gear_list[$found_index]['condition']      = $condition;
-        $gear_list[$found_index]['status']         = $status;
+        $gear_list[$found_index]['name']                 = $name;
+        $gear_list[$found_index]['category']             = $category;
+        $gear_list[$found_index]['brand_model']          = $brand_model;
+        $gear_list[$found_index]['serial_no']            = $serial_no;
+        $gear_list[$found_index]['serial']               = $serial_no;
+        $gear_list[$found_index]['purchase_date']        = $purchase_date;
+        $gear_list[$found_index]['purchase_price']       = $purchase_price;
+        $gear_list[$found_index]['capex']                = $purchase_price;
+        $gear_list[$found_index]['current_value']        = $current_value;
+        $gear_list[$found_index]['condition']            = $condition;
+        $gear_list[$found_index]['status']               = $status;
+        $gear_list[$found_index]['storage_location']     = $storage_location;
+        $gear_list[$found_index]['next_service_due']     = $next_service_due;
+        $gear_list[$found_index]['accessories_included'] = $accessories_included;
+        $gear_list[$found_index]['insurance_expiry']     = $insurance_expiry;
+        if ( ! empty( $image ) ) {
+            $gear_list[$found_index]['image']            = $image;
+        }
         if ( isset( $_POST['assigned_to'] ) ) {
             $gear_list[$found_index]['assigned_to'] = $assigned_to;
+            $gear_list[$found_index]['assigned']    = $assigned_to;
         }
-        $gear_list[$found_index]['updated_at']     = date( 'Y-m-d H:i:s' );
+        $gear_list[$found_index]['updated_at']           = date( 'Y-m-d H:i:s' );
         $saved_item = $gear_list[$found_index];
     } else {
         // Create new item
         $is_new = true;
         $saved_item = array(
-            'id'             => 'gear_' . uniqid(),
-            'name'           => $name,
-            'category'       => $category,
-            'brand_model'    => $brand_model,
-            'serial_no'      => $serial_no,
-            'purchase_date'  => $purchase_date ?: date( 'Y-m-d' ),
-            'purchase_price' => $purchase_price,
-            'current_value'  => $current_value,
-            'condition'      => $condition,
-            'status'         => $status,
-            'assigned_to'    => $assigned_to,
-            'created_at'     => date( 'Y-m-d H:i:s' ),
-            'updated_at'     => date( 'Y-m-d H:i:s' ),
+            'id'                   => 'gear_' . uniqid(),
+            'name'                 => $name,
+            'category'             => $category,
+            'brand_model'          => $brand_model,
+            'serial_no'            => $serial_no,
+            'serial'               => $serial_no,
+            'purchase_date'        => $purchase_date ?: date( 'Y-m-d' ),
+            'purchase_price'       => $purchase_price,
+            'capex'                => $purchase_price,
+            'current_value'        => $current_value,
+            'condition'            => $condition,
+            'status'               => $status,
+            'assigned_to'          => $assigned_to,
+            'assigned'             => $assigned_to,
+            'storage_location'     => $storage_location,
+            'next_service_due'     => $next_service_due,
+            'accessories_included' => $accessories_included,
+            'insurance_expiry'     => $insurance_expiry,
+            'image'                => $image,
+            'created_at'           => date( 'Y-m-d H:i:s' ),
+            'updated_at'           => date( 'Y-m-d H:i:s' ),
         );
         array_unshift( $gear_list, $saved_item );
 
@@ -24021,6 +24045,38 @@ function cora_ajax_save_gear_item() {
         'gear_item' => $saved_item,
         'gear_list' => $gear_list,
     ) );
+}
+
+// 3.2.1 cora_ajax_upload_gear_image
+add_action( 'wp_ajax_cora_ajax_upload_gear_image', 'cora_ajax_upload_gear_image' );
+add_action( 'wp_ajax_nopriv_cora_ajax_upload_gear_image', 'cora_ajax_upload_gear_image' );
+function cora_ajax_upload_gear_image() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( array( 'message' => 'Permission denied.' ) );
+    }
+
+    if ( empty( $_FILES['gear_image'] ) ) {
+        wp_send_json_error( array( 'message' => 'No file uploaded.' ) );
+    }
+
+    $file = $_FILES['gear_image'];
+    require_once( ABSPATH . 'wp-admin/includes/file.php' );
+    require_once( ABSPATH . 'wp-admin/includes/image.php' );
+    require_once( ABSPATH . 'wp-admin/includes/media.php' );
+
+    $upload_overrides = array( 'test_form' => false );
+    $movefile = wp_handle_upload( $file, $upload_overrides );
+
+    if ( $movefile && ! isset( $movefile['error'] ) ) {
+        // Return relative URL relative to content directory for database storage simplicity
+        $wp_uploads = wp_upload_dir();
+        $relative_url = str_replace( $wp_uploads['baseurl'], '', $movefile['url'] );
+        $relative_path = 'uploads' . $relative_url;
+        wp_send_json_success( array( 'url' => $movefile['url'], 'relative_path' => $relative_path ) );
+    } else {
+        wp_send_json_error( array( 'message' => $movefile['error'] ?? 'Upload failed.' ) );
+    }
 }
 
 // 3.3 cora_ajax_checkout_gear
