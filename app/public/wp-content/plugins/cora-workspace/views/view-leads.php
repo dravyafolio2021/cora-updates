@@ -234,15 +234,69 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
 
     <!-- SUB-TAB 1: KANBAN PIPELINE BOARD -->
     <div id="cora-lead-pane-kanban" class="cora-lead-tab-pane">
+        <style>
+            /* Custom Kanban Layout Colors */
+            .cora-kanban-column[data-status="New Lead"] { background-color: #f4fbf7 !important; }
+            .cora-kanban-column[data-status="Negotiation"] { background-color: #faf5ff !important; }
+            .cora-kanban-column[data-status="Converted"] { background-color: #f0f7ff !important; }
+            .cora-kanban-column[data-status="Lost"] { background-color: #fff5ea !important; }
+
+            .dark .cora-kanban-column[data-status="New Lead"] { background-color: rgba(16, 185, 129, 0.05) !important; }
+            .dark .cora-kanban-column[data-status="Negotiation"] { background-color: rgba(139, 92, 246, 0.05) !important; }
+            .dark .cora-kanban-column[data-status="Converted"] { background-color: rgba(14, 165, 233, 0.05) !important; }
+            .dark .cora-kanban-column[data-status="Lost"] { background-color: rgba(249, 115, 22, 0.05) !important; }
+
+            /* Icon Circle backgrounds */
+            .cora-kanban-icon-circle-new { background-color: #2e7d32 !important; }
+            .cora-kanban-icon-circle-neg { background-color: #7b1fa2 !important; }
+            .cora-kanban-icon-circle-conv { background-color: #1565c0 !important; }
+            .cora-kanban-icon-circle-lost { background-color: #d84315 !important; }
+
+            /* Add Inquiry buttons styling */
+            .cora-add-inquiry-btn-new { border: 1px solid rgba(46, 125, 50, 0.25) !important; color: #2e7d32 !important; background-color: #ffffff !important; }
+            .cora-add-inquiry-btn-new:hover { background-color: #e8f5e9 !important; border-color: rgba(46, 125, 50, 0.45) !important; }
+
+            .cora-add-inquiry-btn-neg { border: 1px solid rgba(123, 31, 162, 0.25) !important; color: #7b1fa2 !important; background-color: #ffffff !important; }
+            .cora-add-inquiry-btn-neg:hover { background-color: #f3e5f5 !important; border-color: rgba(123, 31, 162, 0.45) !important; }
+
+            .cora-add-inquiry-btn-conv { border: 1px solid rgba(21, 101, 192, 0.25) !important; color: #1565c0 !important; background-color: #ffffff !important; }
+            .cora-add-inquiry-btn-conv:hover { background-color: #e3f2fd !important; border-color: rgba(21, 101, 192, 0.45) !important; }
+
+            .cora-add-inquiry-btn-lost { border: 1px solid rgba(216, 67, 21, 0.25) !important; color: #d84315 !important; background-color: #ffffff !important; }
+            .cora-add-inquiry-btn-lost:hover { background-color: #fff3e0 !important; border-color: rgba(216, 67, 21, 0.45) !important; }
+
+            .dark .cora-add-inquiry-btn-new { border-color: rgba(16, 185, 129, 0.4) !important; color: #34d399 !important; background-color: #18181b !important; }
+            .dark .cora-add-inquiry-btn-new:hover { background-color: rgba(16, 185, 129, 0.1) !important; }
+
+            .dark .cora-add-inquiry-btn-neg { border-color: rgba(139, 92, 246, 0.4) !important; color: #c084fc !important; background-color: #18181b !important; }
+            .dark .cora-add-inquiry-btn-neg:hover { background-color: rgba(139, 92, 246, 0.1) !important; }
+
+            .dark .cora-add-inquiry-btn-conv { border-color: rgba(14, 165, 233, 0.4) !important; color: #38bdf8 !important; background-color: #18181b !important; }
+            .dark .cora-add-inquiry-btn-conv:hover { background-color: rgba(14, 165, 233, 0.1) !important; }
+
+            .dark .cora-add-inquiry-btn-lost { border-color: rgba(249, 115, 22, 0.4) !important; color: #fb923c !important; background-color: #18181b !important; }
+            .dark .cora-add-inquiry-btn-lost:hover { background-color: rgba(249, 115, 22, 0.1) !important; }
+
+            /* Sum Text */
+            .cora-kanban-sum-new { color: #2e7d32 !important; font-weight: 800; }
+            .cora-kanban-sum-neg { color: #7b1fa2 !important; font-weight: 800; }
+            .cora-kanban-sum-conv { color: #1565c0 !important; font-weight: 800; }
+            .cora-kanban-sum-lost { color: #d84315 !important; font-weight: 800; }
+
+            .dark .cora-kanban-sum-new { color: #34d399 !important; }
+            .dark .cora-kanban-sum-neg { color: #c084fc !important; }
+            .dark .cora-kanban-sum-conv { color: #38bdf8 !important; }
+            .dark .cora-kanban-sum-lost { color: #fb923c !important; }
+        </style>
         <div class="flex overflow-x-auto gap-4 items-stretch pb-8 pt-1" style="scrollbar-width: thin;">
             <?php 
             $stage_styles = array(
                 'New Lead' => array(
-                    'col_bg'         => 'bg-[#f4fbf7] dark:bg-emerald-950/10',
-                    'icon_bg'        => 'bg-[#2e7d32] dark:bg-emerald-800',
+                    'col_bg'         => '',
+                    'icon_bg'        => 'cora-kanban-icon-circle-new',
                     'icon_color'     => 'text-white',
-                    'sum_text'       => 'text-[#2e7d32] dark:text-emerald-400 font-extrabold',
-                    'add_btn'        => 'text-[#2e7d32] dark:text-emerald-400 border-[#2e7d32]/30 dark:border-emerald-800/40 hover:bg-[#e8f5e9] dark:hover:bg-emerald-950/20 bg-white dark:bg-zinc-900',
+                    'sum_text'       => 'cora-kanban-sum-new',
+                    'add_btn'        => 'cora-add-inquiry-btn-new',
                     'add_label'      => 'Add Inquiry',
                     'header_icon'    => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>',
                     'empty_badge'    => '<div class="absolute -bottom-1.5 -right-1.5 bg-[#2e7d32] text-white rounded-full p-1 shadow-md border border-white dark:border-zinc-900"><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></div>',
@@ -250,11 +304,11 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                     'empty_subdesc'  => 'Create or assign a new lead to start the sales funnel.'
                 ),
                 'Negotiation' => array(
-                    'col_bg'         => 'bg-[#faf5ff] dark:bg-purple-950/10',
-                    'icon_bg'        => 'bg-[#7b1fa2] dark:bg-purple-800',
+                    'col_bg'         => '',
+                    'icon_bg'        => 'cora-kanban-icon-circle-neg',
                     'icon_color'     => 'text-white',
-                    'sum_text'       => 'text-[#7b1fa2] dark:text-purple-400 font-extrabold',
-                    'add_btn'        => 'text-[#7b1fa2] dark:text-purple-400 border-[#7b1fa2]/30 dark:border-purple-800/40 hover:bg-[#f3e5f5] dark:hover:bg-purple-950/20 bg-white dark:bg-zinc-900',
+                    'sum_text'       => 'cora-kanban-sum-neg',
+                    'add_btn'        => 'cora-add-inquiry-btn-neg',
                     'add_label'      => 'Add Inquiry',
                     'header_icon'    => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
                     'empty_badge'    => '<div class="absolute -bottom-1.5 -right-1.5 bg-[#7b1fa2] text-white rounded-full p-1 shadow-md border border-white dark:border-zinc-900"><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div>',
@@ -262,11 +316,11 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                     'empty_subdesc'  => 'Start pitching proposal estimates and reviewing project terms.'
                 ),
                 'Converted' => array(
-                    'col_bg'         => 'bg-[#f0f7ff] dark:bg-blue-950/10',
-                    'icon_bg'        => 'bg-[#1565c0] dark:bg-blue-800',
+                    'col_bg'         => '',
+                    'icon_bg'        => 'cora-kanban-icon-circle-conv',
                     'icon_color'     => 'text-white',
-                    'sum_text'       => 'text-[#1565c0] dark:text-blue-400 font-extrabold',
-                    'add_btn'        => 'text-[#1565c0] dark:text-blue-400 border-[#1565c0]/30 dark:border-blue-800/40 hover:bg-[#e3f2fd] dark:hover:bg-blue-950/20 bg-white dark:bg-zinc-900',
+                    'sum_text'       => 'cora-kanban-sum-conv',
+                    'add_btn'        => 'cora-add-inquiry-btn-conv',
                     'add_label'      => 'Add Inquiry',
                     'header_icon'    => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>',
                     'empty_badge'    => '<div class="absolute -bottom-1.5 -right-1.5 bg-[#1565c0] text-white rounded-full p-1 shadow-md border border-white dark:border-zinc-900"><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg></div>',
@@ -274,11 +328,11 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                     'empty_subdesc'  => 'Once a deal is finalized, drag it here to mark as won.'
                 ),
                 'Lost' => array(
-                    'col_bg'         => 'bg-[#fff5ea] dark:bg-orange-950/10',
-                    'icon_bg'        => 'bg-[#d84315] dark:bg-orange-850',
+                    'col_bg'         => '',
+                    'icon_bg'        => 'cora-kanban-icon-circle-lost',
                     'icon_color'     => 'text-white',
-                    'sum_text'       => 'text-[#d84315] dark:text-orange-400 font-extrabold',
-                    'add_btn'        => 'text-[#d84315] dark:text-orange-400 border-[#d84315]/30 dark:border-orange-800/40 hover:bg-[#fff3e0] dark:hover:bg-orange-950/20 bg-white dark:bg-zinc-900',
+                    'sum_text'       => 'cora-kanban-sum-lost',
+                    'add_btn'        => 'cora-add-inquiry-btn-lost',
                     'add_label'      => 'Add Inquiry',
                     'header_icon'    => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>',
                     'empty_badge'    => '<div class="absolute -bottom-1.5 -right-1.5 bg-[#d84315] text-white rounded-full p-1 shadow-md border border-white dark:border-zinc-900"><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="6" y="4" width="4" height="16" rx="0.5"></rect><rect x="14" y="4" width="4" height="16" rx="0.5"></rect></svg></div>',
@@ -292,7 +346,7 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                 'icon_bg'        => 'bg-zinc-500 dark:bg-zinc-650',
                 'icon_color'     => 'text-white',
                 'sum_text'       => 'text-zinc-650 dark:text-zinc-300 font-extrabold',
-                'add_btn'        => 'text-zinc-600 dark:text-zinc-400 border-zinc-200/80 dark:border-zinc-700/80 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-100 bg-white dark:bg-zinc-900',
+                'add_btn'        => 'text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700/80 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-100 bg-white dark:bg-zinc-900',
                 'add_label'      => 'Add Inquiry',
                 'header_icon'    => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>',
                 'empty_badge'    => '<div class="absolute -bottom-1.5 -right-1.5 bg-zinc-500 text-white rounded-full p-1 shadow-md border border-white dark:border-zinc-900"><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>',
@@ -308,7 +362,7 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
 
                 $style = $stage_styles[$stage_key] ?? $fallback_style;
             ?>
-            <div class="cora-kanban-column flex flex-col p-4 rounded-3xl shrink-0 w-[365px] min-w-[365px] relative transition-all duration-200 <?php echo $style['col_bg']; ?>"
+            <div class="cora-kanban-column flex flex-col p-4 rounded-3xl shrink-0 w-[365px] min-w-[365px] relative transition-all duration-200"
                  data-status="<?php echo esc_attr( $stage_key ); ?>"
                  ondragover="coraLeadDragOver(event, this)"
                  ondrop="coraLeadDrop(event, this)">
