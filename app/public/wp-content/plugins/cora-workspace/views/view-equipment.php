@@ -324,7 +324,7 @@ if ( is_array( $cora_gear_maintenance ) ) {
         <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[110px]">
             <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-widest">Total Asset Valuation</span>
-                <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded text-zinc-650 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-700/50">CapEx</span>
+                <span class="text-[9px] font-bold uppercase px-2.5 py-0.5 rounded-full text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-700/50">CapEx</span>
             </div>
             <div class="mt-2.5">
                 <span id="kpi-total-val" class="text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight">₹<?php echo number_format( $total_capex_valuation ); ?></span>
@@ -336,7 +336,7 @@ if ( is_array( $cora_gear_maintenance ) ) {
         <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[110px]">
             <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-widest">Available in Studio</span>
-                <span class="inline-flex items-center gap-1.5 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded text-emerald-700 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/20 border border-emerald-100/50 dark:border-emerald-900/30">
+                <span class="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase px-2.5 py-0.5 rounded-full text-emerald-700 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-900/30 shadow-3xs">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Ready
                 </span>
             </div>
@@ -350,7 +350,7 @@ if ( is_array( $cora_gear_maintenance ) ) {
         <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[110px]">
             <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold text-zinc-455 dark:text-zinc-500 uppercase tracking-widest">Checked Out</span>
-                <span class="inline-flex items-center gap-1.5 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20 border border-amber-100/50 dark:border-amber-900/30">
+                <span class="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase px-2.5 py-0.5 rounded-full text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 shadow-3xs">
                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> On Field
                 </span>
             </div>
@@ -364,7 +364,7 @@ if ( is_array( $cora_gear_maintenance ) ) {
         <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[110px]">
             <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-widest">In Repair</span>
-                <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded text-zinc-650 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-700/50">OpEx</span>
+                <span class="text-[9px] font-bold uppercase px-2.5 py-0.5 rounded-full text-rose-700 dark:text-rose-455 bg-rose-50 dark:bg-rose-950/20 border border-rose-200/50 dark:border-rose-900/30 shadow-3xs">OpEx</span>
             </div>
             <div class="mt-2.5">
                 <span id="kpi-maint-count" class="text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight"><?php echo $maintenance_count; ?> <span class="text-sm font-semibold text-zinc-450">Item<?php echo $maintenance_count === 1 ? '' : 's'; ?></span></span>
@@ -439,11 +439,11 @@ if ( is_array( $cora_gear_maintenance ) ) {
                     <tbody id="cora-gear-tbody" class="divide-y divide-zinc-150 bg-white">
                         <?php foreach ( $cora_studio_gear as $gear ) : 
                             $status = $gear['status'] ?? 'Available';
-                            $status_badge = '<span class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-900"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Available</span>';
+                            $status_badge = '<span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full text-emerald-700 bg-emerald-50 border border-emerald-250/30"><span class="w-1 h-1 rounded-full bg-emerald-500"></span> Available</span>';
                             if ( $status === 'In Use' || $status === 'On Shoot' ) {
-                                $status_badge = '<span class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-900"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> On Shoot</span>';
+                                $status_badge = '<span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full text-amber-700 bg-amber-50 border border-amber-250/30"><span class="w-1 h-1 rounded-full bg-amber-500 animate-pulse"></span> On Shoot</span>';
                             } elseif ( $status === 'Maintenance' || $status === 'In Repair' ) {
-                                $status_badge = '<span class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-900"><span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span> In Repair</span>';
+                                $status_badge = '<span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full text-rose-700 bg-rose-50 border border-rose-250/30"><span class="w-1 h-1 rounded-full bg-rose-500 animate-pulse"></span> In Repair</span>';
                             }
 
                             $category = $gear['category'] ?? 'Camera';
