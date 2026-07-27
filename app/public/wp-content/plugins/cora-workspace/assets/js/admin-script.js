@@ -6425,23 +6425,9 @@ jQuery(document).ready(function($) {
                 }
             });
             
-            // Initialize TomSelect for Categories
-            if (typeof TomSelect !== 'undefined') {
-                if ($('#cora-article-categories').length) {
-                    coraCategorySelect = new TomSelect('#cora-article-categories', {
-                        plugins: ['remove_button'],
-                        placeholder: 'Select Categories...',
-                        create: false
-                    });
-                }
-                if ($('#cora-article-tags').length) {
-                    coraTagSelect = new TomSelect('#cora-article-tags', {
-                        plugins: ['remove_button'],
-                        placeholder: 'Select or Add Tags...',
-                        create: true, // Allow creating new tags on the fly!
-                        createOnBlur: true
-                    });
-                }
+            // Initialize Custom Dropdowns for Meta Tab
+            if (typeof window.coraInitMetaDropdowns === 'function') {
+                window.coraInitMetaDropdowns();
             }
         }
     }
@@ -6546,7 +6532,13 @@ jQuery(document).ready(function($) {
                 const domAuthor = ($(`tr[onclick="coraEditArticle(${id})"] td:nth-child(2) span`).text() || 'Writer').trim();
 
                 // Assignee drop-down
-                $('#cora-article-assignee').val(data.assignee_id || '0');
+                const assigneeId = data.assignee_id || '0';
+                $('#cora-article-assignee').val(assigneeId);
+                const assigneeName = $(`.cora-meta-assignee-option[data-value="${assigneeId}"]`).text() || 'Unassigned';
+                $('#cora-meta-assignee-value').text(assigneeName);
+
+                // Scheduled Date
+                $('#cora-article-scheduled-date').val(data.scheduled_date || '');
 
                 // Reset/Hide editorial banner & feedback container
                 $('#cora-editorial-banner').addClass('hidden');
@@ -6579,19 +6571,40 @@ jQuery(document).ready(function($) {
                 $('#cora-seo-keyword').val(data.keyword || '');
                 $('#cora-seo-description').val(data.description || '');
                 
-                if (coraCategorySelect) {
-                    coraCategorySelect.setValue(data.categories || []);
+                // Sync Categories Custom Checkboxes
+                $('.cora-meta-category-checkbox').prop('checked', false);
+                if (data.categories) {
+                    data.categories.forEach(catId => {
+                        $(`.cora-meta-category-checkbox[value="${catId}"]`).prop('checked', true);
+                    });
                 }
-                if (coraTagSelect) {
-                    // Pre-add tag options if they don't exist yet in the TomSelect list
-                    if (data.tags) {
-                        data.tags.forEach(tagId => {
-                            coraTagSelect.addOption({value: tagId, text: tagId}); // If the tag is an ID. Wait, tags might be returned as names or IDs from backend. Currently we return IDs.
-                        });
-                        coraTagSelect.setValue(data.tags);
-                    } else {
-                        coraTagSelect.clear();
-                    }
+                if (typeof window.coraSyncCategoriesUI === 'function') {
+                    window.coraSyncCategoriesUI();
+                }
+
+                // Sync Tags Custom Checkboxes
+                $('.cora-meta-tag-checkbox').prop('checked', false);
+                if (data.tags) {
+                    data.tags.forEach(tagId => {
+                        let chk = $(`.cora-meta-tag-checkbox[value="${tagId}"], .cora-meta-tag-checkbox[data-name="${tagId}"]`);
+                        if (chk.length === 0) {
+                            const newTagOpt = $(`
+                                <label class="flex items-center gap-2.5 p-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-lg cursor-pointer text-xs text-zinc-850 dark:text-zinc-250 select-none">
+                                    <input type="checkbox" class="cora-meta-tag-checkbox rounded border-zinc-300 focus:ring-0 text-zinc-950" value="${tagId}" data-name="${tagId}" checked>
+                                    <span>${tagId}</span>
+                                </label>
+                            `);
+                            $('#cora-meta-tags-dropdown').append(newTagOpt);
+                            if ($(`#cora-article-tags option[value="${tagId}"]`).length === 0) {
+                                $('#cora-article-tags').append(`<option value="${tagId}">${tagId}</option>`);
+                            }
+                        } else {
+                            chk.prop('checked', true);
+                        }
+                    });
+                }
+                if (typeof window.coraSyncTagsUI === 'function') {
+                    window.coraSyncTagsUI();
                 }
                 
                 if (data.thumbnail_url) {
@@ -6804,6 +6817,7 @@ jQuery(document).ready(function($) {
         const categories = $('#cora-article-categories').val() || [];
         const tags = $('#cora-article-tags').val() || [];
         const thumbnail_id = $('#cora-thumbnail-id').val();
+        const scheduled_date = $('#cora-article-scheduled-date').val() || '';
 
         if (!title) {
             window.coraShowToast('Cannot save an article without a title.', 'error');
@@ -6833,7 +6847,8 @@ jQuery(document).ready(function($) {
             thumbnail_id: thumbnail_id,
             assignee_id: assignee_id,
             slug: slug,
-            comment_status: comment_status
+            comment_status: comment_status,
+            scheduled_date: scheduled_date
         }, function(response) {
             if (response.success) {
                 $('#cora-editor-status').text('Saved at ' + new Date().toLocaleTimeString());
@@ -10281,6 +10296,173 @@ jQuery(document).ready(function($) {
         }
     };
 
+    window.coraInitMetaDropdowns = function() {
+        // Toggle Categories Dropdown
+        $('#cora-meta-categories-trigger').off('click').on('click', function(e) {
+            e.stopPropagation();
+            $('#cora-meta-categories-dropdown').toggleClass('hidden');
+            $('#cora-meta-tags-dropdown, #cora-meta-assignee-dropdown').addClass('hidden');
+        });
 
+        // Toggle Tags Dropdown
+        $('#cora-meta-tags-trigger').off('click').on('click', function(e) {
+            e.stopPropagation();
+            $('#cora-meta-tags-dropdown').toggleClass('hidden');
+            $('#cora-meta-categories-dropdown, #cora-meta-assignee-dropdown').addClass('hidden');
+        });
 
+        // Toggle Assignee Dropdown
+        $('#cora-meta-assignee-trigger').off('click').on('click', function(e) {
+            e.stopPropagation();
+            $('#cora-meta-assignee-dropdown').toggleClass('hidden');
+            $('#cora-meta-categories-dropdown, #cora-meta-tags-dropdown').addClass('hidden');
+        });
 
+        // Close dropdowns on document click
+        $(document).off('click.coraMetaDropdowns').on('click.coraMetaDropdowns', function(e) {
+            if (!$(e.target).closest('#cora-meta-categories-trigger, #cora-meta-categories-dropdown, #cora-meta-tags-trigger, #cora-meta-tags-dropdown, #cora-meta-assignee-trigger, #cora-meta-assignee-dropdown').length) {
+                $('#cora-meta-categories-dropdown, #cora-meta-tags-dropdown, #cora-meta-assignee-dropdown').addClass('hidden');
+            }
+        });
+
+        // Sync Categories
+        $(document).off('change', '.cora-meta-category-checkbox').on('change', '.cora-meta-category-checkbox', function() {
+            window.coraSyncCategoriesUI();
+        });
+
+        // Sync Tags
+        $(document).off('change', '.cora-meta-tag-checkbox').on('change', '.cora-meta-tag-checkbox', function() {
+            window.coraSyncTagsUI();
+        });
+
+        // Remove Category via Badge Close
+        $(document).off('click', '.cora-meta-remove-cat').on('click', '.cora-meta-remove-cat', function(e) {
+            e.stopPropagation();
+            const val = $(this).attr('data-value');
+            $(`.cora-meta-category-checkbox[value="${val}"]`).prop('checked', false);
+            window.coraSyncCategoriesUI();
+        });
+
+        // Remove Tag via Badge Close
+        $(document).off('click', '.cora-meta-remove-tag').on('click', '.cora-meta-remove-tag', function(e) {
+            e.stopPropagation();
+            const val = $(this).attr('data-value');
+            $(`.cora-meta-tag-checkbox[value="${val}"]`).prop('checked', false);
+            window.coraSyncTagsUI();
+        });
+
+        // Add Tag Button/Enter Key
+        $('#cora-meta-tag-add-btn').off('click').on('click', function(e) {
+            e.stopPropagation();
+            coraAddNewCustomTag();
+        });
+        $('#cora-meta-tag-add-input').off('keydown').on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+                coraAddNewCustomTag();
+            }
+        });
+
+        function coraAddNewCustomTag() {
+            const rawVal = $('#cora-meta-tag-add-input').val() || '';
+            const tagVal = rawVal.trim();
+            if (!tagVal) return;
+
+            // Check if already exists
+            let existing = $(`.cora-meta-tag-checkbox[value="${tagVal}"], .cora-meta-tag-checkbox[data-name="${tagVal}"]`);
+            if (existing.length > 0) {
+                existing.prop('checked', true);
+            } else {
+                // Add to dropdown list dynamically
+                const newTagOpt = $(`
+                    <label class="flex items-center gap-2.5 p-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-lg cursor-pointer text-xs text-zinc-850 dark:text-zinc-250 select-none">
+                        <input type="checkbox" class="cora-meta-tag-checkbox rounded border-zinc-300 focus:ring-0 text-zinc-950" value="${tagVal}" data-name="${tagVal}" checked>
+                        <span>${tagVal}</span>
+                    </label>
+                `);
+                $('#cora-meta-tags-dropdown').append(newTagOpt);
+                
+                // Add to hidden select list if not already there
+                if ($(`#cora-article-tags option[value="${tagVal}"]`).length === 0) {
+                    $('#cora-article-tags').append(`<option value="${tagVal}">${tagVal}</option>`);
+                }
+            }
+
+            $('#cora-meta-tag-add-input').val('');
+            window.coraSyncTagsUI();
+        }
+
+        // Assignee Options Selection
+        $('.cora-meta-assignee-option').off('click').on('click', function(e) {
+            e.stopPropagation();
+            const val = $(this).attr('data-value');
+            const name = $(this).text();
+            $('#cora-article-assignee').val(val);
+            $('#cora-meta-assignee-value').text(name);
+            $('#cora-meta-assignee-dropdown').addClass('hidden');
+        });
+        
+        // Reset helper method
+        window.coraResetMetaFields = function() {
+            $('.cora-meta-category-checkbox, .cora-meta-tag-checkbox').prop('checked', false);
+            window.coraSyncCategoriesUI();
+            window.coraSyncTagsUI();
+            $('#cora-article-assignee').val('0');
+            $('#cora-meta-assignee-value').text('Unassigned');
+            $('#cora-article-scheduled-date').val('');
+            $('#cora-article-slug').val('');
+            $('#cora-article-allow-comments').prop('checked', false);
+            window.coraShowToast('Meta fields reset to default.', 'info');
+        };
+    };
+
+    window.coraSyncCategoriesUI = function() {
+        const selected = [];
+        const badgeContainer = $('#cora-meta-categories-selected');
+        badgeContainer.empty();
+        
+        $('.cora-meta-category-checkbox:checked').each(function() {
+            const val = $(this).val();
+            const name = $(this).attr('data-name');
+            selected.push(val);
+            
+            const badge = $(`
+                <span class="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded flex items-center gap-1.5 text-[10px] font-semibold text-zinc-700 dark:text-zinc-300">
+                    ${name}
+                    <span class="cora-meta-remove-cat cursor-pointer text-zinc-400 hover:text-zinc-700" data-value="${val}">✕</span>
+                </span>
+            `);
+            badgeContainer.append(badge);
+        });
+        
+        $('#cora-article-categories').val(selected);
+        if (selected.length === 0) {
+            badgeContainer.html('<span class="text-zinc-350 dark:text-zinc-700">Select categories...</span>');
+        }
+    };
+
+    window.coraSyncTagsUI = function() {
+        const selected = [];
+        const badgeContainer = $('#cora-meta-tags-selected');
+        badgeContainer.empty();
+        
+        $('.cora-meta-tag-checkbox:checked').each(function() {
+            const val = $(this).val();
+            const name = $(this).attr('data-name');
+            selected.push(val);
+            
+            const badge = $(`
+                <span class="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded flex items-center gap-1.5 text-[10px] font-semibold text-zinc-700 dark:text-zinc-300">
+                    ${name}
+                    <span class="cora-meta-remove-tag cursor-pointer text-zinc-400 hover:text-zinc-700" data-value="${val}">✕</span>
+                </span>
+            `);
+            badgeContainer.append(badge);
+        });
+        
+        $('#cora-article-tags').val(selected);
+        if (selected.length === 0) {
+            badgeContainer.html('<span class="text-zinc-350 dark:text-zinc-700">Select or add tags...</span>');
+        }
+    };

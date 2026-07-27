@@ -7040,6 +7040,7 @@ function cora_ajax_get_article() {
     $assignee_id = get_post_meta($post_id, '_cora_assignee_id', true) ?: '';
     $editorial_status = get_post_meta($post_id, '_cora_editorial_status', true) ?: ($post->post_status === 'publish' ? 'published' : 'draft');
     $editorial_feedback = get_post_meta($post_id, '_cora_editorial_feedback', true) ?: '';
+    $scheduled_date = get_post_meta($post_id, '_cora_scheduled_date', true) ?: '';
 
     $categories = wp_get_post_categories($post_id);
     $tags = wp_get_post_tags($post_id, array('fields' => 'ids'));
@@ -7061,7 +7062,8 @@ function cora_ajax_get_article() {
         'thumbnail_url' => $thumbnail_url,
         'assignee_id' => $assignee_id,
         'editorial_status' => $editorial_status,
-        'editorial_feedback' => $editorial_feedback
+        'editorial_feedback' => $editorial_feedback,
+        'scheduled_date' => $scheduled_date
     ));
 }
 add_action( 'wp_ajax_cora_get_article', 'cora_ajax_get_article' );
@@ -7080,6 +7082,7 @@ function cora_ajax_save_article() {
     $keyword = isset($_POST['keyword']) ? sanitize_text_field($_POST['keyword']) : '';
     $description = isset($_POST['description']) ? sanitize_textarea_field($_POST['description']) : '';
     $seo_score = isset($_POST['seo_score']) ? intval($_POST['seo_score']) : '';
+    $scheduled_date = isset($_POST['scheduled_date']) ? sanitize_text_field($_POST['scheduled_date']) : '';
     
     $assignee_id = isset($_POST['assignee_id']) ? intval($_POST['assignee_id']) : 0;
     $editorial_status = isset($_POST['editorial_status']) ? sanitize_key($_POST['editorial_status']) : '';
@@ -7146,6 +7149,15 @@ function cora_ajax_save_article() {
     update_post_meta($saved_id, '_cora_article_subtitle', $subtitle);
     update_post_meta($saved_id, '_cora_assignee_id', $assignee_id);
     update_post_meta($saved_id, '_cora_editorial_feedback', $editorial_feedback);
+    update_post_meta($saved_id, '_cora_scheduled_date', $scheduled_date);
+
+    if (!empty($scheduled_date)) {
+        wp_update_post(array(
+            'ID' => $saved_id,
+            'post_date' => date('Y-m-d H:i:s', strtotime($scheduled_date)),
+            'edit_date' => true
+        ));
+    }
 
     if ($status === 'publish') {
         update_post_meta($saved_id, '_cora_editorial_status', 'published');

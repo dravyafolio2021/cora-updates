@@ -8,6 +8,14 @@ $current_role = ! empty( wp_get_current_user()->roles ) ? wp_get_current_user()-
 $current_agency = cora_get_current_user_agency_id();
 $current_branch = cora_get_current_user_branch_id();
 
+// Active industry mode resolution (Real Estate vs Studio/Photography)
+$active_industry = function_exists( 'cora_get_active_industry' ) 
+    ? cora_get_active_industry() 
+    : ( ! empty( $_COOKIE['cora_workspace_industry'] ) 
+        ? sanitize_text_field( $_COOKIE['cora_workspace_industry'] ) 
+        : get_option( 'cora_workspace_industry', 'real_estate' ) );
+$is_studio_mode = ( strpos( strtolower( $active_industry ), 'photo' ) !== false || strpos( strtolower( $active_industry ), 'studio' ) !== false );
+
 // Build user roles labels dynamically (including custom roles)
 $role_labels = cora_get_all_roles();
 
@@ -63,7 +71,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             </span>
             <div>
                 <h1 class="cora-page-title text-2xl font-bold tracking-tight text-zinc-900">User Management</h1>
-                <p class="cora-section-desc text-xs text-zinc-500 mt-1">Add brokerage team members, manage active user accounts, and control workspace permissions.</p>
+                <p class="cora-section-desc text-xs text-zinc-500 mt-1"><?php echo $is_studio_mode ? 'Add studio crew members, manage active user accounts, and control workspace permissions.' : 'Add brokerage team members, manage active user accounts, and control workspace permissions.'; ?></p>
             </div>
         </div>
         
@@ -522,109 +530,110 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         </div>
 
         <!-- Preset Role Quick-Clones / Template Cards Row -->
+        <?php
+        if ( $is_studio_mode ) {
+            $role_templates = array(
+                array(
+                    'key'   => 'cora_studio_manager',
+                    'title' => 'Studio Manager',
+                    'badge' => 'Manager Access',
+                    'desc'  => 'Shoot schedule oversight, crew dispatch, camera equipment vault, and studio financials.',
+                    'tags'  => array( 'Shoots', 'Equipment', 'Financials', 'Crew' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+                ),
+                array(
+                    'key'   => 'cora_photographer',
+                    'title' => 'Photographer',
+                    'badge' => 'Contributor',
+                    'desc'  => 'Shoot calendar access, camera gear logs, media upload, & shift check-ins.',
+                    'tags'  => array( 'Shoots', 'Camera Gear', 'Media' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>'
+                ),
+                array(
+                    'key'   => 'cora_editor',
+                    'title' => 'Post-Production Editor',
+                    'badge' => 'Contributor',
+                    'desc'  => 'RAW media vault post-processing, retouching pipeline, proofing, & AI suite processing.',
+                    'tags'  => array( 'Media Vault', 'AI Suite', 'Proofing' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>'
+                ),
+                array(
+                    'key'   => 'cora_viewer',
+                    'title' => 'Client Proofing Viewer',
+                    'badge' => 'Read-Only',
+                    'desc'  => 'Read-only gallery access for client photo selection, proofing approval, & invoice views.',
+                    'tags'  => array( 'Galleries', 'Proofing', 'Invoices' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>'
+                ),
+            );
+        } else {
+            $role_templates = array(
+                array(
+                    'key'   => 'cora_branch_manager',
+                    'title' => 'Branch Manager',
+                    'badge' => 'Manager Access',
+                    'desc'  => 'Full office oversight, lead dispatch, team management, property listings, and financials.',
+                    'tags'  => array( 'Buyer Leads', 'Listings', 'Financials', 'Team' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+                ),
+                array(
+                    'key'   => 'cora_re_agent',
+                    'title' => 'Real Estate Agent',
+                    'badge' => 'Contributor',
+                    'desc'  => 'Client buyer leads CRM, site showings calendar, listing inventory, & client task management.',
+                    'tags'  => array( 'Buyer Leads', 'Site Showings', 'Listings' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'
+                ),
+                array(
+                    'key'   => 'cora_re_assistant',
+                    'title' => 'Showings Assistant',
+                    'badge' => 'Contributor',
+                    'desc'  => 'Property site visits, check-ins, client showings scheduling, & task checklists.',
+                    'tags'  => array( 'Site Showings', 'Tasks', 'Attendance' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
+                ),
+                array(
+                    'key'   => 'cora_viewer',
+                    'title' => 'Client / Investor Viewer',
+                    'badge' => 'Read-Only',
+                    'desc'  => 'Read-only portal access for property listings, contracts, and showing status.',
+                    'tags'  => array( 'Listings', 'Contracts', 'Showings' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>'
+                ),
+            );
+        }
+        ?>
         <div class="space-y-3">
             <div class="flex items-center justify-between">
                 <h3 class="text-xs font-bold text-zinc-550 dark:text-zinc-400 uppercase tracking-wider">Role Templates & Quick Starts</h3>
                 <span class="text-[11px] text-zinc-400">Click to launch pre-configured role drawer</span>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                <!-- Template 1: Branch Manager -->
-                <div onclick="openCreateCustomRoleDrawer('cora_branch_manager')" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm hover:border-zinc-400 dark:hover:border-zinc-600 transition-all cursor-pointer group flex flex-col justify-between">
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200">
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                            </span>
-                            <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Manager Access</span>
+                <?php foreach ( $role_templates as $tmpl ) : ?>
+                    <div onclick="openCreateCustomRoleDrawer('<?php echo esc_attr( $tmpl['key'] ); ?>')" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm hover:border-zinc-400 dark:hover:border-zinc-600 transition-all cursor-pointer group flex flex-col justify-between">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200">
+                                    <?php echo $tmpl['svg']; ?>
+                                </span>
+                                <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"><?php echo esc_html( $tmpl['badge'] ); ?></span>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-zinc-950 dark:group-hover:text-white"><?php echo esc_html( $tmpl['title'] ); ?></h4>
+                                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-2"><?php echo esc_html( $tmpl['desc'] ); ?></p>
+                            </div>
+                            <div class="flex flex-wrap gap-1 pt-1">
+                                <?php foreach ( $tmpl['tags'] as $tag ) : ?>
+                                    <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800"><?php echo esc_html( $tag ); ?></span>
+                                <?php endforeach; ?>
+                            </div>
                         </div>
-                        <div>
-                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-zinc-950 dark:group-hover:text-white">Branch Manager</h4>
-                            <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-2">Full branch oversight, lead dispatch, team management, and financials.</p>
-                        </div>
-                        <div class="flex flex-wrap gap-1 pt-1">
-                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">CRM</span>
-                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">Financials</span>
-                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">Team</span>
-                        </div>
-                    </div>
-                    <div class="mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-zinc-300 group-hover:underline">
-                        <span>Use Template</span>
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                    </div>
-                </div>
-
-                <!-- Template 2: Photographer -->
-                <div onclick="openCreateCustomRoleDrawer('cora_photographer')" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm hover:border-zinc-400 dark:hover:border-zinc-600 transition-all cursor-pointer group flex flex-col justify-between">
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200">
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                            </span>
-                            <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Contributor</span>
-                        </div>
-                        <div>
-                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-zinc-950 dark:group-hover:text-white">Photographer</h4>
-                            <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-2">Shoot schedule access, equipment logs, media upload, & check-ins.</p>
-                        </div>
-                        <div class="flex flex-wrap gap-1 pt-1">
-                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">Showings</span>
-                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">Media</span>
-                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">Gear</span>
+                        <div class="mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-zinc-300 group-hover:underline">
+                            <span>Use Template</span>
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         </div>
                     </div>
-                    <div class="mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-zinc-300 group-hover:underline">
-                        <span>Use Template</span>
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                    </div>
-                </div>
-
-                <!-- Template 3: Editor -->
-                <div onclick="openCreateCustomRoleDrawer('cora_editor')" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm hover:border-zinc-400 dark:hover:border-zinc-600 transition-all cursor-pointer group flex flex-col justify-between">
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200">
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>
-                            </span>
-                            <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Contributor</span>
-                        </div>
-                        <div>
-                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-zinc-950 dark:group-hover:text-white">Editor</h4>
-                            <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-2">Media post-production, vault editing, and AI suite processing.</p>
-                        </div>
-                        <div class="flex flex-wrap gap-1 pt-1">
-                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">Media</span>
-                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">AI Suite</span>
-                        </div>
-                    </div>
-                    <div class="mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-zinc-300 group-hover:underline">
-                        <span>Use Template</span>
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                    </div>
-                </div>
-
-                <!-- Template 4: Viewer -->
-                <div onclick="openCreateCustomRoleDrawer('cora_viewer')" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm hover:border-zinc-400 dark:hover:border-zinc-600 transition-all cursor-pointer group flex flex-col justify-between">
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200">
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                            </span>
-                            <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Read-Only</span>
-                        </div>
-                        <div>
-                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-zinc-950 dark:group-hover:text-white">Viewer</h4>
-                            <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-2">Read-only access for external clients, partners, or auditors.</p>
-                        </div>
-                        <div class="flex flex-wrap gap-1 pt-1">
-                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">Showings</span>
-                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800">Media</span>
-                        </div>
-                    </div>
-                    <div class="mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-zinc-300 group-hover:underline">
-                        <span>Use Template</span>
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                    </div>
-                </div>
+                <?php endforeach; ?>
             </div>
         </div>
 
@@ -1508,10 +1517,9 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Base Role Template</label>
             <select id="custom-role-base-template" onchange="handleApplyBaseTemplate(this.value)" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
                 <option value="">Custom (Blank Template)</option>
-                <option value="cora_branch_manager">Branch Manager</option>
-                <option value="cora_photographer">Photographer</option>
-                <option value="cora_editor">Editor</option>
-                <option value="cora_viewer">Viewer</option>
+                <?php foreach ( $role_templates as $tmpl ) : ?>
+                    <option value="<?php echo esc_attr( $tmpl['key'] ); ?>"><?php echo esc_html( $tmpl['title'] ); ?></option>
+                <?php endforeach; ?>
             </select>
             <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1">Clones default permissions and operational access level.</p>
         </div>
@@ -2097,9 +2105,12 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     function handleApplyBaseTemplate(tmplKey) {
         if (!tmplKey) return;
         var permsMap = {
-            'cora_branch_manager': { access: 'manager', perms: ['crm_leads', 'showings_bookings', 'financials', 'media_vault', 'equipment', 'ai_suite', 'attendance'] },
+            'cora_branch_manager': { access: 'manager', perms: ['crm_leads', 'showings_bookings', 'financials', 'media_vault', 'attendance'] },
+            'cora_re_agent': { access: 'contributor', perms: ['crm_leads', 'showings_bookings', 'media_vault', 'attendance'] },
+            'cora_re_assistant': { access: 'contributor', perms: ['showings_bookings', 'attendance'] },
+            'cora_studio_manager': { access: 'manager', perms: ['showings_bookings', 'media_vault', 'equipment', 'financials', 'ai_suite', 'attendance'] },
             'cora_photographer': { access: 'contributor', perms: ['showings_bookings', 'media_vault', 'equipment', 'attendance'] },
-            'cora_editor': { access: 'contributor', perms: ['showings_bookings', 'media_vault', 'ai_suite'] },
+            'cora_editor': { access: 'contributor', perms: ['media_vault', 'ai_suite'] },
             'cora_viewer': { access: 'read_only', perms: ['showings_bookings', 'media_vault'] }
         };
         var config = permsMap[tmplKey];

@@ -7850,8 +7850,22 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
     <!-- Advanced Full-Page AI Content Editor (Notion/Medium Style) -->
     <style>
-    #cora-full-page-editor { display: none; }
-    #cora-full-page-editor:not(.hidden) { display: flex !important; }
+    #cora-full-page-editor {
+        display: none;
+    }
+    #cora-full-page-editor:not(.hidden) {
+        display: flex !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        z-index: 999999 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
     #cora-full-page-editor main { background-color: #FBFaf7 !important; padding: 40px 24px !important; }
 
     /* Inspector sidebar collapse behavior & transitions */
@@ -8469,27 +8483,25 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                     </div><!-- /#cora-editor-slash-menu -->
 
-                    <!-- Quill.js Mount Point -->
-                    <div id="cora-quill-editor" class="text-lg text-zinc-800 leading-relaxed cora-sans-editor min-h-[400px]"></div>
-
-
-                </div><!-- /.cora-writing-sheet -->
-            </main>
-
-            <!-- Inspector Panel -->
-            <aside id="cora-article-inspector" class="w-[320px] shrink-0 border-l border-zinc-200/85 dark:border-zinc-800/40 bg-[#f9fafb] dark:bg-[#0c0c0e] flex flex-col h-full overflow-y-auto transition-all duration-300">
-                <!-- Inspector Navigation Tabs -->
-                <div class="flex border-b border-zinc-200 dark:border-zinc-800 bg-[#f9fafb] dark:bg-[#0c0c0e] sticky top-0 z-10 text-xs font-semibold inspector-tabs-container">
-                    <button type="button" id="tab-inspector-copilot" onclick="coraSwitchInspectorTab('copilot')" class="flex-1 py-3 px-1 text-center border-b-2 border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 cursor-pointer transition-colors flex items-center justify-center gap-1 inspector-tab-btn tab-active">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                           <!-- Inspector Navigation Tabs -->
+                <div class="flex border-b border-zinc-200 dark:border-zinc-800 bg-[#f9fafb] dark:bg-[#0c0c0e] sticky top-0 z-10 text-[10px] font-bold uppercase tracking-wider inspector-tabs-container select-none">
+                    <button type="button" id="tab-inspector-copilot" onclick="coraSwitchInspectorTab('copilot')" class="flex-1 py-3 px-1 text-center border-b-2 border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 cursor-pointer transition-all flex items-center justify-center gap-1.5 inspector-tab-btn tab-active font-bold">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                         <span class="inspector-tab-label">Copilot</span>
-                        <span class="px-1 py-0.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-[8px] font-bold rounded-full uppercase inspector-tab-soon-badge">SOON</span>
+                        <span class="px-1 py-0.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-400 text-[8px] font-extrabold rounded-md uppercase inspector-tab-soon-badge tracking-normal scale-90">SOON</span>
                     </button>
-                    <button type="button" id="tab-inspector-meta" onclick="coraSwitchInspectorTab('meta')" class="flex-1 py-3 px-2 text-center border-b-2 border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer transition-colors flex items-center justify-center gap-1.5 inspector-tab-btn">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <button type="button" id="tab-inspector-meta" onclick="coraSwitchInspectorTab('meta')" class="flex-1 py-3 px-2 text-center border-b-2 border-transparent text-zinc-405 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer transition-all flex items-center justify-center gap-1.5 inspector-tab-btn font-bold">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                         <span class="inspector-tab-label">Meta</span>
                     </button>
-                    <button type="button" id="tab-inspector-seo" onclick="coraSwitchInspectorTab('seo')" class="flex-1 py-3 px-2 text-center border-b-2 border-transparent text-zinc-400 d                <!-- TAB 1: Copilot & AI Tab -->
+                    <button type="button" id="tab-inspector-seo" onclick="coraSwitchInspectorTab('seo')" class="flex-1 py-3 px-2 text-center border-b-2 border-transparent text-zinc-405 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer transition-all flex items-center justify-center gap-1.5 inspector-tab-btn font-bold">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <span class="inspector-tab-label">SEO & GEO</span>
+                    </button>
+                
+
+                <!-- TAB 1: Copilot & AI Tab -->
+
                 <div id="panel-inspector-copilot" class="p-4 space-y-4">
                     <!-- AI Studio Assistant Card -->
                     <div class="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 flex flex-col gap-3 shadow-2xs">
@@ -8610,112 +8622,188 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 <span>Generate</span>
                             </button>
                         </div>
-                        <textarea id="cora-article-excerpt" rows="3" placeholder="Summary snippet for search results and social previews..." class="w-full text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-650 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-350 dark:placeholder:text-zinc-700 shadow-3xs resize-none"></textarea>
-                        <div class="flex justify-end">
-                            <span id="cora-excerpt-char-count" class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500">0 / 160 characters</span>
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- TAB 2: Publishing Meta Tab -->
-                <div id="panel-inspector-meta" class="hidden p-5 space-y-5">
+                        <textarea id="cora-article-excerpt" rows="3" placeholder="Summary snippet for search results and social previews..." class="w-full text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 focu                <!-- TAB 2: Publishing Meta Tab -->
+                <div id="panel-inspector-meta" class="hidden p-4 space-y-4">
                     
                     <!-- Featured Image -->
                     <div class="space-y-2">
-                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Featured Image</span>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-extrabold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider block">Featured Image</span>
+                            <span class="text-[9px] text-zinc-400 font-semibold select-none">Recommended size: 1200 × 630</span>
+                        </div>
                         <input type="hidden" id="cora-thumbnail-id" value="">
-                        <div id="cora-thumbnail-preview" class="w-full aspect-[16/9] bg-zinc-100 rounded-xl border border-zinc-200 flex items-center justify-center overflow-hidden relative group cursor-pointer" onclick="window.coraMediaSelectTarget = 'thumbnail'; coraOpenMediaLibrary();">
+                        <div id="cora-thumbnail-preview" class="w-full aspect-[16/9] bg-white dark:bg-zinc-950 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 flex items-center justify-center overflow-hidden relative group cursor-pointer transition-all hover:border-zinc-400" onclick="window.coraMediaSelectTarget = 'thumbnail'; coraOpenMediaLibrary();">
                             <div class="absolute inset-0 bg-black/60 hidden group-hover:flex items-center justify-center transition-all z-10">
                                 <span class="text-white text-xs font-semibold flex items-center gap-1.5">
-                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                                     Change Image
                                 </span>
                             </div>
                             <img src="" id="cora-thumbnail-img" class="hidden w-full h-full object-cover">
-                            <span id="cora-thumbnail-placeholder" class="text-xs text-zinc-400 font-semibold flex flex-col items-center gap-1">
-                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" class="mb-1"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                Select Image
-                            </span>
+                            <div id="cora-thumbnail-placeholder" class="text-center flex flex-col items-center gap-2 select-none py-6">
+                                <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                <span class="text-xs font-extrabold text-zinc-800 dark:text-zinc-300 block mt-1">Upload Featured Image</span>
+                                <span class="text-[10px] text-zinc-400 dark:text-zinc-550 block">Drag & drop or click to select</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Taxonomies & Metadata -->
-                    <div class="space-y-4 pt-3 border-t border-zinc-200">
-                        <div class="space-y-1.5">
-                            <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Categories</label>
-                            <select id="cora-article-categories" multiple class="w-full text-xs border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800 min-h-[80px]">
+                    <!-- Categories -->
+                    <div class="space-y-1.5 pt-2 border-t border-zinc-150 dark:border-zinc-850">
+                        <span class="text-[10px] font-extrabold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider block">Categories</span>
+                        <div class="relative">
+                            <div id="cora-meta-categories-trigger" class="w-full text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 flex items-center justify-between cursor-pointer shadow-3xs select-none hover:bg-zinc-50/40">
+                                <div class="flex flex-wrap gap-1.5" id="cora-meta-categories-selected">
+                                    <span class="text-zinc-350 dark:text-zinc-700">Select categories...</span>
+                                </div>
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-450 shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div id="cora-meta-categories-dropdown" class="hidden absolute left-0 right-0 mt-1.5 p-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-lg z-30 max-h-[160px] overflow-y-auto space-y-1 animate-fade-in">
                                 <?php foreach($cora_categories as $cat): ?>
-                                    <option value="<?php echo $cat->term_id; ?>"><?php echo esc_html($cat->name); ?></option>
+                                    <label class="flex items-center gap-2.5 p-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-lg cursor-pointer text-xs text-zinc-850 dark:text-zinc-250 select-none">
+                                        <input type="checkbox" class="cora-meta-category-checkbox rounded border-zinc-300 focus:ring-0 text-zinc-950" value="<?php echo $cat->term_id; ?>" data-name="<?php echo esc_attr($cat->name); ?>">
+                                        <span><?php echo esc_html($cat->name); ?></span>
+                                    </label>
                                 <?php endforeach; ?>
-                            </select>
+                            </div>
                         </div>
-                        
-                        <div class="space-y-1.5">
-                            <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Tags</label>
-                            <select id="cora-article-tags" multiple class="w-full text-xs border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800 min-h-[80px]">
+                        <select id="cora-article-categories" multiple class="hidden">
+                            <?php foreach($cora_categories as $cat): ?>
+                                <option value="<?php echo $cat->term_id; ?>"><?php echo esc_html($cat->name); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <p class="text-[9px] text-zinc-400">Choose one or more categories for this content.</p>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="space-y-1.5">
+                        <span class="text-[10px] font-extrabold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider block">Tags</span>
+                        <div class="relative">
+                            <div id="cora-meta-tags-trigger" class="w-full text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 flex items-center justify-between cursor-pointer shadow-3xs select-none hover:bg-zinc-50/40">
+                                <div class="flex items-center gap-2.5 flex-1 min-w-0">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                                    <div class="flex flex-wrap gap-1.5 flex-1" id="cora-meta-tags-selected">
+                                        <span class="text-zinc-350 dark:text-zinc-700">Select or add tags...</span>
+                                    </div>
+                                </div>
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-455 shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div id="cora-meta-tags-dropdown" class="hidden absolute left-0 right-0 mt-1.5 p-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-lg z-30 max-h-[190px] overflow-y-auto space-y-1 animate-fade-in">
+                                <div class="px-2 py-1.5 border-b border-zinc-100 dark:border-zinc-850 mb-1 flex gap-1.5">
+                                    <input type="text" id="cora-meta-tag-add-input" placeholder="Create tag..." class="flex-1 text-xs border border-zinc-200 dark:border-zinc-800 rounded px-2 py-1 focus:outline-none focus:border-zinc-450 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-250">
+                                    <button type="button" id="cora-meta-tag-add-btn" class="px-2.5 py-1 bg-zinc-950 hover:bg-black text-white text-[10px] font-bold rounded-md cursor-pointer transition-colors border-none outline-none">Add</button>
+                                </div>
                                 <?php foreach($cora_tags as $tag): ?>
-                                    <option value="<?php echo $tag->term_id; ?>"><?php echo esc_html($tag->name); ?></option>
+                                    <label class="flex items-center gap-2.5 p-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-lg cursor-pointer text-xs text-zinc-850 dark:text-zinc-250 select-none">
+                                        <input type="checkbox" class="cora-meta-tag-checkbox rounded border-zinc-300 focus:ring-0 text-zinc-950" value="<?php echo $tag->term_id; ?>" data-name="<?php echo esc_attr($tag->name); ?>">
+                                        <span><?php echo esc_html($tag->name); ?></span>
+                                    </label>
                                 <?php endforeach; ?>
-                            </select>
-                            <p class="text-[9px] text-zinc-400">Hold Cmd/Ctrl to select multiple tags.</p>
+                            </div>
                         </div>
+                        <select id="cora-article-tags" multiple class="hidden">
+                            <?php foreach($cora_tags as $tag): ?>
+                                <option value="<?php echo $tag->term_id; ?>"><?php echo esc_html($tag->name); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <p class="text-[9px] text-zinc-400">Hold Cmd/Ctrl to select multiple tags.</p>
+                    </div>
 
-                        <!-- Assignee / Author -->
-                        <div class="space-y-1.5 pt-2 border-t border-zinc-200">
-                            <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Assignee / Author</label>
-                            <select id="cora-article-assignee" class="w-full text-xs border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800">
-                                <option value="0">Unassigned</option>
+                    <!-- Assignee / Author -->
+                    <div class="space-y-1.5 pt-1">
+                        <span class="text-[10px] font-extrabold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider block">Assignee / Author</span>
+                        <div class="relative">
+                            <div id="cora-meta-assignee-trigger" class="w-full text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 flex items-center justify-between cursor-pointer shadow-3xs select-none hover:bg-zinc-50/40">
+                                <div class="flex items-center gap-2.5">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                    <span id="cora-meta-assignee-value" class="font-medium text-zinc-800 dark:text-zinc-200">Unassigned</span>
+                                </div>
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-455 shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <input type="hidden" id="cora-article-assignee" value="0">
+                            <div id="cora-meta-assignee-dropdown" class="hidden absolute left-0 right-0 mt-1.5 p-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-lg z-30 max-h-[160px] overflow-y-auto space-y-1 animate-fade-in">
+                                <div class="cora-meta-assignee-option p-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-lg cursor-pointer text-xs text-zinc-800 dark:text-zinc-200 select-none font-semibold" data-value="0">Unassigned</div>
                                 <?php foreach($cora_users as $usr): ?>
-                                    <option value="<?php echo $usr->ID; ?>"><?php echo esc_html($usr->display_name); ?></option>
+                                    <div class="cora-meta-assignee-option p-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-lg cursor-pointer text-xs text-zinc-800 dark:text-zinc-200 select-none" data-value="<?php echo $usr->ID; ?>"><?php echo esc_html($usr->display_name); ?></div>
                                 <?php endforeach; ?>
-                            </select>
+                            </div>
                         </div>
+                    </div>
 
-                        <!-- Scheduled Publication Date -->
+                    <!-- Scheduled Date -->
+                    <div class="space-y-1.5">
+                        <span class="text-[10px] font-extrabold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider block">Scheduled Date</span>
+                        <div class="relative">
+                            <div class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            </div>
+                            <input type="datetime-local" id="cora-article-scheduled-date" class="w-full text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 pl-9 pr-9 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-650 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 shadow-3xs">
+                            <div class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            </div>
+                        </div>
+                        <p class="text-[9px] text-zinc-400">Set when this content should be published.</p>
+                    </div>
+
+                    <!-- Editorial Feedback Box -->
+                    <div id="cora-editorial-feedback-box" class="hidden p-3 rounded-lg border border-zinc-300 bg-zinc-100 dark:bg-zinc-900 text-xs text-zinc-800 dark:text-zinc-200 leading-tight space-y-1">
+                        <div class="flex items-center gap-1.5 font-bold text-zinc-900 dark:text-zinc-100">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            <span>Revision Required</span>
+                        </div>
+                        <p id="cora-editorial-feedback-text" class="italic text-[11px] text-zinc-600 dark:text-zinc-400"></p>
+                    </div>
+
+                    <!-- Page Settings -->
+                    <div class="space-y-4 pt-3 border-t border-zinc-200 dark:border-zinc-850">
+                        <span class="text-[10px] font-extrabold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider block">Page Settings</span>
+                        
+                        <!-- URL Slug -->
                         <div class="space-y-1.5">
-                            <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Scheduled Date</label>
-                            <input type="datetime-local" id="cora-article-scheduled-date" class="w-full text-xs border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800">
+                            <span class="text-[10px] font-bold text-zinc-550 dark:text-zinc-450 block">URL Slug</span>
+                            <div class="relative">
+                                <div class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                                </div>
+                                <input type="text" id="cora-article-slug" placeholder="url-slug-here" class="w-full text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 pl-9 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-650 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 shadow-3xs">
+                            </div>
+                            <p class="text-[9px] text-zinc-400">The last part of the URL. Keep it short and descriptive.</p>
                         </div>
 
-                        <!-- Editorial Feedback Box -->
-                        <div id="cora-editorial-feedback-box" class="hidden p-3 rounded-lg border border-zinc-300 bg-zinc-100 dark:bg-zinc-900 text-xs text-zinc-800 dark:text-zinc-200 leading-tight space-y-1">
-                            <div class="flex items-center gap-1.5 font-bold text-zinc-900 dark:text-zinc-100">
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                                <span>Revision Required</span>
+                        <!-- Allow Comments -->
+                        <div class="flex items-center justify-between pt-1 select-none">
+                            <div class="space-y-0.5">
+                                <span class="text-[10px] font-extrabold text-zinc-555 dark:text-zinc-400 uppercase tracking-wider block">Allow Comments</span>
+                                <span class="text-[9px] text-zinc-400 dark:text-zinc-500 block leading-tight">Enable comments on this content.</span>
                             </div>
-                            <p id="cora-editorial-feedback-text" class="italic text-[11px] text-zinc-600 dark:text-zinc-400"></p>
+                            <label class="relative inline-flex items-center cursor-pointer select-none">
+                                <input type="checkbox" id="cora-article-allow-comments" class="sr-only peer">
+                                <div class="w-9 h-5 bg-zinc-200 dark:bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-950 dark:peer-checked:bg-white"></div>
+                            </label>
                         </div>
 
-                        <!-- Article/Page Settings Group -->
-                        <div class="space-y-3 pt-3 border-t border-zinc-200 dark:border-zinc-850">
-                            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Page Settings</span>
-                            
-                            <!-- URL Slug -->
-                            <div class="space-y-1.5">
-                                <label class="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 block">URL Slug</label>
-                                <input type="text" id="cora-article-slug" placeholder="url-slug-here" class="w-full text-xs border border-zinc-200 dark:border-zinc-850 rounded-lg p-2 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200">
-                            </div>
-
-                            <!-- Allow Comments Toggle -->
-                            <div class="flex items-center justify-between pt-1 select-none">
-                                <span class="text-[10px] font-bold text-zinc-600 dark:text-zinc-400">Allow Comments</span>
-                                <label class="relative inline-flex items-center cursor-pointer select-none">
-                                    <input type="checkbox" id="cora-article-allow-comments" class="sr-only peer">
-                                    <div class="w-8 h-4 bg-zinc-200 dark:bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 dark:after:border-zinc-600 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-zinc-950 dark:peer-checked:bg-white"></div>
-                                </label>
-                            </div>
-
-                            <!-- Move to Trash -->
-                            <div class="pt-2">
-                                <button type="button" onclick="coraTrashArticle()" class="w-full py-2 bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-950/45 text-red-600 dark:text-red-400 border border-red-200/80 dark:border-red-900/60 rounded-lg text-xs font-semibold cursor-pointer transition-colors flex items-center justify-center gap-1.5 active:scale-95 shadow-2xs">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                    Move to Trash
-                                </button>
-                            </div>
+                        <!-- Move to Trash -->
+                        <div class="pt-2">
+                            <button type="button" onclick="coraTrashArticle()" class="w-full py-2.5 bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-950/45 text-red-650 dark:text-red-400 border border-red-200/80 dark:border-red-900/60 rounded-lg text-xs font-semibold cursor-pointer transition-colors flex items-center justify-center gap-1.5 active:scale-95 shadow-2xs">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                Move to Trash
+                            </button>
                         </div>
+                    </div>
+
+                    <!-- Footer Action Buttons -->
+                    <div class="flex items-center justify-between border-t border-zinc-200/80 dark:border-zinc-800/50 pt-4 mt-6 select-none">
+                        <button type="button" onclick="window.coraResetMetaFields()" class="px-4 py-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-700 dark:text-zinc-300 font-bold rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-3xs">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
+                            Reset
+                        </button>
+                        <button type="button" onclick="coraSaveArticle('draft')" class="px-4 py-2 bg-zinc-950 hover:bg-black dark:bg-zinc-850 dark:hover:bg-zinc-750 text-white font-bold rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-xs border-none outline-none">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                            Save Changes
+                        </button>
                     </div>
                 </div>
+
 
 
                 <!-- TAB 3: SEO & GEO Inspector Tab -->
