@@ -1384,9 +1384,9 @@ if (typeof window.coraCloseAllDrawers !== 'function') {
 
 // Open Drawer Functions
 window.openAddGearDrawer = function() {
-    if (typeof window.coraCloseAllDrawers === 'function') window.coraStopWebcam('add');
-    window.coraStopWebcam('edit');
-    window.coraCloseAllDrawers();
+    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('add');
+    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('edit');
+    if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
     var backdrop = document.getElementById('cora-drawer-backdrop');
     if (backdrop) backdrop.classList.remove('hidden');
 
@@ -1413,9 +1413,9 @@ window.openAddGearDrawer = function() {
 };
 
 window.openCheckoutGearDrawer = function(presetGearName) {
-    if (typeof window.coraCloseAllDrawers === 'function') window.coraStopWebcam('add');
-    window.coraStopWebcam('edit');
-    window.coraCloseAllDrawers();
+    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('add');
+    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('edit');
+    if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
     var backdrop = document.getElementById('cora-drawer-backdrop');
     if (backdrop) backdrop.classList.remove('hidden');
 
@@ -1440,9 +1440,9 @@ window.openCheckoutGearDrawer = function(presetGearName) {
 };
 
 window.openMaintenanceDrawer = function(presetGearName) {
-    if (typeof window.coraCloseAllDrawers === 'function') window.coraStopWebcam('add');
-    window.coraStopWebcam('edit');
-    window.coraCloseAllDrawers();
+    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('add');
+    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('edit');
+    if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
     var backdrop = document.getElementById('cora-drawer-backdrop');
     if (backdrop) backdrop.classList.remove('hidden');
 
@@ -1467,9 +1467,9 @@ window.openMaintenanceDrawer = function(presetGearName) {
 };
 
 window.openViewRepairDrawer = function(gearId) {
-    if (typeof window.coraCloseAllDrawers === 'function') window.coraStopWebcam('add');
-    window.coraStopWebcam('edit');
-    window.coraCloseAllDrawers();
+    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('add');
+    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('edit');
+    if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
     var backdrop = document.getElementById('cora-drawer-backdrop');
     if (backdrop) backdrop.classList.remove('hidden');
 
@@ -1504,9 +1504,9 @@ window.openViewRepairDrawer = function(gearId) {
 };
 
 window.openEditGearDrawer = function(gearId) {
-    if (typeof window.coraCloseAllDrawers === 'function') window.coraStopWebcam('add');
-    window.coraStopWebcam('edit');
-    window.coraCloseAllDrawers();
+    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('add');
+    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('edit');
+    if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
     var backdrop = document.getElementById('cora-drawer-backdrop');
     if (backdrop) backdrop.classList.remove('hidden');
 
