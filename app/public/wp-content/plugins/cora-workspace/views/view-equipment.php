@@ -500,25 +500,43 @@ if ( is_array( $cora_gear_maintenance ) ) {
                             <td class="p-3.5 text-zinc-600 font-medium text-xs">
                                 <?php echo esc_html( $gear['assigned'] ?? $gear['assigned_to'] ?? '' ); ?>
                             </td>
-                            <td class="p-3.5 text-right space-x-1.5 whitespace-nowrap">
-                                <?php if ( $status === 'In Repair' || $status === 'Maintenance' ) : ?>
-                                    <button onclick="openViewRepairDrawer('<?php echo esc_attr( $gear['id'] ); ?>')" title="View repair details" class="px-3 py-1 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs font-semibold transition-all cursor-pointer">
-                                        View Repair
-                                    </button>
-                                <?php else : ?>
-                                    <button onclick="openCheckoutGearDrawer('<?php echo esc_attr( $gear['name'] ); ?>')" title="Check out gear to shoot" class="px-3 py-1 bg-zinc-950 text-white hover:bg-zinc-800 rounded-lg text-xs font-semibold transition-all cursor-pointer">
-                                        Check Out
-                                    </button>
-                                    <button onclick="openMaintenanceDrawer('<?php echo esc_attr( $gear['name'] ); ?>')" title="Log repair or maintenance" class="px-3 py-1 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs font-semibold transition-all cursor-pointer">
-                                        Log Repair
-                                    </button>
-                                <?php endif; ?>
-                                <button onclick="openEditGearDrawer('<?php echo esc_attr( $gear['id'] ); ?>')" title="Edit gear item" class="w-7 h-7 inline-flex items-center justify-center border border-zinc-200 rounded-lg text-zinc-400 hover:text-zinc-950 hover:border-zinc-300 transition-all cursor-pointer">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                </button>
-                                <button onclick="coraDeleteGearItem('<?php echo esc_attr( $gear['id'] ); ?>')" title="Delete gear item" class="w-7 h-7 inline-flex items-center justify-center border border-zinc-200 rounded-lg text-zinc-400 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition-all cursor-pointer">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                </button>
+                            <td class="p-3.5 text-right whitespace-nowrap">
+                                <div class="inline-flex items-center justify-end gap-2 w-full">
+                                    <?php if ( $status === 'In Repair' || $status === 'Maintenance' ) : ?>
+                                        <button onclick="openViewRepairDrawer('<?php echo esc_attr( $gear['id'] ); ?>')" title="View repair details" class="px-3 py-1 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs font-semibold transition-all cursor-pointer">
+                                            View Repair
+                                        </button>
+                                    <?php else : ?>
+                                        <button onclick="openCheckoutGearDrawer('<?php echo esc_attr( $gear['id'] ); ?>')" title="Check out gear to shoot" class="px-3 py-1 bg-zinc-950 text-white hover:bg-zinc-800 rounded-lg text-xs font-semibold transition-all cursor-pointer">
+                                            Check Out
+                                        </button>
+                                    <?php endif; ?>
+
+                                    <!-- Options Dropdown Menu Trigger -->
+                                    <div class="relative inline-block text-left">
+                                        <button onclick="coraToggleRowActions(event, '<?php echo esc_attr( $gear['id'] ); ?>')" title="More actions" class="w-7 h-7 inline-flex items-center justify-center border border-zinc-200 hover:border-zinc-350 hover:bg-zinc-50 rounded-lg text-zinc-500 hover:text-zinc-950 transition-all cursor-pointer">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                                        </button>
+                                        
+                                        <!-- Popover Menu -->
+                                        <div id="cora-row-actions-<?php echo esc_attr( $gear['id'] ); ?>" class="cora-row-actions-dropdown hidden absolute right-0 mt-1.5 w-36 bg-white border border-zinc-200 rounded-xl shadow-lg py-1.5 z-40 space-y-0.5 text-left">
+                                            <?php if ( $status !== 'In Repair' && $status !== 'Maintenance' ) : ?>
+                                                <button onclick="openMaintenanceDrawer('<?php echo esc_attr( $gear['id'] ); ?>'); coraHideAllDropdowns();" class="w-full text-left px-3 py-1.5 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold flex items-center gap-2 cursor-pointer">
+                                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                                                    Log Repair
+                                                </button>
+                                            <?php endif; ?>
+                                            <button onclick="openEditGearDrawer('<?php echo esc_attr( $gear['id'] ); ?>'); coraHideAllDropdowns();" class="w-full text-left px-3 py-1.5 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold flex items-center gap-2 cursor-pointer">
+                                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                                Edit Specs
+                                            </button>
+                                            <button onclick="coraDeleteGearItem('<?php echo esc_attr( $gear['id'] ); ?>'); coraHideAllDropdowns();" class="w-full text-left px-3 py-1.5 hover:bg-rose-50 text-rose-700 text-xs font-semibold flex items-center gap-2 cursor-pointer border-t border-zinc-100">
+                                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                Delete Item
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                         <?php endforeach; ?>
@@ -1643,4 +1661,30 @@ window.executeCoraDeleteGearItem = function() {
         location.reload();
     }
 };
+
+// Toggle Row Actions Dropdown Menu
+window.coraToggleRowActions = function(e, gearId) {
+    e.stopPropagation();
+    var dropdown = document.getElementById('cora-row-actions-' + gearId);
+    var isHidden = dropdown.classList.contains('hidden');
+    
+    // Hide all first
+    window.coraHideAllDropdowns();
+    
+    if (isHidden && dropdown) {
+        dropdown.classList.remove('hidden');
+    }
+};
+
+window.coraHideAllDropdowns = function() {
+    var dropdowns = document.querySelectorAll('.cora-row-actions-dropdown');
+    dropdowns.forEach(function(d) {
+        d.classList.add('hidden');
+    });
+};
+
+// Document click listener to close dropdowns
+document.addEventListener('click', function() {
+    window.coraHideAllDropdowns();
+});
 </script>
