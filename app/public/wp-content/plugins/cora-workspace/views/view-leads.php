@@ -24,14 +24,35 @@ $pipeline_total_value = 0;
 $converted_count = 0;
 $hot_leads_count = 0;
 
-$stages_summary = array(
-    'New Lead'    => array( 'count' => 0, 'value' => 0, 'label' => 'New Inquiries', 'badge' => 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800' ),
-    'Contacted'   => array( 'count' => 0, 'value' => 0, 'label' => 'Proposal Sent', 'badge' => 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800' ),
-    'Site Visit'  => array( 'count' => 0, 'value' => 0, 'label' => 'Site Visit / Viewing', 'badge' => 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800' ),
-    'Negotiation' => array( 'count' => 0, 'value' => 0, 'label' => 'Negotiation', 'badge' => 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800' ),
-    'Converted'   => array( 'count' => 0, 'value' => 0, 'label' => 'Converted', 'badge' => 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' ),
-    'Lost'        => array( 'count' => 0, 'value' => 0, 'label' => 'Closed / Lost', 'badge' => 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800' ),
+$default_stages = array(
+    'New Lead'    => array( 'key' => 'New Lead', 'label' => 'New Inquiries', 'badge' => 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800', 'enabled' => true ),
+    'Contacted'   => array( 'key' => 'Contacted', 'label' => 'Proposal Sent', 'badge' => 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800', 'enabled' => true ),
+    'Site Visit'  => array( 'key' => 'Site Visit', 'label' => 'Site Visit / Viewing', 'badge' => 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800', 'enabled' => true ),
+    'Negotiation' => array( 'key' => 'Negotiation', 'label' => 'Negotiation', 'badge' => 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800', 'enabled' => true ),
+    'Converted'   => array( 'key' => 'Converted', 'label' => 'Converted', 'badge' => 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800', 'enabled' => true ),
+    'Lost'        => array( 'key' => 'Lost', 'label' => 'Closed / Lost', 'badge' => 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800', 'enabled' => true ),
 );
+
+$saved_stages = get_option( 'cora_workspace_lead_stages', array() );
+if ( is_array( $saved_stages ) && ! empty( $saved_stages ) ) {
+    $stages_config = $saved_stages;
+} else {
+    $stages_config = $default_stages;
+}
+
+$stages_summary = array();
+foreach ( $stages_config as $s_key => $s_val ) {
+    if ( isset( $s_val['enabled'] ) && ! $s_val['enabled'] ) {
+        continue;
+    }
+    $stages_summary[$s_key] = array(
+        'key'   => $s_key,
+        'count' => 0,
+        'value' => 0,
+        'label' => $s_val['label'] ?? $s_key,
+        'badge' => $s_val['badge'] ?? 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800',
+    );
+}
 
 foreach ( $cora_leads_raw as $l ) {
     $numeric_price = (float) preg_replace( '/[^0-9.]/', '', $l['price'] ?? '0' );
@@ -190,14 +211,16 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
         </nav>
 
         <div class="flex items-center gap-2">
+            <button type="button" class="px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 font-bold rounded-lg text-xs transition-all flex items-center gap-1.5 cursor-pointer border border-zinc-200 dark:border-zinc-700 shadow-2xs" onclick="coraOpenManageStagesDrawer()">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <span>Customize Columns</span>
+            </button>
+
             <select id="cora-lead-stage-filter" class="px-2.5 py-1.5 text-xs bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-700 dark:text-zinc-300 focus:outline-none" onchange="coraFilterLeadsList()">
                 <option value="all">All Stages</option>
-                <option value="New Lead">New Lead</option>
-                <option value="Contacted">Proposal Sent</option>
-                <option value="Site Visit">Site Visit / Viewing</option>
-                <option value="Negotiation">Negotiation</option>
-                <option value="Converted">Converted</option>
-                <option value="Lost">Closed / Lost</option>
+                <?php foreach ( $stages_summary as $sk => $sd ) : ?>
+                    <option value="<?php echo esc_attr( $sk ); ?>"><?php echo esc_html( $sd['label'] ); ?></option>
+                <?php endforeach; ?>
             </select>
         </div>
     </div>
@@ -211,7 +234,7 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                     return $st === $stage_key;
                 });
             ?>
-            <div class="cora-kanban-column flex flex-col p-3 rounded-2xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs shrink-0 w-[310px] min-h-[580px] relative"
+            <div class="cora-kanban-column flex flex-col p-3.5 rounded-2xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs shrink-0 w-[380px] min-w-[380px] min-h-[600px] relative"
                  data-status="<?php echo esc_attr( $stage_key ); ?>"
                  ondragover="coraLeadDragOver(event)"
                  ondrop="coraLeadDrop(event)">
@@ -751,6 +774,75 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
             <button type="submit" class="px-5 py-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold rounded-lg text-xs hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all cursor-pointer shadow-sm">
                 Save Task
             </button>
+        </div>
+    </form>
+</aside>
+
+<!-- ========================================================================= -->
+<!-- SLIDING SIDE DRAWER 4: CUSTOMIZE PIPELINE STAGES & COLUMNS                 -->
+<!-- ========================================================================= -->
+<aside id="cora-lead-stages-drawer" class="cora-side-drawer fixed top-0 right-0 w-[540px] max-w-[90vw] h-full bg-white dark:bg-zinc-900 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 dark:border-zinc-800 flex flex-col font-sans">
+    <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-zinc-50/50 dark:bg-zinc-850/50">
+        <div>
+            <h3 class="font-extrabold text-base text-zinc-900 dark:text-white">Customize Pipeline Columns</h3>
+            <p class="text-xs text-zinc-400 mt-0.5">Rename stage titles, toggle column visibility, or add custom stage columns.</p>
+        </div>
+        <button type="button" class="text-zinc-400 hover:text-zinc-800 dark:hover:text-white p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" onclick="window.coraCloseAllDrawers()">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <form id="cora-manage-stages-form" class="p-6 overflow-y-auto flex-1 space-y-4 text-xs" onsubmit="event.preventDefault(); coraSavePipelineStages();">
+        <div class="flex items-center justify-between pb-2 border-b border-zinc-200 dark:border-zinc-800">
+            <span class="font-bold text-zinc-800 dark:text-zinc-200">Pipeline Stage Workflow</span>
+            <button type="button" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 hover:underline cursor-pointer border-none bg-transparent" onclick="coraAddNewStageRow()">+ Add Stage Column</button>
+        </div>
+
+        <div id="cora-stages-list-container" class="space-y-3">
+            <?php foreach ( $stages_config as $s_key => $s_val ) : ?>
+            <div class="cora-stage-config-row p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-800/40 space-y-2 relative" data-key="<?php echo esc_attr($s_key); ?>">
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 flex-1">
+                        <span class="text-zinc-400 cursor-grab">⋮⋮</span>
+                        <input type="text" class="cora-stage-label-input px-2.5 py-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg font-bold text-zinc-900 dark:text-zinc-100 text-xs w-full outline-none" value="<?php echo esc_attr($s_val['label'] ?? $s_key); ?>" placeholder="Stage Column Title">
+                    </div>
+                    <label class="flex items-center gap-1.5 text-[11px] text-zinc-500 font-semibold cursor-pointer">
+                        <input type="checkbox" class="cora-stage-enable-checkbox accent-zinc-950 dark:accent-white" <?php echo ( ! isset($s_val['enabled']) || $s_val['enabled'] ) ? 'checked' : ''; ?>>
+                        <span>Show</span>
+                    </label>
+                    <button type="button" class="text-zinc-400 hover:text-rose-600 transition-colors p-1 border-none bg-transparent cursor-pointer" onclick="jQuery(this).closest('.cora-stage-config-row').remove();">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                </div>
+
+                <div class="flex items-center justify-between pt-1">
+                    <span class="text-[10px] text-zinc-400 font-medium">Stage Key: <code class="font-mono text-zinc-600 dark:text-zinc-300"><?php echo esc_html($s_key); ?></code></span>
+                    <select class="cora-stage-badge-select px-2 py-1 text-[10.5px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded text-zinc-800 dark:text-zinc-200 outline-none">
+                        <option value="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800" <?php echo (strpos($s_val['badge'] ?? '', 'blue') !== false) ? 'selected' : ''; ?>>Blue Badge</option>
+                        <option value="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800" <?php echo (strpos($s_val['badge'] ?? '', 'amber') !== false) ? 'selected' : ''; ?>>Amber Badge</option>
+                        <option value="bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800" <?php echo (strpos($s_val['badge'] ?? '', 'purple') !== false) ? 'selected' : ''; ?>>Purple Badge</option>
+                        <option value="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800" <?php echo (strpos($s_val['badge'] ?? '', 'indigo') !== false) ? 'selected' : ''; ?>>Indigo Badge</option>
+                        <option value="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800" <?php echo (strpos($s_val['badge'] ?? '', 'emerald') !== false) ? 'selected' : ''; ?>>Emerald Badge</option>
+                        <option value="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800" <?php echo (strpos($s_val['badge'] ?? '', 'rose') !== false) ? 'selected' : ''; ?>>Rose Badge</option>
+                        <option value="bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800" <?php echo (strpos($s_val['badge'] ?? '', 'zinc') !== false) ? 'selected' : ''; ?>>Zinc Badge</option>
+                    </select>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="pt-4 flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800">
+            <button type="button" class="px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold rounded-lg text-xs cursor-pointer hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all" onclick="coraResetDefaultStages()">
+                Reset to Default
+            </button>
+            <div class="flex items-center gap-2">
+                <button type="button" class="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold rounded-lg text-xs cursor-pointer" onclick="window.coraCloseAllDrawers()">
+                    Cancel
+                </button>
+                <button type="submit" class="px-5 py-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold rounded-lg text-xs hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all cursor-pointer shadow-sm">
+                    Save Pipeline Columns
+                </button>
+            </div>
         </div>
     </form>
 </aside>

@@ -10741,6 +10741,98 @@ jQuery(document).ready(function($) {
         window.open((window.coraData ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php') + '?action=cora_ajax_export_leads', '_blank');
     };
 
+    // Open Manage Stages Drawer
+    window.coraOpenManageStagesDrawer = function() {
+        if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
+        $('#cora-lead-stages-drawer').removeClass('translate-x-full');
+    };
+
+    // Add New Stage Row in Drawer
+    window.coraAddNewStageRow = function() {
+        const randId = 'Stage_' + Math.floor(Math.random() * 8999 + 1000);
+        const html = `
+        <div class="cora-stage-config-row p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-800/40 space-y-2 relative" data-key="${randId}">
+            <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2 flex-1">
+                    <span class="text-zinc-400 cursor-grab">⋮⋮</span>
+                    <input type="text" class="cora-stage-label-input px-2.5 py-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg font-bold text-zinc-900 dark:text-zinc-100 text-xs w-full outline-none" value="Custom Stage Column" placeholder="Stage Column Title">
+                </div>
+                <label class="flex items-center gap-1.5 text-[11px] text-zinc-500 font-semibold cursor-pointer">
+                    <input type="checkbox" class="cora-stage-enable-checkbox accent-zinc-950 dark:accent-white" checked>
+                    <span>Show</span>
+                </label>
+                <button type="button" class="text-zinc-400 hover:text-rose-600 transition-colors p-1 border-none bg-transparent cursor-pointer" onclick="jQuery(this).closest('.cora-stage-config-row').remove();">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+            </div>
+            <div class="flex items-center justify-between pt-1">
+                <span class="text-[10px] text-zinc-400 font-medium">Stage Key: <code class="font-mono text-zinc-600 dark:text-zinc-300">${randId}</code></span>
+                <select class="cora-stage-badge-select px-2 py-1 text-[10.5px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded text-zinc-800 dark:text-zinc-200 outline-none">
+                    <option value="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800">Blue Badge</option>
+                    <option value="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">Amber Badge</option>
+                    <option value="bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800" selected>Purple Badge</option>
+                    <option value="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800">Indigo Badge</option>
+                    <option value="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800">Emerald Badge</option>
+                    <option value="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800">Rose Badge</option>
+                    <option value="bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800">Zinc Badge</option>
+                </select>
+            </div>
+        </div>`;
+        $('#cora-stages-list-container').append(html);
+    };
+
+    // Save Pipeline Stages Config
+    window.coraSavePipelineStages = function() {
+        const stagesObj = {};
+        $('.cora-stage-config-row').each(function() {
+            const key = $(this).attr('data-key');
+            const label = $(this).find('.cora-stage-label-input').val();
+            const enabled = $(this).find('.cora-stage-enable-checkbox').is(':checked');
+            const badge = $(this).find('.cora-stage-badge-select').val();
+            if (key && label) {
+                stagesObj[key] = {
+                    key: key,
+                    label: label,
+                    enabled: enabled,
+                    badge: badge
+                };
+            }
+        });
+
+        $.ajax({
+            url: window.coraData ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php',
+            type: 'POST',
+            data: {
+                action: 'cora_ajax_save_lead_stages',
+                security: window.coraData ? window.coraData.nonce : '',
+                stages: JSON.stringify(stagesObj)
+            },
+            success: function(res) {
+                if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
+                if (window.coraShowToast) window.coraShowToast('Pipeline stage columns updated!', 'success');
+                setTimeout(() => window.location.reload(), 500);
+            }
+        });
+    };
+
+    // Reset Stages to Default
+    window.coraResetDefaultStages = function() {
+        $.ajax({
+            url: window.coraData ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php',
+            type: 'POST',
+            data: {
+                action: 'cora_ajax_save_lead_stages',
+                security: window.coraData ? window.coraData.nonce : '',
+                reset: 'true'
+            },
+            success: function(res) {
+                if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
+                if (window.coraShowToast) window.coraShowToast('Reset pipeline stages to default.', 'info');
+                setTimeout(() => window.location.reload(), 500);
+            }
+        });
+    };
+
     // Auto-Select Sub-Tab from URL on DOM Ready
     $(document).ready(function() {
         const urlParams = new URLSearchParams(window.location.search);

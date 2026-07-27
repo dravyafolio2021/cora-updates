@@ -22506,6 +22506,43 @@ add_action( 'wp_ajax_cora_generate_financial_pdf_report', 'cora_ajax_generate_fi
  */
 
 /**
+ * AJAX Endpoint: cora_ajax_save_lead_stages
+ */
+if ( ! function_exists( 'cora_ajax_save_lead_stages' ) ) {
+    function cora_ajax_save_lead_stages() {
+        $nonce = '';
+        if ( isset( $_REQUEST['security'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['security'] );
+        } elseif ( isset( $_REQUEST['nonce'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+        } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+        }
+        if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+            wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+        }
+
+        $reset = isset( $_POST['reset'] ) ? sanitize_text_field( $_POST['reset'] ) : '';
+        if ( $reset === 'true' ) {
+            delete_option( 'cora_workspace_lead_stages' );
+            wp_send_json_success( array( 'message' => 'Reset lead pipeline stages to default.' ) );
+        }
+
+        $stages_json = isset( $_POST['stages'] ) ? wp_unslash( $_POST['stages'] ) : '';
+        $stages = json_decode( $stages_json, true );
+
+        if ( is_array( $stages ) && ! empty( $stages ) ) {
+            update_option( 'cora_workspace_lead_stages', $stages );
+            wp_send_json_success( array( 'message' => 'Pipeline stages updated successfully.' ) );
+        } else {
+            wp_send_json_error( array( 'message' => 'Invalid stage configurations received.' ) );
+        }
+    }
+    add_action( 'wp_ajax_cora_ajax_save_lead_stages', 'cora_ajax_save_lead_stages' );
+    add_action( 'wp_ajax_cora_save_lead_stages', 'cora_ajax_save_lead_stages' );
+}
+
+/**
  * AJAX Endpoint: cora_ajax_get_leads_data
  */
 if ( ! function_exists( 'cora_ajax_get_leads_data' ) ) {
