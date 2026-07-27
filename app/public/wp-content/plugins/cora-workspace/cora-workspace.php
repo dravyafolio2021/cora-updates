@@ -2723,6 +2723,12 @@ add_action( 'rest_api_init', function () {
         )
     ) );
 
+    register_rest_route( 'cora/v1', '/forms/bulk', array(
+        'methods'             => 'POST',
+        'callback'            => 'cora_rest_bulk_forms',
+        'permission_callback' => 'is_user_logged_in',
+    ) );
+
     register_rest_route( 'cora/v1', '/forms/submissions', array(
         'methods'             => 'GET',
         'callback'            => 'cora_rest_get_all_form_submissions',
@@ -18715,6 +18721,36 @@ function cora_rest_delete_form( $request ) {
     return rest_ensure_response( array( 'success' => true ) );
 }
 
+function cora_rest_bulk_forms( $request ) {
+    global $wpdb;
+    $params = $request->get_json_params();
+    $action = isset( $params['action'] ) ? sanitize_text_field( $params['action'] ) : '';
+    $raw_ids = isset( $params['ids'] ) && is_array( $params['ids'] ) ? $params['ids'] : array();
+    $ids = array_values( array_filter( array_map( 'intval', $raw_ids ) ) );
+
+    if ( empty( $action ) || empty( $ids ) ) {
+        return new WP_Error( 'bad_request', 'Missing bulk action or valid form IDs', array( 'status' => 400 ) );
+    }
+
+    $id_placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+
+    if ( $action === 'delete' ) {
+        $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}cora_forms WHERE id IN ($id_placeholders)", ...$ids ) );
+        $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}cora_form_blocks WHERE form_id IN ($id_placeholders)", ...$ids ) );
+        $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}cora_form_submissions WHERE form_id IN ($id_placeholders)", ...$ids ) );
+        $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}cora_form_audit_log WHERE form_id IN ($id_placeholders)", ...$ids ) );
+        return rest_ensure_response( array( 'success' => true, 'action' => 'delete', 'count' => count( $ids ) ) );
+    } elseif ( $action === 'publish' ) {
+        $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}cora_forms SET status = 'published', updated_at = NOW() WHERE id IN ($id_placeholders)", ...$ids ) );
+        return rest_ensure_response( array( 'success' => true, 'action' => 'publish', 'count' => count( $ids ) ) );
+    } elseif ( $action === 'draft' ) {
+        $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}cora_forms SET status = 'draft', updated_at = NOW() WHERE id IN ($id_placeholders)", ...$ids ) );
+        return rest_ensure_response( array( 'success' => true, 'action' => 'draft', 'count' => count( $ids ) ) );
+    }
+
+    return new WP_Error( 'invalid_action', 'Invalid bulk action', array( 'status' => 400 ) );
+}
+
 function cora_rest_get_form_submissions( $request ) {
     global $wpdb;
     $id = intval( $request->get_param('id') );
@@ -18867,8 +18903,11 @@ function cora_rest_submit_form( $request ) {
     if ( $form ) {
         $settings = ! empty( $form['settings'] ) ? json_decode( $form['settings'], true ) : array();
 
-        // 4a. CRM Sync mapping (Only for completed/non-partial submissions)
-        if ( ! $is_partial && is_array( $submitted_data ) ) {
+        // 4a. CRM Sync mapping (Only for completed/non-partial submissions when lead capture is enabled)
+        $crm_capture_enabled = isset($settings['crm_lead_capture_enable']) ? (bool) $settings['crm_lead_capture_enable'] : true;
+        $form_purpose        = isset($settings['form_purpose']) ? sanitize_text_field($settings['form_purpose']) : 'lead_capture';
+
+        if ( ! $is_partial && is_array( $submitted_data ) && $crm_capture_enabled && $form_purpose !== 'internal_survey' ) {
             $map_name_key  = $settings['map_crm_name'] ?? '';
             $map_email_key = $settings['map_crm_email'] ?? '';
             $map_phone_key = $settings['map_crm_phone'] ?? '';
@@ -18935,6 +18974,8 @@ function cora_rest_submit_form( $request ) {
                     $branch_id = 1;
                 }
 
+                $source_title = sanitize_text_field( ($form['title'] ?? 'Cora Form') . ' (' . ucfirst(str_replace('_', ' ', $form_purpose)) . ')' );
+
                 $wpdb->insert(
                     $wpdb->prefix . 'cora_leads',
                     array(
@@ -18945,7 +18986,7 @@ function cora_rest_submit_form( $request ) {
                         'email'      => sanitize_email( $email_val ),
                         'phone'      => sanitize_text_field( $phone_val ),
                         'notes'      => sanitize_textarea_field( $notes_val ),
-                        'source'     => sanitize_text_field( $form['title'] ?? 'Cora Web Form' ),
+                        'source'     => $source_title,
                         'status'     => 'new',
                         'created_at' => current_time('mysql'),
                         'updated_at' => current_time('mysql')
@@ -18964,7 +19005,7 @@ function cora_rest_submit_form( $request ) {
                     'names'      => trim( $first_name . ' ' . $last_name ),
                     'email'      => sanitize_email( $email_val ),
                     'phone'      => sanitize_text_field( $phone_val ),
-                    'scale'      => 'Form Submission',
+                    'scale'      => ucfirst(str_replace('_', ' ', $form_purpose)),
                     'city'       => 'Website',
                     'notes'      => sanitize_textarea_field( $notes_val ),
                     'price'      => '₹0',

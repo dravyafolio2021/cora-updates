@@ -63,12 +63,39 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </div>
             </div>
 
+        <!-- Bulk Operations Bar -->
+        <div id="forms-bulk-actions-bar" class="hidden items-center justify-between px-5 py-3 bg-zinc-950 text-white rounded-xl mb-4 transition-all shadow-md">
+            <div class="flex items-center gap-3">
+                <span id="bulk-selected-count" class="text-xs font-semibold text-zinc-200 font-mono">0 selected</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="btn-bulk-publish" class="h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border-0">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Publish Selected
+                </button>
+                <button id="btn-bulk-draft" class="h-8 px-3 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border-0">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path></svg>
+                    Set as Draft
+                </button>
+                <button id="btn-bulk-delete" class="h-8 px-3 rounded-lg bg-red-600/90 hover:bg-red-600 text-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border-0">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    Delete Selected
+                </button>
+                <button id="btn-bulk-clear" class="h-8 px-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white text-xs font-semibold transition-all cursor-pointer border-0" title="Deselect All">
+                    ✕
+                </button>
+            </div>
+        </div>
+
         <!-- Table Container -->
         <div class="bg-white border border-zinc-200/80 rounded-xl overflow-hidden shadow-sm">
             <div class="overflow-x-auto">
                 <table class="w-full border-collapse text-left">
                     <thead>
                         <tr class="bg-zinc-50 border-b border-zinc-200/80">
+                            <th class="w-12 px-4 py-3.5 text-center">
+                                <input type="checkbox" id="select-all-forms" class="w-4 h-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-500 cursor-pointer" title="Select All Forms" />
+                            </th>
                             <th class="px-6 py-3.5 text-xs font-semibold text-zinc-500">Form Title</th>
                             <th class="px-6 py-3.5 text-xs font-semibold text-zinc-500">Status</th>
                             <th class="px-6 py-3.5 text-xs font-semibold text-zinc-500">Responses</th>
@@ -79,7 +106,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <tbody id="forms-list-body" class="divide-y divide-zinc-100">
                         <!-- Loading placeholder / Dynamic rows injection -->
                         <tr>
-                            <td colspan="5" class="px-6 py-8 text-center text-xs text-zinc-400">Loading forms list...</td>
+                            <td colspan="6" class="px-6 py-8 text-center text-xs text-zinc-400">Loading forms list...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -732,12 +759,25 @@ if ( ! defined( 'ABSPATH' ) ) {
                             <input id="settings-upi-id" type="text" placeholder="cora@upi or agency@paytm" class="h-8 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 w-full outline-none" />
                         </div>
                     </div>
-                    <div class="p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 space-y-1.5">
+                    <div class="p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 space-y-2.5">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Cora CRM Auto-Sync</span>
-                            <span class="px-1.5 py-0.5 rounded text-[8.5px] font-bold uppercase bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">Automatic</span>
+                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Cora CRM Lead Capture</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="settings-crm-lead-capture-enable" class="sr-only peer" checked>
+                                <div class="w-8 h-4 bg-zinc-300 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all dark:after:border-zinc-600 peer-checked:bg-zinc-950 dark:peer-checked:bg-white"></div>
+                            </label>
                         </div>
-                        <p class="text-[10.5px] text-zinc-500 leading-relaxed">Form responses automatically parse contact details (Name, Email, Phone, Notes) directly into your Workspace CRM database without requiring manual field key setup.</p>
+                        <p class="text-[10.5px] text-zinc-500 leading-relaxed">Choose whether submissions from this specific form auto-register as CRM Leads.</p>
+                        
+                        <div class="space-y-1 pt-1">
+                            <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Form Purpose & Classification</label>
+                            <select id="settings-form-purpose" class="h-8 px-2 text-xs bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-zinc-100 w-full outline-none">
+                                <option value="lead_capture">Lead Capture / Inquiry Form (Creates CRM Lead)</option>
+                                <option value="campaign_form">Campaign / Landing Page Form (Creates CRM Lead)</option>
+                                <option value="contact_form">General Contact Form (Creates CRM Lead)</option>
+                                <option value="internal_survey">Internal Survey / Feedback (Non-Lead / Skip CRM)</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 space-y-1">
                         <div class="flex items-center justify-between">
@@ -2053,12 +2093,78 @@ function deleteForm(id) {
         }
     };
 
+function getSelectedFormIds() {
+    const ids = [];
+    jQuery('.form-select-checkbox:checked').each(function() {
+        const id = parseInt(jQuery(this).data('id'));
+        if (id) ids.push(id);
+    });
+    return ids;
+}
+
+function updateBulkActionBarState() {
+    const selectedIds = getSelectedFormIds();
+    const bulkBar = document.getElementById('forms-bulk-actions-bar');
+    const countEl = document.getElementById('bulk-selected-count');
+    if (!bulkBar || !countEl) return;
+
+    if (selectedIds.length > 0) {
+        countEl.textContent = `${selectedIds.length} form${selectedIds.length === 1 ? '' : 's'} selected`;
+        bulkBar.classList.remove('hidden');
+        bulkBar.classList.add('flex');
+    } else {
+        bulkBar.classList.add('hidden');
+        bulkBar.classList.remove('flex');
+    }
+}
+
+function executeBulkFormAction(action) {
+    const selectedIds = getSelectedFormIds();
+    if (selectedIds.length === 0) return;
+
+    const performRequest = () => {
+        jQuery.ajax({
+            url: '/wp-json/cora/v1/forms/bulk',
+            method: 'POST',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-WP-Nonce', wpNonce);
+            },
+            data: JSON.stringify({ action: action, ids: selectedIds }),
+            contentType: 'application/json',
+            success: function(res) {
+                const count = selectedIds.length;
+                let msg = '';
+                if (action === 'delete') msg = `${count} form${count === 1 ? '' : 's'} deleted successfully!`;
+                else if (action === 'publish') msg = `${count} form${count === 1 ? '' : 's'} published successfully!`;
+                else if (action === 'draft') msg = `${count} form${count === 1 ? '' : 's'} set to draft!`;
+
+                window.coraShowToast && window.coraShowToast(msg, "success");
+                fetchForms();
+            },
+            error: function(err) {
+                window.coraShowToast && window.coraShowToast("Failed to perform bulk operation.", "error");
+            }
+        });
+    };
+
+    if (action === 'delete') {
+        const count = selectedIds.length;
+        coraConfirmAction(`Are you sure you want to delete ${count} selected form${count === 1 ? '' : 's'} and all associated submissions? This action is permanent.`, performRequest);
+    } else {
+        performRequest();
+    }
+}
+
 function renderFormsList() {
         const body = document.getElementById('forms-list-body');
+        const selectAll = document.getElementById('select-all-forms');
+        if (selectAll) selectAll.checked = false;
+        updateBulkActionBarState();
+
         if (formsData.length === 0) {
             body.innerHTML = `
                 <tr>
-                    <td colspan="5" class="px-6 py-8 text-center text-xs text-zinc-400">No forms found. Create one to get started.</td>
+                    <td colspan="6" class="px-6 py-8 text-center text-xs text-zinc-400">No forms found. Create one to get started.</td>
                 </tr>`;
             return;
         }
@@ -2066,8 +2172,11 @@ function renderFormsList() {
         body.innerHTML = '';
         formsData.forEach(form => {
             const tr = document.createElement('tr');
-            tr.className = 'hover:bg-zinc-50/50';
+            tr.className = 'hover:bg-zinc-50/50 transition-colors';
             tr.innerHTML = `
+                <td class="w-12 px-4 py-4 text-center">
+                    <input type="checkbox" class="form-select-checkbox w-4 h-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-500 cursor-pointer" data-id="${form.id}" />
+                </td>
                 <td class="px-6 py-4 text-xs font-medium text-zinc-900">${form.title}</td>
                 <td class="px-6 py-4 text-xs">
                     <span class="px-2.5 py-0.5 rounded-full text-[9px] font-bold ${(form.status || 'draft') === 'published' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400' : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400'}">
@@ -2098,6 +2207,19 @@ function renderFormsList() {
             `;
             body.appendChild(tr);
         });
+
+        // Re-bind row checkbox change handlers
+        jQuery('.form-select-checkbox').on('change', function() {
+            const total = jQuery('.form-select-checkbox').length;
+            const checked = jQuery('.form-select-checkbox:checked').length;
+            const selectAllEl = document.getElementById('select-all-forms');
+            if (selectAllEl) {
+                selectAllEl.checked = total > 0 && total === checked;
+                selectAllEl.indeterminate = checked > 0 && checked < total;
+            }
+            updateBulkActionBarState();
+        });
+    }
 
         // Attach listeners
         jQuery('.btn-view-live').on('click', function() {
