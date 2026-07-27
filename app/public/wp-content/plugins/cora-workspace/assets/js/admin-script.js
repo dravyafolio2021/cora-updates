@@ -7098,15 +7098,20 @@ jQuery(document).ready(function($) {
 
     window.coraSwitchSidebarTab = function(tab) {
         if (tab === 'seo') {
-            $('#btn-sidebar-seo').removeClass('border-transparent text-zinc-400').addClass('border-zinc-950 text-zinc-900');
-            $('#btn-sidebar-geo').removeClass('border-zinc-950 text-zinc-900').addClass('border-transparent text-zinc-400');
+            $('#btn-sidebar-seo').removeClass('border-transparent text-zinc-450 dark:text-zinc-500 bg-transparent hover:text-zinc-750 dark:hover:text-zinc-350 font-normal')
+                                 .addClass('border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-100 bg-white dark:bg-zinc-900 shadow-2xs font-bold');
+            $('#btn-sidebar-geo').removeClass('border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-100 bg-white dark:bg-zinc-900 shadow-2xs font-bold')
+                                 .addClass('border-transparent text-zinc-450 dark:text-zinc-500 bg-transparent hover:text-zinc-750 dark:hover:text-zinc-350 font-normal');
             $('#panel-sidebar-seo').removeClass('hidden');
             $('#panel-sidebar-geo').addClass('hidden');
         } else {
-            $('#btn-sidebar-geo').removeClass('border-transparent text-zinc-400').addClass('border-zinc-950 text-zinc-900');
-            $('#btn-sidebar-seo').removeClass('border-zinc-950 text-zinc-900').addClass('border-transparent text-zinc-400');
+            $('#btn-sidebar-geo').removeClass('border-transparent text-zinc-450 dark:text-zinc-500 bg-transparent hover:text-zinc-750 dark:hover:text-zinc-350 font-normal')
+                                 .addClass('border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-100 bg-white dark:bg-zinc-900 shadow-2xs font-bold');
+            $('#btn-sidebar-seo').removeClass('border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-100 bg-white dark:bg-zinc-900 shadow-2xs font-bold')
+                                 .addClass('border-transparent text-zinc-450 dark:text-zinc-500 bg-transparent hover:text-zinc-750 dark:hover:text-zinc-350 font-normal');
             $('#panel-sidebar-seo').addClass('hidden');
             $('#panel-sidebar-geo').removeClass('hidden');
+
             
             // Render schema in panel
             coraUpdateSchemaPreview();
@@ -7243,28 +7248,30 @@ jQuery(document).ready(function($) {
         } else {
             text = ($('#cora-quill-editor').text() || '');
         }
-        const textLower = text.toLowerCase();
-        const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
-
         let score = 0;
+        let issues = 0;
         
         // 1. Title Audit
         if (title.length > 5) {
             score += 30;
-            $('#chk-indicator-h1').removeClass('bg-zinc-200 text-zinc-500').addClass('bg-emerald-500 text-white').html('✓');
+            $('#chk-indicator-h1').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60 font-black').html('✓');
         } else {
-            $('#chk-indicator-h1').removeClass('bg-emerald-500 text-white').addClass('bg-zinc-200 text-zinc-500').html('✕');
+            issues++;
+            $('#chk-indicator-h1').removeClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').addClass('bg-red-50 text-red-500 border border-red-200/60 font-black').html('!');
         }
 
         // 2. Meta Description Audit
         if (meta.length >= 80 && meta.length <= 160) {
             score += 35;
-            $('#chk-indicator-meta').removeClass('bg-zinc-200 text-zinc-500').addClass('bg-emerald-500 text-white').html('✓');
+            $('#chk-indicator-meta').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60 font-black').html('✓');
         } else {
-            $('#chk-indicator-meta').removeClass('bg-emerald-500 text-white').addClass('bg-zinc-200 text-zinc-500').html('✕');
+            issues++;
+            $('#chk-indicator-meta').removeClass('bg-emerald-50 text-emerald-600 border-emerald-200/60').addClass('bg-red-50 text-red-500 border border-red-200/60 font-black').html('!');
         }
 
         // 3. Keyword Density Audit
+        const textLower = text.toLowerCase();
+        const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
         let count = 0;
         if (kw && textLower) {
             let pos = textLower.indexOf(kw);
@@ -7277,15 +7284,16 @@ jQuery(document).ready(function($) {
 
         if (count >= 1) {
             score += 35;
-            $('#chk-indicator-density').removeClass('bg-zinc-200 text-zinc-500').addClass('bg-emerald-500 text-white').html('✓');
+            $('#chk-indicator-density').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60 font-black').html('✓');
         } else {
-            $('#chk-indicator-density').removeClass('bg-emerald-500 text-white').addClass('bg-zinc-200 text-zinc-500').html('✕');
+            issues++;
+            $('#chk-indicator-density').removeClass('bg-emerald-50 text-emerald-600 border-emerald-200/60').addClass('bg-red-50 text-red-500 border border-red-200/60 font-black').html('!');
         }
 
         // Show/update badge
         let densityBadge = $('#cora-seo-density-badge');
         if (densityBadge.length === 0) {
-            $('#chk-indicator-density').parent().append('<span id="cora-seo-density-badge" class="ml-auto text-[10px] text-zinc-500 font-mono">0.00%</span>');
+            $('#chk-indicator-density').parent().append('<span id="cora-seo-density-badge" class="ml-auto text-[10px] text-zinc-550 dark:text-zinc-400 font-mono font-bold">0.00%</span>');
             densityBadge = $('#cora-seo-density-badge');
         }
         if (kw && words > 0) {
@@ -7294,10 +7302,41 @@ jQuery(document).ready(function($) {
             densityBadge.addClass('hidden');
         }
 
+        // Update Meta character count display
+        $('#cora-seo-description-count').text(`${meta.length} / 160`);
+
+        // Update Issues Badge
+        const badge = $('#checklist-issues-badge');
+        if (issues > 0) {
+            badge.removeClass('bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30')
+                 .addClass('bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 border border-red-100/50 dark:border-red-900/30')
+                 .text(`${issues} ${issues === 1 ? 'Issue' : 'Issues'}`);
+        } else {
+            badge.removeClass('bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 border-red-100/50 dark:border-red-900/30')
+                 .addClass('bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30')
+                 .text('Optimal');
+        }
+
         // Update display elements
         $('#cora-seo-score-display').text(score);
-        $('#cora-seo-score-ring').attr('stroke-dasharray', `${score}, 100`);
-        $('#cora-seo-status-text').text(score >= 70 ? 'Optimal SEO' : (score >= 30 ? 'Needs Improvement' : 'Poor Optimization'));
+        
+        const $ring = $('#cora-seo-score-ring');
+        $ring.attr('stroke-dasharray', `${score}, 100`);
+        $ring.removeClass('text-zinc-950 text-red-500 text-amber-500 text-emerald-500');
+        
+        const statusText = $('#cora-seo-status-text');
+        statusText.removeClass('text-red-500 text-amber-500 text-emerald-500');
+
+        if (score >= 70) {
+            $ring.addClass('text-emerald-500');
+            statusText.addClass('text-emerald-500').text('Optimal SEO');
+        } else if (score >= 30) {
+            $ring.addClass('text-amber-500');
+            statusText.addClass('text-amber-500').text('Needs Improvement');
+        } else {
+            $ring.addClass('text-red-500');
+            statusText.addClass('text-red-500').text('Poor Optimization');
+        }
 
         // 4. GEO Citations Audit
         const geoTerms = ['delhi', 'ncr', 'vasant vihar', 'saket', 'dwarka', 'gurgaon', 'noida', 'okhla', 'bandra', 'mumbai'];
@@ -7353,8 +7392,9 @@ jQuery(document).ready(function($) {
             else readabilityGrade = 'Graduate (Very Hard)';
         }
 
-        $('#cora-readability-score').text(words > 0 ? freScore : '--');
+        $('#cora-readability-score').text(words > 0 ? `${freScore} / 100` : '0 / 100');
         $('#cora-readability-grade').text(readabilityGrade);
+
     };
 
     window.coraUpdateWordCount = function() {

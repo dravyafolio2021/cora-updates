@@ -8703,16 +8703,16 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
 
                 <!-- TAB 3: SEO & GEO Inspector Tab -->
-                <div id="panel-inspector-seo" class="hidden p-5 space-y-5">
+                <div id="panel-inspector-seo" class="hidden p-4 space-y-4">
                     
                     <!-- Sub Header Tab Switcher (SEO vs GEO) -->
-                    <div class="flex border-b border-zinc-200 bg-zinc-100/70 p-1 rounded-lg select-none text-[10px] font-bold uppercase tracking-wider">
-                        <button type="button" class="flex-1 py-1.5 text-center border-b-2 border-zinc-950 text-zinc-900 cursor-pointer transition-colors flex items-center justify-center gap-1.5 rounded-md bg-white shadow-2xs" id="btn-sidebar-seo" onclick="coraSwitchSidebarTab('seo')">
-                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <div class="flex border-b border-zinc-200 dark:border-zinc-800 bg-[#f9fafb] dark:bg-[#0c0c0e] p-1.5 gap-2 select-none text-[10px] font-bold uppercase tracking-wider">
+                        <button type="button" class="flex-1 py-2 text-center border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-950 dark:text-zinc-100 bg-white dark:bg-zinc-900 shadow-2xs cursor-pointer transition-colors flex items-center justify-center gap-1.5 font-bold" id="btn-sidebar-seo" onclick="coraSwitchSidebarTab('seo')">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                             SEO
                         </button>
-                        <button type="button" class="flex-1 py-1.5 text-center border-b-2 border-transparent text-zinc-400 hover:text-zinc-600 cursor-pointer transition-colors flex items-center justify-center gap-1.5 rounded-md" id="btn-sidebar-geo" onclick="coraSwitchSidebarTab('geo')">
-                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        <button type="button" class="flex-1 py-2 text-center border border-transparent rounded-lg text-zinc-450 dark:text-zinc-500 bg-transparent hover:text-zinc-750 dark:hover:text-zinc-350 cursor-pointer transition-colors flex items-center justify-center gap-1.5" id="btn-sidebar-geo" onclick="coraSwitchSidebarTab('geo')">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-450"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                             GEO / AISEO
                         </button>
                     </div>
@@ -8721,87 +8721,162 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <div id="panel-sidebar-seo" class="space-y-4">
                         
                         <!-- SEO Ring Score Chart -->
-                        <div class="p-4 bg-white border border-zinc-200 rounded-xl flex items-center justify-between shadow-2xs">
-                            <div>
-                                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">SEO Health Score</span>
-                                <span class="text-xs text-zinc-500 font-medium" id="cora-seo-status-text">Analysis Pending</span>
+                        <div class="p-4 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-xl flex items-center justify-between shadow-3xs relative overflow-hidden">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-1">
+                                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">SEO Health Score</span>
+                                    <span class="text-[10px] font-semibold text-zinc-400 cursor-help" title="Score is based on current content analysis">(i)</span>
+                                </div>
+                                <span class="text-xs font-bold text-red-500 block" id="cora-seo-status-text">Poor Optimization</span>
+                                <span class="text-[9px] text-zinc-405 dark:text-zinc-500 block leading-tight">Score is based on current content analysis</span>
                             </div>
                             <div class="relative w-14 h-14 flex items-center justify-center">
                                 <svg class="w-14 h-14 transform -rotate-90" viewBox="0 0 36 36">
-                                    <path class="text-zinc-200" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                    <path id="cora-seo-score-ring" class="text-zinc-950" stroke-dasharray="0, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <path class="text-zinc-150 dark:text-zinc-800" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <path id="cora-seo-score-ring" class="text-red-500 transition-all duration-300" stroke-dasharray="0, 100" stroke-dashoffset="0" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                                 </svg>
-                                <span class="absolute text-xs font-extrabold text-zinc-900" id="cora-seo-score-display">--</span>
+                                <div class="absolute flex flex-col items-center justify-center leading-none text-center">
+                                    <span class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100" id="cora-seo-score-display">0</span>
+                                    <span class="text-[7px] text-zinc-400 dark:text-zinc-500 font-bold mt-0.5">/100</span>
+                                </div>
                             </div>
                         </div>
 
+                        <!-- Focus Keyword -->
                         <div class="space-y-1.5">
-                            <label class="text-[10px] font-medium text-zinc-600 block">Focus Keyword</label>
-                            <input type="text" id="cora-seo-keyword" placeholder="e.g. Property Listings" oninput="coraUpdateSEOAudits()" class="w-full text-xs border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800">
+                            <div class="flex items-center gap-1">
+                                <label class="text-[10px] font-bold text-zinc-550 dark:text-zinc-400 uppercase tracking-wider block">Focus Keyword</label>
+                                <span class="text-[10px] font-semibold text-zinc-400 cursor-help" title="Core search query target for this article">(i)</span>
+                            </div>
+                            <div class="relative">
+                                <input type="text" id="cora-seo-keyword" placeholder="e.g. Property Listings" oninput="coraUpdateSEOAudits()" class="w-full text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 pr-9 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-650 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-350 dark:placeholder:text-zinc-700 shadow-3xs">
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-550 cursor-pointer hover:text-zinc-700 dark:hover:text-zinc-300">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line></svg>
+                                </span>
+                            </div>
                         </div>
 
+                        <!-- Meta Description -->
                         <div class="space-y-1.5">
-                            <label class="text-[10px] font-medium text-zinc-600 block">Meta Description</label>
-                            <textarea id="cora-seo-description" placeholder="Summarize article for search engines..." oninput="coraUpdateSEOAudits()" rows="3" class="w-full text-xs border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-zinc-400 resize-none text-zinc-800 bg-white"></textarea>
+                            <div class="flex items-center gap-1">
+                                <label class="text-[10px] font-bold text-zinc-550 dark:text-zinc-400 uppercase tracking-wider block">Meta Description</label>
+                                <span class="text-[10px] font-semibold text-zinc-400 cursor-help" title="Brief summary snippet shown in search listings">(i)</span>
+                            </div>
+                            <textarea id="cora-seo-description" placeholder="Summarize article for search engines..." oninput="coraUpdateSEOAudits()" rows="3" class="w-full text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-650 resize-none text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-950 placeholder:text-zinc-350 dark:placeholder:text-zinc-700 shadow-3xs"></textarea>
+                            <div class="flex justify-end">
+                                <span id="cora-seo-description-count" class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500">0 / 160</span>
+                            </div>
                         </div>
 
                         <!-- Live SEO Checklist -->
-                        <div class="space-y-2 pt-2 border-t border-zinc-200">
-                            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Live Checklist</span>
-                            <div class="space-y-2 text-xs">
-                                <div class="flex items-center gap-2">
-                                    <span id="chk-indicator-h1" class="w-4 h-4 rounded-full bg-zinc-200 text-zinc-500 flex items-center justify-center text-[10px] font-bold">✕</span>
-                                    <span class="text-zinc-700">Article H1 Title Present</span>
+                        <div class="border border-zinc-200 dark:border-zinc-850 rounded-xl overflow-hidden bg-white dark:bg-zinc-950 p-4 shadow-3xs space-y-3.5">
+                            <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-850 pb-2">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[10px] font-extrabold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Live Checklist</span>
+                                    <button type="button" onclick="coraUpdateSEOAudits()" class="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors border-none bg-transparent cursor-pointer">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                                    </button>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <span id="chk-indicator-meta" class="w-4 h-4 rounded-full bg-zinc-200 text-zinc-500 flex items-center justify-center text-[10px] font-bold">✕</span>
-                                    <span class="text-zinc-700">Meta Description (120-160 chars)</span>
+                                <span class="px-1.5 py-0.5 bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 text-[8px] font-extrabold rounded-md uppercase tracking-wider border border-red-100/50 dark:border-red-900/30" id="checklist-issues-badge">3 Issues</span>
+                            </div>
+
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between p-2 rounded-lg border border-zinc-100 dark:border-zinc-850 bg-zinc-50/30 dark:bg-zinc-900/20 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer" onclick="jQuery('#cora-quill-editor').focus();">
+                                    <div class="flex items-center gap-2">
+                                        <span id="chk-indicator-h1" class="w-4 h-4 rounded-full bg-red-50 text-red-500 border border-red-200/60 flex items-center justify-center text-[9px] font-black">!</span>
+                                        <span class="text-xs text-zinc-700 dark:text-zinc-300 font-semibold">Article H1 Title Present</span>
+                                    </div>
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <span id="chk-indicator-density" class="w-4 h-4 rounded-full bg-zinc-200 text-zinc-500 flex items-center justify-center text-[10px] font-bold">✕</span>
-                                    <span class="text-zinc-700">Keyword Density Optimal</span>
+                                <div class="flex items-center justify-between p-2 rounded-lg border border-zinc-100 dark:border-zinc-850 bg-zinc-50/30 dark:bg-zinc-900/20 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer" onclick="jQuery('#cora-seo-description').focus();">
+                                    <div class="flex items-center gap-2">
+                                        <span id="chk-indicator-meta" class="w-4 h-4 rounded-full bg-red-50 text-red-500 border border-red-200/60 flex items-center justify-center text-[9px] font-black">!</span>
+                                        <span class="text-xs text-zinc-700 dark:text-zinc-300 font-semibold">Meta Description (120-160 chars)</span>
+                                    </div>
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                </div>
+                                <div class="flex items-center justify-between p-2 rounded-lg border border-zinc-100 dark:border-zinc-850 bg-zinc-50/30 dark:bg-zinc-900/20 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer" onclick="jQuery('#cora-seo-keyword').focus();">
+                                    <div class="flex items-center gap-2">
+                                        <span id="chk-indicator-density" class="w-4 h-4 rounded-full bg-red-50 text-red-500 border border-red-200/60 flex items-center justify-center text-[9px] font-black">!</span>
+                                        <span class="text-xs text-zinc-700 dark:text-zinc-300 font-semibold">Keyword Density Optimal</span>
+                                    </div>
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                 </div>
                             </div>
+
+                            <button type="button" class="w-full py-2.5 bg-zinc-950 hover:bg-black dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white font-semibold rounded-lg text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-97 border-none outline-none" onclick="coraAnalyzeSEO()">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                                <span>Run SEO Analysis</span>
+                            </button>
                         </div>
 
-                        <button type="button" class="w-full py-2 text-xs font-bold text-zinc-900 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors cursor-pointer shadow-2xs" onclick="coraAnalyzeSEO()">Run SEO Analysis</button>
-
                         <!-- Free SEO Tools Integration Panel -->
-                        <div class="space-y-4 pt-3 border-t border-zinc-200">
-                            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Advanced SEO Tools</span>
+                        <div class="border border-zinc-200 dark:border-zinc-850 rounded-xl overflow-hidden bg-white dark:bg-zinc-950 p-4 shadow-3xs space-y-4">
+                            <span class="text-[10px] font-extrabold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Advanced SEO Tools</span>
 
                             <!-- Synonym & LSI Finder -->
-                            <div class="space-y-1.5">
-                                <label class="text-[10px] font-medium text-zinc-600 block">Synonym & LSI Finder</label>
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="p-1.5 rounded-lg bg-violet-50 dark:bg-violet-950/30 text-violet-600 dark:text-violet-400 shrink-0 border border-violet-100 dark:border-violet-900/20">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                    </div>
+                                    <span class="text-[11px] font-bold text-zinc-750 dark:text-zinc-350 block">Synonym & LSI Finder</span>
+                                </div>
                                 <div class="flex gap-2">
-                                    <input type="text" id="cora-seo-lsi-input" placeholder="Enter keyword..." class="flex-1 text-xs border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800">
-                                    <button type="button" onclick="coraFindSynonyms()" class="px-3 py-2 bg-zinc-950 text-white rounded-lg text-xs font-bold cursor-pointer hover:bg-zinc-800 transition-colors">Find</button>
+                                    <input type="text" id="cora-seo-lsi-input" placeholder="Enter keyword..." class="flex-1 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg p-2 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-650 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-355 shadow-3xs">
+                                    <button type="button" onclick="coraFindSynonyms()" class="px-3.5 py-2 bg-zinc-950 hover:bg-black dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white font-bold rounded-lg text-xs cursor-pointer transition-colors shadow-3xs border-none outline-none">Find</button>
                                 </div>
                                 <div id="cora-seo-lsi-results" class="flex flex-wrap gap-1.5 pt-1">
                                     <!-- Results dynamically loaded here as tag pills -->
-                                    <span class="text-[10px] text-zinc-400 italic">No suggestions loaded yet.</span>
+                                    <span class="text-[10px] text-zinc-400 dark:text-zinc-550 italic">No suggestions loaded yet.</span>
                                 </div>
                             </div>
+
+                            <div class="h-px bg-zinc-100 dark:bg-zinc-850"></div>
 
                             <!-- Readability Checker -->
-                            <div class="space-y-1.5 pt-2 border-t border-zinc-100">
+                            <div class="space-y-2">
                                 <div class="flex items-center justify-between">
-                                    <label class="text-[10px] font-medium text-zinc-600 block">Readability Score</label>
-                                    <span id="cora-readability-grade" class="px-1.5 py-0.5 bg-zinc-100 text-zinc-800 font-bold rounded text-[9px] uppercase">Grade --</span>
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="p-1.5 rounded-lg bg-violet-50 dark:bg-violet-950/30 text-violet-600 dark:text-violet-400 shrink-0 border border-violet-100 dark:border-violet-900/20">
+                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                                        </div>
+                                        <span class="text-[11px] font-bold text-zinc-750 dark:text-zinc-350 block">Readability Score</span>
+                                    </div>
+                                    <span id="cora-readability-grade" class="px-1.5 py-0.5 bg-violet-50 dark:bg-violet-950 text-violet-650 dark:text-violet-300 font-extrabold rounded text-[8px] tracking-wide uppercase border border-violet-100/50 dark:border-violet-900/20">Grade --</span>
                                 </div>
-                                <div class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-xs flex items-center justify-between">
-                                    <span class="text-zinc-500 font-medium">Flesch Reading Ease:</span>
-                                    <span id="cora-readability-score" class="font-extrabold text-zinc-900">--</span>
+                                <div class="p-2.5 rounded-lg bg-zinc-50/50 dark:bg-zinc-900/20 border border-zinc-150 dark:border-zinc-850 flex items-center justify-between text-xs font-semibold text-zinc-650 dark:text-zinc-350 select-none">
+                                    <div class="flex items-center gap-1">
+                                        <span>Flesch Reading Ease</span>
+                                        <span class="text-[10px] text-zinc-400 cursor-help" title="Flesch Reading Ease Score (0-100)">(i)</span>
+                                    </div>
+                                    <span id="cora-readability-score" class="font-extrabold text-zinc-950 dark:text-zinc-50">0 / 100</span>
                                 </div>
                             </div>
 
+                            <div class="h-px bg-zinc-100 dark:bg-zinc-850"></div>
+
                             <!-- Image Alt Auditor -->
-                            <div class="space-y-1.5 pt-2 border-t border-zinc-100">
-                                <button type="button" onclick="coraAuditImageAlts()" class="w-full py-2 text-xs font-bold text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors cursor-pointer shadow-2xs flex items-center justify-center gap-1.5">
+                            <div class="pt-1">
+                                <button type="button" onclick="coraAuditImageAlts()" class="w-full py-2.5 text-xs font-bold text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100 bg-white hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg transition-colors cursor-pointer shadow-3xs flex items-center justify-center gap-1.5">
                                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                                     Audit Image Alt Tags
                                 </button>
                             </div>
+                        </div>
+
+                        <!-- Footer Promote Card -->
+                        <div class="p-4 bg-violet-50/30 dark:bg-violet-950/10 border border-violet-100/60 dark:border-violet-900/20 rounded-xl flex items-center justify-between gap-3 shadow-3xs">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2.5 rounded-xl bg-violet-100/65 dark:bg-violet-900/35 text-violet-650 dark:text-violet-400 shrink-0 border border-violet-200/30 dark:border-violet-850/20 flex items-center justify-center">
+                                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.71-2.16-.01-2.99l-2.99-3.01z"></path><path d="M12 12l9-9-3 12-6-3-3 3-3-3z"></path></svg>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-zinc-850 dark:text-zinc-250 block">Improve your content</span>
+                                    <span class="text-[9px] text-zinc-450 dark:text-zinc-500 block leading-tight mt-0.5">Fix issues from the checklist to improve your SEO score and rankings.</span>
+                                </div>
+                            </div>
+                            <button type="button" class="px-2.5 py-1.5 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-850 text-zinc-700 dark:text-zinc-300 font-bold rounded-lg text-[9px] tracking-wide uppercase transition-colors shrink-0 cursor-pointer shadow-3xs" onclick="coraSwitchInspectorTab('copilot')">View Suggestions</button>
                         </div>
                     </div>
 
