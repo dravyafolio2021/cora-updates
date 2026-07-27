@@ -7048,6 +7048,9 @@ function cora_ajax_get_article() {
     wp_send_json_success(array(
         'title' => $post->post_title,
         'content' => $post->post_content,
+        'slug' => $post->post_name,
+        'comment_status' => $post->comment_status,
+        'permalink' => get_permalink($post_id),
         'keyword' => $keyword,
         'description' => $description,
         'categories' => $categories,
@@ -7102,6 +7105,13 @@ function cora_ajax_save_article() {
         'post_type'    => 'post'
     );
 
+    if ( isset($_POST['slug']) ) {
+        $post_data['post_name'] = sanitize_title($_POST['slug']);
+    }
+    if ( isset($_POST['comment_status']) ) {
+        $post_data['comment_status'] = sanitize_key($_POST['comment_status']);
+    }
+
     if ($post_id > 0) {
         $post_data['ID'] = $post_id;
         $saved_id = wp_update_post($post_data, true);
@@ -7145,9 +7155,30 @@ function cora_ajax_save_article() {
         update_post_meta($saved_id, '_cora_seo_score', $seo_score);
     }
 
-    wp_send_json_success();
+    wp_send_json_success(array(
+        'post_id' => $saved_id,
+        'slug' => get_post($saved_id)->post_name,
+        'permalink' => get_permalink($saved_id)
+    ));
 }
 add_action( 'wp_ajax_cora_save_article', 'cora_ajax_save_article' );
+
+/**
+ * AJAX Action: Trash Article
+ */
+function cora_ajax_trash_article() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
+    if (!$post_id) wp_send_json_error('Invalid post ID');
+    
+    $result = wp_trash_post($post_id);
+    if ($result) {
+        wp_send_json_success(array('message' => 'Article moved to trash.'));
+    } else {
+        wp_send_json_error('Failed to move article to trash.');
+    }
+}
+add_action( 'wp_ajax_cora_trash_article', 'cora_ajax_trash_article' );
 
 /**
  * AJAX Actions: Review State Management

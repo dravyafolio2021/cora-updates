@@ -6604,6 +6604,9 @@ jQuery(document).ready(function($) {
                     $('#cora-thumbnail-placeholder').removeClass('hidden');
                 }
 
+                $('#cora-article-slug').val(data.slug || '');
+                $('#cora-article-allow-comments').prop('checked', data.comment_status === 'open');
+
                 $('#cora-editor-status').text('Saved');
                 if (window.coraSyncBeehiivInputsFromOriginal) {
                     window.coraSyncBeehiivInputsFromOriginal();
@@ -6809,6 +6812,9 @@ jQuery(document).ready(function($) {
 
         const assignee_id = $('#cora-article-assignee').val() || '0';
 
+        const slug = $('#cora-article-slug').val() || '';
+        const comment_status = $('#cora-article-allow-comments').is(':checked') ? 'open' : 'closed';
+
         $('#cora-editor-status').text('Saving...');
         window.coraShowToast(`Saving article as ${status}...`, 'info');
 
@@ -6825,7 +6831,9 @@ jQuery(document).ready(function($) {
             categories: categories,
             tags: tags,
             thumbnail_id: thumbnail_id,
-            assignee_id: assignee_id
+            assignee_id: assignee_id,
+            slug: slug,
+            comment_status: comment_status
         }, function(response) {
             if (response.success) {
                 $('#cora-editor-status').text('Saved at ' + new Date().toLocaleTimeString());
@@ -6837,6 +6845,30 @@ jQuery(document).ready(function($) {
             }
         });
     };
+
+    window.coraTrashArticle = function() {
+        const id = $('#cora-article-id').val();
+        if (!id) {
+            window.coraShowToast('No active article to move to trash.', 'warning');
+            return;
+        }
+
+        window.coraShowToast('Moving article to trash...', 'info');
+
+        $.post(ajaxurl, {
+            action: 'cora_trash_article',
+            nonce: coraREData.ajaxNonce,
+            post_id: id
+        }, function(response) {
+            if (response.success) {
+                window.coraShowToast('Article successfully moved to trash.', 'success');
+                setTimeout(() => window.location.reload(), 800);
+            } else {
+                window.coraShowToast(response.data || 'Error moving article to trash.', 'error');
+            }
+        });
+    };
+
 
     // --- GEO & AISEO Integration ---
     window.coraSwitchBlogsTab = function(tab) {

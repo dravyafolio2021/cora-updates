@@ -7853,6 +7853,44 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     #cora-full-page-editor { display: none; }
     #cora-full-page-editor:not(.hidden) { display: flex !important; }
     #cora-full-page-editor main { background-color: #FBFaf7 !important; padding: 40px 24px !important; }
+
+    /* Inspector sidebar collapse behavior & transitions */
+    #cora-article-inspector {
+        transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s, border-color 0.2s !important;
+    }
+    #cora-article-inspector.collapsed-inspector {
+        width: 64px !important; /* Collapsed width */
+        overflow: hidden !important;
+    }
+    #cora-article-inspector.collapsed-inspector .inspector-tab-btn {
+        flex-direction: column !important;
+        border-bottom: none !important;
+        border-right: 2px solid transparent !important;
+        padding: 14px 0 !important;
+        justify-content: center !important;
+        border-radius: 0 !important;
+    }
+    #cora-article-inspector.collapsed-inspector .inspector-tab-btn.tab-active {
+        border-right-color: #09090b !important;
+        background-color: #f4f4f5 !important;
+        color: #09090b !important;
+    }
+    .cora-dark-theme #cora-article-inspector.collapsed-inspector .inspector-tab-btn.tab-active {
+        border-right-color: #ffffff !important;
+        background-color: #18181b !important;
+        color: #ffffff !important;
+    }
+    #cora-article-inspector.collapsed-inspector .inspector-tabs-container {
+        flex-direction: column !important;
+        border-bottom: none !important;
+        padding: 10px 0 !important;
+    }
+    #cora-article-inspector.collapsed-inspector .inspector-tab-label,
+    #cora-article-inspector.collapsed-inspector .inspector-tab-soon-badge,
+    #cora-article-inspector.collapsed-inspector [id^="panel-inspector-"] {
+        display: none !important;
+    }
+
     .cora-writing-sheet {
         background-color: #ffffff !important;
         border: 1px solid #e4e4e7 !important;
@@ -8301,21 +8339,21 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             </main>
 
             <!-- Inspector Panel -->
-            <aside id="cora-article-inspector" class="w-[320px] shrink-0 border-l border-zinc-200 bg-white flex flex-col h-full overflow-y-auto transition-all duration-300">
+            <aside id="cora-article-inspector" class="w-[320px] shrink-0 border-l border-zinc-200/85 dark:border-zinc-800/40 bg-[#f9fafb] dark:bg-[#0c0c0e] flex flex-col h-full overflow-y-auto transition-all duration-300">
                 <!-- Inspector Navigation Tabs -->
-                <div class="flex border-b border-zinc-200 bg-white sticky top-0 z-10 text-xs font-semibold">
-                    <button type="button" id="tab-inspector-copilot" onclick="coraSwitchInspectorTab('copilot')" class="flex-1 py-3 px-1 text-center border-b-2 border-zinc-950 text-zinc-900 cursor-pointer transition-colors flex items-center justify-center gap-1">
+                <div class="flex border-b border-zinc-200 dark:border-zinc-800 bg-[#f9fafb] dark:bg-[#0c0c0e] sticky top-0 z-10 text-xs font-semibold inspector-tabs-container">
+                    <button type="button" id="tab-inspector-copilot" onclick="coraSwitchInspectorTab('copilot')" class="flex-1 py-3 px-1 text-center border-b-2 border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 cursor-pointer transition-colors flex items-center justify-center gap-1 inspector-tab-btn tab-active">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
-                        <span>Copilot</span>
-                        <span class="px-1 py-0.5 bg-zinc-200 text-zinc-600 text-[8px] font-bold rounded-full uppercase">SOON</span>
+                        <span class="inspector-tab-label">Copilot</span>
+                        <span class="px-1 py-0.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-[8px] font-bold rounded-full uppercase inspector-tab-soon-badge">SOON</span>
                     </button>
-                    <button type="button" id="tab-inspector-meta" onclick="coraSwitchInspectorTab('meta')" class="flex-1 py-3 px-2 text-center border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 cursor-pointer transition-colors flex items-center justify-center gap-1.5">
+                    <button type="button" id="tab-inspector-meta" onclick="coraSwitchInspectorTab('meta')" class="flex-1 py-3 px-2 text-center border-b-2 border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer transition-colors flex items-center justify-center gap-1.5 inspector-tab-btn">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                        <span>Meta</span>
+                        <span class="inspector-tab-label">Meta</span>
                     </button>
-                    <button type="button" id="tab-inspector-seo" onclick="coraSwitchInspectorTab('seo')" class="flex-1 py-3 px-2 text-center border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 cursor-pointer transition-colors flex items-center justify-center gap-1.5">
+                    <button type="button" id="tab-inspector-seo" onclick="coraSwitchInspectorTab('seo')" class="flex-1 py-3 px-2 text-center border-b-2 border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer transition-colors flex items-center justify-center gap-1.5 inspector-tab-btn">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <span>SEO & GEO</span>
+                        <span class="inspector-tab-label">SEO & GEO</span>
                     </button>
                 </div>
 
@@ -8431,15 +8469,44 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         </div>
 
                         <!-- Editorial Feedback Box -->
-                        <div id="cora-editorial-feedback-box" class="hidden p-3 rounded-lg border border-zinc-300 bg-zinc-100 text-xs text-zinc-800 leading-tight space-y-1">
-                            <div class="flex items-center gap-1.5 font-bold text-zinc-900">
+                        <div id="cora-editorial-feedback-box" class="hidden p-3 rounded-lg border border-zinc-300 bg-zinc-100 dark:bg-zinc-900 text-xs text-zinc-800 dark:text-zinc-200 leading-tight space-y-1">
+                            <div class="flex items-center gap-1.5 font-bold text-zinc-900 dark:text-zinc-100">
                                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                                 <span>Revision Required</span>
                             </div>
-                            <p id="cora-editorial-feedback-text" class="italic text-[11px] text-zinc-600"></p>
+                            <p id="cora-editorial-feedback-text" class="italic text-[11px] text-zinc-600 dark:text-zinc-400"></p>
+                        </div>
+
+                        <!-- Article/Page Settings Group -->
+                        <div class="space-y-3 pt-3 border-t border-zinc-200 dark:border-zinc-850">
+                            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Page Settings</span>
+                            
+                            <!-- URL Slug -->
+                            <div class="space-y-1.5">
+                                <label class="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 block">URL Slug</label>
+                                <input type="text" id="cora-article-slug" placeholder="url-slug-here" class="w-full text-xs border border-zinc-200 dark:border-zinc-850 rounded-lg p-2 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200">
+                            </div>
+
+                            <!-- Allow Comments Toggle -->
+                            <div class="flex items-center justify-between pt-1 select-none">
+                                <span class="text-[10px] font-bold text-zinc-600 dark:text-zinc-400">Allow Comments</span>
+                                <label class="relative inline-flex items-center cursor-pointer select-none">
+                                    <input type="checkbox" id="cora-article-allow-comments" class="sr-only peer">
+                                    <div class="w-8 h-4 bg-zinc-200 dark:bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 dark:after:border-zinc-600 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-zinc-950 dark:peer-checked:bg-white"></div>
+                                </label>
+                            </div>
+
+                            <!-- Move to Trash -->
+                            <div class="pt-2">
+                                <button type="button" onclick="coraTrashArticle()" class="w-full py-2 bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-950/45 text-red-600 dark:text-red-400 border border-red-200/80 dark:border-red-900/60 rounded-lg text-xs font-semibold cursor-pointer transition-colors flex items-center justify-center gap-1.5 active:scale-95 shadow-2xs">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    Move to Trash
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
+
 
                 <!-- TAB 3: SEO & GEO Inspector Tab -->
                 <div id="panel-inspector-seo" class="hidden p-5 space-y-5">
@@ -8664,28 +8731,45 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         <script>
         window.coraToggleArticleInspector = function() {
             const $panel = jQuery('#cora-article-inspector');
-            if ($panel.hasClass('w-[320px]')) {
-                $panel.removeClass('w-[320px]').addClass('w-0 overflow-hidden opacity-0 border-l-0');
-            } else {
-                $panel.removeClass('w-0 overflow-hidden opacity-0 border-l-0').addClass('w-[320px]');
-            }
+            $panel.toggleClass('collapsed-inspector');
+            const isCollapsed = $panel.hasClass('collapsed-inspector');
+            try {
+                localStorage.setItem('cora_article_inspector_collapsed', isCollapsed ? 'true' : 'false');
+            } catch(e) {}
         };
 
         window.coraSwitchInspectorTab = function(tab) {
-            jQuery('#tab-inspector-copilot, #tab-inspector-meta, #tab-inspector-seo').removeClass('border-zinc-950 text-zinc-900').addClass('border-transparent text-zinc-400');
+            const $panel = jQuery('#cora-article-inspector');
+            if ($panel.hasClass('collapsed-inspector')) {
+                $panel.removeClass('collapsed-inspector');
+                try {
+                    localStorage.setItem('cora_article_inspector_collapsed', 'false');
+                } catch(e) {}
+            }
+            jQuery('#tab-inspector-copilot, #tab-inspector-meta, #tab-inspector-seo').removeClass('border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active').addClass('border-transparent text-zinc-400 dark:text-zinc-500');
             jQuery('#panel-inspector-copilot, #panel-inspector-meta, #panel-inspector-seo').addClass('hidden');
             
             if (tab === 'copilot') {
-                jQuery('#tab-inspector-copilot').removeClass('border-transparent text-zinc-400').addClass('border-zinc-950 text-zinc-900');
+                jQuery('#tab-inspector-copilot').removeClass('border-transparent text-zinc-400 dark:text-zinc-500').addClass('border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active');
                 jQuery('#panel-inspector-copilot').removeClass('hidden');
             } else if (tab === 'meta') {
-                jQuery('#tab-inspector-meta').removeClass('border-transparent text-zinc-400').addClass('border-zinc-950 text-zinc-900');
+                jQuery('#tab-inspector-meta').removeClass('border-transparent text-zinc-400 dark:text-zinc-500').addClass('border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active');
                 jQuery('#panel-inspector-meta').removeClass('hidden');
             } else if (tab === 'seo') {
-                jQuery('#tab-inspector-seo').removeClass('border-transparent text-zinc-400').addClass('border-zinc-950 text-zinc-900');
+                jQuery('#tab-inspector-seo').removeClass('border-transparent text-zinc-400 dark:text-zinc-500').addClass('border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active');
                 jQuery('#panel-inspector-seo').removeClass('hidden');
             }
         };
+
+        // Restore inspector collapsed state on load
+        (function() {
+            try {
+                if (localStorage.getItem('cora_article_inspector_collapsed') === 'true') {
+                    jQuery('#cora-article-inspector').addClass('collapsed-inspector');
+                }
+            } catch(e) {}
+        })();
+
 
         window.coraSetEditorFont = function(font) {
             const $ed = jQuery('#cora-quill-editor');
