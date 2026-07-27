@@ -7980,50 +7980,83 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         
         <!-- Modern Header Bar -->
         <header class="flex items-center justify-between px-6 py-3 border-b border-zinc-200 bg-white shrink-0 z-30">
-            <div class="flex items-center gap-4">
-                <button type="button" class="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 transition-colors text-xs font-semibold cursor-pointer py-1 px-2.5 rounded-lg hover:bg-zinc-100" onclick="coraToggleContentDrawer(false)">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <div class="flex items-center gap-3">
+                <button type="button" class="flex items-center gap-1.5 text-zinc-650 hover:text-zinc-900 transition-all text-xs font-semibold cursor-pointer py-1.5 px-3 rounded-lg border border-zinc-250 bg-white hover:bg-zinc-50 active:scale-98 shadow-2xs" onclick="coraToggleContentDrawer(false)">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-450"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                     <span>Back</span>
                 </button>
-                <div class="h-4 w-px bg-zinc-200"></div>
                 
-                <!-- Document Status Indicator -->
-                <div class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-zinc-100 text-xs text-zinc-600 font-medium border border-zinc-200/60">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span id="cora-editor-status">Saved to draft</span>
+                <!-- Document Status Indicator Badge next to Back -->
+                <div class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-50 border border-zinc-200 text-[11px] font-medium text-zinc-650 shadow-3xs">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="cora-editor-status">Saved</span>
                 </div>
 
-                <div class="hidden sm:block h-4 w-px bg-zinc-200"></div>
-
-                <!-- Live Word Count & Estimated Read Time -->
-                <div class="hidden sm:flex items-center gap-2 text-xs text-zinc-500 font-mono">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <!-- Live Word Count & Estimated Read Time metrics next to status -->
+                <div class="hidden sm:flex items-center gap-1.5 text-xs text-zinc-400 font-medium font-sans">
+                    <span>·</span>
                     <span id="cora-editor-metrics">0 words · 0 min read</span>
                 </div>
             </div>
 
             <!-- Primary Action Buttons -->
-            <div class="flex items-center gap-2.5">
-                <button type="button" class="px-3.5 py-1.5 border border-zinc-200 rounded-lg text-zinc-700 bg-white font-semibold hover:bg-zinc-50 transition-all cursor-pointer text-xs active:scale-95 shadow-2xs" onclick="coraSaveArticle('draft')">
-                    Save Draft
-                </button>
-                <button type="button" class="px-3.5 py-1.5 border border-zinc-200 rounded-lg text-zinc-700 bg-white font-semibold hover:bg-zinc-50 transition-all cursor-pointer text-xs active:scale-95 shadow-2xs" onclick="coraPreviewArticle()">
+            <div class="flex items-center gap-2">
+                <!-- Preview Button -->
+                <button type="button" class="px-3.5 py-1.5 border border-zinc-200 rounded-lg text-zinc-700 bg-white font-semibold hover:bg-zinc-50 hover:text-zinc-900 transition-all cursor-pointer text-xs active:scale-95 shadow-2xs flex items-center gap-1.5" onclick="coraPreviewArticle()">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-450"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     Preview
                 </button>
-                <button type="button" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white font-semibold rounded-lg transition-all cursor-pointer text-xs flex items-center gap-1.5 active:scale-95 shadow-xs" id="cora-btn-submit-review" onclick="coraSubmitArticleForReview()">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    Submit for Review
-                </button>
-                <button type="button" class="px-4 py-1.5 bg-zinc-950 text-white font-bold rounded-lg hover:bg-black transition-all cursor-pointer text-xs flex items-center gap-2 shadow-xs active:scale-95 border border-zinc-900" onclick="coraSaveArticle('publish')">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
-                    Publish Live
-                </button>
-                
-                <div class="h-4 w-px bg-zinc-200 mx-1"></div>
+
+                <!-- Split Button for Publish Live -->
+                <div class="relative inline-flex rounded-lg shadow-sm" id="cora-publish-dropdown-wrap">
+                    <button type="button" class="inline-flex items-center px-3.5 py-1.5 bg-zinc-950 text-white font-bold rounded-l-lg hover:bg-black transition-all cursor-pointer text-xs border border-zinc-900 border-r-0 active:scale-95" onclick="coraSaveArticle('publish')">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="mr-1.5"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                        Publish Live
+                    </button>
+                    <button type="button" class="inline-flex items-center px-2.5 py-1.5 bg-zinc-950 text-white font-bold rounded-r-lg hover:bg-black transition-all cursor-pointer text-xs border border-zinc-900 border-l-zinc-800" onclick="window.coraTogglePublishDropdown()">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <!-- Dropdown Menu -->
+                    <div id="cora-publish-dropdown-menu" class="hidden absolute right-0 top-full mt-1.5 w-48 bg-white border border-zinc-200 rounded-xl shadow-xl py-1.5 z-40 text-xs font-semibold text-zinc-700">
+                        <button type="button" class="w-full text-left px-4 py-2 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent" onclick="coraSaveArticle('publish'); window.coraTogglePublishDropdown(false);">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            Publish Immediately
+                        </button>
+                        <button type="button" class="w-full text-left px-4 py-2 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent" onclick="window.coraToggleBeehiivDropdown('visibility'); window.coraTogglePublishDropdown(false);">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                            Schedule Publish...
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Three-dot button ... -->
+                <div class="relative" id="cora-header-more-wrap">
+                    <button type="button" class="p-2 border border-zinc-200 text-zinc-650 hover:text-zinc-900 hover:bg-zinc-50 rounded-lg transition-all cursor-pointer flex items-center justify-center active:scale-95 shadow-2xs" onclick="window.coraToggleHeaderMoreDropdown()">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.8" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                    </button>
+                    <!-- Dropdown Menu -->
+                    <div id="cora-header-more-dropdown-menu" class="hidden absolute right-0 top-full mt-1.5 w-52 bg-white border border-zinc-200 rounded-xl shadow-xl py-1.5 z-40 text-xs font-semibold text-zinc-700">
+                        <button type="button" class="w-full text-left px-4 py-2 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent" onclick="coraSaveArticle('draft'); window.coraToggleHeaderMoreDropdown(false);">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                            Save Draft
+                        </button>
+                        <button type="button" id="cora-btn-submit-review-dropdown" class="w-full text-left px-4 py-2 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent" onclick="coraSubmitArticleForReview(); window.coraToggleHeaderMoreDropdown(false);">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Submit for Review
+                        </button>
+                        <div class="h-px bg-zinc-150 my-1"></div>
+                        <button type="button" class="w-full text-left px-4 py-2 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent" onclick="coraToggleArticleInspector(); window.coraToggleHeaderMoreDropdown(false);">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>
+                            Toggle Inspector Sidebar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="h-4 w-px bg-zinc-200 mx-0.5"></div>
 
                 <!-- Toggle Sidebar Button -->
-                <button type="button" id="cora-btn-toggle-inspector" class="p-2 border border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-all cursor-pointer" title="Toggle Inspector Panel" onclick="coraToggleArticleInspector()">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>
+                <button type="button" id="cora-btn-toggle-inspector" class="p-2 border border-zinc-200 text-zinc-650 hover:text-zinc-900 hover:bg-zinc-50 rounded-lg transition-all cursor-pointer" title="Toggle Inspector Panel" onclick="coraToggleArticleInspector()">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>
                 </button>
             </div>
         </header>
@@ -8173,43 +8206,74 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Toggle: More settings dropdown ... -->
+                            <div class="relative inline-block text-left" id="beehiiv-dropdown-more-wrap">
+                                <button type="button" onclick="window.coraToggleBeehiivDropdown('more')" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-350 hover:bg-zinc-50 rounded-lg text-zinc-700 bg-white transition-all flex items-center gap-1.5 cursor-pointer">
+                                    <span>...</span>
+                                </button>
+                                <div id="beehiiv-dropdown-more" class="hidden absolute left-0 mt-1.5 w-56 bg-white border border-zinc-200 rounded-xl shadow-xl p-3.5 z-40 space-y-2 text-xs font-semibold text-zinc-700">
+                                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">Additional Settings</span>
+                                    <button type="button" class="w-full text-left px-3 py-2 hover:bg-zinc-50 rounded-lg flex items-center gap-2 cursor-pointer border-none bg-transparent" onclick="coraSwitchInspectorTab('seo'); coraToggleArticleInspector(true); window.coraToggleBeehiivDropdown('')">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                        SEO & Meta Audits
+                                    </button>
+                                    <button type="button" class="w-full text-left px-3 py-2 hover:bg-zinc-50 rounded-lg flex items-center gap-2 cursor-pointer border-none bg-transparent" onclick="coraSwitchInspectorTab('meta'); coraToggleArticleInspector(true); window.coraToggleBeehiivDropdown('')">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                        Co-authors & Attribution
+                                    </button>
+                                    <button type="button" class="w-full text-left px-3 py-2 hover:bg-zinc-50 rounded-lg flex items-center gap-2 cursor-pointer border-none bg-transparent" onclick="coraToggleArticleInspector(true); window.coraToggleBeehiivDropdown('')">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                        Editorial History
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
                     <!-- Cover Image Dropzone Header -->
-                    <div id="cora-cover-image-container" class="relative group w-full rounded-2xl overflow-hidden bg-zinc-50 border border-dashed border-zinc-200 hover:border-zinc-400 transition-all min-h-[140px] flex items-center justify-center">
+                    <div id="cora-cover-image-container" class="relative group w-full rounded-2xl overflow-hidden bg-zinc-50 border border-dashed border-zinc-200 hover:border-zinc-350 hover:bg-zinc-100/50 transition-all min-h-[160px] flex items-center justify-center">
                         <img id="cora-cover-image-img" src="" class="hidden w-full h-48 md:h-64 object-cover">
                         
                         <!-- Placeholder when no cover image -->
-                        <div id="cora-cover-image-placeholder" class="flex flex-col items-center gap-2 py-8 text-zinc-400 group-hover:text-zinc-600 cursor-pointer transition-colors" onclick="window.coraMediaSelectTarget = 'cover'; coraOpenMediaLibrary();">
-                            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                            <span class="text-xs font-semibold">+ Add Cover Image</span>
+                        <div id="cora-cover-image-placeholder" class="flex flex-col items-center gap-2.5 py-12 text-zinc-400 group-hover:text-zinc-650 cursor-pointer transition-colors w-full h-full text-center px-4" onclick="window.coraMediaSelectTarget = 'cover'; coraOpenMediaLibrary();">
+                            <div class="p-3 bg-zinc-100 rounded-full text-zinc-400 group-hover:bg-zinc-200/60 group-hover:text-zinc-650 transition-all">
+                                <!-- Landscape Icon -->
+                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none" class="text-current"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                            </div>
+                            <div class="flex flex-col items-center gap-0.5 select-none">
+                                <span class="text-xs font-semibold text-zinc-800">Add Cover Image</span>
+                                <span class="text-[11px] text-zinc-400">Recommended: 16:9 ratio, up to 5MB</span>
+                            </div>
                         </div>
 
                         <!-- Hover Controls Bar -->
-                        <div id="cora-cover-image-controls" class="absolute bottom-3 right-3 hidden group-hover:flex items-center gap-1.5 bg-zinc-950/80 backdrop-blur-md text-white p-1.5 rounded-xl shadow-lg border border-white/10">
-                            <button type="button" class="px-2.5 py-1 text-[11px] font-medium hover:bg-white/20 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer" onclick="window.coraMediaSelectTarget = 'cover'; coraOpenMediaLibrary();">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                        <div id="cora-cover-image-controls" class="absolute bottom-3 right-3 hidden group-hover:flex items-center gap-1.5 bg-zinc-950/85 backdrop-blur-md text-white p-1.5 rounded-xl shadow-lg border border-white/10 z-10">
+                            <button type="button" class="px-2.5 py-1 text-[11px] font-semibold hover:bg-white/20 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer border-none bg-transparent" onclick="window.coraMediaSelectTarget = 'cover'; coraOpenMediaLibrary();">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                                 Add Cover Image
                             </button>
-                            <button type="button" class="px-2.5 py-1 text-[11px] font-medium hover:bg-white/20 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer" onclick="window.coraShowToast('Drag cover image to reposition', 'info')">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="15 19 12 22 9 19"></polyline><polyline points="19 9 22 12 19 15"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>
+                            <button type="button" class="px-2.5 py-1 text-[11px] font-semibold hover:bg-white/20 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer border-none bg-transparent" onclick="window.coraShowToast('Drag cover image to reposition', 'info')">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="15 19 12 22 9 19"></polyline><polyline points="19 9 22 12 19 15"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>
                                 Reposition
                             </button>
-                            <button type="button" class="px-2.5 py-1 text-[11px] font-medium hover:bg-red-500/30 text-red-300 hover:text-white rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer" onclick="coraRemoveCoverImage()">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            <button type="button" class="px-2.5 py-1 text-[11px] font-semibold hover:bg-red-500/30 text-red-300 hover:text-white rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer border-none bg-transparent" onclick="coraRemoveCoverImage()">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                                 Remove
                             </button>
                         </div>
                     </div>
 
                     <!-- Typography Switcher & Helper Bar -->
-                    <div class="flex items-center justify-between pb-2 border-b border-zinc-100 select-none">
-                        <div class="flex items-center gap-1 bg-zinc-100 p-1 rounded-lg">
-                            <button type="button" id="cora-font-serif-btn" onclick="coraSetEditorFont('serif')" class="px-3 py-1 rounded-md text-xs font-serif font-bold text-zinc-900 bg-white shadow-xs cursor-pointer transition-all">Serif</button>
-                            <button type="button" id="cora-font-sans-btn" onclick="coraSetEditorFont('sans')" class="px-3 py-1 rounded-md text-xs font-sans font-medium text-zinc-500 hover:text-zinc-900 cursor-pointer transition-all">Sans-Serif</button>
+                    <div class="flex items-center justify-between pb-2.5 border-b border-zinc-100 select-none">
+                        <div class="flex items-center gap-0.5 bg-zinc-100/80 p-0.5 rounded-lg border border-zinc-200/50">
+                            <button type="button" id="cora-font-serif-btn" onclick="coraSetEditorFont('serif')" class="px-3 py-1 rounded-md text-xs font-serif font-bold text-zinc-900 bg-white shadow-sm border border-zinc-200/20 cursor-pointer transition-all active:scale-95">Serif</button>
+                            <button type="button" id="cora-font-sans-btn" onclick="coraSetEditorFont('sans')" class="px-3 py-1 rounded-md text-xs font-sans font-medium text-zinc-500 hover:text-zinc-800 hover:bg-zinc-50/50 cursor-pointer transition-all active:scale-95">Sans-Serif</button>
                         </div>
-                        <span class="text-[11px] text-zinc-400 font-medium">Distraction-Free Medium Canvas</span>
+                        <span class="text-[11px] text-zinc-400 font-medium flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
+                            Distraction-Free Canvas
+                        </span>
                     </div>
 
                     <!-- Sticky Editorial Banner -->
@@ -8245,6 +8309,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     
                     <!-- Title Input -->
                     <input type="text" id="cora-article-title" placeholder="Article Title" oninput="coraUpdateWordCount()" class="text-4xl md:text-5xl font-extrabold text-zinc-900 placeholder:text-zinc-300 w-full border-none focus:ring-0 focus:outline-none bg-transparent leading-tight tracking-tight mb-2">
+                    
+                    <!-- Subtitle/Summary Input Field -->
+                    <input type="text" id="cora-article-subtitle" placeholder="Add a subtitle or summary for your article..." class="text-lg md:text-xl font-medium text-zinc-550 placeholder:text-zinc-300 w-full border-none focus:ring-0 focus:outline-none bg-transparent leading-relaxed tracking-tight mb-4">
                     
                     <!-- Slash Command Hint -->
                     <div class="flex items-center gap-2 py-2 px-3 bg-zinc-50 border border-zinc-200/80 rounded-xl text-xs text-zinc-500 font-mono select-none">
@@ -8359,52 +8426,108 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                 <!-- TAB 1: Copilot & AI Tab -->
                 <div id="panel-inspector-copilot" class="p-5 space-y-5">
-                    <div class="space-y-1">
+                    <!-- AI Studio Assistant Card -->
+                    <div class="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 space-y-3 shadow-2xs">
                         <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">AI Studio Assistant</span>
-                            <span class="px-1.5 py-0.5 bg-zinc-200 text-zinc-600 text-[9px] font-bold rounded-full uppercase tracking-wider">Coming Soon</span>
+                            <div class="flex items-center gap-1.5">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" class="text-zinc-600 dark:text-zinc-400"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                                <span class="text-[10px] font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">AI Studio Assistant</span>
+                            </div>
+                            <span class="px-1.5 py-0.5 bg-zinc-200/80 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-450 text-[9px] font-extrabold rounded-full uppercase tracking-wider">Coming Soon</span>
                         </div>
-                        <p class="text-xs text-zinc-500">Accelerate drafting, tone refinement, and automated content generation.</p>
-                    </div>
-
-                    <div class="space-y-2">
-                        <button type="button" class="w-full py-2.5 px-3 bg-zinc-950 hover:bg-black text-white font-semibold rounded-lg text-xs transition-all flex items-center justify-between gap-2 cursor-pointer shadow-xs active:scale-95 border border-zinc-900" onclick="coraGenerateArticleAI()">
+                        <p class="text-xs text-zinc-550 dark:text-zinc-450 leading-relaxed">Accelerate drafting, tone refinement, and automated content generation.</p>
+                        
+                        <button type="button" class="w-full py-2 px-3 bg-zinc-950 hover:bg-black dark:bg-zinc-800 dark:hover:bg-zinc-750 text-white font-semibold rounded-lg text-xs transition-all flex items-center justify-between gap-2 cursor-pointer shadow-xs active:scale-97 border border-zinc-900 dark:border-zinc-700" onclick="coraGenerateArticleAI()">
                             <div class="flex items-center gap-2">
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
                                 <span>Write with AI</span>
                             </div>
-                            <span class="px-1.5 py-0.5 bg-zinc-800 text-zinc-300 text-[9px] font-bold rounded-full uppercase tracking-wider">SOON</span>
-                        </button>
-                        
-                        <div class="grid grid-cols-2 gap-2 pt-1">
-                            <button type="button" class="py-2 px-2.5 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-800 font-medium rounded-lg text-xs transition-colors flex items-center justify-between gap-1 cursor-pointer shadow-2xs" onclick="coraAIToneImprove()">
-                                <div class="flex items-center gap-1">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-                                    <span>Tone</span>
-                                </div>
-                                <span class="px-1 py-0.5 bg-emerald-50 text-emerald-600 border border-emerald-200 text-[8px] font-extrabold rounded-full">ACTIVE</span>
-                            </button>
-                            <button type="button" class="py-2 px-2.5 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-800 font-medium rounded-lg text-xs transition-colors flex items-center justify-between gap-1 cursor-pointer shadow-2xs" onclick="coraAIFixGrammar()">
-                                <div class="flex items-center gap-1">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                    <span>Grammar</span>
-                                </div>
-                                <span class="px-1 py-0.5 bg-emerald-50 text-emerald-600 border border-emerald-200 text-[8px] font-extrabold rounded-full">ACTIVE</span>
-                            </button>
-                        </div>
-
-                        <button type="button" class="w-full py-2 px-3 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-800 font-medium rounded-lg text-xs transition-colors flex items-center justify-between gap-2 cursor-pointer shadow-2xs" onclick="coraAIGenerateExcerpt()">
-                            <div class="flex items-center gap-2">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="21" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="18" y1="18" x2="3" y2="18"></line></svg>
-                                <span>Auto-Generate Excerpt</span>
-                            </div>
+                            <span class="px-1.5 py-0.5 bg-zinc-800 dark:bg-zinc-700 text-zinc-300 dark:text-zinc-400 text-[8px] font-extrabold rounded-full uppercase tracking-wider">SOON</span>
                         </button>
                     </div>
 
-                    <!-- Excerpt Textarea -->
-                    <div class="space-y-1.5 pt-3 border-t border-zinc-200">
-                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Post Excerpt</label>
-                        <textarea id="cora-article-excerpt" rows="3" placeholder="Summary snippet for search results and social previews..." class="w-full text-xs border border-zinc-200 rounded-lg p-2.5 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800 placeholder:text-zinc-300 resize-none"></textarea>
+                    <!-- Smart Editing Tools -->
+                    <div class="space-y-2">
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Smart Editing Tools</span>
+                        <div class="divide-y divide-zinc-150 dark:divide-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden bg-white dark:bg-zinc-950 shadow-2xs">
+                            <!-- Tone -->
+                            <button type="button" onclick="coraAIToneImprove()" class="w-full flex items-center justify-between p-3 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer text-left border-none outline-none">
+                                <div class="flex items-center gap-2.5">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 dark:text-zinc-400"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                                    <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Tone</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-900/60 text-[8px] font-extrabold rounded-full tracking-wide uppercase">Active</span>
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 dark:text-zinc-500"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                </div>
+                            </button>
+
+                            <!-- Grammar -->
+                            <button type="button" onclick="coraAIFixGrammar()" class="w-full flex items-center justify-between p-3 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer text-left border-none outline-none">
+                                <div class="flex items-center gap-2.5">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 dark:text-zinc-400"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Grammar</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-900/60 text-[8px] font-extrabold rounded-full tracking-wide uppercase">Active</span>
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 dark:text-zinc-500"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                </div>
+                            </button>
+
+                            <!-- Auto-Generate Excerpt -->
+                            <button type="button" onclick="coraAIGenerateExcerpt()" class="w-full flex items-center justify-between p-3 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer text-left border-none outline-none">
+                                <div class="flex items-center gap-2.5">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 dark:text-zinc-400"><line x1="21" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="18" y1="18" x2="3" y2="18"></line></svg>
+                                    <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Auto-Generate Excerpt</span>
+                                </div>
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 dark:text-zinc-500"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Content Insights -->
+                    <div class="space-y-2">
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Content Insights</span>
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <!-- Words -->
+                            <div class="p-3.5 rounded-xl bg-violet-50/50 dark:bg-violet-950/20 border border-violet-100/80 dark:border-violet-900/30 text-violet-850 dark:text-violet-300">
+                                <span class="text-[10px] font-bold uppercase tracking-wider block opacity-75">Words</span>
+                                <span id="insight-words-count" class="text-xl font-extrabold tracking-tight mt-0.5 block">0</span>
+                            </div>
+                            <!-- Read Time -->
+                            <div class="p-3.5 rounded-xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-100/80 dark:border-amber-900/30 text-amber-850 dark:text-amber-300">
+                                <span class="text-[10px] font-bold uppercase tracking-wider block opacity-75">Read Time</span>
+                                <span id="insight-read-time" class="text-xl font-extrabold tracking-tight mt-0.5 block">0 min</span>
+                            </div>
+                            <!-- Headings -->
+                            <div class="p-3.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100/80 dark:border-emerald-900/30 text-emerald-850 dark:text-emerald-300">
+                                <span class="text-[10px] font-bold uppercase tracking-wider block opacity-75">Headings</span>
+                                <span id="insight-headings-count" class="text-xl font-extrabold tracking-tight mt-0.5 block">0</span>
+                            </div>
+                            <!-- Images -->
+                            <div class="p-3.5 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100/80 dark:border-blue-900/30 text-blue-850 dark:text-blue-300">
+                                <span class="text-[10px] font-bold uppercase tracking-wider block opacity-75">Images</span>
+                                <span id="insight-images-count" class="text-xl font-extrabold tracking-tight mt-0.5 block">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Post Excerpt -->
+                    <div class="space-y-2 pt-4 border-t border-zinc-150 dark:border-zinc-800">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-1">
+                                <label class="text-[10px] font-bold text-zinc-550 dark:text-zinc-400 uppercase tracking-wider">Post Excerpt</label>
+                                <span class="text-[10px] font-semibold text-zinc-400 cursor-help" title="A summary snippet for search results and social media previews.">(?)</span>
+                            </div>
+                            <button type="button" onclick="coraAIGenerateExcerpt()" class="px-2.5 py-1 bg-zinc-950 hover:bg-black dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white font-semibold rounded-md text-[10px] transition-all flex items-center gap-1 cursor-pointer shadow-3xs active:scale-95 border-none outline-none">
+                                <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" class="text-amber-400"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                                <span>Generate</span>
+                            </button>
+                        </div>
+                        <textarea id="cora-article-excerpt" rows="3" placeholder="Summary snippet for search results and social previews..." class="w-full text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-650 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-300 dark:placeholder:text-zinc-750 resize-none"></textarea>
+                        <div class="flex justify-end">
+                            <span id="cora-excerpt-char-count" class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500">0 / 160 characters</span>
+                        </div>
                     </div>
                 </div>
 
@@ -8729,6 +8852,144 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         </div>
 
         <script>
+        // Custom Workspace Editor Overrides
+        (function() {
+            // Redefine window.coraToggleBeehiivDropdown to support 'more'
+            window.coraToggleBeehiivDropdown = function(type) {
+                const types = ['title-subtitle', 'visibility', 'authors', 'thumbnail', 'tags', 'more'];
+                types.forEach(t => {
+                    if (t === type) {
+                        jQuery(`#beehiiv-dropdown-${t}`).toggleClass('hidden');
+                    } else {
+                        jQuery(`#beehiiv-dropdown-${t}`).addClass('hidden');
+                    }
+                });
+            };
+
+            // Custom Font Switcher Toggle Styling
+            window.coraSetEditorFont = function(font) {
+                const $ed = jQuery('#cora-quill-editor');
+                const serifBtn = jQuery('#cora-font-serif-btn');
+                const sansBtn = jQuery('#cora-font-sans-btn');
+                
+                if (font === 'sans') {
+                    $ed.removeClass('cora-serif-editor').addClass('cora-sans-editor');
+                    sansBtn.addClass('bg-white text-zinc-900 font-bold shadow-sm border border-zinc-200/20')
+                           .removeClass('text-zinc-500 font-medium hover:text-zinc-800 hover:bg-zinc-50/50');
+                    serifBtn.removeClass('bg-white text-zinc-900 font-bold shadow-sm border border-zinc-200/20')
+                            .addClass('text-zinc-500 font-medium hover:text-zinc-800 hover:bg-zinc-50/50');
+                } else {
+                    $ed.removeClass('cora-sans-editor').addClass('cora-serif-editor');
+                    serifBtn.addClass('bg-white text-zinc-900 font-bold shadow-sm border border-zinc-200/20')
+                           .removeClass('text-zinc-500 font-medium hover:text-zinc-800 hover:bg-zinc-50/50');
+                    sansBtn.removeClass('bg-white text-zinc-900 font-bold shadow-sm border border-zinc-200/20')
+                           .addClass('text-zinc-500 font-medium hover:text-zinc-800 hover:bg-zinc-50/50');
+                }
+            };
+
+            // Header Actions Dropdowns
+            window.coraTogglePublishDropdown = function(forceState) {
+                const menu = jQuery('#cora-publish-dropdown-menu');
+                if (forceState === false) {
+                    menu.addClass('hidden');
+                } else {
+                    menu.toggleClass('hidden');
+                    jQuery('#cora-header-more-dropdown-menu').addClass('hidden');
+                }
+            };
+
+            window.coraToggleHeaderMoreDropdown = function(forceState) {
+                const menu = jQuery('#cora-header-more-dropdown-menu');
+                if (forceState === false) {
+                    menu.addClass('hidden');
+                } else {
+                    menu.toggleClass('hidden');
+                    jQuery('#cora-publish-dropdown-menu').addClass('hidden');
+                }
+            };
+
+            // Wrap coraSelectMedia to sync cover target with post thumbnail ID
+            const originalSelectMedia = window.coraSelectMedia;
+            window.coraSelectMedia = function(id, url) {
+                if (window.coraMediaSelectTarget === 'cover') {
+                    jQuery('#cora-thumbnail-id').val(id);
+                    jQuery('#cora-thumbnail-img').attr('src', url).removeClass('hidden');
+                    jQuery('#cora-thumbnail-placeholder').addClass('hidden');
+                    // Sync with Beehiiv bar thumbnail uploader preview
+                    jQuery('#cora-thumbnail-img-bh').attr('src', url).removeClass('hidden');
+                    jQuery('#cora-thumbnail-placeholder-bh').addClass('hidden');
+                }
+                if (typeof originalSelectMedia === 'function') {
+                    originalSelectMedia(id, url);
+                }
+            };
+
+            // Wrap coraRemoveCoverImage to clear post thumbnail
+            const originalRemoveCoverImage = window.coraRemoveCoverImage;
+            window.coraRemoveCoverImage = function() {
+                if (typeof originalRemoveCoverImage === 'function') {
+                    originalRemoveCoverImage();
+                }
+                jQuery('#cora-thumbnail-id').val('');
+                jQuery('#cora-thumbnail-img').addClass('hidden').attr('src', '');
+                jQuery('#cora-thumbnail-placeholder').removeClass('hidden');
+                jQuery('#cora-thumbnail-img-bh').addClass('hidden').attr('src', '');
+                jQuery('#cora-thumbnail-placeholder-bh').removeClass('hidden');
+            };
+
+            // Intercept AJAX Save to inject subtitle parameter
+            jQuery.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+                if (options.data && typeof options.data === 'string' && options.data.indexOf('action=cora_save_article') !== -1) {
+                    options.data += '&subtitle=' + encodeURIComponent(jQuery('#cora-article-subtitle').val() || '');
+                } else if (options.data && typeof options.data === 'object' && options.data.action === 'cora_save_article') {
+                    options.data.subtitle = jQuery('#cora-article-subtitle').val() || '';
+                }
+            });
+
+            // Intercept AJAX Get response to populate subtitle and cover images
+            jQuery(document).ajaxSuccess(function(event, xhr, settings, data) {
+                if (settings.data && settings.data.indexOf('action=cora_get_article') !== -1) {
+                    if (data.success && data.data) {
+                        jQuery('#cora-article-subtitle').val(data.data.subtitle || '');
+                        jQuery('#cora-article-excerpt-bh').val(data.data.subtitle || '');
+                        
+                        if (data.data.thumbnail_url) {
+                            jQuery('#cora-cover-image-img').attr('src', data.data.thumbnail_url).removeClass('hidden');
+                            jQuery('#cora-cover-image-placeholder').addClass('hidden');
+                            jQuery('#cora-article-cover-url').val(data.data.thumbnail_url);
+                        } else {
+                            jQuery('#cora-cover-image-img').addClass('hidden').attr('src', '');
+                            jQuery('#cora-cover-image-placeholder').removeClass('hidden');
+                            jQuery('#cora-article-cover-url').val('');
+                        }
+                    }
+                }
+            });
+
+            // Sync subtitle and Beehiiv card excerpt input in real-time
+            jQuery(document).ready(function() {
+                jQuery('#cora-article-subtitle').on('input', function() {
+                    jQuery('#cora-article-excerpt-bh').val(jQuery(this).val());
+                });
+                jQuery('#cora-article-excerpt-bh').on('input', function() {
+                    jQuery('#cora-article-subtitle').val(jQuery(this).val());
+                });
+            });
+
+            // Close dropdowns on click outside
+            jQuery(document).on('click', function(e) {
+                if (!jQuery(e.target).closest('#cora-publish-dropdown-wrap').length) {
+                    jQuery('#cora-publish-dropdown-menu').addClass('hidden');
+                }
+                if (!jQuery(e.target).closest('#cora-header-more-wrap').length) {
+                    jQuery('#cora-header-more-dropdown-menu').addClass('hidden');
+                }
+                if (!jQuery(e.target).closest('#beehiiv-dropdown-title-subtitle-wrap, #beehiiv-dropdown-visibility-wrap, #beehiiv-dropdown-authors-wrap, #beehiiv-dropdown-thumbnail-wrap, #beehiiv-dropdown-tags-wrap, #beehiiv-dropdown-more-wrap').length) {
+                    window.coraToggleBeehiivDropdown('');
+                }
+            });
+        })();
+
         window.coraToggleArticleInspector = function() {
             const $panel = jQuery('#cora-article-inspector');
             $panel.toggleClass('collapsed-inspector');
@@ -8787,11 +9048,26 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         // Editor helper functions are loaded from assets/js/admin-script.js
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Real-time character count on excerpt text area
+            jQuery(document).on('input propertychange change', '#cora-article-excerpt', function() {
+                if (typeof window.coraUpdateExcerptCount === 'function') {
+                    window.coraUpdateExcerptCount();
+                }
+            });
+
             setTimeout(function() {
                 if (window.coraQuillListingCoordinator) {
                     window.coraQuillListingCoordinator.on('text-change', function() {
                         window.coraUpdateWordCount();
                     });
+                }
+                
+                // Initialize metrics and counters
+                if (typeof window.coraUpdateWordCount === 'function') {
+                    window.coraUpdateWordCount();
+                }
+                if (typeof window.coraUpdateExcerptCount === 'function') {
+                    window.coraUpdateExcerptCount();
                 }
             }, 1500);
         });

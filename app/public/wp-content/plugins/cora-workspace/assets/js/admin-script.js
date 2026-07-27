@@ -7358,17 +7358,43 @@ jQuery(document).ready(function($) {
     };
 
     window.coraUpdateWordCount = function() {
-        let text = $('#cora-article-title').val() || '';
+        let text = '';
         if (window.coraQuillListingCoordinator) {
-            text += ' ' + (window.coraQuillListingCoordinator.getText() || '');
+            text = window.coraQuillListingCoordinator.getText() || '';
         } else {
-            text += ' ' + ($('#cora-quill-editor').text() || '');
+            text = $('#cora-quill-editor').text() || '';
         }
         const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
-        const mins = Math.max(1, Math.ceil(words / 200));
+        const mins = Math.ceil(words / 200);
+        
+        // Update header metrics
         $('#cora-editor-metrics').text(`${words} words · ${mins} min read`);
         
+        // Update Content Insights grid
+        $('#insight-words-count').text(words);
+        $('#insight-read-time').text(`${mins} min`);
+        
+        let headings = 0;
+        let images = 0;
+        
+        if (window.coraQuillListingCoordinator && window.coraQuillListingCoordinator.root) {
+            headings = window.coraQuillListingCoordinator.root.querySelectorAll('h2, h3, h4').length;
+            images = window.coraQuillListingCoordinator.root.querySelectorAll('img').length;
+        } else {
+            headings = $('#cora-quill-editor').find('h2, h3, h4').length;
+            images = $('#cora-quill-editor').find('img').length;
+        }
+        
+        $('#insight-headings-count').text(headings);
+        $('#insight-images-count').text(images);
+
         coraUpdateSEOAudits();
+    };
+
+    window.coraUpdateExcerptCount = function() {
+        const val = $('#cora-article-excerpt').val() || '';
+        const len = val.length;
+        $('#cora-excerpt-char-count').text(`${len} / 160 characters`);
     };
 
     window.coraRemoveCoverImage = function() {
@@ -7501,7 +7527,7 @@ jQuery(document).ready(function($) {
                 summary = summary.substring(0, 152).trim() + '...';
             }
 
-            $('#cora-article-excerpt').val(summary);
+            $('#cora-article-excerpt').val(summary).trigger('input');
             window.coraShowToast('Excerpt generated successfully based on content semantics.', 'success');
         }, 800);
     };
@@ -7854,7 +7880,7 @@ jQuery(document).ready(function($) {
 
     window.coraApplyBeehiivChanges = function(type) {
         if (type === 'title-subtitle') {
-            $('#cora-article-excerpt').val($('#cora-article-excerpt-bh').val());
+            $('#cora-article-excerpt').val($('#cora-article-excerpt-bh').val()).trigger('input');
         } else if (type === 'visibility') {
             $('#cora-article-scheduled-date').val($('#cora-article-scheduled-date-bh').val());
             const statusVal = $('#cora-article-status-bh').val();

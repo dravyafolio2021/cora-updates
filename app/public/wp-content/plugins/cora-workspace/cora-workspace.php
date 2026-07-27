@@ -7034,6 +7034,7 @@ function cora_ajax_get_article() {
     $post = get_post($post_id);
     if (!$post) wp_send_json_error('Post not found');
 
+    $subtitle = get_post_meta($post_id, '_cora_article_subtitle', true);
     $keyword = get_post_meta($post_id, '_cora_seo_keyword', true);
     $description = get_post_meta($post_id, '_cora_seo_description', true);
     $assignee_id = get_post_meta($post_id, '_cora_assignee_id', true) ?: '';
@@ -7051,6 +7052,7 @@ function cora_ajax_get_article() {
         'slug' => $post->post_name,
         'comment_status' => $post->comment_status,
         'permalink' => get_permalink($post_id),
+        'subtitle' => $subtitle,
         'keyword' => $keyword,
         'description' => $description,
         'categories' => $categories,
@@ -7074,6 +7076,7 @@ function cora_ajax_save_article() {
     $title = isset($_POST['title']) ? sanitize_text_field($_POST['title']) : '';
     $content = isset($_POST['content']) ? wp_kses_post($_POST['content']) : '';
     $status = isset($_POST['status']) && $_POST['status'] === 'publish' ? 'publish' : 'draft';
+    $subtitle = isset($_POST['subtitle']) ? sanitize_text_field($_POST['subtitle']) : '';
     $keyword = isset($_POST['keyword']) ? sanitize_text_field($_POST['keyword']) : '';
     $description = isset($_POST['description']) ? sanitize_textarea_field($_POST['description']) : '';
     $seo_score = isset($_POST['seo_score']) ? intval($_POST['seo_score']) : '';
@@ -7140,6 +7143,7 @@ function cora_ajax_save_article() {
 
     update_post_meta($saved_id, '_cora_seo_keyword', $keyword);
     update_post_meta($saved_id, '_cora_seo_description', $description);
+    update_post_meta($saved_id, '_cora_article_subtitle', $subtitle);
     update_post_meta($saved_id, '_cora_assignee_id', $assignee_id);
     update_post_meta($saved_id, '_cora_editorial_feedback', $editorial_feedback);
 
