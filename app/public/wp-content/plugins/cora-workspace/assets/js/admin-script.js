@@ -10746,6 +10746,39 @@ jQuery(document).ready(function($) {
         window.open((window.coraData ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php') + '?action=cora_ajax_export_leads', '_blank');
     };
 
+    // HTML5 Drag and Drop Reordering for Stage Config Rows
+    let draggedStageRow = null;
+
+    window.coraStageRowDragStart = function(e) {
+        draggedStageRow = e.currentTarget;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', '');
+        jQuery(e.currentTarget).addClass('opacity-40 border-dashed border-zinc-500 scale-[0.99]');
+    };
+
+    window.coraStageRowDragOver = function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const targetRow = jQuery(e.target).closest('.cora-stage-config-row')[0];
+        if (targetRow && targetRow !== draggedStageRow) {
+            const rect = targetRow.getBoundingClientRect();
+            const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
+            const container = document.getElementById('cora-stages-list-container');
+            if (container) {
+                container.insertBefore(draggedStageRow, next ? targetRow.nextSibling : targetRow);
+            }
+        }
+    };
+
+    window.coraStageRowDrop = function(e) {
+        e.preventDefault();
+    };
+
+    window.coraStageRowDragEnd = function(e) {
+        jQuery('.cora-stage-config-row').removeClass('opacity-40 border-dashed border-zinc-500 scale-[0.99]');
+        draggedStageRow = null;
+    };
+
     // Open Manage Stages Drawer
     window.coraOpenManageStagesDrawer = function() {
         window.coraShowSideDrawer('#cora-lead-stages-drawer');
@@ -10755,10 +10788,16 @@ jQuery(document).ready(function($) {
     window.coraAddNewStageRow = function() {
         const randId = 'Stage_' + Math.floor(Math.random() * 8999 + 1000);
         const html = `
-        <div class="cora-stage-config-row p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-800/40 space-y-2 relative" data-key="${randId}">
+        <div class="cora-stage-config-row p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-800/40 space-y-2 relative transition-all cursor-grab active:cursor-grabbing"
+             draggable="true"
+             data-key="${randId}"
+             ondragstart="coraStageRowDragStart(event)"
+             ondragover="coraStageRowDragOver(event)"
+             ondrop="coraStageRowDrop(event)"
+             ondragend="coraStageRowDragEnd(event)">
             <div class="flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2 flex-1">
-                    <span class="text-zinc-400 cursor-grab">⋮⋮</span>
+                    <span class="text-zinc-400 cursor-grab font-bold text-xs select-none">⋮⋮</span>
                     <input type="text" class="cora-stage-label-input px-2.5 py-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg font-bold text-zinc-900 dark:text-zinc-100 text-xs w-full outline-none" value="Custom Stage Column" placeholder="Stage Column Title">
                 </div>
                 <label class="flex items-center gap-1.5 text-[11px] text-zinc-500 font-semibold cursor-pointer">

@@ -800,10 +800,16 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
 
         <div id="cora-stages-list-container" class="space-y-3">
             <?php foreach ( $stages_config as $s_key => $s_val ) : ?>
-            <div class="cora-stage-config-row p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-800/40 space-y-2 relative" data-key="<?php echo esc_attr($s_key); ?>">
+            <div class="cora-stage-config-row p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-800/40 space-y-2 relative transition-all cursor-grab active:cursor-grabbing"
+                 draggable="true"
+                 data-key="<?php echo esc_attr($s_key); ?>"
+                 ondragstart="coraStageRowDragStart(event)"
+                 ondragover="coraStageRowDragOver(event)"
+                 ondrop="coraStageRowDrop(event)"
+                 ondragend="coraStageRowDragEnd(event)">
                 <div class="flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2 flex-1">
-                        <span class="text-zinc-400 cursor-grab">⋮⋮</span>
+                        <span class="text-zinc-400 cursor-grab font-bold text-xs select-none">⋮⋮</span>
                         <input type="text" class="cora-stage-label-input px-2.5 py-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg font-bold text-zinc-900 dark:text-zinc-100 text-xs w-full outline-none" value="<?php echo esc_attr($s_val['label'] ?? $s_key); ?>" placeholder="Stage Column Title">
                     </div>
                     <label class="flex items-center gap-1.5 text-[11px] text-zinc-500 font-semibold cursor-pointer">
@@ -846,6 +852,3 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
         </div>
     </form>
 </aside>
-
-<!-- GLOBAL DRAWER BACKDROP OVERLAY -->
-<div id="cora-drawer-backdrop" onclick="window.coraCloseAllDrawers()" class="hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-[9990] transition-opacity duration-200 cursor-pointer"></div>
