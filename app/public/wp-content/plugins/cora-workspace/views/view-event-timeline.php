@@ -91,36 +91,30 @@ $total_timelines = count( $cora_event_timelines );
 $total_blocks    = count( $timeline_blocks );
 ?>
 
-<div id="cora-event-timeline-wrapper" class="space-y-6 font-sans text-zinc-900 select-none">
-    
-    <!-- 1. HEADER & HIGH-CONTRAST ACTION BUTTONS -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
-        <div class="flex items-center gap-3">
-            <div class="p-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shrink-0 shadow-xs" style="background-color: #f4f4f5 !important; color: #18181b !important;">
-                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+<div id="cora-event-timeline-wrapper" class="space-y-6 font-sans text-zinc-900 select-none max-w-[1700px] mx-auto pb-12">
+    <!-- ═══ 1. STANDARDIZED PAGE HEADER & CTA ACTION BAR ═════════════════════════════════ -->
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-zinc-200">
+        <div>
+            <div class="flex items-center gap-2.5">
+                <h1 class="text-2xl font-bold tracking-tight text-zinc-950">● Multi-Day Tour & Event Planner</h1>
             </div>
-            <div>
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight" style="color: #09090b !important;">Multi-Day Tour & Event Planner</h1>
-                <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-0.5 font-medium" style="color: #52525b !important;">
-                    Organize multi-day property tours, photo shoots, and crew itineraries with live GPS tracking and 1-click WhatsApp updates.
-                </p>
-            </div>
+            <p class="text-xs font-medium text-zinc-500 mt-1">Organize multi-day property tours, photo shoots, and crew itineraries with live GPS tracking.</p>
         </div>
 
-        <div class="flex items-center gap-2.5">
-            <button onclick="coraOpenAddTimelineBlockDrawer()" class="px-4 py-2 text-white text-xs font-bold rounded-xl flex items-center gap-2 cursor-pointer shadow-sm" style="background-color: #09090b !important; color: #ffffff !important;">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                <span>+ Add Time Block</span>
+        <div class="flex items-center gap-3 flex-wrap">
+            <button onclick="coraExportTimelineICal()" class="p-2.5 bg-white border border-zinc-200 hover:bg-zinc-100 hover:border-zinc-300 text-zinc-800 rounded-xl transition-all shadow-2xs cursor-pointer flex items-center justify-center" title="Sync to Calendar">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
             </button>
-            <button onclick="coraOpenShareTimelineDrawer('<?php echo esc_js( $active_timeline['id'] ); ?>')" class="px-3.5 py-2 text-xs font-bold rounded-xl cursor-pointer shadow-sm flex items-center gap-2" style="background-color: #ffffff !important; color: #18181b !important; border: 1px solid #e4e4e7 !important;">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-                <span>Share Client Link</span>
+            <button onclick="coraOpenShareTimelineDrawer('<?php echo esc_js( $active_timeline['id'] ?? '' ); ?>')" class="px-4 py-2.5 bg-white border border-zinc-200 hover:bg-zinc-100 hover:border-zinc-300 text-zinc-800 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center gap-2 cursor-pointer">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                Share Client Link
             </button>
-            <button onclick="coraExportTimelineICal()" class="p-2 rounded-xl cursor-pointer shadow-sm" style="background-color: #ffffff !important; color: #18181b !important; border: 1px solid #e4e4e7 !important;" title="Sync to Calendar">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <button onclick="coraOpenAddTimelineBlockDrawer()" class="px-4.5 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                + Add Time Block
             </button>
         </div>
-    </div>
+    </header>
 
     <!-- 2. TOP 3-STEP "HOW IT WORKS" CARD (BULLETPROOF HIGH CONTRAST) -->
     <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-sm grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-zinc-100 dark:divide-zinc-800 gap-4 text-xs">

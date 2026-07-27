@@ -75,53 +75,80 @@ foreach ( $cora_crew_shifts as $sh ) {
 }
 ?>
 
-<div id="cora-crew-scheduler-wrapper" class="space-y-6 font-sans text-zinc-900">
-    <!-- Header Bar with Call-to-Action Buttons -->
-    <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex items-center justify-between flex-wrap gap-4">
+<div id="cora-crew-scheduler-wrapper" class="space-y-6 font-sans text-zinc-900 max-w-[1700px] mx-auto pb-12">
+    <!-- ═══ 1. STANDARDIZED PAGE HEADER & CTA ACTION BAR ═════════════════════════════════ -->
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-zinc-200">
         <div>
-            <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <h1 class="text-xl font-extrabold text-zinc-950 tracking-tight">Crew & Shift Scheduler Engine</h1>
+            <div class="flex items-center gap-2.5">
+                <h1 class="text-2xl font-bold tracking-tight text-zinc-950">● Crew & Shift Scheduler Engine</h1>
             </div>
-            <p class="text-xs text-zinc-500 mt-1">Conflict-free field staffing, property shift rosters, WhatsApp call-times & labor payouts.</p>
+            <p class="text-xs font-medium text-zinc-500 mt-1">Conflict-free field staffing, property shift rosters, WhatsApp call-times & labor payouts.</p>
         </div>
 
-        <div class="flex items-center gap-2">
-            <button onclick="coraOpenAddShiftDrawer()" class="px-4 py-2 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-all flex items-center gap-2 shadow-sm cursor-pointer">
+        <div class="flex items-center gap-3 flex-wrap">
+            <button onclick="coraExportShiftPayouts()" class="px-4 py-2.5 bg-white border border-zinc-200 hover:bg-zinc-100 hover:border-zinc-300 text-zinc-800 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center gap-2 cursor-pointer">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Export Payouts
+            </button>
+            <button onclick="coraOpenAddShiftDrawer()" class="px-4.5 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 + Assign Shift
             </button>
-            <button onclick="coraExportShiftPayouts()" class="px-3.5 py-2 bg-white border border-zinc-200 text-zinc-800 text-xs font-bold rounded-xl hover:bg-zinc-50 cursor-pointer shadow-xs flex items-center gap-2">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                Export Payout Accounting
-            </button>
         </div>
-    </div>
+    </header>
 
-    <!-- 4 KPI Metrics Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm space-y-1">
-            <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-wider block">Total Scheduled Shifts</span>
-            <div class="text-2xl font-bold text-zinc-950 font-mono"><?php echo $total_shifts; ?></div>
-            <span class="text-[10px] text-zinc-500">Field staff & agent shifts</span>
-        </div>
-
-        <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm space-y-1">
-            <span class="text-[10px] font-extrabold text-emerald-600 uppercase tracking-wider block">Staff On-Site Now</span>
-            <div class="text-2xl font-bold text-emerald-700 font-mono"><?php echo $on_site_count; ?> Active</div>
-            <span class="text-[10px] text-emerald-600 font-semibold">Live GPS verification</span>
+    <!-- ═══ 2. MONOCHROMATIC 4-KPI METRIC STAT CARDS ═════════════════════════════════ -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <!-- 1. Total Scheduled Shifts -->
+        <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[110px]">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-widest">Scheduled Shifts</span>
+                <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded text-zinc-650 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-700/50">Roster</span>
+            </div>
+            <div class="mt-2.5">
+                <span class="text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight"><?php echo $total_shifts; ?> <span class="text-sm font-semibold text-zinc-455">Shifts</span></span>
+                <span class="text-[10px] text-zinc-405 dark:text-zinc-500 block mt-1 font-medium">Field staff roster count</span>
+            </div>
         </div>
 
-        <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm space-y-1">
-            <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-wider block">Conflict Prevention</span>
-            <div class="text-2xl font-bold text-zinc-950 font-mono">100% Safe</div>
-            <span class="text-[10px] text-emerald-600 font-semibold">Zero Double-Bookings</span>
+        <!-- 2. Staff On-Site Now -->
+        <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[110px]">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-widest">On-Site Now</span>
+                <span class="inline-flex items-center gap-1.5 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded text-emerald-700 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/20 border border-emerald-100/50 dark:border-emerald-900/30">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active
+                </span>
+            </div>
+            <div class="mt-2.5">
+                <span class="text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight"><?php echo $on_site_count; ?> <span class="text-sm font-semibold text-zinc-455">Active</span></span>
+                <span class="text-[10px] text-zinc-400 dark:text-zinc-500 block mt-1 font-medium">WhatsApp GPS verified</span>
+            </div>
         </div>
 
-        <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm space-y-1">
-            <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-wider block">Total Labor Payouts</span>
-            <div class="text-2xl font-bold text-zinc-950 font-mono">₹<?php echo number_format( $total_payout_sum ); ?></div>
-            <span class="text-[10px] text-zinc-500">Synced to Financial Board</span>
+        <!-- 3. Conflict Prevention -->
+        <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[110px]">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-zinc-455 dark:text-zinc-500 uppercase tracking-widest">Conflict Shield</span>
+                <span class="inline-flex items-center gap-1.5 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded text-emerald-700 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/20 border border-emerald-100/50 dark:border-emerald-900/30">
+                    Active
+                </span>
+            </div>
+            <div class="mt-2.5">
+                <span class="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight">100% Safe</span>
+                <span class="text-[10px] text-zinc-450 dark:text-zinc-500 block mt-1 font-medium">Zero double-booking conflicts</span>
+            </div>
+        </div>
+
+        <!-- 4. Total Labor Payouts -->
+        <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[110px]">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-widest">Labor Payouts</span>
+                <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded text-zinc-650 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-700/50">Finance</span>
+            </div>
+            <div class="mt-2.5">
+                <span class="text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight">₹<?php echo number_format( $total_payout_sum ); ?></span>
+                <span class="text-[10px] text-zinc-400 dark:text-zinc-500 block mt-1 font-medium">Synced to Financial Board</span>
+            </div>
         </div>
     </div>
 
