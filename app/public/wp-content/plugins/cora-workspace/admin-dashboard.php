@@ -7941,29 +7941,97 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         font-size: 11px !important;
         font-weight: 600 !important;
-        color: #52525b !important;
+        color: #3f3f46 !important;
         border-radius: 6px !important;
         height: 28px !important;
         line-height: 28px !important;
     }
     .ql-snow .ql-picker-label {
-        padding-left: 8px !important;
-        padding-right: 8px !important;
-        border: 1px solid transparent !important;
+        padding-left: 10px !important;
+        padding-right: 22px !important;
+        border: 1px solid #e4e4e7 !important;
         border-radius: 6px !important;
+        background-color: #ffffff !important;
+        color: #3f3f46 !important;
+        position: relative !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        cursor: pointer !important;
+        transition: all 0.15s ease !important;
     }
     .ql-snow .ql-picker-label:hover {
-        background: #f4f4f5 !important;
+        background-color: #f4f4f5 !important;
+        color: #09090b !important;
+        border-color: #d4d4d8 !important;
+    }
+    /* Hide default arrows */
+    .ql-snow .ql-picker-label svg {
+        display: none !important;
+    }
+    /* Chevron down styling */
+    .ql-snow .ql-picker-label::after {
+        content: "" !important;
+        position: absolute !important;
+        right: 8px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        width: 8px !important;
+        height: 4px !important;
+        background-color: currentColor !important;
+        clip-path: polygon(0 0, 100% 0, 50% 100%) !important;
+        opacity: 0.7 !important;
+        transition: transform 0.2s ease !important;
+    }
+    /* Specific width adjustments */
+    .ql-snow .ql-picker.ql-header {
+        width: 96px !important;
+    }
+    .ql-snow .ql-picker.ql-font {
+        width: 102px !important;
+    }
+    .ql-snow .ql-picker.ql-size {
+        width: 72px !important;
+    }
+    /* Floating options menu card */
+    .ql-snow .ql-picker-options {
+        border: 1px solid #e4e4e7 !important;
+        border-radius: 8px !important;
+        box-shadow: 0 10px 15px -3px rgba(9, 9, 11, 0.08), 0 4px 6px -2px rgba(9, 9, 11, 0.04) !important;
+        background-color: #ffffff !important;
+        padding: 4px !important;
+        margin-top: 4px !important;
+        z-index: 50 !important;
+    }
+    .ql-snow .ql-picker-options .ql-picker-item {
+        padding: 5px 8px !important;
+        border-radius: 5px !important;
+        color: #3f3f46 !important;
+        font-size: 11px !important;
+        font-weight: 500 !important;
+        transition: background-color 0.15s ease, color 0.15s ease !important;
+    }
+    .ql-snow .ql-picker-options .ql-picker-item:hover,
+    .ql-snow .ql-picker-options .ql-picker-item.ql-selected {
+        background-color: #f4f4f5 !important;
         color: #09090b !important;
     }
+    /* Button formatting group gaps */
+    .ql-toolbar.ql-snow .ql-formats {
+        margin-right: 12px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 2px !important;
+    }
     .ql-snow .ql-stroke {
-        stroke: currentColor !important;
+        stroke: #52525b !important;
         stroke-width: 2.2 !important;
     }
     .ql-snow .ql-fill {
-        fill: currentColor !important;
+        fill: #52525b !important;
     }
     .ql-container.ql-snow { border: none !important; }
+
     .ql-editor.ql-blank::before { color: #d4d4d8; font-style: normal; }
     /* Typography whitelist classes */
     .ql-font-serif { font-family: ui-serif, Georgia, Cambria, serif !important; }
