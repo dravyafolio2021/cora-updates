@@ -7852,9 +7852,78 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <style>
     #cora-full-page-editor { display: none; }
     #cora-full-page-editor:not(.hidden) { display: flex !important; }
+    #cora-full-page-editor main { background-color: #FBFaf7 !important; padding: 40px 24px !important; }
+    .cora-writing-sheet {
+        background-color: #ffffff !important;
+        border: 1px solid #e4e4e7 !important;
+        border-radius: 20px !important;
+        box-shadow: 0 10px 30px -10px rgba(9, 9, 11, 0.04), 0 1px 3px rgba(9, 9, 11, 0.02) !important;
+        padding: 48px !important;
+        min-height: calc(100vh - 160px) !important;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        position: relative;
+    }
     .cora-serif-editor .ql-editor { font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; font-size: 1.125rem; line-height: 1.8; color: #18181b; }
     .cora-sans-editor .ql-editor { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 1.05rem; line-height: 1.75; color: #18181b; }
-    .ql-toolbar.ql-snow { border: none !important; border-bottom: 1px solid #e4e4e7 !important; padding: 8px 16px !important; position: sticky !important; top: -40px !important; background: rgba(255, 255, 255, 0.96) !important; backdrop-filter: blur(8px) !important; z-index: 40 !important; }
+    .ql-toolbar.ql-snow {
+        border: none !important;
+        border-bottom: 1px solid #f4f4f5 !important;
+        padding: 10px 8px !important;
+        position: sticky !important;
+        top: -40px !important;
+        background: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(8px) !important;
+        z-index: 40 !important;
+        margin-left: -48px !important;
+        margin-right: -48px !important;
+        padding-left: 48px !important;
+        padding-right: 48px !important;
+        margin-top: -12px !important;
+    }
+    .ql-snow.ql-toolbar button, .ql-snow .ql-toolbar button {
+        height: 28px !important;
+        width: 32px !important;
+        padding: 4px 6px !important;
+        border-radius: 6px !important;
+        transition: all 0.15s ease !important;
+        color: #52525b !important;
+    }
+    .ql-snow.ql-toolbar button:hover, .ql-snow .ql-toolbar button:hover,
+    .ql-snow.ql-toolbar button.ql-active, .ql-snow .ql-toolbar button.ql-active {
+        background-color: #f4f4f5 !important;
+        color: #09090b !important;
+    }
+    .ql-snow.ql-toolbar button svg, .ql-snow .ql-toolbar button svg {
+        stroke-width: 2.2 !important;
+    }
+    .ql-snow .ql-picker {
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        font-size: 11px !important;
+        font-weight: 600 !important;
+        color: #52525b !important;
+        border-radius: 6px !important;
+        height: 28px !important;
+        line-height: 28px !important;
+    }
+    .ql-snow .ql-picker-label {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+        border: 1px solid transparent !important;
+        border-radius: 6px !important;
+    }
+    .ql-snow .ql-picker-label:hover {
+        background: #f4f4f5 !important;
+        color: #09090b !important;
+    }
+    .ql-snow .ql-stroke {
+        stroke: currentColor !important;
+        stroke-width: 2.2 !important;
+    }
+    .ql-snow .ql-fill {
+        fill: currentColor !important;
+    }
     .ql-container.ql-snow { border: none !important; }
     .ql-editor.ql-blank::before { color: #d4d4d8; font-style: normal; }
     </style>
@@ -7916,7 +7985,148 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             
             <!-- Notion/Medium-Style Writing Canvas -->
             <main class="flex-1 overflow-y-auto px-6 py-10 md:px-16 xl:px-32 relative">
-                <div class="max-w-[720px] mx-auto w-full flex flex-col gap-6">
+                <div class="max-w-[760px] mx-auto w-full cora-writing-sheet">
+                    
+                    <!-- Beehiiv Horizontal Settings Bar -->
+                    <div class="w-full border-b border-zinc-200/80 pb-3.5 flex items-center justify-between gap-4 text-xs font-semibold relative select-none">
+                        <div class="flex items-center gap-3">
+                            <!-- Toggle: Title & subtitle -->
+                            <div class="relative inline-block text-left" id="beehiiv-dropdown-title-subtitle-wrap">
+                                <button type="button" onclick="window.coraToggleBeehiivDropdown('title-subtitle')" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-350 hover:bg-zinc-50 rounded-lg text-zinc-700 bg-white transition-all flex items-center gap-1.5 cursor-pointer">
+                                    <span>Title & Subtitle</span>
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                </button>
+                                <!-- Dropdown card -->
+                                <div id="beehiiv-dropdown-title-subtitle" class="hidden absolute left-0 mt-1.5 w-80 bg-white border border-zinc-200 rounded-xl shadow-xl p-4 z-40 space-y-3">
+                                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Subtitle & Excerpt</span>
+                                    <!-- Excerpt Content inside this dropdown -->
+                                    <div class="space-y-1">
+                                        <textarea id="cora-article-excerpt-bh" rows="3" placeholder="Summary snippet for search results and social previews..." class="w-full text-xs border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800 placeholder:text-zinc-300 resize-none"></textarea>
+                                        <p class="text-[9px] text-zinc-400 leading-tight">Summarize the article or write a subtitle snippet.</p>
+                                    </div>
+                                    <div class="flex justify-end gap-2 pt-1">
+                                        <button type="button" onclick="window.coraApplyBeehiivChanges('title-subtitle')" class="px-2.5 py-1 bg-zinc-950 text-white rounded text-[10px] font-bold cursor-pointer hover:bg-zinc-800 transition-colors">Apply</button>
+                                        <button type="button" onclick="window.coraToggleBeehiivDropdown('')" class="px-2.5 py-1 border border-zinc-200 hover:bg-zinc-50 rounded text-[10px] text-zinc-650 cursor-pointer">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Toggle: Visibility -->
+                            <div class="relative inline-block text-left" id="beehiiv-dropdown-visibility-wrap">
+                                <button type="button" onclick="window.coraToggleBeehiivDropdown('visibility')" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-350 hover:bg-zinc-50 rounded-lg text-zinc-700 bg-white transition-all flex items-center gap-1.5 cursor-pointer">
+                                    <span>Visibility</span>
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                </button>
+                                <div id="beehiiv-dropdown-visibility" class="hidden absolute left-0 mt-1.5 w-64 bg-white border border-zinc-200 rounded-xl shadow-xl p-4 z-40 space-y-3">
+                                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Status & Schedule</span>
+                                    <div class="space-y-2">
+                                        <div class="space-y-1">
+                                            <label class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Publish Status</label>
+                                            <select id="cora-article-status-bh" class="w-full text-xs border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800">
+                                                <option value="draft">Draft</option>
+                                                <option value="pending">Pending Review</option>
+                                                <option value="publish">Published</option>
+                                            </select>
+                                        </div>
+                                        <div class="space-y-1">
+                                            <label class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Scheduled Publication</label>
+                                            <input type="datetime-local" id="cora-article-scheduled-date-bh" class="w-full text-xs border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800">
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-end gap-2 pt-1">
+                                        <button type="button" onclick="window.coraApplyBeehiivChanges('visibility')" class="px-2.5 py-1 bg-zinc-950 text-white rounded text-[10px] font-bold cursor-pointer hover:bg-zinc-800 transition-colors">Apply</button>
+                                        <button type="button" onclick="window.coraToggleBeehiivDropdown('')" class="px-2.5 py-1 border border-zinc-200 hover:bg-zinc-50 rounded text-[10px] text-zinc-650 cursor-pointer">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Toggle: Authors -->
+                            <div class="relative inline-block text-left" id="beehiiv-dropdown-authors-wrap">
+                                <button type="button" onclick="window.coraToggleBeehiivDropdown('authors')" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-350 hover:bg-zinc-50 rounded-lg text-zinc-700 bg-white transition-all flex items-center gap-1.5 cursor-pointer">
+                                    <span>Authors</span>
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                </button>
+                                <div id="beehiiv-dropdown-authors" class="hidden absolute left-0 mt-1.5 w-60 bg-white border border-zinc-200 rounded-xl shadow-xl p-4 z-40 space-y-3">
+                                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Select Author</span>
+                                    <div class="space-y-1">
+                                        <select id="cora-article-assignee-bh" class="w-full text-xs border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800">
+                                            <option value="0">Unassigned</option>
+                                            <?php foreach($cora_users as $usr): ?>
+                                                <option value="<?php echo $usr->ID; ?>"><?php echo esc_html($usr->display_name); ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="flex justify-end gap-2 pt-1">
+                                        <button type="button" onclick="window.coraApplyBeehiivChanges('authors')" class="px-2.5 py-1 bg-zinc-950 text-white rounded text-[10px] font-bold cursor-pointer hover:bg-zinc-800 transition-colors">Apply</button>
+                                        <button type="button" onclick="window.coraToggleBeehiivDropdown('')" class="px-2.5 py-1 border border-zinc-200 hover:bg-zinc-50 rounded text-[10px] text-zinc-650 cursor-pointer">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Toggle: Web thumbnail -->
+                            <div class="relative inline-block text-left" id="beehiiv-dropdown-thumbnail-wrap">
+                                <button type="button" onclick="window.coraToggleBeehiivDropdown('thumbnail')" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-350 hover:bg-zinc-50 rounded-lg text-zinc-700 bg-white transition-all flex items-center gap-1.5 cursor-pointer">
+                                    <span>Web Thumbnail</span>
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                </button>
+                                <div id="beehiiv-dropdown-thumbnail" class="hidden absolute left-0 mt-1.5 w-72 bg-white border border-zinc-200 rounded-xl shadow-xl p-4 z-40 space-y-3">
+                                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Thumbnail Image</span>
+                                    <div class="space-y-2">
+                                        <div id="cora-thumbnail-preview-bh" class="w-full aspect-[16/9] bg-zinc-100 rounded-xl border border-zinc-200 flex items-center justify-center overflow-hidden relative group cursor-pointer" onclick="window.coraMediaSelectTarget = 'thumbnail'; coraOpenMediaLibrary();">
+                                            <div class="absolute inset-0 bg-black/60 hidden group-hover:flex items-center justify-center transition-all z-10">
+                                                <span class="text-white text-xs font-semibold flex items-center gap-1.5">
+                                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                                    Change Image
+                                                </span>
+                                            </div>
+                                            <img src="" id="cora-thumbnail-img-bh" class="hidden w-full h-full object-cover">
+                                            <span id="cora-thumbnail-placeholder-bh" class="text-xs text-zinc-400 font-semibold flex flex-col items-center gap-1">
+                                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" class="mb-1"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                                Select Image
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-end gap-2 pt-1">
+                                        <button type="button" onclick="window.coraApplyBeehiivChanges('thumbnail')" class="px-2.5 py-1 bg-zinc-950 text-white rounded text-[10px] font-bold cursor-pointer hover:bg-zinc-800 transition-colors">Apply</button>
+                                        <button type="button" onclick="window.coraToggleBeehiivDropdown('')" class="px-2.5 py-1 border border-zinc-200 hover:bg-zinc-50 rounded text-[10px] text-zinc-650 cursor-pointer">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Toggle: Content tags -->
+                            <div class="relative inline-block text-left" id="beehiiv-dropdown-tags-wrap">
+                                <button type="button" onclick="window.coraToggleBeehiivDropdown('tags')" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-350 hover:bg-zinc-50 rounded-lg text-zinc-700 bg-white transition-all flex items-center gap-1.5 cursor-pointer">
+                                    <span>Content Tags</span>
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                </button>
+                                <div id="beehiiv-dropdown-tags" class="hidden absolute left-0 mt-1.5 w-72 bg-white border border-zinc-200 rounded-xl shadow-xl p-4 z-40 space-y-3">
+                                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Categories & Tags</span>
+                                    <div class="space-y-3">
+                                        <div class="space-y-1">
+                                            <label class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Categories</label>
+                                            <select id="cora-article-categories-bh" multiple class="w-full text-xs border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800 min-h-[60px]">
+                                                <?php foreach($cora_categories as $cat): ?>
+                                                    <option value="<?php echo $cat->term_id; ?>"><?php echo esc_html($cat->name); ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        <div class="space-y-1">
+                                            <label class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Tags</label>
+                                            <select id="cora-article-tags-bh" multiple class="w-full text-xs border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800 min-h-[60px]">
+                                                <?php foreach($cora_tags as $tag): ?>
+                                                    <option value="<?php echo $tag->term_id; ?>"><?php echo esc_html($tag->name); ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-end gap-2 pt-1">
+                                        <button type="button" onclick="window.coraApplyBeehiivChanges('tags')" class="px-2.5 py-1 bg-zinc-950 text-white rounded text-[10px] font-bold cursor-pointer hover:bg-zinc-800 transition-colors">Apply</button>
+                                        <button type="button" onclick="window.coraToggleBeehiivDropdown('')" class="px-2.5 py-1 border border-zinc-200 hover:bg-zinc-50 rounded text-[10px] text-zinc-650 cursor-pointer">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     
                     <!-- Cover Image Dropzone Header -->
                     <div id="cora-cover-image-container" class="relative group w-full rounded-2xl overflow-hidden bg-zinc-50 border border-dashed border-zinc-200 hover:border-zinc-400 transition-all min-h-[140px] flex items-center justify-center">

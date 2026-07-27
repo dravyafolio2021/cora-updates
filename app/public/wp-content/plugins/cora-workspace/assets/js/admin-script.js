@@ -6325,6 +6325,31 @@ jQuery(document).ready(function($) {
                 }
             });
             
+            // Slash command detection helper
+            function coraCheckSlashCommand(range) {
+                if (range) {
+                    const [line, offset] = coraQuillListingCoordinator.getLine(range.index);
+                    if (line) {
+                        // Clean zero-width characters using .replace(/[\u200B\uFEFF]/g, '') before checking
+                        const lineText = (line.domNode.textContent || '').replace(/[\u200B\uFEFF]/g, '');
+                        if (lineText.trim() === '/') {
+                            const bounds = coraQuillListingCoordinator.getBounds(range.index);
+                            const editorContainer = $('#cora-quill-editor');
+                            const parentPosition = editorContainer.position();
+                            
+                            $('#cora-editor-slash-menu').removeClass('hidden').css({
+                                top: (parentPosition.top + bounds.bottom + 8) + 'px',
+                                left: (parentPosition.left + bounds.left) + 'px'
+                            });
+                        } else {
+                            $('#cora-editor-slash-menu').addClass('hidden');
+                        }
+                    }
+                } else {
+                    $('#cora-editor-slash-menu').addClass('hidden');
+                }
+            }
+
             // Update custom status on text change
             coraQuillListingCoordinator.on('text-change', function() {
                 $('#cora-editor-status').text('Unsaved changes');
@@ -6345,33 +6370,18 @@ jQuery(document).ready(function($) {
                     }
                 }
                 
-                // Monitor for slash commands
                 const range = coraQuillListingCoordinator.getSelection();
-                if (range) {
-                    const [line, offset] = coraQuillListingCoordinator.getLine(range.index);
-                    if (line) {
-                        const lineText = line.domNode.textContent || '';
-                        if (lineText.trim() === '/') {
-                            const bounds = coraQuillListingCoordinator.getBounds(range.index);
-                            const editorContainer = $('#cora-quill-editor');
-                            const parentPosition = editorContainer.position();
-                            
-                            $('#cora-editor-slash-menu').removeClass('hidden').css({
-                                top: (parentPosition.top + bounds.bottom + 8) + 'px',
-                                left: (parentPosition.left + bounds.left) + 'px'
-                            });
-                        } else {
-                            $('#cora-editor-slash-menu').addClass('hidden');
-                        }
-                    }
-                } else {
-                    $('#cora-editor-slash-menu').addClass('hidden');
-                }
+                coraCheckSlashCommand(range);
                 
                 if (window.coraUpdateWordCount) {
                     window.coraUpdateWordCount();
                 }
             });
+
+            coraQuillListingCoordinator.on('selection-change', function(range) {
+                coraCheckSlashCommand(range);
+            });
+
             $('#cora-article-title, #cora-seo-keyword, #cora-seo-description, #cora-article-categories, #cora-article-tags').on('input change', function() {
                 $('#cora-editor-status').text('Unsaved changes');
                 if (window.coraUpdateWordCount) {
@@ -6452,7 +6462,9 @@ jQuery(document).ready(function($) {
 
         initListingCoordinatorComponentsIfNeeded();
         if (coraQuillListingCoordinator) coraQuillListingCoordinator.root.innerHTML = '';
-        
+        if (window.coraSyncBeehiivInputsFromOriginal) {
+            window.coraSyncBeehiivInputsFromOriginal();
+        }
         coraToggleContentDrawer(true);
     };
 
@@ -6557,6 +6569,9 @@ jQuery(document).ready(function($) {
                 }
 
                 $('#cora-editor-status').text('Saved');
+                if (window.coraSyncBeehiivInputsFromOriginal) {
+                    window.coraSyncBeehiivInputsFromOriginal();
+                }
             } else {
                 if (coraQuillListingCoordinator) coraQuillListingCoordinator.root.innerHTML = '';
                 window.coraShowToast('Failed to load article content', 'error');
@@ -6624,6 +6639,10 @@ jQuery(document).ready(function($) {
             $('#cora-thumbnail-id').val(id);
             $('#cora-thumbnail-img').attr('src', url).removeClass('hidden');
             $('#cora-thumbnail-placeholder').addClass('hidden');
+            
+            // Sync with Beehiiv bar thumbnail uploader preview
+            $('#cora-thumbnail-img-bh').attr('src', url).removeClass('hidden');
+            $('#cora-thumbnail-placeholder-bh').addClass('hidden');
         }
         $('#cora-editor-status').text('Unsaved changes');
         coraToggleMediaDrawer(false);
@@ -7721,9 +7740,77 @@ jQuery(document).ready(function($) {
         }
     };
 
+    window.coraToggleBeehiivDropdown = function(type) {
+        const types = ['title-subtitle', 'visibility', 'authors', 'thumbnail', 'tags'];
+        types.forEach(t => {
+            if (t === type) {
+                $(`#beehiiv-dropdown-${t}`).toggleClass('hidden');
+            } else {
+                $(`#beehiiv-dropdown-${t}`).addClass('hidden');
+            }
+        });
+    };
+
+    window.coraApplyBeehiivChanges = function(type) {
+        if (type === 'title-subtitle') {
+            $('#cora-article-excerpt').val($('#cora-article-excerpt-bh').val());
+        } else if (type === 'visibility') {
+            $('#cora-article-scheduled-date').val($('#cora-article-scheduled-date-bh').val());
+            const statusVal = $('#cora-article-status-bh').val();
+            if ($('#cora-article-status').length) {
+                $('#cora-article-status').val(statusVal);
+            }
+        } else if (type === 'authors') {
+            $('#cora-article-assignee').val($('#cora-article-assignee-bh').val());
+        } else if (type === 'tags') {
+            const categories = $('#cora-article-categories-bh').val() || [];
+            const tags = $('#cora-article-tags-bh').val() || [];
+            if (coraCategorySelect) {
+                coraCategorySelect.setValue(categories);
+            } else {
+                $('#cora-article-categories').val(categories);
+            }
+            if (coraTagSelect) {
+                coraTagSelect.setValue(tags);
+            } else {
+                $('#cora-article-tags').val(tags);
+            }
+        }
+        
+        window.coraToggleBeehiivDropdown('');
+        window.coraShowToast('Option changes applied locally. Remember to Save.', 'info');
+        coraUpdateSEOAudits();
+    };
+
+    window.coraSyncBeehiivInputsFromOriginal = function() {
+        $('#cora-article-excerpt-bh').val($('#cora-article-excerpt').val() || '');
+        $('#cora-article-scheduled-date-bh').val($('#cora-article-scheduled-date').val() || '');
+        $('#cora-article-assignee-bh').val($('#cora-article-assignee').val() || '0');
+        if ($('#cora-article-status').length) {
+            $('#cora-article-status-bh').val($('#cora-article-status').val() || 'draft');
+        }
+        const categories = $('#cora-article-categories').val() || [];
+        $('#cora-article-categories-bh').val(categories);
+        const tags = $('#cora-article-tags').val() || [];
+        $('#cora-article-tags-bh').val(tags);
+        
+        const thumbUrl = $('#cora-thumbnail-img').attr('src') || '';
+        if (thumbUrl) {
+            $('#cora-thumbnail-img-bh').attr('src', thumbUrl).removeClass('hidden');
+            $('#cora-thumbnail-placeholder-bh').addClass('hidden');
+        } else {
+            $('#cora-thumbnail-img-bh').attr('src', '').addClass('hidden');
+            $('#cora-thumbnail-placeholder-bh').removeClass('hidden');
+        }
+    };
+
     $(document).on('mousedown', function(e) {
         if (!$(e.target).closest('#cora-editor-slash-menu, .ql-editor').length) {
             $('#cora-editor-slash-menu').addClass('hidden');
+        }
+        // Click outside handler to close open Beehiiv dropdowns
+        if (!$(e.target).closest('#beehiiv-dropdown-title-subtitle-wrap, #beehiiv-dropdown-visibility-wrap, #beehiiv-dropdown-authors-wrap, #beehiiv-dropdown-thumbnail-wrap, #beehiiv-dropdown-tags-wrap').length) {
+            window.coraToggleBeehiivDropdown('');
         }
     });
 
