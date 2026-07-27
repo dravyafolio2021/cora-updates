@@ -6271,6 +6271,29 @@ jQuery(document).ready(function($) {
 
     function initListingCoordinatorComponentsIfNeeded() {
         if (!coraQuillListingCoordinator && $('#cora-quill-editor').length > 0) {
+            if (typeof Quill !== 'undefined') {
+                const BlockEmbed = Quill.import('blots/block/embed');
+                class CoraWidgetBlot extends BlockEmbed {
+                    static create(value) {
+                        let node = super.create();
+                        node.setAttribute('class', 'cora-inserted-widget');
+                        node.setAttribute('data-type', value.type);
+                        node.setAttribute('contenteditable', 'false');
+                        node.innerHTML = value.html;
+                        return node;
+                    }
+                    static value(node) {
+                        return {
+                            type: node.getAttribute('data-type'),
+                            html: node.innerHTML
+                        };
+                    }
+                }
+                CoraWidgetBlot.blotName = 'cora-widget';
+                CoraWidgetBlot.tagName = 'div';
+                Quill.register(CoraWidgetBlot, true);
+            }
+
             coraQuillListingCoordinator = new Quill('#cora-quill-editor', {
                 theme: 'snow',
                 placeholder: 'Start writing your masterpiece...',
@@ -7539,7 +7562,12 @@ jQuery(document).ready(function($) {
             `;
         }
 
-        coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(deleteIndex, html);
+        coraQuillListingCoordinator.insertEmbed(deleteIndex, 'cora-widget', { type: type, html: html });
+        // Force selection right after the inserted block, insert a newline to allow typing below it easily
+        coraQuillListingCoordinator.setSelection(deleteIndex + 1);
+        coraQuillListingCoordinator.insertText(deleteIndex + 1, '\n');
+        coraQuillListingCoordinator.setSelection(deleteIndex + 2);
+        
         $('#cora-editor-slash-menu').addClass('hidden');
         window.coraShowToast('Widget block inserted successfully!', 'success');
         coraUpdateWordCount();
