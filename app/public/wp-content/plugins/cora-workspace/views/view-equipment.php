@@ -251,71 +251,74 @@ if ( is_array( $cora_gear_maintenance ) ) {
     <!-- ═══ 2. MONOCHROMATIC 4-KPI METRIC STAT CARDS ═════════════════════════════════ -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <!-- 1. Total Asset Valuation -->
-        <div class="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-2xs flex flex-col justify-between space-y-2">
-            <span class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Total Asset Valuation</span>
-            <div class="flex items-baseline justify-between">
-                <span id="kpi-total-val" class="text-3xl font-extrabold text-zinc-950 font-mono tracking-tight">₹<?php echo number_format( $total_capex_valuation ); ?></span>
-                <span class="text-xs font-semibold text-zinc-400">CapEx Total</span>
+        <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[110px]">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-widest">Total Asset Valuation</span>
+                <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded text-zinc-650 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-700/50">CapEx</span>
+            </div>
+            <div class="mt-2.5">
+                <span id="kpi-total-val" class="text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight">₹<?php echo number_format( $total_capex_valuation ); ?></span>
+                <span class="text-[10px] text-zinc-400 dark:text-zinc-500 block mt-1 font-medium">Total acquisition cost</span>
             </div>
         </div>
 
         <!-- 2. Available in Studio -->
-        <div class="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-2xs flex flex-col justify-between space-y-2">
+        <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[110px]">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Available in Studio</span>
-                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600">
+                <span class="text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-widest">Available in Studio</span>
+                <span class="inline-flex items-center gap-1.5 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded text-emerald-700 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/20 border border-emerald-100/50 dark:border-emerald-900/30">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Ready
                 </span>
             </div>
-            <div class="flex items-baseline justify-between">
-                <span id="kpi-avail-count" class="text-3xl font-extrabold text-zinc-950 font-mono tracking-tight"><?php echo $available_count; ?> Items</span>
-                <span class="text-xs font-semibold text-emerald-600">In Studio</span>
+            <div class="mt-2.5">
+                <span id="kpi-avail-count" class="text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight"><?php echo $available_count; ?> <span class="text-sm font-semibold text-zinc-450">Items</span></span>
+                <span class="text-[10px] text-zinc-400 dark:text-zinc-500 block mt-1 font-medium">Ready in studio vault</span>
             </div>
         </div>
 
         <!-- 3. Checked Out on Shoots -->
-        <div class="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-2xs flex flex-col justify-between space-y-2">
+        <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[110px]">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Checked Out on Shoots</span>
-                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600">
+                <span class="text-[10px] font-bold text-zinc-455 dark:text-zinc-500 uppercase tracking-widest">Checked Out</span>
+                <span class="inline-flex items-center gap-1.5 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20 border border-amber-100/50 dark:border-amber-900/30">
                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> On Field
                 </span>
             </div>
-            <div class="flex items-baseline justify-between">
-                <span id="kpi-checkout-count" class="text-3xl font-extrabold text-zinc-950 font-mono tracking-tight"><?php echo $checked_out_count; ?> Allocated</span>
-                <span class="text-xs font-semibold text-amber-600">Active Shoots</span>
+            <div class="mt-2.5">
+                <span id="kpi-checkout-count" class="text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight"><?php echo $checked_out_count; ?> <span class="text-sm font-semibold text-zinc-455">Allocated</span></span>
+                <span class="text-[10px] text-zinc-450 dark:text-zinc-500 block mt-1 font-medium">Active shoot checkouts</span>
             </div>
         </div>
 
         <!-- 4. Under Maintenance / Servicing -->
-        <div class="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-2xs flex flex-col justify-between space-y-2">
+        <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[110px]">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">In Repair / Servicing</span>
-                <span class="text-[10px] font-bold text-zinc-400">OpEx Costs</span>
+                <span class="text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-widest">In Repair</span>
+                <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded text-zinc-650 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-700/50">OpEx</span>
             </div>
-            <div class="flex items-baseline justify-between">
-                <span id="kpi-maint-count" class="text-3xl font-extrabold text-zinc-950 font-mono tracking-tight"><?php echo $maintenance_count; ?> Item<?php echo $maintenance_count === 1 ? '' : 's'; ?></span>
-                <span class="text-xs font-semibold text-zinc-500">₹<?php echo number_format( $total_repair_expense ); ?></span>
+            <div class="mt-2.5">
+                <span id="kpi-maint-count" class="text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight"><?php echo $maintenance_count; ?> <span class="text-sm font-semibold text-zinc-450">Item<?php echo $maintenance_count === 1 ? '' : 's'; ?></span></span>
+                <span class="text-[10px] text-zinc-400 dark:text-zinc-500 block mt-1 font-medium">Servicing Cost: ₹<?php echo number_format( $total_repair_expense ); ?></span>
             </div>
         </div>
     </div>
 
     <!-- ═══ 3. STANDARDIZED PLATFORM SUB-TAB BAR ═════════════════════════════════ -->
     <div class="cora-sub-tabs border-b border-zinc-200 flex gap-6 text-xs font-bold text-zinc-500 select-none pb-0.5">
-        <button id="tab-btn-registry" onclick="coraSwitchEquipmentTab('registry')" class="cora-eq-tab-btn active pb-2.5 border-b-2 border-zinc-950 text-zinc-950 cursor-pointer flex items-center gap-2">
-            Gear Registry (<span id="cnt-tab-registry"><?php echo count( $cora_studio_gear ); ?></span>)
+        <button id="tab-btn-registry" onclick="coraSwitchEquipmentTab('registry')" class="cora-eq-tab-btn active pb-2.5 border-b-2 border-zinc-950 text-zinc-950 cursor-pointer flex items-center gap-1.5">
+            Gear Registry <span id="cnt-tab-registry" class="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-350 px-2 py-0.5 rounded-full border border-zinc-200/40 dark:border-zinc-700/40 font-mono"><?php echo count( $cora_studio_gear ); ?></span>
         </button>
 
-        <button id="tab-btn-checkouts" onclick="coraSwitchEquipmentTab('checkouts')" class="cora-eq-tab-btn pb-2.5 border-b-2 border-transparent hover:text-zinc-900 text-zinc-500 cursor-pointer flex items-center gap-2">
-            Shoot Checkouts (<span id="cnt-tab-checkouts"><?php echo count( $cora_gear_checkouts ); ?></span>)
+        <button id="tab-btn-checkouts" onclick="coraSwitchEquipmentTab('checkouts')" class="cora-eq-tab-btn pb-2.5 border-b-2 border-transparent hover:text-zinc-900 text-zinc-500 cursor-pointer flex items-center gap-1.5">
+            Shoot Checkouts <span id="cnt-tab-checkouts" class="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-350 px-2 py-0.5 rounded-full border border-zinc-200/40 dark:border-zinc-700/40 font-mono"><?php echo count( $cora_gear_checkouts ); ?></span>
         </button>
 
-        <button id="tab-btn-maintenance" onclick="coraSwitchEquipmentTab('maintenance')" class="cora-eq-tab-btn pb-2.5 border-b-2 border-transparent hover:text-zinc-900 text-zinc-500 cursor-pointer flex items-center gap-2">
-            Maintenance & Financial Ledger (<span id="cnt-tab-maintenance"><?php echo count( $cora_gear_maintenance ); ?></span>)
+        <button id="tab-btn-maintenance" onclick="coraSwitchEquipmentTab('maintenance')" class="cora-eq-tab-btn pb-2.5 border-b-2 border-transparent hover:text-zinc-900 text-zinc-500 cursor-pointer flex items-center gap-1.5">
+            Maintenance & Financial Ledger <span id="cnt-tab-maintenance" class="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-350 px-2 py-0.5 rounded-full border border-zinc-200/40 dark:border-zinc-700/40 font-mono"><?php echo count( $cora_gear_maintenance ); ?></span>
         </button>
 
-        <button id="tab-btn-kits" onclick="coraSwitchEquipmentTab('kits')" class="cora-eq-tab-btn pb-2.5 border-b-2 border-transparent hover:text-zinc-900 text-zinc-500 cursor-pointer flex items-center gap-2">
-            Studio Gear Kits (<span id="cnt-tab-kits"><?php echo count( $cora_gear_kits ); ?></span>)
+        <button id="tab-btn-kits" onclick="coraSwitchEquipmentTab('kits')" class="cora-eq-tab-btn pb-2.5 border-b-2 border-transparent hover:text-zinc-900 text-zinc-500 cursor-pointer flex items-center gap-1.5">
+            Studio Gear Kits <span id="cnt-tab-kits" class="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-350 px-2 py-0.5 rounded-full border border-zinc-200/40 dark:border-zinc-700/40 font-mono"><?php echo count( $cora_gear_kits ); ?></span>
         </button>
     </div>
 
