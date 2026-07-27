@@ -10444,32 +10444,32 @@ jQuery(document).ready(function($) {
     // Drag & Drop Handlers for Kanban Cards
     let draggedLeadCardId = null;
 
-    window.coraLeadDragStart = function(ev) {
-        const card = $(ev.currentTarget).closest('.cora-lead-card');
+    window.coraLeadDragStart = function(ev, el) {
+        const card = $(el || ev.currentTarget).closest('.cora-lead-card');
         draggedLeadCardId = card.attr('data-id');
         ev.dataTransfer.effectAllowed = 'move';
         ev.dataTransfer.setData('text/plain', draggedLeadCardId);
         card.addClass('opacity-40 border-dashed border-zinc-500 scale-[0.99]');
     };
 
-    window.coraLeadDragOver = function(ev) {
+    window.coraLeadDragOver = function(ev, el) {
         ev.preventDefault();
         ev.dataTransfer.dropEffect = 'move';
-        $(ev.currentTarget).closest('.cora-kanban-column').addClass('bg-zinc-100/60 dark:bg-zinc-800/60');
+        $(el || ev.currentTarget).closest('.cora-kanban-column').addClass('bg-zinc-100/60 dark:bg-zinc-800/60');
     };
 
-    window.coraLeadDragEnd = function(ev) {
+    window.coraLeadDragEnd = function(ev, el) {
         $('.cora-lead-card').removeClass('opacity-40 border-dashed border-zinc-500 scale-[0.99]');
         $('.cora-kanban-column').removeClass('bg-zinc-100/60 dark:bg-zinc-800/60');
         draggedLeadCardId = null;
     };
 
-    window.coraLeadDrop = function(ev) {
+    window.coraLeadDrop = function(ev, el) {
         ev.preventDefault();
         $('.cora-kanban-column').removeClass('bg-zinc-100/60 dark:bg-zinc-800/60');
         $('.cora-lead-card').removeClass('opacity-40 border-dashed border-zinc-500 scale-[0.99]');
 
-        const col = $(ev.currentTarget).closest('.cora-kanban-column');
+        const col = $(el || ev.currentTarget).closest('.cora-kanban-column');
         const newStage = col.attr('data-status');
         const leadId = ev.dataTransfer.getData('text/plain') || draggedLeadCardId;
 

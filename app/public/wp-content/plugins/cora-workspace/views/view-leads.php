@@ -236,8 +236,8 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
             ?>
             <div class="cora-kanban-column flex flex-col p-3.5 rounded-2xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs shrink-0 w-[380px] min-w-[380px] min-h-[600px] relative"
                  data-status="<?php echo esc_attr( $stage_key ); ?>"
-                 ondragover="coraLeadDragOver(event)"
-                 ondrop="coraLeadDrop(event)">
+                 ondragover="coraLeadDragOver(event, this)"
+                 ondrop="coraLeadDrop(event, this)">
                 
                 <!-- Column Header -->
                 <div class="mb-3 pb-2.5 border-b border-zinc-100 dark:border-zinc-800/80 px-1 pt-1 shrink-0">
@@ -290,8 +290,8 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                              data-name="<?php echo esc_attr( strtolower($lead['names']) ); ?>"
                              data-email="<?php echo esc_attr( strtolower($lead['email']) ); ?>"
                              data-status="<?php echo esc_attr( $stage_key ); ?>"
-                             ondragstart="coraLeadDragStart(event)"
-                             ondragend="coraLeadDragEnd(event)"
+                             ondragstart="coraLeadDragStart(event, this)"
+                             ondragend="coraLeadDragEnd(event, this)"
                              onclick="coraOpenLeadDetailDrawer('<?php echo esc_attr( $lead['id'] ); ?>')">
                             
                             <!-- Header Row: Client Pill + Score Badge + Options -->
