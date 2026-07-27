@@ -2214,6 +2214,10 @@ $cora_settings_tabs = array(
 
 <script>
 jQuery(document).ready(function($) {
+    if (typeof coraAutoSave !== 'undefined') {
+        coraAutoSave.attachForm('#cora-settings-suite-form', 'settings_suite', 'cora_save_system_settings_suite');
+    }
+
     $('#cora-purge-legacy-options').on('click', function(e) {
         e.preventDefault();
         

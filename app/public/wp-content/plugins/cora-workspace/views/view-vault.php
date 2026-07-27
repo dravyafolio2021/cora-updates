@@ -482,7 +482,8 @@ foreach ( $cora_documents as $doc ) {
          VIEW 2: UNIFIED 6-STEP VISUAL GUIDED DOCUMENT WIZARD WITH STICKY DOCK
          ═════════════════════════════════════════════════════════════════════ -->
     <div id="cora-vault-view-editor" class="hidden space-y-8 w-full max-w-none">
-        <input type="hidden" id="studio-doc-id">
+        <form id="cora-doc-wizard-form" data-autosave-module="vault_doc_wizard" class="space-y-8 w-full">
+        <input type="hidden" id="studio-doc-id" name="studio_doc_id">
 
         <!-- STEP 1 SUB-PAGE: DOCUMENT TYPE SELECTION -->
         <div id="sub-page-wiz-step-1" class="bg-white border border-zinc-200/80 rounded-3xl p-6 md:p-10 shadow-xs space-y-6 w-full max-w-none">
@@ -623,7 +624,7 @@ foreach ( $cora_documents as $doc ) {
                 <!-- Left: Doc Title + Save status -->
                 <div class="flex items-center gap-3">
                     <div class="relative">
-                        <input type="text" id="studio-doc-title-input" value="Modern Proposal" placeholder="Document Title..." oninput="coraSyncCanvasFields()" class="text-sm md:text-base font-black text-zinc-950 bg-transparent border border-zinc-200/80 hover:border-zinc-400 focus:border-zinc-950 focus:bg-white rounded-xl px-3.5 py-2 outline-none transition-all w-60 md:w-80 shadow-xs">
+                        <input type="text" id="studio-doc-title-input" name="studio_doc_title" value="Modern Proposal" placeholder="Document Title..." oninput="coraSyncCanvasFields()" class="text-sm md:text-base font-black text-zinc-950 bg-transparent border border-zinc-200/80 hover:border-zinc-400 focus:border-zinc-950 focus:bg-white rounded-xl px-3.5 py-2 outline-none transition-all w-60 md:w-80 shadow-xs">
                     </div>
                     <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-[11px] font-semibold shrink-0">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -931,22 +932,22 @@ foreach ( $cora_documents as $doc ) {
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                                 <div class="space-y-1">
                                     <label class="block font-bold text-zinc-700 text-[11px]">Document Reference #</label>
-                                    <input type="text" id="studio-doc-number" value="DOC-2026" oninput="coraSyncCanvasFields()" class="w-full border border-zinc-200 rounded-xl p-2.5 bg-white outline-none focus:border-zinc-950 transition-colors font-mono font-bold">
+                                    <input type="text" id="studio-doc-number" name="studio_doc_number" value="DOC-2026" oninput="coraSyncCanvasFields()" class="w-full border border-zinc-200 rounded-xl p-2.5 bg-white outline-none focus:border-zinc-950 transition-colors font-mono font-bold">
                                 </div>
 
                                 <div class="space-y-1">
                                     <label class="block font-bold text-zinc-700 text-[11px]">Client Full Name / Company *</label>
-                                    <input type="text" id="studio-client-name" placeholder="e.g. Arjun & Priya / Apex Realty" oninput="coraSyncCanvasFields()" class="w-full border border-zinc-200 rounded-xl p-2.5 bg-white outline-none focus:border-zinc-950 transition-colors font-semibold">
+                                    <input type="text" id="studio-client-name" name="studio_client_name" placeholder="e.g. Arjun & Priya / Apex Realty" oninput="coraSyncCanvasFields()" class="w-full border border-zinc-200 rounded-xl p-2.5 bg-white outline-none focus:border-zinc-950 transition-colors font-semibold">
                                 </div>
 
                                 <div class="space-y-1">
                                     <label class="block font-bold text-zinc-700 text-[11px]">Client Email *</label>
-                                    <input type="email" id="studio-client-email" placeholder="client@example.com" oninput="coraSyncCanvasFields()" class="w-full border border-zinc-200 rounded-xl p-2.5 bg-white outline-none focus:border-zinc-950 transition-colors">
+                                    <input type="email" id="studio-client-email" name="studio_client_email" placeholder="client@example.com" oninput="coraSyncCanvasFields()" class="w-full border border-zinc-200 rounded-xl p-2.5 bg-white outline-none focus:border-zinc-950 transition-colors">
                                 </div>
 
                                 <div class="space-y-1">
                                     <label class="block font-bold text-zinc-700 text-[11px]">WhatsApp Phone Number</label>
-                                    <input type="text" id="studio-client-phone" placeholder="9876543210" oninput="coraSyncCanvasFields()" class="w-full border border-zinc-200 rounded-xl p-2.5 bg-white outline-none focus:border-zinc-950 transition-colors font-mono">
+                                    <input type="text" id="studio-client-phone" name="studio_client_phone" placeholder="9876543210" oninput="coraSyncCanvasFields()" class="w-full border border-zinc-200 rounded-xl p-2.5 bg-white outline-none focus:border-zinc-950 transition-colors font-mono">
                                 </div>
 
                                 <div class="space-y-1 sm:col-span-2">
@@ -962,7 +963,7 @@ foreach ( $cora_documents as $doc ) {
 
                             <input type="hidden" id="studio-doc-type" value="Proposal">
                             <input type="hidden" id="studio-doc-status" value="Draft">
-                            <input type="hidden" id="studio-client-gstin" value="">
+                            <input type="hidden" id="studio-client-gstin" name="studio_client_gstin" value="">
                             <input type="hidden" id="studio-doc-upi" value="cora@icici">
                         </div>
 
@@ -1379,7 +1380,7 @@ foreach ( $cora_documents as $doc ) {
                     <!-- Internal Document Notes -->
                     <div class="space-y-1.5 pt-1 border-t border-zinc-100">
                         <label class="text-[11px] font-bold text-zinc-700 block">Internal Document Notes</label>
-                        <textarea id="step4-quick-notes" rows="3" class="w-full border border-zinc-200 rounded-xl p-2.5 text-xs outline-none focus:border-zinc-950 transition-all text-zinc-800 bg-zinc-50/50 focus:bg-white" placeholder="Internal studio notes (not visible to client)..."></textarea>
+                        <textarea id="step4-quick-notes" name="step4_quick_notes" rows="3" class="w-full border border-zinc-200 rounded-xl p-2.5 text-xs outline-none focus:border-zinc-950 transition-all text-zinc-800 bg-zinc-50/50 focus:bg-white" placeholder="Internal studio notes (not visible to client)..."></textarea>
                     </div>
                 </div>
 
@@ -1646,7 +1647,7 @@ foreach ( $cora_documents as $doc ) {
                                     </div>
                                 </div>
                                 <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                                    <input type="checkbox" id="wiz-sec-watermark-toggle" onchange="coraToggleSecWatermark(this.checked)" class="sr-only">
+                                    <input type="checkbox" id="wiz-sec-watermark-toggle" name="wiz_sec_watermark_toggle" onchange="coraToggleSecWatermark(this.checked)" class="sr-only">
                                     <div id="wiz-sec-watermark-track" class="w-10 h-5.5 bg-zinc-200 rounded-full transition-colors duration-200 relative p-0.5">
                                         <div id="wiz-sec-watermark-knob" class="w-4.5 h-4.5 bg-white rounded-full shadow-md transition-transform duration-200 transform translate-x-0"></div>
                                     </div>
@@ -1763,6 +1764,7 @@ foreach ( $cora_documents as $doc ) {
                 </div>
             </div>
         </div>
+        </form>
     </div>
 
     <!-- ═════════════════════════════════════════════════════════════════════════
@@ -3331,11 +3333,11 @@ window.coraAddStudioLineItem = function(itemData) {
     var tr = document.createElement('tr');
     tr.id = rowId;
     tr.className = 'hover:bg-zinc-50/80 transition-colors cora-line-item-row';
-    tr.innerHTML = '<td class="p-2.5"><input type="text" class="item-desc w-full border border-zinc-200 rounded-lg p-1.5 text-xs outline-none focus:border-zinc-950 transition-colors font-medium" value="' + desc + '" placeholder="Item name / service scope..."></td>' +
-                   '<td class="p-2.5"><input type="text" class="item-sac w-20 border border-zinc-200 rounded-lg p-1.5 text-xs font-mono outline-none focus:border-zinc-950 transition-colors" value="' + sac + '" placeholder="998381"></td>' +
-                   '<td class="p-2.5"><input type="number" class="item-qty w-14 border border-zinc-200 rounded-lg p-1.5 text-xs outline-none focus:border-zinc-950 transition-colors text-center font-bold" value="' + qty + '" onchange="coraRecalculateStudioTotals()"></td>' +
-                   '<td class="p-2.5"><input type="number" class="item-rate w-24 border border-zinc-200 rounded-lg p-1.5 text-xs outline-none focus:border-zinc-950 transition-colors font-bold" value="' + rate + '" onchange="coraRecalculateStudioTotals()"></td>' +
-                   '<td class="p-2.5"><select class="item-tax border border-zinc-200 rounded-lg p-1.5 text-xs outline-none focus:border-zinc-950 transition-colors" onchange="coraRecalculateStudioTotals()"><option value="18" ' + (tax==18?'selected':'') + '>18% GST</option><option value="12" ' + (tax==12?'selected':'') + '>12% GST</option><option value="5" ' + (tax==5?'selected':'') + '>5% GST</option><option value="0" ' + (tax==0?'selected':'') + '>0% GST</option></select></td>' +
+    tr.innerHTML = '<td class="p-2.5"><input type="text" name="item_desc[]" class="item-desc w-full border border-zinc-200 rounded-lg p-1.5 text-xs outline-none focus:border-zinc-950 transition-colors font-medium" value="' + desc + '" placeholder="Item name / service scope..."></td>' +
+                   '<td class="p-2.5"><input type="text" name="item_sac[]" class="item-sac w-20 border border-zinc-200 rounded-lg p-1.5 text-xs font-mono outline-none focus:border-zinc-950 transition-colors" value="' + sac + '" placeholder="998381"></td>' +
+                   '<td class="p-2.5"><input type="number" name="item_qty[]" class="item-qty w-14 border border-zinc-200 rounded-lg p-1.5 text-xs outline-none focus:border-zinc-950 transition-colors text-center font-bold" value="' + qty + '" onchange="coraRecalculateStudioTotals()"></td>' +
+                   '<td class="p-2.5"><input type="number" name="item_rate[]" class="item-rate w-24 border border-zinc-200 rounded-lg p-1.5 text-xs outline-none focus:border-zinc-950 transition-colors font-bold" value="' + rate + '" onchange="coraRecalculateStudioTotals()"></td>' +
+                   '<td class="p-2.5"><select name="item_tax[]" class="item-tax border border-zinc-200 rounded-lg p-1.5 text-xs outline-none focus:border-zinc-950 transition-colors" onchange="coraRecalculateStudioTotals()"><option value="18" ' + (tax==18?'selected':'') + '>18% GST</option><option value="12" ' + (tax==12?'selected':'') + '>12% GST</option><option value="5" ' + (tax==5?'selected':'') + '>5% GST</option><option value="0" ' + (tax==0?'selected':'') + '>0% GST</option></select></td>' +
                    '<td class="p-2.5 text-right font-bold text-zinc-950 font-mono item-line-total">₹0</td>' +
                    '<td class="p-2.5 text-center"><button type="button" onclick="document.getElementById(\'' + rowId + '\').remove(); coraRecalculateStudioTotals();" class="text-zinc-400 hover:text-zinc-950 font-bold p-1">✕</button></td>';
 
@@ -3684,6 +3686,7 @@ window.coraSaveStudioDocument = function() {
         success: function(r) {
             if (r.success) {
                 coraShowToast('Document saved successfully!');
+                if (window.coraAutoSave) window.coraAutoSave.clearLocalDraft('vault_doc_wizard');
                 setTimeout(function(){ location.reload(); }, 600);
             } else {
                 coraShowToast(r.data || 'Save failed.');
@@ -3691,6 +3694,26 @@ window.coraSaveStudioDocument = function() {
         }
     });
 };
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof window.coraAutoSave !== 'undefined') {
+        const draft = window.coraAutoSave.loadLocalDraft('vault_doc_wizard');
+        if (draft && draft.data) {
+            const urlParams = new URLSearchParams(draft.data);
+            let itemCount = 0;
+            urlParams.forEach((val, key) => {
+                if (key === 'item_desc[]') itemCount++;
+            });
+            if (itemCount > 0) {
+                document.getElementById('studio-item-rows').innerHTML = '';
+                for (let i = 0; i < itemCount; i++) {
+                    coraAddStudioItemRow();
+                }
+            }
+            // Let the main coraAutoSave engine handle field restoration now that rows exist
+        }
+    }
+});
 
 window.coraFilterVault = function(type, targetBtn) {
     var btnEl = targetBtn || (typeof event !== 'undefined' && event ? (event.currentTarget || event.target) : null);

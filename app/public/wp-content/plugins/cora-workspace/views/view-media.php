@@ -45,19 +45,144 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 .cm-toggle button.on { background:#09090b; color:#fff; }
 .cm-toggle button + button { border-left:1px solid #e4e4e7; }
 
-/* ─── Folder tab bar ─────────────────────────────────────────────────────── */
-#cm-tab-bar { display:flex; align-items:center; gap:0; padding:0 14px; overflow-x:auto; scrollbar-width:none; border-bottom:1px solid #f4f4f5; flex-shrink:0; background:#fafafa; }
-#cm-tab-bar::-webkit-scrollbar { display:none; }
-.cm-ftab { display:inline-flex; align-items:center; gap:5px; padding:8px 14px; font-size:12px; font-weight:600; color:#71717a; cursor:pointer; white-space:nowrap; border-bottom:2px solid transparent; margin-bottom:-1px; transition:color .12s,border-color .12s; position:relative; }
-.cm-ftab:hover { color:#18181b; }
-.cm-ftab.active { color:#09090b; border-bottom-color:#09090b; }
-.cm-ftab .ct { font-size:10px; background:#f4f4f5; color:#71717a; border-radius:999px; padding:1px 6px; margin-left:1px; }
-.cm-ftab.active .ct { background:#18181b; color:#fff; }
-.cm-ftab-add { padding:8px 10px; color:#a1a1aa; cursor:pointer; display:flex; align-items:center; border:none; background:none; transition:color .12s; }
-.cm-ftab-add:hover { color:#18181b; }
+/* ─── Dedicated Folders Section ────────────────────────────────────────── */
+#cm-folders-section {
+    padding: 16px 20px 14px;
+    border-bottom: 1px solid #f4f4f5;
+    background: #fff;
+    flex-shrink: 0;
+}
+.cm-folders-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+.cm-folders-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 800;
+    color: #09090b;
+    letter-spacing: -.02em;
+}
+#cm-folders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+.cm-fcard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #fafafa;
+    border: 1px solid #e4e4e7;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .15s ease;
+    user-select: none;
+}
+.cm-fcard:hover {
+    background: #fff;
+    border-color: #a1a1aa;
+    box-shadow: 0 4px 12px rgba(0,0,0,.05);
+}
+.cm-fcard.active {
+    background: #f4f4f5;
+    border: 1px solid #d4d4d8;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.cm-fcard-toggle {
+    border: 1px dashed #d4d4d8;
+    color: #52525b;
+}
+.cm-fcard-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+.cm-fcard-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    background: #f4f4f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3f3f46;
+    flex-shrink: 0;
+}
+.cm-fcard-info {
+    min-width: 0;
+}
+.cm-fcard-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #09090b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.cm-fcard-ct {
+    font-size: 10px;
+    color: #71717a;
+    font-weight: 500;
+}
+.cm-fcard-opt {
+    color: #a1a1aa;
+    padding: 4px 6px;
+    border-radius: 6px;
+    transition: color .12s, background .12s;
+    font-weight: 700;
+}
+.cm-fcard-opt:hover {
+    color: #09090b;
+    background: #f4f4f5;
+}
+
+/* ─── Breadcrumbs & Sorting Row ────────────────────────────────────────── */
+#cm-breadcrumbs-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px 4px;
+    background: #fff;
+    flex-wrap: wrap;
+    gap: 10px;
+    flex-shrink: 0;
+}
+.cm-bc-path {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #09090b;
+}
+.cm-bc-sep { color: #a1a1aa; font-weight: 400; }
+.cm-bc-active { color: #09090b; }
+.cm-bc-badge {
+    font-size: 11px;
+    font-weight: 600;
+    background: #f4f4f5;
+    color: #71717a;
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+.cm-sort-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #71717a;
+    font-weight: 600;
+}
 
 /* ─── Toolbar (search + filters) ────────────────────────────────────────── */
-#cm-toolbar { display:flex; align-items:center; gap:8px; padding:9px 18px; border-bottom:1px solid #f4f4f5; flex-wrap:wrap; flex-shrink:0; background:#fff; }
+#cm-toolbar { display:flex; align-items:center; gap:8px; padding:8px 20px 14px; border-bottom:1px solid #f4f4f5; flex-wrap:wrap; flex-shrink:0; background:#fff; }
 .cm-search-wrap { position:relative; flex:1; min-width:160px; max-width:320px; }
 .cm-search-wrap svg { position:absolute; left:9px; top:50%; transform:translateY(-50%); pointer-events:none; color:#a1a1aa; }
 .cm-search { width:100%; border:1px solid #e4e4e7; border-radius:8px; padding:6px 10px 6px 30px; font-size:12px; background:#fafafa; outline:none; box-sizing:border-box; }
@@ -65,6 +190,32 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 .cm-sel { border:1px solid #e4e4e7; border-radius:8px; padding:6px 9px; font-size:11px; color:#52525b; background:#fff; outline:none; cursor:pointer; }
 .cm-bulk-bar { display:none; align-items:center; gap:7px; padding:4px 10px; background:#f4f4f5; border-radius:8px; }
 .cm-bulk-bar.on { display:flex; }
+
+/* ─── Media Card Metadata Footer ────────────────────────────────────────── */
+.cm-cell-meta {
+    padding: 9px 12px;
+    background: #fff;
+    border-top: 1px solid #f4f4f5;
+}
+.cm-cell-sub {
+    font-size: 10px;
+    color: #71717a;
+    font-family: ui-monospace, monospace;
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.cm-cell-opt {
+    color: #a1a1aa;
+    padding: 1px 4px;
+    border-radius: 4px;
+    font-weight: 700;
+}
+.cm-cell-opt:hover {
+    color: #09090b;
+    background: #f4f4f5;
+}
 
 /* ─── Upload progress ────────────────────────────────────────────────────── */
 #cm-uprog { display:none; flex-direction:column; max-height:150px; overflow-y:auto; background:#fafafa; border-bottom:1px solid #e4e4e7; flex-shrink:0; }
@@ -91,19 +242,74 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 .cm-chk.checked svg { display:block; }
 
 /* ─── List view ──────────────────────────────────────────────────────────── */
-#cm-list { display:none; }
+#cm-list { display:none; border:1px solid #e4e4e7; border-radius:12px; overflow:hidden; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.04); }
 .cm-ltable { width:100%; border-collapse:collapse; font-size:12px; }
-.cm-ltable thead th { padding:9px 12px; text-align:left; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:#a1a1aa; border-bottom:1px solid #e4e4e7; background:#fafafa; cursor:pointer; user-select:none; }
-.cm-ltable thead th:hover { color:#18181b; }
-.cm-ltable tbody tr { border-bottom:1px solid #f4f4f5; cursor:pointer; transition:background .1s; }
+.cm-ltable thead th { padding:10px 14px; text-align:left; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:#71717a; border-bottom:1px solid #e4e4e7; background:#fafafa; cursor:pointer; user-select:none; }
+.cm-ltable thead th:hover { color:#09090b; }
+.cm-ltable tbody tr { border-bottom:1px solid #f4f4f5; cursor:pointer; transition:background .12s ease; }
+.cm-ltable tbody tr:last-child { border-bottom:none; }
 .cm-ltable tbody tr:hover { background:#fafafa; }
 .cm-ltable tbody tr.sel { background:#f4f4f5; }
-.cm-ltable td { padding:9px 12px; color:#3f3f46; vertical-align:middle; }
-.cm-lthumb { width:36px; height:36px; border-radius:7px; object-fit:cover; flex-shrink:0; }
+.cm-ltable td { padding:10px 14px; color:#3f3f46; vertical-align:middle; }
+.cm-lthumb { width:36px; height:36px; border-radius:8px; object-fit:cover; flex-shrink:0; }
 
 /* ─── Empty / Loading ────────────────────────────────────────────────────── */
 #cm-empty { display:none; flex-direction:column; align-items:center; justify-content:center; height:100%; min-height:280px; gap:10px; text-align:center; padding:40px; }
 #cm-loading { display:none; padding:16px 18px; }
+
+/* ─── Centered Modal Dialog Pop-ups ───────────────────────────────────────── */
+#cm-folder-dlg, #cm-gallery-dlg, #cm-folder-settings-dlg, #cm-detail {
+    position: fixed; inset: 0; z-index: 99999;
+    background: rgba(9, 9, 11, 0.6); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; opacity: 0; pointer-events: none;
+    transition: opacity .2s ease-in-out;
+}
+#cm-folder-dlg.open, #cm-gallery-dlg.open, #cm-folder-settings-dlg.open, #cm-detail.open {
+    opacity: 1; pointer-events: auto;
+}
+#cm-folder-card, #cm-gallery-card, #cm-folder-settings-card {
+    background: #fff; border: 1px solid #e4e4e7; border-radius: 16px;
+    width: 100%; max-width: 500px; max-height: 90vh;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,.25);
+    display: flex; flex-direction: column; overflow: hidden;
+    transform: scale(0.95); transition: transform .2s ease-in-out;
+}
+#cm-detail-card {
+    background: #fff; border: 1px solid #e4e4e7; border-radius: 16px;
+    width: 100%; max-width: 680px; max-height: 90vh;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,.25);
+    display: flex; flex-direction: column; overflow: hidden;
+    transform: scale(0.95); transition: transform .2s ease-in-out;
+}
+#cm-folder-dlg.open #cm-folder-card,
+#cm-gallery-dlg.open #cm-gallery-card,
+#cm-folder-settings-dlg.open #cm-folder-settings-card,
+#cm-detail.open #cm-detail-card {
+    transform: scale(1) !important;
+}
+#cm-detail-header { flex-shrink:0; padding:14px 18px; border-bottom:1px solid #e4e4e7; display:flex; align-items:center; gap:8px; background:#fff; }
+#cm-detail-header h3 { flex:1; font-size:14px; font-weight:700; color:#09090b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0; }
+.cm-preview { flex-shrink:0; height:260px; background:#09090b; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.cm-preview img,.cm-preview video { max-height:100%; max-width:100%; object-fit:contain; }
+.cm-detail-tabs { display:flex; border-bottom:1px solid #e4e4e7; flex-shrink:0; background:#fff; }
+.cm-dtab { padding:8px 14px; font-size:11px; font-weight:600; color:#a1a1aa; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:color .12s; }
+.cm-dtab.active { color:#09090b; border-bottom-color:#09090b; }
+.cm-dbody { flex:1; overflow-y:auto; padding:16px; }
+.cm-field { margin-bottom:12px; }
+.cm-field label { display:block; font-size:10px; font-weight:700; color:#a1a1aa; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; }
+.cm-field input,.cm-field textarea,.cm-field select { width:100%; border:1px solid #e4e4e7; border-radius:7px; padding:6px 9px; font-size:12px; color:#18181b; background:#fff; outline:none; transition:border .15s; box-sizing:border-box; resize:vertical; }
+.cm-field input:focus,.cm-field textarea:focus,.cm-field select:focus { border-color:#71717a; }
+.cm-meta-row { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #f4f4f5; font-size:11px; }
+.cm-meta-row .mk { color:#a1a1aa; font-size:10px; font-weight:600; text-transform:uppercase; }
+.cm-meta-row .mv { color:#3f3f46; max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:4px; }
+#cm-detail-footer { flex-shrink:0; padding:12px 16px; border-top:1px solid #e4e4e7; background:#fafafa; display:flex; gap:6px; }
+.cm-dfbtn { flex:1; padding:8px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; border:1px solid #e4e4e7; background:#fff; color:#3f3f46; transition:all .12s; }
+.cm-dfbtn:hover { background:#f4f4f5; }
+.cm-dfbtn.save { background:#09090b; color:#fff; border-color:#09090b; }
+.cm-dfbtn.save:hover { background:#27272a; }
+.cm-dfbtn.del { color:#dc2626; border-color:#fecaca; }
+
 .cm-sk { background:#f4f4f5; border-radius:10px; aspect-ratio:4/3; animation:cm-pulse 1.4s ease-in-out infinite; }
 @keyframes cm-pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 #cm-pag { display:none; align-items:center; justify-content:space-between; padding:10px 18px; border-top:1px solid #f4f4f5; font-size:11px; color:#71717a; flex-shrink:0; }
@@ -115,32 +321,6 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 #cm-drop { position:absolute; inset:0; background:rgba(9,9,11,.6); backdrop-filter:blur(4px); z-index:800; display:none; align-items:center; justify-content:center; pointer-events:none; }
 #cm-drop.on { display:flex; }
 .cm-drop-box { border:2px dashed rgba(255,255,255,.5); border-radius:16px; padding:40px 64px; text-align:center; color:#fff; }
-
-/* ─── Detail overlay (right slide-in) ───────────────────────────────────── */
-#cm-detail { position:fixed; top:0; right:0; bottom:0; width:60vw; max-width:90vw; background:#fff; border-left:1px solid #e4e4e7; box-shadow:-8px 0 32px rgba(0,0,0,.15); display:flex; flex-direction:column; transform:translateX(100%); transition:transform .25s cubic-bezier(.4,0,.2,1); z-index:9999; }
-#cm-detail.open { transform:translateX(0); }
-#cm-detail-header { flex-shrink:0; padding:13px 16px; border-bottom:1px solid #e4e4e7; display:flex; align-items:center; gap:8px; }
-#cm-detail-header h3 { flex:1; font-size:13px; font-weight:700; color:#09090b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0; }
-.cm-preview { flex-shrink:0; height:380px; background:#09090b; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-.cm-preview img,.cm-preview video { max-height:100%; max-width:100%; object-fit:contain; }
-.cm-detail-tabs { display:flex; border-bottom:1px solid #e4e4e7; flex-shrink:0; }
-.cm-dtab { padding:8px 14px; font-size:11px; font-weight:600; color:#a1a1aa; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:color .12s; }
-.cm-dtab.active { color:#09090b; border-bottom-color:#09090b; }
-.cm-dbody { flex:1; overflow-y:auto; padding:14px; }
-.cm-field { margin-bottom:12px; }
-.cm-field label { display:block; font-size:10px; font-weight:700; color:#a1a1aa; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; }
-.cm-field input,.cm-field textarea,.cm-field select { width:100%; border:1px solid #e4e4e7; border-radius:7px; padding:6px 9px; font-size:12px; color:#18181b; background:#fff; outline:none; transition:border .15s; box-sizing:border-box; resize:vertical; }
-.cm-field input:focus,.cm-field textarea:focus,.cm-field select:focus { border-color:#71717a; }
-.cm-meta-row { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #f4f4f5; font-size:11px; }
-.cm-meta-row .mk { color:#a1a1aa; font-size:10px; font-weight:600; text-transform:uppercase; }
-.cm-meta-row .mv { color:#3f3f46; max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:4px; }
-#cm-detail-footer { flex-shrink:0; padding:10px 14px; border-top:1px solid #e4e4e7; background:#fafafa; display:flex; gap:6px; }
-.cm-dfbtn { flex:1; padding:8px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; border:1px solid #e4e4e7; background:#fff; color:#3f3f46; transition:all .12s; }
-.cm-dfbtn:hover { background:#f4f4f5; }
-.cm-dfbtn.save { background:#09090b; color:#fff; border-color:#09090b; }
-.cm-dfbtn.save:hover { background:#27272a; }
-.cm-dfbtn.del { color:#dc2626; border-color:#fecaca; }
-.cm-dfbtn.del:hover { background:#fef2f2; }
 
 /* ─── Share link rows ────────────────────────────────────────────────────── */
 .cm-share-row { display:flex; align-items:center; gap:6px; padding:6px 0; border-bottom:1px solid #f4f4f5; font-size:11px; }
@@ -154,7 +334,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 
 /* ─── Image Editor modal ─────────────────────────────────────────────────── */
 #cm-editor-modal {
-    position:fixed; inset:0; z-index:9999;
+    position:fixed; inset:0; z-index:99999;
     background:rgba(9,9,11,.8); backdrop-filter:blur(5px);
     display:none; align-items:center; justify-content:center;
     padding:24px 16px;
@@ -185,7 +365,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 .cm-scale-group input { width:60px; border:1px solid #e4e4e7; border-radius:6px; padding:5px 7px; font-size:11px; text-align:center; outline:none; }
 
 /* ─── Confirm modal ──────────────────────────────────────────────────────── */
-#cm-confirm-modal { position:fixed; inset:0; z-index:10000; background:rgba(9,9,11,.5); backdrop-filter:blur(3px); display:none; align-items:center; justify-content:center; padding:16px; }
+#cm-confirm-modal { position:fixed; inset:0; z-index:100000; background:rgba(9,9,11,.5); backdrop-filter:blur(3px); display:none; align-items:center; justify-content:center; padding:16px; }
 #cm-confirm-modal.open { display:flex; }
 #cm-confirm-card { background:#fff; border:1px solid #e4e4e7; border-radius:14px; padding:24px; max-width:420px; width:100%; box-shadow:0 20px 40px rgba(0,0,0,.15); }
 #cm-confirm-card h4 { margin:0 0 6px; font-size:14px; font-weight:700; }
@@ -193,10 +373,6 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 #cm-confirm-card .btns { display:flex; gap:8px; justify-content:flex-end; }
 
 /* ─── Drawer Overlays ─────────────────────────────────────────────────── */
-#cm-folder-dlg, #cm-gallery-dlg, #cm-folder-settings-dlg { position:fixed; inset:0; z-index:99999; background:rgba(9,9,11,.4); backdrop-filter:blur(2px); display:flex; justify-content:flex-end; opacity:0; pointer-events:none; transition:opacity .25s ease; }
-#cm-folder-dlg.open, #cm-gallery-dlg.open, #cm-folder-settings-dlg.open { opacity:1; pointer-events:auto; }
-#cm-folder-card, #cm-gallery-card, #cm-folder-settings-card { background:#fff; border-left:1px solid #e4e4e7; height:100%; width:100%; max-width:440px; box-shadow:-10px 0 30px rgba(0,0,0,.15); display:flex; flex-direction:column; transform:translateX(100%); transition:transform .25s ease; }
-#cm-folder-dlg.open #cm-folder-card,
 #cm-gallery-dlg.open #cm-gallery-card,
 #cm-folder-settings-dlg.open #cm-folder-settings-card { transform:translateX(0) !important; }
 .cm-drawer-header { padding:20px; border-bottom:1px solid #e4e4e7; display:flex; align-items:center; justify-content:space-between; background:#fafafa; }
@@ -284,25 +460,6 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <input type="file" id="cm-file-input" multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.zip" style="display:none" onchange="cmHandleFiles(this.files)">
         </div>
 
-        <!-- ─ FOLDER & GALLERY TAB BAR ──────────────────────────── -->
-        <div id="cm-tab-bar">
-            <div class="cm-ftab active" id="cm-ftab-all" onclick="cmSelectFolder(null,this)" data-folder-id="">
-                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                All Media <span class="ct" id="cm-ftab-all-ct">—</span>
-            </div>
-            <div class="cm-ftab" id="cm-ftab-none" onclick="cmSelectFolder(-1,this)" data-folder-id="-1">
-                Unorganised <span class="ct" id="cm-ftab-none-ct">—</span>
-            </div>
-            <!-- Dynamic folder tabs -->
-            <div id="cm-folder-tabs" style="display:inline-flex;align-items:center;gap:0"></div>
-            <!-- Client Galleries tabs -->
-            <div id="cm-gallery-tabs" style="display:inline-flex;align-items:center;gap:0"></div>
-            <button class="cm-ftab-add" onclick="cmPromptFolder(null)" title="New folder">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            </button>
-        </div>
-    </div>
-
     <!-- ─── TOOLBAR (search + filters) ─────────────────────────── -->
     <div id="cm-toolbar">
         <div class="cm-search-wrap">
@@ -310,7 +467,11 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <input type="text" id="cm-search" class="cm-search" placeholder="Search files…" oninput="cmOnSearch(this.value)">
         </div>
         <select id="cm-ft" class="cm-sel" onchange="cmFilter()">
-            <option value="all">All Types</option><option value="image">Images</option><option value="video">Videos</option><option value="audio">Audio</option><option value="document">Documents</option>
+            <option value="all">All Types</option>
+            <option value="image">Images</option>
+            <option value="video">Videos</option>
+            <option value="audio">Audio</option>
+            <option value="document">Documents</option>
         </select>
         <select id="cm-fculling" class="cm-sel" onchange="cmFilter()">
             <option value="">All Culling</option>
@@ -320,7 +481,16 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <option value="red">Rejected</option>
         </select>
         <select id="cm-fd" class="cm-sel" onchange="cmFilter()"><option value="">All Dates</option></select>
+        <select id="cm-fdoctype" class="cm-sel" onchange="cmFilter()">
+            <option value="">Resolution / Document</option>
+            <?php foreach ($all_doc_types as $dt): ?><option value="<?php echo esc_attr($dt); ?>"><?php echo esc_html($dt); ?></option><?php endforeach; ?>
+        </select>
         <?php if ($is_admin): ?><select id="cm-fa" class="cm-sel" onchange="cmFilter()"><option value="">All Uploaders</option></select><?php endif; ?>
+
+        <button onclick="cmResetFilters()" class="cm-hbtn" style="font-size:11px;padding:5px 9px">
+            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 .49-3.5"></path></svg>
+            Reset
+        </button>
 
         <!-- Bulk action bar -->
         <div id="cm-bulk-bar" class="cm-bulk-bar">
@@ -330,6 +500,41 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <button onclick="cmBulkAddGallery()" class="cm-hbtn" style="font-size:11px;padding:4px 9px"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" style="display:inline;vertical-align:-2px;margin-right:2px"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> Add to Gallery</button>
             <button onclick="cmBulkZip()" class="cm-hbtn" style="font-size:11px;padding:4px 9px"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" style="display:inline;vertical-align:-2px;margin-right:2px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download ZIP</button>
             <button onclick="cmBulkDelete()" class="cm-hbtn" style="font-size:11px;padding:4px 9px;color:#dc2626;border-color:#fecaca">Delete</button>
+        </div>
+    </div>
+
+    <!-- ─── DEDICATED FOLDERS SECTION ─────────────────────────── -->
+    <div id="cm-folders-section">
+        <div class="cm-folders-header">
+            <div class="cm-folders-title">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                Folders
+            </div>
+            <button class="cm-hbtn" onclick="cmPromptFolder(null)">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                New folder
+            </button>
+        </div>
+        <!-- Dynamic Folder Cards Grid -->
+        <div id="cm-folders-grid"></div>
+    </div>
+
+    <!-- ─── BREADCRUMBS & SORTING ROW ─────────────────────────── -->
+    <div id="cm-breadcrumbs-bar">
+        <div class="cm-bc-path">
+            <span onclick="cmSelectFolder(null)" style="cursor:pointer">All Media</span>
+            <span id="cm-bc-subpath" style="display:inline-flex;align-items:center;gap:6px"></span>
+            <span class="cm-bc-badge" id="cm-bc-count">0 files</span>
+        </div>
+        <div class="cm-sort-group">
+            <label>Sort by:</label>
+            <select id="cm-sort-select" class="cm-sel" onchange="cmOnSortChange(this.value)">
+                <option value="date-DESC">Date added (Newest)</option>
+                <option value="date-ASC">Date added (Oldest)</option>
+                <option value="title-ASC">Name (A - Z)</option>
+                <option value="title-DESC">Name (Z - A)</option>
+                <option value="size-DESC">File Size (Largest)</option>
+            </select>
         </div>
     </div>
 
@@ -366,6 +571,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
                     <th onclick="cmSort('date')">Date ↕</th>
                     <th onclick="cmSort('size')">Size</th>
                     <th>Type</th>
+                    <th style="width:40px;text-align:right"></th>
                 </tr></thead>
                 <tbody id="cm-list-body"></tbody>
             </table>
@@ -391,8 +597,9 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
     </div>
 </div><!-- /cm-root -->
 
-<!-- ═══ DETAIL PANEL (right slide-in overlay) ══════════════════════════════ -->
-<div id="cm-detail">
+<!-- ═══ DETAIL POP-UP MODAL ══════════════════════════════════════════════════ -->
+<div id="cm-detail" onclick="if(event.target===this)cmCloseDetail()">
+  <div id="cm-detail-card">
     <div id="cm-detail-header">
         <h3 id="cm-d-name">File Details</h3>
         <button id="cm-d-edit-btn" onclick="cmOpenEditor()" class="cm-hbtn" style="display:none;font-size:11px;padding:4px 9px">
@@ -445,7 +652,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <input type="text" id="cm-d-shoot-tags" placeholder="e.g. Meera Wedding 2025, Pre-Shoot..." onchange="cmSaveShootTags(this.value)">
         </div>
 
-        <div class="cm-field"><label>Title</label><input type="text" id="cm-d-title" placeholder="File title…"></div>
+        <div class="cm-field"><label>Title (Max 200 chars)</label><input type="text" id="cm-d-title" placeholder="File title…" maxlength="200"></div>
         <div class="cm-field" id="cm-d-alt-wrap"><label>Alt Text</label><input type="text" id="cm-d-alt" placeholder="Describe image for accessibility…"></div>
         <div class="cm-field"><label>Caption</label><textarea id="cm-d-caption" rows="2" placeholder="Short caption…"></textarea></div>
         <div class="cm-field"><label>Description</label><textarea id="cm-d-desc" rows="2" placeholder="Longer description…"></textarea></div>
@@ -507,6 +714,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>
         </button>
     </div>
+  </div>
 </div>
 
 <!-- ═══ IMAGE EDITOR MODAL ═══════════════════════════════════════════════════ -->
@@ -717,7 +925,8 @@ var CM = {
     view:'grid', files:[], folders:[], galleries:[], activeGallery:null, folder:null, selIds:[], bulk:false,
     page:1, pages:1, total:0, perPage:40,
     filters:{q:'',type:'all',culling:'',date:'',author:''},
-    sortBy:'date', sortDir:'DESC', active:null, ctxFile:null, searchT:null, confirmCb:null, upQ:0
+    sortBy:'date', sortDir:'DESC', active:null, ctxFile:null, searchT:null, confirmCb:null, upQ:0,
+    foldersExpanded: false
 };
 
 var LABEL_MAP = {
@@ -1034,12 +1243,26 @@ window.cmRenderGrid = function(files) {
         d.className = 'cm-cell' + (CM.selIds.indexOf(f.id) > -1 ? ' sel' : '');
         d.dataset.id = f.id;
         var chkClass = 'cm-chk' + (CM.selIds.indexOf(f.id) > -1 ? ' checked' : '');
-        var thumb = f.type_category === 'image' && f.thumbnail
-            ? '<img class="cm-thumb" src="' + f.thumbnail + '" alt="" loading="lazy">'
-            : '<div class="cm-cell-icon">' + cmIcon(f.type_category, 36) + '</div>';
+        
+        var thumb = '';
+        if (f.type_category === 'image' && f.thumbnail) {
+            thumb = '<img class="cm-thumb" src="' + f.thumbnail + '" alt="" loading="lazy">';
+        } else if (f.type_category === 'video') {
+            thumb = '<div class="cm-cell-icon" style="position:relative">' +
+                '<svg viewBox="0 0 24 24" width="36" height="36" stroke="#a1a1aa" stroke-width="1.5" fill="none"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2"></rect></svg>' +
+                '<span style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.75);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px;font-family:monospace">03:24</span>' +
+            '</div>';
+        } else if (f.type_category === 'document') {
+            thumb = '<div class="cm-cell-icon">' +
+                '<div style="width:40px;height:48px;border:1.5px solid #e4e4e7;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;color:#ef4444;font-weight:800;font-size:11px">PDF</div>' +
+            '</div>';
+        } else {
+            thumb = '<div class="cm-cell-icon">' + cmIcon(f.type_category, 36) + '</div>';
+        }
         
         var stars = f.rating ? ' <span style="color:#facc15">★' + f.rating + '</span>' : '';
         var dot = (f.label && f.label !== 'none' && LABEL_MAP[f.label]) ? '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:' + LABEL_MAP[f.label].hex + ';margin-right:4px"></span>' : '';
+        var dimSize = (f.dimensions ? f.dimensions + ' • ' : '') + (f.file_size_human || '');
 
         d.innerHTML =
             '<div class="' + chkClass + '" data-id="' + f.id + '">' +
@@ -1047,11 +1270,20 @@ window.cmRenderGrid = function(files) {
             '</div>' +
             thumb +
             '<span class="cm-cell-type">' + esc(f.type_category) + '</span>' +
-            '<div class="cm-cell-name" title="' + esc(f.filename) + '">' + dot + esc(f.title || f.filename) + stars + '</div>';
+            '<div class="cm-cell-meta">' +
+                '<div class="cm-cell-name" title="' + esc(f.filename) + '">' + dot + esc(f.title || f.filename) + stars + '</div>' +
+                '<div class="cm-cell-sub"><span>' + esc(dimSize) + '</span><span class="cm-cell-opt" title="File Details">⋮</span></div>' +
+            '</div>';
         
         d.querySelector('.cm-chk').addEventListener('click', function(e) {
             e.stopPropagation(); cmToggleSel(f.id, CM.selIds.indexOf(f.id) === -1);
         });
+        var opt = d.querySelector('.cm-cell-opt');
+        if (opt) {
+            opt.addEventListener('click', function(e) {
+                e.stopPropagation(); cmOpenDetail(f);
+            });
+        }
         d.addEventListener('click', function() {
             if (CM.bulk) { cmToggleSel(f.id, CM.selIds.indexOf(f.id) === -1); }
             else { cmOpenDetail(f); }
@@ -1081,14 +1313,15 @@ window.cmRenderList = function(files) {
 
         tr.innerHTML =
             '<td><input type="checkbox" style="accent-color:#09090b;' + (CM.bulk ? '' : 'display:none') + '"' + (CM.selIds.indexOf(f.id) > -1 ? ' checked' : '') + '></td>' +
-            '<td><div style="display:flex;align-items:center;gap:9px">' + lthumb +
-                '<div><div style="font-weight:600;color:#18181b;font-size:12px">' + dot + esc(f.title || f.filename) + stars + '</div>' +
-                '<div style="font-size:10px;color:#a1a1aa">' + esc(f.filename) + '</div></div></div></td>' +
+            '<td><div style="display:flex;align-items:center;gap:9px;min-width:0">' + lthumb +
+                '<div style="min-width:0;max-width:320px"><div style="font-weight:600;color:#18181b;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="' + esc(f.title || f.filename) + '">' + dot + esc(f.title || f.filename) + stars + '</div>' +
+                '<div style="font-size:10px;color:#a1a1aa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="' + esc(f.filename) + '">' + esc(f.filename) + '</div></div></div></td>' +
             '<td>' + esc(f.author_name) + '</td>' +
             '<td>' + (f.folder_name ? '<span style="background:#f4f4f5;color:#52525b;border-radius:4px;padding:2px 7px;font-size:10px">' + esc(f.folder_name) + '</span>' : '<span style="color:#d4d4d8">—</span>') + '</td>' +
             '<td style="color:#71717a">' + esc(f.date_formatted) + '</td>' +
-            '<td style="color:#71717a">' + esc(f.file_size_human) + '</td>' +
-            '<td><span style="background:#f4f4f5;color:#52525b;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;text-transform:capitalize">' + esc(f.type_category) + '</span></td>';
+            '<td style="color:#71717a;font-family:ui-monospace,monospace;font-size:11px">' + esc(f.file_size_human) + '</td>' +
+            '<td><span style="background:#f4f4f5;color:#52525b;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;text-transform:capitalize">' + esc(f.type_category) + '</span></td>' +
+            '<td style="text-align:right"><button class="cm-cell-opt" title="Actions" onclick="event.stopPropagation();cmShowContextMenu(event, ' + JSON.stringify(f).replace(/"/g, '&quot;') + ')">⋮</button></td>';
         tr.querySelector('input[type=checkbox]').addEventListener('change', function(e) { cmToggleSel(f.id, e.target.checked); e.stopPropagation(); });
         tr.addEventListener('click', function(e) { if (e.target.type === 'checkbox') return; if (CM.bulk) { cmToggleSel(f.id, CM.selIds.indexOf(f.id) === -1); } else { cmOpenDetail(f); } });
         tr.addEventListener('contextmenu', function(e) { cmShowContextMenu(e, f); });
@@ -1281,53 +1514,190 @@ window.cmLoadFolders = function() {
         cmPopulateBulkFolderSelect(); 
     }});
 };
-window.cmRenderFolderTabs = function() {
-    var container = document.getElementById('cm-folder-tabs'); container.innerHTML = '';
-    
-    // Set All Media count badge from backend data
-    document.getElementById('cm-ftab-all-ct').textContent = CM.total_count || 0;
-    
-    // Set Unorganised count badge from backend data
-    var unorgCt = document.getElementById('cm-ftab-none-ct');
-    if (unorgCt) {
-        unorgCt.textContent = CM.unorganised_count || 0;
-    }
+window.cmToggleFoldersExpand = function() {
+    CM.foldersExpanded = !CM.foldersExpanded;
+    cmRenderFolderTabs();
+};
 
+window.cmRenderFolderTabs = function() {
+    var container = document.getElementById('cm-folders-grid');
+    if (!container) return;
+    container.innerHTML = '';
+
+    var totalCt = CM.total_count || 0;
+    var unorgCt = CM.unorganised_count || 0;
+    var items = [];
+
+    // 1. All Media Global Folder Card
+    var allActive = (CM.folder === null || CM.folder === undefined || CM.folder === '') ? ' active' : '';
+    var allCard = document.createElement('div');
+    allCard.className = 'cm-fcard' + allActive;
+    allCard.innerHTML =
+        '<div class="cm-fcard-left">' +
+            '<div class="cm-fcard-icon">' +
+                '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>' +
+            '</div>' +
+            '<div class="cm-fcard-info">' +
+                '<div class="cm-fcard-name">All Media</div>' +
+                '<div class="cm-fcard-ct">' + totalCt + ' items</div>' +
+            '</div>' +
+        '</div>';
+    allCard.addEventListener('click', function() { cmSelectFolder(null); });
+    items.push(allCard);
+
+    // 2. Unorganised Folder Card
+    var unorgActive = (CM.folder == -1) ? ' active' : '';
+    var unorgCard = document.createElement('div');
+    unorgCard.className = 'cm-fcard' + unorgActive;
+    unorgCard.innerHTML =
+        '<div class="cm-fcard-left">' +
+            '<div class="cm-fcard-icon">' +
+                '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>' +
+            '</div>' +
+            '<div class="cm-fcard-info">' +
+                '<div class="cm-fcard-name">Unorganized</div>' +
+                '<div class="cm-fcard-ct">' + unorgCt + ' items</div>' +
+            '</div>' +
+        '</div>';
+    unorgCard.addEventListener('click', function() { cmSelectFolder(-1); });
+    items.push(unorgCard);
+
+    // 3. Custom Folder Cards
     CM.folders.forEach(function(folder) {
-        var tab = document.createElement('div'); tab.className = 'cm-ftab' + (CM.folder == folder.id ? ' active' : '');
-        tab.dataset.folderId = folder.id;
-        tab.title = 'Click ⋮ or right-click for Folder Settings & Sharing';
-        tab.innerHTML = esc(folder.name) + ' <span class="ct">' + folder.count + '</span><span class="cm-ftab-opt" onclick="event.stopPropagation();cmOpenFolderSettings(' + folder.id + ',\'' + esc(folder.name) + '\')" style="margin-left:5px;cursor:pointer;opacity:.6;padding:0 3px" title="Folder Settings & Share">⋮</span>';
-        tab.addEventListener('click', function() { cmSelectFolder(folder.id, tab); });
-        tab.addEventListener('contextmenu', function(e) {
+        var isAct = (CM.folder == folder.id) ? ' active' : '';
+        var fcard = document.createElement('div');
+        fcard.className = 'cm-fcard' + isAct;
+        fcard.innerHTML =
+            '<div class="cm-fcard-left">' +
+                '<div class="cm-fcard-icon">' +
+                    '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>' +
+                '</div>' +
+                '<div class="cm-fcard-info">' +
+                    '<div class="cm-fcard-name" title="' + esc(folder.name) + '">' + esc(folder.name) + '</div>' +
+                    '<div class="cm-fcard-ct">' + (folder.count || 0) + ' items</div>' +
+                '</div>' +
+            '</div>' +
+            '<span class="cm-fcard-opt" title="Folder Settings & Sharing">⋮</span>';
+        
+        fcard.addEventListener('click', function() { cmSelectFolder(folder.id); });
+        var opt = fcard.querySelector('.cm-fcard-opt');
+        if (opt) {
+            opt.addEventListener('click', function(e) {
+                e.stopPropagation();
+                cmOpenFolderSettings(folder.id, folder.name);
+            });
+        }
+        fcard.addEventListener('contextmenu', function(e) {
             e.preventDefault();
             e.stopPropagation();
             cmOpenFolderSettings(folder.id, folder.name);
         });
-        container.appendChild(tab);
+        items.push(fcard);
+
+        // Subfolders
         (folder.children || []).forEach(function(s) {
-            var st = document.createElement('div'); st.className = 'cm-ftab' + (CM.folder == s.id ? ' active' : '');
-            st.dataset.folderId = s.id;
-            st.title = 'Click ⋮ or right-click for Folder Settings & Sharing';
-            st.innerHTML = '↳ ' + esc(s.name) + ' <span class="ct">' + s.count + '</span><span class="cm-ftab-opt" onclick="event.stopPropagation();cmOpenFolderSettings(' + s.id + ',\'' + esc(s.name) + '\')" style="margin-left:5px;cursor:pointer;opacity:.6;padding:0 3px" title="Folder Settings & Share">⋮</span>';
-            st.addEventListener('click', function() { cmSelectFolder(s.id, st); });
-            st.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                cmOpenFolderSettings(s.id, s.name);
-            });
-            container.appendChild(st);
+            var sAct = (CM.folder == s.id) ? ' active' : '';
+            var scard = document.createElement('div');
+            scard.className = 'cm-fcard' + sAct;
+            scard.innerHTML =
+                '<div class="cm-fcard-left">' +
+                    '<div class="cm-fcard-icon" style="background:#fafafa">' +
+                        '<svg viewBox="0 0 24 24" width="16" height="16" stroke="#71717a" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>' +
+                    '</div>' +
+                    '<div class="cm-fcard-info">' +
+                        '<div class="cm-fcard-name" title="' + esc(s.name) + '">↳ ' + esc(s.name) + '</div>' +
+                        '<div class="cm-fcard-ct">' + (s.count || 0) + ' items</div>' +
+                    '</div>' +
+                '</div>' +
+                '<span class="cm-fcard-opt" title="Folder Settings & Sharing">⋮</span>';
+            scard.addEventListener('click', function() { cmSelectFolder(s.id); });
+            var sOpt = scard.querySelector('.cm-fcard-opt');
+            if (sOpt) {
+                sOpt.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    cmOpenFolderSettings(s.id, s.name);
+                });
+            }
+            items.push(scard);
         });
     });
+
+    if (!CM.foldersExpanded && items.length > 6) {
+        for (var i = 0; i < 5; i++) {
+            container.appendChild(items[i]);
+        }
+        var remaining = items.length - 5;
+        var toggleCard = document.createElement('div');
+        toggleCard.className = 'cm-fcard cm-fcard-toggle';
+        toggleCard.innerHTML =
+            '<div class="cm-fcard-left">' +
+                '<div class="cm-fcard-icon">' +
+                    '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>' +
+                '</div>' +
+                '<div class="cm-fcard-info">' +
+                    '<div class="cm-fcard-name">+ Show ' + remaining + ' more</div>' +
+                '</div>' +
+            '</div>';
+        toggleCard.addEventListener('click', function() { cmToggleFoldersExpand(); });
+        container.appendChild(toggleCard);
+    } else if (CM.foldersExpanded) {
+        items.forEach(function(item) {
+            container.appendChild(item);
+        });
+        var collapseCard = document.createElement('div');
+        collapseCard.className = 'cm-fcard cm-fcard-toggle';
+        collapseCard.innerHTML =
+            '<div class="cm-fcard-left">' +
+                '<div class="cm-fcard-icon">' +
+                    '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>' +
+                '</div>' +
+                '<div class="cm-fcard-info">' +
+                    '<div class="cm-fcard-name">Show less ▲</div>' +
+                '</div>' +
+            '</div>';
+        collapseCard.addEventListener('click', function() { cmToggleFoldersExpand(); });
+        container.appendChild(collapseCard);
+    } else {
+        items.forEach(function(item) {
+            container.appendChild(item);
+        });
+    }
 };
 window.cmPopulateBulkFolderSelect = function() {
-    var bs = document.getElementById('cm-bulk-folder'); bs.innerHTML = '<option value="">Move to folder…</option>';
+    var bs = document.getElementById('cm-bulk-folder'); if(!bs)return; bs.innerHTML = '<option value="">Move to folder…</option>';
     CM.folders.forEach(function(f) { bs.innerHTML += '<option value="'+f.id+'">'+esc(f.name)+'</option>'; (f.children||[]).forEach(function(s){bs.innerHTML+='<option value="'+s.id+'">  ↳ '+esc(s.name)+'</option>';});});
 };
-window.cmSelectFolder = function(id, el) {
+window.cmSelectFolder = function(id) {
     CM.folder = id; CM.page = 1;
-    document.querySelectorAll('.cm-ftab').forEach(function(t){t.classList.remove('active');});
-    el.classList.add('active'); cmLoadFiles();
+    cmRenderFolderTabs();
+    cmUpdateBreadcrumbs();
+    cmLoadFiles();
+};
+window.cmUpdateBreadcrumbs = function() {
+    var subEl = document.getElementById('cm-bc-subpath');
+    var countEl = document.getElementById('cm-bc-count');
+    if (!subEl) return;
+
+    var chevronSvg = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" style="color:#a1a1aa;margin:0 2px"><polyline points="9 18 15 12 9 6"></polyline></svg>';
+
+    if (CM.folder === null || CM.folder === undefined || CM.folder === '') {
+        subEl.innerHTML = '';
+    } else if (CM.folder == -1) {
+        subEl.innerHTML = chevronSvg + '<span class="cm-bc-active">Unorganized</span>';
+    } else {
+        var fName = 'Folder';
+        CM.folders.forEach(function(f) {
+            if (f.id == CM.folder) fName = f.name;
+            (f.children || []).forEach(function(s) {
+                if (s.id == CM.folder) fName = s.name;
+            });
+        });
+        subEl.innerHTML = chevronSvg + '<span class="cm-bc-active">' + esc(fName) + '</span>';
+    }
+
+    if (countEl) {
+        countEl.textContent = (CM.total || 0) + ' files';
+    }
 };
 window.cmPromptFolder = function() {
     document.getElementById('cm-folder-name').value = '';
@@ -1376,6 +1746,26 @@ window.cmFilter = function() {
     CM.filters.date   = document.getElementById('cm-fd').value;
     var a = document.getElementById('cm-fa'); CM.filters.author = a ? a.value : '';
     CM.page = 1; cmLoadFiles();
+};
+window.cmResetFilters = function() {
+    CM.filters = {q:'', type:'all', culling:'', date:'', author:''};
+    var searchEl = document.getElementById('cm-search'); if (searchEl) searchEl.value = '';
+    var ftEl = document.getElementById('cm-ft'); if (ftEl) ftEl.value = 'all';
+    var fcEl = document.getElementById('cm-fculling'); if (fcEl) fcEl.value = '';
+    var fdEl = document.getElementById('cm-fd'); if (fdEl) fdEl.value = '';
+    var fdtEl = document.getElementById('cm-fdoctype'); if (fdtEl) fdtEl.value = '';
+    var faEl = document.getElementById('cm-fa'); if (faEl) faEl.value = '';
+    CM.page = 1;
+    cmLoadFiles();
+    coraShowToast('Filters reset.');
+};
+window.cmOnSortChange = function(val) {
+    if (!val) return;
+    var parts = val.split('-');
+    CM.sortBy = parts[0];
+    CM.sortDir = parts[1] || 'DESC';
+    CM.page = 1;
+    cmLoadFiles();
 };
 window.cmSort = function(col) { if(CM.sortBy===col) CM.sortDir=CM.sortDir==='ASC'?'DESC':'ASC'; else{CM.sortBy=col;CM.sortDir='DESC';} cmLoadFiles(); };
 window.cmUpdatePag = function() {

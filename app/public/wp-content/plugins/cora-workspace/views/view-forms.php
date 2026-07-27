@@ -2453,9 +2453,11 @@ function renderFormsList() {
         const canvasSub = document.getElementById('canvas-form-subtitle');
         if (canvasSub) canvasSub.innerText = 'Fill out details below to submit request.';
         
-        renderCoverImage();
-        renderEditorBlocks();
-        renderStepsBar();
+        if (!checkAndRestoreFormBuilderDraft(0)) {
+            renderCoverImage();
+            renderEditorBlocks();
+            renderStepsBar();
+        }
         switchEditorView('build');
         switchLeftTab('fields');
         if (typeof renderLogicRules === 'function') renderLogicRules();
@@ -2486,6 +2488,43 @@ function renderFormsList() {
                 if (listState) listState.classList.add('hidden');
                 if (editorState) { editorState.classList.remove('hidden'); editorState.classList.add('flex'); }
 
+                syncUIToForm(form);
+
+                // Render editor – wrapped so a crash doesn't leave user stuck
+                try {
+                    if (!checkAndRestoreFormBuilderDraft(id)) {
+                        renderCoverImage();
+                        renderEditorBlocks();
+                        renderStepsBar();
+                        switchEditorView('build');
+                        switchLeftTab('fields');
+                        if (!currentEditingForm.logic) currentEditingForm.logic = [];
+                        if (typeof renderLogicRules === 'function') renderLogicRules();
+                    } else {
+                        switchEditorView('build');
+                        switchLeftTab('fields');
+                    }
+                    window._formIsDirty = false;
+                    updatePublishButtonState(false);
+                } catch(renderErr) {
+                    // Rendering failed but editor is still visible – show a non-blocking warning
+                    window.coraShowToast && window.coraShowToast('Form loaded but some UI elements may not render correctly.', 'error');
+                }
+            },
+            error: function(xhr) {
+                window.coraShowToast && window.coraShowToast("Form not found or failed to load.", "error");
+                // Remove loading overlay and fall back to list view
+                const overlay = document.getElementById('forms-loading-overlay');
+                if (overlay) overlay.remove();
+                if (listState) { listState.classList.remove('hidden'); }
+                if (editorState) { editorState.classList.add('hidden'); editorState.classList.remove('flex'); }
+                window.location.hash = '#list';
+            }
+        });
+    }
+
+
+    function syncUIToForm(form) {
                 // Populate all inputs
                 const titleInp = document.getElementById('editor-form-title');
                 if (titleInp) titleInp.value = form.title || '';
@@ -2583,32 +2622,30 @@ function renderFormsList() {
                     else emailSubmitterDetails.classList.add('hidden');
                 }
 
-                // Render editor – wrapped so a crash doesn't leave user stuck
+
+    }
+
+    function checkAndRestoreFormBuilderDraft(targetId) {
+        if (typeof window.coraAutoSave !== 'undefined') {
+            const draftStr = localStorage.getItem('cora_draft_form_builder_draft');
+            if (draftStr) {
                 try {
-                    renderCoverImage();
-                    renderEditorBlocks();
-                    renderStepsBar();
-                    switchEditorView('build');
-                    switchLeftTab('fields');
-                    if (!currentEditingForm.logic) currentEditingForm.logic = [];
-                    if (typeof renderLogicRules === 'function') renderLogicRules();
-                    window._formIsDirty = false;
-                    updatePublishButtonState(false);
-                } catch(renderErr) {
-                    // Rendering failed but editor is still visible – show a non-blocking warning
-                    window.coraShowToast && window.coraShowToast('Form loaded but some UI elements may not render correctly.', 'error');
-                }
-            },
-            error: function(xhr) {
-                window.coraShowToast && window.coraShowToast("Form not found or failed to load.", "error");
-                // Remove loading overlay and fall back to list view
-                const overlay = document.getElementById('forms-loading-overlay');
-                if (overlay) overlay.remove();
-                if (listState) { listState.classList.remove('hidden'); }
-                if (editorState) { editorState.classList.add('hidden'); editorState.classList.remove('flex'); }
-                window.location.hash = '#list';
+                    const draft = JSON.parse(draftStr);
+                    const draftForm = JSON.parse(draft.data);
+                    if (draftForm && draftForm.id == targetId) {
+                        currentEditingForm = draftForm;
+                        syncUIToForm(draftForm);
+                        renderCoverImage();
+                        renderEditorBlocks();
+                        renderStepsBar();
+                        if (typeof renderLogicRules === 'function') renderLogicRules();
+                        if (window.coraShowToast) window.coraShowToast('Restored unsaved draft from local storage!', 'success');
+                        return true;
+                    }
+                } catch(e) {}
             }
-        });
+        }
+        return false;
     }
 
     function setAutoSaveStatus(status) {
@@ -2652,6 +2689,11 @@ function renderFormsList() {
         window._formIsDirty = true;
         updatePublishButtonState(true);
         setAutoSaveStatus('saving');
+        
+        if (typeof window.coraAutoSave !== 'undefined') {
+            window.coraAutoSave.saveLocalDraft('form_builder_draft', JSON.stringify(currentEditingForm));
+        }
+
         autoSaveTimer = setTimeout(() => {
             saveFormInternal();
         }, 1500);
@@ -2693,6 +2735,9 @@ function renderFormsList() {
                         formsData.unshift(merged);
                     }
                     renderFormsList();
+                    if (typeof window.coraAutoSave !== 'undefined') {
+                        window.coraAutoSave.clearLocalDraft('form_builder_draft');
+                    }
                 }
                 setAutoSaveStatus('saved');
                 if (publish) {

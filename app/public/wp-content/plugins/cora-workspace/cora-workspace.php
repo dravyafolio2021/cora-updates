@@ -985,6 +985,14 @@ function cora_real_estate_ai_admin_assets( $hook ) {
         true // Load in footer
     );
 
+    wp_enqueue_script(
+        'cora-autosave-engine',
+        CORA_WORKSPACE_URL . 'assets/js/cora-autosave-engine.js',
+        array( 'jquery' ),
+        CORA_WORKSPACE_VERSION,
+        true
+    );
+
     // Enqueue WordPress media libraries for logo upload
     wp_enqueue_media();
 
@@ -1008,6 +1016,28 @@ function cora_real_estate_ai_admin_assets( $hook ) {
     ) );
 }
 add_action( 'admin_enqueue_scripts', 'cora_real_estate_ai_admin_assets' );
+
+/**
+ * Handle AJAX request to save a module draft.
+ */
+function cora_save_module_draft_ajax_handler() {
+    $module_key = isset( $_POST['module_key'] ) ? sanitize_text_field( wp_unslash( $_POST['module_key'] ) ) : '';
+    $draft_data = isset( $_POST['draft_data'] ) ? wp_unslash( $_POST['draft_data'] ) : ''; // Leave unslashed to save the exact form data
+
+    if ( empty( $module_key ) ) {
+        wp_send_json_error( array( 'message' => 'Missing module key' ) );
+    }
+
+    $option_key = 'cora_draft_' . sanitize_key( $module_key );
+    update_option( $option_key, $draft_data, false ); // Not autoloaded to save memory
+
+    wp_send_json_success( array(
+        'message'   => 'Draft saved successfully',
+        'timestamp' => time()
+    ) );
+}
+add_action( 'wp_ajax_cora_save_module_draft', 'cora_save_module_draft_ajax_handler' );
+add_action( 'wp_ajax_nopriv_cora_save_module_draft', 'cora_save_module_draft_ajax_handler' );
 
 /**
  * Redirect custom studio roles and administrators to our custom dashboard after login
@@ -9986,7 +10016,7 @@ function cora_ajax_save_media_metadata() {
         wp_send_json_error( array( 'message' => 'Invalid attachment ID.' ) );
     }
 
-    $title       = isset( $_POST['title'] ) ? sanitize_text_field( $_POST['title'] ) : '';
+    $title       = isset( $_POST['title'] ) ? mb_substr( sanitize_text_field( $_POST['title'] ), 0, 200 ) : '';
     $alt         = isset( $_POST['alt'] ) ? sanitize_text_field( $_POST['alt'] ) : '';
     $caption     = isset( $_POST['caption'] ) ? sanitize_textarea_field( $_POST['caption'] ) : '';
     $description = isset( $_POST['description'] ) ? sanitize_textarea_field( $_POST['description'] ) : '';
@@ -12205,7 +12235,7 @@ add_action( 'wp_ajax_cora_media_library_get_folders', 'cora_ajax_media_library_g
  */
 function cora_ajax_media_library_create_folder() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! current_user_can( 'upload_files' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    if ( ! is_user_logged_in() || ( ! cora_is_super_owner() && ! current_user_can( 'upload_files' ) && ! current_user_can( 'manage_options' ) && ! current_user_can( 'edit_posts' ) ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
 
     $name   = sanitize_text_field( $_POST['name'] ?? '' );
     $parent = intval( $_POST['parent_id'] ?? 0 );
@@ -12249,7 +12279,7 @@ add_action( 'wp_ajax_cora_media_library_create_folder', 'cora_ajax_media_library
  */
 function cora_ajax_media_library_rename_folder() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! current_user_can( 'upload_files' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    if ( ! is_user_logged_in() || ( ! cora_is_super_owner() && ! current_user_can( 'upload_files' ) && ! current_user_can( 'manage_options' ) && ! current_user_can( 'edit_posts' ) ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
 
     $id   = intval( $_POST['folder_id'] ?? ($_POST['term_id'] ?? 0) );
     $name = sanitize_text_field( $_POST['name'] ?? '' );
@@ -12266,7 +12296,7 @@ add_action( 'wp_ajax_cora_media_library_rename_folder', 'cora_ajax_media_library
  */
 function cora_ajax_media_library_delete_folder() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! current_user_can( 'upload_files' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    if ( ! is_user_logged_in() || ( ! cora_is_super_owner() && ! current_user_can( 'upload_files' ) && ! current_user_can( 'manage_options' ) && ! current_user_can( 'edit_posts' ) ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
 
     $id = intval( $_POST['folder_id'] ?? ($_POST['term_id'] ?? 0) );
     if ( ! $id ) wp_send_json_error( array( 'message' => 'Invalid folder ID.' ) );
@@ -12283,7 +12313,7 @@ add_action( 'wp_ajax_cora_media_library_delete_folder', 'cora_ajax_media_library
  */
 function cora_ajax_media_library_move() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! current_user_can( 'upload_files' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    if ( ! is_user_logged_in() || ( ! cora_is_super_owner() && ! current_user_can( 'upload_files' ) && ! current_user_can( 'manage_options' ) && ! current_user_can( 'edit_posts' ) ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
 
     $ids       = array_map( 'intval', (array) ( $_POST['attachment_ids'] ?? array() ) );
     $folder_id = intval( $_POST['folder_id'] ?? 0 );

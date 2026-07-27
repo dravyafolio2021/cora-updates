@@ -442,7 +442,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
     <!-- ═════════════════════════════════════════════════════════════════════
          TAB 3: MULTI-CHANNEL AUTOMATION TRIGGERS (PREMIUM NOTION/SHOPIFY STYLED INPUTS)
          ═════════════════════════════════════════════════════════════════════ -->
-    <div id="cora-rev-panel-automation" class="hidden cora-shopify-card space-y-6 max-w-4xl">
+    <form id="cora-rev-panel-automation" class="hidden cora-shopify-card space-y-6 max-w-4xl" onsubmit="event.preventDefault();">
         <!-- Indian Market Insights Banner -->
         <div class="p-4 bg-[#25D366]/10 border border-[#25D366]/30 rounded-2xl flex items-start gap-3 text-xs">
             <div class="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
@@ -459,7 +459,10 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
         </div>
 
         <div class="space-y-1">
-            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Multi-Channel Automation Triggers</h3>
+            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0 flex items-center gap-3">
+                Multi-Channel Automation Triggers
+                <span id="cora-rev-autosave-pill" class="hidden px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 transition-opacity duration-300">✓ Auto-saved</span>
+            </h3>
             <p class="text-xs text-zinc-500 dark:text-zinc-400 m-0">Configure automated post-handover review requests across WhatsApp, Email, SMS, and Social channels.</p>
         </div>
 
@@ -474,7 +477,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                     </div>
-                    <input type="text" id="cora-google-url-input" value="<?php echo esc_attr( $google_link ); ?>" class="w-full pl-9 pr-3.5 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-white focus:ring-2 focus:ring-zinc-950/10 transition-all">
+                    <input type="text" id="cora-google-url-input" name="cora_google_business_url" value="<?php echo esc_attr( $google_link ); ?>" class="w-full pl-9 pr-3.5 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-white focus:ring-2 focus:ring-zinc-950/10 transition-all">
                 </div>
                 <p class="text-[10px] text-zinc-400 m-0">Found under 'Ask for reviews' in your Google Business Profile dashboard.</p>
             </div>
@@ -488,18 +491,18 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
                         <button type="button" onclick="coraApplyHinglishPreset('english_prof')" class="px-2.5 py-1 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 text-zinc-800 dark:text-zinc-200 text-[10px] font-bold rounded-lg cursor-pointer transition-all border border-zinc-200 dark:border-zinc-700">English Prof</button>
                     </div>
                 </div>
-                <textarea id="cora-wa-review-template" rows="3" class="w-full px-3.5 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-sans text-zinc-900 dark:text-zinc-100 leading-relaxed focus:outline-none focus:border-zinc-900 dark:focus:border-white focus:ring-2 focus:ring-zinc-950/10 transition-all resize-y"><?php echo esc_textarea( $wa_template ); ?></textarea>
+                <textarea id="cora-wa-review-template" name="cora_wa_review_template" rows="3" class="w-full px-3.5 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-sans text-zinc-900 dark:text-zinc-100 leading-relaxed focus:outline-none focus:border-zinc-900 dark:focus:border-white focus:ring-2 focus:ring-zinc-950/10 transition-all resize-y"><?php echo esc_textarea( $wa_template ); ?></textarea>
             </div>
 
             <!-- Email Review Request Template -->
             <div class="space-y-1.5">
                 <label class="block font-bold text-xs text-zinc-900 dark:text-zinc-100 m-0">Email Review Request Template</label>
-                <textarea id="cora-email-review-template" rows="3" class="w-full px-3.5 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-sans text-zinc-900 dark:text-zinc-100 leading-relaxed focus:outline-none focus:border-zinc-900 dark:focus:border-white focus:ring-2 focus:ring-zinc-950/10 transition-all resize-y"><?php echo esc_textarea( $email_template ); ?></textarea>
+                <textarea id="cora-email-review-template" name="cora_email_review_template" rows="3" class="w-full px-3.5 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-sans text-zinc-900 dark:text-zinc-100 leading-relaxed focus:outline-none focus:border-zinc-900 dark:focus:border-white focus:ring-2 focus:ring-zinc-950/10 transition-all resize-y"><?php echo esc_textarea( $email_template ); ?></textarea>
             </div>
 
             <div class="pt-1">
                 <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-300 font-semibold cursor-pointer">
-                    <input type="checkbox" id="auto-trigger-check" checked class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
+                    <input type="checkbox" id="auto-trigger-check" name="auto_trigger_check" checked class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
                     <span>Auto-trigger WhatsApp & Email 2 hours after project deal status is set to 'Handed Over' or 'Invoice Paid'</span>
                 </label>
             </div>
@@ -528,7 +531,7 @@ $email_template = get_option( 'cora_email_review_template', 'Hi {client_name}, w
                 </button>
             </div>
         </div>
-    </div>
+    </form>
 
     <!-- ═════════════════════════════════════════════════════════════════════
          TAB 4: AUTOMATED PERFORMANCE & SENTIMENT REPORTS
@@ -1044,4 +1047,64 @@ window.coraSaveReviewSettings = function() {
         }
     });
 };
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof window.coraAutoSave !== 'undefined') {
+        const $form = jQuery('#cora-rev-panel-automation');
+        const moduleKey = 'review_settings';
+        const ajaxAction = 'cora_save_review_settings';
+        
+        // Auto restore from local draft if exists
+        window.coraAutoSave.autoRestoreForm($form, moduleKey);
+        
+        let debounceTimer = null;
+        const pill = document.getElementById('cora-rev-autosave-pill');
+
+        $form.on('input change keyup', 'input, textarea, select, checkbox', function() {
+            const formDataStr = $form.serialize();
+            
+            // 1. Instant local storage draft
+            window.coraAutoSave.saveLocalDraft(moduleKey, formDataStr);
+            
+            if (pill) {
+                pill.classList.remove('hidden');
+                pill.textContent = '...Saving';
+                pill.className = 'px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-50 text-amber-600 border border-amber-200 transition-opacity duration-300 inline-block';
+            }
+
+            if (debounceTimer) clearTimeout(debounceTimer);
+
+            // 2. Debounced AJAX save
+            debounceTimer = setTimeout(() => {
+                const nonce = typeof coraGetAJAXNonce === 'function' ? coraGetAJAXNonce() : '';
+                const ajaxUrl = typeof coraGetAJAXUrl === 'function' ? coraGetAJAXUrl() : '/wp-admin/admin-ajax.php';
+                
+                // For review settings, the action expects standard fields rather than draft_data string
+                // But we can also pass the serialized form data.
+                jQuery.post(ajaxUrl, {
+                    action: ajaxAction,
+                    google_url: jQuery('#cora-google-url-input').val().trim(),
+                    wa_template: jQuery('#cora-wa-review-template').val().trim(),
+                    email_template: jQuery('#cora-email-review-template').val().trim(),
+                    auto_trigger: jQuery('#auto-trigger-check').is(':checked') ? 1 : 0,
+                    nonce: nonce
+                }, function(res) {
+                    if (pill) {
+                        pill.textContent = '✓ Auto-saved';
+                        pill.className = 'px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 transition-opacity duration-300 inline-block';
+                        
+                        setTimeout(() => {
+                            pill.classList.add('opacity-0');
+                            setTimeout(() => {
+                                pill.classList.add('hidden');
+                                pill.classList.remove('opacity-0');
+                            }, 300);
+                        }, 2000);
+                    }
+                });
+            }, 800);
+        });
+    }
+});
 </script>
+
