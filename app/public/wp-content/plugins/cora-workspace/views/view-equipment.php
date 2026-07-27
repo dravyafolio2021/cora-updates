@@ -400,8 +400,7 @@ if ( is_array( $cora_gear_maintenance ) ) {
     
     <!-- SUB-TAB 1: GEAR REGISTRY -->
     <div id="cora-eq-tab-registry" class="cora-eq-tab-content space-y-4">
-        <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-2xs space-y-5">
-            <div class="flex items-center justify-between flex-wrap gap-4 pb-4 border-b border-zinc-100">
+        <div class="flex items-center justify-between flex-wrap gap-4 pb-4 border-b border-zinc-100">
                 <div>
                     <h3 class="text-sm font-bold text-zinc-950">Master Studio Camera & Equipment Registry</h3>
                     <p class="text-xs text-zinc-500 mt-0.5">Asset serial tracking, condition grading, CapEx valuation and crew assignments.</p>
@@ -440,11 +439,11 @@ if ( is_array( $cora_gear_maintenance ) ) {
                     <tbody id="cora-gear-tbody" class="divide-y divide-zinc-150 bg-white">
                         <?php foreach ( $cora_studio_gear as $gear ) : 
                             $status = $gear['status'] ?? 'Available';
-                            $status_badge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Available</span>';
+                            $status_badge = '<span class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-900"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Available</span>';
                             if ( $status === 'In Use' || $status === 'On Shoot' ) {
-                                $status_badge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/60"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> On Shoot</span>';
+                                $status_badge = '<span class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-900"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> On Shoot</span>';
                             } elseif ( $status === 'Maintenance' || $status === 'In Repair' ) {
-                                $status_badge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> In Repair</span>';
+                                $status_badge = '<span class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-900"><span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span> In Repair</span>';
                             }
 
                             $category = $gear['category'] ?? 'Camera';
@@ -543,13 +542,11 @@ if ( is_array( $cora_gear_maintenance ) ) {
                     </tbody>
                 </table>
             </div>
-        </div>
     </div>
 
     <!-- SUB-TAB 2: SHOOT CHECKOUTS & ALLOCATIONS -->
     <div id="cora-eq-tab-checkouts" class="cora-eq-tab-content space-y-4 hidden">
-        <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-2xs space-y-5">
-            <div class="flex items-center justify-between flex-wrap gap-4 pb-4 border-b border-zinc-100">
+        <div class="flex items-center justify-between flex-wrap gap-4 pb-4 border-b border-zinc-100">
                 <div>
                     <h3 class="text-sm font-bold text-zinc-950">Active & Historic Shoot Gear Checkouts</h3>
                     <p class="text-xs text-zinc-500 mt-0.5">Linking camera packages and kits directly to active shoots, client contracts & field operators.</p>
@@ -576,9 +573,9 @@ if ( is_array( $cora_gear_maintenance ) ) {
                     <tbody id="cora-checkouts-tbody" class="divide-y divide-zinc-150 bg-white">
                         <?php foreach ( $cora_gear_checkouts as $chk ) : 
                             $chk_st = $chk['status'] ?? 'Active';
-                            $chk_badge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/60"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Active Shoot</span>';
+                            $chk_badge = '<span class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-900"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Active Shoot</span>';
                             if ( $chk_st === 'Returned' ) {
-                                $chk_badge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-100 text-zinc-600 border border-zinc-200"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Returned</span>';
+                                $chk_badge = '<span class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-550"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Returned</span>';
                             }
                         ?>
                         <tr id="checkout-row-<?php echo esc_attr( $chk['id'] ); ?>" class="hover:bg-zinc-50/60 transition-colors">
@@ -621,13 +618,11 @@ if ( is_array( $cora_gear_maintenance ) ) {
                     </tbody>
                 </table>
             </div>
-        </div>
     </div>
 
     <!-- SUB-TAB 3: MAINTENANCE & FINANCIAL LEDGER -->
     <div id="cora-eq-tab-maintenance" class="cora-eq-tab-content space-y-4 hidden">
-        <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-2xs space-y-5">
-            <div class="flex items-center justify-between flex-wrap gap-4 pb-4 border-b border-zinc-100">
+        <div class="flex items-center justify-between flex-wrap gap-4 pb-4 border-b border-zinc-100">
                 <div>
                     <h3 class="text-sm font-bold text-zinc-950">Equipment Servicing & Maintenance Financial Logs</h3>
                     <p class="text-xs text-zinc-500 mt-0.5">Tracking repair history, vendor invoices, and automatic CapEx/OpEx financial sync.</p>
@@ -664,8 +659,8 @@ if ( is_array( $cora_gear_maintenance ) ) {
                             <td class="p-3.5 text-zinc-800 font-medium text-xs"><?php echo esc_html( $mnt['vendor'] ); ?></td>
                             <td class="p-3.5 font-mono font-bold text-zinc-950 text-xs">₹<?php echo number_format( floatval( $mnt['repair_cost'] ) ); ?></td>
                             <td class="p-3.5">
-                                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 inline-flex items-center gap-1.5">
-                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span class="text-xs font-semibold text-emerald-700 inline-flex items-center gap-1.5">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                     Synced to Financial Ledger
                                 </span>
                             </td>
@@ -674,13 +669,11 @@ if ( is_array( $cora_gear_maintenance ) ) {
                     </tbody>
                 </table>
             </div>
-        </div>
     </div>
 
     <!-- SUB-TAB 4: STUDIO GEAR KITS -->
     <div id="cora-eq-tab-kits" class="cora-eq-tab-content space-y-4 hidden">
-        <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-2xs space-y-5">
-            <div class="flex items-center justify-between flex-wrap gap-4 pb-4 border-b border-zinc-100">
+        <div class="flex items-center justify-between flex-wrap gap-4 pb-4 border-b border-zinc-100">
                 <div>
                     <h3 class="text-sm font-bold text-zinc-950">Pre-Configured Studio Production Kits</h3>
                     <p class="text-xs text-zinc-500 mt-0.5">Bundled equipment packages ready for instant 1-click shoot assignment.</p>
@@ -718,7 +711,6 @@ if ( is_array( $cora_gear_maintenance ) ) {
                 </div>
                 <?php endforeach; ?>
             </div>
-        </div>
     </div>
 </div>
 
