@@ -1013,11 +1013,11 @@ if ( ! defined( 'ABSPATH' ) ) {
         </div>
     </div>
 
-    <!-- BACKDROP FOR SUBMISSIONS BOTTOM DRAWER -->
-    <div id="cora-submissions-backdrop" onclick="closeSubmissionsDrawer()" class="hidden fixed top-[52px] bottom-0 left-0 lg:left-64 right-0 bg-black/40 backdrop-blur-xs z-40 transition-all duration-200 cursor-pointer"></div>
+    <!-- BACKDROP FOR SUBMISSIONS RIGHT DRAWER -->
+    <div id="cora-submissions-backdrop" onclick="closeSubmissionsDrawer()" class="hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-40 transition-all duration-200 cursor-pointer"></div>
 
-    <!-- STATE 3: SUBMISSIONS LIST BOTTOM DRAWER SHEET & DASHBOARD -->
-    <div id="cora-submissions-drawer" class="hidden fixed top-[160px] bottom-0 left-0 lg:left-64 right-0 lg:right-5 max-h-[calc(100vh-160px)] h-[calc(100vh-160px)] bg-white dark:bg-zinc-950 shadow-[0_-12px_32px_rgba(0,0,0,0.07)] border-t border-l border-r border-zinc-200/80 dark:border-zinc-800 z-45 transform translate-y-full transition-all duration-300 ease-in-out flex flex-col rounded-t-[28px] overflow-hidden font-sans">
+    <!-- STATE 3: SUBMISSIONS LIST RIGHT DRAWER SHEET & DASHBOARD -->
+    <div id="cora-submissions-drawer" class="hidden fixed top-0 right-0 bottom-0 w-full sm:w-[680px] md:w-[820px] lg:w-[940px] max-w-full bg-white dark:bg-zinc-950 shadow-2xl border-l border-zinc-200/80 dark:border-zinc-800 z-45 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col overflow-hidden font-sans">
         <!-- Dashboard Header Bar -->
         <div class="px-6 py-4.5 border-b border-zinc-200/80 dark:border-zinc-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 bg-white dark:bg-zinc-950">
             <div class="flex items-center gap-3.5 min-w-0">
@@ -1946,7 +1946,7 @@ function deleteForm(id) {
             drawer.classList.remove('hidden');
             // Force redraw/reflow for transition
             drawer.offsetHeight;
-            drawer.classList.remove('translate-y-full');
+            drawer.classList.remove('translate-x-full');
         }
 
         const content = document.getElementById('submissions-drawer-content');
@@ -2033,7 +2033,7 @@ function deleteForm(id) {
         const inspector = document.getElementById('cora-entry-inspector');
         
         if (drawer) {
-            drawer.classList.add('translate-y-full');
+            drawer.classList.add('translate-x-full');
             setTimeout(() => {
                 drawer.classList.add('hidden');
             }, 300);

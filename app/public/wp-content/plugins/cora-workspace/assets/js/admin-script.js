@@ -10550,12 +10550,22 @@ jQuery(document).ready(function($) {
         });
     };
 
+    // Helper to open side drawer
+    window.coraShowSideDrawer = function(drawerSelector) {
+        if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
+        const drawer = $(drawerSelector);
+        const bd = $('#cora-drawer-backdrop');
+        if (bd.length) {
+            bd.removeClass('hidden').css({'display': 'block', 'pointer-events': 'auto'});
+        }
+        if (drawer.length) {
+            drawer.removeClass('hidden collapsed translate-x-full');
+        }
+    };
+
     // Open Lead Detail Drawer
     window.coraOpenLeadDetailDrawer = function(leadId) {
-        if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
-        const drawer = $('#cora-lead-detail-drawer');
-        $('#cora-drawer-backdrop').removeClass('hidden').addClass('opacity-100');
-        drawer.removeClass('translate-x-full');
+        window.coraShowSideDrawer('#cora-lead-detail-drawer');
 
         // Fetch lead data or inspect existing cards
         const card = $(`.cora-lead-card[data-id="${leadId}"]`);
@@ -10571,21 +10581,16 @@ jQuery(document).ready(function($) {
 
     // Open Create Lead Drawer
     window.coraOpenCreateLeadDrawer = function(initialStage = 'New Lead') {
-        if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
-        const drawer = $('#cora-create-lead-drawer');
-        $('#cora-drawer-backdrop').removeClass('hidden').addClass('opacity-100');
-        drawer.removeClass('translate-x-full');
-
-        $('#cora-create-lead-form')[0].reset();
-        $('#cora-new-lead-stage').val(initialStage);
+        window.coraShowSideDrawer('#cora-create-lead-drawer');
+        if ($('#cora-create-lead-form').length) {
+            $('#cora-create-lead-form')[0].reset();
+            $('#cora-new-lead-stage').val(initialStage);
+        }
     };
 
     // Open Schedule Task Drawer
     window.coraOpenScheduleTaskDrawer = function(leadId) {
-        if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
-        const drawer = $('#cora-lead-schedule-drawer');
-        $('#cora-drawer-backdrop').removeClass('hidden').addClass('opacity-100');
-        drawer.removeClass('translate-x-full');
+        window.coraShowSideDrawer('#cora-lead-schedule-drawer');
         $('#cora-task-lead-id').val(leadId);
     };
 
@@ -10743,8 +10748,7 @@ jQuery(document).ready(function($) {
 
     // Open Manage Stages Drawer
     window.coraOpenManageStagesDrawer = function() {
-        if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
-        $('#cora-lead-stages-drawer').removeClass('translate-x-full');
+        window.coraShowSideDrawer('#cora-lead-stages-drawer');
     };
 
     // Add New Stage Row in Drawer
