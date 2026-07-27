@@ -130,4 +130,23 @@ Located in `#tab-custom-roles`:
 - **Responsive Card Grids (`views/view-users.php`)**:
   - Refined card grid rows to `grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4` to prevent text/stat clutter across screen sizes and drawer states.
 
-
+## 11. Leads Kanban Board Redesign (`views/view-leads.php` & `cora-workspace.php`)
+- **Default Columns & Casing Alignment**:
+  - Configured four columns by default matching the user mockup: **New Inquiries** (Green), **Negotiation** (Purple), **Converted** (Blue), and **On Hold** (Orange/Red).
+  - Aligned database status values (lowercase slugs) and display names.
+  - Automatically resets saved columns option if it contains the old default layout of 6 columns to force reload the 4-column design.
+- **Header Custom Accent Themes**:
+  - Envelope, handshake, thumbs-up, and pause SVG icons respectively.
+  - Tinted color background banners and dynamically formatted total value indicators.
+- **Modern High-Density Cards Layout**:
+  - Renders client uppercase pills, priority badges (Hot, Warm, Won, Cold), bold project title, shoot tags, and bold pricing elements.
+  - Checklist progress numbers and track bar (turns blue if Won/Converted).
+  - Stacked assignee initials avatar, name, and role.
+  - Blue `View Details` action button style for Won deals and clean white border style for `Review`.
+- **Cohesive Mailbox Empty States**:
+  - Implemented an elegant custom inbox/mailbox SVG icon graphic with floating status badges (checks, handshakes, pause) and helper instruction texts.
+- **Cross-Browser Drag & Drop Stability**:
+  - Explicitly passed `this` references in inline event handlers (`ondragstart`, `ondragend`, `ondragover`, `ondrop`).
+  - Added cookie capabilities fallback for administrators so drag saves do not fail silently on nonce checks.
+- **Incremental Cache Flushing**:
+  - Bumped version number to `2.3.3` to force asset clearing.
