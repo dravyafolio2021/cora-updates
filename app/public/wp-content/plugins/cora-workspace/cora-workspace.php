@@ -23742,86 +23742,115 @@ function cora_ajax_get_equipment_data() {
     }
 
     $gear = get_option( 'cora_studio_gear', array() );
+    $cora_needs_init = false;
     if ( empty( $gear ) || ! is_array( $gear ) ) {
+        $cora_needs_init = true;
+    } else {
+        $has_target_serial = false;
+        foreach ( $gear as $item ) {
+            $serial_val = $item['serial'] ?? $item['serial_no'] ?? '';
+            if ( $serial_val === 'SN-774921' ) {
+                $has_target_serial = true;
+                break;
+            }
+        }
+        if ( ! $has_target_serial ) {
+            $cora_needs_init = true;
+        }
+    }
+
+    if ( $cora_needs_init ) {
         // Fallback sample data
         $gear = array(
             array(
-                'id'             => 'gear_sample_1',
-                'name'           => 'Sony Alpha a7 IV',
-                'category'       => 'Camera',
-                'brand_model'    => 'Sony Alpha a7 IV',
-                'serial_no'      => 'SN-7734910',
-                'purchase_date'  => '2023-05-10',
-                'purchase_price' => 2499.00,
-                'current_value'  => 2200.00,
-                'condition'      => 'Excellent',
-                'status'         => 'Available',
-                'assigned_to'    => '',
+                'id'            => 'gear_sony_a7iv',
+                'name'          => 'Sony Alpha a7 IV Cinema Camera',
+                'serial'        => 'SN-774921',
+                'serial_no'     => 'SN-774921',
+                'category'      => 'Camera',
+                'brand_model'   => 'Sony Alpha a7 IV Cinema Camera',
+                'capex'         => 245000,
+                'purchase_price'=> 245000,
+                'current_value' => 245000,
+                'condition'     => 'Excellent',
+                'status'        => 'On Shoot',
+                'assigned'      => 'Wedding Shoot - Rahul & Priya',
+                'assigned_to'   => 'Wedding Shoot - Rahul & Priya',
+                'purchase_date' => '2025-08-15',
+                'image'         => 'gear_sony_a7iv.jpg',
+                'operator'      => 'Karan Malhotra',
             ),
             array(
-                'id'             => 'gear_sample_2',
-                'name'           => 'RED Komodo 6K',
-                'category'       => 'Camera',
-                'brand_model'    => 'RED Komodo 6K Cinema Camera',
-                'serial_no'      => 'SN-RED9021',
-                'purchase_date'  => '2022-11-15',
-                'purchase_price' => 5995.00,
-                'current_value'  => 5200.00,
-                'condition'      => 'Mint',
-                'status'         => 'In Use',
-                'assigned_to'    => 'Marcus Vance',
+                'id'            => 'gear_red_komodo',
+                'name'          => 'RED Komodo 6K Cinema Package',
+                'serial'        => 'RED-9941',
+                'serial_no'     => 'RED-9941',
+                'category'      => 'Camera',
+                'brand_model'   => 'RED Komodo 6K Cinema Package',
+                'capex'         => 680000,
+                'purchase_price'=> 680000,
+                'current_value' => 680000,
+                'condition'     => 'Mint',
+                'status'        => 'Available',
+                'assigned'      => 'Unassigned (Studio Vault)',
+                'assigned_to'   => 'Unassigned (Studio Vault)',
+                'purchase_date' => '2025-07-10',
+                'image'         => 'gear_red_komodo.jpg',
+                'operator'      => 'N/A',
             ),
             array(
-                'id'             => 'gear_sample_3',
-                'name'           => 'DJI Mavic 3 Pro Drone',
-                'category'       => 'Drone',
-                'brand_model'    => 'DJI Mavic 3 Pro',
-                'serial_no'      => 'SN-DJI-482',
-                'purchase_date'  => '2023-08-01',
-                'purchase_price' => 2199.00,
-                'current_value'  => 1950.00,
-                'condition'      => 'Excellent',
-                'status'         => 'Available',
-                'assigned_to'    => '',
+                'id'            => 'gear_canon_2470',
+                'name'          => 'Canon RF 24-70mm f/2.8L IS USM',
+                'serial'        => 'RF24-7028',
+                'serial_no'     => 'RF24-7028',
+                'category'      => 'Lens',
+                'brand_model'   => 'Canon RF 24-70mm f/2.8L IS USM',
+                'capex'         => 152000,
+                'purchase_price'=> 152000,
+                'current_value' => 152000,
+                'condition'     => 'Available',
+                'status'        => 'Available',
+                'assigned'      => 'Unassigned (Studio Vault)',
+                'assigned_to'   => 'Unassigned (Studio Vault)',
+                'purchase_date' => '2025-05-22',
+                'image'         => 'gear_canon_2470.jpg',
+                'operator'      => 'N/A',
             ),
             array(
-                'id'             => 'gear_sample_4',
-                'name'           => 'Canon RF 70-200mm f/2.8',
-                'category'       => 'Lens',
-                'brand_model'    => 'Canon RF 70-200mm f/2.8 L IS USM',
-                'serial_no'      => 'SN-CN-70200',
-                'purchase_date'  => '2023-02-20',
-                'purchase_price' => 2799.00,
-                'current_value'  => 2500.00,
-                'condition'      => 'Mint',
-                'status'         => 'Available',
-                'assigned_to'    => '',
+                'id'            => 'gear_manfrotto_tripod',
+                'name'          => 'Manfrotto 504X Fluid Head Tripod',
+                'serial'        => 'MF-504X-221',
+                'serial_no'     => 'MF-504X-221',
+                'category'      => 'Accessories',
+                'brand_model'   => 'Manfrotto 504X Fluid Head Tripod',
+                'capex'         => 72000,
+                'purchase_price'=> 72000,
+                'current_value' => 72000,
+                'condition'     => 'Excellent',
+                'status'        => 'On Shoot',
+                'assigned'      => 'Ad Shoot - ACME Agency',
+                'assigned_to'   => 'Ad Shoot - ACME Agency',
+                'purchase_date' => '2025-03-18',
+                'image'         => 'gear_manfrotto_tripod.jpg',
+                'operator'      => 'N/A',
             ),
             array(
-                'id'             => 'gear_sample_5',
-                'name'           => 'Aperture 600d Pro Light',
-                'category'       => 'Lighting',
-                'brand_model'    => 'Aputure LS 600d Pro',
-                'serial_no'      => 'SN-APT-600D',
-                'purchase_date'  => '2023-01-10',
-                'purchase_price' => 1890.00,
-                'current_value'  => 1650.00,
-                'condition'      => 'Fair',
-                'status'         => 'Maintenance',
-                'assigned_to'    => '',
-            ),
-            array(
-                'id'             => 'gear_sample_6',
-                'name'           => 'Sennheiser Wireless Mic Kit',
-                'category'       => 'Audio',
-                'brand_model'    => 'Sennheiser EW 112P G4',
-                'serial_no'      => 'SN-SEN-112',
-                'purchase_date'  => '2022-09-05',
-                'purchase_price' => 649.00,
-                'current_value'  => 500.00,
-                'condition'      => 'Needs Service',
-                'status'         => 'Available',
-                'assigned_to'    => '',
+                'id'            => 'gear_aputure_300d',
+                'name'          => 'Aputure 300D II LED Light',
+                'serial'        => 'AP300D-5567',
+                'serial_no'     => 'AP300D-5567',
+                'category'      => 'Lighting',
+                'brand_model'   => 'Aputure 300D II LED Light',
+                'capex'         => 98000,
+                'purchase_price'=> 98000,
+                'current_value' => 98000,
+                'condition'     => 'Needs Repair',
+                'status'        => 'In Repair',
+                'assigned'      => 'Repair: Driver Issue Est. Cost: ₹2,500',
+                'assigned_to'   => 'Repair: Driver Issue Est. Cost: ₹2,500',
+                'purchase_date' => '2025-02-11',
+                'image'         => 'gear_aputure_300d.jpg',
+                'operator'      => 'N/A',
             ),
         );
         update_option( 'cora_studio_gear', $gear );
@@ -24042,10 +24071,16 @@ function cora_ajax_checkout_gear() {
 
     $updated_item_ids = array_unique( $updated_item_ids );
 
+    $assigned_text = $shoot_title;
+    if ( ! empty( $assigned_to ) && strpos( $shoot_title, $assigned_to ) === false ) {
+        $assigned_text = $shoot_title . ' - ' . $assigned_to;
+    }
+
     foreach ( $gear_list as &$g ) {
         if ( isset( $g['id'] ) && in_array( $g['id'], $updated_item_ids ) ) {
-            $g['status']      = 'In Use';
-            $g['assigned_to']  = $assigned_to;
+            $g['status']      = 'On Shoot';
+            $g['assigned']     = $assigned_text;
+            $g['assigned_to']  = $assigned_text;
             $g['updated_at']   = date( 'Y-m-d H:i:s' );
         }
     }
@@ -24148,7 +24183,8 @@ function cora_ajax_return_gear() {
     foreach ( $gear_list as &$g ) {
         if ( isset( $g['id'] ) && in_array( $g['id'], $items_to_free ) ) {
             $g['status']      = 'Available';
-            $g['assigned_to']  = '';
+            $g['assigned']     = 'Unassigned (Studio Vault)';
+            $g['assigned_to']  = 'Unassigned (Studio Vault)';
             $g['updated_at']   = date( 'Y-m-d H:i:s' );
         }
     }
@@ -24205,8 +24241,11 @@ function cora_ajax_log_gear_maintenance() {
     if ( ! empty( $gear_id ) ) {
         foreach ( $gear_list as &$g ) {
             if ( isset( $g['id'] ) && $g['id'] === $gear_id ) {
-                $g['status']     = 'Maintenance';
+                $g['status']     = 'In Repair';
                 $g['condition']  = 'Needs Service';
+                $assigned_text   = 'Repair: ' . $notes . ' Est. Cost: ₹' . number_format( $cost );
+                $g['assigned']   = $assigned_text;
+                $g['assigned_to'] = $assigned_text;
                 $g['updated_at'] = date( 'Y-m-d H:i:s' );
             }
         }
@@ -24264,6 +24303,44 @@ function cora_ajax_log_gear_maintenance() {
         'gear_list'        => $gear_list,
         'ledger_entry'     => $ledger_entry,
     ) );
+}
+
+// 3.5.1 cora_ajax_delete_studio_gear
+add_action( 'wp_ajax_cora_ajax_delete_studio_gear', 'cora_ajax_delete_studio_gear' );
+add_action( 'wp_ajax_nopriv_cora_ajax_delete_studio_gear', 'cora_ajax_delete_studio_gear' );
+function cora_ajax_delete_studio_gear() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( array( 'message' => 'Permission denied.' ) );
+    }
+
+    $gear_id = sanitize_text_field( $_POST['gear_id'] ?? '' );
+    if ( empty( $gear_id ) ) {
+        wp_send_json_error( array( 'message' => 'Gear ID is required.' ) );
+    }
+
+    $gear_list = get_option( 'cora_studio_gear', array() );
+    if ( ! is_array( $gear_list ) ) {
+        $gear_list = array();
+    }
+
+    $updated_gear_list = array();
+    $found = false;
+
+    foreach ( $gear_list as $item ) {
+        if ( isset( $item['id'] ) && $item['id'] === $gear_id ) {
+            $found = true;
+            continue;
+        }
+        $updated_gear_list[] = $item;
+    }
+
+    if ( $found ) {
+        update_option( 'cora_studio_gear', $updated_gear_list );
+        wp_send_json_success( array( 'message' => 'Gear deleted successfully.', 'gear_list' => $updated_gear_list ) );
+    } else {
+        wp_send_json_error( array( 'message' => 'Gear item not found.' ) );
+    }
 }
 
 // 3.6 cora_ajax_save_gear_kit
