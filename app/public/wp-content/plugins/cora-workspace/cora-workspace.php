@@ -13793,9 +13793,11 @@ function cora_db_get_leads() {
     $rows = $wpdb->get_results( $wpdb->prepare( $query, $params ), ARRAY_A );
 
     $mapped = array();
+    $seen_ids = array();
+
     if ( $rows ) {
         foreach ( $rows as $r ) {
-            $status_text = 'New Lead';
+            $status_text = $r['status'] ?? 'New Lead';
             switch($r['status']) {
                 case 'new': $status_text = 'New Lead'; break;
                 case 'contacted': $status_text = 'Proposal Sent'; break;
@@ -13805,26 +13807,148 @@ function cora_db_get_leads() {
                 case 'lost': $status_text = 'Lost'; break;
             }
 
-            $price_text = '₹' . number_format($r['budget_max']);
+            $price_val = floatval($r['budget_max'] ?? 0);
+            $price_text = $price_val > 0 ? '₹' . number_format($price_val) : ($r['budget_min'] ? '₹' . number_format(floatval($r['budget_min'])) : '₹0');
+            $full_name = trim(($r['first_name'] ?? '') . ' ' . ($r['last_name'] ?? ''));
+            if (empty($full_name)) $full_name = 'Client Inquiry';
 
-            $mapped[] = array(
+            $entry = array(
                 'id' => $r['id'],
-                'names' => $r['first_name'],
-                'email' => $r['email'],
-                'phone' => $r['phone'],
-                'scale' => $r['property_type'],
-                'city' => $r['preferred_locations'],
-                'notes' => $r['notes'],
+                'names' => $full_name,
+                'email' => $r['email'] ?? '',
+                'phone' => $r['phone'] ?? '',
+                'scale' => !empty($r['property_type']) ? $r['property_type'] : 'Standard Shoot',
+                'city' => !empty($r['preferred_locations']) ? $r['preferred_locations'] : 'Mumbai',
+                'notes' => $r['notes'] ?? '',
                 'price' => $price_text,
                 'status' => $status_text,
-                'followup_date' => $r['followup_date'] ? date('Y-m-d H:i', strtotime($r['followup_date'])) : '',
+                'score' => !empty($r['priority']) ? strtolower($r['priority']) : 'warm',
+                'followup_date' => !empty($r['followup_date']) ? date('Y-m-d H:i', strtotime($r['followup_date'])) : '',
                 'followup_notes' => $r['followup_notes'] ?? '',
-                'created_at' => strtotime($r['created_at']),
-                'converted_to_client' => intval($r['converted_to_client']),
-                'client_id' => $r['client_id']
+                'created_at' => !empty($r['created_at']) ? strtotime($r['created_at']) : time(),
+                'converted_to_client' => intval($r['converted_to_client'] ?? 0),
+                'client_id' => $r['client_id'] ?? null
+            );
+            $mapped[] = $entry;
+            $seen_ids[(string)$r['id']] = true;
+        }
+    }
+
+    // Merge option stored leads
+    $option_leads = get_option( 'cora_workspace_leads', array() );
+
+    // If both DB and option are empty, seed 6 rich demo leads for instant demonstration
+    if ( empty( $mapped ) && ( ! is_array( $option_leads ) || empty( $option_leads ) ) ) {
+        $seed_demo_leads = array(
+            array(
+                'id'         => 'lead_demo_101',
+                'names'      => 'Vikramaditya Singhania',
+                'email'      => 'vikram@singhania.com',
+                'phone'      => '+91 98765 43210',
+                'price'      => '₹3,50,000',
+                'scale'      => 'Luxury Villa Shoot',
+                'city'       => 'Mumbai, BKC',
+                'status'     => 'New Lead',
+                'score'      => 'hot',
+                'notes'      => 'Requires 4K drone cinematography & interior styling for commercial campaign.',
+                'created_at' => time() - 3600
+            ),
+            array(
+                'id'         => 'lead_demo_102',
+                'names'      => 'Ananya Deshmukh',
+                'email'      => 'ananya@deshmukh.in',
+                'phone'      => '+91 98200 11223',
+                'price'      => '₹1,80,000',
+                'scale'      => 'Commercial Studio Ad',
+                'city'       => 'Pune',
+                'status'     => 'Contacted',
+                'score'      => 'warm',
+                'notes'      => 'Proposal sent for 2-day studio shoot with model casting and post-production editing.',
+                'created_at' => time() - 86400
+            ),
+            array(
+                'id'         => 'lead_demo_103',
+                'names'      => 'Rajesh Oberoi',
+                'email'      => 'oberoi@oberoiholdings.com',
+                'phone'      => '+91 99300 44556',
+                'price'      => '₹5,20,000',
+                'scale'      => 'Resort Architecture Shoot',
+                'city'       => 'Goa, Candolim',
+                'status'     => 'Site Visit',
+                'score'      => 'hot',
+                'notes'      => 'Site inspection completed. Scheduled sunset lighting test and aerial footage capture.',
+                'created_at' => time() - 172800
+            ),
+            array(
+                'id'         => 'lead_demo_104',
+                'names'      => 'Devika Kapoor',
+                'email'      => 'devika@kapoordesigns.com',
+                'phone'      => '+91 98199 88776',
+                'price'      => '₹2,40,000',
+                'scale'      => 'Fashion Lookbook Shoot',
+                'city'       => 'Delhi, South Ext',
+                'status'     => 'Negotiation',
+                'score'      => 'warm',
+                'notes'      => 'Finalizing deliverable count (15 high-res lookbook retouching edits & social reels).',
+                'created_at' => time() - 259200
+            ),
+            array(
+                'id'         => 'lead_demo_105',
+                'names'      => 'Karan Malhotra',
+                'email'      => 'karan@malhotramedia.com',
+                'phone'      => '+91 97690 33221',
+                'price'      => '₹4,10,000',
+                'scale'      => 'Corporate Brand Film',
+                'city'       => 'Bengaluru',
+                'status'     => 'Converted',
+                'score'      => 'hot',
+                'notes'      => 'Advance payment received. Booking confirmed & studio crew allocated.',
+                'created_at' => time() - 345600
+            ),
+            array(
+                'id'         => 'lead_demo_106',
+                'names'      => 'Siddharth Mehta',
+                'email'      => 'sid@mehtagroup.com',
+                'phone'      => '+91 98450 66778',
+                'price'      => '₹95,000',
+                'scale'      => 'Product Catalog Shoot',
+                'city'       => 'Mumbai',
+                'status'     => 'Lost',
+                'score'      => 'cold',
+                'notes'      => 'Client deferred product catalog launch to next fiscal year.',
+                'created_at' => time() - 432000
+            )
+        );
+        update_option( 'cora_workspace_leads', $seed_demo_leads );
+        $option_leads = $seed_demo_leads;
+    }
+
+    if ( is_array( $option_leads ) && ! empty( $option_leads ) ) {
+        foreach ( $option_leads as $ol ) {
+            $id_key = (string)( $ol['id'] ?? '' );
+            if ( ! empty( $id_key ) && isset( $seen_ids[$id_key] ) ) {
+                continue;
+            }
+            $mapped[] = array(
+                'id'                  => $ol['id'] ?? 'lead_' . time(),
+                'names'               => $ol['names'] ?? 'Client Inquiry',
+                'email'               => $ol['email'] ?? '',
+                'phone'               => $ol['phone'] ?? '',
+                'scale'               => $ol['scale'] ?? 'Standard Shoot',
+                'city'                => $ol['city'] ?? 'Mumbai',
+                'notes'               => $ol['notes'] ?? '',
+                'price'               => $ol['price'] ?? '₹0',
+                'status'              => $ol['status'] ?? 'New Lead',
+                'score'               => $ol['score'] ?? 'warm',
+                'followup_date'       => $ol['followup_date'] ?? '',
+                'followup_notes'      => $ol['followup_notes'] ?? '',
+                'created_at'          => $ol['created_at'] ?? time(),
+                'converted_to_client' => intval( $ol['converted_to_client'] ?? 0 ),
+                'client_id'           => $ol['client_id'] ?? null,
             );
         }
     }
+
     return $mapped;
 }
 
