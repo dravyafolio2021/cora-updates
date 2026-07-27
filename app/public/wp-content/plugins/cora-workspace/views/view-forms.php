@@ -285,7 +285,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                 </button>
                 <div class="flex items-center gap-2.5 min-w-0">
-                    <input id="editor-form-title" type="text" placeholder="Untitled Form" value="Security & AI E2E Form 5450" class="text-sm font-bold text-zinc-950 dark:text-zinc-50 bg-transparent border-b border-transparent hover:border-zinc-200 focus:border-zinc-400 outline-none p-0.5 truncate w-48 md:w-72" />
+                    <input id="editor-form-title" type="text" placeholder="Untitled Form" value="Untitled Form" class="text-sm font-bold text-zinc-950 dark:text-zinc-50 bg-transparent border-b border-transparent hover:border-zinc-200 focus:border-zinc-400 outline-none p-0.5 truncate w-48 md:w-72" />
                     <span class="text-zinc-400 text-xs">✎</span>
                     <span id="editor-save-status" class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 text-[10px] font-bold flex items-center gap-1 shrink-0">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Saved
@@ -316,18 +316,17 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </div>
             </div>
 
-            <!-- Right: Publish & Status Controls -->
+            <!-- Right: Publish & Share Controls -->
             <div class="flex items-center gap-2 shrink-0">
                 <button id="btn-view-form" class="h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                     View
                 </button>
-                <select id="editor-form-status" class="h-8 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs font-semibold text-zinc-700 dark:text-zinc-300 outline-none">
-                    <option value="published">Published</option>
-                    <option value="draft">Draft</option>
-                    <option value="closed">Closed</option>
-                </select>
-                <button id="btn-save-form" class="h-8 px-4 rounded-lg bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all cursor-pointer shadow-xs">
+                <button id="btn-share-editor" class="h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                    Share
+                </button>
+                <button id="btn-save-form" class="h-8 px-4 rounded-lg bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all cursor-pointer shadow-xs border-0">
                     Publish Form
                 </button>
             </div>
@@ -588,13 +587,40 @@ if ( ! defined( 'ABSPATH' ) ) {
                         <label class="text-[10px] font-bold text-zinc-400 uppercase">Cover Image URL</label>
                         <input id="settings-cover-url" type="text" placeholder="https://example.com/cover.jpg" class="h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 outline-none w-full" />
                     </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-bold text-zinc-400 uppercase">Confirmation / Success Message</label>
-                        <textarea id="settings-success-msg" rows="3" placeholder="Thank you for submitting!" class="p-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 outline-none w-full resize-none"></textarea>
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-bold text-zinc-400 uppercase">Redirect URL</label>
-                        <input id="settings-redirect-url" type="text" placeholder="https://example.com/thank-you" class="h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 outline-none w-full" />
+                    <!-- Thank You / Completion Screen Customization -->
+                    <div class="space-y-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Thank You Screen & CTA Destination</label>
+                        
+                        <div class="space-y-1">
+                            <span class="text-[9.5px] font-bold text-zinc-500 uppercase">Thank You Heading</span>
+                            <input id="settings-thankyou-title" type="text" placeholder="Response Submitted" class="h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 outline-none w-full" />
+                        </div>
+
+                        <div class="space-y-1">
+                            <span class="text-[9.5px] font-bold text-zinc-500 uppercase">Confirmation Message</span>
+                            <textarea id="settings-success-msg" rows="2" placeholder="Thank you for your response! We will be in touch shortly." class="p-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 outline-none w-full resize-none"></textarea>
+                        </div>
+
+                        <div class="space-y-1">
+                            <span class="text-[9.5px] font-bold text-zinc-500 uppercase">Redirect URL (Optional)</span>
+                            <input id="settings-redirect-url" type="text" placeholder="https://example.com/thank-you" class="h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 outline-none w-full" />
+                        </div>
+
+                        <div class="flex items-center justify-between py-1.5 border-t border-zinc-100 dark:border-zinc-800/80">
+                            <span class="text-xs font-medium text-zinc-700 dark:text-zinc-300">Show Thank You CTA Button</span>
+                            <input type="checkbox" id="settings-thankyou-cta-enable" class="w-4 h-4 rounded accent-zinc-950 cursor-pointer" />
+                        </div>
+
+                        <div id="settings-thankyou-cta-details" class="space-y-2 hidden">
+                            <div class="space-y-1">
+                                <span class="text-[9.5px] font-bold text-zinc-500 uppercase">CTA Button Text</span>
+                                <input id="settings-thankyou-cta-text" type="text" placeholder="Visit Website / Book Call" class="h-8 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 outline-none w-full" />
+                            </div>
+                            <div class="space-y-1">
+                                <span class="text-[9.5px] font-bold text-zinc-500 uppercase">Destination Link URL</span>
+                                <input id="settings-thankyou-cta-url" type="text" placeholder="https://yourdomain.com" class="h-8 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 outline-none w-full" />
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Footer Buttons (CTA) Customization -->
@@ -694,20 +720,24 @@ if ( ! defined( 'ABSPATH' ) ) {
                     </div>
                     <div class="p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 space-y-2">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Stripe Payments API</span>
+                            <div class="flex items-center gap-1.5">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-emerald-600 dark:text-emerald-400"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">UPI Instant Payments (India)</span>
+                            </div>
                             <span class="px-1.5 py-0.5 rounded text-[8.5px] font-bold uppercase bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">Active</span>
                         </div>
-                        <p class="text-[10.5px] text-zinc-500">Collect payments directly through embedded forms.</p>
-                        <input id="settings-stripe-key" type="password" placeholder="pk_test_..." class="h-8 px-2.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 w-full" />
-                    </div>
-                    <div class="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                        <label class="text-[10px] font-bold text-zinc-900 dark:text-zinc-100 uppercase">CRM Field Sync Mappings</label>
-                        <div class="space-y-1.5">
-                            <input id="map-crm-name" type="text" placeholder="Name field key" class="h-8 px-2.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 w-full" />
-                            <input id="map-crm-email" type="text" placeholder="Email field key" class="h-8 px-2.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 w-full" />
-                            <input id="map-crm-phone" type="text" placeholder="Phone field key" class="h-8 px-2.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 w-full" />
-                            <input id="map-crm-notes" type="text" placeholder="Notes field key" class="h-8 px-2.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 w-full" />
+                        <p class="text-[10.5px] text-zinc-500 leading-relaxed">Accept direct UPI payments (GPay, PhonePe, Paytm, BHIM) via UPI ID & QR Code blocks.</p>
+                        <div class="space-y-1 pt-1">
+                            <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Workspace Default UPI ID / VPA</label>
+                            <input id="settings-upi-id" type="text" placeholder="cora@upi or agency@paytm" class="h-8 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 w-full outline-none" />
                         </div>
+                    </div>
+                    <div class="p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Cora CRM Auto-Sync</span>
+                            <span class="px-1.5 py-0.5 rounded text-[8.5px] font-bold uppercase bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">Automatic</span>
+                        </div>
+                        <p class="text-[10.5px] text-zinc-500 leading-relaxed">Form responses automatically parse contact details (Name, Email, Phone, Notes) directly into your Workspace CRM database without requiring manual field key setup.</p>
                     </div>
                     <div class="p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 space-y-1">
                         <div class="flex items-center justify-between">
@@ -1049,21 +1079,92 @@ if ( ! defined( 'ABSPATH' ) ) {
         </div>
     </div>
 
-    <!-- GENERIC CONFIRMATION DRAWER -->
-    <div id="cora-confirm-drawer" class="fixed inset-y-0 right-0 w-full md:w-[350px] bg-white shadow-2xl border-l border-zinc-200 z-50 transform translate-x-full transition-transform duration-300 flex flex-col font-sans">
-        <div class="p-5 border-b border-zinc-100 flex items-center justify-between">
-            <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wide">Confirm Action</h3>
-            <button id="btn-close-confirm" class="h-8 w-8 rounded-lg hover:bg-zinc-50 flex items-center justify-center text-zinc-500">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-        </div>
-        <div class="flex-1 p-5 flex flex-col justify-between gap-6">
-            <div class="space-y-2">
-                <p id="confirm-message-text" class="text-xs text-zinc-650 leading-relaxed">Are you sure you want to proceed with this action?</p>
+    <!-- GENERIC CONFIRMATION MODAL POPUP -->
+    <div id="cora-confirm-modal" class="fixed inset-0 z-[99999] hidden items-center justify-center bg-zinc-950/40 dark:bg-zinc-950/70 backdrop-blur-xs transition-all duration-200">
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-2xl max-w-sm w-full space-y-4 relative mx-4 transform transition-all scale-100">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/80 flex items-center justify-center text-red-600 dark:text-red-400 shrink-0">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    </div>
+                    <div class="flex flex-col min-w-0">
+                        <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-50 tracking-tight" id="confirm-modal-title">Delete Confirmation</h3>
+                        <span class="text-[10px] font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Permanent Action</span>
+                    </div>
+                </div>
+                <button id="btn-close-confirm" type="button" class="h-7 w-7 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors border-0 cursor-pointer">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
             </div>
-            <div class="flex flex-col gap-2">
-                <button id="btn-confirm-action" class="h-9 w-full rounded-lg bg-zinc-950 text-white text-xs font-semibold cursor-pointer">Confirm</button>
-                <button id="btn-cancel-confirm" class="h-9 w-full rounded-lg border border-zinc-200 text-zinc-600 text-xs font-semibold cursor-pointer">Cancel</button>
+
+            <p id="confirm-message-text" class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">Are you sure you want to delete this form and all responses? This action cannot be undone.</p>
+
+            <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                <button id="btn-cancel-confirm" type="button" class="h-9 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-xs font-bold text-zinc-700 dark:text-zinc-300 transition-all cursor-pointer">
+                    Cancel
+                </button>
+                <button id="btn-confirm-action" type="button" class="h-9 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all shadow-xs cursor-pointer border-none flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    Delete Permanently
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHARE FORM MODAL POPUP -->
+    <div id="cora-share-modal" class="fixed inset-0 z-[99999] hidden items-center justify-center bg-zinc-950/40 dark:bg-zinc-950/70 backdrop-blur-xs transition-all duration-200">
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-2xl max-w-md w-full space-y-5 relative mx-4 transform transition-all scale-100">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-50" id="share-modal-title">Share Form</h3>
+                        <p class="text-[10px] text-zinc-400 font-medium">Distribute via direct link, WhatsApp, or email</p>
+                    </div>
+                </div>
+                <button id="btn-close-share-modal" type="button" class="h-7 w-7 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors border-0 cursor-pointer">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+
+            <!-- Public Link Copy Box -->
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Public Shareable Link</label>
+                <div class="flex items-center gap-2">
+                    <input id="share-modal-url-input" type="text" readonly class="h-9 px-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 text-xs text-zinc-800 dark:text-zinc-200 font-mono flex-1 outline-none select-all" />
+                    <button id="btn-share-copy-link" type="button" class="h-9 px-4 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-bold hover:bg-zinc-800 dark:hover:bg-zinc-200 shrink-0 transition-all border-0 cursor-pointer flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        Copy Link
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Share Options Grid -->
+            <div class="grid grid-cols-2 gap-3 pt-1">
+                <button id="btn-share-whatsapp" type="button" class="p-3 rounded-xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/50 dark:bg-emerald-950/30 hover:bg-emerald-100/50 dark:hover:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 flex items-center gap-2.5 transition-all text-xs font-semibold cursor-pointer border-0">
+                    <div class="w-7 h-7 rounded-lg bg-[#25D366] text-white flex items-center justify-center shrink-0 shadow-2xs">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.461c-1.854 0-3.674-.496-5.267-1.438l-.377-.223-3.916 1.027 1.045-3.816-.245-.39c-1.034-1.646-1.58-3.559-1.579-5.518.003-5.69 4.628-10.316 10.32-10.316 2.756.001 5.347 1.074 7.294 3.023 1.947 1.948 3.018 4.54 3.017 7.297-.003 5.692-4.628 10.317-10.32 10.317m0-21.728c-6.29 0-11.412 5.121-11.415 11.414-.002 2.01.52 3.972 1.511 5.694l-1.605 5.864 6.001-1.574c1.66 1.048 3.582 1.6 5.503 1.601h.005c6.289 0 11.412-5.122 11.415-11.414.002-3.048-1.182-5.914-3.332-8.064-2.15-2.15-5.015-3.334-8.066-3.335"/></svg>
+                    </div>
+                    <span>Share on WhatsApp</span>
+                </button>
+
+                <button id="btn-share-email" type="button" class="p-3 rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/50 dark:bg-blue-950/30 hover:bg-blue-100/50 dark:hover:bg-blue-950/60 text-blue-800 dark:text-blue-300 flex items-center gap-2.5 transition-all text-xs font-semibold cursor-pointer border-0">
+                    <div class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    </div>
+                    <span>Send via Email</span>
+                </button>
+            </div>
+
+            <!-- Embed Code Box -->
+            <div class="space-y-1.5 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                <div class="flex items-center justify-between">
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Embed Code (iFrame)</label>
+                    <button id="btn-copy-embed-code" type="button" class="text-[10px] font-bold text-zinc-900 dark:text-zinc-100 hover:underline cursor-pointer border-0 bg-transparent">Copy Code</button>
+                </div>
+                <input id="share-modal-embed-input" type="text" readonly class="h-8 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 text-[11px] text-zinc-600 dark:text-zinc-400 font-mono w-full outline-none select-all" />
             </div>
         </div>
     </div>
@@ -1311,20 +1412,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // View States selectors
     const listState = document.getElementById('forms-list-state');
     const editorState = document.getElementById('form-editor-state');
-    const confirmDrawer = document.getElementById('cora-confirm-drawer');
+    const confirmModal = document.getElementById('cora-confirm-modal');
     let confirmCallback = null;
 
-    document.getElementById('btn-close-confirm')?.addEventListener('click', () => {
-        confirmDrawer?.classList.add('translate-x-full');
-    });
-    document.getElementById('btn-cancel-confirm')?.addEventListener('click', () => {
-        confirmDrawer?.classList.add('translate-x-full');
-    });
+    const closeConfirmModal = () => {
+        if (confirmModal) {
+            confirmModal.classList.add('hidden');
+            confirmModal.classList.remove('flex');
+        }
+    };
+
+    document.getElementById('btn-close-confirm')?.addEventListener('click', closeConfirmModal);
+    document.getElementById('btn-cancel-confirm')?.addEventListener('click', closeConfirmModal);
     document.getElementById('btn-confirm-action')?.addEventListener('click', () => {
         if (typeof confirmCallback === 'function') {
             confirmCallback();
         }
-        confirmDrawer?.classList.add('translate-x-full');
+        closeConfirmModal();
     });
     
     jQuery('#funnel-form-selector').on('change', updateAdvancedFunnelData);
@@ -1385,10 +1489,9 @@ function fetchForms() {
                 formsData = response;
                 renderFormsList();
                 updateMetrics();
-                handleRouting();
             },
             error: function(err) {
-                console.error("Error loading forms:", err);
+                // Ignore silent load error
             }
         });
     }
@@ -1759,9 +1862,14 @@ function renderAuditLogs(logs) {
     }
 
 function coraConfirmAction(message, onConfirm) {
-        document.getElementById('confirm-message-text').textContent = message;
+        const msgEl = document.getElementById('confirm-message-text');
+        if (msgEl) msgEl.textContent = message;
         confirmCallback = onConfirm;
-        confirmDrawer.classList.remove('translate-x-full');
+        const modal = document.getElementById('cora-confirm-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
     }
 
 function deleteForm(id) {
@@ -1994,26 +2102,31 @@ function renderFormsList() {
         // Attach listeners
         jQuery('.btn-view-live').on('click', function() {
             const id = jQuery(this).data('id');
+            const formObj = (formsData || []).find(f => f.id == id);
+            const key = (formObj && formObj.form_key) ? formObj.form_key : id;
             let siteUrl = coraREData.siteUrl || '';
-            if (siteUrl.endsWith('/')) {
-                siteUrl = siteUrl.slice(0, -1);
-            }
-            window.open(siteUrl + '/shared-form/' + id, '_blank');
+            if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
+            window.open(siteUrl + '/shared-form/' + key, '_blank');
         });
 
         jQuery('.btn-share-form').on('click', function() {
             const id = jQuery(this).data('id');
+            const formObj = (formsData || []).find(f => f.id == id);
+            const key = (formObj && formObj.form_key) ? formObj.form_key : id;
             let siteUrl = coraREData.siteUrl || '';
-            if (siteUrl.endsWith('/')) {
-                siteUrl = siteUrl.slice(0, -1);
-            }
-            const shareUrl = siteUrl + '/shared-form/' + id;
+            if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
+            const shareUrl = siteUrl + '/shared-form/' + key;
             coraCopyTextToClipboard(shareUrl);
         });
 
         jQuery('.btn-edit-form').on('click', function() {
             const id = jQuery(this).data('id');
-            window.location.hash = '#edit/' + id;
+            const targetHash = '#edit/' + id;
+            if (window.location.hash === targetHash) {
+                loadFormIntoEditor(id);
+            } else {
+                window.location.hash = targetHash;
+            }
         });
 
         jQuery('.btn-view-subs').on('click', function() {
@@ -2326,6 +2439,7 @@ function renderFormsList() {
             id: 0,
             title: 'Untitled Form',
             status: 'draft',
+            currentStepIndex: 0,
             settings: { steps: ['Step 1'] },
             blocks: [],
             logic: []
@@ -2359,6 +2473,7 @@ function renderFormsList() {
             },
             success: function(form) {
                 currentEditingForm = form;
+                currentEditingForm.currentStepIndex = 0;
                 if (!currentEditingForm.settings) currentEditingForm.settings = {};
                 if (!currentEditingForm.blocks) currentEditingForm.blocks = [];
                 if (!currentEditingForm.settings.steps) currentEditingForm.settings.steps = ['Step 1'];
@@ -2390,20 +2505,25 @@ function renderFormsList() {
                 if (successMsgInp) successMsgInp.value = (form.settings && form.settings.success_message) || '';
                 const redirectUrlInp = document.getElementById('settings-redirect-url');
                 if (redirectUrlInp) redirectUrlInp.value = (form.settings && form.settings.redirect_url) || '';
-                const customCssInp = document.getElementById('settings-custom-css');
-                if (customCssInp) customCssInp.value = (form.styling && form.styling.custom_css) || '';
-                const webhookUrlInp = document.getElementById('settings-webhook-url');
-                if (webhookUrlInp) webhookUrlInp.value = (form.settings && form.settings.webhook_url) || '';
-                const stripeKeyInp = document.getElementById('settings-stripe-key');
-                if (stripeKeyInp) stripeKeyInp.value = (form.settings && form.settings.stripe_key) || '';
-                const crmNameInp = document.getElementById('map-crm-name');
-                if (crmNameInp) crmNameInp.value = (form.settings && form.settings.map_crm_name) || '';
-                const crmEmailInp = document.getElementById('map-crm-email');
-                if (crmEmailInp) crmEmailInp.value = (form.settings && form.settings.map_crm_email) || '';
-                const crmPhoneInp = document.getElementById('map-crm-phone');
-                if (crmPhoneInp) crmPhoneInp.value = (form.settings && form.settings.map_crm_phone) || '';
-                const crmNotesInp = document.getElementById('map-crm-notes');
-                if (crmNotesInp) crmNotesInp.value = (form.settings && form.settings.map_crm_notes) || '';
+
+                const thankyouTitleInp = document.getElementById('settings-thankyou-title');
+                if (thankyouTitleInp) thankyouTitleInp.value = (form.settings && form.settings.thankyou_title) || 'Response Submitted';
+                const thankyouCtaEnableInp = document.getElementById('settings-thankyou-cta-enable');
+                if (thankyouCtaEnableInp) thankyouCtaEnableInp.checked = !!(form.settings && form.settings.thankyou_cta_enable);
+                const thankyouCtaTextInp = document.getElementById('settings-thankyou-cta-text');
+                if (thankyouCtaTextInp) thankyouCtaTextInp.value = (form.settings && form.settings.thankyou_cta_text) || 'Visit Website';
+                const thankyouCtaUrlInp = document.getElementById('settings-thankyou-cta-url');
+                if (thankyouCtaUrlInp) thankyouCtaUrlInp.value = (form.settings && form.settings.thankyou_cta_url) || '';
+
+                const thankyouCtaDetails = document.getElementById('settings-thankyou-cta-details');
+                if (thankyouCtaDetails) {
+                    if (form.settings && form.settings.thankyou_cta_enable) thankyouCtaDetails.classList.remove('hidden');
+                    else thankyouCtaDetails.classList.add('hidden');
+                }
+
+                const upiIdInp = document.getElementById('settings-upi-id');
+                if (upiIdInp) upiIdInp.value = (form.settings && form.settings.upi_id) || 'cora@upi';
+
 
                 // Populate CTA inputs
                 if (!form.settings) form.settings = {};
@@ -2472,6 +2592,8 @@ function renderFormsList() {
                     switchLeftTab('fields');
                     if (!currentEditingForm.logic) currentEditingForm.logic = [];
                     if (typeof renderLogicRules === 'function') renderLogicRules();
+                    window._formIsDirty = false;
+                    updatePublishButtonState(false);
                 } catch(renderErr) {
                     // Rendering failed but editor is still visible – show a non-blocking warning
                     window.coraShowToast && window.coraShowToast('Form loaded but some UI elements may not render correctly.', 'error');
@@ -2507,8 +2629,28 @@ function renderFormsList() {
         }
     }
 
+    window._formIsDirty = false;
+
+    function updatePublishButtonState(isDirty = false) {
+        const btn = document.getElementById('btn-save-form');
+        if (!btn || !currentEditingForm) return;
+
+        if (currentEditingForm.status === 'published' && !isDirty) {
+            btn.innerHTML = `Published <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="inline ml-1"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+            btn.className = 'h-8 px-3.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70 text-xs font-bold transition-all shadow-none cursor-default';
+        } else if (currentEditingForm.status === 'published' && isDirty) {
+            btn.innerText = 'Publish Changes';
+            btn.className = 'h-8 px-4 rounded-lg bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all cursor-pointer shadow-xs border-0';
+        } else {
+            btn.innerText = 'Publish Form';
+            btn.className = 'h-8 px-4 rounded-lg bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all cursor-pointer shadow-xs border-0';
+        }
+    }
+
     function triggerAutoSave() {
         clearTimeout(autoSaveTimer);
+        window._formIsDirty = true;
+        updatePublishButtonState(true);
         setAutoSaveStatus('saving');
         autoSaveTimer = setTimeout(() => {
             saveFormInternal();
@@ -2516,13 +2658,19 @@ function renderFormsList() {
     }
 
     function saveFormInternal(publish = false) {
+        clearTimeout(autoSaveTimer);
         if (!currentEditingForm) return;
 
         const titleInp = document.getElementById('editor-form-title');
-        if (titleInp) currentEditingForm.title = titleInp.value;
+        if (titleInp && titleInp.value && titleInp.value.trim() !== '') {
+            currentEditingForm.title = titleInp.value.trim();
+            const st = document.getElementById('settings-form-title');
+            if (st) st.value = titleInp.value.trim();
+        }
         
-        const statusSel = document.getElementById('editor-form-status');
-        if (statusSel) currentEditingForm.status = statusSel.value;
+        if (publish) {
+            currentEditingForm.status = 'published';
+        }
 
         jQuery.ajax({
             url: '/wp-json/cora/v1/forms',
@@ -2535,12 +2683,21 @@ function renderFormsList() {
             success: function(res) {
                 if (res && res.id) {
                     currentEditingForm.id = res.id;
+                    if (res.form_key) currentEditingForm.form_key = res.form_key;
+                    if (!formsData) formsData = [];
+                    const existingIdx = formsData.findIndex(f => f.id == res.id);
+                    const merged = Object.assign({}, currentEditingForm, res);
+                    if (existingIdx !== -1) {
+                        formsData[existingIdx] = merged;
+                    } else {
+                        formsData.unshift(merged);
+                    }
+                    renderFormsList();
                 }
                 setAutoSaveStatus('saved');
                 if (publish) {
-                    currentEditingForm.status = 'published';
-                    const statusSel = document.getElementById('editor-form-status');
-                    if (statusSel) statusSel.value = 'published';
+                    window._formIsDirty = false;
+                    updatePublishButtonState(false);
                     window.coraShowToast && window.coraShowToast("Form published successfully!", "success");
                     fetchForms();
                 }
@@ -3329,15 +3486,14 @@ function renderFormsList() {
         { id: 'settings-form-title', key: 'title', parent: 'root', syncTo: ['editor-form-title', 'canvas-form-name'] },
         { id: 'settings-form-subtitle', key: 'description', parent: 'root', syncTo: ['canvas-form-subtitle'] },
         { id: 'settings-cover-url', key: 'cover_image', parent: 'settings', syncAction: renderCoverImage },
+        { id: 'settings-thankyou-title', key: 'thankyou_title', parent: 'settings' },
         { id: 'settings-success-msg', key: 'success_message', parent: 'settings' },
         { id: 'settings-redirect-url', key: 'redirect_url', parent: 'settings' },
+        { id: 'settings-thankyou-cta-text', key: 'thankyou_cta_text', parent: 'settings' },
+        { id: 'settings-thankyou-cta-url', key: 'thankyou_cta_url', parent: 'settings' },
         { id: 'settings-custom-css', key: 'custom_css', parent: 'styling' },
         { id: 'settings-webhook-url', key: 'webhook_url', parent: 'settings' },
-        { id: 'settings-stripe-key', key: 'stripe_key', parent: 'settings' },
-        { id: 'map-crm-name', key: 'map_crm_name', parent: 'settings' },
-        { id: 'map-crm-email', key: 'map_crm_email', parent: 'settings' },
-        { id: 'map-crm-phone', key: 'map_crm_phone', parent: 'settings' },
-        { id: 'map-crm-notes', key: 'map_crm_notes', parent: 'settings' }
+        { id: 'settings-upi-id', key: 'upi_id', parent: 'settings' }
     ];
 
     formSettingsBindings.forEach(binding => {
@@ -3366,8 +3522,19 @@ function renderFormsList() {
                 binding.syncAction();
             }
 
-            triggerAutoSave();
         });
+    });
+
+    document.getElementById('settings-thankyou-cta-enable')?.addEventListener('change', (e) => {
+        if (!currentEditingForm) return;
+        if (!currentEditingForm.settings) currentEditingForm.settings = {};
+        currentEditingForm.settings.thankyou_cta_enable = e.target.checked;
+        const details = document.getElementById('settings-thankyou-cta-details');
+        if (details) {
+            if (e.target.checked) details.classList.remove('hidden');
+            else details.classList.add('hidden');
+        }
+        triggerAutoSave();
     });
 
     // Title & Subtitle Sync
@@ -3555,10 +3722,85 @@ function renderFormsList() {
             window.coraShowToast && window.coraShowToast("Please save/publish the form first before viewing", "warning");
             return;
         }
-        window.open(coraREData.siteUrl + '/shared-form/' + currentEditingForm.id, '_blank');
+        let siteUrl = coraREData.siteUrl || '';
+        if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
+        const formKey = currentEditingForm.form_key || currentEditingForm.id;
+        window.open(siteUrl + '/shared-form/' + formKey, '_blank');
+    });
+
+    function openShareModal() {
+        if (!currentEditingForm || !currentEditingForm.id) {
+            window.coraShowToast && window.coraShowToast("Please save the form first to share.", "error");
+            return;
+        }
+
+        let siteUrl = coraREData.siteUrl || '';
+        if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
+        const formKey = currentEditingForm.form_key || currentEditingForm.id;
+        const shareUrl = siteUrl + '/shared-form/' + formKey;
+        const embedCode = `<iframe src="${shareUrl}" width="100%" height="600" frameborder="0"></iframe>`;
+
+        const titleEl = document.getElementById('share-modal-title');
+        if (titleEl) titleEl.textContent = `Share: ${currentEditingForm.title || 'Untitled Form'}`;
+
+        const urlInp = document.getElementById('share-modal-url-input');
+        if (urlInp) urlInp.value = shareUrl;
+
+        const embedInp = document.getElementById('share-modal-embed-input');
+        if (embedInp) embedInp.value = embedCode;
+
+        const modal = document.getElementById('cora-share-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    }
+
+    function closeShareModal() {
+        const modal = document.getElementById('cora-share-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+
+    document.getElementById('btn-share-editor')?.addEventListener('click', openShareModal);
+    document.getElementById('btn-close-share-modal')?.addEventListener('click', closeShareModal);
+
+    document.getElementById('btn-share-copy-link')?.addEventListener('click', () => {
+        const urlInp = document.getElementById('share-modal-url-input');
+        if (urlInp && urlInp.value) {
+            coraCopyTextToClipboard(urlInp.value);
+        }
+    });
+
+    document.getElementById('btn-share-whatsapp')?.addEventListener('click', () => {
+        const urlInp = document.getElementById('share-modal-url-input');
+        if (urlInp && urlInp.value) {
+            const title = currentEditingForm ? (currentEditingForm.title || 'Form') : 'Form';
+            const waUrl = `https://wa.me/?text=${encodeURIComponent('Please fill out this form: ' + title + ' - ' + urlInp.value)}`;
+            window.open(waUrl, '_blank');
+        }
+    });
+
+    document.getElementById('btn-share-email')?.addEventListener('click', () => {
+        const urlInp = document.getElementById('share-modal-url-input');
+        if (urlInp && urlInp.value) {
+            const title = currentEditingForm ? (currentEditingForm.title || 'Form Invite') : 'Form Invite';
+            const mailUrl = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent('Hi,\n\nPlease fill out this form at the following link:\n' + urlInp.value + '\n\nThank you!')}`;
+            window.open(mailUrl, '_blank');
+        }
+    });
+
+    document.getElementById('btn-copy-embed-code')?.addEventListener('click', () => {
+        const embedInp = document.getElementById('share-modal-embed-input');
+        if (embedInp && embedInp.value) {
+            coraCopyTextToClipboard(embedInp.value);
+        }
     });
 
     document.getElementById('btn-back-to-list')?.addEventListener('click', () => {
+        fetchForms();
         window.location.hash = '#list';
     });
 
@@ -3567,7 +3809,10 @@ function renderFormsList() {
     if (formsModuleRoot) {
         formsModuleRoot.addEventListener('click', (e) => {
             const target = e.target.closest('#btn-create-form');
-            if (target) { window.location.hash = '#new'; }
+            if (target) {
+                createNewForm();
+                window.location.hash = '#new';
+            }
         });
     }
 
@@ -3594,7 +3839,7 @@ function renderFormsList() {
     // Bottom Add Button
     document.getElementById('btn-add-element-bottom')?.addEventListener('click', () => {
         switchLeftTab('fields');
-        addFieldToForm('text');
+        window.coraShowToast && window.coraShowToast('Select a field type from the sidebar to add', 'info');
     });
 
     // Left Tab Listeners

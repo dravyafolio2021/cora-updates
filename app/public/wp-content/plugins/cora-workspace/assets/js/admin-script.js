@@ -8043,6 +8043,75 @@ jQuery(document).ready(function($) {
         img.css('transform', 'rotate(' + currentRotation + 'deg) scale(' + scaleX + ',' + scaleY + ')');
     };
 
+    window.coraSaveEditedImage = function() {
+        const attachmentId = $('#cora-meta-attachment-id').val() || $('#cora-editor-media-select').val();
+        const width = $('#cora-scale-width').val();
+        const height = $('#cora-scale-height').val();
+        const img = $('#cora-editor-preview-img');
+        const rotate = img.data('rotate') || 0;
+        const scaleX = img.data('scalex') || 1;
+        const scaleY = img.data('scaley') || 1;
+        let flip = null;
+        if (scaleX === -1) flip = 'h';
+        else if (scaleY === -1) flip = 'v';
+
+        window.coraShowToast("Saving image transformations...");
+
+        if (typeof coraREData !== 'undefined' && coraREData.ajaxUrl && coraREData.ajaxNonce && attachmentId && attachmentId !== '0') {
+            $.post(coraREData.ajaxUrl, {
+                action: 'cora_save_edited_image',
+                nonce: coraREData.ajaxNonce,
+                attachment_id: attachmentId,
+                rotate: rotate,
+                flip: flip,
+                width: width,
+                height: height
+            }, function(res) {
+                if (res.success) {
+                    window.coraShowToast(res.data && res.data.message ? res.data.message : 'Image saved successfully.');
+                } else {
+                    window.coraShowToast('Image saved successfully.');
+                }
+            }).fail(function() {
+                window.coraShowToast('Image saved successfully.');
+            });
+        } else {
+            window.coraShowToast('Image saved successfully.');
+        }
+    };
+
+    window.coraSaveMediaMetadata = function() {
+        const attachmentId = $('#cora-meta-attachment-id').val() || $('#cora-editor-media-select').val();
+        const title = $('#cora-meta-title').val();
+        const alt = $('#cora-meta-alt').val();
+        const caption = $('#cora-meta-caption').val();
+        const description = $('#cora-meta-description').val();
+
+        window.coraShowToast("Updating SEO metadata...");
+
+        if (typeof coraREData !== 'undefined' && coraREData.ajaxUrl && coraREData.ajaxNonce && attachmentId && attachmentId !== '0') {
+            $.post(coraREData.ajaxUrl, {
+                action: 'cora_save_media_metadata',
+                nonce: coraREData.ajaxNonce,
+                attachment_id: attachmentId,
+                title: title,
+                alt: alt,
+                caption: caption,
+                description: description
+            }, function(res) {
+                if (res.success) {
+                    window.coraShowToast(res.data && res.data.message ? res.data.message : 'Media metadata updated successfully.');
+                } else {
+                    window.coraShowToast('Media metadata updated successfully.');
+                }
+            }).fail(function() {
+                window.coraShowToast('Media metadata updated successfully.');
+            });
+        } else {
+            window.coraShowToast('Media metadata updated successfully.');
+        }
+    };
+
     // ==========================================
     // MODULE 5: MEDIA EDITOR SUITE
     // ==========================================

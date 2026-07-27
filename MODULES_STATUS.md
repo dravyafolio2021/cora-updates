@@ -11,7 +11,9 @@
 |---|---|---|---|---|
 | **Core Platform** | `main` | 🟢 Stable Base | `cora-workspace.php`, `view-settings-suite.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
-| **File Manager** | `feature/document-studio-vault` | 🟡 Active Development | `views/view-vault.php`, `cora-workspace.php` | Dedicated Vault Agent |
+| **File Manager** | `feature/document-studio-vault` | 🟢 Merged to Main | `views/view-vault.php`, `cora-workspace.php` | Dedicated Vault Agent |
+| **Forms & Reviews** | `feature/forms-module` | 🟢 Merged to Main | `views/view-forms.php`, `public-form-view.php`, `views/view-emails.php` | Dedicated Forms Agent |
+| **Media Module** | `feature/media-module` | 🟡 Active Feature Branch | `views/view-media.php`, `views/view-media-editor.php`, `cora-workspace.php` | Media Module Agent |
 <!-- MODULE_ROWS_END -->
 
 ---
@@ -30,13 +32,21 @@
 ## 3. Branch Activity & Progress Log
 
 ### `main` (Production Base)
-- **Latest Commit**: `121ba12f` — `docs: sync MODULES_STATUS.md with commit aea75299 on main`
+- **Latest Commit**: `5d416d35` — `feat(settings): add custom favicon, platform logo, browser tab title, and sidebar brand title settings with live DOM updates`
 - **Health**: 100% Operational & Clean Base.
 
 <!-- BRANCH_LOGS_START -->
-### `feature/document-studio-vault` (Active Feature Branch)
-- **Status**: ⚡ In Active Development — Redesigning Document Vault Dashboard, 5-Step Guided Document Studio Wizard, E-Sign Audit Registry, and Right-Sliding Side Drawers.
-- **Main Touchpoint**: `views/view-vault.php`, `cora-workspace.php` (Document Studio Wizard, E-Sign Audit, Invoices & Tax Invoices, Quotation Converter, AJAX Handlers).
+### `feature/document-studio-vault` (Merged Feature Branch)
+- **Status**: 🟢 Merged to `main` (commit `edc5d5a4`) — Document Vault Dashboard, 5-Step Guided Document Studio Wizard, E-Sign Audit Registry, Quality Health Check, GST math, reactive KPI cards, watermark preview.
+- **Main Touchpoint**: `views/view-vault.php`, `cora-workspace.php`.
+
+### `feature/forms-module` (Merged Feature Branch)
+- **Status**: 🟢 Merged to `main` (commit `121ba12f`) — Multi-channel review settings, WhatsApp-first automation rules with Hinglish presets, Notion-styled form inputs.
+- **Main Touchpoint**: `views/view-forms.php`, `public-form-view.php`, `views/view-emails.php`.
+
+### `feature/media-module` (Active Feature Branch)
+- **Status**: 🟡 Active Feature Branch — Studio-grade Media Library Dashboard with folder navigation, search & MIME filtering, bulk toolbar, right-sliding detail sheet, folder email sharing, storage meter, dynamic aspect-ratio crop presets (1:1, 4:3, 16:9), transformations, and SEO metadata manager.
+- **Main Touchpoint**: `views/view-media.php`, `views/view-media-editor.php`, `cora-workspace.php`.
 <!-- BRANCH_LOGS_END -->
 
 ---

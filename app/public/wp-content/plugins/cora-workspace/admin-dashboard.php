@@ -292,13 +292,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             .cora-sidebar {
                 height: calc(100vh - 52px) !important;
             }
-            .admin-bar .cora-sidebar {
-                top: 84px !important;
-                height: calc(100vh - 84px) !important;
-            }
-            .admin-bar .cora-main {
-                height: calc(100vh - 84px) !important;
-            }
         }
 
 
@@ -3131,7 +3124,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 $sidebar_brand_title = 'cora';
             }
             ?>
-            <div class="cora-sidebar-top-container flex items-center justify-between gap-2 px-3 pt-4 pb-2 shrink-0 select-none">
+            <div class="cora-sidebar-top-container flex items-center justify-between gap-2 px-3 pt-2.5 pb-2 shrink-0 select-none">
                 <!-- Workspace Switcher Card + Dropdown -->
                 <div class="relative flex-1 min-w-0">
                     <!-- Trigger Card -->
