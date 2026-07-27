@@ -362,7 +362,7 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
 
                 $style = $stage_styles[$stage_key] ?? $fallback_style;
             ?>
-            <div class="cora-kanban-column flex flex-col p-4 rounded-3xl shrink-0 w-[365px] min-w-[365px] relative transition-all duration-200"
+            <div class="cora-kanban-column flex flex-col p-4 rounded-3xl shrink-0 w-[390px] min-w-[390px] relative transition-all duration-200"
                  data-status="<?php echo esc_attr( $stage_key ); ?>"
                  ondragover="coraLeadDragOver(event, this)"
                  ondrop="coraLeadDrop(event, this)">
@@ -415,17 +415,17 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                             $is_won = ( ( $lead['status'] ?? '' ) === 'Converted' || ( $stage_key ?? '' ) === 'Converted' );
 
                             if ( $is_won ) {
-                                $score_badge = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800';
+                                $score_badge = 'bg-emerald-50/60 text-emerald-600 border border-emerald-250/50 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/50';
                                 $score_label = 'Won ✓';
                             } else {
                                     if ($score === 'hot') {
-                                        $score_badge = 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800';
+                                        $score_badge = 'bg-red-50/60 text-red-600 border border-red-250/50 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/50';
                                         $score_label = 'Hot 🔥';
                                     } else if ($score === 'cold') {
-                                        $score_badge = 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800';
+                                        $score_badge = 'bg-blue-50/60 text-blue-600 border border-blue-250/50 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/50';
                                         $score_label = 'Cold ❄️';
                                     } else {
-                                        $score_badge = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800';
+                                        $score_badge = 'bg-amber-50/60 text-amber-600 border border-amber-250/50 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/50';
                                         $score_label = 'Warm';
                                     }
                             }
@@ -433,15 +433,23 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                             $format_tag = $lead['format'] ?? 'Photoshoot';
                             $assignee_name = $lead['assignee_name'] ?? 'Shruti Sharma';
                             $assignee_role = $lead['assignee_role'] ?? 'Super Admin';
+                            if ( $assignee_role === 'Super Admin' ) {
+                                $assignee_role = 'Just Shruti';
+                            }
                             $assignee_init = $lead['assignee_init'] ?? strtoupper(substr($lead['names'] ?? 'S', 0, 1));
                             $checklist = $lead['checklist'] ?? '1/2 (50%)';
                             $checklist_pct = $lead['checklist_pct'] ?? 50;
 
                             $progress_bar_color = $is_won ? 'bg-blue-600 dark:bg-blue-500' : 'bg-zinc-950 dark:bg-zinc-100';
-                            $action_btn_text = $is_won ? 'View Details' : 'Review';
-                            $action_btn_class = $is_won 
-                                ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900 border-none' 
-                                : 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800';
+                            
+                            // Buttons matching target design: Converted is blue bg, Review is white bg/thin gray border
+                            if ( $is_won ) {
+                                $action_btn_text = 'View Details';
+                                $action_btn_class = 'bg-[#e3f2fd] dark:bg-blue-950/40 text-[#1565c0] dark:text-blue-400 hover:bg-[#bbdefb] dark:hover:bg-blue-900 border-none shadow-none';
+                            } else {
+                                $action_btn_text = 'Review';
+                                $action_btn_class = 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-800 shadow-none';
+                            }
                         ?>
                         <div class="cora-lead-card bg-white dark:bg-zinc-900 p-4 rounded-2xl shadow-sm hover:shadow-md hover:translate-y-[-1px] transition-all cursor-grab active:cursor-grabbing flex flex-col gap-3 relative group"
                              draggable="true"
@@ -455,11 +463,11 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                             
                             <!-- Top Row: Client Name Pill & Priority Badge + Option Dots -->
                             <div class="flex items-center justify-between gap-2">
-                                <span class="px-2.5 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold text-[10px] uppercase tracking-wider truncate max-w-[180px]">
+                                <span class="px-2.5 py-0.5 rounded bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 font-bold text-[9.5px] uppercase tracking-wider truncate max-w-[180px]">
                                     <?php echo esc_html( strtoupper($lead['names']) ); ?>
                                 </span>
                                 <div class="flex items-center gap-1.5 shrink-0">
-                                    <span class="px-2 py-0.5 rounded text-[9.5px] font-bold border <?php echo $score_badge; ?>">
+                                    <span class="px-2 py-0.5 rounded text-[9px] font-bold border <?php echo $score_badge; ?>">
                                         <?php echo $score_label; ?>
                                     </span>
                                     <button type="button" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white p-1 border-none bg-transparent cursor-pointer flex items-center justify-center" onclick="event.stopPropagation(); coraOpenLeadDetailDrawer('<?php echo esc_attr($lead['id']); ?>')">
@@ -480,7 +488,7 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
 
                             <!-- Tags/Price Row: Format Tag Pill & Price -->
                             <div class="flex items-center justify-between gap-2">
-                                <span class="px-2.5 py-1 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-650 dark:text-zinc-400 text-[10px] font-medium bg-zinc-50 dark:bg-zinc-900/50">
+                                <span class="px-2.5 py-1 rounded bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 font-medium text-[10px]">
                                     <?php echo esc_html( $format_tag ); ?>
                                 </span>
                                 <span class="text-zinc-955 dark:text-white text-xs font-bold">
@@ -502,7 +510,7 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                             <!-- Bottom Row: Assignee Info & Action Button -->
                             <div class="pt-2.5 flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800">
                                 <div class="flex items-center gap-2 min-w-0">
-                                    <div class="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center font-bold text-xs shrink-0 border border-zinc-200 dark:border-zinc-700">
+                                    <div class="w-7 h-7 rounded-full bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center font-bold text-xs shrink-0 border border-zinc-200/60 dark:border-zinc-700">
                                         <?php echo esc_html( $assignee_init ); ?>
                                     </div>
                                     <div class="min-w-0 flex flex-col">
@@ -510,7 +518,7 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                                         <span class="text-[9.5px] text-zinc-400 dark:text-zinc-500 truncate leading-tight"><?php echo esc_html( $assignee_role ); ?></span>
                                     </div>
                                 </div>
-                                <button type="button" class="px-3 py-1.5 rounded-lg text-[10.5px] font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 shadow-2xs <?php echo $action_btn_class; ?>" onclick="event.stopPropagation(); coraOpenLeadDetailDrawer('<?php echo esc_attr($lead['id']); ?>')">
+                                <button type="button" class="px-3 py-1.5 rounded-lg text-[10.5px] font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 <?php echo $action_btn_class; ?>" onclick="event.stopPropagation(); coraOpenLeadDetailDrawer('<?php echo esc_attr($lead['id']); ?>')">
                                     <span><?php echo esc_html($action_btn_text); ?></span>
                                     <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                                 </button>
