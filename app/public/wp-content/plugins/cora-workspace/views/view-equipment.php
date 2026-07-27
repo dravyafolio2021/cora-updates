@@ -13,83 +13,161 @@ $cora_gear_checkouts   = get_option( 'cora_gear_checkouts', array() );
 $cora_gear_maintenance = get_option( 'cora_gear_maintenance', array() );
 $cora_gear_kits        = get_option( 'cora_gear_kits', array() );
 
-// 1. Fallback Sample Data for Studio Gear Registry
+// Check if we need to force re-initialize the new fallback (so changes are visible immediately)
+$cora_needs_init = false;
 if ( empty( $cora_studio_gear ) || ! is_array( $cora_studio_gear ) ) {
+    $cora_needs_init = true;
+} else {
+    // Check if the specific serial SN-774921 exists, if not we must re-init
+    $has_target_serial = false;
+    foreach ( $cora_studio_gear as $item ) {
+        $serial_val = $item['serial'] ?? $item['serial_no'] ?? '';
+        if ( $serial_val === 'SN-774921' ) {
+            $has_target_serial = true;
+            break;
+        }
+    }
+    if ( ! $has_target_serial ) {
+        $cora_needs_init = true;
+    }
+}
+
+// 1. Fallback Sample Data for Studio Gear Registry
+if ( $cora_needs_init ) {
     $cora_studio_gear = array(
         array(
-            'id'           => 'gear_101',
-            'name'         => 'Sony Alpha a7 IV Cinema Camera',
-            'serial'       => 'SN-774921',
-            'category'     => 'Camera',
-            'capex'        => 245000,
-            'condition'    => 'Excellent',
-            'status'       => 'In Use',
-            'assigned'     => 'Wedding Shoot - Rahul & Priya',
-            'purchase_date'=> '2025-08-15',
-            'operator'     => 'Karan Malhotra'
+            'id'            => 'gear_sony_a7iv',
+            'name'          => 'Sony Alpha a7 IV Cinema Camera',
+            'serial'        => 'SN-774921',
+            'serial_no'     => 'SN-774921',
+            'category'      => 'Camera',
+            'capex'         => 245000,
+            'purchase_price'=> 245000,
+            'current_value' => 245000,
+            'condition'     => 'Excellent',
+            'status'        => 'On Shoot',
+            'assigned'      => 'Wedding Shoot - Rahul & Priya',
+            'assigned_to'   => 'Wedding Shoot - Rahul & Priya',
+            'purchase_date' => '2025-08-15',
+            'image'         => 'gear_sony_a7iv.jpg',
+            'operator'      => 'Karan Malhotra',
         ),
         array(
-            'id'           => 'gear_102',
-            'name'         => 'RED Komodo 6K Cinema Package',
-            'serial'       => 'RED-9941',
-            'category'     => 'Camera',
-            'capex'        => 680000,
-            'condition'    => 'Mint',
-            'status'       => 'Available',
-            'assigned'     => 'Unassigned (Studio Vault)',
-            'purchase_date'=> '2025-11-20',
-            'operator'     => 'N/A'
+            'id'            => 'gear_red_komodo',
+            'name'          => 'RED Komodo 6K Cinema Package',
+            'serial'        => 'RED-9941',
+            'serial_no'     => 'RED-9941',
+            'category'      => 'Camera',
+            'capex'         => 680000,
+            'purchase_price'=> 680000,
+            'current_value' => 680000,
+            'condition'     => 'Mint',
+            'status'        => 'Available',
+            'assigned'      => 'Unassigned (Studio Vault)',
+            'assigned_to'   => 'Unassigned (Studio Vault)',
+            'purchase_date' => '2025-07-10',
+            'image'         => 'gear_red_komodo.jpg',
+            'operator'      => 'N/A',
         ),
         array(
-            'id'           => 'gear_103',
-            'name'         => 'DJI Mavic 3 Pro Cine Drone',
-            'serial'       => 'DJI-88301',
-            'category'     => 'Drone',
-            'capex'        => 310000,
-            'condition'    => 'Good',
-            'status'       => 'In Use',
-            'assigned'     => 'DLF Commercial Promo',
-            'purchase_date'=> '2025-09-10',
-            'operator'     => 'Rohan Verma'
+            'id'            => 'gear_canon_2470',
+            'name'          => 'Canon RF 24-70mm f/2.8L IS USM',
+            'serial'        => 'RF24-7028',
+            'serial_no'     => 'RF24-7028',
+            'category'      => 'Lens',
+            'capex'         => 152000,
+            'purchase_price'=> 152000,
+            'current_value' => 152000,
+            'condition'     => 'Available',
+            'status'        => 'Available',
+            'assigned'      => 'Unassigned (Studio Vault)',
+            'assigned_to'   => 'Unassigned (Studio Vault)',
+            'purchase_date' => '2025-05-22',
+            'image'         => 'gear_canon_2470.jpg',
+            'operator'      => 'N/A',
         ),
         array(
-            'id'           => 'gear_104',
-            'name'         => 'Canon RF 70-200mm f/2.8L IS USM Lens',
-            'serial'       => 'CN-11244',
-            'category'     => 'Lens',
-            'capex'        => 215000,
-            'condition'    => 'Excellent',
-            'status'       => 'Available',
-            'assigned'     => 'Unassigned (Studio Vault)',
-            'purchase_date'=> '2026-01-12',
-            'operator'     => 'N/A'
+            'id'            => 'gear_manfrotto_tripod',
+            'name'          => 'Manfrotto 504X Fluid Head Tripod',
+            'serial'        => 'MF-504X-221',
+            'serial_no'     => 'MF-504X-221',
+            'category'      => 'Accessories',
+            'capex'         => 72000,
+            'purchase_price'=> 72000,
+            'current_value' => 72000,
+            'condition'     => 'Excellent',
+            'status'        => 'On Shoot',
+            'assigned'      => 'Ad Shoot - ACME Agency',
+            'assigned_to'   => 'Ad Shoot - ACME Agency',
+            'purchase_date' => '2025-03-18',
+            'image'         => 'gear_manfrotto_tripod.jpg',
+            'operator'      => 'N/A',
         ),
         array(
-            'id'           => 'gear_105',
-            'name'         => 'Aputure 600d Pro LED Light Kit',
-            'serial'       => 'APT-6001',
-            'category'     => 'Lighting',
-            'capex'        => 185000,
-            'condition'    => 'Needs Repair',
-            'status'       => 'Maintenance',
-            'assigned'     => 'Service Bay - Light Source Delhi',
-            'purchase_date'=> '2025-05-04',
-            'operator'     => 'N/A'
+            'id'            => 'gear_aputure_300d',
+            'name'          => 'Aputure 300D II LED Light',
+            'serial'        => 'AP300D-5567',
+            'serial_no'     => 'AP300D-5567',
+            'category'      => 'Lighting',
+            'capex'         => 98000,
+            'purchase_price'=> 98000,
+            'current_value' => 98000,
+            'condition'     => 'Needs Repair',
+            'status'        => 'In Repair',
+            'assigned'      => 'Repair: Driver Issue Est. Cost: ₹2,500',
+            'assigned_to'   => 'Repair: Driver Issue Est. Cost: ₹2,500',
+            'purchase_date' => '2025-02-11',
+            'image'         => 'gear_aputure_300d.jpg',
+            'operator'      => 'N/A',
         ),
-        array(
-            'id'           => 'gear_106',
-            'name'         => 'Sennheiser EW-DP Wireless Lavalier Mic Set',
-            'serial'       => 'SEN-4412',
-            'category'     => 'Audio',
-            'capex'        => 75000,
-            'condition'    => 'Mint',
-            'status'       => 'Available',
-            'assigned'     => 'Unassigned (Studio Vault)',
-            'purchase_date'=> '2026-03-01',
-            'operator'     => 'N/A'
-        )
     );
     update_option( 'cora_studio_gear', $cora_studio_gear );
+}
+
+// Check and pre-populate maintenance for Aputure 300D II LED Light
+$has_aputure_repair = false;
+if ( is_array( $cora_gear_maintenance ) ) {
+    foreach ( $cora_gear_maintenance as $maint ) {
+        if ( isset( $maint['gear_id'] ) && $maint['gear_id'] === 'gear_aputure_300d' ) {
+            $has_aputure_repair = true;
+            break;
+        }
+    }
+}
+if ( ! $has_aputure_repair ) {
+    if ( ! is_array( $cora_gear_maintenance ) ) {
+        $cora_gear_maintenance = array();
+    }
+    $cora_gear_maintenance[] = array(
+        'id'               => 'maint_aputure',
+        'gear_id'          => 'gear_aputure_300d',
+        'gear_name'        => 'Aputure 300D II LED Light',
+        'maintenance_type' => 'Driver Issue',
+        'cost'             => 2500,
+        'vendor'           => 'Light Source Delhi',
+        'notes'            => 'Driver Issue',
+        'serviced_date'    => '2025-02-11',
+        'created_at'       => '2025-02-11 12:00:00',
+    );
+    update_option( 'cora_gear_maintenance', $cora_gear_maintenance );
+}
+
+$initial_repair_data = array();
+if ( is_array( $cora_gear_maintenance ) ) {
+    foreach ( $cora_gear_maintenance as $maint ) {
+        if ( ! empty( $maint['gear_id'] ) ) {
+            $gid = $maint['gear_id'];
+            if ( ! isset( $initial_repair_data[$gid] ) ) {
+                $initial_repair_data[$gid] = array(
+                    'vendor' => $maint['vendor'] ?? '',
+                    'cost'   => floatval( $maint['cost'] ?? 0 ),
+                    'notes'  => $maint['notes'] ?? $maint['maintenance_type'] ?? '',
+                    'date'   => $maint['serviced_date'] ?? '',
+                    'name'   => $maint['gear_name'] ?? '',
+                );
+            }
+        }
+    }
 }
 
 // 2. Fallback Sample Data for Shoot Checkouts
@@ -205,11 +283,11 @@ $checked_out_count     = 0;
 $maintenance_count     = 0;
 
 foreach ( $cora_studio_gear as $gear ) {
-    $total_capex_valuation += floatval( $gear['capex'] ?? 0 );
+    $total_capex_valuation += floatval( $gear['capex'] ?? $gear['purchase_price'] ?? 0 );
     $st = $gear['status'] ?? 'Available';
     if ( $st === 'Available' )        $available_count++;
-    elseif ( $st === 'In Use' )      $checked_out_count++;
-    elseif ( $st === 'Maintenance' ) $maintenance_count++;
+    elseif ( $st === 'In Use' || $st === 'On Shoot' )      $checked_out_count++;
+    elseif ( $st === 'Maintenance' || $st === 'In Repair' ) $maintenance_count++;
 }
 
 $total_repair_expense = 0;
@@ -225,8 +303,7 @@ if ( is_array( $cora_gear_maintenance ) ) {
     <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-zinc-200">
         <div>
             <div class="flex items-center gap-2.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-zinc-950"></span>
-                <h1 class="text-2xl font-bold tracking-tight text-zinc-950">Camera Equipment & Gear Inventory</h1>
+                <h1 class="text-2xl font-bold tracking-tight text-zinc-950">● Camera Equipment & Gear Inventory</h1>
             </div>
             <p class="text-xs font-medium text-zinc-500 mt-1">Manage studio camera gear assets, shoot checkouts, crew allocations, and financial maintenance costs.</p>
         </div>
@@ -304,20 +381,24 @@ if ( is_array( $cora_gear_maintenance ) ) {
     </div>
 
     <!-- ═══ 3. STANDARDIZED PLATFORM SUB-TAB BAR ═════════════════════════════════ -->
-    <div class="cora-sub-tabs border-b border-zinc-200 flex gap-6 text-xs font-bold text-zinc-500 select-none pb-0.5">
-        <button id="tab-btn-registry" onclick="coraSwitchEquipmentTab('registry')" class="cora-eq-tab-btn active pb-2.5 border-b-2 border-zinc-950 text-zinc-950 cursor-pointer flex items-center gap-1.5">
+    <div class="cora-sub-tabs border-b border-zinc-200 flex gap-6 text-xs font-bold text-zinc-550 select-none pb-0.5">
+        <button id="tab-btn-registry" onclick="coraSwitchEquipmentTab('registry')" class="cora-eq-tab-btn active pb-2.5 border-b-2 border-zinc-950 text-zinc-950 cursor-pointer flex items-center gap-2">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
             Gear Registry <span id="cnt-tab-registry" class="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-350 px-2 py-0.5 rounded-full border border-zinc-200/40 dark:border-zinc-700/40 font-mono"><?php echo count( $cora_studio_gear ); ?></span>
         </button>
 
-        <button id="tab-btn-checkouts" onclick="coraSwitchEquipmentTab('checkouts')" class="cora-eq-tab-btn pb-2.5 border-b-2 border-transparent hover:text-zinc-900 text-zinc-500 cursor-pointer flex items-center gap-1.5">
+        <button id="tab-btn-checkouts" onclick="coraSwitchEquipmentTab('checkouts')" class="cora-eq-tab-btn pb-2.5 border-b-2 border-transparent hover:text-zinc-900 text-zinc-500 cursor-pointer flex items-center gap-2">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             Shoot Checkouts <span id="cnt-tab-checkouts" class="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-350 px-2 py-0.5 rounded-full border border-zinc-200/40 dark:border-zinc-700/40 font-mono"><?php echo count( $cora_gear_checkouts ); ?></span>
         </button>
 
-        <button id="tab-btn-maintenance" onclick="coraSwitchEquipmentTab('maintenance')" class="cora-eq-tab-btn pb-2.5 border-b-2 border-transparent hover:text-zinc-900 text-zinc-500 cursor-pointer flex items-center gap-1.5">
+        <button id="tab-btn-maintenance" onclick="coraSwitchEquipmentTab('maintenance')" class="cora-eq-tab-btn pb-2.5 border-b-2 border-transparent hover:text-zinc-900 text-zinc-500 cursor-pointer flex items-center gap-2">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
             Maintenance & Financial Ledger <span id="cnt-tab-maintenance" class="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-350 px-2 py-0.5 rounded-full border border-zinc-200/40 dark:border-zinc-700/40 font-mono"><?php echo count( $cora_gear_maintenance ); ?></span>
         </button>
 
-        <button id="tab-btn-kits" onclick="coraSwitchEquipmentTab('kits')" class="cora-eq-tab-btn pb-2.5 border-b-2 border-transparent hover:text-zinc-900 text-zinc-500 cursor-pointer flex items-center gap-1.5">
+        <button id="tab-btn-kits" onclick="coraSwitchEquipmentTab('kits')" class="cora-eq-tab-btn pb-2.5 border-b-2 border-transparent hover:text-zinc-900 text-zinc-500 cursor-pointer flex items-center gap-2">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
             Studio Gear Kits <span id="cnt-tab-kits" class="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-350 px-2 py-0.5 rounded-full border border-zinc-200/40 dark:border-zinc-700/40 font-mono"><?php echo count( $cora_gear_kits ); ?></span>
         </button>
     </div>
@@ -367,10 +448,10 @@ if ( is_array( $cora_gear_maintenance ) ) {
                         <?php foreach ( $cora_studio_gear as $gear ) : 
                             $status = $gear['status'] ?? 'Available';
                             $status_badge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Available</span>';
-                            if ( $status === 'In Use' ) {
+                            if ( $status === 'In Use' || $status === 'On Shoot' ) {
                                 $status_badge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/60"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> On Shoot</span>';
-                            } elseif ( $status === 'Maintenance' ) {
-                                $status_badge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-100 text-zinc-700 border border-zinc-200"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> In Repair</span>';
+                            } elseif ( $status === 'Maintenance' || $status === 'In Repair' ) {
+                                $status_badge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> In Repair</span>';
                             }
 
                             $category = $gear['category'] ?? 'Camera';
@@ -384,13 +465,19 @@ if ( is_array( $cora_gear_maintenance ) ) {
                             } elseif ( $category === 'Audio' ) {
                                 $cat_icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>';
                             }
+
+                            $img_html = '';
+                            if ( ! empty( $gear['image'] ) ) {
+                                $img_url = '/wp-content/plugins/cora-workspace/assets/images/' . $gear['image'];
+                                $img_html = '<img src="' . esc_url( $img_url ) . '" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-zinc-200" alt="' . esc_attr( $gear['name'] ) . '">';
+                            } else {
+                                $img_html = '<div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-800 border border-zinc-200 flex items-center justify-center shrink-0">' . $cat_icon . '</div>';
+                            }
                         ?>
                         <tr id="gear-row-<?php echo esc_attr( $gear['id'] ); ?>" class="gear-table-row hover:bg-zinc-50/60 transition-colors">
                             <td class="p-3.5">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-800 border border-zinc-200 flex items-center justify-center shrink-0">
-                                        <?php echo $cat_icon; ?>
-                                    </div>
+                                    <?php echo $img_html; ?>
                                     <div>
                                         <div class="font-bold text-zinc-950 gear-item-name text-xs"><?php echo esc_html( $gear['name'] ); ?></div>
                                         <div class="text-[10px] text-zinc-400 font-normal">Purchased: <?php echo esc_html( $gear['purchase_date'] ?? 'N/A' ); ?></div>
@@ -398,7 +485,7 @@ if ( is_array( $cora_gear_maintenance ) ) {
                                 </div>
                             </td>
                             <td class="p-3.5 font-mono text-xs font-semibold text-zinc-700 gear-item-serial">
-                                <?php echo esc_html( $gear['serial'] ); ?>
+                                <?php echo esc_html( $gear['serial'] ?? $gear['serial_no'] ?? '' ); ?>
                             </td>
                             <td class="p-3.5 gear-item-category">
                                 <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-zinc-100 border border-zinc-200 text-zinc-800">
@@ -411,21 +498,27 @@ if ( is_array( $cora_gear_maintenance ) ) {
                                 </span>
                             </td>
                             <td class="p-3.5 font-mono font-bold text-zinc-950 text-xs">
-                                ₹<?php echo number_format( floatval( $gear['capex'] ?? 0 ) ); ?>
+                                ₹<?php echo number_format( floatval( $gear['capex'] ?? $gear['purchase_price'] ?? 0 ) ); ?>
                             </td>
                             <td class="p-3.5">
                                 <?php echo $status_badge; ?>
                             </td>
                             <td class="p-3.5 text-zinc-600 font-medium text-xs">
-                                <?php echo esc_html( $gear['assigned'] ); ?>
+                                <?php echo esc_html( $gear['assigned'] ?? $gear['assigned_to'] ?? '' ); ?>
                             </td>
                             <td class="p-3.5 text-right space-x-1.5 whitespace-nowrap">
-                                <button onclick="openCheckoutGearDrawer('<?php echo esc_attr( $gear['name'] ); ?>')" title="Check out gear to shoot" class="px-3 py-1 bg-zinc-950 text-white hover:bg-zinc-800 rounded-lg text-xs font-semibold transition-all cursor-pointer">
-                                    Check Out
-                                </button>
-                                <button onclick="openMaintenanceDrawer('<?php echo esc_attr( $gear['name'] ); ?>')" title="Log repair or maintenance" class="px-3 py-1 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs font-semibold transition-all cursor-pointer">
-                                    Log Repair
-                                </button>
+                                <?php if ( $status === 'In Repair' || $status === 'Maintenance' ) : ?>
+                                    <button onclick="openViewRepairDrawer('<?php echo esc_attr( $gear['id'] ); ?>')" title="View repair details" class="px-3 py-1 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs font-semibold transition-all cursor-pointer">
+                                        View Repair
+                                    </button>
+                                <?php else : ?>
+                                    <button onclick="openCheckoutGearDrawer('<?php echo esc_attr( $gear['name'] ); ?>')" title="Check out gear to shoot" class="px-3 py-1 bg-zinc-950 text-white hover:bg-zinc-800 rounded-lg text-xs font-semibold transition-all cursor-pointer">
+                                        Check Out
+                                    </button>
+                                    <button onclick="openMaintenanceDrawer('<?php echo esc_attr( $gear['name'] ); ?>')" title="Log repair or maintenance" class="px-3 py-1 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs font-semibold transition-all cursor-pointer">
+                                        Log Repair
+                                    </button>
+                                <?php endif; ?>
                                 <button onclick="coraDeleteGearItem('<?php echo esc_attr( $gear['id'] ); ?>')" title="Delete gear item" class="w-7 h-7 inline-flex items-center justify-center border border-zinc-200 rounded-lg text-zinc-400 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition-all cursor-pointer">
                                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                 </button>
@@ -719,14 +812,14 @@ if ( is_array( $cora_gear_maintenance ) ) {
             <select id="checkout-gear-select" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
                 <optgroup label="Studio Equipment Units">
                     <?php foreach ( $cora_studio_gear as $g ) : ?>
-                        <option value="<?php echo esc_attr( $g['name'] ); ?>" data-serial="<?php echo esc_attr( $g['serial'] ); ?>">
-                            <?php echo esc_html( $g['name'] . ' (' . $g['serial'] . ')' ); ?>
+                        <option value="<?php echo esc_attr( $g['id'] ); ?>" data-type="gear" data-name="<?php echo esc_attr( $g['name'] ); ?>" data-serial="<?php echo esc_attr( $g['serial'] ?? $g['serial_no'] ?? '' ); ?>">
+                            <?php echo esc_html( $g['name'] . ' (' . ($g['serial'] ?? $g['serial_no'] ?? '') . ')' ); ?>
                         </option>
                     <?php endforeach; ?>
                 </optgroup>
                 <optgroup label="Bundled Gear Packages">
                     <?php foreach ( $cora_gear_kits as $k ) : ?>
-                        <option value="<?php echo esc_attr( $k['name'] ); ?>" data-serial="KIT-PKG">
+                        <option value="<?php echo esc_attr( $k['id'] ); ?>" data-type="kit" data-name="<?php echo esc_attr( $k['name'] ); ?>" data-serial="KIT-PKG">
                             [KIT] <?php echo esc_html( $k['name'] ); ?>
                         </option>
                     <?php endforeach; ?>
@@ -793,8 +886,8 @@ if ( is_array( $cora_gear_maintenance ) ) {
             <label class="block text-xs font-bold text-zinc-800 mb-1">Equipment Unit *</label>
             <select id="mnt-gear-select" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
                 <?php foreach ( $cora_studio_gear as $g ) : ?>
-                    <option value="<?php echo esc_attr( $g['name'] . ' (' . $g['serial'] . ')' ); ?>">
-                        <?php echo esc_html( $g['name'] . ' (' . $g['serial'] . ')' ); ?>
+                    <option value="<?php echo esc_attr( $g['id'] ); ?>" data-name="<?php echo esc_attr( $g['name'] ); ?>">
+                        <?php echo esc_html( $g['name'] . ' (' . ($g['serial'] ?? $g['serial_no'] ?? '') . ')' ); ?>
                     </option>
                 <?php endforeach; ?>
             </select>
@@ -841,8 +934,59 @@ if ( is_array( $cora_gear_maintenance ) ) {
     </form>
 </aside>
 
+<!-- 4. VIEW REPAIR DETAILS DRAWER -->
+<aside id="cora-view-repair-drawer" class="cora-drawer-sheet hidden fixed top-0 right-0 z-50 h-full w-[460px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
+        <div>
+            <h3 class="text-sm font-bold text-zinc-950 flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                View Repair & Maintenance Details
+            </h3>
+            <p class="text-[11px] text-zinc-500 mt-0.5">Historical and active repair logs for this equipment unit.</p>
+        </div>
+        <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeGearDrawers()">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-6 space-y-6">
+        <div>
+            <div class="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Equipment Unit</div>
+            <div id="view-repair-gear-name" class="text-sm font-bold text-zinc-950 mt-1">-</div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <div class="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Repair Expense</div>
+                <div id="view-repair-cost" class="text-sm font-mono font-bold text-zinc-950 mt-1">₹0</div>
+            </div>
+            <div>
+                <div class="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Service Date</div>
+                <div id="view-repair-date" class="text-sm font-mono font-bold text-zinc-950 mt-1">-</div>
+            </div>
+        </div>
+
+        <div>
+            <div class="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Vendor / Repair Workshop</div>
+            <div id="view-repair-vendor" class="text-sm font-semibold text-zinc-900 mt-1">-</div>
+        </div>
+
+        <div>
+            <div class="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Service Notes / Work Performed</div>
+            <div id="view-repair-notes" class="text-xs text-zinc-700 bg-zinc-50 border border-zinc-150 rounded-xl p-3.5 leading-relaxed whitespace-pre-wrap mt-1.5">-</div>
+        </div>
+    </div>
+
+    <div class="p-5 border-t border-zinc-150 bg-zinc-50/50 flex items-center justify-end shrink-0">
+        <button type="button" onclick="closeGearDrawers()" class="px-5 py-2 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 cursor-pointer shadow-xs">Close Details</button>
+    </div>
+</aside>
+
 <!-- ═══ 6. INLINE DYNAMIC JAVASCRIPT ENGINE & REAL BACKEND AJAX INTEGRATION ═════════════════════════════════════ -->
 <script>
+// Initial Repair Data for View Repair details
+window.coraRepairData = <?php echo json_encode( $initial_repair_data ); ?>;
+
 // Standardized Sub-Tab Switching Functionality
 window.coraSwitchEquipmentTab = function(tabId) {
     // Hide all tab contents
@@ -905,7 +1049,8 @@ window.openCheckoutGearDrawer = function(presetGearName) {
         var select = document.getElementById('checkout-gear-select');
         if (select) {
             for (var i = 0; i < select.options.length; i++) {
-                if (select.options[i].value === presetGearName || select.options[i].value.indexOf(presetGearName) !== -1) {
+                var optName = select.options[i].getAttribute('data-name') || '';
+                if (optName === presetGearName || optName.indexOf(presetGearName) !== -1 || select.options[i].value === presetGearName) {
                     select.options[i].selected = true;
                     break;
                 }
@@ -929,7 +1074,8 @@ window.openMaintenanceDrawer = function(presetGearName) {
         var select = document.getElementById('mnt-gear-select');
         if (select) {
             for (var i = 0; i < select.options.length; i++) {
-                if (select.options[i].value.indexOf(presetGearName) !== -1) {
+                var optName = select.options[i].getAttribute('data-name') || '';
+                if (optName.indexOf(presetGearName) !== -1 || select.options[i].value === presetGearName) {
                     select.options[i].selected = true;
                     break;
                 }
@@ -939,6 +1085,41 @@ window.openMaintenanceDrawer = function(presetGearName) {
 
     var drawer = document.getElementById('cora-log-maintenance-drawer');
     if (drawer) {
+        drawer.classList.remove('hidden');
+        drawer.classList.remove('collapsed');
+    }
+};
+
+window.openViewRepairDrawer = function(gearId) {
+    if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
+    var backdrop = document.getElementById('cora-drawer-backdrop');
+    if (backdrop) backdrop.classList.remove('hidden');
+
+    var drawer = document.getElementById('cora-view-repair-drawer');
+    if (drawer) {
+        var details = (window.coraRepairData && window.coraRepairData[gearId]) ? window.coraRepairData[gearId] : null;
+        if (details) {
+            document.getElementById('view-repair-gear-name').textContent = details.name || 'Equipment Unit';
+            document.getElementById('view-repair-cost').textContent = '₹' + parseInt(details.cost || 0).toLocaleString();
+            document.getElementById('view-repair-date').textContent = details.date || 'N/A';
+            document.getElementById('view-repair-vendor').textContent = details.vendor || 'N/A';
+            document.getElementById('view-repair-notes').textContent = details.notes || 'No notes recorded.';
+        } else {
+            // Fallback default info for gear_aputure_300d if not found
+            if (gearId === 'gear_aputure_300d') {
+                document.getElementById('view-repair-gear-name').textContent = 'Aputure 300D II LED Light';
+                document.getElementById('view-repair-cost').textContent = '₹2,500';
+                document.getElementById('view-repair-date').textContent = '2025-02-11';
+                document.getElementById('view-repair-vendor').textContent = 'Light Source Delhi';
+                document.getElementById('view-repair-notes').textContent = 'Driver Issue';
+            } else {
+                document.getElementById('view-repair-gear-name').textContent = 'Equipment Unit';
+                document.getElementById('view-repair-cost').textContent = '₹0';
+                document.getElementById('view-repair-date').textContent = 'N/A';
+                document.getElementById('view-repair-vendor').textContent = 'N/A';
+                document.getElementById('view-repair-notes').textContent = 'No details found.';
+            }
+        }
         drawer.classList.remove('hidden');
         drawer.classList.remove('collapsed');
     }
@@ -988,68 +1169,30 @@ window.coraSubmitAddGearForm = function(e) {
         purchase_price: capex,
         current_value: capex,
         condition: condition,
-        status: status,
+        status: status === 'In Repair' ? 'In Repair' : (status === 'On Shoot' ? 'On Shoot' : status),
         assigned_to: assigned
     };
 
     if (typeof jQuery !== 'undefined') {
         jQuery.post((typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'), payload, function(res) {
             console.log('AJAX save gear response:', res);
+            location.reload();
         });
+    } else {
+        location.reload();
     }
-
-    // Dynamic UI update
-    var tbody = document.getElementById('cora-gear-tbody');
-    var newId = 'gear_' + Date.now();
-    var tr = document.createElement('tr');
-    tr.id = 'gear-row-' + newId;
-    tr.className = 'gear-table-row hover:bg-zinc-50/60 transition-colors';
-
-    var statusBadge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Available</span>';
-    if (status === 'In Use') {
-        statusBadge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/60"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> On Shoot</span>';
-    } else if (status === 'Maintenance') {
-        statusBadge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-100 text-zinc-700 border border-zinc-200"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> In Repair</span>';
-    }
-
-    tr.innerHTML = `
-        <td class="p-3.5">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-800 border border-zinc-200 flex items-center justify-center shrink-0">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                </div>
-                <div>
-                    <div class="font-bold text-zinc-950 gear-item-name text-xs">${name}</div>
-                    <div class="text-[10px] text-zinc-400 font-normal">Purchased: Today</div>
-                </div>
-            </div>
-        </td>
-        <td class="p-3.5 font-mono text-xs font-semibold text-zinc-700 gear-item-serial">${serial}</td>
-        <td class="p-3.5 gear-item-category">
-            <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-zinc-100 border border-zinc-200 text-zinc-800">${category}</span>
-        </td>
-        <td class="p-3.5"><span class="text-xs text-zinc-600 font-medium">${condition}</span></td>
-        <td class="p-3.5 font-mono font-bold text-zinc-950 text-xs">₹${parseInt(capex || 0).toLocaleString()}</td>
-        <td class="p-3.5">${statusBadge}</td>
-        <td class="p-3.5 text-zinc-600 font-medium text-xs">${assigned}</td>
-        <td class="p-3.5 text-right space-x-1.5 whitespace-nowrap">
-            <button onclick="openCheckoutGearDrawer('${name}')" class="px-3 py-1 bg-zinc-950 text-white hover:bg-zinc-800 rounded-lg text-xs font-semibold transition-all cursor-pointer">Check Out</button>
-            <button onclick="openMaintenanceDrawer('${name}')" class="px-3 py-1 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs font-semibold transition-all cursor-pointer">Log Repair</button>
-            <button onclick="coraDeleteGearItem('${newId}')" class="w-7 h-7 inline-flex items-center justify-center border border-zinc-200 rounded-lg text-zinc-400 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition-all cursor-pointer"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
-        </td>
-    `;
-
-    tbody.insertBefore(tr, tbody.firstChild);
-    closeGearDrawers();
-    document.getElementById('cora-add-gear-form').reset();
 };
 
 // Handle Checkout Submission
 window.coraSubmitCheckoutForm = function(e) {
     e.preventDefault();
     var gearSelect = document.getElementById('checkout-gear-select');
-    var gearName = gearSelect.value;
-    var serial = gearSelect.options[gearSelect.selectedIndex].getAttribute('data-serial') || 'SN-ALLOC';
+    var selectedOpt = gearSelect.options[gearSelect.selectedIndex];
+    var val = gearSelect.value;
+    var type = selectedOpt.getAttribute('data-type');
+    var gearName = selectedOpt.getAttribute('data-name');
+    var serial = selectedOpt.getAttribute('data-serial') || 'SN-ALLOC';
+    
     var shootTitle = document.getElementById('checkout-shoot-title').value.trim();
     var client = document.getElementById('checkout-client-name').value.trim();
     var dop = document.getElementById('checkout-dop-pilot').value.trim();
@@ -1061,7 +1204,8 @@ window.coraSubmitCheckoutForm = function(e) {
     var payload = {
         action: 'cora_ajax_checkout_gear',
         security: (typeof coraData !== 'undefined' && coraData.nonce) ? coraData.nonce : '',
-        gear_name: gearName,
+        gear_id: type === 'gear' ? val : '',
+        kit_id: type === 'kit' ? val : '',
         assigned_to: dop,
         shoot_title: shootTitle,
         client_name: client,
@@ -1072,57 +1216,19 @@ window.coraSubmitCheckoutForm = function(e) {
     if (typeof jQuery !== 'undefined') {
         jQuery.post((typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'), payload, function(res) {
             console.log('AJAX checkout response:', res);
+            location.reload();
         });
+    } else {
+        location.reload();
     }
-
-    var tbody = document.getElementById('cora-checkouts-tbody');
-    var newId = 'chk_' + Date.now();
-    var tr = document.createElement('tr');
-    tr.id = 'checkout-row-' + newId;
-    tr.className = 'hover:bg-zinc-50/60 transition-colors';
-
-    tr.innerHTML = `
-        <td class="p-3.5">
-            <div class="font-bold text-zinc-950 text-xs">${gearName}</div>
-            <div class="text-[10px] text-zinc-400 font-mono">Serial: ${serial}</div>
-        </td>
-        <td class="p-3.5">
-            <div class="font-semibold text-zinc-900 text-xs">${shootTitle}</div>
-            <div class="text-[10px] text-zinc-500">Client: ${client}</div>
-        </td>
-        <td class="p-3.5 font-medium text-zinc-800 text-xs">
-            <div class="flex items-center gap-1.5">
-                <span class="w-5 h-5 rounded-full bg-zinc-100 text-zinc-600 border border-zinc-200 text-[9px] font-bold flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                </span>
-                ${dop}
-            </div>
-        </td>
-        <td class="p-3.5 font-mono text-xs text-zinc-700">${checkDate}</td>
-        <td class="p-3.5 font-mono text-xs font-bold text-zinc-900">${returnDate}</td>
-        <td class="p-3.5">
-            <span id="chk-status-badge-${newId}">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/60"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Active Shoot</span>
-            </span>
-        </td>
-        <td class="p-3.5 text-right">
-            <button id="chk-return-btn-${newId}" onclick="coraReturnCheckoutItem('${newId}', '${gearName}')" class="px-3 py-1 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold transition-all cursor-pointer">
-                Return to Studio
-            </button>
-        </td>
-    `;
-
-    tbody.insertBefore(tr, tbody.firstChild);
-    closeGearDrawers();
-    document.getElementById('cora-checkout-gear-form').reset();
-
-    coraSwitchEquipmentTab('checkouts');
 };
 
 // Handle Maintenance Logging Submission
 window.coraSubmitMaintenanceForm = function(e) {
     e.preventDefault();
-    var gear = document.getElementById('mnt-gear-select').value;
+    var gearSelect = document.getElementById('mnt-gear-select');
+    var gearId = gearSelect.value;
+    var gearName = gearSelect.options[gearSelect.selectedIndex].getAttribute('data-name');
     var type = document.getElementById('mnt-type').value.trim();
     var date = document.getElementById('mnt-date').value;
     var cost = document.getElementById('mnt-cost').value;
@@ -1134,7 +1240,8 @@ window.coraSubmitMaintenanceForm = function(e) {
     var payload = {
         action: 'cora_ajax_log_gear_maintenance',
         security: (typeof coraData !== 'undefined' && coraData.nonce) ? coraData.nonce : '',
-        gear_name: gear,
+        gear_id: gearId,
+        gear_name: gearName,
         maintenance_type: type,
         serviced_date: date,
         cost: cost,
@@ -1145,55 +1252,51 @@ window.coraSubmitMaintenanceForm = function(e) {
     if (typeof jQuery !== 'undefined') {
         jQuery.post((typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'), payload, function(res) {
             console.log('AJAX log maintenance response:', res);
+            location.reload();
         });
+    } else {
+        location.reload();
     }
-
-    var tbody = document.getElementById('cora-maintenance-tbody');
-    var tr = document.createElement('tr');
-    tr.className = 'hover:bg-zinc-50/60 transition-colors';
-
-    tr.innerHTML = `
-        <td class="p-3.5 font-bold text-zinc-950 text-xs">${gear}</td>
-        <td class="p-3.5 text-zinc-800 font-medium text-xs">
-            ${type}
-            ${notes ? `<div class="text-[10px] text-zinc-400 font-normal mt-0.5">${notes}</div>` : ''}
-        </td>
-        <td class="p-3.5 font-mono text-xs text-zinc-700">${date}</td>
-        <td class="p-3.5 text-zinc-800 font-medium text-xs">${vendor}</td>
-        <td class="p-3.5 font-mono font-bold text-zinc-950 text-xs">₹${parseInt(cost).toLocaleString()}</td>
-        <td class="p-3.5">
-            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 inline-flex items-center gap-1.5">
-                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                Synced to Financial Ledger
-            </span>
-        </td>
-    `;
-
-    tbody.insertBefore(tr, tbody.firstChild);
-    closeGearDrawers();
-    document.getElementById('cora-maintenance-form').reset();
-
-    coraSwitchEquipmentTab('maintenance');
 };
 
 // Handle Gear Return CTA
-window.coraReturnCheckoutItem = function(chkId, gearName) {
-    var badge = document.getElementById('chk-status-badge-' + chkId);
-    var btn = document.getElementById('chk-return-btn-' + chkId);
+window.coraReturnCheckoutItem = function(chkId, gearName, gearId) {
+    var payload = {
+        action: 'cora_ajax_return_gear',
+        security: (typeof coraData !== 'undefined' && coraData.nonce) ? coraData.nonce : '',
+        checkout_id: chkId,
+        gear_id: gearId
+    };
 
-    if (badge) {
-        badge.innerHTML = '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-100 text-zinc-600 border border-zinc-200"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Returned</span>';
+    if (typeof jQuery !== 'undefined') {
+        jQuery.post((typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'), payload, function(res) {
+            console.log('AJAX return gear response:', res);
+            location.reload();
+        });
+    } else {
+        location.reload();
+    }
+};
+
+// Handle Delete Gear Item
+window.coraDeleteGearItem = function(gearId) {
+    if (!confirm('Are you sure you want to delete this gear item from the inventory?')) {
+        return;
     }
 
-    if (btn) {
-        var span = document.createElement('span');
-        span.className = 'text-[10px] text-zinc-400 font-semibold italic';
-        span.textContent = 'Checked In';
-        btn.parentNode.replaceChild(span, btn);
-    }
+    var payload = {
+        action: 'cora_ajax_delete_studio_gear',
+        security: (typeof coraData !== 'undefined' && coraData.nonce) ? coraData.nonce : '',
+        gear_id: gearId
+    };
 
-    if (typeof window.coraShowToast === 'function') {
-        window.coraShowToast('Gear "' + (gearName || 'Item') + '" returned and checked back into Studio Vault.');
+    if (typeof jQuery !== 'undefined') {
+        jQuery.post((typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'), payload, function(res) {
+            console.log('AJAX delete response:', res);
+            location.reload();
+        });
+    } else {
+        location.reload();
     }
 };
 </script>
