@@ -717,7 +717,7 @@ if ( is_array( $cora_gear_maintenance ) ) {
 <!-- ═══ 5. RIGHT-SLIDING SIDE DRAWER SHEETS ═════════════════════════════════════ -->
 
 <!-- 1. REGISTER NEW GEAR DRAWER -->
-<aside id="cora-add-gear-drawer" class="cora-drawer-sheet hidden fixed top-0 right-0 z-50 h-full w-[680px] max-w-[95vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+<aside id="cora-add-gear-drawer" class="cora-drawer-sheet hidden fixed top-0 right-0 z-50 h-full w-[500px] max-w-[95vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
         <div>
             <h3 class="text-sm font-bold text-zinc-950 flex items-center gap-2">
@@ -731,164 +731,155 @@ if ( is_array( $cora_gear_maintenance ) ) {
         </button>
     </div>
 
-    <form id="cora-add-gear-form" onsubmit="coraSubmitAddGearForm(event)" class="flex-1 flex overflow-hidden">
-        <!-- Left Sidebar (Step Indicators) -->
-        <div class="w-[180px] shrink-0 bg-zinc-50 border-r border-zinc-200 p-4 flex flex-col gap-5 justify-start pt-6">
-            <div class="cora-step-indicator flex items-start gap-2.5 cursor-pointer" data-step="1" onclick="if(addGearStep > 1 || validateCurrentStep('cora-add-gear-drawer', addGearStep)) setAddGearStep(1)">
+    <form id="cora-add-gear-form" onsubmit="coraSubmitAddGearForm(event)" class="flex-1 flex flex-col overflow-hidden">
+        <!-- Topbar Step Tracker -->
+        <div class="px-6 py-4 bg-zinc-50 border-b border-zinc-200 shrink-0 flex items-center justify-between gap-2 select-none">
+            <div class="cora-step-indicator flex items-center gap-2 cursor-pointer" data-step="1" onclick="if(addGearStep > 1 || validateCurrentStep('cora-add-gear-drawer', addGearStep)) setAddGearStep(1)">
                 <div class="step-circle w-5.5 h-5.5 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[10px] font-bold shrink-0">1</div>
-                <div>
-                    <div class="step-label text-[11px] font-bold text-zinc-950 leading-tight">Specifications</div>
-                    <div class="text-[9px] text-zinc-400">Name & Serial</div>
-                </div>
+                <div class="step-label text-[11px] font-bold text-zinc-950 leading-tight">Specifications</div>
             </div>
-            <div class="cora-step-indicator flex items-start gap-2.5 cursor-pointer" data-step="2" onclick="if(addGearStep > 2 || validateCurrentStep('cora-add-gear-drawer', addGearStep)) setAddGearStep(2)">
+            <div class="h-px bg-zinc-200 flex-1 max-w-[60px]"></div>
+            <div class="cora-step-indicator flex items-center gap-2 cursor-pointer" data-step="2" onclick="if(addGearStep > 2 || validateCurrentStep('cora-add-gear-drawer', addGearStep)) setAddGearStep(2)">
                 <div class="step-circle w-5.5 h-5.5 rounded-full border border-zinc-200 text-zinc-400 flex items-center justify-center text-[10px] font-medium shrink-0 bg-white">2</div>
+                <div class="step-label text-[11px] font-medium text-zinc-400 leading-tight">Acquisition</div>
+            </div>
+            <div class="h-px bg-zinc-200 flex-1 max-w-[60px]"></div>
+            <div class="cora-step-indicator flex items-center gap-2 cursor-pointer" data-step="3" onclick="if(validateCurrentStep('cora-add-gear-drawer', addGearStep)) setAddGearStep(3)">
+                <div class="step-circle w-5.5 h-5.5 rounded-full border border-zinc-200 text-zinc-400 flex items-center justify-center text-[10px] font-medium shrink-0 bg-white">3</div>
+                <div class="step-label text-[11px] font-medium text-zinc-400 leading-tight">Lifecycle</div>
+            </div>
+        </div>
+
+        <!-- Content Panel -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-5">
+            <!-- Step 1: General Details -->
+            <div class="cora-step-content space-y-4" data-step="1">
+                <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-3">General Specifications</h4>
+                
                 <div>
-                    <div class="step-label text-[11px] font-medium text-zinc-400 leading-tight">Acquisition</div>
-                    <div class="text-[9px] text-zinc-400">Valuation & Date</div>
+                    <label class="block text-xs font-semibold text-zinc-700 mb-1">Equipment Name / Model *</label>
+                    <input type="text" id="add-gear-name" required placeholder="e.g. Sony Alpha a7 IV Cinema Camera" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Serial Number # *</label>
+                        <input type="text" id="add-gear-serial" required placeholder="SN-774921" class="w-full px-3 py-2 text-xs font-mono border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Category *</label>
+                        <select id="add-gear-category" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
+                            <option value="Camera">Camera</option>
+                            <option value="Lens">Lens</option>
+                            <option value="Lighting">Lighting</option>
+                            <option value="Drone">Drone</option>
+                            <option value="Audio">Audio</option>
+                            <option value="Accessories">Accessories</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-700 mb-1">Included Accessories</label>
+                    <textarea id="add-gear-accessories" rows="4" placeholder="e.g. Charger, 2x Batteries, Lens Cap" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 resize-none"></textarea>
                 </div>
             </div>
-            <div class="cora-step-indicator flex items-start gap-2.5 cursor-pointer" data-step="3" onclick="if(validateCurrentStep('cora-add-gear-drawer', addGearStep)) setAddGearStep(3)">
-                <div class="step-circle w-5.5 h-5.5 rounded-full border border-zinc-200 text-zinc-400 flex items-center justify-center text-[10px] font-medium shrink-0 bg-white">3</div>
+
+            <!-- Step 2: Financials -->
+            <div class="cora-step-content space-y-4 hidden" data-step="2">
+                <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-3">Acquisition & Financials</h4>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">CapEx Valuation (₹) *</label>
+                        <input type="number" id="add-gear-capex" required placeholder="245000" class="w-full px-3 py-2 text-xs font-mono border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Purchase Date</label>
+                        <input type="date" id="add-gear-date" value="<?php echo date('Y-m-d'); ?>" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Condition Rating *</label>
+                        <select id="add-gear-condition" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
+                            <option value="Mint">Mint</option>
+                            <option value="Excellent" selected>Excellent</option>
+                            <option value="Good">Good</option>
+                            <option value="Needs Repair">Needs Repair</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Initial Status *</label>
+                        <select id="add-gear-status" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
+                            <option value="Available" selected>Available in Studio</option>
+                            <option value="On Shoot">On Shoot</option>
+                            <option value="In Repair">In Repair</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div>
-                    <div class="step-label text-[11px] font-medium text-zinc-400 leading-tight">Lifecycle & Photo</div>
-                    <div class="text-[9px] text-zinc-400">Status & Media</div>
+                    <label class="block text-xs font-semibold text-zinc-700 mb-1">Storage Location</label>
+                    <input type="text" id="add-gear-storage-location" placeholder="e.g. Shelf A-3" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+                </div>
+            </div>
+
+            <!-- Step 3: Media & Lifecycle -->
+            <div class="cora-step-content space-y-4 hidden" data-step="3">
+                <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-3">Lifecycle & Media Asset</h4>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Next Service Due</label>
+                        <input type="date" id="add-gear-next-service" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Insurance Expiry</label>
+                        <input type="date" id="add-gear-insurance" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-700 mb-1">Assigned Crew / Shoot</label>
+                    <input type="text" id="add-gear-assigned" placeholder="e.g. Unassigned (Studio Vault)" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-700 mb-1">Product Photo</label>
+                    <div class="flex items-center gap-4 p-4 border border-dashed border-zinc-200 rounded-xl bg-zinc-50/50 hover:bg-zinc-50 transition-colors relative group">
+                        <div class="flex-1 flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0 overflow-hidden">
+                                <img id="add-gear-image-preview" src="" class="w-full h-full object-cover hidden">
+                                <svg id="add-gear-image-placeholder" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                            </div>
+                            <div>
+                                <div class="text-xs font-bold text-zinc-800">Upload Gear Image</div>
+                                <div class="text-[10px] text-zinc-400">PNG, JPG, or WEBP up to 5MB</div>
+                            </div>
+                        </div>
+                        <input type="file" id="add-gear-image-file" onchange="coraUploadGearImage(this, 'add-gear-image-preview', 'add-gear-image-path')" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                        <input type="hidden" id="add-gear-image-path" value="">
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Right Content Panel -->
-        <div class="flex-1 flex flex-col overflow-hidden bg-white">
-            <div class="flex-1 overflow-y-auto p-6 space-y-5">
-                <!-- Step 1: General Details -->
-                <div class="cora-step-content space-y-4" data-step="1">
-                    <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-3">General Specifications</h4>
-                    
-                    <div>
-                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Equipment Name / Model *</label>
-                        <input type="text" id="add-gear-name" required placeholder="e.g. Sony Alpha a7 IV Cinema Camera" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Serial Number # *</label>
-                            <input type="text" id="add-gear-serial" required placeholder="SN-774921" class="w-full px-3 py-2 text-xs font-mono border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Category *</label>
-                            <select id="add-gear-category" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
-                                <option value="Camera">Camera</option>
-                                <option value="Lens">Lens</option>
-                                <option value="Lighting">Lighting</option>
-                                <option value="Drone">Drone</option>
-                                <option value="Audio">Audio</option>
-                                <option value="Accessories">Accessories</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Included Accessories</label>
-                        <textarea id="add-gear-accessories" rows="4" placeholder="e.g. Charger, 2x Batteries, Lens Cap" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 resize-none"></textarea>
-                    </div>
-                </div>
-
-                <!-- Step 2: Financials -->
-                <div class="cora-step-content space-y-4 hidden" data-step="2">
-                    <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-3">Acquisition & Financials</h4>
-                    
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-zinc-700 mb-1">CapEx Valuation (₹) *</label>
-                            <input type="number" id="add-gear-capex" required placeholder="245000" class="w-full px-3 py-2 text-xs font-mono border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Purchase Date</label>
-                            <input type="date" id="add-gear-date" value="<?php echo date('Y-m-d'); ?>" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Condition Rating *</label>
-                            <select id="add-gear-condition" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
-                                <option value="Mint">Mint</option>
-                                <option value="Excellent" selected>Excellent</option>
-                                <option value="Good">Good</option>
-                                <option value="Needs Repair">Needs Repair</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Initial Status *</label>
-                            <select id="add-gear-status" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
-                                <option value="Available" selected>Available in Studio</option>
-                                <option value="On Shoot">On Shoot</option>
-                                <option value="In Repair">In Repair</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Storage Location</label>
-                        <input type="text" id="add-gear-storage-location" placeholder="e.g. Shelf A-3" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
-                    </div>
-                </div>
-
-                <!-- Step 3: Media & Lifecycle -->
-                <div class="cora-step-content space-y-4 hidden" data-step="3">
-                    <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-3">Lifecycle & Media Asset</h4>
-                    
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Next Service Due</label>
-                            <input type="date" id="add-gear-next-service" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Insurance Expiry</label>
-                            <input type="date" id="add-gear-insurance" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Assigned Crew / Shoot</label>
-                        <input type="text" id="add-gear-assigned" placeholder="e.g. Unassigned (Studio Vault)" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Product Photo</label>
-                        <div class="flex items-center gap-4 p-4 border border-dashed border-zinc-200 rounded-xl bg-zinc-50/50 hover:bg-zinc-50 transition-colors relative group">
-                            <div class="flex-1 flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0 overflow-hidden">
-                                    <img id="add-gear-image-preview" src="" class="w-full h-full object-cover hidden">
-                                    <svg id="add-gear-image-placeholder" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                                </div>
-                                <div>
-                                    <div class="text-xs font-bold text-zinc-800">Upload Gear Image</div>
-                                    <div class="text-[10px] text-zinc-400">PNG, JPG, or WEBP up to 5MB</div>
-                                </div>
-                            </div>
-                            <input type="file" id="add-gear-image-file" onchange="coraUploadGearImage(this, 'add-gear-image-preview', 'add-gear-image-path')" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                            <input type="hidden" id="add-gear-image-path" value="">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Footer Actions -->
-            <div class="p-4 border-t border-zinc-100 flex items-center justify-between bg-zinc-50/50 shrink-0">
-                <button type="button" onclick="closeGearDrawers()" class="px-4 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-bold rounded-xl hover:bg-zinc-50 cursor-pointer">Cancel</button>
-                <div class="flex items-center gap-2">
-                    <button type="button" id="add-gear-back-btn" onclick="setAddGearStep(addGearStep - 1)" class="px-4 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-bold rounded-xl hover:bg-zinc-50 cursor-pointer hidden">Back</button>
-                    <button type="button" id="add-gear-next-btn" onclick="if(validateCurrentStep('cora-add-gear-drawer', addGearStep)) setAddGearStep(addGearStep + 1)" class="px-4.5 py-2 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 cursor-pointer shadow-xs">Next</button>
-                    <button type="submit" id="add-gear-submit-btn" class="px-5 py-2 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 cursor-pointer shadow-xs hidden">Save & Register Gear</button>
-                </div>
+        <!-- Footer Actions -->
+        <div class="p-4 border-t border-zinc-100 flex items-center justify-between bg-zinc-50/50 shrink-0">
+            <button type="button" onclick="closeGearDrawers()" class="px-4 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-bold rounded-xl hover:bg-zinc-50 cursor-pointer">Cancel</button>
+            <div class="flex items-center gap-2">
+                <button type="button" id="add-gear-back-btn" onclick="setAddGearStep(addGearStep - 1)" class="px-4 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-bold rounded-xl hover:bg-zinc-50 cursor-pointer hidden">Back</button>
+                <button type="button" id="add-gear-next-btn" onclick="if(validateCurrentStep('cora-add-gear-drawer', addGearStep)) setAddGearStep(addGearStep + 1)" class="px-4.5 py-2 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 cursor-pointer shadow-xs">Next</button>
+                <button type="submit" id="add-gear-submit-btn" class="px-5 py-2 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 cursor-pointer shadow-xs hidden">Save & Register Gear</button>
             </div>
         </div>
     </form>
 </aside>
 
 <!-- 1.1 EDIT EXISTING GEAR DRAWER -->
-<aside id="cora-edit-gear-drawer" class="cora-drawer-sheet hidden fixed top-0 right-0 z-50 h-full w-[680px] max-w-[95vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+<aside id="cora-edit-gear-drawer" class="cora-drawer-sheet hidden fixed top-0 right-0 z-50 h-full w-[500px] max-w-[95vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
         <div>
             <h3 class="text-sm font-bold text-zinc-950 flex items-center gap-2">
@@ -902,159 +893,150 @@ if ( is_array( $cora_gear_maintenance ) ) {
         </button>
     </div>
 
-    <form id="cora-edit-gear-form" onsubmit="coraSubmitEditGearForm(event)" class="flex-1 flex overflow-hidden">
+    <form id="cora-edit-gear-form" onsubmit="coraSubmitEditGearForm(event)" class="flex-1 flex flex-col overflow-hidden">
         <input type="hidden" id="edit-gear-id">
 
-        <!-- Left Sidebar (Step Indicators) -->
-        <div class="w-[180px] shrink-0 bg-zinc-50 border-r border-zinc-200 p-4 flex flex-col gap-5 justify-start pt-6">
-            <div class="cora-step-indicator flex items-start gap-2.5 cursor-pointer" data-step="1" onclick="if(editGearStep > 1 || validateCurrentStep('cora-edit-gear-drawer', editGearStep)) setEditGearStep(1)">
+        <!-- Topbar Step Tracker -->
+        <div class="px-6 py-4 bg-zinc-50 border-b border-zinc-200 shrink-0 flex items-center justify-between gap-2 select-none">
+            <div class="cora-step-indicator flex items-center gap-2 cursor-pointer" data-step="1" onclick="if(editGearStep > 1 || validateCurrentStep('cora-edit-gear-drawer', editGearStep)) setEditGearStep(1)">
                 <div class="step-circle w-5.5 h-5.5 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[10px] font-bold shrink-0">1</div>
-                <div>
-                    <div class="step-label text-[11px] font-bold text-zinc-950 leading-tight">Specifications</div>
-                    <div class="text-[9px] text-zinc-400">Name & Serial</div>
-                </div>
+                <div class="step-label text-[11px] font-bold text-zinc-950 leading-tight">Specifications</div>
             </div>
-            <div class="cora-step-indicator flex items-start gap-2.5 cursor-pointer" data-step="2" onclick="if(editGearStep > 2 || validateCurrentStep('cora-edit-gear-drawer', editGearStep)) setEditGearStep(2)">
+            <div class="h-px bg-zinc-200 flex-1 max-w-[60px]"></div>
+            <div class="cora-step-indicator flex items-center gap-2 cursor-pointer" data-step="2" onclick="if(editGearStep > 2 || validateCurrentStep('cora-edit-gear-drawer', editGearStep)) setEditGearStep(2)">
                 <div class="step-circle w-5.5 h-5.5 rounded-full border border-zinc-200 text-zinc-400 flex items-center justify-center text-[10px] font-medium shrink-0 bg-white">2</div>
+                <div class="step-label text-[11px] font-medium text-zinc-400 leading-tight">Acquisition</div>
+            </div>
+            <div class="h-px bg-zinc-200 flex-1 max-w-[60px]"></div>
+            <div class="cora-step-indicator flex items-center gap-2 cursor-pointer" data-step="3" onclick="if(validateCurrentStep('cora-edit-gear-drawer', editGearStep)) setEditGearStep(3)">
+                <div class="step-circle w-5.5 h-5.5 rounded-full border border-zinc-200 text-zinc-400 flex items-center justify-center text-[10px] font-medium shrink-0 bg-white">3</div>
+                <div class="step-label text-[11px] font-medium text-zinc-400 leading-tight">Lifecycle</div>
+            </div>
+        </div>
+
+        <!-- Content Panel -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-5">
+            <!-- Step 1: General Details -->
+            <div class="cora-step-content space-y-4" data-step="1">
+                <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-3">General Specifications</h4>
+                
                 <div>
-                    <div class="step-label text-[11px] font-medium text-zinc-400 leading-tight">Acquisition</div>
-                    <div class="text-[9px] text-zinc-400">Valuation & Date</div>
+                    <label class="block text-xs font-semibold text-zinc-700 mb-1">Equipment Name / Model *</label>
+                    <input type="text" id="edit-gear-name" required placeholder="e.g. Sony Alpha a7 IV Cinema Camera" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Serial Number # *</label>
+                        <input type="text" id="edit-gear-serial" required placeholder="SN-774921" class="w-full px-3 py-2 text-xs font-mono border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Category *</label>
+                        <select id="edit-gear-category" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
+                            <option value="Camera">Camera</option>
+                            <option value="Lens">Lens</option>
+                            <option value="Lighting">Lighting</option>
+                            <option value="Drone">Drone</option>
+                            <option value="Audio">Audio</option>
+                            <option value="Accessories">Accessories</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-700 mb-1">Included Accessories</label>
+                    <textarea id="edit-gear-accessories" rows="4" placeholder="e.g. Charger, 2x Batteries, Lens Cap" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 resize-none"></textarea>
                 </div>
             </div>
-            <div class="cora-step-indicator flex items-start gap-2.5 cursor-pointer" data-step="3" onclick="if(validateCurrentStep('cora-edit-gear-drawer', editGearStep)) setEditGearStep(3)">
-                <div class="step-circle w-5.5 h-5.5 rounded-full border border-zinc-200 text-zinc-400 flex items-center justify-center text-[10px] font-medium shrink-0 bg-white">3</div>
+
+            <!-- Step 2: Financials -->
+            <div class="cora-step-content space-y-4 hidden" data-step="2">
+                <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-3">Acquisition & Financials</h4>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">CapEx Valuation (₹) *</label>
+                        <input type="number" id="edit-gear-capex" required placeholder="245000" class="w-full px-3 py-2 text-xs font-mono border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Purchase Date</label>
+                        <input type="date" id="edit-gear-date" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Condition Rating *</label>
+                        <select id="edit-gear-condition" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
+                            <option value="Mint">Mint</option>
+                            <option value="Excellent">Excellent</option>
+                            <option value="Good">Good</option>
+                            <option value="Needs Repair">Needs Repair</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Status *</label>
+                        <select id="edit-gear-status" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
+                            <option value="Available">Available in Studio</option>
+                            <option value="On Shoot">On Shoot</option>
+                            <option value="In Repair">In Repair</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div>
-                    <div class="step-label text-[11px] font-medium text-zinc-400 leading-tight">Lifecycle & Photo</div>
-                    <div class="text-[9px] text-zinc-400">Status & Media</div>
+                    <label class="block text-xs font-semibold text-zinc-700 mb-1">Storage Location</label>
+                    <input type="text" id="edit-gear-storage-location" placeholder="e.g. Shelf A-3" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+                </div>
+            </div>
+
+            <!-- Step 3: Media & Lifecycle -->
+            <div class="cora-step-content space-y-4 hidden" data-step="3">
+                <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-3">Lifecycle & Media Asset</h4>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Next Service Due</label>
+                        <input type="date" id="edit-gear-next-service" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Insurance Expiry</label>
+                        <input type="date" id="edit-gear-insurance" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-700 mb-1">Assigned Crew / Shoot</label>
+                    <input type="text" id="edit-gear-assigned" placeholder="e.g. Unassigned (Studio Vault)" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-700 mb-1">Product Photo</label>
+                    <div class="flex items-center gap-4 p-4 border border-dashed border-zinc-200 rounded-xl bg-zinc-50/50 hover:bg-zinc-50 transition-colors relative group">
+                        <div class="flex-1 flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0 overflow-hidden">
+                                <img id="edit-gear-image-preview" src="" class="w-full h-full object-cover hidden">
+                                <svg id="edit-gear-image-placeholder" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                            </div>
+                            <div>
+                                <div class="text-xs font-bold text-zinc-800">Upload Gear Image</div>
+                                <div class="text-[10px] text-zinc-400">PNG, JPG, or WEBP up to 5MB</div>
+                            </div>
+                        </div>
+                        <input type="file" id="edit-gear-image-file" onchange="coraUploadGearImage(this, 'edit-gear-image-preview', 'edit-gear-image-path')" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                        <input type="hidden" id="edit-gear-image-path" value="">
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Right Content Panel -->
-        <div class="flex-1 flex flex-col overflow-hidden bg-white">
-            <div class="flex-1 overflow-y-auto p-6 space-y-5">
-                <!-- Step 1: General Details -->
-                <div class="cora-step-content space-y-4" data-step="1">
-                    <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-3">General Specifications</h4>
-                    
-                    <div>
-                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Equipment Name / Model *</label>
-                        <input type="text" id="edit-gear-name" required placeholder="e.g. Sony Alpha a7 IV Cinema Camera" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Serial Number # *</label>
-                            <input type="text" id="edit-gear-serial" required placeholder="SN-774921" class="w-full px-3 py-2 text-xs font-mono border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Category *</label>
-                            <select id="edit-gear-category" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
-                                <option value="Camera">Camera</option>
-                                <option value="Lens">Lens</option>
-                                <option value="Lighting">Lighting</option>
-                                <option value="Drone">Drone</option>
-                                <option value="Audio">Audio</option>
-                                <option value="Accessories">Accessories</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Included Accessories</label>
-                        <textarea id="edit-gear-accessories" rows="4" placeholder="e.g. Charger, 2x Batteries, Lens Cap" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 resize-none"></textarea>
-                    </div>
-                </div>
-
-                <!-- Step 2: Financials -->
-                <div class="cora-step-content space-y-4 hidden" data-step="2">
-                    <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-3">Acquisition & Financials</h4>
-                    
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-zinc-700 mb-1">CapEx Valuation (₹) *</label>
-                            <input type="number" id="edit-gear-capex" required placeholder="245000" class="w-full px-3 py-2 text-xs font-mono border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Purchase Date</label>
-                            <input type="date" id="edit-gear-date" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Condition Rating *</label>
-                            <select id="edit-gear-condition" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
-                                <option value="Mint">Mint</option>
-                                <option value="Excellent">Excellent</option>
-                                <option value="Good">Good</option>
-                                <option value="Needs Repair">Needs Repair</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Status *</label>
-                            <select id="edit-gear-status" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
-                                <option value="Available">Available in Studio</option>
-                                <option value="On Shoot">On Shoot</option>
-                                <option value="In Repair">In Repair</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Storage Location</label>
-                        <input type="text" id="edit-gear-storage-location" placeholder="e.g. Shelf A-3" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
-                    </div>
-                </div>
-
-                <!-- Step 3: Media & Lifecycle -->
-                <div class="cora-step-content space-y-4 hidden" data-step="3">
-                    <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-3">Lifecycle & Media Asset</h4>
-                    
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Next Service Due</label>
-                            <input type="date" id="edit-gear-next-service" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Insurance Expiry</label>
-                            <input type="date" id="edit-gear-insurance" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Assigned Crew / Shoot</label>
-                        <input type="text" id="edit-gear-assigned" placeholder="e.g. Unassigned (Studio Vault)" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Product Photo</label>
-                        <div class="flex items-center gap-4 p-4 border border-dashed border-zinc-200 rounded-xl bg-zinc-50/50 hover:bg-zinc-50 transition-colors relative group">
-                            <div class="flex-1 flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0 overflow-hidden">
-                                    <img id="edit-gear-image-preview" src="" class="w-full h-full object-cover hidden">
-                                    <svg id="edit-gear-image-placeholder" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                                </div>
-                                <div>
-                                    <div class="text-xs font-bold text-zinc-800">Upload Gear Image</div>
-                                    <div class="text-[10px] text-zinc-400">PNG, JPG, or WEBP up to 5MB</div>
-                                </div>
-                            </div>
-                            <input type="file" id="edit-gear-image-file" onchange="coraUploadGearImage(this, 'edit-gear-image-preview', 'edit-gear-image-path')" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                            <input type="hidden" id="edit-gear-image-path" value="">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Footer Actions -->
-            <div class="p-4 border-t border-zinc-100 flex items-center justify-between bg-zinc-50/50 shrink-0">
-                <button type="button" onclick="closeGearDrawers()" class="px-4 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-bold rounded-xl hover:bg-zinc-50 cursor-pointer">Cancel</button>
-                <div class="flex items-center gap-2">
-                    <button type="button" id="edit-gear-back-btn" onclick="setEditGearStep(editGearStep - 1)" class="px-4 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-bold rounded-xl hover:bg-zinc-50 cursor-pointer hidden">Back</button>
-                    <button type="button" id="edit-gear-next-btn" onclick="if(validateCurrentStep('cora-edit-gear-drawer', editGearStep)) setEditGearStep(editGearStep + 1)" class="px-4.5 py-2 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 cursor-pointer shadow-xs">Next</button>
-                    <button type="submit" id="edit-gear-submit-btn" class="px-5 py-2 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 cursor-pointer shadow-xs hidden">Save Changes</button>
-                </div>
+        <!-- Footer Actions -->
+        <div class="p-4 border-t border-zinc-100 flex items-center justify-between bg-zinc-50/50 shrink-0">
+            <button type="button" onclick="closeGearDrawers()" class="px-4 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-bold rounded-xl hover:bg-zinc-50 cursor-pointer">Cancel</button>
+            <div class="flex items-center gap-2">
+                <button type="button" id="edit-gear-back-btn" onclick="setEditGearStep(editGearStep - 1)" class="px-4 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-bold rounded-xl hover:bg-zinc-50 cursor-pointer hidden">Back</button>
+                <button type="button" id="edit-gear-next-btn" onclick="if(validateCurrentStep('cora-edit-gear-drawer', editGearStep)) setEditGearStep(editGearStep + 1)" class="px-4.5 py-2 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 cursor-pointer shadow-xs">Next</button>
+                <button type="submit" id="edit-gear-submit-btn" class="px-5 py-2 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 cursor-pointer shadow-xs hidden">Save Changes</button>
             </div>
         </div>
     </form>
