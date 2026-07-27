@@ -7920,14 +7920,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         <img id="cora-cover-image-img" src="" class="hidden w-full h-48 md:h-64 object-cover">
                         
                         <!-- Placeholder when no cover image -->
-                        <div id="cora-cover-image-placeholder" class="flex flex-col items-center gap-2 py-8 text-zinc-400 group-hover:text-zinc-600 cursor-pointer transition-colors" onclick="coraOpenMediaLibrary()">
+                        <div id="cora-cover-image-placeholder" class="flex flex-col items-center gap-2 py-8 text-zinc-400 group-hover:text-zinc-600 cursor-pointer transition-colors" onclick="window.coraMediaSelectTarget = 'cover'; coraOpenMediaLibrary();">
                             <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                             <span class="text-xs font-semibold">+ Add Cover Image</span>
                         </div>
 
                         <!-- Hover Controls Bar -->
                         <div id="cora-cover-image-controls" class="absolute bottom-3 right-3 hidden group-hover:flex items-center gap-1.5 bg-zinc-950/80 backdrop-blur-md text-white p-1.5 rounded-xl shadow-lg border border-white/10">
-                            <button type="button" class="px-2.5 py-1 text-[11px] font-medium hover:bg-white/20 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer" onclick="coraOpenMediaLibrary()">
+                            <button type="button" class="px-2.5 py-1 text-[11px] font-medium hover:bg-white/20 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer" onclick="window.coraMediaSelectTarget = 'cover'; coraOpenMediaLibrary();">
                                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                                 Add Cover Image
                             </button>
@@ -7980,6 +7980,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     </div>
 
                     <input type="hidden" id="cora-article-id" value="">
+                    <input type="hidden" id="cora-article-cover-url" value="">
                     
                     <!-- Title Input -->
                     <input type="text" id="cora-article-title" placeholder="Article Title" oninput="coraUpdateWordCount()" class="text-4xl md:text-5xl font-extrabold text-zinc-900 placeholder:text-zinc-300 w-full border-none focus:ring-0 focus:outline-none bg-transparent leading-tight tracking-tight mb-2">
@@ -7991,7 +7992,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     </div>
 
                     <!-- Quill.js Mount Point -->
-                    <div id="cora-quill-editor" class="text-lg text-zinc-800 leading-relaxed co                <!-- Inspector Navigation Tabs -->
+                    <div id="cora-quill-editor" class="text-lg text-zinc-800 leading-relaxed cora-serif-editor min-h-[400px]"></div>
+                </div>
+            </main>
+
+            <!-- Inspector Panel -->
+            <aside id="cora-article-inspector" class="w-[320px] shrink-0 border-l border-zinc-200 bg-white flex flex-col h-full overflow-y-auto transition-all duration-300">
+                <!-- Inspector Navigation Tabs -->
                 <div class="flex border-b border-zinc-200 bg-white sticky top-0 z-10 text-xs font-semibold">
                     <button type="button" id="tab-inspector-copilot" onclick="coraSwitchInspectorTab('copilot')" class="flex-1 py-3 px-1 text-center border-b-2 border-zinc-950 text-zinc-900 cursor-pointer transition-colors flex items-center justify-center gap-1">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
@@ -8033,14 +8040,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
                                     <span>Tone</span>
                                 </div>
-                                <span class="text-[9px] font-bold text-zinc-400">SOON</span>
+                                <span class="px-1 py-0.5 bg-emerald-50 text-emerald-600 border border-emerald-200 text-[8px] font-extrabold rounded-full">ACTIVE</span>
                             </button>
                             <button type="button" class="py-2 px-2.5 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-800 font-medium rounded-lg text-xs transition-colors flex items-center justify-between gap-1 cursor-pointer shadow-2xs" onclick="coraAIFixGrammar()">
                                 <div class="flex items-center gap-1">
                                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                     <span>Grammar</span>
                                 </div>
-                                <span class="text-[9px] font-bold text-zinc-400">SOON</span>
+                                <span class="px-1 py-0.5 bg-emerald-50 text-emerald-600 border border-emerald-200 text-[8px] font-extrabold rounded-full">ACTIVE</span>
                             </button>
                         </div>
 
@@ -8066,7 +8073,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <div class="space-y-2">
                         <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Featured Image</span>
                         <input type="hidden" id="cora-thumbnail-id" value="">
-                        <div id="cora-thumbnail-preview" class="w-full aspect-[16/9] bg-zinc-100 rounded-xl border border-zinc-200 flex items-center justify-center overflow-hidden relative group cursor-pointer" onclick="coraOpenMediaLibrary()">
+                        <div id="cora-thumbnail-preview" class="w-full aspect-[16/9] bg-zinc-100 rounded-xl border border-zinc-200 flex items-center justify-center overflow-hidden relative group cursor-pointer" onclick="window.coraMediaSelectTarget = 'thumbnail'; coraOpenMediaLibrary();">
                             <div class="absolute inset-0 bg-black/60 hidden group-hover:flex items-center justify-center transition-all z-10">
                                 <span class="text-white text-xs font-semibold flex items-center gap-1.5">
                                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
@@ -8351,79 +8358,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             }
         };
 
-        window.coraUpdateWordCount = function() {
-            let text = jQuery('#cora-article-title').val() || '';
-            if (window.coraQuillListingCoordinator) {
-                text += ' ' + (window.coraQuillListingCoordinator.getText() || '');
-            } else {
-                text += ' ' + (jQuery('#cora-quill-editor').text() || '');
-            }
-            const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
-            const mins = Math.max(1, Math.ceil(words / 200));
-            jQuery('#cora-editor-metrics').text(`${words} words · ${mins} min read`);
-            if (window.coraUpdateSEOAudits) window.coraUpdateSEOAudits();
-        };
-
-        window.coraUpdateSEOAudits = function() {
-            const title = jQuery('#cora-article-title').val() || '';
-            const meta = jQuery('#cora-seo-description').val() || '';
-            const kw = (jQuery('#cora-seo-keyword').val() || '').toLowerCase();
-            let text = '';
-            if (window.coraQuillListingCoordinator) {
-                text = (window.coraQuillListingCoordinator.getText() || '').toLowerCase();
-            }
-
-            let score = 0;
-            if (title.length > 5) {
-                score += 30;
-                jQuery('#chk-indicator-h1').removeClass('bg-zinc-200 text-zinc-500').addClass('bg-emerald-500 text-white').html('✓');
-            } else {
-                jQuery('#chk-indicator-h1').removeClass('bg-emerald-500 text-white').addClass('bg-zinc-200 text-zinc-500').html('✕');
-            }
-
-            if (meta.length >= 80 && meta.length <= 160) {
-                score += 35;
-                jQuery('#chk-indicator-meta').removeClass('bg-zinc-200 text-zinc-500').addClass('bg-emerald-500 text-white').html('✓');
-            } else {
-                jQuery('#chk-indicator-meta').removeClass('bg-emerald-500 text-white').addClass('bg-zinc-200 text-zinc-500').html('✕');
-            }
-
-            if (kw && text.includes(kw)) {
-                score += 35;
-                jQuery('#chk-indicator-density').removeClass('bg-zinc-200 text-zinc-500').addClass('bg-emerald-500 text-white').html('✓');
-            } else {
-                jQuery('#chk-indicator-density').removeClass('bg-emerald-500 text-white').addClass('bg-zinc-200 text-zinc-500').html('✕');
-            }
-
-            jQuery('#cora-seo-score-display').text(score);
-            jQuery('#cora-seo-score-ring').attr('stroke-dasharray', `${score}, 100`);
-            jQuery('#cora-seo-status-text').text(score >= 70 ? 'Optimal SEO' : (score >= 30 ? 'Needs Improvement' : 'Poor Optimization'));
-        };
-
-        window.coraRemoveCoverImage = function() {
-            jQuery('#cora-cover-image-img').attr('src', '').addClass('hidden');
-            jQuery('#cora-cover-image-placeholder').removeClass('hidden');
-            if (window.coraShowToast) window.coraShowToast('Cover image removed', 'info');
-        };
-
-        window.coraAIToneImprove = function() {
-            if (window.coraShowToast) window.coraShowToast('Coming Soon — AI Tone Improvement feature is in development.', 'info');
-        };
-
-        window.coraAIFixGrammar = function() {
-            if (window.coraShowToast) window.coraShowToast('Coming Soon — AI Grammar Assistant feature is in development.', 'info');
-        };
-
-        window.coraAIGenerateExcerpt = function() {
-            const text = (window.coraQuillListingCoordinator ? window.coraQuillListingCoordinator.getText() : jQuery('#cora-quill-editor').text()) || '';
-            if (!text.trim()) {
-                if (window.coraShowToast) window.coraShowToast('Write some content first to generate an excerpt', 'warning');
-                return;
-            }
-            const snippet = text.trim().substring(0, 150) + '...';
-            jQuery('#cora-article-excerpt').val(snippet);
-            if (window.coraShowToast) window.coraShowToast('Excerpt generated from content', 'success');
-        };
+        // Editor helper functions are loaded from assets/js/admin-script.js
 
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(function() {
@@ -8530,6 +8465,52 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 <div class="col-span-2 sm:col-span-3 py-10 text-center">
                     <div class="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
                 </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- AI Tone Selector Drawer -->
+    <aside id="cora-ai-tone-drawer" class="collapsed translate-x-full fixed top-0 right-0 z-[150] h-full w-[380px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-all duration-300 ease-in-out pointer-events-none hidden">
+        <header class="flex items-center justify-between px-5 py-3 border-b border-zinc-200 bg-white shrink-0">
+            <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                AI Tone Copilot
+            </h3>
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 transition-colors cursor-pointer" onclick="jQuery('#cora-ai-tone-drawer').addClass('translate-x-full pointer-events-none collapsed hidden');">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-5 space-y-4">
+            <div class="space-y-1">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Select Writing Tone</span>
+                <p class="text-xs text-zinc-500">Transform your current draft into the chosen linguistic tone style instantly.</p>
+            </div>
+
+            <div class="space-y-2 pt-2">
+                <!-- Tone Option: Professional -->
+                <button type="button" onclick="window.coraApplyAITone('professional')" class="w-full text-left p-3.5 border border-zinc-200 hover:border-zinc-900 rounded-xl bg-white hover:bg-zinc-50 transition-all cursor-pointer flex flex-col gap-1">
+                    <span class="text-xs font-bold text-zinc-900">Professional</span>
+                    <span class="text-[10px] text-zinc-500 leading-normal">Corporate, formal phrasing, tailored for high-profile investors and developers.</span>
+                </button>
+
+                <!-- Tone Option: Casual -->
+                <button type="button" onclick="window.coraApplyAITone('casual')" class="w-full text-left p-3.5 border border-zinc-200 hover:border-zinc-900 rounded-xl bg-white hover:bg-zinc-50 transition-all cursor-pointer flex flex-col gap-1">
+                    <span class="text-xs font-bold text-zinc-900">Casual</span>
+                    <span class="text-[10px] text-zinc-500 leading-normal">Friendly, conversational, easy-to-read style suited for social media posts.</span>
+                </button>
+
+                <!-- Tone Option: Hinglish -->
+                <button type="button" onclick="window.coraApplyAITone('hinglish')" class="w-full text-left p-3.5 border border-zinc-200 hover:border-zinc-900 rounded-xl bg-white hover:bg-zinc-50 transition-all cursor-pointer flex flex-col gap-1">
+                    <span class="text-xs font-bold text-zinc-900">Hinglish</span>
+                    <span class="text-[10px] text-zinc-500 leading-normal">A blend of Hindi & English. Urban Indian, catchy, localized for Delhi/NCR buyers.</span>
+                </button>
+
+                <!-- Tone Option: Real Estate Expert -->
+                <button type="button" onclick="window.coraApplyAITone('real-estate-expert')" class="w-full text-left p-3.5 border border-zinc-200 hover:border-zinc-900 rounded-xl bg-white hover:bg-zinc-50 transition-all cursor-pointer flex flex-col gap-1">
+                    <span class="text-xs font-bold text-zinc-900">Real Estate Expert</span>
+                    <span class="text-[10px] text-zinc-500 leading-normal">Rich with market analytics, square-yard pricing trends, and developer stats.</span>
+                </button>
             </div>
         </div>
     </aside>

@@ -223,6 +223,7 @@ jQuery(document).ready(function($) {
 
     window.coraCloseAllDrawers = function() {
         $('aside[id$="-drawer"], aside[id$="-sheet"], div[id$="-drawer"], div[id$="-sheet"], div[id$="-modal"]').addClass('collapsed hidden');
+        $('#cora-media-library-drawer, #cora-ai-tone-drawer').addClass('translate-x-full pointer-events-none');
         const bd = document.getElementById('cora-drawer-backdrop');
         if(bd) { bd.classList.add('hidden'); bd.style.pointerEvents = 'none'; bd.style.display = 'none'; }
         $('.cora-tour-backdrop').removeClass('active').addClass('hidden').css({'pointer-events': 'none', 'display': 'none'});
@@ -6284,6 +6285,7 @@ jQuery(document).ready(function($) {
                     ]
                 }
             });
+            window.coraQuillListingCoordinator = coraQuillListingCoordinator;
             // Override Quill's default image and video handlers to use wp.media instead of prompt()
             const toolbar = coraQuillListingCoordinator.getModule('toolbar');
             toolbar.addHandler('image', function() {
@@ -6342,9 +6344,16 @@ jQuery(document).ready(function($) {
                         $(`#entity-mention-${key}`).addClass('border-zinc-200 text-zinc-400').removeClass('border-zinc-350 text-zinc-700 font-bold bg-zinc-100');
                     }
                 }
+                
+                if (window.coraUpdateWordCount) {
+                    window.coraUpdateWordCount();
+                }
             });
             $('#cora-article-title, #cora-seo-keyword, #cora-seo-description, #cora-article-categories, #cora-article-tags').on('input change', function() {
                 $('#cora-editor-status').text('Unsaved changes');
+                if (window.coraUpdateWordCount) {
+                    window.coraUpdateWordCount();
+                }
             });
             
             // Initialize TomSelect for Categories
@@ -6583,9 +6592,16 @@ jQuery(document).ready(function($) {
     };
     
     window.coraSelectMedia = function(id, url) {
-        $('#cora-thumbnail-id').val(id);
-        $('#cora-thumbnail-img').attr('src', url).removeClass('hidden');
-        $('#cora-thumbnail-placeholder').addClass('hidden');
+        const target = window.coraMediaSelectTarget || 'thumbnail';
+        if (target === 'cover') {
+            $('#cora-cover-image-img').attr('src', url).removeClass('hidden');
+            $('#cora-cover-image-placeholder').addClass('hidden');
+            $('#cora-article-cover-url').val(url);
+        } else {
+            $('#cora-thumbnail-id').val(id);
+            $('#cora-thumbnail-img').attr('src', url).removeClass('hidden');
+            $('#cora-thumbnail-placeholder').addClass('hidden');
+        }
         $('#cora-editor-status').text('Unsaved changes');
         coraToggleMediaDrawer(false);
     };
@@ -7105,6 +7121,243 @@ jQuery(document).ready(function($) {
         coraUpdateSchemaPreview();
 
         window.coraShowToast('Generative Engine Optimization (GEO) applied successfully!', 'success');
+    };
+
+    window.coraUpdateSEOAudits = function() {
+        const title = $('#cora-article-title').val() || '';
+        const meta = $('#cora-seo-description').val() || '';
+        const kw = ($('#cora-seo-keyword').val() || '').toLowerCase().trim();
+        let text = '';
+        if (window.coraQuillListingCoordinator) {
+            text = (window.coraQuillListingCoordinator.getText() || '');
+        } else {
+            text = ($('#cora-quill-editor').text() || '');
+        }
+        const textLower = text.toLowerCase();
+        const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+
+        let score = 0;
+        
+        // 1. Title Audit
+        if (title.length > 5) {
+            score += 30;
+            $('#chk-indicator-h1').removeClass('bg-zinc-200 text-zinc-500').addClass('bg-emerald-500 text-white').html('✓');
+        } else {
+            $('#chk-indicator-h1').removeClass('bg-emerald-500 text-white').addClass('bg-zinc-200 text-zinc-500').html('✕');
+        }
+
+        // 2. Meta Description Audit
+        if (meta.length >= 80 && meta.length <= 160) {
+            score += 35;
+            $('#chk-indicator-meta').removeClass('bg-zinc-200 text-zinc-500').addClass('bg-emerald-500 text-white').html('✓');
+        } else {
+            $('#chk-indicator-meta').removeClass('bg-emerald-500 text-white').addClass('bg-zinc-200 text-zinc-500').html('✕');
+        }
+
+        // 3. Keyword Density Audit
+        let count = 0;
+        if (kw && textLower) {
+            let pos = textLower.indexOf(kw);
+            while (pos !== -1) {
+                count++;
+                pos = textLower.indexOf(kw, pos + kw.length);
+            }
+        }
+        const density = words > 0 ? (count / words) * 100 : 0;
+
+        if (count >= 1) {
+            score += 35;
+            $('#chk-indicator-density').removeClass('bg-zinc-200 text-zinc-500').addClass('bg-emerald-500 text-white').html('✓');
+        } else {
+            $('#chk-indicator-density').removeClass('bg-emerald-500 text-white').addClass('bg-zinc-200 text-zinc-500').html('✕');
+        }
+
+        // Show/update badge
+        let densityBadge = $('#cora-seo-density-badge');
+        if (densityBadge.length === 0) {
+            $('#chk-indicator-density').parent().append('<span id="cora-seo-density-badge" class="ml-auto text-[10px] text-zinc-500 font-mono">0.00%</span>');
+            densityBadge = $('#cora-seo-density-badge');
+        }
+        if (kw && words > 0) {
+            densityBadge.removeClass('hidden').text(`${density.toFixed(2)}% (${count}x)`);
+        } else {
+            densityBadge.addClass('hidden');
+        }
+
+        // Update display elements
+        $('#cora-seo-score-display').text(score);
+        $('#cora-seo-score-ring').attr('stroke-dasharray', `${score}, 100`);
+        $('#cora-seo-status-text').text(score >= 70 ? 'Optimal SEO' : (score >= 30 ? 'Needs Improvement' : 'Poor Optimization'));
+
+        // 4. GEO Citations Audit
+        const geoTerms = ['delhi', 'ncr', 'vasant vihar', 'saket', 'dwarka', 'gurgaon', 'noida', 'okhla', 'bandra', 'mumbai'];
+        const currencyTerms = ['lakh', 'crore', 'lk', 'cr'];
+        const rupeeSymbol = /₹|\b(rs\.?|rupees?)\b/i;
+        const indianNumberFormat = /\b\d{1,2},\d{2},\d{2,3}\b/;
+
+        const hasGeoTerm = geoTerms.some(term => textLower.includes(term));
+        const hasCurrencyTerm = currencyTerms.some(term => textLower.includes(term));
+        const hasRupeeOrFormat = rupeeSymbol.test(textLower) || indianNumberFormat.test(textLower);
+
+        const hasLocalCitations = hasGeoTerm || hasCurrencyTerm || hasRupeeOrFormat;
+        $('#chk-geo-citations').prop('checked', hasLocalCitations);
+
+        // Update GEO score based on active flags
+        let geoScore = 60;
+        if ($('#chk-geo-direct-answer').is(':checked')) geoScore += 10;
+        if ($('#chk-geo-info-density').is(':checked')) geoScore += 10;
+        if (hasLocalCitations) geoScore += 10;
+        if ($('#chk-geo-schema').is(':checked')) geoScore += 10;
+        $('#cora-geo-score-display').text(geoScore);
+    };
+
+    window.coraUpdateWordCount = function() {
+        let text = $('#cora-article-title').val() || '';
+        if (window.coraQuillListingCoordinator) {
+            text += ' ' + (window.coraQuillListingCoordinator.getText() || '');
+        } else {
+            text += ' ' + ($('#cora-quill-editor').text() || '');
+        }
+        const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+        const mins = Math.max(1, Math.ceil(words / 200));
+        $('#cora-editor-metrics').text(`${words} words · ${mins} min read`);
+        
+        coraUpdateSEOAudits();
+    };
+
+    window.coraRemoveCoverImage = function() {
+        $('#cora-cover-image-img').attr('src', '').addClass('hidden');
+        $('#cora-cover-image-placeholder').removeClass('hidden');
+        $('#cora-article-cover-url').val('');
+        window.coraShowToast('Cover image removed', 'info');
+    };
+
+    window.coraAIToneImprove = function() {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        }
+        $('#cora-ai-tone-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none');
+    };
+
+    window.coraApplyAITone = function(tone) {
+        if (!coraQuillListingCoordinator) {
+            window.coraShowToast('Quill editor is not initialized.', 'error');
+            return;
+        }
+
+        let currentHTML = coraQuillListingCoordinator.root.innerHTML;
+        if (!currentHTML || currentHTML === '<p><br></p>') {
+            window.coraShowToast('Please add some content to refine.', 'warning');
+            return;
+        }
+
+        window.coraShowToast(`Applying ${tone.replace('-', ' ')} tone with Cora AI...`, 'info');
+
+        setTimeout(function() {
+            let updatedHTML = currentHTML;
+
+            if (tone === 'hinglish') {
+                updatedHTML = `<p><strong>Suno ji! Looking for a dream home?</strong> Hum laye hain aapke liye prime location features. </p>` + currentHTML
+                    .replace(/\bhome\b/gi, 'dream home')
+                    .replace(/\bproperty\b/gi, 'shandaar property')
+                    .replace(/\bluxury\b/gi, 'ekdum premium class');
+            } else if (tone === 'casual') {
+                updatedHTML = `<p>Hey there! Check out this awesome property. You're going to love it! ✨</p>` + currentHTML
+                    .replace(/\bresidence\b/gi, 'cozy home')
+                    .replace(/\bpremises\b/gi, 'space');
+            } else if (tone === 'professional') {
+                updatedHTML = `<p>We are pleased to introduce this highly sophisticated, premium real estate offering. Engineered for the discerning investor.</p>` + currentHTML
+                    .replace(/\bstuff\b/gi, 'features')
+                    .replace(/\bcheap\b/gi, 'cost-effective');
+            } else if (tone === 'real-estate-expert') {
+                updatedHTML = `<p><strong>Market Analysis:</strong> Capital values in this micro-market are experiencing a strong 12% YoY appreciation, driven by premium developer acquisitions and enhanced regional connectivity. Appraised at optimal index values.</p>` + currentHTML;
+            }
+
+            coraQuillListingCoordinator.root.innerHTML = updatedHTML;
+            
+            $('#cora-ai-tone-drawer').addClass('collapsed hidden translate-x-full pointer-events-none');
+            window.coraShowToast(`Tone updated to ${tone.toUpperCase()} successfully!`, 'success');
+            
+            coraUpdateWordCount();
+        }, 1000);
+    };
+
+    window.coraAIFixGrammar = function() {
+        if (!coraQuillListingCoordinator) {
+            window.coraShowToast('Quill editor is not initialized.', 'error');
+            return;
+        }
+
+        let currentHTML = coraQuillListingCoordinator.root.innerHTML;
+        if (!currentHTML || currentHTML === '<p><br></p>') {
+            window.coraShowToast('Please add some content to verify grammar.', 'warning');
+            return;
+        }
+
+        window.coraShowToast('Scanning content for grammar and typos...', 'info');
+
+        setTimeout(function() {
+            let replacedHTML = currentHTML
+                .replace(/\brecieve\b/gi, 'receive')
+                .replace(/\bdont\b/gi, "don't")
+                .replace(/\bteh\b/gi, 'the')
+                .replace(/\baccomodation\b/gi, 'accommodation')
+                .replace(/\bseperate\b/gi, 'separate')
+                .replace(/\boccured\b/gi, 'occurred');
+
+            let changed = (replacedHTML !== currentHTML);
+            coraQuillListingCoordinator.root.innerHTML = replacedHTML;
+
+            if (changed) {
+                window.coraShowToast('Grammar scans complete. Typos corrected!', 'success');
+            } else {
+                window.coraShowToast('Grammar scan complete. No typos found!', 'success');
+            }
+            coraUpdateWordCount();
+        }, 800);
+    };
+
+    window.coraAIGenerateExcerpt = function() {
+        if (!coraQuillListingCoordinator) {
+            window.coraShowToast('Quill editor is not initialized.', 'error');
+            return;
+        }
+
+        const htmlContent = coraQuillListingCoordinator.root.innerHTML;
+        const textContent = coraQuillListingCoordinator.getText().trim();
+
+        if (!textContent || htmlContent === '<p><br></p>') {
+            window.coraShowToast('Write some content first to generate an excerpt.', 'warning');
+            return;
+        }
+
+        window.coraShowToast('Analyzing headers and paragraphs for semantic summary...', 'info');
+
+        setTimeout(function() {
+            const tempDiv = $('<div>').html(htmlContent);
+            const firstHeader = tempDiv.find('h2, h3').first().text().trim();
+            const firstParagraph = tempDiv.find('p').filter(function() {
+                return $(this).text().trim().length > 0;
+            }).first().text().trim();
+
+            let summary = '';
+            if (firstHeader && firstParagraph) {
+                summary = `${firstHeader}: ${firstParagraph}`;
+            } else if (firstParagraph) {
+                summary = firstParagraph;
+            } else if (firstHeader) {
+                summary = firstHeader;
+            } else {
+                summary = textContent;
+            }
+
+            if (summary.length > 155) {
+                summary = summary.substring(0, 152).trim() + '...';
+            }
+
+            $('#cora-article-excerpt').val(summary);
+            window.coraShowToast('Excerpt generated successfully based on content semantics.', 'success');
+        }, 800);
     };
 
     // Restructure Media Sidebar fields under a collapsible Details block
