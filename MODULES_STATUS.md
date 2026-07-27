@@ -14,6 +14,7 @@
 | **File Manager** | `feature/document-studio-vault` | 🟢 Merged to Main | `views/view-vault.php`, `cora-workspace.php` | Dedicated Vault Agent |
 | **Forms & Reviews** | `feature/forms-module` | 🟢 Merged to Main | `views/view-forms.php`, `public-form-view.php`, `views/view-emails.php` | Dedicated Forms Agent |
 | **Media Module** | `feature/media-module` | 🟢 Merged to Main | `views/view-media.php`, `views/view-media-editor.php`, `cora-workspace.php` | Media Module Agent |
+| **Studio Module** | `feature/studio-module` | 🟡 Active Work | `cora-workspace.php`, Studio Views & Features | Studio Module Agent (Arjun) |
 <!-- MODULE_ROWS_END -->
 
 ---
@@ -36,6 +37,10 @@
 - **Health**: 100% Operational & Clean Base.
 
 <!-- BRANCH_LOGS_START -->
+### `feature/studio-module` (Active Branch)
+- **Status**: 🟡 Active — Studio Features, Studio Booking & Management, Equipment & Crew Integration, and Studio Suite workflows.
+- **Main Touchpoint**: `cora-workspace.php`, `views/view-crew-scheduler.php`, Studio plugin assets & views.
+
 ### `feature/document-studio-vault` (Merged Feature Branch)
 - **Status**: 🟢 Merged to `main` (commit `edc5d5a4`) — Document Vault Dashboard, 5-Step Guided Document Studio Wizard, E-Sign Audit Registry, Quality Health Check, GST math, reactive KPI cards, watermark preview.
 - **Main Touchpoint**: `views/view-vault.php`, `cora-workspace.php`.
