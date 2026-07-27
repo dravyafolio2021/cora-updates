@@ -23060,11 +23060,29 @@ if ( ! function_exists( 'cora_ajax_update_lead_stage' ) ) {
             wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
         }
 
+        global $wpdb;
         $lead_id   = isset( $_POST['lead_id'] ) ? sanitize_text_field( $_POST['lead_id'] ) : '';
         $new_stage = isset( $_POST['new_stage'] ) ? sanitize_text_field( $_POST['new_stage'] ) : '';
 
         if ( empty( $lead_id ) || empty( $new_stage ) ) {
             wp_send_json_error( array( 'message' => 'Lead ID and New Stage are required.' ) );
+        }
+
+        // Map stage to DB status slug if numeric ID
+        $db_status_slug = 'new';
+        $st_lower = strtolower($new_stage);
+        if (strpos($st_lower, 'contact') !== false || strpos($st_lower, 'proposal') !== false) $db_status_slug = 'contacted';
+        elseif (strpos($st_lower, 'visit') !== false || strpos($st_lower, 'viewing') !== false) $db_status_slug = 'site_visit';
+        elseif (strpos($st_lower, 'negotiat') !== false) $db_status_slug = 'negotiation';
+        elseif (strpos($st_lower, 'convert') !== false || strpos($st_lower, 'closed') !== false) $db_status_slug = 'closed';
+        elseif (strpos($st_lower, 'lost') !== false) $db_status_slug = 'lost';
+
+        if ( is_numeric( $lead_id ) ) {
+            $wpdb->update(
+                "{$wpdb->prefix}cora_leads",
+                array( 'status' => $db_status_slug ),
+                array( 'id' => intval( $lead_id ) )
+            );
         }
 
         $existing_leads = get_option( 'cora_workspace_leads', array() );
@@ -23083,14 +23101,13 @@ if ( ! function_exists( 'cora_ajax_update_lead_stage' ) ) {
 
         if ( $updated ) {
             update_option( 'cora_workspace_leads', $existing_leads );
-            wp_send_json_success( array(
-                'message'   => 'Lead moved to ' . $new_stage . '.',
-                'lead_id'   => $lead_id,
-                'new_stage' => $new_stage,
-            ) );
-        } else {
-            wp_send_json_error( array( 'message' => 'Lead not found.' ) );
         }
+
+        wp_send_json_success( array(
+            'message'   => 'Lead moved to ' . $new_stage . '.',
+            'lead_id'   => $lead_id,
+            'new_stage' => $new_stage,
+        ) );
     }
     add_action( 'wp_ajax_cora_ajax_update_lead_stage', 'cora_ajax_update_lead_stage' );
     add_action( 'wp_ajax_cora_update_lead_stage', 'cora_ajax_update_lead_stage' );

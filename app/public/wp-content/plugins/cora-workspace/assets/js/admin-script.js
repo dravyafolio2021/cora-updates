@@ -5131,82 +5131,8 @@ jQuery(document).ready(function($) {
     };
 
     // ==========================================
-    // KANBAN HTML5 DRAG & DROP HANDLERS
+    // END OLD DRAG & DROP HANDLERS BLOCK
     // ==========================================
-
-    let draggedCardId = null;
-
-    window.coraLeadDragStart = function(ev) {
-        const card = $(ev.currentTarget);
-        draggedCardId = card.data('id');
-        ev.dataTransfer.effectAllowed = 'move';
-        ev.dataTransfer.setData('text/plain', draggedCardId);
-        card.addClass('opacity-50');
-    };
-
-    window.coraLeadDragOver = function(ev) {
-        ev.preventDefault();
-        ev.dataTransfer.dropEffect = 'move';
-    };
-
-    window.coraLeadDrop = function(ev) {
-        ev.preventDefault();
-        const column = $(ev.currentTarget);
-        const targetStatus = column.data('status');
-        
-        // Remove opacity from card
-        $(`.cora-lead-card[data-id="${draggedCardId}"]`).removeClass('opacity-50');
-
-        if (!draggedCardId || !targetStatus) return;
-
-        const card = $(`.cora-lead-card[data-id="${draggedCardId}"]`);
-        const sourceCol = card.closest('.cora-kanban-column');
-        const targetContainer = column.find('.cora-cards-container');
-        
-        if (card.parent().parent()[0] === column[0]) {
-            // Dropped in same column
-            return;
-        }
-
-        // Move DOM element
-        targetContainer.append(card);
-
-        // Update counts
-        const sourceCountSpan = sourceCol.find('.col-count');
-        const targetCountSpan = column.find('.col-count');
-        sourceCountSpan.text(parseInt(sourceCountSpan.text()) - 1);
-        targetCountSpan.text(parseInt(targetCountSpan.text()) + 1);
-
-        // AJAX update
-        $.post(coraREData.ajaxUrl, {
-            action: 'cora_update_lead_status',
-            nonce: coraREData.ajaxNonce,
-            id: draggedCardId,
-            status: targetStatus
-        }, function(res) {
-            if (res.success) {
-                window.coraShowToast(`Lead moved to "${targetStatus}".`);
-                if (targetStatus === 'Converted') {
-                    setTimeout(() => {
-                        location.reload();
-                    }, 850);
-                }
-            } else {
-                window.coraShowToast(res.data || "Failed to update status.");
-                location.reload();
-            }
-        }).fail(function() {
-            window.coraShowToast("Network error updating status.");
-            location.reload();
-        });
-
-        draggedCardId = null;
-    };
-
-    // Dragend listener for cleanup if dropped outside column
-    $(document).on('dragend', '.cora-lead-card', function() {
-        $(this).removeClass('opacity-50');
-    });
 
     // ==========================================
     // FINANCIAL LEDGER & DOCUMENT TEMPLATE UTILS
@@ -10508,27 +10434,48 @@ jQuery(document).ready(function($) {
         });
     };
 
-    // Drag & Drop Handlers
+    // Drag & Drop Handlers for Kanban Cards
+    let draggedLeadCardId = null;
+
     window.coraLeadDragStart = function(ev) {
-        ev.dataTransfer.setData('text/plain', $(ev.currentTarget).attr('data-id'));
+        const card = $(ev.currentTarget).closest('.cora-lead-card');
+        draggedLeadCardId = card.attr('data-id');
+        ev.dataTransfer.effectAllowed = 'move';
+        ev.dataTransfer.setData('text/plain', draggedLeadCardId);
+        card.addClass('opacity-40 border-dashed border-zinc-500 scale-[0.99]');
     };
 
     window.coraLeadDragOver = function(ev) {
         ev.preventDefault();
+        ev.dataTransfer.dropEffect = 'move';
+        $(ev.currentTarget).closest('.cora-kanban-column').addClass('bg-zinc-100/60 dark:bg-zinc-800/60');
+    };
+
+    window.coraLeadDragEnd = function(ev) {
+        $('.cora-lead-card').removeClass('opacity-40 border-dashed border-zinc-500 scale-[0.99]');
+        $('.cora-kanban-column').removeClass('bg-zinc-100/60 dark:bg-zinc-800/60');
+        draggedLeadCardId = null;
     };
 
     window.coraLeadDrop = function(ev) {
         ev.preventDefault();
-        const leadId = ev.dataTransfer.getData('text/plain');
+        $('.cora-kanban-column').removeClass('bg-zinc-100/60 dark:bg-zinc-800/60');
+        $('.cora-lead-card').removeClass('opacity-40 border-dashed border-zinc-500 scale-[0.99]');
+
         const col = $(ev.currentTarget).closest('.cora-kanban-column');
         const newStage = col.attr('data-status');
+        const leadId = ev.dataTransfer.getData('text/plain') || draggedLeadCardId;
 
         if (!leadId || !newStage) return;
 
         const card = $(`.cora-lead-card[data-id="${leadId}"]`);
         if (card.length) {
-            col.find('.cora-cards-container').append(card);
+            const targetContainer = col.find('.cora-cards-container');
+            targetContainer.find('.text-center').remove();
+            targetContainer.append(card);
             card.attr('data-status', newStage);
+
+            window.coraUpdateColumnCounters();
         }
 
         $.ajax({
@@ -10542,9 +10489,27 @@ jQuery(document).ready(function($) {
             },
             success: function(res) {
                 if (res.success) {
-                    if (window.coraShowToast) window.coraShowToast(`Moved deal to ${newStage}`, 'success');
+                    if (window.coraShowToast) window.coraShowToast(res.data.message || `Moved deal to ${newStage}`, 'success');
                 } else {
                     if (window.coraShowToast) window.coraShowToast(res.data.message || 'Failed to update stage', 'error');
+                }
+            }
+        });
+
+        draggedLeadCardId = null;
+    };
+
+    window.coraUpdateColumnCounters = function() {
+        $('.cora-kanban-column').each(function() {
+            const cards = $(this).find('.cora-lead-card');
+            $(this).find('.col-count').text(cards.length);
+            if (cards.length === 0) {
+                if ($(this).find('.cora-cards-container > div').length === 0) {
+                    $(this).find('.cora-cards-container').html(`
+                        <div class="p-4 text-center border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl text-[11px] text-zinc-400 my-2 select-none">
+                            No deals in this stage
+                        </div>
+                    `);
                 }
             }
         });

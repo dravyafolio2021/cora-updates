@@ -291,6 +291,7 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                              data-email="<?php echo esc_attr( strtolower($lead['email']) ); ?>"
                              data-status="<?php echo esc_attr( $stage_key ); ?>"
                              ondragstart="coraLeadDragStart(event)"
+                             ondragend="coraLeadDragEnd(event)"
                              onclick="coraOpenLeadDetailDrawer('<?php echo esc_attr( $lead['id'] ); ?>')">
                             
                             <!-- Header Row: Client Pill + Score Badge + Options -->
