@@ -264,7 +264,8 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                         <div class="p-4 text-center border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl text-[11px] text-zinc-400 my-2 select-none">
                             No deals in this stage
                         </div>
-                    <?php el                        <?php foreach ( $col_leads as $lead ) : 
+                    <?php else : ?>
+                        <?php foreach ( $col_leads as $lead ) : 
                             $score = isset($lead['score']) ? strtolower($lead['score']) : 'warm';
                             $score_badge = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800';
                             $score_label = 'Warm';
