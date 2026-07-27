@@ -21,7 +21,7 @@ test.describe('Cora Forms Security & AI Compatibility E2E tests', () => {
 
     const testFormTitle = `Security & AI E2E Form ${Math.floor(Math.random() * 10000)}`;
     await page.fill('#editor-form-title', testFormTitle);
-    await page.selectOption('#editor-form-status', 'published');
+
 
     // Save initial form to generate database records (saves & keeps editor open)
     await page.click('#btn-save-form');
@@ -30,6 +30,7 @@ test.describe('Cora Forms Security & AI Compatibility E2E tests', () => {
 
     // Go back to the forms list manually
     await page.click('#btn-back-to-list');
+    await page.waitForLoadState('networkidle');
 
     // Verify we are back on the forms list state
     await page.waitForSelector('#forms-list-state:not(.hidden)', { state: 'visible' });
@@ -48,6 +49,7 @@ test.describe('Cora Forms Security & AI Compatibility E2E tests', () => {
 
     // Go back to list manually (since we didn't save)
     await page.click('#btn-back-to-list');
+    await page.waitForSelector('#forms-list-state:not(.hidden)', { state: 'visible' });
 
     // Get the form ID from database/REST options
     // We use page.request to inherit browser login session cookies and attach X-WP-Nonce

@@ -665,10 +665,15 @@ function cora_real_estate_ai_handle_workspace_route() {
     }
 
     if ( isset( $path_parts[0] ) && 'shared-form' === $path_parts[0] ) {
-        $form_id = isset( $path_parts[1] ) ? intval( $path_parts[1] ) : 0;
-        if ( $form_id > 0 ) {
+        $identifier = isset( $path_parts[1] ) ? sanitize_text_field( $path_parts[1] ) : '';
+        if ( ! empty( $identifier ) ) {
             global $wpdb;
-            $form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_forms WHERE id = %d", $form_id ), ARRAY_A );
+            $form = null;
+            if ( is_numeric( $identifier ) ) {
+                $form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_forms WHERE id = %d OR form_key = %s", intval( $identifier ), $identifier ), ARRAY_A );
+            } else {
+                $form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_forms WHERE form_key = %s", $identifier ), ARRAY_A );
+            }
             if ( $form ) {
                 nocache_headers();
                 include CORA_WORKSPACE_PATH . 'public-form-view.php';
@@ -9972,7 +9977,7 @@ add_action( 'wp_ajax_cora_gdpr_erase', 'cora_ajax_gdpr_erase' );
 
 function cora_ajax_save_media_metadata() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! current_user_can( 'upload_files' ) && ! current_user_can( 'manage_options' ) ) {
+    if ( ! is_user_logged_in() || ( ! cora_is_super_owner() && ! current_user_can( 'upload_files' ) && ! current_user_can( 'manage_options' ) && ! current_user_can( 'edit_posts' ) ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized' ) );
     }
 
@@ -10999,7 +11004,7 @@ add_action( 'wp_ajax_cora_get_attachment_metadata', 'cora_ajax_get_attachment_me
 
 function cora_ajax_save_edited_image() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! current_user_can( 'upload_files' ) && ! current_user_can( 'manage_options' ) ) {
+    if ( ! is_user_logged_in() || ( ! cora_is_super_owner() && ! current_user_can( 'upload_files' ) && ! current_user_can( 'manage_options' ) && ! current_user_can( 'edit_posts' ) ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized' ) );
     }
     $attachment_id = isset( $_POST['attachment_id'] ) ? intval( $_POST['attachment_id'] ) : 0;
@@ -12979,6 +12984,7 @@ function cora_create_custom_tables() {
     $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_forms (
       id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
       agency_id bigint(20) unsigned NOT NULL,
+      form_key varchar(100) DEFAULT NULL,
       title varchar(255) NOT NULL,
       status varchar(50) NOT NULL DEFAULT 'draft',
       styling text,
@@ -12986,7 +12992,8 @@ function cora_create_custom_tables() {
       created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
       updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
       PRIMARY KEY  (id),
-      KEY agency_id (agency_id)
+      KEY agency_id (agency_id),
+      KEY form_key (form_key)
     ) $charset_collate;";
 
     // 19. cora_form_blocks
@@ -13043,12 +13050,17 @@ function cora_create_custom_tables() {
         dbDelta( $query );
     }
 
-    // Migration/schema update: Ensure agency_id column exists in wp_cora_forms
+    // Migration/schema update: Ensure agency_id and form_key columns exist in wp_cora_forms
     $forms_table = $wpdb->prefix . 'cora_forms';
     $has_agency_id = $wpdb->get_results( "SHOW COLUMNS FROM {$forms_table} LIKE 'agency_id'" );
     if ( empty( $has_agency_id ) ) {
         $wpdb->query( "ALTER TABLE {$forms_table} ADD COLUMN agency_id bigint(20) unsigned NOT NULL AFTER id;" );
         $wpdb->query( "ALTER TABLE {$forms_table} ADD KEY agency_id (agency_id);" );
+    }
+    $has_form_key = $wpdb->get_results( "SHOW COLUMNS FROM {$forms_table} LIKE 'form_key'" );
+    if ( empty( $has_form_key ) ) {
+        $wpdb->query( "ALTER TABLE {$forms_table} ADD COLUMN form_key varchar(100) DEFAULT NULL AFTER agency_id;" );
+        $wpdb->query( "ALTER TABLE {$forms_table} ADD KEY form_key (form_key);" );
     }
 
     update_option( 'cora_db_v2_created', true );
@@ -18357,9 +18369,13 @@ function cora_get_bip_problems_html() {
 
 function cora_rest_get_forms( $request ) {
     global $wpdb;
-    $forms = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_forms ORDER BY id DESC LIMIT 4", ARRAY_A );
+    $forms = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_forms ORDER BY id DESC", ARRAY_A );
     if ( is_array( $forms ) ) {
         foreach ( $forms as &$form ) {
+            if ( empty( $form['form_key'] ) ) {
+                $form['form_key'] = 'frm_' . substr( md5( $form['id'] . $form['title'] ), 0, 8 );
+                $wpdb->update( $wpdb->prefix . 'cora_forms', array( 'form_key' => $form['form_key'] ), array( 'id' => $form['id'] ) );
+            }
             $form['styling'] = json_decode( $form['styling'], true ) ?: array();
             $form['settings'] = json_decode( $form['settings'], true ) ?: array();
             
@@ -18391,6 +18407,10 @@ function cora_rest_save_form( $request ) {
     $id = isset( $params['id'] ) ? intval( $params['id'] ) : 0;
     $title = isset( $params['title'] ) ? sanitize_text_field( $params['title'] ) : 'Untitled Form';
     $status = isset( $params['status'] ) ? sanitize_text_field( $params['status'] ) : 'draft';
+    $form_key = isset( $params['form_key'] ) ? sanitize_text_field( $params['form_key'] ) : '';
+    if ( empty( $form_key ) ) {
+        $form_key = 'frm_' . substr( md5( uniqid( $title . time(), true ) ), 0, 8 );
+    }
     $styling = isset( $params['styling'] ) ? json_encode( $params['styling'] ) : '{}';
     $settings = isset( $params['settings'] ) ? json_encode( $params['settings'] ) : '{}';
     $blocks = isset( $params['blocks'] ) ? $params['blocks'] : array();
@@ -18402,6 +18422,7 @@ function cora_rest_save_form( $request ) {
             $wpdb->prefix . 'cora_forms',
             array(
                 'title'      => $title,
+                'form_key'   => $form_key,
                 'status'     => $status,
                 'styling'    => $styling,
                 'settings'   => $settings,
@@ -18415,6 +18436,7 @@ function cora_rest_save_form( $request ) {
             $wpdb->prefix . 'cora_forms',
             array(
                 'agency_id'  => 1,
+                'form_key'   => $form_key,
                 'title'      => $title,
                 'status'     => $status,
                 'styling'    => $styling,

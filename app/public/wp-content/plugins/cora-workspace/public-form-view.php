@@ -35,22 +35,41 @@ $description = isset( $settings['description'] ) ? $settings['description'] : ( 
         <?php echo isset( $styling['custom_css'] ) ? esc_html( $styling['custom_css'] ) : ''; ?>
     </style>
 </head>
-<body class="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center p-0 sm:p-6 md:p-10">
-    <div class="w-full sm:max-w-2xl bg-white dark:bg-zinc-900 border-0 sm:border border-zinc-200/80 dark:border-zinc-800/80 rounded-none sm:rounded-2xl p-6 sm:p-10 shadow-none sm:shadow-[0_8px_30px_rgb(0,0,0,0.01)] relative flex flex-col min-h-screen sm:min-h-0">
-        <!-- Progress bar indicator -->
-        <div class="absolute top-0 left-0 w-full h-1 bg-zinc-100 dark:bg-zinc-800 rounded-t-none sm:rounded-t-2xl overflow-hidden">
-            <div id="form-progress-indicator" class="h-full bg-zinc-950 transition-all duration-300" style="width: 0%"></div>
+<body class="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center p-0 sm:p-6 md:p-8">
+    <div class="w-full sm:max-w-2xl bg-white dark:bg-zinc-900 border-0 sm:border border-zinc-200/90 dark:border-zinc-800/90 rounded-none sm:rounded-2xl p-5 sm:px-8 sm:py-6 shadow-none sm:shadow-[0_12px_40px_-12px_rgba(0,0,0,0.06)] relative flex flex-col min-h-screen sm:min-h-0">
+
+
+        <!-- Top Platform Brand Banner & Exit Button -->
+        <div class="flex items-center justify-between pb-3 mb-4 border-b border-zinc-100 dark:border-zinc-800/80">
+            <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold text-xs flex items-center justify-center shadow-xs leading-none">
+                    C
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 tracking-tight leading-none">Cora Forms</span>
+                    <span class="text-[9.5px] font-medium text-zinc-400 dark:text-zinc-500">Official Communication</span>
+                </div>
+            </div>
+            <button type="button" class="w-7 h-7 rounded-full bg-zinc-100/80 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center justify-center text-zinc-400 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-all border-0 cursor-pointer" onclick="if (window.opener) { window.close(); } else { window.history.back(); }">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
         </div>
 
-        <!-- Exit/Close Button -->
-        <button type="button" class="absolute top-6 right-6 w-8 h-8 rounded-full bg-zinc-50 hover:bg-zinc-100 flex items-center justify-center text-zinc-400 hover:text-zinc-600 transition-colors border-0 cursor-pointer" onclick="if (window.opener) { window.close(); } else { window.history.back(); }">
-            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
+        <!-- Multi-Step Header Tracker -->
+        <div id="multistep-header-tracker" class="mb-4 space-y-2 hidden">
+            <div class="flex items-center justify-between">
+                <span id="multistep-badge-text" class="px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-[10px] font-mono uppercase tracking-wider">
+                    Step 1 of 1
+                </span>
+                <span id="multistep-step-title" class="text-xs font-bold text-zinc-800 dark:text-zinc-200"></span>
+            </div>
+            <div id="multistep-pills-bar" class="flex items-center gap-1.5 w-full"></div>
+        </div>
 
         <!-- Form Header -->
-        <div class="mb-6 pr-8">
-            <h1 class="text-xl font-bold text-zinc-950 tracking-tight mb-1"><?php echo esc_html( $form['title'] ); ?></h1>
-            <p class="text-xs text-zinc-500 font-medium"><?php echo esc_html( $description ); ?></p>
+        <div class="mb-4">
+            <h1 class="text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight mb-1.5"><?php echo esc_html( $form['title'] ); ?></h1>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed"><?php echo esc_html( $description ); ?></p>
         </div>
 
         <form id="public-cora-form" class="space-y-6" data-form-id="<?php echo esc_attr( $form['id'] ); ?>">
@@ -64,28 +83,57 @@ $description = isset( $settings['description'] ) ? $settings['description'] : ( 
             </div>
 
             <!-- Navigation Actions -->
-            <div class="flex items-center justify-between pt-6 border-t border-zinc-100">
-                <button type="button" id="btn-prev-step" class="hidden h-10 px-4 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-700 flex items-center gap-1.5 transition-all cursor-pointer">
+            <div class="flex items-center justify-between pt-6 border-t border-zinc-100 dark:border-zinc-800">
+                <button type="button" id="btn-prev-step" class="hidden h-10 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-xs font-bold text-zinc-700 dark:text-zinc-200 flex items-center gap-1.5 transition-all shadow-3xs cursor-pointer">
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                     Back
                 </button>
                 <div class="flex-1"></div>
-                <button type="button" id="btn-next-step" class="h-10 px-5 rounded-xl bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer">
+                <button type="button" id="btn-next-step" class="h-10 px-6 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 hover:bg-zinc-900 dark:hover:bg-zinc-100 text-xs font-bold flex items-center gap-2 transition-all shadow-xs cursor-pointer border-none">
                     Next
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
             </div>
         </form>
 
-        <!-- Success view -->
-        <div id="form-success-container" class="hidden flex-col items-center justify-center text-center py-12 space-y-4">
-            <div class="h-12 w-12 rounded-full bg-zinc-50 border border-zinc-200 flex items-center justify-center text-zinc-950 text-xl font-bold">
-                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <!-- Success / Thank You view -->
+        <div id="form-success-container" class="hidden flex-col items-center justify-center text-center py-10 space-y-4">
+            <div class="h-14 w-14 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/80 flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-2xl font-bold shadow-xs">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </div>
-            <h2 class="text-base font-bold text-zinc-950">Response Submitted</h2>
-            <p class="text-xs text-zinc-500 max-w-sm leading-relaxed" id="success-msg-text">
-                <?php echo esc_html( isset($settings['success_message']) ? $settings['success_message'] : 'Thank you for your response!' ); ?>
-            </p>
+            <div class="space-y-1.5">
+                <h2 id="success-title-text" class="text-lg font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight">
+                    <?php echo esc_html( isset($settings['thankyou_title']) && !empty($settings['thankyou_title']) ? $settings['thankyou_title'] : 'Response Submitted' ); ?>
+                </h2>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 max-w-md leading-relaxed mx-auto" id="success-msg-text">
+                    <?php echo esc_html( isset($settings['success_message']) && !empty($settings['success_message']) ? $settings['success_message'] : 'Thank you for your response! We will be in touch shortly.' ); ?>
+                </p>
+            </div>
+            <?php 
+            $thankyou_cta_enable = isset($settings['thankyou_cta_enable']) ? $settings['thankyou_cta_enable'] : false;
+            $thankyou_cta_text = isset($settings['thankyou_cta_text']) && !empty($settings['thankyou_cta_text']) ? $settings['thankyou_cta_text'] : 'Visit Website';
+            $thankyou_cta_url = isset($settings['thankyou_cta_url']) ? $settings['thankyou_cta_url'] : '';
+            if ($thankyou_cta_enable && !empty($thankyou_cta_url)) : 
+            ?>
+            <div class="pt-2">
+                <a id="success-cta-btn" href="<?php echo esc_url($thankyou_cta_url); ?>" target="_blank" rel="noopener noreferrer" class="h-10 px-6 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 hover:bg-zinc-900 dark:hover:bg-zinc-100 text-xs font-bold inline-flex items-center justify-center gap-2 transition-all shadow-xs no-underline">
+                    <span><?php echo esc_html($thankyou_cta_text); ?></span>
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                </a>
+            </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Footer Watermark & Security Trust Badge -->
+        <div class="mt-8 pt-5 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[11px] text-zinc-400 dark:text-zinc-500 select-none">
+            <div class="flex items-center gap-1.5 font-medium">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-zinc-400"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+                Powered by <strong class="text-zinc-700 dark:text-zinc-300 font-bold">Cora Forms</strong>
+            </div>
+            <div class="flex items-center gap-1">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-emerald-500"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <span>256-bit Encrypted</span>
+            </div>
         </div>
     </div>
 
@@ -140,24 +188,32 @@ $description = isset( $settings['description'] ) ? $settings['description'] : ( 
                 }
             }
 
+            let stepTitles = [];
             // Split blocks list into visual steps / pages
             function partitionBlocks() {
+                steps = [];
+                stepTitles = [];
                 let currentStep = [];
+                let currentTitle = 'Step 1';
                 formBlocks.forEach(block => {
                     if (block.type === 'page_break') {
                         if (currentStep.length > 0) {
                             steps.push(currentStep);
+                            stepTitles.push(currentTitle);
                             currentStep = [];
                         }
+                        currentTitle = block.label || `Step ${steps.length + 1}`;
                     } else {
                         currentStep.push(block);
                     }
                 });
                 if (currentStep.length > 0) {
                     steps.push(currentStep);
+                    stepTitles.push(currentTitle);
                 }
                 if (steps.length === 0) {
                     steps.push([]);
+                    stepTitles.push('Step 1');
                 }
             }
 
@@ -858,8 +914,40 @@ $description = isset( $settings['description'] ) ? $settings['description'] : ( 
                 initCustomFieldsLogic(stepsContainer);
 
                 // Update progress percentage
-                const progressPct = steps.length > 1 ? (idx / (steps.length - 1)) * 100 : 100;
-                document.getElementById('form-progress-indicator').style.width = `${progressPct}%`;
+                const progressPct = steps.length > 1 ? ((idx + 1) / steps.length) * 100 : 100;
+                const progressEl = document.getElementById('form-progress-indicator');
+                if (progressEl) progressEl.style.width = `${progressPct}%`;
+
+                // Update Multi-step tracker UI
+                const trackerContainer = document.getElementById('multistep-header-tracker');
+                if (steps.length > 1 && trackerContainer) {
+                    trackerContainer.classList.remove('hidden');
+                    
+                    const badgeText = document.getElementById('multistep-badge-text');
+                    if (badgeText) badgeText.textContent = `Step ${idx + 1} of ${steps.length}`;
+                    
+                    const stepTitleEl = document.getElementById('multistep-step-title');
+                    if (stepTitleEl) stepTitleEl.textContent = stepTitles[idx] || `Step ${idx + 1}`;
+                    
+                    const pillsBar = document.getElementById('multistep-pills-bar');
+                    if (pillsBar) {
+                        pillsBar.innerHTML = '';
+                        for (let s = 0; s < steps.length; s++) {
+                            const pill = document.createElement('div');
+                            pill.style.flex = '1';
+                            if (s < idx) {
+                                pill.className = 'h-1.5 rounded-full bg-zinc-950 dark:bg-white transition-all';
+                            } else if (s === idx) {
+                                pill.className = 'h-1.5 rounded-full bg-zinc-950 dark:bg-white ring-2 ring-zinc-950/20 dark:ring-white/20 transition-all';
+                            } else {
+                                pill.className = 'h-1.5 rounded-full bg-zinc-200 dark:bg-zinc-800 transition-all';
+                            }
+                            pillsBar.appendChild(pill);
+                        }
+                    }
+                } else if (trackerContainer) {
+                    trackerContainer.classList.add('hidden');
+                }
 
                 // Configure Nav Buttons
                 if (idx === 0) {
