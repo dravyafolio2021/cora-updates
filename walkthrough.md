@@ -137,12 +137,21 @@ Located in `#tab-custom-roles`:
   - Automatically resets saved columns option if it contains the old default layout of 6 columns to force reload the 4-column design.
 - **Header Custom Accent Themes**:
   - Envelope, handshake, thumbs-up, and pause SVG icons respectively.
-  - Tinted color background banners and dynamically formatted total value indicators.
+  - Placed inside rounded colored circle badges rather than inside header block boxes.
+  - Separated title and total sum indicators by a clean horizontal rule.
+- **Full-Height Column Pastel Background Tints & Equal Heights**:
+  - Column background colors use full-height soft pastel tints (emerald, purple, blue, and orange/peach) to match the target mockup exactly.
+  - Removed standard gray/dark column borders for a clean, borderless layout.
+  - Enforced flex stretching (`items-stretch` on parent container) to align all columns to the same height as the tallest column dynamically.
+  - Removed `max-height` and `overflow-y-auto` from the card list container to eliminate inner column scrollbars and allow natural expansion.
 - **Modern High-Density Cards Layout**:
   - Renders client uppercase pills, priority badges (Hot, Warm, Won, Cold), bold project title, shoot tags, and bold pricing elements.
   - Checklist progress numbers and track bar (turns blue if Won/Converted).
   - Stacked assignee initials avatar, name, and role.
   - Blue `View Details` action button style for Won deals and clean white border style for `Review`.
+  - Cards are rendered borderless with soft shadows (`shadow-sm`, hover elevation transition) to pop off the pastel tinted column backgrounds.
+- **Transparent Bottom Add Buttons**:
+  - Restyled the bottom add buttons with transparent backgrounds, colored borders, and matching colored text (e.g. green for New Inquiries, purple for Negotiation).
 - **Cohesive Mailbox Empty States**:
   - Implemented an elegant custom inbox/mailbox SVG icon graphic with floating status badges (checks, handshakes, pause) and helper instruction texts.
 - **Cross-Browser Drag & Drop Stability**:
