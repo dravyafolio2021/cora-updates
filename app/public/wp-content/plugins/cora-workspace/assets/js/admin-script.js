@@ -10688,9 +10688,10 @@ jQuery(document).ready(function($) {
             url: window.coraData ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php',
             type: 'POST',
             data: {
-                action: 'cora_ajax_convert_lead_to_client',
+                action: 'cora_ajax_convert_lead_to_client_suite',
                 security: window.coraData ? window.coraData.nonce : '',
-                lead_id: leadId
+                lead_id: leadId,
+                id: leadId
             },
             success: function(res) {
                 if (res.success) {
@@ -10713,9 +10714,10 @@ jQuery(document).ready(function($) {
             url: window.coraData ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php',
             type: 'POST',
             data: {
-                action: 'cora_ajax_delete_lead',
+                action: 'cora_ajax_delete_lead_suite',
                 security: window.coraData ? window.coraData.nonce : '',
-                lead_id: leadId
+                lead_id: leadId,
+                id: leadId
             },
             success: function(res) {
                 if (res.success) {
