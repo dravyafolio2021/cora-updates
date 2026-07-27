@@ -1331,7 +1331,7 @@ if ( is_array( $cora_gear_maintenance ) ) {
 
         <div class="flex items-center justify-end gap-2.5 pt-2">
             <button type="button" onclick="closeCoraDeleteModal()" class="px-4 py-2 bg-white border border-zinc-200 hover:bg-zinc-100 hover:border-zinc-300 text-zinc-800 text-xs font-bold rounded-xl transition-all cursor-pointer shadow-2xs">Cancel</button>
-            <button type="button" onclick="executeCoraDeleteGearItem()" class="px-4.5 py-2 bg-rose-650 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm">Delete Item</button>
+            <button type="button" onclick="executeCoraDeleteGearItem()" class="px-4.5 py-2 bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm border border-transparent">Delete Item</button>
         </div>
     </div>
 </div>
