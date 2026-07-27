@@ -7272,6 +7272,93 @@ add_action( 'wp_ajax_cora_submit_blog_lead', 'cora_ajax_submit_blog_lead' );
 add_action( 'wp_ajax_nopriv_cora_submit_blog_lead', 'cora_ajax_submit_blog_lead' );
 
 /**
+ * AJAX Action: Editor Slash Command Search
+ * Lightweight, transient-cached search for articles, listings, and equipment.
+ * Returns max 8 results. Cache TTL: 60 seconds.
+ */
+function cora_ajax_editor_search() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    $type  = isset( $_POST['type'] ) ? sanitize_key( $_POST['type'] ) : '';
+    $query = isset( $_POST['q'] )    ? sanitize_text_field( $_POST['q'] ) : '';
+
+    if ( ! in_array( $type, array( 'article', 'listing', 'equipment' ), true ) ) {
+        wp_send_json_error( 'Invalid type.' );
+    }
+
+    // Transient cache key — safe, short-lived
+    $cache_key = 'cora_es_' . $type . '_' . md5( $query );
+    $cached    = get_transient( $cache_key );
+    if ( false !== $cached ) {
+        wp_send_json_success( $cached );
+        return;
+    }
+
+    $results = array();
+
+    if ( $type === 'article' ) {
+        $args = array(
+            'post_type'      => 'post',
+            'post_status'    => array( 'publish', 'draft', 'pending' ),
+            'posts_per_page' => 8,
+            'orderby'        => 'modified',
+            'order'          => 'DESC',
+            'no_found_rows'  => true,  // Performance: skip pagination count
+            'fields'         => 'all',
+        );
+        if ( ! empty( $query ) ) {
+            $args['s'] = $query;
+        }
+        $wp_query = new WP_Query( $args );
+        foreach ( $wp_query->posts as $post ) {
+            $thumb_id  = get_post_thumbnail_id( $post->ID );
+            $thumb_url = $thumb_id ? wp_get_attachment_image_url( $thumb_id, 'thumbnail' ) : '';
+            $results[] = array(
+                'id'        => $post->ID,
+                'title'     => $post->post_title ?: '(Untitled)',
+                'url'       => get_permalink( $post->ID ),
+                'status'    => $post->post_status,
+                'thumb'     => $thumb_url,
+                'excerpt'   => wp_trim_words( $post->post_excerpt ?: $post->post_content, 12, '…' ),
+            );
+        }
+        wp_reset_postdata();
+
+    } else {
+        // listings and equipment share the same cached WP option
+        $inventory = get_option( 'cora_workspace_listings_inventory', array() );
+        if ( ! is_array( $inventory ) ) {
+            $inventory = array();
+        }
+
+        $category_filter = ( $type === 'equipment' ) ? null : null; // future: filter by category
+        $count = 0;
+        foreach ( $inventory as $item ) {
+            if ( $count >= 8 ) break;
+            $name = isset( $item['name'] ) ? $item['name'] : '';
+            if ( ! empty( $query ) && stripos( $name, $query ) === false ) {
+                continue;
+            }
+            $results[] = array(
+                'id'       => isset( $item['id'] ) ? $item['id'] : '',
+                'title'    => $name,
+                'category' => isset( $item['category'] ) ? $item['category'] : '',
+                'status'   => isset( $item['status'] ) ? $item['status'] : '',
+                'thumb'    => isset( $item['photo_url'] ) ? $item['photo_url'] : '',
+                'rera'     => isset( $item['rera_reg_id'] ) ? $item['rera_reg_id'] : '',
+                'notes'    => isset( $item['notes'] ) ? wp_trim_words( $item['notes'], 10, '…' ) : '',
+            );
+            $count++;
+        }
+    }
+
+    // Cache for 60 seconds to prevent repeated DB/option hits
+    set_transient( $cache_key, $results, 60 );
+    wp_send_json_success( $results );
+}
+add_action( 'wp_ajax_cora_editor_search', 'cora_ajax_editor_search' );
+
+/**
  * AJAX Action: Get captured leads for Blog Post Drawer
  */
 function cora_ajax_get_article_leads() {

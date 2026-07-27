@@ -6292,6 +6292,15 @@ jQuery(document).ready(function($) {
                 CoraWidgetBlot.blotName = 'cora-widget';
                 CoraWidgetBlot.tagName = 'div';
                 Quill.register(CoraWidgetBlot, true);
+
+                // Register font and size whitelists
+                const FontStyle = Quill.import('formats/font');
+                FontStyle.whitelist = ['sans', 'serif', 'mono'];
+                Quill.register(FontStyle, true);
+
+                const SizeStyle = Quill.import('attributors/style/size');
+                SizeStyle.whitelist = ['13px', '15px', '18px', '24px'];
+                Quill.register(SizeStyle, true);
             }
 
             coraQuillListingCoordinator = new Quill('#cora-quill-editor', {
@@ -6299,10 +6308,14 @@ jQuery(document).ready(function($) {
                 placeholder: 'Start writing your masterpiece...',
                 modules: {
                     toolbar: [
-                        [{ 'header': [2, 3, 4, false] }],
+                        [{ 'header': [1, 2, 3, 4, false] }],
+                        [{ 'font': ['', 'sans', 'serif', 'mono'] }],
+                        [{ 'size': ['13px', false, '18px', '24px'] }],
                         ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'color': ['#09090b','#52525b','#a1a1aa','#ffffff','#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#8b5cf6'] }],
+                        [{ 'align': [] }],
                         ['blockquote', 'code-block'],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'indent': '-1'}, { 'indent': '+1' }],
                         ['link', 'image', 'video'],
                         ['clean']
                     ]
@@ -7461,7 +7474,7 @@ jQuery(document).ready(function($) {
         }, 800);
     };
 
-    window.coraInsertSlashWidget = function(type) {
+    window.coraInsertSlashWidget = function(type, data) {
         if (!coraQuillListingCoordinator) {
             window.coraShowToast('Quill editor is not initialized.', 'error');
             return;
@@ -7475,103 +7488,131 @@ jQuery(document).ready(function($) {
         let deleteIndex = range.index;
         if (line) {
             const lineStartPos = range.index - offset;
-            const lineText = line.domNode.textContent || '';
+            const lineText = (line.domNode.textContent || '').replace(/[\u200B\uFEFF]/g, '');
             const slashOffset = lineText.indexOf('/');
             if (slashOffset !== -1) {
                 deleteIndex = lineStartPos + slashOffset;
             }
         }
-        
+
         coraQuillListingCoordinator.deleteText(deleteIndex, 1);
 
         let html = '';
         const postId = $('#cora-article-id').val() || '0';
 
         if (type === 'valuation') {
-            html = `
-            <div class="cora-inline-cta-card" style="background:#ffffff; border:1px solid #e4e4e7; border-radius:12px; padding:24px; margin:24px 0; max-width:550px; font-family:system-ui, sans-serif; box-shadow:0 1px 3px rgba(0,0,0,0.05);" contenteditable="false">
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
-                    <span style="padding:6px; background:#f4f4f5; border-radius:6px; color:#09090b; display:inline-flex; align-items:center;">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                    </span>
-                    <strong style="font-size:14px; text-transform:uppercase; letter-spacing:0.05em; color:#71717a;">Free Local Appraisal</strong>
-                </div>
-                <h3 style="font-size:18px; font-weight:800; color:#09090b; margin:0 0 6px 0; line-height:1.2;">Get a Free Professional Property Valuation</h3>
-                <p style="font-size:12px; color:#71717a; margin:0 0 16px 0;">Find out exactly what your luxury home or villa is worth in today's market.</p>
-                <form class="cora-blog-lead-form" onsubmit="event.preventDefault(); window.coraSubmitBlogLeadForm(this, ${postId});" style="display:grid; grid-template-columns:1fr; gap:10px;">
-                    <input type="text" name="first_name" placeholder="Full Name" required style="width:100%; border:1px solid #e4e4e7; border-radius:6px; padding:8px 12px; font-size:13px; box-sizing:border-box;">
-                    <input type="email" name="email" placeholder="Email Address" required style="width:100%; border:1px solid #e4e4e7; border-radius:6px; padding:8px 12px; font-size:13px; box-sizing:border-box;">
-                    <input type="text" name="phone" placeholder="Phone Number" required style="width:100%; border:1px solid #e4e4e7; border-radius:6px; padding:8px 12px; font-size:13px; box-sizing:border-box;">
-                    <input type="text" name="notes" placeholder="Property Address" required style="width:100%; border:1px solid #e4e4e7; border-radius:6px; padding:8px 12px; font-size:13px; box-sizing:border-box;">
-                    <button type="submit" style="width:100%; background:#09090b; color:#ffffff; font-weight:700; border:none; border-radius:6px; padding:10px; font-size:13px; cursor:pointer;">Request Free Appraisal</button>
-                </form>
-            </div>
-            `;
+            html = `<div class="cora-inline-cta-card" style="background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;padding:24px;margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,0.05);" contenteditable="false"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="padding:6px;background:#f4f4f5;border-radius:6px;color:#09090b;display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></span><strong style="font-size:14px;text-transform:uppercase;letter-spacing:0.05em;color:#71717a;">Free Local Appraisal</strong></div><h3 style="font-size:18px;font-weight:800;color:#09090b;margin:0 0 6px;line-height:1.2;">Get a Free Professional Property Valuation</h3><p style="font-size:12px;color:#71717a;margin:0 0 16px;">Find out exactly what your luxury home or villa is worth in today's market.</p><form class="cora-blog-lead-form" onsubmit="event.preventDefault();window.coraSubmitBlogLeadForm(this,${postId});" style="display:grid;gap:10px;"><input type="text" name="first_name" placeholder="Full Name" required style="width:100%;border:1px solid #e4e4e7;border-radius:6px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="email" name="email" placeholder="Email Address" required style="width:100%;border:1px solid #e4e4e7;border-radius:6px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="text" name="phone" placeholder="Phone Number" required style="width:100%;border:1px solid #e4e4e7;border-radius:6px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="text" name="notes" placeholder="Property Address" required style="width:100%;border:1px solid #e4e4e7;border-radius:6px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><button type="submit" style="width:100%;background:#09090b;color:#fff;font-weight:700;border:none;border-radius:6px;padding:10px;font-size:13px;cursor:pointer;">Request Free Appraisal</button></form></div>`;
+
+        } else if (type === 'article') {
+            const title   = data && data.title   ? data.title   : 'Related Article';
+            const excerpt = data && data.excerpt ? data.excerpt : 'Click to read the full article on this platform.';
+            const url     = data && data.url     ? data.url     : '#';
+            const thumb   = data && data.thumb   ? `<img src="${data.thumb}" style="width:64px;height:64px;object-fit:cover;border-radius:8px;flex-shrink:0;">` : `<span style="width:64px;height:64px;background:#f4f4f5;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><svg viewBox="0 0 24 24" width="20" height="20" stroke="#a1a1aa" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></span>`;
+            html = `<div class="cora-related-article-card" style="background:#fff;border:1px solid #e4e4e7;border-radius:12px;padding:16px;margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;display:flex;gap:14px;align-items:flex-start;" contenteditable="false">${thumb}<div style="flex:1;min-width:0;"><span style="font-size:9px;text-transform:uppercase;color:#71717a;font-weight:700;letter-spacing:0.05em;">Related Read</span><h4 style="font-size:14px;font-weight:700;margin:4px 0 6px;color:#09090b;line-height:1.3;">${title}</h4><p style="font-size:11px;color:#71717a;margin:0 0 10px;">${excerpt}</p><a href="${url}" target="_blank" style="font-size:11px;font-weight:600;color:#09090b;text-decoration:none;display:inline-flex;align-items:center;gap:4px;border:1px solid #e4e4e7;padding:4px 10px;border-radius:6px;">Read Article <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a></div></div>`;
+
+        } else if (type === 'listing') {
+            const title    = data && data.title    ? data.title    : 'Property Listing';
+            const category = data && data.category ? data.category : '';
+            const rera     = data && data.rera     ? 'RERA: ' + data.rera : '';
+            const status   = data && data.status   ? data.status   : 'Available';
+            const notes    = data && data.notes    ? data.notes    : 'Premium property available for sale or lease. Contact us for details.';
+            const thumb    = data && data.thumb    ? `<img src="${data.thumb}" style="width:100%;height:130px;object-fit:cover;border-radius:8px;margin-bottom:12px;">` : `<div style="width:100%;height:90px;background:#f4f4f5;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;"><svg viewBox="0 0 24 24" width="22" height="22" stroke="#a1a1aa" stroke-width="1.8" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></div>`;
+            html = `<div class="cora-listing-card" style="background:#fff;border:1px solid #e4e4e7;border-radius:14px;padding:20px;margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;" contenteditable="false">${thumb}<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;"><h4 style="font-size:15px;font-weight:800;color:#09090b;margin:0;line-height:1.2;">${title}</h4><span style="font-size:9px;font-weight:700;background:#f4f4f5;color:#52525b;padding:3px 8px;border-radius:999px;white-space:nowrap;">${status}</span></div>${category ? `<span style="font-size:10px;color:#71717a;font-weight:600;">${category}</span>` : ''}${rera ? `<span style="font-size:9px;color:#a1a1aa;margin-left:8px;">${rera}</span>` : ''}<p style="font-size:11px;color:#71717a;margin:8px 0 0;">${notes}</p></div>`;
+
         } else if (type === 'equipment') {
-            html = `
-            <div class="cora-equipment-showcase-card" style="background:#ffffff; border:1px solid #e4e4e7; border-radius:12px; padding:20px; margin:24px 0; max-width:550px; font-family:system-ui, sans-serif;" contenteditable="false">
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
-                    <span style="padding:6px; background:#f4f4f5; border-radius:6px; color:#09090b; display:inline-flex; align-items:center;">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                    </span>
-                    <strong style="font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#71717a;">Production Equipment Showcase</strong>
-                </div>
-                <h4 style="font-size:14px; font-weight:700; margin:0 0 8px 0;">Ultra-High Definition Cinematic Gear</h4>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                    <div style="background:#f4f4f5; border-radius:6px; padding:10px;">
-                        <strong style="font-size:11px; display:block;">Sony FX3 Cinema Camera</strong>
-                        <span style="font-size:10px; color:#71717a;">UHD 4K 120fps recording capability.</span>
-                    </div>
-                    <div style="background:#f4f4f5; border-radius:6px; padding:10px;">
-                        <strong style="font-size:11px; display:block;">DJI Ronin RS3 Pro Gimbal</strong>
-                        <span style="font-size:10px; color:#71717a;">3-axis stabilization for butter smooth cinematic walk-throughs.</span>
-                    </div>
-                </div>
-            </div>
-            `;
+            const title    = data && data.title    ? data.title    : 'Equipment Item';
+            const category = data && data.category ? data.category : 'Studio Gear';
+            const notes    = data && data.notes    ? data.notes    : 'High-performance production equipment for professional shoots.';
+            const thumb    = data && data.thumb    ? `<img src="${data.thumb}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;flex-shrink:0;">` : `<span style="width:56px;height:56px;background:#f4f4f5;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><svg viewBox="0 0 24 24" width="18" height="18" stroke="#a1a1aa" stroke-width="2" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></span>`;
+            html = `<div class="cora-equipment-card" style="background:#fff;border:1px solid #e4e4e7;border-radius:12px;padding:16px;margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;display:flex;gap:14px;align-items:center;" contenteditable="false">${thumb}<div><span style="font-size:9px;text-transform:uppercase;color:#71717a;font-weight:700;letter-spacing:0.05em;">${category}</span><h4 style="font-size:13px;font-weight:700;color:#09090b;margin:3px 0 4px;">${title}</h4><p style="font-size:11px;color:#71717a;margin:0;">${notes}</p></div></div>`;
+
         } else if (type === 'gallery') {
-            html = `
-            <div class="cora-gallery-showcase" style="margin:24px 0; max-width:550px; font-family:system-ui, sans-serif;" contenteditable="false">
-                <h4 style="font-size:14px; font-weight:750; margin:0 0 10px 0; color:#09090b;">Media Portfolio Showcase</h4>
-                <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;">
-                    <div style="aspect-ratio:1/1; background:#f4f4f5; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#a1a1aa; font-size:10px; font-weight:bold; border:1px solid #e4e4e7;">Exterior View</div>
-                    <div style="aspect-ratio:1/1; background:#f4f4f5; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#a1a1aa; font-size:10px; font-weight:bold; border:1px solid #e4e4e7;">Living Hall</div>
-                    <div style="aspect-ratio:1/1; background:#f4f4f5; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#a1a1aa; font-size:10px; font-weight:bold; border:1px solid #e4e4e7;">Master Suite</div>
-                </div>
-            </div>
-            `;
-        } else if (type === 'related') {
-            html = `
-            <div class="cora-related-article-card" style="background:#ffffff; border:1px solid #e4e4e7; border-radius:12px; padding:16px; margin:24px 0; max-width:550px; font-family:system-ui, sans-serif; display:flex; gap:12px; align-items:center;" contenteditable="false">
-                <span style="padding:12px; background:#f4f4f5; border-radius:8px; color:#09090b; display:inline-flex; align-items:center;">
-                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line></svg>
-                </span>
-                <div>
-                    <span style="font-size:9px; text-transform:uppercase; color:#71717a; font-weight:bold;">Related Read</span>
-                    <h4 style="font-size:13px; font-weight:700; margin:2px 0 4px 0; color:#09090b;">Jaipur Real Estate: The 2026 Comprehensive Investment Guide</h4>
-                    <span style="font-size:10px; color:#71717a;">Market trends, regional developments, and top micro-markets analyzed.</span>
-                </div>
-            </div>
-            `;
+            html = `<div class="cora-gallery-showcase" style="margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;" contenteditable="false"><h4 style="font-size:14px;font-weight:700;margin:0 0 10px;color:#09090b;">Media Gallery</h4><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"><div style="aspect-ratio:1/1;background:#f4f4f5;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#a1a1aa;font-size:10px;font-weight:bold;border:1px solid #e4e4e7;">Exterior</div><div style="aspect-ratio:1/1;background:#f4f4f5;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#a1a1aa;font-size:10px;font-weight:bold;border:1px solid #e4e4e7;">Living Hall</div><div style="aspect-ratio:1/1;background:#f4f4f5;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#a1a1aa;font-size:10px;font-weight:bold;border:1px solid #e4e4e7;">Master Suite</div></div></div>`;
+
+        } else if (type === 'divider') {
+            html = `<div class="cora-divider-block" style="margin:32px 0;display:flex;align-items:center;gap:12px;" contenteditable="false"><div style="flex:1;height:1px;background:#e4e4e7;"></div><svg viewBox="0 0 24 24" width="14" height="14" stroke="#d4d4d8" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="6" cy="12" r="1"></circle><circle cx="18" cy="12" r="1"></circle></svg><div style="flex:1;height:1px;background:#e4e4e7;"></div></div>`;
+
+        } else if (type === 'pullquote') {
+            html = `<div class="cora-pullquote-block" style="margin:32px 0;padding:24px 28px;border-left:3px solid #09090b;background:#fafafa;border-radius:0 8px 8px 0;max-width:560px;font-family:system-ui,sans-serif;" contenteditable="false"><p style="font-size:18px;font-weight:700;color:#09090b;line-height:1.5;margin:0 0 10px;font-style:italic;">"The best investment on earth is earth."</p><span style="font-size:11px;color:#71717a;font-weight:600;">— Louis Glickman</span></div>`;
+
         } else if (type === 'signature') {
-            html = `
-            <div class="cora-editorial-signature" style="margin:24px 0; padding-top:16px; border-top:1px solid #e4e4e7; font-family:system-ui, sans-serif; max-width:550px;" contenteditable="false">
-                <p style="font-size:12px; margin:0; font-weight:700; color:#09090b;">Nitin & Shanaya Arora</p>
-                <p style="font-size:10px; margin:2px 0 0 0; color:#71717a;">Lead Listings Coordinator &amp; Editors at Apex Realty Group</p>
-            </div>
-            `;
+            html = `<div class="cora-editorial-signature" style="margin:24px 0;padding-top:16px;border-top:1px solid #e4e4e7;font-family:system-ui,sans-serif;max-width:560px;" contenteditable="false"><p style="font-size:12px;margin:0;font-weight:700;color:#09090b;">Nitin &amp; Shanaya Arora</p><p style="font-size:10px;margin:2px 0 0;color:#71717a;">Lead Listings Coordinator &amp; Editors at Apex Realty Group</p></div>`;
         }
 
         coraQuillListingCoordinator.insertEmbed(deleteIndex, 'cora-widget', { type: type, html: html });
-        // Force selection right after the inserted block, insert a newline to allow typing below it easily
         coraQuillListingCoordinator.setSelection(deleteIndex + 1);
         coraQuillListingCoordinator.insertText(deleteIndex + 1, '\n');
         coraQuillListingCoordinator.setSelection(deleteIndex + 2);
-        
+
         $('#cora-editor-slash-menu').addClass('hidden');
+        coraCloseSlashPicker();
         window.coraShowToast('Widget block inserted successfully!', 'success');
         coraUpdateWordCount();
     };
+
+    // ── Slash Picker: open inline search sub-panel ─────────────────────────
+    window.coraOpenSlashPicker = function(type) {
+        $('#cora-slash-main-panel').addClass('hidden');
+        $('#cora-slash-picker-panel').removeClass('hidden');
+        $('#cora-slash-picker-search').val('').attr('data-type', type);
+        $('#cora-slash-picker-results').html('<div class="px-3 py-4 text-[10px] text-zinc-400 text-center">Loading recent items...</div>');
+        setTimeout(function() { $('#cora-slash-picker-search').focus(); }, 50);
+        coraSearchSlashItems(type, '');
+    };
+
+    window.coraCloseSlashPicker = function() {
+        $('#cora-slash-picker-panel').addClass('hidden');
+        $('#cora-slash-main-panel').removeClass('hidden');
+        $('#cora-slash-picker-search').val('');
+    };
+
+    // ── Slash Picker: debounced AJAX search ────────────────────────────────
+    let _coraSlashSearchTimer = null;
+    $(document).on('input', '#cora-slash-picker-search', function() {
+        const query = $(this).val().trim();
+        const type  = $(this).attr('data-type') || 'article';
+        clearTimeout(_coraSlashSearchTimer);
+        _coraSlashSearchTimer = setTimeout(function() {
+            coraSearchSlashItems(type, query);
+        }, 300);
+    });
+
+    window.coraSearchSlashItems = function(type, query) {
+        $('#cora-slash-picker-results').html('<div class="px-3 py-4 text-[10px] text-zinc-400 text-center flex items-center justify-center gap-1.5"><svg class="animate-spin" viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>Searching...</div>');
+
+        $.post(coraAjax.ajax_url, {
+            action: 'cora_editor_search',
+            nonce:  coraAjax.nonce,
+            type:   type,
+            q:      query
+        }, function(resp) {
+            if (!resp.success || !resp.data || resp.data.length === 0) {
+                $('#cora-slash-picker-results').html('<div class="px-3 py-4 text-[10px] text-zinc-400 text-center">No results found. Try a different search.</div>');
+                return;
+            }
+            let html = '';
+            resp.data.forEach(function(item) {
+                const thumb = item.thumb
+                    ? `<img src="${item.thumb}" class="w-8 h-8 rounded-md object-cover shrink-0 bg-zinc-100">`
+                    : `<span class="w-8 h-8 rounded-md bg-zinc-100 flex items-center justify-center shrink-0 text-zinc-400"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></span>`;
+                const sub = (type === 'article')
+                    ? `<span class="text-[9px] text-zinc-400 leading-none">${item.status || 'draft'}</span>`
+                    : `<span class="text-[9px] text-zinc-400 leading-none">${item.category || ''}${item.rera ? ' · ' + item.rera : ''}</span>`;
+                const safeData = JSON.stringify(item).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                html += `<button type="button" onclick="coraSelectSlashItem('${type}', JSON.parse(this.dataset.item))" data-item="${safeData}" class="w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">${thumb}<div class="min-w-0 flex-1"><span class="font-semibold block text-[11px] text-zinc-800 truncate">${item.title}</span>${sub}</div></button>`;
+            });
+            $('#cora-slash-picker-results').html(html);
+        }).fail(function() {
+            $('#cora-slash-picker-results').html('<div class="px-3 py-4 text-[10px] text-zinc-400 text-center">Search failed. Check your connection.</div>');
+        });
+    };
+
+    window.coraSelectSlashItem = function(type, item) {
+        $('#cora-editor-slash-menu').addClass('hidden');
+        coraCloseSlashPicker();
+        coraInsertSlashWidget(type, item);
+    };
+
 
     window.coraPreviewArticle = function() {
         const title = $('#cora-article-title').val() || 'Untitled Article';

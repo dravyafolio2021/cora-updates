@@ -3040,7 +3040,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                         <button class="w-full text-left px-2.5 py-2 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-955 font-medium flex items-center justify-between cursor-pointer transition-colors" onclick="coraNavigateTo('settings-suite'); $('#cora-header-profile-popover').addClass('hidden');">
                             <div class="flex items-center gap-3">
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l-.06-.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                                 Settings
                             </div>
                             <span class="text-[10px] text-zinc-400 font-mono">⌘.</span>
@@ -7926,6 +7926,16 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     }
     .ql-container.ql-snow { border: none !important; }
     .ql-editor.ql-blank::before { color: #d4d4d8; font-style: normal; }
+    /* Typography whitelist classes */
+    .ql-font-serif { font-family: ui-serif, Georgia, Cambria, serif !important; }
+    .ql-font-mono  { font-family: ui-monospace, 'Cascadia Code', 'Fira Code', monospace !important; }
+    .ql-font-sans  { font-family: ui-sans-serif, system-ui, -apple-system, sans-serif !important; }
+    .ql-size-13px  { font-size: 13px !important; }
+    .ql-size-18px  { font-size: 18px !important; }
+    .ql-size-24px  { font-size: 24px !important; }
+    /* Slash picker spinner */
+    @keyframes ql-spin { to { transform: rotate(360deg); } }
+    .animate-spin { animation: ql-spin 0.8s linear infinite; }
     </style>
 
     <div id="cora-full-page-editor" class="hidden fixed inset-0 z-[100] bg-white flex-col h-full overflow-hidden select-none">
@@ -8198,65 +8208,96 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <!-- Title Input -->
                     <input type="text" id="cora-article-title" placeholder="Article Title" oninput="coraUpdateWordCount()" class="text-4xl md:text-5xl font-extrabold text-zinc-900 placeholder:text-zinc-300 w-full border-none focus:ring-0 focus:outline-none bg-transparent leading-tight tracking-tight mb-2">
                     
-                    <!-- Floating / Inline Formatting & Slash Command Hint -->
+                    <!-- Slash Command Hint -->
                     <div class="flex items-center gap-2 py-2 px-3 bg-zinc-50 border border-zinc-200/80 rounded-xl text-xs text-zinc-500 font-mono select-none">
                         <span class="px-1.5 py-0.5 bg-zinc-200 text-zinc-800 font-bold rounded text-[10px]">/</span>
-                        <span>Type <kbd class="font-bold text-zinc-800">/</kbd> for slash commands or select text for floating formatting toolbar</span>
+                        <span>Type <kbd class="font-bold text-zinc-800">/</kbd> for slash commands or select text for formatting</span>
                     </div>
+
+                    <!-- Notion-Style Slash Commands Menu -->
+                    <div id="cora-editor-slash-menu" class="hidden absolute bg-white border border-zinc-200 rounded-xl shadow-xl w-[290px] z-[999] select-none text-zinc-800 font-sans text-xs overflow-hidden">
+
+                        <!-- Main menu panel -->
+                        <div id="cora-slash-main-panel" class="py-2">
+
+                            <div class="px-3 py-1.5 text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Content</div>
+                            <button type="button" onclick="coraOpenSlashPicker('article')" class="w-full text-left px-3 py-2.5 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
+                                <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-700 shrink-0"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line></svg></span>
+                                <div class="flex-1 min-w-0">
+                                    <span class="font-semibold block text-[11px] text-zinc-800">Related Article</span>
+                                    <span class="text-[9px] text-zinc-400 block leading-none mt-0.5">Link to an article from this platform</span>
+                                </div>
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0 text-zinc-300"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </button>
+                            <button type="button" onclick="coraInsertSlashWidget('valuation')" class="w-full text-left px-3 py-2.5 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
+                                <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-700 shrink-0"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></span>
+                                <div>
+                                    <span class="font-semibold block text-[11px] text-zinc-800">Lead Capture Form</span>
+                                    <span class="text-[9px] text-zinc-400 block leading-none mt-0.5">Property appraisal request form</span>
+                                </div>
+                            </button>
+
+                            <div class="h-px bg-zinc-100 mx-3 my-1.5"></div>
+                            <div class="px-3 py-1.5 text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Listings &amp; Studio</div>
+                            <button type="button" onclick="coraOpenSlashPicker('listing')" class="w-full text-left px-3 py-2.5 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
+                                <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-700 shrink-0"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></span>
+                                <div class="flex-1 min-w-0">
+                                    <span class="font-semibold block text-[11px] text-zinc-800">Property Showcase</span>
+                                    <span class="text-[9px] text-zinc-400 block leading-none mt-0.5">Embed a listing card from the platform</span>
+                                </div>
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0 text-zinc-300"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </button>
+                            <button type="button" onclick="coraOpenSlashPicker('equipment')" class="w-full text-left px-3 py-2.5 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
+                                <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-700 shrink-0"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></span>
+                                <div class="flex-1 min-w-0">
+                                    <span class="font-semibold block text-[11px] text-zinc-800">Equipment Card</span>
+                                    <span class="text-[9px] text-zinc-400 block leading-none mt-0.5">Embed a gear item from Studio module</span>
+                                </div>
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0 text-zinc-300"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </button>
+                            <button type="button" onclick="coraInsertSlashWidget('gallery')" class="w-full text-left px-3 py-2.5 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
+                                <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-700 shrink-0"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></span>
+                                <div>
+                                    <span class="font-semibold block text-[11px] text-zinc-800">Media Gallery</span>
+                                    <span class="text-[9px] text-zinc-400 block leading-none mt-0.5">Responsive image gallery grid</span>
+                                </div>
+                            </button>
+
+                            <div class="h-px bg-zinc-100 mx-3 my-1.5"></div>
+                            <div class="px-3 py-1.5 text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Blocks</div>
+                            <button type="button" onclick="coraInsertSlashWidget('divider')" class="w-full text-left px-3 py-2.5 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
+                                <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-700 shrink-0"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line></svg></span>
+                                <div><span class="font-semibold block text-[11px] text-zinc-800">Divider</span><span class="text-[9px] text-zinc-400 block leading-none mt-0.5">Horizontal section break</span></div>
+                            </button>
+                            <button type="button" onclick="coraInsertSlashWidget('pullquote')" class="w-full text-left px-3 py-2.5 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
+                                <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-700 shrink-0"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"></path><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"></path></svg></span>
+                                <div><span class="font-semibold block text-[11px] text-zinc-800">Pull Quote</span><span class="text-[9px] text-zinc-400 block leading-none mt-0.5">Highlighted editorial quote</span></div>
+                            </button>
+                            <button type="button" onclick="coraInsertSlashWidget('signature')" class="w-full text-left px-3 py-2.5 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
+                                <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-700 shrink-0"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>
+                                <div><span class="font-semibold block text-[11px] text-zinc-800">Signature Block</span><span class="text-[9px] text-zinc-400 block leading-none mt-0.5">Author sign-off block</span></div>
+                            </button>
+                        </div>
+
+                        <!-- Item search picker sub-panel -->
+                        <div id="cora-slash-picker-panel" class="hidden">
+                            <div class="flex items-center gap-2 px-3 py-2.5 border-b border-zinc-100">
+                                <button type="button" onclick="coraCloseSlashPicker()" class="p-1 rounded hover:bg-zinc-100 transition-colors text-zinc-400 hover:text-zinc-700 cursor-pointer border-none bg-transparent shrink-0">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                </button>
+                                <input type="text" id="cora-slash-picker-search" placeholder="Search..." class="flex-1 text-xs outline-none border-none bg-transparent text-zinc-800 placeholder:text-zinc-300" autocomplete="off">
+                            </div>
+                            <div id="cora-slash-picker-results" class="max-h-[240px] overflow-y-auto py-1">
+                                <div class="px-3 py-4 text-[10px] text-zinc-400 text-center">Type to search...</div>
+                            </div>
+                        </div>
+
+                    </div><!-- /#cora-editor-slash-menu -->
 
                     <!-- Quill.js Mount Point -->
                     <div id="cora-quill-editor" class="text-lg text-zinc-800 leading-relaxed cora-serif-editor min-h-[400px]"></div>
 
-                    <!-- Notion-Style Slash Commands Menu -->
-                    <div id="cora-editor-slash-menu" class="hidden absolute bg-white border border-zinc-200 rounded-xl shadow-xl w-60 py-2 z-[999] select-none text-zinc-800 font-sans text-xs">
-                        <div class="px-3 py-1 text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Insert Widget</div>
-                        <button type="button" onclick="coraInsertSlashWidget('valuation')" class="w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
-                            <span class="p-1.5 bg-zinc-100 rounded text-zinc-900 shrink-0">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                            </span>
-                            <div>
-                                <span class="font-bold block text-[11px]">Lead Capture Form</span>
-                                <span class="text-[9px] text-zinc-400 block leading-none">Property appraisal request form</span>
-                            </div>
-                        </button>
-                        <button type="button" onclick="coraInsertSlashWidget('equipment')" class="w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
-                            <span class="p-1.5 bg-zinc-100 rounded text-zinc-900 shrink-0">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                            </span>
-                            <div>
-                                <span class="font-bold block text-[11px]">Equipment Showcase</span>
-                                <span class="text-[9px] text-zinc-400 block leading-none">High-end camera equipment layout</span>
-                            </div>
-                        </button>
-                        <button type="button" onclick="coraInsertSlashWidget('gallery')" class="w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
-                            <span class="p-1.5 bg-zinc-100 rounded text-zinc-900 shrink-0">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                            </span>
-                            <div>
-                                <span class="font-bold block text-[11px]">Media Gallery</span>
-                                <span class="text-[9px] text-zinc-400 block leading-none">Insert responsive image gallery grid</span>
-                            </div>
-                        </button>
-                        <button type="button" onclick="coraInsertSlashWidget('related')" class="w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
-                            <span class="p-1.5 bg-zinc-100 rounded text-zinc-900 shrink-0">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                            </span>
-                            <div>
-                                <span class="font-bold block text-[11px]">Related Article</span>
-                                <span class="text-[9px] text-zinc-400 block leading-none">Internal link showcase card</span>
-                            </div>
-                        </button>
-                        <button type="button" onclick="coraInsertSlashWidget('signature')" class="w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
-                            <span class="p-1.5 bg-zinc-100 rounded text-zinc-900 shrink-0">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                            </span>
-                            <div>
-                                <span class="font-bold block text-[11px]">Signature Block</span>
-                                <span class="text-[9px] text-zinc-400 block leading-none">Nitin & Shanaya Arora sign-off</span>
-                            </div>
-                        </button>
-                    </div>
-                </div>
+                </div><!-- /.cora-writing-sheet -->
             </main>
 
             <!-- Inspector Panel -->
