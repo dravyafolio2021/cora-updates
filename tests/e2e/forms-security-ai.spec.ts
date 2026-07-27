@@ -151,5 +151,29 @@ test.describe('Cora Forms Security & AI Compatibility E2E tests', () => {
     await expect(page.locator('#cora-toast-container')).toContainText('FigJam Prompt copied');
   });
 
+  test('Verify Bulk Operations selection and bulk actions bar', async ({ page }) => {
+    await login(page);
+    await page.goto('/workspace/forms');
+    await page.waitForLoadState('networkidle');
+
+    // 1. Check Select All checkbox is visible
+    const selectAll = page.locator('#select-all-forms');
+    await expect(selectAll).toBeVisible();
+
+    // 2. Check select all checkbox
+    await selectAll.check();
+
+    // 3. Verify Bulk Actions Bar appears with selection count
+    const bulkBar = page.locator('#forms-bulk-actions-bar');
+    await expect(bulkBar).toBeVisible();
+
+    const selectedCountText = page.locator('#bulk-selected-count');
+    await expect(selectedCountText).toContainText('selected');
+
+    // 4. Test Clear selection button
+    await page.click('#btn-bulk-clear');
+    await expect(bulkBar).toBeHidden();
+  });
+
 });
 

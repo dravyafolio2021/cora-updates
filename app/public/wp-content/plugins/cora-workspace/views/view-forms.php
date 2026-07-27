@@ -2219,7 +2219,6 @@ function renderFormsList() {
             }
             updateBulkActionBarState();
         });
-    }
 
         // Attach listeners
         jQuery('.btn-view-live').on('click', function() {
@@ -3982,6 +3981,23 @@ function renderFormsList() {
             }
         });
     }
+
+    // Bulk Operations Event Listeners
+    document.getElementById('select-all-forms')?.addEventListener('change', (e) => {
+        const checked = e.target.checked;
+        jQuery('.form-select-checkbox').prop('checked', checked);
+        updateBulkActionBarState();
+    });
+
+    document.getElementById('btn-bulk-publish')?.addEventListener('click', () => executeBulkFormAction('publish'));
+    document.getElementById('btn-bulk-draft')?.addEventListener('click', () => executeBulkFormAction('draft'));
+    document.getElementById('btn-bulk-delete')?.addEventListener('click', () => executeBulkFormAction('delete'));
+    document.getElementById('btn-bulk-clear')?.addEventListener('click', () => {
+        const selectAll = document.getElementById('select-all-forms');
+        if (selectAll) selectAll.checked = false;
+        jQuery('.form-select-checkbox').prop('checked', false);
+        updateBulkActionBarState();
+    });
 
     // Palette Items (Add & Drag)
     document.querySelectorAll('[data-add-type]').forEach(item => {
