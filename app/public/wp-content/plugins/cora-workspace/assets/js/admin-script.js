@@ -10500,6 +10500,10 @@ jQuery(document).ready(function($) {
                 } else {
                     if (window.coraShowToast) window.coraShowToast(res.data.message || 'Failed to update stage', 'error');
                 }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', xhr.responseText || error);
+                if (window.coraShowToast) window.coraShowToast('Failed to update stage: Network or authorization issue.', 'error');
             }
         });
 

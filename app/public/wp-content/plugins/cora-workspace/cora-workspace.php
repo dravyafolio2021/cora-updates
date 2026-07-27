@@ -22967,7 +22967,15 @@ if ( ! function_exists( 'cora_ajax_save_lead' ) ) {
         } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
             $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
         }
-        if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+
+        $verified = false;
+        if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+            $verified = true;
+        } elseif ( current_user_can( 'manage_options' ) ) {
+            $verified = true;
+        }
+
+        if ( ! $verified ) {
             wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
         }
 
@@ -23146,7 +23154,15 @@ if ( ! function_exists( 'cora_ajax_convert_lead_to_client_suite' ) ) {
         } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
             $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
         }
-        if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+
+        $verified = false;
+        if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+            $verified = true;
+        } elseif ( current_user_can( 'manage_options' ) ) {
+            $verified = true;
+        }
+
+        if ( ! $verified ) {
             wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
         }
 
@@ -23216,7 +23232,15 @@ if ( ! function_exists( 'cora_ajax_delete_lead_suite' ) ) {
         } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
             $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
         }
-        if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+
+        $verified = false;
+        if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+            $verified = true;
+        } elseif ( current_user_can( 'manage_options' ) ) {
+            $verified = true;
+        }
+
+        if ( ! $verified ) {
             wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
         }
 
