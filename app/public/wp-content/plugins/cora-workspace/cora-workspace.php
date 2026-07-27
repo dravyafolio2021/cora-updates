@@ -18460,8 +18460,8 @@ function cora_get_bip_problems_html() {
 
                 <!-- Leak 4 -->
                 <div class="p-4 bg-white border border-zinc-200 rounded-xl hover:border-zinc-350 transition-colors flex flex-col justify-between gap-3">
-                    <span class="w-7 h-7 flex items-center justify-center bg-zinc-100 text-zinc-700 rounded-lg">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    <span class="w-7 h-7 flex items-center justify-center bg-zinc-100 text-zinc-700 rounded-lg font-bold text-xs select-none">
+                        ₹
                     </span>
                     <div>
                         <h4 class="text-xs font-bold text-zinc-900 leading-tight">4. UPI Payment Friction</h4>

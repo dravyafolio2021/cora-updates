@@ -127,8 +127,8 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
         <div class="p-4 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs">
             <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
                 <span class="text-[11px] font-bold uppercase tracking-wider">Pipeline Value</span>
-                <div class="p-1.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                <div class="p-1.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center w-6 h-6">
+                    <span class="text-xs font-extrabold leading-none select-none">₹</span>
                 </div>
             </div>
             <div class="mt-2 flex items-baseline justify-between">

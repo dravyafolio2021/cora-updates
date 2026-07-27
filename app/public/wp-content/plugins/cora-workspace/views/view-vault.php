@@ -735,8 +735,8 @@ foreach ( $cora_documents as $doc ) {
                                 </div>
                                 <div class="p-2.5 grid grid-cols-1 gap-2 bg-white">
                                     <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'services_table')" onclick="coraAddCanvasBlock('services_table')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-950 hover:bg-zinc-50 flex items-center gap-3 transition-all cursor-grab text-left">
-                                        <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 text-zinc-800">
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                                        <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 text-zinc-800 font-extrabold text-xs select-none">
+                                            ₹
                                         </div>
                                         <div>
                                             <div class="text-[11px] font-bold text-zinc-900">Services Table</div>

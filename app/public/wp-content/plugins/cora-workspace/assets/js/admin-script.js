@@ -5035,7 +5035,7 @@ jQuery(document).ready(function($) {
                 
                 let iconSvg = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>';
                 if (doc.type === 'Invoice') {
-                    iconSvg = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>';
+                    iconSvg = '<span class="font-extrabold text-xs select-none">₹</span>';
                 }
                 
                 docsHtml += `

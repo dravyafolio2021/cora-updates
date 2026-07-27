@@ -74,8 +74,8 @@ $financial_entries = function_exists( 'cora_db_get_ledger' ) ? cora_db_get_ledge
         <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-sm flex flex-col justify-between space-y-4">
             <div class="flex items-start justify-between">
                 <div class="flex items-center gap-2">
-                    <span class="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    <span class="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-extrabold text-sm select-none">
+                        ₹
                     </span>
                     <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">GROSS REVENUE (INFLOWS)</span>
                 </div>

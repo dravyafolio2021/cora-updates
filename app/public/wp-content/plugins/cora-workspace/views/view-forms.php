@@ -484,7 +484,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                                     Address Field
                                 </button>
                                 <button draggable="true" class="p-2 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-400 hover:bg-zinc-50 text-left flex items-center gap-2 cursor-grab active:cursor-grabbing text-[11px] font-medium text-zinc-800 dark:text-zinc-200 transition-all" data-add-type="services_checklist">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0 text-zinc-500"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                    <span class="shrink-0 text-zinc-500 font-bold text-xs select-none">₹</span>
                                     Pricing List
                                 </button>
                             </div>
