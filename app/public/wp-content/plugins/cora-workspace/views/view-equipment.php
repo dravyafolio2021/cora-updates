@@ -313,7 +313,7 @@ if ( is_array( $cora_gear_maintenance ) ) {
             <!-- Primary Action CTA -->
             <button onclick="openAddGearDrawer()" class="px-4.5 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                + Register New Gear
+                Register New Gear
             </button>
         </div>
     </header>
@@ -561,7 +561,7 @@ if ( is_array( $cora_gear_maintenance ) ) {
                 </div>
                 <button onclick="openCheckoutGearDrawer()" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-xs">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    + New Shoot Checkout
+                    New Shoot Checkout
                 </button>
             </div>
 
@@ -637,7 +637,7 @@ if ( is_array( $cora_gear_maintenance ) ) {
                 </div>
                 <button onclick="openMaintenanceDrawer()" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-xs">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
-                    + Log Service Expense
+                    Log Service Expense
                 </button>
             </div>
 

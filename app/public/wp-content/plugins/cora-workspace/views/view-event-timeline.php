@@ -111,7 +111,7 @@ $total_blocks    = count( $timeline_blocks );
             </button>
             <button onclick="coraOpenAddTimelineBlockDrawer()" class="px-4.5 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                + Add Time Block
+                Add Time Block
             </button>
         </div>
     </header>
@@ -391,7 +391,7 @@ $total_blocks    = count( $timeline_blocks );
 <aside id="cora-add-timeline-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out select-none">
     <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 flex items-center justify-between">
         <div>
-            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">+ Add Time Block</h3>
+            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Add Time Block</h3>
             <p class="text-[11px] text-zinc-500 mt-0.5">Add a site visit, due diligence audit, or photo shoot session.</p>
         </div>
         <button onclick="window.coraCloseAllDrawers()" class="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer">✕</button>
