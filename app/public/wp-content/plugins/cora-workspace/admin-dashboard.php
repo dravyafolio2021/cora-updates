@@ -7896,11 +7896,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         border: 1px solid #e4e4e7 !important;
         border-radius: 20px !important;
         box-shadow: 0 10px 30px -10px rgba(9, 9, 11, 0.04), 0 1px 3px rgba(9, 9, 11, 0.02) !important;
-        padding: 48px !important;
+        padding: 32px 40px !important;
         min-height: calc(100vh - 160px) !important;
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: 16px;
         position: relative;
     }
     .cora-serif-editor .ql-editor { font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; font-size: 1.125rem; line-height: 1.8; color: #18181b; }
@@ -7914,12 +7914,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         background: rgba(255, 255, 255, 0.98) !important;
         backdrop-filter: blur(8px) !important;
         z-index: 40 !important;
-        margin-left: -48px !important;
-        margin-right: -48px !important;
-        padding-left: 48px !important;
-        padding-right: 48px !important;
+        margin-left: -40px !important;
+        margin-right: -40px !important;
+        padding-left: 40px !important;
+        padding-right: 40px !important;
         margin-top: -12px !important;
     }
+
     .ql-snow.ql-toolbar button, .ql-snow .ql-toolbar button {
         height: 28px !important;
         width: 32px !important;
@@ -8267,8 +8268,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <!-- Typography Switcher & Helper Bar -->
                     <div class="flex items-center justify-between pb-2.5 border-b border-zinc-100 select-none">
                         <div class="flex items-center gap-0.5 bg-zinc-100/80 p-0.5 rounded-lg border border-zinc-200/50">
-                            <button type="button" id="cora-font-serif-btn" onclick="coraSetEditorFont('serif')" class="px-3 py-1 rounded-md text-xs font-serif font-bold text-zinc-900 bg-white shadow-sm border border-zinc-200/20 cursor-pointer transition-all active:scale-95">Serif</button>
-                            <button type="button" id="cora-font-sans-btn" onclick="coraSetEditorFont('sans')" class="px-3 py-1 rounded-md text-xs font-sans font-medium text-zinc-500 hover:text-zinc-800 hover:bg-zinc-50/50 cursor-pointer transition-all active:scale-95">Sans-Serif</button>
+                            <button type="button" id="cora-font-serif-btn" onclick="coraSetEditorFont('serif')" class="px-3 py-1 rounded-md text-xs font-serif font-medium text-zinc-500 hover:text-zinc-800 hover:bg-zinc-50/50 cursor-pointer transition-all active:scale-95">Serif</button>
+                            <button type="button" id="cora-font-sans-btn" onclick="coraSetEditorFont('sans')" class="px-3 py-1 rounded-md text-xs font-sans font-bold text-zinc-900 bg-white shadow-sm border border-zinc-200/20 cursor-pointer transition-all active:scale-95">Sans-Serif</button>
+
                         </div>
                         <span class="text-[11px] text-zinc-400 font-medium flex items-center gap-1.5">
                             <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
@@ -8400,7 +8402,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     </div><!-- /#cora-editor-slash-menu -->
 
                     <!-- Quill.js Mount Point -->
-                    <div id="cora-quill-editor" class="text-lg text-zinc-800 leading-relaxed cora-serif-editor min-h-[400px]"></div>
+                    <div id="cora-quill-editor" class="text-lg text-zinc-800 leading-relaxed cora-sans-editor min-h-[400px]"></div>
+
 
                 </div><!-- /.cora-writing-sheet -->
             </main>
@@ -9048,12 +9051,17 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         // Editor helper functions are loaded from assets/js/admin-script.js
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Set default font
+            if (typeof window.coraSetEditorFont === 'function') {
+                window.coraSetEditorFont('sans');
+            }
             // Real-time character count on excerpt text area
             jQuery(document).on('input propertychange change', '#cora-article-excerpt', function() {
                 if (typeof window.coraUpdateExcerptCount === 'function') {
                     window.coraUpdateExcerptCount();
                 }
             });
+
 
             setTimeout(function() {
                 if (window.coraQuillListingCoordinator) {
