@@ -22413,6 +22413,319 @@ add_action( 'wp_ajax_cora_ajax_generate_financial_pdf_report', 'cora_ajax_genera
 add_action( 'wp_ajax_cora_generate_financial_pdf_report', 'cora_ajax_generate_financial_pdf_report' );
 
 /**
+ * =========================================================================
+ * ENTERPRISE LEAD MANAGEMENT CRM AJAX ENDPOINTS
+ * =========================================================================
+ */
+
+/**
+ * AJAX Endpoint: cora_ajax_get_leads_data
+ */
+function cora_ajax_get_leads_data() {
+    $nonce = '';
+    if ( isset( $_REQUEST['security'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['security'] );
+    } elseif ( isset( $_REQUEST['nonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+    } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+    }
+    if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+    }
+
+    $search = isset( $_REQUEST['search'] ) ? sanitize_text_field( $_REQUEST['search'] ) : '';
+    $stage  = isset( $_REQUEST['stage'] ) ? sanitize_text_field( $_REQUEST['stage'] ) : 'all';
+
+    $leads = cora_db_get_leads();
+    $filtered = array();
+
+    foreach ( $leads as $l ) {
+        if ( $stage !== 'all' && isset( $l['status'] ) && strtolower( $l['status'] ) !== strtolower( $stage ) ) {
+            continue;
+        }
+
+        if ( ! empty( $search ) ) {
+            $s = strtolower( $search );
+            $name  = strtolower( $l['names'] ?? '' );
+            $email = strtolower( $l['email'] ?? '' );
+            $city  = strtolower( $l['city'] ?? '' );
+            if ( strpos( $name, $s ) === false && strpos( $email, $s ) === false && strpos( $city, $s ) === false ) {
+                continue;
+            }
+        }
+
+        $filtered[] = $l;
+    }
+
+    wp_send_json_success( array(
+        'leads' => $filtered,
+        'count' => count( $filtered ),
+    ) );
+}
+add_action( 'wp_ajax_cora_ajax_get_leads_data', 'cora_ajax_get_leads_data' );
+add_action( 'wp_ajax_cora_get_leads_data', 'cora_ajax_get_leads_data' );
+
+/**
+ * AJAX Endpoint: cora_ajax_save_lead
+ */
+function cora_ajax_save_lead() {
+    $nonce = '';
+    if ( isset( $_REQUEST['security'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['security'] );
+    } elseif ( isset( $_REQUEST['nonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+    } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+    }
+    if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+    }
+
+    global $wpdb;
+    $lead_id = isset( $_POST['lead_id'] ) ? sanitize_text_field( $_POST['lead_id'] ) : '';
+    $names   = isset( $_POST['names'] ) ? sanitize_text_field( $_POST['names'] ) : '';
+    $email   = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
+    $phone   = isset( $_POST['phone'] ) ? sanitize_text_field( $_POST['phone'] ) : '';
+    $price   = isset( $_POST['price'] ) ? sanitize_text_field( $_POST['price'] ) : '';
+    $scale   = isset( $_POST['scale'] ) ? sanitize_text_field( $_POST['scale'] ) : 'Standard Shoot';
+    $city    = isset( $_POST['city'] ) ? sanitize_text_field( $_POST['city'] ) : 'Mumbai';
+    $status  = isset( $_POST['status'] ) ? sanitize_text_field( $_POST['status'] ) : 'New Lead';
+    $score   = isset( $_POST['score'] ) ? sanitize_text_field( $_POST['score'] ) : 'warm';
+    $notes   = isset( $_POST['notes'] ) ? sanitize_textarea_field( $_POST['notes'] ) : '';
+
+    if ( empty( $names ) || empty( $email ) ) {
+        wp_send_json_error( array( 'message' => 'Client Name and Email are required fields.' ) );
+    }
+
+    $existing_leads = get_option( 'cora_workspace_leads', array() );
+    if ( ! is_array( $existing_leads ) ) {
+        $existing_leads = array();
+    }
+
+    if ( ! empty( $lead_id ) ) {
+        // Update existing lead
+        $found = false;
+        foreach ( $existing_leads as &$el ) {
+            if ( (string) $el['id'] === (string) $lead_id ) {
+                $el['names'] = $names;
+                $el['email'] = $email;
+                $el['phone'] = $phone;
+                $el['price'] = $price;
+                $el['scale'] = $scale;
+                $el['city']  = $city;
+                $el['status'] = $status;
+                $el['score']  = $score;
+                $el['notes']  = $notes;
+                $found = true;
+                break;
+            }
+        }
+        if ( ! $found ) {
+            $existing_leads[] = array(
+                'id'         => $lead_id,
+                'names'      => $names,
+                'email'      => $email,
+                'phone'      => $phone,
+                'price'      => $price,
+                'scale'      => $scale,
+                'city'       => $city,
+                'status'     => $status,
+                'score'      => $score,
+                'notes'      => $notes,
+                'created_at' => time(),
+            );
+        }
+    } else {
+        // Create new lead
+        $lead_id = 'lead_' . time() . '_' . rand( 100, 999 );
+        $new_lead = array(
+            'id'         => $lead_id,
+            'names'      => $names,
+            'email'      => $email,
+            'phone'      => $phone,
+            'price'      => $price,
+            'scale'      => $scale,
+            'city'       => $city,
+            'status'     => $status,
+            'score'      => $score,
+            'notes'      => $notes,
+            'created_at' => time(),
+        );
+        array_unshift( $existing_leads, $new_lead );
+    }
+
+    update_option( 'cora_workspace_leads', $existing_leads );
+
+    wp_send_json_success( array(
+        'message' => 'Lead deal saved successfully.',
+        'lead_id' => $lead_id,
+    ) );
+}
+add_action( 'wp_ajax_cora_ajax_save_lead', 'cora_ajax_save_lead' );
+add_action( 'wp_ajax_cora_save_lead', 'cora_ajax_save_lead' );
+
+/**
+ * AJAX Endpoint: cora_ajax_update_lead_stage
+ */
+function cora_ajax_update_lead_stage() {
+    $nonce = '';
+    if ( isset( $_REQUEST['security'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['security'] );
+    } elseif ( isset( $_REQUEST['nonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+    } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+    }
+    if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+    }
+
+    $lead_id   = isset( $_POST['lead_id'] ) ? sanitize_text_field( $_POST['lead_id'] ) : '';
+    $new_stage = isset( $_POST['new_stage'] ) ? sanitize_text_field( $_POST['new_stage'] ) : '';
+
+    if ( empty( $lead_id ) || empty( $new_stage ) ) {
+        wp_send_json_error( array( 'message' => 'Lead ID and New Stage are required.' ) );
+    }
+
+    $existing_leads = get_option( 'cora_workspace_leads', array() );
+    if ( ! is_array( $existing_leads ) ) {
+        $existing_leads = array();
+    }
+
+    $updated = false;
+    foreach ( $existing_leads as &$el ) {
+        if ( (string) $el['id'] === (string) $lead_id ) {
+            $el['status'] = $new_stage;
+            $updated = true;
+            break;
+        }
+    }
+
+    if ( $updated ) {
+        update_option( 'cora_workspace_leads', $existing_leads );
+        wp_send_json_success( array(
+            'message'   => 'Lead moved to ' . $new_stage . '.',
+            'lead_id'   => $lead_id,
+            'new_stage' => $new_stage,
+        ) );
+    } else {
+        wp_send_json_error( array( 'message' => 'Lead not found.' ) );
+    }
+}
+add_action( 'wp_ajax_cora_ajax_update_lead_stage', 'cora_ajax_update_lead_stage' );
+add_action( 'wp_ajax_cora_update_lead_stage', 'cora_ajax_update_lead_stage' );
+
+/**
+ * AJAX Endpoint: cora_ajax_convert_lead_to_client
+ */
+function cora_ajax_convert_lead_to_client() {
+    $nonce = '';
+    if ( isset( $_REQUEST['security'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['security'] );
+    } elseif ( isset( $_REQUEST['nonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+    } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+    }
+    if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+    }
+
+    $lead_id = isset( $_POST['lead_id'] ) ? sanitize_text_field( $_POST['lead_id'] ) : '';
+    if ( empty( $lead_id ) ) {
+        wp_send_json_error( array( 'message' => 'Lead ID required.' ) );
+    }
+
+    $existing_leads = get_option( 'cora_workspace_leads', array() );
+    if ( ! is_array( $existing_leads ) ) {
+        $existing_leads = array();
+    }
+
+    $converted_lead = null;
+    foreach ( $existing_leads as &$el ) {
+        if ( (string) $el['id'] === (string) $lead_id ) {
+            $el['status'] = 'Converted';
+            $el['converted_to_client'] = 1;
+            $converted_lead = $el;
+            break;
+        }
+    }
+    update_option( 'cora_workspace_leads', $existing_leads );
+
+    if ( $converted_lead ) {
+        $clients = get_option( 'cora_workspace_clients', array() );
+        if ( ! is_array( $clients ) ) {
+            $clients = array();
+        }
+
+        $new_client = array(
+            'id'         => 'client_' . time(),
+            'lead_id'    => $lead_id,
+            'names'      => $converted_lead['names'] ?? 'Client',
+            'email'      => $converted_lead['email'] ?? '',
+            'phone'      => $converted_lead['phone'] ?? '',
+            'city'       => $converted_lead['city'] ?? '',
+            'status'     => 'Active Client',
+            'created_at' => time(),
+        );
+
+        array_unshift( $clients, $new_client );
+        update_option( 'cora_workspace_clients', $clients );
+
+        wp_send_json_success( array(
+            'message' => 'Lead converted to active client successfully!',
+            'client'  => $new_client,
+        ) );
+    } else {
+        wp_send_json_error( array( 'message' => 'Lead record not found.' ) );
+    }
+}
+add_action( 'wp_ajax_cora_ajax_convert_lead_to_client', 'cora_ajax_convert_lead_to_client' );
+add_action( 'wp_ajax_cora_convert_lead_to_client', 'cora_ajax_convert_lead_to_client' );
+
+/**
+ * AJAX Endpoint: cora_ajax_delete_lead
+ */
+function cora_ajax_delete_lead() {
+    $nonce = '';
+    if ( isset( $_REQUEST['security'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['security'] );
+    } elseif ( isset( $_REQUEST['nonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+    } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+        $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+    }
+    if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+    }
+
+    $lead_id = isset( $_POST['lead_id'] ) ? sanitize_text_field( $_POST['lead_id'] ) : '';
+    if ( empty( $lead_id ) ) {
+        wp_send_json_error( array( 'message' => 'Lead ID required.' ) );
+    }
+
+    $existing_leads = get_option( 'cora_workspace_leads', array() );
+    if ( ! is_array( $existing_leads ) ) {
+        $existing_leads = array();
+    }
+
+    $filtered = array_filter( $existing_leads, function( $l ) use ( $lead_id ) {
+        return (string) $l['id'] !== (string) $lead_id;
+    });
+
+    update_option( 'cora_workspace_leads', array_values( $filtered ) );
+
+    wp_send_json_success( array(
+        'message' => 'Lead deleted from workspace.',
+        'lead_id' => $lead_id,
+    ) );
+}
+add_action( 'wp_ajax_cora_ajax_delete_lead', 'cora_ajax_delete_lead' );
+add_action( 'wp_ajax_cora_delete_lead', 'cora_ajax_delete_lead' );
+
+
+/**
  * AJAX Action: Generate Automated Financial Report Summary & HTML Breakdown
  */
 function cora_ajax_generate_financial_report() {

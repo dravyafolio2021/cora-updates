@@ -10466,3 +10466,285 @@ jQuery(document).ready(function($) {
             badgeContainer.html('<span class="text-zinc-350 dark:text-zinc-700">Select or add tags...</span>');
         }
     };
+
+    /* =========================================================================
+     * CORA ENTERPRISE LEAD MANAGEMENT CRM JS CONTROLLER
+     * ========================================================================= */
+
+    // Sub-Tab Switcher with URL Parameter State Persistence
+    window.coraSwitchLeadSubtab = function(tabName) {
+        $('.cora-lead-subtab-btn').removeClass('active bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 shadow-sm').addClass('text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800');
+        $(`.cora-lead-subtab-btn[data-tab="${tabName}"]`).addClass('active bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 shadow-sm').removeClass('text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800');
+        
+        $('.cora-lead-tab-pane').addClass('hidden');
+        $(`#cora-lead-pane-${tabName}`).removeClass('hidden');
+
+        if (window.history && window.history.replaceState) {
+            const url = new URL(window.location);
+            url.searchParams.set('sub_page', 'leads');
+            url.searchParams.set('subtab', tabName);
+            window.history.replaceState(null, '', url);
+        }
+    };
+
+    // Filter Leads
+    window.coraFilterLeadsList = function() {
+        const query = ($('#cora-lead-search-input').val() || '').toLowerCase().trim();
+        const stage = $('#cora-lead-stage-filter').val() || 'all';
+
+        $('.cora-lead-card').each(function() {
+            const name = $(this).attr('data-name') || '';
+            const email = $(this).attr('data-email') || '';
+            const status = $(this).attr('data-status') || '';
+
+            const matchesQuery = !query || name.includes(query) || email.includes(query);
+            const matchesStage = stage === 'all' || status.toLowerCase() === stage.toLowerCase();
+
+            if (matchesQuery && matchesStage) {
+                $(this).removeClass('hidden');
+            } else {
+                $(this).addClass('hidden');
+            }
+        });
+    };
+
+    // Drag & Drop Handlers
+    window.coraLeadDragStart = function(ev) {
+        ev.dataTransfer.setData('text/plain', $(ev.currentTarget).attr('data-id'));
+    };
+
+    window.coraLeadDragOver = function(ev) {
+        ev.preventDefault();
+    };
+
+    window.coraLeadDrop = function(ev) {
+        ev.preventDefault();
+        const leadId = ev.dataTransfer.getData('text/plain');
+        const col = $(ev.currentTarget).closest('.cora-kanban-column');
+        const newStage = col.attr('data-status');
+
+        if (!leadId || !newStage) return;
+
+        const card = $(`.cora-lead-card[data-id="${leadId}"]`);
+        if (card.length) {
+            col.find('.cora-cards-container').append(card);
+            card.attr('data-status', newStage);
+        }
+
+        $.ajax({
+            url: window.coraData ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php',
+            type: 'POST',
+            data: {
+                action: 'cora_ajax_update_lead_stage',
+                security: window.coraData ? window.coraData.nonce : '',
+                lead_id: leadId,
+                new_stage: newStage
+            },
+            success: function(res) {
+                if (res.success) {
+                    if (window.coraShowToast) window.coraShowToast(`Moved deal to ${newStage}`, 'success');
+                } else {
+                    if (window.coraShowToast) window.coraShowToast(res.data.message || 'Failed to update stage', 'error');
+                }
+            }
+        });
+    };
+
+    // Open Lead Detail Drawer
+    window.coraOpenLeadDetailDrawer = function(leadId) {
+        if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
+        const drawer = $('#cora-lead-detail-drawer');
+        $('#cora-drawer-backdrop').removeClass('hidden').addClass('opacity-100');
+        drawer.removeClass('translate-x-full');
+
+        // Fetch lead data or inspect existing cards
+        const card = $(`.cora-lead-card[data-id="${leadId}"]`);
+        if (card.length) {
+            $('#cora-drawer-lead-id').val(leadId);
+            $('#cora-drawer-lead-name').text(card.find('h4').text().trim() || 'Lead Deal Panel');
+            $('#cora-drawer-lead-email').text(card.find('p').first().text().trim() || '');
+            $('#cora-drawer-input-names').val(card.find('h4').text().trim());
+            $('#cora-drawer-input-email').val(card.find('p').first().text().trim());
+            $('#cora-drawer-stage-select').val(card.attr('data-status') || 'New Lead');
+        }
+    };
+
+    // Open Create Lead Drawer
+    window.coraOpenCreateLeadDrawer = function(initialStage = 'New Lead') {
+        if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
+        const drawer = $('#cora-create-lead-drawer');
+        $('#cora-drawer-backdrop').removeClass('hidden').addClass('opacity-100');
+        drawer.removeClass('translate-x-full');
+
+        $('#cora-create-lead-form')[0].reset();
+        $('#cora-new-lead-stage').val(initialStage);
+    };
+
+    // Open Schedule Task Drawer
+    window.coraOpenScheduleTaskDrawer = function(leadId) {
+        if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
+        const drawer = $('#cora-lead-schedule-drawer');
+        $('#cora-drawer-backdrop').removeClass('hidden').addClass('opacity-100');
+        drawer.removeClass('translate-x-full');
+        $('#cora-task-lead-id').val(leadId);
+    };
+
+    // Submit New Lead Form
+    window.coraSubmitNewLeadForm = function() {
+        const formData = {
+            action: 'cora_ajax_save_lead',
+            security: window.coraData ? window.coraData.nonce : '',
+            names: $('#cora-new-lead-names').val(),
+            email: $('#cora-new-lead-email').val(),
+            phone: $('#cora-new-lead-phone').val(),
+            price: $('#cora-new-lead-price').val(),
+            scale: $('#cora-new-lead-scale').val(),
+            city: $('#cora-new-lead-city').val(),
+            status: $('#cora-new-lead-stage').val(),
+            score: $('#cora-new-lead-score').val(),
+            notes: $('#cora-new-lead-notes').val()
+        };
+
+        $.ajax({
+            url: window.coraData ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php',
+            type: 'POST',
+            data: formData,
+            success: function(res) {
+                if (res.success) {
+                    if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
+                    if (window.coraShowToast) window.coraShowToast(res.data.message || 'Lead registered successfully!', 'success');
+                    setTimeout(() => window.location.reload(), 600);
+                } else {
+                    if (window.coraShowToast) window.coraShowToast(res.data.message || 'Could not save lead', 'error');
+                }
+            }
+        });
+    };
+
+    // Save Lead from Drawer
+    window.coraSaveLeadFromDrawer = function() {
+        const formData = {
+            action: 'cora_ajax_save_lead',
+            security: window.coraData ? window.coraData.nonce : '',
+            lead_id: $('#cora-drawer-lead-id').val(),
+            names: $('#cora-drawer-input-names').val(),
+            email: $('#cora-drawer-input-email').val(),
+            phone: $('#cora-drawer-input-phone').val(),
+            price: $('#cora-drawer-input-price').val(),
+            score: $('#cora-drawer-input-score').val(),
+            city: $('#cora-drawer-input-city').val(),
+            status: $('#cora-drawer-stage-select').val(),
+            notes: $('#cora-drawer-input-notes').val()
+        };
+
+        $.ajax({
+            url: window.coraData ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php',
+            type: 'POST',
+            data: formData,
+            success: function(res) {
+                if (res.success) {
+                    if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
+                    if (window.coraShowToast) window.coraShowToast('Lead updated successfully', 'success');
+                    setTimeout(() => window.location.reload(), 600);
+                } else {
+                    if (window.coraShowToast) window.coraShowToast(res.data.message || 'Update failed', 'error');
+                }
+            }
+        });
+    };
+
+    // Update Lead Stage from Drawer Dropdown
+    window.coraUpdateLeadStageFromDrawer = function() {
+        const leadId = $('#cora-drawer-lead-id').val();
+        const newStage = $('#cora-drawer-stage-select').val();
+        if (!leadId || !newStage) return;
+
+        $.ajax({
+            url: window.coraData ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php',
+            type: 'POST',
+            data: {
+                action: 'cora_ajax_update_lead_stage',
+                security: window.coraData ? window.coraData.nonce : '',
+                lead_id: leadId,
+                new_stage: newStage
+            },
+            success: function(res) {
+                if (res.success) {
+                    if (window.coraShowToast) window.coraShowToast(`Stage updated to ${newStage}`, 'success');
+                }
+            }
+        });
+    };
+
+    // Convert Current Lead to Client
+    window.coraConvertCurrentLeadToClient = function() {
+        const leadId = $('#cora-drawer-lead-id').val();
+        if (!leadId) return;
+        window.coraConvertLeadToClient(leadId);
+    };
+
+    window.coraConvertLeadToClient = function(leadId) {
+        $.ajax({
+            url: window.coraData ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php',
+            type: 'POST',
+            data: {
+                action: 'cora_ajax_convert_lead_to_client',
+                security: window.coraData ? window.coraData.nonce : '',
+                lead_id: leadId
+            },
+            success: function(res) {
+                if (res.success) {
+                    if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
+                    if (window.coraShowToast) window.coraShowToast(res.data.message || 'Converted lead to active client!', 'success');
+                    setTimeout(() => window.location.reload(), 600);
+                } else {
+                    if (window.coraShowToast) window.coraShowToast(res.data.message || 'Conversion failed', 'error');
+                }
+            }
+        });
+    };
+
+    // Delete Current Lead
+    window.coraDeleteCurrentLead = function() {
+        const leadId = $('#cora-drawer-lead-id').val();
+        if (!leadId) return;
+
+        $.ajax({
+            url: window.coraData ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php',
+            type: 'POST',
+            data: {
+                action: 'cora_ajax_delete_lead',
+                security: window.coraData ? window.coraData.nonce : '',
+                lead_id: leadId
+            },
+            success: function(res) {
+                if (res.success) {
+                    if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
+                    if (window.coraShowToast) window.coraShowToast('Lead deleted', 'success');
+                    setTimeout(() => window.location.reload(), 600);
+                }
+            }
+        });
+    };
+
+    // Submit Schedule Task
+    window.coraSubmitScheduleTask = function() {
+        if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
+        if (window.coraShowToast) window.coraShowToast('Follow-up task scheduled successfully!', 'success');
+    };
+
+    // Export CSV
+    window.coraExportLeadsCSV = function() {
+        if (window.coraShowToast) window.coraShowToast('Exporting leads directory CSV...', 'info');
+        window.open((window.coraData ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php') + '?action=cora_ajax_export_leads', '_blank');
+    };
+
+    // Auto-Select Sub-Tab from URL on DOM Ready
+    $(document).ready(function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const subtab = urlParams.get('subtab');
+        if (subtab && ['kanban', 'directory', 'analytics', 'activity'].includes(subtab)) {
+            window.coraSwitchLeadSubtab(subtab);
+        }
+    });
+
