@@ -13,6 +13,15 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
 
+?>
+<script>
+window.coraData = window.coraData || {};
+window.coraData.ajax_url = '<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>';
+window.coraData.nonce = '<?php echo wp_create_nonce( 'cora_ajax_nonce' ); ?>';
+</script>
+<?php
+
+
 // Fetch leads and initial datasets
 $cora_leads_raw = cora_db_get_leads();
 $cora_clients_raw = function_exists('cora_db_get_clients') ? cora_db_get_clients() : array();
@@ -733,7 +742,7 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
 <!-- ========================================================================= -->
 <!-- SLIDING SIDE DRAWER 1: LEAD DETAIL & DEAL SHEET DRAWER                    -->
 <!-- ========================================================================= -->
-<aside id="cora-lead-detail-drawer" class="cora-side-drawer fixed top-0 right-0 w-[520px] max-w-[90vw] h-full bg-white dark:bg-zinc-900 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 dark:border-zinc-800 flex flex-col font-sans">
+<aside id="cora-lead-detail-drawer" class="cora-side-drawer hidden collapsed fixed top-0 right-0 w-[520px] max-w-[90vw] h-full bg-white dark:bg-zinc-900 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 dark:border-zinc-800 flex flex-col font-sans">
     <!-- Header -->
     <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-zinc-50/50 dark:bg-zinc-850/50">
         <div>
@@ -835,7 +844,7 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
 <!-- ========================================================================= -->
 <!-- SLIDING SIDE DRAWER 2: CREATE / EDIT LEAD DRAWER                         -->
 <!-- ========================================================================= -->
-<aside id="cora-create-lead-drawer" class="cora-side-drawer fixed top-0 right-0 w-[500px] max-w-[90vw] h-full bg-white dark:bg-zinc-900 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 dark:border-zinc-800 flex flex-col font-sans">
+<aside id="cora-create-lead-drawer" class="cora-side-drawer hidden collapsed fixed top-0 right-0 w-[500px] max-w-[90vw] h-full bg-white dark:bg-zinc-900 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 dark:border-zinc-800 flex flex-col font-sans">
     <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-zinc-50/50 dark:bg-zinc-850/50">
         <div>
             <h3 class="font-extrabold text-base text-zinc-900 dark:text-white">Register New Lead Inquiry</h3>
@@ -918,7 +927,7 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
 <!-- ========================================================================= -->
 <!-- SLIDING SIDE DRAWER 3: SCHEDULE FOLLOW-UP TASK                            -->
 <!-- ========================================================================= -->
-<aside id="cora-lead-schedule-drawer" class="cora-side-drawer fixed top-0 right-0 w-[450px] max-w-[90vw] h-full bg-white dark:bg-zinc-900 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 dark:border-zinc-800 flex flex-col font-sans">
+<aside id="cora-lead-schedule-drawer" class="cora-side-drawer hidden collapsed fixed top-0 right-0 w-[450px] max-w-[90vw] h-full bg-white dark:bg-zinc-900 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 dark:border-zinc-800 flex flex-col font-sans">
     <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-zinc-50/50 dark:bg-zinc-850/50">
         <div>
             <h3 class="font-extrabold text-base text-zinc-900 dark:text-white">Schedule Follow-Up Action</h3>
@@ -982,7 +991,7 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
 <!-- ========================================================================= -->
 <!-- SLIDING SIDE DRAWER 4: CUSTOMIZE PIPELINE STAGES & COLUMNS                 -->
 <!-- ========================================================================= -->
-<aside id="cora-lead-stages-drawer" class="cora-side-drawer fixed top-0 right-0 w-[540px] max-w-[90vw] h-full bg-white dark:bg-zinc-900 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 dark:border-zinc-800 flex flex-col font-sans">
+<aside id="cora-lead-stages-drawer" class="cora-side-drawer hidden collapsed fixed top-0 right-0 w-[540px] max-w-[90vw] h-full bg-white dark:bg-zinc-900 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 dark:border-zinc-800 flex flex-col font-sans">
     <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-zinc-50/50 dark:bg-zinc-850/50">
         <div>
             <h3 class="font-extrabold text-base text-zinc-900 dark:text-white">Customize Pipeline Columns</h3>

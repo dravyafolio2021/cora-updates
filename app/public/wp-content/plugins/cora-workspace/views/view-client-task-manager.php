@@ -51,6 +51,46 @@ if (!defined('ABSPATH')) {
     opacity: 1 !important;
     pointer-events: auto !important;
 }
+
+/* Dual Pane Responsive Split Layout */
+.cora-task-manager-split-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: flex-start;
+    margin-top: 16px;
+    width: 100%;
+}
+.cora-task-manager-sidebar {
+    width: 100%;
+    background-color: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    height: 350px;
+    overflow: hidden;
+    box-shadow: none;
+    flex-shrink: 0;
+}
+.cora-task-manager-main {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .cora-task-manager-split-container {
+        flex-direction: row;
+    }
+    .cora-task-manager-sidebar {
+        width: 280px !important;
+        height: 680px !important;
+        position: -webkit-sticky;
+        position: sticky;
+        top: 20px;
+    }
+}
 </style>
 
 <div class="cora-task-manager-wrap bg-zinc-50 min-h-screen text-zinc-900 font-sans px-8 py-6 max-w-[1700px] mx-auto pb-20 relative">
@@ -115,121 +155,144 @@ if (!defined('ABSPATH')) {
         </div>
     </div>
 
-    <!-- View Switcher & Filter Toolbar -->
-    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 bg-white p-3 rounded-2xl border border-zinc-200/80 shadow-2xs">
-        <div class="flex items-center gap-1.5 p-1 bg-zinc-100/80 rounded-xl border border-zinc-200/60 w-full md:w-auto">
-            <button onclick="coraSwitchView('kanban')" id="btn-view-kanban" class="px-4 py-2 text-xs font-bold rounded-lg text-zinc-950 bg-white shadow-2xs border border-zinc-200 transition-all cursor-pointer">Kanban Board</button>
-            <button onclick="coraSwitchView('matrix')" id="btn-view-matrix" class="px-4 py-2 text-xs font-bold rounded-lg text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100 transition-all cursor-pointer">Client Matrix</button>
-            <button onclick="coraSwitchView('roster')" id="btn-view-roster" class="px-4 py-2 text-xs font-bold rounded-lg text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100 transition-all cursor-pointer">Team Roster</button>
-        </div>
+    <!-- Redesigned Dual-Level Main Split Layout -->
+    <div class="cora-task-manager-split-container">
         
-        <div class="flex items-center gap-3 w-full md:w-auto justify-end overflow-x-auto">
-            <div class="relative min-w-[200px] flex-1 md:flex-initial">
-                <svg class="w-4 h-4 absolute left-3 top-2.5 text-zinc-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path></svg>
-                <input type="text" id="task-search-input" placeholder="Search task title or client..." class="pl-9 pr-3 py-2 text-xs font-medium border border-zinc-200 rounded-xl bg-white focus:outline-none focus:border-zinc-950 w-full text-zinc-900 placeholder-zinc-400" oninput="coraFilterTasks()">
+        <!-- Left Sidebar: Client Projects Directory -->
+        <aside class="cora-task-manager-sidebar">
+            <!-- Sidebar Header -->
+            <div class="p-5 border-b border-zinc-200/80 shrink-0">
+                <h3 class="font-extrabold text-xs text-zinc-950 uppercase tracking-wider mb-2.5">Client Projects</h3>
+                <div class="relative">
+                    <svg class="w-3.5 h-3.5 absolute left-3 top-2.5 text-zinc-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path></svg>
+                    <input type="text" id="project-sidebar-search" placeholder="Search projects..." class="pl-8.5 pr-3 py-1.5 text-xs font-medium border border-zinc-200 rounded-xl bg-zinc-50 focus:outline-none focus:border-zinc-950 w-full text-zinc-900 placeholder-zinc-400" oninput="coraFilterSidebarProjects()">
+                </div>
             </div>
-            <select id="task-filter-client" class="py-2 pl-3 pr-8 text-xs font-bold border border-zinc-200 rounded-xl bg-white focus:outline-none focus:border-zinc-950 text-zinc-700 cursor-pointer" onchange="coraFilterTasks()">
-                <option value="">All Clients</option>
-            </select>
-            <select id="task-filter-category" class="py-2 pl-3 pr-8 text-xs font-bold border border-zinc-200 rounded-xl bg-white focus:outline-none focus:border-zinc-950 text-zinc-700 cursor-pointer" onchange="coraFilterTasks()">
-                <option value="">All Deliverable Types</option>
-                <option value="Photo Shoot Prep">Photo Shoot Prep</option>
-                <option value="Video Production">Video Production</option>
-                <option value="Post-Production &amp; Editing">Post-Production &amp; Editing</option>
-                <option value="Client Deliverables &amp; Vault">Client Deliverables &amp; Vault</option>
-                <option value="Client Communication">Client Communication</option>
-            </select>
-            <select id="task-filter-assignee" class="py-2 pl-3 pr-8 text-xs font-bold border border-zinc-200 rounded-xl bg-white focus:outline-none focus:border-zinc-950 text-zinc-700 cursor-pointer" onchange="coraFilterTasks()">
-                <option value="">All Assignees</option>
-            </select>
-        </div>
-    </div>
+            <!-- Sidebar List -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-2" id="project-sidebar-list">
+                <!-- Rendered dynamically -->
+            </div>
+        </aside>
 
-    <!-- View Panels Container -->
-    <div class="relative">
-        
-        <!-- Panel 1: Horizontally Scrollable Kanban Board -->
-        <div id="panel-view-kanban" class="flex gap-5 overflow-x-auto pb-8 pt-1 scrollbar-thin">
-            
-            <!-- Column: To Do -->
-            <div class="kanban-col flex flex-col bg-zinc-100/80 rounded-2xl p-4 border border-zinc-200/80 w-[330px] shrink-0 min-h-[620px]">
-                <div class="flex items-center justify-between mb-4 px-1">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-zinc-400"></span>
-                        <h3 class="text-xs font-bold text-zinc-800 uppercase tracking-wider">To Do</h3>
+        <!-- Right Main Pane: Task Views & Filters -->
+        <div class="cora-task-manager-main space-y-6">
+            <!-- View Switcher & Filter Toolbar -->
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-3 rounded-2xl border border-zinc-200/80 shadow-none">
+                <div class="flex items-center gap-1.5 p-1 bg-zinc-100/80 rounded-xl border border-zinc-200/60 w-full md:w-auto">
+                    <button onclick="coraSwitchView('kanban')" id="btn-view-kanban" class="px-4 py-2 text-xs font-bold rounded-lg text-zinc-950 bg-white shadow-2xs border border-zinc-200 transition-all cursor-pointer">Kanban Board</button>
+                    <button onclick="coraSwitchView('matrix')" id="btn-view-matrix" class="px-4 py-2 text-xs font-bold rounded-lg text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100 transition-all cursor-pointer">Client Matrix</button>
+                    <button onclick="coraSwitchView('roster')" id="btn-view-roster" class="px-4 py-2 text-xs font-bold rounded-lg text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100 transition-all cursor-pointer">Team Roster</button>
+                </div>
+                
+                <div class="flex items-center gap-3 w-full md:w-auto justify-end overflow-x-auto">
+                    <div class="relative min-w-[200px] flex-1 md:flex-initial">
+                        <svg class="w-4 h-4 absolute left-3 top-2.5 text-zinc-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path></svg>
+                        <input type="text" id="task-search-input" placeholder="Search task title or client..." class="pl-9 pr-3 py-2 text-xs font-medium border border-zinc-200 rounded-xl bg-white focus:outline-none focus:border-zinc-950 w-full text-zinc-900 placeholder-zinc-400" oninput="coraFilterTasks()">
                     </div>
-                    <span class="text-[11px] font-bold bg-white border border-zinc-200/80 text-zinc-800 px-2.5 py-0.5 rounded-full shadow-2xs" id="count-kanban-todo">0</span>
-                </div>
-                <div class="space-y-3.5 flex-1 overflow-y-auto pr-0.5" id="kanban-todo">
-                    <!-- Tasks rendered dynamically -->
+                    <select id="task-filter-client" class="py-2 pl-3 pr-8 text-xs font-bold border border-zinc-200 rounded-xl bg-white focus:outline-none focus:border-zinc-950 text-zinc-700 cursor-pointer" onchange="coraFilterTasks()">
+                        <option value="">All Clients</option>
+                    </select>
+                    <select id="task-filter-category" class="py-2 pl-3 pr-8 text-xs font-bold border border-zinc-200 rounded-xl bg-white focus:outline-none focus:border-zinc-950 text-zinc-700 cursor-pointer" onchange="coraFilterTasks()">
+                        <option value="">All Deliverable Types</option>
+                        <option value="Photo Shoot Prep">Photo Shoot Prep</option>
+                        <option value="Video Production">Video Production</option>
+                        <option value="Post-Production &amp; Editing">Post-Production &amp; Editing</option>
+                        <option value="Client Deliverables &amp; Vault">Client Deliverables &amp; Vault</option>
+                        <option value="Client Communication">Client Communication</option>
+                    </select>
+                    <select id="task-filter-assignee" class="py-2 pl-3 pr-8 text-xs font-bold border border-zinc-200 rounded-xl bg-white focus:outline-none focus:border-zinc-950 text-zinc-700 cursor-pointer" onchange="coraFilterTasks()">
+                        <option value="">All Assignees</option>
+                    </select>
                 </div>
             </div>
 
-            <!-- Column: In Progress -->
-            <div class="kanban-col flex flex-col bg-amber-50/30 rounded-2xl p-4 border border-amber-200/60 w-[330px] shrink-0 min-h-[620px]">
-                <div class="flex items-center justify-between mb-4 px-1">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                        <h3 class="text-xs font-bold text-amber-900 uppercase tracking-wider">In Progress</h3>
+            <!-- View Panels Container -->
+            <div class="relative">
+                
+                <!-- Panel 1: Horizontally Scrollable Kanban Board -->
+                <div id="panel-view-kanban" class="flex gap-5 overflow-x-auto pb-8 pt-1 scrollbar-thin">
+                    
+                    <!-- Column: To Do -->
+                    <div class="kanban-col flex flex-col bg-zinc-100/80 rounded-2xl p-4 border border-zinc-200/80 w-[330px] shrink-0 min-h-[620px]">
+                        <div class="flex items-center justify-between mb-4 px-1">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-zinc-400"></span>
+                                <h3 class="text-xs font-bold text-zinc-800 uppercase tracking-wider">To Do</h3>
+                            </div>
+                            <span class="text-[11px] font-bold bg-white border border-zinc-200/80 text-zinc-800 px-2.5 py-0.5 rounded-full shadow-2xs" id="count-kanban-todo">0</span>
+                        </div>
+                        <div class="space-y-3.5 flex-1 overflow-y-auto pr-0.5" id="kanban-todo">
+                            <!-- Tasks rendered dynamically -->
+                        </div>
                     </div>
-                    <span class="text-[11px] font-bold bg-white border border-amber-200 text-amber-900 px-2.5 py-0.5 rounded-full shadow-2xs" id="count-kanban-inprogress">0</span>
-                </div>
-                <div class="space-y-3.5 flex-1 overflow-y-auto pr-0.5" id="kanban-inprogress">
-                    <!-- Tasks rendered dynamically -->
-                </div>
-            </div>
 
-            <!-- Column: Client Review -->
-            <div class="kanban-col flex flex-col bg-blue-50/30 rounded-2xl p-4 border border-blue-200/60 w-[330px] shrink-0 min-h-[620px]">
-                <div class="flex items-center justify-between mb-4 px-1">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-                        <h3 class="text-xs font-bold text-blue-900 uppercase tracking-wider">Client Review</h3>
+                    <!-- Column: In Progress -->
+                    <div class="kanban-col flex flex-col bg-amber-50/30 rounded-2xl p-4 border border-amber-200/60 w-[330px] shrink-0 min-h-[620px]">
+                        <div class="flex items-center justify-between mb-4 px-1">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                                <h3 class="text-xs font-bold text-amber-900 uppercase tracking-wider">In Progress</h3>
+                            </div>
+                            <span class="text-[11px] font-bold bg-white border border-amber-200 text-amber-900 px-2.5 py-0.5 rounded-full shadow-2xs" id="count-kanban-inprogress">0</span>
+                        </div>
+                        <div class="space-y-3.5 flex-1 overflow-y-auto pr-0.5" id="kanban-inprogress">
+                            <!-- Tasks rendered dynamically -->
+                        </div>
                     </div>
-                    <span class="text-[11px] font-bold bg-white border border-blue-200 text-blue-900 px-2.5 py-0.5 rounded-full shadow-2xs" id="count-kanban-review">0</span>
-                </div>
-                <div class="space-y-3.5 flex-1 overflow-y-auto pr-0.5" id="kanban-review">
-                    <!-- Tasks rendered dynamically -->
-                </div>
-            </div>
 
-            <!-- Column: Blocked -->
-            <div class="kanban-col flex flex-col bg-rose-50/30 rounded-2xl p-4 border border-rose-200/60 w-[330px] shrink-0 min-h-[620px]">
-                <div class="flex items-center justify-between mb-4 px-1">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-                        <h3 class="text-xs font-bold text-rose-900 uppercase tracking-wider">Blocked</h3>
+                    <!-- Column: Client Review -->
+                    <div class="kanban-col flex flex-col bg-blue-50/30 rounded-2xl p-4 border border-blue-200/60 w-[330px] shrink-0 min-h-[620px]">
+                        <div class="flex items-center justify-between mb-4 px-1">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                                <h3 class="text-xs font-bold text-blue-900 uppercase tracking-wider">Client Review</h3>
+                            </div>
+                            <span class="text-[11px] font-bold bg-white border border-blue-200 text-blue-900 px-2.5 py-0.5 rounded-full shadow-2xs" id="count-kanban-review">0</span>
+                        </div>
+                        <div class="space-y-3.5 flex-1 overflow-y-auto pr-0.5" id="kanban-review">
+                            <!-- Tasks rendered dynamically -->
+                        </div>
                     </div>
-                    <span class="text-[11px] font-bold bg-white border border-rose-200 text-rose-900 px-2.5 py-0.5 rounded-full shadow-2xs" id="count-kanban-blocked">0</span>
-                </div>
-                <div class="space-y-3.5 flex-1 overflow-y-auto pr-0.5" id="kanban-blocked">
-                    <!-- Tasks rendered dynamically -->
-                </div>
-            </div>
 
-            <!-- Column: Done -->
-            <div class="kanban-col flex flex-col bg-emerald-50/30 rounded-2xl p-4 border border-emerald-200/60 w-[330px] shrink-0 min-h-[620px]">
-                <div class="flex items-center justify-between mb-4 px-1">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                        <h3 class="text-xs font-bold text-emerald-900 uppercase tracking-wider">Done</h3>
+                    <!-- Column: Blocked -->
+                    <div class="kanban-col flex flex-col bg-rose-50/30 rounded-2xl p-4 border border-rose-200/60 w-[330px] shrink-0 min-h-[620px]">
+                        <div class="flex items-center justify-between mb-4 px-1">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                                <h3 class="text-xs font-bold text-rose-900 uppercase tracking-wider">Blocked</h3>
+                            </div>
+                            <span class="text-[11px] font-bold bg-white border border-rose-200 text-rose-900 px-2.5 py-0.5 rounded-full shadow-2xs" id="count-kanban-blocked">0</span>
+                        </div>
+                        <div class="space-y-3.5 flex-1 overflow-y-auto pr-0.5" id="kanban-blocked">
+                            <!-- Tasks rendered dynamically -->
+                        </div>
                     </div>
-                    <span class="text-[11px] font-bold bg-white border border-emerald-200 text-emerald-900 px-2.5 py-0.5 rounded-full shadow-2xs" id="count-kanban-done">0</span>
+
+                    <!-- Column: Done -->
+                    <div class="kanban-col flex flex-col bg-emerald-50/30 rounded-2xl p-4 border border-emerald-200/60 w-[330px] shrink-0 min-h-[620px]">
+                        <div class="flex items-center justify-between mb-4 px-1">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                <h3 class="text-xs font-bold text-emerald-900 uppercase tracking-wider">Done</h3>
+                            </div>
+                            <span class="text-[11px] font-bold bg-white border border-emerald-200 text-emerald-900 px-2.5 py-0.5 rounded-full shadow-2xs" id="count-kanban-done">0</span>
+                        </div>
+                        <div class="space-y-3.5 flex-1 overflow-y-auto pr-0.5" id="kanban-done">
+                            <!-- Tasks rendered dynamically -->
+                        </div>
+                    </div>
                 </div>
-                <div class="space-y-3.5 flex-1 overflow-y-auto pr-0.5" id="kanban-done">
-                    <!-- Tasks rendered dynamically -->
+
+                <!-- Panel 2: Client Project Matrix (Hidden initially) -->
+                <div id="panel-view-matrix" class="hidden grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Project Cards rendered dynamically -->
+                </div>
+
+                <!-- Panel 3: Team Roster Workload (Hidden initially) -->
+                <div id="panel-view-roster" class="hidden grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Staff Cards rendered dynamically -->
                 </div>
             </div>
-        </div>
-
-        <!-- Panel 2: Client Project Matrix (Hidden initially) -->
-        <div id="panel-view-matrix" class="hidden grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Project Cards rendered dynamically -->
-        </div>
-
-        <!-- Panel 3: Team Roster Workload (Hidden initially) -->
-        <div id="panel-view-roster" class="hidden grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Staff Cards rendered dynamically -->
         </div>
     </div>
 </div>
@@ -632,6 +695,8 @@ document.addEventListener('click', function(e) {
     };
 
     // Data Store
+    let selectedSidebarClientId = null;
+
     let coraTaskState = {
         tasks: [],
         clients: [],
@@ -690,6 +755,80 @@ document.addEventListener('click', function(e) {
         $('#create-task-assignee, #detail-task-assignee').html(staffSelectOpts);
     }
 
+    function renderProjectSidebar(allTasks) {
+        const query = ($('#project-sidebar-search').val() || '').toLowerCase();
+        let html = '';
+        
+        // "All Active Projects" item
+        const allActiveCount = allTasks.length;
+        const allCompleted = allTasks.filter(t => t.status === 'done').length;
+        const allPct = allActiveCount ? Math.round((allCompleted / allActiveCount) * 100) : 0;
+        
+        const isAllActive = !selectedSidebarClientId;
+        html += `
+            <div onclick="coraSelectSidebarProject(null)" id="project-sidebar-all" class="project-sidebar-item p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col gap-2 ${isAllActive ? 'bg-zinc-100 text-zinc-950 border-zinc-950/40 font-bold' : 'bg-white text-zinc-700 border-zinc-200/80 hover:bg-zinc-50'}">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold uppercase tracking-wider">All Projects</span>
+                    <span class="text-[10px] font-bold bg-zinc-200/80 text-zinc-800 px-2 py-0.5 rounded-md border border-zinc-300/40">${allActiveCount} Tasks</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="flex-1 bg-zinc-200/60 rounded-full h-1 overflow-hidden">
+                        <div class="bg-zinc-950 h-1 rounded-full" style="width: ${allPct}%"></div>
+                    </div>
+                    <span class="text-[9.5px] font-bold text-zinc-500">${allPct}%</span>
+                </div>
+            </div>
+        `;
+
+        coraTaskState.clients.forEach(c => {
+            if (query && !c.name.toLowerCase().includes(query)) return;
+
+            // Calculate tasks for this client
+            const clientTasks = coraTaskState.tasks.filter(t => String(t.client_id) === String(c.id));
+            const activeCount = clientTasks.length;
+            const completedCount = clientTasks.filter(t => t.status === 'done').length;
+            const pct = activeCount ? Math.round((completedCount / activeCount) * 100) : 0;
+
+            const isSelected = String(selectedSidebarClientId) === String(c.id);
+            
+            html += `
+                <div onclick="coraSelectSidebarProject('${c.id}')" data-id="${c.id}" class="project-sidebar-item p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col gap-2 ${isSelected ? 'bg-zinc-100 text-zinc-950 border-zinc-950/40 font-bold' : 'bg-white text-zinc-700 border-zinc-200/80 hover:bg-zinc-50'}">
+                    <div class="flex justify-between items-start gap-1">
+                        <span class="text-xs font-bold truncate max-w-[170px]">${escHtml(c.name)}</span>
+                        <span class="text-[10px] font-bold bg-zinc-200/80 text-zinc-800 px-2 py-0.5 rounded-md border border-zinc-300/40 shrink-0">${activeCount} Tasks</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="flex-1 bg-zinc-200/60 rounded-full h-1 overflow-hidden">
+                            <div class="bg-zinc-950 h-1 rounded-full" style="width: ${pct}%"></div>
+                        </div>
+                        <span class="text-[9.5px] font-bold text-zinc-500">${pct}%</span>
+                    </div>
+                </div>
+            `;
+        });
+
+        $('#project-sidebar-list').html(html);
+    }
+
+    window.coraSelectSidebarProject = function(clientId) {
+        selectedSidebarClientId = clientId || null;
+        $('#task-filter-client').val(selectedSidebarClientId || '');
+        
+        // Highlight active item
+        $('.project-sidebar-item').removeClass('bg-zinc-100 text-zinc-950 border-zinc-950/40').addClass('bg-white text-zinc-700 border-zinc-200/80');
+        if (selectedSidebarClientId) {
+            $(`.project-sidebar-item[data-id="${selectedSidebarClientId}"]`).addClass('bg-zinc-100 text-zinc-950 border-zinc-950/40').removeClass('bg-white text-zinc-700 border-zinc-200/80');
+        } else {
+            $('#project-sidebar-all').addClass('bg-zinc-100 text-zinc-950 border-zinc-950/40').removeClass('bg-white text-zinc-700 border-zinc-200/80');
+        }
+        
+        coraRenderTaskViews();
+    };
+
+    window.coraFilterSidebarProjects = function() {
+        renderProjectSidebar(coraTaskState.tasks);
+    };
+
     function getFilteredTasks() {
         const query = ($('#task-search-input').val() || '').toLowerCase();
         const clientVal = $('#task-filter-client').val();
@@ -698,6 +837,7 @@ document.addEventListener('click', function(e) {
 
         return coraTaskState.tasks.filter(t => {
             if (query && !t.title.toLowerCase().includes(query) && !(t.client_name || '').toLowerCase().includes(query)) return false;
+            if (selectedSidebarClientId && String(t.client_id) !== String(selectedSidebarClientId)) return false;
             if (clientVal && String(t.client_id) !== String(clientVal)) return false;
             if (catVal && t.deliverable_type !== catVal) return false;
             if (assigneeVal && String(t.assignee_id) !== String(assigneeVal)) return false;
@@ -711,6 +851,7 @@ document.addEventListener('click', function(e) {
         renderKanbanColumns(tasks);
         renderMatrixProjects(tasks);
         renderRosterTeam(tasks);
+        renderProjectSidebar(coraTaskState.tasks);
     };
 
     function updateKPICounters(tasks) {
@@ -1193,6 +1334,14 @@ document.addEventListener('click', function(e) {
     };
 
     window.coraFilterTasks = function() {
+        const clientVal = $('#task-filter-client').val();
+        selectedSidebarClientId = clientVal || null;
+        $('.project-sidebar-item').removeClass('bg-zinc-100 text-zinc-950 border-zinc-950/40').addClass('bg-white text-zinc-700 border-zinc-200/80');
+        if (selectedSidebarClientId) {
+            $(`.project-sidebar-item[data-id="${selectedSidebarClientId}"]`).addClass('bg-zinc-100 text-zinc-950 border-zinc-950/40').removeClass('bg-white text-zinc-700 border-zinc-200/80');
+        } else {
+            $('#project-sidebar-all').addClass('bg-zinc-100 text-zinc-950 border-zinc-950/40').removeClass('bg-white text-zinc-700 border-zinc-200/80');
+        }
         coraRenderTaskViews();
     };
 

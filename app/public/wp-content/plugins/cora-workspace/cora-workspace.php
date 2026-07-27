@@ -1425,9 +1425,12 @@ function cora_get_active_industry() {
             return $ind;
         }
     }
-    $ind = get_option( 'cora_workspace_industry' );
-    if ( ! $ind && ! empty( $_COOKIE['cora_workspace_industry'] ) ) {
+    $ind = '';
+    if ( ! empty( $_COOKIE['cora_workspace_industry'] ) ) {
         $ind = sanitize_text_field( $_COOKIE['cora_workspace_industry'] );
+    }
+    if ( ! $ind ) {
+        $ind = get_option( 'cora_workspace_industry' );
     }
     if ( ! $ind ) {
         $ind = 'real_estate';
@@ -2077,7 +2080,7 @@ function cora_generate_listing_seo( $name, $category, $rera_id, $link ) {
 function cora_ajax_save_equipment() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
     $user = wp_get_current_user();
-    if ( ! current_user_can( 'manage_options' ) && ! in_array( 'cora_manager', (array) $user->roles ) ) {
+    if ( ! cora_is_super_owner( $user ) && ! current_user_can( 'manage_options' ) && ! in_array( 'cora_manager', (array) $user->roles ) ) {
         wp_send_json_error( 'Unauthorized access.' );
     }
 
@@ -2235,6 +2238,7 @@ function cora_ajax_save_equipment() {
     wp_send_json_success( $saved_item );
 }
 add_action( 'wp_ajax_cora_workspace_save_listing', 'cora_ajax_save_equipment' );
+add_action( 'wp_ajax_cora_re_save_listing', 'cora_ajax_save_equipment' );
 
 /**
  * AJAX Handler: Assign Equipment
@@ -2242,7 +2246,7 @@ add_action( 'wp_ajax_cora_workspace_save_listing', 'cora_ajax_save_equipment' );
 function cora_ajax_assign_equipment() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
     $user = wp_get_current_user();
-    if ( ! current_user_can( 'manage_options' ) && ! in_array( 'cora_manager', (array) $user->roles ) ) {
+    if ( ! cora_is_super_owner( $user ) && ! current_user_can( 'manage_options' ) && ! in_array( 'cora_manager', (array) $user->roles ) ) {
         wp_send_json_error( 'Unauthorized access.' );
     }
 
@@ -2300,7 +2304,7 @@ add_action( 'wp_ajax_cora_assign_equipment', 'cora_ajax_assign_equipment' );
 function cora_ajax_save_crew_assignments() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
     $user = wp_get_current_user();
-    if ( ! current_user_can( 'manage_options' ) && ! in_array( 'cora_manager', (array) $user->roles ) ) {
+    if ( ! cora_is_super_owner( $user ) && ! current_user_can( 'manage_options' ) && ! in_array( 'cora_manager', (array) $user->roles ) ) {
         wp_send_json_error( 'Unauthorized access.' );
     }
 
@@ -2439,7 +2443,7 @@ add_action( 'wp_ajax_cora_update_team_user', 'cora_ajax_update_team_user' );
 function cora_ajax_delete_equipment() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
     $user = wp_get_current_user();
-    if ( ! current_user_can( 'manage_options' ) && ! in_array( 'cora_manager', (array) $user->roles ) ) {
+    if ( ! cora_is_super_owner( $user ) && ! current_user_can( 'manage_options' ) && ! in_array( 'cora_manager', (array) $user->roles ) ) {
         wp_send_json_error( 'Unauthorized access.' );
     }
 
@@ -2478,6 +2482,7 @@ function cora_ajax_delete_equipment() {
     }
 }
 add_action( 'wp_ajax_cora_workspace_delete_listing', 'cora_ajax_delete_equipment' );
+add_action( 'wp_ajax_cora_re_delete_listing', 'cora_ajax_delete_equipment' );
 
 /**
  * AJAX Handler: Save Document
@@ -2485,7 +2490,7 @@ add_action( 'wp_ajax_cora_workspace_delete_listing', 'cora_ajax_delete_equipment
 function cora_ajax_save_document() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
     $user = wp_get_current_user();
-    if ( ! current_user_can( 'manage_options' ) && ! in_array( 'cora_manager', (array) $user->roles ) ) {
+    if ( ! cora_is_super_owner( $user ) && ! current_user_can( 'manage_options' ) && ! in_array( 'cora_manager', (array) $user->roles ) ) {
         wp_send_json_error( 'Unauthorized access.' );
     }
 
@@ -2559,7 +2564,7 @@ add_action( 'wp_ajax_cora_workspace_save_document', 'cora_ajax_save_document' );
 function cora_ajax_share_document() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
     $user = wp_get_current_user();
-    if ( ! current_user_can( 'manage_options' ) && ! in_array( 'cora_manager', (array) $user->roles ) ) {
+    if ( ! cora_is_super_owner( $user ) && ! current_user_can( 'manage_options' ) && ! in_array( 'cora_manager', (array) $user->roles ) ) {
         wp_send_json_error( 'Unauthorized access.' );
     }
 
@@ -3613,7 +3618,7 @@ function cora_ajax_sync_google_doc() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
     
     $user = wp_get_current_user();
-    if ( ! current_user_can( 'manage_options' ) && ! in_array( 'cora_manager', (array) $user->roles ) ) {
+    if ( ! cora_is_super_owner( $user ) && ! current_user_can( 'manage_options' ) && ! in_array( 'cora_manager', (array) $user->roles ) ) {
         wp_send_json_error( 'Unauthorized access.' );
     }
 
@@ -6375,6 +6380,108 @@ function cora_copy_lead_to_clients( $lead ) {
     );
 
     update_option( 'cora_workspace_clients', $clients );
+
+    cora_auto_generate_client_tasks( $new_client_id, $lead['names'], ($lead['scale'] ?? 'Standard') . ' Shoot - ' . ($lead['city'] ?? 'Mumbai') );
+}
+
+/**
+ * Automatically generates 4 default workflow tasks for a newly converted client project
+ */
+function cora_auto_generate_client_tasks( $client_id, $client_name, $booking_title = '', $booking_id = '' ) {
+    $tasks = get_option( 'cora_workspace_client_tasks', array() );
+    if ( ! is_array( $tasks ) ) {
+        $tasks = array();
+    }
+
+    if ( empty( $booking_title ) ) {
+        $booking_title = 'Standard Photo Shoot';
+    }
+    if ( empty( $booking_id ) ) {
+        $booking_id = 'b_' . uniqid();
+    }
+
+    // Check if tasks already exist for this client to prevent duplication
+    foreach ( $tasks as $t ) {
+        if ( (string)$t['client_id'] === (string)$client_id ) {
+            return; // Tasks already seeded for this client
+        }
+    }
+
+    $new_tasks = array(
+        array(
+            'id' => uniqid(),
+            'title' => 'Initial Creative Consultation',
+            'client_id' => $client_id,
+            'client_name' => $client_name,
+            'booking_id' => $booking_id,
+            'booking_title' => $booking_title,
+            'assignee_id' => 'u1',
+            'assignee_name' => 'Shruti Sharma (Super Admin)',
+            'deliverable_type' => 'Client Communication',
+            'priority' => 'high',
+            'due_date' => date('Y-m-d', strtotime('+3 days')),
+            'status' => 'todo',
+            'desc' => 'Conduct kickoff call to align on mood boards, photoshoot style, and coordinate shoot logistics.',
+            'subtasks' => array(
+                array( 'id' => uniqid(), 'text' => 'Call client to schedule kickoff', 'completed' => false ),
+                array( 'id' => uniqid(), 'text' => 'Prepare mood board presentation', 'completed' => false )
+            )
+        ),
+        array(
+            'id' => uniqid(),
+            'title' => 'Draft Project Timeline & Contract',
+            'client_id' => $client_id,
+            'client_name' => $client_name,
+            'booking_id' => $booking_id,
+            'booking_title' => $booking_title,
+            'assignee_id' => 'u1',
+            'assignee_name' => 'Shruti Sharma (Super Admin)',
+            'deliverable_type' => 'Admin',
+            'priority' => 'high',
+            'due_date' => date('Y-m-d', strtotime('+5 days')),
+            'status' => 'todo',
+            'desc' => 'Draft the detailed timeline breakdown and send the formal shoot contract for signing.',
+            'subtasks' => array(
+                array( 'id' => uniqid(), 'text' => 'Customise contract clauses template', 'completed' => false ),
+                array( 'id' => uniqid(), 'text' => 'Send contract via secure client portal', 'completed' => false )
+            )
+        ),
+        array(
+            'id' => uniqid(),
+            'title' => 'Location Scouting & Sunlight Analysis',
+            'client_id' => $client_id,
+            'client_name' => $client_name,
+            'booking_id' => $booking_id,
+            'booking_title' => $booking_title,
+            'assignee_id' => 'u4',
+            'assignee_name' => 'Rohan Kapoor (Lead Photographer)',
+            'deliverable_type' => 'Planning',
+            'priority' => 'medium',
+            'due_date' => date('Y-m-d', strtotime('+7 days')),
+            'status' => 'todo',
+            'desc' => 'Assess the preferred shoot locations, check sunlight angles, and secure permit permissions.',
+            'subtasks' => array()
+        ),
+        array(
+            'id' => uniqid(),
+            'title' => 'Prepare Cameras, Lenses & Lighting Gear',
+            'client_id' => $client_id,
+            'client_name' => $client_name,
+            'booking_id' => $booking_id,
+            'booking_title' => $booking_title,
+            'assignee_id' => 'u5',
+            'assignee_name' => 'Priya Nair (Videographer)',
+            'deliverable_type' => 'Prep',
+            'priority' => 'medium',
+            'due_date' => date('Y-m-d', strtotime('+9 days')),
+            'status' => 'todo',
+            'desc' => 'Check inventory, charge camera batteries, pack lenses, memory cards, and clean studio lighting gear.',
+            'subtasks' => array()
+        )
+    );
+
+    $tasks = array_merge( $new_tasks, $tasks );
+    update_option( 'cora_workspace_client_tasks', $tasks );
 }
 
 /**
@@ -9801,11 +9908,22 @@ function cora_ajax_fetch_client_tasks() {
     
     // Clients
     $clients = array();
-    $leads_table = $wpdb->prefix . 'cora_leads';
-    if ( $wpdb->get_var("SHOW TABLES LIKE '{$leads_table}'") === $leads_table ) {
-        $db_clients = $wpdb->get_results("SELECT id, name FROM {$leads_table} WHERE status = 'client' OR status = 'converted' ORDER BY name ASC", ARRAY_A);
-        if ( ! empty($db_clients) ) {
-            $clients = $db_clients;
+    $opt_clients = get_option('cora_workspace_clients', array());
+    if ( is_array($opt_clients) && ! empty($opt_clients) ) {
+        foreach ($opt_clients as $oc) {
+            $clients[] = array(
+                'id' => $oc['id'],
+                'name' => $oc['names'] ?? $oc['name'] ?? 'Client'
+            );
+        }
+    }
+    if ( empty($clients) ) {
+        $leads_table = $wpdb->prefix . 'cora_leads';
+        if ( $wpdb->get_var("SHOW TABLES LIKE '{$leads_table}'") === $leads_table ) {
+            $db_clients = $wpdb->get_results("SELECT id, name FROM {$leads_table} WHERE status = 'client' OR status = 'converted' ORDER BY name ASC", ARRAY_A);
+            if ( ! empty($db_clients) ) {
+                $clients = $db_clients;
+            }
         }
     }
     if ( empty($clients) ) {
@@ -9833,6 +9951,27 @@ function cora_ajax_fetch_client_tasks() {
             array('id' => 'b3', 'title' => 'Penthouse Architectural Shoot', 'client_id' => 'c3'),
             array('id' => 'b4', 'title' => 'Quarterly Corporate Headshots', 'client_id' => 'c4')
         );
+    }
+
+    // Inject mock bookings for option store clients so they are selectable in the task dropdowns
+    if ( is_array($opt_clients) && ! empty($opt_clients) ) {
+        foreach ($opt_clients as $oc) {
+            $client_has_booking = false;
+            foreach ($bookings as $b) {
+                if ((string)$b['client_id'] === (string)$oc['id']) {
+                    $client_has_booking = true;
+                    break;
+                }
+            }
+            if (!$client_has_booking) {
+                $bookings[] = array(
+                    'id' => 'b_' . $oc['id'],
+                    'title' => ($oc['scale'] ?? 'Standard Shoot') . ' - ' . ($oc['city'] ?? 'Mumbai'),
+                    'client_id' => $oc['id'],
+                    'client_name' => $oc['names'] ?? $oc['name'] ?? 'Client'
+                );
+            }
+        }
     }
 
     // Team Members
@@ -9900,7 +10039,7 @@ function cora_ajax_save_client_task() {
 
     $updated = false;
     foreach ($tasks as &$t) {
-        if (String($t['id']) === String($task['id'])) {
+        if ( (string) $t['id'] === (string) $task['id'] ) {
             $t = array_merge($t, $task);
             $updated = true;
             break;
@@ -13841,15 +13980,55 @@ function cora_db_get_leads() {
     }
 
     $has_demo = false;
+    $has_sample = false;
     foreach ( $option_leads as $ol ) {
-        if ( isset( $ol['id'] ) && strpos( $ol['id'], 'lead_demo_' ) !== false ) {
-            $has_demo = true;
-            break;
+        if ( isset( $ol['id'] ) ) {
+            if ( strpos( $ol['id'], 'lead_demo_' ) !== false ) {
+                $has_demo = true;
+            }
+            if ( $ol['id'] === 'lead_sample_1' ) {
+                $has_sample = true;
+            }
         }
     }
 
     // Seed 16 rich demo leads if they are not in the option store yet
+    $seed_demo_leads = array();
+    $needs_update = false;
+    $leads_to_seed = array();
+    
+    if ( ! $has_sample ) {
+        $leads_to_seed = array_merge( $leads_to_seed, array(
+            array(
+                'id' => 'lead_sample_1',
+                'names' => 'Kabir & Kiara',
+                'email' => 'kabir.kiara@gmail.com',
+                'scale' => 'destination',
+                'city' => 'Udaipur',
+                'notes' => 'Looking for cinematic, documentary-style listing photography over 3 days.',
+                'price' => '₹4,50,000',
+                'status' => 'New Lead',
+                'emails' => array(),
+                'created_at' => time() - 3600*24*2
+            ),
+            array(
+                'id' => 'lead_sample_2',
+                'names' => 'Aditya & Riya',
+                'email' => 'aditya.riya@yahoo.com',
+                'scale' => 'intimate',
+                'city' => 'Goa',
+                'notes' => 'Intimate beachside listing. Need property viewing and 1 day event coverage.',
+                'price' => '₹1,50,000',
+                'status' => 'Proposal Sent',
+                'emails' => array(),
+                'created_at' => time() - 3600*24*4
+            )
+        ) );
+        $needs_update = true;
+    }
+
     if ( ! $has_demo ) {
+        $needs_update = true;
         $seed_demo_leads = array(
             array(
                 'id'            => 'lead_demo_101',
@@ -14156,7 +14335,10 @@ function cora_db_get_leads() {
                 'created_at'    => time() - 561600
             )
         );
-        $merged_leads = array_merge( $option_leads, $seed_demo_leads );
+    }
+
+    if ( $needs_update ) {
+        $merged_leads = array_merge( $option_leads, array_merge( $leads_to_seed, $seed_demo_leads ) );
         update_option( 'cora_workspace_leads', $merged_leads );
         $option_leads = $merged_leads;
     }
@@ -14723,8 +14905,10 @@ function cora_sync_db_tables_to_options() {
         $opt_ids = array();
         $cleaned_listings = array();
         foreach ( $listings_opt as $lst ) {
-            if ( isset( $lst['id'] ) && is_numeric( $lst['id'] ) ) {
-                $opt_ids[] = intval($lst['id']);
+            if ( isset( $lst['id'] ) ) {
+                if ( is_numeric( $lst['id'] ) ) {
+                    $opt_ids[] = intval($lst['id']);
+                }
                 $cleaned_listings[] = $lst;
             }
         }
@@ -14744,8 +14928,10 @@ function cora_sync_db_tables_to_options() {
         $opt_ids = array();
         $cleaned_leads = array();
         foreach ( $leads_opt as $ld ) {
-            if ( isset( $ld['id'] ) && is_numeric( $ld['id'] ) ) {
-                $opt_ids[] = intval($ld['id']);
+            if ( isset( $ld['id'] ) ) {
+                if ( is_numeric( $ld['id'] ) ) {
+                    $opt_ids[] = intval($ld['id']);
+                }
                 $cleaned_leads[] = $ld;
             }
         }
@@ -14765,8 +14951,10 @@ function cora_sync_db_tables_to_options() {
         $opt_ids = array();
         $cleaned_clients = array();
         foreach ( $clients_opt as $cl ) {
-            if ( isset( $cl['id'] ) && is_numeric( $cl['id'] ) ) {
-                $opt_ids[] = intval($cl['id']);
+            if ( isset( $cl['id'] ) ) {
+                if ( is_numeric( $cl['id'] ) ) {
+                    $opt_ids[] = intval($cl['id']);
+                }
                 $cleaned_clients[] = $cl;
             }
         }
@@ -23119,16 +23307,21 @@ if ( ! function_exists( 'cora_ajax_update_lead_stage' ) ) {
         }
 
         $updated = false;
+        $matched_lead = null;
         foreach ( $existing_leads as &$el ) {
             if ( (string) $el['id'] === (string) $lead_id ) {
                 $el['status'] = $new_stage;
                 $updated = true;
+                $matched_lead = $el;
                 break;
             }
         }
 
         if ( $updated ) {
             update_option( 'cora_workspace_leads', $existing_leads );
+            if ( $new_stage === 'Converted' && $matched_lead ) {
+                cora_copy_lead_to_clients( $matched_lead );
+            }
         }
 
         wp_send_json_success( array(
@@ -23206,6 +23399,8 @@ if ( ! function_exists( 'cora_ajax_convert_lead_to_client_suite' ) ) {
 
             array_unshift( $clients, $new_client );
             update_option( 'cora_workspace_clients', $clients );
+
+            cora_auto_generate_client_tasks( $new_client['id'], $new_client['names'], ($converted_lead['scale'] ?? 'Standard') . ' Shoot - ' . ($converted_lead['city'] ?? 'Mumbai') );
 
             wp_send_json_success( array(
                 'message' => 'Lead converted to active client successfully!',

@@ -10535,7 +10535,10 @@ jQuery(document).ready(function($) {
             bd.removeClass('hidden').css({'display': 'block', 'pointer-events': 'auto'});
         }
         if (drawer.length) {
-            drawer.removeClass('hidden collapsed translate-x-full');
+            drawer.removeClass('hidden collapsed');
+            // Force browser layout reflow to ensure smooth transition animation
+            drawer.each(function() { this.offsetHeight; });
+            drawer.removeClass('translate-x-full');
         }
     };
 

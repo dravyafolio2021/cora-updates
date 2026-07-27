@@ -110,7 +110,7 @@ test.describe('Verify New Features Empirically', () => {
 
   test('3. 3rd-party Sync & AI SEO meta-data generation', async ({ page }) => {
     await login(page);
-    await page.goto('/workspace/equipment');
+    await page.goto('/workspace/equipment?set_industry=real_estate');
 
     // Open add listing drawer
     await page.click('button:has-text("Add Listing")');
@@ -157,6 +157,55 @@ test.describe('Verify New Features Empirically', () => {
     const rowToDelete = page.locator('tr.cora-eq-row:has-text("Zillow Sunset Villa")').first();
     await rowToDelete.locator('button.cora-delete-eq-btn').click();
     await expect(page.locator('#cora-toast-container')).toContainText('Equipment asset deleted.');
+  });
+
+  test('4. Kanban Board Drag & Drop AJAX Update', async ({ page }) => {
+    await login(page);
+    await page.goto('/workspace/leads');
+    
+    // Check console logs of AJAX request
+    page.on('console', msg => {
+      console.log('PAGE CONSOLE:', msg.text());
+    });
+
+    // Let's trigger the AJAX call in the page context for 'lead_sample_1' (Kabir & Kiara) to 'Negotiation'
+    const ajaxResult = await page.evaluate(() => {
+      return new Promise((resolve, reject) => {
+        const nonceVal = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) 
+          ? coraREWPData.ajaxNonce 
+          : ((window.coraData && window.coraData.nonce) ? window.coraData.nonce : '');
+        jQuery.ajax({
+            url: window.coraData ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php',
+            type: 'POST',
+            data: {
+                action: 'cora_ajax_update_lead_stage',
+                security: nonceVal,
+                lead_id: 'lead_sample_1',
+                new_stage: 'Negotiation'
+            },
+            success: function(res) {
+                console.log('AJAX SUCCESS RESPONSE:', JSON.stringify(res));
+                resolve(res);
+            },
+            error: function(xhr, status, error) {
+                console.log('AJAX ERROR RESPONSE:', status, error, xhr.responseText);
+                reject(error);
+            }
+        });
+      });
+    });
+
+    console.log('E2E TEST - AJAX RESPONSE JSON:', JSON.stringify(ajaxResult));
+
+    // Reload page and check if Kabir & Kiara is in Negotiation column
+    await page.reload();
+    await page.waitForLoadState('networkidle');
+
+
+
+    // Check if lead_sample_1 is in the Negotiation column (data-status="Negotiation")
+    const cardInNegotiation = page.locator('.cora-kanban-column[data-status="Negotiation"] .cora-lead-card[data-id="lead_sample_1"]');
+    await expect(cardInNegotiation).toBeVisible();
   });
 
 });

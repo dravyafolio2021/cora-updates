@@ -9180,7 +9180,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
             // Intercept AJAX Get response to populate subtitle and cover images
             jQuery(document).ajaxSuccess(function(event, xhr, settings, data) {
-                if (settings.data && settings.data.indexOf('action=cora_get_article') !== -1) {
+                if (settings.data && typeof settings.data === 'string' && settings.data.indexOf('action=cora_get_article') !== -1) {
                     if (data.success && data.data) {
                         jQuery('#cora-article-subtitle').val(data.data.subtitle || '');
                         jQuery('#cora-article-excerpt-bh').val(data.data.subtitle || '');
