@@ -846,3 +846,6 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
         </div>
     </form>
 </aside>
+
+<!-- GLOBAL DRAWER BACKDROP OVERLAY -->
+<div id="cora-drawer-backdrop" onclick="window.coraCloseAllDrawers()" class="hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-[9990] transition-opacity duration-200 cursor-pointer"></div>
