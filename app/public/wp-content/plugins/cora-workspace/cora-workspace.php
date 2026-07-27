@@ -23692,7 +23692,9 @@ function cora_ajax_add_event_timeline() {
 
 // 3. Studio Camera & Gear Inventory AJAX Handlers
 add_action('wp_ajax_cora_ajax_add_studio_gear', 'cora_ajax_add_studio_gear');
+add_action('wp_ajax_nopriv_cora_ajax_add_studio_gear', 'cora_ajax_add_studio_gear');
 add_action('wp_ajax_cora_add_studio_gear', 'cora_ajax_add_studio_gear');
+add_action('wp_ajax_nopriv_cora_add_studio_gear', 'cora_ajax_add_studio_gear');
 function cora_ajax_add_studio_gear() {
     check_ajax_referer('cora_ajax_nonce', 'security');
     if ( ! current_user_can('read') ) wp_send_json_error(array('message' => 'Permission denied.'));
@@ -23727,3 +23729,621 @@ function cora_ajax_add_studio_gear() {
         'gear_list' => $gear_list
     ));
 }
+
+// 3.1 cora_ajax_get_equipment_data
+add_action( 'wp_ajax_cora_ajax_get_equipment_data', 'cora_ajax_get_equipment_data' );
+add_action( 'wp_ajax_nopriv_cora_ajax_get_equipment_data', 'cora_ajax_get_equipment_data' );
+add_action( 'wp_ajax_cora_get_equipment_data', 'cora_ajax_get_equipment_data' );
+add_action( 'wp_ajax_nopriv_cora_get_equipment_data', 'cora_ajax_get_equipment_data' );
+function cora_ajax_get_equipment_data() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( array( 'message' => 'Permission denied.' ) );
+    }
+
+    $gear = get_option( 'cora_studio_gear', array() );
+    if ( empty( $gear ) || ! is_array( $gear ) ) {
+        // Fallback sample data
+        $gear = array(
+            array(
+                'id'             => 'gear_sample_1',
+                'name'           => 'Sony Alpha a7 IV',
+                'category'       => 'Camera',
+                'brand_model'    => 'Sony Alpha a7 IV',
+                'serial_no'      => 'SN-7734910',
+                'purchase_date'  => '2023-05-10',
+                'purchase_price' => 2499.00,
+                'current_value'  => 2200.00,
+                'condition'      => 'Excellent',
+                'status'         => 'Available',
+                'assigned_to'    => '',
+            ),
+            array(
+                'id'             => 'gear_sample_2',
+                'name'           => 'RED Komodo 6K',
+                'category'       => 'Camera',
+                'brand_model'    => 'RED Komodo 6K Cinema Camera',
+                'serial_no'      => 'SN-RED9021',
+                'purchase_date'  => '2022-11-15',
+                'purchase_price' => 5995.00,
+                'current_value'  => 5200.00,
+                'condition'      => 'Mint',
+                'status'         => 'In Use',
+                'assigned_to'    => 'Marcus Vance',
+            ),
+            array(
+                'id'             => 'gear_sample_3',
+                'name'           => 'DJI Mavic 3 Pro Drone',
+                'category'       => 'Drone',
+                'brand_model'    => 'DJI Mavic 3 Pro',
+                'serial_no'      => 'SN-DJI-482',
+                'purchase_date'  => '2023-08-01',
+                'purchase_price' => 2199.00,
+                'current_value'  => 1950.00,
+                'condition'      => 'Excellent',
+                'status'         => 'Available',
+                'assigned_to'    => '',
+            ),
+            array(
+                'id'             => 'gear_sample_4',
+                'name'           => 'Canon RF 70-200mm f/2.8',
+                'category'       => 'Lens',
+                'brand_model'    => 'Canon RF 70-200mm f/2.8 L IS USM',
+                'serial_no'      => 'SN-CN-70200',
+                'purchase_date'  => '2023-02-20',
+                'purchase_price' => 2799.00,
+                'current_value'  => 2500.00,
+                'condition'      => 'Mint',
+                'status'         => 'Available',
+                'assigned_to'    => '',
+            ),
+            array(
+                'id'             => 'gear_sample_5',
+                'name'           => 'Aperture 600d Pro Light',
+                'category'       => 'Lighting',
+                'brand_model'    => 'Aputure LS 600d Pro',
+                'serial_no'      => 'SN-APT-600D',
+                'purchase_date'  => '2023-01-10',
+                'purchase_price' => 1890.00,
+                'current_value'  => 1650.00,
+                'condition'      => 'Fair',
+                'status'         => 'Maintenance',
+                'assigned_to'    => '',
+            ),
+            array(
+                'id'             => 'gear_sample_6',
+                'name'           => 'Sennheiser Wireless Mic Kit',
+                'category'       => 'Audio',
+                'brand_model'    => 'Sennheiser EW 112P G4',
+                'serial_no'      => 'SN-SEN-112',
+                'purchase_date'  => '2022-09-05',
+                'purchase_price' => 649.00,
+                'current_value'  => 500.00,
+                'condition'      => 'Needs Service',
+                'status'         => 'Available',
+                'assigned_to'    => '',
+            ),
+        );
+        update_option( 'cora_studio_gear', $gear );
+    }
+
+    $checkouts   = get_option( 'cora_gear_checkouts', array() );
+    if ( ! is_array( $checkouts ) ) $checkouts = array();
+
+    $maintenance = get_option( 'cora_gear_maintenance', array() );
+    if ( ! is_array( $maintenance ) ) $maintenance = array();
+
+    $kits        = get_option( 'cora_gear_kits', array() );
+    if ( ! is_array( $kits ) ) $kits = array();
+
+    // Calculate metrics
+    $total_value            = 0;
+    $total_items            = count( $gear );
+    $in_use_count           = 0;
+    $available_count        = 0;
+    $maintenance_count      = 0;
+    $total_maintenance_cost = 0;
+
+    foreach ( $gear as $item ) {
+        $val = floatval( isset( $item['current_value'] ) && floatval( $item['current_value'] ) > 0 ? $item['current_value'] : ( $item['purchase_price'] ?? 0 ) );
+        $total_value += $val;
+
+        $st = isset( $item['status'] ) ? $item['status'] : 'Available';
+        if ( $st === 'In Use' ) {
+            $in_use_count++;
+        } elseif ( $st === 'Maintenance' ) {
+            $maintenance_count++;
+        } else {
+            $available_count++;
+        }
+    }
+
+    foreach ( $maintenance as $m ) {
+        $c = floatval( $m['cost'] ?? 0 );
+        $total_maintenance_cost += $c;
+    }
+
+    wp_send_json_success( array(
+        'gear'        => $gear,
+        'checkouts'   => $checkouts,
+        'maintenance' => $maintenance,
+        'kits'        => $kits,
+        'metrics'     => array(
+            'total_value'            => round( $total_value, 2 ),
+            'total_items'            => $total_items,
+            'in_use_count'           => $in_use_count,
+            'available_count'        => $available_count,
+            'maintenance_count'      => $maintenance_count,
+            'total_maintenance_cost' => round( $total_maintenance_cost, 2 ),
+        ),
+    ) );
+}
+
+// 3.2 cora_ajax_save_gear_item
+add_action( 'wp_ajax_cora_ajax_save_gear_item', 'cora_ajax_save_gear_item' );
+add_action( 'wp_ajax_nopriv_cora_ajax_save_gear_item', 'cora_ajax_save_gear_item' );
+add_action( 'wp_ajax_cora_save_gear_item', 'cora_ajax_save_gear_item' );
+add_action( 'wp_ajax_nopriv_cora_save_gear_item', 'cora_ajax_save_gear_item' );
+function cora_ajax_save_gear_item() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( array( 'message' => 'Permission denied.' ) );
+    }
+
+    $gear_id        = sanitize_text_field( $_POST['gear_id'] ?? $_POST['id'] ?? '' );
+    $name           = sanitize_text_field( $_POST['name'] ?? '' );
+    $category       = sanitize_text_field( $_POST['category'] ?? 'Camera' );
+    $brand_model    = sanitize_text_field( $_POST['brand_model'] ?? '' );
+    $serial_no      = sanitize_text_field( $_POST['serial_no'] ?? '' );
+    $purchase_date  = sanitize_text_field( $_POST['purchase_date'] ?? '' );
+    $purchase_price = floatval( $_POST['purchase_price'] ?? 0 );
+    $current_value  = floatval( $_POST['current_value'] ?? $purchase_price );
+    $condition      = sanitize_text_field( $_POST['condition'] ?? 'Excellent' );
+    $status         = sanitize_text_field( $_POST['status'] ?? 'Available' );
+    $assigned_to    = sanitize_text_field( $_POST['assigned_to'] ?? '' );
+
+    if ( empty( $name ) ) {
+        wp_send_json_error( array( 'message' => 'Gear item name is required.' ) );
+    }
+
+    $gear_list = get_option( 'cora_studio_gear', array() );
+    if ( ! is_array( $gear_list ) ) {
+        $gear_list = array();
+    }
+
+    $is_new = false;
+    $found_index = -1;
+
+    if ( ! empty( $gear_id ) ) {
+        foreach ( $gear_list as $index => $item ) {
+            if ( isset( $item['id'] ) && $item['id'] === $gear_id ) {
+                $found_index = $index;
+                break;
+            }
+        }
+    }
+
+    if ( $found_index >= 0 ) {
+        // Update existing item
+        $gear_list[$found_index]['name']           = $name;
+        $gear_list[$found_index]['category']       = $category;
+        $gear_list[$found_index]['brand_model']    = $brand_model;
+        $gear_list[$found_index]['serial_no']      = $serial_no;
+        $gear_list[$found_index]['purchase_date']  = $purchase_date;
+        $gear_list[$found_index]['purchase_price'] = $purchase_price;
+        $gear_list[$found_index]['current_value']  = $current_value;
+        $gear_list[$found_index]['condition']      = $condition;
+        $gear_list[$found_index]['status']         = $status;
+        if ( isset( $_POST['assigned_to'] ) ) {
+            $gear_list[$found_index]['assigned_to'] = $assigned_to;
+        }
+        $gear_list[$found_index]['updated_at']     = date( 'Y-m-d H:i:s' );
+        $saved_item = $gear_list[$found_index];
+    } else {
+        // Create new item
+        $is_new = true;
+        $saved_item = array(
+            'id'             => 'gear_' . uniqid(),
+            'name'           => $name,
+            'category'       => $category,
+            'brand_model'    => $brand_model,
+            'serial_no'      => $serial_no,
+            'purchase_date'  => $purchase_date ?: date( 'Y-m-d' ),
+            'purchase_price' => $purchase_price,
+            'current_value'  => $current_value,
+            'condition'      => $condition,
+            'status'         => $status,
+            'assigned_to'    => $assigned_to,
+            'created_at'     => date( 'Y-m-d H:i:s' ),
+            'updated_at'     => date( 'Y-m-d H:i:s' ),
+        );
+        array_unshift( $gear_list, $saved_item );
+
+        // If purchase_price > 0 for new item, log capital expense in cora_financial_ledger
+        if ( $purchase_price > 0 ) {
+            $ledger = get_option( 'cora_financial_ledger', array() );
+            if ( ! is_array( $ledger ) ) {
+                $ledger = array();
+            }
+            $current_user = wp_get_current_user();
+            $ledger_entry = array(
+                'id'             => 'led_' . uniqid(),
+                'timestamp'      => time(),
+                'date'           => date( 'Y-m-d H:i:s' ),
+                'user_id'        => get_current_user_id(),
+                'user_name'      => $current_user->exists() ? $current_user->display_name : 'System',
+                'type'           => 'outflow',
+                'category'       => 'Equipment Acquisition (CapEx)',
+                'description'    => 'Capital Expense: ' . $name . ( ! empty( $brand_model ) ? ' (' . $brand_model . ')' : '' ),
+                'amount'         => $purchase_price,
+                'payment_status' => 'Paid',
+                'status'         => 'completed',
+                'industry'       => 'studio'
+            );
+            array_unshift( $ledger, $ledger_entry );
+            update_option( 'cora_financial_ledger', $ledger );
+        }
+    }
+
+    update_option( 'cora_studio_gear', $gear_list );
+
+    wp_send_json_success( array(
+        'message'   => $is_new ? 'Gear item created successfully.' : 'Gear item updated successfully.',
+        'gear_item' => $saved_item,
+        'gear_list' => $gear_list,
+    ) );
+}
+
+// 3.3 cora_ajax_checkout_gear
+add_action( 'wp_ajax_cora_ajax_checkout_gear', 'cora_ajax_checkout_gear' );
+add_action( 'wp_ajax_nopriv_cora_ajax_checkout_gear', 'cora_ajax_checkout_gear' );
+add_action( 'wp_ajax_cora_checkout_gear', 'cora_ajax_checkout_gear' );
+add_action( 'wp_ajax_nopriv_cora_checkout_gear', 'cora_ajax_checkout_gear' );
+function cora_ajax_checkout_gear() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( array( 'message' => 'Permission denied.' ) );
+    }
+
+    $gear_id         = sanitize_text_field( $_POST['gear_id'] ?? '' );
+    $kit_id          = sanitize_text_field( $_POST['kit_id'] ?? '' );
+    $assigned_to     = sanitize_text_field( $_POST['assigned_to'] ?? '' );
+    $shoot_title     = sanitize_text_field( $_POST['shoot_title'] ?? '' );
+    $client_name     = sanitize_text_field( $_POST['client_name'] ?? '' );
+    $checkout_date   = sanitize_text_field( $_POST['checkout_date'] ?? date( 'Y-m-d H:i' ) );
+    $expected_return = sanitize_text_field( $_POST['expected_return'] ?? '' );
+
+    if ( empty( $gear_id ) && empty( $kit_id ) ) {
+        wp_send_json_error( array( 'message' => 'Gear ID or Kit ID is required for checkout.' ) );
+    }
+
+    $gear_list = get_option( 'cora_studio_gear', array() );
+    if ( ! is_array( $gear_list ) ) $gear_list = array();
+
+    $updated_item_ids = array();
+
+    if ( ! empty( $gear_id ) ) {
+        $updated_item_ids[] = $gear_id;
+    }
+
+    if ( ! empty( $kit_id ) ) {
+        $kits = get_option( 'cora_gear_kits', array() );
+        if ( is_array( $kits ) ) {
+            foreach ( $kits as $k ) {
+                if ( isset( $k['id'] ) && $k['id'] === $kit_id ) {
+                    if ( ! empty( $k['item_ids'] ) && is_array( $k['item_ids'] ) ) {
+                        $updated_item_ids = array_merge( $updated_item_ids, $k['item_ids'] );
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    $updated_item_ids = array_unique( $updated_item_ids );
+
+    foreach ( $gear_list as &$g ) {
+        if ( isset( $g['id'] ) && in_array( $g['id'], $updated_item_ids ) ) {
+            $g['status']      = 'In Use';
+            $g['assigned_to']  = $assigned_to;
+            $g['updated_at']   = date( 'Y-m-d H:i:s' );
+        }
+    }
+    unset( $g );
+
+    update_option( 'cora_studio_gear', $gear_list );
+
+    $checkouts = get_option( 'cora_gear_checkouts', array() );
+    if ( ! is_array( $checkouts ) ) $checkouts = array();
+
+    $new_checkout = array(
+        'id'              => 'chk_' . uniqid(),
+        'gear_id'         => $gear_id,
+        'kit_id'          => $kit_id,
+        'assigned_to'     => $assigned_to,
+        'shoot_title'     => $shoot_title,
+        'client_name'     => $client_name,
+        'checkout_date'   => $checkout_date,
+        'expected_return' => $expected_return,
+        'actual_return'   => '',
+        'status'          => 'Active',
+        'created_at'      => date( 'Y-m-d H:i:s' ),
+    );
+
+    array_unshift( $checkouts, $new_checkout );
+    update_option( 'cora_gear_checkouts', $checkouts );
+
+    wp_send_json_success( array(
+        'message'   => 'Gear checked out successfully.',
+        'checkout'  => $new_checkout,
+        'checkouts' => $checkouts,
+        'gear_list' => $gear_list,
+    ) );
+}
+
+// 3.4 cora_ajax_return_gear
+add_action( 'wp_ajax_cora_ajax_return_gear', 'cora_ajax_return_gear' );
+add_action( 'wp_ajax_nopriv_cora_ajax_return_gear', 'cora_ajax_return_gear' );
+add_action( 'wp_ajax_cora_return_gear', 'cora_ajax_return_gear' );
+add_action( 'wp_ajax_nopriv_cora_return_gear', 'cora_ajax_return_gear' );
+function cora_ajax_return_gear() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( array( 'message' => 'Permission denied.' ) );
+    }
+
+    $checkout_id = sanitize_text_field( $_POST['checkout_id'] ?? '' );
+    $gear_id     = sanitize_text_field( $_POST['gear_id'] ?? '' );
+
+    if ( empty( $checkout_id ) && empty( $gear_id ) ) {
+        wp_send_json_error( array( 'message' => 'Checkout ID or Gear ID is required to return gear.' ) );
+    }
+
+    $checkouts = get_option( 'cora_gear_checkouts', array() );
+    if ( ! is_array( $checkouts ) ) $checkouts = array();
+
+    $gear_list = get_option( 'cora_studio_gear', array() );
+    if ( ! is_array( $gear_list ) ) $gear_list = array();
+
+    $items_to_free = array();
+
+    if ( ! empty( $checkout_id ) ) {
+        foreach ( $checkouts as &$chk ) {
+            if ( isset( $chk['id'] ) && $chk['id'] === $checkout_id ) {
+                $chk['status']        = 'Returned';
+                $chk['actual_return'] = date( 'Y-m-d H:i:s' );
+                if ( ! empty( $chk['gear_id'] ) ) {
+                    $items_to_free[] = $chk['gear_id'];
+                }
+                if ( ! empty( $chk['kit_id'] ) ) {
+                    $kits = get_option( 'cora_gear_kits', array() );
+                    if ( is_array( $kits ) ) {
+                        foreach ( $kits as $k ) {
+                            if ( isset( $k['id'] ) && $k['id'] === $chk['kit_id'] ) {
+                                if ( ! empty( $k['item_ids'] ) && is_array( $k['item_ids'] ) ) {
+                                    $items_to_free = array_merge( $items_to_free, $k['item_ids'] );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        unset( $chk );
+    }
+
+    if ( ! empty( $gear_id ) ) {
+        $items_to_free[] = $gear_id;
+        foreach ( $checkouts as &$chk ) {
+            if ( ( isset( $chk['gear_id'] ) && $chk['gear_id'] === $gear_id ) && ( $chk['status'] ?? '' ) === 'Active' ) {
+                $chk['status']        = 'Returned';
+                $chk['actual_return'] = date( 'Y-m-d H:i:s' );
+            }
+        }
+        unset( $chk );
+    }
+
+    $items_to_free = array_unique( $items_to_free );
+
+    foreach ( $gear_list as &$g ) {
+        if ( isset( $g['id'] ) && in_array( $g['id'], $items_to_free ) ) {
+            $g['status']      = 'Available';
+            $g['assigned_to']  = '';
+            $g['updated_at']   = date( 'Y-m-d H:i:s' );
+        }
+    }
+    unset( $g );
+
+    update_option( 'cora_gear_checkouts', $checkouts );
+    update_option( 'cora_studio_gear', $gear_list );
+
+    wp_send_json_success( array(
+        'message'   => 'Gear returned successfully.',
+        'checkouts' => $checkouts,
+        'gear_list' => $gear_list,
+    ) );
+}
+
+// 3.5 cora_ajax_log_gear_maintenance
+add_action( 'wp_ajax_cora_ajax_log_gear_maintenance', 'cora_ajax_log_gear_maintenance' );
+add_action( 'wp_ajax_nopriv_cora_ajax_log_gear_maintenance', 'cora_ajax_log_gear_maintenance' );
+add_action( 'wp_ajax_cora_log_gear_maintenance', 'cora_ajax_log_gear_maintenance' );
+add_action( 'wp_ajax_nopriv_cora_log_gear_maintenance', 'cora_ajax_log_gear_maintenance' );
+function cora_ajax_log_gear_maintenance() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( array( 'message' => 'Permission denied.' ) );
+    }
+
+    $gear_id          = sanitize_text_field( $_POST['gear_id'] ?? '' );
+    $gear_name        = sanitize_text_field( $_POST['gear_name'] ?? '' );
+    $maintenance_type = sanitize_text_field( $_POST['maintenance_type'] ?? 'Routine Service' );
+    $cost             = floatval( $_POST['cost'] ?? 0 );
+    $vendor           = sanitize_text_field( $_POST['vendor'] ?? '' );
+    $notes            = sanitize_textarea_field( $_POST['notes'] ?? '' );
+    $serviced_date    = sanitize_text_field( $_POST['serviced_date'] ?? date( 'Y-m-d' ) );
+
+    if ( empty( $gear_name ) && ! empty( $gear_id ) ) {
+        $gear_list = get_option( 'cora_studio_gear', array() );
+        if ( is_array( $gear_list ) ) {
+            foreach ( $gear_list as $g ) {
+                if ( isset( $g['id'] ) && $g['id'] === $gear_id ) {
+                    $gear_name = $g['name'];
+                    break;
+                }
+            }
+        }
+    }
+
+    if ( empty( $gear_name ) ) {
+        $gear_name = 'Gear Equipment';
+    }
+
+    // Update gear item status to Maintenance in cora_studio_gear if gear_id provided
+    $gear_list = get_option( 'cora_studio_gear', array() );
+    if ( ! is_array( $gear_list ) ) $gear_list = array();
+    if ( ! empty( $gear_id ) ) {
+        foreach ( $gear_list as &$g ) {
+            if ( isset( $g['id'] ) && $g['id'] === $gear_id ) {
+                $g['status']     = 'Maintenance';
+                $g['condition']  = 'Needs Service';
+                $g['updated_at'] = date( 'Y-m-d H:i:s' );
+            }
+        }
+        unset( $g );
+        update_option( 'cora_studio_gear', $gear_list );
+    }
+
+    // Append to cora_gear_maintenance
+    $maintenance = get_option( 'cora_gear_maintenance', array() );
+    if ( ! is_array( $maintenance ) ) $maintenance = array();
+
+    $new_entry = array(
+        'id'               => 'maint_' . uniqid(),
+        'gear_id'          => $gear_id,
+        'gear_name'        => $gear_name,
+        'maintenance_type' => $maintenance_type,
+        'cost'             => $cost,
+        'vendor'           => $vendor,
+        'notes'            => $notes,
+        'serviced_date'    => $serviced_date,
+        'created_at'       => date( 'Y-m-d H:i:s' ),
+    );
+
+    array_unshift( $maintenance, $new_entry );
+    update_option( 'cora_gear_maintenance', $maintenance );
+
+    // FINANCIAL INTEGRATION: Append outflow entry into cora_financial_ledger
+    $ledger = get_option( 'cora_financial_ledger', array() );
+    if ( ! is_array( $ledger ) ) {
+        $ledger = array();
+    }
+    $current_user = wp_get_current_user();
+    $vendor_desc = ! empty( $vendor ) ? " ({$vendor})" : "";
+    $ledger_entry = array(
+        'id'             => 'led_' . uniqid(),
+        'timestamp'      => time(),
+        'date'           => date( 'Y-m-d H:i:s' ),
+        'user_id'        => get_current_user_id(),
+        'user_name'      => $current_user->exists() ? $current_user->display_name : 'System',
+        'type'           => 'outflow',
+        'category'       => 'Equipment Maintenance & Repair',
+        'description'    => "Gear Maintenance: {$gear_name}{$vendor_desc}",
+        'amount'         => $cost,
+        'payment_status' => 'Paid',
+        'status'         => 'completed',
+        'industry'       => 'studio'
+    );
+    array_unshift( $ledger, $ledger_entry );
+    update_option( 'cora_financial_ledger', $ledger );
+
+    wp_send_json_success( array(
+        'message'          => 'Gear maintenance log saved successfully.',
+        'maintenance_entry'=> $new_entry,
+        'maintenance'      => $maintenance,
+        'gear_list'        => $gear_list,
+        'ledger_entry'     => $ledger_entry,
+    ) );
+}
+
+// 3.6 cora_ajax_save_gear_kit
+add_action( 'wp_ajax_cora_ajax_save_gear_kit', 'cora_ajax_save_gear_kit' );
+add_action( 'wp_ajax_nopriv_cora_ajax_save_gear_kit', 'cora_ajax_save_gear_kit' );
+add_action( 'wp_ajax_cora_save_gear_kit', 'cora_ajax_save_gear_kit' );
+add_action( 'wp_ajax_nopriv_cora_save_gear_kit', 'cora_ajax_save_gear_kit' );
+function cora_ajax_save_gear_kit() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( array( 'message' => 'Permission denied.' ) );
+    }
+
+    $kit_id      = sanitize_text_field( $_POST['kit_id'] ?? $_POST['id'] ?? '' );
+    $kit_name    = sanitize_text_field( $_POST['kit_name'] ?? $_POST['name'] ?? '' );
+    $category    = sanitize_text_field( $_POST['category'] ?? 'Camera Package' );
+    $description = sanitize_textarea_field( $_POST['description'] ?? '' );
+    
+    // Parse item_ids (can be array, JSON string, or comma-separated string)
+    $raw_item_ids = $_POST['item_ids'] ?? array();
+    $item_ids     = array();
+
+    if ( is_array( $raw_item_ids ) ) {
+        $item_ids = array_map( 'sanitize_text_field', $raw_item_ids );
+    } elseif ( is_string( $raw_item_ids ) && ! empty( $raw_item_ids ) ) {
+        $decoded = json_decode( stripslashes( $raw_item_ids ), true );
+        if ( is_array( $decoded ) ) {
+            $item_ids = array_map( 'sanitize_text_field', $decoded );
+        } else {
+            $item_ids = array_map( 'trim', explode( ',', sanitize_text_field( $raw_item_ids ) ) );
+        }
+    }
+
+    if ( empty( $kit_name ) ) {
+        wp_send_json_error( array( 'message' => 'Kit name is required.' ) );
+    }
+
+    $kits = get_option( 'cora_gear_kits', array() );
+    if ( ! is_array( $kits ) ) {
+        $kits = array();
+    }
+
+    $found_index = -1;
+    if ( ! empty( $kit_id ) ) {
+        foreach ( $kits as $index => $k ) {
+            if ( isset( $k['id'] ) && $k['id'] === $kit_id ) {
+                $found_index = $index;
+                break;
+            }
+        }
+    }
+
+    if ( $found_index >= 0 ) {
+        $kits[$found_index]['name']        = $kit_name;
+        $kits[$found_index]['kit_name']    = $kit_name;
+        $kits[$found_index]['category']    = $category;
+        $kits[$found_index]['description'] = $description;
+        $kits[$found_index]['item_ids']    = $item_ids;
+        $kits[$found_index]['updated_at']  = date( 'Y-m-d H:i:s' );
+        $saved_kit = $kits[$found_index];
+    } else {
+        $saved_kit = array(
+            'id'          => 'kit_' . uniqid(),
+            'name'        => $kit_name,
+            'kit_name'    => $kit_name,
+            'category'    => $category,
+            'description' => $description,
+            'item_ids'    => $item_ids,
+            'created_at'  => date( 'Y-m-d H:i:s' ),
+            'updated_at'  => date( 'Y-m-d H:i:s' ),
+        );
+        array_unshift( $kits, $saved_kit );
+    }
+
+    update_option( 'cora_gear_kits', $kits );
+
+    wp_send_json_success( array(
+        'message'  => 'Gear kit saved successfully.',
+        'gear_kit' => $saved_kit,
+        'kits'     => $kits,
+    ) );
+}
+

@@ -5603,6 +5603,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
             <!-- SECTION 8: EQUIPMENT TRACKING -->
             <?php if ( $sub_page === 'equipment' ) : ?>
+            <?php 
+                $cora_eq_ind = function_exists('cora_get_active_industry') ? cora_get_active_industry() : 'photography_studio';
+                if ( $cora_eq_ind === 'photography_studio' ) :
+            ?>
+            <section id="cora-page-equipment" class="cora-page-section cora-active">
+                <?php include CORA_WORKSPACE_PATH . 'views/view-equipment.php'; ?>
+            </section>
+            <?php else : ?>
             <section id="cora-page-equipment" class="cora-page-section cora-active space-y-6">
                 <div class="flex items-center justify-between">
                     <div class="cora-page-header flex items-center gap-3">
@@ -5820,6 +5828,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     </div>
                 </div>
             </section>
+            <?php endif; ?>
             <?php endif; ?>
 
             <!-- SECTION 9: STUDIO VAULT -->
