@@ -423,8 +423,8 @@ if ( is_array( $cora_gear_maintenance ) ) {
                 </div>
             </div>
 
-            <div class="border border-zinc-200/80 rounded-xl overflow-hidden shadow-2xs">
-                <table class="w-full text-left border-collapse text-xs">
+            <div class="border border-zinc-200/80 rounded-xl overflow-x-auto shadow-2xs">
+                <table class="w-full text-left border-collapse text-xs min-w-[1000px]">
                     <thead>
                         <tr class="bg-zinc-50/60 border-b border-zinc-200 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
                             <th class="p-3.5">Equipment Unit</th>
@@ -542,8 +542,8 @@ if ( is_array( $cora_gear_maintenance ) ) {
                 </button>
             </div>
 
-            <div class="border border-zinc-200/80 rounded-xl overflow-hidden shadow-2xs">
-                <table class="w-full text-left border-collapse text-xs">
+            <div class="border border-zinc-200/80 rounded-xl overflow-x-auto shadow-2xs">
+                <table class="w-full text-left border-collapse text-xs min-w-[1000px]">
                     <thead>
                         <tr class="bg-zinc-50/60 border-b border-zinc-200 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
                             <th class="p-3.5">Equipment / Package</th>
@@ -620,8 +620,8 @@ if ( is_array( $cora_gear_maintenance ) ) {
                 </button>
             </div>
 
-            <div class="border border-zinc-200/80 rounded-xl overflow-hidden shadow-2xs">
-                <table class="w-full text-left border-collapse text-xs">
+            <div class="border border-zinc-200/80 rounded-xl overflow-x-auto shadow-2xs">
+                <table class="w-full text-left border-collapse text-xs min-w-[1000px]">
                     <thead>
                         <tr class="bg-zinc-50/60 border-b border-zinc-200 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
                             <th class="p-3.5">Equipment Unit</th>
