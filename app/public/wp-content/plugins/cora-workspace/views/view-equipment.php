@@ -18,16 +18,9 @@ $cora_needs_init = false;
 if ( empty( $cora_studio_gear ) || ! is_array( $cora_studio_gear ) ) {
     $cora_needs_init = true;
 } else {
-    // Check if the specific serial SN-774921 exists, if not we must re-init
-    $has_target_serial = false;
-    foreach ( $cora_studio_gear as $item ) {
-        $serial_val = $item['serial'] ?? $item['serial_no'] ?? '';
-        if ( $serial_val === 'SN-774921' ) {
-            $has_target_serial = true;
-            break;
-        }
-    }
-    if ( ! $has_target_serial ) {
+    // Check if the first item has the new ID gear_sony_a7iv
+    $first_item = reset( $cora_studio_gear );
+    if ( ! isset( $first_item['id'] ) || $first_item['id'] !== 'gear_sony_a7iv' ) {
         $cora_needs_init = true;
     }
 }
