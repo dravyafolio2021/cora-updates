@@ -23068,7 +23068,15 @@ if ( ! function_exists( 'cora_ajax_update_lead_stage' ) ) {
         } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
             $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
         }
-        if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+
+        $verified = false;
+        if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+            $verified = true;
+        } elseif ( current_user_can( 'manage_options' ) ) {
+            $verified = true;
+        }
+
+        if ( ! $verified ) {
             wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
         }
 
