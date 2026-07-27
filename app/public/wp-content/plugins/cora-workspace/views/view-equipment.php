@@ -1086,11 +1086,40 @@ if ( is_array( $cora_gear_maintenance ) ) {
         <div class="grid grid-cols-2 gap-3">
             <div>
                 <label class="block text-xs font-bold text-zinc-800 mb-1">Client Name *</label>
-                <input type="text" id="checkout-client-name" required placeholder="e.g. Oberoi Group" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+                <select id="checkout-client-name" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
+                    <option value="" disabled selected>Select Client...</option>
+                    <?php 
+                    $cora_existing_clients = get_option( 'cora_workspace_clients', array() );
+                    if ( is_array( $cora_existing_clients ) ) :
+                        foreach ( $cora_existing_clients as $client ) :
+                            $client_name = $client['names'] ?? $client['name'] ?? '';
+                            if ( ! empty( $client_name ) ) :
+                                ?>
+                                <option value="<?php echo esc_attr( $client_name ); ?>"><?php echo esc_html( $client_name ); ?></option>
+                                <?php
+                            endif;
+                        endforeach;
+                    endif;
+                    ?>
+                </select>
             </div>
             <div>
                 <label class="block text-xs font-bold text-zinc-800 mb-1">Assigned DoP / Operator *</label>
-                <input type="text" id="checkout-dop-pilot" required placeholder="e.g. Karan Malhotra" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950">
+                <select id="checkout-dop-pilot" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl focus:border-zinc-900 focus:outline-none bg-white text-zinc-950 cursor-pointer">
+                    <option value="" disabled selected>Select Crew / DoP...</option>
+                    <?php 
+                    $cora_all_users = get_users( array( 'fields' => array( 'ID', 'display_name' ) ) );
+                    if ( is_array( $cora_all_users ) ) :
+                        foreach ( $cora_all_users as $u ) :
+                            if ( ! empty( $u->display_name ) ) :
+                                ?>
+                                <option value="<?php echo esc_attr( $u->display_name ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
+                                <?php
+                            endif;
+                        endforeach;
+                    endif;
+                    ?>
+                </select>
             </div>
         </div>
 
