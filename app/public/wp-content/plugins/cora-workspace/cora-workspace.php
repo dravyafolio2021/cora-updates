@@ -23571,3 +23571,159 @@ function cora_ajax_export_gstr1() {
 
     wp_send_json_success(array('csv' => $csv, 'filename' => 'GSTR1_Outward_Supplies_' . date('Y_m') . '.csv'));
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * STUDIO MODULE AJAX HANDLERS (feature/studio-module)
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+// 1. Crew Shift Scheduling AJAX Handlers
+add_action('wp_ajax_cora_ajax_add_crew_shift', 'cora_ajax_add_crew_shift');
+add_action('wp_ajax_cora_add_crew_shift', 'cora_ajax_add_crew_shift');
+function cora_ajax_add_crew_shift() {
+    check_ajax_referer('cora_ajax_nonce', 'security');
+    if ( ! current_user_can('read') ) wp_send_json_error(array('message' => 'Permission denied.'));
+
+    $staff_name = sanitize_text_field($_POST['staff_name'] ?? '');
+    $staff_role = sanitize_text_field($_POST['staff_role'] ?? 'Photographer');
+    $staff_phone = sanitize_text_field($_POST['staff_phone'] ?? '');
+    $property_title = sanitize_text_field($_POST['property_title'] ?? 'Studio Shoot');
+    $venue = sanitize_text_field($_POST['venue'] ?? 'Main Studio');
+    $date = sanitize_text_field($_POST['date'] ?? date('Y-m-d'));
+    $time_start = sanitize_text_field($_POST['time_start'] ?? '09:00 AM');
+    $time_end = sanitize_text_field($_POST['time_end'] ?? '05:00 PM');
+    $shift_type = sanitize_text_field($_POST['shift_type'] ?? 'Standard (8h)');
+    $day_rate = floatval($_POST['day_rate'] ?? 0);
+    $overtime_pay = floatval($_POST['overtime_pay'] ?? 0);
+
+    if (empty($staff_name)) {
+        wp_send_json_error(array('message' => 'Staff member name is required.'));
+    }
+
+    $cora_crew_shifts = get_option('cora_crew_shifts', array());
+    if (!is_array($cora_crew_shifts)) $cora_crew_shifts = array();
+
+    $new_shift = array(
+        'id'            => 'shift_' . uniqid(),
+        'staff_name'    => $staff_name,
+        'staff_role'    => $staff_role,
+        'staff_phone'   => $staff_phone,
+        'property_title'=> $property_title,
+        'venue'         => $venue,
+        'date'          => $date,
+        'time_start'    => $time_start,
+        'time_end'      => $time_end,
+        'shift_type'    => $shift_type,
+        'day_rate'      => $day_rate,
+        'overtime_pay'  => $overtime_pay,
+        'total_payout'  => $day_rate + $overtime_pay,
+        'status'        => 'Scheduled'
+    );
+
+    array_unshift($cora_crew_shifts, $new_shift);
+    update_option('cora_crew_shifts', $cora_crew_shifts);
+
+    wp_send_json_success(array(
+        'message' => 'Shift assigned successfully to ' . $staff_name,
+        'shift' => $new_shift,
+        'shifts' => $cora_crew_shifts
+    ));
+}
+
+add_action('wp_ajax_cora_ajax_delete_crew_shift', 'cora_ajax_delete_crew_shift');
+add_action('wp_ajax_cora_delete_crew_shift', 'cora_ajax_delete_crew_shift');
+function cora_ajax_delete_crew_shift() {
+    check_ajax_referer('cora_ajax_nonce', 'security');
+    if ( ! current_user_can('read') ) wp_send_json_error(array('message' => 'Permission denied.'));
+
+    $shift_id = sanitize_text_field($_POST['shift_id'] ?? '');
+    if (empty($shift_id)) wp_send_json_error(array('message' => 'Invalid shift ID.'));
+
+    $cora_crew_shifts = get_option('cora_crew_shifts', array());
+    if (!is_array($cora_crew_shifts)) $cora_crew_shifts = array();
+
+    $cora_crew_shifts = array_filter($cora_crew_shifts, function($s) use ($shift_id) {
+        return ($s['id'] ?? '') !== $shift_id;
+    });
+
+    update_option('cora_crew_shifts', array_values($cora_crew_shifts));
+    wp_send_json_success(array('message' => 'Shift removed successfully.'));
+}
+
+// 2. Multi-Day Event Timeline AJAX Handlers
+add_action('wp_ajax_cora_ajax_add_event_timeline', 'cora_ajax_add_event_timeline');
+add_action('wp_ajax_cora_add_event_timeline', 'cora_ajax_add_event_timeline');
+function cora_ajax_add_event_timeline() {
+    check_ajax_referer('cora_ajax_nonce', 'security');
+    if ( ! current_user_can('read') ) wp_send_json_error(array('message' => 'Permission denied.'));
+
+    $title = sanitize_text_field($_POST['title'] ?? '');
+    $category = sanitize_text_field($_POST['category'] ?? 'Photography Shoot');
+    $client_name = sanitize_text_field($_POST['client_name'] ?? '');
+    $client_phone = sanitize_text_field($_POST['client_phone'] ?? '');
+    $total_days = intval($_POST['total_days'] ?? 1);
+
+    if (empty($title)) wp_send_json_error(array('message' => 'Timeline title is required.'));
+
+    $cora_event_timelines = get_option('cora_event_timelines', array());
+    if (!is_array($cora_event_timelines)) $cora_event_timelines = array();
+
+    $new_timeline = array(
+        'id'          => 'tl_' . uniqid(),
+        'title'       => $title,
+        'category'    => $category,
+        'client_name' => $client_name,
+        'client_phone'=> $client_phone,
+        'total_days'  => $total_days,
+        'status'      => 'Active Live',
+        'token'       => 'tl_token_' . substr(md5(uniqid()), 0, 8),
+        'created_at'  => date('Y-m-d'),
+        'blocks'      => array()
+    );
+
+    array_unshift($cora_event_timelines, $new_timeline);
+    update_option('cora_event_timelines', $cora_event_timelines);
+
+    wp_send_json_success(array(
+        'message' => 'Event timeline created successfully.',
+        'timeline' => $new_timeline,
+        'timelines' => $cora_event_timelines
+    ));
+}
+
+// 3. Studio Camera & Gear Inventory AJAX Handlers
+add_action('wp_ajax_cora_ajax_add_studio_gear', 'cora_ajax_add_studio_gear');
+add_action('wp_ajax_cora_add_studio_gear', 'cora_ajax_add_studio_gear');
+function cora_ajax_add_studio_gear() {
+    check_ajax_referer('cora_ajax_nonce', 'security');
+    if ( ! current_user_can('read') ) wp_send_json_error(array('message' => 'Permission denied.'));
+
+    $name = sanitize_text_field($_POST['name'] ?? '');
+    $category = sanitize_text_field($_POST['category'] ?? 'Camera');
+    $serial_no = sanitize_text_field($_POST['serial_no'] ?? '');
+    $status = sanitize_text_field($_POST['status'] ?? 'Available');
+    $assigned_to = sanitize_text_field($_POST['assigned_to'] ?? '');
+
+    if (empty($name)) wp_send_json_error(array('message' => 'Equipment name is required.'));
+
+    $gear_list = get_option('cora_studio_gear', array());
+    if (!is_array($gear_list)) $gear_list = array();
+
+    $new_gear = array(
+        'id'          => 'gear_' . uniqid(),
+        'name'        => $name,
+        'category'    => $category,
+        'serial_no'   => $serial_no,
+        'status'      => $status,
+        'assigned_to' => $assigned_to,
+        'updated_at'  => date('Y-m-d H:i')
+    );
+
+    array_unshift($gear_list, $new_gear);
+    update_option('cora_studio_gear', $gear_list);
+
+    wp_send_json_success(array(
+        'message' => 'Gear added to Studio Inventory successfully.',
+        'gear' => $new_gear,
+        'gear_list' => $gear_list
+    ));
+}
