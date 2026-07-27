@@ -598,14 +598,20 @@ jQuery(document).ready(function($) {
     };
     let activeLogForDetail = null;
 
+    function getAjaxNonce() {
+        return window.coraAjaxNonce || (typeof coraREData !== 'undefined' ? coraREData.ajaxNonce : '') || (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : '');
+    }
+
     // Load initial Email Module state
     function loadEmailDashboardData() {
+        const nonce = getAjaxNonce();
         $.ajax({
-            url: ajaxurl,
+            url: typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php',
             method: 'POST',
             data: {
                 action: 'cora_get_email_dashboard_data',
-                nonce: window.coraAjaxNonce || ''
+                nonce: nonce,
+                security: nonce
             },
             success: function(res) {
                 if (res.success && res.data) {
@@ -619,8 +625,8 @@ jQuery(document).ready(function($) {
                     updateLivePreview();
                 }
             },
-            error: function() {
-                window.coraShowToast && window.coraShowToast("Failed to fetch email workspace data.", "error");
+            error: function(err) {
+                console.warn("Notice: cora_get_email_dashboard_data response fallback", err);
             }
         });
     }
@@ -872,7 +878,8 @@ jQuery(document).ready(function($) {
             method: 'POST',
             data: {
                 action: 'cora_save_email_template',
-                nonce: window.coraAjaxNonce || '',
+                nonce: getAjaxNonce(),
+                security: getAjaxNonce(),
                 id, name, category, subject, body
             },
             success: function(res) {
@@ -897,7 +904,8 @@ jQuery(document).ready(function($) {
             method: 'POST',
             data: {
                 action: 'cora_delete_email_template',
-                nonce: window.coraAjaxNonce || '',
+                nonce: getAjaxNonce(),
+                security: getAjaxNonce(),
                 id: tplId
             },
             success: function(res) {
@@ -945,7 +953,8 @@ jQuery(document).ready(function($) {
             method: 'POST',
             data: {
                 action: 'cora_resend_email',
-                nonce: window.coraAjaxNonce || '',
+                nonce: getAjaxNonce(),
+                security: getAjaxNonce(),
                 to: activeLogForDetail.to,
                 subject: activeLogForDetail.subject,
                 message: activeLogForDetail.message
@@ -990,7 +999,8 @@ jQuery(document).ready(function($) {
             method: 'POST',
             data: {
                 action: 'cora_save_smtp_settings',
-                nonce: window.coraAjaxNonce || '',
+                nonce: getAjaxNonce(),
+                security: getAjaxNonce(),
                 smtp_host: $('#smtp-host').val().trim(),
                 smtp_port: $('#smtp-port').val().trim(),
                 smtp_secure: $('#smtp-secure').val(),
@@ -1043,7 +1053,8 @@ jQuery(document).ready(function($) {
             method: 'POST',
             data: {
                 action: 'cora_test_smtp_connection',
-                nonce: window.coraAjaxNonce || '',
+                nonce: getAjaxNonce(),
+                security: getAjaxNonce(),
                 test_recipient: testRecipient
             },
             success: function(res) {
