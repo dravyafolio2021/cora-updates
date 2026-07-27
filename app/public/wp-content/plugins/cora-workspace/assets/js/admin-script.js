@@ -7339,7 +7339,7 @@ jQuery(document).ready(function($) {
         }
 
         // 4. GEO Citations Audit
-        const geoTerms = ['delhi', 'ncr', 'vasant vihar', 'saket', 'dwarka', 'gurgaon', 'noida', 'okhla', 'bandra', 'mumbai'];
+        const geoTerms = ['delhi', 'ncr', 'vasant vihar', 'saket', 'dwarka', 'gurgaon', 'noida', 'okhla', 'bandra', 'mumbai', 'gurugram', 'cybercity'];
         const currencyTerms = ['lakh', 'crore', 'lk', 'cr'];
         const rupeeSymbol = /₹|\b(rs\.?|rupees?)\b/i;
         const indianNumberFormat = /\b\d{1,2},\d{2},\d{2,3}\b/;
@@ -7348,16 +7348,99 @@ jQuery(document).ready(function($) {
         const hasCurrencyTerm = currencyTerms.some(term => textLower.includes(term));
         const hasRupeeOrFormat = rupeeSymbol.test(textLower) || indianNumberFormat.test(textLower);
 
-        const hasLocalCitations = hasGeoTerm || hasCurrencyTerm || hasRupeeOrFormat;
-        $('#chk-geo-citations').prop('checked', hasLocalCitations);
+        // Real-Time GEO Optimizations Audit checks
+        const hasDirectAnswer = textLower.includes('q:') || textLower.includes('answer:') || textLower.includes('cora-geo-answer-block') || textLower.includes('q&a');
+        const hasStats = hasCurrencyTerm || hasRupeeOrFormat || /\b\d+(%| percent| sq\.?ft| lakhs?| crores?)\b/i.test(textLower);
+        const hasSchema = textLower.includes('faq') || textLower.includes('frequently asked questions') || textLower.includes('schema') || (jQuery('#cora-schema-preview-block').length && jQuery('#cora-schema-preview-block').text().length > 5);
+        const hasCitations = hasGeoTerm;
 
-        // Update GEO score based on active flags
-        let geoScore = 60;
-        if ($('#chk-geo-direct-answer').is(':checked')) geoScore += 10;
-        if ($('#chk-geo-info-density').is(':checked')) geoScore += 10;
-        if (hasLocalCitations) geoScore += 10;
-        if ($('#chk-geo-schema').is(':checked')) geoScore += 10;
-        $('#cora-geo-score-display').text(geoScore);
+        // Update Checklist visual states
+        let geoIssues = 0;
+        let geoScore = 0;
+
+        // Answer Block
+        if (hasDirectAnswer) {
+            geoScore += 25;
+            $('#chk-geo-direct-answer-icon').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').html('✓');
+            $('#chk-geo-direct-answer-status').removeClass('text-red-500').addClass('text-emerald-600').text('Good');
+        } else {
+            geoIssues++;
+            $('#chk-geo-direct-answer-icon').removeClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').addClass('bg-red-50 text-red-500 border border-red-200/60').html('!');
+            $('#chk-geo-direct-answer-status').removeClass('text-emerald-600').addClass('text-red-500').text('Missing');
+        }
+
+        // Facts & Stats
+        if (hasStats) {
+            geoScore += 25;
+            $('#chk-geo-info-density-icon').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').html('✓');
+            $('#chk-geo-info-density-status').removeClass('text-red-500').addClass('text-emerald-600').text('Good');
+        } else {
+            geoIssues++;
+            $('#chk-geo-info-density-icon').removeClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').addClass('bg-red-50 text-red-500 border border-red-200/60').html('!');
+            $('#chk-geo-info-density-status').removeClass('text-emerald-600').addClass('text-red-500').text('Missing');
+        }
+
+        // Schema FAQ
+        if (hasSchema) {
+            geoScore += 25;
+            $('#chk-geo-schema-icon').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').html('✓');
+            $('#chk-geo-schema-status').removeClass('text-red-500').addClass('text-emerald-600').text('Good');
+        } else {
+            geoIssues++;
+            $('#chk-geo-schema-icon').removeClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').addClass('bg-red-50 text-red-500 border border-red-200/60').html('!');
+            $('#chk-geo-schema-status').removeClass('text-emerald-600').addClass('text-red-500').text('Missing');
+        }
+
+        // Entity Citations
+        if (hasCitations) {
+            geoScore += 25;
+            $('#chk-geo-citations-icon').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').html('✓');
+            $('#chk-geo-citations-status').removeClass('text-red-500').addClass('text-emerald-600').text('Good');
+        } else {
+            geoIssues++;
+            $('#chk-geo-citations-icon').removeClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').addClass('bg-red-50 text-red-500 border border-red-200/60').html('!');
+            $('#chk-geo-citations-status').removeClass('text-emerald-600').addClass('text-red-500').text('Missing');
+        }
+
+        // Update display elements & ring colors
+        $('#cora-geo-score-display').text(words > 0 ? geoScore : '22');
+        const $geoRing = $('#cora-geo-score-ring');
+        $geoRing.attr('stroke-dasharray', `${words > 0 ? geoScore : 22}, 100`);
+        $geoRing.removeClass('text-red-500 text-amber-500 text-emerald-500');
+        
+        const geoStatusText = $('#cora-geo-status-text');
+        geoStatusText.removeClass('text-red-500 text-amber-500 text-emerald-500');
+
+        const activeGeoScore = words > 0 ? geoScore : 22;
+        if (activeGeoScore >= 75) {
+            $geoRing.addClass('text-emerald-500');
+            geoStatusText.addClass('text-emerald-500').text('Optimal AI Search');
+        } else if (activeGeoScore >= 50) {
+            $geoRing.addClass('text-amber-500');
+            geoStatusText.addClass('text-amber-500').text('Needs Improvement');
+        } else {
+            $geoRing.addClass('text-red-500');
+            geoStatusText.addClass('text-red-500').text('Needs Improvement');
+        }
+
+        // Update Issues Badge
+        const geoBadge = $('#geo-checklist-issues-badge');
+        if (words > 0) {
+            if (geoIssues > 0) {
+                geoBadge.removeClass('bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30')
+                        .addClass('bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 border border-red-100/50 dark:border-red-900/30')
+                        .text(`${geoIssues} ${geoIssues === 1 ? 'Issue' : 'Issues'}`);
+            } else {
+                geoBadge.removeClass('bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 border-red-100/50 dark:border-red-900/30')
+                        .addClass('bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30')
+                        .text('Optimal');
+            }
+        } else {
+            geoBadge.removeClass('bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30')
+                    .addClass('bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 border border-red-100/50 dark:border-red-900/30')
+                    .text('4 Issues');
+        }
+
 
         // Readability Checker (Flesch Reading Ease)
         let sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length || 1;
@@ -10164,6 +10247,40 @@ jQuery(document).ready(function($) {
             setTimeout(function() { window.coraLoadGitHubBranches(savedRepo); }, 700);
         }
     }());
+
+    window.coraInjectGeoBlock = function(type) {
+        if (!window.coraQuillListingCoordinator) {
+            window.coraShowToast('Editor coordinator not ready.', 'error');
+            return;
+        }
+
+        let html = '';
+        if (type === 'answer') {
+            html = `<h2>Direct Answer: What are the current commercial property leasing rates in DLF CyberCity, Gurgaon?</h2><p class="cora-geo-answer-block"><strong>Answer:</strong> Commercial leasing rates in DLF CyberCity, Gurgaon currently range between ₹140 to ₹180 per sq. ft. per month, depending on the building class and office size. Premium Grade-A office spaces command up to ₹200 per sq. ft. due to high corporate demand.</p><p></p>`;
+            window.coraShowToast('Answer Block template added to editor.', 'success');
+        } else if (type === 'takeaways') {
+            html = `<h3>Key Takeaways & Facts:</h3><ul><li><strong>Average rent:</strong> ₹160/sq.ft. in Grade-A complexes.</li><li><strong>Vacancy rate:</strong> Reduced to 8.5% in Gurgaon's primary commercial sectors.</li><li><strong>Premium options:</strong> DLF CyberCity represents the highest demand hub.</li></ul><p></p>`;
+            window.coraShowToast('Key Takeaways block added to editor.', 'success');
+        } else if (type === 'faq') {
+            html = `<h3>Frequently Asked Questions (FAQ)</h3><p><strong>Q: What is the average lease lock-in period in DLF CyberCity?</strong><br>A: Standard commercial lease lock-in periods range from 3 to 5 years with a 15% escalation every 3 years.</p><p><strong>Q: Are there ready-to-move office configurations available?</strong><br>A: Yes, multiple fully-furnished managed office spaces are available for lease starting from 10,000 sq. ft.</p><p></p>`;
+            window.coraShowToast('FAQ Section block added to editor.', 'success');
+        }
+
+        if (html) {
+            const range = window.coraQuillListingCoordinator.getSelection();
+            const index = range ? range.index : window.coraQuillListingCoordinator.getLength();
+            window.coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(index, html);
+            
+            // Trigger recalculations
+            if (typeof window.coraUpdateWordCount === 'function') {
+                window.coraUpdateWordCount();
+            }
+            if (typeof window.coraUpdateSEOAudits === 'function') {
+                window.coraUpdateSEOAudits();
+            }
+        }
+    };
+
 
 
 
