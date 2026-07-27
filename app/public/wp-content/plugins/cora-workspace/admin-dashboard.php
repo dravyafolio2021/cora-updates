@@ -7854,7 +7854,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     #cora-full-page-editor:not(.hidden) { display: flex !important; }
     .cora-serif-editor .ql-editor { font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; font-size: 1.125rem; line-height: 1.8; color: #18181b; }
     .cora-sans-editor .ql-editor { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 1.05rem; line-height: 1.75; color: #18181b; }
-    .ql-toolbar.ql-snow { border: none !important; border-bottom: 1px solid #e4e4e7 !important; padding: 8px 16px !important; sticky: top; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); z-index: 20; }
+    .ql-toolbar.ql-snow { border: none !important; border-bottom: 1px solid #e4e4e7 !important; padding: 8px 16px !important; position: sticky !important; top: -40px !important; background: rgba(255, 255, 255, 0.96) !important; backdrop-filter: blur(8px) !important; z-index: 40 !important; }
     .ql-container.ql-snow { border: none !important; }
     .ql-editor.ql-blank::before { color: #d4d4d8; font-style: normal; }
     </style>
@@ -7889,6 +7889,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             <div class="flex items-center gap-2.5">
                 <button type="button" class="px-3.5 py-1.5 border border-zinc-200 rounded-lg text-zinc-700 bg-white font-semibold hover:bg-zinc-50 transition-all cursor-pointer text-xs active:scale-95 shadow-2xs" onclick="coraSaveArticle('draft')">
                     Save Draft
+                </button>
+                <button type="button" class="px-3.5 py-1.5 border border-zinc-200 rounded-lg text-zinc-700 bg-white font-semibold hover:bg-zinc-50 transition-all cursor-pointer text-xs active:scale-95 shadow-2xs" onclick="coraPreviewArticle()">
+                    Preview
                 </button>
                 <button type="button" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white font-semibold rounded-lg transition-all cursor-pointer text-xs flex items-center gap-1.5 active:scale-95 shadow-xs" id="cora-btn-submit-review" onclick="coraSubmitArticleForReview()">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -7993,6 +7996,56 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                     <!-- Quill.js Mount Point -->
                     <div id="cora-quill-editor" class="text-lg text-zinc-800 leading-relaxed cora-serif-editor min-h-[400px]"></div>
+
+                    <!-- Notion-Style Slash Commands Menu -->
+                    <div id="cora-editor-slash-menu" class="hidden absolute bg-white border border-zinc-200 rounded-xl shadow-xl w-60 py-2 z-[999] select-none text-zinc-800 font-sans text-xs">
+                        <div class="px-3 py-1 text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Insert Widget</div>
+                        <button type="button" onclick="coraInsertSlashWidget('valuation')" class="w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
+                            <span class="p-1.5 bg-zinc-100 rounded text-zinc-900 shrink-0">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                            </span>
+                            <div>
+                                <span class="font-bold block text-[11px]">Lead Capture Form</span>
+                                <span class="text-[9px] text-zinc-400 block leading-none">Property appraisal request form</span>
+                            </div>
+                        </button>
+                        <button type="button" onclick="coraInsertSlashWidget('equipment')" class="w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
+                            <span class="p-1.5 bg-zinc-100 rounded text-zinc-900 shrink-0">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                            </span>
+                            <div>
+                                <span class="font-bold block text-[11px]">Equipment Showcase</span>
+                                <span class="text-[9px] text-zinc-400 block leading-none">High-end camera equipment layout</span>
+                            </div>
+                        </button>
+                        <button type="button" onclick="coraInsertSlashWidget('gallery')" class="w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
+                            <span class="p-1.5 bg-zinc-100 rounded text-zinc-900 shrink-0">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                            </span>
+                            <div>
+                                <span class="font-bold block text-[11px]">Media Gallery</span>
+                                <span class="text-[9px] text-zinc-400 block leading-none">Insert responsive image gallery grid</span>
+                            </div>
+                        </button>
+                        <button type="button" onclick="coraInsertSlashWidget('related')" class="w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
+                            <span class="p-1.5 bg-zinc-100 rounded text-zinc-900 shrink-0">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                            </span>
+                            <div>
+                                <span class="font-bold block text-[11px]">Related Article</span>
+                                <span class="text-[9px] text-zinc-400 block leading-none">Internal link showcase card</span>
+                            </div>
+                        </button>
+                        <button type="button" onclick="coraInsertSlashWidget('signature')" class="w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
+                            <span class="p-1.5 bg-zinc-100 rounded text-zinc-900 shrink-0">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            </span>
+                            <div>
+                                <span class="font-bold block text-[11px]">Signature Block</span>
+                                <span class="text-[9px] text-zinc-400 block leading-none">Nitin & Shanaya Arora sign-off</span>
+                            </div>
+                        </button>
+                    </div>
                 </div>
             </main>
 
@@ -8200,6 +8253,44 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         </div>
 
                         <button type="button" class="w-full py-2 text-xs font-bold text-zinc-900 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors cursor-pointer shadow-2xs" onclick="coraAnalyzeSEO()">Run SEO Analysis</button>
+
+                        <!-- Free SEO Tools Integration Panel -->
+                        <div class="space-y-4 pt-3 border-t border-zinc-200">
+                            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Advanced SEO Tools</span>
+
+                            <!-- Synonym & LSI Finder -->
+                            <div class="space-y-1.5">
+                                <label class="text-[10px] font-medium text-zinc-600 block">Synonym & LSI Finder</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="cora-seo-lsi-input" placeholder="Enter keyword..." class="flex-1 text-xs border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800">
+                                    <button type="button" onclick="coraFindSynonyms()" class="px-3 py-2 bg-zinc-950 text-white rounded-lg text-xs font-bold cursor-pointer hover:bg-zinc-800 transition-colors">Find</button>
+                                </div>
+                                <div id="cora-seo-lsi-results" class="flex flex-wrap gap-1.5 pt-1">
+                                    <!-- Results dynamically loaded here as tag pills -->
+                                    <span class="text-[10px] text-zinc-400 italic">No suggestions loaded yet.</span>
+                                </div>
+                            </div>
+
+                            <!-- Readability Checker -->
+                            <div class="space-y-1.5 pt-2 border-t border-zinc-100">
+                                <div class="flex items-center justify-between">
+                                    <label class="text-[10px] font-medium text-zinc-600 block">Readability Score</label>
+                                    <span id="cora-readability-grade" class="px-1.5 py-0.5 bg-zinc-100 text-zinc-800 font-bold rounded text-[9px] uppercase">Grade --</span>
+                                </div>
+                                <div class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-xs flex items-center justify-between">
+                                    <span class="text-zinc-500 font-medium">Flesch Reading Ease:</span>
+                                    <span id="cora-readability-score" class="font-extrabold text-zinc-900">--</span>
+                                </div>
+                            </div>
+
+                            <!-- Image Alt Auditor -->
+                            <div class="space-y-1.5 pt-2 border-t border-zinc-100">
+                                <button type="button" onclick="coraAuditImageAlts()" class="w-full py-2 text-xs font-bold text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors cursor-pointer shadow-2xs flex items-center justify-center gap-1.5">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                    Audit Image Alt Tags
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- GEO & AISEO Panel -->

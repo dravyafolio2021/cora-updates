@@ -6345,6 +6345,29 @@ jQuery(document).ready(function($) {
                     }
                 }
                 
+                // Monitor for slash commands
+                const range = coraQuillListingCoordinator.getSelection();
+                if (range) {
+                    const [line, offset] = coraQuillListingCoordinator.getLine(range.index);
+                    if (line) {
+                        const lineText = line.domNode.textContent || '';
+                        if (lineText.trim() === '/') {
+                            const bounds = coraQuillListingCoordinator.getBounds(range.index);
+                            const editorContainer = $('#cora-quill-editor');
+                            const parentPosition = editorContainer.position();
+                            
+                            $('#cora-editor-slash-menu').removeClass('hidden').css({
+                                top: (parentPosition.top + bounds.bottom + 8) + 'px',
+                                left: (parentPosition.left + bounds.left) + 'px'
+                            });
+                        } else {
+                            $('#cora-editor-slash-menu').addClass('hidden');
+                        }
+                    }
+                } else {
+                    $('#cora-editor-slash-menu').addClass('hidden');
+                }
+                
                 if (window.coraUpdateWordCount) {
                     window.coraUpdateWordCount();
                 }
@@ -7209,6 +7232,42 @@ jQuery(document).ready(function($) {
         if (hasLocalCitations) geoScore += 10;
         if ($('#chk-geo-schema').is(':checked')) geoScore += 10;
         $('#cora-geo-score-display').text(geoScore);
+
+        // Readability Checker (Flesch Reading Ease)
+        let sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length || 1;
+        
+        function countSyllables(word) {
+            word = word.toLowerCase().trim();
+            if (word.length <= 3) return 1;
+            word = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '');
+            word = word.replace(/^y/, '');
+            const syllables = word.match(/[aeiouy]{1,2}/g);
+            return syllables ? syllables.length : 1;
+        }
+
+        let totalSyllables = 0;
+        const wordList = text.trim().split(/\s+/).filter(w => w.length > 0);
+        wordList.forEach(w => {
+            totalSyllables += countSyllables(w);
+        });
+
+        const wordCount = wordList.length || 1;
+        const rawFlesch = 206.835 - 1.015 * (wordCount / sentences) - 84.6 * (totalSyllables / wordCount);
+        const freScore = Math.max(0, Math.min(100, Math.round(rawFlesch)));
+
+        let readabilityGrade = 'Grade --';
+        if (words > 0) {
+            if (freScore >= 90) readabilityGrade = 'Grade 5 (Very Easy)';
+            else if (freScore >= 80) readabilityGrade = 'Grade 6 (Easy)';
+            else if (freScore >= 70) readabilityGrade = 'Grade 7 (Fairly Easy)';
+            else if (freScore >= 60) readabilityGrade = 'Grade 8-9 (Standard)';
+            else if (freScore >= 50) readabilityGrade = 'Grade 10-12 (Fairly Hard)';
+            else if (freScore >= 30) readabilityGrade = 'College (Difficult)';
+            else readabilityGrade = 'Graduate (Very Hard)';
+        }
+
+        $('#cora-readability-score').text(words > 0 ? freScore : '--');
+        $('#cora-readability-grade').text(readabilityGrade);
     };
 
     window.coraUpdateWordCount = function() {
@@ -7359,6 +7418,314 @@ jQuery(document).ready(function($) {
             window.coraShowToast('Excerpt generated successfully based on content semantics.', 'success');
         }, 800);
     };
+
+    window.coraInsertSlashWidget = function(type) {
+        if (!coraQuillListingCoordinator) {
+            window.coraShowToast('Quill editor is not initialized.', 'error');
+            return;
+        }
+
+        const range = coraQuillListingCoordinator.getSelection(true);
+        if (!range) return;
+
+        // Find and delete the "/" character that triggered the slash menu
+        const [line, offset] = coraQuillListingCoordinator.getLine(range.index);
+        let deleteIndex = range.index;
+        if (line) {
+            const lineStartPos = range.index - offset;
+            const lineText = line.domNode.textContent || '';
+            const slashOffset = lineText.indexOf('/');
+            if (slashOffset !== -1) {
+                deleteIndex = lineStartPos + slashOffset;
+            }
+        }
+        
+        coraQuillListingCoordinator.deleteText(deleteIndex, 1);
+
+        let html = '';
+        const postId = $('#cora-article-id').val() || '0';
+
+        if (type === 'valuation') {
+            html = `
+            <div class="cora-inline-cta-card" style="background:#ffffff; border:1px solid #e4e4e7; border-radius:12px; padding:24px; margin:24px 0; max-width:550px; font-family:system-ui, sans-serif; box-shadow:0 1px 3px rgba(0,0,0,0.05);" contenteditable="false">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                    <span style="padding:6px; background:#f4f4f5; border-radius:6px; color:#09090b; display:inline-flex; align-items:center;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    </span>
+                    <strong style="font-size:14px; text-transform:uppercase; letter-spacing:0.05em; color:#71717a;">Free Local Appraisal</strong>
+                </div>
+                <h3 style="font-size:18px; font-weight:800; color:#09090b; margin:0 0 6px 0; line-height:1.2;">Get a Free Professional Property Valuation</h3>
+                <p style="font-size:12px; color:#71717a; margin:0 0 16px 0;">Find out exactly what your luxury home or villa is worth in today's market.</p>
+                <form class="cora-blog-lead-form" onsubmit="event.preventDefault(); window.coraSubmitBlogLeadForm(this, ${postId});" style="display:grid; grid-template-columns:1fr; gap:10px;">
+                    <input type="text" name="first_name" placeholder="Full Name" required style="width:100%; border:1px solid #e4e4e7; border-radius:6px; padding:8px 12px; font-size:13px; box-sizing:border-box;">
+                    <input type="email" name="email" placeholder="Email Address" required style="width:100%; border:1px solid #e4e4e7; border-radius:6px; padding:8px 12px; font-size:13px; box-sizing:border-box;">
+                    <input type="text" name="phone" placeholder="Phone Number" required style="width:100%; border:1px solid #e4e4e7; border-radius:6px; padding:8px 12px; font-size:13px; box-sizing:border-box;">
+                    <input type="text" name="notes" placeholder="Property Address" required style="width:100%; border:1px solid #e4e4e7; border-radius:6px; padding:8px 12px; font-size:13px; box-sizing:border-box;">
+                    <button type="submit" style="width:100%; background:#09090b; color:#ffffff; font-weight:700; border:none; border-radius:6px; padding:10px; font-size:13px; cursor:pointer;">Request Free Appraisal</button>
+                </form>
+            </div>
+            `;
+        } else if (type === 'equipment') {
+            html = `
+            <div class="cora-equipment-showcase-card" style="background:#ffffff; border:1px solid #e4e4e7; border-radius:12px; padding:20px; margin:24px 0; max-width:550px; font-family:system-ui, sans-serif;" contenteditable="false">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                    <span style="padding:6px; background:#f4f4f5; border-radius:6px; color:#09090b; display:inline-flex; align-items:center;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                    </span>
+                    <strong style="font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#71717a;">Production Equipment Showcase</strong>
+                </div>
+                <h4 style="font-size:14px; font-weight:700; margin:0 0 8px 0;">Ultra-High Definition Cinematic Gear</h4>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <div style="background:#f4f4f5; border-radius:6px; padding:10px;">
+                        <strong style="font-size:11px; display:block;">Sony FX3 Cinema Camera</strong>
+                        <span style="font-size:10px; color:#71717a;">UHD 4K 120fps recording capability.</span>
+                    </div>
+                    <div style="background:#f4f4f5; border-radius:6px; padding:10px;">
+                        <strong style="font-size:11px; display:block;">DJI Ronin RS3 Pro Gimbal</strong>
+                        <span style="font-size:10px; color:#71717a;">3-axis stabilization for butter smooth cinematic walk-throughs.</span>
+                    </div>
+                </div>
+            </div>
+            `;
+        } else if (type === 'gallery') {
+            html = `
+            <div class="cora-gallery-showcase" style="margin:24px 0; max-width:550px; font-family:system-ui, sans-serif;" contenteditable="false">
+                <h4 style="font-size:14px; font-weight:750; margin:0 0 10px 0; color:#09090b;">Media Portfolio Showcase</h4>
+                <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;">
+                    <div style="aspect-ratio:1/1; background:#f4f4f5; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#a1a1aa; font-size:10px; font-weight:bold; border:1px solid #e4e4e7;">Exterior View</div>
+                    <div style="aspect-ratio:1/1; background:#f4f4f5; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#a1a1aa; font-size:10px; font-weight:bold; border:1px solid #e4e4e7;">Living Hall</div>
+                    <div style="aspect-ratio:1/1; background:#f4f4f5; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#a1a1aa; font-size:10px; font-weight:bold; border:1px solid #e4e4e7;">Master Suite</div>
+                </div>
+            </div>
+            `;
+        } else if (type === 'related') {
+            html = `
+            <div class="cora-related-article-card" style="background:#ffffff; border:1px solid #e4e4e7; border-radius:12px; padding:16px; margin:24px 0; max-width:550px; font-family:system-ui, sans-serif; display:flex; gap:12px; align-items:center;" contenteditable="false">
+                <span style="padding:12px; background:#f4f4f5; border-radius:8px; color:#09090b; display:inline-flex; align-items:center;">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line></svg>
+                </span>
+                <div>
+                    <span style="font-size:9px; text-transform:uppercase; color:#71717a; font-weight:bold;">Related Read</span>
+                    <h4 style="font-size:13px; font-weight:700; margin:2px 0 4px 0; color:#09090b;">Jaipur Real Estate: The 2026 Comprehensive Investment Guide</h4>
+                    <span style="font-size:10px; color:#71717a;">Market trends, regional developments, and top micro-markets analyzed.</span>
+                </div>
+            </div>
+            `;
+        } else if (type === 'signature') {
+            html = `
+            <div class="cora-editorial-signature" style="margin:24px 0; padding-top:16px; border-top:1px solid #e4e4e7; font-family:system-ui, sans-serif; max-width:550px;" contenteditable="false">
+                <p style="font-size:12px; margin:0; font-weight:700; color:#09090b;">Nitin & Shanaya Arora</p>
+                <p style="font-size:10px; margin:2px 0 0 0; color:#71717a;">Lead Listings Coordinator &amp; Editors at Apex Realty Group</p>
+            </div>
+            `;
+        }
+
+        coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(deleteIndex, html);
+        $('#cora-editor-slash-menu').addClass('hidden');
+        window.coraShowToast('Widget block inserted successfully!', 'success');
+        coraUpdateWordCount();
+    };
+
+    window.coraPreviewArticle = function() {
+        const title = $('#cora-article-title').val() || 'Untitled Article';
+        const coverUrl = $('#cora-cover-image-img').attr('src') || '';
+        const content = coraQuillListingCoordinator ? coraQuillListingCoordinator.root.innerHTML : '';
+
+        const previewWindow = window.open('', '_blank');
+        if (!previewWindow) {
+            window.coraShowToast('Pop-up blocked. Please allow popups for previews.', 'error');
+            return;
+        }
+
+        const coverHtml = coverUrl ? `<div style="width:100%; height:320px; overflow:hidden; border-radius:16px; margin-bottom:32px;"><img src="${coverUrl}" style="width:100%; height:100%; object-fit:cover;"></div>` : '';
+
+        previewWindow.document.write(\`
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Preview: \${title}</title>
+                <style>
+                    body {
+                        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                        color: #18181b;
+                        background-color: #fafafa;
+                        margin: 0;
+                        padding: 40px 20px;
+                        line-height: 1.6;
+                    }
+                    .preview-container {
+                        max-width: 680px;
+                        margin: 0 auto;
+                        background: #ffffff;
+                        padding: 40px;
+                        border: 1px solid #e4e4e7;
+                        border-radius: 20px;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+                    }
+                    h1 {
+                        font-size: 2.5rem;
+                        font-weight: 800;
+                        color: #09090b;
+                        line-height: 1.15;
+                        margin-top: 0;
+                        margin-bottom: 24px;
+                        letter-spacing: -0.02em;
+                    }
+                    .meta-info {
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        font-size: 0.8rem;
+                        color: #71717a;
+                        margin-bottom: 32px;
+                        border-bottom: 1px solid #f4f4f5;
+                        padding-bottom: 16px;
+                    }
+                    .badge {
+                        background: #f4f4f5;
+                        color: #18181b;
+                        padding: 2px 8px;
+                        border-radius: 9999px;
+                        font-weight: 600;
+                    }
+                    .content {
+                        font-size: 1.05rem;
+                        color: #27272a;
+                        line-height: 1.8;
+                    }
+                    .content h2 {
+                        font-size: 1.5rem;
+                        font-weight: 700;
+                        color: #09090b;
+                        margin-top: 36px;
+                        margin-bottom: 16px;
+                    }
+                    .content h3 {
+                        font-size: 1.25rem;
+                        font-weight: 700;
+                        color: #09090b;
+                        margin-top: 28px;
+                        margin-bottom: 12px;
+                    }
+                    .content p {
+                        margin-top: 0;
+                        margin-bottom: 24px;
+                    }
+                    .content table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 24px;
+                        font-size: 0.9rem;
+                    }
+                    .content th, .content td {
+                        border: 1px solid #e4e4e7;
+                        padding: 8px 12px;
+                    }
+                    .content th {
+                        background: #f4f4f5;
+                    }
+                    .cora-inline-cta-card, .cora-equipment-showcase-card, .cora-related-article-card {
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="preview-container">
+                    \${coverHtml}
+                    <h1>\${title}</h1>
+                    <div class="meta-info">
+                        <span class="badge">PREVIEW MODE</span>
+                        <span>Generated at: \${new Date().toLocaleString()}</span>
+                        <span>· By Nitin & Shanaya Arora</span>
+                    </div>
+                    <div class="content">
+                        \${content}
+                    </div>
+                </div>
+            </body>
+            </html>
+        \`);
+        previewWindow.document.close();
+        window.coraShowToast('Premium article preview generated.', 'success');
+    };
+
+    window.coraFindSynonyms = function() {
+        const keyword = $('#cora-seo-lsi-input').val().trim();
+        if (!keyword) {
+            window.coraShowToast('Enter a keyword to find synonyms.', 'warning');
+            return;
+        }
+
+        const btn = $('#cora-seo-lsi-input').next('button');
+        const resultsContainer = $('#cora-seo-lsi-results');
+        
+        btn.prop('disabled', true).text('Finding...');
+        resultsContainer.html('<span class="text-[10px] text-zinc-400 animate-pulse">Loading LSI keywords...</span>');
+
+        $.ajax({
+            url: `https://api.datamuse.com/words?ml=\${encodeURIComponent(keyword)}&max=8`,
+            method: 'GET',
+            success: function(data) {
+                btn.prop('disabled', false).text('Find');
+                if (data && data.length > 0) {
+                    let pills = '';
+                    data.forEach(item => {
+                        pills += \`
+                            <span class="px-2 py-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 rounded-full text-[10px] font-semibold cursor-pointer select-none transition-colors border border-zinc-200/50" onclick="jQuery('#cora-seo-keyword').val('\${item.word}').trigger('change'); window.coraShowToast('Keyword set to: \${item.word}', 'info');">
+                                + \${item.word}
+                            </span>
+                        \`;
+                    });
+                    resultsContainer.html(pills);
+                } else {
+                    resultsContainer.html('<span class="text-[10px] text-zinc-400 italic">No suggestions found.</span>');
+                }
+            },
+            error: function() {
+                btn.prop('disabled', false).text('Find');
+                resultsContainer.html('<span class="text-[10px] text-red-500 italic">Failed to retrieve synonyms.</span>');
+                window.coraShowToast('Error connecting to Datamuse LSI engine.', 'error');
+            }
+        });
+    };
+
+    window.coraAuditImageAlts = function() {
+        if (!coraQuillListingCoordinator) {
+            window.coraShowToast('Quill editor is not initialized.', 'error');
+            return;
+        }
+
+        const html = coraQuillListingCoordinator.root.innerHTML;
+        const tempDiv = $('<div>').html(html);
+        const images = tempDiv.find('img');
+        
+        if (images.length === 0) {
+            window.coraShowToast('No images found in the editor to audit.', 'info');
+            return;
+        }
+
+        let missingAltCount = 0;
+        images.each(function() {
+            const alt = $(this).attr('alt');
+            if (!alt || alt.trim() === '') {
+                missingAltCount++;
+            }
+        });
+
+        if (missingAltCount > 0) {
+            window.coraShowToast(`Image Alt Audit: Found \${missingAltCount} image(s) missing alt attributes!`, 'warning');
+        } else {
+            window.coraShowToast('Image Alt Audit: All images have alt attributes. Great job!', 'success');
+        }
+    };
+
+    $(document).on('mousedown', function(e) {
+        if (!$(e.target).closest('#cora-editor-slash-menu, .ql-editor').length) {
+            $('#cora-editor-slash-menu').addClass('hidden');
+        }
+    });
 
     // Restructure Media Sidebar fields under a collapsible Details block
     function coraRestructureMediaSidebar() {
