@@ -187,9 +187,15 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 .cm-search-wrap svg { position:absolute; left:9px; top:50%; transform:translateY(-50%); pointer-events:none; color:#a1a1aa; }
 .cm-search { width:100%; border:1px solid #e4e4e7; border-radius:8px; padding:6px 10px 6px 30px; font-size:12px; background:#fafafa; outline:none; box-sizing:border-box; }
 .cm-search:focus { border-color:#71717a; background:#fff; }
-.cm-sel { border:1px solid #e4e4e7; border-radius:8px; padding:6px 9px; font-size:11px; color:#52525b; background:#fff; outline:none; cursor:pointer; }
-.cm-bulk-bar { display:none; align-items:center; gap:7px; padding:4px 10px; background:#f4f4f5; border-radius:8px; }
+.cm-sel { border:1px solid #e4e4e7; border-radius:8px; padding:6px 10px; font-size:11px; font-weight:500; color:#3f3f46; background:#fff; outline:none; cursor:pointer; transition:all .12s ease; height:32px; box-sizing:border-box; }
+.cm-sel:hover { border-color:#a1a1aa; color:#18181b; }
+.cm-sel:focus { border-color:#09090b; }
+.cm-bulk-bar { display:none; align-items:center; gap:8px; padding:6px 12px; background:#18181b; color:#fff; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,.15); transition:all .15s ease; }
 .cm-bulk-bar.on { display:flex; }
+.cm-bulk-bar select.cm-sel { background:#27272a; border-color:#3f3f46; color:#f4f4f5; }
+.cm-bulk-bar .cm-hbtn { background:#27272a; border-color:#3f3f46; color:#f4f4f5; }
+.cm-bulk-bar .cm-hbtn:hover { background:#3f3f46; color:#fff; }
+.cm-cell:hover .cm-chk, .cm-chk.checked { display:flex; }
 
 /* ─── Media Card Metadata Footer ────────────────────────────────────────── */
 .cm-cell-meta {
@@ -494,12 +500,14 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 
         <!-- Bulk action bar -->
         <div id="cm-bulk-bar" class="cm-bulk-bar">
-            <span id="cm-bulk-ct" style="font-size:11px;font-weight:700;color:#3f3f46">0 selected</span>
+            <span id="cm-bulk-ct" style="font-size:11px;font-weight:700;color:#f4f4f5">0 selected</span>
+            <button onclick="cmListAll(true)" class="cm-hbtn" style="font-size:11px;padding:4px 9px">Select All</button>
             <select id="cm-bulk-folder" class="cm-sel" style="font-size:11px"><option value="">Move to folder…</option></select>
             <button onclick="cmBulkMove()" class="cm-hbtn" style="font-size:11px;padding:4px 9px">Move</button>
             <button onclick="cmBulkAddGallery()" class="cm-hbtn" style="font-size:11px;padding:4px 9px"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" style="display:inline;vertical-align:-2px;margin-right:2px"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> Add to Gallery</button>
             <button onclick="cmBulkZip()" class="cm-hbtn" style="font-size:11px;padding:4px 9px"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" style="display:inline;vertical-align:-2px;margin-right:2px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download ZIP</button>
-            <button onclick="cmBulkDelete()" class="cm-hbtn" style="font-size:11px;padding:4px 9px;color:#dc2626;border-color:#fecaca">Delete</button>
+            <button onclick="cmBulkDelete()" class="cm-hbtn" style="font-size:11px;padding:4px 9px;color:#f87171;border-color:#7f1d1d">Delete</button>
+            <button onclick="cmToggleBulk()" class="cm-hbtn" style="font-size:11px;padding:4px 9px;margin-left:auto">✕ Close</button>
         </div>
     </div>
 
@@ -926,8 +934,9 @@ var CM = {
     page:1, pages:1, total:0, perPage:40,
     filters:{q:'',type:'all',culling:'',date:'',author:''},
     sortBy:'date', sortDir:'DESC', active:null, ctxFile:null, searchT:null, confirmCb:null, upQ:0,
-    foldersExpanded: false
+    foldersExpanded: false, storage_bytes: 0, limit_bytes: 5 * 1024 * 1024 * 1024
 };
+window.CM = CM;
 
 var LABEL_MAP = {
     none:   { hex: '#d4d4d8', label: 'None' },
@@ -1300,7 +1309,11 @@ window.cmRenderGrid = function(files) {
 window.cmRenderList = function(files) {
     files = files || CM.files;
     var tb = document.getElementById('cm-list-body'); tb.innerHTML = '';
-    document.getElementById('cm-list-all').style.display = CM.bulk ? '' : 'none';
+    var listAll = document.getElementById('cm-list-all');
+    if (listAll) {
+        listAll.style.display = '';
+        listAll.checked = CM.files.length > 0 && CM.selIds.length === CM.files.length;
+    }
     files.forEach(function(f) {
         var tr = document.createElement('tr');
         tr.className = CM.selIds.indexOf(f.id) > -1 ? 'sel' : ''; tr.dataset.id = f.id;
@@ -1312,7 +1325,7 @@ window.cmRenderList = function(files) {
         var dot = (f.label && f.label !== 'none' && LABEL_MAP[f.label]) ? '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:' + LABEL_MAP[f.label].hex + ';margin-right:4px"></span>' : '';
 
         tr.innerHTML =
-            '<td><input type="checkbox" style="accent-color:#09090b;' + (CM.bulk ? '' : 'display:none') + '"' + (CM.selIds.indexOf(f.id) > -1 ? ' checked' : '') + '></td>' +
+            '<td><input type="checkbox" style="accent-color:#09090b;cursor:pointer;width:15px;height:15px"' + (CM.selIds.indexOf(f.id) > -1 ? ' checked' : '') + '></td>' +
             '<td><div style="display:flex;align-items:center;gap:9px;min-width:0">' + lthumb +
                 '<div style="min-width:0;max-width:320px"><div style="font-weight:600;color:#18181b;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="' + esc(f.title || f.filename) + '">' + dot + esc(f.title || f.filename) + stars + '</div>' +
                 '<div style="font-size:10px;color:#a1a1aa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="' + esc(f.filename) + '">' + esc(f.filename) + '</div></div></div></td>' +
@@ -1461,11 +1474,34 @@ window.cmCopyUrl = function() { if (!CM.active) return; navigator.clipboard.writ
 // ── UPLOAD ────────────────────────────────────────────────────────────────────
 window.cmHandleFiles = function(files) {
     if (!files || !files.length) return;
-    Array.from(files).forEach(function(f) { cmUploadOne(f); });
-    document.getElementById('cm-file-input').value = '';
+    var disallowed = ['php', 'exe', 'sh', 'bat', 'cmd', 'js', 'html', 'htm', 'py', 'pl', 'cgi', 'jar', 'vbs'];
+    var maxFileSize = 100 * 1024 * 1024;
+    var currentStorage = (typeof CM.storage_bytes === 'number') ? CM.storage_bytes : 0;
+    var limitStorage = (typeof CM.limit_bytes === 'number' && CM.limit_bytes > 0) ? CM.limit_bytes : (5 * 1024 * 1024 * 1024);
+
+    Array.from(files).forEach(function(f) {
+        var parts = f.name ? f.name.split('.') : [];
+        var ext = parts.length > 1 ? parts.pop().toLowerCase() : '';
+        if (disallowed.indexOf(ext) !== -1) {
+            coraShowToast('Upload rejected: Security risk file extension is not allowed.');
+            return;
+        }
+        if (f.size > maxFileSize) {
+            coraShowToast('Upload rejected: File size exceeds 100 MB limit.');
+            return;
+        }
+        if ((currentStorage + f.size) > limitStorage) {
+            coraShowToast('Upload rejected: Exceeds 5 GB workspace storage quota.');
+            return;
+        }
+        currentStorage += f.size;
+        cmUploadOne(f);
+    });
+    var el = document.getElementById('cm-file-input');
+    if (el) el.value = '';
 };
 window.cmUploadOne = function(file) {
-    var MAX = 25 * 1024 * 1024;
+    var MAX = 100 * 1024 * 1024;
     var prog = document.getElementById('cm-uprog'); prog.classList.add('on');
     var rid = 'up' + Date.now() + Math.random().toString(36).slice(2);
     var row = document.createElement('div'); row.className = 'cm-urow'; row.id = rid;
@@ -1787,21 +1823,66 @@ window.cmLoadFilterOpts = function() {
 
 // ── BULK ──────────────────────────────────────────────────────────────────────
 window.cmToggleBulk = function() {
-    CM.bulk = !CM.bulk; CM.selIds = [];
-    document.getElementById('cm-bulk-btn').textContent = CM.bulk ? 'Cancel' : 'Select';
+    CM.bulk = !CM.bulk;
+    if (!CM.bulk) {
+        CM.selIds = [];
+    }
+    var btn = document.getElementById('cm-bulk-btn');
+    if (btn) btn.textContent = CM.bulk ? 'Cancel' : 'Select';
     var bb = document.getElementById('cm-bulk-bar');
-    bb.style.display = CM.bulk ? 'flex' : 'none'; bb.className = 'cm-bulk-bar' + (CM.bulk ? ' on' : '');
-    cmRender(); cmBulkCt();
-};
-window.cmToggleSel = function(id, on) {
-    if (on) { if(CM.selIds.indexOf(id)===-1) CM.selIds.push(id); } else { CM.selIds=CM.selIds.filter(function(x){return x!==id;}); }
-    var gc=document.querySelector('.cm-cell[data-id="'+id+'"]');
-    if(gc){ gc.classList.toggle('sel',on); var chk=gc.querySelector('.cm-chk'); if(chk) chk.classList.toggle('checked',on); }
-    var lc=document.querySelector('#cm-list-body tr[data-id="'+id+'"]'); if(lc){ lc.classList.toggle('sel',on); var cb=lc.querySelector('input[type=checkbox]'); if(cb) cb.checked=on; }
+    if (bb) {
+        bb.style.display = CM.bulk ? 'flex' : 'none';
+        bb.className = 'cm-bulk-bar' + (CM.bulk ? ' on' : '');
+    }
+    var listAll = document.getElementById('cm-list-all');
+    if (listAll) listAll.checked = CM.bulk && CM.files.length > 0 && CM.selIds.length === CM.files.length;
+    cmRender();
     cmBulkCt();
 };
-window.cmListAll = function(ch) { CM.files.forEach(function(f){cmToggleSel(f.id,ch);}); };
-window.cmBulkCt = function() { document.getElementById('cm-bulk-ct').textContent = CM.selIds.length + ' selected'; };
+window.cmToggleSel = function(id, on) {
+    if (on) {
+        if (CM.selIds.indexOf(id) === -1) CM.selIds.push(id);
+        if (!CM.bulk) {
+            CM.bulk = true;
+            var btn = document.getElementById('cm-bulk-btn');
+            if (btn) btn.textContent = 'Cancel';
+            var bb = document.getElementById('cm-bulk-bar');
+            if (bb) {
+                bb.style.display = 'flex';
+                bb.className = 'cm-bulk-bar on';
+            }
+            var g = document.getElementById('cm-grid');
+            if (g) g.classList.add('cm-bulk-mode');
+        }
+    } else {
+        CM.selIds = CM.selIds.filter(function(x) { return x !== id; });
+    }
+    var gc = document.querySelector('.cm-cell[data-id="' + id + '"]');
+    if (gc) {
+        gc.classList.toggle('sel', on);
+        var chk = gc.querySelector('.cm-chk');
+        if (chk) chk.classList.toggle('checked', on);
+    }
+    var lc = document.querySelector('#cm-list-body tr[data-id="' + id + '"]');
+    if (lc) {
+        lc.classList.toggle('sel', on);
+        var cb = lc.querySelector('input[type=checkbox]');
+        if (cb) cb.checked = on;
+    }
+    var listAll = document.getElementById('cm-list-all');
+    if (listAll) {
+        listAll.checked = CM.files.length > 0 && CM.selIds.length === CM.files.length;
+    }
+    cmBulkCt();
+};
+window.cmListAll = function(ch) {
+    if (typeof ch === 'undefined') ch = true;
+    CM.files.forEach(function(f) { cmToggleSel(f.id, ch); });
+};
+window.cmBulkCt = function() {
+    var ctEl = document.getElementById('cm-bulk-ct');
+    if (ctEl) ctEl.textContent = CM.selIds.length + ' selected';
+};
 window.cmBulkMove = function() {
     var fid=document.getElementById('cm-bulk-folder').value; if(!fid||!CM.selIds.length){coraShowToast('Select files and a destination folder.');return;}
     $.ajax({url:coraREData.ajaxUrl,type:'POST',data:{action:'cora_media_library_move',nonce:coraREData.ajaxNonce,attachment_ids:CM.selIds,folder_id:fid},
@@ -2043,6 +2124,8 @@ window.cmDeleteFolderFromSettings = function() {
 window.cmLoadStorage = function() {
     $.ajax({url:coraREData.ajaxUrl,type:'POST',data:{action:'cora_media_library_get_storage',nonce:coraREData.ajaxNonce},
     success:function(r){if(!r.success)return;var d=r.data,p=Math.min(100,d.percent_used);
+        if (typeof d.total_bytes !== 'undefined') CM.storage_bytes = d.total_bytes;
+        if (typeof d.limit_bytes !== 'undefined') CM.limit_bytes = d.limit_bytes;
         document.getElementById('cm-storage-lbl').textContent=d.total_human+' / '+d.limit_human;
         document.getElementById('cm-storage-pct').textContent=p+'%';
         document.getElementById('cm-storage-bar').style.width=p+'%';

@@ -110,4 +110,29 @@ test.describe('Media Library - Dedicated Folders Layout', () => {
     }
   });
 
+  test('7. Verify Pre-Upload Validation for Security Extensions, File Size, and Storage Quota', async ({ page }) => {
+    // 1. Test disallowed security extension rejection
+    await page.evaluate(() => {
+      (window as any).cmHandleFiles([{ name: 'malicious.php', size: 1024 }]);
+    });
+    await expect(page.locator('#cora-toast-container')).toContainText('Upload rejected: Security risk file extension is not allowed.');
+
+    // 2. Test per-file size exceeding 100 MB limit rejection
+    await page.evaluate(() => {
+      (window as any).cmHandleFiles([{ name: 'oversized_video.mp4', size: 101 * 1024 * 1024 }]);
+    });
+    await expect(page.locator('#cora-toast-container')).toContainText('Upload rejected: File size exceeds 100 MB limit.');
+
+    // 3. Test storage quota limit check rejection
+    await page.evaluate(() => {
+      if ((window as any).CM) {
+        (window as any).CM.storage_bytes = 4.95 * 1024 * 1024 * 1024;
+        (window as any).CM.limit_bytes = 5 * 1024 * 1024 * 1024;
+      }
+      (window as any).cmHandleFiles([{ name: 'large_archive.zip', size: 100 * 1024 * 1024 }]);
+    });
+    await expect(page.locator('#cora-toast-container')).toContainText('Upload rejected: Exceeds 5 GB workspace storage quota.');
+  });
+
 });
+

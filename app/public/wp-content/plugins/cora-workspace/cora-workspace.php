@@ -12029,6 +12029,10 @@ add_action( 'wp_ajax_cora_media_library_get', 'cora_ajax_media_library_get' );
 function cora_ajax_media_library_upload() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
 
+    if ( ! is_user_logged_in() || ( ! cora_is_super_owner() && ! current_user_can( 'upload_files' ) && ! current_user_can( 'manage_options' ) && ! current_user_can( 'edit_posts' ) ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    }
+
     if ( empty( $_FILES['file'] ) ) {
         wp_send_json_error( array( 'message' => 'No file provided.' ) );
     }
@@ -12039,6 +12043,23 @@ function cora_ajax_media_library_upload() {
     $file = $_FILES['file'];
     if ( $file['error'] !== UPLOAD_ERR_OK ) {
         wp_send_json_error( array( 'message' => 'Upload error code: ' . $file['error'] ) );
+    }
+
+    $filename = $file['name'];
+    $ext      = strtolower( pathinfo( $filename, PATHINFO_EXTENSION ) );
+    $blocked  = array( 'php', 'php3', 'php4', 'php5', 'phtml', 'exe', 'sh', 'bat', 'cmd', 'js', 'html', 'htm', 'py', 'pl', 'cgi', 'jar', 'vbs' );
+    if ( in_array( $ext, $blocked, true ) ) {
+        wp_send_json_error( array( 'message' => 'Upload rejected: Security risk file extension (.' . $ext . ') is not allowed.' ) );
+    }
+
+    if ( $file['size'] > 100 * 1024 * 1024 ) {
+        wp_send_json_error( array( 'message' => 'Upload rejected: File size (' . size_format( $file['size'] ) . ') exceeds maximum per-file limit of 100 MB.' ) );
+    }
+
+    $current_usage = cora_get_workspace_storage_usage_bytes();
+    $storage_limit = cora_get_workspace_storage_limit_bytes();
+    if ( ( $current_usage + $file['size'] ) > $storage_limit ) {
+        wp_send_json_error( array( 'message' => 'Upload rejected: File size (' . size_format( $file['size'] ) . ') exceeds 5 GB workspace storage quota limit.' ) );
     }
 
     // ZIP: extract and import each image
@@ -12576,19 +12597,28 @@ function cora_ajax_media_library_get_activity() {
 }
 add_action( 'wp_ajax_cora_media_library_get_activity', 'cora_ajax_media_library_get_activity' );
 
-/**
- * AJAX: Storage statistics
- */
-function cora_ajax_media_library_get_storage() {
-    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    $upload_dir = wp_upload_dir();
-    $base       = $upload_dir['basedir'];
+function cora_get_workspace_storage_usage_bytes() {
+    $upload_dir  = wp_upload_dir();
+    $base        = $upload_dir['basedir'];
     $total_bytes = 0;
     if ( is_dir( $base ) ) {
         $it = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $base, FilesystemIterator::SKIP_DOTS ) );
         foreach ( $it as $f ) { if ( $f->isFile() ) $total_bytes += $f->getSize(); }
     }
-    $limit_bytes = apply_filters( 'cora_media_storage_limit', 5 * 1024 * 1024 * 1024 ); // 5 GB default
+    return $total_bytes;
+}
+
+function cora_get_workspace_storage_limit_bytes() {
+    return apply_filters( 'cora_media_storage_limit', 5 * 1024 * 1024 * 1024 ); // 5 GB default
+}
+
+/**
+ * AJAX: Storage statistics
+ */
+function cora_ajax_media_library_get_storage() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $total_bytes = cora_get_workspace_storage_usage_bytes();
+    $limit_bytes = cora_get_workspace_storage_limit_bytes();
     $pct = $limit_bytes > 0 ? round( ( $total_bytes / $limit_bytes ) * 100, 1 ) : 0;
     wp_send_json_success( array(
         'total_human' => cora_media_human_size( $total_bytes ),

@@ -13,7 +13,7 @@
 <!-- MODULE_ROWS_START -->
 | **File Manager** | `feature/document-studio-vault` | 🟢 Merged to Main | `views/view-vault.php`, `cora-workspace.php` | Dedicated Vault Agent |
 | **Forms & Reviews** | `feature/forms-module` | 🟢 Merged to Main | `views/view-forms.php`, `public-form-view.php`, `views/view-emails.php` | Dedicated Forms Agent |
-| **Media Module** | `feature/media-module` | 🟡 Active Feature Branch | `views/view-media.php`, `views/view-media-editor.php`, `cora-workspace.php` | Media Module Agent |
+| **Media Module** | `feature/media-module` | 🟢 Merged to Main | `views/view-media.php`, `views/view-media-editor.php`, `cora-workspace.php` | Media Module Agent |
 <!-- MODULE_ROWS_END -->
 
 ---
@@ -23,7 +23,7 @@
 > [!IMPORTANT]
 > If multiple feature branches modify any of the following shared files simultaneously, coordinators must review parameter signatures and line ranges to prevent merge conflicts:
 
-- `app/public/wp-content/plugins/cora-workspace/cora-workspace.php` (Core AJAX Handlers & Hooks)
+- `app/public/wp-content/plugins/cora-workspace/cora-workspace.php` (Core AJAX Handlers & Hooks, Universal Auto-Save Engine)
 - `app/public/wp-content/plugins/cora-workspace/views/view-vault.php` (Document Vault & Document Studio Wizard)
 - `app/public/wp-content/plugins/cora-workspace/views/view-settings-suite.php` (Settings & Backup Views)
 
@@ -32,7 +32,7 @@
 ## 3. Branch Activity & Progress Log
 
 ### `main` (Production Base)
-- **Latest Commit**: `5d416d35` — `feat(settings): add custom favicon, platform logo, browser tab title, and sidebar brand title settings with live DOM updates`
+- **Latest Commit**: `64d89186` — `feat(autosave): implement universal hybrid auto-save & zero-data-loss draft engine across all platform modules`
 - **Health**: 100% Operational & Clean Base.
 
 <!-- BRANCH_LOGS_START -->
@@ -44,8 +44,8 @@
 - **Status**: 🟢 Merged to `main` (commit `121ba12f`) — Multi-channel review settings, WhatsApp-first automation rules with Hinglish presets, Notion-styled form inputs.
 - **Main Touchpoint**: `views/view-forms.php`, `public-form-view.php`, `views/view-emails.php`.
 
-### `feature/media-module` (Active Feature Branch)
-- **Status**: 🟡 Active Feature Branch — Studio-grade Media Library Dashboard with folder navigation, search & MIME filtering, bulk toolbar, right-sliding detail sheet, folder email sharing, storage meter, dynamic aspect-ratio crop presets (1:1, 4:3, 16:9), transformations, and SEO metadata manager.
+### `feature/media-module` (Merged Feature Branch)
+- **Status**: 🟢 Merged to `main` (commit `e27bc7f3`) — Studio-grade Media Library Dashboard with folder navigation, search & MIME filtering, bulk toolbar, right-sliding detail sheet, folder email sharing, storage meter, dynamic aspect-ratio crop presets (1:1, 4:3, 16:9), transformations, and SEO metadata manager.
 - **Main Touchpoint**: `views/view-media.php`, `views/view-media-editor.php`, `cora-workspace.php`.
 <!-- BRANCH_LOGS_END -->
 
