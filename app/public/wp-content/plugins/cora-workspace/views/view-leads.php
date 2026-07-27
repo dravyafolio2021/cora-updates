@@ -232,7 +232,8 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
         </div>
     </div>
 
-    <!-- SUB-TAB 1: KANBAN PIPELINE BOAR    <div id="cora-lead-pane-kanban" class="cora-lead-tab-pane">
+    <!-- SUB-TAB 1: KANBAN PIPELINE BOARD -->
+    <div id="cora-lead-pane-kanban" class="cora-lead-tab-pane">
         <div class="flex overflow-x-auto gap-4 items-stretch pb-8 pt-1" style="scrollbar-width: thin;">
             <?php 
             $stage_styles = array(
