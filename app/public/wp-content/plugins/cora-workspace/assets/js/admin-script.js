@@ -7539,13 +7539,13 @@ jQuery(document).ready(function($) {
 
         const coverHtml = coverUrl ? `<div style="width:100%; height:320px; overflow:hidden; border-radius:16px; margin-bottom:32px;"><img src="${coverUrl}" style="width:100%; height:100%; object-fit:cover;"></div>` : '';
 
-        previewWindow.document.write(\`
+        previewWindow.document.write(`
             <!DOCTYPE html>
             <html lang="en">
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Preview: \${title}</title>
+                <title>Preview: ${title}</title>
                 <style>
                     body {
                         font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -7633,20 +7633,20 @@ jQuery(document).ready(function($) {
             </head>
             <body>
                 <div class="preview-container">
-                    \${coverHtml}
-                    <h1>\${title}</h1>
+                    ${coverHtml}
+                    <h1>${title}</h1>
                     <div class="meta-info">
                         <span class="badge">PREVIEW MODE</span>
-                        <span>Generated at: \${new Date().toLocaleString()}</span>
+                        <span>Generated at: ${new Date().toLocaleString()}</span>
                         <span>· By Nitin & Shanaya Arora</span>
                     </div>
                     <div class="content">
-                        \${content}
+                        ${content}
                     </div>
                 </div>
             </body>
             </html>
-        \`);
+        `);
         previewWindow.document.close();
         window.coraShowToast('Premium article preview generated.', 'success');
     };
@@ -7665,18 +7665,18 @@ jQuery(document).ready(function($) {
         resultsContainer.html('<span class="text-[10px] text-zinc-400 animate-pulse">Loading LSI keywords...</span>');
 
         $.ajax({
-            url: `https://api.datamuse.com/words?ml=\${encodeURIComponent(keyword)}&max=8`,
+            url: `https://api.datamuse.com/words?ml=${encodeURIComponent(keyword)}&max=8`,
             method: 'GET',
             success: function(data) {
                 btn.prop('disabled', false).text('Find');
                 if (data && data.length > 0) {
                     let pills = '';
                     data.forEach(item => {
-                        pills += \`
-                            <span class="px-2 py-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 rounded-full text-[10px] font-semibold cursor-pointer select-none transition-colors border border-zinc-200/50" onclick="jQuery('#cora-seo-keyword').val('\${item.word}').trigger('change'); window.coraShowToast('Keyword set to: \${item.word}', 'info');">
-                                + \${item.word}
+                        pills += `
+                            <span class="px-2 py-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 rounded-full text-[10px] font-semibold cursor-pointer select-none transition-colors border border-zinc-200/50" onclick="jQuery('#cora-seo-keyword').val('${item.word}').trigger('change'); window.coraShowToast('Keyword set to: ${item.word}', 'info');">
+                                + ${item.word}
                             </span>
-                        \`;
+                        `;
                     });
                     resultsContainer.html(pills);
                 } else {
@@ -7715,7 +7715,7 @@ jQuery(document).ready(function($) {
         });
 
         if (missingAltCount > 0) {
-            window.coraShowToast(`Image Alt Audit: Found \${missingAltCount} image(s) missing alt attributes!`, 'warning');
+            window.coraShowToast(`Image Alt Audit: Found ${missingAltCount} image(s) missing alt attributes!`, 'warning');
         } else {
             window.coraShowToast('Image Alt Audit: All images have alt attributes. Great job!', 'success');
         }
