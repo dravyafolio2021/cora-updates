@@ -18879,24 +18879,44 @@ function cora_rest_submit_form( $request ) {
             $phone_val = '';
             $notes_val = '';
 
-            // Extract mapped values case-insensitively or exactly
+            // Extract mapped values case-insensitively or auto-detect contact fields
             foreach ( $submitted_data as $key => $val ) {
-                $trimmed_key = trim( $key );
-                if ( ! empty( $map_name_key ) && strcasecmp( $trimmed_key, trim( $map_name_key ) ) === 0 ) {
+                if ( is_array( $val ) ) {
+                    $val = implode( ', ', $val );
+                }
+                $trimmed_key = strtolower( trim( $key ) );
+                
+                if ( ! empty( $map_name_key ) && strcasecmp( trim( $key ), trim( $map_name_key ) ) === 0 ) {
+                    $name_val = $val;
+                } elseif ( empty( $name_val ) && ( strpos( $trimmed_key, 'name' ) !== false || strpos( $trimmed_key, 'full' ) !== false || strpos( $trimmed_key, 'client' ) !== false ) ) {
                     $name_val = $val;
                 }
-                if ( ! empty( $map_email_key ) && strcasecmp( $trimmed_key, trim( $map_email_key ) ) === 0 ) {
+
+                if ( ! empty( $map_email_key ) && strcasecmp( trim( $key ), trim( $map_email_key ) ) === 0 ) {
+                    $email_val = $val;
+                } elseif ( empty( $email_val ) && ( strpos( $trimmed_key, 'email' ) !== false || is_email( $val ) ) ) {
                     $email_val = $val;
                 }
-                if ( ! empty( $map_phone_key ) && strcasecmp( $trimmed_key, trim( $map_phone_key ) ) === 0 ) {
+
+                if ( ! empty( $map_phone_key ) && strcasecmp( trim( $key ), trim( $map_phone_key ) ) === 0 ) {
+                    $phone_val = $val;
+                } elseif ( empty( $phone_val ) && ( strpos( $trimmed_key, 'phone' ) !== false || strpos( $trimmed_key, 'mobile' ) !== false || strpos( $trimmed_key, 'whatsapp' ) !== false ) ) {
                     $phone_val = $val;
                 }
-                if ( ! empty( $map_notes_key ) && strcasecmp( $trimmed_key, trim( $map_notes_key ) ) === 0 ) {
+
+                if ( ! empty( $map_notes_key ) && strcasecmp( trim( $key ), trim( $map_notes_key ) ) === 0 ) {
+                    $notes_val = $val;
+                } elseif ( empty( $notes_val ) && ( strpos( $trimmed_key, 'note' ) !== false || strpos( $trimmed_key, 'message' ) !== false || strpos( $trimmed_key, 'requirement' ) !== false ) ) {
                     $notes_val = $val;
                 }
             }
 
-            // Sync lead to database if at least name or email is mapped and provided
+            // Fallback name if email present
+            if ( empty( $name_val ) && ! empty( $email_val ) ) {
+                $name_val = explode( '@', $email_val )[0];
+            }
+
+            // Sync lead to database and workspace options if contact details are present
             if ( ! empty( $name_val ) || ! empty( $email_val ) ) {
                 $first_name = $name_val;
                 $last_name  = '';
@@ -18909,7 +18929,7 @@ function cora_rest_submit_form( $request ) {
                 // Retrieve branch ID for agency
                 $branch_id = $wpdb->get_var( $wpdb->prepare(
                     "SELECT id FROM {$wpdb->prefix}cora_branches WHERE agency_id = %d LIMIT 1",
-                    $form['agency_id']
+                    $form['agency_id'] ?? 1
                 ) );
                 if ( ! $branch_id ) {
                     $branch_id = 1;
@@ -18918,19 +18938,43 @@ function cora_rest_submit_form( $request ) {
                 $wpdb->insert(
                     $wpdb->prefix . 'cora_leads',
                     array(
-                        'agency_id'  => $form['agency_id'],
+                        'agency_id'  => $form['agency_id'] ?? 1,
                         'branch_id'  => $branch_id,
                         'first_name' => sanitize_text_field( $first_name ),
                         'last_name'  => sanitize_text_field( $last_name ),
                         'email'      => sanitize_email( $email_val ),
                         'phone'      => sanitize_text_field( $phone_val ),
                         'notes'      => sanitize_textarea_field( $notes_val ),
-                        'source'     => sanitize_text_field( $form['title'] ),
+                        'source'     => sanitize_text_field( $form['title'] ?? 'Cora Web Form' ),
                         'status'     => 'new',
                         'created_at' => current_time('mysql'),
                         'updated_at' => current_time('mysql')
                     )
                 );
+                $new_db_id = $wpdb->insert_id;
+
+                // Also sync into cora_workspace_leads option for immediate UI reactivity
+                $leads = get_option( 'cora_workspace_leads', array() );
+                if ( ! is_array( $leads ) ) {
+                    $leads = array();
+                }
+
+                $new_lead_entry = array(
+                    'id'         => $new_db_id ? $new_db_id : 'lead_' . time(),
+                    'names'      => trim( $first_name . ' ' . $last_name ),
+                    'email'      => sanitize_email( $email_val ),
+                    'phone'      => sanitize_text_field( $phone_val ),
+                    'scale'      => 'Form Submission',
+                    'city'       => 'Website',
+                    'notes'      => sanitize_textarea_field( $notes_val ),
+                    'price'      => '₹0',
+                    'status'     => 'New Lead',
+                    'score'      => 'hot',
+                    'created_at' => time()
+                );
+
+                array_unshift( $leads, $new_lead_entry );
+                update_option( 'cora_workspace_leads', $leads );
             }
         }
 
