@@ -5604,8 +5604,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             <!-- SECTION 8: EQUIPMENT TRACKING -->
             <?php if ( $sub_page === 'equipment' ) : ?>
             <?php 
-                $cora_eq_ind = function_exists('cora_get_active_industry') ? cora_get_active_industry() : 'photography_studio';
-                if ( $cora_eq_ind === 'photography_studio' ) :
+                $current_industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : ( isset( $active_industry ) ? $active_industry : get_option( 'cora_workspace_industry', 'real_estate' ) );
+                if ( $current_industry === 'photography_studio' || $current_industry === 'photography' ) :
             ?>
             <section id="cora-page-equipment" class="cora-page-section cora-active">
                 <?php include CORA_WORKSPACE_PATH . 'views/view-equipment.php'; ?>

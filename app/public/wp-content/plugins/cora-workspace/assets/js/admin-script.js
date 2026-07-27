@@ -305,6 +305,58 @@ jQuery(document).ready(function($) {
         }
     };
 
+    // Studio Camera Equipment Drawer Opener Helpers
+    window.openAddGearDrawer = function() {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        }
+        const drawer = $('#cora-add-gear-drawer, #cora-add-equipment-drawer');
+        if (drawer.length) {
+            drawer.removeClass('collapsed hidden');
+        }
+        const bd = document.getElementById('cora-drawer-backdrop');
+        if (bd) {
+            bd.classList.remove('hidden');
+            bd.style.display = 'block';
+            bd.style.pointerEvents = 'auto';
+        }
+        $('body').addClass('cora-drawer-open overflow-hidden');
+    };
+
+    window.openCheckoutGearDrawer = function(gearData) {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        }
+        const drawer = $('#cora-checkout-gear-drawer, #cora-checkout-equipment-drawer');
+        if (drawer.length) {
+            drawer.removeClass('collapsed hidden');
+        }
+        const bd = document.getElementById('cora-drawer-backdrop');
+        if (bd) {
+            bd.classList.remove('hidden');
+            bd.style.display = 'block';
+            bd.style.pointerEvents = 'auto';
+        }
+        $('body').addClass('cora-drawer-open overflow-hidden');
+    };
+
+    window.openMaintenanceDrawer = function(gearData) {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        }
+        const drawer = $('#cora-maintenance-drawer, #cora-equipment-maintenance-drawer');
+        if (drawer.length) {
+            drawer.removeClass('collapsed hidden');
+        }
+        const bd = document.getElementById('cora-drawer-backdrop');
+        if (bd) {
+            bd.classList.remove('hidden');
+            bd.style.display = 'block';
+            bd.style.pointerEvents = 'auto';
+        }
+        $('body').addClass('cora-drawer-open overflow-hidden');
+    };
+
     window.generateInstantReport = function(type) {
         type = type || 'monthly';
         if (typeof window.coraShowToast === 'function') {
@@ -1162,8 +1214,8 @@ jQuery(document).ready(function($) {
         window.coraShowToast(`${title} module is coming soon!`);
     });
 
-    // 16. Sub-Tab Navigation for Team and Equipment Sections
-    $('.cora-sub-tab').on('click', function(e) {
+    // 16. Sub-Tab Navigation for Team and Equipment Sections (handles both Studio gear sub-tabs and Real Estate listing sub-tabs seamlessly)
+    $(document).on('click', '.cora-sub-tab', function(e) {
         const tab = $(this);
         const target = tab.data('sub-target');
         if (!target) return;
@@ -1176,7 +1228,11 @@ jQuery(document).ready(function($) {
         
         // Hide all sub-sections and show active one
         parentSection.find('.cora-sub-section').addClass('hidden').removeClass('active');
-        parentSection.find(`#cora-sub-page-${target}`).removeClass('hidden').addClass('active');
+        let targetElem = parentSection.find(`#cora-sub-page-${target}`);
+        if (!targetElem.length) {
+            targetElem = parentSection.find(`#${target}`);
+        }
+        targetElem.removeClass('hidden').addClass('active');
     });
 
     // Toggle allocation input visibility in assign equipment tab
