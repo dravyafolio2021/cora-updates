@@ -13800,7 +13800,7 @@ function cora_db_get_leads() {
             $status_text = $r['status'] ?? 'New Lead';
             switch($r['status']) {
                 case 'new': $status_text = 'New Lead'; break;
-                case 'contacted': $status_text = 'Proposal Sent'; break;
+                case 'contacted': $status_text = 'Contacted'; break;
                 case 'site_visit': $status_text = 'Site Visit'; break;
                 case 'negotiation': $status_text = 'Negotiation'; break;
                 case 'closed': $status_text = 'Converted'; break;
@@ -13837,8 +13837,8 @@ function cora_db_get_leads() {
     // Merge option stored leads
     $option_leads = get_option( 'cora_workspace_leads', false );
 
-    // If option has never been created, seed 16 rich demo leads once
-    if ( $option_leads === false && empty( $mapped ) ) {
+    // If option has never been created or is empty, seed 16 rich demo leads once
+    if ( $option_leads === false || empty( $option_leads ) ) {
         $seed_demo_leads = array(
             array(
                 'id'            => 'lead_demo_101',
