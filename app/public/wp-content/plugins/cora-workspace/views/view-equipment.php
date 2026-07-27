@@ -460,8 +460,16 @@ if ( is_array( $cora_gear_maintenance ) ) {
 
                             $img_html = '';
                             if ( ! empty( $gear['image'] ) ) {
-                                $is_upload = ( strpos( $gear['image'], '/' ) !== false );
-                                $img_url = $is_upload ? '/wp-content/' . $gear['image'] : '/wp-content/plugins/cora-workspace/assets/images/' . $gear['image'];
+                                $img_src = $gear['image'];
+                                if ( strpos( $img_src, 'data:' ) === 0 || strpos( $img_src, 'http' ) === 0 ) {
+                                    $img_url = $img_src;
+                                } elseif ( strpos( $img_src, '/' ) === 0 ) {
+                                    $img_url = $img_src;
+                                } elseif ( strpos( $img_src, '/' ) !== false ) {
+                                    $img_url = '/wp-content/' . $img_src;
+                                } else {
+                                    $img_url = '/wp-content/plugins/cora-workspace/assets/images/' . $img_src;
+                                }
                                 $img_html = '<img src="' . esc_url( $img_url ) . '" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-zinc-200" alt="' . esc_attr( $gear['name'] ) . '">';
                             } else {
                                 $img_html = '<div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-800 border border-zinc-200 flex items-center justify-center shrink-0">' . $cat_icon . '</div>';
@@ -734,18 +742,18 @@ if ( is_array( $cora_gear_maintenance ) ) {
     <form id="cora-add-gear-form" onsubmit="coraSubmitAddGearForm(event)" class="flex-1 flex flex-col overflow-hidden">
         <!-- Topbar Step Tracker -->
         <div class="px-6 py-4 bg-zinc-50 border-b border-zinc-200 shrink-0 flex items-center justify-between gap-2 select-none">
-            <div class="cora-step-indicator flex items-center gap-2 cursor-pointer" data-step="1" onclick="if(addGearStep > 1 || validateCurrentStep('cora-add-gear-drawer', addGearStep)) setAddGearStep(1)">
-                <div class="step-circle w-5.5 h-5.5 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[10px] font-bold shrink-0">1</div>
+            <div class="cora-step-indicator flex items-center gap-2.5 cursor-pointer" data-step="1" onclick="if(addGearStep > 1 || validateCurrentStep('cora-add-gear-drawer', addGearStep)) setAddGearStep(1)">
+                <div class="step-circle w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[10px] font-bold shrink-0 transition-all">1</div>
                 <div class="step-label text-[11px] font-bold text-zinc-950 leading-tight">Specifications</div>
             </div>
-            <div class="h-px bg-zinc-200 flex-1 max-w-[60px]"></div>
-            <div class="cora-step-indicator flex items-center gap-2 cursor-pointer" data-step="2" onclick="if(addGearStep > 2 || validateCurrentStep('cora-add-gear-drawer', addGearStep)) setAddGearStep(2)">
-                <div class="step-circle w-5.5 h-5.5 rounded-full border border-zinc-200 text-zinc-400 flex items-center justify-center text-[10px] font-medium shrink-0 bg-white">2</div>
+            <div class="h-px bg-zinc-250 flex-1 max-w-[50px] mx-1"></div>
+            <div class="cora-step-indicator flex items-center gap-2.5 cursor-pointer" data-step="2" onclick="if(addGearStep > 2 || validateCurrentStep('cora-add-gear-drawer', addGearStep)) setAddGearStep(2)">
+                <div class="step-circle w-6 h-6 rounded-full border border-zinc-200 text-zinc-400 flex items-center justify-center text-[10px] font-medium shrink-0 bg-white transition-all">2</div>
                 <div class="step-label text-[11px] font-medium text-zinc-400 leading-tight">Acquisition</div>
             </div>
-            <div class="h-px bg-zinc-200 flex-1 max-w-[60px]"></div>
-            <div class="cora-step-indicator flex items-center gap-2 cursor-pointer" data-step="3" onclick="if(validateCurrentStep('cora-add-gear-drawer', addGearStep)) setAddGearStep(3)">
-                <div class="step-circle w-5.5 h-5.5 rounded-full border border-zinc-200 text-zinc-400 flex items-center justify-center text-[10px] font-medium shrink-0 bg-white">3</div>
+            <div class="h-px bg-zinc-250 flex-1 max-w-[50px] mx-1"></div>
+            <div class="cora-step-indicator flex items-center gap-2.5 cursor-pointer" data-step="3" onclick="if(validateCurrentStep('cora-add-gear-drawer', addGearStep)) setAddGearStep(3)">
+                <div class="step-circle w-6 h-6 rounded-full border border-zinc-200 text-zinc-400 flex items-center justify-center text-[10px] font-medium shrink-0 bg-white transition-all">3</div>
                 <div class="step-label text-[11px] font-medium text-zinc-400 leading-tight">Lifecycle</div>
             </div>
         </div>
@@ -848,18 +856,40 @@ if ( is_array( $cora_gear_maintenance ) ) {
 
                 <div>
                     <label class="block text-xs font-semibold text-zinc-700 mb-1">Product Photo</label>
-                    <div class="flex items-center gap-4 p-4 border border-dashed border-zinc-200 rounded-xl bg-zinc-50/50 hover:bg-zinc-50 transition-colors relative group">
-                        <div class="flex-1 flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0 overflow-hidden">
+                    <div class="border border-zinc-200 rounded-xl bg-white overflow-hidden p-4 space-y-4">
+                        <div id="add-gear-upload-box" class="flex items-center gap-4">
+                            <div class="w-16 h-16 rounded-lg bg-zinc-100 border border-zinc-250 flex items-center justify-center shrink-0 overflow-hidden relative">
                                 <img id="add-gear-image-preview" src="" class="w-full h-full object-cover hidden">
-                                <svg id="add-gear-image-placeholder" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                                <svg id="add-gear-image-placeholder" viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-450"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
                             </div>
-                            <div>
-                                <div class="text-xs font-bold text-zinc-800">Upload Gear Image</div>
-                                <div class="text-[10px] text-zinc-400">PNG, JPG, or WEBP up to 5MB</div>
+                            <div class="flex-1 space-y-2">
+                                <div class="text-[11px] font-bold text-zinc-900 leading-tight">Attach a visual asset:</div>
+                                <div class="flex flex-wrap gap-2">
+                                    <button type="button" onclick="document.getElementById('add-gear-image-file').click()" class="px-3 py-1.5 bg-zinc-950 text-white text-[10px] font-bold rounded-lg hover:bg-zinc-800 shadow-xs cursor-pointer flex items-center gap-1.5 border border-transparent">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                        Upload File
+                                    </button>
+                                    <button type="button" onclick="coraSelectMediaLibrary('add-gear-image-preview', 'add-gear-image-path')" class="px-3 py-1.5 bg-white text-zinc-700 text-[10px] font-bold rounded-lg hover:bg-zinc-50 cursor-pointer flex items-center gap-1.5 border border-zinc-200">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                        Media Library
+                                    </button>
+                                    <button type="button" onclick="coraStartWebcam('add')" class="px-3 py-1.5 bg-white text-zinc-700 text-[10px] font-bold rounded-lg hover:bg-zinc-50 cursor-pointer flex items-center gap-1.5 border border-zinc-200">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                                        Access Camera
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        <input type="file" id="add-gear-image-file" onchange="coraUploadGearImage(this, 'add-gear-image-preview', 'add-gear-image-path')" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+
+                        <div id="add-gear-camera-container" class="hidden border border-zinc-200 rounded-xl overflow-hidden bg-black relative w-full aspect-video">
+                            <video id="add-gear-video" autoplay playsinline class="w-full h-full object-cover"></video>
+                            <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-2 z-20">
+                                <button type="button" onclick="coraCaptureWebcamPhoto('add-gear-image-preview', 'add-gear-image-path', 'add')" class="px-4 py-1.5 bg-zinc-950 text-white text-xs font-bold rounded-lg hover:bg-zinc-800 shadow-sm cursor-pointer border border-zinc-700">Capture</button>
+                                <button type="button" onclick="coraStopWebcam('add')" class="px-4 py-1.5 bg-white text-zinc-800 text-xs font-bold rounded-lg hover:bg-zinc-100 shadow-sm cursor-pointer border border-zinc-250">Cancel</button>
+                            </div>
+                        </div>
+
+                        <input type="file" id="add-gear-image-file" onchange="coraUploadGearImage(this, 'add-gear-image-preview', 'add-gear-image-path')" accept="image/*" class="hidden">
                         <input type="hidden" id="add-gear-image-path" value="">
                     </div>
                 </div>
@@ -898,18 +928,18 @@ if ( is_array( $cora_gear_maintenance ) ) {
 
         <!-- Topbar Step Tracker -->
         <div class="px-6 py-4 bg-zinc-50 border-b border-zinc-200 shrink-0 flex items-center justify-between gap-2 select-none">
-            <div class="cora-step-indicator flex items-center gap-2 cursor-pointer" data-step="1" onclick="if(editGearStep > 1 || validateCurrentStep('cora-edit-gear-drawer', editGearStep)) setEditGearStep(1)">
-                <div class="step-circle w-5.5 h-5.5 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[10px] font-bold shrink-0">1</div>
+            <div class="cora-step-indicator flex items-center gap-2.5 cursor-pointer" data-step="1" onclick="if(editGearStep > 1 || validateCurrentStep('cora-edit-gear-drawer', editGearStep)) setEditGearStep(1)">
+                <div class="step-circle w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[10px] font-bold shrink-0 transition-all">1</div>
                 <div class="step-label text-[11px] font-bold text-zinc-950 leading-tight">Specifications</div>
             </div>
-            <div class="h-px bg-zinc-200 flex-1 max-w-[60px]"></div>
-            <div class="cora-step-indicator flex items-center gap-2 cursor-pointer" data-step="2" onclick="if(editGearStep > 2 || validateCurrentStep('cora-edit-gear-drawer', editGearStep)) setEditGearStep(2)">
-                <div class="step-circle w-5.5 h-5.5 rounded-full border border-zinc-200 text-zinc-400 flex items-center justify-center text-[10px] font-medium shrink-0 bg-white">2</div>
+            <div class="h-px bg-zinc-250 flex-1 max-w-[50px] mx-1"></div>
+            <div class="cora-step-indicator flex items-center gap-2.5 cursor-pointer" data-step="2" onclick="if(editGearStep > 2 || validateCurrentStep('cora-edit-gear-drawer', editGearStep)) setEditGearStep(2)">
+                <div class="step-circle w-6 h-6 rounded-full border border-zinc-200 text-zinc-400 flex items-center justify-center text-[10px] font-medium shrink-0 bg-white transition-all">2</div>
                 <div class="step-label text-[11px] font-medium text-zinc-400 leading-tight">Acquisition</div>
             </div>
-            <div class="h-px bg-zinc-200 flex-1 max-w-[60px]"></div>
-            <div class="cora-step-indicator flex items-center gap-2 cursor-pointer" data-step="3" onclick="if(validateCurrentStep('cora-edit-gear-drawer', editGearStep)) setEditGearStep(3)">
-                <div class="step-circle w-5.5 h-5.5 rounded-full border border-zinc-200 text-zinc-400 flex items-center justify-center text-[10px] font-medium shrink-0 bg-white">3</div>
+            <div class="h-px bg-zinc-250 flex-1 max-w-[50px] mx-1"></div>
+            <div class="cora-step-indicator flex items-center gap-2.5 cursor-pointer" data-step="3" onclick="if(validateCurrentStep('cora-edit-gear-drawer', editGearStep)) setEditGearStep(3)">
+                <div class="step-circle w-6 h-6 rounded-full border border-zinc-200 text-zinc-400 flex items-center justify-center text-[10px] font-medium shrink-0 bg-white transition-all">3</div>
                 <div class="step-label text-[11px] font-medium text-zinc-400 leading-tight">Lifecycle</div>
             </div>
         </div>
@@ -1012,18 +1042,40 @@ if ( is_array( $cora_gear_maintenance ) ) {
 
                 <div>
                     <label class="block text-xs font-semibold text-zinc-700 mb-1">Product Photo</label>
-                    <div class="flex items-center gap-4 p-4 border border-dashed border-zinc-200 rounded-xl bg-zinc-50/50 hover:bg-zinc-50 transition-colors relative group">
-                        <div class="flex-1 flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0 overflow-hidden">
+                    <div class="border border-zinc-200 rounded-xl bg-white overflow-hidden p-4 space-y-4">
+                        <div id="edit-gear-upload-box" class="flex items-center gap-4">
+                            <div class="w-16 h-16 rounded-lg bg-zinc-100 border border-zinc-250 flex items-center justify-center shrink-0 overflow-hidden relative">
                                 <img id="edit-gear-image-preview" src="" class="w-full h-full object-cover hidden">
-                                <svg id="edit-gear-image-placeholder" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                                <svg id="edit-gear-image-placeholder" viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-450"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
                             </div>
-                            <div>
-                                <div class="text-xs font-bold text-zinc-800">Upload Gear Image</div>
-                                <div class="text-[10px] text-zinc-400">PNG, JPG, or WEBP up to 5MB</div>
+                            <div class="flex-1 space-y-2">
+                                <div class="text-[11px] font-bold text-zinc-900 leading-tight">Attach a visual asset:</div>
+                                <div class="flex flex-wrap gap-2">
+                                    <button type="button" onclick="document.getElementById('edit-gear-image-file').click()" class="px-3 py-1.5 bg-zinc-950 text-white text-[10px] font-bold rounded-lg hover:bg-zinc-800 shadow-xs cursor-pointer flex items-center gap-1.5 border border-transparent">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                        Upload File
+                                    </button>
+                                    <button type="button" onclick="coraSelectMediaLibrary('edit-gear-image-preview', 'edit-gear-image-path')" class="px-3 py-1.5 bg-white text-zinc-700 text-[10px] font-bold rounded-lg hover:bg-zinc-50 cursor-pointer flex items-center gap-1.5 border border-zinc-200">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                        Media Library
+                                    </button>
+                                    <button type="button" onclick="coraStartWebcam('edit')" class="px-3 py-1.5 bg-white text-zinc-700 text-[10px] font-bold rounded-lg hover:bg-zinc-50 cursor-pointer flex items-center gap-1.5 border border-zinc-200">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                                        Access Camera
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        <input type="file" id="edit-gear-image-file" onchange="coraUploadGearImage(this, 'edit-gear-image-preview', 'edit-gear-image-path')" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+
+                        <div id="edit-gear-camera-container" class="hidden border border-zinc-200 rounded-xl overflow-hidden bg-black relative w-full aspect-video">
+                            <video id="edit-gear-video" autoplay playsinline class="w-full h-full object-cover"></video>
+                            <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-2 z-20">
+                                <button type="button" onclick="coraCaptureWebcamPhoto('edit-gear-image-preview', 'edit-gear-image-path', 'edit')" class="px-4 py-1.5 bg-zinc-950 text-white text-xs font-bold rounded-lg hover:bg-zinc-800 shadow-sm cursor-pointer border border-zinc-700">Capture</button>
+                                <button type="button" onclick="coraStopWebcam('edit')" class="px-4 py-1.5 bg-white text-zinc-800 text-xs font-bold rounded-lg hover:bg-zinc-100 shadow-sm cursor-pointer border border-zinc-250">Cancel</button>
+                            </div>
+                        </div>
+
+                        <input type="file" id="edit-gear-image-file" onchange="coraUploadGearImage(this, 'edit-gear-image-preview', 'edit-gear-image-path')" accept="image/*" class="hidden">
                         <input type="hidden" id="edit-gear-image-path" value="">
                     </div>
                 </div>
@@ -1332,7 +1384,9 @@ if (typeof window.coraCloseAllDrawers !== 'function') {
 
 // Open Drawer Functions
 window.openAddGearDrawer = function() {
-    if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
+    if (typeof window.coraCloseAllDrawers === 'function') window.coraStopWebcam('add');
+    window.coraStopWebcam('edit');
+    window.coraCloseAllDrawers();
     var backdrop = document.getElementById('cora-drawer-backdrop');
     if (backdrop) backdrop.classList.remove('hidden');
 
@@ -1359,7 +1413,9 @@ window.openAddGearDrawer = function() {
 };
 
 window.openCheckoutGearDrawer = function(presetGearName) {
-    if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
+    if (typeof window.coraCloseAllDrawers === 'function') window.coraStopWebcam('add');
+    window.coraStopWebcam('edit');
+    window.coraCloseAllDrawers();
     var backdrop = document.getElementById('cora-drawer-backdrop');
     if (backdrop) backdrop.classList.remove('hidden');
 
@@ -1384,7 +1440,9 @@ window.openCheckoutGearDrawer = function(presetGearName) {
 };
 
 window.openMaintenanceDrawer = function(presetGearName) {
-    if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
+    if (typeof window.coraCloseAllDrawers === 'function') window.coraStopWebcam('add');
+    window.coraStopWebcam('edit');
+    window.coraCloseAllDrawers();
     var backdrop = document.getElementById('cora-drawer-backdrop');
     if (backdrop) backdrop.classList.remove('hidden');
 
@@ -1409,7 +1467,9 @@ window.openMaintenanceDrawer = function(presetGearName) {
 };
 
 window.openViewRepairDrawer = function(gearId) {
-    if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
+    if (typeof window.coraCloseAllDrawers === 'function') window.coraStopWebcam('add');
+    window.coraStopWebcam('edit');
+    window.coraCloseAllDrawers();
     var backdrop = document.getElementById('cora-drawer-backdrop');
     if (backdrop) backdrop.classList.remove('hidden');
 
@@ -1444,7 +1504,9 @@ window.openViewRepairDrawer = function(gearId) {
 };
 
 window.openEditGearDrawer = function(gearId) {
-    if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
+    if (typeof window.coraCloseAllDrawers === 'function') window.coraStopWebcam('add');
+    window.coraStopWebcam('edit');
+    window.coraCloseAllDrawers();
     var backdrop = document.getElementById('cora-drawer-backdrop');
     if (backdrop) backdrop.classList.remove('hidden');
 
@@ -1483,8 +1545,18 @@ window.openEditGearDrawer = function(gearId) {
         if (pathInput) pathInput.value = item.image || '';
         if (preview) {
             if (item.image) {
-                var isUpload = item.image.indexOf('/') !== -1;
-                preview.src = isUpload ? '/wp-content/' + item.image : '/wp-content/plugins/cora-workspace/assets/images/' + item.image;
+                var imgSrc = item.image;
+                var imgUrl = '';
+                if (imgSrc.indexOf('data:') === 0 || imgSrc.indexOf('http') === 0) {
+                    imgUrl = imgSrc;
+                } else if (imgSrc.indexOf('/') === 0) {
+                    imgUrl = imgSrc;
+                } else if (imgSrc.indexOf('/') !== -1) {
+                    imgUrl = '/wp-content/' + imgSrc;
+                } else {
+                    imgUrl = '/wp-content/plugins/cora-workspace/assets/images/' + imgSrc;
+                }
+                preview.src = imgUrl;
                 preview.classList.remove('hidden');
                 if (placeholder) placeholder.classList.add('hidden');
             } else {
@@ -1538,15 +1610,15 @@ window.setAddGearStep = function(step) {
         var circle = el.querySelector('.step-circle');
         var label = el.querySelector('.step-label');
         if (s === step) {
-            circle.className = 'step-circle w-5.5 h-5.5 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[10px] font-bold shrink-0';
+            circle.className = 'step-circle w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[10px] font-bold shrink-0 transition-all';
             if (label) label.className = 'step-label text-[11px] font-bold text-zinc-950 leading-tight';
             circle.innerHTML = s;
         } else if (s < step) {
-            circle.className = 'step-circle w-5.5 h-5.5 rounded-full bg-zinc-200 text-zinc-800 flex items-center justify-center text-[10px] font-bold shrink-0';
+            circle.className = 'step-circle w-6 h-6 rounded-full bg-zinc-100 text-zinc-800 border border-zinc-200 flex items-center justify-center text-[10px] font-bold shrink-0 transition-all';
             if (label) label.className = 'step-label text-[11px] font-semibold text-zinc-700 leading-tight';
-            circle.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+            circle.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>';
         } else {
-            circle.className = 'step-circle w-5.5 h-5.5 rounded-full border border-zinc-200 text-zinc-400 flex items-center justify-center text-[10px] font-medium shrink-0 bg-white';
+            circle.className = 'step-circle w-6 h-6 rounded-full border border-zinc-200 text-zinc-400 flex items-center justify-center text-[10px] font-medium shrink-0 bg-white transition-all';
             if (label) label.className = 'step-label text-[11px] font-medium text-zinc-400 leading-tight';
             circle.innerHTML = s;
         }
@@ -1593,15 +1665,15 @@ window.setEditGearStep = function(step) {
         var circle = el.querySelector('.step-circle');
         var label = el.querySelector('.step-label');
         if (s === step) {
-            circle.className = 'step-circle w-5.5 h-5.5 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[10px] font-bold shrink-0';
+            circle.className = 'step-circle w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[10px] font-bold shrink-0 transition-all';
             if (label) label.className = 'step-label text-[11px] font-bold text-zinc-950 leading-tight';
             circle.innerHTML = s;
         } else if (s < step) {
-            circle.className = 'step-circle w-5.5 h-5.5 rounded-full bg-zinc-200 text-zinc-800 flex items-center justify-center text-[10px] font-bold shrink-0';
+            circle.className = 'step-circle w-6 h-6 rounded-full bg-zinc-100 text-zinc-800 border border-zinc-200 flex items-center justify-center text-[10px] font-bold shrink-0 transition-all';
             if (label) label.className = 'step-label text-[11px] font-semibold text-zinc-700 leading-tight';
-            circle.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+            circle.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>';
         } else {
-            circle.className = 'step-circle w-5.5 h-5.5 rounded-full border border-zinc-200 text-zinc-400 flex items-center justify-center text-[10px] font-medium shrink-0 bg-white';
+            circle.className = 'step-circle w-6 h-6 rounded-full border border-zinc-200 text-zinc-400 flex items-center justify-center text-[10px] font-medium shrink-0 bg-white transition-all';
             if (label) label.className = 'step-label text-[11px] font-medium text-zinc-400 leading-tight';
             circle.innerHTML = s;
         }
@@ -1627,7 +1699,145 @@ window.setEditGearStep = function(step) {
     }
 };
 
+
+// WordPress Media Library Selector
+window.coraSelectMediaLibrary = function(previewId, pathId) {
+    if (typeof wp !== 'undefined' && wp.media) {
+        var file_frame = wp.media({
+            title: 'Select or Upload Product Photo',
+            button: {
+                text: 'Use this photo'
+            },
+            multiple: false
+        });
+
+        file_frame.on('select', function() {
+            var attachment = file_frame.state().get('selection').first().toJSON();
+            var preview = document.getElementById(previewId);
+            var pathInput = document.getElementById(pathId);
+            var placeholderId = previewId.replace('-preview', '-placeholder');
+            var placeholder = document.getElementById(placeholderId);
+
+            if (preview) {
+                preview.src = attachment.url;
+                preview.classList.remove('hidden');
+            }
+            if (placeholder) {
+                placeholder.classList.add('hidden');
+            }
+            if (pathInput) {
+                var relativePath = attachment.url;
+                var contentIndex = attachment.url.indexOf('/wp-content/');
+                if (contentIndex !== -1) {
+                    relativePath = attachment.url.substring(contentIndex);
+                }
+                pathInput.value = relativePath;
+            }
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Image selected from library.', 'success');
+            }
+        });
+
+        file_frame.open();
+    } else {
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast('WordPress Media Library is not enqueued.', 'error');
+        }
+    }
+};
+
+// HTML5 Webcam Capture Integration
+window.coraWebcamStream = null;
+
+window.coraStartWebcam = function(prefix) {
+    var container = document.getElementById(prefix + '-gear-camera-container');
+    var video = document.getElementById(prefix + '-gear-video');
+    var uploadBox = document.getElementById(prefix + '-gear-upload-box');
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast('Camera access is not supported by your browser or requires a secure HTTPS connection.', 'error');
+        }
+        return;
+    }
+
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        .then(function(stream) {
+            window.coraWebcamStream = stream;
+            if (video) {
+                video.srcObject = stream;
+                video.play();
+            }
+            if (container) container.classList.remove('hidden');
+            if (uploadBox) uploadBox.classList.add('hidden');
+        })
+        .catch(function(err) {
+            console.error('Camera access error:', err);
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Could not access camera. Please check permissions.', 'error');
+            }
+        });
+};
+
+window.coraStopWebcam = function(prefix) {
+    var container = document.getElementById(prefix + '-gear-camera-container');
+    var uploadBox = document.getElementById(prefix + '-gear-upload-box');
+    var video = document.getElementById(prefix + '-gear-video');
+
+    if (window.coraWebcamStream) {
+        window.coraWebcamStream.getTracks().forEach(function(track) {
+            track.stop();
+        });
+        window.coraWebcamStream = null;
+    }
+    if (video) video.srcObject = null;
+    if (container) container.classList.add('hidden');
+    if (uploadBox) uploadBox.classList.remove('hidden');
+};
+
+window.coraCaptureWebcamPhoto = function(previewId, pathId, prefix) {
+    var video = document.getElementById(prefix + '-gear-video');
+    var canvas = document.getElementById('cora-webcam-canvas');
+    if (!canvas) {
+        canvas = document.createElement('canvas');
+        canvas.id = 'cora-webcam-canvas';
+        canvas.width = 640;
+        canvas.height = 480;
+        canvas.className = 'hidden';
+        document.body.appendChild(canvas);
+    }
+
+    if (video && canvas) {
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        var dataUrl = canvas.toDataURL('image/jpeg');
+
+        var preview = document.getElementById(previewId);
+        var pathInput = document.getElementById(pathId);
+        var placeholderId = previewId.replace('-preview', '-placeholder');
+        var placeholder = document.getElementById(placeholderId);
+
+        if (preview) {
+            preview.src = dataUrl;
+            preview.classList.remove('hidden');
+        }
+        if (placeholder) {
+            placeholder.classList.add('hidden');
+        }
+        if (pathInput) {
+            pathInput.value = dataUrl;
+        }
+
+        window.coraStopWebcam(prefix);
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast('Photo captured successfully.', 'success');
+        }
+    }
+};
+
 window.closeGearDrawers = function() {
+    window.coraStopWebcam('add');
+    window.coraStopWebcam('edit');
     window.coraCloseAllDrawers();
 };
 
