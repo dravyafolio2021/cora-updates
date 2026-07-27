@@ -9,6 +9,13 @@ if (typeof window.coraREData === 'undefined') {
     Object.assign(window.coraREData, coraREWPData);
 }
 
+if (typeof window.coraData === 'undefined') {
+    window.coraData = {
+        ajax_url: (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php',
+        nonce: (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : ''
+    };
+}
+
 if (typeof window.ajaxurl === 'undefined') {
     window.ajaxurl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
 }

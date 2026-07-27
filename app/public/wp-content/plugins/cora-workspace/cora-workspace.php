@@ -13835,10 +13835,21 @@ function cora_db_get_leads() {
     }
 
     // Merge option stored leads
-    $option_leads = get_option( 'cora_workspace_leads', false );
+    $option_leads = get_option( 'cora_workspace_leads', array() );
+    if ( ! is_array( $option_leads ) ) {
+        $option_leads = array();
+    }
 
-    // If option has never been created or is empty, seed 16 rich demo leads once
-    if ( $option_leads === false || empty( $option_leads ) ) {
+    $has_demo = false;
+    foreach ( $option_leads as $ol ) {
+        if ( isset( $ol['id'] ) && strpos( $ol['id'], 'lead_demo_' ) !== false ) {
+            $has_demo = true;
+            break;
+        }
+    }
+
+    // Seed 16 rich demo leads if they are not in the option store yet
+    if ( ! $has_demo ) {
         $seed_demo_leads = array(
             array(
                 'id'            => 'lead_demo_101',
@@ -14145,8 +14156,9 @@ function cora_db_get_leads() {
                 'created_at'    => time() - 561600
             )
         );
-        update_option( 'cora_workspace_leads', $seed_demo_leads );
-        $option_leads = $seed_demo_leads;
+        $merged_leads = array_merge( $option_leads, $seed_demo_leads );
+        update_option( 'cora_workspace_leads', $merged_leads );
+        $option_leads = $merged_leads;
     }
 
     if ( is_array( $option_leads ) && ! empty( $option_leads ) ) {
