@@ -370,7 +370,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         <button id="btn-left-tab-fields" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-bold bg-white dark:bg-zinc-700 text-zinc-950 dark:text-zinc-50 shadow-2xs whitespace-nowrap cursor-pointer transition-all border-0 outline-none">Add Fields</button>
                         <button id="btn-left-tab-settings" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 whitespace-nowrap cursor-pointer transition-all bg-transparent border-0 outline-none">Fields</button>
                         <button id="btn-left-tab-form" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 whitespace-nowrap cursor-pointer transition-all bg-transparent border-0 outline-none">Form</button>
-                        <button id="btn-left-tab-integ" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 whitespace-nowrap cursor-pointer transition-all bg-transparent border-0 outline-none">Integ</button>
+                        <button id="btn-left-tab-integ" class="flex-1 py-1.5 px-1 rounded-md text-[10px] font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 whitespace-nowrap cursor-pointer transition-all bg-transparent border-0 outline-none">Integrations</button>
                     </div>
                 </div>
 
@@ -771,12 +771,17 @@ if ( ! defined( 'ABSPATH' ) ) {
                         
                         <div class="space-y-1 pt-1">
                             <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Form Purpose & Classification</label>
-                            <select id="settings-form-purpose" class="h-8 px-2 text-xs bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-zinc-100 w-full outline-none">
+                            <select id="settings-form-purpose" class="h-8 px-2 text-xs bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-zinc-100 w-full outline-none" onchange="if(this.value==='custom_campaign'){jQuery('#settings-custom-campaign-box').removeClass('hidden');}else{jQuery('#settings-custom-campaign-box').addClass('hidden');}">
                                 <option value="lead_capture">Lead Capture / Inquiry Form (Creates CRM Lead)</option>
                                 <option value="campaign_form">Campaign / Landing Page Form (Creates CRM Lead)</option>
                                 <option value="contact_form">General Contact Form (Creates CRM Lead)</option>
+                                <option value="custom_campaign">+ Custom Campaign / Custom Purpose Tag...</option>
                                 <option value="internal_survey">Internal Survey / Feedback (Non-Lead / Skip CRM)</option>
                             </select>
+                            <div id="settings-custom-campaign-box" class="pt-1.5 hidden">
+                                <label class="text-[8.5px] font-bold text-zinc-400 uppercase tracking-wider block">Custom Campaign Name / Source Tag</label>
+                                <input id="settings-custom-campaign-tag" type="text" placeholder="e.g. Summer Promo 2026, Instagram Reel" class="h-8 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 w-full outline-none mt-0.5" />
+                            </div>
                         </div>
                     </div>
                     <div class="p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 space-y-1">

@@ -18974,7 +18974,9 @@ function cora_rest_submit_form( $request ) {
                     $branch_id = 1;
                 }
 
-                $source_title = sanitize_text_field( ($form['title'] ?? 'Cora Form') . ' (' . ucfirst(str_replace('_', ' ', $form_purpose)) . ')' );
+                $custom_tag   = ! empty( $settings['custom_campaign_tag'] ) ? sanitize_text_field( $settings['custom_campaign_tag'] ) : '';
+                $source_title = sanitize_text_field( ($form['title'] ?? 'Cora Form') . ( ! empty( $custom_tag ) ? ' [' . $custom_tag . ']' : ' (' . ucfirst(str_replace('_', ' ', $form_purpose)) . ')' ) );
+                $scale_tag    = ! empty( $custom_tag ) ? $custom_tag : ucfirst(str_replace('_', ' ', $form_purpose));
 
                 $wpdb->insert(
                     $wpdb->prefix . 'cora_leads',
@@ -19005,7 +19007,7 @@ function cora_rest_submit_form( $request ) {
                     'names'      => trim( $first_name . ' ' . $last_name ),
                     'email'      => sanitize_email( $email_val ),
                     'phone'      => sanitize_text_field( $phone_val ),
-                    'scale'      => ucfirst(str_replace('_', ' ', $form_purpose)),
+                    'scale'      => $scale_tag,
                     'city'       => 'Website',
                     'notes'      => sanitize_textarea_field( $notes_val ),
                     'price'      => '₹0',
