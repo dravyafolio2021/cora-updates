@@ -7545,7 +7545,7 @@ jQuery(document).ready(function($) {
         coraQuillListingCoordinator.setSelection(deleteIndex + 2);
 
         $('#cora-editor-slash-menu').addClass('hidden');
-        coraCloseSlashPicker();
+        if (typeof coraCloseSlashPicker === 'function') coraCloseSlashPicker();
         window.coraShowToast('Widget block inserted successfully!', 'success');
         coraUpdateWordCount();
     };
@@ -7580,9 +7580,9 @@ jQuery(document).ready(function($) {
     window.coraSearchSlashItems = function(type, query) {
         $('#cora-slash-picker-results').html('<div class="px-3 py-4 text-[10px] text-zinc-400 text-center flex items-center justify-center gap-1.5"><svg class="animate-spin" viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>Searching...</div>');
 
-        $.post(coraAjax.ajax_url, {
+        $.post(coraREWPData.ajaxUrl, {
             action: 'cora_editor_search',
-            nonce:  coraAjax.nonce,
+            nonce:  coraREWPData.ajaxNonce,
             type:   type,
             q:      query
         }, function(resp) {
