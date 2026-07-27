@@ -1338,6 +1338,12 @@ if ( is_array( $cora_gear_maintenance ) ) {
 
 <!-- ═══ 6. INLINE DYNAMIC JAVASCRIPT ENGINE & REAL BACKEND AJAX INTEGRATION ═════════════════════════════════════ -->
 <script>
+// Nonce and localization bridge fallback
+window.coraData = window.coraData || {};
+if (!window.coraData.nonce) {
+    window.coraData.nonce = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '';
+}
+
 // Initial Repair Data for View Repair details
 window.coraRepairData = <?php echo json_encode( $initial_repair_data ); ?>;
 window.coraStudioGearList = <?php echo json_encode( $cora_studio_gear ); ?>;
