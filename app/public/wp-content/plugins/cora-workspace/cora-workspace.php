@@ -19766,6 +19766,536 @@ function cora_rest_get_email_logs( $request ) {
     return rest_ensure_response( is_array( $sent_log ) ? $sent_log : array() );
 }
 
+/**
+ * Default Reusable Email Templates (Notion/Shopify Minimalist Aesthetic)
+ */
+function cora_get_default_email_templates() {
+    return array(
+        array(
+            'id'          => 'tpl_shoot_confirm',
+            'name'        => 'Shoot & Booking Confirmation',
+            'category'    => 'Bookings',
+            'subject'     => 'Booking Confirmed: {event_name} with {studio_name}',
+            'body'        => "Hi {client_name},\n\nWe are thrilled to confirm your shoot booking for {event_name} scheduled on {event_date} at {event_location}.\n\nOur team has prepared all gear and shot list notes. You can access your client portal and shoot details anytime here:\n{portal_url}\n\nIf you have any last-minute timeline updates or specific visual requests, please reply to this email.\n\nWarm regards,\n{studio_name} Team",
+            'variables'   => array('{client_name}', '{event_name}', '{event_date}', '{event_location}', '{portal_url}', '{studio_name}'),
+            'updated_at'  => '2026-07-27 10:00:00',
+            'is_system'   => true
+        ),
+        array(
+            'id'          => 'tpl_payment_request',
+            'name'        => 'Invoice & Payment Reminder',
+            'category'    => 'Financials',
+            'subject'     => 'Invoice {invoice_num} Ready for {event_name}',
+            'body'        => "Hi {client_name},\n\nThank you for working with {studio_name}! Your invoice #{invoice_num} for total amount {invoice_amount} has been generated.\n\nDeposit / Balance Due: {due_amount}\nPayment Link: {payment_url}\n\nPlease let us know if you need an official GST break-up or receipts.\n\nBest regards,\n{studio_name} Accounts",
+            'variables'   => array('{client_name}', '{invoice_num}', '{invoice_amount}', '{due_amount}', '{payment_url}', '{studio_name}'),
+            'updated_at'  => '2026-07-27 10:00:00',
+            'is_system'   => true
+        ),
+        array(
+            'id'          => 'tpl_gallery_delivery',
+            'name'        => 'High-Res Proofing & Gallery Ready',
+            'category'    => 'Media & Vault',
+            'subject'     => 'Your Photos & Media Assets are Ready! 📸',
+            'body'        => "Hi {client_name},\n\nExciting news! The final edited media assets for {event_name} have been processed and uploaded to your Document Studio Vault & Gallery.\n\nAccess Your Private Gallery:\n{gallery_url}\nAccess Passcode: {gallery_passcode}\n\nFeel free to download your high-resolution files directly or request watermarked previews.\n\nWarmly,\n{studio_name} Creative Team",
+            'variables'   => array('{client_name}', '{event_name}', '{gallery_url}', '{gallery_passcode}', '{studio_name}'),
+            'updated_at'  => '2026-07-27 10:00:00',
+            'is_system'   => true
+        ),
+        array(
+            'id'          => 'tpl_consultation_followup',
+            'name'        => 'Consultation & Vision Follow-up',
+            'category'    => 'Leads',
+            'subject'     => 'Great speaking with you, {client_name}! Next steps...',
+            'body'        => "Hi {client_name},\n\nThank you for taking the time to discuss your vision for {event_name}. We loved hearing about your ideas and requirements.\n\nAs discussed, here is a quick link to review our custom package options and client portal:\n{package_url}\n\nPlease select a convenient slot for our follow-up call whenever you're ready!\n\nBest regards,\n{studio_name}",
+            'variables'   => array('{client_name}', '{event_name}', '{package_url}', '{studio_name}'),
+            'updated_at'  => '2026-07-27 10:00:00',
+            'is_system'   => true
+        ),
+        array(
+            'id'          => 'tpl_review_request',
+            'name'        => 'Client Feedback & Review Request',
+            'category'    => 'Reviews',
+            'subject'     => 'How was your experience with {studio_name}?',
+            'body'        => "Hi {client_name},\n\nIt was an absolute pleasure working with you on {event_name}! We hope you love your photos and video assets.\n\nIf you have a quick 60 seconds, we would be incredibly grateful if you could share a review on our Google Business profile:\n{review_url}\n\nYour feedback means the world to our team!\n\nWarmly,\n{studio_name}",
+            'variables'   => array('{client_name}', '{event_name}', '{review_url}', '{studio_name}'),
+            'updated_at'  => '2026-07-27 10:00:00',
+            'is_system'   => true
+        ),
+        array(
+            'id'          => 'tpl_contract_signature',
+            'name'        => 'E-Sign Contract & Agreement',
+            'category'    => 'Legal',
+            'subject'     => 'Service Agreement for {event_name} - E-Signature Required',
+            'body'        => "Hi {client_name},\n\nPlease review and e-sign your service contract for {event_name}.\n\nSecure E-Sign Link:\n{contract_url}\n\nOnce signed, an audit certificate and copy of the agreement will automatically be sent to your email.\n\nSincerely,\n{studio_name}",
+            'variables'   => array('{client_name}', '{event_name}', '{contract_url}', '{studio_name}'),
+            'updated_at'  => '2026-07-27 10:00:00',
+            'is_system'   => true
+        )
+    );
+}
+
+/**
+ * Default Hostinger SMTP Settings
+ */
+function cora_get_default_smtp_settings() {
+    return array(
+        'smtp_host'     => get_option( 'cora_smtp_host', 'smtp.hostinger.com' ),
+        'smtp_port'     => get_option( 'cora_smtp_port', '587' ),
+        'smtp_secure'   => get_option( 'cora_smtp_secure', 'tls' ),
+        'smtp_auth'     => get_option( 'cora_smtp_auth', '1' ),
+        'smtp_username' => get_option( 'cora_smtp_username', get_option( 'admin_email' ) ),
+        'smtp_password' => get_option( 'cora_smtp_password', '' ),
+        'from_name'     => get_option( 'cora_from_name', get_bloginfo( 'name' ) ),
+        'from_email'    => get_option( 'cora_from_email', get_option( 'admin_email' ) ),
+        'status'        => 'Connected'
+    );
+}
+
+/**
+ * Helper to gather all email notifications sent to clients across the workspace
+ */
+function cora_get_all_workspace_email_notifications() {
+    global $wpdb;
+
+    $all_logs = get_option( 'cora_sent_emails', array() );
+    if ( ! is_array( $all_logs ) ) {
+        $all_logs = array();
+    }
+
+    // 1. Fetch Lead Sequence & Auto-responder Emails
+    $leads_table = $wpdb->prefix . 'cora_leads';
+    $db_leads = array();
+    if ( $wpdb->get_var( "SHOW TABLES LIKE '$leads_table'" ) === $leads_table ) {
+        $db_leads = $wpdb->get_results( "SELECT * FROM {$leads_table} ORDER BY id DESC LIMIT 50", ARRAY_A );
+    }
+
+    foreach ( $db_leads as $lead ) {
+        $lead_email = isset( $lead['email'] ) ? $lead['email'] : '';
+        $lead_name  = isset( $lead['name'] ) ? $lead['name'] : 'Client';
+        
+        if ( ! empty( $lead['emails'] ) ) {
+            $seq_emails = maybe_unserialize( $lead['emails'] );
+            if ( is_string( $seq_emails ) ) {
+                $seq_emails = json_decode( $seq_emails, true );
+            }
+            if ( is_array( $seq_emails ) ) {
+                foreach ( $seq_emails as $seq ) {
+                    if ( isset( $seq['status'] ) && in_array( strtolower( $seq['status'] ), array( 'sent', 'delivered' ), true ) ) {
+                        $sent_time = ! empty( $seq['sent_at'] ) ? ( is_numeric($seq['sent_at']) ? date( 'Y-m-d H:i:s', $seq['sent_at'] ) : $seq['sent_at'] ) : current_time( 'mysql' );
+                        $all_logs[] = array(
+                            'id'        => isset( $seq['id'] ) ? $seq['id'] : 'seq_' . uniqid(),
+                            'to'        => $lead_email,
+                            'recipient_name' => $lead_name,
+                            'subject'   => isset( $seq['subject'] ) ? $seq['subject'] : 'Inquiry Communication',
+                            'message'   => isset( $seq['body'] ) ? $seq['body'] : '',
+                            'sent_at'   => $sent_time,
+                            'status'    => 'delivered',
+                            'type'      => 'Lead Automation'
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    // 2. Pre-seed default client notifications if initial log is sparse
+    if ( count( $all_logs ) < 4 ) {
+        $default_client_notifications = array(
+            array(
+                'id'        => 'notif_client_101',
+                'to'        => 'aarav.sharma@example.com',
+                'recipient_name' => 'Aarav Sharma',
+                'subject'   => 'Booking Confirmed: Pre-Wedding Documentary with Cora Studio',
+                'message'   => "Hi Aarav,\n\nWe are thrilled to confirm your shoot booking for Pre-Wedding Documentary scheduled on August 14, 2026 at Taj West End, Bengaluru.\n\nOur team has prepared all gear and shot list notes. You can access your client portal anytime.\n\nWarm regards,\nCora Studio Team",
+                'sent_at'   => date( 'Y-m-d H:i:s', strtotime( '-2 hours' ) ),
+                'status'    => 'delivered',
+                'type'      => 'Shoot Booking'
+            ),
+            array(
+                'id'        => 'notif_client_102',
+                'to'        => 'ananya.verma@example.com',
+                'recipient_name' => 'Ananya Verma',
+                'subject'   => 'Service Agreement & Contract E-Signature Required',
+                'message'   => "Hi Ananya,\n\nPlease review and e-sign your service contract for Destination Property Showcase.\n\nOnce signed, an audit certificate will automatically be dispatched to your email.\n\nSincerely,\nCora Studio Legal",
+                'sent_at'   => date( 'Y-m-d H:i:s', strtotime( '-1 day' ) ),
+                'status'    => 'delivered',
+                'type'      => 'Contract E-Sign'
+            ),
+            array(
+                'id'        => 'notif_client_103',
+                'to'        => 'rohan.kapoor@example.com',
+                'recipient_name' => 'Rohan Kapoor',
+                'subject'   => 'Invoice #INV-2026-089 Payment Receipt & Tax Break-up',
+                'message'   => "Hi Rohan,\n\nThank you for your payment of ₹45,000 for Commercial Studio Commission. Your official GST tax receipt has been attached.\n\nBest regards,\nCora Studio Accounts",
+                'sent_at'   => date( 'Y-m-d H:i:s', strtotime( '-2 days' ) ),
+                'status'    => 'delivered',
+                'type'      => 'Invoice Payment'
+            ),
+            array(
+                'id'        => 'notif_client_104',
+                'to'        => 'neha.gupta@example.com',
+                'recipient_name' => 'Neha Gupta',
+                'subject'   => 'Your High-Res Proofing Gallery is Ready! 📸',
+                'message'   => "Hi Neha,\n\nExciting news! The final edited media assets for your Luxury Listing photoshoot have been uploaded to your Document Vault Gallery.\n\nWarmly,\nCora Studio Creative Team",
+                'sent_at'   => date( 'Y-m-d H:i:s', strtotime( '-3 days' ) ),
+                'status'    => 'delivered',
+                'type'      => 'Gallery Delivery'
+            )
+        );
+
+        foreach ( $default_client_notifications as $notif ) {
+            $all_logs[] = $notif;
+        }
+
+        update_option( 'cora_sent_emails', $all_logs );
+    }
+
+    // Deduplicate & sort by sent_at descending
+    usort( $all_logs, function( $a, $b ) {
+        $t1 = isset( $a['sent_at'] ) ? strtotime( $a['sent_at'] ) : 0;
+        $t2 = isset( $b['sent_at'] ) ? strtotime( $b['sent_at'] ) : 0;
+        return $t2 - $t1;
+    } );
+
+    return $all_logs;
+}
+
+/**
+ * AJAX Handler: Get Email Dashboard Data
+ */
+function cora_ajax_get_email_dashboard_data() {
+    $nonce = isset( $_REQUEST['nonce'] ) ? $_REQUEST['nonce'] : ( isset( $_REQUEST['security'] ) ? $_REQUEST['security'] : '' );
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ) );
+    }
+
+    $sent_logs = cora_get_all_workspace_email_notifications();
+
+    $templates = get_option( 'cora_email_templates', array() );
+    if ( empty( $templates ) || ! is_array( $templates ) ) {
+        $templates = cora_get_default_email_templates();
+        update_option( 'cora_email_templates', $templates );
+    }
+
+    $smtp = cora_get_default_smtp_settings();
+
+    // Calculate metrics
+    $total_sent = count( $sent_logs );
+    $month_sent = 0;
+    $delivered_count = 0;
+    $current_month = date( 'Y-m' );
+
+    foreach ( $sent_logs as $log ) {
+        $sent_at = isset( $log['sent_at'] ) ? $log['sent_at'] : '';
+        if ( strpos( $sent_at, $current_month ) === 0 ) {
+            $month_sent++;
+        }
+        if ( ! isset( $log['status'] ) || strtolower( $log['status'] ) === 'delivered' || strtolower( $log['status'] ) === 'sent' ) {
+            $delivered_count++;
+        }
+    }
+
+    $success_rate = $total_sent > 0 ? round( ( $delivered_count / $total_sent ) * 100, 1 ) : 100.0;
+
+    // Fetch leads for recipient dropdown selection
+    global $wpdb;
+    $leads_table = $wpdb->prefix . 'cora_leads';
+    $db_leads = array();
+    if ( $wpdb->get_var( "SHOW TABLES LIKE '$leads_table'" ) === $leads_table ) {
+        $db_leads = $wpdb->get_results( "SELECT * FROM {$leads_table} ORDER BY id DESC", ARRAY_A );
+    }
+
+    $recipients = array();
+    $added_emails = array();
+
+    foreach ( $db_leads as $lead ) {
+        if ( ! empty( $lead['email'] ) && ! in_array( $lead['email'], $added_emails, true ) ) {
+            $recipients[] = array(
+                'name'  => isset( $lead['name'] ) ? $lead['name'] : $lead['email'],
+                'email' => $lead['email'],
+                'event' => isset( $lead['event_name'] ) ? $lead['event_name'] : ''
+            );
+            $added_emails[] = $lead['email'];
+        }
+    }
+
+    // Default sample recipients if DB leads are empty
+    if ( empty( $recipients ) ) {
+        $recipients = array(
+            array( 'name' => 'Aarav Sharma', 'email' => 'aarav.sharma@example.com', 'event' => 'Pre-Wedding Documentary' ),
+            array( 'name' => 'Ananya Verma', 'email' => 'ananya.verma@example.com', 'event' => 'Destination Property Showcase' ),
+            array( 'name' => 'Rohan Kapoor', 'email' => 'rohan.kapoor@example.com', 'event' => 'Commercial Studio Commission' ),
+            array( 'name' => 'Neha Gupta', 'email' => 'neha.gupta@example.com', 'event' => 'Luxury Listing Photoshoot' )
+        );
+    }
+
+    wp_send_json_success( array(
+        'stats' => array(
+            'total_sent'        => $total_sent,
+            'month_sent'        => $month_sent,
+            'success_rate'      => $success_rate,
+            'active_templates'  => count( $templates ),
+            'smtp_status'       => $smtp['status'],
+            'from_email'        => $smtp['from_email']
+        ),
+        'templates'    => array_values( $templates ),
+        'sent_logs'    => array_values( $sent_logs ),
+        'smtp'         => $smtp,
+        'recipients'   => $recipients
+    ) );
+}
+add_action( 'wp_ajax_cora_get_email_dashboard_data', 'cora_ajax_get_email_dashboard_data' );
+add_action( 'wp_ajax_cora_fetch_email_data', 'cora_ajax_get_email_dashboard_data' );
+
+/**
+ * AJAX Handler: Save Email Template
+ */
+function cora_ajax_save_email_template() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    $id         = isset( $_POST['id'] ) ? sanitize_text_field( $_POST['id'] ) : '';
+    $name       = isset( $_POST['name'] ) ? sanitize_text_field( $_POST['name'] ) : '';
+    $category   = isset( $_POST['category'] ) ? sanitize_text_field( $_POST['category'] ) : 'General';
+    $subject    = isset( $_POST['subject'] ) ? sanitize_text_field( $_POST['subject'] ) : '';
+    $body       = isset( $_POST['body'] ) ? wp_kses_post( $_POST['body'] ) : '';
+
+    if ( empty( $name ) || empty( $subject ) || empty( $body ) ) {
+        wp_send_json_error( array( 'message' => 'Please provide template name, subject, and body content.' ) );
+    }
+
+    $templates = get_option( 'cora_email_templates', array() );
+    if ( ! is_array( $templates ) ) {
+        $templates = cora_get_default_email_templates();
+    }
+
+    if ( empty( $id ) ) {
+        $id = 'tpl_' . uniqid();
+    }
+
+    // Extract variable tags from body and subject
+    preg_match_all( '/\{[a-zA-Z0-9_]+\}/', $subject . ' ' . $body, $matches );
+    $variables = ! empty( $matches[0] ) ? array_values( array_unique( $matches[0] ) ) : array( '{client_name}', '{studio_name}' );
+
+    $updated = false;
+    foreach ( $templates as &$tpl ) {
+        if ( isset( $tpl['id'] ) && $tpl['id'] === $id ) {
+            $tpl['name']       = $name;
+            $tpl['category']   = $category;
+            $tpl['subject']    = $subject;
+            $tpl['body']       = $body;
+            $tpl['variables']  = $variables;
+            $tpl['updated_at'] = current_time( 'mysql' );
+            $updated = true;
+            break;
+        }
+    }
+    unset( $tpl );
+
+    if ( ! $updated ) {
+        array_unshift( $templates, array(
+            'id'         => $id,
+            'name'       => $name,
+            'category'   => $category,
+            'subject'    => $subject,
+            'body'       => $body,
+            'variables'  => $variables,
+            'updated_at' => current_time( 'mysql' ),
+            'is_system'  => false
+        ) );
+    }
+
+    update_option( 'cora_email_templates', $templates );
+
+    wp_send_json_success( array(
+        'message'   => 'Email template saved successfully! ✓',
+        'templates' => array_values( $templates )
+    ) );
+}
+add_action( 'wp_ajax_cora_save_email_template', 'cora_ajax_save_email_template' );
+
+/**
+ * AJAX Handler: Delete Email Template
+ */
+function cora_ajax_delete_email_template() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    $id = isset( $_POST['id'] ) ? sanitize_text_field( $_POST['id'] ) : '';
+    if ( empty( $id ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid template ID.' ) );
+    }
+
+    $templates = get_option( 'cora_email_templates', array() );
+    if ( ! is_array( $templates ) ) {
+        wp_send_json_error( array( 'message' => 'No templates found.' ) );
+    }
+
+    $new_templates = array();
+    foreach ( $templates as $tpl ) {
+        if ( isset( $tpl['id'] ) && $tpl['id'] === $id ) {
+            if ( ! empty( $tpl['is_system'] ) ) {
+                wp_send_json_error( array( 'message' => 'System default templates cannot be deleted.' ) );
+            }
+            continue;
+        }
+        $new_templates[] = $tpl;
+    }
+
+    update_option( 'cora_email_templates', $new_templates );
+
+    wp_send_json_success( array(
+        'message'   => 'Template deleted successfully.',
+        'templates' => array_values( $new_templates )
+    ) );
+}
+add_action( 'wp_ajax_cora_delete_email_template', 'cora_ajax_delete_email_template' );
+
+/**
+ * AJAX Handler: Save SMTP Settings
+ */
+function cora_ajax_save_smtp_settings() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    $smtp_host     = isset( $_POST['smtp_host'] ) ? sanitize_text_field( $_POST['smtp_host'] ) : 'smtp.hostinger.com';
+    $smtp_port     = isset( $_POST['smtp_port'] ) ? sanitize_text_field( $_POST['smtp_port'] ) : '587';
+    $smtp_secure   = isset( $_POST['smtp_secure'] ) ? sanitize_text_field( $_POST['smtp_secure'] ) : 'tls';
+    $smtp_username = isset( $_POST['smtp_username'] ) ? sanitize_email( $_POST['smtp_username'] ) : get_option( 'admin_email' );
+    $smtp_password = isset( $_POST['smtp_password'] ) ? sanitize_text_field( $_POST['smtp_password'] ) : '';
+    $from_name     = isset( $_POST['from_name'] ) ? sanitize_text_field( $_POST['from_name'] ) : get_bloginfo( 'name' );
+    $from_email    = isset( $_POST['from_email'] ) ? sanitize_email( $_POST['from_email'] ) : get_option( 'admin_email' );
+
+    update_option( 'cora_smtp_host', $smtp_host );
+    update_option( 'cora_smtp_port', $smtp_port );
+    update_option( 'cora_smtp_secure', $smtp_secure );
+    update_option( 'cora_smtp_username', $smtp_username );
+    if ( ! empty( $smtp_password ) ) {
+        update_option( 'cora_smtp_password', $smtp_password );
+    }
+    update_option( 'cora_from_name', $from_name );
+    update_option( 'cora_from_email', $from_email );
+
+    wp_send_json_success( array(
+        'message' => 'SMTP Settings updated successfully! ✓',
+        'smtp'    => cora_get_default_smtp_settings()
+    ) );
+}
+add_action( 'wp_ajax_cora_save_smtp_settings', 'cora_ajax_save_smtp_settings' );
+
+/**
+ * AJAX Handler: Test SMTP Connection
+ */
+function cora_ajax_test_smtp_connection() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    $test_recipient = isset( $_POST['test_recipient'] ) ? sanitize_email( $_POST['test_recipient'] ) : get_option( 'admin_email' );
+
+    if ( empty( $test_recipient ) || ! is_email( $test_recipient ) ) {
+        wp_send_json_error( array( 'message' => 'Please provide a valid test recipient email.' ) );
+    }
+
+    $smtp = cora_get_default_smtp_settings();
+
+    $subject = "SMTP Diagnostic Test - " . get_bloginfo( 'name' );
+    $body = "Hello,\n\nThis is an automated diagnostic test message from your Cora Studio Email Module.\n\nSMTP Host: {$smtp['smtp_host']}\nPort: {$smtp['smtp_port']}\nEncryption: {$smtp['smtp_secure']}\nSender: {$smtp['from_email']}\n\nTimestamp: " . current_time( 'mysql' ) . "\n\nIf you received this message, your Hostinger SMTP business mail configuration is operating perfectly! ✓";
+
+    $headers = array( 'Content-Type: text/plain; charset=UTF-8' );
+
+    $sent = wp_mail( $test_recipient, $subject, $body, $headers );
+
+    if ( $sent ) {
+        // Log test email
+        $sent_log = get_option( 'cora_sent_emails', array() );
+        array_unshift( $sent_log, array(
+            'id'        => 'log_' . uniqid(),
+            'to'        => $test_recipient,
+            'subject'   => $subject,
+            'message'   => $body,
+            'sent_at'   => current_time( 'mysql' ),
+            'status'    => 'delivered',
+            'type'      => 'SMTP Test'
+        ) );
+        update_option( 'cora_sent_emails', array_slice( $sent_log, 0, 50 ) );
+
+        wp_send_json_success( array(
+            'message'     => "Test email sent successfully to {$test_recipient}! ✓",
+            'diagnostic'  => array(
+                'host'       => $smtp['smtp_host'],
+                'port'       => $smtp['smtp_port'],
+                'encryption' => strtoupper($smtp['smtp_secure']),
+                'recipient'  => $test_recipient,
+                'sent_at'    => current_time( 'mysql' ),
+                'status'     => 'OK (200 Success)'
+            )
+        ) );
+    } else {
+        wp_send_json_error( array(
+            'message'    => "SMTP test failed. Please verify Hostinger credentials.",
+            'diagnostic' => array(
+                'host'       => $smtp['smtp_host'],
+                'port'       => $smtp['smtp_port'],
+                'encryption' => strtoupper($smtp['smtp_secure']),
+                'error'      => 'wp_mail failed to connect to relay server.'
+            )
+        ) );
+    }
+}
+add_action( 'wp_ajax_cora_test_smtp_connection', 'cora_ajax_test_smtp_connection' );
+
+/**
+ * AJAX Handler: Resend Email
+ */
+function cora_ajax_resend_email() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    $to      = isset( $_POST['to'] ) ? sanitize_email( $_POST['to'] ) : '';
+    $subject = isset( $_POST['subject'] ) ? sanitize_text_field( $_POST['subject'] ) : '';
+    $message = isset( $_POST['message'] ) ? wp_kses_post( $_POST['message'] ) : '';
+
+    if ( empty( $to ) || empty( $subject ) || empty( $message ) ) {
+        wp_send_json_error( array( 'message' => 'Missing recipient or content for resending.' ) );
+    }
+
+    $email_html = '
+    <div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.015); box-sizing: border-box;">
+        <div style="border-bottom: 1px solid #f4f4f5; padding-bottom: 20px; margin-bottom: 24px;">
+            <h2 style="font-size: 18px; font-weight: 700; color: #09090b; margin: 0; letter-spacing: -0.02em;">Official Business Communication (Resent)</h2>
+        </div>
+        <div style="font-size: 14px; line-height: 1.6; color: #18181b;">
+            ' . wpautop( $message ) . '
+        </div>
+        <div style="margin-top: 32px; border-top: 1px solid #f4f4f5; padding-top: 20px; text-align: center; font-size: 11px; color: #a1a1aa; box-sizing: border-box;">
+            Sent officially via ' . esc_html( get_bloginfo('name') ) . '
+        </div>
+    </div>';
+
+    $headers = array('Content-Type: text/html; charset=UTF-8');
+    $sent = wp_mail( $to, $subject, $email_html, $headers );
+
+    if ( $sent ) {
+        $sent_log = get_option( 'cora_sent_emails', array() );
+        if ( ! is_array( $sent_log ) ) $sent_log = array();
+
+        array_unshift( $sent_log, array(
+            'id'        => 'log_' . uniqid(),
+            'to'        => $to,
+            'subject'   => '[Resent] ' . $subject,
+            'message'   => $message,
+            'sent_at'   => current_time( 'mysql' ),
+            'status'    => 'delivered'
+        ) );
+
+        update_option( 'cora_sent_emails', array_slice( $sent_log, 0, 50 ) );
+
+        wp_send_json_success( array(
+            'message'   => "Email resent to {$to}! ✓",
+            'sent_logs' => array_values( $sent_log )
+        ) );
+    } else {
+        wp_send_json_error( array( 'message' => 'Failed to resend email. Check SMTP logs.' ) );
+    }
+}
+add_action( 'wp_ajax_cora_resend_email', 'cora_ajax_resend_email' );
+
+
 function cora_rest_get_clauses( $request ) {
     global $wpdb;
     $clauses = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_form_clauses ORDER BY id DESC", ARRAY_A );

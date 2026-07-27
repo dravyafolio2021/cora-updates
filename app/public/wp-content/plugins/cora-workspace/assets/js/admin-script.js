@@ -230,7 +230,7 @@ jQuery(document).ready(function($) {
 
     window.coraCloseAllDrawers = function() {
         $('aside[id$="-drawer"], aside[id$="-sheet"], div[id$="-drawer"], div[id$="-sheet"], div[id$="-modal"]').addClass('collapsed hidden');
-        $('#cora-media-library-drawer, #cora-ai-tone-drawer').addClass('translate-x-full pointer-events-none');
+        $('#cora-media-library-drawer, #cora-ai-tone-drawer, #cora-email-template-drawer, #cora-email-detail-drawer, #cora-smtp-test-drawer, #email-detail-drawer').addClass('translate-x-full pointer-events-none');
         const bd = document.getElementById('cora-drawer-backdrop');
         if(bd) { bd.classList.add('hidden'); bd.style.pointerEvents = 'none'; bd.style.display = 'none'; }
         $('.cora-tour-backdrop').removeClass('active').addClass('hidden').css({'pointer-events': 'none', 'display': 'none'});
