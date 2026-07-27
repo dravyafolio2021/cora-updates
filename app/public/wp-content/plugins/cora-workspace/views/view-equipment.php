@@ -1340,8 +1340,20 @@ if ( is_array( $cora_gear_maintenance ) ) {
 <script>
 // Nonce and localization bridge fallback
 window.coraData = window.coraData || {};
-if (!window.coraData.nonce) {
-    window.coraData.nonce = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '';
+Object.defineProperty(window.coraData, 'nonce', {
+    get: function() {
+        return (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '';
+    },
+    configurable: true
+});
+
+if (typeof window.ajaxurl === 'undefined') {
+    Object.defineProperty(window, 'ajaxurl', {
+        get: function() {
+            return (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php';
+        },
+        configurable: true
+    });
 }
 
 // Initial Repair Data for View Repair details
