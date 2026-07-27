@@ -16,6 +16,7 @@
 | **Media Module** | `feature/media-module` | 🟢 Merged to Main | `views/view-media.php`, `views/view-media-editor.php`, `cora-workspace.php` | Media Module Agent |
 | **Studio Module** | `feature/studio-module` | 🟡 Active Work | `cora-workspace.php`, Studio Views & Features | Studio Module Agent (Arjun) |
 | **Content Module** | `feature/content-module` | 🟡 Active Work | `views/view-content-suite.php`, `cora-workspace.php` | Content Module Agent |
+| **Lead Management** | `feature/lead-management` | 🟡 Active Work | `views/view-leads.php`, `cora-workspace.php`, `admin-dashboard.php` | Lead Suite Agent |
 <!-- MODULE_ROWS_END -->
 
 ---
@@ -38,6 +39,9 @@
 - **Health**: 100% Operational & Clean Base.
 
 <!-- BRANCH_LOGS_START -->
+### `feature/lead-management` (Active Branch)
+- **Status**: 🟡 Active — Enterprise Lead Management Suite: Drag & drop Kanban funnel, searchable directory table, funnel & revenue analytics, sliding side drawers (deal details, create/edit lead, schedule follow-up), lead activity timeline, direct email outreach, and lead conversion to client.
+- **Main Touchpoint**: `views/view-leads.php`, `cora-workspace.php`, `admin-dashboard.php`.
 ### `feature/content-module` (Active Branch)
 - **Status**: 🟡 Active — AI Content Suite: Article Library, SEO Analysis, Local SEO, Content Calendar, and Content Writing Assistant workflows.
 - **Main Touchpoint**: `views/view-content-suite.php`, `cora-workspace.php`, `admin-dashboard.php`.

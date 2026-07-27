@@ -2723,6 +2723,12 @@ add_action( 'rest_api_init', function () {
         )
     ) );
 
+    register_rest_route( 'cora/v1', '/forms/bulk', array(
+        'methods'             => 'POST',
+        'callback'            => 'cora_rest_bulk_forms',
+        'permission_callback' => 'is_user_logged_in',
+    ) );
+
     register_rest_route( 'cora/v1', '/forms/submissions', array(
         'methods'             => 'GET',
         'callback'            => 'cora_rest_get_all_form_submissions',
@@ -18715,6 +18721,36 @@ function cora_rest_delete_form( $request ) {
     return rest_ensure_response( array( 'success' => true ) );
 }
 
+function cora_rest_bulk_forms( $request ) {
+    global $wpdb;
+    $params = $request->get_json_params();
+    $action = isset( $params['action'] ) ? sanitize_text_field( $params['action'] ) : '';
+    $raw_ids = isset( $params['ids'] ) && is_array( $params['ids'] ) ? $params['ids'] : array();
+    $ids = array_values( array_filter( array_map( 'intval', $raw_ids ) ) );
+
+    if ( empty( $action ) || empty( $ids ) ) {
+        return new WP_Error( 'bad_request', 'Missing bulk action or valid form IDs', array( 'status' => 400 ) );
+    }
+
+    $id_placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+
+    if ( $action === 'delete' ) {
+        $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}cora_forms WHERE id IN ($id_placeholders)", ...$ids ) );
+        $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}cora_form_blocks WHERE form_id IN ($id_placeholders)", ...$ids ) );
+        $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}cora_form_submissions WHERE form_id IN ($id_placeholders)", ...$ids ) );
+        $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}cora_form_audit_log WHERE form_id IN ($id_placeholders)", ...$ids ) );
+        return rest_ensure_response( array( 'success' => true, 'action' => 'delete', 'count' => count( $ids ) ) );
+    } elseif ( $action === 'publish' ) {
+        $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}cora_forms SET status = 'published', updated_at = NOW() WHERE id IN ($id_placeholders)", ...$ids ) );
+        return rest_ensure_response( array( 'success' => true, 'action' => 'publish', 'count' => count( $ids ) ) );
+    } elseif ( $action === 'draft' ) {
+        $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}cora_forms SET status = 'draft', updated_at = NOW() WHERE id IN ($id_placeholders)", ...$ids ) );
+        return rest_ensure_response( array( 'success' => true, 'action' => 'draft', 'count' => count( $ids ) ) );
+    }
+
+    return new WP_Error( 'invalid_action', 'Invalid bulk action', array( 'status' => 400 ) );
+}
+
 function cora_rest_get_form_submissions( $request ) {
     global $wpdb;
     $id = intval( $request->get_param('id') );
@@ -18867,8 +18903,11 @@ function cora_rest_submit_form( $request ) {
     if ( $form ) {
         $settings = ! empty( $form['settings'] ) ? json_decode( $form['settings'], true ) : array();
 
-        // 4a. CRM Sync mapping (Only for completed/non-partial submissions)
-        if ( ! $is_partial && is_array( $submitted_data ) ) {
+        // 4a. CRM Sync mapping (Only for completed/non-partial submissions when lead capture is enabled)
+        $crm_capture_enabled = isset($settings['crm_lead_capture_enable']) ? (bool) $settings['crm_lead_capture_enable'] : true;
+        $form_purpose        = isset($settings['form_purpose']) ? sanitize_text_field($settings['form_purpose']) : 'lead_capture';
+
+        if ( ! $is_partial && is_array( $submitted_data ) && $crm_capture_enabled && $form_purpose !== 'internal_survey' ) {
             $map_name_key  = $settings['map_crm_name'] ?? '';
             $map_email_key = $settings['map_crm_email'] ?? '';
             $map_phone_key = $settings['map_crm_phone'] ?? '';
@@ -18879,24 +18918,44 @@ function cora_rest_submit_form( $request ) {
             $phone_val = '';
             $notes_val = '';
 
-            // Extract mapped values case-insensitively or exactly
+            // Extract mapped values case-insensitively or auto-detect contact fields
             foreach ( $submitted_data as $key => $val ) {
-                $trimmed_key = trim( $key );
-                if ( ! empty( $map_name_key ) && strcasecmp( $trimmed_key, trim( $map_name_key ) ) === 0 ) {
+                if ( is_array( $val ) ) {
+                    $val = implode( ', ', $val );
+                }
+                $trimmed_key = strtolower( trim( $key ) );
+                
+                if ( ! empty( $map_name_key ) && strcasecmp( trim( $key ), trim( $map_name_key ) ) === 0 ) {
+                    $name_val = $val;
+                } elseif ( empty( $name_val ) && ( strpos( $trimmed_key, 'name' ) !== false || strpos( $trimmed_key, 'full' ) !== false || strpos( $trimmed_key, 'client' ) !== false ) ) {
                     $name_val = $val;
                 }
-                if ( ! empty( $map_email_key ) && strcasecmp( $trimmed_key, trim( $map_email_key ) ) === 0 ) {
+
+                if ( ! empty( $map_email_key ) && strcasecmp( trim( $key ), trim( $map_email_key ) ) === 0 ) {
+                    $email_val = $val;
+                } elseif ( empty( $email_val ) && ( strpos( $trimmed_key, 'email' ) !== false || is_email( $val ) ) ) {
                     $email_val = $val;
                 }
-                if ( ! empty( $map_phone_key ) && strcasecmp( $trimmed_key, trim( $map_phone_key ) ) === 0 ) {
+
+                if ( ! empty( $map_phone_key ) && strcasecmp( trim( $key ), trim( $map_phone_key ) ) === 0 ) {
+                    $phone_val = $val;
+                } elseif ( empty( $phone_val ) && ( strpos( $trimmed_key, 'phone' ) !== false || strpos( $trimmed_key, 'mobile' ) !== false || strpos( $trimmed_key, 'whatsapp' ) !== false ) ) {
                     $phone_val = $val;
                 }
-                if ( ! empty( $map_notes_key ) && strcasecmp( $trimmed_key, trim( $map_notes_key ) ) === 0 ) {
+
+                if ( ! empty( $map_notes_key ) && strcasecmp( trim( $key ), trim( $map_notes_key ) ) === 0 ) {
+                    $notes_val = $val;
+                } elseif ( empty( $notes_val ) && ( strpos( $trimmed_key, 'note' ) !== false || strpos( $trimmed_key, 'message' ) !== false || strpos( $trimmed_key, 'requirement' ) !== false ) ) {
                     $notes_val = $val;
                 }
             }
 
-            // Sync lead to database if at least name or email is mapped and provided
+            // Fallback name if email present
+            if ( empty( $name_val ) && ! empty( $email_val ) ) {
+                $name_val = explode( '@', $email_val )[0];
+            }
+
+            // Sync lead to database and workspace options if contact details are present
             if ( ! empty( $name_val ) || ! empty( $email_val ) ) {
                 $first_name = $name_val;
                 $last_name  = '';
@@ -18909,28 +18968,54 @@ function cora_rest_submit_form( $request ) {
                 // Retrieve branch ID for agency
                 $branch_id = $wpdb->get_var( $wpdb->prepare(
                     "SELECT id FROM {$wpdb->prefix}cora_branches WHERE agency_id = %d LIMIT 1",
-                    $form['agency_id']
+                    $form['agency_id'] ?? 1
                 ) );
                 if ( ! $branch_id ) {
                     $branch_id = 1;
                 }
 
+                $source_title = sanitize_text_field( ($form['title'] ?? 'Cora Form') . ' (' . ucfirst(str_replace('_', ' ', $form_purpose)) . ')' );
+
                 $wpdb->insert(
                     $wpdb->prefix . 'cora_leads',
                     array(
-                        'agency_id'  => $form['agency_id'],
+                        'agency_id'  => $form['agency_id'] ?? 1,
                         'branch_id'  => $branch_id,
                         'first_name' => sanitize_text_field( $first_name ),
                         'last_name'  => sanitize_text_field( $last_name ),
                         'email'      => sanitize_email( $email_val ),
                         'phone'      => sanitize_text_field( $phone_val ),
                         'notes'      => sanitize_textarea_field( $notes_val ),
-                        'source'     => sanitize_text_field( $form['title'] ),
+                        'source'     => $source_title,
                         'status'     => 'new',
                         'created_at' => current_time('mysql'),
                         'updated_at' => current_time('mysql')
                     )
                 );
+                $new_db_id = $wpdb->insert_id;
+
+                // Also sync into cora_workspace_leads option for immediate UI reactivity
+                $leads = get_option( 'cora_workspace_leads', array() );
+                if ( ! is_array( $leads ) ) {
+                    $leads = array();
+                }
+
+                $new_lead_entry = array(
+                    'id'         => $new_db_id ? $new_db_id : 'lead_' . time(),
+                    'names'      => trim( $first_name . ' ' . $last_name ),
+                    'email'      => sanitize_email( $email_val ),
+                    'phone'      => sanitize_text_field( $phone_val ),
+                    'scale'      => ucfirst(str_replace('_', ' ', $form_purpose)),
+                    'city'       => 'Website',
+                    'notes'      => sanitize_textarea_field( $notes_val ),
+                    'price'      => '₹0',
+                    'status'     => 'New Lead',
+                    'score'      => 'hot',
+                    'created_at' => time()
+                );
+
+                array_unshift( $leads, $new_lead_entry );
+                update_option( 'cora_workspace_leads', $leads );
             }
         }
 
@@ -22411,6 +22496,329 @@ function cora_ajax_generate_financial_pdf_report() {
 }
 add_action( 'wp_ajax_cora_ajax_generate_financial_pdf_report', 'cora_ajax_generate_financial_pdf_report' );
 add_action( 'wp_ajax_cora_generate_financial_pdf_report', 'cora_ajax_generate_financial_pdf_report' );
+
+/**
+ * =========================================================================
+ * ENTERPRISE LEAD MANAGEMENT CRM AJAX ENDPOINTS
+ * =========================================================================
+ */
+
+/**
+ * AJAX Endpoint: cora_ajax_get_leads_data
+ */
+if ( ! function_exists( 'cora_ajax_get_leads_data' ) ) {
+    function cora_ajax_get_leads_data() {
+        $nonce = '';
+        if ( isset( $_REQUEST['security'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['security'] );
+        } elseif ( isset( $_REQUEST['nonce'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+        } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+        }
+        if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+            wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+        }
+
+        $search = isset( $_REQUEST['search'] ) ? sanitize_text_field( $_REQUEST['search'] ) : '';
+        $stage  = isset( $_REQUEST['stage'] ) ? sanitize_text_field( $_REQUEST['stage'] ) : 'all';
+
+        $leads = cora_db_get_leads();
+        $filtered = array();
+
+        foreach ( $leads as $l ) {
+            if ( $stage !== 'all' && isset( $l['status'] ) && strtolower( $l['status'] ) !== strtolower( $stage ) ) {
+                continue;
+            }
+
+            if ( ! empty( $search ) ) {
+                $s = strtolower( $search );
+                $name  = strtolower( $l['names'] ?? '' );
+                $email = strtolower( $l['email'] ?? '' );
+                $city  = strtolower( $l['city'] ?? '' );
+                if ( strpos( $name, $s ) === false && strpos( $email, $s ) === false && strpos( $city, $s ) === false ) {
+                    continue;
+                }
+            }
+
+            $filtered[] = $l;
+        }
+
+        wp_send_json_success( array(
+            'leads' => $filtered,
+            'count' => count( $filtered ),
+        ) );
+    }
+    add_action( 'wp_ajax_cora_ajax_get_leads_data', 'cora_ajax_get_leads_data' );
+    add_action( 'wp_ajax_cora_get_leads_data', 'cora_ajax_get_leads_data' );
+}
+
+/**
+ * AJAX Endpoint: cora_ajax_save_lead
+ */
+if ( ! function_exists( 'cora_ajax_save_lead' ) ) {
+    function cora_ajax_save_lead() {
+        $nonce = '';
+        if ( isset( $_REQUEST['security'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['security'] );
+        } elseif ( isset( $_REQUEST['nonce'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+        } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+        }
+        if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+            wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+        }
+
+        global $wpdb;
+        $lead_id = isset( $_POST['lead_id'] ) ? sanitize_text_field( $_POST['lead_id'] ) : '';
+        $names   = isset( $_POST['names'] ) ? sanitize_text_field( $_POST['names'] ) : '';
+        $email   = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
+        $phone   = isset( $_POST['phone'] ) ? sanitize_text_field( $_POST['phone'] ) : '';
+        $price   = isset( $_POST['price'] ) ? sanitize_text_field( $_POST['price'] ) : '';
+        $scale   = isset( $_POST['scale'] ) ? sanitize_text_field( $_POST['scale'] ) : 'Standard Shoot';
+        $city    = isset( $_POST['city'] ) ? sanitize_text_field( $_POST['city'] ) : 'Mumbai';
+        $status  = isset( $_POST['status'] ) ? sanitize_text_field( $_POST['status'] ) : 'New Lead';
+        $score   = isset( $_POST['score'] ) ? sanitize_text_field( $_POST['score'] ) : 'warm';
+        $notes   = isset( $_POST['notes'] ) ? sanitize_textarea_field( $_POST['notes'] ) : '';
+
+        if ( empty( $names ) || empty( $email ) ) {
+            wp_send_json_error( array( 'message' => 'Client Name and Email are required fields.' ) );
+        }
+
+        $existing_leads = get_option( 'cora_workspace_leads', array() );
+        if ( ! is_array( $existing_leads ) ) {
+            $existing_leads = array();
+        }
+
+        if ( ! empty( $lead_id ) ) {
+            // Update existing lead
+            $found = false;
+            foreach ( $existing_leads as &$el ) {
+                if ( (string) $el['id'] === (string) $lead_id ) {
+                    $el['names'] = $names;
+                    $el['email'] = $email;
+                    $el['phone'] = $phone;
+                    $el['price'] = $price;
+                    $el['scale'] = $scale;
+                    $el['city']  = $city;
+                    $el['status'] = $status;
+                    $el['score']  = $score;
+                    $el['notes']  = $notes;
+                    $found = true;
+                    break;
+                }
+            }
+            if ( ! $found ) {
+                $existing_leads[] = array(
+                    'id'         => $lead_id,
+                    'names'      => $names,
+                    'email'      => $email,
+                    'phone'      => $phone,
+                    'price'      => $price,
+                    'scale'      => $scale,
+                    'city'       => $city,
+                    'status'     => $status,
+                    'score'      => $score,
+                    'notes'      => $notes,
+                    'created_at' => time(),
+                );
+            }
+        } else {
+            // Create new lead
+            $lead_id = 'lead_' . time() . '_' . rand( 100, 999 );
+            $new_lead = array(
+                'id'         => $lead_id,
+                'names'      => $names,
+                'email'      => $email,
+                'phone'      => $phone,
+                'price'      => $price,
+                'scale'      => $scale,
+                'city'       => $city,
+                'status'     => $status,
+                'score'      => $score,
+                'notes'      => $notes,
+                'created_at' => time(),
+            );
+            array_unshift( $existing_leads, $new_lead );
+        }
+
+        update_option( 'cora_workspace_leads', $existing_leads );
+
+        wp_send_json_success( array(
+            'message' => 'Lead deal saved successfully.',
+            'lead_id' => $lead_id,
+        ) );
+    }
+    add_action( 'wp_ajax_cora_ajax_save_lead', 'cora_ajax_save_lead' );
+    add_action( 'wp_ajax_cora_save_lead', 'cora_ajax_save_lead' );
+}
+
+/**
+ * AJAX Endpoint: cora_ajax_update_lead_stage
+ */
+if ( ! function_exists( 'cora_ajax_update_lead_stage' ) ) {
+    function cora_ajax_update_lead_stage() {
+        $nonce = '';
+        if ( isset( $_REQUEST['security'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['security'] );
+        } elseif ( isset( $_REQUEST['nonce'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+        } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+        }
+        if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+            wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+        }
+
+        $lead_id   = isset( $_POST['lead_id'] ) ? sanitize_text_field( $_POST['lead_id'] ) : '';
+        $new_stage = isset( $_POST['new_stage'] ) ? sanitize_text_field( $_POST['new_stage'] ) : '';
+
+        if ( empty( $lead_id ) || empty( $new_stage ) ) {
+            wp_send_json_error( array( 'message' => 'Lead ID and New Stage are required.' ) );
+        }
+
+        $existing_leads = get_option( 'cora_workspace_leads', array() );
+        if ( ! is_array( $existing_leads ) ) {
+            $existing_leads = array();
+        }
+
+        $updated = false;
+        foreach ( $existing_leads as &$el ) {
+            if ( (string) $el['id'] === (string) $lead_id ) {
+                $el['status'] = $new_stage;
+                $updated = true;
+                break;
+            }
+        }
+
+        if ( $updated ) {
+            update_option( 'cora_workspace_leads', $existing_leads );
+            wp_send_json_success( array(
+                'message'   => 'Lead moved to ' . $new_stage . '.',
+                'lead_id'   => $lead_id,
+                'new_stage' => $new_stage,
+            ) );
+        } else {
+            wp_send_json_error( array( 'message' => 'Lead not found.' ) );
+        }
+    }
+    add_action( 'wp_ajax_cora_ajax_update_lead_stage', 'cora_ajax_update_lead_stage' );
+    add_action( 'wp_ajax_cora_update_lead_stage', 'cora_ajax_update_lead_stage' );
+}
+
+/**
+ * AJAX Endpoint: cora_ajax_convert_lead_to_client_suite
+ */
+if ( ! function_exists( 'cora_ajax_convert_lead_to_client_suite' ) ) {
+    function cora_ajax_convert_lead_to_client_suite() {
+        $nonce = '';
+        if ( isset( $_REQUEST['security'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['security'] );
+        } elseif ( isset( $_REQUEST['nonce'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+        } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+        }
+        if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+            wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+        }
+
+        $lead_id = isset( $_POST['lead_id'] ) ? sanitize_text_field( $_POST['lead_id'] ) : '';
+        if ( empty( $lead_id ) ) {
+            wp_send_json_error( array( 'message' => 'Lead ID required.' ) );
+        }
+
+        $existing_leads = get_option( 'cora_workspace_leads', array() );
+        if ( ! is_array( $existing_leads ) ) {
+            $existing_leads = array();
+        }
+
+        $converted_lead = null;
+        foreach ( $existing_leads as &$el ) {
+            if ( (string) $el['id'] === (string) $lead_id ) {
+                $el['status'] = 'Converted';
+                $el['converted_to_client'] = 1;
+                $converted_lead = $el;
+                break;
+            }
+        }
+        update_option( 'cora_workspace_leads', $existing_leads );
+
+        if ( $converted_lead ) {
+            $clients = get_option( 'cora_workspace_clients', array() );
+            if ( ! is_array( $clients ) ) {
+                $clients = array();
+            }
+
+            $new_client = array(
+                'id'         => 'client_' . time(),
+                'lead_id'    => $lead_id,
+                'names'      => $converted_lead['names'] ?? 'Client',
+                'email'      => $converted_lead['email'] ?? '',
+                'phone'      => $converted_lead['phone'] ?? '',
+                'city'       => $converted_lead['city'] ?? '',
+                'status'     => 'Active Client',
+                'created_at' => time(),
+            );
+
+            array_unshift( $clients, $new_client );
+            update_option( 'cora_workspace_clients', $clients );
+
+            wp_send_json_success( array(
+                'message' => 'Lead converted to active client successfully!',
+                'client'  => $new_client,
+            ) );
+        } else {
+            wp_send_json_error( array( 'message' => 'Lead record not found.' ) );
+        }
+    }
+    add_action( 'wp_ajax_cora_ajax_convert_lead_to_client_suite', 'cora_ajax_convert_lead_to_client_suite' );
+    add_action( 'wp_ajax_cora_convert_lead_to_client_suite', 'cora_ajax_convert_lead_to_client_suite' );
+}
+
+/**
+ * AJAX Endpoint: cora_ajax_delete_lead_suite
+ */
+if ( ! function_exists( 'cora_ajax_delete_lead_suite' ) ) {
+    function cora_ajax_delete_lead_suite() {
+        $nonce = '';
+        if ( isset( $_REQUEST['security'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['security'] );
+        } elseif ( isset( $_REQUEST['nonce'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+        } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+        }
+        if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+            wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+        }
+
+        $lead_id = isset( $_POST['lead_id'] ) ? sanitize_text_field( $_POST['lead_id'] ) : '';
+        if ( empty( $lead_id ) ) {
+            wp_send_json_error( array( 'message' => 'Lead ID required.' ) );
+        }
+
+        $existing_leads = get_option( 'cora_workspace_leads', array() );
+        if ( ! is_array( $existing_leads ) ) {
+            $existing_leads = array();
+        }
+
+        $filtered = array_filter( $existing_leads, function( $l ) use ( $lead_id ) {
+            return (string) $l['id'] !== (string) $lead_id;
+        });
+
+        update_option( 'cora_workspace_leads', array_values( $filtered ) );
+
+        wp_send_json_success( array(
+            'message' => 'Lead deleted from workspace.',
+            'lead_id' => $lead_id,
+        ) );
+    }
+    add_action( 'wp_ajax_cora_ajax_delete_lead_suite', 'cora_ajax_delete_lead_suite' );
+    add_action( 'wp_ajax_cora_delete_lead_suite', 'cora_ajax_delete_lead_suite' );
+}
+
 
 /**
  * AJAX Action: Generate Automated Financial Report Summary & HTML Breakdown
