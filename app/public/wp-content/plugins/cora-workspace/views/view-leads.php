@@ -264,8 +264,7 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                         <div class="p-4 text-center border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl text-[11px] text-zinc-400 my-2 select-none">
                             No deals in this stage
                         </div>
-                    <?php else : ?>
-                        <?php foreach ( $col_leads as $lead ) : 
+                    <?php el                        <?php foreach ( $col_leads as $lead ) : 
                             $score = isset($lead['score']) ? strtolower($lead['score']) : 'warm';
                             $score_badge = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800';
                             $score_label = 'Warm';
@@ -276,8 +275,15 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                                 $score_badge = 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800';
                                 $score_label = 'Cold ❄️';
                             }
+
+                            $format_tag = $lead['format'] ?? 'Photoshoot';
+                            $assignee_name = $lead['assignee_name'] ?? 'Shruti Sharma';
+                            $assignee_role = $lead['assignee_role'] ?? 'Super Admin';
+                            $assignee_init = $lead['assignee_init'] ?? strtoupper(substr($lead['names'], 0, 1));
+                            $checklist = $lead['checklist'] ?? '1/2 (50%)';
+                            $checklist_pct = $lead['checklist_pct'] ?? 50;
                         ?>
-                        <div class="cora-lead-card bg-white dark:bg-zinc-850 border border-zinc-200/90 dark:border-zinc-750 p-3.5 rounded-xl shadow-2xs hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-650 transition-all cursor-grab active:cursor-grabbing flex flex-col gap-2.5 relative group"
+                        <div class="cora-lead-card bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 p-4 rounded-2xl shadow-2xs hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-grab active:cursor-grabbing flex flex-col gap-3 relative group"
                              draggable="true"
                              data-id="<?php echo esc_attr( $lead['id'] ); ?>"
                              data-name="<?php echo esc_attr( strtolower($lead['names']) ); ?>"
@@ -286,40 +292,66 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                              ondragstart="coraLeadDragStart(event)"
                              onclick="coraOpenLeadDetailDrawer('<?php echo esc_attr( $lead['id'] ); ?>')">
                             
-                            <div class="flex items-start justify-between gap-2">
-                                <div class="min-w-0 flex-1">
-                                    <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-xs tracking-tight truncate group-hover:text-zinc-950 dark:group-hover:text-white" title="<?php echo esc_attr( $lead['names'] ); ?>">
-                                        <?php echo esc_html( $lead['names'] ); ?>
-                                    </h4>
-                                    <p class="text-[10px] text-zinc-400 dark:text-zinc-500 truncate mt-0.5"><?php echo esc_html( $lead['email'] ); ?></p>
+                            <!-- Header Row: Client Pill + Score Badge + Options -->
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="px-2.5 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-extrabold text-[10px] uppercase tracking-wider truncate max-w-[200px]">
+                                    <?php echo esc_html( strtoupper($lead['names']) ); ?>
+                                </span>
+                                <div class="flex items-center gap-1.5 shrink-0">
+                                    <span class="px-2 py-0.5 rounded text-[9.5px] font-bold border <?php echo $score_badge; ?>">
+                                        <?php echo $score_label; ?>
+                                    </span>
+                                    <button type="button" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white p-1 border-none bg-transparent cursor-pointer" onclick="event.stopPropagation(); coraOpenLeadDetailDrawer('<?php echo esc_attr($lead['id']); ?>')">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                                    </button>
                                 </div>
-                                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold border shrink-0 <?php echo $score_badge; ?>">
-                                    <?php echo $score_label; ?>
+                            </div>
+
+                            <!-- Main Title & Shoot Subheading -->
+                            <div>
+                                <h4 class="font-extrabold text-zinc-950 dark:text-white text-xs tracking-tight leading-snug group-hover:text-zinc-900 dark:group-hover:text-zinc-100" title="<?php echo esc_attr( $lead['scale'] ); ?>">
+                                    <?php echo esc_html( $lead['scale'] ?? 'Standard Shoot' ); ?>
+                                </h4>
+                                <p class="text-[10.5px] text-zinc-500 dark:text-zinc-400 font-medium truncate mt-0.5">
+                                    Shoot: <?php echo esc_html( $lead['city'] ?? 'Mumbai' ); ?>
+                                </p>
+                            </div>
+
+                            <!-- Tags & Deal Value Row -->
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-bold bg-white dark:bg-zinc-900 shadow-2xs">
+                                    <?php echo esc_html( $format_tag ); ?>
+                                </span>
+                                <span class="px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-950 dark:text-white text-[10.5px] font-black tracking-tight">
+                                    <?php echo esc_html( $lead['price'] ?? '₹0' ); ?>
                                 </span>
                             </div>
 
-                            <div class="bg-zinc-50 dark:bg-zinc-900/60 p-2 rounded-lg border border-zinc-150 dark:border-zinc-800 space-y-1 text-[10.5px]">
-                                <div class="flex items-center justify-between text-zinc-600 dark:text-zinc-300 font-medium">
-                                    <span class="text-zinc-400">Budget / Deal:</span>
-                                    <span class="font-bold text-zinc-900 dark:text-white"><?php echo esc_html( $lead['price'] ?? '₹0' ); ?></span>
+                            <!-- Progress Bar / Deliverables Checklist -->
+                            <div class="space-y-1.5 pt-0.5">
+                                <div class="flex items-center justify-between text-[10px] font-bold text-zinc-600 dark:text-zinc-400">
+                                    <span>Checklist</span>
+                                    <span><?php echo esc_html( $checklist ); ?></span>
                                 </div>
-                                <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-                                    <span>Scope:</span>
-                                    <span class="font-semibold text-zinc-700 dark:text-zinc-300 truncate max-w-[120px]"><?php echo esc_html( $lead['scale'] ?? 'Standard' ); ?></span>
-                                </div>
-                                <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-                                    <span>City:</span>
-                                    <span class="font-semibold text-zinc-700 dark:text-zinc-300 truncate max-w-[120px]"><?php echo esc_html( $lead['city'] ?? 'Mumbai' ); ?></span>
+                                <div class="w-full h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-zinc-950 dark:bg-white rounded-full transition-all" style="width: <?php echo intval($checklist_pct); ?>%;"></div>
                                 </div>
                             </div>
 
-                            <div class="pt-1.5 flex items-center justify-between text-[10px] text-zinc-400 border-t border-zinc-100 dark:border-zinc-800">
-                                <div class="flex items-center gap-1">
-                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                    <span><?php echo esc_html( date( 'd M Y', $lead['created_at'] ) ); ?></span>
+                            <!-- Bottom Row: Assignee Avatar + Action Button -->
+                            <div class="pt-2.5 flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <div class="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center font-extrabold text-xs shrink-0 border border-zinc-200/80 dark:border-zinc-700">
+                                        <?php echo esc_html( $assignee_init ); ?>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <div class="font-bold text-zinc-900 dark:text-white text-[11px] truncate leading-tight"><?php echo esc_html( $assignee_name ); ?></div>
+                                        <div class="text-[9.5px] text-zinc-400 dark:text-zinc-500 truncate leading-tight"><?php echo esc_html( $assignee_role ); ?></div>
+                                    </div>
                                 </div>
-                                <button type="button" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white p-1" onclick="event.stopPropagation(); coraOpenScheduleTaskDrawer('<?php echo esc_attr($lead['id']); ?>')">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                <button type="button" class="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 text-[10.5px] font-bold hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all flex items-center gap-1 cursor-pointer shrink-0 shadow-2xs" onclick="event.stopPropagation(); coraOpenLeadDetailDrawer('<?php echo esc_attr($lead['id']); ?>')">
+                                    <span>Review</span>
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                                 </button>
                             </div>
                         </div>
