@@ -213,6 +213,12 @@ foreach ( $cora_studio_gear as $gear ) {
 }
 
 $total_repair_expense = 0;
+if ( is_array( $cora_gear_maintenance ) ) {
+    foreach ( $cora_gear_maintenance as $maint ) {
+        $total_repair_expense += floatval( $maint['cost'] ?? 0 );
+    }
+}
+?>
 <div id="cora-equipment-view-wrapper" class="space-y-6 font-sans text-zinc-900 max-w-[1700px] mx-auto pb-12">
     
     <!-- ═══ 1. STANDARDIZED PAGE HEADER & CTA ACTION BAR ═════════════════════════════════ -->
