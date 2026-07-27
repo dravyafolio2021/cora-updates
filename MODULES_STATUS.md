@@ -11,11 +11,10 @@
 |---|---|---|---|---|
 | **Core Platform** | `main` | 🟢 Stable Base | `cora-workspace.php`, `view-settings-suite.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
+| **Email Management** | `feature/email-management` | 🟡 Active Development | `views/view-emails.php`, `cora-workspace.php` | Email Module Agent |
 | **File Manager** | `feature/document-studio-vault` | 🟢 Merged to Main | `views/view-vault.php`, `cora-workspace.php` | Dedicated Vault Agent |
 | **Forms & Reviews** | `feature/forms-module` | 🟢 Merged to Main | `views/view-forms.php`, `public-form-view.php`, `views/view-emails.php` | Dedicated Forms Agent |
 | **Media Module** | `feature/media-module` | 🟢 Merged to Main | `views/view-media.php`, `views/view-media-editor.php`, `cora-workspace.php` | Media Module Agent |
-| **Studio Module** | `feature/studio-module` | 🟡 Active Work | `cora-workspace.php`, Studio Views & Features | Studio Module Agent (Arjun) |
-| **Content Module** | `feature/content-module` | 🟡 Active Work | `views/view-content-suite.php`, `cora-workspace.php` | Content Module Agent |
 <!-- MODULE_ROWS_END -->
 
 ---
@@ -26,6 +25,7 @@
 > If multiple feature branches modify any of the following shared files simultaneously, coordinators must review parameter signatures and line ranges to prevent merge conflicts:
 
 - `app/public/wp-content/plugins/cora-workspace/cora-workspace.php` (Core AJAX Handlers & Hooks, Universal Auto-Save Engine)
+- `app/public/wp-content/plugins/cora-workspace/views/view-emails.php` (Email Center View & Outbox Composer)
 - `app/public/wp-content/plugins/cora-workspace/views/view-vault.php` (Document Vault & Document Studio Wizard)
 - `app/public/wp-content/plugins/cora-workspace/views/view-settings-suite.php` (Settings & Backup Views)
 
@@ -34,17 +34,13 @@
 ## 3. Branch Activity & Progress Log
 
 ### `main` (Production Base)
-- **Latest Commit**: `64d89186` — `feat(autosave): implement universal hybrid auto-save & zero-data-loss draft engine across all platform modules`
+- **Latest Commit**: `166c70a7` — `feat(sidebar): move Emails item into Sales Channel navigation group`
 - **Health**: 100% Operational & Clean Base.
 
 <!-- BRANCH_LOGS_START -->
-### `feature/content-module` (Active Branch)
-- **Status**: 🟡 Active — AI Content Suite: Article Library, SEO Analysis, Local SEO, Content Calendar, and Content Writing Assistant workflows.
-- **Main Touchpoint**: `views/view-content-suite.php`, `cora-workspace.php`, `admin-dashboard.php`.
-
-### `feature/studio-module` (Active Branch)
-- **Status**: 🟡 Active — Studio Features, Studio Booking & Management, Equipment & Crew Integration, and Studio Suite workflows.
-- **Main Touchpoint**: `cora-workspace.php`, `views/view-crew-scheduler.php`, Studio plugin assets & views.
+### `feature/email-management` (Active Feature Branch)
+- **Status**: ⚡ In Active Development — Studio-grade Email Center, Outbox, Templates, SMTP Integration, Auto-responders, and Email Analytics.
+- **Main Touchpoint**: `views/view-emails.php`, `cora-workspace.php`.
 
 ### `feature/document-studio-vault` (Merged Feature Branch)
 - **Status**: 🟢 Merged to `main` (commit `edc5d5a4`) — Document Vault Dashboard, 5-Step Guided Document Studio Wizard, E-Sign Audit Registry, Quality Health Check, GST math, reactive KPI cards, watermark preview.
