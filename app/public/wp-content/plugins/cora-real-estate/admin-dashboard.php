@@ -9506,6 +9506,94 @@ wp_print_footer_scripts();
         }
     };
 
+    window.coraCommandSetHomepage = function(pageId, pageTitle) {
+        window.coraCloseCommandPalette();
+
+        const confirmFn = window.coraConfirmAction || function(title, body, callback) {
+            if (confirm(body)) callback();
+        };
+
+        confirmFn(
+            'Set Homepage',
+            `Set "${pageTitle}" as your homepage? This will update WordPress Reading settings.`,
+            function() {
+                if (window.coraShowToast) {
+                    window.coraShowToast('Updating homepage...', 'info');
+                }
+
+                const ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
+                const nonce = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : '';
+
+                jQuery.post(ajaxUrl, {
+                    action: 'cora_ajax_set_homepage',
+                    page_id: pageId,
+                    theme_id: 0,
+                    nonce: nonce
+                }, function(res) {
+                    if (res.success) {
+                        if (window.coraShowToast) {
+                            window.coraShowToast('Homepage updated successfully.', 'success');
+                        }
+                        if (typeof fetchThemePages === 'function' && window.canvasState && window.canvasState.activeThemeId) {
+                            fetchThemePages(window.canvasState.activeThemeId);
+                        } else {
+                            setTimeout(() => { window.location.reload(); }, 1200);
+                        }
+                    } else {
+                        if (window.coraShowToast) {
+                            window.coraShowToast('Failed to update homepage.', 'error');
+                        }
+                    }
+                });
+            }
+        );
+    };
+
+    window.coraCommandExecutePageAction = function(pageId, action, pageTitle, extraData) {
+        window.coraCloseCommandPalette();
+
+        // Switch tab to pages and execute immediately if on canvas sub-panel
+        const urlParams = new URLSearchParams(window.location.search);
+        const isCanvas = urlParams.get('sub') === 'canvas';
+
+        if (isCanvas && typeof window.switchTab === 'function') {
+            window.switchTab('pages');
+            
+            // Wait brief moment for DOM tabs to activate
+            setTimeout(() => {
+                if (action === 'rename' && typeof window.triggerRenamePage === 'function') {
+                    window.triggerRenamePage(pageId, pageTitle);
+                } else if (action === 'slug' && typeof window.triggerChangePageSlug === 'function') {
+                    window.triggerChangePageSlug(pageId, extraData || '');
+                } else if (action === 'homepage' && typeof window.triggerSetHomepage === 'function') {
+                    window.triggerSetHomepage(pageId, pageTitle, extraData || 0);
+                } else if (action === 'seo' && typeof window.openSEODrawer === 'function') {
+                    let currentSEO = { title: '', desc: '', img: '' };
+                    if (window.canvasState && Array.isArray(window.canvasState.pages)) {
+                        const p = window.canvasState.pages.find(pg => pg.id == pageId);
+                        if (p) {
+                            currentSEO.title = p.seo_title || '';
+                            currentSEO.desc = p.seo_description || '';
+                            currentSEO.img = p.seo_og_image || '';
+                        }
+                    }
+                    window.openSEODrawer(pageId, pageTitle, currentSEO.title, currentSEO.desc, currentSEO.img);
+                } else if (action === 'revisions' && typeof window.openRevisionsDrawer === 'function') {
+                    window.openRevisionsDrawer(pageId, pageTitle);
+                } else if (action === 'duplicate' && typeof window.triggerDuplicatePage === 'function') {
+                    window.triggerDuplicatePage(pageId);
+                } else if (action === 'delete' && typeof window.triggerDeletePage === 'function') {
+                    window.triggerDeletePage(pageId);
+                }
+            }, 100);
+        } else {
+            // Save payload to localStorage and redirect to Canvas
+            const payload = { pageId, action, pageTitle, extraData };
+            localStorage.setItem('cora_pending_canvas_command', JSON.stringify(payload));
+            window.location.href = '?page=cora-workspace&sub=canvas&edit_page=' + pageId;
+        }
+    };
+
     window.coraTriggerCommandAI = function() {
         coraCloseCommandPalette();
         const sidebar = document.getElementById('cora-ai-sidebar');

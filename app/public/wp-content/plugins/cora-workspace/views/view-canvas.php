@@ -34,6 +34,11 @@ $themes = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes O
 
 // Fetch WP pages for dropdown selectors
 $wp_pages = get_pages();
+
+// Fetch Platform Data for Statistics
+$cora_listings_count = count( cora_db_get_properties() );
+$cora_leads_count = count( cora_db_get_leads() );
+$cora_bookings_count = count( cora_db_get_bookings() );
 ?>
 
 <!-- Include CodeMirror Assets for CSS/JS Editor -->
@@ -537,9 +542,9 @@ $wp_pages = get_pages();
                         ['label' => 'Pages', 'icon' => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline>', 'value' => count($live_stats), 'delta' => '+5', 'positive' => true],
                         ['label' => 'Published', 'icon' => '<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>', 'value' => $pub_count, 'delta' => 'No change', 'neutral' => true],
                         ['label' => 'Drafts', 'icon' => '<path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>', 'value' => $dr_count, 'delta' => '-3', 'positive' => false],
-                        ['label' => 'Collections', 'icon' => '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>', 'value' => 8, 'delta' => '+1', 'positive' => true],
-                        ['label' => 'Products', 'icon' => '<circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>', 'value' => 54, 'delta' => '+7', 'positive' => true],
-                        ['label' => 'Blog posts', 'icon' => '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline>', 'value' => 16, 'delta' => '+2', 'positive' => true],
+                        ['label' => 'Active Listings', 'icon' => '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>', 'value' => $cora_listings_count, 'delta' => '+1', 'positive' => true],
+                        ['label' => 'Client Leads', 'icon' => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>', 'value' => $cora_leads_count, 'delta' => '+7', 'positive' => true],
+                        ['label' => 'Total Bookings', 'icon' => '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>', 'value' => $cora_bookings_count, 'delta' => '+2', 'positive' => true],
                     ];
                     foreach ($stats_rows as $row) :
                     ?>
@@ -768,6 +773,7 @@ $wp_pages = get_pages();
                 <button onclick="switchTab('menus')" id="tab-btn-menus" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Menus</button>
                 <button onclick="switchTab('settings')" id="tab-btn-settings" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Theme Settings</button>
                 <button onclick="switchTab('code')" id="tab-btn-code" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Custom Code</button>
+                <button onclick="switchTab('theme-builder')" id="tab-btn-theme-builder" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Theme Builder</button>
             </div>
             
             <!-- Dynamic active tab actions aligned directly on the right side of the workspace tabs bar -->
@@ -1070,6 +1076,7 @@ $wp_pages = get_pages();
                 <button onclick="switchSettingsPanel('spacing')" id="spill-spacing" class="settings-pill px-3 py-2 text-[10px] font-bold uppercase tracking-wider rounded-t-lg border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 bg-transparent cursor-pointer transition-all">Spacing &amp; Borders</button>
                 <button onclick="switchSettingsPanel('layout')" id="spill-layout" class="settings-pill px-3 py-2 text-[10px] font-bold uppercase tracking-wider rounded-t-lg border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 bg-transparent cursor-pointer transition-all">Layout</button>
                 <button onclick="switchSettingsPanel('social')" id="spill-social" class="settings-pill px-3 py-2 text-[10px] font-bold uppercase tracking-wider rounded-t-lg border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 bg-transparent cursor-pointer transition-all">Social &amp; SEO</button>
+                <button onclick="switchSettingsPanel('routing')" id="spill-routing" class="settings-pill px-3 py-2 text-[10px] font-bold uppercase tracking-wider rounded-t-lg border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 bg-transparent cursor-pointer transition-all">Page Mapping</button>
                 <div id="spill-elementor-wrap" class="hidden">
                     <button onclick="switchSettingsPanel('elementor')" id="spill-elementor" class="settings-pill px-3 py-2 text-[10px] font-bold uppercase tracking-wider rounded-t-lg border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 bg-transparent cursor-pointer transition-all">
                         <span class="inline-flex items-center gap-1.5">
@@ -1558,6 +1565,31 @@ $wp_pages = get_pages();
             </div>
 
             <!-- ══════════════════════════════════════════════════════ -->
+            <!-- PANEL: Page Mapping                                   -->
+            <!-- ══════════════════════════════════════════════════════ -->
+            <div id="spanel-routing" class="settings-panel p-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <h5 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-100 pb-2">Page Mapping</h5>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Homepage</label>
+                            <select id="setting-homepage-page-id" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
+                                <option value="">-- Loading Pages... --</option>
+                            </select>
+                            <p class="text-[10px] text-zinc-400">Select which page is loaded when users visit the root domain (e.g. `/`).</p>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Contact Page</label>
+                            <select id="setting-contact-page-id" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
+                                <option value="">-- Loading Pages... --</option>
+                            </select>
+                            <p class="text-[10px] text-zinc-400">Select which page functions as your main contact form page.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════ -->
             <!-- PANEL: Elementor Sync (conditional)                   -->
             <!-- ══════════════════════════════════════════════════════ -->
             <div id="spanel-elementor" class="settings-panel p-6 hidden">
@@ -1906,6 +1938,13 @@ $wp_pages = get_pages();
 
                 </div><!-- end editor area -->
             </div><!-- end flex container -->
+        </div>
+
+        <!-- TAB CONTENT: THEME BUILDER -->
+        <div id="tab-content-theme-builder" class="hidden">
+            <div class="bg-white border border-zinc-200 rounded-xl shadow-sm overflow-hidden" style="height:700px">
+                <iframe id="theme-builder-iframe" src="" class="w-full h-full border-0"></iframe>
+            </div>
         </div>
 
     </div>
@@ -3278,6 +3317,21 @@ $wp_pages = get_pages();
         });
     });
 
+    function safeGetSettings(themeObj) {
+        if (!themeObj) return {};
+        if (typeof themeObj.settings === 'string') {
+            const trimmed = themeObj.settings.trim();
+            if (trimmed === '') return {};
+            try {
+                return JSON.parse(trimmed) || {};
+            } catch (e) {
+                console.error('Failed to parse theme settings:', e);
+                return {};
+            }
+        }
+        return themeObj.settings || {};
+    }
+
     // --- Level 1 Theme Functions ---
     function openNewThemeDrawer() {
         if (canvasState.isReadOnly) return;
@@ -3564,7 +3618,7 @@ $wp_pages = get_pages();
         const themeObj = canvasState.themes.find(t => t.id == id);
         let isElementor = false;
         if (themeObj) {
-            const settings = typeof themeObj.settings === 'string' ? JSON.parse(themeObj.settings) : themeObj.settings;
+            const settings = safeGetSettings(themeObj);
             if (settings) {
                 if (settings.source === 'elementor' || (!settings.github_repo && !settings.lovable_project_url)) {
                     isElementor = true;
@@ -3646,6 +3700,7 @@ $wp_pages = get_pages();
         jQuery('#tab-content-menus').addClass('hidden');
         jQuery('#tab-content-settings').addClass('hidden');
         jQuery('#tab-content-code').addClass('hidden');
+        jQuery('#tab-content-theme-builder').addClass('hidden');
 
         jQuery('#tab-content-' + tabId).removeClass('hidden');
 
@@ -3657,6 +3712,40 @@ $wp_pages = get_pages();
 
         if (tabId === 'menus') {
             showMenusTabContent();
+        } else if (tabId === 'theme-builder') {
+            const iframe = jQuery('#theme-builder-iframe');
+            if (!iframe.attr('src')) {
+                const themeBuilderUrl = coraREData.siteUrl + '/wp-admin/admin.php?page=elementor-app#/site-editor';
+                iframe.attr('src', themeBuilderUrl);
+
+                // Intercept template editing within the Theme Builder iframe and open in Level 3 full screen
+                iframe.on('load', function() {
+                    try {
+                        const iframeWindow = this.contentWindow;
+                        const currentUrl = iframeWindow.location.href;
+                        
+                        if (currentUrl.includes('post.php') && currentUrl.includes('action=elementor')) {
+                            // Extract the post ID
+                            const urlParams = new URLSearchParams(iframeWindow.location.search);
+                            const wpPostId = urlParams.get('post');
+                            
+                            let title = 'Elementor Template';
+                            try {
+                                title = iframeWindow.document.title || 'Elementor Template';
+                                title = title.replace(/\s*—\s*WordPress\s*/, '').replace(/\s*-\s*WordPress\s*/, '');
+                            } catch(e) {}
+                            
+                            // Revert navigation in the Theme Builder iframe
+                            iframeWindow.history.back();
+                            
+                            // Open in full-screen Level 3 editor
+                            openPageEditor(0, title, wpPostId, 'publish', '');
+                        }
+                    } catch(e) {
+                        console.error("Theme Builder iframe load observer error:", e);
+                    }
+                });
+            }
         }
         syncStateToUrl();
     }
@@ -3675,8 +3764,69 @@ $wp_pages = get_pages();
                 if (res.success) {
                     canvasState.pages = res.data || [];
                     filterPages();
+                    populatePageMappingSelectors();
+
+                    // Check for and execute pending Command Palette actions
+                    setTimeout(() => {
+                        const pendingStr = localStorage.getItem('cora_pending_canvas_command');
+                        if (pendingStr) {
+                            try {
+                                const cmd = JSON.parse(pendingStr);
+                                if (cmd && cmd.pageId) {
+                                    localStorage.removeItem('cora_pending_canvas_command');
+                                    if (typeof window.switchTab === 'function') {
+                                        window.switchTab('pages');
+                                    }
+                                    setTimeout(() => {
+                                        if (cmd.action === 'rename' && typeof window.triggerRenamePage === 'function') {
+                                            window.triggerRenamePage(cmd.pageId, cmd.pageTitle);
+                                        } else if (cmd.action === 'slug' && typeof window.triggerChangePageSlug === 'function') {
+                                            window.triggerChangePageSlug(cmd.pageId, cmd.extraData || '');
+                                        } else if (cmd.action === 'homepage' && typeof window.triggerSetHomepage === 'function') {
+                                            window.triggerSetHomepage(cmd.pageId, cmd.pageTitle, cmd.extraData || 0);
+                                        } else if (cmd.action === 'seo' && typeof window.openSEODrawer === 'function') {
+                                            const p = canvasState.pages.find(page => page.id == cmd.pageId);
+                                            window.openSEODrawer(cmd.pageId, cmd.pageTitle, p ? (p.seo_title || '') : '', p ? (p.seo_description || '') : '', p ? (p.seo_og_image || '') : '');
+                                        } else if (cmd.action === 'revisions' && typeof window.openRevisionsDrawer === 'function') {
+                                            window.openRevisionsDrawer(cmd.pageId, cmd.pageTitle);
+                                        } else if (cmd.action === 'duplicate' && typeof window.triggerDuplicatePage === 'function') {
+                                            window.triggerDuplicatePage(cmd.pageId);
+                                        } else if (cmd.action === 'delete' && typeof window.triggerDeletePage === 'function') {
+                                            window.triggerDeletePage(cmd.pageId);
+                                        }
+                                    }, 100);
+                                }
+                            } catch(e) {
+                                console.error('Failed to parse pending canvas command', e);
+                            }
+                        }
+                    }, 200);
                 }
             }
+        });
+    }
+
+    function populatePageMappingSelectors() {
+        const themeId = canvasState.activeThemeId;
+        const themeObj = canvasState.themes.find(t => t.id == themeId);
+        if (!themeObj) return;
+        const settings = safeGetSettings(themeObj);
+
+        const homeSelect = jQuery('#setting-homepage-page-id');
+        const contactSelect = jQuery('#setting-contact-page-id');
+
+        homeSelect.empty().append('<option value="">-- Select Page --</option>');
+        contactSelect.empty().append('<option value="">-- Select Page --</option>');
+
+        const dbHomepage = canvasState.pages.find(p => p.is_homepage == 1);
+        const activeHomeId = dbHomepage ? dbHomepage.id : (settings.homepage_page_id || '');
+
+        canvasState.pages.forEach(p => {
+            const selectedHome = p.id == activeHomeId ? 'selected' : '';
+            const selectedContact = p.id == settings.contact_page_id ? 'selected' : '';
+            
+            homeSelect.append(`<option value="${p.id}" ${selectedHome}>${p.title} (${p.slug})</option>`);
+            contactSelect.append(`<option value="${p.id}" ${selectedContact}>${p.title} (${p.slug})</option>`);
         });
     }
 
@@ -3959,6 +4109,10 @@ $wp_pages = get_pages();
                 ? `<span class="ml-2 px-1.5 py-0.5 text-[8px] font-bold rounded-md bg-zinc-100 border border-zinc-200 text-zinc-500 inline-flex items-center gap-0.5"><svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Home</span>`
                 : '';
 
+            const previewUrl = p.is_homepage == 1
+                ? `${coraREData.siteUrl}/?cv_preview_theme=${canvasState.activeThemeId}`
+                : `${coraREData.siteUrl}/${p.slug}${p.slug.includes('?') ? '&' : '?'}cv_preview_theme=${canvasState.activeThemeId}`;
+
             body.append(`
                 <tr class="border-b border-zinc-100 hover:bg-zinc-50/60 group transition-colors">
                     <td class="pl-3 pr-1 py-2">
@@ -3979,7 +4133,7 @@ $wp_pages = get_pages();
                     <td class="px-3 py-2 w-28 whitespace-nowrap text-right">
                         <div class="flex items-center gap-1 justify-end">
                             <!-- Preview/View shortcut -->
-                            <a href="${coraREData.siteUrl}/${p.slug}${p.slug.includes('?') ? '&' : '?'}cv_preview_theme=${canvasState.activeThemeId}" target="_blank"
+                            <a href="${previewUrl}" target="_blank"
                                 class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900 cursor-pointer transition-all"
                                 title="Preview Page">
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -3997,29 +4151,51 @@ $wp_pages = get_pages();
                                     title="More Actions">
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
                                 </button>
-                                <div id="page-menu-${p.id}" class="hidden absolute right-0 top-full mt-1 w-44 bg-white border border-zinc-200 rounded-xl shadow-lg py-1 z-20 text-left">
+                                <div id="page-menu-${p.id}" class="hidden absolute right-0 top-full mt-1 w-44 bg-white border border-zinc-200 rounded-xl shadow-lg py-1 z-20 text-left whitespace-normal">
                                 <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id || 0}, '${p.status || 'draft'}', '${esc_js(p.slug || '')}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
                                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                     Edit page
                                 </button>
-                                <a href="${coraREData.siteUrl}/${p.slug}${p.slug.includes('?') ? '&' : '?'}cv_preview_theme=${canvasState.activeThemeId}" target="_blank" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
+                                <a href="${previewUrl}" target="_blank" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
                                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                                     Preview
                                 </a>
                                 <?php if ( ! $is_read_only ) : ?>
                                 <div class="border-t border-zinc-100 my-1"></div>
-                                <button onclick="triggerDuplicatePage(${p.id})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">Duplicate</button>
-                                <button onclick="triggerRenamePage(${p.id}, '${esc_js(p.title)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">Rename</button>
-                                <button onclick="triggerChangePageSlug(${p.id}, '${esc_js(p.slug)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">Change slug</button>
-                                <button onclick="triggerSetHomepage(${p.id}, '${esc_js(p.title)}', ${p.is_homepage})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">Set as homepage</button>
-                                <button onclick="openSEODrawer(${p.id}, '${esc_js(p.title)}', '${esc_js(p.seo_title)}', '${esc_js(p.seo_description)}', '${esc_js(p.seo_og_image)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">SEO settings</button>
-                                <button onclick="openRevisionsDrawer(${p.id}, '${esc_js(p.title)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer">Revision history</button>
+                                <button onclick="triggerDuplicatePage(${p.id})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    Duplicate
+                                </button>
+                                <button onclick="triggerRenamePage(${p.id}, '${esc_js(p.title)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                    Rename
+                                </button>
+                                <button onclick="triggerChangePageSlug(${p.id}, '${esc_js(p.slug)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                                    Change slug
+                                </button>
+                                <button onclick="triggerSetHomepage(${p.id}, '${esc_js(p.title)}', ${p.is_homepage})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                    Set as homepage
+                                </button>
+                                <button onclick="openSEODrawer(${p.id}, '${esc_js(p.title)}', '${esc_js(p.seo_title)}', '${esc_js(p.seo_description)}', '${esc_js(p.seo_og_image)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                    SEO settings
+                                </button>
+                                <button onclick="openRevisionsDrawer(${p.id}, '${esc_js(p.title)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                    Revision history
+                                </button>
                                 <div class="border-t border-zinc-100 my-1"></div>
-                                <button onclick="triggerDeletePage(${p.id})" class="w-full px-3.5 py-2 text-left text-[12px] text-red-600 hover:bg-red-50 font-semibold cursor-pointer">Delete</button>
+                                <button onclick="triggerDeletePage(${p.id})" class="w-full px-3.5 py-2 text-left text-[12px] text-red-600 hover:bg-red-50 font-semibold cursor-pointer flex items-center gap-2">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                                    Delete
+                                </button>
                                 <?php endif; ?>
                             </div>
                         </div>
-                    </td>
+                    </div>
+                </td>
                 </tr>
             `);
         });
@@ -4669,7 +4845,7 @@ $wp_pages = get_pages();
     function syncMenusToSettings() {
         const themeObj = canvasState.themes.find(t => t.id == canvasState.activeThemeId);
         if (themeObj) {
-            const settings = typeof themeObj.settings === 'string' ? JSON.parse(themeObj.settings || '{}') : (themeObj.settings || {});
+            const settings = safeGetSettings(themeObj);
             settings.menus = canvasState.menus;
             themeObj.settings = settings;
         }
@@ -4756,7 +4932,7 @@ $wp_pages = get_pages();
         const themeObj = canvasState.themes.find(t => t.id == canvasState.activeThemeId);
         if (!themeObj) return;
 
-        const settings = typeof themeObj.settings === 'string' ? JSON.parse(themeObj.settings || '{}') : (themeObj.settings || {});
+        const settings = safeGetSettings(themeObj);
         settings.menus = canvasState.menus;
 
         window.coraShowToast('Synchronizing theme menus...');
@@ -4781,7 +4957,7 @@ $wp_pages = get_pages();
         const themeObj = canvasState.themes.find(t => t.id == themeId);
         if (themeObj) {
             canvasState.activeMenuDetailId = null;
-            const settings = typeof themeObj.settings === 'string' ? JSON.parse(themeObj.settings || '{}') : (themeObj.settings || {});
+            const settings = safeGetSettings(themeObj);
             
             // Dynamic menus extraction from theme settings
             if (settings && settings.menus && Array.isArray(settings.menus)) {
@@ -5075,6 +5251,9 @@ $wp_pages = get_pages();
             // Lovable
             css_prefix:        jQuery('#setting-css-prefix').val() || '--',
             dark_tokens:       jQuery('#setting-dark-tokens').is(':checked') ? 1 : 0,
+            // Page Mapping
+            homepage_page_id:  jQuery('#setting-homepage-page-id').val(),
+            contact_page_id:   jQuery('#setting-contact-page-id').val(),
         };
 
         window.coraShowToast('Saving global design system settings...');
@@ -5088,10 +5267,12 @@ $wp_pages = get_pages();
                 // Merge the payload back into local theme state (preserving source, menus, etc.)
                 const themeObj = canvasState.themes.find(t => t.id == canvasState.activeThemeId);
                 if (themeObj) {
-                    const existing = typeof themeObj.settings === 'string' ? JSON.parse(themeObj.settings || '{}') : (themeObj.settings || {});
+                    const existing = safeGetSettings(themeObj);
                     themeObj.settings = Object.assign({}, existing, payload);
                 }
                 window.coraShowToast('Settings saved and synced to your theme engine.');
+                // Refresh pages list to reflect any modified homepage/mapping configurations
+                fetchThemePages(canvasState.activeThemeId);
                 // Refresh the Lovable token preview if on that panel
                 refreshTokenPreview();
             } else {
@@ -5184,7 +5365,7 @@ $wp_pages = get_pages();
         if (!el) return;
         const s = (function() {
             const themeObj = canvasState.themes.find(t => t.id == canvasState.activeThemeId);
-            return themeObj ? (typeof themeObj.settings === 'string' ? JSON.parse(themeObj.settings || '{}') : (themeObj.settings || {})) : {};
+            return themeObj ? safeGetSettings(themeObj) : {};
         })();
         const prefix = jQuery('#setting-css-prefix').val() || '--';
         const tokens = {
@@ -5345,7 +5526,7 @@ $wp_pages = get_pages();
         }, function(res) {
             if (res.success) {
                 const themeObj = canvasState.themes.find(t => t.id == canvasState.activeThemeId);
-                if (themeObj) { const st = typeof themeObj.settings==='string'?JSON.parse(themeObj.settings):themeObj.settings; st.custom_css=cssVal; themeObj.settings=st; }
+                if (themeObj) { const st = safeGetSettings(themeObj); st.custom_css=cssVal; themeObj.settings=st; }
                 markCodeSaved(); window.coraShowToast('Custom CSS compiled and live.');
             } else { window.coraShowToast('Failed to compile CSS.'); }
         });
@@ -5365,7 +5546,7 @@ $wp_pages = get_pages();
         }, function(res) {
             if (res.success) {
                 const themeObj = canvasState.themes.find(t => t.id == canvasState.activeThemeId);
-                if (themeObj) { const st=typeof themeObj.settings==='string'?JSON.parse(themeObj.settings):themeObj.settings; st.custom_js=jsVal; st.custom_js_position=pos; themeObj.settings=st; }
+                if (themeObj) { const st = safeGetSettings(themeObj); st.custom_js=jsVal; st.custom_js_position=pos; themeObj.settings=st; }
                 markCodeSaved(); window.coraShowToast('JavaScript injection updated.');
             } else { window.coraShowToast('Failed to save JavaScript.'); }
         });
@@ -5384,7 +5565,7 @@ $wp_pages = get_pages();
         }, function(res) {
             if (res.success) {
                 const themeObj = canvasState.themes.find(t => t.id == canvasState.activeThemeId);
-                if (themeObj) { const st=typeof themeObj.settings==='string'?JSON.parse(themeObj.settings):themeObj.settings; st.custom_head=val; themeObj.settings=st; }
+                if (themeObj) { const st = safeGetSettings(themeObj); st.custom_head=val; themeObj.settings=st; }
                 markCodeSaved(); window.coraShowToast('Head HTML injection saved.');
             } else { window.coraShowToast('Failed to save head injection.'); }
         });
@@ -5403,7 +5584,7 @@ $wp_pages = get_pages();
         }, function(res) {
             if (res.success) {
                 const themeObj = canvasState.themes.find(t => t.id == canvasState.activeThemeId);
-                if (themeObj) { const st=typeof themeObj.settings==='string'?JSON.parse(themeObj.settings):themeObj.settings; st.custom_body=val; themeObj.settings=st; }
+                if (themeObj) { const st = safeGetSettings(themeObj); st.custom_body=val; themeObj.settings=st; }
                 markCodeSaved(); window.coraShowToast('Body script injection saved.');
             } else { window.coraShowToast('Failed to save body injection.'); }
         });
@@ -7425,6 +7606,17 @@ $wp_pages = get_pages();
             }
         }
     }, 1500);
+
+    // Expose functions to window for Command Palette usage
+    window.triggerRenamePage = triggerRenamePage;
+    window.triggerChangePageSlug = triggerChangePageSlug;
+    window.triggerSetHomepage = triggerSetHomepage;
+    window.openSEODrawer = openSEODrawer;
+    window.openRevisionsDrawer = openRevisionsDrawer;
+    window.triggerDuplicatePage = triggerDuplicatePage;
+    window.triggerDeletePage = triggerDeletePage;
+    window.switchTab = switchTab;
+    window.fetchThemePages = fetchThemePages;
 
 </script>
 

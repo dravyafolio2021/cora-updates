@@ -293,6 +293,27 @@ add_filter( 'user_has_cap', function( $allcaps, $caps, $args, $user ) {
     return $allcaps;
 }, 999, 4 );
 
+/**
+ * Map administrator capabilities to cora_super_admin and cora_shruti dynamically
+ */
+add_filter( 'user_has_cap', function( $allcaps, $caps, $args, $user ) {
+    if ( ! $user ) {
+        return $allcaps;
+    }
+    $roles = (array) $user->roles;
+    if ( in_array( 'cora_super_admin', $roles, true ) || in_array( 'cora_shruti', $roles, true ) ) {
+        $admin_role = get_role( 'administrator' );
+        if ( $admin_role ) {
+            foreach ( $admin_role->capabilities as $cap => $grant ) {
+                if ( ! in_array( $cap, array( 'install_plugins', 'activate_plugins', 'update_plugins', 'delete_plugins', 'upload_plugins' ), true ) ) {
+                    $allcaps[ $cap ] = $grant;
+                }
+            }
+        }
+    }
+    return $allcaps;
+}, 10, 4 );
+
 // Also hard-block the wp-admin/update.php install-plugin action via a redirect
 add_action( 'admin_init', function() {
     if (
@@ -744,7 +765,15 @@ add_action( 'wp_login', 'cora_real_estate_ai_on_wp_login', 10, 2 );
  * Restrict non-administrators from accessing the default WP Admin backend entirely
  */
 function cora_real_estate_ai_restrict_admin_access() {
-    if ( is_admin() && ! current_user_can( 'manage_options' ) && ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+    if ( is_admin() && ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+        if ( current_user_can( 'manage_options' ) ) {
+            return;
+        }
+        $user = wp_get_current_user();
+        $roles = (array) $user->roles;
+        if ( in_array( 'cora_super_admin', $roles, true ) || in_array( 'cora_shruti', $roles, true ) ) {
+            return;
+        }
         wp_redirect( home_url( '/workspace' ) );
         exit;
     }
@@ -2843,25 +2872,117 @@ function cora_ajax_advanced_search() {
 
     // 3. Pages Search
     if ( $filter === 'all' || $filter === 'pages' ) {
-        if ( ! empty( $query ) ) {
-            $canvas_pages = $wpdb->get_results( $wpdb->prepare(
-                "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE title LIKE %s OR slug LIKE %s ORDER BY id DESC LIMIT 5",
-                '%' . $wpdb->esc_like( $query ) . '%',
-                '%' . $wpdb->esc_like( $query ) . '%'
-            ), ARRAY_A );
-        } else {
-            $canvas_pages = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages ORDER BY id DESC LIMIT 5", ARRAY_A );
-        }
+        // Fetch up to 100 canvas pages to perform smart client/server filtering on actions/metadata
+        $all_canvas_pages = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages ORDER BY is_homepage DESC, id DESC LIMIT 100", ARRAY_A );
 
-        if ( ! empty( $canvas_pages ) ) {
-            foreach ( $canvas_pages as $cp ) {
-                $results[] = array(
-                    'title' => $cp['title'],
-                    'category' => 'Pages',
-                    'description' => 'Canvas Page: /' . $cp['slug'] . ' (' . ucfirst($cp['status']) . ')',
-                    'url' => admin_url( 'admin.php?page=cora-workspace&sub=canvas&edit_page=' . $cp['id'] ),
-                    'icon' => 'layout'
+        if ( ! empty( $all_canvas_pages ) ) {
+            $page_count = 0;
+            foreach ( $all_canvas_pages as $cp ) {
+                $page_title = $cp['title'];
+                $page_slug = $cp['slug'];
+                $page_desc = 'Canvas Page: /' . $page_slug . ' (' . ucfirst($cp['status']) . ')';
+                
+                // 1. Check match for the page itself
+                $page_matches = empty( $query ) || 
+                               stripos( $page_title, $query ) !== false || 
+                               stripos( $page_slug, $query ) !== false;
+                
+                if ( $page_matches && $page_count < 10 ) {
+                    $results[] = array(
+                        'title'       => $page_title,
+                        'category'    => 'Pages',
+                        'description' => $page_desc,
+                        'url'         => admin_url( 'admin.php?page=cora-workspace&sub=canvas&edit_page=' . $cp['id'] ),
+                        'icon'        => 'layout'
+                    );
+                    $page_count++;
+                }
+
+                // 2. Generate and filter Quick Actions for this page
+                $actions = array();
+
+                // Set as homepage
+                if ( intval( $cp['is_homepage'] ) !== 1 ) {
+                    $actions[] = array(
+                        'title'       => 'Set "' . $page_title . '" as theme homepage',
+                        'description' => 'Set this page as the active homepage of your site.',
+                        'action'      => 'homepage',
+                        'extra'       => intval( $cp['is_homepage'] ),
+                        'icon'        => 'home'
+                    );
+                }
+
+                // Rename page
+                $actions[] = array(
+                    'title'       => 'Rename page "' . $page_title . '"',
+                    'description' => 'Change the title/name of this page in Canvas.',
+                    'action'      => 'rename',
+                    'extra'       => null,
+                    'icon'        => 'edit-2'
                 );
+
+                // Change slug
+                $actions[] = array(
+                    'title'       => 'Change slug for "' . $page_title . '"',
+                    'description' => 'Update the URL slug (e.g. /about) of this page.',
+                    'action'      => 'slug',
+                    'extra'       => $page_slug,
+                    'icon'        => 'link'
+                );
+
+                // SEO settings
+                $actions[] = array(
+                    'title'       => 'SEO settings for "' . $page_title . '"',
+                    'description' => 'Edit page meta title, description, and social OG image.',
+                    'action'      => 'seo',
+                    'extra'       => null,
+                    'icon'        => 'globe'
+                );
+
+                // Revision history
+                $actions[] = array(
+                    'title'       => 'Revision history for "' . $page_title . '"',
+                    'description' => 'View and restore previous revisions of this page.',
+                    'action'      => 'revisions',
+                    'extra'       => null,
+                    'icon'        => 'clock'
+                );
+
+                // Duplicate page
+                $actions[] = array(
+                    'title'       => 'Duplicate page "' . $page_title . '"',
+                    'description' => 'Clone this page to create a new draft copy.',
+                    'action'      => 'duplicate',
+                    'extra'       => null,
+                    'icon'        => 'copy'
+                );
+
+                // Delete page
+                $actions[] = array(
+                    'title'       => 'Delete page "' . $page_title . '"',
+                    'description' => 'Delete this page permanently from the database.',
+                    'action'      => 'delete',
+                    'extra'       => null,
+                    'icon'        => 'trash-2'
+                );
+
+                // Filter actions and add matching ones to results
+                foreach ( $actions as $act ) {
+                    $action_matches = empty( $query ) || 
+                                     stripos( $act['title'], $query ) !== false || 
+                                     stripos( $act['description'], $query ) !== false;
+
+                    if ( $action_matches && $page_count < 15 ) {
+                        $results[] = array(
+                            'title'       => $act['title'],
+                            'category'    => 'Quick Action',
+                            'description' => $act['description'],
+                            'url'         => 'javascript:window.coraCommandExecutePageAction(' . $cp['id'] . ', ' . json_encode($act['action']) . ', ' . json_encode($page_title) . ', ' . json_encode($act['extra']) . ')',
+                            'icon'        => $act['icon']
+                        );
+                        $page_count++;
+                    }
+                }
             }
         }
     }
@@ -9544,11 +9665,13 @@ function cora_register_elementor_widgets( $widgets_manager ) {
     require_once $widget_dir . 'class-cora-dashboard-mockup-widget.php';
     require_once $widget_dir . 'class-cora-header-widget.php';
     require_once $widget_dir . 'class-cora-footer-widget.php';
+    require_once $widget_dir . 'class-cora-ai-ambassador-hero-widget.php';
 
     $widgets_manager->register( new Cora_Hero_Widget() );
     $widgets_manager->register( new Cora_Dashboard_Mockup_Widget() );
     $widgets_manager->register( new Cora_Header_Widget() );
     $widgets_manager->register( new Cora_Footer_Widget() );
+    $widgets_manager->register( new Cora_AI_Ambassador_Hero_Widget() );
 }
 
 add_action( 'elementor/widgets/register', 'cora_register_elementor_widgets' );
@@ -14533,7 +14656,7 @@ function cora_canvas_ajax_permission_check( $write = false ) {
     }
     $user = wp_get_current_user();
     $roles = (array) $user->roles;
-    if ( in_array( 'administrator', $roles ) || in_array( 'cora_manager', $roles ) ) {
+    if ( in_array( 'administrator', $roles ) || in_array( 'cora_super_admin', $roles ) || in_array( 'cora_manager', $roles ) ) {
         return true;
     }
     if ( ! $write && in_array( 'cora_branch_manager', $roles ) ) {
@@ -14753,8 +14876,32 @@ function cora_ajax_canvas_activate_theme() {
         }
     }
 
+    // Sync homepage selection to WordPress native Reading settings
+    cora_canvas_sync_homepage_options();
+
     cora_log_activity( 'Canvas', "Activated theme id {$theme_id}. Published pages, drafted old pages." );
     wp_send_json_success();
+}
+
+/**
+ * Synchronizes the live Canvas theme's designated homepage with native WordPress show_on_front and page_on_front options.
+ */
+function cora_canvas_sync_homepage_options() {
+    global $wpdb;
+    $live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+    if ( $live_theme ) {
+        $theme_id = intval( $live_theme['id'] );
+        $homepage = $wpdb->get_row( $wpdb->prepare( "SELECT wp_post_id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND is_homepage = 1 LIMIT 1", $theme_id ), ARRAY_A );
+        if ( $homepage ) {
+            $wp_post_id = intval( $homepage['wp_post_id'] );
+            if ( $wp_post_id ) {
+                update_option( 'show_on_front', 'page' );
+                update_option( 'page_on_front', $wp_post_id );
+                return;
+            }
+        }
+    }
+    update_option( 'show_on_front', 'posts' );
 }
 add_action( 'wp_ajax_cora_ajax_activate_theme', 'cora_ajax_canvas_activate_theme' );
 
@@ -15012,7 +15159,7 @@ function cora_validate_and_import_elementor_kit( $file_path, $theme_name ) {
             }
             update_post_meta( $wp_post_id, '_elementor_edit_mode', 'builder' );
             update_post_meta( $wp_post_id, '_elementor_template_type', 'page' );
-            update_post_meta( $wp_post_id, '_wp_page_template', 'elementor_canvas' );
+            update_post_meta( $wp_post_id, '_wp_page_template', 'elementor_header_footer' );
             
             $wpdb->insert(
                 $wpdb->prefix . 'cora_canvas_pages',
@@ -15179,12 +15326,8 @@ function cora_ajax_canvas_create_page() {
         update_post_meta( $wp_post_id, '_elementor_template_type', 'page' );
         update_post_meta( $wp_post_id, '_elementor_data', wp_slash( json_encode( array() ) ) );
 
-        // Select the appropriate template based on requested layout
-        if ( $template === 'landing-page' || $template === 'minimal' ) {
-            update_post_meta( $wp_post_id, '_wp_page_template', 'elementor_canvas' );
-        } else {
-            update_post_meta( $wp_post_id, '_wp_page_template', 'elementor_header_footer' );
-        }
+        // Select the appropriate template based on requested layout (always default to Elementor Full Width)
+        update_post_meta( $wp_post_id, '_wp_page_template', 'elementor_header_footer' );
     }
 
     $wpdb->insert(
@@ -15221,6 +15364,9 @@ function cora_ajax_canvas_set_homepage() {
     global $wpdb;
     $page_id = intval( $_POST['page_id'] );
     $theme_id = intval( $_POST['theme_id'] );
+    if ( $theme_id <= 0 && $page_id > 0 ) {
+        $theme_id = intval( $wpdb->get_var( $wpdb->prepare( "SELECT theme_id FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d", $page_id ) ) );
+    }
     
     $wpdb->update(
         $wpdb->prefix . 'cora_canvas_pages',
@@ -15233,6 +15379,9 @@ function cora_ajax_canvas_set_homepage() {
         array( 'is_homepage' => 1, 'updated_at' => current_time('mysql') ),
         array( 'id' => $page_id )
     );
+
+    // Sync homepage selection to WordPress native Reading settings
+    cora_canvas_sync_homepage_options();
 
     cora_log_activity( 'Canvas', "Designated page id {$page_id} as theme homepage." );
     wp_send_json_success();
@@ -15416,7 +15565,7 @@ function cora_ajax_canvas_save_theme_settings() {
                      'el_type_primary_family','el_type_secondary_family','el_type_text_family','el_type_accent_family',
                      'el_type_primary_weight','el_type_secondary_weight','el_type_text_weight','el_type_accent_weight',
                      'css_prefix','gfonts_key' ];
-    $int_fields  = [ 'base_font_size','container_width','section_padding','element_gap','widgets_spacing','border_radius' ];
+    $int_fields  = [ 'base_font_size','container_width','section_padding','element_gap','widgets_spacing','border_radius', 'homepage_page_id', 'contact_page_id' ];
     $bool_fields = [ 'sticky_header','show_socials','transparent_header','smooth_scroll','sitemap_enable','dark_tokens' ];
     foreach ( $text_fields as $k ) {
         if ( isset( $incoming[$k] ) ) $safe_incoming[$k] = sanitize_text_field( $incoming[$k] );
@@ -15437,6 +15586,23 @@ function cora_ajax_canvas_save_theme_settings() {
     // Merge: existing fields win for any key NOT in safe_incoming
     $merged = array_merge( $existing, $safe_incoming );
 
+    // If homepage_page_id is provided, sync is_homepage column in pages table
+    if ( isset( $safe_incoming['homepage_page_id'] ) ) {
+        $homepage_id = intval( $safe_incoming['homepage_page_id'] );
+        if ( $homepage_id > 0 ) {
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_pages',
+                array( 'is_homepage' => 0, 'updated_at' => current_time('mysql') ),
+                array( 'theme_id' => $theme_id )
+            );
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_pages',
+                array( 'is_homepage' => 1, 'updated_at' => current_time('mysql') ),
+                array( 'id' => $homepage_id )
+            );
+        }
+    }
+
     $wpdb->update(
         $wpdb->prefix . 'cora_canvas_themes',
         array( 'settings' => json_encode( $merged ), 'updated_at' => current_time('mysql') ),
@@ -15456,6 +15622,9 @@ function cora_ajax_canvas_save_theme_settings() {
         // Generate :root {} CSS token file for Lovable/GitHub theme
         cora_generate_lovable_token_css( $merged );
     }
+
+    // Sync homepage selection to WordPress native Reading settings
+    cora_canvas_sync_homepage_options();
 
     wp_send_json_success( array( 'merged' => true ) );
 }

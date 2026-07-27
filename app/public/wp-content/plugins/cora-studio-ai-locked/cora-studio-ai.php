@@ -320,7 +320,15 @@ add_action( 'wp_login', 'cora_studio_ai_on_wp_login', 10, 2 );
  * Restrict non-administrators from accessing the default WP Admin backend entirely
  */
 function cora_studio_ai_restrict_admin_access() {
-    if ( is_admin() && ! current_user_can( 'manage_options' ) && ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+    if ( is_admin() && ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+        if ( current_user_can( 'manage_options' ) ) {
+            return;
+        }
+        $user = wp_get_current_user();
+        $roles = (array) $user->roles;
+        if ( in_array( 'cora_super_admin', $roles, true ) || in_array( 'cora_shruti', $roles, true ) ) {
+            return;
+        }
         wp_redirect( home_url( '/workspace' ) );
         exit;
     }
