@@ -13835,10 +13835,10 @@ function cora_db_get_leads() {
     }
 
     // Merge option stored leads
-    $option_leads = get_option( 'cora_workspace_leads', array() );
+    $option_leads = get_option( 'cora_workspace_leads', false );
 
-    // If both DB and option are empty (or reset), seed 16 rich demo leads for instant demonstration
-    if ( empty( $mapped ) && ( ! is_array( $option_leads ) || empty( $option_leads ) || count( $option_leads ) < 10 ) ) {
+    // If option has never been created, seed 16 rich demo leads once
+    if ( $option_leads === false && empty( $mapped ) ) {
         $seed_demo_leads = array(
             array(
                 'id'            => 'lead_demo_101',
