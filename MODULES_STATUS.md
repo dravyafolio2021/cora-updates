@@ -15,6 +15,7 @@
 | **Forms & Reviews** | `feature/forms-module` | 🟢 Merged to Main | `views/view-forms.php`, `public-form-view.php`, `views/view-emails.php` | Dedicated Forms Agent |
 | **Media Module** | `feature/media-module` | 🟢 Merged to Main | `views/view-media.php`, `views/view-media-editor.php`, `cora-workspace.php` | Media Module Agent |
 | **Studio Module** | `feature/studio-module` | 🟡 Active Work | `cora-workspace.php`, Studio Views & Features | Studio Module Agent (Arjun) |
+| **Content Module** | `feature/content-module` | 🟡 Active Work | `views/view-content-suite.php`, `cora-workspace.php` | Content Module Agent |
 <!-- MODULE_ROWS_END -->
 
 ---
@@ -37,6 +38,10 @@
 - **Health**: 100% Operational & Clean Base.
 
 <!-- BRANCH_LOGS_START -->
+### `feature/content-module` (Active Branch)
+- **Status**: 🟡 Active — AI Content Suite: Article Library, SEO Analysis, Local SEO, Content Calendar, and Content Writing Assistant workflows.
+- **Main Touchpoint**: `views/view-content-suite.php`, `cora-workspace.php`, `admin-dashboard.php`.
+
 ### `feature/studio-module` (Active Branch)
 - **Status**: 🟡 Active — Studio Features, Studio Booking & Management, Equipment & Crew Integration, and Studio Suite workflows.
 - **Main Touchpoint**: `cora-workspace.php`, `views/view-crew-scheduler.php`, Studio plugin assets & views.
