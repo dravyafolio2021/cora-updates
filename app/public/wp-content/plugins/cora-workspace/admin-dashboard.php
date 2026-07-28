@@ -3108,113 +3108,171 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <div class="flex flex-row flex-1 min-h-0 relative w-full lg:overflow-hidden">
     <!-- Workspace Sidebar -->
     <aside class="cora-sidebar w-64 bg-[#f9fafb] dark:bg-[#0c0c0e] border-r border-zinc-200/80 dark:border-zinc-800/40 flex flex-col shrink-0 h-[calc(100vh-52px)] fixed lg:sticky top-[52px] left-0 z-50 lg:z-30 transition-all duration-200 transform -translate-x-full lg:translate-x-0">
-        <!-- UPPER BLOCK: SCROLLABLE NAVIGATION CONTENT -->
-        <div id="cora-sidebar-scroll-container" class="flex-1 flex flex-col min-h-0 overflow-y-auto overflow-x-visible">
-            <!-- Sidebar Top Header / Brand Logo & Toggle -->
-            <?php
-            $cora_active_workspace = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array( 'id' => 1, 'name' => 'Apex Realty Group', 'slug' => 'apex-realty', 'plan' => 'enterprise', 'status' => 'active' );
-            $cora_user_workspaces   = function_exists( 'cora_get_user_workspaces' ) ? cora_get_user_workspaces( get_current_user_id() ) : array( $cora_active_workspace );
-            $cora_ws_name           = ! empty( $cora_active_workspace['name'] ) ? $cora_active_workspace['name'] : 'Apex Realty Group';
-            $cora_ws_slug           = ! empty( $cora_active_workspace['slug'] ) ? $cora_active_workspace['slug'] : 'apex-realty';
-            $cora_ws_initial        = ! empty( $cora_ws_name ) ? strtoupper( substr( $cora_ws_name, 0, 1 ) ) : 'C';
-            
-            $sidebar_brand_logo = get_option( 'cora_brand_logo_url', '' );
-            $sidebar_brand_title = get_option( 'cora_sidebar_title', 'cora' );
-            if ( empty( $sidebar_brand_title ) ) {
-                $sidebar_brand_title = 'cora';
-            }
-            ?>
-            <div class="cora-sidebar-top-container flex items-center justify-between gap-2 px-3 pt-2.5 pb-2 shrink-0 select-none">
-                <!-- Workspace Switcher Card + Dropdown -->
-                <div class="relative flex-1 min-w-0">
-                    <!-- Trigger Card -->
-                    <div class="cora-workspace-card flex items-center justify-between gap-2 px-2.5 py-1.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900/50 dark:hover:bg-zinc-850 border border-zinc-200 dark:border-zinc-850 rounded-lg cursor-pointer transition-all select-none" onclick="event.stopPropagation(); if($('.cora-sidebar').hasClass('collapsed-sidebar')){ window.coraToggleSidebarCollapse(); } else { $('#cora-workspace-popover').toggleClass('hidden'); $('#cora-profile-popover').addClass('hidden'); }">
-                        <div class="flex items-center gap-2 min-w-0">
-                            <?php if ( ! empty( $sidebar_brand_logo ) ) : ?>
-                            <div class="w-6 h-6 rounded flex items-center justify-center shrink-0">
-                                <img src="<?php echo esc_url( $sidebar_brand_logo ); ?>" alt="Logo" class="w-full h-full object-contain rounded">
-                            </div>
-                            <?php else : ?>
-                            <div class="w-6 h-6 rounded bg-black dark:bg-white text-white dark:text-black font-bold text-[13px] flex items-center justify-center shrink-0 leading-none">
-                                <?php echo esc_html( strtoupper( substr( $sidebar_brand_title, 0, 1 ) ) ); ?>
-                            </div>
-                            <?php endif; ?>
-                            <span class="cora-studio-info text-zinc-900 dark:text-zinc-100 font-bold text-xs truncate"><?php echo esc_html( $sidebar_brand_title ); ?></span>
+        <!-- Sidebar Top Header / Brand Logo & Toggle -->
+        <?php
+        $cora_active_workspace = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array( 'id' => 1, 'name' => 'Apex Realty Group', 'slug' => 'apex-realty', 'plan' => 'enterprise', 'status' => 'active' );
+        $cora_user_workspaces   = function_exists( 'cora_get_user_workspaces' ) ? cora_get_user_workspaces( get_current_user_id() ) : array( $cora_active_workspace );
+        $cora_ws_name           = ! empty( $cora_active_workspace['name'] ) ? $cora_active_workspace['name'] : 'Apex Realty Group';
+        $cora_ws_slug           = ! empty( $cora_active_workspace['slug'] ) ? $cora_active_workspace['slug'] : 'apex-realty';
+        $cora_ws_initial        = ! empty( $cora_ws_name ) ? strtoupper( substr( $cora_ws_name, 0, 1 ) ) : 'C';
+        
+        $sidebar_brand_logo = get_option( 'cora_brand_logo_url', '' );
+        $sidebar_brand_title = get_option( 'cora_sidebar_title', 'cora' );
+        if ( empty( $sidebar_brand_title ) ) {
+            $sidebar_brand_title = 'cora';
+        }
+        ?>
+        <div class="cora-sidebar-top-container flex items-center justify-between gap-2 px-3 pt-2.5 pb-2 shrink-0 select-none">
+            <!-- Workspace Switcher Card + Dropdown -->
+            <div class="relative flex-1 min-w-0">
+                <!-- Trigger Card -->
+                <div class="cora-workspace-card flex items-center justify-between gap-2 px-2.5 py-1.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900/50 dark:hover:bg-zinc-850 border border-zinc-200 dark:border-zinc-850 rounded-lg cursor-pointer transition-all select-none" onclick="event.stopPropagation(); if($('.cora-sidebar').hasClass('collapsed-sidebar')){ window.coraToggleSidebarCollapse(); } else { $('#cora-workspace-popover').toggleClass('hidden'); $('#cora-profile-popover').addClass('hidden'); }">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <?php if ( ! empty( $sidebar_brand_logo ) ) : ?>
+                        <div class="w-6 h-6 rounded flex items-center justify-center shrink-0">
+                            <img src="<?php echo esc_url( $sidebar_brand_logo ); ?>" alt="Logo" class="w-full h-full object-contain rounded" onerror="this.parentNode.style.display='none'; this.parentNode.nextElementSibling.style.display='flex';">
                         </div>
-                        <svg class="cora-switcher-arrow text-zinc-500 shrink-0" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        <div class="w-6 h-6 rounded bg-black dark:bg-white text-white dark:text-black font-bold text-[13px] flex items-center justify-center shrink-0 leading-none" style="display: none;">
+                            <?php echo esc_html( strtoupper( substr( $sidebar_brand_title, 0, 1 ) ) ); ?>
+                        </div>
+                        <?php else : ?>
+                        <div class="w-6 h-6 rounded bg-black dark:bg-white text-white dark:text-black font-bold text-[13px] flex items-center justify-center shrink-0 leading-none">
+                            <?php echo esc_html( strtoupper( substr( $sidebar_brand_title, 0, 1 ) ) ); ?>
+                        </div>
+                        <?php endif; ?>
+                        <span class="cora-studio-info text-zinc-900 dark:text-zinc-100 font-bold text-xs truncate"><?php echo esc_html( $sidebar_brand_title ); ?></span>
                     </div>
-
-                    <!-- Workspace Popover Sheet -->
-                    <div id="cora-workspace-popover" class="hidden absolute top-full mt-2 left-0 w-[232px] bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl p-3 z-50 flex flex-col select-none" style="animation: popoverSlideDown 0.12s ease-out;">
-                        <!-- Header -->
-                        <div class="flex items-center gap-2.5 pb-2.5 border-b border-zinc-100 dark:border-zinc-800 min-w-0">
-                            <div class="w-9 h-9 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-black text-base flex items-center justify-center shrink-0 leading-none shadow-sm">
+                    <svg class="cora-switcher-arrow text-zinc-500 shrink-0" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+                <div id="cora-workspace-popover" class="hidden absolute top-full mt-2 left-0 w-[280px] bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl p-3.5 z-50 flex flex-col select-none" style="animation: popoverSlideDown 0.12s ease-out;">
+                    <!-- Header -->
+                    <div class="flex items-start justify-between pb-3.5 border-b border-zinc-100 dark:border-zinc-800/60 min-w-0">
+                        <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                            <div class="w-9 h-9 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-black text-base flex items-center justify-center shrink-0 leading-none shadow-sm select-none">
                                 <?php echo esc_html( $cora_ws_initial ); ?>
                             </div>
                             <div class="flex flex-col min-w-0 flex-1 leading-tight">
                                 <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate"><?php echo esc_html( $cora_ws_name ); ?></span>
-                                <span class="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 truncate">app.heycora.in/<?php echo esc_html( $cora_ws_slug ); ?></span>
-                            </div>
-                        </div>
-
-                        <!-- Settings & Team Buttons -->
-                        <div class="grid grid-cols-2 gap-1.5 my-2.5">
-                            <button class="flex items-center justify-center gap-1.5 px-2 py-1.5 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-850 border border-zinc-200 dark:border-zinc-800 rounded-xl text-[11px] font-semibold text-zinc-700 dark:text-zinc-200 cursor-pointer transition-colors shadow-2xs" onclick="coraNavigateTo('settings-suite'); $('#cora-workspace-popover').addClass('hidden');">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-zinc-500"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06-.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                                Settings
-                            </button>
-                            <button class="flex items-center justify-center gap-1.5 px-2 py-1.5 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-850 border border-zinc-200 dark:border-zinc-800 rounded-xl text-[11px] font-semibold text-zinc-700 dark:text-zinc-200 cursor-pointer transition-colors shadow-2xs" onclick="coraNavigateTo('team-roles'); $('#cora-workspace-popover').addClass('hidden');">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-zinc-500"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                                Team
-                            </button>
-                        </div>
-
-                        <!-- Workspaces List -->
-                        <div class="flex flex-col gap-1.5 pt-2 border-t border-zinc-100 dark:border-zinc-800 min-w-0">
-                            <div class="flex items-center justify-between px-0.5 gap-1">
-                                <span class="text-[9.5px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate">Workspaces</span>
-                                <?php if ( cora_is_super_owner() ) : ?>
-                                    <span class="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded shrink-0">Admin (Shruti)</span>
-                                <?php endif; ?>
-                            </div>
-                            <div class="space-y-1 max-h-48 overflow-y-auto pr-0.5">
-                                <?php foreach ( $cora_user_workspaces as $ws_item ) :
-                                    $is_current = ( isset( $ws_item['slug'] ) && $ws_item['slug'] === $cora_ws_slug );
-                                    $ws_item_name = ! empty( $ws_item['name'] ) ? $ws_item['name'] : 'Workspace';
-                                    $ws_item_slug = ! empty( $ws_item['slug'] ) ? $ws_item['slug'] : 'workspace';
-                                    $ws_item_init = strtoupper( substr( $ws_item_name, 0, 1 ) );
-                                ?>
-                                <div onclick="coraSwitchWorkspace('<?php echo esc_js( $ws_item_slug ); ?>')" class="flex items-center justify-between px-2 py-1.5 <?php echo $is_current ? 'bg-zinc-100 dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700' : 'bg-zinc-50/50 hover:bg-zinc-100 dark:bg-zinc-900/40 dark:hover:bg-zinc-850 border-zinc-200/60 dark:border-zinc-800/60'; ?> border rounded-xl cursor-pointer transition-all min-w-0">
-                                    <div class="flex items-center gap-2 min-w-0 flex-1">
-                                        <div class="w-5 h-5 rounded-md bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold text-[10px] flex items-center justify-center shrink-0 leading-none">
-                                            <?php echo esc_html( $ws_item_init ); ?>
-                                        </div>
-                                        <div class="flex flex-col min-w-0 flex-1 leading-tight">
-                                            <span class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100 truncate"><?php echo esc_html( $ws_item_name ); ?></span>
-                                            <span class="text-[9px] text-zinc-400 dark:text-zinc-500 font-mono truncate">app.heycora.in/<?php echo esc_html( $ws_item_slug ); ?></span>
-                                        </div>
-                                    </div>
-                                    <?php if ( $is_current ) : ?>
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-900 dark:text-white shrink-0 ml-1"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                    <?php endif; ?>
+                                <div class="flex items-center gap-1 min-w-0 mt-0.5">
+                                    <span class="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 truncate">app.heycora.in/<?php echo esc_html( $cora_ws_slug ); ?></span>
+                                    <a href="https://app.heycora.in/<?php echo esc_html( $cora_ws_slug ); ?>" target="_blank" class="text-zinc-400 hover:text-zinc-650 dark:hover:text-zinc-200 shrink-0 select-none" onclick="event.stopPropagation();">
+                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                    </a>
                                 </div>
-                                <?php endforeach; ?>
                             </div>
+                        </div>
+                        <span class="text-[9.5px] font-bold text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-850 px-2 py-0.5 rounded-md flex items-center gap-1 shrink-0 border border-zinc-200/50 dark:border-zinc-800/50 select-none">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="shrink-0 text-zinc-500"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            Current
+                        </span>
+                    </div>
+
+                    <!-- Settings & Team Buttons -->
+                    <div class="grid grid-cols-2 gap-2 my-3">
+                        <button class="flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900/60 dark:hover:bg-zinc-850/80 border border-transparent rounded-xl text-[11px] font-semibold text-zinc-700 dark:text-zinc-255 cursor-pointer transition-all shadow-2xs active:scale-[0.98]" onclick="coraNavigateTo('settings-suite'); $('#cora-workspace-popover').addClass('hidden');">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-zinc-500"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06-.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            Settings
+                        </button>
+                        <button class="flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900/60 dark:hover:bg-zinc-850/80 border border-transparent rounded-xl text-[11px] font-semibold text-zinc-700 dark:text-zinc-255 cursor-pointer transition-all shadow-2xs active:scale-[0.98]" onclick="coraNavigateTo('team-roles'); $('#cora-workspace-popover').addClass('hidden');">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-zinc-500"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            Team
+                        </button>
+                    </div>
+
+                    <!-- Workspaces List -->
+                    <div class="border-t border-zinc-100 dark:border-zinc-800/60 pt-3">
+                        <div class="flex items-center justify-between px-1 mb-2 select-none">
+                            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Workspaces</span>
+                            <?php if ( cora_is_super_owner() ) : ?>
+                                <span class="text-[9px] font-bold text-emerald-600 dark:text-emerald-450 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded shrink-0">Admin (Shruti)</span>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <div class="space-y-1 max-h-48 overflow-y-auto pr-0.5 no-scrollbar select-none">
+                            <!-- Virtual Super Admin Workspace -->
+                            <?php 
+                            if ( cora_is_real_shruti() ) : 
+                                $is_super_current = ( $cora_ws_slug === 'super' );
+                            ?>
+                            <div class="group flex items-center justify-between px-2 py-1.5 <?php echo $is_super_current ? 'bg-zinc-100 dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700' : 'bg-transparent hover:bg-zinc-50 dark:hover:bg-zinc-900 border-transparent hover:border-zinc-200 dark:hover:border-zinc-800'; ?> border rounded-xl cursor-pointer transition-all min-w-0" onclick="coraSwitchWorkspace('super')">
+                                <div class="flex items-center gap-2 min-w-0 flex-1">
+                                    <div class="w-5 h-5 rounded-md bg-emerald-600 dark:bg-emerald-500 text-white font-bold text-[9px] flex items-center justify-center shrink-0 leading-none">
+                                        ★
+                                    </div>
+                                    <div class="flex flex-col min-w-0 flex-1 leading-tight">
+                                        <span class="text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 truncate">Platform Control Center</span>
+                                        <span class="text-[9px] text-zinc-450 dark:text-zinc-500 font-mono truncate">Global / Super Admin View</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1 shrink-0 ml-1">
+                                    <?php if ( $is_super_current ) : ?>
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-900 dark:text-white shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    <?php endif; ?>
+                                    <button type="button" class="p-0.5 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded text-zinc-400 hover:text-zinc-750 dark:hover:text-zinc-200 shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity" onclick="event.stopPropagation(); window.coraToggleEditWorkspaceDrawer(true, 0, 'Platform Control Center', 'super', 'enterprise', 'shruti@heycora.in', 'active');">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+
+                            <!-- Dynamic workspaces -->
+                            <?php foreach ( $cora_user_workspaces as $ws_item ) :
+                                if ( isset( $ws_item['slug'] ) && $ws_item['slug'] === 'super' ) continue;
+                                $is_current = ( isset( $ws_item['slug'] ) && $ws_item['slug'] === $cora_ws_slug );
+                                $ws_item_name = ! empty( $ws_item['name'] ) ? $ws_item['name'] : 'Workspace';
+                                $ws_item_slug = ! empty( $ws_item['slug'] ) ? $ws_item['slug'] : 'workspace';
+                                $ws_item_plan = ! empty( $ws_item['plan'] ) ? $ws_item['plan'] : 'enterprise';
+                                $ws_item_email = ! empty( $ws_item['owner_email'] ) ? $ws_item['owner_email'] : 'shruti@heycora.in';
+                                $ws_item_status = ! empty( $ws_item['status'] ) ? $ws_item['status'] : 'active';
+                                $ws_item_init = strtoupper( substr( $ws_item_name, 0, 1 ) );
+                            ?>
+                            <div class="group flex items-center justify-between px-2 py-1.5 <?php echo $is_current ? 'bg-zinc-100 dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700' : 'bg-transparent hover:bg-zinc-50 dark:hover:bg-zinc-900 border-transparent hover:border-zinc-200 dark:hover:border-zinc-800'; ?> border rounded-xl cursor-pointer transition-all min-w-0" onclick="coraSwitchWorkspace('<?php echo esc_js( $ws_item_slug ); ?>')">
+                                <div class="flex items-center gap-2 min-w-0 flex-1">
+                                    <div class="w-5 h-5 rounded-md bg-zinc-950 dark:bg-white text-white dark:text-zinc-955 font-bold text-[10px] flex items-center justify-center shrink-0 leading-none">
+                                        <?php echo esc_html( $ws_item_init ); ?>
+                                    </div>
+                                    <div class="flex flex-col min-w-0 flex-1 leading-tight">
+                                        <span class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100 truncate"><?php echo esc_html( $ws_item_name ); ?></span>
+                                        <span class="text-[9px] text-zinc-400 dark:text-zinc-500 font-mono truncate">app.heycora.in/<?php echo esc_html( $ws_item_slug ); ?></span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1 shrink-0 ml-1">
+                                    <?php if ( $is_current ) : ?>
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-900 dark:text-white shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    <?php endif; ?>
+                                    <button type="button" class="p-0.5 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded text-zinc-400 hover:text-zinc-755 dark:hover:text-zinc-200 shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity" onclick="event.stopPropagation(); window.coraToggleEditWorkspaceDrawer(true, <?php echo intval( $ws_item['id'] ); ?>, '<?php echo esc_js( $ws_item_name ); ?>', '<?php echo esc_js( $ws_item_slug ); ?>', '<?php echo esc_js( $ws_item_plan ); ?>', '<?php echo esc_js( $ws_item_email ); ?>', '<?php echo esc_js( $ws_item_status ); ?>');">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
                         </div>
                     </div>
-                </div>
 
-                <div class="cora-sidebar-header-actions flex items-center gap-1.5 shrink-0">
-                    <!-- Collapse Toggle Button (layout-sidebar icon) -->
-                    <button id="cora-sidebar-toggle" onclick="return window.coraToggleSidebarCollapse(event);" class="text-zinc-500 hover:text-black dark:text-zinc-450 dark:hover:text-white bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2 rounded-lg transition-colors cursor-pointer select-none shadow-2xs" title="Collapse / Expand Sidebar">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="9" y1="3" x2="9" y2="21"></line>
-                        </svg>
-                    </button>
+                    <!-- Create New Workspace Button -->
+                    <div class="border-t border-zinc-100 dark:border-zinc-800/60 mt-3 pt-2">
+                        <button type="button" class="w-full flex items-center gap-2.5 px-2 py-2 text-left hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-xl transition-all cursor-pointer group" onclick="event.stopPropagation(); window.coraToggleCreateWorkspaceDrawer(true);">
+                            <div class="w-5.5 h-5.5 rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 flex items-center justify-center text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors shrink-0">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            </div>
+                            <span class="text-xs font-semibold text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">Create New Workspace</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
+            <div class="cora-sidebar-header-actions flex items-center gap-1.5 shrink-0">
+                <!-- Collapse Toggle Button (layout-sidebar icon) -->
+                <button id="cora-sidebar-toggle" onclick="return window.coraToggleSidebarCollapse(event);" class="text-zinc-500 hover:text-black dark:text-zinc-450 dark:hover:text-white bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2 rounded-lg transition-colors cursor-pointer select-none shadow-2xs" title="Collapse / Expand Sidebar">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="cora-sidebar-scroll-container" class="flex-1 flex flex-col min-h-0 overflow-y-auto overflow-x-visible">
             <?php if ( cora_is_super_owner() ) :
                 $current_industry = cora_get_active_industry();
                 $re_url  = add_query_arg( 'set_industry', 'real_estate',       remove_query_arg( array('set_industry','industry') ) );
@@ -10474,6 +10532,363 @@ if ( current_user_can( 'manage_options' ) ) :
     </div>
 </div>
 <?php endif; ?>
+
+<style>
+.cora-side-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 400px;
+    max-width: 100%;
+    height: 100%;
+    z-index: 10000;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: -10px 0 30px rgba(0,0,0,0.08);
+}
+.cora-side-drawer.collapsed {
+    transform: translateX(100%);
+}
+</style>
+
+<!-- Create Workspace Side Drawer -->
+<div id="cora-create-workspace-drawer" class="cora-side-drawer collapsed bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 flex flex-col select-none">
+    <!-- Header -->
+    <div class="px-6 py-5 border-b border-zinc-150 dark:border-zinc-850 flex items-center justify-between flex-shrink-0">
+        <div>
+            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Create New Workspace</h3>
+            <p class="text-[11px] text-zinc-550 dark:text-zinc-400 mt-0.5">Spin up a brand new workspace agency instance</p>
+        </div>
+        <button type="button" onclick="window.coraToggleCreateWorkspaceDrawer(false);" class="w-8 h-8 rounded-lg bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-850 border border-zinc-200 dark:border-zinc-800/80 cursor-pointer flex items-center justify-center text-zinc-555 dark:text-zinc-400 transition-colors">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    </div>
+
+    <!-- Scrollable content -->
+    <form id="cora-create-ws-form" class="flex-1 overflow-y-auto p-6 space-y-5" onsubmit="event.preventDefault(); window.coraSubmitCreateWorkspace();">
+        <div>
+            <label class="block text-[10.5px] font-bold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">Workspace Name</label>
+            <input type="text" id="cora-create-ws-name" required placeholder="e.g. Acme Agency" class="w-full h-10 px-3 bg-zinc-50 border border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 rounded-lg text-xs font-semibold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-900 dark:focus:border-white transition-colors" onkeyup="window.coraAutoSlugify(this.value)">
+        </div>
+
+        <div>
+            <label class="block text-[10.5px] font-bold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">Workspace Slug / URL</label>
+            <div class="relative flex items-center">
+                <span class="absolute left-3 text-[10px] font-mono text-zinc-400 select-none">heycora.in/</span>
+                <input type="text" id="cora-create-ws-slug" required placeholder="acme" class="w-full h-10 pl-[74px] pr-3 bg-zinc-50 border border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 rounded-lg text-xs font-mono text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-900 dark:focus:border-white transition-colors">
+            </div>
+            <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1.5 leading-normal">The unique URL identifier for this workspace. Use lowercase letters, numbers, and hyphens only.</p>
+        </div>
+
+        <div>
+            <label class="block text-[10.5px] font-bold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">Pricing Plan</label>
+            <select id="cora-create-ws-plan" class="w-full h-10 px-2.5 bg-zinc-50 border border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-900 dark:focus:border-white transition-colors">
+                <option value="starter">Starter Plan</option>
+                <option value="professional">Professional Plan</option>
+                <option value="enterprise" selected>Enterprise Plan</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-[10.5px] font-bold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">Owner Email Address</label>
+            <input type="email" id="cora-create-ws-owner-email" required value="<?php echo esc_attr( wp_get_current_user()->user_email ); ?>" class="w-full h-10 px-3 bg-zinc-50 border border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 rounded-lg text-xs font-semibold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-900 dark:focus:border-white transition-colors">
+        </div>
+    </form>
+
+    <!-- Footer actions -->
+    <div class="p-6 border-t border-zinc-150 dark:border-zinc-850 bg-zinc-50 dark:bg-zinc-900/30 flex items-center gap-3 flex-shrink-0">
+        <button type="button" id="cora-create-ws-btn" onclick="window.coraSubmitCreateWorkspace();" class="flex-1 h-10 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-950 text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.98]">
+            Create Workspace
+        </button>
+        <button type="button" onclick="window.coraToggleCreateWorkspaceDrawer(false);" class="px-4 h-10 rounded-lg bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700/80 text-zinc-700 dark:text-zinc-300 text-xs font-bold transition-all cursor-pointer active:scale-[0.98]">
+            Cancel
+        </button>
+    </div>
+</div>
+
+<!-- Edit Workspace Side Drawer -->
+<div id="cora-edit-workspace-drawer" class="cora-side-drawer collapsed bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 flex flex-col select-none">
+    <!-- Header -->
+    <div class="px-6 py-5 border-b border-zinc-150 dark:border-zinc-850 flex items-center justify-between flex-shrink-0">
+        <div>
+            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Edit Workspace Settings</h3>
+            <p class="text-[11px] text-zinc-550 dark:text-zinc-400 mt-0.5">Manage administrative settings and status</p>
+        </div>
+        <button type="button" onclick="window.coraToggleEditWorkspaceDrawer(false);" class="w-8 h-8 rounded-lg bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-850 border border-zinc-200 dark:border-zinc-800/80 cursor-pointer flex items-center justify-center text-zinc-555 dark:text-zinc-400 transition-colors">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    </div>
+
+    <!-- Scrollable content -->
+    <div class="flex-1 overflow-y-auto p-6 space-y-6">
+        <input type="hidden" id="cora-edit-ws-id" value="0">
+
+        <div class="space-y-4">
+            <div>
+                <label class="block text-[10.5px] font-bold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">Workspace Name</label>
+                <input type="text" id="cora-edit-ws-name" required class="w-full h-10 px-3 bg-zinc-50 border border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 rounded-lg text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-white transition-colors">
+            </div>
+
+            <div>
+                <label class="block text-[10.5px] font-bold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">Workspace Slug</label>
+                <div class="relative flex items-center">
+                    <span class="absolute left-3 text-[10px] font-mono text-zinc-400 select-none">heycora.in/</span>
+                    <input type="text" id="cora-edit-ws-slug" required class="w-full h-10 pl-[74px] pr-3 bg-zinc-50 border border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 rounded-lg text-xs font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-white transition-colors">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[10.5px] font-bold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">Status</label>
+                    <select id="cora-edit-ws-status" class="w-full h-10 px-2.5 bg-zinc-50 border border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-900 dark:focus:border-white transition-colors">
+                        <option value="active">Active</option>
+                        <option value="suspended">Suspended</option>
+                        <option value="pending">Pending</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10.5px] font-bold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">Pricing Plan</label>
+                    <select id="cora-edit-ws-plan" class="w-full h-10 px-2.5 bg-zinc-50 border border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-900 dark:focus:border-white transition-colors">
+                        <option value="starter">Starter Plan</option>
+                        <option value="professional">Professional Plan</option>
+                        <option value="enterprise">Enterprise Plan</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[10.5px] font-bold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">Owner Email Address</label>
+                <input type="email" id="cora-edit-ws-owner-email" required class="w-full h-10 px-3 bg-zinc-50 border border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 rounded-lg text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-white transition-colors">
+            </div>
+        </div>
+
+        <!-- Danger Zone (Delete Workspace) -->
+        <div class="border-t border-zinc-150 dark:border-zinc-850 pt-5 mt-5">
+            <h4 class="text-xs font-bold text-red-600 dark:text-red-400 mb-1">Danger Zone</h4>
+            <p class="text-[10px] text-zinc-500 dark:text-zinc-400 leading-normal mb-3">Permanently delete this workspace and erase all associated settings, credentials, and assets. This cannot be undone.</p>
+
+            <div id="cora-delete-actions-trigger">
+                <button type="button" onclick="window.coraConfirmDeleteWorkspace();" class="w-full h-10 rounded-lg bg-red-500/5 hover:bg-red-500/10 border border-red-500/20 hover:border-red-500/35 text-red-650 dark:text-red-400 text-xs font-bold cursor-pointer transition-colors flex items-center justify-center gap-1.5">
+                    Delete Workspace...
+                </button>
+            </div>
+
+            <div id="cora-delete-actions-confirm" class="hidden p-4 bg-red-500/5 border border-red-500/20 rounded-xl space-y-3">
+                <p class="text-[10px] font-bold text-red-600 dark:text-red-400 leading-normal">⚠️ Are you absolutely sure? Click confirm below to permanently wipe this workspace from the database.</p>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="window.coraExecuteDeleteWorkspace();" class="flex-1 h-9 rounded-lg bg-red-600 hover:bg-red-750 text-white text-[11px] font-bold cursor-pointer transition-colors active:scale-[0.98]">
+                        Yes, Delete Workspace
+                    </button>
+                    <button type="button" onclick="window.coraCancelDeleteWorkspace();" class="px-3.5 h-9 rounded-lg bg-zinc-100 dark:bg-zinc-850 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer actions -->
+    <div class="p-6 border-t border-zinc-150 dark:border-zinc-850 bg-zinc-50 dark:bg-zinc-900/30 flex items-center gap-3 flex-shrink-0">
+        <button type="button" id="cora-edit-ws-btn" onclick="window.coraSubmitUpdateWorkspace();" class="flex-1 h-10 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-950 text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.98]">
+            Save Changes
+        </button>
+        <button type="button" onclick="window.coraToggleEditWorkspaceDrawer(false);" class="px-4 h-10 rounded-lg bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700/80 text-zinc-700 dark:text-zinc-300 text-xs font-bold transition-all cursor-pointer active:scale-[0.98]">
+            Cancel
+        </button>
+    </div>
+</div>
+
+<script>
+(function($) {
+    $(document).ready(function() {
+        // Auto slugify helper
+        window.coraAutoSlugify = function(text) {
+            const slug = text.toString().toLowerCase()
+                .replace(/\s+/g, '-')           // Replace spaces with -
+                .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+                .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+                .replace(/^-+/, '')             // Trim - from start of text
+                .replace(/-+$/, '');            // Trim - from end of text
+            document.getElementById('cora-create-ws-slug').value = slug;
+        };
+
+        // Toggle Create Drawer
+        window.coraToggleCreateWorkspaceDrawer = function(open) {
+            const drawer = document.getElementById('cora-create-workspace-drawer');
+            const backdrop = document.getElementById('cora-drawer-backdrop');
+            if (!drawer) return;
+            if (open) {
+                drawer.classList.remove('collapsed');
+                if (backdrop) {
+                    backdrop.classList.remove('hidden');
+                    backdrop.style.display = 'block';
+                    backdrop.style.pointerEvents = 'auto';
+                }
+                document.getElementById('cora-workspace-popover').classList.add('hidden');
+                document.getElementById('cora-create-ws-name').value = '';
+                document.getElementById('cora-create-ws-slug').value = '';
+            } else {
+                drawer.classList.add('collapsed');
+                if (backdrop) {
+                    backdrop.classList.add('hidden');
+                    backdrop.style.display = 'none';
+                    backdrop.style.pointerEvents = 'none';
+                }
+            }
+        };
+
+        // Toggle Edit Drawer
+        window.coraToggleEditWorkspaceDrawer = function(open, wsId, wsName, wsSlug, wsPlan, wsOwnerEmail, wsStatus) {
+            const drawer = document.getElementById('cora-edit-workspace-drawer');
+            const backdrop = document.getElementById('cora-drawer-backdrop');
+            if (!drawer) return;
+            if (open) {
+                document.getElementById('cora-edit-ws-id').value = wsId || 0;
+                document.getElementById('cora-edit-ws-name').value = wsName || '';
+                document.getElementById('cora-edit-ws-slug').value = wsSlug || '';
+                document.getElementById('cora-edit-ws-plan').value = wsPlan || 'enterprise';
+                document.getElementById('cora-edit-ws-owner-email').value = wsOwnerEmail || 'shruti@heycora.in';
+                document.getElementById('cora-edit-ws-status').value = wsStatus || 'active';
+                
+                // Reset danger zone state
+                window.coraCancelDeleteWorkspace();
+
+                drawer.classList.remove('collapsed');
+                if (backdrop) {
+                    backdrop.classList.remove('hidden');
+                    backdrop.style.display = 'block';
+                    backdrop.style.pointerEvents = 'auto';
+                }
+                document.getElementById('cora-workspace-popover').classList.add('hidden');
+            } else {
+                drawer.classList.add('collapsed');
+                if (backdrop) {
+                    backdrop.classList.add('hidden');
+                    backdrop.style.display = 'none';
+                    backdrop.style.pointerEvents = 'none';
+                }
+            }
+        };
+
+        // Close all drawers
+        window.coraCloseAllDrawers = function() {
+            window.coraToggleCreateWorkspaceDrawer(false);
+            window.coraToggleEditWorkspaceDrawer(false);
+            if (window.coraCloseUpdateDrawer) {
+                window.coraCloseUpdateDrawer();
+            }
+        };
+
+        // Create Workspace Submit
+        window.coraSubmitCreateWorkspace = function() {
+            const name = document.getElementById('cora-create-ws-name').value;
+            const slug = document.getElementById('cora-create-ws-slug').value;
+            const plan = document.getElementById('cora-create-ws-plan').value;
+            const ownerEmail = document.getElementById('cora-create-ws-owner-email').value;
+            const btn = document.getElementById('cora-create-ws-btn');
+
+            if (!name || !slug) {
+                if (window.coraShowToast) window.coraShowToast('error', 'Workspace name and slug are required.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Creating...';
+
+            $.post(coraREData.ajaxUrl, {
+                action: 'cora_super_create_workspace',
+                security: coraREData.ajaxNonce,
+                name: name,
+                slug: slug,
+                plan: plan,
+                owner_email: ownerEmail
+            }, function(res) {
+                btn.disabled = false;
+                btn.textContent = 'Create Workspace';
+                if (res.success) {
+                    if (window.coraShowToast) window.coraShowToast('success', res.data.message || 'Workspace created successfully!');
+                    window.coraToggleCreateWorkspaceDrawer(false);
+                    setTimeout(() => { window.location.reload(); }, 1200);
+                } else {
+                    if (window.coraShowToast) window.coraShowToast('error', res.data.message || res.data || 'Failed to create workspace.');
+                }
+            });
+        };
+
+        // Update Workspace Submit
+        window.coraSubmitUpdateWorkspace = function() {
+            const wsId = document.getElementById('cora-edit-ws-id').value;
+            const name = document.getElementById('cora-edit-ws-name').value;
+            const slug = document.getElementById('cora-edit-ws-slug').value;
+            const plan = document.getElementById('cora-edit-ws-plan').value;
+            const ownerEmail = document.getElementById('cora-edit-ws-owner-email').value;
+            const status = document.getElementById('cora-edit-ws-status').value;
+            const btn = document.getElementById('cora-edit-ws-btn');
+
+            if (!name || !slug) {
+                if (window.coraShowToast) window.coraShowToast('error', 'Workspace name and slug are required.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            $.post(coraREData.ajaxUrl, {
+                action: 'cora_super_update_workspace',
+                security: coraREData.ajaxNonce,
+                workspace_id: wsId,
+                name: name,
+                slug: slug,
+                plan: plan,
+                owner_email: ownerEmail,
+                status: status
+            }, function(res) {
+                btn.disabled = false;
+                btn.textContent = 'Save Changes';
+                if (res.success) {
+                    if (window.coraShowToast) window.coraShowToast('success', res.data.message || 'Workspace updated successfully.');
+                    window.coraToggleEditWorkspaceDrawer(false);
+                    setTimeout(() => { window.location.reload(); }, 1200);
+                } else {
+                    if (window.coraShowToast) window.coraShowToast('error', res.data.message || res.data || 'Failed to update workspace.');
+                }
+            });
+        };
+
+        // Delete Workspace Confirm handlers
+        window.coraConfirmDeleteWorkspace = function() {
+            document.getElementById('cora-delete-actions-trigger').classList.add('hidden');
+            document.getElementById('cora-delete-actions-confirm').classList.remove('hidden');
+        };
+
+        window.coraCancelDeleteWorkspace = function() {
+            document.getElementById('cora-delete-actions-trigger').classList.remove('hidden');
+            document.getElementById('cora-delete-actions-confirm').classList.add('hidden');
+        };
+
+        window.coraExecuteDeleteWorkspace = function() {
+            const wsId = document.getElementById('cora-edit-ws-id').value;
+            if (wsId == 0 || wsId == 1) {
+                if (window.coraShowToast) window.coraShowToast('error', 'This workspace is protected and cannot be deleted.');
+                return;
+            }
+
+            $.post(coraREData.ajaxUrl, {
+                action: 'cora_super_delete_workspace',
+                security: coraREData.ajaxNonce,
+                workspace_id: wsId
+            }, function(res) {
+                if (res.success) {
+                    if (window.coraShowToast) window.coraShowToast('success', res.data.message || 'Workspace deleted successfully!');
+                    window.coraToggleEditWorkspaceDrawer(false);
+                    setTimeout(() => { window.location.reload(); }, 1200);
+                } else {
+                    if (window.coraShowToast) window.coraShowToast('error', res.data.message || 'Failed to delete workspace.');
+                }
+            });
+        };
+    });
+})(jQuery);
+</script>
 
 <!-- Global Drawer Backdrop -->
 <div id="cora-drawer-backdrop" onclick="window.coraCloseAllDrawers()" class="hidden fixed inset-0 bg-black/30 dark:bg-black/60 z-[9990] backdrop-blur-[1.5px] transition-opacity duration-200 cursor-pointer"></div>

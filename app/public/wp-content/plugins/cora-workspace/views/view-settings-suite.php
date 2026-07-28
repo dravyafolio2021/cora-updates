@@ -833,7 +833,11 @@ $cora_settings_tabs = array(
                         <?php $logo_url = get_option('cora_brand_logo_url', ''); ?>
                         <div id="cora-suite-logo-preview" class="w-full h-full flex items-center justify-center overflow-hidden">
                             <?php if ( ! empty( $logo_url ) ) : ?>
-                                <img src="<?php echo esc_url( $logo_url ); ?>" class="max-h-full max-w-full object-contain transition-transform group-hover:scale-105" alt="Logo Preview">
+                                <img src="<?php echo esc_url( $logo_url ); ?>" class="max-h-full max-w-full object-contain transition-transform group-hover:scale-105" alt="Logo Preview" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                                <div class="hidden text-center space-y-1">
+                                    <svg class="mx-auto h-5 w-5 text-zinc-400 group-hover:text-zinc-650 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                    <span class="block text-[9px] text-zinc-400 font-bold uppercase tracking-wider">Upload Logo</span>
+                                </div>
                             <?php else : ?>
                                 <div class="text-center space-y-1">
                                     <svg class="mx-auto h-5 w-5 text-zinc-400 group-hover:text-zinc-650 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>

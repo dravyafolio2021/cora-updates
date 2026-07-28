@@ -890,8 +890,8 @@ jQuery(document).ready(function($) {
         coraToggleSidebar(isCollapsed);
     });
 
-    // Search bar opens the command palette modal
-    $('.cora-sidebar-search').on('click', function(e) {
+    // Search bar opens the command palette modal (excluding sidebar search input container)
+    $('.cora-sidebar-search').not('.cora-sidebar .cora-sidebar-search').on('click', function(e) {
         if ($(e.target).is('input')) {
             return;
         }
@@ -899,6 +899,11 @@ jQuery(document).ready(function($) {
         if (typeof window.coraOpenCommandPalette === 'function') {
             window.coraOpenCommandPalette();
         }
+    });
+
+    // Focus the input when clicking the sidebar search container
+    $('.cora-sidebar .cora-sidebar-search').on('click', function(e) {
+        $('#cora-sidebar-search-input').focus();
     });
 
     // Send chat messages from input box
@@ -1053,7 +1058,9 @@ jQuery(document).ready(function($) {
         // 1. Search Box shortcut: Cmd + K or Ctrl + K
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
             e.preventDefault();
-            $('.cora-sidebar-search').trigger('click');
+            if (typeof window.coraOpenCommandPalette === 'function') {
+                window.coraOpenCommandPalette();
+            }
         }
 
         // 2. Sidebar Toggle shortcut: Cmd + \ or Ctrl + \
@@ -9604,6 +9611,7 @@ jQuery(document).ready(function($) {
             const logoImg = $('#cora-sidebar-logo-img');
             if (logoImg.length) {
                 logoImg.attr('src', logoUrl).removeClass('hidden').show();
+                logoImg.next().addClass('hidden');
             }
         }
 
@@ -9613,6 +9621,11 @@ jQuery(document).ready(function($) {
     };
 
     $(document).on('input', 'input[name="blogname"], input[name="cora_brand_favicon_url"], input[name="cora_brand_logo_url"], input[name="cora_sidebar_title"]', function() {
+        const name = $(this).attr('name');
+        if (name === 'blogname' || name === 'cora_sidebar_title') {
+            const val = $(this).val();
+            $('input[name="' + name + '"]').not(this).val(val);
+        }
         if(window.coraApplyBrandingLive) window.coraApplyBrandingLive();
     });
 

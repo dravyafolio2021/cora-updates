@@ -453,6 +453,15 @@ add_filter( 'pre_option_update_core', '__return_null' );
  */
 function cora_get_workspace_by_slug( $slug ) {
     if ( empty( $slug ) ) return null;
+    if ( strtolower( $slug ) === 'super' ) {
+        return array(
+            'id'     => 'super',
+            'name'   => 'Platform Control Center',
+            'slug'   => 'super',
+            'plan'   => 'enterprise',
+            'status' => 'active'
+        );
+    }
     global $wpdb;
     $table_name = $wpdb->prefix . 'cora_agencies';
     
@@ -1484,7 +1493,7 @@ function cora_get_all_roles() {
     $roles = array(
         'administrator'       => 'Super Admin',
         'cora_shruti'         => 'Owner (Shruti)',
-        'cora_super_admin'    => 'Workspace Super Admin',
+        'cora_super_admin'    => 'Workspace Owner',
         'cora_branch_manager' => 'Branch Manager',
         'cora_viewer'         => 'Viewer'
     );
@@ -1523,7 +1532,7 @@ function cora_real_estate_ai_register_roles() {
     }
 
     add_role( 'cora_shruti', 'Owner (Shruti)', array( 'read' => true ) );
-    add_role( 'cora_super_admin', 'Workspace Super Admin', array( 'read' => true ) );
+    add_role( 'cora_super_admin', 'Workspace Owner', array( 'read' => true ) );
     add_role( 'cora_manager', 'Manager', array( 'read' => true ) );
     add_role( 'cora_branch_manager', 'Branch Manager', array( 'read' => true ) );
     add_role( 'cora_photographer', 'Photographer', array( 'read' => true ) );
@@ -3099,6 +3108,124 @@ function cora_rest_schedule_task( $request ) {
 }
 
 /**
+ * Calculate search similarity score based on synonyms, partial match, and levenshtein distance.
+ */
+function cora_search_similarity_score( $query, $title, $description, $tags = array() ) {
+    $query = strtolower( trim( $query ) );
+    if ( empty( $query ) ) {
+        return 100;
+    }
+
+    $title = strtolower( $title );
+    $description = strtolower( $description );
+
+    $normalized_tags = array();
+    foreach ( $tags as $tag ) {
+        $normalized_tags[] = strtolower( $tag );
+    }
+
+    $synonyms = array(
+        'image'      => array( 'image', 'photo', 'picture', 'logo', 'favicon', 'media', 'gallery', 'avatar', 'upload', 'file', 'png', 'jpg', 'jpeg', 'svg' ),
+        'photo'      => array( 'image', 'photo', 'picture', 'logo', 'favicon', 'media', 'gallery', 'avatar', 'upload', 'file', 'png', 'jpg', 'jpeg', 'svg' ),
+        'picture'    => array( 'image', 'photo', 'picture', 'logo', 'favicon', 'media', 'gallery', 'avatar', 'upload', 'file', 'png', 'jpg', 'jpeg', 'svg' ),
+        'logo'       => array( 'logo', 'branding', 'branding & api keys', 'favicon', 'image' ),
+        'favicon'    => array( 'favicon', 'branding', 'logo', 'image', 'monogram' ),
+        'upload'     => array( 'upload', 'media', 'vault', 'image', 'file', 'attachment' ),
+        'file'       => array( 'file', 'document', 'pdf', 'invoice', 'proposal', 'contract', 'estimate', 'upload' ),
+        'document'   => array( 'document', 'file', 'pdf', 'invoice', 'proposal', 'contract', 'estimate', 'vault' ),
+        'invoice'    => array( 'invoice', 'billing', 'payment', 'ledger', 'gst', 'gstin', 'tax', 'receipt', 'financials' ),
+        'billing'    => array( 'billing', 'invoice', 'payment', 'ledger', 'gst', 'gstin', 'tax', 'receipt', 'financials' ),
+        'payment'    => array( 'payment', 'invoice', 'billing', 'ledger', 'receipt', 'financials', 'payout' ),
+        'money'      => array( 'money', 'ledger', 'financials', 'payout', 'expense', 'profit', 'revenue' ),
+        'gst'        => array( 'gst', 'gstin', 'tax', 'invoice', 'billing', 'estimate', 'financials' ),
+        'tax'        => array( 'tax', 'gst', 'gstin', 'invoice', 'billing', 'estimate', 'financials' ),
+        'crew'       => array( 'crew', 'shift', 'scheduler', 'calendar', 'roster', 'employee', 'payout' ),
+        'shift'      => array( 'shift', 'crew', 'scheduler', 'calendar', 'roster' ),
+        'scheduler'  => array( 'scheduler', 'crew', 'shift', 'calendar', 'roster', 'itinerary', 'conflict' ),
+        'calendar'   => array( 'calendar', 'shift', 'crew', 'scheduler', 'roster', 'bookings', 'showings' ),
+        'booking'    => array( 'booking', 'bookings', 'showings', 'shoot', 'photoshoot', 'site showing', 'calendar' ),
+        'shoot'      => array( 'shoot', 'photoshoot', 'booking', 'bookings', 'showings', 'calendar' ),
+        'git'        => array( 'git', 'github', 'sync', 'branch', 'repository' ),
+        'github'     => array( 'git', 'github', 'sync', 'branch', 'repository' ),
+        'sync'       => array( 'sync', 'git', 'github', 'branch', 'repository' ),
+        'database'   => array( 'database', 'sql', 'snapshot', 'snap', 'backup', 'drive' ),
+        'backup'     => array( 'backup', 'database', 'sql', 'snapshot', 'drive', 'google drive' ),
+        'review'     => array( 'review', 'rating', 'feedback', 'google', 'stars', 'whatsapp', 'acquisition' ),
+        'whatsapp'   => array( 'whatsapp', 'review', 'payout', 'notification', 'credentials' ),
+        'user'       => array( 'user', 'member', 'roster', 'permission', 'role', 'access', 'employee' ),
+        'role'       => array( 'role', 'user', 'member', 'roster', 'permission', 'access' ),
+        'permission' => array( 'permission', 'role', 'user', 'member', 'roster', 'access' )
+    );
+
+    $query_tokens = preg_split( '/[\s,\-\.\/_]+/', $query );
+    $query_tokens = array_filter( array_map( 'trim', $query_tokens ) );
+    
+    $expanded_tokens = $query_tokens;
+    foreach ( $query_tokens as $token ) {
+        if ( isset( $synonyms[ $token ] ) ) {
+            $expanded_tokens = array_merge( $expanded_tokens, $synonyms[ $token ] );
+        }
+        foreach ( $synonyms as $key => $syns ) {
+            if ( levenshtein( $token, $key ) <= 1 ) {
+                $expanded_tokens = array_merge( $expanded_tokens, $syns );
+            }
+        }
+    }
+    $expanded_tokens = array_unique( $expanded_tokens );
+
+    $title_tokens = preg_split( '/[\s,\-\.\/_]+/', $title );
+    $title_tokens = array_filter( array_map( 'trim', $title_tokens ) );
+
+    $desc_tokens = preg_split( '/[\s,\-\.\/_]+/', $description );
+    $desc_tokens = array_filter( array_map( 'trim', $desc_tokens ) );
+
+    $score = 0;
+    
+    if ( false !== strpos( $title, $query ) ) {
+        $score += 55;
+    }
+    if ( false !== strpos( $description, $query ) ) {
+        $score += 35;
+    }
+
+    foreach ( $expanded_tokens as $q_tok ) {
+        if ( empty( $q_tok ) ) {
+            continue;
+        }
+
+        foreach ( $title_tokens as $t_tok ) {
+            if ( $q_tok === $t_tok ) {
+                $score += 25;
+            } elseif ( false !== strpos( $t_tok, $q_tok ) ) {
+                $score += 15;
+            } elseif ( levenshtein( $q_tok, $t_tok ) <= 1 ) {
+                $score += 10;
+            }
+        }
+
+        foreach ( $desc_tokens as $d_tok ) {
+            if ( $q_tok === $d_tok ) {
+                $score += 12;
+            } elseif ( false !== strpos( $d_tok, $q_tok ) ) {
+                $score += 8;
+            } elseif ( levenshtein( $q_tok, $d_tok ) <= 1 ) {
+                $score += 5;
+            }
+        }
+
+        foreach ( $normalized_tags as $tag ) {
+            if ( $q_tok === $tag ) {
+                $score += 20;
+            } elseif ( false !== strpos( $tag, $q_tok ) ) {
+                $score += 10;
+            }
+        }
+    }
+
+    return $score;
+}
+
+/**
  * Callback: AJAX handler for Advanced Command Search requests
  */
 function cora_ajax_advanced_search() {
@@ -3118,301 +3245,376 @@ function cora_ajax_advanced_search() {
 
     $results = array();
 
-    // 1. Settings Search
-    if ( $filter === 'all' || $filter === 'settings' ) {
-        $settings_items = array(
-            array(
-                'title' => 'General Settings',
-                'category' => 'Settings',
-                'description' => 'Workspace details, identity, log retention, and tours configurations.',
-                'url' => home_url( '/workspace/settings-suite?settings_tab=general' ),
-                'icon' => 'settings'
-            ),
-            array(
-                'title' => 'Language Settings',
-                'category' => 'Settings',
-                'description' => 'Configure platform display language (English, Hindi, Bengali, Telugu, Marathi, Tamil, etc.).',
-                'url' => home_url( '/workspace/settings-suite?settings_tab=general' ),
-                'icon' => 'globe'
-            ),
-            array(
-                'title' => 'Backup & Recovery',
-                'category' => 'Settings',
-                'description' => 'Create manual SQL database snapshots and configure automated Google Drive backups.',
-                'url' => home_url( '/workspace/settings-suite?settings_tab=backup' ),
-                'icon' => 'server'
-            ),
-            array(
-                'title' => 'Password Policy',
-                'category' => 'Settings',
-                'description' => 'Configure and enforce minimum length, digits, and uppercase symbols.',
-                'url' => home_url( '/workspace/settings-suite?settings_tab=pwd-policy' ),
-                'icon' => 'lock'
-            ),
-            array(
-                'title' => 'Branch Management',
-                'category' => 'Settings',
-                'description' => 'Manage physical brokerage offices, cities, and address list.',
-                'url' => home_url( '/workspace/settings-suite?settings_tab=branches' ),
-                'icon' => 'map-pin'
-            ),
-            array(
-                'title' => 'Branding & API Keys',
-                'category' => 'Settings',
-                'description' => 'Set logo, favicon, Google Maps integration, and WhatsApp cloud credentials.',
-                'url' => home_url( '/workspace/settings-suite?settings_tab=brand' ),
-                'icon' => 'image'
-            ),
-            array(
-                'title' => 'Model Context Protocol (MCP)',
-                'category' => 'Settings',
-                'description' => 'Access and configure Model Context Protocol (MCP) server endpoints.',
-                'url' => home_url( '/workspace/mcp' ),
-                'icon' => 'cpu'
-            ),
-            array(
-                'title' => 'Reading & SEO Indexing',
-                'category' => 'Settings',
-                'description' => 'Setup home landing pages and control search engine crawlers.',
-                'url' => home_url( '/workspace/settings-suite?settings_tab=reading' ),
-                'icon' => 'book-open'
-            ),
-            array(
-                'title' => 'SEO Permalinks',
-                'category' => 'Settings',
-                'description' => 'Set standard clean and SEO-friendly slug url formats.',
-                'url' => home_url( '/workspace/settings-suite?settings_tab=permalinks' ),
-                'icon' => 'link'
-            ),
-            array(
-                'title' => 'Privacy Policy Page',
-                'category' => 'Settings',
-                'description' => 'Configure legal compliance page.',
-                'url' => home_url( '/workspace/settings-suite?settings_tab=privacy' ),
-                'icon' => 'file-text'
-            ),
-            array(
-                'title' => 'Audit logs panel',
-                'category' => 'Security',
-                'description' => 'View system log feed and download transaction records.',
-                'url' => home_url( '/workspace/settings-suite?settings_tab=audit' ),
-                'icon' => 'activity'
-            ),
-            // Enterprise Modules & Features Indexing
-            array(
-                'title' => 'File Manager',
-                'category' => 'Feature Studio',
-                'description' => '5-step visual wizard for proposals, tax invoices, GST estimates, A4 PDF print engine.',
-                'url' => home_url( '/workspace/vault?vtab=editor' ),
-                'icon' => 'file-text'
-            ),
-            array(
-                'title' => 'Smart Review Acquisition Engine',
-                'category' => 'Growth & Marketing',
-                'description' => 'Automated 5-star Google Business review collector, AI snippet drafter, and private reputation shield.',
-                'url' => home_url( '/workspace/review_acquisition' ),
-                'icon' => 'globe'
-            ),
-            array(
-                'title' => 'Operations Scheduler Center',
-                'category' => 'Operations & Logistics',
-                'description' => 'Unified scheduling engine for multi-day itineraries, crew shift rosters, WhatsApp notifications, and conflict prevention.',
-                'url' => home_url( '/workspace/crew_scheduler' ),
-                'icon' => 'calendar'
-            ),
-            array(
-                'title' => 'Photo Shoots & Site Showings',
-                'category' => 'Operations',
-                'description' => 'Manage shoot calendar, property site showings, client schedules, and booking statuses.',
-                'url' => home_url( '/workspace/bookings' ),
-                'icon' => 'layout'
-            ),
-            array(
-                'title' => 'Financial Overview & Payouts',
-                'category' => 'Finance',
-                'description' => 'Track revenue, tax invoices, crew labor payouts, expenses, and net profit ledger.',
-                'url' => home_url( '/workspace/financials' ),
-                'icon' => 'activity'
-            )
-        );
+    // 1. Settings & Core Pages Definitions
+    $settings_items = array(
+        array(
+            'title' => 'General Settings',
+            'category' => 'Settings',
+            'description' => 'Workspace details, identity, log retention, and tours configurations.',
+            'url' => home_url( '/workspace/settings-suite?settings_tab=general' ),
+            'icon' => 'settings',
+            'tags' => array( 'site title', 'tagline', 'identity', 'general', 'timezone' )
+        ),
+        array(
+            'title' => 'Language Settings',
+            'category' => 'Settings',
+            'description' => 'Configure platform display language (English, Hindi, Bengali, Telugu, Marathi, Tamil, etc.).',
+            'url' => home_url( '/workspace/settings-suite?settings_tab=general' ),
+            'icon' => 'globe',
+            'tags' => array( 'language', 'translate', 'locale', 'hindi', 'english' )
+        ),
+        array(
+            'title' => 'Backup & Recovery',
+            'category' => 'Settings',
+            'description' => 'Create manual SQL database snapshots and configure automated Google Drive backups.',
+            'url' => home_url( '/workspace/settings-suite?settings_tab=backup' ),
+            'icon' => 'server',
+            'tags' => array( 'backup', 'recovery', 'database', 'google drive', 'sql', 'restore' )
+        ),
+        array(
+            'title' => 'Password Policy',
+            'category' => 'Settings',
+            'description' => 'Configure and enforce minimum length, digits, and uppercase symbols.',
+            'url' => home_url( '/workspace/settings-suite?settings_tab=pwd-policy' ),
+            'icon' => 'lock',
+            'tags' => array( 'password', 'security', 'digits', 'uppercase', 'policy' )
+        ),
+        array(
+            'title' => 'Branch Management',
+            'category' => 'Settings',
+            'description' => 'Manage physical brokerage offices, cities, and address list.',
+            'url' => home_url( '/workspace/settings-suite?settings_tab=branches' ),
+            'icon' => 'map-pin',
+            'tags' => array( 'branch', 'office', 'city', 'address', 'brokerage' )
+        ),
+        array(
+            'title' => 'Branding & API Keys',
+            'category' => 'Settings',
+            'description' => 'Set logo, favicon, Google Maps integration, and WhatsApp cloud credentials.',
+            'url' => home_url( '/workspace/settings-suite?settings_tab=brand' ),
+            'icon' => 'image',
+            'tags' => array( 'logo', 'favicon', 'brand', 'api', 'whatsapp', 'google maps' )
+        ),
+        array(
+            'title' => 'Model Context Protocol (MCP)',
+            'category' => 'Settings',
+            'description' => 'Access and configure Model Context Protocol (MCP) server endpoints.',
+            'url' => home_url( '/workspace/mcp' ),
+            'icon' => 'cpu',
+            'tags' => array( 'mcp', 'context', 'server', 'protocol', 'ai' )
+        ),
+        array(
+            'title' => 'Reading & SEO Indexing',
+            'category' => 'Settings',
+            'description' => 'Setup home landing pages and control search engine crawlers.',
+            'url' => home_url( '/workspace/settings-suite?settings_tab=reading' ),
+            'icon' => 'book-open',
+            'tags' => array( 'seo', 'reading', 'homepage', 'crawler', 'robot' )
+        ),
+        array(
+            'title' => 'SEO Permalinks',
+            'category' => 'Settings',
+            'description' => 'Set standard clean and SEO-friendly slug url formats.',
+            'url' => home_url( '/workspace/settings-suite?settings_tab=permalinks' ),
+            'icon' => 'link',
+            'tags' => array( 'permalink', 'slug', 'seo', 'url' )
+        ),
+        array(
+            'title' => 'Privacy Policy Page',
+            'category' => 'Settings',
+            'description' => 'Configure legal compliance page.',
+            'url' => home_url( '/workspace/settings-suite?settings_tab=privacy' ),
+            'icon' => 'file-text',
+            'tags' => array( 'privacy', 'legal', 'compliance', 'terms' )
+        ),
+        array(
+            'title' => 'Audit logs panel',
+            'category' => 'Security',
+            'description' => 'View system log feed and download transaction records.',
+            'url' => home_url( '/workspace/settings-suite?settings_tab=audit' ),
+            'icon' => 'activity',
+            'tags' => array( 'audit', 'logs', 'security', 'activity', 'transactions' )
+        ),
+        array(
+            'title' => 'File Manager & Vault',
+            'category' => 'Feature Studio',
+            'description' => '5-step visual wizard for proposals, tax invoices, GST estimates, A4 PDF print engine.',
+            'url' => home_url( '/workspace/vault?vtab=editor' ),
+            'icon' => 'file-text',
+            'tags' => array( 'invoice', 'proposal', 'estimate', 'pdf', 'gst', 'vault', 'document' )
+        ),
+        array(
+            'title' => 'Smart Review Acquisition Engine',
+            'category' => 'Growth & Marketing',
+            'description' => 'Automated 5-star Google Business review collector, AI snippet drafter, and private reputation shield.',
+            'url' => home_url( '/workspace/review_acquisition' ),
+            'icon' => 'globe',
+            'tags' => array( 'review', 'reputation', 'google business', 'stars', 'whatsapp' )
+        ),
+        array(
+            'title' => 'Operations Scheduler Center',
+            'category' => 'Operations & Logistics',
+            'description' => 'Unified scheduling engine for multi-day itineraries, crew shift rosters, WhatsApp notifications, and conflict prevention.',
+            'url' => home_url( '/workspace/crew_scheduler' ),
+            'icon' => 'calendar',
+            'tags' => array( 'scheduler', 'crew', 'shift', 'roster', 'conflict' )
+        ),
+        array(
+            'title' => 'Photo Shoots & Site Showings',
+            'category' => 'Operations',
+            'description' => 'Manage shoot calendar, property site showings, client schedules, and booking statuses.',
+            'url' => home_url( '/workspace/bookings' ),
+            'icon' => 'layout',
+            'tags' => array( 'shoot', 'booking', 'showing', 'photoshoot', 'schedule' )
+        ),
+        array(
+            'title' => 'Financial Overview & Payouts',
+            'category' => 'Finance',
+            'description' => 'Track revenue, tax invoices, crew labor payouts, expenses, and net profit ledger.',
+            'url' => home_url( '/workspace/financials' ),
+            'icon' => 'activity',
+            'tags' => array( 'financials', 'payout', 'expense', 'profit', 'ledger', 'revenue' )
+        )
+    );
 
+    // Filter 1: Settings
+    if ( $filter === 'all' || $filter === 'settings' ) {
         foreach ( $settings_items as $item ) {
-            if ( empty( $query ) || stripos( $item['title'], $query ) !== false || stripos( $item['description'], $query ) !== false ) {
+            $score = cora_search_similarity_score( $query, $item['title'], $item['description'], $item['tags'] );
+            if ( $score > 0 || empty( $query ) ) {
+                $item['score'] = $score;
                 $results[] = $item;
             }
         }
     }
 
-    // 2. Leads Search (CRM)
+    // Filter 2: Leads (CRM)
     if ( $filter === 'all' || $filter === 'leads' ) {
-        if ( ! empty( $query ) ) {
-            $leads = $wpdb->get_results( $wpdb->prepare(
-                "SELECT * FROM {$wpdb->prefix}cora_leads WHERE name LIKE %s OR email LIKE %s OR phone LIKE %s ORDER BY id DESC LIMIT 5",
-                '%' . $wpdb->esc_like( $query ) . '%',
-                '%' . $wpdb->esc_like( $query ) . '%',
-                '%' . $wpdb->esc_like( $query ) . '%'
-            ), ARRAY_A );
-        } else {
-            $leads = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_leads ORDER BY id DESC LIMIT 5", ARRAY_A );
+        $leads = get_option( 'cora_workspace_leads', array() );
+        if ( ! is_array( $leads ) ) {
+            $leads = array();
         }
-
-        if ( ! empty( $leads ) ) {
-            foreach ( $leads as $l ) {
+        foreach ( $leads as $l ) {
+            $score = cora_search_similarity_score( $query, $l['name'], ( $l['email'] ?? '' ) . ' ' . ( $l['phone'] ?? '' ) );
+            if ( $score > 0 || empty( $query ) ) {
                 $results[] = array(
                     'title' => $l['name'],
                     'category' => 'Leads',
-                    'description' => 'Client: ' . $l['email'] . ' | Phone: ' . $l['phone'],
+                    'description' => 'Lead Email: ' . ($l['email'] ?? 'N/A') . ' | Phone: ' . ($l['phone'] ?? 'N/A'),
                     'url' => home_url( '/workspace/leads?lead_id=' . $l['id'] ),
-                    'icon' => 'user'
+                    'icon' => 'user',
+                    'score' => $score
                 );
             }
         }
     }
 
-    // 3. Pages Search
+    // Filter 3: Pages (Canvas)
     if ( $filter === 'all' || $filter === 'pages' ) {
-        // Fetch up to 100 canvas pages to perform smart client/server filtering on actions/metadata
         $all_canvas_pages = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages ORDER BY is_homepage DESC, id DESC LIMIT 100", ARRAY_A );
-
         if ( ! empty( $all_canvas_pages ) ) {
-            $page_count = 0;
             foreach ( $all_canvas_pages as $cp ) {
                 $page_title = $cp['title'];
                 $page_slug = $cp['slug'];
                 $page_desc = 'Canvas Page: /' . $page_slug . ' (' . ucfirst($cp['status']) . ')';
-                
-                // 1. Check match for the page itself
-                $page_matches = empty( $query ) || 
-                               stripos( $page_title, $query ) !== false || 
-                               stripos( $page_slug, $query ) !== false;
-                
-                if ( $page_matches && $page_count < 10 ) {
+
+                $score = cora_search_similarity_score( $query, $page_title, $page_desc, array( $page_slug, 'canvas', 'theme' ) );
+                if ( $score > 0 || empty( $query ) ) {
                     $results[] = array(
                         'title'       => $page_title,
                         'category'    => 'Pages',
                         'description' => $page_desc,
                         'url'         => home_url( '/workspace/canvas?edit_page=' . $cp['id'] ),
-                        'icon'        => 'layout'
+                        'icon'        => 'layout',
+                        'score'       => $score
                     );
-                    $page_count++;
-                }
 
-                // 2. Generate and filter Quick Actions for this page
-                $actions = array();
-
-                // Set as homepage
-                if ( intval( $cp['is_homepage'] ) !== 1 ) {
-                    $actions[] = array(
-                        'title'       => 'Set "' . $page_title . '" as theme homepage',
-                        'description' => 'Set this page as the active homepage of your site.',
-                        'action'      => 'homepage',
-                        'extra'       => intval( $cp['is_homepage'] ),
-                        'icon'        => 'home'
-                    );
-                }
-
-                // Rename page
-                $actions[] = array(
-                    'title'       => 'Rename page "' . $page_title . '"',
-                    'description' => 'Change the title/name of this page in Canvas.',
-                    'action'      => 'rename',
-                    'extra'       => null,
-                    'icon'        => 'edit-2'
-                );
-
-                // Change slug
-                $actions[] = array(
-                    'title'       => 'Change slug for "' . $page_title . '"',
-                    'description' => 'Update the URL slug (e.g. /about) of this page.',
-                    'action'      => 'slug',
-                    'extra'       => $page_slug,
-                    'icon'        => 'link'
-                );
-
-                // SEO settings
-                $actions[] = array(
-                    'title'       => 'SEO settings for "' . $page_title . '"',
-                    'description' => 'Edit page meta title, description, and social OG image.',
-                    'action'      => 'seo',
-                    'extra'       => null,
-                    'icon'        => 'globe'
-                );
-
-                // Revision history
-                $actions[] = array(
-                    'title'       => 'Revision history for "' . $page_title . '"',
-                    'description' => 'View and restore previous revisions of this page.',
-                    'action'      => 'revisions',
-                    'extra'       => null,
-                    'icon'        => 'clock'
-                );
-
-                // Duplicate page
-                $actions[] = array(
-                    'title'       => 'Duplicate page "' . $page_title . '"',
-                    'description' => 'Clone this page to create a new draft copy.',
-                    'action'      => 'duplicate',
-                    'extra'       => null,
-                    'icon'        => 'copy'
-                );
-
-                // Delete page
-                $actions[] = array(
-                    'title'       => 'Delete page "' . $page_title . '"',
-                    'description' => 'Delete this page permanently from the database.',
-                    'action'      => 'delete',
-                    'extra'       => null,
-                    'icon'        => 'trash-2'
-                );
-
-                // Filter actions and add matching ones to results
-                foreach ( $actions as $act ) {
-                    $action_matches = empty( $query ) || 
-                                     stripos( $act['title'], $query ) !== false || 
-                                     stripos( $act['description'], $query ) !== false;
-
-                    if ( $action_matches && $page_count < 15 ) {
+                    // Add Quick Actions for pages only if score is high
+                    if ( $score > 15 || empty( $query ) ) {
                         $results[] = array(
-                            'title'       => $act['title'],
+                            'title'       => 'SEO settings for "' . $page_title . '"',
                             'category'    => 'Quick Action',
-                            'description' => $act['description'],
-                            'url'         => 'javascript:window.coraCommandExecutePageAction(' . $cp['id'] . ', ' . json_encode($act['action']) . ', ' . json_encode($page_title) . ', ' . json_encode($act['extra']) . ')',
-                            'icon'        => $act['icon']
+                            'description' => 'Edit page meta title, description, and social OG image.',
+                            'url'         => 'javascript:window.coraCommandExecutePageAction(' . $cp['id'] . ', "seo", ' . json_encode($page_title) . ', null)',
+                            'icon'        => 'globe',
+                            'score'       => $score - 2
                         );
-                        $page_count++;
+                        $results[] = array(
+                            'title'       => 'Rename page "' . $page_title . '"',
+                            'category'    => 'Quick Action',
+                            'description' => 'Change the title/name of this page in Canvas.',
+                            'url'         => 'javascript:window.coraCommandExecutePageAction(' . $cp['id'] . ', "rename", ' . json_encode($page_title) . ', null)',
+                            'icon'        => 'edit-2',
+                            'score'       => $score - 5
+                        );
                     }
                 }
             }
         }
     }
 
-    // 4. Listings Search (Properties)
+    // Filter 4: Listings (Properties)
     if ( $filter === 'all' || $filter === 'listings' ) {
         $post_type = post_type_exists( 'cora_listing' ) ? 'cora_listing' : 'post';
-        $args = array(
-            'post_type'      => $post_type,
-            'posts_per_page' => 5,
-            'post_status'    => 'any'
-        );
-        if ( ! empty( $query ) ) {
-            $args['s'] = $query;
-        }
-
-        $posts_query = new WP_Query( $args );
-        $posts = $posts_query->posts;
-
+        $posts = $wpdb->get_results( $wpdb->prepare(
+            "SELECT ID, post_title, post_status FROM {$wpdb->posts} WHERE post_type = %s AND post_status IN ('publish', 'draft', 'pending', 'private') LIMIT 25",
+            $post_type
+        ) );
         if ( ! empty( $posts ) ) {
             foreach ( $posts as $p ) {
-                $results[] = array(
-                    'title' => $p->post_title,
-                    'category' => 'Listings',
-                    'description' => 'Property Post ID: ' . $p->ID . ' | Status: ' . $p->post_status,
-                    'url' => home_url( '/workspace/properties?property_id=' . $p->ID ),
-                    'icon' => 'home'
-                );
+                $score = cora_search_similarity_score( $query, $p->post_title, 'Status: ' . $p->post_status );
+                if ( $score > 0 || empty( $query ) ) {
+                    $results[] = array(
+                        'title' => $p->post_title,
+                        'category' => 'Listings',
+                        'description' => 'Property Post ID: ' . $p->ID . ' | Status: ' . $p->post_status,
+                        'url' => home_url( '/workspace/properties?property_id=' . $p->ID ),
+                        'icon' => 'listings',
+                        'score' => $score
+                    );
+                }
             }
         }
     }
+
+    // Filter 5: Vault Documents (Proposals, Invoices, Contracts)
+    if ( $filter === 'all' || $filter === 'vault' || $filter === 'documents' ) {
+        $docs = get_option( 'cora_workspace_vault_docs', array() );
+        if ( is_array( $docs ) ) {
+            foreach ( $docs as $d ) {
+                $score = cora_search_similarity_score( $query, $d['title'], ( $d['type'] ?? '' ) . ' ' . ( $d['amount'] ?? '' ) . ' ' . ( $d['status'] ?? '' ) );
+                if ( $score > 0 || empty( $query ) ) {
+                    $results[] = array(
+                        'title' => $d['title'],
+                        'category' => 'Vault Documents',
+                        'description' => ($d['type'] ?? 'Doc') . ' | Total: ' . ($d['amount'] ?? 'N/A') . ' | Status: ' . ($d['status'] ?? 'Draft'),
+                        'url' => home_url( '/workspace/vault?vtab=editor&doc_id=' . $d['id'] ),
+                        'icon' => 'file-text',
+                        'score' => $score
+                    );
+                }
+            }
+        }
+    }
+
+    // Filter 6: Media Library (Images, Uploaded Assets)
+    if ( $filter === 'all' || $filter === 'media' || $filter === 'images' ) {
+        // Query WordPress attachment library
+        $attachments = $wpdb->get_results( "SELECT ID, post_title, guid, post_mime_type FROM {$wpdb->posts} WHERE post_type = 'attachment' LIMIT 20" );
+        if ( ! empty( $attachments ) ) {
+            foreach ( $attachments as $att ) {
+                $score = cora_search_similarity_score( $query, $att->post_title, $att->post_mime_type );
+                if ( $score > 0 || empty( $query ) ) {
+                    $results[] = array(
+                        'title' => $att->post_title,
+                        'category' => 'Media Library',
+                        'description' => 'File Type: ' . $att->post_mime_type . ' | URL: ' . basename($att->guid),
+                        'url' => $att->guid,
+                        'icon' => 'image',
+                        'score' => $score
+                    );
+                }
+            }
+        }
+
+        // Portfolios and inside assets matching
+        $portfolios = get_option( 'cora_workspace_portfolios', array() );
+        if ( is_array( $portfolios ) ) {
+            foreach ( $portfolios as $port ) {
+                $score = cora_search_similarity_score( $query, $port['title'], ($port['client_email'] ?? '') );
+                if ( $score > 0 || empty( $query ) ) {
+                    $results[] = array(
+                        'title' => $port['title'],
+                        'category' => 'Portfolios',
+                        'description' => 'Client: ' . ($port['client_email'] ?? 'N/A') . ' | Template: ' . ($port['template'] ?? 'masonry'),
+                        'url' => home_url( '/workspace/vault?vtab=editor' ),
+                        'icon' => 'image',
+                        'score' => $score
+                    );
+                }
+                if ( ! empty( $port['assets'] ) ) {
+                    foreach ( $port['assets'] as $asset ) {
+                        $asset_score = cora_search_similarity_score( $query, $asset['name'], ($asset['type'] ?? '') );
+                        if ( $asset_score > 0 ) {
+                            $results[] = array(
+                                'title' => $asset['name'],
+                                'category' => 'Portfolio Asset',
+                                'description' => 'In Gallery: ' . $port['title'] . ' | Type: ' . ($asset['type'] ?? 'image'),
+                                'url' => $asset['url'],
+                                'icon' => 'image',
+                                'score' => $asset_score
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Filter 7: Client Tasks (Kanban board tasks)
+    if ( $filter === 'all' || $filter === 'tasks' ) {
+        $tasks = get_option( 'cora_workspace_client_tasks', array() );
+        if ( is_array( $tasks ) ) {
+            foreach ( $tasks as $t ) {
+                $score = cora_search_similarity_score( $query, $t['title'], ($t['notes'] ?? '') . ' ' . ($t['status'] ?? '') );
+                if ( $score > 0 || empty( $query ) ) {
+                    $results[] = array(
+                        'title' => $t['title'],
+                        'category' => 'Client Tasks',
+                        'description' => 'Task Status: ' . strtoupper($t['status'] ?? 'Todo') . ' | Notes: ' . wp_strip_all_tags($t['notes'] ?? 'N/A'),
+                        'url' => home_url( '/workspace/client_tasks' ),
+                        'icon' => 'file-text',
+                        'score' => $score
+                    );
+                }
+            }
+        }
+    }
+
+    // Filter 8: Crew Shifts & Equipment Gear
+    if ( $filter === 'all' || $filter === 'crew' || $filter === 'gear' ) {
+        $shifts = get_option( 'cora_crew_shifts', array() );
+        if ( is_array( $shifts ) ) {
+            foreach ( $shifts as $s ) {
+                $score = cora_search_similarity_score( $query, ($s['title'] ?? 'Shift'), ($s['employee_name'] ?? '') );
+                if ( $score > 0 || empty( $query ) ) {
+                    $results[] = array(
+                        'title' => ($s['title'] ?? 'Shift') . ' - ' . ($s['employee_name'] ?? 'Unassigned'),
+                        'category' => 'Crew Shifts',
+                        'description' => 'Date: ' . ($s['date'] ?? 'N/A') . ' | Duration: ' . ($s['duration'] ?? 'N/A'),
+                        'url' => home_url( '/workspace/crew_scheduler' ),
+                        'icon' => 'calendar',
+                        'score' => $score
+                    );
+                }
+            }
+        }
+
+        $gear = get_option( 'cora_studio_gear', array() );
+        if ( is_array( $gear ) ) {
+            foreach ( $gear as $g ) {
+                $score = cora_search_similarity_score( $query, ($g['name'] ?? ''), ($g['serial'] ?? '') . ' ' . ($g['status'] ?? '') );
+                if ( $score > 0 || empty( $query ) ) {
+                    $results[] = array(
+                        'title' => ($g['name'] ?? 'Studio Gear'),
+                        'category' => 'Studio Gear',
+                        'description' => 'Serial #: ' . ($g['serial'] ?? 'N/A') . ' | Status: ' . ($g['status'] ?? 'Available'),
+                        'url' => home_url( '/workspace/crew_scheduler' ),
+                        'icon' => 'server',
+                        'score' => $score
+                    );
+                }
+            }
+        }
+    }
+
+    // Sort all results by calculated similarity score descending
+    usort( $results, function( $a, $b ) {
+        return ( $b['score'] ?? 0 ) <=> ( $a['score'] ?? 0 );
+    } );
+
+    // Keep top 15 results
+    $results = array_slice( $results, 0, 15 );
 
     wp_send_json_success( array(
         'results' => $results
@@ -13237,6 +13439,15 @@ function cora_get_current_user_agency_id() {
     if ( ! $user_id ) {
         return '';
     }
+    if ( cora_is_real_shruti() ) {
+        $current_ws = cora_get_current_workspace_context();
+        if ( ! empty( $current_ws ) && isset( $current_ws['slug'] ) ) {
+            if ( $current_ws['slug'] === 'super' ) {
+                return 'super';
+            }
+            return $current_ws['slug'];
+        }
+    }
     if ( current_user_can( 'administrator' ) ) {
         $impersonated = get_user_meta( $user_id, 'cora_impersonate_agency_id', true );
         if ( ! empty( $impersonated ) ) {
@@ -15657,6 +15868,50 @@ add_filter( 'pre_update_option_cora_workspace_clients', 'cora_pre_update_tenancy
 add_filter( 'pre_update_option_cora_workspace_vault_docs', 'cora_pre_update_tenancy_data', 10, 3 );
 add_filter( 'pre_update_option_cora_workspace_portfolios', 'cora_pre_update_tenancy_data', 10, 3 );
 add_filter( 'pre_update_option_cora_workspace_listings_inventory', 'cora_pre_update_tenancy_data', 10, 3 );
+
+// ── Workspace Branding Options Isolation ─────────────────────────────────────
+
+function cora_filter_workspace_branding_option( $value, $option_name ) {
+    $current_ws = cora_get_current_workspace_context();
+    if ( ! empty( $current_ws ) && isset( $current_ws['slug'] ) && $current_ws['slug'] !== 'super' ) {
+        $ws_option_name = 'cora_' . $current_ws['slug'] . '_' . $option_name;
+        global $wpdb;
+        $ws_value = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $ws_option_name ) );
+        if ( null !== $ws_value ) {
+            return maybe_unserialize( $ws_value );
+        }
+    }
+    return $value;
+}
+
+function cora_pre_update_workspace_branding_option( $new_value, $old_value, $option_name ) {
+    $current_ws = cora_get_current_workspace_context();
+    if ( ! empty( $current_ws ) && isset( $current_ws['slug'] ) && $current_ws['slug'] !== 'super' ) {
+        $ws_option_name = 'cora_' . $current_ws['slug'] . '_' . $option_name;
+        update_option( $ws_option_name, $new_value );
+    }
+    return $new_value;
+}
+
+$workspace_branding_options = array(
+    'blogname',
+    'blogdescription',
+    'cora_brand_logo_url',
+    'cora_brand_favicon_url',
+    'cora_sidebar_title',
+    'cora_tab_title_format',
+    'cora_workspace_name',
+    'cora_workspace_address',
+    'cora_workspace_tax_details'
+);
+foreach ( $workspace_branding_options as $opt ) {
+    add_filter( 'option_' . $opt, function( $value ) use ( $opt ) {
+        return cora_filter_workspace_branding_option( $value, $opt );
+    } );
+    add_filter( 'pre_update_option_' . $opt, function( $new_value, $old_value ) use ( $opt ) {
+        return cora_pre_update_workspace_branding_option( $new_value, $old_value, $opt );
+    }, 10, 2 );
+}
 
 // ── CUSTOM AUTHENTICATION AJAX HANDLERS ──────────────────────────────────────
 
@@ -22778,6 +23033,39 @@ function cora_is_super_owner( $user = null ) {
 }
 
 /**
+ * Check if the logged-in user is Shruti specifically.
+ */
+function cora_is_real_shruti( $user = null ) {
+    if ( null === $user ) {
+        if ( ! is_user_logged_in() ) {
+            return false;
+        }
+        $user = wp_get_current_user();
+    }
+    if ( ! $user || ! $user->exists() ) {
+        return false;
+    }
+    
+    // Check actual WP user DB roles (not current simulated preview role)
+    $actual_user = new WP_User( $user->ID );
+    if ( in_array( 'cora_shruti', (array) $actual_user->roles, true ) ) {
+        return true;
+    }
+    
+    $shruti_logins = array( 'shruti', 'shrutian' );
+    if ( in_array( strtolower( $user->user_login ), $shruti_logins, true ) ) {
+        return true;
+    }
+    
+    $shruti_emails = array( 'shruti@heycora.in', 'shrutian@heycora.in', 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com' );
+    if ( in_array( strtolower( $user->user_email ), $shruti_emails, true ) || strpos( strtolower( $user->user_email ), 'shruti' ) !== false ) {
+        return true;
+    }
+    
+    return false;
+}
+
+/**
  * AJAX Callback: Get all workspaces.
  */
 function cora_ajax_super_get_workspaces() {
@@ -22917,13 +23205,6 @@ function cora_ajax_super_update_workspace() {
         wp_send_json_error( 'Invalid workspace ID.' );
     }
 
-    $status = isset( $_POST['status'] ) ? sanitize_text_field( $_POST['status'] ) : '';
-    $plan = isset( $_POST['plan'] ) ? sanitize_text_field( $_POST['plan'] ) : '';
-
-    if ( empty( $status ) || empty( $plan ) ) {
-        wp_send_json_error( 'Status and plan are required.' );
-    }
-
     $table_name = $wpdb->prefix . 'cora_agencies';
 
     // Verify workspace exists
@@ -22932,16 +23213,45 @@ function cora_ajax_super_update_workspace() {
         wp_send_json_error( 'Workspace not found.' );
     }
 
+    $name = isset( $_POST['name'] ) ? sanitize_text_field( $_POST['name'] ) : $workspace['name'];
+    $slug = isset( $_POST['slug'] ) ? sanitize_title( $_POST['slug'] ) : $workspace['slug'];
+    $status = isset( $_POST['status'] ) ? sanitize_text_field( $_POST['status'] ) : $workspace['status'];
+    $plan = isset( $_POST['plan'] ) ? sanitize_text_field( $_POST['plan'] ) : $workspace['plan'];
+    $owner_email = isset( $_POST['owner_email'] ) ? sanitize_email( $_POST['owner_email'] ) : '';
+
+    $owner_id = $workspace['owner_user_id'];
+    if ( ! empty( $owner_email ) ) {
+        $owner_user = get_user_by( 'email', $owner_email );
+        if ( $owner_user ) {
+            $owner_id = $owner_user->ID;
+        }
+    }
+
+    if ( empty( $name ) || empty( $slug ) ) {
+        wp_send_json_error( 'Workspace name and slug are required.' );
+    }
+
+    // Verify slug uniqueness if slug changed
+    if ( $slug !== $workspace['slug'] ) {
+        $existing = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table_name} WHERE slug = %s AND id != %d", $slug, $workspace_id ) );
+        if ( $existing ) {
+            wp_send_json_error( 'Workspace slug already exists. Please choose a unique slug.' );
+        }
+    }
+
     // Update table
     $updated = $wpdb->update(
         $table_name,
         array(
+            'name' => $name,
+            'slug' => $slug,
             'status' => $status,
             'plan' => $plan,
+            'owner_user_id' => $owner_id,
             'updated_at' => current_time( 'mysql' )
         ),
         array( 'id' => $workspace_id ),
-        array( '%s', '%s', '%s' ),
+        array( '%s', '%s', '%s', '%s', '%d', '%s' ),
         array( '%d' )
     );
 
@@ -22967,20 +23277,74 @@ function cora_ajax_super_update_workspace() {
     if ( ! isset( $agencies[$key] ) ) {
         $agencies[$key] = array(
             'id' => $key,
-            'name' => $workspace['name'],
-            'subdomain' => $workspace['slug'],
             'created_at' => $workspace['created_at']
         );
     }
 
+    $agencies[$key]['id'] = $workspace_id;
+    $agencies[$key]['name'] = $name;
+    $agencies[$key]['slug'] = $slug;
+    $agencies[$key]['subdomain'] = $slug;
     $agencies[$key]['status'] = $status;
     $agencies[$key]['plan'] = $plan;
+    $agencies[$key]['owner_user_id'] = $owner_id;
 
     update_option( 'cora_agencies', $agencies );
 
     wp_send_json_success( array( 'message' => 'Workspace updated successfully.' ) );
 }
 add_action( 'wp_ajax_cora_super_update_workspace', 'cora_ajax_super_update_workspace' );
+
+/**
+ * AJAX Callback: Delete workspace.
+ */
+function cora_ajax_super_delete_workspace() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! cora_is_super_owner() ) {
+        wp_send_json_error( 'Unauthorized access.' );
+    }
+
+    global $wpdb;
+    $workspace_id = isset( $_POST['workspace_id'] ) ? intval( $_POST['workspace_id'] ) : 0;
+    if ( $workspace_id <= 0 ) {
+        wp_send_json_error( 'Invalid workspace ID.' );
+    }
+
+    $table_name = $wpdb->prefix . 'cora_agencies';
+
+    // Verify workspace exists
+    $workspace = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_name} WHERE id = %d", $workspace_id ), ARRAY_A );
+    if ( ! $workspace ) {
+        wp_send_json_error( 'Workspace not found.' );
+    }
+
+    // Do not delete protected/super admin view
+    if ( $workspace['slug'] === 'super' || $workspace['slug'] === 'default' ) {
+        wp_send_json_error( 'Protected workspace cannot be deleted.' );
+    }
+
+    $deleted = $wpdb->delete( $table_name, array( 'id' => $workspace_id ), array( '%d' ) );
+    if ( $deleted ) {
+        $agencies = get_option( 'cora_agencies', array() );
+        $key = 'agency_' . $workspace_id;
+        if ( ! isset( $agencies[$key] ) ) {
+            foreach ( $agencies as $k => $agency_data ) {
+                if ( isset( $agency_data['id'] ) && ( intval( $agency_data['id'] ) === $workspace_id || $agency_data['id'] === $key ) ) {
+                    $key = $k;
+                    break;
+                }
+            }
+        }
+        if ( isset( $agencies[$key] ) ) {
+            unset( $agencies[$key] );
+            update_option( 'cora_agencies', $agencies );
+        }
+        wp_send_json_success( array( 'message' => 'Workspace deleted successfully!' ) );
+    }
+
+    wp_send_json_error( 'Failed to delete workspace from database.' );
+}
+add_action( 'wp_ajax_cora_super_delete_workspace', 'cora_ajax_super_delete_workspace' );
 
 /**
  * AJAX Callback: Create new workspace.

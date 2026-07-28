@@ -18,6 +18,9 @@ $is_studio_mode = ( strpos( strtolower( $active_industry ), 'photo' ) !== false 
 
 // Build user roles labels dynamically (including custom roles)
 $role_labels = cora_get_all_roles();
+if ( ! cora_is_real_shruti() ) {
+    unset( $role_labels['administrator'], $role_labels['cora_shruti'] );
+}
 
 // Fetch all users in active agency (multi-tenant scope)
 $user_query_args = array();
@@ -1219,8 +1222,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     echo '<option value="cora_branch_manager">Branch Manager</option>';
                 }
                 foreach ( $roles_list as $role_key => $role_label ) {
-                    if ( in_array( $role_key, array( 'administrator', 'cora_manager' ) ) ) {
+                    if ( ! cora_is_real_shruti() && in_array( $role_key, array( 'administrator', 'cora_shruti' ), true ) ) {
                         continue;
+                    }
+                    if ( in_array( $role_key, array( 'administrator', 'cora_manager' ) ) ) {
+                        if ( ! cora_is_real_shruti() ) {
+                            continue;
+                        }
                     }
                     echo '<option value="' . esc_attr( $role_key ) . '">' . esc_html( $role_label ) . '</option>';
                 }
@@ -1285,6 +1293,9 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         <select id="edit-role" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
                             <?php
                             $all_roles_map = cora_get_all_roles();
+                            if ( ! cora_is_real_shruti() ) {
+                                unset( $all_roles_map['administrator'], $all_roles_map['cora_shruti'] );
+                            }
                             foreach ( $all_roles_map as $r_key => $r_label ) {
                                 echo '<option value="' . esc_attr( $r_key ) . '">' . esc_html( $r_label ) . '</option>';
                             }
