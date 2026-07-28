@@ -20,7 +20,27 @@ if (typeof window.coraREData === 'undefined') {
 <?php
 
 $active_tab = isset( $_GET['settings_tab'] ) ? sanitize_text_field( $_GET['settings_tab'] ) : 'general';
-$pages      = get_pages();
+// Only fetch real, human-created published pages — exclude WP auto-generated/system pages
+$pages = get_pages( array(
+    'post_status'    => 'publish',
+    'sort_column'    => 'post_title',
+    'sort_order'     => 'ASC',
+    'exclude_tree'   => array(),
+    'meta_query'     => array(
+        array(
+            'key'     => '_wp_page_template',
+            'compare' => 'EXISTS',
+        ),
+    ),
+) );
+// Filter out WP auto-generated pages (comments, menu, etc.) by name pattern
+$pages = array_filter( $pages, function( $p ) {
+    $skip_patterns = array( ' Comments Page ', ' Menu Page ', ' Front Page ', 'Coming Soon' );
+    foreach ( $skip_patterns as $pattern ) {
+        if ( strpos( $p->post_title, $pattern ) !== false ) return false;
+    }
+    return true;
+} );
 $categories = get_categories();
 $roles      = wp_roles()->get_names();
 
@@ -1094,63 +1114,105 @@ $cora_settings_tabs = array(
 
         <!-- TAB 5: READING & SEO SETTINGS -->
         <div id="cora-settings-panel-reading" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'reading' ? '' : 'hidden'; ?>">
-            <!-- Card 1: Homepage Displays -->
-            <div class="cora-shopify-card space-y-4">
-                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Reading & Search Engine Indexing</h3>
-                    <p class="text-xs text-zinc-500">Control homepage display mode and static page assignments.</p>
+
+            <!-- SEO Health Banner -->
+            <?php $is_indexed = get_option('blog_public', 1); ?>
+            <div class="flex items-center gap-3 px-4 py-3 rounded-xl border <?php echo $is_indexed ? 'bg-emerald-50/50 border-emerald-200 dark:bg-emerald-950/10 dark:border-emerald-900/40' : 'bg-red-50/50 border-red-200 dark:bg-red-950/10 dark:border-red-900/40'; ?>">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 <?php echo $is_indexed ? 'bg-emerald-100 dark:bg-emerald-900/40' : 'bg-red-100 dark:bg-red-900/40'; ?>">
+                    <?php if ( $is_indexed ) : ?>
+                        <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" class="text-emerald-600 dark:text-emerald-400"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    <?php else : ?>
+                        <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" class="text-red-600 dark:text-red-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <?php endif; ?>
                 </div>
-                
-                <div class="space-y-4">
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-bold <?php echo $is_indexed ? 'text-emerald-800 dark:text-emerald-300' : 'text-red-800 dark:text-red-300'; ?>">
+                        <?php echo $is_indexed ? 'Site is publicly visible to search engines' : '⚠ Site is hidden from search engines — this affects lead generation'; ?>
+                    </p>
+                    <p class="text-[11px] text-zinc-500 mt-0.5"><?php echo $is_indexed ? 'Google, Bing, and other crawlers can index your listings and pages.' : 'Robots.txt is blocking crawlers. Change this immediately to restore organic traffic.'; ?></p>
+                </div>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex-shrink-0 <?php echo $is_indexed ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400' : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400'; ?>"><?php echo $is_indexed ? 'Live' : 'Blocked'; ?></span>
+            </div>
+
+            <!-- Card 1: Homepage Routing -->
+            <div class="cora-shopify-card space-y-5">
+                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-start justify-between gap-4">
                     <div>
-                        <label>Homepage Displays</label>
-                        <div class="space-y-2.5 mt-2">
-                            <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-300 font-medium cursor-pointer">
-                                <input type="radio" name="show_on_front" value="posts" <?php checked( get_option('show_on_front'), 'posts' ); ?> class="text-zinc-900 focus:ring-zinc-900">
-                                <span class="cora-label-raw">Your latest blog posts feed</span>
-                            </label>
-                            <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-300 font-medium cursor-pointer">
-                                <input type="radio" name="show_on_front" value="page" <?php checked( get_option('show_on_front'), 'page' ); ?> class="text-zinc-900 focus:ring-zinc-900">
-                                <span class="cora-label-raw">A static landing page</span>
-                            </label>
-                        </div>
+                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Homepage &amp; Blog Routing</h3>
+                        <p class="text-xs text-zinc-500 mt-0.5">Controls which page Google surfaces first when someone searches your agency name.</p>
                     </div>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                        <div>
-                            <label>Static Homepage</label>
-                            <select name="page_on_front">
-                                <option value="0">— Select Page —</option>
-                                <?php foreach ( $pages as $p ) : ?>
-                                    <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( get_option('page_on_front'), $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div>
-                            <label>Posts Page (Blog Archive)</label>
-                            <select name="page_for_posts">
-                                <option value="0">— Select Page —</option>
-                                <?php foreach ( $pages as $p ) : ?>
-                                    <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( get_option('page_for_posts'), $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 flex-shrink-0 mt-0.5">
+                        <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        SEO Critical
+                    </span>
+                </div>
+
+                <!-- Display Mode Toggle -->
+                <div>
+                    <p class="text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-3">What should visitors see at your root URL?</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <label class="flex items-start gap-3 p-3.5 border rounded-lg cursor-pointer transition-all <?php echo get_option('show_on_front') === 'posts' ? 'border-zinc-900 dark:border-zinc-100 bg-zinc-50 dark:bg-zinc-900/60' : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300'; ?>">
+                            <input type="radio" name="show_on_front" value="posts" <?php checked( get_option('show_on_front'), 'posts' ); ?> class="mt-0.5 text-zinc-900 focus:ring-zinc-900">
+                            <div>
+                                <span class="text-xs font-semibold text-zinc-900 dark:text-zinc-100 block">Blog Feed</span>
+                                <span class="text-[11px] text-zinc-500 mt-0.5 block">Latest posts / property news</span>
+                            </div>
+                        </label>
+                        <label class="flex items-start gap-3 p-3.5 border rounded-lg cursor-pointer transition-all <?php echo get_option('show_on_front') === 'page' ? 'border-zinc-900 dark:border-zinc-100 bg-zinc-50 dark:bg-zinc-900/60' : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300'; ?>">
+                            <input type="radio" name="show_on_front" value="page" <?php checked( get_option('show_on_front'), 'page' ); ?> class="mt-0.5 text-zinc-900 focus:ring-zinc-900">
+                            <div>
+                                <span class="text-xs font-semibold text-zinc-900 dark:text-zinc-100 block">Static Landing Page</span>
+                                <span class="text-[11px] text-zinc-500 mt-0.5 block">Dedicated hero/conversion page</span>
+                            </div>
+                        </label>
                     </div>
+                </div>
+
+                <!-- Page Pickers -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 border-t border-zinc-100 dark:border-zinc-800/40">
+                    <div>
+                        <label>Static Homepage
+                            <span class="ml-1 text-[10px] font-normal text-zinc-400">— shown at yourdomain.com</span>
+                        </label>
+                        <select name="page_on_front">
+                            <option value="0">— Select Page —</option>
+                            <?php foreach ( $pages as $p ) : ?>
+                                <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( get_option('page_on_front'), $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Blog / News Archive
+                            <span class="ml-1 text-[10px] font-normal text-zinc-400">— property news & updates</span>
+                        </label>
+                        <select name="page_for_posts">
+                            <option value="0">— Select Page —</option>
+                            <?php foreach ( $pages as $p ) : ?>
+                                <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( get_option('page_for_posts'), $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Growth Tip -->
+                <div class="flex items-start gap-2.5 p-3 bg-zinc-50 dark:bg-zinc-900/40 rounded-lg border border-zinc-100 dark:border-zinc-800">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <p class="text-[11px] text-zinc-500 leading-relaxed"><strong class="text-zinc-700 dark:text-zinc-300">Growth tip:</strong> Set your homepage to a dedicated landing page with a lead capture form and property search. Agencies using a static conversion page typically see 2–3× more inquiry submissions than blog-first layouts.</p>
                 </div>
             </div>
 
-            <!-- Card 2: Crawler Visibility -->
+            <!-- Card 2: Search Engine Visibility -->
             <div class="cora-shopify-card space-y-4">
                 <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
                     <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Search Engine Crawler Visibility</h3>
-                    <p class="text-xs text-zinc-500">Configure robots.txt headers and search engine crawlers visibility permissions.</p>
+                    <p class="text-xs text-zinc-500">Control whether Google and Bing can discover and rank your listings pages.</p>
                 </div>
-                <div class="p-4 border border-red-200 dark:border-red-950/60 bg-red-50/30 dark:bg-red-950/5 rounded-lg">
-                    <label class="flex items-start gap-2.5 text-xs text-zinc-800 dark:text-zinc-300 font-semibold cursor-pointer">
-                        <input type="checkbox" name="blog_public" value="0" <?php checked( get_option('blog_public'), 0 ); ?> class="rounded border-zinc-300 text-red-600 focus:ring-red-650 mt-0.5">
-                        <div class="space-y-0.5">
-                            <span class="text-red-700 dark:text-red-400 font-bold cora-label-raw">Discourage search engines from indexing this site</span>
-                            <p class="text-[11px] text-zinc-550 dark:text-zinc-400 font-normal">Modifies robots.txt and meta tags. Note: It is up to search engines to honor this request.</p>
+                <div class="p-4 border border-red-200 dark:border-red-900/40 bg-red-50/40 dark:bg-red-950/10 rounded-lg">
+                    <label class="flex items-start gap-3 cursor-pointer">
+                        <input type="checkbox" name="blog_public" value="0" <?php checked( get_option('blog_public'), 0 ); ?> class="rounded border-zinc-300 text-red-600 focus:ring-red-500 mt-0.5 flex-shrink-0">
+                        <div>
+                            <span class="text-xs font-bold text-red-700 dark:text-red-400 block">Hide site from search engines (robots.txt noindex)</span>
+                            <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-relaxed">When checked, Google cannot index your pages. <strong class="text-zinc-700 dark:text-zinc-300">Leave unchecked</strong> in production to maintain organic lead flow. Use only during staging or site rebuilds.</p>
                         </div>
                     </label>
                 </div>
