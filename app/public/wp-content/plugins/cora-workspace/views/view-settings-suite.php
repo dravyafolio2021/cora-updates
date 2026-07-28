@@ -215,11 +215,12 @@ $cora_settings_tabs = array(
     border-radius: 8px !important;
     padding: 12px 20px !important;
     box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.03), 0 1px 3px 0 rgba(0, 0, 0, 0.02) !important;
-    z-index: 100 !important;
+    z-index: 30 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
     margin-top: 24px !important;
+    max-width: 48rem !important;
 }
 .dark .cora-shopify-actions-bar {
     background: rgba(24, 24, 27, 0.85) !important; /* zinc-900 */
