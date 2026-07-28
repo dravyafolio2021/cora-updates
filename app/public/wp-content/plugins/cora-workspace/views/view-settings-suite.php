@@ -205,27 +205,24 @@ $cora_settings_tabs = array(
     background-color: #27272a !important; /* zinc-800 */
     color: #f9fafb !important; /* gray-50 */
 }
-/* Shopify-style Actions Bar sticky container */
+/* Shopify-style Actions Bar container */
 .cora-shopify-actions-bar {
-    position: sticky !important;
-    bottom: 16px !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    backdrop-filter: blur(8px) !important;
+    position: relative !important;
+    background: #ffffff !important;
     border: 1px solid #e4e4e7 !important;
     border-radius: 8px !important;
     padding: 12px 20px !important;
-    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.03), 0 1px 3px 0 rgba(0, 0, 0, 0.02) !important;
-    z-index: 30 !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    margin-top: 24px !important;
+    margin-top: 32px !important;
     max-width: 48rem !important;
 }
 .dark .cora-shopify-actions-bar {
-    background: rgba(24, 24, 27, 0.85) !important; /* zinc-900 */
+    background: #18181b !important; /* zinc-900 */
     border-color: #27272a !important; /* zinc-800 */
-    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.2), 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2) !important;
 }
 </style>
 
