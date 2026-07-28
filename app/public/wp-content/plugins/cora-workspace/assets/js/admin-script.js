@@ -9,6 +9,28 @@ if (typeof window.coraREData === 'undefined') {
     Object.assign(window.coraREData, coraREWPData);
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    // Show skeleton on initial load
+    if (typeof window.coraShowSkeleton === 'function') {
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentView = urlParams.get('sub_page') || 'dashboard';
+        // Extract from path if permalinks are used
+        if (!urlParams.has('sub_page')) {
+            const parts = window.location.pathname.split('/').filter(Boolean);
+            if (parts.length > 0) {
+                const possibleView = parts[parts.length - 1];
+                if (['dashboard', 'bookings', 'leads', 'equipment', 'vault', 'financials', 'team-roles', 'settings', 'portfolio', 'gbp'].includes(possibleView)) {
+                    currentView = possibleView;
+                }
+            }
+        }
+        window.coraShowSkeleton(currentView);
+        setTimeout(function() {
+            window.coraHideSkeleton();
+        }, 600);
+    }
+});
+
 if (typeof window.coraData === 'undefined') {
     window.coraData = {
         ajax_url: (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php',
@@ -116,28 +138,57 @@ jQuery(document).ready(function($) {
     };
 
     // 1. Navigation & Tab Switching
+    window.coraShowSkeleton = function(viewType) {
+        var overlay = document.getElementById('cora-skeleton-overlay');
+        var dashSkeleton = document.getElementById('cora-skeleton-dashboard');
+        var listSkeleton = document.getElementById('cora-skeleton-list');
+        if (!overlay) return;
+        
+        // Hide both first
+        if (dashSkeleton) dashSkeleton.classList.add('hidden');
+        if (listSkeleton) listSkeleton.classList.add('hidden');
+        
+        // Show appropriate skeleton
+        if (viewType === 'dashboard' || viewType === 'home' || !viewType) {
+            if (dashSkeleton) dashSkeleton.classList.remove('hidden');
+        } else {
+            if (listSkeleton) listSkeleton.classList.remove('hidden');
+        }
+        
+        overlay.classList.remove('hidden');
+    };
+
+    window.coraHideSkeleton = function() {
+        var overlay = document.getElementById('cora-skeleton-overlay');
+        if (overlay) overlay.classList.add('hidden');
+    };
+
     window.coraNavigateTo = function(targetPageId) {
         if (!targetPageId) return;
 
-        if (window.location.pathname.indexOf('admin.php') !== -1 || window.location.search.indexOf('page=cora-workspace') !== -1) {
-            window.location.href = window.location.origin + window.location.pathname + '?page=cora-workspace&sub_page=' + encodeURIComponent(targetPageId);
-            return;
-        }
+        window.coraShowSkeleton(targetPageId);
+        setTimeout(function() {
+            window.coraHideSkeleton();
+            if (window.location.pathname.indexOf('admin.php') !== -1 || window.location.search.indexOf('page=cora-workspace') !== -1) {
+                window.location.href = window.location.origin + window.location.pathname + '?page=cora-workspace&sub_page=' + encodeURIComponent(targetPageId);
+                return;
+            }
 
-        const activeData = (window.coraREData && window.coraREData.currentRole) ? window.coraREData : (window.coraData || {});
-        let siteUrl = activeData.siteUrl || window.location.origin;
-        if (siteUrl.endsWith('/')) {
-            siteUrl = siteUrl.slice(0, -1);
-        }
-        
-        let activeWsSlug = 'workspace';
-        if (window.coraREData && window.coraREData.activeWorkspace && window.coraREData.activeWorkspace.slug) {
-            activeWsSlug = window.coraREData.activeWorkspace.slug;
-        } else if (window.coraAppData && window.coraAppData.activeWorkspace && window.coraAppData.activeWorkspace.slug) {
-            activeWsSlug = window.coraAppData.activeWorkspace.slug;
-        }
+            const activeData = (window.coraREData && window.coraREData.currentRole) ? window.coraREData : (window.coraData || {});
+            let siteUrl = activeData.siteUrl || window.location.origin;
+            if (siteUrl.endsWith('/')) {
+                siteUrl = siteUrl.slice(0, -1);
+            }
+            
+            let activeWsSlug = 'workspace';
+            if (window.coraREData && window.coraREData.activeWorkspace && window.coraREData.activeWorkspace.slug) {
+                activeWsSlug = window.coraREData.activeWorkspace.slug;
+            } else if (window.coraAppData && window.coraAppData.activeWorkspace && window.coraAppData.activeWorkspace.slug) {
+                activeWsSlug = window.coraAppData.activeWorkspace.slug;
+            }
 
-        window.location.href = siteUrl + '/' + encodeURIComponent(activeWsSlug) + '/' + encodeURIComponent(targetPageId);
+            window.location.href = siteUrl + '/' + encodeURIComponent(activeWsSlug) + '/' + encodeURIComponent(targetPageId);
+        }, 350);
     };
 
     $(document).on('click', '.cora-nav-item, .cora-bottom-nav-item', function(e) {

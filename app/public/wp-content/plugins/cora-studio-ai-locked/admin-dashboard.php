@@ -2203,13 +2203,27 @@ $s2_assignments = isset($cora_shoot_assignments['shoot2']) ? $cora_shoot_assignm
             background-color: #FBFaf7 !important; /* Premium warm cream background */
             background-image: radial-gradient(rgba(120, 115, 105, 0.07) 1px, transparent 1px) !important;
             background-size: 24px 24px !important;
-            padding: 2.5rem 0 !important; /* Bento Grid spans full width horizontally */
-            border-radius: 20px !important;
+            padding: 24px !important;
+            border-radius: 20px 20px 0px 0px !important;
+            border: none !important;
+            box-shadow: none !important;
             transition: background-color 0.3s ease;
+            margin-bottom: 0px !important;
+        }
+        main.cora-main, .cora-main, .cora-content-wrapper {
+            background-color: #ffffff !important;
+        }
+        .cora-content-wrapper {
+            padding-bottom: 0px !important;
         }
         .cora-dark-theme #cora-page-dashboard {
-            background-color: #0c0d0e !important; /* Premium deep charcoal background */
+            background-color: #0e0f10 !important; /* Premium deep charcoal background */
             background-image: radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px) !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        .cora-dark-theme main.cora-main, .cora-dark-theme .cora-main, .cora-dark-theme .cora-content-wrapper {
+            background-color: #0c0c0e !important;
         }
 
         /* Dashboard Sketched Grid Layout */
@@ -2521,6 +2535,7 @@ $s2_assignments = isset($cora_shoot_assignments['shoot2']) ? $cora_shoot_assignm
     $cora_initials = strtoupper(substr($cora_display_name, 0, 1));
     ?>
     <header id="cora-global-topbar" class="cora-topbar sticky top-0 z-50 h-[52px] bg-zinc-950 dark:bg-black text-white flex items-center justify-between px-4 md:px-6 border-b border-zinc-800/80 shrink-0 select-none" style="background-color: #09090b !important;">
+        <div class="hidden lg:flex w-full items-center justify-between">
         <!-- Left Section: Brand, Mobile Menu Toggle & Active Page Breadcrumb -->
         <div class="flex items-center gap-3 min-w-0">
             <button id="cora-mobile-menu-toggle" class="lg:hidden p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-850 transition-colors cursor-pointer select-none" title="Open Menu">
@@ -2652,6 +2667,31 @@ $s2_assignments = isset($cora_shoot_assignments['shoot2']) ? $cora_shoot_assignm
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400 shrink-0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                         Sign out
                     </a>
+                </div>
+            </div>
+        </div>
+        </div>
+        
+        <div class="flex lg:hidden w-full items-center justify-between bg-transparent py-0.5">
+            <div onclick="document.getElementById('cora-mobile-menu-toggle').click();" class="flex items-center cursor-pointer select-none shrink-0 hover:opacity-85 transition-opacity pr-1.5">
+                <span class="tracking-[0.18em] font-black text-[13px] text-white">CORA</span>
+            </div>
+
+            <div onclick="window.coraOpenCommandPalette();" class="flex-1 mx-2 bg-zinc-900/60 border border-zinc-800/80 rounded-xl px-2.5 py-1.5 flex items-center justify-between text-zinc-400 text-xs cursor-pointer">
+                <div class="flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <span class="text-[11px]">Search anything...</span>
+                </div>
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-purple-400"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="window.coraToggleNotificationDrawer(true);" class="relative p-1 text-zinc-400 hover:text-white transition-all cursor-pointer flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-purple-500 rounded-full border border-[#09090b]"></span>
+                </button>
+                <div onclick="window.coraToggleProfilePopover(event);" class="flex items-center cursor-pointer shrink-0">
+                    <div class="bg-white text-black w-7 h-7 rounded-full flex items-center justify-center font-bold text-[11px]"><?php echo esc_html($cora_initials); ?></div>
                 </div>
             </div>
         </div>
