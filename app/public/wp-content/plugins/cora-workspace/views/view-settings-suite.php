@@ -1018,23 +1018,24 @@ $cora_settings_tabs = array(
                 </div>
 
                 <!-- Browser Tab & Sidebar Title Settings -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/40">
-                    <div class="md:col-span-3 space-y-3">
-                        <h4 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Browser Tab & Sidebar Title Settings</h4>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label>Site Title</label>
-                                <input type="text" name="blogname" value="<?php echo esc_attr( get_option('blogname') ); ?>">
-                            </div>
-                            <div>
-                                <label>Sidebar Brand Title</label>
-                                <input type="text" name="cora_sidebar_title" value="<?php echo esc_attr( get_option('cora_sidebar_title', 'cora') ); ?>">
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label>Browser Tab Title Template</label>
-                                <input type="text" disabled value="[Page Name] - <?php echo esc_attr( get_option('blogname') ); ?>" class="bg-zinc-100 dark:bg-zinc-800 text-zinc-500 cursor-not-allowed">
-                                <p class="text-[11px] text-zinc-400 mt-1">This is how your tab titles will appear across the workspace.</p>
-                            </div>
+                <div class="cora-shopify-card space-y-4">
+                    <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Browser Tab &amp; Sidebar Title Settings</h3>
+                        <p class="text-xs text-zinc-500 mt-0.5">Control how your site name appears in the browser tab and sidebar.</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label>Site Title</label>
+                            <input type="text" name="blogname" value="<?php echo esc_attr( get_option('blogname') ); ?>" placeholder="Cora">
+                        </div>
+                        <div>
+                            <label>Sidebar Brand Title</label>
+                            <input type="text" name="cora_sidebar_title" value="<?php echo esc_attr( get_option('cora_sidebar_title', 'cora') ); ?>" placeholder="Cora">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label>Browser Tab Title Template</label>
+                            <input type="text" disabled value="[Page Name] – <?php echo esc_attr( get_option('blogname') ); ?>" class="bg-zinc-100 dark:bg-zinc-800 text-zinc-500 cursor-not-allowed">
+                            <p class="text-[11px] text-zinc-400 mt-1.5">This is how your tab titles will appear across the workspace.</p>
                         </div>
                     </div>
                 </div>
