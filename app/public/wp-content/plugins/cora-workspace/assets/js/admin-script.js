@@ -10089,31 +10089,68 @@ jQuery(document).ready(function($) {
         function openDropdown() {
             $dropdown.show();
             $arrow.css('transform', 'rotate(180deg)');
-            $trigger.css('border-color', '#a1a1aa');
+            $trigger.addClass('border-zinc-400 dark:border-zinc-650');
             $searchInput.val('').trigger('input').focus();
             isOpen = true;
         }
         function closeDropdown() {
             $dropdown.hide();
             $arrow.css('transform', 'rotate(0deg)');
-            $trigger.css('border-color', '#e4e4e7');
+            $trigger.removeClass('border-zinc-400 dark:border-zinc-650');
             isOpen = false;
         }
 
         function setTriggerLabel(text, isPlaceholder) {
-            $displayText.text(text).css('color', isPlaceholder ? '#a1a1aa' : '#18181b');
+            $displayText.text(text);
+            if (isPlaceholder) {
+                $displayText.addClass('text-zinc-400 dark:text-zinc-500').removeClass('text-zinc-800 dark:text-zinc-200');
+            } else {
+                $displayText.removeClass('text-zinc-400 dark:text-zinc-500').addClass('text-zinc-800 dark:text-zinc-200');
+            }
         }
 
         function renderRepoItem(url, owner, repo, isCurrent) {
             var checkSvg = isCurrent
-                ? '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#18181b" stroke-width="2.5" style="flex-shrink:0;margin-left:auto;"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+                ? '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" class="text-zinc-900 dark:text-zinc-100 shrink-0 ml-auto"><polyline points="20 6 9 17 4 12"></polyline></svg>'
                 : '';
-            return '<div class="cora-repo-option-item" data-url="' + url + '" data-name="' + owner + '/' + repo + '" style="display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;font-size:11px;font-family:inherit;">' +
-                '<div style="flex:1;min-width:0;">' +
-                    '<span style="color:#71717a;font-size:10px;">' + owner + '/</span>' +
-                    '<span style="color:#18181b;font-weight:500;">' + repo + '</span>' +
+            return '<div class="cora-repo-option-item hover:bg-zinc-50 dark:hover:bg-zinc-900/60 transition-colors" data-url="' + url + '" data-name="' + owner + '/' + repo + '" data-current="' + isCurrent + '" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:11px;font-family:inherit;border:none !important;border-bottom:none !important;background:transparent;">' +
+                '<div style="flex:1;min-width:0;text-align:left;border:none !important;">' +
+                    '<span class="text-zinc-500 dark:text-zinc-450" style="font-size:10px;border:none !important;background:transparent;">' + owner + '/</span>' +
+                    '<span class="text-zinc-800 dark:text-zinc-200" style="font-weight:500;border:none !important;background:transparent;">' + repo + '</span>' +
                 '</div>' + checkSvg +
             '</div>';
+        }
+
+        function updateFilteredDisplay() {
+            var q = $searchInput.val().toLowerCase().trim();
+            var items = $optionsList.find('.cora-repo-option-item');
+            var shownCount = 0;
+            
+            items.each(function() {
+                var url = $(this).attr('data-url');
+                var name = $(this).attr('data-name') || '';
+                var isCur = $(this).attr('data-current') === 'true';
+                
+                if (url === 'manual') {
+                    $(this).css('display', 'flex');
+                    return;
+                }
+                
+                if (q === '') {
+                    if (shownCount < 6 || isCur) {
+                        $(this).css('display', 'flex');
+                        if (!isCur) shownCount++;
+                    } else {
+                        $(this).css('display', 'none');
+                    }
+                } else {
+                    if (name.toLowerCase().indexOf(q) > -1) {
+                        $(this).css('display', 'flex');
+                    } else {
+                        $(this).css('display', 'none');
+                    }
+                }
+            });
         }
 
         $optionsList.html('<div style="padding:8px 12px;font-size:11px;color:#a1a1aa;font-style:italic;">Loading...</div>');
@@ -10142,12 +10179,13 @@ jQuery(document).ready(function($) {
                 });
 
                 // "Enter manually" footer option
-                html += '<div class="cora-repo-option-item" data-url="manual" data-name="manual" style="display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;font-size:11px;font-family:inherit;border-top:1px solid #f4f4f5;color:#71717a;">' +
-                    '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
+                html += '<div class="cora-repo-option-item hover:bg-zinc-50 dark:hover:bg-zinc-900/60 transition-colors" data-url="manual" data-name="manual" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:11px;font-family:inherit;border:none !important;border-top:1px solid #f4f4f5 !important;color:#71717a;background:transparent;">' +
+                    '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
                     'Enter URL manually...' +
                 '</div>';
 
                 $optionsList.html(html);
+                updateFilteredDisplay();
 
                 if (savedUrl && !foundSaved) {
                     var parts2 = savedUrl.replace('https://github.com/', '').split('/');
@@ -10166,14 +10204,6 @@ jQuery(document).ready(function($) {
             $optionsList.html('<div style="padding:8px 12px;font-size:11px;color:#f43f5e;">Network error loading repositories.</div>');
         });
 
-        // Hover style
-        $optionsList.off('mouseenter', '.cora-repo-option-item').on('mouseenter', '.cora-repo-option-item', function() {
-            $(this).css('background', '#f9f9f9');
-        });
-        $optionsList.off('mouseleave', '.cora-repo-option-item').on('mouseleave', '.cora-repo-option-item', function() {
-            $(this).css('background', '');
-        });
-
         // Toggle
         $trigger.off('click').on('click', function(e) {
             e.stopPropagation();
@@ -10187,16 +10217,7 @@ jQuery(document).ready(function($) {
 
         // Search
         $searchInput.off('input').on('input', function() {
-            var q = $(this).val().toLowerCase().trim();
-            $optionsList.find('.cora-repo-option-item').each(function() {
-                var url  = $(this).attr('data-url');
-                var name = $(this).attr('data-name') || '';
-                if (url === 'manual' || name.toLowerCase().indexOf(q) > -1) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
-            });
+            updateFilteredDisplay();
         });
 
         // Select
@@ -10243,18 +10264,49 @@ jQuery(document).ready(function($) {
         function openBranchDropdown() {
             $dropdown.show();
             $arrow.css('transform', 'rotate(180deg)');
-            $trigger.css('border-color', '#a1a1aa');
+            $trigger.addClass('border-zinc-400 dark:border-zinc-650');
             $searchInput.val('').trigger('input').focus();
             isOpen = true;
         }
         function closeBranchDropdown() {
             $dropdown.hide();
             $arrow.css('transform', 'rotate(0deg)');
-            $trigger.css('border-color', '#e4e4e7');
+            $trigger.removeClass('border-zinc-400 dark:border-zinc-650');
             isOpen = false;
         }
         function setBranchLabel(text, isPlaceholder) {
-            $displayText.text(text).css('color', isPlaceholder ? '#a1a1aa' : '#18181b');
+            $displayText.text(text);
+            if (isPlaceholder) {
+                $displayText.addClass('text-zinc-400 dark:text-zinc-500').removeClass('text-zinc-800 dark:text-zinc-200');
+            } else {
+                $displayText.removeClass('text-zinc-400 dark:text-zinc-500').addClass('text-zinc-800 dark:text-zinc-200');
+            }
+        }
+
+        function updateFilteredBranchDisplay() {
+            var q = $searchInput.val().toLowerCase().trim();
+            var items = $optionsList.find('.cora-branch-option-item');
+            var shownCount = 0;
+            
+            items.each(function() {
+                var branch = $(this).attr('data-branch') || '';
+                var isCur = $(this).attr('data-current') === 'true';
+                
+                if (q === '') {
+                    if (shownCount < 6 || isCur) {
+                        $(this).css('display', 'flex');
+                        if (!isCur) shownCount++;
+                    } else {
+                        $(this).css('display', 'none');
+                    }
+                } else {
+                    if (branch.toLowerCase().indexOf(q) > -1) {
+                        $(this).css('display', 'flex');
+                    } else {
+                        $(this).css('display', 'none');
+                    }
+                }
+            });
         }
 
         setBranchLabel('Loading branches...', true);
@@ -10278,16 +10330,17 @@ jQuery(document).ready(function($) {
                         $hiddenInput.val(branch);
                     }
                     var checkSvg = isCur
-                        ? '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#18181b" stroke-width="2.5" style="flex-shrink:0;margin-left:auto;"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+                        ? '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" class="text-zinc-900 dark:text-zinc-100 shrink-0 ml-auto"><polyline points="20 6 9 17 4 12"></polyline></svg>'
                         : '';
-                    html += '<div class="cora-branch-option-item" data-branch="' + branch + '" style="display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;font-size:11px;font-family:inherit;">' +
-                        '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#a1a1aa" stroke-width="2" style="flex-shrink:0;"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>' +
-                        '<span style="color:' + (isCur ? '#18181b' : '#3f3f46') + ';font-weight:' + (isCur ? '600' : '400') + ';">' + branch + '</span>' +
+                    html += '<div class="cora-branch-option-item hover:bg-zinc-50 dark:hover:bg-zinc-900/60 transition-colors" data-branch="' + branch + '" data-current="' + isCur + '" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:11px;font-family:inherit;border:none !important;border-bottom:none !important;background:transparent;">' +
+                        '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" class="text-zinc-400 dark:text-zinc-550 shrink-0"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>' +
+                        '<span class="text-zinc-700 dark:text-zinc-300" style="font-weight:' + (isCur ? '600' : '400') + ';border:none !important;">' + branch + '</span>' +
                         checkSvg +
                     '</div>';
                 });
 
                 $optionsList.html(html);
+                updateFilteredBranchDisplay();
 
                 if (!foundSaved && branches.length > 0) {
                     setBranchLabel(branches[0], false);
@@ -10300,14 +10353,6 @@ jQuery(document).ready(function($) {
         }).fail(function() {
             setBranchLabel('Error loading', true);
             $optionsList.html('<div style="padding:8px 12px;font-size:11px;color:#f43f5e;">Network error loading branches.</div>');
-        });
-
-        // Hover
-        $optionsList.off('mouseenter', '.cora-branch-option-item').on('mouseenter', '.cora-branch-option-item', function() {
-            $(this).css('background', '#f9f9f9');
-        });
-        $optionsList.off('mouseleave', '.cora-branch-option-item').on('mouseleave', '.cora-branch-option-item', function() {
-            $(this).css('background', '');
         });
 
         // Toggle
@@ -10323,10 +10368,7 @@ jQuery(document).ready(function($) {
 
         // Search
         $searchInput.off('input').on('input', function() {
-            var q = $(this).val().toLowerCase().trim();
-            $optionsList.find('.cora-branch-option-item').each(function() {
-                $(this).toggle($(this).attr('data-branch').toLowerCase().indexOf(q) > -1);
-            });
+            updateFilteredBranchDisplay();
         });
 
         // Select
