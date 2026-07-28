@@ -103,16 +103,18 @@ $cora_settings_tabs = array(
 .cora-shopify-settings-theme {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
 }
-.cora-shopify-settings-theme label:not(.flex):not(.cora-label-raw) {
-    display: block !important;
+.cora-shopify-settings-theme label:not(.cora-label-raw) {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
     font-size: 11px !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     color: #52525b !important; /* zinc-600 */
-    text-transform: none !important;
-    letter-spacing: normal !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
     margin-bottom: 6px !important;
 }
-.dark .cora-shopify-settings-theme label:not(.flex):not(.cora-label-raw) {
+.dark .cora-shopify-settings-theme label:not(.cora-label-raw) {
     color: #a1a1aa !important; /* zinc-400 */
 }
 .cora-shopify-settings-theme input[type="text"],
@@ -123,13 +125,13 @@ $cora_settings_tabs = array(
 .cora-shopify-settings-theme select {
     width: 100% !important;
     background-color: #ffffff !important;
-    border: 1px solid #d4d4d8 !important; /* zinc-300 */
-    border-radius: 6px !important;
-    padding: 6px 12px !important;
-    font-size: 12px !important;
+    border: 1px solid #e4e4e7 !important; /* zinc-200 */
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    font-size: 13px !important;
     color: #18181b !important; /* zinc-900 */
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04) !important;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
+    transition: all 0.15s ease !important;
 }
 .cora-shopify-settings-theme input[type="text"]:focus,
 .cora-shopify-settings-theme input[type="email"]:focus,
@@ -138,8 +140,8 @@ $cora_settings_tabs = array(
 .cora-shopify-settings-theme input[type="url"]:focus,
 .cora-shopify-settings-theme select:focus {
     outline: none !important;
-    border-color: #18181b !important; /* zinc-900 */
-    box-shadow: 0 0 0 1px #18181b, 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    border-color: #09090b !important; /* zinc-950 */
+    box-shadow: 0 0 0 2px rgba(9, 9, 11, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
 }
 /* Dark Mode Override */
 .dark .cora-shopify-settings-theme input[type="text"],
@@ -148,10 +150,10 @@ $cora_settings_tabs = array(
 .dark .cora-shopify-settings-theme input[type="number"],
 .dark .cora-shopify-settings-theme input[type="url"],
 .dark .cora-shopify-settings-theme select {
-    background-color: #09090b !important; /* zinc-950 */
+    background-color: #09090b !important; /* zinc-955 */
     border-color: #27272a !important; /* zinc-800 */
     color: #f4f4f5 !important; /* zinc-100 */
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2) !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15) !important;
 }
 .dark .cora-shopify-settings-theme input[type="text"]:focus,
 .dark .cora-shopify-settings-theme input[type="email"]:focus,
@@ -159,8 +161,51 @@ $cora_settings_tabs = array(
 .dark .cora-shopify-settings-theme input[type="number"]:focus,
 .dark .cora-shopify-settings-theme input[type="url"]:focus,
 .dark .cora-shopify-settings-theme select:focus {
-    border-color: #f4f4f5 !important; /* zinc-100 */
-    box-shadow: 0 0 0 1px #f4f4f5, 0 1px 2px 0 rgba(0, 0, 0, 0.25) !important;
+    border-color: #ffffff !important;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.2) !important;
+}
+/* Custom Checkboxes */
+.cora-shopify-settings-theme input[type="checkbox"] {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    width: 16px !important;
+    height: 16px !important;
+    border: 1px solid #d4d4d8 !important;
+    border-radius: 4px !important;
+    outline: none !important;
+    background-color: #ffffff !important;
+    cursor: pointer !important;
+    position: relative !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.03) !important;
+    transition: all 0.15s ease !important;
+}
+.cora-shopify-settings-theme input[type="checkbox"]:checked {
+    background-color: #09090b !important;
+    border-color: #09090b !important;
+}
+.cora-shopify-settings-theme input[type="checkbox"]:checked::after {
+    content: '' !important;
+    position: absolute !important;
+    left: 5px !important;
+    top: 2px !important;
+    width: 4px !important;
+    height: 8px !important;
+    border: solid #ffffff !important;
+    border-width: 0 2px 2px 0 !important;
+    transform: rotate(45deg) !important;
+}
+.dark .cora-shopify-settings-theme input[type="checkbox"] {
+    background-color: #09090b !important;
+    border-color: #27272a !important;
+}
+.dark .cora-shopify-settings-theme input[type="checkbox"]:checked {
+    background-color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+.dark .cora-shopify-settings-theme input[type="checkbox"]:checked::after {
+    border-color: #09090b !important;
 }
 /* Shopify discrete card blocks */
 .cora-shopify-card {
@@ -687,19 +732,19 @@ $cora_settings_tabs = array(
                                     $mgr_name = $mgr ? $mgr->display_name : 'Unassigned';
                                     $crew_count = $branch_agent_counts[$b_id] ?? 0;
                                 ?>
-                                    <tr class="hover:bg-zinc-50/10">
-                                        <td class="px-5 py-3.5 font-bold text-zinc-900"><?php echo esc_html( $b['name'] ); ?></td>
-                                        <td class="px-5 py-3.5 text-zinc-500 font-semibold"><?php echo esc_html( $b['city'] . ' / ' . $b['address'] ); ?></td>
-                                        <td class="px-5 py-3.5 font-semibold text-zinc-700">
-                                            <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-800 text-[9px] font-bold">
+                                    <tr class="hover:bg-zinc-50/10 dark:hover:bg-zinc-800/10">
+                                        <td class="px-5 py-3.5 font-bold text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $b['name'] ); ?></td>
+                                        <td class="px-5 py-3.5 text-zinc-500 dark:text-zinc-400 font-semibold"><?php echo esc_html( $b['city'] . ' / ' . $b['address'] ); ?></td>
+                                        <td class="px-5 py-3.5 font-semibold text-zinc-700 dark:text-zinc-300">
+                                            <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 text-[9px] font-bold">
                                                 <?php echo esc_html( $mgr_name ); ?>
                                             </span>
                                         </td>
-                                        <td class="px-5 py-3.5 font-bold text-zinc-900"><?php echo esc_html( $crew_count ); ?> Agents</td>
+                                        <td class="px-5 py-3.5 font-bold text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $crew_count ); ?> Agents</td>
                                         <td class="px-5 py-3.5 text-right">
                                             <div class="flex items-center justify-end gap-2">
-                                                <button type="button" onclick="openEditBranchDrawer('<?php echo esc_attr($b_id); ?>', '<?php echo esc_attr($b['name']); ?>', '<?php echo esc_attr($b['city']); ?>', '<?php echo esc_attr($b['address']); ?>', '<?php echo esc_attr($b['manager_id'] ?? ''); ?>')" class="px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-sm transition-colors">Edit</button>
-                                                <button type="button" onclick="deleteBranch('<?php echo esc_attr($b_id); ?>', <?php echo $crew_count; ?>)" class="px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-red-600 bg-white hover:bg-red-50 hover:border-red-200 cursor-pointer shadow-sm transition-colors">Delete</button>
+                                                <button type="button" onclick="openEditBranchDrawer('<?php echo esc_attr($b_id); ?>', '<?php echo esc_attr($b['name']); ?>', '<?php echo esc_attr($b['city']); ?>', '<?php echo esc_attr($b['address']); ?>', '<?php echo esc_attr($b['manager_id'] ?? ''); ?>')" class="px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer shadow-sm transition-colors">Edit</button>
+                                                <button type="button" onclick="deleteBranch('<?php echo esc_attr($b_id); ?>', <?php echo $crew_count; ?>)" class="px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[10px] font-bold text-red-600 dark:text-red-400 bg-white dark:bg-zinc-900 hover:bg-red-50 dark:hover:bg-red-950/30 hover:border-red-200 dark:hover:border-red-800 cursor-pointer shadow-sm transition-colors">Delete</button>
                                             </div>
                                         </td>
                                     </tr>
@@ -954,84 +999,83 @@ $cora_settings_tabs = array(
                 </div>
                 
                 <!-- Agency Logo Settings -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/40">
-                    <div class="md:col-span-2 space-y-3">
-                        <div>
-                            <label>Agency Logo URL</label>
-                            <div class="flex gap-2">
-                                <input type="url" id="cora-brand-logo-url-suite" name="cora_brand_logo_url" value="<?php echo esc_url( get_option('cora_brand_logo_url', '') ); ?>" placeholder="https://...">
-                                <button type="button" class="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-semibold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraOpenMediaSelector('cora-brand-logo-url-suite')">Browse</button>
+                <div class="p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/40 space-y-3">
+                    <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300">Agency Logo</label>
+                    <input type="hidden" id="cora-brand-logo-url-suite" name="cora_brand_logo_url" value="<?php echo esc_url( get_option('cora_brand_logo_url', '') ); ?>">
+                    
+                    <div class="flex items-center gap-5">
+                        <!-- Preview Box / Upload Dropzone -->
+                        <div id="cora-suite-logo-dropzone" class="w-full max-w-sm h-32 border-2 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-700 rounded-2xl bg-white dark:bg-zinc-950 flex flex-col items-center justify-center p-4 cursor-pointer transition-all group" onclick="coraOpenMediaSelector('cora-brand-logo-url-suite')">
+                            <?php $logo_url = get_option('cora_brand_logo_url', ''); ?>
+                            <div id="cora-suite-logo-preview" class="w-full h-full flex flex-col items-center justify-center overflow-hidden">
+                                <?php if ( ! empty( $logo_url ) ) : ?>
+                                    <img src="<?php echo esc_url( $logo_url ); ?>" class="max-h-full max-w-full object-contain transition-transform group-hover:scale-102" alt="Logo Preview">
+                                <?php else : ?>
+                                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-650 dark:group-hover:text-zinc-300 transition-colors mb-1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                    <span class="text-xs font-bold text-zinc-850 dark:text-zinc-200">Upload Agency Logo</span>
+                                    <span class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1">Recommended size: 250x80px (PNG/JPG)</span>
+                                <?php endif; ?>
                             </div>
                         </div>
-                        <p class="text-[11px] text-zinc-400">Upload your real estate group's official logo. This will be used on all shared portfolios and custom client portals.</p>
-                    </div>
-                    <div class="flex items-center justify-center border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 p-3 h-28 cursor-pointer hover:border-zinc-400 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-900/60 transition-all group" onclick="coraOpenMediaSelector('cora-brand-logo-url-suite')" title="Click to upload logo">
-                        <?php $logo_url = get_option('cora_brand_logo_url', ''); ?>
-                        <div id="cora-suite-logo-preview" class="w-full h-full flex items-center justify-center overflow-hidden">
-                            <?php if ( ! empty( $logo_url ) ) : ?>
-                                <img src="<?php echo esc_url( $logo_url ); ?>" class="max-h-full max-w-full object-contain transition-transform group-hover:scale-105" alt="Logo Preview" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
-                                <div class="hidden text-center space-y-1">
-                                    <svg class="mx-auto h-5 w-5 text-zinc-400 group-hover:text-zinc-650 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                    <span class="block text-[9px] text-zinc-400 font-bold uppercase tracking-wider">Upload Logo</span>
-                                </div>
-                            <?php else : ?>
-                                <div class="text-center space-y-1">
-                                    <svg class="mx-auto h-5 w-5 text-zinc-400 group-hover:text-zinc-650 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                    <span class="block text-[9px] text-zinc-400 font-bold uppercase tracking-wider">Upload Logo</span>
-                                </div>
-                            <?php endif; ?>
+                        
+                        <!-- Control Actions -->
+                        <div class="space-y-2">
+                            <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold text-xs rounded-xl shadow-2xs transition-all cursor-pointer flex items-center gap-1.5" onclick="coraOpenMediaSelector('cora-brand-logo-url-suite')">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                Choose File
+                            </button>
+                            <button type="button" id="cora-suite-logo-clear" class="px-3.5 py-2 bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800/60 text-red-500 hover:text-red-650 font-semibold text-xs rounded-xl transition-all cursor-pointer <?php echo empty($logo_url) ? 'hidden' : ''; ?>" onclick="document.getElementById('cora-brand-logo-url-suite').value=''; jQuery('#cora-brand-logo-url-suite').trigger('change');">
+                                Remove Logo
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Custom Favicon Settings -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/40">
-                    <div class="md:col-span-2 space-y-3">
-                        <div>
-                            <label>Custom Favicon URL (32x32 / 64x64 PNG)</label>
-                            <div class="flex gap-2">
-                                <input type="url" id="cora-brand-favicon-url-suite" name="cora_brand_favicon_url" value="<?php echo esc_url( get_option('cora_brand_favicon_url', '') ); ?>" placeholder="https://...">
-                                <button type="button" class="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-semibold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraOpenMediaSelector('cora-brand-favicon-url-suite')">Browse</button>
+                <div class="p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/40 space-y-3">
+                    <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300">Custom Favicon (32x32 / 64x64 PNG)</label>
+                    <input type="hidden" id="cora-brand-favicon-url-suite" name="cora_brand_favicon_url" value="<?php echo esc_url( get_option('cora_brand_favicon_url', '') ); ?>">
+                    
+                    <div class="flex items-center gap-5">
+                        <!-- Preview Box / Upload Dropzone -->
+                        <div id="cora-suite-favicon-dropzone" class="w-24 h-24 border-2 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-700 rounded-2xl bg-white dark:bg-zinc-950 flex flex-col items-center justify-center p-3 cursor-pointer transition-all group shrink-0" onclick="coraOpenMediaSelector('cora-brand-favicon-url-suite')">
+                            <?php 
+                            $favicon_url = get_option('cora_brand_favicon_url', ''); 
+                            if ( empty( $favicon_url ) ) {
+                                $favicon_url = CORA_WORKSPACE_URL . 'assets/images/cora-favicon.png';
+                            }
+                            ?>
+                            <div id="cora-suite-favicon-preview" class="w-full h-full flex flex-col items-center justify-center overflow-hidden">
+                                <?php if ( ! empty( $favicon_url ) ) : ?>
+                                    <img src="<?php echo esc_url( $favicon_url ); ?>" class="w-8 h-8 object-contain transition-transform group-hover:scale-105" alt="Favicon Preview">
+                                <?php else : ?>
+                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-650 dark:group-hover:text-zinc-350 transition-colors mb-1"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                    <span class="text-[9px] text-zinc-400 font-bold uppercase tracking-wider">Upload</span>
+                                <?php endif; ?>
                             </div>
                         </div>
-                        <div class="flex gap-2">
-                            <button type="button" class="px-2.5 py-1.5 border border-zinc-200 dark:border-zinc-850 hover:border-zinc-450 bg-white dark:bg-zinc-900 text-zinc-750 dark:text-zinc-300 font-semibold text-[10px] rounded transition-colors cursor-pointer" onclick="coraSetDefaultPremiumFavicon()">
-                                Set to Premium Monogram Icon
-                            </button>
-                            <button type="button" class="px-2.5 py-1.5 border border-zinc-200 dark:border-zinc-850 hover:border-zinc-450 bg-white dark:bg-zinc-900 text-zinc-750 dark:text-zinc-300 font-semibold text-[10px] rounded transition-colors cursor-pointer" onclick="document.getElementById('cora-brand-favicon-url-suite').value='';">
-                                Clear Favicon
-                            </button>
-                            <button type="button" class="px-2.5 py-1.5 border border-zinc-200 dark:border-zinc-850 hover:border-zinc-450 bg-zinc-950 text-white font-semibold text-[10px] rounded transition-colors cursor-pointer" onclick="if(window.coraApplyBrandingLive) window.coraApplyBrandingLive();">
-                                Apply to Browser Tab Now
-                            </button>
-                        </div>
-                        <script>
-                            function coraSetDefaultPremiumFavicon() {
-                                const url = "<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/cora-favicon.png' ); ?>";
-                                document.getElementById('cora-brand-favicon-url-suite').value = url;
-                                const img = document.querySelector('#cora-suite-favicon-preview img');
-                                if (img) {
-                                    img.src = url;
-                                } else {
-                                    document.getElementById('cora-suite-favicon-preview').innerHTML = `<img src="${url}" class="w-10 h-10 object-contain" alt="Favicon Preview">`;
-                                }
-                                window.coraShowToast("Premium Monogram Icon selected as Favicon.");
-                            }
-                        </script>
-                        <p class="text-[11px] text-zinc-400">Configure your website browser tab favicon.</p>
-                    </div>
-                    <div class="flex flex-col items-center justify-center border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 p-3 h-28 space-y-1.5 cursor-pointer hover:border-zinc-400 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-900/60 transition-all group" onclick="coraOpenMediaSelector('cora-brand-favicon-url-suite')" title="Click to upload favicon">
-                        <span class="text-[9px] text-zinc-450 dark:text-zinc-500 uppercase font-bold tracking-wider group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors">Tab Favicon</span>
-                        <?php 
-                        $favicon_url = get_option('cora_brand_favicon_url', ''); 
-                        if ( empty( $favicon_url ) ) {
-                            $favicon_url = CORA_WORKSPACE_URL . 'assets/images/cora-favicon.png';
-                        }
-                        ?>
-                        <div id="cora-suite-favicon-preview" class="w-12 h-12 flex items-center justify-center border border-zinc-100 dark:border-zinc-850 rounded-md bg-zinc-50 dark:bg-zinc-900 transition-transform group-hover:scale-105">
-                            <img src="<?php echo esc_url( $favicon_url ); ?>" class="w-8 h-8 object-contain" alt="Favicon Preview">
+                        
+                        <!-- Control Actions -->
+                        <div class="space-y-1.5">
+                            <div class="flex gap-2">
+                                <button type="button" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold text-[11px] rounded-lg shadow-2xs transition-all cursor-pointer flex items-center gap-1" onclick="coraOpenMediaSelector('cora-brand-favicon-url-suite')">
+                                    Choose Icon
+                                </button>
+                                <button type="button" class="px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold text-[11px] rounded-lg transition-colors cursor-pointer" onclick="coraSetDefaultPremiumFavicon()">
+                                    Use Premium Monogram
+                                </button>
+                            </div>
+                            <div class="flex gap-2">
+                                <button type="button" id="cora-suite-favicon-clear" class="px-2.5 py-1 text-red-500 hover:text-red-650 font-semibold text-[10px] rounded transition-all cursor-pointer <?php echo empty(get_option('cora_brand_favicon_url', '')) ? 'hidden' : ''; ?>" onclick="document.getElementById('cora-brand-favicon-url-suite').value=''; jQuery('#cora-brand-favicon-url-suite').trigger('change');">
+                                    Reset to Default
+                                </button>
+                                <button type="button" class="px-2.5 py-1 text-zinc-600 dark:text-zinc-400 hover:text-zinc-850 dark:hover:text-zinc-200 font-semibold text-[10px] rounded transition-all cursor-pointer" onclick="if(window.coraApplyBrandingLive) window.coraApplyBrandingLive();">
+                                    Apply Live
+                                </button>
+                            </div>
                         </div>
                     </div>
+                </div>
                 </div>
 
                 <!-- Browser Tab & Sidebar Title Settings -->
@@ -2456,6 +2500,12 @@ $cora_settings_tabs = array(
                     }
                 });
             });
+        };
+
+        window.coraSetDefaultPremiumFavicon = function() {
+            var url = "<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/cora-favicon.png' ); ?>";
+            jQuery('#cora-brand-favicon-url-suite').val(url).trigger('change');
+            if (window.coraShowToast) window.coraShowToast("Premium Monogram Icon selected as Favicon.");
         };
         </script>
 
