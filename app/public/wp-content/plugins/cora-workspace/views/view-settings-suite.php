@@ -66,24 +66,9 @@ $cora_settings_tabs = array(
         'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>'
     ),
     'reading'    => array(
-        'label' => 'Reading & SEO',
-        'desc'  => 'Homepage and search engines',
+        'label' => 'Content & SEO',
+        'desc'  => 'Pages, writing, URLs & indexing',
         'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>'
-    ),
-    'writing'    => array(
-        'label' => 'Writing',
-        'desc'  => 'Category & format variables',
-        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>'
-    ),
-    'discussion' => array(
-        'label' => 'Discussion',
-        'desc'  => 'Moderation & blacklists',
-        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>'
-    ),
-    'permalinks' => array(
-        'label' => 'Permalinks',
-        'desc'  => 'SEO URL structures',
-        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>'
     ),
     'privacy'    => array(
         'label' => 'Privacy',
@@ -1217,18 +1202,14 @@ $cora_settings_tabs = array(
                     </label>
                 </div>
             </div>
-        </div>
 
-        <!-- TAB 6: WRITING DEFAULTS -->
-        <div id="cora-settings-panel-writing" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'writing' ? '' : 'hidden'; ?>">
-            <!-- Card: Writing Defaults -->
+            <!-- Card 3: Writing & Content Defaults -->
             <div class="cora-shopify-card space-y-4">
                 <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Writing & Content Defaults</h3>
-                    <p class="text-xs text-zinc-500">Configure default taxonomy labeling and publishing format presets.</p>
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Writing &amp; Content Defaults</h3>
+                    <p class="text-xs text-zinc-500">Default category and format for new posts and articles.</p>
                 </div>
-                
-                <div class="space-y-4 max-w-md">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
                     <div>
                         <label>Default Post Category</label>
                         <select name="default_category">
@@ -1248,102 +1229,80 @@ $cora_settings_tabs = array(
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- TAB 7: DISCUSSION & MODERATION -->
-        <div id="cora-settings-panel-discussion" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'discussion' ? '' : 'hidden'; ?>">
-            <!-- Card 1: Comment Moderation Policies -->
+            <!-- Card 4: SEO URL Permalinks -->
             <div class="cora-shopify-card space-y-4">
                 <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Comment Moderation Policies</h3>
-                    <p class="text-xs text-zinc-500">Enforce global submission guidelines for blog discussions and listing comments.</p>
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">URL Permalink Structure</h3>
+                    <p class="text-xs text-zinc-500">Choose clean, human-readable URL schemas for better search engine rankings.</p>
                 </div>
-                
-                <div class="space-y-3.5">
-                    <label class="flex items-center gap-2.5 text-xs text-zinc-850 dark:text-zinc-300 font-semibold cursor-pointer">
-                        <input type="checkbox" name="default_pingback_flag" value="1" <?php checked( get_option('default_pingback_flag'), 1 ); ?> class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
-                        <span class="cora-label-raw">Allow link notifications from other blogs (pingbacks and trackbacks)</span>
-                    </label>
-                    
-                    <label class="flex items-center gap-2.5 text-xs text-zinc-850 dark:text-zinc-300 font-semibold cursor-pointer">
-                        <input type="checkbox" name="default_comment_status" value="open" <?php checked( get_option('default_comment_status'), 'open' ); ?> class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
-                        <span class="cora-label-raw">Allow people to submit comments on new articles</span>
-                    </label>
-                    
-                    <label class="flex items-center gap-2.5 text-xs text-zinc-850 dark:text-zinc-300 font-semibold cursor-pointer">
-                        <input type="checkbox" name="comment_moderation" value="1" <?php checked( get_option('comment_moderation'), 1 ); ?> class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
-                        <span class="cora-label-raw">Comment must be manually approved before publishing</span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Card 2: Spam Filtering & Moderation Keywords -->
-            <div class="cora-shopify-card space-y-4">
-                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Spam Filtering & Moderation Keywords</h3>
-                    <p class="text-xs text-zinc-500">Automate comment holds and trash actions using exact keyword triggers.</p>
-                </div>
-                
-                <div class="space-y-4">
-                    <div>
-                        <label>Comment Moderation Queue Keywords</label>
-                        <textarea name="moderation_keys" rows="3" placeholder="One word, IP address, or URL per line..." class="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-xs text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-100 shadow-3xs"><?php echo esc_textarea( get_option('moderation_keys') ); ?></textarea>
-                        <p class="text-[10px] text-zinc-400 mt-1">When a comment contains any of these words, it will be held in the moderation queue.</p>
-                    </div>
-                    <div>
-                        <label class="text-red-700 dark:text-red-400">Disallowed Comment Keys (Automatic Trash/Spam)</label>
-                        <textarea name="disallowed_keys" rows="3" placeholder="One word, IP address, or URL per line..." class="w-full bg-white dark:bg-zinc-950 border border-red-200 dark:border-red-900/60 rounded-lg p-2.5 text-xs text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:ring-1 focus:ring-red-650 dark:focus:ring-red-650 shadow-3xs"><?php echo esc_textarea( get_option('disallowed_keys') ); ?></textarea>
-                        <p class="text-[10px] text-zinc-400 mt-1">Comments matching these triggers will be instantly moved to trash.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 8: SEO PERMALINKS -->
-        <div id="cora-settings-panel-permalinks" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'permalinks' ? '' : 'hidden'; ?>">
-            <!-- Card: SEO URL Permalinks -->
-            <div class="cora-shopify-card space-y-4">
-                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">SEO URL Permalinks Structure</h3>
-                    <p class="text-xs text-zinc-500">Choose clean, human-readable URL routing schemas for better search engine rankings.</p>
-                </div>
-                
-                <div class="space-y-3">
+                <div class="space-y-2">
                     <?php $current_permalink = get_option('permalink_structure'); ?>
-                    
                     <label class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-zinc-50/50 dark:bg-zinc-900/30 hover:bg-zinc-100/50 dark:hover:bg-zinc-900/60 cursor-pointer transition-colors gap-2">
                         <div class="flex items-center gap-3">
                             <input type="radio" name="permalink_structure" value="" <?php checked( $current_permalink, '' ); ?> class="text-zinc-900 focus:ring-zinc-900">
-                            <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200 cora-label-raw">Plain</span>
+                            <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200">Plain</span>
                         </div>
                         <code class="text-[10px] text-zinc-500 font-mono truncate break-all"><?php echo esc_url( home_url('/?p=123') ); ?></code>
                     </label>
-
                     <label class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-zinc-50/50 dark:bg-zinc-900/30 hover:bg-zinc-100/50 dark:hover:bg-zinc-900/60 cursor-pointer transition-colors gap-2">
                         <div class="flex items-center gap-3">
                             <input type="radio" name="permalink_structure" value="/%year%/%monthnum%/%day%/%postname%/" <?php checked( $current_permalink, '/%year%/%monthnum%/%day%/%postname%/' ); ?> class="text-zinc-900 focus:ring-zinc-900">
-                            <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200 cora-label-raw">Day and name</span>
+                            <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200">Day and name</span>
                         </div>
                         <code class="text-[10px] text-zinc-500 font-mono truncate break-all"><?php echo esc_url( home_url('/2026/07/08/sample-post/') ); ?></code>
                     </label>
-
                     <label class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-zinc-50/50 dark:bg-zinc-900/30 hover:bg-zinc-100/50 dark:hover:bg-zinc-900/60 cursor-pointer transition-colors gap-2">
                         <div class="flex items-center gap-3">
                             <input type="radio" name="permalink_structure" value="/%year%/%monthnum%/%postname%/" <?php checked( $current_permalink, '/%year%/%monthnum%/%postname%/' ); ?> class="text-zinc-900 focus:ring-zinc-900">
-                            <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200 cora-label-raw">Month and name</span>
+                            <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200">Month and name</span>
                         </div>
                         <code class="text-[10px] text-zinc-500 font-mono truncate break-all"><?php echo esc_url( home_url('/2026/07/sample-post/') ); ?></code>
                     </label>
-
                     <label class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 border border-zinc-900 dark:border-zinc-100 rounded-lg bg-zinc-900/5 dark:bg-zinc-100/5 hover:bg-zinc-900/10 dark:hover:bg-zinc-100/10 cursor-pointer transition-colors gap-2">
                         <div class="flex items-center gap-3">
                             <input type="radio" name="permalink_structure" value="/%postname%/" <?php checked( $current_permalink, '/%postname%/' ); ?> class="text-zinc-900 focus:ring-zinc-900">
                             <div>
-                                <span class="text-xs font-bold text-zinc-900 dark:text-white cora-label-raw">Post name (Recommended SEO)</span>
+                                <span class="text-xs font-bold text-zinc-900 dark:text-white">Post name</span>
+                                <span class="ml-2 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">Recommended SEO</span>
                             </div>
                         </div>
                         <code class="text-[10px] text-zinc-900 dark:text-white font-bold font-mono truncate break-all"><?php echo esc_url( home_url('/sample-post/') ); ?></code>
                     </label>
+                </div>
+            </div>
+
+            <!-- Card 5: Comment Moderation -->
+            <div class="cora-shopify-card space-y-4">
+                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Comment &amp; Discussion</h3>
+                    <p class="text-xs text-zinc-500">Moderation policies and spam filtering for blog and listing comments.</p>
+                </div>
+                <div class="space-y-3">
+                    <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-300 font-semibold cursor-pointer">
+                        <input type="checkbox" name="default_pingback_flag" value="1" <?php checked( get_option('default_pingback_flag'), 1 ); ?> class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
+                        <span>Allow pingbacks and trackbacks from other blogs</span>
+                    </label>
+                    <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-300 font-semibold cursor-pointer">
+                        <input type="checkbox" name="default_comment_status" value="open" <?php checked( get_option('default_comment_status'), 'open' ); ?> class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
+                        <span>Allow comments on new articles</span>
+                    </label>
+                    <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-300 font-semibold cursor-pointer">
+                        <input type="checkbox" name="comment_moderation" value="1" <?php checked( get_option('comment_moderation'), 1 ); ?> class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
+                        <span>Comments must be manually approved before publishing</span>
+                    </label>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-zinc-100 dark:border-zinc-800/40 pt-4">
+                    <div>
+                        <label>Moderation Queue Keywords</label>
+                        <textarea name="moderation_keys" rows="3" placeholder="One word or URL per line..." class="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-xs text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:ring-1 focus:ring-zinc-900 shadow-3xs"><?php echo esc_textarea( get_option('moderation_keys') ); ?></textarea>
+                        <p class="text-[10px] text-zinc-400 mt-1">Comments with these words are held for review.</p>
+                    </div>
+                    <div>
+                        <label class="text-red-700 dark:text-red-400">Disallowed Keys (Auto-Trash)</label>
+                        <textarea name="disallowed_keys" rows="3" placeholder="One word or URL per line..." class="w-full bg-white dark:bg-zinc-950 border border-red-200 dark:border-red-900/60 rounded-lg p-2.5 text-xs text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:ring-1 focus:ring-red-500 shadow-3xs"><?php echo esc_textarea( get_option('disallowed_keys') ); ?></textarea>
+                        <p class="text-[10px] text-zinc-400 mt-1">Matching comments are instantly trashed.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2157,6 +2116,11 @@ $cora_settings_tabs = array(
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- TAB: AUDIT & LOGS -->
+        <div id="cora-settings-panel-audit" class="cora-settings-panel space-y-6 max-w-full <?php echo $active_tab === 'audit' ? '' : 'hidden'; ?>">
+            <?php include __DIR__ . '/view-audit-panel.php'; ?>
         </div>
 
         <script>
