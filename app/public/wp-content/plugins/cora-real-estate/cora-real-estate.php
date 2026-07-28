@@ -8263,6 +8263,12 @@ function cora_ajax_save_system_settings_suite() {
     );
 
     foreach ( $fields as $field ) {
+        if ( $field === 'blog_public' ) {
+            // Checked (Hide site) = 0; Unchecked (Show site) = 1
+            $val = isset( $_POST['blog_public'] ) ? 0 : 1;
+            update_option( 'blog_public', $val );
+            continue;
+        }
         if ( isset( $_POST[ $field ] ) ) {
             $val = $_POST[ $field ];
             if ( in_array( $field, array( 'users_can_register', 'blog_public', 'default_pingback_flag', 'comment_moderation', 'cora_pwd_policy_min_len', 'cora_activity_logs_retention', 'cora_workspace_allow_tours', 'cora_git_sync_enabled', 'cora_onboarding_enabled', 'cora_onboarding_google_enabled', 'cora_onboarding_email_enabled', 'cora_onboarding_require_verification', 'cora_backup_google_drive_enabled' ) ) ) {
