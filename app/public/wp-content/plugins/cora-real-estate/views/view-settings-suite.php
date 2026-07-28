@@ -1909,9 +1909,9 @@ $cora_settings_tabs = array(
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
                 <!-- Left 2 Cols: Backup Configuration & System Snapshots -->
-                <div class="lg:col-span-2 space-y-6">
+                <div class="xl:col-span-7 space-y-6">
                     
                     <!-- Card 1: Full System Snapshot & Export Generator -->
                     <div class="cora-shopify-card space-y-4">
@@ -2047,7 +2047,7 @@ $cora_settings_tabs = array(
                 </div>
 
                 <!-- Right 1 Col: Snapshot Logs & One-Click Restore Center -->
-                <div class="space-y-6">
+                <div class="xl:col-span-5 space-y-6">
                     <div class="cora-shopify-card space-y-4">
                         <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between">
                             <div>
@@ -2077,9 +2077,9 @@ $cora_settings_tabs = array(
                                      </div>
  
                                      <!-- Row 2: Date & Size (Meta Details) -->
-                                     <div class="flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-450 border-t border-zinc-50 dark:border-zinc-850/60 pt-2 font-medium">
-                                         <span><?php echo esc_html( date( 'M j, Y H:i', $item['time'] ) ) . ' UTC'; ?></span>
-                                         <span class="font-semibold text-zinc-600 dark:text-zinc-400"><?php echo esc_html( $item['size'] ); ?></span>
+                                     <div class="flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-450 border-t border-zinc-50 dark:border-zinc-850/60 pt-2 font-medium gap-3">
+                                         <span class="whitespace-nowrap"><?php echo esc_html( date( 'M j, Y H:i', $item['time'] ) ) . ' UTC'; ?></span>
+                                         <span class="font-semibold text-zinc-650 dark:text-zinc-400 whitespace-nowrap"><?php echo esc_html( $item['size'] ); ?></span>
                                      </div>
  
                                      <!-- Row 3: Action Buttons -->
