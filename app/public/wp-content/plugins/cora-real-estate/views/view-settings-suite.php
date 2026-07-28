@@ -1116,7 +1116,7 @@ $cora_settings_tabs = array(
                     </p>
                     <p class="text-[11px] text-zinc-500 mt-0.5"><?php echo $is_indexed ? 'Google, Bing, and other crawlers can index your listings and pages.' : 'Robots.txt is blocking crawlers. Change this immediately to restore organic traffic.'; ?></p>
                 </div>
-                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex-shrink-0 <?php echo $is_indexed ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400' : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400'; ?>"><?php echo $is_indexed ? 'Live' : 'Blocked'; ?></span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex-shrink-0 whitespace-nowrap <?php echo $is_indexed ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400' : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400'; ?>"><?php echo $is_indexed ? 'Live' : 'Blocked'; ?></span>
             </div>
 
             <!-- Card 1: Homepage Routing -->
@@ -1351,7 +1351,7 @@ $cora_settings_tabs = array(
                             </div>
                         </div>
                         <?php $git_token = get_option('cora_git_sync_token', ''); ?>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold <?php echo $git_token ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400 border border-green-200 dark:border-green-900/55' : 'bg-zinc-100 text-zinc-650 dark:bg-zinc-850 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800'; ?>">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold whitespace-nowrap <?php echo $git_token ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400 border border-green-200 dark:border-green-900/55' : 'bg-zinc-100 text-zinc-650 dark:bg-zinc-850 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800'; ?>">
                             <span class="w-1.5 h-1.5 rounded-full <?php echo $git_token ? 'bg-green-500 animate-pulse' : 'bg-zinc-400'; ?>"></span>
                             <?php echo $git_token ? 'Connected' : 'Not Connected'; ?>
                         </span>
@@ -1466,7 +1466,7 @@ $cora_settings_tabs = array(
                             </div>
                         </div>
                         <?php $live_url = get_option('cora_git_sync_live_url', ''); ?>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold <?php echo $live_url ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400 border border-green-200 dark:border-green-900/55' : 'bg-zinc-100 text-zinc-650 dark:bg-zinc-850 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800'; ?>">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold whitespace-nowrap <?php echo $live_url ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400 border border-green-200 dark:border-green-900/55' : 'bg-zinc-100 text-zinc-650 dark:bg-zinc-850 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800'; ?>">
                             <span class="w-1.5 h-1.5 rounded-full <?php echo $live_url ? 'bg-green-500 animate-pulse' : 'bg-zinc-400'; ?>"></span>
                             <?php echo $live_url ? 'Connected &amp; Live' : 'Not Connected'; ?>
                         </span>
@@ -1962,7 +1962,7 @@ $cora_settings_tabs = array(
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5">
+                                <span class="px-3 py-1 rounded-full text-[10px] font-bold whitespace-nowrap bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Connected & Active
                                 </span>
                                 <button type="button" id="cora-disconnect-google-drive" class="px-2.5 py-1 bg-white dark:bg-zinc-900 hover:bg-red-50 dark:hover:bg-red-950/40 text-zinc-500 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 text-[11px] font-semibold rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-red-200 dark:hover:border-red-800 transition-all flex items-center gap-1.5 cursor-pointer">
