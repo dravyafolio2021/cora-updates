@@ -175,6 +175,19 @@ $cora_settings_tabs = array(
     border-color: #27272a !important; /* zinc-800 */
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
 }
+/* Mobile UI/UX Responsiveness Overrides */
+@media (max-width: 639px) {
+    .cora-shopify-card {
+        padding: 12px 14px !important;
+    }
+}
+.scrollbar-none::-webkit-scrollbar {
+    display: none !important;
+}
+.scrollbar-none {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+}
 /* Left sidebar items */
 .cora-settings-nav-item {
     display: flex !important;
@@ -1865,7 +1878,7 @@ $cora_settings_tabs = array(
         <div id="cora-settings-panel-backup" class="cora-settings-panel space-y-6 <?php echo $active_tab === 'backup' ? '' : 'hidden'; ?>">
             
             <!-- Top Metric & Status Summary Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 md:gap-4">
                 <div class="cora-shopify-card border-l-2 border-l-emerald-500 shadow-2xs">
                     <div class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1">System Health</div>
                     <div class="text-sm font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">

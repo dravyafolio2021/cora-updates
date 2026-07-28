@@ -9605,7 +9605,15 @@ jQuery(document).ready(function($) {
 
         // Update active tab hidden input
         $('input[name="active_tab"]').val(tabKey);
-        
+
+        // Auto-scroll active mobile tab into view
+        var activeMobileTab = $('.cora-settings-nav-mobile.active-tab');
+        if (activeMobileTab.length) {
+            var container = activeMobileTab.parent();
+            container.animate({
+                scrollLeft: activeMobileTab.offset().left - container.offset().left + container.scrollLeft() - 16
+            }, 200);
+        }
         // Update browser history without reload
         if (window.history && window.history.replaceState) {
             const currentUrl = new URL(window.location.href);
