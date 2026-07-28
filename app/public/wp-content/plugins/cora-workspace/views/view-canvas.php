@@ -1402,9 +1402,9 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                         <div class="space-y-2">
                             <label class="block text-[10px] font-bold text-zinc-500 uppercase">Header/Footer Mode</label>
                             <select id="setting-header-footer-mode" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
-                                <option value="canvas_fallback">Cora Canvas (Fallback Injected Header/Footer)</option>
+                                <option value="elementor_full_control">Elementor Theme Builder (Full Design Control)</option>
                                 <option value="theme_default">Hello Elementor Theme (Default Header/Footer)</option>
-                                <option value="elementor_full_control">Elementor Canvas (Full Design Control - Hide Theme Header/Footer)</option>
+                                <option value="canvas_fallback">Cora Canvas (Fallback Injected Header/Footer)</option>
                             </select>
                             <p class="text-[9px] text-zinc-450 mt-1">Controls how headers/footers render on live pages. Set to "Full Design Control" if you want a blank canvas to design them directly via Elementor.</p>
                         </div>
@@ -5070,7 +5070,7 @@ $cora_bookings_count = count( cora_db_get_bookings() );
             jQuery('#setting-box-shadow').val(settings.box_shadow || '0 1px 3px rgba(0,0,0,0.06)');
 
             // Layout
-            jQuery('#setting-header-footer-mode').val(settings.header_footer_mode || 'canvas_fallback');
+            jQuery('#setting-header-footer-mode').val(settings.header_footer_mode || 'elementor_full_control');
             jQuery('#setting-header-layout').val(settings.header_layout || 'Logo Left');
             jQuery('#setting-nav-menu').val(settings.nav_menu || '0');
             jQuery('#setting-sticky-header').prop('checked', settings.sticky_header == 1);

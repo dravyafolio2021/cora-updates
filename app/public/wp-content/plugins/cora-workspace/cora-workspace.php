@@ -5174,7 +5174,7 @@ function cora_canvas_inject_header_footer( $content ) {
     $settings = json_decode( $theme['settings'], true ) ?: array();
     
     // Check Header/Footer Mode
-    $mode = $settings['header_footer_mode'] ?? 'canvas_fallback';
+    $mode = $settings['header_footer_mode'] ?? 'elementor_full_control';
     if ( $mode === 'theme_default' || $mode === 'elementor_full_control' ) {
         return $content;
     }
@@ -5339,7 +5339,7 @@ function cora_canvas_hello_elementor_header_footer_filter( $display ) {
     }
 
     $settings = json_decode( $theme['settings'], true ) ?: array();
-    $mode = $settings['header_footer_mode'] ?? 'canvas_fallback';
+    $mode = $settings['header_footer_mode'] ?? 'elementor_full_control';
 
     if ( $mode === 'canvas_fallback' ) {
         return false;
@@ -12328,6 +12328,32 @@ function cora_enqueue_elementor_reskin_scripts() {
         time(),
         true
     );
+
+    // Pass Cora theme context to the reskin toolbar
+    global $wpdb;
+    $post_id = isset( $_GET['post'] ) ? intval( $_GET['post'] ) : 0;
+    $theme_data = array(
+        'themeStatus' => 'unknown',
+        'themeName'   => '',
+        'themeId'     => 0,
+    );
+    if ( $post_id ) {
+        $row = $wpdb->get_row( $wpdb->prepare(
+            "SELECT t.id, t.name, t.status
+             FROM {$wpdb->prefix}cora_canvas_themes t
+             INNER JOIN {$wpdb->prefix}cora_canvas_pages p ON t.id = p.theme_id
+             WHERE p.wp_post_id = %d
+             LIMIT 1",
+            $post_id
+        ), ARRAY_A );
+        if ( $row ) {
+            $theme_data['themeStatus'] = $row['status'];
+            $theme_data['themeName']   = $row['name'];
+            $theme_data['themeId']     = intval( $row['id'] );
+        }
+    }
+    wp_localize_script( 'cora-elementor-reskin-js', 'coraEditorContext', $theme_data );
+
     // Git integration
     wp_enqueue_script(
         'cora-git-integration-js',

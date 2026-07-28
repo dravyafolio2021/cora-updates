@@ -4612,7 +4612,7 @@ function cora_canvas_inject_header_footer( $content ) {
     $settings = json_decode( $theme['settings'], true ) ?: array();
     
     // Check Header/Footer Mode
-    $mode = $settings['header_footer_mode'] ?? 'canvas_fallback';
+    $mode = $settings['header_footer_mode'] ?? 'elementor_full_control';
     if ( $mode === 'theme_default' || $mode === 'elementor_full_control' ) {
         return $content;
     }
@@ -4777,7 +4777,7 @@ function cora_canvas_hello_elementor_header_footer_filter( $display ) {
     }
 
     $settings = json_decode( $theme['settings'], true ) ?: array();
-    $mode = $settings['header_footer_mode'] ?? 'canvas_fallback';
+    $mode = $settings['header_footer_mode'] ?? 'elementor_full_control';
 
     if ( $mode === 'canvas_fallback' ) {
         return false;
