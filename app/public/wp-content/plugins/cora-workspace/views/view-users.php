@@ -453,9 +453,24 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         $cora_permissions = get_option( 'cora_role_permissions', array() );
                         $cora_custom_roles = get_option( 'cora_custom_roles', array() );
 
+                        $active_ind = ! empty( $_COOKIE['cora_workspace_industry'] ) 
+                            ? $_COOKIE['cora_workspace_industry'] 
+                            : get_option( 'cora_workspace_industry', 'real_estate' );
+                        $active_ind_clean = str_replace( '_', '-', strtolower( trim( $active_ind ) ) );
+                        $is_studio_ind = ( $active_ind_clean === 'photography' || $active_ind_clean === 'studio' );
+
+                        $re_only_roles     = array('cora_branch_manager', 'cora_re_agent', 'cora_lead_coordinator');
+                        $studio_only_roles = array('cora_studio_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor');
+
                         $target_roles = array();
                         foreach ( $all_roles as $rk => $rl ) {
                             if ( $rk !== 'administrator' && $rk !== 'cora_shruti' && $rk !== 'cora_super_admin' ) {
+                                if ( $is_studio_ind && in_array( $rk, $re_only_roles, true ) ) {
+                                    continue;
+                                }
+                                if ( ! $is_studio_ind && in_array( $rk, $studio_only_roles, true ) ) {
+                                    continue;
+                                }
                                 $target_roles[$rk] = $rl;
                             }
                         }

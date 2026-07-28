@@ -10990,6 +10990,7 @@ function cora_ws_ajax_clear_cache() {
     wp_send_json_success( array( 'message' => 'System cache and option caches cleared successfully.' ) );
 }
 add_action( 'wp_ajax_cora_clear_cache', 'cora_ws_ajax_clear_cache' );
+add_action( 'wp_ajax_cora_clear_system_cache', 'cora_ws_ajax_clear_cache' );
 
 /**
  * AJAX Action: Save Git Sync Field

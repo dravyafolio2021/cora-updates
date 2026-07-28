@@ -9583,6 +9583,60 @@ jQuery(document).ready(function($) {
         });
     };
 
+    window.coraSwitchSettingsTab = function(tabKey) {
+        if (!tabKey) return;
+        
+        // Hide all settings panels
+        $('.cora-settings-panel').addClass('hidden').removeClass('block');
+        
+        // Show target settings panel
+        const targetPanel = $('#cora-settings-panel-' + tabKey);
+        if (targetPanel.length) {
+            targetPanel.removeClass('hidden').addClass('block');
+        }
+        
+        // Update sidebar navigation active classes
+        $('.cora-settings-nav-item').removeClass('active');
+        $('.cora-settings-nav-item[data-settings-tab="' + tabKey + '"]').addClass('active');
+        
+        // Update mobile tab navigation active classes
+        $('.cora-settings-nav-mobile').removeClass('bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 active-tab').addClass('bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-850 dark:text-zinc-300 dark:hover:bg-zinc-800');
+        $('.cora-settings-nav-mobile[data-settings-tab-mobile="' + tabKey + '"]').removeClass('bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-850 dark:text-zinc-300 dark:hover:bg-zinc-800').addClass('bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 active-tab');
+
+        // Update active tab hidden input
+        $('input[name="active_tab"]').val(tabKey);
+        
+        // Update browser history without reload
+        if (window.history && window.history.replaceState) {
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('settings_tab', tabKey);
+            window.history.replaceState({ path: currentUrl.toString() }, '', currentUrl.toString());
+        }
+    };
+
+    window.coraClearSystemCache = function() {
+        window.coraShowToast("Clearing platform transients & options cache...");
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_clear_system_cache',
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res && res.success) {
+                if (window.localStorage) {
+                    Object.keys(localStorage).forEach(function(key) {
+                        if (key.indexOf('cora_cache_') === 0 || key.indexOf('cora_temp_') === 0) {
+                            localStorage.removeItem(key);
+                        }
+                    });
+                }
+                window.coraShowToast(res.data.message || "System cache & transients cleared successfully!");
+            } else {
+                window.coraShowToast("Failed to clear cache: " + (res.data ? res.data.message : "Unknown error."));
+            }
+        }).fail(function() {
+            window.coraShowToast("Local storage cache purged.");
+        });
+    };
+
     window.coraSaveSystemSettingsSuite = function() {
         const form = $('#cora-settings-suite-form');
         if (!form.length || !coraREData.ajaxNonce) {
@@ -9604,7 +9658,8 @@ jQuery(document).ready(function($) {
             'users_can_register', 'blog_public', 'default_pingback_flag', 'default_comment_status', 
             'comment_moderation', 'cora_workspace_allow_tours', 'cora_git_sync_enabled',
             'cora_onboarding_enabled', 'cora_onboarding_google_enabled', 'cora_onboarding_email_enabled', 
-            'cora_onboarding_require_verification'
+            'cora_onboarding_require_verification', 'cora_pwd_policy_numbers', 'cora_pwd_policy_uppercase',
+            'cora_pwd_policy_special', 'cora_backup_google_drive_enabled'
         ];
         checkboxes.forEach(function(cbName) {
             const cb = form.find('input[name="' + cbName + '"]');

@@ -261,7 +261,7 @@ $cora_settings_tabs = array(
     foreach ( $tabs as $tab_key => $tab ) :
         $is_active = ( $active_tab === $tab_key );
     ?>
-    <a href="<?php echo home_url( '/workspace/settings-suite?settings_tab=' . $tab_key ); ?>" class="flex items-center gap-1.5 px-3.5 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors shrink-0 <?php echo $is_active ? 'bg-zinc-950 text-white dark:bg-white dark:text-zinc-950' : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-850 dark:text-zinc-300 dark:hover:bg-zinc-800'; ?>">
+    <a href="#" onclick="window.coraSwitchSettingsTab('<?php echo esc_js( $tab_key ); ?>'); return false;" data-settings-tab-mobile="<?php echo esc_attr( $tab_key ); ?>" class="cora-settings-nav-mobile flex items-center gap-1.5 px-3.5 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors shrink-0 <?php echo $is_active ? 'bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 active-tab' : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-850 dark:text-zinc-300 dark:hover:bg-zinc-800'; ?>">
         <span class="shrink-0 <?php echo $is_active ? 'text-white dark:text-zinc-950' : 'text-zinc-550 dark:text-zinc-400'; ?>">
             <?php echo $tab['icon']; ?>
         </span>
@@ -278,7 +278,7 @@ $cora_settings_tabs = array(
         foreach ( $tabs as $tab_key => $tab ) :
             $is_active = ( $active_tab === $tab_key );
         ?>
-        <a href="<?php echo home_url( '/workspace/settings-suite?settings_tab=' . $tab_key ); ?>" class="cora-settings-nav-item <?php echo $is_active ? 'active' : ''; ?>">
+        <a href="#" onclick="window.coraSwitchSettingsTab('<?php echo esc_js( $tab_key ); ?>'); return false;" data-settings-tab="<?php echo esc_attr( $tab_key ); ?>" class="cora-settings-nav-item <?php echo $is_active ? 'active' : ''; ?>">
             <div class="<?php echo $is_active ? 'text-zinc-800 dark:text-zinc-100' : 'text-zinc-400 dark:text-zinc-555 group-hover:text-zinc-700'; ?> shrink-0">
                 <?php echo $tab['icon']; ?>
             </div>
@@ -295,9 +295,8 @@ $cora_settings_tabs = array(
         <form id="cora-settings-suite-form" onsubmit="event.preventDefault(); coraSaveSystemSettingsSuite();" class="space-y-6">
             <input type="hidden" name="active_tab" value="<?php echo esc_attr( $active_tab ); ?>">
 
-        <?php if ( $active_tab === 'general' ) : ?>
         <!-- TAB 1: GENERAL SETTINGS -->
-        <div class="space-y-6 max-w-3xl">
+        <div id="cora-settings-panel-general" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'general' ? '' : 'hidden'; ?>">
             <!-- Card 1: General Site Configuration -->
             <div class="cora-shopify-card space-y-4">
                 <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
@@ -332,10 +331,40 @@ $cora_settings_tabs = array(
                     </div>
                     <div>
                         <label>New User Default Role</label>
-                        <select name="default_role">
-                            <?php foreach ( $roles as $role_key => $role_name ) : ?>
-                                <option value="<?php echo esc_attr( $role_key ); ?>" <?php selected( get_option('default_role'), $role_key ); ?>><?php echo esc_html( $role_name ); ?></option>
-                            <?php endforeach; ?>
+                        <?php
+                        $current_industry = ! empty( $_COOKIE['cora_workspace_industry'] ) 
+                            ? $_COOKIE['cora_workspace_industry'] 
+                            : get_option( 'cora_workspace_industry', 'real_estate' );
+                        $current_industry_clean = str_replace( '_', '-', strtolower( trim( $current_industry ) ) );
+                        $is_studio = ( $current_industry_clean === 'photography' || $current_industry_clean === 'studio' );
+                        $default_role_val = get_option('default_role');
+                        ?>
+                        <select name="default_role" id="cora-default-role-select">
+                            <?php if ( ! $is_studio ) : ?>
+                                <optgroup label="Real Estate Industry Roles" class="cora-role-optgroup-real_estate">
+                                    <option value="cora_workspace_owner" <?php selected( $default_role_val, 'cora_workspace_owner' ); ?>>Workspace Owner</option>
+                                    <option value="cora_manager" <?php selected( $default_role_val, 'cora_manager' ); ?>>Manager</option>
+                                    <option value="cora_branch_manager" <?php selected( $default_role_val, 'cora_branch_manager' ); ?>>Branch Manager</option>
+                                    <option value="cora_re_agent" <?php selected( $default_role_val, 'cora_re_agent' ); ?>>Real Estate Agent</option>
+                                    <option value="cora_lead_coordinator" <?php selected( $default_role_val, 'cora_lead_coordinator' ); ?>>Lead Coordinator</option>
+                                </optgroup>
+                            <?php else : ?>
+                                <optgroup label="Studio & Media Roles" class="cora-role-optgroup-photography">
+                                    <option value="cora_photographer" <?php selected( $default_role_val, 'cora_photographer' ); ?>>Photographer</option>
+                                    <option value="cora_videographer" <?php selected( $default_role_val, 'cora_videographer' ); ?>>Videographer</option>
+                                    <option value="cora_drone_pilot" <?php selected( $default_role_val, 'cora_drone_pilot' ); ?>>Drone Pilot</option>
+                                    <option value="cora_editor" <?php selected( $default_role_val, 'cora_editor' ); ?>>Photo / Video Editor</option>
+                                    <option value="cora_studio_manager" <?php selected( $default_role_val, 'cora_studio_manager' ); ?>>Studio Manager</option>
+                                    <option value="cora_workspace_owner" <?php selected( $default_role_val, 'cora_workspace_owner' ); ?>>Workspace Owner</option>
+                                </optgroup>
+                            <?php endif; ?>
+                            <optgroup label="Core & Standard Roles">
+                                <option value="subscriber" <?php selected( $default_role_val, 'subscriber' ); ?>>Subscriber (Client / Portal)</option>
+                                <option value="administrator" <?php selected( $default_role_val, 'administrator' ); ?>>Administrator</option>
+                                <option value="editor" <?php selected( $default_role_val, 'editor' ); ?>>WP Editor</option>
+                                <option value="author" <?php selected( $default_role_val, 'author' ); ?>>WP Author</option>
+                                <option value="contributor" <?php selected( $default_role_val, 'contributor' ); ?>>WP Contributor</option>
+                            </optgroup>
                         </select>
                     </div>
                 </div>
@@ -367,12 +396,71 @@ $cora_settings_tabs = array(
                     </div>
                     <div>
                         <label>Workspace Industry Profile</label>
-                        <select name="cora_workspace_industry" style="width: 100%; padding: 10px 14px; font-size: 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;">
+                        <select name="cora_workspace_industry" id="cora-settings-industry-select" onchange="coraFilterRolesByIndustry(this.value);" style="width: 100%; padding: 10px 14px; font-size: 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;">
                             <?php $industry = get_option('cora_workspace_industry', 'real_estate'); ?>
                             <option value="real_estate" <?php selected( $industry, 'real_estate' ); ?>>Real Estate Agency</option>
                             <option value="photography" <?php selected( $industry, 'photography' ); ?>>Photography Studio</option>
                         </select>
                     </div>
+
+                    <script>
+                    function coraFilterRolesByIndustry(industry) {
+                        if (!industry) {
+                            industry = $('#cora-settings-industry-select').val() || 'real_estate';
+                        }
+                        if (industry === 'studio') industry = 'photography';
+                        
+                        const select = $('#cora-default-role-select');
+                        if (!select.length) return;
+
+                        const currentVal = select.val();
+
+                        const realEstateRoles = `
+                            <optgroup label="Real Estate Industry Roles" class="cora-role-optgroup-real_estate">
+                                <option value="cora_workspace_owner">Workspace Owner</option>
+                                <option value="cora_manager">Manager</option>
+                                <option value="cora_branch_manager">Branch Manager</option>
+                                <option value="cora_re_agent">Real Estate Agent</option>
+                                <option value="cora_lead_coordinator">Lead Coordinator</option>
+                            </optgroup>
+                        `;
+
+                        const studioRoles = `
+                            <optgroup label="Studio & Media Roles" class="cora-role-optgroup-photography">
+                                <option value="cora_photographer">Photographer</option>
+                                <option value="cora_videographer">Videographer</option>
+                                <option value="cora_drone_pilot">Drone Pilot</option>
+                                <option value="cora_editor">Photo / Video Editor</option>
+                                <option value="cora_studio_manager">Studio Manager</option>
+                                <option value="cora_workspace_owner">Workspace Owner</option>
+                            </optgroup>
+                        `;
+
+                        const standardRoles = `
+                            <optgroup label="Core & Standard Roles">
+                                <option value="subscriber">Subscriber (Client / Portal)</option>
+                                <option value="administrator">Administrator</option>
+                                <option value="editor">WP Editor</option>
+                                <option value="author">WP Author</option>
+                                <option value="contributor">WP Contributor</option>
+                            </optgroup>
+                        `;
+
+                        if (industry === 'real_estate') {
+                            select.html(realEstateRoles + standardRoles);
+                        } else {
+                            select.html(studioRoles + standardRoles);
+                        }
+
+                        if (currentVal && select.find('option[value="' + currentVal + '"]').length) {
+                            select.val(currentVal);
+                        }
+                    }
+                    jQuery(document).ready(function($) {
+                        const currentInd = $('#cora-settings-industry-select').val() || '<?php echo esc_js($is_studio ? "photography" : "real_estate"); ?>';
+                        coraFilterRolesByIndustry(currentInd);
+                    });
+                    </script>
                     <div>
                         <label>Platform Language</label>
                         <select id="cora-settings-suite-language-select" name="cora_workspace_language" class="cora-language-selector" style="width: 100%; padding: 10px 14px; font-size: 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;" onchange="if(window.coraSetLanguage) window.coraSetLanguage(this.value, true);">
@@ -437,9 +525,9 @@ $cora_settings_tabs = array(
             </div>
         </div>
 
-        <?php elseif ( $active_tab === 'pwd-policy' ) : ?>
-        <!-- TAB: PASSWORD POLICY SETTINGS -->
-        <div class="space-y-6 max-w-3xl">
+        </div>
+        <!-- TAB 2: PASSWORD POLICY SETTINGS -->
+        <div id="cora-settings-panel-pwd-policy" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'pwd-policy' ? '' : 'hidden'; ?>">
             <!-- Card: Password Policy -->
             <div class="cora-shopify-card space-y-4">
                 <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
@@ -473,7 +561,8 @@ $cora_settings_tabs = array(
             </div>
         </div>
 
-        <?php elseif ( $active_tab === 'branches' ) : 
+        </div>
+        <?php
             $agency_id = cora_get_current_user_agency_id();
             $branches  = cora_db_get_branches();
             $filtered_branches = $branches;
@@ -514,8 +603,8 @@ $cora_settings_tabs = array(
                 }
             }
         ?>
-        <!-- TAB: BRANCH MANAGEMENT -->
-        <div class="space-y-6 max-w-3xl">
+        <!-- TAB 3: BRANCH MANAGEMENT -->
+        <div id="cora-settings-panel-branches" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'branches' ? '' : 'hidden'; ?>">
             <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
                 <div>
                     <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Brokerage Branches</h3>
@@ -807,9 +896,9 @@ $cora_settings_tabs = array(
             }
         </script>
 
-        <?php elseif ( $active_tab === 'brand' ) : ?>
-        <!-- TAB 7: BRANDING & API KEYS -->
-        <div class="space-y-6 max-w-3xl">
+        </div>
+        <!-- TAB 4: BRANDING & API KEYS -->
+        <div id="cora-settings-panel-brand" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'brand' ? '' : 'hidden'; ?>">
             <!-- Card 1: Brand Assets -->
             <div class="cora-shopify-card space-y-4">
                 <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
@@ -961,9 +1050,9 @@ $cora_settings_tabs = array(
             </div>
         </div>
 
-        <?php elseif ( $active_tab === 'reading' ) : ?>
-        <!-- TAB 2: READING & SEO SETTINGS -->
-        <div class="space-y-6 max-w-3xl">
+        </div>
+        <!-- TAB 5: READING & SEO SETTINGS -->
+        <div id="cora-settings-panel-reading" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'reading' ? '' : 'hidden'; ?>">
             <!-- Card 1: Homepage Displays -->
             <div class="cora-shopify-card space-y-4">
                 <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
@@ -1027,9 +1116,9 @@ $cora_settings_tabs = array(
             </div>
         </div>
 
-        <?php elseif ( $active_tab === 'writing' ) : ?>
-        <!-- TAB 3: WRITING DEFAULTS -->
-        <div class="space-y-6 max-w-3xl">
+        </div>
+        <!-- TAB 6: WRITING DEFAULTS -->
+        <div id="cora-settings-panel-writing" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'writing' ? '' : 'hidden'; ?>">
             <!-- Card: Writing Defaults -->
             <div class="cora-shopify-card space-y-4">
                 <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
@@ -1059,9 +1148,9 @@ $cora_settings_tabs = array(
             </div>
         </div>
 
-        <?php elseif ( $active_tab === 'discussion' ) : ?>
-        <!-- TAB 4: DISCUSSION & MODERATION -->
-        <div class="space-y-6 max-w-3xl">
+        </div>
+        <!-- TAB 7: DISCUSSION & MODERATION -->
+        <div id="cora-settings-panel-discussion" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'discussion' ? '' : 'hidden'; ?>">
             <!-- Card 1: Comment Moderation Policies -->
             <div class="cora-shopify-card space-y-4">
                 <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
@@ -1109,9 +1198,9 @@ $cora_settings_tabs = array(
             </div>
         </div>
 
-        <?php elseif ( $active_tab === 'permalinks' ) : ?>
-        <!-- TAB 5: SEO PERMALINKS -->
-        <div class="space-y-6 max-w-3xl">
+        </div>
+        <!-- TAB 8: SEO PERMALINKS -->
+        <div id="cora-settings-panel-permalinks" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'permalinks' ? '' : 'hidden'; ?>">
             <!-- Card: SEO URL Permalinks -->
             <div class="cora-shopify-card space-y-4">
                 <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
@@ -1159,9 +1248,9 @@ $cora_settings_tabs = array(
             </div>
         </div>
 
-        <?php elseif ( $active_tab === 'privacy' ) : ?>
-        <!-- TAB 6: PRIVACY POLICY -->
-        <div class="space-y-6 max-w-3xl">
+        </div>
+        <!-- TAB 9: PRIVACY POLICY -->
+        <div id="cora-settings-panel-privacy" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'privacy' ? '' : 'hidden'; ?>">
             <!-- Card: Privacy Policy -->
             <div class="cora-shopify-card space-y-4">
                 <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
@@ -1185,9 +1274,9 @@ $cora_settings_tabs = array(
                 </div>
             </div>
         </div>
-        <?php elseif ( $active_tab === 'git-sync' ) : ?>
-        <!-- TAB 7: GIT SYNC (LOVABLE & GITHUB) -->
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start max-w-full">
+        </div>
+        <!-- TAB 10: GIT SYNC (LOVABLE & GITHUB) -->
+        <div id="cora-settings-panel-git-sync" class="cora-settings-panel space-y-6 max-w-full <?php echo $active_tab === 'git-sync' ? '' : 'hidden'; ?>">
             <!-- Left side: Form Settings Card -->
             <div class="xl:col-span-7 space-y-6">
                 <!-- Card 1: GitHub Connection -->
@@ -1399,14 +1488,8 @@ $cora_settings_tabs = array(
                 </div>
             </div>
         </div>
-        <?php elseif ( $active_tab === 'audit' ) : ?>
-        <!-- TAB 12: AUDIT & LOGS PANEL -->
-        <div class="space-y-6 max-w-5xl">
-            <?php include CORA_WORKSPACE_PATH . 'views/view-audit-panel.php'; ?>
-        </div>
-
-        <?php elseif ( $active_tab === 'onboarding' ) : ?>
-        <!-- TAB 13: USER ONBOARDING PANEL -->
+        <!-- TAB 12: USER ONBOARDING PANEL -->
+        <div id="cora-settings-panel-onboarding" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'onboarding' ? '' : 'hidden'; ?>">
         <?php
         $ob_enabled_raw   = get_option( 'cora_onboarding_enabled', '1' );
         $ob_enabled       = ( $ob_enabled_raw !== '0' && $ob_enabled_raw !== 0 ) ? 1 : 0;
@@ -1709,7 +1792,8 @@ $cora_settings_tabs = array(
         </script>
         <?php // end onboarding tab ?>
 
-        <?php elseif ( $active_tab === 'backup' ) : 
+        </div>
+        <?php 
             $google_client_id     = get_option('cora_google_client_id', '');
             $google_client_secret = get_option('cora_google_client_secret', '');
             $google_refresh_token = get_option('cora_google_refresh_token', '');
@@ -1719,8 +1803,8 @@ $cora_settings_tabs = array(
             $is_google_connected  = (!empty($google_refresh_token)); // ONLY true if OAuth token exists
             $history = get_option( 'cora_workspace_backup_history', array() );
         ?>
-        <!-- TAB 14: PROMINENT BACKUP & RECOVERY PANEL -->
-        <div class="space-y-6">
+        <!-- TAB 13: BACKUP & RECOVERY PANEL -->
+        <div id="cora-settings-panel-backup" class="cora-settings-panel space-y-6 <?php echo $active_tab === 'backup' ? '' : 'hidden'; ?>">
             
             <!-- Top Metric & Status Summary Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -2299,20 +2383,18 @@ $cora_settings_tabs = array(
         }
         </script>
 
-        <?php endif; // end backup tab ?>
+        </div>
 
         <!-- Sticky Save Actions Bar (Shopify Style) -->
-        <?php if ( $active_tab !== 'audit' ) : ?>
         <div class="cora-shopify-actions-bar">
             <div class="text-xs text-zinc-500 font-semibold hidden sm:block">
                 Configure your Cora system environment.
             </div>
-            <button type="submit" class="px-5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors shadow-sm cursor-pointer flex items-center gap-2">
+            <button type="submit" class="px-5 py-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-lg text-xs transition-colors shadow-sm cursor-pointer flex items-center gap-2">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M19 21H5a2 2 0 0 1-2 2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
                 Save Settings
             </button>
         </div>
-        <?php endif; ?>
     </form>
 </div>
 </div>

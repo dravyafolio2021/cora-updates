@@ -8331,6 +8331,7 @@ function cora_ajax_clear_cache() {
 }
 add_action( 'wp_ajax_cora_clear_cache', 'cora_ajax_clear_cache' );
 add_action( 'wp_ajax_nopriv_cora_clear_cache', 'cora_ajax_clear_cache' );
+add_action( 'wp_ajax_cora_clear_system_cache', 'cora_ajax_clear_cache' );
 
 /**
  * AJAX Action: Save Git Sync Field
