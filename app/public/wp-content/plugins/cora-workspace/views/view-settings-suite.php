@@ -2064,42 +2064,39 @@ $cora_settings_tabs = array(
                                     $is_zip = ( strpos( $item['filename'], '.zip' ) !== false );
                                     $display_name = strlen($item['filename']) > 24 ? substr($item['filename'], 0, 24) . '...' : $item['filename'];
                             ?>
-                                <div class="cora-shopify-card !p-3.5 flex flex-col gap-3.5 bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl shadow-3xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
-                                    <div class="flex items-start justify-between gap-3">
-                                        <div class="flex items-center gap-2.5 min-w-0">
-                                            <div class="w-8.5 h-8.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-150 dark:border-zinc-800 flex items-center justify-center shrink-0 text-zinc-500 dark:text-zinc-400">
-                                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                            </div>
-                                            <div class="min-w-0">
-                                                <p class="font-bold text-xs text-zinc-800 dark:text-zinc-200 truncate m-0" title="<?php echo esc_attr( $item['filename'] ); ?>"><?php echo esc_html( $display_name ); ?></p>
-                                                <div class="flex items-center gap-1.5 mt-1">
-                                                    <span class="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">
-                                                        <?php echo esc_html( date( 'M j, Y', $item['time'] ) ) . ' &bull; ' . esc_html( date( 'H:i', $item['time'] ) ) . ' UTC'; ?>
-                                                    </span>
-                                                    <span class="text-[10px] text-zinc-300 dark:text-zinc-700">&bull;</span>
-                                                    <span class="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/40 dark:border-zinc-750 rounded-md"><?php echo esc_html( $item['size'] ); ?></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <span class="text-[8px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0 bg-zinc-100 dark:bg-zinc-850 text-zinc-650 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800/80">
-                                            <?php echo $is_zip ? '.zip' : 'SQL'; ?>
-                                        </span>
-                                    </div>
-
-                                    <div class="flex items-center justify-between pt-2.5 border-t border-zinc-100 dark:border-zinc-800/50">
-                                        <button type="button" onclick="coraRestoreBackup('<?php echo esc_js($item['filename']); ?>')" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 font-bold text-[10px] rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shadow-3xs active:scale-97">
-                                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 2v6h6"></path><path d="M3 13a9 9 0 1 0 3-7.7L3 8"></path></svg>
-                                            Restore
-                                        </button>
-                                        <div class="flex items-center gap-1.5">
-                                            <a href="<?php echo admin_url('admin-ajax.php?action=cora_download_backup&file=' . urlencode( $item['filename'] ) . '&nonce=' . wp_create_nonce('cora_download_backup_nonce')); ?>" class="p-1.5 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-250 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-750 rounded-lg border border-zinc-200/30 dark:border-zinc-850 transition-all" title="Download Archive">
-                                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                            </a>
-                                            <button type="button" onclick="coraDeleteBackup('<?php echo esc_js($item['filename']); ?>')" class="p-1.5 text-red-500 hover:text-red-600 dark:hover:text-red-400 bg-red-50/50 hover:bg-red-55 dark:bg-red-950/20 dark:hover:bg-red-950/40 rounded-lg border border-red-100/30 dark:border-red-900/20 transition-all cursor-pointer" title="Delete Log">
-                                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                            </button>
-                                        </div>
-                                    </div>
+                                <div class="cora-shopify-card !p-3.5 flex flex-col gap-3 bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl shadow-3xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+                                     <!-- Row 1: File Name and Format Badge -->
+                                     <div class="flex items-center justify-between gap-2.5 min-w-0">
+                                         <div class="flex items-center gap-2 min-w-0">
+                                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 dark:text-zinc-550 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                             <span class="font-bold text-xs text-zinc-850 dark:text-zinc-200 truncate" title="<?php echo esc_attr( $item['filename'] ); ?>"><?php echo esc_html( $display_name ); ?></span>
+                                         </div>
+                                         <span class="text-[8px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-850 text-zinc-600 dark:text-zinc-455 border border-zinc-200/60 dark:border-zinc-800 shrink-0">
+                                             <?php echo $is_zip ? '.zip' : 'SQL'; ?>
+                                         </span>
+                                     </div>
+ 
+                                     <!-- Row 2: Date & Size (Meta Details) -->
+                                     <div class="flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-450 border-t border-zinc-50 dark:border-zinc-850/60 pt-2 font-medium">
+                                         <span><?php echo esc_html( date( 'M j, Y H:i', $item['time'] ) ) . ' UTC'; ?></span>
+                                         <span class="font-semibold text-zinc-600 dark:text-zinc-400"><?php echo esc_html( $item['size'] ); ?></span>
+                                     </div>
+ 
+                                     <!-- Row 3: Action Buttons -->
+                                     <div class="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800/50">
+                                         <button type="button" onclick="coraRestoreBackup('<?php echo esc_js($item['filename']); ?>')" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 font-bold text-[10px] rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shadow-3xs active:scale-97">
+                                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 2v6h6"></path><path d="M3 13a9 9 0 1 0 3-7.7L3 8"></path></svg>
+                                             Restore
+                                         </button>
+                                         <div class="flex items-center gap-1.5">
+                                             <a href="<?php echo admin_url('admin-ajax.php?action=cora_download_backup&file=' . urlencode( $item['filename'] ) . '&nonce=' . wp_create_nonce('cora_download_backup_nonce')); ?>" class="p-1.5 text-zinc-500 hover:text-zinc-850 dark:hover:text-zinc-250 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-750 rounded-lg border border-zinc-200/30 dark:border-zinc-850 transition-all" title="Download Archive">
+                                                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                             </a>
+                                             <button type="button" onclick="coraDeleteBackup('<?php echo esc_js($item['filename']); ?>')" class="p-1.5 text-red-500 hover:text-red-600 dark:hover:text-red-400 bg-red-50/50 hover:bg-red-55 dark:bg-red-950/20 dark:hover:bg-red-950/40 rounded-lg border border-red-100/30 dark:border-red-900/20 transition-all cursor-pointer" title="Delete Log">
+                                                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                             </button>
+                                         </div>
+                                     </div>
                                 </div>
                             <?php 
                                 endforeach;
