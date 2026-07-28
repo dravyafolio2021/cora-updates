@@ -9710,10 +9710,10 @@ jQuery(document).ready(function($) {
         const sidebarTitle = form.find('input[name="cora_sidebar_title"]').val();
 
         if (blogname !== undefined) {
-            document.title = blogname;
+            document.title = blogname || 'Cora';
             const template = form.find('input[disabled]');
             if(template.length) {
-                template.val(blogname);
+                template.val(blogname || 'Cora');
             }
         }
         

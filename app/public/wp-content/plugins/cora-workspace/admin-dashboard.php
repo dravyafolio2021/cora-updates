@@ -222,9 +222,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     $current_industry_clean = str_replace( '_', '-', strtolower( trim( $current_industry ) ) );
     $is_studio_ind = ( $current_industry_clean === 'photography' || $current_industry_clean === 'studio' || $current_industry_clean === 'photography-studio' );
 
-    $title_real_estate = get_option( 'cora_site_title_real_estate', 'Cora Real Estate' );
-    $title_studio      = get_option( 'cora_site_title_studio', 'Cora Studio' );
-    $page_title_format = $is_studio_ind ? $title_studio : $title_real_estate;
+    $title_real_estate = get_option( 'cora_site_title_real_estate', '' );
+    $title_studio      = get_option( 'cora_site_title_studio', '' );
+    $page_title_raw    = $is_studio_ind ? $title_studio : $title_real_estate;
+    $page_title_format = $page_title_raw ?: 'Cora';
     ?>
     <link rel="icon" type="image/png" href="<?php echo esc_url( $favicon_url ); ?>" />
     <link rel="shortcut icon" id="cora-dynamic-favicon" href="<?php echo esc_url( $favicon_url ); ?>" />

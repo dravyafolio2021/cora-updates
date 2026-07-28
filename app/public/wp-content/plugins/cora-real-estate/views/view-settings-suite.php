@@ -314,22 +314,22 @@ $cora_settings_tabs = array(
                         $current_industry_clean = str_replace( '_', '-', strtolower( trim( $current_industry ) ) );
                         $is_studio = ( $current_industry_clean === 'photography' || $current_industry_clean === 'studio' || $current_industry_clean === 'photography-studio' );
 
-                        $title_real_estate = get_option( 'cora_site_title_real_estate', 'Cora Real Estate' );
-                        $title_studio      = get_option( 'cora_site_title_studio', 'Cora Studio' );
+                        $title_real_estate = get_option( 'cora_site_title_real_estate', '' );
+                        $title_studio      = get_option( 'cora_site_title_studio', '' );
                         $active_site_title = $is_studio ? $title_studio : $title_real_estate;
 
-                        $desc_real_estate = get_option( 'cora_tagline_real_estate', 'Luxury Properties & Real Estate Suite' );
-                        $desc_studio      = get_option( 'cora_tagline_studio', 'Media & Photography Studio Suite' );
+                        $desc_real_estate = get_option( 'cora_tagline_real_estate', '' );
+                        $desc_studio      = get_option( 'cora_tagline_studio', '' );
                         $active_tagline    = $is_studio ? $desc_studio : $desc_real_estate;
                         ?>
-                        <input type="text" name="blogname" id="cora-site-title-input" value="<?php echo esc_attr( $active_site_title ); ?>">
+                        <input type="text" name="blogname" id="cora-site-title-input" value="<?php echo esc_attr( $active_site_title ); ?>" placeholder="Cora">
                     </div>
                     <div>
                         <label class="flex items-center gap-1.5" title="This title appears on your browser tab and platform header.">
                             Tagline / Subtitle
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                         </label>
-                        <input type="text" name="blogdescription" id="cora-site-tagline-input" value="<?php echo esc_attr( $active_tagline ); ?>">
+                        <input type="text" name="blogdescription" id="cora-site-tagline-input" value="<?php echo esc_attr( $active_tagline ); ?>" placeholder="Luxury Properties & Studio Suite">
                     </div>
                     <div>
                         <label class="flex items-center gap-1.5" title="Changes the top-left sidebar title text">
