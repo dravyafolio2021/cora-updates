@@ -1068,14 +1068,25 @@ $cora_settings_tabs = array(
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-zinc-100 dark:border-zinc-800/40 pt-4">
-                    <div>
-                        <label>WhatsApp Cloud API Token</label>
-                        <?php $wa_token = get_option('cora_whatsapp_api_token', ''); ?>
-                        <input type="password" name="cora_whatsapp_api_token" value="<?php echo esc_attr( $wa_token ? str_repeat('•', 24) : '' ); ?>" placeholder="EAAW..." class="cora-credential-input" oncopy="return false;" oncut="return false;" ondragstart="return false;" ondrop="return false;" autocomplete="off">
+                    <div class="relative">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <label class="!mb-0 text-zinc-400 dark:text-zinc-600">WhatsApp Cloud API Token</label>
+                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-700">
+                                <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                Coming Soon
+                            </span>
+                        </div>
+                        <input type="text" disabled placeholder="EAAW..." class="bg-zinc-50 dark:bg-zinc-900 text-zinc-300 dark:text-zinc-700 cursor-not-allowed border-zinc-200 dark:border-zinc-800 placeholder:text-zinc-300 dark:placeholder:text-zinc-700">
                     </div>
-                    <div>
-                        <label>WhatsApp Business Phone ID</label>
-                        <input type="text" name="cora_whatsapp_phone_number" value="<?php echo esc_attr( get_option('cora_whatsapp_phone_number', '') ); ?>" placeholder="e.g. 1093847291039">
+                    <div class="relative">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <label class="!mb-0 text-zinc-400 dark:text-zinc-600">WhatsApp Business Phone ID</label>
+                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-700">
+                                <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                Coming Soon
+                            </span>
+                        </div>
+                        <input type="text" disabled placeholder="e.g. 1093847291039" class="bg-zinc-50 dark:bg-zinc-900 text-zinc-300 dark:text-zinc-700 cursor-not-allowed border-zinc-200 dark:border-zinc-800 placeholder:text-zinc-300 dark:placeholder:text-zinc-700">
                     </div>
                 </div>
             </div>
