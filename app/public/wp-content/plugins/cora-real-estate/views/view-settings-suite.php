@@ -491,13 +491,13 @@ $cora_settings_tabs = array(
 
                         if (window.coraApplyBrandingLive) window.coraApplyBrandingLive();
                     }
-                    jQuery(document).ready(function($) {
+                    (function($) {
                         $('#cora-site-title-input, #cora-site-tagline-input').on('input', function() {
                             $(this).data('user-edited', true);
                         });
                         const currentInd = $('#cora-settings-industry-select').val() || '<?php echo esc_js($is_studio ? "photography_studio" : "real_estate"); ?>';
                         coraFilterRolesByIndustry(currentInd);
-                    });
+                    })(jQuery);
                     </script>
                     <div>
                         <label>Platform Language</label>
@@ -2124,7 +2124,7 @@ $cora_settings_tabs = array(
         </div>
 
         <script>
-        jQuery(document).ready(function($) {
+        (function($) {
             // Full Snapshot Zip Generator
             $('#cora-trigger-full-snapshot-backup').on('click', function(e) {
                 e.preventDefault();
@@ -2284,7 +2284,7 @@ $cora_settings_tabs = array(
                     if (window.coraShowToast) window.coraShowToast('Network error while disconnecting Google Drive.', 'error');
                 });
             });
-        });
+        })(jQuery);
 
         <!-- Custom Confirmation Drawer (replaces all browser confirm() dialogs) -->
         <div id="cora-confirm-drawer" class="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center" style="display:none !important;">
@@ -2400,7 +2400,7 @@ $cora_settings_tabs = array(
 
         <script>
         // Restore Backup Handler
-        function coraRestoreBackup(filename) {
+        window.coraRestoreBackup = function(filename) {
             window.coraConfirm({
                 title:   'Restore Platform Snapshot',
                 message: 'Restore to "' + filename + '"? A pre-restore safety snapshot will be created automatically before restoring.',
@@ -2420,10 +2420,10 @@ $cora_settings_tabs = array(
                     }
                 });
             });
-        }
+        };
 
         // Delete Backup Handler
-        function coraDeleteBackup(filename) {
+        window.coraDeleteBackup = function(filename) {
             window.coraConfirm({
                 title:   'Delete Snapshot',
                 message: 'Permanently delete "' + filename + '"? This cannot be undone.',
@@ -2441,7 +2441,7 @@ $cora_settings_tabs = array(
                     }
                 });
             });
-        }
+        };
         </script>
 
     </form>
@@ -2449,7 +2449,7 @@ $cora_settings_tabs = array(
 </div>
 
 <script>
-jQuery(document).ready(function($) {
+(function($) {
     if (typeof coraAutoSave !== 'undefined') {
         coraAutoSave.attachForm('#cora-settings-suite-form', 'settings_suite', 'cora_save_system_settings_suite');
     }
@@ -2476,6 +2476,6 @@ jQuery(document).ready(function($) {
             $btn.prop('disabled', false).text('Purge Old wp_options Cache');
         });
     });
-});
+})(jQuery);
 </script>
 </div><!-- end cora-shopify-settings-theme -->
