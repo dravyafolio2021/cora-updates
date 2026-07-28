@@ -1326,7 +1326,14 @@ $cora_settings_tabs = array(
                                     <option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( get_option('wp_page_for_privacy_policy'), $p->ID ); ?>><?php echo esc_html( $p->post_title ); ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <a href="?page=cora-workspace&sub=pages" class="px-3.5         <!-- TAB 10: GIT SYNC (LOVABLE & GITHUB) -->
+                            <a href="?page=cora-workspace&sub=pages" class="px-3.5 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-semibold text-xs rounded-lg transition-colors flex items-center gap-1 shadow-3xs cursor-pointer">Create Page</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 10: GIT SYNC (LOVABLE & GITHUB) -->
         <div id="cora-settings-panel-git-sync" class="cora-settings-panel max-w-full <?php echo $active_tab === 'git-sync' ? '' : 'hidden'; ?> grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
             <!-- Left side: Form Settings Card -->
             <div class="xl:col-span-7 space-y-6">
