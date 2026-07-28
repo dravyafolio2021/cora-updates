@@ -108,3 +108,33 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
     visibility: visible;
 }
 
+/* =====================================================================
+   WP MEDIA MODAL FIXES
+   Ensure WordPress media library modal buttons are not clipped or
+   hidden by Cora's Tailwind resets or overflow rules.
+   ===================================================================== */
+
+/* Force the media modal toolbar and select button to always be visible */
+.media-modal .media-frame-toolbar,
+.media-modal .media-toolbar,
+.media-modal .media-toolbar-primary,
+.media-modal .button.media-button,
+.media-modal .button.media-button-select {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* Ensure the attachment sidebar is scrollable so button is reachable */
+.media-modal .attachment-details,
+.media-modal .attachment-info {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+/* Fix: WP media modal must sit above Cora drawers (z-index: 99999) */
+.media-modal-backdrop,
+.media-modal {
+    z-index: 160100 !important;
+}
