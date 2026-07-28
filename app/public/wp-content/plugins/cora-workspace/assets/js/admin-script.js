@@ -9655,7 +9655,7 @@ jQuery(document).ready(function($) {
         });
 
         const checkboxes = [
-            'users_can_register', 'blog_public', 'default_pingback_flag', 'default_comment_status', 
+            'users_can_register', 'default_pingback_flag', 'default_comment_status', 
             'comment_moderation', 'cora_workspace_allow_tours', 'cora_git_sync_enabled',
             'cora_onboarding_enabled', 'cora_onboarding_google_enabled', 'cora_onboarding_email_enabled', 
             'cora_onboarding_require_verification', 'cora_pwd_policy_numbers', 'cora_pwd_policy_uppercase',
