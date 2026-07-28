@@ -6739,7 +6739,7 @@ jQuery(document).ready(function($) {
         });
     };
 
-    window.coraSaveArticle = function(status) {
+    window.coraSaveArticle = function(status, isAutoSave) {
         if (!status) status = 'draft';
         const id = $('#cora-article-id').val();
         const title = $('#cora-article-title').val();
@@ -6753,22 +6753,29 @@ jQuery(document).ready(function($) {
         const thumbnail_id = $('#cora-thumbnail-id').val();
         const scheduled_date = $('#cora-article-scheduled-date').val() || '';
 
-        if (!title) {
+        if (!title && !isAutoSave) {
             window.coraShowToast('Cannot save an article without a title.', 'error');
             return;
         }
+        if (!title) return;
 
         const assignee_id = $('#cora-article-assignee').val() || '0';
-
         const slug = $('#cora-article-slug').val() || '';
         const comment_status = $('#cora-article-allow-comments').is(':checked') ? 'open' : 'closed';
 
-        $('#cora-editor-status').text('Saving...');
-        window.coraShowToast(`Saving article as ${status}...`, 'info');
+        if (!isAutoSave) {
+            $('#cora-editor-status').text('Saving...');
+            window.coraShowToast(`Saving article as ${status}...`, 'info');
+        } else {
+            $('#cora-editor-save-status').html('<span class="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block mr-1 animate-pulse"></span>Saving...');
+        }
 
-        $.post(ajaxurl, {
+        const nonce = typeof coraREData !== 'undefined' ? coraREData.ajaxNonce : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : '');
+        const ajaxUrl = typeof ajaxurl !== 'undefined' ? ajaxurl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php');
+
+        $.post(ajaxUrl, {
             action: 'cora_save_article',
-            nonce: coraREData.ajaxNonce,
+            nonce: nonce,
             post_id: id,
             title: title,
             content: content,
@@ -6784,13 +6791,22 @@ jQuery(document).ready(function($) {
             comment_status: comment_status,
             scheduled_date: scheduled_date
         }, function(response) {
-            if (response.success) {
+            if (response && response.success) {
+                if (response.data && response.data.post_id) {
+                    $('#cora-article-id').val(response.data.post_id);
+                }
                 $('#cora-editor-status').text('Saved at ' + new Date().toLocaleTimeString());
-                window.coraShowToast(`Article ${status === 'publish' ? 'published' : 'saved'} successfully!`, 'success');
-                setTimeout(() => window.location.reload(), 800); 
+                $('#cora-editor-save-status').html('<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block mr-1"></span>Saved');
+                
+                if (!isAutoSave) {
+                    window.coraShowToast(`Article ${status === 'publish' ? 'published' : 'saved'} successfully!`, 'success');
+                    setTimeout(() => window.location.reload(), 800); 
+                }
             } else {
                 $('#cora-editor-status').text('Save Failed');
-                window.coraShowToast(response.data || 'Error saving article.', 'error');
+                if (!isAutoSave) {
+                    window.coraShowToast(response ? response.data : 'Error saving article.', 'error');
+                }
             }
         });
     };

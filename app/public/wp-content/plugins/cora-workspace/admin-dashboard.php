@@ -6108,6 +6108,16 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
             <!-- SECTION: EMAILS COMPOSER -->
             <?php if ( $sub_page === 'emails' ) : ?>
+            <?php
+            echo '<style>
+                .cora-content-wrapper {
+                    padding: 0 !important;
+                    gap: 0 !important;
+                }
+                /* Remove Tailwind space-y-6 between sections */
+                .cora-content-wrapper > * + * { margin-top: 0 !important; }
+            </style>';
+            ?>
             <section id="cora-page-emails" class="cora-page-section cora-active" style="padding:0;margin:0;overflow:hidden;flex:1;min-height:0;display:flex;flex-direction:column;">
                 <?php include CORA_WORKSPACE_PATH . 'views/view-emails.php'; ?>
             </section>
@@ -7999,7 +8009,16 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                     </div><!-- /#cora-editor-slash-menu -->
 
-                           <!-- Inspector Navigation Tabs -->
+                    <!-- Quill Rich-Text Editor Canvas Container -->
+                    <div id="cora-quill-editor" class="w-full text-zinc-900 min-h-[420px] border-none focus:outline-none text-base leading-relaxed mt-2"></div>
+
+                </div><!-- /.cora-writing-sheet -->
+            </main>
+
+            <!-- Right Inspector Sidebar (Copilot, Meta, SEO & GEO) -->
+            <aside id="cora-article-inspector" class="w-80 md:w-96 border-l border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col shrink-0 overflow-y-auto transition-all">
+                
+                <!-- Inspector Navigation Tabs -->
                 <div class="flex border-b border-zinc-200 dark:border-zinc-800 bg-[#f9fafb] dark:bg-[#0c0c0e] sticky top-0 z-10 text-[10px] font-bold uppercase tracking-wider inspector-tabs-container select-none">
                     <button type="button" id="tab-inspector-copilot" onclick="coraSwitchInspectorTab('copilot')" class="flex-1 py-3 px-1 text-center border-b-2 border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 cursor-pointer transition-all flex items-center justify-center gap-1.5 inspector-tab-btn tab-active font-bold">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
@@ -8014,7 +8033,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         <span class="inspector-tab-label">SEO & GEO</span>
                     </button>
-                
+                </div><!-- /.inspector-tabs-container -->
 
                 <!-- TAB 1: Copilot & AI Tab -->
 
@@ -8138,7 +8157,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 <span>Generate</span>
                             </button>
                         </div>
-                        <textarea id="cora-article-excerpt" rows="3" placeholder="Summary snippet for search results and social previews..." class="w-full text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 focu                <!-- TAB 2: Publishing Meta Tab -->
+                        <textarea id="cora-article-excerpt" rows="3" placeholder="Summary snippet for search results and social previews..." class="w-full text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-650 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 shadow-3xs"></textarea>
+                    </div><!-- /.space-y-2 (Post Excerpt) -->
+                </div><!-- /#panel-inspector-copilot -->
+
+                <!-- TAB 2: Publishing Meta Tab -->
                 <div id="panel-inspector-meta" class="hidden p-4 space-y-4">
                     
                     <!-- Featured Image -->
@@ -8922,26 +8945,101 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
         // Editor helper functions are loaded from assets/js/admin-script.js
 
+        // --- REAL-TIME AUTO-SAVE & DRAFT RECOVERY ENGINE ---
+        window.coraEditorAutoSaveTimer = null;
+
+        window.coraTriggerEditorAutoSave = function() {
+            const postId = jQuery('#cora-article-id').val() || 'draft';
+            const draftKey = 'cora_article_draft_' + postId;
+            
+            const draftData = {
+                title: jQuery('#cora-article-title').val(),
+                subtitle: jQuery('#cora-article-subtitle').val(),
+                excerpt: jQuery('#cora-article-excerpt').val() || jQuery('#cora-article-excerpt-bh').val(),
+                slug: jQuery('#cora-article-slug').val(),
+                cover_url: jQuery('#cora-article-cover-url').val(),
+                content: window.coraQuillListingCoordinator ? window.coraQuillListingCoordinator.root.innerHTML : '',
+                timestamp: new Date().getTime()
+            };
+
+            // Instant local cache (<5ms)
+            try {
+                localStorage.setItem(draftKey, JSON.stringify(draftData));
+            } catch(e) {}
+
+            jQuery('#cora-editor-save-status').html('<span class="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block mr-1 animate-pulse"></span>Saving...');
+
+            if (window.coraEditorAutoSaveTimer) {
+                clearTimeout(window.coraEditorAutoSaveTimer);
+            }
+
+            window.coraEditorAutoSaveTimer = setTimeout(function() {
+                if (typeof window.coraSaveArticle === 'function') {
+                    window.coraSaveArticle('draft', true);
+                }
+            }, 1500);
+        };
+
+        window.coraRestoreEditorDraft = function(postId) {
+            const draftKey = 'cora_article_draft_' + (postId || 'draft');
+            try {
+                const raw = localStorage.getItem(draftKey);
+                if (!raw) return false;
+                const draft = JSON.parse(raw);
+                if (!draft) return false;
+
+                const data = draft.data || draft;
+                if (data.title && !jQuery('#cora-article-title').val()) {
+                    jQuery('#cora-article-title').val(data.title);
+                }
+                if (data.subtitle && !jQuery('#cora-article-subtitle').val()) {
+                    jQuery('#cora-article-subtitle').val(data.subtitle);
+                }
+                if (data.excerpt) {
+                    jQuery('#cora-article-excerpt, #cora-article-excerpt-bh').val(data.excerpt);
+                }
+                if (data.slug) {
+                    jQuery('#cora-article-slug').val(data.slug);
+                }
+                if (data.content && window.coraQuillListingCoordinator) {
+                    const currentText = window.coraQuillListingCoordinator.getText().trim();
+                    if (!currentText || currentText === 'Welcome to WordPress. This is your first post. Edit or delete it, then start writing!') {
+                        window.coraQuillListingCoordinator.root.innerHTML = data.content;
+                    }
+                }
+                jQuery('#cora-editor-save-status').html('<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block mr-1"></span>Draft Restored');
+                return true;
+            } catch(e) {
+                return false;
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', function() {
             // Set default font
             if (typeof window.coraSetEditorFont === 'function') {
                 window.coraSetEditorFont('sans');
             }
-            // Real-time character count on excerpt text area
-            jQuery(document).on('input propertychange change', '#cora-article-excerpt', function() {
+            
+            // Typist listener for real-time auto-saving
+            jQuery(document).on('input propertychange change keyup', '#cora-article-title, #cora-article-subtitle, #cora-article-excerpt, #cora-article-slug, #cora-article-excerpt-bh', function() {
                 if (typeof window.coraUpdateExcerptCount === 'function') {
                     window.coraUpdateExcerptCount();
                 }
+                window.coraTriggerEditorAutoSave();
             });
-
 
             setTimeout(function() {
                 if (window.coraQuillListingCoordinator) {
                     window.coraQuillListingCoordinator.on('text-change', function() {
                         window.coraUpdateWordCount();
+                        window.coraTriggerEditorAutoSave();
                     });
                 }
                 
+                // Restore unsaved draft from localStorage if page refreshed
+                const activeId = jQuery('#cora-article-id').val();
+                window.coraRestoreEditorDraft(activeId);
+
                 // Initialize metrics and counters
                 if (typeof window.coraUpdateWordCount === 'function') {
                     window.coraUpdateWordCount();
@@ -8949,7 +9047,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 if (typeof window.coraUpdateExcerptCount === 'function') {
                     window.coraUpdateExcerptCount();
                 }
-            }, 1500);
+            }, 1000);
         });
         </script>
     </div>
