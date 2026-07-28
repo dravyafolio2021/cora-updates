@@ -2406,8 +2406,6 @@ $cora_settings_tabs = array(
         }
         </script>
 
-        </div>
-
     </form>
 </div>
 </div>
