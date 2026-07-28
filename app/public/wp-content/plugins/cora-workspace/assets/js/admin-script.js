@@ -9600,8 +9600,8 @@ jQuery(document).ready(function($) {
         $('.cora-settings-nav-item[data-settings-tab="' + tabKey + '"]').addClass('active');
         
         // Update mobile tab navigation active classes
-        $('.cora-settings-nav-mobile').removeClass('bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 active-tab').addClass('bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-850 dark:text-zinc-300 dark:hover:bg-zinc-800');
-        $('.cora-settings-nav-mobile[data-settings-tab-mobile="' + tabKey + '"]').removeClass('bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-850 dark:text-zinc-300 dark:hover:bg-zinc-800').addClass('bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 active-tab');
+        $('.cora-settings-nav-mobile').removeClass('border-zinc-950 text-zinc-950 dark:border-white dark:text-white font-bold active-tab').addClass('border-transparent text-zinc-550 dark:text-zinc-400 hover:text-zinc-850 dark:hover:text-zinc-250');
+        $('.cora-settings-nav-mobile[data-settings-tab-mobile="' + tabKey + '"]').removeClass('border-transparent text-zinc-550 dark:text-zinc-400 hover:text-zinc-850 dark:hover:text-zinc-250').addClass('border-zinc-950 text-zinc-950 dark:border-white dark:text-white font-bold active-tab');
 
         // Update active tab hidden input
         $('input[name="active_tab"]').val(tabKey);
