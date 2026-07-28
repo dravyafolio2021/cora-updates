@@ -403,7 +403,7 @@ $cora_settings_tabs = array(
                     <div>
                         <label>Workspace Industry Profile</label>
                         <select name="cora_workspace_industry" id="cora-settings-industry-select" onchange="coraFilterRolesByIndustry(this.value);" style="width: 100%; padding: 10px 14px; font-size: 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;">
-                            <?php $industry = get_option('cora_workspace_industry', 'real_estate'); ?>
+                            <?php $industry = $current_industry; ?>
                             <option value="real_estate" <?php selected( $industry, 'real_estate' ); ?>>Real Estate Agency</option>
                             <option value="photography_studio" <?php selected( $industry, 'photography_studio' ); ?>>Photography Studio</option>
                         </select>
