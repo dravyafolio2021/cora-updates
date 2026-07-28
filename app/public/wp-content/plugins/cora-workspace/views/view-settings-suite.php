@@ -244,44 +244,43 @@ $cora_settings_tabs = array(
 }
 </style>
 
-<div class="cora-shopify-settings-theme">
-<div class="cora-page-header flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="cora-shopify-settings-theme"><div class="cora-page-header flex flex-row items-center justify-between gap-4 border-b border-zinc-150/70 dark:border-zinc-800/40 pb-4">
     <div class="flex items-center gap-3">
         <span class="cora-page-emoji text-zinc-900 flex shrink-0">
-            <svg viewBox="0 0 24 24" width="30" height="30" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="3"></circle>
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
             </svg>
         </span>
         <div>
-            <h1 class="cora-page-title text-2xl font-bold tracking-tight text-zinc-900">System Settings Complete Suite</h1>
-            <p class="text-sm text-zinc-500 mt-0.5">Global network parameters, reading/writing defaults, discussion moderation rules, and SEO permalinks.</p>
+            <h1 class="cora-page-title text-lg sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white m-0">System Settings Complete Suite</h1>
+            <p class="text-xs text-zinc-500 mt-0.5 hidden sm:block">Global network parameters, reading/writing defaults, discussion moderation rules, and SEO permalinks.</p>
         </div>
     </div>
-    <div class="flex items-center gap-2">
-        <button type="button" class="px-3 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold rounded-md text-xs transition-colors flex items-center gap-1.5 border border-zinc-200 dark:border-zinc-700 shadow-2xs cursor-pointer" onclick="coraClearSystemCache()">
-            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
-            Clear Cache
+    <div class="flex items-center gap-2 shrink-0">
+        <button type="button" class="p-2 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-650 dark:text-zinc-350 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-3xs cursor-pointer" onclick="coraClearSystemCache()" title="Clear Cache">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
         </button>
-        <button type="button" class="cora-btn-primary px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold rounded-md text-xs transition-colors cursor-pointer flex items-center gap-2 shadow-sm" onclick="coraSaveSystemSettingsSuite()">
-            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-            Save All Settings
+        <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-97" onclick="coraSaveSystemSettingsSuite()">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+            <span class="hidden sm:inline">Save Settings</span>
+            <span class="sm:hidden">Save</span>
         </button>
     </div>
 </div>
 
 <!-- Mobile Horizontal Tab Strip (Hidden on Desktop) -->
-<div class="lg:hidden flex overflow-x-auto gap-2 pb-3 mb-2 scrollbar-none border-b border-zinc-200/50 dark:border-zinc-800/40 w-full" style="-webkit-overflow-scrolling: touch;">
+<div class="lg:hidden flex overflow-x-auto gap-5 pb-0.5 mb-4 scrollbar-none border-b border-zinc-200/50 dark:border-zinc-800/40 w-full mt-4" style="-webkit-overflow-scrolling: touch;">
     <?php
     $tabs = $cora_settings_tabs;
     foreach ( $tabs as $tab_key => $tab ) :
         $is_active = ( $active_tab === $tab_key );
     ?>
-    <a href="#" onclick="window.coraSwitchSettingsTab('<?php echo esc_js( $tab_key ); ?>'); return false;" data-settings-tab-mobile="<?php echo esc_attr( $tab_key ); ?>" class="cora-settings-nav-mobile flex items-center gap-1.5 px-3.5 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors shrink-0 <?php echo $is_active ? 'bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 active-tab' : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-850 dark:text-zinc-300 dark:hover:bg-zinc-800'; ?>">
-        <span class="shrink-0 <?php echo $is_active ? 'text-white dark:text-zinc-950' : 'text-zinc-550 dark:text-zinc-400'; ?>">
+    <a href="#" onclick="window.coraSwitchSettingsTab('<?php echo esc_js( $tab_key ); ?>'); return false;" data-settings-tab-mobile="<?php echo esc_attr( $tab_key ); ?>" class="cora-settings-nav-mobile flex items-center gap-1.5 pb-2 border-b-2 whitespace-nowrap transition-all shrink-0 <?php echo $is_active ? 'border-zinc-950 text-zinc-950 dark:border-white dark:text-white font-bold active-tab' : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-850 dark:hover:text-zinc-250'; ?>">
+        <span class="shrink-0">
             <?php echo $tab['icon']; ?>
         </span>
-        <span><?php echo esc_html( $tab['label'] ); ?></span>
+        <span class="text-xs"><?php echo esc_html( $tab['label'] ); ?></span>
     </a>
     <?php endforeach; ?>
 </div>
@@ -1929,29 +1928,32 @@ $cora_settings_tabs = array(
                     <!-- Card 1: Full System Snapshot & Export Generator -->
                     <div class="cora-shopify-card space-y-4">
                         <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                            <div class="flex items-center gap-2 mb-0.5">
+                            <div class="flex items-center gap-2 mb-1">
                                 <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 m-0">Full System Snapshot & Export</h3>
-                                <span class="text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full">v2.1.0 Ready</span>
+                                <span class="text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full shrink-0">v2.1.0 Ready</span>
+                                <!-- Info Icon with Tooltip Popover -->
+                                <div class="relative group cursor-pointer flex shrink-0">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 hover:text-zinc-650 dark:hover:text-zinc-300 transition-colors"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-zinc-950 dark:bg-zinc-900 border border-zinc-850 dark:border-zinc-800 text-white rounded-xl shadow-xl opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all z-50 text-[10px] leading-relaxed font-normal normal-case">
+                                        <span class="font-bold text-zinc-100 block mb-1">Full System Snapshot (.zip)</span>
+                                        Packages the complete database schema, row records, environment manifest, active module states, and asset indexes into a single compressed backup archive. Standard database export (.sql) exports table structures and rows only.
+                                    </div>
+                                </div>
                             </div>
                             <p class="text-xs text-zinc-500 dark:text-zinc-400 m-0">Generate full system backup archives (.zip) or lightweight database SQL files.</p>
                         </div>
-                        <div class="p-4 bg-zinc-50 dark:bg-zinc-900/30 border border-zinc-150 dark:border-zinc-800/50 rounded-xl space-y-3">
-                            <p class="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
-                                <strong class="text-zinc-900 dark:text-zinc-100">Full System Snapshot (.zip)</strong> packages the complete database schema, row records, environment manifest, active module states, and asset indexes into a single compressed backup archive. Standard database export (.sql) exports table structures and rows only.
-                            </p>
-                            <div class="border-t border-zinc-200/60 dark:border-zinc-700/60 pt-3 flex flex-wrap gap-2.5">
-                                <!-- Primary: Full System Snapshot Zip Button -->
-                                <button type="button" id="cora-trigger-full-snapshot-backup" class="px-5 py-2.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-sm active:scale-97">
-                                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                    Generate Full Snapshot (.zip)
-                                </button>
+                        <div class="flex flex-wrap gap-2.5 pt-1.5">
+                            <!-- Primary: Full System Snapshot Zip Button -->
+                            <button type="button" id="cora-trigger-full-snapshot-backup" class="px-5 py-2.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-sm active:scale-97">
+                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                Generate Full Snapshot (.zip)
+                            </button>
 
-                                <!-- Secondary: Database Only SQL Button -->
-                                <button type="button" id="cora-trigger-manual-db-backup" class="px-4 py-2.5 bg-transparent hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm">
-                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
-                                    Export Database Only (.sql)
-                                </button>
-                            </div>
+                            <!-- Secondary: Database Only SQL Button -->
+                            <button type="button" id="cora-trigger-manual-db-backup" class="px-4 py-2.5 bg-transparent hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+                                Export Database Only (.sql)
+                            </button>
                         </div>
                     </div>
 
