@@ -558,7 +558,6 @@ $cora_settings_tabs = array(
             </div>
         </div>
 
-        </div>
         <!-- TAB 2: PASSWORD POLICY SETTINGS -->
         <div id="cora-settings-panel-pwd-policy" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'pwd-policy' ? '' : 'hidden'; ?>">
             <!-- Card: Password Policy -->
@@ -594,7 +593,6 @@ $cora_settings_tabs = array(
             </div>
         </div>
 
-        </div>
         <?php
             $agency_id = cora_get_current_user_agency_id();
             $branches  = cora_db_get_branches();
@@ -694,7 +692,6 @@ $cora_settings_tabs = array(
                     </table>
                 </div>
             </div>
-        </div>
 
         <!-- ═══ CREATE BRANCH DRAWER SHEET ══════════════════════════════════════════ -->
         <div id="drawer-create-branch" class="fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
@@ -1083,7 +1080,6 @@ $cora_settings_tabs = array(
             </div>
         </div>
 
-        </div>
         <!-- TAB 5: READING & SEO SETTINGS -->
         <div id="cora-settings-panel-reading" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'reading' ? '' : 'hidden'; ?>">
             <!-- Card 1: Homepage Displays -->
@@ -1149,7 +1145,6 @@ $cora_settings_tabs = array(
             </div>
         </div>
 
-        </div>
         <!-- TAB 6: WRITING DEFAULTS -->
         <div id="cora-settings-panel-writing" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'writing' ? '' : 'hidden'; ?>">
             <!-- Card: Writing Defaults -->
@@ -1181,7 +1176,6 @@ $cora_settings_tabs = array(
             </div>
         </div>
 
-        </div>
         <!-- TAB 7: DISCUSSION & MODERATION -->
         <div id="cora-settings-panel-discussion" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'discussion' ? '' : 'hidden'; ?>">
             <!-- Card 1: Comment Moderation Policies -->
@@ -1231,7 +1225,6 @@ $cora_settings_tabs = array(
             </div>
         </div>
 
-        </div>
         <!-- TAB 8: SEO PERMALINKS -->
         <div id="cora-settings-panel-permalinks" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'permalinks' ? '' : 'hidden'; ?>">
             <!-- Card: SEO URL Permalinks -->
@@ -1281,7 +1274,6 @@ $cora_settings_tabs = array(
             </div>
         </div>
 
-        </div>
         <!-- TAB 9: PRIVACY POLICY -->
         <div id="cora-settings-panel-privacy" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'privacy' ? '' : 'hidden'; ?>">
             <!-- Card: Privacy Policy -->
@@ -1307,9 +1299,8 @@ $cora_settings_tabs = array(
                 </div>
             </div>
         </div>
-        </div>
         <!-- TAB 10: GIT SYNC (LOVABLE & GITHUB) -->
-        <div id="cora-settings-panel-git-sync" class="cora-settings-panel space-y-6 max-w-full <?php echo $active_tab === 'git-sync' ? '' : 'hidden'; ?>">
+        <div id="cora-settings-panel-git-sync" class="cora-settings-panel max-w-full <?php echo $active_tab === 'git-sync' ? '' : 'hidden'; ?> grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
             <!-- Left side: Form Settings Card -->
             <div class="xl:col-span-7 space-y-6">
                 <!-- Card 1: GitHub Connection -->
@@ -1464,7 +1455,6 @@ $cora_settings_tabs = array(
 
 
                 </div>
-            </div>
 
             <!-- Right side: Onboarding & Instructions Card -->
             <div class="xl:col-span-5 space-y-5 cora-shopify-card dark:bg-zinc-900/60 bg-zinc-50/50">
