@@ -236,6 +236,7 @@ jQuery(document).ready(function($) {
         $('.cora-tour-backdrop').removeClass('active').addClass('hidden').css({'pointer-events': 'none', 'display': 'none'});
         $('.cora-tour-highlight').removeClass('cora-tour-highlight');
         $('body').removeClass('cora-drawer-open overflow-hidden');
+        $('.cora-bottom-drawer').removeClass('cora-drawer-open');
     };
 
     $(document).on('keydown', function(e) {

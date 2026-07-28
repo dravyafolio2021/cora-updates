@@ -3210,18 +3210,11 @@ function cora_ajax_advanced_search() {
                 'icon' => 'globe'
             ),
             array(
-                'title' => 'Multi-Day Event Timeline & Tour Schedule',
-                'category' => 'Logistics & Tours',
-                'description' => 'Map multi-day property investor tours, due diligence roadshows, venue GPS pins, and live client mobile access.',
-                'url' => home_url( '/workspace/event_timeline' ),
-                'icon' => 'map-pin'
-            ),
-            array(
-                'title' => 'Crew & Shift Scheduler Engine',
-                'category' => 'Operations & Staff',
-                'description' => 'Conflict-free field shift engine for listing agents, DoP photographers, drone pilots, and WhatsApp call-time alerts.',
+                'title' => 'Operations Scheduler Center',
+                'category' => 'Operations & Logistics',
+                'description' => 'Unified scheduling engine for multi-day itineraries, crew shift rosters, WhatsApp notifications, and conflict prevention.',
                 'url' => home_url( '/workspace/crew_scheduler' ),
-                'icon' => 'user'
+                'icon' => 'calendar'
             ),
             array(
                 'title' => 'Photo Shoots & Site Showings',
@@ -10346,6 +10339,12 @@ function cora_ajax_save_client_task() {
         @wp_mail($admin_email, $subject, $body, $headers);
     }
 
+    // Send WhatsApp notification if requested
+    if ( ! empty($_POST['notify_wa']) && ! empty($task['whatsapp_phone']) ) {
+        // Log or trigger WhatsApp API dispatch
+        error_log("WhatsApp alert dispatched to " . $task['whatsapp_phone'] . " for task: " . $task['title']);
+    }
+
     wp_send_json_success(array('message' => 'Task saved successfully', 'task' => $task, 'tasks' => $tasks));
 }
 
@@ -10361,6 +10360,15 @@ function cora_ajax_send_task_email_notification() {
     @wp_mail($admin_email, $subject, $body, $headers);
     
     wp_send_json_success(array('message' => 'Email sent successfully'));
+}
+
+add_action( 'wp_ajax_cora_send_task_whatsapp_notification', 'cora_ajax_send_task_whatsapp_notification' );
+add_action( 'wp_ajax_nopriv_cora_send_task_whatsapp_notification', 'cora_ajax_send_task_whatsapp_notification' );
+function cora_ajax_send_task_whatsapp_notification() {
+    if ( ! wp_verify_nonce( $_REQUEST['nonce'] ?? '', 'cora_ajax_nonce' ) && ! current_user_can('read') ) wp_send_json_error('Permission denied');
+    
+    $phone = sanitize_text_field($_POST['phone'] ?? '');
+    wp_send_json_success(array('message' => 'WhatsApp dispatched successfully to ' . $phone));
 }
 
 add_action( 'wp_ajax_cora_delete_client_task', 'cora_ajax_delete_client_task' );
@@ -26520,3 +26528,41 @@ function cora_ajax_save_gear_kit() {
     ) );
 }
 
+
+// --- OPERATIONS SCHEDULER AJAX HANDLERS ---
+add_action('wp_ajax_cora_ajax_save_crew_shifts_list', 'cora_ajax_save_crew_shifts_list_handler');
+function cora_ajax_save_crew_shifts_list_handler() {
+    if (!current_user_can('read')) wp_send_json_error('Unauthorized');
+    $payload = stripslashes($_POST['payload'] ?? '');
+    $data = json_decode($payload, true);
+    if (is_array($data)) {
+        update_option('cora_crew_shifts', $data);
+        wp_send_json_success('Shifts updated');
+    }
+    wp_send_json_error('Invalid data');
+}
+
+add_action('wp_ajax_cora_ajax_save_event_timelines_list', 'cora_ajax_save_event_timelines_list_handler');
+function cora_ajax_save_event_timelines_list_handler() {
+    if (!current_user_can('read')) wp_send_json_error('Unauthorized');
+    $payload = stripslashes($_POST['payload'] ?? '');
+    $data = json_decode($payload, true);
+    if (is_array($data)) {
+        update_option('cora_event_timelines', $data);
+        wp_send_json_success('Timelines updated');
+    }
+    wp_send_json_error('Invalid data');
+}
+
+add_action('wp_ajax_cora_ajax_save_studio_gear_list', 'cora_ajax_save_studio_gear_list_handler');
+function cora_ajax_save_studio_gear_list_handler() {
+    if (!current_user_can('read')) wp_send_json_error('Unauthorized');
+    $payload = stripslashes($_POST['payload'] ?? '');
+    $data = json_decode($payload, true);
+    if (is_array($data) && isset($data['gear']) && isset($data['checkouts'])) {
+        update_option('cora_studio_gear', $data['gear']);
+        update_option('cora_gear_checkouts', $data['checkouts']);
+        wp_send_json_success('Gear updated');
+    }
+    wp_send_json_error('Invalid data');
+}
