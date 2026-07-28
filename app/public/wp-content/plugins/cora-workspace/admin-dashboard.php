@@ -216,10 +216,15 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     if ( empty( $favicon_url ) ) {
         $favicon_url = CORA_WORKSPACE_URL . 'assets/images/cora-favicon.png';
     }
-    $page_title_format = get_option( 'cora_tab_title_format', 'Cora for Real Estate - Workspace' );
-    if ( empty( $page_title_format ) ) {
-        $page_title_format = get_option( 'blogname', 'Cora for Real Estate' ) . ' - Workspace';
-    }
+    $current_industry = ! empty( $_COOKIE['cora_workspace_industry'] ) 
+        ? $_COOKIE['cora_workspace_industry'] 
+        : get_option( 'cora_workspace_industry', 'real_estate' );
+    $current_industry_clean = str_replace( '_', '-', strtolower( trim( $current_industry ) ) );
+    $is_studio_ind = ( $current_industry_clean === 'photography' || $current_industry_clean === 'studio' || $current_industry_clean === 'photography-studio' );
+
+    $title_real_estate = get_option( 'cora_site_title_real_estate', 'Cora Real Estate' );
+    $title_studio      = get_option( 'cora_site_title_studio', 'Cora Studio' );
+    $page_title_format = $is_studio_ind ? $title_studio : $title_real_estate;
     ?>
     <link rel="icon" type="image/png" href="<?php echo esc_url( $favicon_url ); ?>" />
     <link rel="shortcut icon" id="cora-dynamic-favicon" href="<?php echo esc_url( $favicon_url ); ?>" />
