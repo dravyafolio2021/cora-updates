@@ -408,25 +408,32 @@ $cora_settings_tabs = array(
                         <select name="cora_workspace_industry" id="cora-settings-industry-select" onchange="coraFilterRolesByIndustry(this.value);" style="width: 100%; padding: 10px 14px; font-size: 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;">
                             <?php $industry = get_option('cora_workspace_industry', 'real_estate'); ?>
                             <option value="real_estate" <?php selected( $industry, 'real_estate' ); ?>>Real Estate Agency</option>
-                            <option value="photography" <?php selected( $industry, 'photography' ); ?>>Photography Studio</option>
+                            <option value="photography_studio" <?php selected( $industry, 'photography_studio' ); ?>>Photography Studio</option>
                         </select>
                     </div>
 
                     <script>
+                    window.coraBrandingValues = {
+                        titleRE: <?php echo json_encode( $title_real_estate ); ?>,
+                        titleST: <?php echo json_encode( $title_studio ); ?>,
+                        descRE: <?php echo json_encode( $desc_real_estate ); ?>,
+                        descST: <?php echo json_encode( $desc_studio ); ?>
+                    };
+
                     function coraFilterRolesByIndustry(industry) {
                         if (!industry) {
                             industry = $('#cora-settings-industry-select').val() || 'real_estate';
                         }
-                        if (industry === 'studio') industry = 'photography';
+                        if (industry === 'studio' || industry === 'photography') industry = 'photography_studio';
                         
                         const select = $('#cora-default-role-select');
                         const siteTitleInput = $('#cora-site-title-input');
                         const taglineInput   = $('#cora-site-tagline-input');
                         
-                        const titleRE = <?php echo json_encode( $title_real_estate ); ?>;
-                        const titleST = <?php echo json_encode( $title_studio ); ?>;
-                        const descRE  = <?php echo json_encode( $desc_real_estate ); ?>;
-                        const descST  = <?php echo json_encode( $desc_studio ); ?>;
+                        const titleRE = window.coraBrandingValues.titleRE;
+                        const titleST = window.coraBrandingValues.titleST;
+                        const descRE  = window.coraBrandingValues.descRE;
+                        const descST  = window.coraBrandingValues.descST;
                         
                         if (industry === 'real_estate') {
                             if (siteTitleInput.length && (!siteTitleInput.data('user-edited'))) siteTitleInput.val(titleRE);
@@ -486,7 +493,7 @@ $cora_settings_tabs = array(
                         $('#cora-site-title-input, #cora-site-tagline-input').on('input', function() {
                             $(this).data('user-edited', true);
                         });
-                        const currentInd = $('#cora-settings-industry-select').val() || '<?php echo esc_js($is_studio ? "photography" : "real_estate"); ?>';
+                        const currentInd = $('#cora-settings-industry-select').val() || '<?php echo esc_js($is_studio ? "photography_studio" : "real_estate"); ?>';
                         coraFilterRolesByIndustry(currentInd);
                     });
                     </script>

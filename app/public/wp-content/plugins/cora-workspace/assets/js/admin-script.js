@@ -9670,6 +9670,21 @@ jQuery(document).ready(function($) {
 
         $.post(coraREData.ajaxUrl, data, function(res) {
             if (res && res.success) {
+                const currentInd = $('#cora-settings-industry-select').val() || 'real_estate';
+                const currentTitle = $('#cora-site-title-input').val();
+                const currentDesc = $('#cora-site-tagline-input').val();
+
+                if (window.coraBrandingValues) {
+                    if (currentInd === 'real_estate') {
+                        window.coraBrandingValues.titleRE = currentTitle;
+                        window.coraBrandingValues.descRE = currentDesc;
+                    } else {
+                        window.coraBrandingValues.titleST = currentTitle;
+                        window.coraBrandingValues.descST = currentDesc;
+                    }
+                }
+                $('#cora-site-title-input, #cora-site-tagline-input').data('user-edited', false);
+
                 const langSelect = form.find('select[name="cora_workspace_language"], #cora-language-selector, #cora-platform-language-select, .cora-language-selector');
                 if (langSelect.length) {
                     const newLang = langSelect.val();
