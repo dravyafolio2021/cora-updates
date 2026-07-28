@@ -309,14 +309,29 @@ $cora_settings_tabs = array(
                             Site Title
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                         </label>
-                        <input type="text" name="blogname" value="<?php echo esc_attr( get_option('blogname', 'Cora Studio') ?: 'Cora Studio' ); ?>">
+                        <?php
+                        $current_industry = ! empty( $_COOKIE['cora_workspace_industry'] ) 
+                            ? $_COOKIE['cora_workspace_industry'] 
+                            : get_option( 'cora_workspace_industry', 'real_estate' );
+                        $current_industry_clean = str_replace( '_', '-', strtolower( trim( $current_industry ) ) );
+                        $is_studio = ( $current_industry_clean === 'photography' || $current_industry_clean === 'studio' || $current_industry_clean === 'photography-studio' );
+
+                        $title_real_estate = get_option( 'cora_site_title_real_estate', 'Cora Real Estate' );
+                        $title_studio      = get_option( 'cora_site_title_studio', 'Cora Studio' );
+                        $active_site_title = $is_studio ? $title_studio : $title_real_estate;
+
+                        $desc_real_estate = get_option( 'cora_tagline_real_estate', 'Luxury Properties & Real Estate Suite' );
+                        $desc_studio      = get_option( 'cora_tagline_studio', 'Media & Photography Studio Suite' );
+                        $active_tagline    = $is_studio ? $desc_studio : $desc_real_estate;
+                        ?>
+                        <input type="text" name="blogname" id="cora-site-title-input" value="<?php echo esc_attr( $active_site_title ); ?>">
                     </div>
                     <div>
                         <label class="flex items-center gap-1.5" title="This title appears on your browser tab and platform header.">
                             Tagline / Subtitle
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                         </label>
-                        <input type="text" name="blogdescription" value="<?php echo esc_attr( get_option('blogdescription', 'Luxury Properties & Studio Suite') ?: 'Luxury Properties & Studio Suite' ); ?>">
+                        <input type="text" name="blogdescription" id="cora-site-tagline-input" value="<?php echo esc_attr( $active_tagline ); ?>">
                     </div>
                     <div>
                         <label class="flex items-center gap-1.5" title="Changes the top-left sidebar title text">
@@ -331,14 +346,7 @@ $cora_settings_tabs = array(
                     </div>
                     <div>
                         <label>New User Default Role</label>
-                        <?php
-                        $current_industry = ! empty( $_COOKIE['cora_workspace_industry'] ) 
-                            ? $_COOKIE['cora_workspace_industry'] 
-                            : get_option( 'cora_workspace_industry', 'real_estate' );
-                        $current_industry_clean = str_replace( '_', '-', strtolower( trim( $current_industry ) ) );
-                        $is_studio = ( $current_industry_clean === 'photography' || $current_industry_clean === 'studio' );
-                        $default_role_val = get_option('default_role');
-                        ?>
+                        <?php $default_role_val = get_option('default_role'); ?>
                         <select name="default_role" id="cora-default-role-select">
                             <?php if ( ! $is_studio ) : ?>
                                 <optgroup label="Real Estate Industry Roles" class="cora-role-optgroup-real_estate">
@@ -411,8 +419,23 @@ $cora_settings_tabs = array(
                         if (industry === 'studio') industry = 'photography';
                         
                         const select = $('#cora-default-role-select');
-                        if (!select.length) return;
+                        const siteTitleInput = $('#cora-site-title-input');
+                        const taglineInput   = $('#cora-site-tagline-input');
+                        
+                        const titleRE = <?php echo json_encode( $title_real_estate ); ?>;
+                        const titleST = <?php echo json_encode( $title_studio ); ?>;
+                        const descRE  = <?php echo json_encode( $desc_real_estate ); ?>;
+                        const descST  = <?php echo json_encode( $desc_studio ); ?>;
+                        
+                        if (industry === 'real_estate') {
+                            if (siteTitleInput.length && (!siteTitleInput.data('user-edited'))) siteTitleInput.val(titleRE);
+                            if (taglineInput.length && (!taglineInput.data('user-edited'))) taglineInput.val(descRE);
+                        } else {
+                            if (siteTitleInput.length && (!siteTitleInput.data('user-edited'))) siteTitleInput.val(titleST);
+                            if (taglineInput.length && (!taglineInput.data('user-edited'))) taglineInput.val(descST);
+                        }
 
+                        if (!select.length) return;
                         const currentVal = select.val();
 
                         const realEstateRoles = `
@@ -455,8 +478,13 @@ $cora_settings_tabs = array(
                         if (currentVal && select.find('option[value="' + currentVal + '"]').length) {
                             select.val(currentVal);
                         }
+
+                        if (window.coraApplyBrandingLive) window.coraApplyBrandingLive();
                     }
                     jQuery(document).ready(function($) {
+                        $('#cora-site-title-input, #cora-site-tagline-input').on('input', function() {
+                            $(this).data('user-edited', true);
+                        });
                         const currentInd = $('#cora-settings-industry-select').val() || '<?php echo esc_js($is_studio ? "photography" : "real_estate"); ?>';
                         coraFilterRolesByIndustry(currentInd);
                     });

@@ -8280,6 +8280,28 @@ function cora_ajax_save_system_settings_suite() {
         }
     }
 
+    // Sync industry-specific site title and tagline
+    $active_ind_save = isset( $_POST['cora_workspace_industry'] ) ? sanitize_text_field( $_POST['cora_workspace_industry'] ) : get_option( 'cora_workspace_industry', 'real_estate' );
+    $is_studio_save  = ( $active_ind_save === 'photography' || $active_ind_save === 'photography_studio' || $active_ind_save === 'studio' );
+
+    if ( isset( $_POST['blogname'] ) ) {
+        $b_title = sanitize_text_field( $_POST['blogname'] );
+        if ( $is_studio_save ) {
+            update_option( 'cora_site_title_studio', $b_title );
+        } else {
+            update_option( 'cora_site_title_real_estate', $b_title );
+        }
+    }
+
+    if ( isset( $_POST['blogdescription'] ) ) {
+        $b_desc = sanitize_text_field( $_POST['blogdescription'] );
+        if ( $is_studio_save ) {
+            update_option( 'cora_tagline_studio', $b_desc );
+        } else {
+            update_option( 'cora_tagline_real_estate', $b_desc );
+        }
+    }
+
     $policy_checkboxes = array( 'cora_pwd_policy_numbers', 'cora_pwd_policy_uppercase', 'cora_pwd_policy_special' );
     foreach ( $policy_checkboxes as $cb ) {
         if ( ! isset( $_POST[ $cb ] ) ) {
