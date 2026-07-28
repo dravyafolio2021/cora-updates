@@ -741,7 +741,7 @@ class Cora_Header_Widget extends Widget_Base {
                             if (window.coraShowToast) {
                                 window.coraShowToast(res.data.message || 'Error occurred.');
                             } else {
-                                alert(res.data.message || 'Error occurred.');
+                                console.error(res.data.message || 'Error occurred.');
                             }
                             btn.disabled = false;
                             btn.textContent = 'Continue';
@@ -751,7 +751,7 @@ class Cora_Header_Widget extends Widget_Base {
                         if (window.coraShowToast) {
                             window.coraShowToast('Network error. Please try again.');
                         } else {
-                            alert('Network error. Please try again.');
+                            console.error('Network error. Please try again.');
                         }
                         btn.disabled = false;
                         btn.textContent = 'Continue';

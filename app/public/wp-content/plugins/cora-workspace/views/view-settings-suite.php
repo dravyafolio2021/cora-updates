@@ -1650,22 +1650,56 @@ $cora_settings_tabs = array(
         function obChangeRole(uid) {
             var roles = ['cora_manager','cora_branch_manager','cora_photographer','cora_videographer','cora_drone_pilot','cora_editor','cora_viewer'];
             var labels = ['Workspace Owner','Branch Manager','Photographer','Videographer','Drone Pilot','Editor','Viewer'];
-            var html = '<select id="ob-role-sel" style="width:100%;padding:6px;margin-bottom:10px;border:1px solid #e4e4e7;border-radius:6px;font-size:12px;">';
-            roles.forEach(function(r,i){ html += '<option value="'+r+'">'+labels[i]+'</option>'; });
-            html += '</select>';
-            // Use a simple browser-style prompt replacement (toast-based picker)
-            var role = window.prompt('Enter role key (cora_manager, cora_branch_manager, cora_photographer, cora_videographer, cora_drone_pilot, cora_editor, cora_viewer):');
-            if (role && roles.indexOf(role) >= 0) { obAction(uid, 'change_role', {new_role: role}); }
-            else if (role) { window.coraShowToast('Invalid role key. Use one of the listed keys.'); }
+            
+            var options = roles.map(function(r, i) {
+                return { value: r, label: labels[i] };
+            });
+            
+            if (window.coraPrompt) {
+                window.coraPrompt({
+                    title: 'Select Role',
+                    message: 'Select the new role for this user:',
+                    type: 'select',
+                    options: options
+                }, function(role) {
+                    if (role) {
+                        obAction(uid, 'change_role', {new_role: role});
+                    }
+                });
+            } else {
+                window.coraShowToast('UI prompt not ready.');
+            }
         }
         function obSetExpiry(uid) {
-            var days = window.prompt('Set expiry in days (0 = lifetime access, remove expiry):');
-            if (days !== null) { obAction(uid, 'set_expiry', {days: parseInt(days)||0}); }
+            if (window.coraPrompt) {
+                window.coraPrompt({
+                    title: 'Set Expiry',
+                    message: 'Set account expiry duration (in days). Enter 0 for lifetime access:',
+                    type: 'number',
+                    defaultValue: '0'
+                }, function(days) {
+                    if (days !== null && days !== '') {
+                        obAction(uid, 'set_expiry', {days: parseInt(days)||0});
+                    }
+                });
+            } else {
+                window.coraShowToast('UI prompt not ready.');
+            }
         }
         function obToggleStatus(uid, action) { obAction(uid, action); }
         function obDeleteUser(uid) {
-            if (window.confirm && window.confirm('Permanently delete this user? This cannot be undone.')) {
+            const deleteFn = function() {
                 obAction(uid, 'delete');
+            };
+            if (window.coraConfirm) {
+                window.coraConfirm({
+                    title: 'Delete User',
+                    message: 'Permanently delete this user? This cannot be undone.',
+                    danger: true,
+                    okLabel: 'Delete'
+                }, deleteFn);
+            } else {
+                deleteFn();
             }
         }
         </script>
@@ -2124,6 +2158,32 @@ $cora_settings_tabs = array(
                 </div>
             </div>
         </div>
+        
+        <!-- Custom Prompt Drawer (replaces all browser prompt() dialogs) -->
+        <div id="cora-prompt-drawer" class="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center" style="display:none !important;">
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" id="cora-prompt-backdrop"></div>
+            <div class="relative w-full max-w-sm mx-4 mb-4 sm:mb-0 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden" style="animation: slideUpFade 0.18s ease;">
+                <div class="p-5">
+                    <div class="flex items-start gap-3 mb-3">
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-zinc-100 dark:bg-zinc-800">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0" id="cora-prompt-title">Input Required</p>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed" id="cora-prompt-message"></p>
+                        </div>
+                    </div>
+                    <div class="mb-4" id="cora-prompt-input-container">
+                        <!-- Dynamically populated select or input -->
+                    </div>
+                    <div class="flex items-center gap-2.5">
+                        <button type="button" id="cora-prompt-cancel" class="flex-1 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-xl transition-all cursor-pointer">Cancel</button>
+                        <button type="button" id="cora-prompt-ok" class="flex-1 py-2 text-xs font-bold text-white bg-zinc-900 hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white rounded-xl transition-all cursor-pointer">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <style>
         @keyframes slideUpFade { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
         </style>
@@ -2145,6 +2205,47 @@ $cora_settings_tabs = array(
             document.getElementById('cora-confirm-cancel').onclick   = close;
             document.getElementById('cora-confirm-backdrop').onclick = close;
             okBtn.onclick = function() { close(); onConfirm(); };
+        };
+
+        // Custom Prompt Utility — replaces all browser prompt() calls
+        window.coraPrompt = function(opts, onSubmit) {
+            var drawer = document.getElementById('cora-prompt-drawer');
+            document.getElementById('cora-prompt-title').textContent = opts.title || 'Input Required';
+            document.getElementById('cora-prompt-message').textContent = opts.message || '';
+            
+            var container = document.getElementById('cora-prompt-input-container');
+            container.innerHTML = '';
+            
+            var input;
+            if (opts.type === 'select') {
+                input = document.createElement('select');
+                input.className = 'w-full border border-zinc-200 dark:border-zinc-800 rounded-xl px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none';
+                opts.options.forEach(function(o) {
+                    var opt = document.createElement('option');
+                    opt.value = o.value;
+                    opt.textContent = o.label;
+                    if (o.value === opts.defaultValue) opt.selected = true;
+                    input.appendChild(opt);
+                });
+            } else {
+                input = document.createElement('input');
+                input.type = opts.type || 'text';
+                input.value = opts.defaultValue || '';
+                input.placeholder = opts.placeholder || '';
+                input.className = 'w-full border border-zinc-200 dark:border-zinc-800 rounded-xl px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none';
+            }
+            container.appendChild(input);
+            
+            drawer.style.cssText = 'display:flex !important; position:fixed; inset:0; z-index:9999; align-items:center; justify-content:center;';
+            var close = function() { drawer.style.cssText = 'display:none !important;'; };
+            document.getElementById('cora-prompt-cancel').onclick   = close;
+            document.getElementById('cora-prompt-backdrop').onclick = close;
+            
+            document.getElementById('cora-prompt-ok').onclick = function() {
+                var val = input.value;
+                close();
+                onSubmit(val);
+            };
         };
         </script>
 

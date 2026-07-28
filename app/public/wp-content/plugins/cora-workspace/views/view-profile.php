@@ -366,20 +366,31 @@ $sessions = $session_tokens->get_all();
     }
 
     function coraLogOutOtherSessions() {
-        if (!confirm('Are you sure you want to log out all other devices?')) return;
-        window.coraShowToast('Logging out other devices...');
-        $.post(coraREData.ajaxUrl, {
-            action: 'cora_ajax_logout_other_sessions',
-            nonce: coraREData.ajaxNonce
-        }, function(res) {
-            if (res.success) {
-                window.coraShowToast('Successfully logged out other devices.');
-                setTimeout(function() {
-                    window.location.reload();
-                }, 1000);
-            } else {
-                window.coraShowToast('Logout failed.');
-            }
-        });
+        const performLogout = function() {
+            window.coraShowToast('Logging out other devices...');
+            $.post(coraREData.ajaxUrl, {
+                action: 'cora_ajax_logout_other_sessions',
+                nonce: coraREData.ajaxNonce
+            }, function(res) {
+                if (res.success) {
+                    window.coraShowToast('Successfully logged out other devices.');
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    window.coraShowToast('Logout failed.');
+                }
+            });
+        };
+
+        if (window.coraConfirmAction) {
+            window.coraConfirmAction(
+                'Log Out Other Sessions',
+                'Are you sure you want to log out all other devices?',
+                performLogout
+            );
+        } else {
+            performLogout();
+        }
     }
 </script>

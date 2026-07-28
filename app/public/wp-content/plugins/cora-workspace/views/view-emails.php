@@ -897,28 +897,38 @@ jQuery(document).ready(function($) {
     };
 
     window.deleteEmailTemplate = function(tplId) {
-        if (!confirm("Are you sure you want to delete this custom template?")) return;
-
-        $.ajax({
-            url: ajaxurl,
-            method: 'POST',
-            data: {
-                action: 'cora_delete_email_template',
-                nonce: getAjaxNonce(),
-                security: getAjaxNonce(),
-                id: tplId
-            },
-            success: function(res) {
-                if (res.success) {
-                    window.coraShowToast && window.coraShowToast(res.data.message, "success");
-                    emailData.templates = res.data.templates || [];
-                    renderEmailTemplates();
-                    populateTemplatesDropdown();
-                } else {
-                    window.coraShowToast && window.coraShowToast(res.data.message, "error");
+        const performDelete = function() {
+            $.ajax({
+                url: ajaxurl,
+                method: 'POST',
+                data: {
+                    action: 'cora_delete_email_template',
+                    nonce: getAjaxNonce(),
+                    security: getAjaxNonce(),
+                    id: tplId
+                },
+                success: function(res) {
+                    if (res.success) {
+                        window.coraShowToast && window.coraShowToast(res.data.message, "success");
+                        emailData.templates = res.data.templates || [];
+                        renderEmailTemplates();
+                        populateTemplatesDropdown();
+                    } else {
+                        window.coraShowToast && window.coraShowToast(res.data.message, "error");
+                    }
                 }
-            }
-        });
+            });
+        };
+
+        if (window.coraConfirmAction) {
+            window.coraConfirmAction(
+                'Delete Template',
+                'Are you sure you want to delete this custom template?',
+                performDelete
+            );
+        } else {
+            performDelete();
+        }
     };
 
     // SENT EMAIL DETAIL DRAWER CONTROLLER

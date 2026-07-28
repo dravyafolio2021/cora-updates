@@ -1042,6 +1042,11 @@ add_action( 'admin_enqueue_scripts', 'cora_real_estate_ai_admin_assets' );
  * Handle AJAX request to save a module draft.
  */
 function cora_save_module_draft_ajax_handler() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized access' ) );
+    }
+
     $module_key = isset( $_POST['module_key'] ) ? sanitize_text_field( wp_unslash( $_POST['module_key'] ) ) : '';
     $draft_data = isset( $_POST['draft_data'] ) ? wp_unslash( $_POST['draft_data'] ) : ''; // Leave unslashed to save the exact form data
 
@@ -1058,7 +1063,6 @@ function cora_save_module_draft_ajax_handler() {
     ) );
 }
 add_action( 'wp_ajax_cora_save_module_draft', 'cora_save_module_draft_ajax_handler' );
-add_action( 'wp_ajax_nopriv_cora_save_module_draft', 'cora_save_module_draft_ajax_handler' );
 
 /**
  * Redirect custom studio roles and administrators to our custom dashboard after login
@@ -1581,7 +1585,7 @@ function cora_real_estate_ai_seed_data() {
             array( 'id' => 'eq4', 'name' => 'Commercial Office Cyber City', 'category' => 'Commercial', 'rera_reg_id' => 'HR-ERA-2023-99', 'status' => 'Available', 'crew' => '', 'shoot' => '', 'sync_link' => '', 'notes' => 'Premium IT office space.' ),
             array( 'id' => 'eq5', 'name' => 'Sohna Road Residential Plot', 'category' => 'Plot', 'rera_reg_id' => 'HR-ERA-2023-01', 'status' => 'Available', 'crew' => '', 'shoot' => '', 'sync_link' => '', 'notes' => 'Fenced corner residential plot.' )
         );
-        update_option( 'cora_workspace_listings_inventory', $equipment );
+        update_option( 'cora_workspace_listings_inventory', $equipment , false );
     } else {
         // Dynamic cleanup: reset any equipment currently assigned to dummy users
         $equipment = get_option( 'cora_workspace_listings_inventory', array() );
@@ -1595,7 +1599,7 @@ function cora_real_estate_ai_seed_data() {
             }
         }
         if ( $has_updates ) {
-            update_option( 'cora_workspace_listings_inventory', $equipment );
+            update_option( 'cora_workspace_listings_inventory', $equipment , false );
         }
     }
 
@@ -1773,7 +1777,7 @@ function cora_real_estate_ai_seed_data() {
                 'secured_shares' => array()
             )
         );
-        update_option( 'cora_workspace_vault_docs', $initial_docs );
+        update_option( 'cora_workspace_vault_docs', $initial_docs , false );
     }
 
     // Seed initial financials
@@ -1840,7 +1844,7 @@ function cora_real_estate_ai_seed_data() {
                 'client_link' => '',
             )
         );
-        update_option( 'cora_workspace_ledger', $initial_txs );
+        update_option( 'cora_workspace_ledger', $initial_txs , false );
     }
 
     // Seed initial portfolios
@@ -1913,7 +1917,7 @@ function cora_real_estate_ai_seed_data() {
                 'created_date' => '2026-06-22'
             )
         );
-        update_option( 'cora_workspace_portfolios', $initial_portfolios );
+        update_option( 'cora_workspace_portfolios', $initial_portfolios , false );
     }
 
     // Migrate existing portfolios to add client_email if not set
@@ -1932,7 +1936,7 @@ function cora_real_estate_ai_seed_data() {
             }
         }
         if ( $portfolio_modified ) {
-            update_option( 'cora_workspace_portfolios', $existing_portfolios );
+            update_option( 'cora_workspace_portfolios', $existing_portfolios , false );
         }
     }
 }
@@ -2263,7 +2267,7 @@ function cora_ajax_save_equipment() {
         $inventory[] = $saved_item;
     }
 
-    update_option( 'cora_workspace_listings_inventory', $inventory );
+    update_option( 'cora_workspace_listings_inventory', $inventory , false );
     wp_send_json_success( $saved_item );
 }
 add_action( 'wp_ajax_cora_workspace_save_listing', 'cora_ajax_save_equipment' );
@@ -2319,7 +2323,7 @@ function cora_ajax_assign_equipment() {
     }
 
     if ( $updated ) {
-        update_option( 'cora_workspace_listings_inventory', $inventory );
+        update_option( 'cora_workspace_listings_inventory', $inventory , false );
         wp_send_json_success( 'Equipment assigned successfully.' );
     } else {
         wp_send_json_error( 'Equipment item not found.' );
@@ -2504,7 +2508,7 @@ function cora_ajax_delete_equipment() {
     }
 
     if ( $found ) {
-        update_option( 'cora_workspace_listings_inventory', $updated_inventory );
+        update_option( 'cora_workspace_listings_inventory', $updated_inventory , false );
         wp_send_json_success( 'Equipment deleted successfully.' );
     } else {
         wp_send_json_error( 'Equipment item not found.' );
@@ -2582,7 +2586,7 @@ function cora_ajax_save_document() {
         $documents[] = $new_doc;
     }
 
-    update_option( 'cora_workspace_vault_docs', $documents );
+    update_option( 'cora_workspace_vault_docs', $documents , false );
     wp_send_json_success( $new_doc );
 }
 add_action( 'wp_ajax_cora_workspace_save_document', 'cora_ajax_save_document' );
@@ -2652,7 +2656,7 @@ function cora_ajax_share_document() {
     }
 
     if ( $found ) {
-        update_option( 'cora_workspace_vault_docs', $documents );
+        update_option( 'cora_workspace_vault_docs', $documents , false );
         wp_send_json_success( array(
             'share_link' => $share_link,
             'expiry_date' => $no_expiry ? 'Never (Permanent Link)' : date( 'M d, Y H:i', $expiry_time )
@@ -5951,7 +5955,7 @@ function cora_ajax_save_portfolio() {
         );
     }
 
-    update_option( 'cora_workspace_portfolios', $portfolios );
+    update_option( 'cora_workspace_portfolios', $portfolios , false );
     wp_send_json_success( array( 'message' => 'Gallery saved successfully.' ) );
 }
 add_action( 'wp_ajax_cora_save_portfolio', 'cora_ajax_save_portfolio' );
@@ -5987,7 +5991,7 @@ function cora_ajax_delete_portfolio() {
     }
 
     if ( $deleted ) {
-        update_option( 'cora_workspace_portfolios', $updated_portfolios );
+        update_option( 'cora_workspace_portfolios', $updated_portfolios , false );
         wp_send_json_success( array( 'message' => 'Gallery deleted successfully.' ) );
     } else {
         wp_send_json_error( 'Gallery not found.' );
@@ -6039,7 +6043,7 @@ function cora_ajax_toggle_portfolio_like() {
     }
 
     $portfolios[$found_key]['likes'] = $likes;
-    update_option( 'cora_workspace_portfolios', $portfolios );
+    update_option( 'cora_workspace_portfolios', $portfolios , false );
 
     wp_send_json_success( array(
         'message' => 'Selection updated.',
@@ -6755,7 +6759,7 @@ function cora_auto_generate_client_tasks( $client_id, $client_name, $booking_tit
     );
 
     $tasks = array_merge( $new_tasks, $tasks );
-    update_option( 'cora_workspace_client_tasks', $tasks );
+    update_option( 'cora_workspace_client_tasks', $tasks , false );
 }
 
 /**
@@ -7249,7 +7253,7 @@ function cora_ajax_save_transaction() {
         $transactions[] = $new_tx;
     }
 
-    update_option( 'cora_workspace_ledger', $transactions );
+    update_option( 'cora_workspace_ledger', $transactions , false );
     wp_send_json_success( $new_tx );
 }
 add_action( 'wp_ajax_cora_save_transaction', 'cora_ajax_save_transaction' );
@@ -7292,7 +7296,7 @@ function cora_ajax_delete_transaction() {
         if ( null !== $found_key ) {
             unset( $transactions[$found_key] );
             $transactions = array_values( $transactions );
-            update_option( 'cora_workspace_ledger', $transactions );
+            update_option( 'cora_workspace_ledger', $transactions , false );
         }
     }
 
@@ -7402,7 +7406,7 @@ function cora_ajax_send_document_email() {
     }
     $documents[$found_key]['secured_shares'][] = $new_share;
     
-    update_option( 'cora_workspace_vault_docs', $documents );
+    update_option( 'cora_workspace_vault_docs', $documents , false );
 
     wp_send_json_success( array(
         'message' => 'Document emailed directly to ' . $email . ' successfully.',
@@ -10156,10 +10160,10 @@ add_action( 'cora_attendance_admin_report', 'cora_send_attendance_daily_admin_re
 // CLIENT TASKS ENGINE AND REPOSITORIES
 
 add_action( 'wp_ajax_cora_fetch_client_tasks', 'cora_ajax_fetch_client_tasks' );
-add_action( 'wp_ajax_nopriv_cora_fetch_client_tasks', 'cora_ajax_fetch_client_tasks' );
 function cora_ajax_fetch_client_tasks() {
-    if ( ! wp_verify_nonce( $_REQUEST['nonce'] ?? '', 'cora_ajax_nonce' ) ) {
-        if ( ! current_user_can('read') ) wp_send_json_error('Invalid nonce or permission denied.');
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( 'Permission denied' );
     }
 
     $tasks = get_option('cora_workspace_client_tasks', array());
@@ -10175,7 +10179,7 @@ function cora_ajax_fetch_client_tasks() {
             array('id' => uniqid(), 'title' => 'Backup RAW Files', 'client_id' => 'c1', 'client_name' => 'Ananya & Rohan Wedding', 'booking_id' => 'b1', 'booking_title' => 'Destination Wedding - Udaipur', 'assignee_id' => 'u3', 'assignee_name' => 'Aarav Mehta (Senior Editor)', 'deliverable_type' => 'Admin', 'priority' => 'high', 'due_date' => date('Y-m-d'), 'status' => 'done', 'desc' => 'Upload to NAS.', 'subtasks' => array()),
             array('id' => uniqid(), 'title' => 'Client Onboarding Call', 'client_id' => 'c2', 'client_name' => 'Skyline Towers Commercial', 'booking_id' => 'b2', 'booking_title' => 'Corporate Video - Tech Summit', 'assignee_id' => 'u1', 'assignee_name' => 'Shruti Sharma (Super Admin)', 'deliverable_type' => 'Admin', 'priority' => 'medium', 'due_date' => date('Y-m-d', strtotime('+2 days')), 'status' => 'todo', 'desc' => 'Discuss project scope.', 'subtasks' => array()),
         );
-        update_option('cora_workspace_client_tasks', $tasks);
+        update_option( 'cora_workspace_client_tasks', $tasks, false );
     }
 
     global $wpdb;
@@ -10275,9 +10279,11 @@ function cora_ajax_fetch_client_tasks() {
 }
 
 add_action( 'wp_ajax_cora_save_client_task', 'cora_ajax_save_client_task' );
-add_action( 'wp_ajax_nopriv_cora_save_client_task', 'cora_ajax_save_client_task' );
 function cora_ajax_save_client_task() {
-    if ( ! wp_verify_nonce( $_REQUEST['nonce'] ?? '', 'cora_ajax_nonce' ) && ! current_user_can('read') ) wp_send_json_error('Permission denied');
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( 'Permission denied' );
+    }
 
     $raw_task = $_POST['task'] ?? null;
     if ( $raw_task ) {
@@ -10323,7 +10329,7 @@ function cora_ajax_save_client_task() {
         $tasks[] = $task;
     }
 
-    update_option('cora_workspace_client_tasks', $tasks);
+    update_option( 'cora_workspace_client_tasks', $tasks, false );
 
     // Send email notification if requested
     if ( ! empty($_POST['notify_email']) && ! empty($task['assignee_name']) ) {
@@ -10349,9 +10355,11 @@ function cora_ajax_save_client_task() {
 }
 
 add_action( 'wp_ajax_cora_send_task_email_notification', 'cora_ajax_send_task_email_notification' );
-add_action( 'wp_ajax_nopriv_cora_send_task_email_notification', 'cora_ajax_send_task_email_notification' );
 function cora_ajax_send_task_email_notification() {
-    if ( ! wp_verify_nonce( $_REQUEST['nonce'] ?? '', 'cora_ajax_nonce' ) && ! current_user_can('read') ) wp_send_json_error('Permission denied');
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( 'Permission denied' );
+    }
     
     $admin_email = get_option('admin_email');
     $subject = '[Cora Alert] High Priority Task Email Alert';
@@ -10363,18 +10371,22 @@ function cora_ajax_send_task_email_notification() {
 }
 
 add_action( 'wp_ajax_cora_send_task_whatsapp_notification', 'cora_ajax_send_task_whatsapp_notification' );
-add_action( 'wp_ajax_nopriv_cora_send_task_whatsapp_notification', 'cora_ajax_send_task_whatsapp_notification' );
 function cora_ajax_send_task_whatsapp_notification() {
-    if ( ! wp_verify_nonce( $_REQUEST['nonce'] ?? '', 'cora_ajax_nonce' ) && ! current_user_can('read') ) wp_send_json_error('Permission denied');
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( 'Permission denied' );
+    }
     
     $phone = sanitize_text_field($_POST['phone'] ?? '');
     wp_send_json_success(array('message' => 'WhatsApp dispatched successfully to ' . $phone));
 }
 
 add_action( 'wp_ajax_cora_delete_client_task', 'cora_ajax_delete_client_task' );
-add_action( 'wp_ajax_nopriv_cora_delete_client_task', 'cora_ajax_delete_client_task' );
 function cora_ajax_delete_client_task() {
-    if ( ! wp_verify_nonce( $_REQUEST['nonce'] ?? '', 'cora_ajax_nonce' ) && ! current_user_can('read') ) wp_send_json_error('Permission denied');
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( 'Permission denied' );
+    }
 
     $task_id = sanitize_text_field($_POST['task_id'] ?? '');
     if ( empty($task_id) ) wp_send_json_error('Invalid task ID');
@@ -10387,14 +10399,16 @@ function cora_ajax_delete_client_task() {
     });
 
     $tasks = array_values($tasks);
-    update_option('cora_workspace_client_tasks', $tasks);
+    update_option( 'cora_workspace_client_tasks', $tasks, false );
     wp_send_json_success(array('message' => 'Task deleted successfully', 'tasks' => $tasks));
 }
 
 add_action( 'wp_ajax_cora_update_task_status', 'cora_ajax_update_task_status' );
-add_action( 'wp_ajax_nopriv_cora_update_task_status', 'cora_ajax_update_task_status' );
 function cora_ajax_update_task_status() {
-    if ( ! wp_verify_nonce( $_REQUEST['nonce'] ?? '', 'cora_ajax_nonce' ) && ! current_user_can('read') ) wp_send_json_error('Permission denied');
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( 'Permission denied' );
+    }
 
     $task_id = sanitize_text_field($_POST['task_id'] ?? '');
     $status = sanitize_text_field($_POST['status'] ?? '');
@@ -10413,7 +10427,7 @@ function cora_ajax_update_task_status() {
     }
 
     if ($updated) {
-        update_option('cora_workspace_client_tasks', $tasks);
+        update_option( 'cora_workspace_client_tasks', $tasks, false );
         wp_send_json_success(array('message' => 'Status updated'));
     } else {
         wp_send_json_error('Task not found');
@@ -10421,9 +10435,11 @@ function cora_ajax_update_task_status() {
 }
 
 add_action( 'wp_ajax_cora_toggle_task_subtask', 'cora_ajax_toggle_task_subtask' );
-add_action( 'wp_ajax_nopriv_cora_toggle_task_subtask', 'cora_ajax_toggle_task_subtask' );
 function cora_ajax_toggle_task_subtask() {
-    if ( ! wp_verify_nonce( $_REQUEST['nonce'] ?? '', 'cora_ajax_nonce' ) && ! current_user_can('read') ) wp_send_json_error('Permission denied');
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( 'Permission denied' );
+    }
 
     $task_id = sanitize_text_field($_POST['task_id'] ?? '');
     $subtask_id = sanitize_text_field($_POST['subtask_id'] ?? '');
@@ -10448,7 +10464,7 @@ function cora_ajax_toggle_task_subtask() {
     }
 
     if ($updated_task) {
-        update_option('cora_workspace_client_tasks', $tasks);
+        update_option( 'cora_workspace_client_tasks', $tasks, false );
         wp_send_json_success(array('message' => 'Subtask updated', 'task' => $updated_task));
     } else {
         wp_send_json_error('Task not found');
@@ -10456,9 +10472,11 @@ function cora_ajax_toggle_task_subtask() {
 }
 
 add_action( 'wp_ajax_cora_apply_task_template', 'cora_ajax_apply_task_template' );
-add_action( 'wp_ajax_nopriv_cora_apply_task_template', 'cora_ajax_apply_task_template' );
 function cora_ajax_apply_task_template() {
-    if ( ! wp_verify_nonce( $_REQUEST['nonce'] ?? '', 'cora_ajax_nonce' ) && ! current_user_can('read') ) wp_send_json_error('Permission denied');
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( 'Permission denied' );
+    }
 
     $template_key = sanitize_text_field($_POST['template_key'] ?? '');
     $client_id = sanitize_text_field($_POST['client_id'] ?? '');
@@ -10530,7 +10548,7 @@ function cora_ajax_apply_task_template() {
     if ( ! is_array($tasks) ) $tasks = array();
 
     $tasks = array_merge($tasks, $generated);
-    update_option('cora_workspace_client_tasks', $tasks);
+    update_option( 'cora_workspace_client_tasks', $tasks, false );
 
     wp_send_json_success(array('message' => count($generated) . ' tasks generated successfully', 'count' => count($generated)));
 }
@@ -10737,6 +10755,11 @@ add_action( 'wp_ajax_cora_save_system_settings_suite', 'cora_ajax_save_system_se
  * AJAX Action: Clear System Cache
  */
 function cora_ws_ajax_clear_cache() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+    }
+
     global $wpdb;
     delete_option( 'cora_git_sync_repo' );
     delete_option( 'cora_git_sync_branch' );
@@ -10765,12 +10788,16 @@ function cora_ws_ajax_clear_cache() {
     wp_send_json_success( array( 'message' => 'System cache and option caches cleared successfully.' ) );
 }
 add_action( 'wp_ajax_cora_clear_cache', 'cora_ws_ajax_clear_cache' );
-add_action( 'wp_ajax_nopriv_cora_clear_cache', 'cora_ws_ajax_clear_cache' );
 
 /**
  * AJAX Action: Save Git Sync Field
  */
 function cora_ws_ajax_save_git_sync_field() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+    }
+
     global $wpdb;
     $field = isset( $_POST['field'] ) ? sanitize_text_field( $_POST['field'] ) : '';
     $value = isset( $_POST['value'] ) ? sanitize_text_field( $_POST['value'] ) : '';
@@ -10807,12 +10834,16 @@ function cora_ws_ajax_save_git_sync_field() {
     }
 }
 add_action( 'wp_ajax_cora_save_git_sync_field', 'cora_ws_ajax_save_git_sync_field' );
-add_action( 'wp_ajax_nopriv_cora_save_git_sync_field', 'cora_ws_ajax_save_git_sync_field' );
 
 /**
  * AJAX Action: Disconnect GitHub
  */
 function cora_ws_ajax_disconnect_github() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+    }
+
     global $wpdb;
     $uid = get_current_user_id();
     delete_user_meta( $uid, 'cora_github_access_token' );
@@ -10845,12 +10876,16 @@ function cora_ws_ajax_disconnect_github() {
     wp_send_json_success( array( 'message' => 'GitHub account disconnected.' ) );
 }
 add_action( 'wp_ajax_cora_disconnect_github', 'cora_ws_ajax_disconnect_github' );
-add_action( 'wp_ajax_nopriv_cora_disconnect_github', 'cora_ws_ajax_disconnect_github' );
 
 /**
  * AJAX Action: Disconnect Lovable
  */
 function cora_ws_ajax_disconnect_lovable() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+    }
+
     global $wpdb;
     delete_option( 'cora_git_sync_live_url' );
 
@@ -10874,7 +10909,6 @@ function cora_ws_ajax_disconnect_lovable() {
     wp_send_json_success( array( 'message' => 'Lovable project disconnected.' ) );
 }
 add_action( 'wp_ajax_cora_disconnect_lovable', 'cora_ws_ajax_disconnect_lovable' );
-add_action( 'wp_ajax_nopriv_cora_disconnect_lovable', 'cora_ws_ajax_disconnect_lovable' );
 
 /**
  * AJAX Action: Save Platform Language
@@ -15198,7 +15232,7 @@ function cora_sync_db_tables_to_options() {
             }
         }
         if ( count( $cleaned_listings ) !== count( $listings_opt ) ) {
-            update_option( 'cora_workspace_listings_inventory', $cleaned_listings );
+            update_option( 'cora_workspace_listings_inventory', $cleaned_listings , false );
         }
         if ( ! empty( $opt_ids ) ) {
             $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_properties WHERE id NOT IN (" . implode( ',', $opt_ids ) . ")" );

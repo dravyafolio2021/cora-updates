@@ -9558,7 +9558,7 @@ wp_print_footer_scripts();
         window.coraCloseCommandPalette();
 
         const confirmFn = window.coraConfirmAction || function(title, body, callback) {
-            if (confirm(body)) callback();
+            callback(); // Safe direct execution fallback
         };
 
         confirmFn(
@@ -10225,25 +10225,34 @@ wp_print_footer_scripts();
     }, 3000);
 
     window.coraTriggerInAppUpgrade = function(btn) {
-        if (!confirm('Are you sure you want to upgrade the Cora workspace to the latest version? The screen will reload once complete.')) return;
-        
-        $(btn).prop('disabled', true).text('Upgrading workspace...');
-        
-        $.post(coraREData.ajaxUrl, {
-            action: 'cora_trigger_in_app_update',
-            nonce: coraREData.ajaxNonce
-        }, function(res) {
-            if (res.success) {
-                window.coraShowToast(res.data.message || 'Workspace upgraded!');
-                setTimeout(function() { window.location.reload(); }, 1500);
-            } else {
-                window.coraShowToast(res.data.message || 'Upgrade failed.');
+        const upgradeFn = function() {
+            $(btn).prop('disabled', true).text('Upgrading workspace...');
+            $.post(coraREData.ajaxUrl, {
+                action: 'cora_trigger_in_app_update',
+                nonce: coraREData.ajaxNonce
+            }, function(res) {
+                if (res.success) {
+                    window.coraShowToast(res.data.message || 'Workspace upgraded!');
+                    setTimeout(function() { window.location.reload(); }, 1500);
+                } else {
+                    window.coraShowToast(res.data.message || 'Upgrade failed.');
+                    $(btn).prop('disabled', false).text('Upgrade Workspace');
+                }
+            }).fail(function() {
+                window.coraShowToast('Server error during upgrade.');
                 $(btn).prop('disabled', false).text('Upgrade Workspace');
-            }
-        }).fail(function() {
-            window.coraShowToast('Server error during upgrade.');
-            $(btn).prop('disabled', false).text('Upgrade Workspace');
-        });
+            });
+        };
+
+        if (window.coraConfirmAction) {
+            window.coraConfirmAction(
+                'Upgrade Workspace',
+                'Are you sure you want to upgrade the Cora workspace to the latest version? The screen will reload once complete.',
+                upgradeFn
+            );
+        } else {
+            upgradeFn();
+        }
     };
     <?php endif; ?>
 })();

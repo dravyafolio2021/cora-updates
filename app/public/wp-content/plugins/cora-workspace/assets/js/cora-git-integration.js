@@ -347,11 +347,22 @@
         document.getElementById('cora-git-auto-toggle').addEventListener('change', function () { state.autoCommit = this.checked; });
 
         document.getElementById('cora-git-disconnect-btn').addEventListener('click', function () {
-            if (!window.confirm('Disconnect GitHub? You can reconnect any time.')) return;
-            ajax('cora_github_disconnect').then(function () {
-                state.connected = false; state.username = ''; state.repo = ''; state.has_repo = false;
-                renderNotConnected();
-            });
+            const performDisconnect = function() {
+                ajax('cora_github_disconnect').then(function () {
+                    state.connected = false; state.username = ''; state.repo = ''; state.has_repo = false;
+                    renderNotConnected();
+                });
+            };
+
+            if (window.coraConfirmAction) {
+                window.coraConfirmAction(
+                    'Disconnect GitHub',
+                    'Disconnect GitHub? You can reconnect any time.',
+                    performDisconnect
+                );
+            } else {
+                performDisconnect();
+            }
         });
     }
 

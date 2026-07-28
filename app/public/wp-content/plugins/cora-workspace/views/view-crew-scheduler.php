@@ -1467,16 +1467,26 @@ if (window.coraSubmitAddShift) {
         };
         
         var hasConflict = window.coraCheckScheduleConflicts('staff', newShift, window.cora_crew_shifts_data);
+        const saveShiftFn = function() {
+            window.cora_crew_shifts_data.push(newShift);
+            _coraAjaxPost('cora_ajax_save_crew_shifts_list', window.cora_crew_shifts_data).then(() => {
+                original_coraSubmitAddShift();
+            });
+        };
+
         if (hasConflict) {
-            if (!confirm("There is a scheduling conflict. Do you still want to save?")) {
-                return;
+            if (window.coraConfirmAction) {
+                window.coraConfirmAction(
+                    'Scheduling Conflict',
+                    'There is a scheduling conflict. Do you still want to save?',
+                    saveShiftFn
+                );
+            } else {
+                saveShiftFn();
             }
+        } else {
+            saveShiftFn();
         }
-        
-        window.cora_crew_shifts_data.push(newShift);
-        _coraAjaxPost('cora_ajax_save_crew_shifts_list', window.cora_crew_shifts_data).then(() => {
-            original_coraSubmitAddShift();
-        });
     };
 }
 
@@ -1498,25 +1508,35 @@ if (window.coraSaveEditShift) {
         };
         
         var hasConflict = window.coraCheckScheduleConflicts('staff', editShift, window.cora_crew_shifts_data);
+        const saveEditShiftFn = function() {
+            var found = false;
+            for (var i = 0; i < window.cora_crew_shifts_data.length; i++) {
+                if (window.cora_crew_shifts_data[i].id === id) {
+                    Object.assign(window.cora_crew_shifts_data[i], editShift);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) window.cora_crew_shifts_data.push(editShift);
+            
+            _coraAjaxPost('cora_ajax_save_crew_shifts_list', window.cora_crew_shifts_data).then(() => {
+                original_coraSaveEditShift();
+            });
+        };
+
         if (hasConflict) {
-            if (!confirm("There is a scheduling conflict. Do you still want to save?")) {
-                return;
+            if (window.coraConfirmAction) {
+                window.coraConfirmAction(
+                    'Scheduling Conflict',
+                    'There is a scheduling conflict. Do you still want to save?',
+                    saveEditShiftFn
+                );
+            } else {
+                saveEditShiftFn();
             }
+        } else {
+            saveEditShiftFn();
         }
-        
-        var found = false;
-        for (var i = 0; i < window.cora_crew_shifts_data.length; i++) {
-            if (window.cora_crew_shifts_data[i].id === id) {
-                Object.assign(window.cora_crew_shifts_data[i], editShift);
-                found = true;
-                break;
-            }
-        }
-        if (!found) window.cora_crew_shifts_data.push(editShift);
-        
-        _coraAjaxPost('cora_ajax_save_crew_shifts_list', window.cora_crew_shifts_data).then(() => {
-            original_coraSaveEditShift();
-        });
     };
 }
 
