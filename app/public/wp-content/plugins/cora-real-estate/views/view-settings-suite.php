@@ -2408,16 +2408,6 @@ $cora_settings_tabs = array(
 
         </div>
 
-        <!-- Sticky Save Actions Bar (Shopify Style) -->
-        <div class="cora-shopify-actions-bar">
-            <div class="text-xs text-zinc-500 font-semibold hidden sm:block">
-                Configure your Cora system environment.
-            </div>
-            <button type="submit" class="px-5 py-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-lg text-xs transition-colors shadow-sm cursor-pointer flex items-center gap-2">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M19 21H5a2 2 0 0 1-2 2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                Save Settings
-            </button>
-        </div>
     </form>
 </div>
 </div>
