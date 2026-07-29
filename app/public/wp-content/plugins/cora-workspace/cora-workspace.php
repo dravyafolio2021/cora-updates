@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.3.3
+ * Version: 2.3.4
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.3.3' );
+define( 'CORA_WORKSPACE_VERSION', '2.3.4' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -7386,11 +7386,12 @@ function cora_ajax_save_transaction() {
                 'description' => $description,
                 'client_id' => $db_client_id ?: null,
                 'status' => strtolower($status),
+                'category' => $category,
                 'transaction_date' => $date,
                 'updated_at' => current_time('mysql')
             ),
             array( 'id' => $db_id, 'agency_id' => $agency_id ),
-            array('%s', '%d', '%s', '%d', '%s', '%s', '%s'),
+            array('%s', '%d', '%s', '%d', '%s', '%s', '%s', '%s'),
             array('%d', '%d')
         );
         $new_id = $db_id;
@@ -7406,12 +7407,13 @@ function cora_ajax_save_transaction() {
                 'lead_id' => null,
                 'client_id' => $db_client_id ?: null,
                 'status' => strtolower($status),
+                'category' => $category,
                 'transaction_date' => $date,
                 'created_by' => get_current_user_id(),
                 'created_at' => current_time('mysql'),
                 'updated_at' => current_time('mysql')
             ),
-            array('%d', '%d', '%s', '%d', '%s', '%d', '%d', '%s', '%s', '%d', '%s', '%s')
+            array('%d', '%d', '%s', '%d', '%s', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s')
         );
         $new_id = $wpdb->insert_id;
     }
@@ -12803,8 +12805,8 @@ function cora_ajax_media_library_get() {
             'relation' => 'OR',
             array(
                 'key'     => 'cora_agency_id',
-                'value'   => $agency_id,
-                'compare' => '='
+                'value'   => function_exists('cora_get_agency_identifiers') ? cora_get_agency_identifiers( $agency_id ) : $agency_id,
+                'compare' => 'IN'
             ),
             array(
                 'key'     => 'cora_agency_id',
@@ -13027,6 +13029,7 @@ function cora_ajax_media_library_get_folders() {
     $result = array();
     if ( ! is_wp_error( $terms ) ) {
         foreach ( $terms as $t ) {
+            $color = get_term_meta( $t->term_id, 'cora_folder_color', true ) ?: '#3b82f6';
             // Count attachments directly assigned to this parent folder term
             $parent_objs = get_objects_in_term( $t->term_id, 'cora_media_folder' );
             $folder_count = is_array( $parent_objs ) ? count( $parent_objs ) : 0;
@@ -13035,9 +13038,10 @@ function cora_ajax_media_library_get_folders() {
             $ch = array();
             if ( ! is_wp_error( $children ) ) {
                 foreach ( $children as $c ) {
+                    $child_color = get_term_meta( $c->term_id, 'cora_folder_color', true ) ?: '#3b82f6';
                     $child_objs = get_objects_in_term( $c->term_id, 'cora_media_folder' );
                     $child_count = is_array( $child_objs ) ? count( $child_objs ) : 0;
-                    $ch[] = array( 'id' => $c->term_id, 'name' => $c->name, 'count' => $child_count );
+                    $ch[] = array( 'id' => $c->term_id, 'name' => $c->name, 'count' => $child_count, 'color' => $child_color );
                     // Folders with children can roll up their count or show only direct count. Let's roll child count into parent for better UX
                     $folder_count += $child_count;
                 }
@@ -13047,6 +13051,7 @@ function cora_ajax_media_library_get_folders() {
                 'name'      => $t->name,
                 'count'     => $folder_count,
                 'is_system' => false,
+                'color'     => $color,
                 'children'  => $ch,
             );
         }
@@ -13090,6 +13095,7 @@ function cora_ajax_media_library_create_folder() {
     $name   = sanitize_text_field( $_POST['name'] ?? '' );
     $parent = intval( $_POST['parent_id'] ?? 0 );
     $desc   = sanitize_textarea_field( $_POST['description'] ?? '' );
+    $color  = sanitize_text_field( $_POST['color'] ?? '#3b82f6' );
     if ( ! $name ) wp_send_json_error( array( 'message' => 'Folder name is required.' ) );
 
     $term_args = array( 'parent' => $parent );
@@ -13099,6 +13105,8 @@ function cora_ajax_media_library_create_folder() {
     if ( is_wp_error( $term ) ) wp_send_json_error( array( 'message' => $term->get_error_message() ) );
 
     $term_id = $term['term_id'];
+    update_term_meta( $term_id, 'cora_folder_color', $color );
+
     $linked_record = sanitize_text_field( $_POST['linked_record'] ?? '' );
     if ( $linked_record ) {
         update_term_meta( $term_id, '_cora_folder_record', $linked_record );
@@ -13131,13 +13139,17 @@ function cora_ajax_media_library_rename_folder() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
     if ( ! is_user_logged_in() || ( ! cora_is_super_owner() && ! current_user_can( 'upload_files' ) && ! current_user_can( 'manage_options' ) && ! current_user_can( 'edit_posts' ) ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
 
-    $id   = intval( $_POST['folder_id'] ?? ($_POST['term_id'] ?? 0) );
-    $name = sanitize_text_field( $_POST['name'] ?? '' );
+    $id    = intval( $_POST['folder_id'] ?? ($_POST['term_id'] ?? 0) );
+    $name  = sanitize_text_field( $_POST['name'] ?? '' );
+    $color = sanitize_text_field( $_POST['color'] ?? '#3b82f6' );
     if ( ! $id || ! $name ) wp_send_json_error( array( 'message' => 'Invalid data.' ) );
 
     $r = wp_update_term( $id, 'cora_media_folder', array( 'name' => $name ) );
     if ( is_wp_error( $r ) ) wp_send_json_error( array( 'message' => $r->get_error_message() ) );
-    wp_send_json_success( array( 'message' => 'Folder renamed.' ) );
+    
+    update_term_meta( $id, 'cora_folder_color', $color );
+
+    wp_send_json_success( array( 'message' => 'Folder updated.' ) );
 }
 add_action( 'wp_ajax_cora_media_library_rename_folder', 'cora_ajax_media_library_rename_folder' );
 
@@ -13463,6 +13475,48 @@ add_action( 'wp_ajax_cora_media_library_get_storage', 'cora_ajax_media_library_g
  * ═══ PROPOS: MULTI-TENANCY & USER MANAGEMENT MODULE ═════════════════════════════
  */
 
+/**
+ * Helper to resolve all possible agency identifiers (slug, DB ID, and legacy keys).
+ */
+function cora_get_agency_identifiers( $agency_id ) {
+    if ( empty( $agency_id ) || $agency_id === 'super' ) {
+        return array( 'super' );
+    }
+    
+    global $wpdb;
+    $agency_ids = array( $agency_id );
+    $agency_row = null;
+    
+    $table_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->prefix . 'cora_agencies' ) );
+    if ( $table_exists ) {
+        if ( is_numeric( $agency_id ) ) {
+            $agency_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_agencies WHERE id = %d", intval( $agency_id ) ), ARRAY_A );
+        } elseif ( strpos( $agency_id, 'agency_' ) === 0 ) {
+            $db_id = intval( substr( $agency_id, 7 ) );
+            $agency_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_agencies WHERE id = %d", $db_id ), ARRAY_A );
+        } else {
+            $agency_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_agencies WHERE slug = %s", $agency_id ), ARRAY_A );
+        }
+    }
+    
+    if ( $agency_row ) {
+        $agency_ids[] = (string) $agency_row['id'];
+        if ( ! empty( $agency_row['slug'] ) ) {
+            $agency_ids[] = $agency_row['slug'];
+        }
+        $agency_ids[] = 'agency_' . $agency_row['id'];
+    } else {
+        if ( strpos( $agency_id, 'agency_' ) === 0 ) {
+            $db_id = substr( $agency_id, 7 );
+            $agency_ids[] = $db_id;
+        } elseif ( is_numeric( $agency_id ) ) {
+            $agency_ids[] = 'agency_' . $agency_id;
+        }
+    }
+    
+    return array_unique( array_filter( $agency_ids ) );
+}
+
 function cora_get_current_user_agency_id() {
     $user_id = get_current_user_id();
     if ( ! $user_id ) {
@@ -13496,6 +13550,9 @@ function cora_get_current_user_agency_id() {
 function cora_get_current_user_branch_id() {
     $user_id = get_current_user_id();
     if ( ! $user_id ) {
+        return '';
+    }
+    if ( function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) {
         return '';
     }
     if ( current_user_can( 'administrator' ) ) {
@@ -13711,6 +13768,7 @@ function cora_create_custom_tables() {
       lead_id bigint(20) unsigned,
       client_id bigint(20) unsigned,
       status varchar(50) NOT NULL DEFAULT 'pending',
+      category varchar(100) DEFAULT '',
       transaction_date date NOT NULL DEFAULT '0000-00-00',
       created_by bigint(20) unsigned NOT NULL,
       created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -13959,6 +14017,13 @@ function cora_create_custom_tables() {
     if ( empty( $has_form_key ) ) {
         $wpdb->query( "ALTER TABLE {$forms_table} ADD COLUMN form_key varchar(100) DEFAULT NULL AFTER agency_id;" );
         $wpdb->query( "ALTER TABLE {$forms_table} ADD KEY form_key (form_key);" );
+    }
+
+    // Ensure category column exists in wp_cora_ledger
+    $ledger_table = $wpdb->prefix . 'cora_ledger';
+    $has_category = $wpdb->get_results( "SHOW COLUMNS FROM {$ledger_table} LIKE 'category'" );
+    if ( empty( $has_category ) ) {
+        $wpdb->query( "ALTER TABLE {$ledger_table} ADD COLUMN category varchar(100) DEFAULT '' AFTER status;" );
     }
 
     update_option( 'cora_db_v2_created', true );
@@ -15094,7 +15159,7 @@ function cora_db_get_ledger() {
                 'description' => $r['description'],
                 'type' => ucfirst($r['type']),
                 'amount' => intval($r['amount'] / 100),
-                'category' => '',
+                'category' => ! empty( $r['category'] ) ? $r['category'] : '',
                 'status' => ucfirst($r['status']),
                 'client_link' => $client_old_id
             );
@@ -16003,8 +16068,8 @@ function cora_ajax_login() {
                         $admin_query_args['meta_query'] = array(
                             array(
                                 'key'     => 'cora_agency_id',
-                                'value'   => $target_agency_id,
-                                'compare' => '='
+                                'value'   => function_exists('cora_get_agency_identifiers') ? cora_get_agency_identifiers( $target_agency_id ) : $target_agency_id,
+                                'compare' => 'IN'
                             )
                         );
                     }
@@ -16572,6 +16637,16 @@ function cora_ajax_save_user_changes() {
     if ( ! empty( $hourly_rate ) )      update_user_meta( $target_user_id, 'cora_hourly_rate', $hourly_rate );
     if ( ! empty( $bank_upi ) )          update_user_meta( $target_user_id, 'cora_bank_upi', $bank_upi );
 
+    // Profile Avatar & Banner
+    if ( isset( $_POST['avatar_url'] ) ) {
+        $avatar_url = esc_url_raw( wp_unslash( $_POST['avatar_url'] ) );
+        update_user_meta( $target_user_id, 'cora_avatar_url', $avatar_url );
+    }
+    if ( isset( $_POST['banner_url'] ) ) {
+        $banner_url = esc_url_raw( wp_unslash( $_POST['banner_url'] ) );
+        update_user_meta( $target_user_id, 'cora_profile_banner_url', $banner_url );
+    }
+
     // Save Role
     $target_user->set_role( $target_role );
 
@@ -16825,6 +16900,34 @@ function cora_log_activity( $action_type, $description, $custom_user_id = 0, $ho
     $device = cora_get_device_info();
 
     global $wpdb;
+
+    // De-duplication: check if an identical action by same user was logged in the last 5 minutes (300 seconds)
+    $current_mysql_time = current_time('mysql');
+    $current_timestamp = strtotime($current_mysql_time);
+    
+    $last_log = $wpdb->get_row( $wpdb->prepare(
+        "SELECT created_at FROM {$wpdb->prefix}cora_activity_logs 
+         WHERE user_id = %d AND action_type = %s AND description = %s 
+         ORDER BY id DESC LIMIT 1",
+        $user_id ?: 1,
+        $action_type,
+        $description
+    ) );
+
+    if ( $last_log ) {
+        $last_time = strtotime( $last_log->created_at );
+        if ( ( $current_timestamp - $last_time ) < 300 ) {
+            return; // Skip logging duplicate events
+        }
+    }
+
+    // Purge database logs older than 7 days
+    $seven_days_ago = date( 'Y-m-d H:i:s', $current_timestamp - ( 7 * 24 * 60 * 60 ) );
+    $wpdb->query( $wpdb->prepare(
+        "DELETE FROM {$wpdb->prefix}cora_activity_logs WHERE created_at < %s",
+        $seven_days_ago
+    ) );
+
     $wpdb->insert(
         $wpdb->prefix . 'cora_activity_logs',
         array(
@@ -16840,7 +16943,7 @@ function cora_log_activity( $action_type, $description, $custom_user_id = 0, $ho
             'instructed_by' => $instructed_by ?: null,
             'ai_reasoning' => $ai_reasoning,
             'embed_vector' => 0,
-            'created_at' => current_time('mysql')
+            'created_at' => $current_mysql_time
         ),
         array('%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%d', '%s', '%d', '%s')
     );
@@ -16850,7 +16953,7 @@ function cora_log_activity( $action_type, $description, $custom_user_id = 0, $ho
         $logs = array();
     }
     $logs[] = array(
-        'timestamp'     => time(),
+        'timestamp'     => $current_timestamp,
         'user_id'       => $user_id,
         'user_name'     => $username,
         'user_role'     => $user && ! empty( $user->roles ) ? $user->roles[0] : 'guest',
@@ -16864,6 +16967,12 @@ function cora_log_activity( $action_type, $description, $custom_user_id = 0, $ho
         'instructed_by' => $instructed_by,
         'ai_reasoning'  => $ai_reasoning
     );
+
+    // Clean option logs older than 7 days
+    $cutoff_timestamp = $current_timestamp - ( 7 * 24 * 60 * 60 );
+    $logs = array_filter( $logs, function( $log ) use ( $cutoff_timestamp ) {
+        return isset( $log['timestamp'] ) && $log['timestamp'] >= $cutoff_timestamp;
+    } );
 
     if ( count( $logs ) > 1000 ) {
         $logs = array_slice( $logs, -1000 );
@@ -17757,8 +17866,8 @@ function cora_handle_api_v1_request( $path_parts ) {
             $user_query_args['meta_query'] = array(
                 array(
                     'key'     => 'cora_agency_id',
-                    'value'   => $current_agency,
-                    'compare' => '='
+                    'value'   => function_exists('cora_get_agency_identifiers') ? cora_get_agency_identifiers( $current_agency ) : $current_agency,
+                    'compare' => 'IN'
                 )
             );
         }
@@ -23745,7 +23854,8 @@ function cora_ajax_get_financial_data() {
     $industry_scope = isset( $_REQUEST['industry_scope'] ) ? sanitize_text_field( $_REQUEST['industry_scope'] ) : 'all';
     $status         = isset( $_REQUEST['status'] ) ? sanitize_text_field( $_REQUEST['status'] ) : '';
 
-    $ledger   = get_option( 'cora_financial_ledger', array() );
+    // Read from the database ledger table instead of the option array
+    $ledger   = cora_db_get_ledger();
     $invoices = get_option( 'cora_invoices', array() );
     $payouts  = get_option( 'cora_payouts', array() );
 
@@ -23765,6 +23875,29 @@ function cora_ajax_get_financial_data() {
     foreach ( $ledger as $entry ) {
         if ( ! is_array( $entry ) ) continue;
 
+        // Normalize type
+        $raw_type = strtolower( trim( $entry['type'] ?? 'inflow' ) );
+        $type = ( $raw_type === 'income' || $raw_type === 'inflow' ) ? 'inflow' : 'outflow';
+        $entry['type'] = $type;
+
+        // Auto-categorize if empty
+        if ( empty( $entry['category'] ) ) {
+            $desc_lower = strtolower( $entry['description'] ?? '' );
+            if ( strpos( $desc_lower, 'rent' ) !== false || strpos( $desc_lower, 'lease' ) !== false || strpos( $desc_lower, 'office' ) !== false || strpos( $desc_lower, 'electricity' ) !== false ) {
+                $entry['category'] = 'Studio Ops & Rent';
+            } elseif ( strpos( $desc_lower, 'marketing' ) !== false || strpos( $desc_lower, 'ads' ) !== false || strpos( $desc_lower, 'listing' ) !== false || strpos( $desc_lower, 'campaign' ) !== false ) {
+                $entry['category'] = 'Marketing & Listings';
+            } elseif ( strpos( $desc_lower, 'split' ) !== false || strpos( $desc_lower, 'payout' ) !== false ) {
+                $entry['category'] = 'Agent / Crew Payouts';
+            } elseif ( strpos( $desc_lower, 'catering' ) !== false || strpos( $desc_lower, 'food' ) !== false || strpos( $desc_lower, 'travel' ) !== false ) {
+                $entry['category'] = 'Food & Travel';
+            } elseif ( strpos( $desc_lower, 'rental' ) !== false || strpos( $desc_lower, 'gear' ) !== false || strpos( $desc_lower, 'sony' ) !== false || strpos( $desc_lower, 'fx6' ) !== false || strpos( $desc_lower, 'camera' ) !== false ) {
+                $entry['category'] = 'Gear & Tech';
+            } else {
+                $entry['category'] = ( $type === 'inflow' ) ? 'Inflows & Retainers' : 'Studio Ops & Rent';
+            }
+        }
+
         $ts = cora_financial_extract_item_timestamp( $entry );
         if ( null !== $start_ts && $ts > 0 && $ts < $start_ts ) continue;
         if ( null !== $end_ts   && $ts > 0 && $ts > $end_ts )   continue;
@@ -23782,10 +23915,9 @@ function cora_ajax_get_financial_data() {
         $filtered_ledger[] = $entry;
 
         $amt  = floatval( $entry['amount'] ?? 0 );
-        $type = strtolower( trim( $entry['type'] ?? 'inflow' ) );
         if ( $type === 'inflow' ) {
             $total_inflow += $amt;
-        } elseif ( $type === 'outflow' ) {
+        } else {
             $total_outflow += $amt;
         }
     }
@@ -24118,6 +24250,31 @@ function cora_ajax_process_payout() {
     }
     array_unshift( $ledger, $ledger_entry );
     update_option( 'cora_financial_ledger', $ledger );
+
+    // Dynamic Database logging of the outflow transaction
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $branch_id = cora_db_get_branch_id();
+    $amount_cents = intval($net_payout * 100);
+    $wpdb->insert(
+        $wpdb->prefix . 'cora_ledger',
+        array(
+            'agency_id' => $agency_id,
+            'branch_id' => $branch_id,
+            'type' => 'outflow',
+            'amount' => $amount_cents,
+            'description' => 'Payout to ' . $recipient_name . ' (' . ucfirst( $recipient_role ) . ')' . ( ! empty( $notes ) ? ' - ' . $notes : '' ),
+            'lead_id' => null,
+            'client_id' => null,
+            'status' => 'paid',
+            'category' => 'Agent / Crew Payouts',
+            'transaction_date' => date( 'Y-m-d' ),
+            'created_by' => get_current_user_id(),
+            'created_at' => current_time('mysql'),
+            'updated_at' => current_time('mysql')
+        ),
+        array('%d', '%d', '%s', '%d', '%s', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s')
+    );
 
     wp_send_json_success( array(
         'message' => 'Payout processed successfully.',
@@ -24966,6 +25123,274 @@ function cora_ajax_save_financial_schedule() {
 }
 add_action( 'wp_ajax_cora_save_financial_schedule', 'cora_ajax_save_financial_schedule' );
 add_action( 'wp_ajax_cora_ajax_save_financial_schedule', 'cora_ajax_save_financial_schedule' );
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// FINANCIAL REPORT EMAIL AUTOMATION v2
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * AJAX: Get saved financial report schedule (v2)
+ */
+function cora_ajax_get_financial_schedule() {
+    $schedule = get_option( 'cora_fin_report_schedule_v2', array() );
+    wp_send_json_success( $schedule );
+}
+add_action( 'wp_ajax_cora_get_financial_schedule', 'cora_ajax_get_financial_schedule' );
+
+/**
+ * AJAX: Save financial report schedule (v2) and register/clear WP-Cron events
+ */
+function cora_ajax_save_financial_schedule_v2() {
+    $nonce = sanitize_text_field( $_REQUEST['security'] ?? $_REQUEST['nonce'] ?? '' );
+    if ( $nonce && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+    }
+
+    $daily      = ! empty( $_POST['daily'] )     && $_POST['daily']     == '1';
+    $weekly     = ! empty( $_POST['weekly'] )    && $_POST['weekly']    == '1';
+    $monthly    = ! empty( $_POST['monthly'] )   && $_POST['monthly']   == '1';
+    $quarterly  = ! empty( $_POST['quarterly'] ) && $_POST['quarterly'] == '1';
+    $custom     = ! empty( $_POST['custom'] )    && $_POST['custom']    == '1';
+    $custom_cron = sanitize_text_field( $_POST['custom_cron'] ?? '' );
+
+    $raw_recipients = sanitize_textarea_field( $_POST['recipients'] ?? '' );
+    $recipients = array_filter( array_map( 'sanitize_email', explode( ',', $raw_recipients ) ) );
+
+    $schedule = array(
+        'daily'        => $daily,
+        'weekly'       => $weekly,
+        'monthly'      => $monthly,
+        'quarterly'    => $quarterly,
+        'custom'       => $custom,
+        'custom_cron'  => $custom_cron,
+        'recipients'   => array_values( $recipients ),
+        'include_pdf'    => ! empty( $_POST['include_pdf'] )    ? 1 : 0,
+        'include_csv'    => ! empty( $_POST['include_csv'] )    ? 1 : 0,
+        'include_chart'  => ! empty( $_POST['include_chart'] )  ? 1 : 0,
+        'include_inline' => ! empty( $_POST['include_inline'] ) ? 1 : 0,
+        'updated_at'   => current_time( 'mysql' ),
+    );
+
+    update_option( 'cora_fin_report_schedule_v2', $schedule );
+
+    // Clear any previously scheduled financial report crons
+    $cron_hooks = array(
+        'cora_financial_report_daily',
+        'cora_financial_report_weekly',
+        'cora_financial_report_monthly',
+        'cora_financial_report_quarterly',
+    );
+    foreach ( $cron_hooks as $hook ) {
+        $timestamp = wp_next_scheduled( $hook );
+        if ( $timestamp ) {
+            wp_unschedule_event( $timestamp, $hook );
+        }
+    }
+
+    $tz = wp_timezone();
+
+    // Schedule Daily (8:00 AM every day)
+    if ( $daily ) {
+        if ( ! wp_next_scheduled( 'cora_financial_report_daily' ) ) {
+            $t = new DateTime( 'today 08:00:00', $tz );
+            if ( $t->getTimestamp() < time() ) $t->modify( '+1 day' );
+            wp_schedule_event( $t->getTimestamp(), 'daily', 'cora_financial_report_daily' );
+        }
+    }
+
+    // Schedule Weekly (Monday 9:00 AM)
+    if ( $weekly ) {
+        if ( ! wp_next_scheduled( 'cora_financial_report_weekly' ) ) {
+            $t = new DateTime( 'next Monday 09:00:00', $tz );
+            wp_schedule_event( $t->getTimestamp(), 'weekly', 'cora_financial_report_weekly' );
+        }
+    }
+
+    // Schedule Monthly (1st of month 07:30 AM)
+    if ( $monthly ) {
+        if ( ! wp_next_scheduled( 'cora_financial_report_monthly' ) ) {
+            $t = new DateTime( 'first day of next month 07:30:00', $tz );
+            wp_schedule_event( $t->getTimestamp(), 'monthly', 'cora_financial_report_monthly' );
+        }
+    }
+
+    // Schedule Quarterly (1st of Jan/Apr/Jul/Oct 07:00 AM)
+    if ( $quarterly ) {
+        if ( ! wp_next_scheduled( 'cora_financial_report_quarterly' ) ) {
+            $m       = (int) current_time( 'n' );
+            $next_q  = ( $m <= 3 ) ? 4 : ( ( $m <= 6 ) ? 7 : ( ( $m <= 9 ) ? 10 : 13 ) );
+            $year    = (int) current_time( 'Y' );
+            if ( $next_q === 13 ) { $next_q = 1; $year++; }
+            $t = new DateTime( sprintf( '%04d-%02d-01 07:00:00', $year, $next_q ), $tz );
+            wp_schedule_event( $t->getTimestamp(), 'quarterly', 'cora_financial_report_quarterly' );
+        }
+    }
+
+    wp_send_json_success( array(
+        'message'  => 'Report schedule saved and cron events registered.',
+        'schedule' => $schedule,
+    ) );
+}
+add_action( 'wp_ajax_cora_save_financial_schedule_v2', 'cora_ajax_save_financial_schedule_v2' );
+
+/**
+ * AJAX: Test-send a financial report email immediately
+ */
+function cora_ajax_test_send_financial_report() {
+    $nonce = sanitize_text_field( $_REQUEST['security'] ?? $_REQUEST['nonce'] ?? '' );
+    if ( $nonce && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+    }
+
+    $recipient = sanitize_email( $_POST['recipient'] ?? get_option( 'admin_email' ) );
+    $period    = sanitize_key( $_POST['period'] ?? 'this_month' );
+
+    $result = cora_send_financial_report_email( $recipient, $period, true );
+
+    if ( $result ) {
+        wp_send_json_success( array( 'message' => 'Test report sent to ' . $recipient ) );
+    } else {
+        wp_send_json_error( array( 'message' => 'Failed to send test report. Check WordPress mail settings.' ) );
+    }
+}
+add_action( 'wp_ajax_cora_test_send_financial_report', 'cora_ajax_test_send_financial_report' );
+
+/**
+ * Core email sender for financial reports.
+ * Called by cron hooks and the test-send AJAX.
+ *
+ * @param string $recipient   Email address.
+ * @param string $period      Period key (this_month, last_month, etc.).
+ * @param bool   $is_test     Whether this is a test send.
+ * @return bool               Whether wp_mail succeeded.
+ */
+function cora_send_financial_report_email( $recipient, $period = 'this_month', $is_test = false ) {
+    $schedule = get_option( 'cora_fin_report_schedule_v2', array() );
+    $inc_pdf   = ! empty( $schedule['include_pdf'] );
+    $inc_csv   = ! empty( $schedule['include_csv'] );
+    $inc_inline = ! empty( $schedule['include_inline'] );
+
+    // Gather KPI data
+    $entries  = function_exists( 'cora_db_get_ledger' ) ? cora_db_get_ledger() : array();
+    $inflow   = 0; $outflow = 0;
+    foreach ( (array) $entries as $e ) {
+        $t = strtolower( trim( $e['type'] ?? 'inflow' ) );
+        if ( $t === 'income' || $t === 'inflow' ) {
+            $inflow += floatval( $e['amount'] ?? 0 );
+        } else {
+            $outflow += floatval( $e['amount'] ?? 0 );
+        }
+    }
+    $profit = $inflow - $outflow;
+    $margin = $inflow > 0 ? round( ( $profit / $inflow ) * 100, 1 ) : 0;
+    $period_label = ucwords( str_replace( '_', ' ', $period ) );
+    $site_name    = get_bloginfo( 'name' );
+    $test_badge   = $is_test ? ' [TEST]' : '';
+
+    $subject = sprintf( '[%s]%s Financial Report – %s', $site_name, $test_badge, $period_label );
+
+    // Build HTML body
+    $body  = '<html><head><meta charset="utf-8"><style>';
+    $body .= 'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f9f9f9;margin:0;padding:0;}';
+    $body .= '.wrap{max-width:600px;margin:40px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06);}';
+    $body .= '.header{background:#09090b;padding:28px 32px;color:#fff;}';
+    $body .= '.header h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.3px;}';
+    $body .= '.header p{margin:6px 0 0;font-size:13px;opacity:.6;}';
+    $body .= '.body{padding:32px;}';
+    $body .= '.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 24px;}';
+    $body .= '.kpi{background:#f4f4f5;border-radius:12px;padding:16px 18px;}';
+    $body .= '.kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#71717a;margin-bottom:6px;}';
+    $body .= '.kpi-value{font-size:22px;font-weight:800;color:#09090b;}';
+    $body .= '.footer{background:#f4f4f5;padding:18px 32px;font-size:11px;color:#a1a1aa;text-align:center;}';
+    $body .= '</style></head><body>';
+    $body .= '<div class="wrap">';
+    $body .= '<div class="header"><h1>' . esc_html( $site_name ) . ' — Financial Report</h1><p>' . esc_html( $period_label ) . ( $is_test ? ' &bull; TEST SEND' : '' ) . '</p></div>';
+    $body .= '<div class="body">';
+
+    if ( $inc_inline ) {
+        $body .= '<div class="kpi-grid">';
+        $body .= '<div class="kpi"><div class="kpi-label">Gross Revenue</div><div class="kpi-value">&#8377;' . number_format( $inflow, 0, '.', ',' ) . '</div></div>';
+        $body .= '<div class="kpi"><div class="kpi-label">Total Expenses</div><div class="kpi-value">&#8377;' . number_format( $outflow, 0, '.', ',' ) . '</div></div>';
+        $body .= '<div class="kpi"><div class="kpi-label">Net Profit</div><div class="kpi-value">&#8377;' . number_format( $profit, 0, '.', ',' ) . '</div></div>';
+        $body .= '<div class="kpi"><div class="kpi-label">Profit Margin</div><div class="kpi-value">' . $margin . '%</div></div>';
+        $body .= '</div>';
+    }
+
+    $body .= '<p style="font-size:13px;color:#52525b;line-height:1.6;">This is your automated ' . esc_html( $period_label ) . ' financial summary from Cora Studio. Log in to your dashboard to view detailed ledger entries, invoices, and analytics.</p>';
+    $body .= '</div>';
+    $body .= '<div class="footer">Generated by Cora Workspace &bull; ' . date( 'j M Y, H:i' ) . '</div>';
+    $body .= '</div></body></html>';
+
+    $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+
+    return wp_mail( $recipient, $subject, $body, $headers );
+}
+
+/**
+ * Cron hook callbacks — fire scheduled financial report emails to all recipients.
+ */
+function cora_cron_send_financial_daily() {
+    $s = get_option( 'cora_fin_report_schedule_v2', array() );
+    if ( empty( $s['daily'] ) || empty( $s['recipients'] ) ) return;
+    foreach ( (array) $s['recipients'] as $email ) {
+        cora_send_financial_report_email( $email, 'this_month' );
+    }
+}
+add_action( 'cora_financial_report_daily', 'cora_cron_send_financial_daily' );
+
+function cora_cron_send_financial_weekly() {
+    $s = get_option( 'cora_fin_report_schedule_v2', array() );
+    if ( empty( $s['weekly'] ) || empty( $s['recipients'] ) ) return;
+    foreach ( (array) $s['recipients'] as $email ) {
+        cora_send_financial_report_email( $email, 'last_month' );
+    }
+}
+add_action( 'cora_financial_report_weekly', 'cora_cron_send_financial_weekly' );
+
+function cora_cron_send_financial_monthly() {
+    $s = get_option( 'cora_fin_report_schedule_v2', array() );
+    if ( empty( $s['monthly'] ) || empty( $s['recipients'] ) ) return;
+    foreach ( (array) $s['recipients'] as $email ) {
+        cora_send_financial_report_email( $email, 'last_month' );
+    }
+}
+add_action( 'cora_financial_report_monthly', 'cora_cron_send_financial_monthly' );
+
+function cora_cron_send_financial_quarterly() {
+    $s = get_option( 'cora_fin_report_schedule_v2', array() );
+    if ( empty( $s['quarterly'] ) || empty( $s['recipients'] ) ) return;
+    foreach ( (array) $s['recipients'] as $email ) {
+        cora_send_financial_report_email( $email, 'last_quarter' );
+    }
+}
+add_action( 'cora_financial_report_quarterly', 'cora_cron_send_financial_quarterly' );
+
+/**
+ * Register custom WP-Cron intervals needed for financial reports.
+ */
+function cora_financial_cron_schedules( $schedules ) {
+    if ( ! isset( $schedules['weekly'] ) ) {
+        $schedules['weekly'] = array(
+            'interval' => WEEK_IN_SECONDS,
+            'display'  => __( 'Once Weekly' ),
+        );
+    }
+    if ( ! isset( $schedules['monthly'] ) ) {
+        $schedules['monthly'] = array(
+            'interval' => 30 * DAY_IN_SECONDS,
+            'display'  => __( 'Once Monthly' ),
+        );
+    }
+    if ( ! isset( $schedules['quarterly'] ) ) {
+        $schedules['quarterly'] = array(
+            'interval' => 91 * DAY_IN_SECONDS,
+            'display'  => __( 'Once Quarterly' ),
+        );
+    }
+    return $schedules;
+}
+add_filter( 'cron_schedules', 'cora_financial_cron_schedules' );
 
 
 /**

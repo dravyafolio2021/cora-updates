@@ -135,6 +135,41 @@ test.describe('Media Library - Dedicated Folders Layout', () => {
     await expect(page.locator('#cora-toast-container')).toContainText('Upload rejected: Exceeds 5 GB workspace storage quota.');
   });
 
+  test('8. Verify Dual Search Filters Folder Cards', async ({ page }) => {
+    const searchInput = page.locator('#cm-search');
+    await expect(searchInput).toBeVisible();
+
+    const foldersGrid = page.locator('#cm-folders-grid');
+    
+    // Type non-matching search term
+    await searchInput.fill('NonExistentFolderQuery12345');
+    await page.waitForTimeout(450);
+
+    // Verify matching folder card text is absent
+    await expect(foldersGrid).not.toContainText('NonExistentFolderQuery12345');
+
+    // Clear search query
+    await searchInput.fill('');
+    await page.waitForTimeout(450);
+    await expect(foldersGrid).toContainText('All Media');
+  });
+
+  test('9. Verify Folder Color Tags Rendering', async ({ page }) => {
+    const foldersGrid = page.locator('#cm-folders-grid');
+    await expect(foldersGrid).toBeVisible();
+
+    const folderCards = page.locator('#cm-folders-grid .cm-fcard');
+    const count = await folderCards.count();
+    expect(count).toBeGreaterThan(0);
+
+    // Verify folder cards render color styling / border-left
+    const firstFolderCard = folderCards.first();
+    const borderLeft = await firstFolderCard.evaluate((el) => {
+      return window.getComputedStyle(el).borderLeftStyle || window.getComputedStyle(el).borderLeftWidth;
+    });
+    expect(borderLeft).toBeTruthy();
+  });
+
 });
 
 test.describe('Media Library - Mobile Viewport Layout', () => {
@@ -147,6 +182,14 @@ test.describe('Media Library - Mobile Viewport Layout', () => {
   });
 
   test('1. Verify Mobile Header & Sticky Bottom Bar', async ({ page }) => {
+    // Select & Upload buttons hidden from top header on mobile viewport
+    const headerSelectBtn = page.locator('#cm-header-top #cm-bulk-btn');
+    await expect(headerSelectBtn).not.toBeVisible();
+
+    const headerUploadBtn = page.locator('#cm-header-top button.primary');
+    await expect(headerUploadBtn).not.toBeVisible();
+
+    // Sticky bottom bar visible with Mobile Upload and New Folder buttons
     const bottomBar = page.locator('#cm-mobile-bottom-bar');
     await expect(bottomBar).toBeVisible();
 

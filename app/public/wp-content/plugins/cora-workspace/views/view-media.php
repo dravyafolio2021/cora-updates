@@ -32,32 +32,31 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 .cm-h-title { font-size:15px; font-weight:800; color:#09090b; letter-spacing:-.02em; }
 .cm-h-subtitle { font-size:11px; color:#a1a1aa; font-weight:500; }
 .cm-h-sep { flex:1; }
-.cm-h-storage { display:flex; flex-direction:column; gap:3px; min-width:130px; }
-.cm-h-storage-label { font-size:10px; color:#a1a1aa; font-weight:600; display:flex; justify-content:space-between; }
-.cm-sbar-w { height:3px; background:#f4f4f5; border-radius:99px; overflow:hidden; }
-.cm-sbar   { height:100%; background:#18181b; border-radius:99px; transition:width .4s; }
+.cm-h-storage-label { font-size:10.5px; color:inherit; font-weight:600; display:inline-flex; align-items:center; gap:5px; }
+.cm-sbar-w { height:3px; width:45px; background:#e4e4e7; border-radius:99px; overflow:hidden; }
+.cm-sbar   { height:100%; border-radius:99px; transition:width .4s; }
 
-#cm-storage-wrap { padding: 5px 10px; border-radius: 8px; transition: all .2s ease; border: 1px solid #e4e4e7; }
+#cm-storage-wrap { padding: 4px 9px; border-radius: 999px; font-size: 10.5px; font-weight: 600; transition: all .2s; border: 1px solid #e4e4e7; background: #fafafa; display: inline-flex; align-items: center; gap: 6px; }
 .cm-storage-dot { font-size: 8px; margin-right: 3px; }
 .cm-storage-pct-badge { font-weight: 700; padding: 1px 5px; border-radius: 4px; font-size: 10px; }
 
 /* Healthy (<70%) */
-.cm-storage-healthy { background: #ecfdf5; border-color: #a7f3d0 !important; color: #047857 !important; }
+.cm-storage-healthy { background: #ecfdf5 !important; border-color: #a7f3d0 !important; color: #047857 !important; }
 .cm-storage-healthy .cm-storage-dot { color: #10b981; }
 .cm-storage-healthy .cm-storage-pct-badge { background: #d1fae5; color: #065f46; }
-.cm-storage-healthy .cm-sbar { background: #10b981; }
+.cm-storage-healthy .cm-sbar { background: #10b981 !important; }
 
 /* Warning (70%-90%) */
-.cm-storage-warning { background: #fffbeb; border-color: #fde68a !important; color: #b45309 !important; }
+.cm-storage-warning { background: #fffbeb !important; border-color: #fde68a !important; color: #b45309 !important; }
 .cm-storage-warning .cm-storage-dot { color: #f59e0b; }
 .cm-storage-warning .cm-storage-pct-badge { background: #fef3c7; color: #92400e; }
-.cm-storage-warning .cm-sbar { background: #f59e0b; }
+.cm-storage-warning .cm-sbar { background: #f59e0b !important; }
 
 /* Critical (>90%) */
-.cm-storage-critical { background: #fef2f2; border-color: #fecaca !important; color: #b91c1c !important; }
+.cm-storage-critical { background: #fef2f2 !important; border-color: #fecaca !important; color: #b91c1c !important; }
 .cm-storage-critical .cm-storage-dot { color: #ef4444; }
 .cm-storage-critical .cm-storage-pct-badge { background: #fee2e2; color: #991b1b; }
-.cm-storage-critical .cm-sbar { background: #ef4444; }
+.cm-storage-critical .cm-sbar { background: #ef4444 !important; }
 .cm-hbtn { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; border:1px solid #e4e4e7; background:#fff; color:#3f3f46; transition:all .12s; white-space:nowrap; }
 .cm-hbtn:hover { background:#f4f4f5; border-color:#d4d4d8; }
 .cm-hbtn.primary { background:#09090b; color:#fff; border-color:#09090b; }
@@ -593,33 +592,21 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
         display: none !important;
     }
     #cm-header-top {
-        flex-direction: row;
-        justify-content: space-between;
+        display: flex;
         align-items: center;
+        justify-content: space-between;
         padding: 10px 14px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    #cm-header-top #cm-bulk-btn,
+    #cm-header-top button.primary {
+        display: none !important;
     }
     .cm-h-title {
         font-size: 14px;
     }
     .cm-h-subtitle {
-        display: none;
-    }
-    #cm-header-top #cm-storage-wrap {
-        display: inline-flex !important;
-        flex-direction: row;
-        align-items: center;
-        gap: 6px;
-        padding: 3px 8px;
-        background: #f4f4f5;
-        border-radius: 99px;
-        min-width: auto;
-    }
-    #cm-header-top #cm-storage-wrap .cm-h-storage-label {
-        font-size: 10px;
-        color: #52525b;
-        gap: 4px;
-    }
-    #cm-header-top #cm-storage-wrap .cm-sbar-w {
         display: none;
     }
 
@@ -673,22 +660,22 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 
     #cm-bulk-bar.on {
         position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 950;
-        border-radius: 0;
-        margin: 0;
-        width: 100%;
+        bottom: 70px;
+        left: 12px;
+        right: 12px;
+        width: auto;
+        z-index: 99999;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        border: 1px solid #3f3f46;
+        border-radius: 12px;
         overflow-x: auto;
         flex-wrap: nowrap;
-        max-width: 100vw;
         box-sizing: border-box;
         padding: 10px 12px;
     }
 
-    #cm-root {
-        padding-bottom: 60px;
+    #cm-root, #cm-canvas {
+        padding-bottom: 90px !important;
     }
 }
 @media(max-width:640px){
@@ -1172,6 +1159,13 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
                 <textarea id="cm-folder-desc" placeholder="Add internal notes or client instructions..." rows="3" style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:12px;outline:none;box-sizing:border-box;resize:vertical"></textarea>
             </div>
 
+            <!-- Folder Color Tag -->
+            <div style="margin-bottom:18px">
+                <label style="display:block;font-size:11px;font-weight:700;color:#27272a;margin-bottom:6px">Folder Color Tag</label>
+                <input type="hidden" id="cm-folder-color" value="#3b82f6">
+                <div id="cm-folder-color-swatches" style="display:flex;gap:8px;align-items:center;padding:4px 0"></div>
+            </div>
+
             <!-- Auto Share Link -->
             <div style="margin-bottom:18px;border-top:1px solid #f4f4f5;padding-top:14px">
                 <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#27272a;cursor:pointer">
@@ -1229,8 +1223,15 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
                 <label style="display:block;font-size:11px;font-weight:700;color:#27272a;margin-bottom:6px">Folder Name</label>
                 <div style="display:flex;gap:6px">
                     <input type="text" id="cm-fs-name-input" style="flex:1;border:1px solid #e4e4e7;border-radius:8px;padding:7px 10px;font-size:13px;outline:none">
-                    <button onclick="cmSaveRenameFolder()" class="cm-hbtn primary" style="font-size:11px">Save</button>
+                    <button onclick="cmSaveFolderSettings()" class="cm-hbtn primary" style="font-size:11px">Save</button>
                 </div>
+            </div>
+
+            <!-- Folder Color Tag -->
+            <div style="margin-bottom:18px">
+                <label style="display:block;font-size:11px;font-weight:700;color:#27272a;margin-bottom:6px">Folder Color Tag</label>
+                <input type="hidden" id="cm-fs-color" value="#3b82f6">
+                <div id="cm-fs-color-swatches" style="display:flex;gap:8px;align-items:center;padding:4px 0"></div>
             </div>
 
             <!-- Folder Share Link -->
@@ -1957,63 +1958,77 @@ window.cmRenderFolderTabs = function() {
     items.push(unorgCard);
 
     // 3. Custom Folder Cards
+    var searchQ = (CM.filters.q || '').trim().toLowerCase();
     CM.folders.forEach(function(folder) {
-        var isAct = (CM.folder == folder.id) ? ' active' : '';
-        var fcard = document.createElement('div');
-        fcard.className = 'cm-fcard' + isAct;
-        fcard.innerHTML =
-            '<div class="cm-fcard-left">' +
-                '<div class="cm-fcard-icon">' +
-                    '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>' +
-                '</div>' +
-                '<div class="cm-fcard-info">' +
-                    '<div class="cm-fcard-name" title="' + esc(folder.name) + '">' + esc(folder.name) + '</div>' +
-                    '<div class="cm-fcard-ct">' + (folder.count || 0) + ' items</div>' +
-                '</div>' +
-            '</div>' +
-            '<span class="cm-fcard-opt" title="Folder Settings & Sharing">⋮</span>';
-        
-        fcard.addEventListener('click', function() { cmSelectFolder(folder.id); });
-        var opt = fcard.querySelector('.cm-fcard-opt');
-        if (opt) {
-            opt.addEventListener('click', function(e) {
-                e.stopPropagation();
-                cmOpenFolderSettings(folder.id, folder.name);
+        var matchParent = !searchQ || folder.name.toLowerCase().indexOf(searchQ) !== -1;
+        var matchingChildren = (folder.children || []).filter(function(s) {
+            return !searchQ || s.name.toLowerCase().indexOf(searchQ) !== -1;
+        });
+
+        if (!searchQ || matchParent || matchingChildren.length > 0) {
+            if (!searchQ || matchParent) {
+                var fColor = folder.color || '#3b82f6';
+                var isAct = (CM.folder == folder.id) ? ' active' : '';
+                var fcard = document.createElement('div');
+                fcard.className = 'cm-fcard' + isAct;
+                fcard.style.borderLeft = '3px solid ' + fColor;
+                fcard.innerHTML =
+                    '<div class="cm-fcard-left">' +
+                        '<div class="cm-fcard-icon">' +
+                            '<svg viewBox="0 0 24 24" width="18" height="18" stroke="' + fColor + '" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>' +
+                        '</div>' +
+                        '<div class="cm-fcard-info">' +
+                            '<div class="cm-fcard-name" title="' + esc(folder.name) + '">' + esc(folder.name) + '</div>' +
+                            '<div class="cm-fcard-ct">' + (folder.count || 0) + ' items</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<span class="cm-fcard-opt" title="Folder Settings & Sharing">⋮</span>';
+                
+                fcard.addEventListener('click', function() { cmSelectFolder(folder.id); });
+                var opt = fcard.querySelector('.cm-fcard-opt');
+                if (opt) {
+                    opt.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        cmOpenFolderSettings(folder.id, folder.name);
+                    });
+                }
+                fcard.addEventListener('contextmenu', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    cmOpenFolderSettings(folder.id, folder.name);
+                });
+                items.push(fcard);
+            }
+
+            // Subfolders
+            matchingChildren.forEach(function(s) {
+                var sColor = s.color || '#3b82f6';
+                var sAct = (CM.folder == s.id) ? ' active' : '';
+                var scard = document.createElement('div');
+                scard.className = 'cm-fcard' + sAct;
+                scard.style.borderLeft = '3px solid ' + sColor;
+                scard.innerHTML =
+                    '<div class="cm-fcard-left">' +
+                        '<div class="cm-fcard-icon" style="background:#fafafa">' +
+                            '<svg viewBox="0 0 24 24" width="16" height="16" stroke="' + sColor + '" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>' +
+                        '</div>' +
+                        '<div class="cm-fcard-info">' +
+                            '<div class="cm-fcard-name" title="' + esc(s.name) + '">↳ ' + esc(s.name) + '</div>' +
+                            '<div class="cm-fcard-ct">' + (s.count || 0) + ' items</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<span class="cm-fcard-opt" title="Folder Settings & Sharing">⋮</span>';
+                scard.addEventListener('click', function() { cmSelectFolder(s.id); });
+                var sOpt = scard.querySelector('.cm-fcard-opt');
+                if (sOpt) {
+                    sOpt.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        cmOpenFolderSettings(s.id, s.name);
+                    });
+                }
+                items.push(scard);
             });
         }
-        fcard.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            cmOpenFolderSettings(folder.id, folder.name);
-        });
-        items.push(fcard);
-
-        // Subfolders
-        (folder.children || []).forEach(function(s) {
-            var sAct = (CM.folder == s.id) ? ' active' : '';
-            var scard = document.createElement('div');
-            scard.className = 'cm-fcard' + sAct;
-            scard.innerHTML =
-                '<div class="cm-fcard-left">' +
-                    '<div class="cm-fcard-icon" style="background:#fafafa">' +
-                        '<svg viewBox="0 0 24 24" width="16" height="16" stroke="#71717a" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>' +
-                    '</div>' +
-                    '<div class="cm-fcard-info">' +
-                        '<div class="cm-fcard-name" title="' + esc(s.name) + '">↳ ' + esc(s.name) + '</div>' +
-                        '<div class="cm-fcard-ct">' + (s.count || 0) + ' items</div>' +
-                    '</div>' +
-                '</div>' +
-                '<span class="cm-fcard-opt" title="Folder Settings & Sharing">⋮</span>';
-            scard.addEventListener('click', function() { cmSelectFolder(s.id); });
-            var sOpt = scard.querySelector('.cm-fcard-opt');
-            if (sOpt) {
-                sOpt.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    cmOpenFolderSettings(s.id, s.name);
-                });
-            }
-            items.push(scard);
-        });
     });
 
     if (!CM.foldersExpanded && items.length > 6) {
@@ -2054,6 +2069,24 @@ window.cmRenderFolderTabs = function() {
     } else {
         items.forEach(function(item) {
             container.appendChild(item);
+        });
+    }
+
+    if (CM.filters && CM.filters.q) {
+        var q = CM.filters.q.trim().toLowerCase();
+        var cards = container.querySelectorAll('.cm-fcard');
+        cards.forEach(function(card) {
+            if (card.classList.contains('cm-fcard-toggle')) {
+                card.style.display = q ? 'none' : '';
+                return;
+            }
+            var nameEl = card.querySelector('.cm-fcard-name');
+            var name = nameEl ? nameEl.textContent.toLowerCase() : '';
+            if (!q || name.indexOf(q) !== -1) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
         });
     }
 };
@@ -2134,7 +2167,7 @@ window.cmCreateFolder = function() {
 };
 
 // ── FILTERS / SORT / PAGINATION ───────────────────────────────────────────────
-window.cmOnSearch = function(v) { clearTimeout(CM.searchT); CM.searchT=setTimeout(function(){CM.filters.q=v;CM.page=1;cmLoadFiles();},350); };
+window.cmOnSearch = function(v) { clearTimeout(CM.searchT); CM.searchT=setTimeout(function(){CM.filters.q=v;CM.page=1;cmLoadFiles();cmRenderFolderTabs();},350); };
 window.cmFilter = function() {
     var ft = document.getElementById('cm-ft') ? document.getElementById('cm-ft').value : 'all';
     var fc = document.getElementById('cm-fculling') ? document.getElementById('cm-fculling').value : '';
@@ -2537,30 +2570,39 @@ window.cmAddWatermark = function() {
 // ── FOLDER SETTINGS & SHARING ──────────────────────────────────────────────────
 window.cmOpenFolderSettings = function(folderId, name) {
     if (!folderId) return;
-    if (!name) {
-        var f = (CM.folders || []).find(function(x){ return x.id == folderId; });
-        if (f) name = f.name;
+    var folderObj = null;
+    (CM.folders || []).forEach(function(x) {
+        if (x.id == folderId) folderObj = x;
+        (x.children || []).forEach(function(ch) {
+            if (ch.id == folderId) folderObj = ch;
+        });
+    });
+    if (!name && folderObj) {
+        name = folderObj.name;
     }
+    var color = (folderObj && folderObj.color) ? folderObj.color : '#3b82f6';
     document.getElementById('cm-fs-id').value = folderId;
     document.getElementById('cm-fs-name-input').value = name || '';
     document.getElementById('cm-fs-title').textContent = 'Folder Settings: ' + (name || '');
     document.getElementById('cm-fs-url-input').value = '';
+    cmRenderSwatches('cm-fs-color-swatches', 'cm-fs-color', color);
     if (typeof cmHideContextMenu === 'function') cmHideContextMenu();
     document.getElementById('cm-folder-settings-dlg').classList.add('open');
 };
 
-window.cmSaveRenameFolder = function() {
+window.cmSaveFolderSettings = window.cmSaveRenameFolder = function() {
     var id = document.getElementById('cm-fs-id').value;
     var name = document.getElementById('cm-fs-name-input').value.trim();
+    var color = document.getElementById('cm-fs-color') ? document.getElementById('cm-fs-color').value : '#3b82f6';
     if (!id || !name) { coraShowToast('Folder name required.'); return; }
     $.ajax({ url: coraREData.ajaxUrl, type: 'POST', data: {
-        action: 'cora_media_library_rename_folder', nonce: coraREData.ajaxNonce, term_id: id, name: name
+        action: 'cora_media_library_rename_folder', nonce: coraREData.ajaxNonce, term_id: id, name: name, color: color
     }, success: function(r) {
         if (r.success) {
-            coraShowToast('Folder renamed!');
+            coraShowToast('Folder updated!');
             document.getElementById('cm-folder-settings-dlg').classList.remove('open');
             cmLoadFolders();
-        } else coraShowToast(r.data || 'Rename failed.');
+        } else coraShowToast(r.data || 'Save failed.');
     }});
 };
 
@@ -2651,7 +2693,7 @@ window.cmLoadStorage = function() {
             } else {
                 wrap.classList.add('cm-storage-critical');
             }
-            wrap.style.display = 'flex';
+            wrap.style.display = 'inline-flex';
         }
     }});
 };
