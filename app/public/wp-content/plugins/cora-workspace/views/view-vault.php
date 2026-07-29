@@ -482,17 +482,16 @@ foreach ( $cora_documents as $doc ) {
 
         <!-- STEP 1 SUB-PAGE: DOCUMENT TYPE SELECTION -->
         <div id="sub-page-wiz-step-1" class="bg-white border border-zinc-200/80 rounded-3xl p-6 md:p-10 pb-24 sm:pb-28 shadow-xs space-y-6 w-full max-w-none">
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-zinc-100 pb-5">
-                <div class="max-w-xl">
-                    <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest block mb-1">Step 1 of 6</span>
-                    <h3 class="text-xl font-black text-zinc-950 tracking-tight">What type of document are you creating?</h3>
-                    <p class="text-xs text-zinc-500 mt-1 leading-relaxed">Select a category below or search document types. In Step 2, you can choose visual blueprint templates.</p>
+            <div class="border-b border-zinc-100 pb-4">
+                <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest block">Step 1 of 6</span>
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-1.5">
+                    <h3 class="text-lg font-black text-zinc-950 tracking-tight">What type of document are you creating?</h3>
+                    <div class="relative w-full md:w-72 shrink-0">
+                        <input type="text" id="wiz-cat-search-input" onkeyup="coraFilterWizCategories(this.value)" placeholder="Search document types..." class="w-full pl-9 pr-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-medium outline-none focus:border-zinc-950 focus:bg-white transition-all">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="absolute left-3 top-2.5 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </div>
                 </div>
-
-                <div class="relative w-full md:w-72">
-                    <input type="text" id="wiz-cat-search-input" onkeyup="coraFilterWizCategories(this.value)" placeholder="Search document types..." class="w-full pl-9 pr-3.5 py-2.5 bg-zinc-50/80 border border-zinc-200 rounded-xl text-xs font-medium outline-none focus:border-zinc-950 focus:bg-white transition-all">
-                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-3 top-3 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                </div>
+                <p class="text-xs text-zinc-500 mt-1.5 leading-relaxed">Select a category below or search document types. In Step 2, you can choose visual blueprint templates.</p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pt-1">
@@ -589,20 +588,19 @@ foreach ( $cora_documents as $doc ) {
 
         <!-- STEP 2 SUB-PAGE: CHOOSE VISUAL TEMPLATE BLUEPRINT -->
         <div id="sub-page-wiz-step-2" class="hidden bg-white border border-zinc-200/80 rounded-3xl p-6 md:p-10 pb-24 sm:pb-28 shadow-xs space-y-6 w-full max-w-none">
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-zinc-100 pb-5">
-                <div class="max-w-xl">
-                    <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest block mb-1">Step 2 of 6</span>
-                    <h3 class="text-xl font-black text-zinc-950 tracking-tight">Choose a Visual Template Blueprint</h3>
-                    <p class="text-xs text-zinc-500 mt-1 leading-relaxed">Below are visual paper preview cards for your selected category. Click any template to select it.</p>
+            <div class="border-b border-zinc-100 pb-4">
+                <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest block">Step 2 of 6</span>
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-1.5">
+                    <h3 class="text-lg font-black text-zinc-950 tracking-tight">Choose a Visual Template Blueprint</h3>
+                    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none shrink-0" id="wiz-tpl-filter-tabs">
+                        <button type="button" onclick="coraFilterTemplates('all', this)" class="cora-tpl-tab px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white shadow-xs cursor-pointer shrink-0">All Templates</button>
+                        <button type="button" onclick="coraFilterTemplates('minimal', this)" class="cora-tpl-tab px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer shrink-0">Minimal</button>
+                        <button type="button" onclick="coraFilterTemplates('modern', this)" class="cora-tpl-tab px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer shrink-0">Modern</button>
+                        <button type="button" onclick="coraFilterTemplates('professional', this)" class="cora-tpl-tab px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer shrink-0">Professional</button>
+                        <button type="button" onclick="coraFilterTemplates('creative', this)" class="cora-tpl-tab px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer shrink-0">Creative</button>
+                    </div>
                 </div>
-
-                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none" id="wiz-tpl-filter-tabs">
-                    <button type="button" onclick="coraFilterTemplates('all', this)" class="cora-tpl-tab px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white shadow-xs cursor-pointer shrink-0">All Templates</button>
-                    <button type="button" onclick="coraFilterTemplates('minimal', this)" class="cora-tpl-tab px-3.5 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer shrink-0">Minimal</button>
-                    <button type="button" onclick="coraFilterTemplates('modern', this)" class="cora-tpl-tab px-3.5 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer shrink-0">Modern</button>
-                    <button type="button" onclick="coraFilterTemplates('professional', this)" class="cora-tpl-tab px-3.5 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer shrink-0">Professional</button>
-                    <button type="button" onclick="coraFilterTemplates('creative', this)" class="cora-tpl-tab px-3.5 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer shrink-0">Creative</button>
-                </div>
+                <p class="text-xs text-zinc-500 mt-1.5 leading-relaxed">Below are visual paper preview cards for your selected category. Click any template to select it.</p>
             </div>
 
             <div id="wiz-subpage-template-gallery" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-1">
