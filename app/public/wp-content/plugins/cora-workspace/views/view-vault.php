@@ -456,7 +456,7 @@ foreach ( $cora_documents as $doc ) {
             </div>
 
             <!-- Mobile List View (Stacked professional list layout replacing horizontal tables on small viewports) -->
-            <div class="block md:hidden divide-y divide-zinc-100" id="cora-vault-mobile-list">
+            <div class="block md:hidden p-4 bg-zinc-50/40 space-y-3.5" id="cora-vault-mobile-list">
                 <?php foreach ( $cora_documents as $doc ) : 
                     $type_lower = strtolower($doc['type'] ?? '');
                     $status = $doc['status'] ?? 'Draft';
@@ -488,7 +488,7 @@ foreach ( $cora_documents as $doc ) {
                     $is_signed = ! empty( $doc['signed'] );
                     $is_proposal = $type_lower === 'proposal';
                 ?>
-                <div class="p-4 space-y-3 hover:bg-zinc-50/40 transition-colors cora-vault-row" data-type="<?php echo esc_attr( $type_lower ); ?>">
+                <div class="p-4 bg-white border border-zinc-200/80 rounded-2xl shadow-3xs space-y-3 hover:bg-zinc-50/30 transition-colors cora-vault-row" data-type="<?php echo esc_attr( $type_lower ); ?>">
                     <!-- Row 1: Doc Number, Category, Status -->
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-1.5">
