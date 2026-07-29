@@ -612,6 +612,7 @@ foreach ( $cora_documents as $doc ) {
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
             </div>
+        </div>
 
         <!-- STEP 2 SUB-PAGE: CHOOSE VISUAL TEMPLATE BLUEPRINT -->
         <div id="sub-page-wiz-step-2" class="hidden bg-white border border-zinc-200/80 rounded-3xl p-6 md:p-10 pb-24 sm:pb-28 shadow-xs space-y-6 w-full max-w-none">
