@@ -3666,9 +3666,9 @@ window.coraOpenClientProfileInCRM = function(clientName) {
 };
 
 // VIEW SWITCHER
-window.coraSwitchVaultView = function(view, docId) {
+window.coraSwitchVaultView = function(view, docId, forceStep) {
     var urlParams = new URLSearchParams(window.location.search);
-    var storedStep = urlParams.get('step') || localStorage.getItem('cora_wiz_step') || 1;
+    var storedStep = forceStep || urlParams.get('step') || localStorage.getItem('cora_wiz_step') || 1;
     var stepNum = parseInt(storedStep, 10);
     if (isNaN(stepNum) || stepNum < 1 || stepNum > 6) stepNum = 1;
 
@@ -3778,7 +3778,7 @@ window.coraCreateNewDocInStudio = function() {
         coraAddStudioLineItem({ desc: '3-Day Full Wedding Cinematography & Aerial Drone', sac: '998381', qty: 1, rate: 300000, tax: 18 });
         coraAddStudioLineItem({ desc: 'Candid Fine-Art Photography & Signature Album Box', sac: '998381', qty: 1, rate: 150000, tax: 18 });
     }
-    coraSwitchVaultView('editor');
+    coraSwitchVaultView('editor', null, 1);
 };
 
 window.coraOpenDocInStudio = function(docId) {
