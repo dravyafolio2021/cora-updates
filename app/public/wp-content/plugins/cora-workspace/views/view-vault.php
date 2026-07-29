@@ -699,153 +699,153 @@ foreach ( $cora_documents as $doc ) {
                         <button type="button" onclick="coraToggleStep3Sidebar('left')" title="Close Sidebar" class="w-6.5 h-6.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-500 hover:text-zinc-950 flex items-center justify-center transition-colors cursor-pointer shrink-0">
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
-                    </div>
-
-                    <!-- Segmented Tab Switcher -->
-                    <div class="flex items-center bg-zinc-100 p-1 rounded-xl w-full">
-                        <button type="button" id="step3-tab-btn-components" onclick="coraSwitchStep3SidebarTab('components')" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all bg-white text-zinc-950 shadow-xs cursor-pointer text-center whitespace-nowrap">
-                            Blocks
-                        </button>
-                        <button type="button" id="step3-tab-btn-outline" onclick="coraSwitchStep3SidebarTab('outline')" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all text-zinc-500 hover:text-zinc-900 cursor-pointer text-center whitespace-nowrap">
-                            Outline
-                        </button>
-                    </div>
-
-                    <!-- TAB 1: COMPONENT LIBRARY BLOCKS -->
+                              <!-- TAB 1: COMPONENT LIBRARY BLOCKS -->
                     <div id="step3-sidebar-content-components" class="space-y-4">
-                        <p class="text-[11px] text-zinc-500">Click or drag blocks to add to canvas.</p>
+                        <p class="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Click or drag blocks to add to canvas</p>
                         <!-- Library Groups -->
                         <div class="space-y-4 text-xs">
                             <!-- Group 1: Basic Blocks -->
-                            <div class="border border-zinc-200 rounded-2xl overflow-hidden">
-                                <div class="bg-zinc-50 px-3.5 py-2.5 font-bold text-zinc-900 flex items-center justify-between border-b border-zinc-200">
-                                    <span class="text-xs font-extrabold uppercase tracking-wider text-zinc-800">Basic Blocks</span>
-                                    <span class="text-[10px] bg-zinc-200 text-zinc-700 font-mono px-1.5 py-0.5 rounded">6</span>
+                            <div class="border border-zinc-200/80 rounded-2xl overflow-hidden shadow-2xs">
+                                <div class="bg-zinc-50/80 px-4 py-2.5 font-bold text-zinc-900 flex items-center justify-between border-b border-zinc-200/60">
+                                    <span class="text-[11px] font-black uppercase tracking-wider text-zinc-800">Basic Blocks</span>
+                                    <span class="text-[10px] bg-zinc-200/80 text-zinc-700 font-mono px-2 py-0.5 rounded-full font-bold">6</span>
                                 </div>
-                                <div class="p-2.5 grid grid-cols-2 gap-2 bg-white">
-                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'text')" onclick="coraAddCanvasBlock('text')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-950 hover:bg-zinc-50 flex flex-col items-center gap-1.5 text-center transition-all cursor-grab">
-                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
-                                        <span class="text-[11px] font-semibold text-zinc-800">Text</span>
+                                <div class="p-3 grid grid-cols-2 gap-2.5 bg-white">
+                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'text')" onclick="coraAddCanvasBlock('text')" class="p-3 rounded-2xl border border-zinc-200/80 bg-zinc-50/30 hover:border-zinc-950 hover:bg-white hover:shadow-xs flex flex-col items-center gap-2 text-center transition-all cursor-grab group">
+                                        <div class="w-8 h-8 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-center text-zinc-500 group-hover:text-zinc-950 group-hover:border-zinc-300 group-hover:scale-105 transition-all shadow-3xs shrink-0">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+                                        </div>
+                                        <span class="text-[11px] font-bold text-zinc-700 group-hover:text-zinc-950 transition-colors">Text</span>
                                     </button>
-                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'heading')" onclick="coraAddCanvasBlock('heading')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-950 hover:bg-zinc-50 flex flex-col items-center gap-1.5 text-center transition-all cursor-grab">
-                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><path d="M6 4v16M18 4v16M6 12h12"></path></svg>
-                                        <span class="text-[11px] font-semibold text-zinc-800">Heading</span>
+                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'heading')" onclick="coraAddCanvasBlock('heading')" class="p-3 rounded-2xl border border-zinc-200/80 bg-zinc-50/30 hover:border-zinc-950 hover:bg-white hover:shadow-xs flex flex-col items-center gap-2 text-center transition-all cursor-grab group">
+                                        <div class="w-8 h-8 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-center text-zinc-500 group-hover:text-zinc-950 group-hover:border-zinc-300 group-hover:scale-105 transition-all shadow-3xs shrink-0">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M6 4v16M18 4v16M6 12h12"></path></svg>
+                                        </div>
+                                        <span class="text-[11px] font-bold text-zinc-700 group-hover:text-zinc-950 transition-colors">Heading</span>
                                     </button>
-                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'image')" onclick="coraAddCanvasBlock('image')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-950 hover:bg-zinc-50 flex flex-col items-center gap-1.5 text-center transition-all cursor-grab">
-                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                        <span class="text-[11px] font-semibold text-zinc-800">Image</span>
+                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'image')" onclick="coraAddCanvasBlock('image')" class="p-3 rounded-2xl border border-zinc-200/80 bg-zinc-50/30 hover:border-zinc-950 hover:bg-white hover:shadow-xs flex flex-col items-center gap-2 text-center transition-all cursor-grab group">
+                                        <div class="w-8 h-8 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-center text-zinc-500 group-hover:text-zinc-950 group-hover:border-zinc-300 group-hover:scale-105 transition-all shadow-3xs shrink-0">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                        </div>
+                                        <span class="text-[11px] font-bold text-zinc-700 group-hover:text-zinc-950 transition-colors">Image</span>
                                     </button>
-                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'table')" onclick="coraAddCanvasBlock('table')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-950 hover:bg-zinc-50 flex flex-col items-center gap-1.5 text-center transition-all cursor-grab">
-                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18M3 15h18M9 3v18"></path></svg>
-                                        <span class="text-[11px] font-semibold text-zinc-800">Table</span>
+                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'table')" onclick="coraAddCanvasBlock('table')" class="p-3 rounded-2xl border border-zinc-200/80 bg-zinc-50/30 hover:border-zinc-950 hover:bg-white hover:shadow-xs flex flex-col items-center gap-2 text-center transition-all cursor-grab group">
+                                        <div class="w-8 h-8 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-center text-zinc-500 group-hover:text-zinc-950 group-hover:border-zinc-300 group-hover:scale-105 transition-all shadow-3xs shrink-0">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18M3 15h18M9 3v18"></path></svg>
+                                        </div>
+                                        <span class="text-[11px] font-bold text-zinc-700 group-hover:text-zinc-950 transition-colors">Table</span>
                                     </button>
-                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'divider')" onclick="coraAddCanvasBlock('divider')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-950 hover:bg-zinc-50 flex flex-col items-center gap-1.5 text-center transition-all cursor-grab">
-                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                        <span class="text-[11px] font-semibold text-zinc-800">Divider</span>
+                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'divider')" onclick="coraAddCanvasBlock('divider')" class="p-3 rounded-2xl border border-zinc-200/80 bg-zinc-50/30 hover:border-zinc-950 hover:bg-white hover:shadow-xs flex flex-col items-center gap-2 text-center transition-all cursor-grab group">
+                                        <div class="w-8 h-8 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-center text-zinc-500 group-hover:text-zinc-950 group-hover:border-zinc-300 group-hover:scale-105 transition-all shadow-3xs shrink-0">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                        </div>
+                                        <span class="text-[11px] font-bold text-zinc-700 group-hover:text-zinc-950 transition-colors">Divider</span>
                                     </button>
-                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'spacer')" onclick="coraAddCanvasBlock('spacer')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-950 hover:bg-zinc-50 flex flex-col items-center gap-1.5 text-center transition-all cursor-grab">
-                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><path d="M12 5v14M5 12h14"></path></svg>
-                                        <span class="text-[11px] font-semibold text-zinc-800">Spacer</span>
+                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'spacer')" onclick="coraAddCanvasBlock('spacer')" class="p-3 rounded-2xl border border-zinc-200/80 bg-zinc-50/30 hover:border-zinc-950 hover:bg-white hover:shadow-xs flex flex-col items-center gap-2 text-center transition-all cursor-grab group">
+                                        <div class="w-8 h-8 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-center text-zinc-500 group-hover:text-zinc-950 group-hover:border-zinc-300 group-hover:scale-105 transition-all shadow-3xs shrink-0">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 5v14M5 12h14"></path></svg>
+                                        </div>
+                                        <span class="text-[11px] font-bold text-zinc-700 group-hover:text-zinc-950 transition-colors">Spacer</span>
                                     </button>
                                 </div>
                             </div>
-
+ 
                             <!-- Group 2: Smart Blocks -->
-                            <div class="border border-zinc-200 rounded-2xl overflow-hidden">
-                                <div class="bg-zinc-50 px-3.5 py-2.5 font-bold text-zinc-900 flex items-center justify-between border-b border-zinc-200">
-                                    <span class="text-xs font-extrabold uppercase tracking-wider text-zinc-800">Smart Blocks</span>
-                                    <span class="text-[10px] bg-zinc-200 text-zinc-700 font-mono px-1.5 py-0.5 rounded">5</span>
+                            <div class="border border-zinc-200/80 rounded-2xl overflow-hidden shadow-2xs">
+                                <div class="bg-zinc-50/80 px-4 py-2.5 font-bold text-zinc-900 flex items-center justify-between border-b border-zinc-200/60">
+                                    <span class="text-[11px] font-black uppercase tracking-wider text-zinc-800">Smart Blocks</span>
+                                    <span class="text-[10px] bg-zinc-200/80 text-zinc-700 font-mono px-2 py-0.5 rounded-full font-bold">5</span>
                                 </div>
-                                <div class="p-2.5 grid grid-cols-1 gap-2 bg-white">
-                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'services_table')" onclick="coraAddCanvasBlock('services_table')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-950 hover:bg-zinc-50 flex items-center gap-3 transition-all cursor-grab text-left">
-                                        <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 text-zinc-800 font-extrabold text-xs select-none">
+                                <div class="p-3 bg-white space-y-2">
+                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'services_table')" onclick="coraAddCanvasBlock('services_table')" class="w-full p-2.5 rounded-2xl border border-zinc-200/80 bg-zinc-50/30 hover:border-zinc-950 hover:bg-white hover:shadow-xs flex items-center gap-3 transition-all cursor-grab text-left group">
+                                        <div class="w-9 h-9 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-center shrink-0 text-zinc-700 font-extrabold text-[11px] select-none group-hover:text-zinc-950 group-hover:border-zinc-300 group-hover:scale-105 transition-all shadow-3xs">
                                             ₹
                                         </div>
                                         <div>
-                                            <div class="text-[11px] font-bold text-zinc-900">Services Table</div>
-                                            <div class="text-[10px] text-zinc-500">Structured service deliverables matrix</div>
+                                            <div class="text-[11px] font-black text-zinc-800 group-hover:text-zinc-950 transition-colors">Services Table</div>
+                                            <div class="text-[9.5px] text-zinc-400 group-hover:text-zinc-500 transition-colors">Structured service deliverables matrix</div>
                                         </div>
                                     </button>
-                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'pricing_table')" onclick="coraAddCanvasBlock('pricing_table')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-950 hover:bg-zinc-50 flex items-center gap-3 transition-all cursor-grab text-left">
-                                        <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 text-zinc-800">
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'pricing_table')" onclick="coraAddCanvasBlock('pricing_table')" class="w-full p-2.5 rounded-2xl border border-zinc-200/80 bg-zinc-50/30 hover:border-zinc-950 hover:bg-white hover:shadow-xs flex items-center gap-3 transition-all cursor-grab text-left group">
+                                        <div class="w-9 h-9 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-center shrink-0 text-zinc-500 group-hover:text-zinc-950 group-hover:border-zinc-300 group-hover:scale-105 transition-all shadow-3xs">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                                         </div>
                                         <div>
-                                            <div class="text-[11px] font-bold text-zinc-900">Pricing Table</div>
-                                            <div class="text-[10px] text-zinc-500">Itemized rates & GST calculation matrix</div>
+                                            <div class="text-[11px] font-black text-zinc-800 group-hover:text-zinc-950 transition-colors">Pricing Table</div>
+                                            <div class="text-[9.5px] text-zinc-400 group-hover:text-zinc-500 transition-colors">Itemized rates & GST calculation matrix</div>
                                         </div>
                                     </button>
-                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'timeline')" onclick="coraAddCanvasBlock('timeline')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-950 hover:bg-zinc-50 flex items-center gap-3 transition-all cursor-grab text-left">
-                                        <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 text-zinc-800">
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'timeline')" onclick="coraAddCanvasBlock('timeline')" class="w-full p-2.5 rounded-2xl border border-zinc-200/80 bg-zinc-50/30 hover:border-zinc-950 hover:bg-white hover:shadow-xs flex items-center gap-3 transition-all cursor-grab text-left group">
+                                        <div class="w-9 h-9 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-center shrink-0 text-zinc-500 group-hover:text-zinc-950 group-hover:border-zinc-300 group-hover:scale-105 transition-all shadow-3xs">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                                         </div>
                                         <div>
-                                            <div class="text-[11px] font-bold text-zinc-900">Timeline</div>
-                                            <div class="text-[10px] text-zinc-500">Project shoot & delivery milestones</div>
+                                            <div class="text-[11px] font-black text-zinc-800 group-hover:text-zinc-950 transition-colors">Timeline</div>
+                                            <div class="text-[9.5px] text-zinc-400 group-hover:text-zinc-500 transition-colors">Project shoot & delivery milestones</div>
                                         </div>
                                     </button>
-                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'testimonial')" onclick="coraAddCanvasBlock('testimonial')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-950 hover:bg-zinc-50 flex items-center gap-3 transition-all cursor-grab text-left">
-                                        <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 text-zinc-800">
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'testimonial')" onclick="coraAddCanvasBlock('testimonial')" class="w-full p-2.5 rounded-2xl border border-zinc-200/80 bg-zinc-50/30 hover:border-zinc-950 hover:bg-white hover:shadow-xs flex items-center gap-3 transition-all cursor-grab text-left group">
+                                        <div class="w-9 h-9 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-center shrink-0 text-zinc-500 group-hover:text-zinc-950 group-hover:border-zinc-300 group-hover:scale-105 transition-all shadow-3xs">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                                         </div>
                                         <div>
-                                            <div class="text-[11px] font-bold text-zinc-900">Testimonial</div>
-                                            <div class="text-[10px] text-zinc-500">Client endorsement & review quote</div>
+                                            <div class="text-[11px] font-black text-zinc-800 group-hover:text-zinc-950 transition-colors">Testimonial</div>
+                                            <div class="text-[9.5px] text-zinc-400 group-hover:text-zinc-500 transition-colors">Client endorsement & review quote</div>
                                         </div>
                                     </button>
-                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'faq')" onclick="coraAddCanvasBlock('faq')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-950 hover:bg-zinc-50 flex items-center gap-3 transition-all cursor-grab text-left">
-                                        <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 text-zinc-800">
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'faq')" onclick="coraAddCanvasBlock('faq')" class="w-full p-2.5 rounded-2xl border border-zinc-200/80 bg-zinc-50/30 hover:border-zinc-950 hover:bg-white hover:shadow-xs flex items-center gap-3 transition-all cursor-grab text-left group">
+                                        <div class="w-9 h-9 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-center shrink-0 text-zinc-500 group-hover:text-zinc-950 group-hover:border-zinc-300 group-hover:scale-105 transition-all shadow-3xs">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                                         </div>
                                         <div>
-                                            <div class="text-[11px] font-bold text-zinc-900">FAQ Section</div>
-                                            <div class="text-[10px] text-zinc-500">Frequently asked questions accordion</div>
+                                            <div class="text-[11px] font-black text-zinc-800 group-hover:text-zinc-950 transition-colors">FAQ Section</div>
+                                            <div class="text-[9.5px] text-zinc-400 group-hover:text-zinc-500 transition-colors">Frequently asked questions accordion</div>
                                         </div>
                                     </button>
                                 </div>
                             </div>
-
+ 
                             <!-- Group 3: Building Blocks -->
-                            <div class="border border-zinc-200 rounded-2xl overflow-hidden">
-                                <div class="bg-zinc-50 px-3.5 py-2.5 font-bold text-zinc-900 flex items-center justify-between border-b border-zinc-200">
-                                    <span class="text-xs font-extrabold uppercase tracking-wider text-zinc-800">Building Blocks</span>
-                                    <span class="text-[10px] bg-zinc-200 text-zinc-700 font-mono px-1.5 py-0.5 rounded">4</span>
+                            <div class="border border-zinc-200/80 rounded-2xl overflow-hidden shadow-2xs">
+                                <div class="bg-zinc-50/80 px-4 py-2.5 font-bold text-zinc-900 flex items-center justify-between border-b border-zinc-200/60">
+                                    <span class="text-[11px] font-black uppercase tracking-wider text-zinc-800">Building Blocks</span>
+                                    <span class="text-[10px] bg-zinc-200/80 text-zinc-700 font-mono px-2 py-0.5 rounded-full font-bold">4</span>
                                 </div>
-                                <div class="p-2.5 grid grid-cols-1 gap-2 bg-white">
-                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'cover')" onclick="coraAddCanvasBlock('cover')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-950 hover:bg-zinc-50 flex items-center gap-3 transition-all cursor-grab text-left">
-                                        <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 text-zinc-800">
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                                <div class="p-3 bg-white space-y-2">
+                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'cover')" onclick="coraAddCanvasBlock('cover')" class="w-full p-2.5 rounded-2xl border border-zinc-200/80 bg-zinc-50/30 hover:border-zinc-950 hover:bg-white hover:shadow-xs flex items-center gap-3 transition-all cursor-grab text-left group">
+                                        <div class="w-9 h-9 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-center shrink-0 text-zinc-500 group-hover:text-zinc-950 group-hover:border-zinc-300 group-hover:scale-105 transition-all shadow-3xs">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                                         </div>
                                         <div>
-                                            <div class="text-[11px] font-bold text-zinc-900">Cover Page</div>
-                                            <div class="text-[10px] text-zinc-500">Title hero & branding cover block</div>
+                                            <div class="text-[11px] font-black text-zinc-800 group-hover:text-zinc-950 transition-colors">Cover Page</div>
+                                            <div class="text-[9.5px] text-zinc-400 group-hover:text-zinc-500 transition-colors">Title hero & branding cover block</div>
                                         </div>
                                     </button>
-                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'client_info')" onclick="coraAddCanvasBlock('client_info')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-950 hover:bg-zinc-50 flex items-center gap-3 transition-all cursor-grab text-left">
-                                        <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 text-zinc-800">
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'client_info')" onclick="coraAddCanvasBlock('client_info')" class="w-full p-2.5 rounded-2xl border border-zinc-200/80 bg-zinc-50/30 hover:border-zinc-950 hover:bg-white hover:shadow-xs flex items-center gap-3 transition-all cursor-grab text-left group">
+                                        <div class="w-9 h-9 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-center shrink-0 text-zinc-500 group-hover:text-zinc-950 group-hover:border-zinc-300 group-hover:scale-105 transition-all shadow-3xs">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                                         </div>
                                         <div>
-                                            <div class="text-[11px] font-bold text-zinc-900">Client Info</div>
-                                            <div class="text-[10px] text-zinc-500">Client contact & GST metadata section</div>
+                                            <div class="text-[11px] font-black text-zinc-800 group-hover:text-zinc-950 transition-colors">Client Info</div>
+                                            <div class="text-[9.5px] text-zinc-400 group-hover:text-zinc-500 transition-colors">Client contact & GST metadata section</div>
                                         </div>
                                     </button>
-                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'signature_info')" onclick="coraAddCanvasBlock('signature_info')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-950 hover:bg-zinc-50 flex items-center gap-3 transition-all cursor-grab text-left">
-                                        <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 text-zinc-800">
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path><polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon></svg>
+                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'signature_info')" onclick="coraAddCanvasBlock('signature_info')" class="w-full p-2.5 rounded-2xl border border-zinc-200/80 bg-zinc-50/30 hover:border-zinc-950 hover:bg-white hover:shadow-xs flex items-center gap-3 transition-all cursor-grab text-left group">
+                                        <div class="w-9 h-9 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-center shrink-0 text-zinc-500 group-hover:text-zinc-950 group-hover:border-zinc-300 group-hover:scale-105 transition-all shadow-3xs">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path><polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon></svg>
                                         </div>
                                         <div>
-                                            <div class="text-[11px] font-bold text-zinc-900">Signature Info</div>
-                                            <div class="text-[10px] text-zinc-500">Dual E-signature sign-off box</div>
+                                            <div class="text-[11px] font-black text-zinc-800 group-hover:text-zinc-950 transition-colors">Signature Info</div>
+                                            <div class="text-[9.5px] text-zinc-400 group-hover:text-zinc-500 transition-colors">Dual E-signature sign-off box</div>
                                         </div>
                                     </button>
-                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'file_upload')" onclick="coraAddCanvasBlock('file_upload')" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-950 hover:bg-zinc-50 flex items-center gap-3 transition-all cursor-grab text-left">
-                                        <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 text-zinc-800">
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                    <button type="button" draggable="true" ondragstart="coraDragBlockStart(event, 'file_upload')" onclick="coraAddCanvasBlock('file_upload')" class="w-full p-2.5 rounded-2xl border border-zinc-200/80 bg-zinc-50/30 hover:border-zinc-950 hover:bg-white hover:shadow-xs flex items-center gap-3 transition-all cursor-grab text-left group">
+                                        <div class="w-9 h-9 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-center shrink-0 text-zinc-500 group-hover:text-zinc-950 group-hover:border-zinc-300 group-hover:scale-105 transition-all shadow-3xs">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                                         </div>
                                         <div>
-                                            <div class="text-[11px] font-bold text-zinc-900">File Upload</div>
-                                            <div class="text-[10px] text-zinc-500">Attachment dropzone for client files</div>
+                                            <div class="text-[11px] font-black text-zinc-800 group-hover:text-zinc-950 transition-colors">File Upload</div>
+                                            <div class="text-[9.5px] text-zinc-400 group-hover:text-zinc-500 transition-colors">Attachment dropzone for client files</div>
                                         </div>
                                     </button>
                                 </div>
