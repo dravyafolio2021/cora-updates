@@ -3027,6 +3027,54 @@ window.coraRenderPaperPreviewInStep5 = function() {
     html += '  <button type="button" onclick="coraShowToast(\'Pair with another UPI requested\')" class="text-xs font-extrabold text-zinc-700 hover:text-black transition-colors cursor-pointer bg-transparent border-none p-0">+ Pair with another UPI</button>';
     html += '</div>';
 
+    // 5b. Signature Section
+    html += '<div class="pt-6 border-t border-zinc-200/80 mt-6">';
+    html += '  <h4 class="text-[11px] font-black uppercase tracking-wider text-zinc-950 mb-4">Authorization & E-Signature</h4>';
+    html += '  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">';
+    
+    // Prepared by
+    html += '    <div class="p-4 bg-zinc-55/40 border border-zinc-200 rounded-2xl space-y-2">';
+    html += '      <span class="text-[9px] font-extrabold text-zinc-400 uppercase tracking-wider block">Prepared By</span>';
+    html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-end pb-1 font-serif text-xs italic text-zinc-800">Cora Studio Representative</div>';
+    html += '      <div class="text-[10px] text-zinc-500 font-medium">Date: \' + formattedDate + \'</div>';
+    html += '    </div>';
+
+    // Client Signature
+    html += '    <div class="p-4 bg-zinc-55/40 border border-zinc-200 rounded-2xl space-y-2">';
+    html += '      <span class="text-[9px] font-extrabold text-zinc-400 uppercase tracking-wider block">Client Acceptance</span>';
+    
+    var isDocSigned = false;
+    var signerName = "";
+    var signedDate = "";
+    var signatureImg = "";
+    
+    var activeDocId = document.getElementById("studio-doc-id") ? document.getElementById("studio-doc-id").value : "";
+    if (activeDocId && window.CORA_DOCUMENTS) {
+        var existingDoc = window.CORA_DOCUMENTS.find(function(d){ return String(d.id) === String(activeDocId); });
+        if (existingDoc && existingDoc.signed) {
+            isDocSigned = true;
+            signerName = existingDoc.signer_name || clientName;
+            signedDate = existingDoc.signed_at || formattedDate;
+            signatureImg = existingDoc.signature_image || "";
+        }
+    }
+    
+    if (isDocSigned) {
+        if (signatureImg) {
+            html += \'      <div class="h-10 border-b border-dashed border-zinc-200 flex items-center justify-center pb-1"><img src="\' + signatureImg + \'" class="h-8 object-contain" /></div>\';
+        } else {
+            html += \'      <div class="h-10 border-b border-dashed border-zinc-200 flex items-end pb-1 font-serif text-xs italic text-zinc-800">\' + signerName + \'</div>\';
+        }
+        html += \'      <div class="text-[10px] text-zinc-500 font-medium">Signed: \' + signedDate + \'</div>\';
+    } else {
+        html += \'      <div class="h-10 border-b border-dashed border-zinc-200 flex items-center justify-center pb-1 text-zinc-400 text-[10px] italic">Signature Pending</div>\';
+        html += \'      <div class="text-[10px] text-zinc-500 font-medium">Client: \' + clientName + \'</div>\';
+    }
+    
+    html += \'    </div>\';
+    html += \'  </div>\';
+    html += \'</div>\';
+
     // 6. Footer Disclaimer
     html += '<div class="border-t border-zinc-200/80 pt-6 mt-8 text-center text-[10px] text-zinc-400 font-mono">';
     html += '  © <?php echo date("Y"); ?> <span id="paper-footer-company">' + companyName + '</span>. GSTIN: 07AAAAA0000A1Z5. Confidential & Proprietary Document.';
@@ -4027,8 +4075,18 @@ window.coraOpenDocPreviewDrawer = function(docId) {
                 '<span class="text-[10px] font-extrabold uppercase tracking-widest block text-zinc-600">✓ E-Sign Audit Verified</span>' +
                 '<div class="font-bold">Signed by: ' + (doc.signer_name||'—') + ' (' + (doc.signer_email||'—') + ')</div>' +
                 '<div class="font-mono text-[10px] text-zinc-500">Timestamp: ' + (doc.signed_at||'—') + ' | IP: ' + (doc.signer_ip||'103.21.124.8') + '</div>' +
-                '<div class="font-mono text-[10px] font-bold text-zinc-950 mt-1">Hash: ' + (doc.verification_hash||'ESIGN-HASH-V1') + '</div>' +
-                '</div>';
+                '<div class="font-mono text-[10px] font-bold text-zinc-950 mt-1">Hash: ' + (doc.verification_hash||'ESIGN-HASH-V1') + '</div>';
+        
+        if (doc.signature_image) {
+            html += '<div class="mt-2.5 pt-2.5 border-t border-zinc-200">' +
+                    '  <span class="text-[9px] font-extrabold uppercase tracking-wider block text-zinc-400">Captured E-Signature</span>' +
+                    '  <div class="mt-1 p-1 bg-white border border-zinc-200 rounded-xl inline-block">' +
+                    '    <img src="' + doc.signature_image + '" class="h-10 object-contain block" style="max-height: 40px;" />' +
+                    '  </div>' +
+                    '</div>';
+        }
+        
+        html += '</div>';
     }
 
     document.getElementById('preview-drawer-content').innerHTML = html;
