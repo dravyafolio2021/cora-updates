@@ -2360,7 +2360,7 @@ window.coraRenderWizardStepUI = function() {
             // Completed step — dark pill with checkmark
             pill.className = 'wiz-step-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-800 cursor-pointer transition-all shrink-0';
             if (numEl) { numEl.className = 'wiz-step-num w-5 h-5 rounded-full bg-white/20 text-white text-[10px] font-bold flex items-center justify-center shrink-0'; numEl.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"/></svg>'; }
-            if (label) { label.className = 'wiz-step-label text-[11px] font-medium text-white/70 whitespace-nowrap'; }
+            if (label) { label.className = 'wiz-step-label text-[11px] font-medium text-white whitespace-nowrap'; }
         } else {
             // Upcoming step — light pill
             pill.className = 'wiz-step-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 cursor-pointer transition-all shrink-0 hover:bg-zinc-150';
