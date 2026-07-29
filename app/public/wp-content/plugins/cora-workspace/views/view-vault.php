@@ -218,7 +218,7 @@ foreach ( $cora_documents as $doc ) {
 }
 </style>
 
-<div id="cora-vault-wrapper" class="space-y-5 relative font-sans text-zinc-900 pb-10">
+<div id="cora-vault-wrapper" class="space-y-5 relative font-sans text-zinc-900 pb-0">
    <!-- Top Header & Navigation area (Shopify/Notion UI style alignment) -->
    <div class="flex flex-col gap-4 border-b border-zinc-200/80 pb-0 mb-5" style="padding-bottom: 0 !important;">
        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
