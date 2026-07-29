@@ -262,6 +262,115 @@ if ( ! defined( 'ABSPATH' ) ) {
             text-align: center;
         }
 
+        /* E-Sign Portal Styles */
+        .esign-portal-section {
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1px solid #e4e4e7;
+        }
+        .esign-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 16px;
+        }
+        @media (max-width: 640px) {
+            .esign-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .esign-card {
+            background-color: #fafaf9;
+            border: 1px solid #e4e4e7;
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .esign-card-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #71717a;
+        }
+        .esign-canvas-wrapper {
+            border: 1.5px dashed #d4d4d8;
+            border-radius: 12px;
+            background: #ffffff;
+            overflow: hidden;
+            position: relative;
+        }
+        .esign-canvas {
+            width: 100%;
+            height: 120px;
+            display: block;
+            cursor: crosshair;
+        }
+        .esign-input {
+            width: 100%;
+            border: 1px solid #e4e4e7;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 13px;
+            outline: none;
+            box-sizing: border-box;
+            font-family: var(--font-sans);
+        }
+        .esign-input:focus {
+            border-color: #18181b;
+        }
+        .esign-btn-submit {
+            background-color: #18181b;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.15s;
+            font-family: var(--font-sans);
+        }
+        .esign-btn-submit:hover {
+            background-color: #27272a;
+        }
+        .esign-btn-clear {
+            background: none;
+            border: none;
+            color: #71717a;
+            font-size: 11px;
+            font-weight: 600;
+            text-decoration: underline;
+            cursor: pointer;
+            align-self: flex-end;
+        }
+        .esign-stamp-box {
+            height: 60px;
+            border-bottom: 1px dashed #e4e4e7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 4px;
+        }
+        .esign-stamp-box img {
+            max-height: 50px;
+            max-width: 100%;
+            object-fit: contain;
+        }
+        .esign-verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #10b981;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
         @media print {
             body {
                 background: #ffffff;
@@ -271,7 +380,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 border: none;
                 box-shadow: none;
             }
-            .header-bar, .expiry-box, .actions {
+            .header-bar, .expiry-box, .actions, #guest-esign-clear-btn, #guest-signer-name, #guest-signer-email, #guest-esign-submit-btn, .esign-canvas-wrapper {
                 display: none !important;
             }
             .content-area {
@@ -344,6 +453,83 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <?php echo wp_kses_post( $found_doc['content'] ); ?>
             </div>
 
+            <!-- DUAL E-SIGNATURE INTERFACE -->
+            <div class="esign-portal-section">
+                <h3 style="font-family: var(--font-display); font-size: 18px; font-weight: 700; margin-top: 0; margin-bottom: 8px; color: #09090b;">Authorization & E-Signature</h3>
+                <p style="font-size: 12px; color: #71717a; margin-top: 0; margin-bottom: 20px;">This document requires electronic signatures from both the preparing studio representative and the client signatory.</p>
+                
+                <div class="esign-grid">
+                    <!-- Column 1: Prepared By (Admin) -->
+                    <div class="esign-card">
+                        <span class="esign-card-title">Prepared By (Workspace Signatory)</span>
+                        <?php if ( ! empty($found_doc['admin_signed']) ) : ?>
+                            <div class="esign-stamp-box">
+                                <img src="<?php echo esc_url($found_doc['admin_signature_data']); ?>" alt="Admin Signature Stamp">
+                            </div>
+                            <div style="font-size: 12px; font-weight: 600; color: #18181b;">
+                                <?php echo esc_html($found_doc['admin_signer_name'] ?? 'Authorized representative'); ?>
+                            </div>
+                            <div style="font-size: 11px; color: #71717a; font-family: monospace;">
+                                Signed: <?php echo esc_html(date('d M Y H:i', strtotime($found_doc['admin_signed_at']))); ?>
+                            </div>
+                            <span class="esign-verified-badge">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Verified Stamp
+                            </span>
+                        <?php else : ?>
+                            <div style="height: 60px; border-bottom: 1px dashed #e4e4e7; display: flex; align-items: center; justify-content: center; color: #a1a1aa; font-size: 12px; font-style: italic; background: #ffffff; border-radius: 8px;">
+                                Awaiting Workspace Sign-off
+                            </div>
+                            <div style="font-size: 12px; font-weight: 600; color: #71717a;">Authorized Signatory</div>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Column 2: Client Acceptance (Client) -->
+                    <div class="esign-card" id="client-esign-card-container">
+                        <span class="esign-card-title">Client Acceptance (Client Signatory)</span>
+                        <?php if ( ! empty($found_doc['client_signed']) || ! empty($found_doc['signed']) ) : 
+                            $cl_name = $found_doc['client_signer_name'] ?? $found_doc['signer_name'] ?? 'Client Signatory';
+                            $cl_date = $found_doc['client_signed_at'] ?? $found_doc['signed_at'] ?? '';
+                            $cl_sig = $found_doc['client_signature_data'] ?? $found_doc['signature_data'] ?? $found_doc['signature_image'] ?? '';
+                        ?>
+                            <div class="esign-stamp-box">
+                                <?php if ( ! empty($cl_sig) ) : ?>
+                                    <img src="<?php echo esc_url($cl_sig); ?>" alt="Client Signature Stamp">
+                                <?php endif; ?>
+                            </div>
+                            <div style="font-size: 12px; font-weight: 600; color: #18181b;">
+                                <?php echo esc_html($cl_name); ?>
+                            </div>
+                            <div style="font-size: 11px; color: #71717a; font-family: monospace;">
+                                Signed: <?php echo esc_html(empty($cl_date) ? '' : date('d M Y H:i', strtotime($cl_date))); ?>
+                            </div>
+                            <span class="esign-verified-badge">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Verified Stamp
+                            </span>
+                        <?php else : ?>
+                            <!-- Drawing Canvas and Form for Guest -->
+                            <div class="esign-canvas-wrapper">
+                                <canvas id="guest-esign-canvas" class="esign-canvas"></canvas>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <span style="font-size: 10px; color: #a1a1aa;">Draw signature above</span>
+                                <button type="button" id="guest-esign-clear-btn" class="esign-btn-clear">Clear Pad</button>
+                            </div>
+                            
+                            <div style="space-y-2 mt-2">
+                                <input type="text" id="guest-signer-name" placeholder="Your Full Name *" class="esign-input" value="<?php echo esc_attr($found_doc['client_name'] ?? ''); ?>">
+                                <input type="email" id="guest-signer-email" placeholder="Your Email Address *" class="esign-input" style="margin-top: 8px;" value="<?php echo esc_attr($found_doc['client_email'] ?? ''); ?>">
+                            </div>
+                            
+                            <button type="button" id="guest-esign-submit-btn" class="esign-btn-submit" style="margin-top: 12px;">
+                                Confirm & Execute E-Signature Stamp →
+                            </button>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
             <?php if ( ! empty( $found_doc['footer_text'] ) ) : ?>
                 <div class="doc-footer-branding">
                     <?php echo esc_html( $found_doc['footer_text'] ); ?>
@@ -378,8 +564,11 @@ if ( ! defined( 'ABSPATH' ) ) {
     <?php endif; ?>
 </div>
 
+<div id="guest-toast" class="hidden fixed bottom-6 right-6 bg-zinc-950 text-white text-xs font-bold px-4 py-3 rounded-xl shadow-lg z-[9999] transition-all transform translate-y-2 opacity-0"></div>
+
 <?php if ( ! $is_expired ) : ?>
 <script>
+    // Expiry timer logic
     (function() {
         const expiryTime = <?php echo intval( $found_share['expiry_time'] ); ?> * 1000;
         
@@ -403,7 +592,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     indicator.style.backgroundColor = '#ef4444';
                     indicator.style.boxShadow = '0 0 8px rgba(239, 68, 68, 0.5)';
                 }
-                window.location.reload(); // Refresh to trigger server-side expiry warning
+                window.location.reload();
                 return;
             }
             
@@ -411,7 +600,6 @@ if ( ! defined( 'ABSPATH' ) ) {
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
             
-            // Add warning color if less than 1 hour remaining
             if (distance < 1000 * 60 * 60) {
                 const indicator = document.getElementById('timer-indicator');
                 if (indicator) {
@@ -430,6 +618,138 @@ if ( ! defined( 'ABSPATH' ) ) {
         
         updateTimer();
         setInterval(updateTimer, 1000);
+    })();
+
+    // Toast helpers
+    function showGuestToast(msg) {
+        const toast = document.getElementById('guest-toast');
+        if (!toast) return;
+        toast.textContent = msg;
+        toast.classList.remove('hidden');
+        setTimeout(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+        }, 50);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(2px)';
+            setTimeout(() => toast.classList.add('hidden'), 300);
+        }, 3000);
+    }
+
+    // Guest client e-signature pad logic
+    (function() {
+        const canvas = document.getElementById('guest-esign-canvas');
+        if (!canvas) return;
+
+        canvas.width = canvas.clientWidth || 300;
+        canvas.height = canvas.clientHeight || 120;
+
+        const ctx = canvas.getContext('2d');
+        ctx.lineWidth = 2.2;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#18181b';
+
+        let drawing = false;
+        let hasStrokes = false;
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: clientX - rect.left, y: clientY - rect.top };
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            drawing = true;
+            const pos = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        });
+        canvas.addEventListener('mousemove', (e) => {
+            if (!drawing) return;
+            const pos = getPos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            hasStrokes = true;
+        });
+        window.addEventListener('mouseup', () => { drawing = false; });
+
+        canvas.addEventListener('touchstart', (e) => {
+            drawing = true;
+            const pos = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            e.preventDefault();
+        });
+        canvas.addEventListener('touchmove', (e) => {
+            if (!drawing) return;
+            const pos = getPos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            hasStrokes = true;
+            e.preventDefault();
+        });
+        canvas.addEventListener('touchend', () => { drawing = false; });
+
+        document.getElementById('guest-esign-clear-btn').addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            hasStrokes = false;
+        });
+
+        document.getElementById('guest-esign-submit-btn').addEventListener('click', () => {
+            const name = document.getElementById('guest-signer-name').value.trim();
+            const email = document.getElementById('guest-signer-email').value.trim();
+
+            if (!name || !email) {
+                showGuestToast('Please provide your full name and email.');
+                return;
+            }
+            if (!hasStrokes) {
+                showGuestToast('Please draw your signature before submitting.');
+                return;
+            }
+
+            const signatureData = canvas.toDataURL();
+            
+            document.getElementById('guest-esign-submit-btn').disabled = true;
+            document.getElementById('guest-esign-submit-btn').textContent = 'Processing Stamp...';
+
+            const params = new URLSearchParams({
+                action: 'cora_client_esign',
+                doc_id: '<?php echo esc_js($found_doc["id"]); ?>',
+                share_hash: '<?php echo esc_js($hash); ?>',
+                signer_name: name,
+                signer_email: email,
+                signature_data: signatureData
+            });
+
+            fetch('<?php echo esc_url(admin_url("admin-ajax.php")); ?>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: params
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showGuestToast('E-Signature submitted successfully!');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showGuestToast(data.data || 'Failed to submit signature.');
+                    document.getElementById('guest-esign-submit-btn').disabled = false;
+                    document.getElementById('guest-esign-submit-btn').textContent = 'Confirm & Execute E-Signature Stamp →';
+                }
+            })
+            .catch(err => {
+                showGuestToast('Connection error. Please try again.');
+                document.getElementById('guest-esign-submit-btn').disabled = false;
+                document.getElementById('guest-esign-submit-btn').textContent = 'Confirm & Execute E-Signature Stamp →';
+            });
+        });
     })();
 </script>
 <?php endif; ?>

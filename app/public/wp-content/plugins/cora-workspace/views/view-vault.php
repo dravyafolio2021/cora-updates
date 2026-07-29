@@ -1920,6 +1920,14 @@ foreach ( $cora_documents as $doc ) {
                     </div>
 
                     <div class="space-y-1">
+                        <label class="block font-bold text-zinc-800">Signatory Role</label>
+                        <select id="esign-role-input" onchange="coraOnESignRoleChange()" class="w-full border border-zinc-200 rounded-xl p-3 bg-white outline-none focus:border-zinc-950 transition-colors font-semibold">
+                            <option value="admin">Workspace Signatory (Admin)</option>
+                            <option value="client">Client Signatory</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1">
                         <label class="block font-bold text-zinc-800">Signer Full Name *</label>
                         <input type="text" id="esign-signer-name-input" placeholder="e.g. Rajesh Sharma" class="w-full border border-zinc-200 rounded-xl p-3 bg-white outline-none focus:border-zinc-950 transition-colors font-semibold">
                     </div>
@@ -3122,40 +3130,65 @@ window.coraRenderPaperPreviewInStep5 = function() {
     html += '  <h4 class="text-[11px] font-black uppercase tracking-wider text-zinc-950 mb-4">Authorization & E-Signature</h4>';
     html += '  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">';
     
-    // Prepared by
+    // Prepared by (Admin Signature)
     html += '    <div class="p-4 bg-zinc-55/40 border border-zinc-200 rounded-2xl space-y-2">';
-    html += '      <span class="text-[9px] font-extrabold text-zinc-400 uppercase tracking-wider block">Prepared By</span>';
-    html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-end pb-1 font-serif text-xs italic text-zinc-800">Cora Studio Representative</div>';
-    html += '      <div class="text-[10px] text-zinc-500 font-medium">Date: ' + formattedDate + '</div>';
+    html += '      <span class="text-[9px] font-extrabold text-zinc-400 uppercase tracking-wider block">Prepared By (Workspace Signatory)</span>';
+    
+    var isAdminSigned = false;
+    var adminSignerName = "Workspace Representative";
+    var adminSignedDate = "";
+    var adminSignatureImg = "";
+
+    var activeDocId = document.getElementById("studio-doc-id") ? document.getElementById("studio-doc-id").value : "";
+    if (activeDocId && window.CORA_DOCUMENTS) {
+        var existingDoc = window.CORA_DOCUMENTS.find(function(d){ return String(d.id) === String(activeDocId); });
+        if (existingDoc && existingDoc.admin_signed) {
+            isAdminSigned = true;
+            adminSignerName = existingDoc.admin_signer_name || "Workspace Representative";
+            adminSignedDate = existingDoc.admin_signed_at || formattedDate;
+            adminSignatureImg = existingDoc.admin_signature_data || "";
+        }
+    }
+
+    if (isAdminSigned) {
+        if (adminSignatureImg) {
+            html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-center justify-center pb-1"><img src="' + adminSignatureImg + '" class="h-8 object-contain" /></div>';
+        } else {
+            html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-end pb-1 font-serif text-xs italic text-zinc-800">' + adminSignerName + '</div>';
+        }
+        html += '      <div class="text-[10px] text-zinc-500 font-medium">Signed: ' + adminSignedDate + '</div>';
+    } else {
+        html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-center justify-center pb-1 text-zinc-400 text-[10px] italic">Signature Pending</div>';
+        html += '      <div class="text-[10px] text-zinc-500 font-medium">Authorized Signatory</div>';
+    }
     html += '    </div>';
 
     // Client Signature
     html += '    <div class="p-4 bg-zinc-55/40 border border-zinc-200 rounded-2xl space-y-2">';
     html += '      <span class="text-[9px] font-extrabold text-zinc-400 uppercase tracking-wider block">Client Acceptance</span>';
     
-    var isDocSigned = false;
-    var signerName = "";
-    var signedDate = "";
-    var signatureImg = "";
+    var isClientSigned = false;
+    var clientSignerName = clientName;
+    var clientSignedDate = "";
+    var clientSignatureImg = "";
     
-    var activeDocId = document.getElementById("studio-doc-id") ? document.getElementById("studio-doc-id").value : "";
     if (activeDocId && window.CORA_DOCUMENTS) {
         var existingDoc = window.CORA_DOCUMENTS.find(function(d){ return String(d.id) === String(activeDocId); });
-        if (existingDoc && existingDoc.signed) {
-            isDocSigned = true;
-            signerName = existingDoc.signer_name || clientName;
-            signedDate = existingDoc.signed_at || formattedDate;
-            signatureImg = existingDoc.signature_image || "";
+        if (existingDoc && (existingDoc.client_signed || existingDoc.signed)) {
+            isClientSigned = true;
+            clientSignerName = existingDoc.client_signer_name || existingDoc.signer_name || clientName;
+            clientSignedDate = existingDoc.client_signed_at || existingDoc.signed_at || formattedDate;
+            clientSignatureImg = existingDoc.client_signature_data || existingDoc.signature_data || "";
         }
     }
     
-    if (isDocSigned) {
-        if (signatureImg) {
-            html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-center justify-center pb-1"><img src="' + signatureImg + '" class="h-8 object-contain" /></div>';
+    if (isClientSigned) {
+        if (clientSignatureImg) {
+            html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-center justify-center pb-1"><img src="' + clientSignatureImg + '" class="h-8 object-contain" /></div>';
         } else {
-            html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-end pb-1 font-serif text-xs italic text-zinc-800">' + signerName + '</div>';
+            html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-end pb-1 font-serif text-xs italic text-zinc-800">' + clientSignerName + '</div>';
         }
-        html += '      <div class="text-[10px] text-zinc-500 font-medium">Signed: ' + signedDate + '</div>';
+        html += '      <div class="text-[10px] text-zinc-500 font-medium">Signed: ' + clientSignedDate + '</div>';
     } else {
         html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-center justify-center pb-1 text-zinc-400 text-[10px] italic">Signature Pending</div>';
         html += '      <div class="text-[10px] text-zinc-500 font-medium">Client: ' + clientName + '</div>';
@@ -3949,12 +3982,30 @@ window.coraOpenESignDrawer = function(docId) {
     document.getElementById('esign-target-doc-id').value = doc.id;
     document.getElementById('esign-doc-title-display').textContent = doc.title;
     document.getElementById('esign-doc-num-display').textContent = doc.number || 'DOC-2026';
-    document.getElementById('esign-signer-name-input').value = doc.client_name || '';
-    document.getElementById('esign-signer-email-input').value = doc.client_email || '';
+    
+    // Default to workspace signatory
+    var roleInput = document.getElementById('esign-role-input');
+    if (roleInput) roleInput.value = 'admin';
+    
+    coraOnESignRoleChange();
 
     var drawer = document.getElementById('cora-esign-drawer');
     drawer.classList.remove('hidden', 'pointer-events-none');
     coraClearSigCanvas();
+};
+
+window.coraOnESignRoleChange = function() {
+    var docId = document.getElementById('esign-target-doc-id').value;
+    var role = document.getElementById('esign-role-input') ? document.getElementById('esign-role-input').value : 'admin';
+    var doc = CORA_DOCUMENTS.find(function(d){ return String(d.id) === String(docId); });
+    
+    if (role === 'client') {
+        document.getElementById('esign-signer-name-input').value = (doc ? doc.client_name : '') || '';
+        document.getElementById('esign-signer-email-input').value = (doc ? doc.client_email : '') || '';
+    } else {
+        document.getElementById('esign-signer-name-input').value = 'Authorized Workspace Signatory';
+        document.getElementById('esign-signer-email-input').value = 'workspace@cora.com';
+    }
 };
 
 window.coraCloseESignDrawer = function() {
@@ -4004,6 +4055,7 @@ window.coraSubmitESign = function() {
     var docId = document.getElementById('esign-target-doc-id').value;
     var name  = document.getElementById('esign-signer-name-input').value.trim();
     var email = document.getElementById('esign-signer-email-input').value.trim();
+    var role  = document.getElementById('esign-role-input') ? document.getElementById('esign-role-input').value : 'admin';
 
     if (!docId || !name || !email) {
         coraShowToast('Please provide signer name and email.');
@@ -4022,11 +4074,33 @@ window.coraSubmitESign = function() {
     if (window.CORA_DOCUMENTS) {
         var doc = window.CORA_DOCUMENTS.find(function(d){ return String(d.id) === String(docId); });
         if (doc) {
-            doc.signed = true;
-            doc.signed_at = new Date().toISOString().replace('T', ' ').split('.')[0];
-            doc.signer_name = name;
-            doc.signer_email = email;
-            doc.status = 'Signed';
+            var timeString = new Date().toISOString().replace('T', ' ').split('.')[0];
+            if (role === 'client') {
+                doc.client_signed = true;
+                doc.client_signer_name = name;
+                doc.client_signer_email = email;
+                doc.client_signature_data = sigData;
+                doc.client_signed_at = timeString;
+
+                // Backward compatibility
+                doc.signed = true;
+                doc.signer_name = name;
+                doc.signer_email = email;
+                doc.signature_image = sigData;
+                doc.signed_at = timeString;
+            } else {
+                doc.admin_signed = true;
+                doc.admin_signer_name = name;
+                doc.admin_signer_email = email;
+                doc.admin_signature_data = sigData;
+                doc.admin_signed_at = timeString;
+            }
+
+            if (doc.admin_signed && doc.client_signed) {
+                doc.status = 'Signed';
+            } else {
+                doc.status = 'Partially Signed';
+            }
         }
     }
     coraUpdateKPICards();
@@ -4040,15 +4114,19 @@ window.coraSubmitESign = function() {
             doc_id: docId,
             signer_name: name,
             signer_email: email,
-            signature_data: sigData
+            signature_data: sigData,
+            sign_role: role
         },
         success: function(r) {
             coraShowToast('Document e-signed successfully!');
             coraCloseESignDrawer();
+            coraRefreshDocumentPreview();
+            setTimeout(function(){ location.reload(); }, 600);
         },
         error: function() {
             coraShowToast('E-Sign recorded locally.');
             coraCloseESignDrawer();
+            coraRefreshDocumentPreview();
         }
     });
 };
@@ -4156,22 +4234,46 @@ window.coraOpenDocPreviewDrawer = function(docId) {
             '<div class="text-base font-black text-zinc-950">Grand Total (Incl. GST): ₹' + Math.round(grand).toLocaleString() + '</div>' +
             '</div>';
 
-    if (doc.signed) {
-        html += '<div class="bg-zinc-100 border border-zinc-300 p-4 rounded-2xl space-y-1 text-zinc-950">' +
-                '<span class="text-[10px] font-extrabold uppercase tracking-widest block text-zinc-600">✓ E-Sign Audit Verified</span>' +
-                '<div class="font-bold">Signed by: ' + (doc.signer_name||'—') + ' (' + (doc.signer_email||'—') + ')</div>' +
-                '<div class="font-mono text-[10px] text-zinc-500">Timestamp: ' + (doc.signed_at||'—') + ' | IP: ' + (doc.signer_ip||'103.21.124.8') + '</div>' +
-                '<div class="font-mono text-[10px] font-bold text-zinc-950 mt-1">Hash: ' + (doc.verification_hash||'ESIGN-HASH-V1') + '</div>';
-        
-        if (doc.signature_image) {
-            html += '<div class="mt-2.5 pt-2.5 border-t border-zinc-200">' +
-                    '  <span class="text-[9px] font-extrabold uppercase tracking-wider block text-zinc-400">Captured E-Signature</span>' +
+    // Admin E-Sign Audit Details
+    if (doc.admin_signed) {
+        html += '<div class="bg-zinc-50 border border-zinc-200 p-4 rounded-2xl space-y-1 text-zinc-950 mb-3">' +
+                '<span class="text-[10px] font-extrabold uppercase tracking-widest block text-zinc-600">✓ Workspace Sign-off Verified</span>' +
+                '<div class="font-bold">Signed by: ' + (doc.admin_signer_name||'—') + ' (' + (doc.admin_signer_email||'—') + ')</div>' +
+                '<div class="font-mono text-[10px] text-zinc-500">Timestamp: ' + (doc.admin_signed_at||'—') + ' | IP: ' + (doc.admin_signer_ip||'127.0.0.1') + '</div>' +
+                '<div class="font-mono text-[10px] font-bold text-zinc-950 mt-1">Hash: ' + (doc.admin_verification_hash||'ESIGN-HASH-V1') + '</div>';
+        if (doc.admin_signature_data) {
+            html += '<div class="mt-2 pt-2 border-t border-zinc-200">' +
+                    '  <span class="text-[9px] font-extrabold uppercase tracking-wider block text-zinc-400">Workspace Stamp</span>' +
                     '  <div class="mt-1 p-1 bg-white border border-zinc-200 rounded-xl inline-block">' +
-                    '    <img src="' + doc.signature_image + '" class="h-10 object-contain block" style="max-height: 40px;" />' +
+                    '    <img src="' + doc.admin_signature_data + '" class="h-10 object-contain block" style="max-height: 40px;" />' +
                     '  </div>' +
                     '</div>';
         }
-        
+        html += '</div>';
+    }
+
+    // Client E-Sign Audit Details
+    if (doc.client_signed || doc.signed) {
+        var clName  = doc.client_signer_name || doc.signer_name || '—';
+        var clEmail = doc.client_signer_email || doc.signer_email || '—';
+        var clDate  = doc.client_signed_at || doc.signed_at || '—';
+        var clIp    = doc.client_signer_ip || doc.signer_ip || '103.21.124.8';
+        var clHash  = doc.client_verification_hash || doc.verification_hash || 'ESIGN-HASH-V1';
+        var clSigImg = doc.client_signature_data || doc.signature_data || doc.signature_image || '';
+
+        html += '<div class="bg-zinc-50 border border-zinc-200 p-4 rounded-2xl space-y-1 text-zinc-950">' +
+                '<span class="text-[10px] font-extrabold uppercase tracking-widest block text-zinc-600">✓ Client Sign-off Verified</span>' +
+                '<div class="font-bold">Signed by: ' + clName + ' (' + clEmail + ')</div>' +
+                '<div class="font-mono text-[10px] text-zinc-500">Timestamp: ' + clDate + ' | IP: ' + clIp + '</div>' +
+                '<div class="font-mono text-[10px] font-bold text-zinc-950 mt-1">Hash: ' + clHash + '</div>';
+        if (clSigImg) {
+            html += '<div class="mt-2 pt-2 border-t border-zinc-200">' +
+                    '  <span class="text-[9px] font-extrabold uppercase tracking-wider block text-zinc-400">Client Stamp</span>' +
+                    '  <div class="mt-1 p-1 bg-white border border-zinc-200 rounded-xl inline-block">' +
+                    '    <img src="' + clSigImg + '" class="h-10 object-contain block" style="max-height: 40px;" />' +
+                    '  </div>' +
+                    '</div>';
+        }
         html += '</div>';
     }
 

@@ -642,7 +642,15 @@ function cora_real_estate_ai_handle_workspace_route() {
     if ( isset( $path_parts[0] ) && 'shared-doc' === $path_parts[0] ) {
         $hash = isset( $path_parts[1] ) ? sanitize_text_field( $path_parts[1] ) : '';
         if ( ! empty( $hash ) ) {
-            $documents = get_option( 'cora_workspace_vault_docs', array() );
+            $documents = get_option( 'cora_documents', array() );
+            if ( ! is_array( $documents ) ) $documents = array();
+            
+            // Also merge with cora_workspace_vault_docs for safety
+            $vault_docs = get_option( 'cora_workspace_vault_docs', array() );
+            if ( is_array( $vault_docs ) ) {
+                $documents = array_merge( $documents, $vault_docs );
+            }
+
             $found_doc = null;
             $found_share = null;
             foreach ( $documents as $doc ) {
@@ -26355,6 +26363,7 @@ function cora_ajax_sign_document() {
     $signer_name    = sanitize_text_field($_POST['signer_name'] ?? '');
     $signer_email   = sanitize_email($_POST['signer_email'] ?? '');
     $signature_data = sanitize_textarea_field($_POST['signature_data'] ?? '');
+    $sign_role      = sanitize_text_field($_POST['sign_role'] ?? 'admin'); // 'admin' or 'client'
 
     if ( empty($doc_id) || empty($signer_name) || empty($signer_email) ) {
         wp_send_json_error('Signer name and email are required.');
@@ -26366,14 +26375,50 @@ function cora_ajax_sign_document() {
     $found = false;
     foreach ($docs as &$d) {
         if ($d['id'] === $doc_id) {
-            $d['signed']           = true;
-            $d['status']           = 'Signed';
-            $d['signer_name']      = $signer_name;
-            $d['signer_email']     = $signer_email;
-            $d['signature_data']   = $signature_data;
-            $d['signed_at']        = current_time('mysql');
-            $d['signer_ip']        = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
-            $d['verification_hash'] = 'ESIGN-HASH-' . strtoupper(substr(md5($doc_id . $signer_name . time()), 0, 12));
+            $time_now = current_time('mysql');
+            $ip_now   = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+            $hash_now = 'ESIGN-HASH-' . strtoupper(substr(md5($doc_id . $signer_name . time()), 0, 12));
+
+            if ($sign_role === 'client') {
+                $d['client_signed']            = true;
+                $d['client_signer_name']       = $signer_name;
+                $d['client_signer_email']      = $signer_email;
+                $d['client_signature_data']    = $signature_data;
+                $d['client_signed_at']         = $time_now;
+                $d['client_signer_ip']         = $ip_now;
+                $d['client_verification_hash'] = $hash_now;
+
+                // Keep legacy fields for backward compatibility
+                $d['signed']                   = true;
+                $d['signer_name']              = $signer_name;
+                $d['signer_email']             = $signer_email;
+                $d['signature_data']           = $signature_data;
+                $d['signed_at']                = $time_now;
+                $d['signer_ip']                = $ip_now;
+                $d['verification_hash']         = $hash_now;
+            } else {
+                // Admin / Workspace Signatory
+                $d['admin_signed']             = true;
+                $d['admin_signer_name']        = $signer_name;
+                $d['admin_signer_email']       = $signer_email;
+                $d['admin_signature_data']     = $signature_data;
+                $d['admin_signed_at']          = $time_now;
+                $d['admin_signer_ip']          = $ip_now;
+                $d['admin_verification_hash']   = $hash_now;
+            }
+
+            // Recalculate document status
+            $admin_done = !empty($d['admin_signed']);
+            $client_done = !empty($d['client_signed']);
+
+            if ($admin_done && $client_done) {
+                $d['status'] = 'Signed';
+            } elseif ($admin_done || $client_done) {
+                $d['status'] = 'Partially Signed';
+            } else {
+                $d['status'] = 'Sent';
+            }
+
             $found = true;
             break;
         }
@@ -26384,6 +26429,127 @@ function cora_ajax_sign_document() {
         wp_send_json_success('Document e-signed successfully!');
     } else {
         wp_send_json_error('Document not found.');
+    }
+}
+
+add_action('wp_ajax_cora_client_esign', 'cora_ajax_client_esign');
+add_action('wp_ajax_nopriv_cora_client_esign', 'cora_ajax_client_esign');
+function cora_ajax_client_esign() {
+    $doc_id         = sanitize_text_field($_POST['doc_id'] ?? '');
+    $share_hash     = sanitize_text_field($_POST['share_hash'] ?? '');
+    $signer_name    = sanitize_text_field($_POST['signer_name'] ?? '');
+    $signer_email   = sanitize_email($_POST['signer_email'] ?? '');
+    $signature_data = sanitize_textarea_field($_POST['signature_data'] ?? '');
+
+    if ( empty($doc_id) || empty($share_hash) || empty($signer_name) || empty($signer_email) || empty($signature_data) ) {
+        wp_send_json_error('All fields and drawing signature are required.');
+    }
+
+    $time_now = current_time('mysql');
+    $ip_now   = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+    $hash_now = 'ESIGN-HASH-' . strtoupper(substr(md5($doc_id . $signer_name . time()), 0, 12));
+
+    // Try finding in cora_documents first
+    $found_in_cora_docs = false;
+    $cora_docs = get_option('cora_documents', array());
+    if ( is_array($cora_docs) ) {
+        foreach ($cora_docs as &$d) {
+            if ($d['id'] === $doc_id) {
+                // Verify hash exists in secured_shares
+                $hash_match = false;
+                if ( ! empty($d['secured_shares']) && is_array($d['secured_shares']) ) {
+                    foreach ($d['secured_shares'] as $sh) {
+                        if (isset($sh['hash']) && $sh['hash'] === $share_hash) {
+                            $hash_match = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if ($hash_match) {
+                    $d['client_signed']            = true;
+                    $d['client_signer_name']       = $signer_name;
+                    $d['client_signer_email']      = $signer_email;
+                    $d['client_signature_data']    = $signature_data;
+                    $d['client_signed_at']         = $time_now;
+                    $d['client_signer_ip']         = $ip_now;
+                    $d['client_verification_hash'] = $hash_now;
+
+                    // Backward compatibility
+                    $d['signed']                   = true;
+                    $d['signer_name']              = $signer_name;
+                    $d['signer_email']             = $signer_email;
+                    $d['signature_data']           = $signature_data;
+                    $d['signature_image']          = $signature_data;
+                    $d['signed_at']                = $time_now;
+                    $d['signer_ip']                = $ip_now;
+                    $d['verification_hash']         = $hash_now;
+
+                    // Recalculate document status
+                    $admin_done = !empty($d['admin_signed']);
+                    $d['status'] = $admin_done ? 'Signed' : 'Partially Signed';
+
+                    $found_in_cora_docs = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    // Try finding in cora_workspace_vault_docs if not found or sync both
+    $found_in_vault_docs = false;
+    $vault_docs = get_option('cora_workspace_vault_docs', array());
+    if ( is_array($vault_docs) ) {
+        foreach ($vault_docs as &$d) {
+            if ($d['id'] === $doc_id) {
+                $hash_match = false;
+                if ( ! empty($d['secured_shares']) && is_array($d['secured_shares']) ) {
+                    foreach ($d['secured_shares'] as $sh) {
+                        if (isset($sh['hash']) && $sh['hash'] === $share_hash) {
+                            $hash_match = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if ($hash_match) {
+                    $d['client_signed']            = true;
+                    $d['client_signer_name']       = $signer_name;
+                    $d['client_signer_email']      = $signer_email;
+                    $d['client_signature_data']    = $signature_data;
+                    $d['client_signed_at']         = $time_now;
+                    $d['client_signer_ip']         = $ip_now;
+                    $d['client_verification_hash'] = $hash_now;
+
+                    $d['signed']                   = true;
+                    $d['signer_name']              = $signer_name;
+                    $d['signer_email']             = $signer_email;
+                    $d['signature_data']           = $signature_data;
+                    $d['signature_image']          = $signature_data;
+                    $d['signed_at']                = $time_now;
+                    $d['signer_ip']                = $ip_now;
+                    $d['verification_hash']         = $hash_now;
+
+                    $admin_done = !empty($d['admin_signed']);
+                    $d['status'] = $admin_done ? 'Signed' : 'Partially Signed';
+
+                    $found_in_vault_docs = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if ($found_in_cora_docs || $found_in_vault_docs) {
+        if ($found_in_cora_docs) {
+            update_option('cora_documents', $cora_docs);
+        }
+        if ($found_in_vault_docs) {
+            update_option('cora_workspace_vault_docs', $vault_docs);
+        }
+        wp_send_json_success('E-Signature executed successfully!');
+    } else {
+        wp_send_json_error('Verification error: Secure token or document target is invalid.');
     }
 }
 
@@ -26401,23 +26567,58 @@ function cora_ajax_share_document_email() {
     }
 
     $docs = get_option('cora_documents', array());
-    $doc_title = 'Official Document';
-    $doc_token = 'vtoken';
-    foreach ($docs as $d) {
+    if ( ! is_array($docs) ) $docs = array();
+
+    $found = false;
+    $share_hash = '';
+    
+    foreach ($docs as &$d) {
         if ($d['id'] === $doc_id) {
+            $found = true;
+            
+            // Check if secured_shares exists
+            if ( empty($d['secured_shares']) || ! is_array($d['secured_shares']) ) {
+                $d['secured_shares'] = array();
+            }
+
+            // Look for existing share for this email
+            foreach ($d['secured_shares'] as $sh) {
+                if (isset($sh['email']) && $sh['email'] === $email) {
+                    $share_hash = $sh['hash'];
+                    break;
+                }
+            }
+
+            // Create one if none exists
+            if (empty($share_hash)) {
+                $share_hash = wp_hash($doc_id . time() . uniqid());
+                $d['secured_shares'][] = array(
+                    'hash'        => $share_hash,
+                    'email'       => $email,
+                    'expiry_time' => 0, // No expiry
+                    'created_at'  => time()
+                );
+            }
+            
             $doc_title = $d['title'];
-            $doc_token = $d['token'] ?? 'vtoken';
             break;
         }
     }
 
-    $share_url = add_query_arg(array('cora_doc' => $doc_id, 'token' => $doc_token), site_url('/workspace/vault'));
-    $subject   = "Official Document Access: " . $doc_title;
-    $message   = "Hello,\n\nYou have been shared an official document from Cora Workspace: '" . $doc_title . "'.\n\n" . ($custom_msg ? "Note: " . $custom_msg . "\n\n" : "") . "Click here to view, e-sign, and download:\n" . $share_url . "\n\nBest regards,\nCora Studio Workspace";
+    if (!$found) {
+        wp_send_json_error('Document not found.');
+    }
+
+    // Save changes to DB
+    update_option('cora_documents', $docs);
+
+    $share_url = home_url('/shared-doc/' . $share_hash);
+    $subject   = "Official Document Access & E-Sign Request: " . $doc_title;
+    $message   = "Hello,\n\nYou have been requested to review and e-sign an official document from Cora Workspace: '" . $doc_title . "'.\n\n" . ($custom_msg ? "Note: " . $custom_msg . "\n\n" : "") . "Please click the link below to view the document and sign your section online:\n" . $share_url . "\n\nBest regards,\nCora Studio Workspace";
 
     $sent = wp_mail($email, $subject, $message);
     if ($sent) {
-        wp_send_json_success('Document emailed to ' . $email);
+        wp_send_json_success('Document secure e-sign link emailed to ' . $email);
     } else {
         wp_send_json_error('Email delivery failed.');
     }
