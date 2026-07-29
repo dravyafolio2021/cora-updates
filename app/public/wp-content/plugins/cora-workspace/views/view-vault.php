@@ -576,8 +576,8 @@ foreach ( $cora_documents as $doc ) {
     <!-- ═════════════════════════════════════════════════════════════════════════
          VIEW 2: UNIFIED 6-STEP VISUAL GUIDED DOCUMENT WIZARD WITH STICKY DOCK
          ═════════════════════════════════════════════════════════════════════ -->
-    <div id="cora-vault-view-editor" class="hidden space-y-8 w-full max-w-none">
-        <form id="cora-doc-wizard-form" data-autosave-module="vault_doc_wizard" class="space-y-8 w-full">
+    <div id="cora-vault-view-editor" class="hidden w-full max-w-none">
+        <form id="cora-doc-wizard-form" data-autosave-module="vault_doc_wizard" class="w-full">
         <input type="hidden" id="studio-doc-id" name="studio_doc_id">
 
         <!-- STEP 1 SUB-PAGE: DOCUMENT TYPE SELECTION -->
