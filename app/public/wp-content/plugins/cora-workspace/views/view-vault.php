@@ -638,32 +638,6 @@ foreach ( $cora_documents as $doc ) {
 
         <!-- STEP 3 SUB-PAGE: BUILD DOCUMENT (DOCUMENT BUILDER MAIN CANVAS) -->
         <div id="sub-page-wiz-step-3" class="hidden space-y-6 w-full max-w-none pb-24 sm:pb-28">
-            
-            <!-- LAYOUT DIAGNOSTIC DEBUGGER -->
-            <div id="cora-layout-debugger" class="bg-zinc-900 text-white p-3.5 rounded-2xl text-[11px] font-mono space-y-1 shadow-md border border-zinc-700/50 max-w-sm">
-                <div class="font-extrabold uppercase text-[9px] text-zinc-400 tracking-wider mb-1">Layout Diagnostics</div>
-                <div>Viewport Width: <span id="db-viewport" class="font-bold text-emerald-400">--</span></div>
-                <div>Sidebar Client Width: <span id="db-sidebar" class="font-bold text-emerald-400">--</span></div>
-                <div>Step 3 Wrapper Width: <span id="db-container" class="font-bold text-emerald-400">--</span></div>
-                <div>Match Media (min-width: 768px): <span id="db-md" class="font-bold text-emerald-400">--</span></div>
-                <div>Match Media (min-width: 1024px): <span id="db-lg" class="font-bold text-emerald-400">--</span></div>
-            </div>
-            <script>
-            setInterval(function() {
-                var sb = document.getElementById('step3-left-sidebar');
-                var co = document.getElementById('sub-page-wiz-step-3');
-                var dbV = document.getElementById('db-viewport');
-                var dbS = document.getElementById('db-sidebar');
-                var dbC = document.getElementById('db-container');
-                var dbM = document.getElementById('db-md');
-                var dbL = document.getElementById('db-lg');
-                if (dbV) dbV.textContent = window.innerWidth + 'px';
-                if (dbS) dbS.textContent = sb ? sb.clientWidth + 'px (computed: ' + window.getComputedStyle(sb).width + ')' : 'none';
-                if (dbC) dbC.textContent = co ? co.clientWidth + 'px' : 'none';
-                if (dbM) dbM.textContent = window.matchMedia('(min-width: 768px)').matches;
-                if (dbL) dbL.textContent = window.matchMedia('(min-width: 1024px)').matches;
-            }, 500);
-            </script>
 
             <!-- 1. TOP TOOLBAR FOR STEP 3 -->
             <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-4">
