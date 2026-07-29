@@ -115,38 +115,84 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     <!-- TAB 1: ACTIVE MEMBERS -->
     <div id="tab-active-members" class="cora-tab-content space-y-4">
         <!-- Filters Toolbar -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
-            <div class="flex flex-row flex-wrap gap-3 items-center flex-1">
-                <!-- Search bar -->
-                <div class="relative flex-1 min-w-[160px] max-w-xs">
-                    <input type="text" id="member-search" oninput="filterActiveMembers()" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 pl-9 pr-3 text-xs bg-white dark:bg-zinc-950 focus:border-zinc-400 focus:outline-none focus:ring-0 text-zinc-900 dark:text-zinc-100 transition-colors" placeholder="Search by name or email...">
-                    <div class="absolute left-3 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex flex-col gap-3">
+            <!-- Search bar & Mobile Toggle Row -->
+            <div class="flex flex-row items-center gap-3 w-full justify-between">
+                <div class="flex flex-row items-center gap-2 flex-1 min-w-0">
+                    <!-- Search bar -->
+                    <div class="relative flex-1 max-w-xs md:max-w-sm">
+                        <input type="text" id="member-search" oninput="filterActiveMembers()" class="w-full h-9 text-xs pl-8 pr-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 focus:border-zinc-400 focus:ring-0 focus:outline-none text-zinc-900 dark:text-zinc-100 transition-colors" placeholder="Search by name or email...">
+                        <div class="absolute left-2.5 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Filter Toggle Button -->
+                    <button type="button" id="mobile-filter-toggle" onclick="toggleMobileFilters()" class="md:hidden h-9 w-9 shrink-0 flex items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900 focus:outline-none focus:ring-0 transition-colors cursor-pointer" title="Toggle Filters">
+                        <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                    </button>
+
+                    <!-- Desktop Inline Filters -->
+                    <div class="hidden md:flex items-center gap-3">
+                        <!-- Role Filter -->
+                        <select id="filter-role" onchange="filterActiveMembers()" class="border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 px-3 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer focus:border-zinc-400 focus:ring-0 w-32 transition-colors">
+                            <option value="">All Roles</option>
+                            <?php foreach ( $role_labels as $key => $lbl ) : ?>
+                                <option value="<?php echo esc_attr($key); ?>"><?php echo esc_html($lbl); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <!-- Branch Filter -->
+                        <select id="filter-branch" onchange="filterActiveMembers()" class="border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 px-3 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer focus:border-zinc-400 focus:ring-0 w-32 transition-colors">
+                            <option value="">All Branches</option>
+                            <?php foreach ( $agency_branches as $b_id => $b ) : ?>
+                                <option value="<?php echo esc_attr($b_id); ?>"><?php echo esc_html($b['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <!-- Status Filter -->
+                        <select id="filter-status" onchange="filterActiveMembers()" class="border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 px-3 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer focus:border-zinc-400 focus:ring-0 w-32 transition-colors">
+                            <option value="">All Statuses</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <!-- Clear Filters Button (Desktop) -->
+                        <button type="button" onclick="clearFilters()" class="hidden border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 px-3 text-xs text-zinc-500 hover:text-zinc-950 dark:hover:text-zinc-150 hover:bg-zinc-50 dark:hover:bg-zinc-950 transition-colors focus:outline-none focus:ring-0 cursor-pointer" id="btn-clear-filters-desktop">Clear</button>
                     </div>
                 </div>
-                <!-- Role Filter -->
-                <select id="filter-role" onchange="filterActiveMembers()" class="border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 px-3 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer focus:border-zinc-400 focus:ring-0 w-32 transition-colors">
-                    <option value="">All Roles</option>
-                    <?php foreach ( $role_labels as $key => $lbl ) : ?>
-                        <option value="<?php echo esc_attr($key); ?>"><?php echo esc_html($lbl); ?></option>
-                    <?php endforeach; ?>
-                </select>
-                <!-- Branch Filter -->
-                <select id="filter-branch" onchange="filterActiveMembers()" class="border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 px-3 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer focus:border-zinc-400 focus:ring-0 w-32 transition-colors">
-                    <option value="">All Branches</option>
-                    <?php foreach ( $agency_branches as $b_id => $b ) : ?>
-                        <option value="<?php echo esc_attr($b_id); ?>"><?php echo esc_html($b['name']); ?></option>
-                    <?php endforeach; ?>
-                </select>
-                <!-- Status Filter -->
-                <select id="filter-status" onchange="filterActiveMembers()" class="border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 px-3 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer focus:border-zinc-400 focus:ring-0 w-32 transition-colors">
-                    <option value="">All Statuses</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                </select>
+
+                <!-- Member Count Badge -->
+                <div class="flex items-center justify-end shrink-0 select-none">
+                    <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider" id="member-count-badge"><?php echo count($users); ?> members total</span>
+                </div>
             </div>
-            <div class="flex items-center justify-end shrink-0">
-                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider" id="member-count-badge"><?php echo count($users); ?> members total</span>
+
+            <!-- Collapsible Mobile Filters Panel -->
+            <div id="member-filter-panel" class="hidden md:hidden border-t border-zinc-150/60 dark:border-zinc-800/60 pt-3">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    <!-- Role Filter -->
+                    <select id="filter-role-mobile" onchange="syncFilterAndRun('role')" class="bg-zinc-50 dark:bg-zinc-950 border border-zinc-150 dark:border-zinc-800 text-xs rounded-lg px-2 py-1.5 h-9 w-full cursor-pointer text-zinc-700 dark:text-zinc-300 focus:border-zinc-400 focus:ring-0 focus:outline-none transition-colors">
+                        <option value="">All Roles</option>
+                        <?php foreach ( $role_labels as $key => $lbl ) : ?>
+                            <option value="<?php echo esc_attr($key); ?>"><?php echo esc_html($lbl); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <!-- Branch Filter -->
+                    <select id="filter-branch-mobile" onchange="syncFilterAndRun('branch')" class="bg-zinc-50 dark:bg-zinc-950 border border-zinc-150 dark:border-zinc-800 text-xs rounded-lg px-2 py-1.5 h-9 w-full cursor-pointer text-zinc-700 dark:text-zinc-300 focus:border-zinc-400 focus:ring-0 focus:outline-none transition-colors">
+                        <option value="">All Branches</option>
+                        <?php foreach ( $agency_branches as $b_id => $b ) : ?>
+                            <option value="<?php echo esc_attr($b_id); ?>"><?php echo esc_html($b['name']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <!-- Status Filter -->
+                    <select id="filter-status-mobile" onchange="syncFilterAndRun('status')" class="bg-zinc-50 dark:bg-zinc-950 border border-zinc-150 dark:border-zinc-800 text-xs rounded-lg px-2 py-1.5 h-9 w-full cursor-pointer text-zinc-700 dark:text-zinc-300 focus:border-zinc-400 focus:ring-0 focus:outline-none transition-colors">
+                        <option value="">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    <!-- Clear Filters button -->
+                    <button type="button" onclick="clearFilters()" class="hidden h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-500 hover:text-zinc-950 dark:hover:text-zinc-150 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors focus:ring-0 focus:outline-none cursor-pointer flex items-center justify-center gap-1" id="btn-clear-filters-mobile">
+                        Clear Filters
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -1677,6 +1723,14 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         var branch = $('#filter-branch').val();
         var status = $('#filter-status').val();
         
+        // Sync desktop selects to mobile selects
+        $('#filter-role-mobile').val(role);
+        $('#filter-branch-mobile').val(branch);
+        $('#filter-status-mobile').val(status);
+        
+        // Update the visibility of the "Clear Filters" buttons
+        updateClearFiltersVisibility();
+        
         var count = 0;
         $('.active-member-row').each(function() {
             var rowName = $(this).data('name') || '';
@@ -1698,6 +1752,41 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             }
         });
         $('#member-count-badge').text(count + ' members total');
+    }
+
+    function syncFilterAndRun(type) {
+        var mobileVal = $('#filter-' + type + '-mobile').val();
+        $('#filter-' + type).val(mobileVal);
+        filterActiveMembers();
+    }
+
+    function updateClearFiltersVisibility() {
+        var hasFilters = $('#filter-role').val() || $('#filter-branch').val() || $('#filter-status').val();
+        if (hasFilters) {
+            $('#btn-clear-filters-desktop').removeClass('hidden');
+            $('#btn-clear-filters-mobile').removeClass('hidden');
+        } else {
+            $('#btn-clear-filters-desktop').addClass('hidden');
+            $('#btn-clear-filters-mobile').addClass('hidden');
+        }
+    }
+
+    function toggleMobileFilters() {
+        var $panel = $('#member-filter-panel');
+        if ($panel.hasClass('hidden')) {
+            $panel.removeClass('hidden');
+            $('#mobile-filter-toggle').addClass('bg-zinc-50 dark:bg-zinc-800 border-zinc-400 dark:border-zinc-700 text-zinc-950 dark:text-zinc-50');
+        } else {
+            $panel.addClass('hidden');
+            $('#mobile-filter-toggle').removeClass('bg-zinc-50 dark:bg-zinc-800 border-zinc-400 dark:border-zinc-700 text-zinc-950 dark:text-zinc-50');
+        }
+    }
+
+    function clearFilters() {
+        $('#filter-role, #filter-role-mobile').val('');
+        $('#filter-branch, #filter-branch-mobile').val('');
+        $('#filter-status, #filter-status-mobile').val('');
+        filterActiveMembers();
     }
 
     // Invite user drawer
