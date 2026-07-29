@@ -481,7 +481,7 @@ foreach ( $cora_documents as $doc ) {
         <input type="hidden" id="studio-doc-id" name="studio_doc_id">
 
         <!-- STEP 1 SUB-PAGE: DOCUMENT TYPE SELECTION -->
-        <div id="sub-page-wiz-step-1" class="bg-white border border-zinc-200/80 rounded-3xl p-6 md:p-10 shadow-xs space-y-6 w-full max-w-none">
+        <div id="sub-page-wiz-step-1" class="bg-white border border-zinc-200/80 rounded-3xl p-6 md:p-10 pb-24 sm:pb-28 shadow-xs space-y-6 w-full max-w-none">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-100 pb-6">
                 <div class="max-w-xl">
                     <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest block mb-1">Step 1 of 6</span>
@@ -497,99 +497,98 @@ foreach ( $cora_documents as $doc ) {
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pt-1">
                 <!-- 1. Proposal & Quotation -->
-                <div onclick="coraSelectWizCategoryCard('proposal')" id="wiz-cat-card-proposal" class="cora-wiz-cat-card p-6 border-2 border-zinc-950 bg-zinc-50/80 rounded-2xl cursor-pointer transition-all space-y-3 shadow-xs hover:shadow-md">
+                <div onclick="coraSelectWizCategoryCard('proposal')" id="wiz-cat-card-proposal" class="cora-wiz-cat-card p-4.5 border-2 border-zinc-950 bg-zinc-50/80 rounded-2xl cursor-pointer transition-all space-y-2 shadow-xs hover:shadow-md">
                     <div class="flex items-center justify-between">
                         <span class="px-2.5 py-1 rounded-md bg-zinc-950 text-white text-[10px] font-extrabold uppercase tracking-wider">PROPOSAL</span>
                         <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-900"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line></svg>
                     </div>
-                    <h4 class="font-black text-zinc-950 text-base">Proposal & Quotation</h4>
+                    <h4 class="font-extrabold text-zinc-950 text-sm">Proposal & Quotation</h4>
                     <p class="text-zinc-500 text-xs leading-relaxed">Shoot packages, real estate listing media, commercial bids, and production estimates.</p>
                 </div>
 
                 <!-- 2. Invoices & Receipts -->
-                <div onclick="coraSelectWizCategoryCard('invoice')" id="wiz-cat-card-invoice" class="cora-wiz-cat-card p-6 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-3 hover:shadow-md">
+                <div onclick="coraSelectWizCategoryCard('invoice')" id="wiz-cat-card-invoice" class="cora-wiz-cat-card p-4.5 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-2 hover:shadow-md">
                     <div class="flex items-center justify-between">
                         <span class="px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-800 text-[10px] font-extrabold uppercase tracking-wider border border-zinc-200">TAX INVOICE</span>
                         <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
                     </div>
-                    <h4 class="font-black text-zinc-950 text-base">Invoices & Receipts</h4>
+                    <h4 class="font-extrabold text-zinc-950 text-sm">Invoices & Receipts</h4>
                     <p class="text-zinc-500 text-xs leading-relaxed">Retainer tax invoices, post-production final bills, deposit slips, and statutory GST notes.</p>
                 </div>
 
                 <!-- 3. Contracts & SLAs -->
-                <div onclick="coraSelectWizCategoryCard('contract')" id="wiz-cat-card-contract" class="cora-wiz-cat-card p-6 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-3 hover:shadow-md">
+                <div onclick="coraSelectWizCategoryCard('contract')" id="wiz-cat-card-contract" class="cora-wiz-cat-card p-4.5 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-2 hover:shadow-md">
                     <div class="flex items-center justify-between">
                         <span class="px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-800 text-[10px] font-extrabold uppercase tracking-wider border border-zinc-200">CONTRACT</span>
                         <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                     </div>
-                    <h4 class="font-black text-zinc-950 text-base">Contracts & SLAs</h4>
+                    <h4 class="font-extrabold text-zinc-950 text-sm">Contracts & SLAs</h4>
                     <p class="text-zinc-500 text-xs leading-relaxed">Service level agreements, licensing rights, copyright release terms, and deliverables protection.</p>
                 </div>
 
                 <!-- 4. Hiring & Offer Letters -->
-                <div onclick="coraSelectWizCategoryCard('offer')" id="wiz-cat-card-offer" class="cora-wiz-cat-card p-6 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-3 hover:shadow-md">
+                <div onclick="coraSelectWizCategoryCard('offer')" id="wiz-cat-card-offer" class="cora-wiz-cat-card p-4.5 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-2 hover:shadow-md">
                     <div class="flex items-center justify-between">
                         <span class="px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-800 text-[10px] font-extrabold uppercase tracking-wider border border-zinc-200">OFFER LETTER</span>
                         <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle></svg>
                     </div>
-                    <h4 class="font-black text-zinc-950 text-base">Hiring & Offer Letters</h4>
+                    <h4 class="font-extrabold text-zinc-950 text-sm">Hiring & Offer Letters</h4>
                     <p class="text-zinc-500 text-xs leading-relaxed">Associate photographer offers, editor contractor agreements, monthly studio retainers.</p>
                 </div>
 
                 <!-- 5. NDA -->
-                <div onclick="coraSelectWizCategoryCard('nda')" id="wiz-cat-card-nda" class="cora-wiz-cat-card p-6 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-3 hover:shadow-md">
+                <div onclick="coraSelectWizCategoryCard('nda')" id="wiz-cat-card-nda" class="cora-wiz-cat-card p-4.5 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-2 hover:shadow-md">
                     <div class="flex items-center justify-between">
                         <span class="px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-800 text-[10px] font-extrabold uppercase tracking-wider border border-zinc-200">NDA</span>
                         <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                     </div>
-                    <h4 class="font-black text-zinc-950 text-base">NDA (Confidentiality)</h4>
+                    <h4 class="font-extrabold text-zinc-950 text-sm">NDA (Confidentiality)</h4>
                     <p class="text-zinc-500 text-xs leading-relaxed">Mutual non-disclosure agreements, pre-release media confidentiality, trade secret protection.</p>
                 </div>
 
                 <!-- 6. Service Agreement -->
-                <div onclick="coraSelectWizCategoryCard('service_agreement')" id="wiz-cat-card-service_agreement" class="cora-wiz-cat-card p-6 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-3 hover:shadow-md">
+                <div onclick="coraSelectWizCategoryCard('service_agreement')" id="wiz-cat-card-service_agreement" class="cora-wiz-cat-card p-4.5 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-2 hover:shadow-md">
                     <div class="flex items-center justify-between">
                         <span class="px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-800 text-[10px] font-extrabold uppercase tracking-wider border border-zinc-200">SERVICE AGMT</span>
                         <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
                     </div>
-                    <h4 class="font-black text-zinc-950 text-base">Service Agreement</h4>
+                    <h4 class="font-extrabold text-zinc-950 text-sm">Service Agreement</h4>
                     <p class="text-zinc-500 text-xs leading-relaxed">Comprehensive client engagement contracts, scope definitions, and payment schedules.</p>
                 </div>
 
                 <!-- 7. Purchase Order -->
-                <div onclick="coraSelectWizCategoryCard('purchase_order')" id="wiz-cat-card-purchase_order" class="cora-wiz-cat-card p-6 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-3 hover:shadow-md">
+                <div onclick="coraSelectWizCategoryCard('purchase_order')" id="wiz-cat-card-purchase_order" class="cora-wiz-cat-card p-4.5 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-2 hover:shadow-md">
                     <div class="flex items-center justify-between">
                         <span class="px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-800 text-[10px] font-extrabold uppercase tracking-wider border border-zinc-200">PURCHASE ORDER</span>
                         <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
                     </div>
-                    <h4 class="font-black text-zinc-950 text-base">Purchase Order</h4>
+                    <h4 class="font-extrabold text-zinc-950 text-sm">Purchase Order</h4>
                     <p class="text-zinc-500 text-xs leading-relaxed">Equipment procurement orders, vendor requisitions, and gear purchase confirmations.</p>
                 </div>
 
                 <!-- 8. Receipt -->
-                <div onclick="coraSelectWizCategoryCard('receipt')" id="wiz-cat-card-receipt" class="cora-wiz-cat-card p-6 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-3 hover:shadow-md">
+                <div onclick="coraSelectWizCategoryCard('receipt')" id="wiz-cat-card-receipt" class="cora-wiz-cat-card p-4.5 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-2 hover:shadow-md">
                     <div class="flex items-center justify-between">
                         <span class="px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-800 text-[10px] font-extrabold uppercase tracking-wider border border-zinc-200">RECEIPT</span>
                         <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                     </div>
-                    <h4 class="font-black text-zinc-950 text-base">Payment Receipt</h4>
+                    <h4 class="font-extrabold text-zinc-950 text-sm">Payment Receipt</h4>
                     <p class="text-zinc-500 text-xs leading-relaxed">Advance deposit receipts, interim payment vouchers, and payment confirmation slips.</p>
                 </div>
 
                 <!-- 9. Custom Document -->
-                <div onclick="coraSelectWizCategoryCard('custom')" id="wiz-cat-card-custom" class="cora-wiz-cat-card p-6 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-3 hover:shadow-md">
+                <div onclick="coraSelectWizCategoryCard('custom')" id="wiz-cat-card-custom" class="cora-wiz-cat-card p-4.5 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-2 hover:shadow-md">
                     <div class="flex items-center justify-between">
                         <span class="px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-800 text-[10px] font-extrabold uppercase tracking-wider border border-zinc-200">CUSTOM</span>
                         <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     </div>
-                    <h4 class="font-black text-zinc-950 text-base">Custom Document</h4>
+                    <h4 class="font-extrabold text-zinc-950 text-sm">Custom Document</h4>
                     <p class="text-zinc-500 text-xs leading-relaxed">Blank canvas blueprint for tailored studio documents and bespoke agreements.</p>
                 </div>
             </div>
-        </div>
 
         <!-- STEP 2 SUB-PAGE: CHOOSE VISUAL TEMPLATE BLUEPRINT -->
-        <div id="sub-page-wiz-step-2" class="hidden bg-white border border-zinc-200/80 rounded-3xl p-6 md:p-10 shadow-xs space-y-6 w-full max-w-none">
+        <div id="sub-page-wiz-step-2" class="hidden bg-white border border-zinc-200/80 rounded-3xl p-6 md:p-10 pb-24 sm:pb-28 shadow-xs space-y-6 w-full max-w-none">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-100 pb-6">
                 <div class="max-w-xl">
                     <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest block mb-1">Step 2 of 6</span>
@@ -612,7 +611,7 @@ foreach ( $cora_documents as $doc ) {
         </div>
 
         <!-- STEP 3 SUB-PAGE: BUILD DOCUMENT (DOCUMENT BUILDER MAIN CANVAS) -->
-        <div id="sub-page-wiz-step-3" class="hidden space-y-6 w-full max-w-none">
+        <div id="sub-page-wiz-step-3" class="hidden space-y-6 w-full max-w-none pb-24 sm:pb-28">
             
             <!-- 1. TOP TOOLBAR FOR STEP 3 -->
             <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-4">
@@ -664,10 +663,10 @@ foreach ( $cora_documents as $doc ) {
             </div>
 
             <!-- MAIN STEP 3 WORKSPACE: DOCKED TABBED SIDEBAR & CANVAS CONTAINER -->
-            <div class="flex flex-row items-start gap-4 w-full relative min-w-0 min-h-[950px]">
+            <div class="flex flex-col lg:flex-row items-start gap-4 w-full relative min-w-0 min-h-[950px]">
 
                 <!-- 2. LEFT PANEL - COMPONENT LIBRARY & DOCUMENT OUTLINE (DOCKED SIDEBAR) -->
-                <div id="step3-left-sidebar" class="w-[280px] shrink-0 bg-white border border-zinc-200/80 rounded-3xl p-5 shadow-xs space-y-4 sticky top-4 self-start pointer-events-auto">
+                <div id="step3-left-sidebar" class="w-full lg:w-[280px] lg:shrink-0 bg-white border border-zinc-200/80 rounded-3xl p-5 shadow-xs space-y-4 lg:sticky lg:top-4 self-start pointer-events-auto">
                     <!-- Segmented Tab Header -->
                     <div class="flex items-center justify-between border-b border-zinc-100 pb-3 gap-2">
                         <div class="flex items-center bg-zinc-100 p-1 rounded-xl w-full">
@@ -1198,7 +1197,7 @@ foreach ( $cora_documents as $doc ) {
         </div>
 
         <!-- STEP 4 SUB-PAGE: PREVIEW & EDIT -->
-        <div id="sub-page-wiz-step-4" class="hidden space-y-6 w-full max-w-none">
+        <div id="sub-page-wiz-step-4" class="hidden space-y-6 w-full max-w-none pb-24 sm:pb-28">
             <!-- Top Action Bar -->
             <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 flex items-center justify-between flex-wrap gap-4 shadow-xs">
                 <div>
@@ -1231,10 +1230,10 @@ foreach ( $cora_documents as $doc ) {
             </div>
 
             <!-- PREVIEW WORKSPACE 3-COLUMN SIDEBAR & CANVAS CONTAINER -->
-            <div class="flex flex-row items-start gap-3.5 w-full relative min-w-0">
+            <div class="flex flex-col lg:flex-row items-start gap-3.5 w-full relative min-w-0">
 
                 <!-- Left Panel: Pages Sidebar (Fixed 240px width - Docked Left Sidebar) -->
-                <div id="step4-left-pages-sidebar" class="w-[240px] shrink-0 bg-white border border-zinc-200/80 rounded-3xl p-5 shadow-xs space-y-4 sticky top-4 self-start pointer-events-auto">
+                <div id="step4-left-pages-sidebar" class="w-full lg:w-[240px] lg:shrink-0 bg-white border border-zinc-200/80 rounded-3xl p-5 shadow-xs space-y-4 lg:sticky lg:top-4 self-start pointer-events-auto">
                     <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
                         <h4 class="font-extrabold text-zinc-950 text-xs uppercase tracking-wider flex items-center gap-2">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
@@ -1320,7 +1319,7 @@ foreach ( $cora_documents as $doc ) {
                 </div>
 
                 <!-- Right Docked Sidebar Panel: Quick Edit Panel (Fixed 280px width - Docked Right Sidebar) -->
-                <div id="step4-right-edit-sidebar" class="hidden w-[280px] shrink-0 bg-white border border-zinc-200/80 rounded-3xl p-5 shadow-xs space-y-4 sticky top-4 self-start pointer-events-auto">
+                <div id="step4-right-edit-sidebar" class="hidden w-full lg:w-[280px] lg:shrink-0 bg-white border border-zinc-200/80 rounded-3xl p-5 shadow-xs space-y-4 lg:sticky lg:top-4 self-start pointer-events-auto">
                     <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
                         <h4 class="font-extrabold text-zinc-950 text-xs uppercase tracking-wider flex items-center gap-2">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
@@ -1383,7 +1382,7 @@ foreach ( $cora_documents as $doc ) {
         </div>
 
         <!-- STEP 5 SUB-PAGE: GENERATE DOCUMENT & DOCUMENT READY -->
-        <div id="sub-page-wiz-step-5" class="hidden bg-white border border-zinc-200/80 rounded-3xl p-6 md:p-12 shadow-xs space-y-8 w-full max-w-none">
+        <div id="sub-page-wiz-step-5" class="hidden bg-white border border-zinc-200/80 rounded-3xl p-6 md:p-12 pb-24 sm:pb-28 shadow-xs space-y-8 w-full max-w-none">
             <!-- Center Hero State -->
             <div class="text-center max-w-xl mx-auto space-y-3 py-4">
                 <div class="w-16 h-16 rounded-full bg-zinc-950 text-white flex items-center justify-center shadow-lg mx-auto border-4 border-zinc-100">
@@ -1451,7 +1450,7 @@ foreach ( $cora_documents as $doc ) {
         </div>
 
         <!-- STEP 6 SUB-PAGE: SAVE & SHARE WITH SECURITY -->
-        <div id="sub-page-wiz-step-6" class="hidden bg-white border border-zinc-200/80 rounded-3xl p-5 md:p-8 shadow-xs space-y-6 w-full max-w-none">
+        <div id="sub-page-wiz-step-6" class="hidden bg-white border border-zinc-200/80 rounded-3xl p-5 md:p-8 pb-24 sm:pb-28 shadow-xs space-y-6 w-full max-w-none">
             <!-- Header Bar -->
             <div class="border-b border-zinc-100 pb-4 flex items-center justify-between flex-wrap gap-3">
                 <div>
