@@ -1749,63 +1749,62 @@ foreach ( $cora_documents as $doc ) {
         </div>
 
         <!-- STICKY FLOATING BOTTOM WIZARD STEPPER DOCK -->
-        <div class="sticky bottom-4 z-[8000] w-full max-w-5xl mx-auto font-sans">
-            <div class="bg-white/95 backdrop-blur-md border border-zinc-200 rounded-2xl px-5 py-3 shadow-lg">
-                <div class="flex items-center gap-4">
+        <div class="sticky bottom-4 z-[8000] w-full max-w-4xl mx-auto font-sans">
+            <div class="bg-white/98 backdrop-blur-xl border border-zinc-200/80 rounded-2xl px-4 py-2.5 shadow-[0_8px_32px_-4px_rgba(0,0,0,0.12)]">
+                <div class="flex items-center gap-3">
                     <!-- Previous Button -->
-                    <button type="button" id="wiz-prev-step-btn" onclick="coraNavWizardStep(-1)" class="hidden px-3.5 py-2 border border-zinc-200 rounded-xl text-xs font-semibold text-zinc-600 bg-white hover:bg-zinc-50 cursor-pointer transition-all whitespace-nowrap shrink-0">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="inline -mt-px mr-0.5"><polyline points="15 18 9 12 15 6"/></svg>
-                        Back
+                    <button type="button" id="wiz-prev-step-btn" onclick="coraNavWizardStep(-1)" class="hidden w-8 h-8 rounded-lg border border-zinc-200 flex items-center justify-center text-zinc-500 bg-white hover:bg-zinc-50 cursor-pointer transition-all shrink-0">
+                        <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"/></svg>
                     </button>
 
                     <!-- Stepper Track -->
-                    <div class="flex items-center flex-1 justify-between min-w-0">
+                    <div class="flex items-center flex-1 gap-1.5 min-w-0 overflow-x-auto scrollbar-none">
                         <!-- Step 1 -->
-                        <button type="button" onclick="coraJumpToWizardStep(1)" id="wiz-step-pill-1" class="cora-wiz-step-btn flex flex-col items-center gap-1 cursor-pointer group shrink-0" data-step="1">
-                            <div class="wiz-step-circle w-8 h-8 rounded-full bg-zinc-950 text-white text-[11px] font-bold flex items-center justify-center transition-all shadow-sm">1</div>
-                            <span class="wiz-step-label text-[10px] font-semibold text-zinc-950 transition-all hidden sm:block">Type</span>
+                        <button type="button" onclick="coraJumpToWizardStep(1)" id="wiz-step-pill-1" class="wiz-step-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-950 cursor-pointer transition-all shrink-0" data-step="1">
+                            <span class="wiz-step-num w-5 h-5 rounded-full bg-white/20 text-white text-[10px] font-bold flex items-center justify-center shrink-0">1</span>
+                            <span class="wiz-step-label text-[11px] font-semibold text-white whitespace-nowrap">Type</span>
                         </button>
-                        <div class="wiz-step-line flex-1 h-[2px] bg-zinc-200 mx-1 rounded-full transition-all" data-line="1"></div>
+                        <div class="wiz-step-line w-4 border-t border-dashed border-zinc-300 shrink-0" data-line="1"></div>
 
                         <!-- Step 2 -->
-                        <button type="button" onclick="coraJumpToWizardStep(2)" id="wiz-step-pill-2" class="cora-wiz-step-btn flex flex-col items-center gap-1 cursor-pointer group shrink-0" data-step="2">
-                            <div class="wiz-step-circle w-8 h-8 rounded-full bg-zinc-100 text-zinc-400 text-[11px] font-bold flex items-center justify-center border border-zinc-200 transition-all">2</div>
-                            <span class="wiz-step-label text-[10px] font-medium text-zinc-400 transition-all hidden sm:block">Template</span>
+                        <button type="button" onclick="coraJumpToWizardStep(2)" id="wiz-step-pill-2" class="wiz-step-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 cursor-pointer transition-all shrink-0 hover:bg-zinc-150" data-step="2">
+                            <span class="wiz-step-num w-5 h-5 rounded-full bg-zinc-200 text-zinc-500 text-[10px] font-bold flex items-center justify-center shrink-0">2</span>
+                            <span class="wiz-step-label text-[11px] font-medium text-zinc-400 whitespace-nowrap">Template</span>
                         </button>
-                        <div class="wiz-step-line flex-1 h-[2px] bg-zinc-200 mx-1 rounded-full transition-all" data-line="2"></div>
+                        <div class="wiz-step-line w-4 border-t border-dashed border-zinc-300 shrink-0" data-line="2"></div>
 
                         <!-- Step 3 -->
-                        <button type="button" onclick="coraJumpToWizardStep(3)" id="wiz-step-pill-3" class="cora-wiz-step-btn flex flex-col items-center gap-1 cursor-pointer group shrink-0" data-step="3">
-                            <div class="wiz-step-circle w-8 h-8 rounded-full bg-zinc-100 text-zinc-400 text-[11px] font-bold flex items-center justify-center border border-zinc-200 transition-all">3</div>
-                            <span class="wiz-step-label text-[10px] font-medium text-zinc-400 transition-all hidden sm:block">Build</span>
+                        <button type="button" onclick="coraJumpToWizardStep(3)" id="wiz-step-pill-3" class="wiz-step-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 cursor-pointer transition-all shrink-0 hover:bg-zinc-150" data-step="3">
+                            <span class="wiz-step-num w-5 h-5 rounded-full bg-zinc-200 text-zinc-500 text-[10px] font-bold flex items-center justify-center shrink-0">3</span>
+                            <span class="wiz-step-label text-[11px] font-medium text-zinc-400 whitespace-nowrap">Build</span>
                         </button>
-                        <div class="wiz-step-line flex-1 h-[2px] bg-zinc-200 mx-1 rounded-full transition-all" data-line="3"></div>
+                        <div class="wiz-step-line w-4 border-t border-dashed border-zinc-300 shrink-0" data-line="3"></div>
 
                         <!-- Step 4 -->
-                        <button type="button" onclick="coraJumpToWizardStep(4)" id="wiz-step-pill-4" class="cora-wiz-step-btn flex flex-col items-center gap-1 cursor-pointer group shrink-0" data-step="4">
-                            <div class="wiz-step-circle w-8 h-8 rounded-full bg-zinc-100 text-zinc-400 text-[11px] font-bold flex items-center justify-center border border-zinc-200 transition-all">4</div>
-                            <span class="wiz-step-label text-[10px] font-medium text-zinc-400 transition-all hidden sm:block">Preview</span>
+                        <button type="button" onclick="coraJumpToWizardStep(4)" id="wiz-step-pill-4" class="wiz-step-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 cursor-pointer transition-all shrink-0 hover:bg-zinc-150" data-step="4">
+                            <span class="wiz-step-num w-5 h-5 rounded-full bg-zinc-200 text-zinc-500 text-[10px] font-bold flex items-center justify-center shrink-0">4</span>
+                            <span class="wiz-step-label text-[11px] font-medium text-zinc-400 whitespace-nowrap">Preview</span>
                         </button>
-                        <div class="wiz-step-line flex-1 h-[2px] bg-zinc-200 mx-1 rounded-full transition-all" data-line="4"></div>
+                        <div class="wiz-step-line w-4 border-t border-dashed border-zinc-300 shrink-0" data-line="4"></div>
 
                         <!-- Step 5 -->
-                        <button type="button" onclick="coraJumpToWizardStep(5)" id="wiz-step-pill-5" class="cora-wiz-step-btn flex flex-col items-center gap-1 cursor-pointer group shrink-0" data-step="5">
-                            <div class="wiz-step-circle w-8 h-8 rounded-full bg-zinc-100 text-zinc-400 text-[11px] font-bold flex items-center justify-center border border-zinc-200 transition-all">5</div>
-                            <span class="wiz-step-label text-[10px] font-medium text-zinc-400 transition-all hidden sm:block">Generate</span>
+                        <button type="button" onclick="coraJumpToWizardStep(5)" id="wiz-step-pill-5" class="wiz-step-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 cursor-pointer transition-all shrink-0 hover:bg-zinc-150" data-step="5">
+                            <span class="wiz-step-num w-5 h-5 rounded-full bg-zinc-200 text-zinc-500 text-[10px] font-bold flex items-center justify-center shrink-0">5</span>
+                            <span class="wiz-step-label text-[11px] font-medium text-zinc-400 whitespace-nowrap">Generate</span>
                         </button>
-                        <div class="wiz-step-line flex-1 h-[2px] bg-zinc-200 mx-1 rounded-full transition-all" data-line="5"></div>
+                        <div class="wiz-step-line w-4 border-t border-dashed border-zinc-300 shrink-0" data-line="5"></div>
 
                         <!-- Step 6 -->
-                        <button type="button" onclick="coraJumpToWizardStep(6)" id="wiz-step-pill-6" class="cora-wiz-step-btn flex flex-col items-center gap-1 cursor-pointer group shrink-0" data-step="6">
-                            <div class="wiz-step-circle w-8 h-8 rounded-full bg-zinc-100 text-zinc-400 text-[11px] font-bold flex items-center justify-center border border-zinc-200 transition-all">6</div>
-                            <span class="wiz-step-label text-[10px] font-medium text-zinc-400 transition-all hidden sm:block">Share</span>
+                        <button type="button" onclick="coraJumpToWizardStep(6)" id="wiz-step-pill-6" class="wiz-step-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 cursor-pointer transition-all shrink-0 hover:bg-zinc-150" data-step="6">
+                            <span class="wiz-step-num w-5 h-5 rounded-full bg-zinc-200 text-zinc-500 text-[10px] font-bold flex items-center justify-center shrink-0">6</span>
+                            <span class="wiz-step-label text-[11px] font-medium text-zinc-400 whitespace-nowrap">Share</span>
                         </button>
                     </div>
 
                     <!-- Next Button -->
-                    <button type="button" id="wiz-next-step-btn" onclick="coraNavWizardStep(1)" class="px-5 py-2.5 bg-zinc-950 text-white rounded-xl text-xs font-bold hover:bg-zinc-800 cursor-pointer shadow-sm transition-all whitespace-nowrap shrink-0">
-                        Next Step
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="inline -mt-px ml-0.5"><polyline points="9 18 15 12 9 6"/></svg>
+                    <button type="button" id="wiz-next-step-btn" onclick="coraNavWizardStep(1)" class="px-4 py-2 bg-zinc-950 text-white rounded-xl text-[11px] font-bold hover:bg-zinc-800 cursor-pointer shadow-sm transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5">
+                        <span>Next</span>
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="9 18 15 12 9 6"/></svg>
                     </button>
                 </div>
             </div>
@@ -2348,40 +2347,31 @@ window.coraRenderWizardStepUI = function() {
     for (var i = 1; i <= 6; i++) {
         var pill = document.getElementById('wiz-step-pill-' + i);
         if (!pill) continue;
-        var circle = pill.querySelector('.wiz-step-circle');
+        var numEl = pill.querySelector('.wiz-step-num');
         var label = pill.querySelector('.wiz-step-label');
         var line = document.querySelector('.wiz-step-line[data-line="' + i + '"]');
 
-        if (circle) {
-            if (i === step) {
-                // Active step
-                circle.className = 'wiz-step-circle w-8 h-8 rounded-full bg-zinc-950 text-white text-[11px] font-bold flex items-center justify-center transition-all shadow-sm';
-                circle.innerHTML = i;
-            } else if (i < step) {
-                // Completed step — show checkmark
-                circle.className = 'wiz-step-circle w-8 h-8 rounded-full bg-zinc-950 text-white text-[11px] font-bold flex items-center justify-center transition-all shadow-sm';
-                circle.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"/></svg>';
-            } else {
-                // Upcoming step
-                circle.className = 'wiz-step-circle w-8 h-8 rounded-full bg-zinc-100 text-zinc-400 text-[11px] font-bold flex items-center justify-center border border-zinc-200 transition-all';
-                circle.innerHTML = i;
-            }
+        if (i === step) {
+            // Active step — dark pill
+            pill.className = 'wiz-step-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-950 cursor-pointer transition-all shrink-0';
+            if (numEl) { numEl.className = 'wiz-step-num w-5 h-5 rounded-full bg-white/20 text-white text-[10px] font-bold flex items-center justify-center shrink-0'; numEl.innerHTML = i; }
+            if (label) { label.className = 'wiz-step-label text-[11px] font-semibold text-white whitespace-nowrap'; }
+        } else if (i < step) {
+            // Completed step — dark pill with checkmark
+            pill.className = 'wiz-step-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-800 cursor-pointer transition-all shrink-0';
+            if (numEl) { numEl.className = 'wiz-step-num w-5 h-5 rounded-full bg-white/20 text-white text-[10px] font-bold flex items-center justify-center shrink-0'; numEl.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"/></svg>'; }
+            if (label) { label.className = 'wiz-step-label text-[11px] font-medium text-white/70 whitespace-nowrap'; }
+        } else {
+            // Upcoming step — light pill
+            pill.className = 'wiz-step-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 cursor-pointer transition-all shrink-0 hover:bg-zinc-150';
+            if (numEl) { numEl.className = 'wiz-step-num w-5 h-5 rounded-full bg-zinc-200 text-zinc-500 text-[10px] font-bold flex items-center justify-center shrink-0'; numEl.innerHTML = i; }
+            if (label) { label.className = 'wiz-step-label text-[11px] font-medium text-zinc-400 whitespace-nowrap'; }
         }
-        if (label) {
-            if (i === step) {
-                label.className = 'wiz-step-label text-[10px] font-semibold text-zinc-950 transition-all hidden sm:block';
-            } else if (i < step) {
-                label.className = 'wiz-step-label text-[10px] font-semibold text-zinc-700 transition-all hidden sm:block';
-            } else {
-                label.className = 'wiz-step-label text-[10px] font-medium text-zinc-400 transition-all hidden sm:block';
-            }
-        }
+
         if (line) {
-            if (i < step) {
-                line.className = 'wiz-step-line flex-1 h-[2px] bg-zinc-950 mx-1 rounded-full transition-all';
-            } else {
-                line.className = 'wiz-step-line flex-1 h-[2px] bg-zinc-200 mx-1 rounded-full transition-all';
-            }
+            line.className = i < step
+                ? 'wiz-step-line w-4 border-t border-dashed border-zinc-950 shrink-0'
+                : 'wiz-step-line w-4 border-t border-dashed border-zinc-300 shrink-0';
         }
     }
 
@@ -2414,21 +2404,15 @@ window.coraRenderWizardStepUI = function() {
         else prevBtn.classList.remove('hidden');
     }
 
-    var chevronSvg = ' <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="inline -mt-px ml-0.5"><polyline points="9 18 15 12 9 6"/></svg>';
+    var chevronSvg = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="9 18 15 12 9 6"/></svg>';
     if (nextBtn) {
-        if (step === 2) {
-            nextBtn.innerHTML = 'Continue' + chevronSvg;
-        } else if (step === 3) {
-            nextBtn.innerHTML = 'Preview' + chevronSvg;
-        } else if (step === 4) {
-            nextBtn.innerHTML = 'Generate' + chevronSvg;
-        } else if (step === 5) {
-            nextBtn.innerHTML = 'Save & Share' + chevronSvg;
-        } else if (step === 6) {
-            nextBtn.innerHTML = 'Finish' + chevronSvg;
-        } else {
-            nextBtn.innerHTML = 'Next Step' + chevronSvg;
-        }
+        var label = 'Next';
+        if (step === 2) label = 'Continue';
+        else if (step === 3) label = 'Preview';
+        else if (step === 4) label = 'Generate';
+        else if (step === 5) label = 'Save & Share';
+        else if (step === 6) label = 'Finish';
+        nextBtn.innerHTML = '<span>' + label + '</span>' + chevronSvg;
     }
 
     if (step === 2) {
