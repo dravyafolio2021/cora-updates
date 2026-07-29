@@ -515,18 +515,30 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 /* ─── Responsive ─────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
     #cm-toolbar {
-        flex-wrap: wrap;
-        gap: 8px;
-        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 14px 10px;
+        width: 100%;
+        box-sizing: border-box;
+        flex-wrap: nowrap;
     }
     .cm-search-wrap {
         flex: 1 1 auto;
-        width: calc(100% - 110px);
-        max-width: none;
+        min-width: 0;
+        width: auto;
     }
     #cm-btn-mobile-filter {
         display: inline-flex !important;
         flex-shrink: 0;
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+    #cm-toolbar > button[onclick*="cmResetFilters"] {
+        display: inline-flex !important;
+        flex-shrink: 0;
+        padding: 6px 10px;
+        font-size: 11px;
     }
     #cm-toolbar select.cm-sel {
         display: none !important;
@@ -595,11 +607,15 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 10px 14px;
-        flex-wrap: wrap;
+        padding: 10px 14px 6px;
         gap: 8px;
+        width: 100%;
+        box-sizing: border-box;
+        flex-wrap: nowrap;
     }
-    #cm-header-top #cm-bulk-btn,
+    #cm-header-top #cm-bulk-btn {
+        display: inline-flex !important;
+    }
     #cm-header-top button.primary {
         display: none !important;
     }

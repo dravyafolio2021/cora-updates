@@ -182,9 +182,9 @@ test.describe('Media Library - Mobile Viewport Layout', () => {
   });
 
   test('1. Verify Mobile Header & Sticky Bottom Bar', async ({ page }) => {
-    // Select & Upload buttons hidden from top header on mobile viewport
+    // Select button visible on mobile header top
     const headerSelectBtn = page.locator('#cm-header-top #cm-bulk-btn');
-    await expect(headerSelectBtn).not.toBeVisible();
+    await expect(headerSelectBtn).toBeVisible();
 
     const headerUploadBtn = page.locator('#cm-header-top button.primary');
     await expect(headerUploadBtn).not.toBeVisible();
