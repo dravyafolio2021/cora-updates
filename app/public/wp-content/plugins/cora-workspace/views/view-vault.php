@@ -3036,7 +3036,7 @@ window.coraRenderPaperPreviewInStep5 = function() {
     html += '    <div class="p-4 bg-zinc-55/40 border border-zinc-200 rounded-2xl space-y-2">';
     html += '      <span class="text-[9px] font-extrabold text-zinc-400 uppercase tracking-wider block">Prepared By</span>';
     html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-end pb-1 font-serif text-xs italic text-zinc-800">Cora Studio Representative</div>';
-    html += '      <div class="text-[10px] text-zinc-500 font-medium">Date: \' + formattedDate + \'</div>';
+    html += '      <div class="text-[10px] text-zinc-500 font-medium">Date: ' + formattedDate + '</div>';
     html += '    </div>';
 
     // Client Signature
@@ -3061,19 +3061,19 @@ window.coraRenderPaperPreviewInStep5 = function() {
     
     if (isDocSigned) {
         if (signatureImg) {
-            html += \'      <div class="h-10 border-b border-dashed border-zinc-200 flex items-center justify-center pb-1"><img src="\' + signatureImg + \'" class="h-8 object-contain" /></div>\';
+            html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-center justify-center pb-1"><img src="' + signatureImg + '" class="h-8 object-contain" /></div>';
         } else {
-            html += \'      <div class="h-10 border-b border-dashed border-zinc-200 flex items-end pb-1 font-serif text-xs italic text-zinc-800">\' + signerName + \'</div>\';
+            html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-end pb-1 font-serif text-xs italic text-zinc-800">' + signerName + '</div>';
         }
-        html += \'      <div class="text-[10px] text-zinc-500 font-medium">Signed: \' + signedDate + \'</div>\';
+        html += '      <div class="text-[10px] text-zinc-500 font-medium">Signed: ' + signedDate + '</div>';
     } else {
-        html += \'      <div class="h-10 border-b border-dashed border-zinc-200 flex items-center justify-center pb-1 text-zinc-400 text-[10px] italic">Signature Pending</div>\';
-        html += \'      <div class="text-[10px] text-zinc-500 font-medium">Client: \' + clientName + \'</div>\';
+        html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-center justify-center pb-1 text-zinc-400 text-[10px] italic">Signature Pending</div>';
+        html += '      <div class="text-[10px] text-zinc-500 font-medium">Client: ' + clientName + '</div>';
     }
     
-    html += \'    </div>\';
-    html += \'  </div>\';
-    html += \'</div>\';
+    html += '    </div>';
+    html += '  </div>';
+    html += '</div>';
 
     // 6. Footer Disclaimer
     html += '<div class="border-t border-zinc-200/80 pt-6 mt-8 text-center text-[10px] text-zinc-400 font-mono">';
