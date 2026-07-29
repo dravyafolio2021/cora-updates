@@ -28,8 +28,8 @@ if ( $current_agency !== 'super' ) {
     $user_query_args['meta_query'] = array(
         array(
             'key'     => 'cora_agency_id',
-            'value'   => $current_agency,
-            'compare' => '='
+            'value'   => function_exists('cora_get_agency_identifiers') ? cora_get_agency_identifiers( $current_agency ) : $current_agency,
+            'compare' => 'IN'
         )
     );
 }
@@ -62,7 +62,66 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 ?>
 
 <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <!-- ── MOBILE HEADER (hidden on desktop) ── -->
+    <div class="flex md:hidden items-center justify-between gap-3 mb-2">
+        <div>
+            <h1 class="text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-100 leading-tight"><?php echo $is_studio_mode ? 'Crew' : 'Team'; ?></h1>
+            <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5"><?php echo $is_studio_mode ? 'Crew members &amp; permissions' : 'Team members &amp; permissions'; ?></p>
+        </div>
+        <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager' ) ) ) : ?>
+            <button onclick="openInviteDrawer()" class="shrink-0 bg-zinc-950 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer active:scale-95 flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span class="hidden xs:inline">Invite</span>
+                <span class="xs:hidden">+</span>
+            </button>
+        <?php endif; ?>
+    </div>
+
+    <!-- ── MOBILE TAB NAVIGATION (hidden on desktop) ── -->
+    <div class="cora-sub-tabs-container flex md:hidden items-end gap-0 border-b border-zinc-200 dark:border-zinc-800 mb-4">
+        <!-- Primary tabs (always visible) -->
+        <div class="flex items-end gap-0 flex-1 overflow-x-auto no-scrollbar">
+            <button class="cora-sub-tab active flex items-center gap-1.5 px-3.5 pb-2.5 pt-1.5 text-xs font-semibold border-b-2 border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 transition-all cursor-pointer whitespace-nowrap" data-target="tab-active-members">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                Members
+                <span class="bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?php echo count($users); ?></span>
+            </button>
+            <button class="cora-sub-tab flex items-center gap-1.5 px-3.5 pb-2.5 pt-1.5 text-xs font-medium border-b-2 border-transparent text-zinc-550 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-all cursor-pointer whitespace-nowrap" data-target="tab-pending-invites">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                Invites
+                <?php $inv_count = count(array_filter($pending_invites, fn($i) => $i['status'] === 'pending')); if($inv_count > 0): ?>
+                <span class="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?php echo $inv_count; ?></span>
+                <?php endif; ?>
+            </button>
+        </div>
+        <!-- More → secondary tabs (Permissions, Attendance, Custom Roles) -->
+        <div class="relative shrink-0 pb-px" id="users-more-tab-wrapper">
+            <button onclick="toggleUsersMoreMenu()" id="users-more-tab-btn" class="flex items-center gap-1 px-3 pb-2.5 pt-1.5 text-xs font-medium text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors cursor-pointer whitespace-nowrap border-b-2 border-transparent" aria-label="More tabs">
+                More
+                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <!-- More dropdown menu -->
+            <div id="users-more-menu" class="hidden absolute right-0 top-full mt-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-lg z-30 py-1 min-w-[200px]">
+                <button class="cora-sub-tab w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer transition-colors" data-target="tab-attendance-logs" onclick="closeUsersMoreMenu()">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    Attendance Logs
+                </button>
+                <button class="cora-sub-tab w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer transition-colors" data-target="tab-permissions-matrix" onclick="closeUsersMoreMenu()">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+                    Permissions Matrix
+                </button>
+                <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_re_broker_owner', 'cora_studio_owner' ) ) ) : ?>
+                <button class="cora-sub-tab w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer transition-colors" data-target="tab-custom-roles" onclick="closeUsersMoreMenu()">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    Custom Roles
+                </button>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── DESKTOP HEADER (hidden on mobile) ── -->
+    <div class="hidden md:flex items-center justify-between mb-4">
         <div class="cora-page-header flex items-center gap-3">
             <span class="cora-page-emoji text-zinc-900 flex shrink-0">
                 <svg viewBox="0 0 24 24" width="30" height="30" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -86,8 +145,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         <?php endif; ?>
     </div>
 
-    <!-- Sub Navigation Tabs -->
-    <div class="cora-sub-tabs-container border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-1.5 overflow-x-auto pb-px shrink-0 select-none no-scrollbar mb-4">
+    <!-- ── DESKTOP TAB NAVIGATION (hidden on mobile) ── -->
+    <div class="hidden md:flex cora-sub-tabs-container border-b border-zinc-200 dark:border-zinc-800 flex-row items-center gap-1.5 overflow-x-auto pb-px shrink-0 select-none no-scrollbar mb-4">
         <button class="cora-sub-tab active flex items-center gap-2 px-3 pb-2.5 pt-1 text-xs font-semibold border-b-2 border-zinc-950 dark:border-zinc-150 text-zinc-950 dark:text-zinc-150 transition-all cursor-pointer whitespace-nowrap animate-none" data-target="tab-active-members">
             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             Active Members
@@ -114,8 +173,131 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
     <!-- TAB 1: ACTIVE MEMBERS -->
     <div id="tab-active-members" class="cora-tab-content space-y-4">
-        <!-- Filters Toolbar -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
+        <!-- ── MOBILE SEARCH + FILTER ROW (hidden on desktop) ── -->
+        <div class="flex md:hidden items-center gap-2 mb-2">
+            <!-- Search (always visible, primary action) -->
+            <div class="relative flex-1">
+                <input type="text" id="mobile-member-search" oninput="filterActiveMembers()" autocomplete="off"
+                    class="w-full h-10 pl-9 pr-3 rounded-xl text-sm bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400"
+                    placeholder="Search members...">
+                <div class="absolute left-3 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </div>
+            </div>
+            <!-- Filter toggle (secondary — opens filter panel) -->
+            <button id="member-filter-toggle" onclick="toggleMemberFilters()" class="h-10 w-10 flex items-center justify-center rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors relative cursor-pointer shrink-0">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="8" y1="12" x2="16" y2="12"></line><line x1="11" y1="18" x2="13" y2="18"></line></svg>
+                <span id="filter-active-dot" class="hidden absolute top-2 right-2 w-2 h-2 rounded-full bg-zinc-950 dark:bg-zinc-100"></span>
+            </button>
+        </div>
+
+        <!-- ── MOBILE FILTER PANEL (collapsed by default, hidden on desktop) ── -->
+        <div id="member-filter-panel" class="hidden md:hidden bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-sm p-3 space-y-2 mb-2">
+            <div class="grid grid-cols-2 gap-2">
+                <select id="mobile-filter-role" onchange="filterActiveMembers()" class="rounded-lg h-9 px-2.5 text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 outline-none cursor-pointer">
+                    <option value="">All Roles</option>
+                    <?php foreach ( $role_labels as $key => $lbl ) : ?>
+                        <option value="<?php echo esc_attr($key); ?>"><?php echo esc_html($lbl); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <select id="mobile-filter-branch" onchange="filterActiveMembers()" class="rounded-lg h-9 px-2.5 text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 outline-none cursor-pointer">
+                    <option value="">All Branches</option>
+                    <?php foreach ( $agency_branches as $b_id => $b ) : ?>
+                        <option value="<?php echo esc_attr($b_id); ?>"><?php echo esc_html($b['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <select id="mobile-filter-status" onchange="filterActiveMembers()" class="rounded-lg h-9 px-2.5 text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 outline-none cursor-pointer col-span-2">
+                    <option value="">All Statuses</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            <button onclick="clearMemberFilters()" class="w-full h-8 text-[11px] font-bold text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-250 transition-colors border border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer">
+                Clear Filters
+            </button>
+        </div>
+
+        <!-- ── MOBILE CARDS GRID (hidden on desktop) ── -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:hidden">
+            <?php foreach ( $users as $u ) :
+                $u_role = ! empty( $u->roles ) ? $u->roles[0] : 'subscriber';
+                $u_role_lbl = isset( $role_labels[$u_role] ) ? $role_labels[$u_role] : $u_role;
+                $u_branch_id = get_user_meta( $u->ID, 'cora_branch_id', true );
+                $u_branch_lbl = isset( $agency_branches[$u_branch_id] ) ? $agency_branches[$u_branch_id]['name'] : '—';
+                $u_status = get_user_meta( $u->ID, 'cora_user_status', true ) ?: 'active';
+                $u_joined = date( 'd M Y', strtotime( $u->user_registered ) );
+                $avatar = get_user_meta( $u->ID, 'cora_avatar_url', true );
+                $banner = get_user_meta( $u->ID, 'cora_profile_banner_url', true );
+                
+                $u_phone = get_user_meta( $u->ID, 'cora_phone', true );
+                $u_specs = get_user_meta( $u->ID, 'cora_specializations', true ) ?: array();
+                $u_split = get_user_meta( $u->ID, 'cora_commission_split', true ) ?: '70/30';
+                $u_rate  = get_user_meta( $u->ID, 'cora_hourly_rate', true ) ?: '2500';
+                $u_bank  = get_user_meta( $u->ID, 'cora_bank_upi', true ) ?: '';
+                $u_bio   = get_user_meta( $u->ID, 'description', true ) ?: '';
+
+                $user_payload = array(
+                    'id'         => $u->ID,
+                    'name'       => $u->display_name,
+                    'email'      => $u->user_email,
+                    'phone'      => $u_phone,
+                    'role'       => $u_role,
+                    'branch'     => $u_branch_id,
+                    'status'     => $u_status,
+                    'specs'      => (array) $u_specs,
+                    'split'      => $u_split,
+                    'rate'       => $u_rate,
+                    'bank'       => $u_bank,
+                    'bio'        => $u_bio,
+                    'avatar'     => $avatar ? $avatar : '',
+                    'banner'     => $banner ? $banner : ''
+                );
+                
+                $name_initials = '';
+                $words = explode( ' ', $u->display_name );
+                foreach ( $words as $w ) $name_initials .= strtoupper( substr( $w, 0, 1 ) );
+                $name_initials = substr( $name_initials, 0, 2 );
+                $name_color = '#' . substr( md5( $u->display_name ), 0, 6 );
+            ?>
+                <div class="active-member-row bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-sm p-3.5 flex items-center gap-3 cursor-pointer active:bg-zinc-50 dark:active:bg-zinc-800/60 transition-colors"
+                    data-name="<?php echo esc_attr(strtolower($u->display_name)); ?>"
+                    data-email="<?php echo esc_attr(strtolower($u->user_email)); ?>"
+                    data-role="<?php echo esc_attr($u_role); ?>"
+                    data-branch="<?php echo esc_attr($u_branch_id); ?>"
+                    data-status="<?php echo esc_attr($u_status); ?>"
+                    data-user="<?php echo esc_attr(wp_json_encode($user_payload)); ?>"
+                    onclick="openEditUserDrawer(this)">
+                    <!-- Avatar -->
+                    <?php if ( ! empty($avatar) ) : ?>
+                        <img src="<?php echo esc_url($avatar); ?>" class="w-10 h-10 rounded-full object-cover shrink-0">
+                    <?php else : ?>
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 border border-zinc-100 dark:border-zinc-800" style="background-color: <?php echo esc_attr($name_color); ?>"><?php echo esc_html($name_initials); ?></div>
+                    <?php endif; ?>
+                    <!-- Info -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 justify-between">
+                            <span class="font-bold text-xs text-zinc-900 dark:text-zinc-100 truncate"><?php echo esc_html($u->display_name); ?></span>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-bold rounded-full whitespace-nowrap shrink-0 <?php echo $u_status === 'active' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400'; ?>">
+                                <span class="w-1.5 h-1.5 rounded-full <?php echo $u_status === 'active' ? 'bg-emerald-500' : 'bg-zinc-400'; ?> inline-block"></span>
+                                <?php echo esc_html(ucfirst($u_status)); ?>
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                            <span class="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400"><?php echo esc_html($u_role_lbl); ?></span>
+                            <?php if ($u_branch_lbl && $u_branch_lbl !== '—') : ?>
+                            <span class="text-zinc-300 dark:text-zinc-650">·</span>
+                            <span class="text-[10px] text-zinc-400 dark:text-zinc-500"><?php echo esc_html($u_branch_lbl); ?></span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <!-- Chevron -->
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-300 dark:text-zinc-600 shrink-0"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <!-- ── DESKTOP: FILTERS TOOLBAR (hidden on mobile) ── -->
+        <div class="hidden md:flex flex-row gap-4 items-center justify-between">
             <div class="flex flex-row flex-wrap gap-3 items-center flex-1">
                 <!-- Search bar -->
                 <div class="relative flex-1 min-w-[160px] max-w-xs">
@@ -150,22 +332,22 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             </div>
         </div>
 
-        <!-- Members Table -->
-        <div class="bg-white border border-zinc-200/85 rounded-xl shadow-sm overflow-hidden">
+        <!-- ── DESKTOP: MEMBERS TABLE (hidden on mobile) ── -->
+        <div class="hidden md:block bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-zinc-200 text-xs text-left" id="active-members-table">
-                    <thead class="bg-zinc-50/50">
+                <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-xs text-left" id="active-members-table">
+                    <thead class="bg-zinc-50/50 dark:bg-zinc-800/40">
                         <tr>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Name</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Email Address</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Role</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Branch</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Status</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Joined Date</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-right">Actions</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Name</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Email Address</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Role</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Branch</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Status</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Joined Date</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px] text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-zinc-100">
+                    <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
                         <?php foreach ( $users as $u ) :
                             $u_role = ! empty( $u->roles ) ? $u->roles[0] : 'subscriber';
                             $u_role_lbl = isset( $role_labels[$u_role] ) ? $role_labels[$u_role] : $u_role;
@@ -174,6 +356,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             $u_status = get_user_meta( $u->ID, 'cora_user_status', true ) ?: 'active';
                             $u_joined = date( 'd M Y', strtotime( $u->user_registered ) );
                             $avatar = get_user_meta( $u->ID, 'cora_avatar_url', true );
+                            $banner = get_user_meta( $u->ID, 'cora_profile_banner_url', true );
                             
                             $u_phone = get_user_meta( $u->ID, 'cora_phone', true );
                             $u_specs = get_user_meta( $u->ID, 'cora_specializations', true ) ?: array();
@@ -194,7 +377,9 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 'split'      => $u_split,
                                 'rate'       => $u_rate,
                                 'bank'       => $u_bank,
-                                'bio'        => $u_bio
+                                'bio'        => $u_bio,
+                                'avatar'     => $avatar ? $avatar : '',
+                                'banner'     => $banner ? $banner : ''
                             );
                             
                             $name_initials = '';
@@ -212,23 +397,23 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                             <?php echo esc_html( $name_initials ); ?>
                                         </div>
                                     <?php endif; ?>
-                                    <span class="font-bold text-zinc-900"><?php echo esc_html( $u->display_name ); ?></span>
+                                    <span class="font-bold text-zinc-900 dark:text-zinc-150"><?php echo esc_html( $u->display_name ); ?></span>
                                 </td>
                                 <td class="px-5 py-3 text-zinc-500 font-medium"><?php echo esc_html( $u->user_email ); ?></td>
                                 <td class="px-5 py-3">
-                                    <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 text-zinc-700 whitespace-nowrap select-none">
+                                    <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 whitespace-nowrap select-none">
                                         <?php echo esc_html($u_role_lbl); ?>
                                     </span>
                                 </td>
-                                <td class="px-5 py-3 font-semibold text-zinc-800"><?php echo esc_html($u_branch_lbl); ?></td>
+                                <td class="px-5 py-3 font-semibold text-zinc-800 dark:text-zinc-200"><?php echo esc_html($u_branch_lbl); ?></td>
                                 <td class="px-5 py-3">
-                                    <span class="px-2 py-0.5 text-[9px] font-bold rounded-md select-none <?php echo $u_status === 'active' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'; ?>">
+                                    <span class="px-2 py-0.5 text-[9px] font-bold rounded-md select-none <?php echo $u_status === 'active' ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-450' : 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-450'; ?>">
                                         <?php echo esc_html(ucfirst($u_status)); ?>
                                     </span>
                                 </td>
                                 <td class="px-5 py-3 text-zinc-400 font-medium"><?php echo esc_html($u_joined); ?></td>
                                 <td class="px-5 py-3 text-right">
-                                    <button data-user="<?php echo esc_attr( wp_json_encode( $user_payload ) ); ?>" onclick="openEditUserDrawer(this)" class="cora-edit-user-btn px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-sm transition-colors">Edit</button>
+                                    <button data-user="<?php echo esc_attr( wp_json_encode( $user_payload ) ); ?>" onclick="openEditUserDrawer(this)" class="cora-edit-user-btn px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer shadow-sm transition-colors">Edit</button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -1268,13 +1453,17 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
 <!-- ═══ EDIT USER DRAWER SHEET ═══════════════════════════════════════════════ -->
 <aside id="cora-edit-user-drawer" class="collapsed fixed top-0 right-0 z-50 h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+        <!-- Mobile pull-down handle -->
+        <div class="md:hidden flex justify-center pt-2 pb-0 cursor-pointer" onclick="closeEditUserDrawer()">
+            <div class="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600"></div>
+        </div>
         <!-- Header -->
         <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-950/50">
             <div>
                 <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100" id="edit-user-title">Edit Team Member</h3>
                 <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5" id="edit-user-subtitle">Manage account details, role specializations, and compensation.</p>
             </div>
-            <button class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-1" onclick="closeEditUserDrawer()">
+            <button type="button" id="edit-drawer-close-btn" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-2 -mr-1 min-w-[40px] min-h-[40px] flex items-center justify-center" onclick="closeEditUserDrawer()">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
@@ -1293,6 +1482,59 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             <div class="p-6 space-y-5">
                 <!-- TAB 1: GENERAL PROFILE -->
                 <div id="tab-edit-general" class="drawer-tab-content space-y-4">
+                    <!-- Profile Image & Banner -->
+                    <div class="relative mb-2">
+                        <!-- Banner -->
+                        <div id="edit-banner-preview" class="w-full h-[100px] rounded-xl bg-zinc-100 dark:bg-zinc-800 relative overflow-hidden cursor-pointer group" onclick="coraSelectBanner()">
+                            <img id="edit-banner-img" src="" alt="" class="w-full h-full object-cover hidden">
+                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                                <div class="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 dark:bg-zinc-900/90 rounded-lg px-3 py-1.5 flex items-center gap-1.5 shadow-sm">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-300"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                                    <span class="text-[10px] font-medium text-zinc-600 dark:text-zinc-300">Change Cover</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Avatar -->
+                        <div class="absolute -bottom-5 left-4 z-10">
+                            <div id="edit-avatar-preview" class="w-16 h-16 rounded-full border-[3px] border-white dark:border-zinc-900 bg-zinc-200 dark:bg-zinc-700 overflow-hidden cursor-pointer group relative shadow-md" onclick="coraSelectAvatar()">
+                                <img id="edit-avatar-img" src="" alt="" class="w-full h-full object-cover hidden">
+                                <div id="edit-avatar-initials" class="w-full h-full flex items-center justify-center text-lg font-bold text-zinc-500 dark:text-zinc-400"></div>
+                                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="white" stroke-width="2" fill="none" class="opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-md"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-4">
+                        <!-- Default Avatar Options -->
+                        <label class="block text-[10px] font-medium text-zinc-400 dark:text-zinc-500 mb-1.5">Or pick a default avatar</label>
+                        <div class="flex items-center gap-2" id="default-avatar-options">
+                            <button type="button" class="default-avatar-btn w-9 h-9 rounded-full border-2 border-zinc-200 dark:border-zinc-700 hover:border-zinc-900 dark:hover:border-zinc-100 overflow-hidden transition-colors cursor-pointer bg-zinc-800 flex items-center justify-center" onclick="coraPickDefaultAvatar(this)" data-avatar-svg="1">
+                                <svg viewBox="0 0 40 40" width="36" height="36"><circle cx="20" cy="15" r="7" fill="#a1a1aa"/><ellipse cx="20" cy="35" rx="13" ry="10" fill="#a1a1aa"/></svg>
+                            </button>
+                            <button type="button" class="default-avatar-btn w-9 h-9 rounded-full border-2 border-zinc-200 dark:border-zinc-700 hover:border-zinc-900 dark:hover:border-zinc-100 overflow-hidden transition-colors cursor-pointer bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center" onclick="coraPickDefaultAvatar(this)" data-avatar-svg="2">
+                                <svg viewBox="0 0 40 40" width="36" height="36"><rect x="10" y="8" width="20" height="20" rx="6" fill="#71717a"/><circle cx="16" cy="17" r="2" fill="#fafafa"/><circle cx="24" cy="17" r="2" fill="#fafafa"/><path d="M15 23 Q20 27 25 23" stroke="#fafafa" stroke-width="1.5" fill="none"/></svg>
+                            </button>
+                            <button type="button" class="default-avatar-btn w-9 h-9 rounded-full border-2 border-zinc-200 dark:border-zinc-700 hover:border-zinc-900 dark:hover:border-zinc-100 overflow-hidden transition-colors cursor-pointer bg-zinc-900 flex items-center justify-center" onclick="coraPickDefaultAvatar(this)" data-avatar-svg="3">
+                                <svg viewBox="0 0 40 40" width="36" height="36"><polygon points="20,5 35,30 5,30" fill="#52525b"/><circle cx="20" cy="20" r="5" fill="#d4d4d8"/></svg>
+                            </button>
+                            <button type="button" class="default-avatar-btn w-9 h-9 rounded-full border-2 border-zinc-200 dark:border-zinc-700 hover:border-zinc-900 dark:hover:border-zinc-100 overflow-hidden transition-colors cursor-pointer bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center" onclick="coraPickDefaultAvatar(this)" data-avatar-svg="4">
+                                <svg viewBox="0 0 40 40" width="36" height="36"><rect x="8" y="8" width="24" height="24" rx="4" fill="#3f3f46"/><line x1="14" y1="18" x2="20" y2="18" stroke="#d4d4d8" stroke-width="2" stroke-linecap="round"/><line x1="14" y1="23" x2="26" y2="23" stroke="#d4d4d8" stroke-width="2" stroke-linecap="round"/></svg>
+                            </button>
+                            <button type="button" class="default-avatar-btn w-9 h-9 rounded-full border-2 border-zinc-200 dark:border-zinc-700 hover:border-zinc-900 dark:hover:border-zinc-100 overflow-hidden transition-colors cursor-pointer bg-zinc-300 dark:bg-zinc-600 flex items-center justify-center" onclick="coraPickDefaultAvatar(this)" data-avatar-svg="5">
+                                <svg viewBox="0 0 40 40" width="36" height="36"><circle cx="20" cy="20" r="14" fill="none" stroke="#52525b" stroke-width="3"/><circle cx="20" cy="20" r="6" fill="#52525b"/></svg>
+                            </button>
+                            <button type="button" class="default-avatar-btn w-9 h-9 rounded-full border-2 border-zinc-200 dark:border-zinc-700 hover:border-zinc-900 dark:hover:border-zinc-100 overflow-hidden transition-colors cursor-pointer bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center" onclick="coraPickDefaultAvatar(this)" data-avatar-svg="6">
+                                <svg viewBox="0 0 40 40" width="36" height="36"><path d="M10 28 Q15 10 20 20 Q25 30 30 12" stroke="#71717a" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+                            </button>
+                            <button type="button" class="w-9 h-9 rounded-full border-2 border-dashed border-zinc-300 dark:border-zinc-600 hover:border-zinc-500 dark:hover:border-zinc-400 flex items-center justify-center cursor-pointer transition-colors" onclick="coraRemoveAvatar()" title="Remove avatar">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <input type="hidden" id="edit-avatar-url" value="">
+                    <input type="hidden" id="edit-banner-url" value="">
+
                     <div>
                         <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Display Name</label>
                         <input type="text" id="edit-display-name" required class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
@@ -1431,6 +1673,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             
             <div class="p-5 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0">
                 <button type="submit" id="save-edit-btn" class="w-full py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-zinc-200 font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm">Save Changes</button>
+            </div>
         </form>
 </aside>
 
@@ -1620,23 +1863,40 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     window.closeCreateCustomRoleDrawer = closeCreateCustomRoleDrawer;
     window.openAttendanceReportsDrawer = openAttendanceReportsDrawer;
     window.closeAttendanceReportsDrawer = closeAttendanceReportsDrawer;
+    window.openInviteDrawer = openInviteDrawer;
+    window.closeInviteDrawer = closeInviteDrawer;
+    window.openEditUserDrawer = openEditUserDrawer;
+    window.closeEditUserDrawer = closeEditUserDrawer;
 
-    // Tab switching for User Management section
+    // Tab switching for User Management section (synchronized across mobile/desktop menus)
     $(document).on('click', '.cora-sub-tabs-container .cora-sub-tab', function(e) {
         e.preventDefault();
         var targetId = $(this).data('target');
         if (!targetId) return;
 
         $('.cora-sub-tabs-container .cora-sub-tab')
-            .removeClass('active border-zinc-950 dark:border-zinc-150 text-zinc-950 dark:text-zinc-150 font-semibold')
+            .removeClass('active border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 font-semibold')
             .addClass('border-transparent text-zinc-550 dark:text-zinc-400 font-medium');
         
-        $(this)
-            .addClass('active border-zinc-950 dark:border-zinc-150 text-zinc-950 dark:text-zinc-150 font-semibold')
+        var $matchingTabs = $('.cora-sub-tabs-container .cora-sub-tab[data-target="' + targetId + '"]');
+        $matchingTabs
+            .addClass('active border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 font-semibold')
             .removeClass('border-transparent text-zinc-550 dark:text-zinc-400 font-medium');
         
         $('.cora-tab-content').addClass('hidden');
         $('#' + targetId).removeClass('hidden');
+
+        // Handle More dropdown active styling on mobile
+        var isSecondary = ['tab-attendance-logs', 'tab-permissions-matrix', 'tab-custom-roles'].indexOf(targetId) !== -1;
+        if (isSecondary) {
+            $('#users-more-tab-btn')
+                .addClass('active border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 font-semibold')
+                .removeClass('border-transparent text-zinc-400 dark:text-zinc-500 font-medium');
+        } else {
+            $('#users-more-tab-btn')
+                .removeClass('active border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 font-semibold')
+                .addClass('border-transparent text-zinc-400 dark:text-zinc-500 font-medium');
+        }
 
         if (targetId === 'tab-attendance-logs' && typeof fetchAttendanceLogs === 'function') {
             fetchAttendanceLogs();
@@ -1672,10 +1932,12 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     });
 
     function filterActiveMembers() {
-        var q = $('#member-search').val().toLowerCase();
-        var role = $('#filter-role').val();
-        var branch = $('#filter-branch').val();
-        var status = $('#filter-status').val();
+        var isMobile = window.innerWidth < 768;
+        var q = (isMobile ? $('#mobile-member-search').val() : $('#member-search').val()) || '';
+        q = q.toLowerCase().trim();
+        var role = isMobile ? $('#mobile-filter-role').val() : $('#filter-role').val();
+        var branch = isMobile ? $('#mobile-filter-branch').val() : $('#filter-branch').val();
+        var status = isMobile ? $('#mobile-filter-status').val() : $('#filter-status').val();
         
         var count = 0;
         $('.active-member-row').each(function() {
@@ -1697,8 +1959,79 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 $(this).hide();
             }
         });
+        
         $('#member-count-badge').text(count + ' members total');
+        $('#mobile-members-count-badge').text(count);
+        
+        // Show indicator dot on filter toggle button if filters are active
+        if (role || branch || status) {
+            $('#filter-active-dot').removeClass('hidden');
+        } else {
+            $('#filter-active-dot').addClass('hidden');
+        }
     }
+
+    function toggleUsersMoreMenu() {
+        $('#users-more-menu').toggleClass('hidden');
+    }
+    window.toggleUsersMoreMenu = toggleUsersMoreMenu;
+
+    function closeUsersMoreMenu() {
+        $('#users-more-menu').addClass('hidden');
+    }
+    window.closeUsersMoreMenu = closeUsersMoreMenu;
+
+    function toggleMemberFilters() {
+        $('#member-filter-panel').toggleClass('hidden');
+    }
+    window.toggleMemberFilters = toggleMemberFilters;
+
+    function clearMemberFilters() {
+        $('#mobile-member-search').val('');
+        $('#mobile-filter-role').val('');
+        $('#mobile-filter-branch').val('');
+        $('#mobile-filter-status').val('');
+        
+        $('#member-search').val('');
+        $('#filter-role').val('');
+        $('#filter-branch').val('');
+        $('#filter-status').val('');
+        
+        filterActiveMembers();
+        $('#member-filter-panel').addClass('hidden');
+    }
+    window.clearMemberFilters = clearMemberFilters;
+
+    // Sync filter inputs between mobile and desktop layouts
+    $(document).on('input', '#member-search', function() { $('#mobile-member-search').val($(this).val()); });
+    $(document).on('input', '#mobile-member-search', function() { $('#member-search').val($(this).val()); });
+    $(document).on('change', '#filter-role', function() { $('#mobile-filter-role').val($(this).val()); });
+    $(document).on('change', '#mobile-filter-role', function() { $('#filter-role').val($(this).val()); });
+    $(document).on('change', '#filter-branch', function() { $('#mobile-filter-branch').val($(this).val()); });
+    $(document).on('change', '#mobile-filter-branch', function() { $('#filter-branch').val($(this).val()); });
+    $(document).on('change', '#filter-status', function() { $('#mobile-filter-status').val($(this).val()); });
+    $(document).on('change', '#mobile-filter-status', function() { $('#filter-status').val($(this).val()); });
+
+    // Robust close handler for edit drawer (backup for inline onclick)
+    $(document).on('click touchend', '#edit-drawer-close-btn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof window.closeEditUserDrawer === 'function') {
+            window.closeEditUserDrawer();
+        } else if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        } else {
+            $('#cora-edit-user-drawer').addClass('collapsed');
+            $('#cora-drawer-backdrop').addClass('hidden');
+        }
+    });
+
+    // Close dropdown menu when clicking outside
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#users-more-tab-wrapper').length) {
+            closeUsersMoreMenu();
+        }
+    });
 
     // Invite user drawer
     function openInviteDrawer() {
@@ -1707,8 +2040,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         } else {
             $('aside[id$="-drawer"]').addClass('collapsed');
         }
-        $('#cora-invite-user-drawer').removeClass('collapsed');
-        $('#cora-drawer-backdrop').removeClass('hidden');
+        $('#cora-invite-user-drawer').removeClass('collapsed hidden');
+        $('#cora-drawer-backdrop').removeClass('hidden').css({'display':'','pointer-events':''});
     }
 
     function closeInviteDrawer() {
@@ -1836,6 +2169,25 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
         $('#edit-user-title').text('Edit ' + (user.name || 'Team Member'));
 
+        // Profile Image & Banner
+        var avatarUrl = user.avatar || '';
+        var bannerUrl = user.banner || '';
+        $('#edit-avatar-url').val(avatarUrl);
+        $('#edit-banner-url').val(bannerUrl);
+        if (avatarUrl) {
+            $('#edit-avatar-img').attr('src', avatarUrl).removeClass('hidden');
+            $('#edit-avatar-initials').addClass('hidden');
+        } else {
+            $('#edit-avatar-img').addClass('hidden').attr('src', '');
+            $('#edit-avatar-initials').removeClass('hidden').text((user.name || '?').charAt(0).toUpperCase());
+        }
+        if (bannerUrl) {
+            $('#edit-banner-img').attr('src', bannerUrl).removeClass('hidden');
+        } else {
+            $('#edit-banner-img').addClass('hidden').attr('src', '');
+        }
+        $('.default-avatar-btn').removeClass('ring-2 ring-zinc-900 dark:ring-zinc-100');
+
         // Reset and populate specializations checkboxes
         $('.edit-spec-checkbox').prop('checked', false);
         if (Array.isArray(user.specs)) {
@@ -1859,8 +2211,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         // Reset to Tab 1
         $('.drawer-edit-tab[data-drawer-tab="tab-edit-general"]').trigger('click');
 
-        $('#cora-edit-user-drawer').removeClass('collapsed');
-        $('#cora-drawer-backdrop').removeClass('hidden');
+        $('#cora-edit-user-drawer').removeClass('collapsed hidden');
+        $('#cora-drawer-backdrop').removeClass('hidden').css({'display':'','pointer-events':''});
     }
     window.openEditUserDrawer = openEditUserDrawer;
     window.coraOpenEditUserDrawer = openEditUserDrawer;
@@ -1873,6 +2225,62 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             $('#cora-edit-user-drawer').addClass('collapsed');
         }
     }
+
+    // Profile Avatar & Banner Helpers
+    window.coraSelectAvatar = function() {
+        if (typeof wp !== 'undefined' && wp.media) {
+            var frame = wp.media({
+                title: 'Select Profile Photo',
+                button: { text: 'Use as Avatar' },
+                multiple: false,
+                library: { type: 'image' }
+            });
+            frame.on('select', function() {
+                var attachment = frame.state().get('selection').first().toJSON();
+                $('#edit-avatar-url').val(attachment.url);
+                $('#edit-avatar-img').attr('src', attachment.url).removeClass('hidden');
+                $('#edit-avatar-initials').addClass('hidden');
+                $('.default-avatar-btn').removeClass('ring-2 ring-zinc-900 dark:ring-zinc-100');
+            });
+            frame.open();
+        }
+    };
+
+    window.coraSelectBanner = function() {
+        if (typeof wp !== 'undefined' && wp.media) {
+            var frame = wp.media({
+                title: 'Select Cover Banner',
+                button: { text: 'Use as Banner' },
+                multiple: false,
+                library: { type: 'image' }
+            });
+            frame.on('select', function() {
+                var attachment = frame.state().get('selection').first().toJSON();
+                $('#edit-banner-url').val(attachment.url);
+                $('#edit-banner-img').attr('src', attachment.url).removeClass('hidden');
+            });
+            frame.open();
+        }
+    };
+
+    window.coraPickDefaultAvatar = function(btn) {
+        var svgEl = $(btn).find('svg')[0];
+        if (!svgEl) return;
+        var svgData = new XMLSerializer().serializeToString(svgEl);
+        var dataUri = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+        $('#edit-avatar-url').val(dataUri);
+        $('#edit-avatar-img').attr('src', dataUri).removeClass('hidden');
+        $('#edit-avatar-initials').addClass('hidden');
+        $('.default-avatar-btn').removeClass('ring-2 ring-zinc-900 dark:ring-zinc-100');
+        $(btn).addClass('ring-2 ring-zinc-900 dark:ring-zinc-100');
+    };
+
+    window.coraRemoveAvatar = function() {
+        $('#edit-avatar-url').val('');
+        $('#edit-avatar-img').addClass('hidden').attr('src', '');
+        $('#edit-avatar-initials').removeClass('hidden');
+        $('.default-avatar-btn').removeClass('ring-2 ring-zinc-900 dark:ring-zinc-100');
+    };
 
     function handleStatusToggleChange(el) {
         var active = $(el).is(':checked');
@@ -1942,6 +2350,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             commission_split: split,
             hourly_rate: rate,
             bank_upi: bank,
+            avatar_url: $('#edit-avatar-url').val(),
+            banner_url: $('#edit-banner-url').val(),
             nonce: coraREData.ajaxNonce
         }, function(res) {
             var msg = (res && res.data && (typeof res.data === 'string' ? res.data : res.data.message)) || 'Failed to update user.';
@@ -2202,7 +2612,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         }
 
         $('#cora-create-custom-role-drawer').removeClass('collapsed');
-        $('#cora-drawer-backdrop').removeClass('hidden');
+        $('#cora-drawer-backdrop').removeClass('hidden').css({'display':'','pointer-events':''});
     }
 
     function closeCreateCustomRoleDrawer() {
@@ -2234,8 +2644,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             $(this).prop('checked', perms.indexOf(val) !== -1 || perms.indexOf(val.replace('_', '-')) !== -1);
         });
 
-        $('#cora-edit-custom-role-drawer').removeClass('collapsed');
-        $('#cora-drawer-backdrop').removeClass('hidden');
+        $('#cora-edit-custom-role-drawer').removeClass('collapsed hidden');
+        $('#cora-drawer-backdrop').removeClass('hidden').css({'display':'','pointer-events':''});
     }
 
     function closeEditCustomRoleDrawer() {
@@ -2357,7 +2767,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             $('aside[id$="-drawer"]').addClass('collapsed');
         }
         $('#cora-attendance-reports-drawer').removeClass('collapsed');
-        $('#cora-drawer-backdrop').removeClass('hidden');
+        $('#cora-drawer-backdrop').removeClass('hidden').css({'display':'','pointer-events':''});
     }
 
     function closeAttendanceReportsDrawer() {
@@ -2622,7 +3032,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         }
 
         $('#cora-geofence-drawer').removeClass('collapsed');
-        $('#cora-drawer-backdrop').removeClass('hidden');
+        $('#cora-drawer-backdrop').removeClass('hidden').css({'display':'','pointer-events':''});
     }
 
     function closeGeofenceDrawer() {

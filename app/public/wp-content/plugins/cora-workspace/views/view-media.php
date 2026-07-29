@@ -1642,9 +1642,9 @@ window.cmFolderCtxAction = function(action) {
     if (!folder) return;
 
     if (action === 'settings') {
-        cmOpenFolderSettings(folder.id, folder.name);
+        setTimeout(function() { cmOpenFolderSettings(folder.id, folder.name); }, 40);
     } else if (action === 'subfolder') {
-        cmPromptFolder(folder.id);
+        setTimeout(function() { cmPromptFolder(folder.id); }, 40);
     } else if (action === 'share_link') {
         if (folder.share_url) {
             navigator.clipboard.writeText(folder.share_url);
@@ -2377,11 +2377,12 @@ window.cmUpdateBreadcrumbs = function() {
     }
 };
 window.cmPromptFolder = function(parentId) {
+    if (typeof cmHideFolderContextMenu === 'function') cmHideFolderContextMenu();
     document.getElementById('cm-folder-name').value = '';
     var parentSel = document.getElementById('cm-folder-parent');
     if (parentSel) {
         parentSel.innerHTML = '<option value="0">Root (Main Workspace)</option>';
-        CM.folders.forEach(function(f) {
+        (CM.folders || []).forEach(function(f) {
             parentSel.innerHTML += '<option value="' + f.id + '">' + esc(f.name) + '</option>';
         });
         if (parentId) {
@@ -2392,7 +2393,9 @@ window.cmPromptFolder = function(parentId) {
     }
     if (document.getElementById('cm-folder-desc')) document.getElementById('cm-folder-desc').value = '';
     if (document.getElementById('cm-folder-autoshare')) document.getElementById('cm-folder-autoshare').checked = false;
-    document.getElementById('cm-folder-dlg').classList.add('open');
+    cmRenderSwatches('cm-folder-color-swatches', 'cm-folder-color', '#3b82f6');
+    var dlg = document.getElementById('cm-folder-dlg');
+    if (dlg) dlg.classList.add('open');
     setTimeout(function() { document.getElementById('cm-folder-name').focus(); }, 80);
 };
 
@@ -3001,10 +3004,9 @@ window.cmOpenFolderSettings = function(folderId, name) {
     document.getElementById('cm-fs-id').value = folderId;
     document.getElementById('cm-fs-name-input').value = name || '';
     document.getElementById('cm-fs-title').textContent = 'Folder Settings: ' + (name || '');
-    document.getElementById('cm-fs-url-input').value = '';
     cmRenderSwatches('cm-fs-color-swatches', 'cm-fs-color', color);
-    if (typeof cmHideContextMenu === 'function') cmHideContextMenu();
-    var dlg = document.getElementById('cm-folder-ctx-menu') || document.getElementById('cm-folder-settings-dlg');
+    if (typeof cmHideFolderContextMenu === 'function') cmHideFolderContextMenu();
+    var dlg = document.getElementById('cm-folder-settings-dlg');
     if (dlg) dlg.classList.add('open');
 };
 

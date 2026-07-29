@@ -280,10 +280,10 @@ jQuery(document).ready(function($) {
     });
 
     window.coraCloseAllDrawers = function() {
-        $('aside[id$="-drawer"], aside[id$="-sheet"], div[id$="-drawer"], div[id$="-sheet"], div[id$="-modal"]').addClass('collapsed hidden');
+        $('aside[id$="-drawer"], aside[id$="-sheet"], div[id$="-drawer"], div[id$="-sheet"], div[id$="-modal"]').addClass('collapsed');
         $('#cora-media-library-drawer, #cora-ai-tone-drawer, #cora-email-template-drawer, #cora-email-detail-drawer, #cora-smtp-test-drawer, #email-detail-drawer').addClass('translate-x-full pointer-events-none');
         const bd = document.getElementById('cora-drawer-backdrop');
-        if(bd) { bd.classList.add('hidden'); bd.style.pointerEvents = 'none'; bd.style.display = 'none'; }
+        if(bd) { bd.classList.add('hidden'); bd.style.pointerEvents = 'none'; bd.style.display = ''; }
         $('.cora-tour-backdrop').removeClass('active').addClass('hidden').css({'pointer-events': 'none', 'display': 'none'});
         $('.cora-tour-highlight').removeClass('cora-tour-highlight');
         $('body').removeClass('cora-drawer-open overflow-hidden');
@@ -307,7 +307,7 @@ jQuery(document).ready(function($) {
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         }
-        $('#cora-geofence-drawer').removeClass('collapsed');
+        $('#cora-geofence-drawer').removeClass('collapsed hidden');
         $('#cora-drawer-backdrop').removeClass('hidden');
     };
 
@@ -326,7 +326,7 @@ jQuery(document).ready(function($) {
                 handleApplyBaseTemplate(baseTemplate);
             }
         }
-        $('#cora-create-custom-role-drawer').removeClass('collapsed');
+        $('#cora-create-custom-role-drawer').removeClass('collapsed hidden');
         $('#cora-drawer-backdrop').removeClass('hidden');
     };
 
@@ -339,7 +339,7 @@ jQuery(document).ready(function($) {
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         }
-        $('#cora-attendance-reports-drawer').removeClass('collapsed');
+        $('#cora-attendance-reports-drawer').removeClass('collapsed hidden');
         $('#cora-drawer-backdrop').removeClass('hidden');
     };
 
@@ -352,7 +352,7 @@ jQuery(document).ready(function($) {
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         }
-        $('#cora-financial-reports-drawer').removeClass('collapsed');
+        $('#cora-financial-reports-drawer').removeClass('collapsed hidden');
         $('#cora-drawer-backdrop').removeClass('hidden');
     };
 
@@ -9593,6 +9593,25 @@ jQuery(document).ready(function($) {
         const targetPanel = $('#cora-settings-panel-' + tabKey);
         if (targetPanel.length) {
             targetPanel.removeClass('hidden').addClass('block');
+            
+            // Accordion: Collapse all card bodies in the active panel except the first one
+            var cards = targetPanel.find('.cora-shopify-card');
+            cards.each(function(index, cardEl) {
+                var card = $(cardEl);
+                var header = card.find('.cora-shopify-card-header');
+                var body = card.find('.cora-shopify-card-body');
+                if (body.length) {
+                    if (index === 0) {
+                        body.show();
+                        header.find('.cora-card-chevron').addClass('active');
+                        card.addClass('expanded');
+                    } else {
+                        body.hide();
+                        header.find('.cora-card-chevron').removeClass('active');
+                        card.removeClass('expanded');
+                    }
+                }
+            });
         }
         
         // Update sidebar navigation active classes
@@ -10012,6 +10031,33 @@ jQuery(document).ready(function($) {
             clearBtn.removeClass('hidden');
         } else {
             clearBtn.addClass('hidden');
+        }
+    });
+
+    // Collapsible settings cards handler
+    $(document).on('click', '.cora-shopify-card-header', function() {
+        var header = $(this);
+        var card = header.closest('.cora-shopify-card');
+        var body = header.siblings('.cora-shopify-card-body');
+        var panel = header.closest('.cora-settings-panel');
+        if (body.length) {
+            var isVisible = body.is(':visible');
+            
+            if (isVisible) {
+                body.slideUp(200);
+                header.find('.cora-card-chevron').removeClass('active');
+                card.removeClass('expanded');
+            } else {
+                // Keep only 1 open: close all other open card bodies in this panel
+                var otherCards = panel.find('.cora-shopify-card').not(card);
+                otherCards.removeClass('expanded');
+                otherCards.find('.cora-shopify-card-body').slideUp(200);
+                otherCards.find('.cora-card-chevron').removeClass('active');
+                
+                body.slideDown(200);
+                header.find('.cora-card-chevron').addClass('active');
+                card.addClass('expanded');
+            }
         }
     });
 
@@ -11071,6 +11117,28 @@ jQuery(document).ready(function($) {
         const subtab = urlParams.get('subtab');
         if (subtab && ['kanban', 'directory', 'analytics', 'activity'].includes(subtab)) {
             window.coraSwitchLeadSubtab(subtab);
+        }
+
+        // Initialize Settings Suite Accordion
+        var activePanel = $('.cora-settings-panel').not('.hidden');
+        if (activePanel.length) {
+            var cards = activePanel.find('.cora-shopify-card');
+            cards.each(function(index, cardEl) {
+                var card = $(cardEl);
+                var header = card.find('.cora-shopify-card-header');
+                var body = card.find('.cora-shopify-card-body');
+                if (body.length) {
+                    if (index === 0) {
+                        body.show();
+                        header.find('.cora-card-chevron').addClass('active');
+                        card.addClass('expanded');
+                    } else {
+                        body.hide();
+                        header.find('.cora-card-chevron').removeClass('active');
+                        card.removeClass('expanded');
+                    }
+                }
+            });
         }
     });
 

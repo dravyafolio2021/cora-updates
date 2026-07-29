@@ -212,18 +212,23 @@ $cora_settings_tabs = array(
     background-color: #ffffff !important;
     border: 1px solid #e4e4e7 !important;
     border-radius: 8px !important;
-    padding: 20px 24px !important;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.01), 0 1px 2px 0 rgba(0, 0, 0, 0.02) !important;
+    padding: 0 !important; /* Remove card wrapper padding */
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
+    overflow: hidden !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.cora-shopify-card.cora-metric-card {
+    padding: 16px 20px !important;
 }
 .dark .cora-shopify-card {
     background-color: #18181b !important; /* zinc-900 */
     border-color: #27272a !important; /* zinc-800 */
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.1) !important;
 }
 /* Mobile UI/UX Responsiveness Overrides */
 @media (max-width: 639px) {
     .cora-shopify-card {
-        padding: 12px 14px !important;
+        padding: 0 !important;
     }
 }
 .scrollbar-none::-webkit-scrollbar {
@@ -286,6 +291,80 @@ $cora_settings_tabs = array(
     background: #18181b !important; /* zinc-900 */
     border-color: #27272a !important; /* zinc-800 */
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2) !important;
+}
+/* Collapsible settings cards */
+.cora-shopify-card-header {
+    cursor: pointer !important;
+    user-select: none !important;
+    padding: 16px 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    border-bottom: 0px solid transparent !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, border-bottom-width 0.2s ease !important;
+}
+@media (max-width: 639px) {
+    .cora-shopify-card-header {
+        padding: 12px 14px !important;
+    }
+}
+.cora-shopify-card-header:hover {
+    background-color: #fafafa !important;
+}
+.dark .cora-shopify-card-header:hover {
+    background-color: #1f1f23 !important;
+}
+/* Highlight expanded cards */
+.cora-shopify-card.expanded {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02) !important;
+}
+.cora-shopify-card.expanded .cora-shopify-card-header {
+    border-bottom: 1px solid #f4f4f5 !important;
+}
+.dark .cora-shopify-card.expanded .cora-shopify-card-header {
+    border-bottom: 1px solid #27272a !important;
+}
+
+/* Card Body spacing and defaults */
+.cora-shopify-card-body {
+    display: none; /* hidden by default */
+    padding: 20px !important;
+    animation: coraFadeIn 0.2s ease-out;
+}
+@media (max-width: 639px) {
+    .cora-shopify-card-body {
+        padding: 14px !important;
+    }
+}
+/* Class-specific body padding overrides */
+.cora-shopify-card-body.pt-0 {
+    padding-top: 0 !important;
+}
+.cora-shopify-card-body.pb-0 {
+    padding-bottom: 0 !important;
+}
+.cora-shopify-card-body.px-0 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+.cora-shopify-card-body.p-0 {
+    padding: 0 !important;
+}
+
+@keyframes coraFadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.cora-card-chevron {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transform: rotate(180deg) !important; /* Point down by default when collapsed */
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.cora-card-chevron.active {
+    transform: rotate(0deg) !important; /* Point up when expanded */
 }
 </style>
 
@@ -358,12 +437,18 @@ $cora_settings_tabs = array(
         <!-- TAB 1: GENERAL SETTINGS -->
         <div id="cora-settings-panel-general" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'general' ? '' : 'hidden'; ?>">
             <!-- Card 1: General Site Configuration -->
-            <div class="cora-shopify-card space-y-4">
-                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">General Site Configuration</h3>
-                    <p class="text-xs text-zinc-500">Core identity and default user registration parameters.</p>
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between cursor-pointer select-none">
+                    <div>
+                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 m-0">General Site Configuration</h3>
+                        <p class="text-xs text-zinc-500 m-0">Core identity and default user registration parameters.</p>
+                    </div>
+                    <span class="cora-card-chevron text-zinc-400 dark:text-zinc-500 transition-transform duration-200">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </span>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="cora-shopify-card-body pt-4 space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="flex items-center gap-1.5" title="This title appears on your browser tab and platform header.">
                             Site Title
@@ -442,15 +527,22 @@ $cora_settings_tabs = array(
                         <span class="cora-label-raw">Membership: Anyone can register for an account</span>
                     </label>
                 </div>
+                </div> <!-- close cora-shopify-card-body -->
             </div>
 
             <!-- Card 2: Workspace Details Section -->
-            <div class="cora-shopify-card space-y-4">
-                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">General Workspace Settings</h3>
-                    <p class="text-xs text-zinc-500">Corporate identity, localized workspace address, and billing tax descriptors.</p>
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between cursor-pointer select-none">
+                    <div>
+                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 m-0">General Workspace Settings</h3>
+                        <p class="text-xs text-zinc-500 m-0">Corporate identity, localized workspace address, and billing tax descriptors.</p>
+                    </div>
+                    <span class="cora-card-chevron text-zinc-400 dark:text-zinc-500 transition-transform duration-200">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </span>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="cora-shopify-card-body pt-4 space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="flex items-center gap-1.5" title="This title appears on your browser tab and platform header.">
                             Workspace Name
@@ -599,15 +691,22 @@ $cora_settings_tabs = array(
                         <span class="cora-label-raw">Enable Workspace Interactive Tour guides for first-time logins</span>
                     </label>
                 </div>
+                </div> <!-- close cora-shopify-card-body -->
             </div>
 
             <!-- Card 3: Database Clean Up Section -->
-            <div class="cora-shopify-card space-y-4">
-                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                    <h3 class="text-sm font-semibold text-red-650">Database Optimization</h3>
-                    <p class="text-xs text-zinc-500">Clean up legacy key-value storage once you have verified custom database tables are fully working.</p>
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between cursor-pointer select-none">
+                    <div>
+                        <h3 class="text-sm font-semibold text-red-650 m-0">Database Optimization</h3>
+                        <p class="text-xs text-zinc-500 m-0">Clean up legacy key-value storage once you have verified custom database tables are fully working.</p>
+                    </div>
+                    <span class="cora-card-chevron text-zinc-400 dark:text-zinc-500 transition-transform duration-200">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </span>
                 </div>
-                <div class="p-4 border border-red-200 dark:border-red-900/60 bg-red-50/50 dark:bg-red-950/10 rounded-lg space-y-3">
+                <div class="cora-shopify-card-body pt-4 space-y-4">
+                    <div class="p-4 border border-red-200 dark:border-red-900/60 bg-red-50/50 dark:bg-red-950/10 rounded-lg space-y-3">
                     <p class="text-xs text-zinc-700 dark:text-zinc-300">
                         Purging legacy data removes redundant options storage and clears temporary system caches.
                         <strong>Note:</strong> Make sure you have verified data integrity before purging.
@@ -617,19 +716,25 @@ $cora_settings_tabs = array(
                         Purge Old System Cache
                     </button>
                 </div>
+                </div> <!-- close cora-shopify-card-body -->
             </div>
         </div>
 
         <!-- TAB 2: PASSWORD POLICY SETTINGS -->
         <div id="cora-settings-panel-pwd-policy" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'pwd-policy' ? '' : 'hidden'; ?>">
             <!-- Card: Password Policy -->
-            <div class="cora-shopify-card space-y-4">
-                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Workspace Password Policy</h3>
-                    <p class="text-xs text-zinc-500">Enforce minimum complexity guidelines for passwords across logins, setups, and resets.</p>
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between cursor-pointer select-none">
+                    <div>
+                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 m-0">Workspace Password Policy</h3>
+                        <p class="text-xs text-zinc-500 m-0">Enforce minimum complexity guidelines for passwords across logins, setups, and resets.</p>
+                    </div>
+                    <span class="cora-card-chevron text-zinc-400 dark:text-zinc-500 transition-transform duration-200">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </span>
                 </div>
-                
-                <div class="space-y-4">
+                <div class="cora-shopify-card-body pt-4 space-y-4">
+                    <div class="space-y-4">
                     <div class="w-48">
                         <label>Minimum Password Length</label>
                         <input type="number" min="6" max="32" name="cora_pwd_policy_min_len" value="<?php echo esc_attr( get_option('cora_pwd_policy_min_len', 8) ); ?>">
@@ -652,6 +757,7 @@ $cora_settings_tabs = array(
                         </label>
                     </div>
                 </div>
+                </div> <!-- close cora-shopify-card-body -->
             </div>
         </div>
 
@@ -681,8 +787,8 @@ $cora_settings_tabs = array(
                 $manager_query_args['meta_query'] = array(
                     array(
                         'key'     => 'cora_agency_id',
-                        'value'   => $agency_id,
-                        'compare' => '='
+                        'value'   => function_exists('cora_get_agency_identifiers') ? cora_get_agency_identifiers( $agency_id ) : $agency_id,
+                        'compare' => 'IN'
                     )
                 );
             }
@@ -698,61 +804,67 @@ $cora_settings_tabs = array(
         ?>
         <!-- TAB 3: BRANCH MANAGEMENT -->
         <div id="cora-settings-panel-branches" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'branches' ? '' : 'hidden'; ?>">
-            <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                <div>
-                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Brokerage Branches</h3>
-                    <p class="text-xs text-zinc-500">Manage multiple physical offices, assign localized managers, and monitor regional agent counts.</p>
-                </div>
-                <button type="button" onclick="openCreateBranchDrawer()" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    New Branch
-                </button>
-            </div>
-
             <div class="cora-shopify-card p-0 overflow-hidden">
-                <div class="overflow-x-auto w-full" style="-webkit-overflow-scrolling: touch;">
-                    <table class="min-w-full divide-y divide-zinc-200 text-xs text-left">
-                        <thead class="bg-zinc-50/50">
-                            <tr>
-                                <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Branch Name</th>
-                                <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Location / Address</th>
-                                <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Branch Manager</th>
-                                <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Active Crew</th>
-                                <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-zinc-100">
-                            <?php if ( empty( $filtered_branches ) ) : ?>
-                                <tr>
-                                    <td colspan="5" class="px-5 py-8 text-center text-zinc-400 font-medium">No branches configured.</td>
-                                </tr>
-                            <?php else : ?>
-                                <?php foreach ( $filtered_branches as $b_id => $b ) :
-                                    $mgr = ! empty( $b['manager_id'] ) ? get_userdata( $b['manager_id'] ) : null;
-                                    $mgr_name = $mgr ? $mgr->display_name : 'Unassigned';
-                                    $crew_count = $branch_agent_counts[$b_id] ?? 0;
-                                ?>
-                                    <tr class="hover:bg-zinc-50/10 dark:hover:bg-zinc-800/10">
-                                        <td class="px-5 py-3.5 font-bold text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $b['name'] ); ?></td>
-                                        <td class="px-5 py-3.5 text-zinc-500 dark:text-zinc-400 font-semibold"><?php echo esc_html( $b['city'] . ' / ' . $b['address'] ); ?></td>
-                                        <td class="px-5 py-3.5 font-semibold text-zinc-700 dark:text-zinc-300">
-                                            <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 text-[9px] font-bold">
-                                                <?php echo esc_html( $mgr_name ); ?>
-                                            </span>
-                                        </td>
-                                        <td class="px-5 py-3.5 font-bold text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $crew_count ); ?> Agents</td>
-                                        <td class="px-5 py-3.5 text-right">
-                                            <div class="flex items-center justify-end gap-2">
-                                                <button type="button" onclick="openEditBranchDrawer('<?php echo esc_attr($b_id); ?>', '<?php echo esc_attr($b['name']); ?>', '<?php echo esc_attr($b['city']); ?>', '<?php echo esc_attr($b['address']); ?>', '<?php echo esc_attr($b['manager_id'] ?? ''); ?>')" class="px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer shadow-sm transition-colors">Edit</button>
-                                                <button type="button" onclick="deleteBranch('<?php echo esc_attr($b_id); ?>', <?php echo $crew_count; ?>)" class="px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[10px] font-bold text-red-600 dark:text-red-400 bg-white dark:bg-zinc-900 hover:bg-red-50 dark:hover:bg-red-950/30 hover:border-red-200 dark:hover:border-red-800 cursor-pointer shadow-sm transition-colors">Delete</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
+                <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800/40 p-4 flex items-center justify-between cursor-pointer select-none">
+                    <div>
+                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 m-0">Brokerage Branches</h3>
+                        <p class="text-xs text-zinc-500 m-0">Manage multiple physical offices, assign localized managers, and monitor regional agent counts.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button type="button" onclick="event.stopPropagation(); openCreateBranchDrawer()" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm flex items-center gap-1.5">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            New Branch
+                        </button>
+                        <span class="cora-card-chevron text-zinc-400 dark:text-zinc-500 transition-transform duration-200">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                        </span>
+                    </div>
                 </div>
+                <div class="cora-shopify-card-body pt-0">
+                    <div class="overflow-x-auto w-full" style="-webkit-overflow-scrolling: touch;">
+                        <table class="min-w-full divide-y divide-zinc-200 text-xs text-left">
+                            <thead class="bg-zinc-50/50">
+                                <tr>
+                                    <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Branch Name</th>
+                                    <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Location / Address</th>
+                                    <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Branch Manager</th>
+                                    <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Active Crew</th>
+                                    <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-zinc-100">
+                                <?php if ( empty( $filtered_branches ) ) : ?>
+                                    <tr>
+                                        <td colspan="5" class="px-5 py-8 text-center text-zinc-400 font-medium">No branches configured.</td>
+                                    </tr>
+                                <?php else : ?>
+                                    <?php foreach ( $filtered_branches as $b_id => $b ) :
+                                        $mgr = ! empty( $b['manager_id'] ) ? get_userdata( $b['manager_id'] ) : null;
+                                        $mgr_name = $mgr ? $mgr->display_name : 'Unassigned';
+                                        $crew_count = $branch_agent_counts[$b_id] ?? 0;
+                                    ?>
+                                        <tr class="hover:bg-zinc-50/10 dark:hover:bg-zinc-800/10">
+                                            <td class="px-5 py-3.5 font-bold text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $b['name'] ); ?></td>
+                                            <td class="px-5 py-3.5 text-zinc-500 dark:text-zinc-400 font-semibold"><?php echo esc_html( $b['city'] . ' / ' . $b['address'] ); ?></td>
+                                            <td class="px-5 py-3.5 font-semibold text-zinc-700 dark:text-zinc-300">
+                                                <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 text-[9px] font-bold">
+                                                    <?php echo esc_html( $mgr_name ); ?>
+                                                </span>
+                                            </td>
+                                            <td class="px-5 py-3.5 font-bold text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $crew_count ); ?> Agents</td>
+                                            <td class="px-5 py-3.5 text-right">
+                                                <div class="flex items-center justify-end gap-2">
+                                                    <button type="button" onclick="openEditBranchDrawer('<?php echo esc_attr($b_id); ?>', '<?php echo esc_attr($b['name']); ?>', '<?php echo esc_attr($b['city']); ?>', '<?php echo esc_attr($b['address']); ?>', '<?php echo esc_attr($b['manager_id'] ?? ''); ?>')" class="px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer shadow-sm transition-colors">Edit</button>
+                                                    <button type="button" onclick="deleteBranch('<?php echo esc_attr($b_id); ?>', <?php echo $crew_count; ?>)" class="px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[10px] font-bold text-red-650 dark:text-red-400 bg-white dark:bg-zinc-900 hover:bg-red-50 dark:hover:bg-red-950/30 hover:border-red-200 dark:hover:border-red-800 cursor-pointer shadow-sm transition-colors">Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div> <!-- close cora-shopify-card-body -->
             </div>
 
         <!-- ═══ CREATE BRANCH DRAWER SHEET ══════════════════════════════════════════ -->
@@ -992,11 +1104,17 @@ $cora_settings_tabs = array(
         <!-- TAB 4: BRANDING & API KEYS -->
         <div id="cora-settings-panel-brand" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'brand' ? '' : 'hidden'; ?>">
             <!-- Card 1: Brand Assets -->
-            <div class="cora-shopify-card space-y-4">
-                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Brand Assets</h3>
-                    <p class="text-xs text-zinc-500">Configure your agency's logo and browser favicon.</p>
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between cursor-pointer select-none">
+                    <div>
+                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 m-0">Brand Assets</h3>
+                        <p class="text-xs text-zinc-500 m-0">Configure your agency's logo and browser favicon.</p>
+                    </div>
+                    <span class="cora-card-chevron text-zinc-400 dark:text-zinc-500 transition-transform duration-200">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </span>
                 </div>
+                <div class="cora-shopify-card-body pt-4 space-y-4">
                 
                 <!-- Agency Logo Settings -->
                 <div class="p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/40 space-y-3">
@@ -1075,15 +1193,22 @@ $cora_settings_tabs = array(
                             </div>
                         </div>
                     </div>
-                </div>
-                </div>
+                </div> <!-- close custom favicon settings -->
+                </div> <!-- close cora-shopify-card-body -->
+            </div> <!-- close cora-shopify-card -->
 
                 <!-- Browser Tab & Sidebar Title Settings -->
-                <div class="cora-shopify-card space-y-4">
-                    <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Browser Tab &amp; Sidebar Title Settings</h3>
-                        <p class="text-xs text-zinc-500 mt-0.5">Control how your site name appears in the browser tab and sidebar.</p>
+                <div class="cora-shopify-card">
+                    <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between cursor-pointer select-none">
+                        <div>
+                            <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 m-0">Browser Tab &amp; Sidebar Title Settings</h3>
+                            <p class="text-xs text-zinc-500 mt-0.5 m-0">Control how your site name appears in the browser tab and sidebar.</p>
+                        </div>
+                        <span class="cora-card-chevron text-zinc-400 dark:text-zinc-500 transition-transform duration-200">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                        </span>
                     </div>
+                    <div class="cora-shopify-card-body pt-4 space-y-4">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label>Site Title</label>
@@ -1098,16 +1223,22 @@ $cora_settings_tabs = array(
                             <input type="text" disabled value="[Page Name] – <?php echo esc_attr( get_option('blogname') ); ?>" class="bg-zinc-100 dark:bg-zinc-800 text-zinc-500 cursor-not-allowed">
                             <p class="text-[11px] text-zinc-400 mt-1.5">This is how your tab titles will appear across the workspace.</p>
                         </div>
-                    </div>
+                    </div> <!-- close cora-shopify-card-body -->
                 </div>
             </div>
 
             <!-- Card 2: Developer Keys & API Integrations -->
-            <div class="cora-shopify-card space-y-4">
-                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Third-Party Developer Keys</h3>
-                    <p class="text-xs text-zinc-500">Provide map keys and CRM notification credentials.</p>
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between cursor-pointer select-none">
+                    <div>
+                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 m-0">Third-Party Developer Keys</h3>
+                        <p class="text-xs text-zinc-500 m-0">Provide map keys and CRM notification credentials.</p>
+                    </div>
+                    <span class="cora-card-chevron text-zinc-400 dark:text-zinc-500 transition-transform duration-200">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </span>
                 </div>
+                <div class="cora-shopify-card-body pt-4 space-y-4">
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -1149,9 +1280,10 @@ $cora_settings_tabs = array(
                         </div>
                         <input type="text" disabled placeholder="e.g. 1093847291039" class="bg-zinc-50 dark:bg-zinc-900 text-zinc-300 dark:text-zinc-700 cursor-not-allowed border-zinc-200 dark:border-zinc-800 placeholder:text-zinc-300 dark:placeholder:text-zinc-700">
                     </div>
-                </div>
-            </div>
-        </div>
+                </div> <!-- close Grid 2 -->
+                </div> <!-- close cora-shopify-card-body -->
+            </div> <!-- close cora-shopify-card -->
+        </div> <!-- close cora-settings-panel-brand -->
 
         <!-- TAB 5: READING & SEO SETTINGS -->
         <div id="cora-settings-panel-reading" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'reading' ? '' : 'hidden'; ?>">
@@ -1176,17 +1308,23 @@ $cora_settings_tabs = array(
             </div>
 
             <!-- Card 1: Homepage Routing -->
-            <div class="cora-shopify-card space-y-5">
-                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-start justify-between gap-4">
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between cursor-pointer select-none">
                     <div>
-                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Homepage &amp; Blog Routing</h3>
-                        <p class="text-xs text-zinc-500 mt-0.5">Controls which page Google surfaces first when someone searches your agency name.</p>
+                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 m-0">Homepage &amp; Blog Routing</h3>
+                        <p class="text-xs text-zinc-500 mt-0.5 m-0">Controls which page Google surfaces first when someone searches your agency name.</p>
                     </div>
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 flex-shrink-0 mt-0.5">
-                        <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        SEO Critical
-                    </span>
+                    <div class="flex items-center gap-3">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 flex-shrink-0">
+                            <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            SEO Critical
+                        </span>
+                        <span class="cora-card-chevron text-zinc-400 dark:text-zinc-500 transition-transform duration-200">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                        </span>
+                    </div>
                 </div>
+                <div class="cora-shopify-card-body pt-4 space-y-5">
 
                 <!-- Display Mode Toggle -->
                 <div>
@@ -1240,14 +1378,21 @@ $cora_settings_tabs = array(
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                     <p class="text-[11px] text-zinc-500 leading-relaxed"><strong class="text-zinc-700 dark:text-zinc-300">Growth tip:</strong> Set your homepage to a dedicated landing page with a lead capture form and property search. Agencies using a static conversion page typically see 2–3× more inquiry submissions than blog-first layouts.</p>
                 </div>
+                </div> <!-- close cora-shopify-card-body -->
             </div>
 
             <!-- Card 2: Search Engine Visibility -->
-            <div class="cora-shopify-card space-y-4">
-                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Search Engine Crawler Visibility</h3>
-                    <p class="text-xs text-zinc-500">Control whether Google and Bing can discover and rank your listings pages.</p>
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between cursor-pointer select-none">
+                    <div>
+                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 m-0">Search Engine Crawler Visibility</h3>
+                        <p class="text-xs text-zinc-500 m-0">Control whether Google and Bing can discover and rank your listings pages.</p>
+                    </div>
+                    <span class="cora-card-chevron text-zinc-400 dark:text-zinc-500 transition-transform duration-200">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </span>
                 </div>
+                <div class="cora-shopify-card-body pt-4 space-y-4">
                 <div class="p-4 border border-red-200 dark:border-red-900/40 bg-red-50/40 dark:bg-red-950/10 rounded-lg">
                     <label class="flex items-start gap-3 cursor-pointer">
                         <input type="checkbox" name="blog_public" value="0" <?php checked( get_option('blog_public'), 0 ); ?> class="rounded border-zinc-300 text-red-600 focus:ring-red-500 mt-0.5 flex-shrink-0">
@@ -1257,14 +1402,21 @@ $cora_settings_tabs = array(
                         </div>
                     </label>
                 </div>
+                </div> <!-- close cora-shopify-card-body -->
             </div>
 
             <!-- Card 3: Writing & Content Defaults -->
-            <div class="cora-shopify-card space-y-4">
-                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Writing &amp; Content Defaults</h3>
-                    <p class="text-xs text-zinc-500">Default category and format for new posts and articles.</p>
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between cursor-pointer select-none">
+                    <div>
+                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 m-0">Writing &amp; Content Defaults</h3>
+                        <p class="text-xs text-zinc-500 m-0">Default category and format for new posts and articles.</p>
+                    </div>
+                    <span class="cora-card-chevron text-zinc-400 dark:text-zinc-500 transition-transform duration-200">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </span>
                 </div>
+                <div class="cora-shopify-card-body pt-4 space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
                     <div>
                         <label>Default Post Category</label>
@@ -1284,14 +1436,21 @@ $cora_settings_tabs = array(
                         </select>
                     </div>
                 </div>
+                </div> <!-- close cora-shopify-card-body -->
             </div>
 
             <!-- Card 4: SEO URL Permalinks -->
-            <div class="cora-shopify-card space-y-4">
-                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">URL Permalink Structure</h3>
-                    <p class="text-xs text-zinc-500">Choose clean, human-readable URL schemas for better search engine rankings.</p>
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between cursor-pointer select-none">
+                    <div>
+                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 m-0">URL Permalink Structure</h3>
+                        <p class="text-xs text-zinc-500 m-0">Choose clean, human-readable URL schemas for better search engine rankings.</p>
+                    </div>
+                    <span class="cora-card-chevron text-zinc-400 dark:text-zinc-500 transition-transform duration-200">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </span>
                 </div>
+                <div class="cora-shopify-card-body pt-4 space-y-4">
                 <div class="space-y-2">
                     <?php $current_permalink = get_option('permalink_structure'); ?>
                     <label class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-zinc-50/50 dark:bg-zinc-900/30 hover:bg-zinc-100/50 dark:hover:bg-zinc-900/60 cursor-pointer transition-colors gap-2">
@@ -1326,14 +1485,21 @@ $cora_settings_tabs = array(
                         <code class="text-[10px] text-zinc-900 dark:text-white font-bold font-mono truncate break-all"><?php echo esc_url( home_url('/sample-post/') ); ?></code>
                     </label>
                 </div>
+                </div> <!-- close cora-shopify-card-body -->
             </div>
 
             <!-- Card 5: Comment Moderation -->
-            <div class="cora-shopify-card space-y-4">
-                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Comment &amp; Discussion</h3>
-                    <p class="text-xs text-zinc-500">Moderation policies and spam filtering for blog and listing comments.</p>
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between cursor-pointer select-none">
+                    <div>
+                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 m-0">Comment &amp; Discussion</h3>
+                        <p class="text-xs text-zinc-500 m-0">Moderation policies and spam filtering for blog and listing comments.</p>
+                    </div>
+                    <span class="cora-card-chevron text-zinc-400 dark:text-zinc-500 transition-transform duration-200">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </span>
                 </div>
+                <div class="cora-shopify-card-body pt-4 space-y-4">
                 <div class="space-y-3">
                     <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-300 font-semibold cursor-pointer">
                         <input type="checkbox" name="default_pingback_flag" value="1" <?php checked( get_option('default_pingback_flag'), 1 ); ?> class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900">
@@ -1360,19 +1526,26 @@ $cora_settings_tabs = array(
                         <p class="text-[10px] text-zinc-400 mt-1">Matching comments are instantly trashed.</p>
                     </div>
                 </div>
+                </div> <!-- close cora-shopify-card-body -->
             </div>
         </div>
 
         <!-- TAB 9: PRIVACY POLICY -->
         <div id="cora-settings-panel-privacy" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'privacy' ? '' : 'hidden'; ?>">
             <!-- Card: Privacy Policy -->
-            <div class="cora-shopify-card space-y-4">
-                <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Privacy Policy Page Assignment</h3>
-                    <p class="text-xs text-zinc-500">Designate an official privacy policy page for legal compliance and user transparency.</p>
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between cursor-pointer select-none">
+                    <div>
+                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 m-0">Privacy Policy Page Assignment</h3>
+                        <p class="text-xs text-zinc-500 m-0">Designate an official privacy policy page for legal compliance and user transparency.</p>
+                    </div>
+                    <span class="cora-card-chevron text-zinc-400 dark:text-zinc-500 transition-transform duration-200">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </span>
                 </div>
                 
-                <div class="space-y-4 max-w-md">
+                <div class="cora-shopify-card-body pt-4 space-y-4">
+                    <div class="space-y-4 max-w-md">
                     <div>
                         <label>Select Privacy Policy Page</label>
                         <div class="flex gap-2">
@@ -1385,7 +1558,8 @@ $cora_settings_tabs = array(
                             <a href="?page=cora-workspace&sub=pages" class="px-3.5 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-semibold text-xs rounded-lg transition-colors flex items-center gap-1 shadow-3xs cursor-pointer">Create Page</a>
                         </div>
                     </div>
-                </div>
+                    </div>
+                </div> <!-- close cora-shopify-card-body -->
             </div>
         </div>
 
@@ -1394,25 +1568,30 @@ $cora_settings_tabs = array(
             <!-- Left side: Form Settings Card -->
             <div class="xl:col-span-7 space-y-6">
                 <!-- Card 1: GitHub Connection -->
-                <div class="cora-shopify-card space-y-4">
-                    <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-4 flex items-center justify-between">
+                <div class="cora-shopify-card">
+                    <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800/40 pb-4 flex items-center justify-between cursor-pointer select-none">
                         <div class="flex items-center gap-3">
                             <!-- GitHub Logo SVG (official mark) -->
                             <div class="w-9 h-9 rounded-xl bg-zinc-950 dark:bg-zinc-900 border border-zinc-800 flex items-center justify-center flex-shrink-0 shadow-sm">
                                 <svg viewBox="0 0 98 96" width="20" height="20" fill="#ffffff" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"/></svg>
                             </div>
                             <div>
-                                <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">GitHub Connection</h3>
-                                <p class="text-xs text-zinc-500 mt-0.5">Sync your website code from a GitHub repository.</p>
+                                <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 m-0">GitHub Connection</h3>
+                                <p class="text-xs text-zinc-500 mt-0.5 m-0">Sync your website code from a GitHub repository.</p>
                             </div>
                         </div>
-                        <?php $git_token = get_option('cora_git_sync_token', ''); ?>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold whitespace-nowrap <?php echo $git_token ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400 border border-green-200 dark:border-green-900/55' : 'bg-zinc-100 text-zinc-650 dark:bg-zinc-850 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800'; ?>">
-                            <span class="w-1.5 h-1.5 rounded-full <?php echo $git_token ? 'bg-green-500 animate-pulse' : 'bg-zinc-400'; ?>"></span>
-                            <?php echo $git_token ? 'Connected' : 'Not Connected'; ?>
-                        </span>
+                        <div class="flex items-center gap-4">
+                            <?php $git_token = get_option('cora_git_sync_token', ''); ?>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold whitespace-nowrap <?php echo $git_token ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400 border border-green-200 dark:border-green-900/55' : 'bg-zinc-100 text-zinc-650 dark:bg-zinc-850 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800'; ?>">
+                                <span class="w-1.5 h-1.5 rounded-full <?php echo $git_token ? 'bg-green-500 animate-pulse' : 'bg-zinc-400'; ?>"></span>
+                                <?php echo $git_token ? 'Connected' : 'Not Connected'; ?>
+                            </span>
+                            <span class="cora-card-chevron text-zinc-400 dark:text-zinc-500 transition-transform duration-200">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                            </span>
+                        </div>
                     </div>
-
+                    <div class="cora-shopify-card-body pt-4 space-y-4">
                     <?php if ( empty( $git_token ) ) : ?>
                         <div class="space-y-4">
                             <!-- Token prompt hint box -->
@@ -1496,11 +1675,12 @@ $cora_settings_tabs = array(
                             </button>
                         </div>
                     <?php endif; ?>
+                    </div> <!-- close cora-shopify-card-body -->
                 </div>
 
                 <!-- Card 2: Lovable Integration -->
-                <div class="cora-shopify-card space-y-4">
-                    <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-4 flex items-center justify-between">
+                <div class="cora-shopify-card">
+                    <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800/40 pb-4 flex items-center justify-between cursor-pointer select-none">
                         <div class="flex items-center gap-3">
                             <!-- Official Lovable Logo Mark (Pure Native SVG) -->
                             <div class="w-10 h-10 flex items-center justify-center shrink-0">
@@ -1517,18 +1697,23 @@ $cora_settings_tabs = array(
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Lovable Integration</h3>
-                                <p class="text-xs text-zinc-500 mt-0.5">Connect your live Lovable URL to preview and sync updates.</p>
+                                <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 m-0">Lovable Integration</h3>
+                                <p class="text-xs text-zinc-500 mt-0.5 m-0">Connect your live Lovable URL to preview and sync updates.</p>
                             </div>
                         </div>
-                        <?php $live_url = get_option('cora_git_sync_live_url', ''); ?>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold whitespace-nowrap <?php echo $live_url ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400 border border-green-200 dark:border-green-900/55' : 'bg-zinc-100 text-zinc-650 dark:bg-zinc-850 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800'; ?>">
-                            <span class="w-1.5 h-1.5 rounded-full <?php echo $live_url ? 'bg-green-500 animate-pulse' : 'bg-zinc-400'; ?>"></span>
-                            <?php echo $live_url ? 'Connected &amp; Live' : 'Not Connected'; ?>
-                        </span>
+                        <div class="flex items-center gap-4">
+                            <?php $live_url = get_option('cora_git_sync_live_url', ''); ?>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold whitespace-nowrap <?php echo $live_url ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400 border border-green-200 dark:border-green-900/55' : 'bg-zinc-100 text-zinc-650 dark:bg-zinc-850 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800'; ?>">
+                                <span class="w-1.5 h-1.5 rounded-full <?php echo $live_url ? 'bg-green-500 animate-pulse' : 'bg-zinc-400'; ?>"></span>
+                                <?php echo $live_url ? 'Connected &amp; Live' : 'Not Connected'; ?>
+                            </span>
+                            <span class="cora-card-chevron text-zinc-400 dark:text-zinc-500 transition-transform duration-200">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                            </span>
+                        </div>
                     </div>
-
-                    <div class="space-y-4">
+                    <div class="cora-shopify-card-body pt-4 space-y-4">
+                        <div class="space-y-4">
                         <div>
                             <label class="block text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Lovable Live URL</label>
                             <input type="text" name="cora_git_sync_live_url" id="cora-lovable-live-url" value="<?php echo esc_attr( $live_url ); ?>" placeholder="https://your-app.lovable.app" class="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-950 dark:focus:ring-zinc-100 transition-all shadow-3xs">
@@ -1541,62 +1726,65 @@ $cora_settings_tabs = array(
                             </button>
                         <?php endif; ?>
                     </div>
+                    </div> <!-- close cora-shopify-card-body -->
                 </div>
             </div>
 
             <!-- Right side: Onboarding & Instructions Card -->
-            <div class="xl:col-span-5 space-y-5 cora-shopify-card dark:bg-zinc-900/60 bg-zinc-50/50">
-                <div class="flex items-center gap-2.5 pb-2 border-b border-zinc-200 dark:border-zinc-800/40">
-                    <span class="text-zinc-900 dark:text-zinc-100 shrink-0">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500 dark:text-zinc-400"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                    </span>
-                    <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Lovable Integration Guide</h4>
-                </div>
-
-                <!-- Step-by-step tutorial list -->
-                <div class="space-y-5 text-xs text-zinc-700 dark:text-zinc-350">
-                    <!-- Step 1 -->
-                    <div class="flex gap-3">
-                        <div class="w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px] shrink-0">1</div>
-                        <div class="space-y-1">
-                            <span class="font-bold text-zinc-900 dark:text-zinc-100">Initiate on Lovable</span>
-                            <p class="leading-relaxed">Build your real estate client site or application on <a href="https://lovable.dev" target="_blank" class="underline font-semibold text-zinc-950 dark:text-white hover:text-zinc-850">Lovable.dev</a> using plain English, and publish it to a GitHub repository.</p>
-                        </div>
+            <div class="xl:col-span-5 cora-shopify-card dark:bg-zinc-900/60 bg-zinc-50/50">
+                <div class="p-5 space-y-5">
+                    <div class="flex items-center gap-2.5 pb-2 border-b border-zinc-200 dark:border-zinc-800/40">
+                        <span class="text-zinc-900 dark:text-zinc-100 shrink-0">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500 dark:text-zinc-400"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                        </span>
+                        <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Lovable Integration Guide</h4>
                     </div>
 
-                    <!-- Step 2 -->
-                    <div class="flex gap-3">
-                        <div class="w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px] shrink-0">2</div>
-                        <div class="space-y-2">
-                            <div>
-                                <span class="font-bold text-zinc-900 dark:text-zinc-100 block">Generate a GitHub Token</span>
-                                <p class="leading-relaxed">If your repository is Private, generate a security token so Cora can access the code.</p>
+                    <!-- Step-by-step tutorial list -->
+                    <div class="space-y-5 text-xs text-zinc-700 dark:text-zinc-350">
+                        <!-- Step 1 -->
+                        <div class="flex gap-3">
+                            <div class="w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px] shrink-0">1</div>
+                            <div class="space-y-1">
+                                <span class="font-bold text-zinc-900 dark:text-zinc-100">Initiate on Lovable</span>
+                                <p class="leading-relaxed">Build your real estate client site or application on <a href="https://lovable.dev" target="_blank" class="underline font-semibold text-zinc-950 dark:text-white hover:text-zinc-850">Lovable.dev</a> using plain English, and publish it to a GitHub repository.</p>
                             </div>
-                            <a href="https://github.com/settings/tokens/new?scopes=repo&description=Cora%20Git%20Sync" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-white text-[10px] font-bold rounded-xl transition-all shadow-3xs cursor-pointer">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                                Generate Token on GitHub
-                            </a>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="flex gap-3">
+                            <div class="w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px] shrink-0">2</div>
+                            <div class="space-y-2">
+                                <div>
+                                    <span class="font-bold text-zinc-900 dark:text-zinc-100 block">Generate a GitHub Token</span>
+                                    <p class="leading-relaxed">If your repository is Private, generate a security token so Cora can access the code.</p>
+                                </div>
+                                <a href="https://github.com/settings/tokens/new?scopes=repo&description=Cora%20Git%20Sync" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-white text-[10px] font-bold rounded-xl transition-all shadow-3xs cursor-pointer">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                    Generate Token on GitHub
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="flex gap-3">
+                            <div class="w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px] shrink-0">3</div>
+                            <div class="space-y-1">
+                                <span class="font-bold text-zinc-900 dark:text-zinc-100">Connect & Sync</span>
+                                <p class="leading-relaxed">Connect your GitHub and Lovable accounts on the left, choose where to host the frontend, and click **Sync & Deploy Now**.</p>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Step 3 -->
-                    <div class="flex gap-3">
-                        <div class="w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px] shrink-0">3</div>
+                    <!-- Info Alert box -->
+                    <div class="p-3.5 bg-zinc-100 dark:bg-zinc-950 rounded-xl border border-zinc-200/50 dark:border-zinc-800/60 flex gap-3 mt-4">
+                        <span class="text-zinc-650 dark:text-zinc-400 shrink-0 mt-0.5">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        </span>
                         <div class="space-y-1">
-                            <span class="font-bold text-zinc-900 dark:text-zinc-100">Connect & Sync</span>
-                            <p class="leading-relaxed">Connect your GitHub and Lovable accounts on the left, choose where to host the frontend, and click **Sync & Deploy Now**.</p>
+                            <span class="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider">Dynamic Integration</span>
+                            <p class="text-[10px] text-zinc-550 dark:text-zinc-450 leading-relaxed font-medium">Cora injects `window.CORA_API_URL` and `window.CORA_NONCE` automatically. Any form submissions or CRM requests made in your Lovable code will query this site's databases dynamically.</p>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Info Alert box -->
-                <div class="p-3.5 bg-zinc-100 dark:bg-zinc-950 rounded-xl border border-zinc-200/50 dark:border-zinc-800/60 flex gap-3 mt-4">
-                    <span class="text-zinc-650 dark:text-zinc-400 shrink-0 mt-0.5">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                    </span>
-                    <div class="space-y-1">
-                        <span class="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider">Dynamic Integration</span>
-                        <p class="text-[10px] text-zinc-550 dark:text-zinc-450 leading-relaxed font-medium">Cora injects `window.CORA_API_URL` and `window.CORA_NONCE` automatically. Any form submissions or CRM requests made in your Lovable code will query this site's databases dynamically.</p>
                     </div>
                 </div>
             </div>
@@ -1658,7 +1846,7 @@ $cora_settings_tabs = array(
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer shrink-0">
                             <input type="checkbox" name="<?php echo esc_attr( $toggle['key'] ); ?>" value="1" <?php checked( 1, intval( $toggle['val'] ) ); ?> class="sr-only peer">
-                            <div class="w-9 h-5 bg-zinc-200 dark:bg-zinc-850 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 dark:after:border-zinc-800 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-950 dark:peer-checked:bg-zinc-100"></div>
+                            <div class="relative w-9 h-5 bg-zinc-200 dark:bg-zinc-850 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 dark:after:border-zinc-800 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-950 dark:peer-checked:bg-zinc-100"></div>
                         </label>
                     </div>
                     <?php endforeach; ?>
@@ -1921,8 +2109,8 @@ $cora_settings_tabs = array(
         <div id="cora-settings-panel-backup" class="cora-settings-panel space-y-6 <?php echo $active_tab === 'backup' ? '' : 'hidden'; ?>">
             
             <!-- Top Metric & Status Summary Cards -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 md:gap-4">
-                <div class="cora-shopify-card border-l-2 border-l-emerald-500 shadow-2xs">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 md:gap-4 mb-2 lg:mb-0">
+                <div class="cora-shopify-card cora-metric-card border-l-2 border-l-emerald-500 shadow-2xs">
                     <div class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1">System Health</div>
                     <div class="text-sm font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -1931,7 +2119,7 @@ $cora_settings_tabs = array(
                     <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1">24h Automation Active</div>
                 </div>
 
-                <div class="cora-shopify-card border-l-2 border-l-zinc-400 dark:border-l-zinc-600 shadow-2xs">
+                <div class="cora-shopify-card cora-metric-card border-l-2 border-l-zinc-400 dark:border-l-zinc-600 shadow-2xs">
                     <div class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1">Last Snapshot Taken</div>
                     <div class="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">
                         <?php 
@@ -1941,8 +2129,8 @@ $cora_settings_tabs = array(
                     <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1">Full System (.zip) & SQL</div>
                 </div>
 
-                <div class="cora-shopify-card border-l-2 <?php echo $is_google_connected ? 'border-l-emerald-500' : 'border-l-zinc-400 dark:border-l-zinc-600'; ?> shadow-2xs">
-                    <div class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1">Google Drive Storage</div>
+                <div class="cora-shopify-card cora-metric-card border-l-2 <?php echo $is_google_connected ? 'border-l-emerald-500' : 'border-l-zinc-400 dark:border-l-zinc-600'; ?> shadow-2xs">
+                    <div class="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider mb-1">Google Drive Storage</div>
                     <div class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
                         <?php if ( $is_google_connected ) : ?>
                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -1955,7 +2143,7 @@ $cora_settings_tabs = array(
                     <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 truncate" title="<?php echo esc_attr($google_folder_id ?: 'Click 1-Click Connect'); ?>">Folder: <?php echo esc_html($google_folder_id ?: 'Click 1-Click Connect'); ?></div>
                 </div>
 
-                <div class="cora-shopify-card border-l-2 border-l-indigo-500 shadow-2xs">
+                <div class="cora-shopify-card cora-metric-card border-l-2 border-l-indigo-500 shadow-2xs">
                     <div class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1">Restore Guard</div>
                     <div class="text-sm font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
@@ -1970,43 +2158,56 @@ $cora_settings_tabs = array(
                 <div class="xl:col-span-7 space-y-6">
                     
                     <!-- Card 1: Full System Snapshot & Export Generator -->
-                    <div class="cora-shopify-card space-y-4">
-                        <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                            <div class="flex items-center gap-2 mb-1">
-                                <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 m-0">Full System Snapshot & Export</h3>
-                                <span class="text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full shrink-0">v2.1.0 Ready</span>
-                                <!-- Info Icon with Tooltip Popover -->
-                                <div class="relative group cursor-pointer flex shrink-0">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 hover:text-zinc-650 dark:hover:text-zinc-300 transition-colors"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-zinc-950 dark:bg-zinc-900 border border-zinc-850 dark:border-zinc-800 text-white rounded-xl shadow-xl opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all z-50 text-[10px] leading-relaxed font-normal normal-case">
-                                        <span class="font-bold text-zinc-100 block mb-1">Full System Snapshot (.zip)</span>
-                                        Packages the complete database schema, row records, environment manifest, active module states, and asset indexes into a single compressed backup archive. Standard database export (.sql) exports table structures and rows only.
+                    <div class="cora-shopify-card">
+                        <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between cursor-pointer select-none">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 m-0">Full System Snapshot & Export</h3>
+                                    <span class="text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full shrink-0">v2.1.0 Ready</span>
+                                    <!-- Info Icon with Tooltip Popover -->
+                                    <div class="relative group cursor-pointer flex shrink-0">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 hover:text-zinc-650 dark:hover:text-zinc-300 transition-colors"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-zinc-950 dark:bg-zinc-900 border border-zinc-850 dark:border-zinc-800 text-white rounded-xl shadow-xl opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all z-50 text-[10px] leading-relaxed font-normal normal-case">
+                                            <span class="font-bold text-zinc-100 block mb-1">Full System Snapshot (.zip)</span>
+                                            Packages the complete database schema, row records, environment manifest, active module states, and asset indexes into a single compressed backup archive. Standard database export (.sql) exports table structures and rows only.
+                                        </div>
                                     </div>
                                 </div>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 m-0">Generate full system backup archives (.zip) or lightweight database SQL files.</p>
                             </div>
-                            <p class="text-xs text-zinc-500 dark:text-zinc-400 m-0">Generate full system backup archives (.zip) or lightweight database SQL files.</p>
+                            <span class="cora-card-chevron text-zinc-400 dark:text-zinc-500 transition-transform duration-200">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                            </span>
                         </div>
-                        <div class="flex flex-wrap gap-2.5 pt-1.5">
-                            <!-- Primary: Full System Snapshot Zip Button -->
-                            <button type="button" id="cora-trigger-full-snapshot-backup" class="px-5 py-2.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-sm active:scale-97">
-                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                Generate Full Snapshot (.zip)
-                            </button>
-
-                            <!-- Secondary: Database Only SQL Button -->
-                            <button type="button" id="cora-trigger-manual-db-backup" class="px-4 py-2.5 bg-transparent hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm">
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
-                                Export Database Only (.sql)
-                            </button>
-                        </div>
+                        <div class="cora-shopify-card-body pt-4 space-y-4">
+                            <div class="flex flex-wrap gap-2.5 pt-1.5">
+                                <!-- Primary: Full System Snapshot Zip Button -->
+                                <button type="button" id="cora-trigger-full-snapshot-backup" class="px-5 py-2.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-sm active:scale-97">
+                                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                    Generate Full Snapshot (.zip)
+                                </button>
+    
+                                <!-- Secondary: Database Only SQL Button -->
+                                <button type="button" id="cora-trigger-manual-db-backup" class="px-4 py-2.5 bg-transparent hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+                                    Export Database Only (.sql)
+                                </button>
+                            </div>
+                        </div> <!-- close cora-shopify-card-body -->
                     </div>
 
                     <!-- Card 2: 24h Automated Google Drive Sync -->
-                    <div class="cora-shopify-card space-y-4" id="cora-google-drive-card">
-                        <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                            <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 m-0">24-Hour Automated Google Drive Sync</h3>
-                            <p class="text-xs text-zinc-500 dark:text-zinc-400 m-0">Automatically upload daily platform snapshots to your personal Google Drive.</p>
+                    <div class="cora-shopify-card" id="cora-google-drive-card">
+                        <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between cursor-pointer select-none">
+                            <div>
+                                <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 m-0">24-Hour Automated Google Drive Sync</h3>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 m-0">Automatically upload daily platform snapshots to your personal Google Drive.</p>
+                            </div>
+                            <span class="cora-card-chevron text-zinc-400 dark:text-zinc-500 transition-transform duration-200">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                            </span>
                         </div>
+                        <div class="cora-shopify-card-body pt-4 space-y-4">
 
                         <?php if ( $is_google_connected ) : ?>
                         <!-- STATE: Fully connected -->
@@ -2099,6 +2300,7 @@ $cora_settings_tabs = array(
                         </div>
                         <?php endif; ?>
 
+                        </div> <!-- close cora-shopify-card-body -->
                     </div>
 
 
@@ -2107,14 +2309,20 @@ $cora_settings_tabs = array(
 
                 <!-- Right 1 Col: Snapshot Logs & One-Click Restore Center -->
                 <div class="xl:col-span-5 space-y-6">
-                    <div class="cora-shopify-card space-y-4">
-                        <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between">
-                            <div>
-                                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Backup Logs & Restore Center</h3>
-                                <p class="text-xs text-zinc-500 dark:text-zinc-400 m-0">Stored system restore points & archives.</p>
+                    <div class="cora-shopify-card">
+                        <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between cursor-pointer select-none">
+                            <div class="flex items-center justify-between flex-1 pr-4">
+                                <div>
+                                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Backup Logs & Restore Center</h3>
+                                    <p class="text-xs text-zinc-500 dark:text-zinc-400 m-0">Stored system restore points & archives.</p>
+                                </div>
+                                <span class="text-[10px] font-mono text-zinc-500 dark:text-zinc-400">cora-backups/</span>
                             </div>
-                            <span class="text-[10px] font-mono text-zinc-500 dark:text-zinc-400">cora-backups/</span>
+                            <span class="cora-card-chevron text-zinc-400 dark:text-zinc-500 transition-transform duration-200">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                            </span>
                         </div>
+                        <div class="cora-shopify-card-body pt-4 space-y-4">
 
                         <div id="cora-backups-history-list" class="space-y-3">
                             <?php 
@@ -2172,6 +2380,7 @@ $cora_settings_tabs = array(
                                 </div>
                             <?php endif; ?>
                         </div>
+                        </div> <!-- close cora-shopify-card-body -->
                     </div>
                 </div>
             </div>

@@ -91,12 +91,12 @@ test.describe('Media Library - Dedicated Folders Layout', () => {
 
     // If truncation toggle is visible, expand to reveal new folder
     const toggleCard = page.locator('#cm-folders-grid .cm-fcard-toggle');
-    if (await toggleCard.isVisible()) {
-      await toggleCard.click();
-    }
-
-    // Folder appears in grid
-    await expect(page.locator('#cm-folders-grid')).toContainText(folderName);
+    await expect.poll(async () => {
+      if (await toggleCard.isVisible() && (await toggleCard.textContent())?.includes('+ Show')) {
+        await toggleCard.click();
+      }
+      return (await page.locator('#cm-folders-grid').textContent()) || '';
+    }, { timeout: 10000 }).toContain(folderName);
   });
 
   test('6. Verify Folder Truncation and Expand/Collapse Toggle', async ({ page }) => {
@@ -247,6 +247,8 @@ test.describe('Media Library - Dedicated Folders Layout', () => {
     await expect(optBtn).toBeVisible();
 
     const folderCtxMenu = page.locator('#cm-folder-ctx-menu');
+    const settingsDlg = page.locator('#cm-folder-settings-dlg');
+    const folderDlg = page.locator('#cm-folder-dlg');
 
     // 1. Verify clicking 3-dots '⋮' on a folder card opens #cm-folder-ctx-menu
     await optBtn.click();
@@ -260,6 +262,31 @@ test.describe('Media Library - Dedicated Folders Layout', () => {
     const targetCard = page.locator('#cm-folders-grid .cm-fcard:has(.cm-fcard-opt)').first();
     await targetCard.click({ button: 'right' });
     await expect(folderCtxMenu).toBeVisible();
+
+    // 3. Verify clicking "Folder Settings & Rename" opens #cm-folder-settings-dlg with class .open
+    const settingsItem = folderCtxMenu.locator('.cm-ctx-item:has-text("Folder Settings & Rename")');
+    await expect(settingsItem).toBeVisible();
+    await settingsItem.click();
+    await expect(settingsDlg).toBeVisible();
+    await expect(settingsDlg).toHaveClass(/open/);
+
+    // Close folder settings dialog
+    await page.locator('#cm-folder-settings-dlg .cm-drawer-header button').click();
+    await expect(settingsDlg).not.toHaveClass(/open/);
+
+    // 4. Verify clicking "New Subfolder Inside" opens #cm-folder-dlg with class .open
+    await optBtn.click();
+    await expect(folderCtxMenu).toBeVisible();
+
+    const subfolderItem = folderCtxMenu.locator('.cm-ctx-item:has-text("New Subfolder Inside")');
+    await expect(subfolderItem).toBeVisible();
+    await subfolderItem.click();
+    await expect(folderDlg).toBeVisible();
+    await expect(folderDlg).toHaveClass(/open/);
+
+    // Close folder dialog
+    await page.locator('#cm-folder-dlg .cm-drawer-header button').click();
+    await expect(folderDlg).not.toHaveClass(/open/);
   });
 
 });

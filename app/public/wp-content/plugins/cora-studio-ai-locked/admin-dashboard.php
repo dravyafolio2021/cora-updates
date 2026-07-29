@@ -2562,7 +2562,7 @@ $s2_assignments = isset($cora_shoot_assignments['shoot2']) ? $cora_shoot_assignm
 
         <!-- Center Section: Command Palette Trigger -->
         <div class="flex-1 max-w-2xl mx-4 hidden sm:flex items-center justify-center">
-            <div onclick="event.stopPropagation(); window.coraOpenCommandPalette();" class="cora-sidebar-search w-full h-10 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800/90 hover:border-zinc-700 rounded-lg px-3 flex items-center justify-between text-zinc-400 hover:text-zinc-200 cursor-pointer transition-all shadow-inner" style="height: 40px !important;">
+            <div onclick="event.stopPropagation(); window.coraOpenCommandPalette();" class="cora-sidebar-search w-full px-3 flex items-center justify-between text-zinc-400 hover:text-zinc-200 cursor-pointer transition-all" style="height: 32px; background-color: #343434e3; border-radius: 8px; border: none;">
                 <div class="flex items-center gap-2 text-xs font-medium">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <span>Search anything...</span>
@@ -2677,7 +2677,7 @@ $s2_assignments = isset($cora_shoot_assignments['shoot2']) ? $cora_shoot_assignm
                 <span class="tracking-[0.18em] font-black text-[13px] text-white">CORA</span>
             </div>
 
-            <div onclick="window.coraOpenCommandPalette();" class="flex-1 mx-2 bg-zinc-900/60 border border-zinc-800/80 rounded-xl px-2.5 py-1.5 flex items-center justify-between text-zinc-400 text-xs cursor-pointer">
+            <div onclick="window.coraOpenCommandPalette();" class="mx-2 flex items-center justify-between text-zinc-400 text-xs cursor-pointer" style="max-width: 248px; height: 32px; background-color: #343434e3; border-radius: 8px; border: none; padding: 0 10px; flex: 1;">
                 <div class="flex items-center gap-1.5">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <span class="text-[11px]">Search anything...</span>
@@ -3132,62 +3132,62 @@ $s2_assignments = isset($cora_shoot_assignments['shoot2']) ? $cora_shoot_assignm
                     $greeting_title = 'Good evening!';
                 }
                 ?>
-                <!-- Metrics Card Grid (Studio Telemetry Redesign - Centered Non-Overlapping Layout) -->
-                <div class="bg-white/80 dark:bg-zinc-900/60 p-3 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-800/40 rounded-2xl p-4.5 max-w-3xl mx-4 md:mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 shadow-3xs select-none">
+                <!-- Metrics Card Grid (Studio Telemetry Redesign - Premium Responsive Layout: 2-Cols on Mobile, 4-Cols on Desktop) -->
+                <div class="w-full max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 select-none px-4 md:px-0">
                     <!-- Listed Galleries -->
-                    <div class="flex items-center justify-between pb-1.5 border-b border-zinc-200/60 dark:border-zinc-800/60 min-w-0 pr-1">
-                        <div class="flex flex-col min-w-0 gap-0.5">
-                            <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-555 uppercase tracking-widest truncate">Galleries</span>
-                            <div class="flex items-baseline gap-1 mt-0.5 min-w-0">
-                                <span class="text-xs font-bold text-zinc-800 dark:text-zinc-150 leading-none shrink-0"><?php echo count( $cora_galleries ); ?></span>
-                                <span class="text-[8px] font-bold text-emerald-600 dark:text-emerald-500 shrink-0">Active</span>
+                    <div class="bg-white/80 dark:bg-zinc-900/60 p-4 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-800/40 rounded-2xl flex items-center justify-between transition-all hover:scale-[1.01] hover:shadow-xs cursor-default">
+                        <div class="space-y-1 min-w-0 pr-2">
+                            <span class="block text-[9px] sm:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate">Galleries</span>
+                            <div class="flex items-baseline gap-1.5 flex-wrap">
+                                <span class="text-base sm:text-2xl font-extrabold text-zinc-900 dark:text-zinc-100 leading-none tracking-tight"><?php echo count( $cora_galleries ); ?></span>
+                                <span class="text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 inline-flex items-center text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none">Active</span>
                             </div>
                         </div>
-                        <svg class="h-4 w-9 text-zinc-300 dark:text-zinc-700 ml-auto shrink-0 overflow-hidden" viewBox="0 0 100 30" fill="none" stroke="currentColor" stroke-width="1.8">
-                            <path d="M0 25 C 20 25, 30 5, 50 15 C 70 25, 80 10, 100 5" />
-                        </svg>
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/35 border border-zinc-100 dark:border-zinc-800/50 flex items-center justify-center text-zinc-650 dark:text-zinc-350 shrink-0 shadow-3xs">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" class="w-4 h-4"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                        </div>
                     </div>
 
                     <!-- Active Leads -->
-                    <div class="flex items-center justify-between pb-1.5 border-b border-zinc-200/60 dark:border-zinc-800/60 min-w-0 pr-1">
-                        <div class="flex flex-col min-w-0 gap-0.5">
-                            <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-555 uppercase tracking-widest truncate">Active Leads</span>
-                            <div class="flex items-baseline gap-1 mt-0.5 min-w-0">
-                                <span class="text-xs font-bold text-zinc-800 dark:text-zinc-150 leading-none shrink-0"><?php echo count( $cora_leads ); ?></span>
-                                <span class="text-[8px] font-bold text-emerald-600 dark:text-emerald-500 shrink-0">+12%</span>
+                    <div class="bg-white/80 dark:bg-zinc-900/60 p-4 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-800/40 rounded-2xl flex items-center justify-between transition-all hover:scale-[1.01] hover:shadow-xs cursor-default">
+                        <div class="space-y-1 min-w-0 pr-2">
+                            <span class="block text-[9px] sm:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate">Active Leads</span>
+                            <div class="flex items-baseline gap-1.5 flex-wrap">
+                                <span class="text-base sm:text-2xl font-extrabold text-zinc-900 dark:text-zinc-100 leading-none tracking-tight"><?php echo count( $cora_leads ); ?></span>
+                                <span class="text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 inline-flex items-center text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none">+12%</span>
                             </div>
                         </div>
-                        <svg class="h-4 w-9 text-zinc-300 dark:text-zinc-700 ml-auto shrink-0 overflow-hidden" viewBox="0 0 100 30" fill="none" stroke="currentColor" stroke-width="1.8">
-                            <path d="M0 5 C 20 5, 40 25, 60 15 C 80 5, 90 28, 100 28" />
-                        </svg>
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/35 border border-zinc-100 dark:border-zinc-800/50 flex items-center justify-center text-zinc-650 dark:text-zinc-350 shrink-0 shadow-3xs">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" class="w-4 h-4"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        </div>
                     </div>
 
-                    <!-- Shoot Bookings -->
-                    <div class="flex items-center justify-between pb-1.5 border-b border-zinc-200/60 dark:border-zinc-800/60 min-w-0 pr-1">
-                        <div class="flex flex-col min-w-0 gap-0.5">
-                            <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-555 uppercase tracking-widest truncate">Shoots</span>
-                            <div class="flex items-baseline gap-1 mt-0.5 min-w-0">
-                                <span class="text-xs font-bold text-zinc-800 dark:text-zinc-150 leading-none shrink-0"><?php echo $dynamic_bookings_count; ?></span>
-                                <span class="text-[8px] font-bold text-zinc-400 dark:text-zinc-500 shrink-0">Scheduled</span>
+                    <!-- Shoots -->
+                    <div class="bg-white/80 dark:bg-zinc-900/60 p-4 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-800/40 rounded-2xl flex items-center justify-between transition-all hover:scale-[1.01] hover:shadow-xs cursor-default">
+                        <div class="space-y-1 min-w-0 pr-2">
+                            <span class="block text-[9px] sm:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate">Shoots</span>
+                            <div class="flex items-baseline gap-1.5 flex-wrap">
+                                <span class="text-base sm:text-2xl font-extrabold text-zinc-900 dark:text-zinc-100 leading-none tracking-tight"><?php echo $dynamic_bookings_count; ?></span>
+                                <span class="text-zinc-650 dark:text-zinc-450 bg-zinc-100 dark:bg-zinc-850 inline-flex items-center text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none font-medium">Scheduled</span>
                             </div>
                         </div>
-                        <svg class="h-4 w-9 text-zinc-300 dark:text-zinc-700 ml-auto shrink-0 overflow-hidden" viewBox="0 0 100 30" fill="none" stroke="currentColor" stroke-width="1.8">
-                            <path d="M0 8 C 20 8, 40 22, 60 12 C 80 2, 90 25, 100 25" />
-                        </svg>
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/35 border border-zinc-100 dark:border-zinc-800/50 flex items-center justify-center text-zinc-650 dark:text-zinc-350 shrink-0 shadow-3xs">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" class="w-4 h-4"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        </div>
                     </div>
 
-                    <!-- Revenue Pipeline -->
-                    <div id="cora-dashboard-financial-card" class="flex items-center justify-between pb-1.5 border-b border-zinc-200/60 dark:border-zinc-800/60 md:border-b-0 min-w-0">
-                        <div class="flex flex-col min-w-0 gap-0.5">
-                            <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-555 uppercase tracking-widest truncate">Pipeline Value</span>
-                            <div class="flex items-baseline gap-1 mt-0.5 min-w-0">
-                                <span class="text-xs font-bold text-zinc-800 dark:text-zinc-150 leading-none shrink-0"><?php echo cora_format_rupees( $dynamic_revenue_total ); ?></span>
-                                <span class="text-[8px] font-bold text-zinc-400 dark:text-zinc-500 shrink-0 truncate">Negotiating</span>
+                    <!-- Pipeline Value -->
+                    <div class="bg-white/80 dark:bg-zinc-900/60 p-4 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-800/40 rounded-2xl flex items-center justify-between transition-all hover:scale-[1.01] hover:shadow-xs cursor-default">
+                        <div class="space-y-1 min-w-0 pr-2">
+                            <span class="block text-[9px] sm:text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider truncate">Pipeline Value</span>
+                            <div class="flex items-baseline gap-1.5 flex-wrap">
+                                <span class="text-base sm:text-2xl font-extrabold text-zinc-900 dark:text-zinc-100 leading-none tracking-tight"><?php echo cora_format_rupees( $dynamic_revenue_total ); ?></span>
+                                <span class="text-zinc-655 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-850 inline-flex items-center text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none font-medium">Negotiating</span>
                             </div>
                         </div>
-                        <svg class="h-4 w-9 text-zinc-300 dark:text-zinc-700 ml-auto shrink-0 overflow-hidden" viewBox="0 0 100 30" fill="none" stroke="currentColor" stroke-width="1.8">
-                            <path d="M0 15 L 100 15" stroke-dasharray="2 2" />
-                        </svg>
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/35 border border-zinc-100 dark:border-zinc-800/50 flex items-center justify-center text-zinc-650 dark:text-zinc-350 shrink-0 shadow-3xs">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" class="w-4 h-4"><path d="M6 3h12M6 8h12M9 3v10.5M9 3h3.5a5 5 0 0 1 0 10H9M9 13.5L16 21"></path></svg>
+                        </div>
                     </div>
                 </div>
 
