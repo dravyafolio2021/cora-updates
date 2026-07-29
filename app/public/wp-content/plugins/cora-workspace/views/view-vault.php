@@ -1491,10 +1491,10 @@ foreach ( $cora_documents as $doc ) {
             </div>
 
             <!-- 12-COLUMN RESPONSIVE GRID (7 cols + 5 cols) -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start w-full">
                 
                 <!-- Left 7 Columns: Share Options & Security Options Cards -->
-                <div class="lg:col-span-7 space-y-5 w-full">
+                <div class="md:col-span-7 space-y-5 w-full">
                     
                     <!-- Card 1: SHARE OPTIONS -->
                     <div class="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-xs space-y-4">
@@ -1680,7 +1680,7 @@ foreach ( $cora_documents as $doc ) {
                 </div>
 
                 <!-- Right 5 Columns: Document Summary Card Box -->
-                <div class="lg:col-span-5 space-y-5 w-full sticky top-4 self-start">
+                <div class="md:col-span-5 space-y-5 w-full sticky top-4 self-start">
                     <div class="bg-white border border-zinc-200/80 p-5 rounded-2xl shadow-xs space-y-5">
                         <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
                             <h4 class="text-xs font-extrabold uppercase tracking-wider text-zinc-950">
