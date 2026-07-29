@@ -482,7 +482,7 @@ foreach ( $cora_documents as $doc ) {
 
         <!-- STEP 1 SUB-PAGE: DOCUMENT TYPE SELECTION -->
         <div id="sub-page-wiz-step-1" class="bg-white border border-zinc-200/80 rounded-3xl p-6 md:p-10 pb-24 sm:pb-28 shadow-xs space-y-6 w-full max-w-none">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-100 pb-6">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-zinc-100 pb-5">
                 <div class="max-w-xl">
                     <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest block mb-1">Step 1 of 6</span>
                     <h3 class="text-xl font-black text-zinc-950 tracking-tight">What type of document are you creating?</h3>
@@ -589,7 +589,7 @@ foreach ( $cora_documents as $doc ) {
 
         <!-- STEP 2 SUB-PAGE: CHOOSE VISUAL TEMPLATE BLUEPRINT -->
         <div id="sub-page-wiz-step-2" class="hidden bg-white border border-zinc-200/80 rounded-3xl p-6 md:p-10 pb-24 sm:pb-28 shadow-xs space-y-6 w-full max-w-none">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-100 pb-6">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-zinc-100 pb-5">
                 <div class="max-w-xl">
                     <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest block mb-1">Step 2 of 6</span>
                     <h3 class="text-xl font-black text-zinc-950 tracking-tight">Choose a Visual Template Blueprint</h3>
