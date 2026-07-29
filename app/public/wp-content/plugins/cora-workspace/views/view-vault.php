@@ -459,14 +459,14 @@ foreach ( $cora_documents as $doc ) {
             <div class="p-4 bg-zinc-50/50 border-t border-zinc-200/80 flex items-center justify-between flex-wrap gap-3">
                 <span class="text-xs text-zinc-500 font-medium">Showing 1 to <?php echo $total_docs; ?> of <?php echo $total_docs; ?> documents</span>
                 <div class="flex items-center gap-1.5">
-                    <button class="w-7 h-7 rounded-lg border border-zinc-200 bg-white text-zinc-400 hover:text-zinc-950 flex items-center justify-center text-xs cursor-pointer shadow-xs">
-                        &lt;
+                    <button class="w-7 h-7 rounded-lg border border-zinc-200 bg-white text-zinc-500 hover:text-zinc-950 flex items-center justify-center cursor-pointer shadow-xs transition-colors">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
                     </button>
                     <button class="w-7 h-7 rounded-lg bg-zinc-950 text-white font-bold flex items-center justify-center text-xs shadow-xs">
                         1
                     </button>
-                    <button class="w-7 h-7 rounded-lg border border-zinc-200 bg-white text-zinc-400 hover:text-zinc-950 flex items-center justify-center text-xs cursor-pointer shadow-xs">
-                        &gt;
+                    <button class="w-7 h-7 rounded-lg border border-zinc-200 bg-white text-zinc-500 hover:text-zinc-950 flex items-center justify-center cursor-pointer shadow-xs transition-colors">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </button>
                 </div>
             </div>
