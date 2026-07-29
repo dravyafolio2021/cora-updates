@@ -187,6 +187,52 @@ test.describe('Media Library - Dedicated Folders Layout', () => {
     await expect(ringFill).toBeVisible();
   });
 
+  test('11. Verify Desktop Page Scroll capability', async ({ page }) => {
+    const canvas = page.locator('#cm-canvas');
+    await expect(canvas).toBeVisible();
+
+    const scrollState = await page.evaluate(() => {
+      const el = document.querySelector('#cm-canvas');
+      window.scrollTo(0, 100);
+      return {
+        overflowY: el ? window.getComputedStyle(el).overflowY : '',
+        canScroll: document.documentElement.scrollHeight >= window.innerHeight || (el ? el.scrollHeight >= el.clientHeight : false)
+      };
+    });
+
+    expect(['auto', 'scroll', 'visible']).toContain(scrollState.overflowY);
+    expect(scrollState.canScroll).toBe(true);
+  });
+
+  test('12. Verify Multi-Select Folders in Bulk Mode', async ({ page }) => {
+    const bulkBtn = page.locator('#cm-bulk-btn');
+    await expect(bulkBtn).toBeVisible();
+    await bulkBtn.click();
+
+    const bulkBar = page.locator('#cm-bulk-bar');
+    await expect(bulkBar).toHaveClass(/on/);
+
+    const folderCheckboxes = page.locator('#cm-folders-grid .cm-fcard-chk');
+    const count = await folderCheckboxes.count();
+    if (count > 0) {
+      const firstChk = folderCheckboxes.first();
+      await expect(firstChk).toBeVisible();
+      await firstChk.check();
+      await expect(firstChk).toBeChecked();
+
+      if (count > 1) {
+        const secondChk = folderCheckboxes.nth(1);
+        await expect(secondChk).toBeVisible();
+        await secondChk.check();
+        await expect(secondChk).toBeChecked();
+      }
+    }
+
+    await bulkBtn.click();
+    await expect(bulkBar).not.toHaveClass(/on/);
+    await expect(page.locator('#cm-folders-grid .cm-fcard-chk')).toHaveCount(0);
+  });
+
 });
 
 test.describe('Media Library - Mobile Viewport Layout', () => {

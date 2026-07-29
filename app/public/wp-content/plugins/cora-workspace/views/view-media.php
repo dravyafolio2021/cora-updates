@@ -12,7 +12,7 @@ $leads           = cora_db_get_leads();
 $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'Floor Plan', 'NOC / Approval', 'Invoice', 'Other' );
 ?>
 <style>
-#cora-page-media { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+#cora-page-media { margin: 0 !important; padding: 0 !important; width: 100% !important; overflow: visible !important; height: auto !important; }
 
 /* ─── Reset & Clean Layout Canvas ─────────────────────────────────────────── */
 #cm-root {
@@ -20,10 +20,11 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
     flex-direction: column;
     width: 100%;
     min-height: calc(100vh - 80px);
+    height: auto !important;
+    overflow: visible !important;
     background: #fff;
     position: relative;
     margin: 0;
-    border-radius: 0;
 }
 
 /* ─── Top header bar ─────────────────────────────────────────────────────── */
@@ -100,6 +101,14 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
     background: #f4f4f5;
     border: 1px solid #d4d4d8;
     box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.cm-fcard-chk {
+    accent-color: #09090b;
+    cursor: pointer;
+    width: 15px;
+    height: 15px;
+    margin-right: 6px;
+    flex-shrink: 0;
 }
 .cm-fcard-toggle {
     border: 1px dashed #d4d4d8;
@@ -246,7 +255,12 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 .cm-ubar.err { background:#ef4444; }
 
 /* ─── Grid canvas ────────────────────────────────────────────────────────── */
-#cm-canvas { flex:1; overflow-y:auto; padding:20px 22px; }
+#cm-canvas {
+    flex: 1;
+    overflow: visible !important;
+    height: auto !important;
+    padding: 20px 22px;
+}
 #cm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; }
 .cm-cell { position:relative; border:1px solid #e4e4e7; border-radius:12px; overflow:hidden; cursor:pointer; transition:all .18s ease; background:#fafafa; }
 .cm-cell:hover { box-shadow:0 8px 24px rgba(0,0,0,.08); border-color:#a1a1aa; transform:translateY(-1px); }
@@ -814,6 +828,19 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <div class="cm-bulk-row-2" style="display:flex;align-items:center;gap:6px">
                 <select id="cm-bulk-folder" class="cm-sel" style="font-size:11px"><option value="">Move to folder…</option></select>
                 <button onclick="cmBulkMove()" class="cm-hbtn" style="font-size:11px;padding:4px 9px">Move</button>
+                <div style="position:relative;display:inline-block">
+                    <button onclick="cmToggleBulkColorMenu(event)" class="cm-hbtn" style="font-size:11px;padding:4px 9px">Folder Color ▾</button>
+                    <div id="cm-bulk-color-menu" style="display:none;position:absolute;bottom:100%;left:0;margin-bottom:6px;background:#18181b;border:1px solid #3f3f46;border-radius:10px;padding:8px;gap:6px;box-shadow:0 6px 16px rgba(0,0,0,.3);z-index:900;align-items:center">
+                        <div onclick="cmBulkColorFolders('#3b82f6')" style="width:18px;height:18px;border-radius:50%;background:#3b82f6;cursor:pointer" title="Blue"></div>
+                        <div onclick="cmBulkColorFolders('#ef4444')" style="width:18px;height:18px;border-radius:50%;background:#ef4444;cursor:pointer" title="Red"></div>
+                        <div onclick="cmBulkColorFolders('#f59e0b')" style="width:18px;height:18px;border-radius:50%;background:#f59e0b;cursor:pointer" title="Orange"></div>
+                        <div onclick="cmBulkColorFolders('#10b981')" style="width:18px;height:18px;border-radius:50%;background:#10b981;cursor:pointer" title="Green"></div>
+                        <div onclick="cmBulkColorFolders('#8b5cf6')" style="width:18px;height:18px;border-radius:50%;background:#8b5cf6;cursor:pointer" title="Purple"></div>
+                        <div onclick="cmBulkColorFolders('#ec4899')" style="width:18px;height:18px;border-radius:50%;background:#ec4899;cursor:pointer" title="Pink"></div>
+                        <div onclick="cmBulkColorFolders('#64748b')" style="width:18px;height:18px;border-radius:50%;background:#64748b;cursor:pointer" title="Slate"></div>
+                        <div onclick="cmBulkColorFolders('#09090b')" style="width:18px;height:18px;border-radius:50%;background:#09090b;cursor:pointer;border:1px solid #3f3f46" title="Dark"></div>
+                    </div>
+                </div>
                 <button onclick="cmBulkAddGallery()" class="cm-hbtn" style="font-size:11px;padding:4px 9px">Gallery</button>
                 <button onclick="cmBulkZip()" class="cm-hbtn" style="font-size:11px;padding:4px 9px">ZIP</button>
                 <button onclick="cmBulkDelete()" class="cm-hbtn" style="font-size:11px;padding:4px 9px;color:#f87171;border-color:#7f1d1d">Delete</button>
@@ -1328,7 +1355,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 (function(){
 'use strict';
 var CM = {
-    view:'grid', files:[], folders:[], galleries:[], activeGallery:null, folder:null, selIds:[], bulk:false,
+    view:'grid', files:[], folders:[], galleries:[], activeGallery:null, folder:null, selIds:[], selFolderIds:[], bulk:false,
     page:1, pages:1, total:0, perPage:40,
     filters:{q:'',type:'all',culling:'',date:'',author:''},
     sortBy:'date', sortDir:'DESC', active:null, ctxFile:null, searchT:null, confirmCb:null, upQ:0,
@@ -2016,7 +2043,9 @@ window.cmRenderFolderTabs = function() {
                 var fcard = document.createElement('div');
                 fcard.className = 'cm-fcard' + isAct;
                 fcard.style.borderLeft = '3px solid ' + fColor;
+                var chkHtml = CM.bulk ? '<input type="checkbox" class="cm-fcard-chk" ' + (CM.selFolderIds.indexOf(folder.id) > -1 ? 'checked' : '') + ' onclick="event.stopPropagation();cmToggleFolderSel(' + folder.id + ',this.checked)">' : '';
                 fcard.innerHTML =
+                    chkHtml +
                     '<div class="cm-fcard-left">' +
                         '<div class="cm-fcard-icon">' +
                             '<svg viewBox="0 0 24 24" width="18" height="18" stroke="' + fColor + '" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>' +
@@ -2028,7 +2057,16 @@ window.cmRenderFolderTabs = function() {
                     '</div>' +
                     '<span class="cm-fcard-opt" title="Folder Settings & Sharing">⋮</span>';
                 
-                fcard.addEventListener('click', function() { cmSelectFolder(folder.id); });
+                fcard.addEventListener('click', function() {
+                    if (CM.bulk) {
+                        var isChecked = CM.selFolderIds.indexOf(folder.id) === -1;
+                        cmToggleFolderSel(folder.id, isChecked);
+                        var chk = fcard.querySelector('.cm-fcard-chk');
+                        if (chk) chk.checked = isChecked;
+                    } else {
+                        cmSelectFolder(folder.id);
+                    }
+                });
                 var opt = fcard.querySelector('.cm-fcard-opt');
                 if (opt) {
                     opt.addEventListener('click', function(e) {
@@ -2051,7 +2089,9 @@ window.cmRenderFolderTabs = function() {
                 var scard = document.createElement('div');
                 scard.className = 'cm-fcard' + sAct;
                 scard.style.borderLeft = '3px solid ' + sColor;
+                var sChkHtml = CM.bulk ? '<input type="checkbox" class="cm-fcard-chk" ' + (CM.selFolderIds.indexOf(s.id) > -1 ? 'checked' : '') + ' onclick="event.stopPropagation();cmToggleFolderSel(' + s.id + ',this.checked)">' : '';
                 scard.innerHTML =
+                    sChkHtml +
                     '<div class="cm-fcard-left">' +
                         '<div class="cm-fcard-icon" style="background:#fafafa">' +
                             '<svg viewBox="0 0 24 24" width="16" height="16" stroke="' + sColor + '" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>' +
@@ -2062,7 +2102,16 @@ window.cmRenderFolderTabs = function() {
                         '</div>' +
                     '</div>' +
                     '<span class="cm-fcard-opt" title="Folder Settings & Sharing">⋮</span>';
-                scard.addEventListener('click', function() { cmSelectFolder(s.id); });
+                scard.addEventListener('click', function() {
+                    if (CM.bulk) {
+                        var isChecked = CM.selFolderIds.indexOf(s.id) === -1;
+                        cmToggleFolderSel(s.id, isChecked);
+                        var chk = scard.querySelector('.cm-fcard-chk');
+                        if (chk) chk.checked = isChecked;
+                    } else {
+                        cmSelectFolder(s.id);
+                    }
+                });
                 var sOpt = scard.querySelector('.cm-fcard-opt');
                 if (sOpt) {
                     sOpt.addEventListener('click', function(e) {
@@ -2415,6 +2464,7 @@ window.cmToggleBulk = function() {
     CM.bulk = !CM.bulk;
     if (!CM.bulk) {
         CM.selIds = [];
+        CM.selFolderIds = [];
     }
     var btn = document.getElementById('cm-bulk-btn');
     if (btn) btn.textContent = CM.bulk ? 'Cancel' : 'Select';
@@ -2425,9 +2475,33 @@ window.cmToggleBulk = function() {
     }
     var listAll = document.getElementById('cm-list-all');
     if (listAll) listAll.checked = CM.bulk && CM.files.length > 0 && CM.selIds.length === CM.files.length;
+    cmRenderFolderTabs();
     cmRender();
-    cmBulkCt();
+    cmUpdateBulkCounter();
 };
+
+window.cmToggleFolderSel = function(id, checked) {
+    id = parseInt(id, 10) || id;
+    if (checked) {
+        if (CM.selFolderIds.indexOf(id) === -1) CM.selFolderIds.push(id);
+        if (!CM.bulk) {
+            CM.bulk = true;
+            var btn = document.getElementById('cm-bulk-btn');
+            if (btn) btn.textContent = 'Cancel';
+            var bb = document.getElementById('cm-bulk-bar');
+            if (bb) {
+                bb.style.display = 'flex';
+                bb.className = 'cm-bulk-bar on';
+            }
+            cmRenderFolderTabs();
+            cmRender();
+        }
+    } else {
+        CM.selFolderIds = CM.selFolderIds.filter(function(x) { return x != id; });
+    }
+    cmUpdateBulkCounter();
+};
+
 window.cmToggleSel = function(id, on) {
     if (on) {
         if (CM.selIds.indexOf(id) === -1) CM.selIds.push(id);
@@ -2442,6 +2516,7 @@ window.cmToggleSel = function(id, on) {
             }
             var g = document.getElementById('cm-grid');
             if (g) g.classList.add('cm-bulk-mode');
+            cmRenderFolderTabs();
         }
     } else {
         CM.selIds = CM.selIds.filter(function(x) { return x !== id; });
@@ -2462,22 +2537,158 @@ window.cmToggleSel = function(id, on) {
     if (listAll) {
         listAll.checked = CM.files.length > 0 && CM.selIds.length === CM.files.length;
     }
-    cmBulkCt();
+    cmUpdateBulkCounter();
 };
+
 window.cmListAll = function(ch) {
     if (typeof ch === 'undefined') ch = true;
     CM.files.forEach(function(f) { cmToggleSel(f.id, ch); });
+    if (ch) {
+        var allFids = [];
+        (CM.folders || []).forEach(function(folder) {
+            allFids.push(folder.id);
+            (folder.children || []).forEach(function(child) {
+                allFids.push(child.id);
+            });
+        });
+        CM.selFolderIds = allFids;
+    } else {
+        CM.selFolderIds = [];
+    }
+    cmRenderFolderTabs();
+    cmUpdateBulkCounter();
 };
-window.cmBulkCt = function() {
-    var ctEl = document.getElementById('cm-bulk-ct');
-    if (ctEl) ctEl.textContent = CM.selIds.length + ' selected';
+
+window.cmUpdateBulkCounter = window.cmBulkCt = function() {
+    var fct = CM.selFolderIds.length, mct = CM.selIds.length;
+    var txt = [];
+    if (fct > 0) txt.push(fct + ' folder' + (fct > 1 ? 's' : ''));
+    if (mct > 0) txt.push(mct + ' file' + (mct > 1 ? 's' : ''));
+    var el = document.getElementById('cm-bulk-ct');
+    if (el) el.textContent = txt.join(', ') || '0 selected';
 };
+
 window.cmBulkMove = function() {
     var fid=document.getElementById('cm-bulk-folder').value; if(!fid||!CM.selIds.length){coraShowToast('Select files and a destination folder.');return;}
     $.ajax({url:coraREData.ajaxUrl,type:'POST',data:{action:'cora_media_library_move',nonce:coraREData.ajaxNonce,attachment_ids:CM.selIds,folder_id:fid},
     success:function(r){if(r.success){coraShowToast(r.data.message);CM.selIds=[];cmLoadFiles();cmLoadFolders();}else coraShowToast('Move failed.');}});
 };
-window.cmBulkDelete = function() { if(!CM.selIds.length){coraShowToast('Select files first.');return;} cmDeletePrompt(CM.selIds.slice()); };
+
+window.cmBulkDeleteFolders = function() {
+    if (!CM.selFolderIds.length) {
+        coraShowToast('Select folders first.');
+        return;
+    }
+    var count = CM.selFolderIds.length;
+    document.getElementById('cm-confirm-title').textContent = 'Delete ' + count + ' folder' + (count > 1 ? 's' : '') + '?';
+    document.getElementById('cm-confirm-desc').textContent = 'This will permanently remove the selected folder(s). Files inside will become unorganized.';
+    document.getElementById('cm-confirm-modal').classList.add('open');
+    CM.confirmCb = function() {
+        var ids = CM.selFolderIds.slice();
+        var done = 0;
+        coraShowToast('Deleting folders...');
+        ids.forEach(function(id) {
+            $.ajax({
+                url: coraREData.ajaxUrl,
+                type: 'POST',
+                data: { action: 'cora_media_library_delete_folder', nonce: coraREData.ajaxNonce, term_id: id },
+                complete: function() {
+                    done++;
+                    if (done === ids.length) {
+                        CM.selFolderIds = [];
+                        coraShowToast('Folder(s) deleted.');
+                        cmLoadFolders();
+                        cmLoadFiles();
+                        cmUpdateBulkCounter();
+                    }
+                }
+            });
+        });
+    };
+};
+
+window.cmBulkDelete = function() {
+    if (CM.selFolderIds.length > 0) {
+        cmBulkDeleteFolders();
+    }
+    if (CM.selIds.length > 0) {
+        cmDeletePrompt(CM.selIds.slice());
+    }
+    if (!CM.selFolderIds.length && !CM.selIds.length) {
+        coraShowToast('Select items to delete.');
+    }
+};
+
+window.cmBulkColorFolders = function(color) {
+    if (!CM.selFolderIds.length) {
+        coraShowToast('Select folders first.');
+        return;
+    }
+    var fMap = {};
+    (CM.folders || []).forEach(function(f) {
+        fMap[f.id] = f.name;
+        (f.children || []).forEach(function(s) {
+            fMap[s.id] = s.name;
+        });
+    });
+
+    var ids = CM.selFolderIds.slice();
+    var done = 0;
+    coraShowToast('Updating folder colors...');
+    ids.forEach(function(id) {
+        var name = fMap[id] || 'Folder';
+        $.ajax({
+            url: coraREData.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'cora_media_library_rename_folder',
+                nonce: coraREData.ajaxNonce,
+                term_id: id,
+                name: name,
+                color: color
+            },
+            complete: function() {
+                done++;
+                if (done === ids.length) {
+                    coraShowToast('Folder colors updated!');
+                    cmLoadFolders();
+                }
+            }
+        });
+    });
+    var menu = document.getElementById('cm-bulk-color-menu');
+    if (menu) menu.style.display = 'none';
+};
+
+window.cmToggleBulkColorMenu = function(e) {
+    if (e) e.stopPropagation();
+    var menu = document.getElementById('cm-bulk-color-menu');
+    if (!menu) return;
+    var isOpen = menu.style.display === 'flex';
+    menu.style.display = isOpen ? 'none' : 'flex';
+};
+
+window.cmRenderSwatches = function(containerId, inputId, activeColor) {
+    var colors = ['#3b82f6', '#ef4444', '#f59e0b', '#10b981', '#8b5cf6', '#ec4899', '#64748b', '#09090b'];
+    var container = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
+    if (!container) return;
+    if (inputId) {
+        var inputEl = document.getElementById(inputId);
+        if (inputEl) inputEl.value = activeColor || colors[0];
+    }
+    container.innerHTML = colors.map(function(c) {
+        var activeStyle = (c.toLowerCase() === (activeColor || '').toLowerCase()) ? 'outline:2px solid #09090b;outline-offset:2px;transform:scale(1.1);' : '';
+        return '<div onclick="cmSelectSwatch(\'' + containerId + '\', \'' + inputId + '\', \'' + c + '\')" style="width:20px;height:20px;border-radius:50%;background:' + c + ';cursor:pointer;transition:all .15s;' + activeStyle + '" data-color="' + c + '"></div>';
+    }).join('');
+};
+
+window.cmSelectSwatch = function(containerId, inputId, color) {
+    if (inputId) {
+        var inputEl = document.getElementById(inputId);
+        if (inputEl) inputEl.value = color;
+    }
+    cmRenderSwatches(containerId, inputId, color);
+};
 
 // ── SHARE LINKS ───────────────────────────────────────────────────────────────
 window.cmRenderShareLinks = function(links) {
