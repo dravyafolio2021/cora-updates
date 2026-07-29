@@ -689,10 +689,10 @@ foreach ( $cora_documents as $doc ) {
             </div>
 
             <!-- MAIN STEP 3 WORKSPACE: DOCKED TABBED SIDEBAR & CANVAS CONTAINER -->
-            <div class="flex flex-col lg:flex-row items-start gap-4 w-full relative min-w-0 min-h-[950px]">
+            <div class="flex flex-col md:flex-row items-start gap-4 w-full relative min-w-0 min-h-[950px]">
 
                 <!-- 2. LEFT PANEL - COMPONENT LIBRARY & DOCUMENT OUTLINE (DOCKED SIDEBAR) -->
-                <div id="step3-left-sidebar" class="w-full lg:w-[280px] lg:shrink-0 bg-white border border-zinc-200/80 rounded-3xl p-5 shadow-xs space-y-4 lg:sticky lg:top-4 self-start pointer-events-auto">
+                <div id="step3-left-sidebar" class="w-full md:w-[280px] md:shrink-0 bg-white border border-zinc-200/80 rounded-3xl p-5 shadow-xs space-y-4 md:sticky md:top-4 self-start pointer-events-auto">
                     <!-- Segmented Tab Header -->
                     <div class="flex items-center justify-between border-b border-zinc-100 pb-3 gap-2">
                         <div class="flex items-center bg-zinc-100 p-1 rounded-xl w-full">
@@ -1256,10 +1256,10 @@ foreach ( $cora_documents as $doc ) {
             </div>
 
             <!-- PREVIEW WORKSPACE 3-COLUMN SIDEBAR & CANVAS CONTAINER -->
-            <div class="flex flex-col lg:flex-row items-start gap-3.5 w-full relative min-w-0">
+            <div class="flex flex-col md:flex-row items-start gap-3.5 w-full relative min-w-0">
 
                 <!-- Left Panel: Pages Sidebar (Fixed 240px width - Docked Left Sidebar) -->
-                <div id="step4-left-pages-sidebar" class="w-full lg:w-[240px] lg:shrink-0 bg-white border border-zinc-200/80 rounded-3xl p-5 shadow-xs space-y-4 lg:sticky lg:top-4 self-start pointer-events-auto">
+                <div id="step4-left-pages-sidebar" class="w-full md:w-[240px] md:shrink-0 bg-white border border-zinc-200/80 rounded-3xl p-5 shadow-xs space-y-4 md:sticky md:top-4 self-start pointer-events-auto">
                     <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
                         <h4 class="font-extrabold text-zinc-950 text-xs uppercase tracking-wider flex items-center gap-2">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
@@ -1345,7 +1345,7 @@ foreach ( $cora_documents as $doc ) {
                 </div>
 
                 <!-- Right Docked Sidebar Panel: Quick Edit Panel (Fixed 280px width - Docked Right Sidebar) -->
-                <div id="step4-right-edit-sidebar" class="hidden w-full lg:w-[280px] lg:shrink-0 bg-white border border-zinc-200/80 rounded-3xl p-5 shadow-xs space-y-4 lg:sticky lg:top-4 self-start pointer-events-auto">
+                <div id="step4-right-edit-sidebar" class="hidden w-full md:w-[280px] md:shrink-0 bg-white border border-zinc-200/80 rounded-3xl p-5 shadow-xs space-y-4 md:sticky md:top-4 self-start pointer-events-auto">
                     <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
                         <h4 class="font-extrabold text-zinc-950 text-xs uppercase tracking-wider flex items-center gap-2">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
