@@ -699,7 +699,19 @@ foreach ( $cora_documents as $doc ) {
                         <button type="button" onclick="coraToggleStep3Sidebar('left')" title="Close Sidebar" class="w-6.5 h-6.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-500 hover:text-zinc-950 flex items-center justify-center transition-colors cursor-pointer shrink-0">
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
-                              <!-- TAB 1: COMPONENT LIBRARY BLOCKS -->
+                    </div>
+
+                    <!-- Segmented Tab Switcher -->
+                    <div class="flex items-center bg-zinc-100 p-1 rounded-xl w-full">
+                        <button type="button" id="step3-tab-btn-components" onclick="coraSwitchStep3SidebarTab('components')" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all bg-white text-zinc-950 shadow-xs cursor-pointer text-center whitespace-nowrap">
+                            Blocks
+                        </button>
+                        <button type="button" id="step3-tab-btn-outline" onclick="coraSwitchStep3SidebarTab('outline')" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all text-zinc-500 hover:text-zinc-900 cursor-pointer text-center whitespace-nowrap">
+                            Outline
+                        </button>
+                    </div>
+
+                    <!-- TAB 1: COMPONENT LIBRARY BLOCKS -->
                     <div id="step3-sidebar-content-components" class="space-y-4">
                         <p class="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Click or drag blocks to add to canvas</p>
                         <!-- Library Groups -->
