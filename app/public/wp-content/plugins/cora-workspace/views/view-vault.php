@@ -334,7 +334,7 @@ foreach ( $cora_documents as $doc ) {
         </div>
 
         <!-- Master Documents Table (Scrollable Container) -->
-        <div class="bg-white border border-zinc-200/80 rounded-2xl shadow-xs overflow-hidden">
+        <div class="md:bg-white md:border md:border-zinc-200/80 md:rounded-2xl md:shadow-xs md:overflow-hidden">
             <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs min-w-[700px]">
                 <thead>
@@ -456,7 +456,7 @@ foreach ( $cora_documents as $doc ) {
             </div>
 
             <!-- Mobile List View (Stacked professional list layout replacing horizontal tables on small viewports) -->
-            <div class="block md:hidden p-4 bg-zinc-50/40 space-y-3.5" id="cora-vault-mobile-list">
+            <div class="block md:hidden space-y-3" id="cora-vault-mobile-list">
                 <?php foreach ( $cora_documents as $doc ) : 
                     $type_lower = strtolower($doc['type'] ?? '');
                     $status = $doc['status'] ?? 'Draft';
@@ -557,7 +557,7 @@ foreach ( $cora_documents as $doc ) {
             </div>
 
             <!-- Table Footer & Pagination Bar -->
-            <div class="p-4 bg-zinc-50/50 border-t border-zinc-200/80 flex items-center justify-between flex-wrap gap-3">
+            <div class="p-4 bg-white md:bg-zinc-50/50 border md:border-none md:border-t border-zinc-200/80 rounded-2xl md:rounded-none shadow-3xs md:shadow-none flex items-center justify-between flex-wrap gap-3 mt-3 md:mt-0">
                 <span class="text-xs text-zinc-500 font-medium">Showing 1 to <?php echo $total_docs; ?> of <?php echo $total_docs; ?> documents</span>
                 <div class="flex items-center gap-1.5">
                     <button class="w-7 h-7 rounded-lg border border-zinc-200 bg-white text-zinc-500 hover:text-zinc-950 flex items-center justify-center cursor-pointer shadow-xs transition-colors">
