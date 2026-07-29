@@ -1931,62 +1931,123 @@ foreach ( $cora_documents as $doc ) {
          VIEW 3: E-SIGN LEGAL AUDIT REGISTRY
          ═════════════════════════════════════════════════════════════════════════ -->
     <div id="cora-vault-view-esign" class="hidden space-y-6">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
                 <h2 class="text-base font-black text-zinc-950">E-Signature Audit Registry</h2>
                 <p class="text-xs text-zinc-500">Tamper-evident log of legally binding electronic signature certificates.</p>
             </div>
-            <span class="px-3 py-1 bg-zinc-100 text-zinc-950 rounded-lg text-xs font-bold border border-zinc-300 font-mono">
+            <span class="self-start sm:self-auto px-3 py-1 bg-zinc-100 text-zinc-950 rounded-lg text-[10px] sm:text-xs font-bold border border-zinc-300 font-mono whitespace-nowrap">
                 <?php echo $signed_count; ?> Verified Signatures
             </span>
         </div>
 
-        <div class="bg-white border border-zinc-200/80 rounded-2xl shadow-xs overflow-hidden">
-            <table class="w-full text-left border-collapse text-xs">
-                <thead>
-                    <tr class="bg-zinc-50/80 border-b border-zinc-200 text-[10px] font-extrabold text-zinc-500 uppercase tracking-wider">
-                        <th class="p-3.5">Document Title & #</th>
-                        <th class="p-3.5">Signer Name</th>
-                        <th class="p-3.5">Signer Email</th>
-                        <th class="p-3.5">IP Address</th>
-                        <th class="p-3.5">Verification Hash</th>
-                        <th class="p-3.5">Timestamp</th>
-                        <th class="p-3.5 text-right">Certificate</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-zinc-100">
-                    <?php 
-                    $has_signed = false;
-                    foreach ( $cora_documents as $doc ) : 
-                        if ( empty( $doc['signed'] ) ) continue;
-                        $has_signed = true;
-                    ?>
-                    <tr class="hover:bg-zinc-50/80 transition-colors">
-                        <td class="p-3.5">
-                            <div class="font-bold text-zinc-950"><?php echo esc_html( $doc['title'] ); ?></div>
-                            <div class="font-mono text-[10px] text-zinc-400"><?php echo esc_html( $doc['number'] ?? 'DOC-2026' ); ?></div>
-                        </td>
-                        <td class="p-3.5 font-semibold text-zinc-900"><?php echo esc_html( $doc['signer_name'] ?? '—' ); ?></td>
-                        <td class="p-3.5 text-zinc-600"><?php echo esc_html( $doc['signer_email'] ?? '—' ); ?></td>
-                        <td class="p-3.5 font-mono text-[10px] text-zinc-500"><?php echo esc_html( $doc['signer_ip'] ?? '103.21.124.8' ); ?></td>
-                        <td class="p-3.5 font-mono text-[10px] font-bold text-zinc-950"><?php echo esc_html( $doc['verification_hash'] ?? 'ESIGN-HASH-V1' ); ?></td>
-                        <td class="p-3.5 font-mono text-[10px] text-zinc-500"><?php echo esc_html( $doc['signed_at'] ?? $doc['created_at'] ); ?></td>
-                        <td class="p-3.5 text-right">
-                            <button onclick="coraOpenDocPreviewDrawer('<?php echo esc_js( $doc['id'] ); ?>')" class="px-2.5 py-1 bg-zinc-950 text-white rounded-lg text-[11px] font-bold cursor-pointer hover:bg-zinc-800 transition-all">
-                                View Audit
-                            </button>
-                        </td>
-                    </tr>
-                    <?php endforeach; 
-                    if ( ! $has_signed ) : ?>
-                    <tr>
-                        <td colspan="7" class="p-8 text-center text-zinc-400 text-xs">
-                            No e-signed documents recorded yet. Click "+ E-Sign" on any document to collect a signature.
-                        </td>
-                    </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+        <div class="md:bg-white md:border md:border-zinc-200/80 md:rounded-2xl md:shadow-xs md:overflow-hidden">
+            <!-- Desktop Table View -->
+            <div class="hidden md:block overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-zinc-50/80 border-b border-zinc-200 text-[10px] font-extrabold text-zinc-500 uppercase tracking-wider">
+                            <th class="p-3.5">Document Title & #</th>
+                            <th class="p-3.5">Signer Name</th>
+                            <th class="p-3.5">Signer Email</th>
+                            <th class="p-3.5">IP Address</th>
+                            <th class="p-3.5">Verification Hash</th>
+                            <th class="p-3.5">Timestamp</th>
+                            <th class="p-3.5 text-right">Certificate</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-100">
+                        <?php 
+                        $has_signed = false;
+                        foreach ( $cora_documents as $doc ) : 
+                            if ( empty( $doc['signed'] ) ) continue;
+                            $has_signed = true;
+                        ?>
+                        <tr class="hover:bg-zinc-50/80 transition-colors">
+                            <td class="p-3.5">
+                                <div class="font-bold text-zinc-950"><?php echo esc_html( $doc['title'] ); ?></div>
+                                <div class="font-mono text-[10px] text-zinc-400"><?php echo esc_html( $doc['number'] ?? 'DOC-2026' ); ?></div>
+                            </td>
+                            <td class="p-3.5 font-semibold text-zinc-900"><?php echo esc_html( $doc['signer_name'] ?? '—' ); ?></td>
+                            <td class="p-3.5 text-zinc-600"><?php echo esc_html( $doc['signer_email'] ?? '—' ); ?></td>
+                            <td class="p-3.5 font-mono text-[10px] text-zinc-500"><?php echo esc_html( $doc['signer_ip'] ?? '103.21.124.8' ); ?></td>
+                            <td class="p-3.5 font-mono text-[10px] font-bold text-zinc-950"><?php echo esc_html( $doc['verification_hash'] ?? 'ESIGN-HASH-V1' ); ?></td>
+                            <td class="p-3.5 font-mono text-[10px] text-zinc-500"><?php echo esc_html( $doc['signed_at'] ?? $doc['created_at'] ); ?></td>
+                            <td class="p-3.5 text-right">
+                                <button onclick="coraOpenDocPreviewDrawer('<?php echo esc_js( $doc['id'] ); ?>')" class="px-2.5 py-1 bg-zinc-950 text-white rounded-lg text-[11px] font-bold cursor-pointer hover:bg-zinc-800 transition-all">
+                                    View Audit
+                                </button>
+                            </td>
+                        </tr>
+                        <?php endforeach; 
+                        if ( ! $has_signed ) : ?>
+                        <tr>
+                            <td colspan="7" class="p-8 text-center text-zinc-400 text-xs">
+                                No e-signed documents recorded yet. Click "+ E-Sign" on any document to collect a signature.
+                            </td>
+                        </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile List View (Stacked professional cards replacing horizontal tables on mobile) -->
+            <div class="block md:hidden space-y-3.5" id="cora-esign-mobile-list">
+                <?php 
+                $has_signed_mobile = false;
+                foreach ( $cora_documents as $doc ) : 
+                    if ( empty( $doc['signed'] ) ) continue;
+                    $has_signed_mobile = true;
+                ?>
+                <div class="p-4 bg-white border border-zinc-200/80 rounded-2xl shadow-3xs space-y-3.5 hover:bg-zinc-50/30 transition-colors">
+                    <!-- Row 1: Doc Title & Number & CTA -->
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-zinc-950 text-xs truncate" title="<?php echo esc_attr( $doc['title'] ); ?>"><?php echo esc_html( $doc['title'] ); ?></h4>
+                            <span class="font-mono text-[9px] text-zinc-400 font-bold tracking-tight block mt-0.5"><?php echo esc_html( $doc['number'] ?? 'DOC-2026' ); ?></span>
+                        </div>
+                        <button onclick="coraOpenDocPreviewDrawer('<?php echo esc_js( $doc['id'] ); ?>')" class="px-2.5 py-1 bg-zinc-950 hover:bg-zinc-800 text-white text-[10px] font-bold rounded-lg transition-all whitespace-nowrap shrink-0 shadow-xs cursor-pointer">
+                            View Audit
+                        </button>
+                    </div>
+
+                    <!-- Row 2: Signer Name & Email -->
+                    <div class="grid grid-cols-2 gap-3 text-xs border-t border-zinc-100 pt-2.5">
+                        <div class="min-w-0">
+                            <span class="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block leading-none">Signer Name</span>
+                            <span class="font-semibold text-zinc-900 mt-1 block truncate"><?php echo esc_html( $doc['signer_name'] ?? '—' ); ?></span>
+                        </div>
+                        <div class="min-w-0">
+                            <span class="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block leading-none">Signer Email</span>
+                            <span class="text-zinc-600 mt-1 block break-all text-[11px]" style="word-break: break-all;"><?php echo esc_html( $doc['signer_email'] ?? '—' ); ?></span>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: IP & Verification Hash -->
+                    <div class="grid grid-cols-2 gap-3 text-xs border-t border-zinc-100 pt-2.5">
+                        <div class="min-w-0">
+                            <span class="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block leading-none">IP Address</span>
+                            <span class="font-mono text-[10px] text-zinc-500 mt-1 block truncate"><?php echo esc_html( $doc['signer_ip'] ?? '103.21.124.8' ); ?></span>
+                        </div>
+                        <div class="min-w-0">
+                            <span class="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block leading-none">Verification Hash</span>
+                            <span class="font-mono text-[10px] font-bold text-zinc-950 mt-1 block break-all" style="word-break: break-all;"><?php echo esc_html( $doc['verification_hash'] ?? 'ESIGN-HASH-V1' ); ?></span>
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Timestamp -->
+                    <div class="border-t border-zinc-100 pt-2.5 flex items-center justify-between text-[10px] text-zinc-400">
+                        <span class="font-bold uppercase tracking-wider text-[8px]">Timestamp</span>
+                        <span class="font-mono"><?php echo esc_html( $doc['signed_at'] ?? $doc['created_at'] ); ?></span>
+                    </div>
+                </div>
+                <?php endforeach; 
+                if ( ! $has_signed_mobile ) : ?>
+                <div class="p-8 bg-white border border-zinc-200/80 rounded-2xl text-center text-zinc-400 text-xs shadow-3xs">
+                    No e-signed documents recorded yet. Click "+ E-Sign" on any document to collect a signature.
+                </div>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 </div>
