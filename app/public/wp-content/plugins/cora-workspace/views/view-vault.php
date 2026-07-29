@@ -219,135 +219,118 @@ foreach ( $cora_documents as $doc ) {
 </style>
 
 <div id="cora-vault-wrapper" class="space-y-5 relative font-sans text-zinc-900 pb-20">
-    <!-- Top Navigation Bar (Precision Spacing & Alignments) -->
-    <div class="flex items-center justify-between border-b border-zinc-200/80 pb-0 flex-wrap gap-4">
-        <div class="flex items-center gap-1 sm:gap-2">
-            <button onclick="coraSwitchVaultView('vault')" id="vault-mode-btn-vault" class="flex items-center gap-2 py-2.5 px-3.5 text-xs font-bold transition-all text-zinc-950 border-b-2 border-zinc-950 -mb-px bg-transparent cursor-pointer whitespace-nowrap">
-                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                Document Vault
-            </button>
-            <button onclick="coraSwitchVaultView('editor')" id="vault-mode-btn-editor" class="flex items-center gap-2 py-2.5 px-3.5 text-xs font-semibold text-zinc-500 hover:text-zinc-950 transition-all border-b-2 border-transparent -mb-px cursor-pointer whitespace-nowrap">
-                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                Document Studio Wizard
-            </button>
-            <button onclick="coraSwitchVaultView('esign')" id="vault-mode-btn-esign" class="flex items-center gap-2 py-2.5 px-3.5 text-xs font-semibold text-zinc-500 hover:text-zinc-950 transition-all border-b-2 border-transparent -mb-px cursor-pointer whitespace-nowrap">
-                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                E-Sign Audit Registry
-            </button>
-        </div>
+   <!-- Top Header & Navigation area (Shopify/Notion UI style alignment) -->
+   <div class="flex flex-col gap-4 border-b border-zinc-200/80 pb-4 mb-5">
+       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+           <div>
+               <h1 class="text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">File Manager & Vault</h1>
+               <p class="text-xs text-zinc-500 mt-0.5 font-medium">Manage legally binding contracts, proposals, client invoices, and e-sign registry workflows.</p>
+           </div>
+           
+           <!-- Actions inline with title on desktop -->
+           <div class="flex items-center gap-2">
+               <button onclick="coraCreateNewDocInStudio()" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-xs cursor-pointer whitespace-nowrap">
+                   <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                   Create Document Wizard
+               </button>
+               <button onclick="coraExportVaultCSV()" class="px-3 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-semibold rounded-xl hover:bg-zinc-50 cursor-pointer shadow-xs flex items-center gap-1.5 whitespace-nowrap">
+                   <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                   CSV Export
+               </button>
+               <button onclick="coraExportGSTR1()" class="px-3 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-semibold rounded-xl hover:bg-zinc-50 cursor-pointer shadow-xs flex items-center gap-1.5 whitespace-nowrap">
+                   <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                   GSTR-1 Tax CSV
+               </button>
+           </div>
+       </div>
 
-        <div class="flex items-center gap-2 pb-2.5">
-            <button onclick="coraCreateNewDocInStudio()" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-xs cursor-pointer whitespace-nowrap">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Create Document Wizard
-            </button>
-            <button onclick="coraExportVaultCSV()" class="px-3 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-semibold rounded-xl hover:bg-zinc-50 cursor-pointer shadow-xs flex items-center gap-1.5 whitespace-nowrap">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                CSV Export
-            </button>
-            <button onclick="coraExportGSTR1()" class="px-3 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-semibold rounded-xl hover:bg-zinc-50 cursor-pointer shadow-xs flex items-center gap-1.5 whitespace-nowrap">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-                GSTR-1 Tax CSV
-            </button>
-        </div>
-    </div>
+       <!-- Segmented Switcher Tab Bar -->
+       <div class="flex items-center">
+           <div class="bg-zinc-150/70 p-1 rounded-xl border border-zinc-200/60 inline-flex items-center gap-0.5 shadow-3xs">
+               <button onclick="coraSwitchVaultView('vault')" id="vault-mode-btn-vault" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-white border border-zinc-200/50 shadow-2xs text-zinc-950 cursor-pointer flex items-center gap-1.5 whitespace-nowrap">
+                   <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                   Document Vault
+               </button>
+               <button onclick="coraSwitchVaultView('editor')" id="vault-mode-btn-editor" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-650 hover:text-zinc-950 hover:bg-white/40 cursor-pointer flex items-center gap-1.5 whitespace-nowrap">
+                   <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                   Document Studio Wizard
+               </button>
+               <button onclick="coraSwitchVaultView('esign')" id="vault-mode-btn-esign" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-650 hover:text-zinc-950 hover:bg-white/40 cursor-pointer flex items-center gap-1.5 whitespace-nowrap">
+                   <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                   E-Sign Audit Registry
+               </button>
+           </div>
+       </div>
+   </div>
 
     <!-- ═════════════════════════════════════════════════════════════════════════
          VIEW 1: MASTER DOCUMENT VAULT DASHBOARD (COLORED BADGES ENHANCED)
          ═════════════════════════════════════════════════════════════════════ -->
     <div id="cora-vault-view-dashboard" class="space-y-5">
-        <!-- 4 KPI Cards Grid with Tinted Colored Badges -->
+        <!-- 4 KPI Cards Grid (Compact & Monochromatic Horizontal Spacing) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- Card 1: Total Documents -->
-            <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 sm:p-5 shadow-xs relative overflow-hidden flex flex-col justify-between space-y-3.5 hover:border-blue-300 transition-all">
-                <div class="flex items-center justify-between">
-                    <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">Total Documents</span>
-                        <span id="kpi-total-docs-count" class="text-2xl sm:text-3xl font-black text-zinc-950 tracking-tight block mt-0.5"><?php echo $total_docs; ?></span>
-                    </div>
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 shadow-2xs hover:border-zinc-300 transition-all flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-zinc-50 border border-zinc-100 text-zinc-750 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                 </div>
-                <div class="flex items-center justify-between pt-1 text-[11px]">
-                    <span class="text-zinc-400">All your documents in one place</span>
-                    <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md">Active</span>
+                <div class="min-w-0 flex-1">
+                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Total Documents</span>
+                    <span id="kpi-total-docs-count" class="text-xl font-extrabold text-zinc-950 tracking-tight block mt-0.5"><?php echo $total_docs; ?></span>
                 </div>
-                <div class="h-0.5 bg-blue-500 rounded-full w-full"></div>
             </div>
 
             <!-- Card 2: Proposals & Quotes -->
-            <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 sm:p-5 shadow-xs relative overflow-hidden flex flex-col justify-between space-y-3.5 hover:border-purple-300 transition-all">
-                <div class="flex items-center justify-between">
-                    <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
-                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line></svg>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">Proposals & Quotes</span>
-                        <span id="kpi-proposals-count" class="text-2xl sm:text-3xl font-black text-zinc-950 tracking-tight block mt-0.5"><?php echo $proposal_count; ?></span>
-                    </div>
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 shadow-2xs hover:border-zinc-300 transition-all flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-zinc-50 border border-zinc-100 text-zinc-750 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line></svg>
                 </div>
-                <div class="flex items-center justify-between pt-1 text-[11px]">
-                    <span class="text-zinc-400">Awaiting client response</span>
-                    <span class="text-[10px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md">Bids</span>
+                <div class="min-w-0 flex-1">
+                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Proposals & Quotes</span>
+                    <span id="kpi-proposals-count" class="text-xl font-extrabold text-zinc-950 tracking-tight block mt-0.5"><?php echo $proposal_count; ?></span>
                 </div>
-                <div class="h-0.5 bg-purple-500 rounded-full w-full"></div>
             </div>
 
             <!-- Card 3: Signed Contracts -->
-            <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 sm:p-5 shadow-xs relative overflow-hidden flex flex-col justify-between space-y-3.5 hover:border-emerald-300 transition-all">
-                <div class="flex items-center justify-between">
-                    <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">Signed Contracts</span>
-                        <span id="kpi-signed-count" class="text-2xl sm:text-3xl font-black text-zinc-950 tracking-tight block mt-0.5"><?php echo $signed_count; ?></span>
-                    </div>
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 shadow-2xs hover:border-zinc-300 transition-all flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-zinc-50 border border-zinc-100 text-zinc-750 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 </div>
-                <div class="flex items-center justify-between pt-1 text-[11px]">
-                    <span class="text-zinc-400">Legally verified & secured</span>
-                    <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">✓ Verified</span>
+                <div class="min-w-0 flex-1">
+                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Signed Contracts</span>
+                    <span id="kpi-signed-count" class="text-xl font-extrabold text-zinc-950 tracking-tight block mt-0.5"><?php echo $signed_count; ?></span>
                 </div>
-                <div class="h-0.5 bg-emerald-500 rounded-full w-full"></div>
             </div>
 
             <!-- Card 4: Pending Receivables -->
-            <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 sm:p-5 shadow-xs relative overflow-hidden flex flex-col justify-between space-y-3.5 hover:border-amber-300 transition-all">
-                <div class="flex items-center justify-between">
-                    <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-base shrink-0">
-                        ₹
-                    </div>
-                    <div class="text-right">
-                        <span class="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">Pending Receivables</span>
-                        <span id="kpi-receivables-amount" class="text-2xl sm:text-3xl font-black text-zinc-950 tracking-tight block mt-0.5">₹<?php echo number_format( $total_receivables ); ?></span>
-                    </div>
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 shadow-2xs hover:border-zinc-300 transition-all flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-zinc-50 border border-zinc-100 text-zinc-750 flex items-center justify-center font-extrabold text-sm shrink-0">
+                    ₹
                 </div>
-                <div class="flex items-center justify-between pt-1 text-[11px]">
-                    <span class="text-zinc-400">Payments awaiting collection</span>
-                    <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md">Due</span>
+                <div class="min-w-0 flex-1">
+                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Pending Receivables</span>
+                    <span id="kpi-receivables-amount" class="text-xl font-extrabold text-zinc-950 tracking-tight block mt-0.5">₹<?php echo number_format( $total_receivables ); ?></span>
                 </div>
-                <div class="h-0.5 bg-amber-500 rounded-full w-full"></div>
             </div>
         </div>
 
-        <!-- Filter & Search Toolbar (Responsive & Clean Hover States) -->
-        <div class="bg-white border border-zinc-200/80 rounded-2xl p-3 sm:p-3.5 shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
-            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none" id="vault-type-tabs">
-                <button onclick="coraFilterVault('all', this)" class="cora-vtab px-4 py-2 rounded-xl text-xs font-bold active-vtab cursor-pointer shadow-xs shrink-0" data-type="all">All Documents</button>
-                <button onclick="coraFilterVault('proposal', this)" class="cora-vtab px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer shrink-0" data-type="proposal">Proposals</button>
-                <button onclick="coraFilterVault('invoice', this)" class="cora-vtab px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer shrink-0" data-type="invoice">Invoices</button>
-                <button onclick="coraFilterVault('contract', this)" class="cora-vtab px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer shrink-0" data-type="contract">Contracts</button>
-                <button onclick="coraFilterVault('offer', this)" class="cora-vtab px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer shrink-0" data-type="offer">Offer Letters</button>
+        <!-- Filter & Search Toolbar (Natural Borderless Layout) -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 mt-2 mb-1">
+            <div class="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 scrollbar-none" id="vault-type-tabs">
+                <button onclick="coraFilterVault('all', this)" class="cora-vtab px-3 py-1.5 rounded-lg text-xs font-bold active-vtab cursor-pointer transition-all shadow-3xs shrink-0" data-type="all">All Documents</button>
+                <button onclick="coraFilterVault('proposal', this)" class="cora-vtab px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-all hover:bg-zinc-100 hover:text-zinc-950 text-zinc-655 shrink-0" data-type="proposal">Proposals</button>
+                <button onclick="coraFilterVault('invoice', this)" class="cora-vtab px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-all hover:bg-zinc-100 hover:text-zinc-950 text-zinc-655 shrink-0" data-type="invoice">Invoices</button>
+                <button onclick="coraFilterVault('contract', this)" class="cora-vtab px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-all hover:bg-zinc-100 hover:text-zinc-950 text-zinc-655 shrink-0" data-type="contract">Contracts</button>
+                <button onclick="coraFilterVault('offer', this)" class="cora-vtab px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-all hover:bg-zinc-100 hover:text-zinc-950 text-zinc-655 shrink-0" data-type="offer">Offer Letters</button>
             </div>
 
             <div class="flex items-center gap-2 flex-1 sm:w-72 max-w-md">
                 <div class="relative flex-1">
-                    <input type="text" id="vault-search-input" onkeyup="coraSearchVault(this.value)" placeholder="Search title, client, or doc #..." class="w-full pl-9 pr-3 py-2 bg-zinc-50/60 border border-zinc-200 rounded-xl text-xs outline-none focus:border-zinc-950 focus:bg-white transition-all font-medium">
-                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-3 top-2.5 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="vault-search-input" onkeyup="coraSearchVault(this.value)" placeholder="Search title, client, or doc #..." class="w-full pl-9 pr-3 py-2 bg-white border border-zinc-200 rounded-xl text-xs outline-none focus:border-zinc-950 transition-all font-medium shadow-3xs">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-3 top-2.5 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </div>
-                <button class="p-2 border border-zinc-200 rounded-xl bg-white text-zinc-700 hover:bg-zinc-50 cursor-pointer shadow-xs shrink-0" title="Advanced Filter Options">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+                <button class="p-2 border border-zinc-200 rounded-xl bg-white text-zinc-700 hover:bg-zinc-50 cursor-pointer shadow-3xs shrink-0" title="Advanced Filter Options">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
                 </button>
             </div>
         </div>
@@ -373,29 +356,24 @@ foreach ( $cora_documents as $doc ) {
                         $status = $doc['status'] ?? 'Draft';
                         
                         // Category soft badges & icons (borderless soft fills)
-                        $cat_bg = 'bg-blue-50 text-blue-700';
-                        $icon_bg = 'bg-blue-50 text-blue-600';
-                        if ($type_lower === 'invoice') {
-                            $cat_bg = 'bg-emerald-50 text-emerald-700';
-                            $icon_bg = 'bg-emerald-50 text-emerald-600';
-                        } elseif ($type_lower === 'contract') {
-                            $cat_bg = 'bg-purple-50 text-purple-700';
-                            $icon_bg = 'bg-purple-50 text-purple-600';
-                        } elseif ($type_lower === 'equipment') {
-                            $cat_bg = 'bg-amber-50 text-amber-700';
-                            $icon_bg = 'bg-amber-50 text-amber-600';
+                        $cat_bg = 'bg-zinc-100 border border-zinc-200/60 text-zinc-800';
+                        if ($type_lower === 'contract' || $type_lower === 'sla' || $type_lower === 'nda') {
+                            $cat_bg = 'bg-zinc-950 text-white border border-zinc-950';
                         }
+                        
+                        $icon_bg = 'bg-zinc-50 border border-zinc-200/50 text-zinc-650';
 
                         // Status badges (borderless soft fills)
-                        $status_bg = 'bg-blue-50 text-blue-700 font-bold';
-                        if ($status === 'Paid') $status_bg = 'bg-emerald-50 text-emerald-700 font-bold';
-                        elseif ($status === 'Signed') $status_bg = 'bg-purple-50 text-purple-700 font-bold';
+                        $status_bg = 'bg-zinc-100 border border-zinc-200/50 text-zinc-700 font-semibold';
+                        if ($status === 'Signed' || $status === 'Paid') {
+                            $status_bg = 'bg-zinc-950 text-white border border-zinc-950 font-bold';
+                        }
 
                         $is_signed = ! empty( $doc['signed'] );
                         $is_proposal = $type_lower === 'proposal';
                     ?>
                     <tr class="hover:bg-zinc-50/80 transition-colors cora-vault-row" data-type="<?php echo esc_attr( $type_lower ); ?>">
-                        <td class="p-4">
+                        <td class="p-4 py-3.5">
                             <div class="flex items-center gap-3">
                                 <div class="w-9 h-9 rounded-xl <?php echo $icon_bg; ?> flex items-center justify-center shrink-0">
                                     <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
@@ -406,28 +384,28 @@ foreach ( $cora_documents as $doc ) {
                                 </div>
                             </div>
                         </td>
-                        <td class="p-4">
-                            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold <?php echo $cat_bg; ?> uppercase tracking-wider">
+                        <td class="p-4 py-3.5">
+                            <span class="px-2.5 py-1 rounded-md text-[9px] font-bold <?php echo $cat_bg; ?> uppercase tracking-wider">
                                 <?php echo esc_html( $doc['type'] ); ?>
                             </span>
                         </td>
-                        <td class="p-4">
+                        <td class="p-4 py-3.5">
                             <div class="font-semibold text-zinc-900"><?php echo esc_html( $doc['client_name'] ); ?></div>
                             <?php if ( ! empty( $doc['client_gstin'] ) ) : ?>
                                 <div class="text-[10px] font-mono text-zinc-400"><?php echo esc_html( $doc['client_gstin'] ); ?></div>
                             <?php endif; ?>
                         </td>
-                        <td class="p-4 font-bold font-mono text-zinc-950 text-sm">
+                        <td class="p-4 py-3.5 font-bold font-mono text-zinc-950 text-sm">
                             ₹<?php echo number_format( floatval( $doc['grand_total'] ?? $doc['amount'] ?? 0 ) ); ?>
                         </td>
-                        <td class="p-4">
-                            <span class="px-2.5 py-1 rounded-md text-[10px] <?php echo $status_bg; ?>">
+                        <td class="p-4 py-3.5">
+                            <span class="px-2.5 py-1 rounded-md text-[9px] <?php echo $status_bg; ?> uppercase tracking-wider">
                                 <?php echo esc_html( $status ); ?>
                             </span>
                         </td>
-                        <td class="p-4">
+                        <td class="p-4 py-3.5">
                             <?php if ( $is_signed ) : ?>
-                                <span class="text-emerald-700 font-bold text-[11px] flex items-center gap-1 whitespace-nowrap">
+                                <span class="text-zinc-950 font-bold text-[11px] flex items-center gap-1 whitespace-nowrap">
                                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                     Signed
                                 </span>
@@ -437,7 +415,7 @@ foreach ( $cora_documents as $doc ) {
                                 </button>
                             <?php endif; ?>
                         </td>
-                        <td class="p-4 text-right">
+                        <td class="p-4 py-3.5 text-right">
                             <div class="flex items-center justify-end gap-1.5 whitespace-nowrap">
                                 <?php if ( $is_proposal ) : ?>
                                     <button onclick="coraConvertQuoteToInvoice('<?php echo esc_js( $doc['id'] ); ?>')" class="p-1.5 bg-zinc-950 text-white hover:bg-zinc-800 rounded-lg transition-all cursor-pointer shadow-xs whitespace-nowrap" title="Convert to GST Invoice">
@@ -3522,14 +3500,14 @@ window.coraSwitchVaultView = function(view, docId) {
     document.getElementById('cora-vault-view-esign').classList.add('hidden');
 
     document.querySelectorAll('[id^="vault-mode-btn-"]').forEach(function(b){
-        b.classList.remove('text-zinc-950', 'border-zinc-950', 'font-bold');
-        b.classList.add('text-zinc-500', 'border-transparent', 'font-semibold');
+        b.classList.remove('bg-white', 'border-zinc-200/50', 'shadow-2xs', 'font-bold', 'text-zinc-950');
+        b.classList.add('text-zinc-650', 'font-semibold');
     });
 
     var activeBtn = document.getElementById('vault-mode-btn-' + view);
     if (activeBtn) {
-        activeBtn.classList.add('text-zinc-950', 'border-zinc-950', 'font-bold');
-        activeBtn.classList.remove('text-zinc-500', 'border-transparent', 'font-semibold');
+        activeBtn.classList.add('bg-white', 'border-zinc-200/50', 'shadow-2xs', 'font-bold', 'text-zinc-950');
+        activeBtn.classList.remove('text-zinc-650', 'font-semibold');
     }
 
     if (view === 'vault') document.getElementById('cora-vault-view-dashboard').classList.remove('hidden');
