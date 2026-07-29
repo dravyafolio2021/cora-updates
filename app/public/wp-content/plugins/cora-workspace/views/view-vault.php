@@ -3637,16 +3637,14 @@ document.addEventListener('DOMContentLoaded', function() {
     var savedTab = localStorage.getItem('cora_vault_tab');
     var coraView = urlParams.get('cora_view') || urlParams.get('vtab') || savedTab;
     var urlStep = urlParams.get('step');
-    // Only restore step from localStorage if the saved tab was editor
-    var localStep = (savedTab === 'editor') ? localStorage.getItem('cora_wiz_step') : null;
+    // Always read from localStorage — never wipe persisted step on refresh
+    var localStep = localStorage.getItem('cora_wiz_step');
     var targetStepNum = urlStep ? parseInt(urlStep, 10) : (localStep ? parseInt(localStep, 10) : (CORA_STUDIO_STATE.currentStep || 1));
     if (isNaN(targetStepNum) || targetStepNum < 1 || targetStepNum > 6) targetStepNum = 1;
 
     var docId = urlParams.get('doc_id') || localStorage.getItem('cora_vault_doc_id');
 
-    if (coraView === 'editor' || urlStep) {
-        // Clear stale step if no URL param drives it
-        if (!urlStep) localStorage.removeItem('cora_wiz_step');
+    if (coraView === 'editor' || urlStep || (savedTab === 'editor' && localStep)) {
         if (docId && coraView === 'editor') {
             coraOpenDocInStudio(docId);
         } else {
@@ -3655,8 +3653,6 @@ document.addEventListener('DOMContentLoaded', function() {
         coraJumpToWizardStep(targetStepNum, true);
         coraRenderPaperPreviewInStep5();
     } else {
-        // Clear stale editor state when landing on vault
-        localStorage.removeItem('cora_wiz_step');
         coraSwitchVaultView(coraView || 'vault');
     }
 
