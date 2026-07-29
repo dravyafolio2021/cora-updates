@@ -164,6 +164,30 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
     color: #09090b;
     background: #f4f4f5;
 }
+.cm-ctx-item {
+    padding: 8px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #27272a;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background .12s, color .12s;
+    user-select: none;
+}
+.cm-ctx-item:hover {
+    background: #f4f4f5;
+    color: #09090b;
+}
+.cm-ctx-item.del {
+    color: #ef4444;
+}
+.cm-ctx-item.del:hover {
+    background: #fef2f2;
+    color: #dc2626;
+}
 
 /* ─── Breadcrumbs & Sorting Row ────────────────────────────────────────── */
 #cm-breadcrumbs-bar {
@@ -1074,6 +1098,27 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
   </div>
 </div>
 
+<!-- ═══ FLOATING FOLDER COMMAND CONTEXT MENU ═════════════════════════════════ -->
+<div id="cm-folder-ctx-menu" class="cm-ctx-menu" style="display:none;position:fixed;z-index:99999;background:#fff;border:1px solid #e4e4e7;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.15);padding:6px;width:210px">
+    <div class="cm-ctx-item" onclick="cmFolderCtxAction('settings')">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        Folder Settings & Rename
+    </div>
+    <div class="cm-ctx-item" onclick="cmFolderCtxAction('subfolder')">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        New Subfolder Inside
+    </div>
+    <div class="cm-ctx-item" onclick="cmFolderCtxAction('share_link')">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+        Copy Public Share Link
+    </div>
+    <div class="cm-ctx-sep" style="height:1px;background:#f4f4f5;margin:4px 0"></div>
+    <div class="cm-ctx-item del" onclick="cmFolderCtxAction('delete')" style="color:#ef4444">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>
+        Delete Folder
+    </div>
+</div>
+
 <!-- ═══ IMAGE EDITOR MODAL ═══════════════════════════════════════════════════ -->
 <div id="cm-editor-modal">
     <div id="cm-editor-card">
@@ -1391,6 +1436,7 @@ window.cmInit = function() {
     });
     document.addEventListener('click', function(e) {
         if (!e.target.closest('#cm-ctx-menu')) cmHideContextMenu();
+        if (!e.target.closest('#cm-folder-ctx-menu')) cmHideFolderContextMenu();
     });
     var op = document.getElementById('cm-wm-op');
     if (op) op.addEventListener('input', function() { document.getElementById('cm-wm-op-v').textContent = this.value + '%'; });
@@ -1500,6 +1546,7 @@ window.cmBulkZip = function() {
 // ── CONTEXT MENU ────────────────────────────────────────────────────────────
 window.cmShowContextMenu = function(e, f) {
     e.preventDefault();
+    if (typeof cmHideFolderContextMenu === 'function') cmHideFolderContextMenu();
     CM.ctxFile = f;
     document.getElementById('cm-ctx-title').textContent = f.title || f.filename;
 
@@ -1544,6 +1591,111 @@ window.cmCtxAction = function(act) {
     else if (act === 'gallery') { CM.selIds = [f.id]; cmBulkAddGallery(); }
     else if (act === 'download') { var a = document.createElement('a'); a.href = f.url; a.download = f.filename; a.click(); }
     else if (act === 'delete') { cmDeletePrompt([f.id]); }
+};
+
+// ── FLOATING FOLDER CONTEXT MENU ───────────────────────────────────────────
+window._activeFolderCtxObj = null;
+
+window.cmShowFolderContextMenu = function(e, folderObj) {
+    if (e) {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+    }
+    if (typeof cmHideContextMenu === 'function') cmHideContextMenu();
+    window._activeFolderCtxObj = folderObj;
+
+    var menu = document.getElementById('cm-folder-ctx-menu');
+    if (!menu) return;
+    menu.style.display = 'block';
+
+    var x = 0, y = 0;
+    if (e && typeof e.clientX === 'number' && (e.clientX !== 0 || e.clientY !== 0)) {
+        x = e.clientX;
+        y = e.clientY;
+    } else if (e && e.target) {
+        var rect = e.target.getBoundingClientRect();
+        x = rect.left;
+        y = rect.bottom + 4;
+    }
+
+    var menuW = menu.offsetWidth || 210;
+    var menuH = menu.offsetHeight || 160;
+    if (x + menuW > window.innerWidth - 10) {
+        x = Math.max(10, window.innerWidth - menuW - 10);
+    }
+    if (y + menuH > window.innerHeight - 10) {
+        y = Math.max(10, window.innerHeight - menuH - 10);
+    }
+
+    menu.style.left = x + 'px';
+    menu.style.top = y + 'px';
+};
+
+window.cmHideFolderContextMenu = function() {
+    var menu = document.getElementById('cm-folder-ctx-menu');
+    if (menu) menu.style.display = 'none';
+};
+
+window.cmFolderCtxAction = function(action) {
+    var folder = window._activeFolderCtxObj;
+    cmHideFolderContextMenu();
+    if (!folder) return;
+
+    if (action === 'settings') {
+        cmOpenFolderSettings(folder.id, folder.name);
+    } else if (action === 'subfolder') {
+        cmPromptFolder(folder.id);
+    } else if (action === 'share_link') {
+        if (folder.share_url) {
+            navigator.clipboard.writeText(folder.share_url);
+            coraShowToast('Folder link copied to clipboard!');
+        } else {
+            coraShowToast('Generating share link...');
+            $.ajax({
+                url: coraREData.ajaxUrl,
+                type: 'POST',
+                data: { action: 'cora_media_library_share_folder', nonce: coraREData.ajaxNonce, folder_id: folder.id },
+                success: function(r) {
+                    if (r.success && r.data && r.data.share_url) {
+                        folder.share_url = r.data.share_url;
+                        navigator.clipboard.writeText(r.data.share_url);
+                        coraShowToast('Folder link copied to clipboard!');
+                    } else {
+                        coraShowToast(r.data || 'Share link generation failed.');
+                    }
+                },
+                error: function() {
+                    coraShowToast('Failed to generate share link.');
+                }
+            });
+        }
+    } else if (action === 'delete') {
+        cmConfirmDeleteFolder(folder);
+    }
+};
+
+window.cmConfirmDeleteFolder = function(folderObj) {
+    if (!folderObj) return;
+    document.getElementById('cm-confirm-title').textContent = 'Delete folder "' + (folderObj.name || '') + '"?';
+    document.getElementById('cm-confirm-desc').textContent = 'This will permanently remove the folder. Files inside will become unorganized.';
+    document.getElementById('cm-confirm-modal').classList.add('open');
+    CM.confirmCb = function() {
+        coraShowToast('Deleting folder...');
+        $.ajax({
+            url: coraREData.ajaxUrl,
+            type: 'POST',
+            data: { action: 'cora_media_library_delete_folder', nonce: coraREData.ajaxNonce, term_id: folderObj.id },
+            success: function(r) {
+                if (r.success) {
+                    coraShowToast('Folder deleted.');
+                    cmLoadFolders();
+                    cmLoadFiles();
+                } else {
+                    coraShowToast(r.data || 'Failed to delete folder.');
+                }
+            }
+        });
+    };
 };
 
 // ── CULLING / RATING / LABELS ──────────────────────────────────────────────
@@ -2071,13 +2223,13 @@ window.cmRenderFolderTabs = function() {
                 if (opt) {
                     opt.addEventListener('click', function(e) {
                         e.stopPropagation();
-                        cmOpenFolderSettings(folder.id, folder.name);
+                        cmShowFolderContextMenu(e, folder);
                     });
                 }
                 fcard.addEventListener('contextmenu', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    cmOpenFolderSettings(folder.id, folder.name);
+                    cmShowFolderContextMenu(e, folder);
                 });
                 items.push(fcard);
             }
@@ -2116,9 +2268,14 @@ window.cmRenderFolderTabs = function() {
                 if (sOpt) {
                     sOpt.addEventListener('click', function(e) {
                         e.stopPropagation();
-                        cmOpenFolderSettings(s.id, s.name);
+                        cmShowFolderContextMenu(e, s);
                     });
                 }
+                scard.addEventListener('contextmenu', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    cmShowFolderContextMenu(e, s);
+                });
                 items.push(scard);
             });
         }
@@ -2219,7 +2376,7 @@ window.cmUpdateBreadcrumbs = function() {
         countEl.textContent = (CM.total || 0) + ' files';
     }
 };
-window.cmPromptFolder = function() {
+window.cmPromptFolder = function(parentId) {
     document.getElementById('cm-folder-name').value = '';
     var parentSel = document.getElementById('cm-folder-parent');
     if (parentSel) {
@@ -2227,6 +2384,11 @@ window.cmPromptFolder = function() {
         CM.folders.forEach(function(f) {
             parentSel.innerHTML += '<option value="' + f.id + '">' + esc(f.name) + '</option>';
         });
+        if (parentId) {
+            parentSel.value = parentId;
+        } else {
+            parentSel.value = '0';
+        }
     }
     if (document.getElementById('cm-folder-desc')) document.getElementById('cm-folder-desc').value = '';
     if (document.getElementById('cm-folder-autoshare')) document.getElementById('cm-folder-autoshare').checked = false;
@@ -2842,7 +3004,8 @@ window.cmOpenFolderSettings = function(folderId, name) {
     document.getElementById('cm-fs-url-input').value = '';
     cmRenderSwatches('cm-fs-color-swatches', 'cm-fs-color', color);
     if (typeof cmHideContextMenu === 'function') cmHideContextMenu();
-    document.getElementById('cm-folder-settings-dlg').classList.add('open');
+    var dlg = document.getElementById('cm-folder-ctx-menu') || document.getElementById('cm-folder-settings-dlg');
+    if (dlg) dlg.classList.add('open');
 };
 
 window.cmSaveFolderSettings = window.cmSaveRenameFolder = function() {
@@ -2855,7 +3018,8 @@ window.cmSaveFolderSettings = window.cmSaveRenameFolder = function() {
     }, success: function(r) {
         if (r.success) {
             coraShowToast('Folder updated!');
-            document.getElementById('cm-folder-settings-dlg').classList.remove('open');
+            var dlg = document.getElementById('cm-folder-ctx-menu') || document.getElementById('cm-folder-settings-dlg');
+            if (dlg) dlg.classList.remove('open');
             cmLoadFolders();
         } else coraShowToast(r.data || 'Save failed.');
     }});
@@ -2923,7 +3087,8 @@ window.cmDeleteFolderFromSettings = function() {
     }, success: function(r) {
         if (r.success) {
             coraShowToast('Folder deleted.');
-            document.getElementById('cm-folder-settings-dlg').classList.remove('open');
+            var dlg = document.getElementById('cm-folder-ctx-menu') || document.getElementById('cm-folder-settings-dlg');
+            if (dlg) dlg.classList.remove('open');
             cmLoadFolders();
         }
     }});

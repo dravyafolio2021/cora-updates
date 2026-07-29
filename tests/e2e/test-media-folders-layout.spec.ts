@@ -233,6 +233,35 @@ test.describe('Media Library - Dedicated Folders Layout', () => {
     await expect(page.locator('#cm-folders-grid .cm-fcard-chk')).toHaveCount(0);
   });
 
+  test('13. Verify Folder Context Menu via 3-Dots Click and Right-Click', async ({ page }) => {
+    let optBtn = page.locator('#cm-folders-grid .cm-fcard .cm-fcard-opt').first();
+    if (!(await optBtn.isVisible())) {
+      const foldersSection = page.locator('#cm-folders-section');
+      const newFolderBtn = foldersSection.locator('button:has-text("New folder")');
+      await newFolderBtn.click();
+      const folderName = 'Context Menu Test Folder ' + Date.now();
+      await page.fill('#cm-folder-name', folderName);
+      await page.locator('#cm-folder-card button:has-text("Create Folder")').click();
+      await expect(page.locator('#cm-folder-dlg')).not.toHaveClass(/open/);
+    }
+    await expect(optBtn).toBeVisible();
+
+    const folderCtxMenu = page.locator('#cm-folder-ctx-menu');
+
+    // 1. Verify clicking 3-dots '⋮' on a folder card opens #cm-folder-ctx-menu
+    await optBtn.click();
+    await expect(folderCtxMenu).toBeVisible();
+
+    // Close menu by clicking on body/canvas
+    await page.locator('body').click({ position: { x: 10, y: 10 } });
+    await expect(folderCtxMenu).toBeHidden();
+
+    // 2. Verify right-clicking a folder card opens #cm-folder-ctx-menu
+    const targetCard = page.locator('#cm-folders-grid .cm-fcard:has(.cm-fcard-opt)').first();
+    await targetCard.click({ button: 'right' });
+    await expect(folderCtxMenu).toBeVisible();
+  });
+
 });
 
 test.describe('Media Library - Mobile Viewport Layout', () => {
