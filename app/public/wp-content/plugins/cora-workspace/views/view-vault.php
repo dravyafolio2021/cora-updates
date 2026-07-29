@@ -353,34 +353,34 @@ foreach ( $cora_documents as $doc ) {
                         $type_lower = strtolower($doc['type'] ?? '');
                         $status = $doc['status'] ?? 'Draft';
                         
-                        // Category soft badges & icons (Color psychology tints - Borderless Soft Fills)
-                        $cat_bg = 'bg-zinc-100 text-zinc-700 font-bold';
-                        $icon_bg = 'bg-zinc-105/60 text-zinc-500';
+                        // Category soft badges & icons (Color psychology tints - Soft Fills with Faint Borders)
+                        $cat_bg = 'bg-zinc-50 border border-zinc-200 text-zinc-650 font-semibold';
+                        $icon_bg = 'bg-zinc-50 border border-zinc-150 text-zinc-500';
                         
                         if ($type_lower === 'invoice') {
-                            $cat_bg = 'bg-emerald-100/75 text-emerald-800 font-bold';
-                            $icon_bg = 'bg-emerald-100/50 text-emerald-600';
+                            $cat_bg = 'bg-emerald-50 border border-emerald-100 text-emerald-700 font-bold';
+                            $icon_bg = 'bg-emerald-50 border border-emerald-100 text-emerald-600';
                         } elseif ($type_lower === 'contract' || $type_lower === 'sla' || $type_lower === 'nda') {
-                            $cat_bg = 'bg-purple-100/75 text-purple-800 font-bold';
-                            $icon_bg = 'bg-purple-100/50 text-purple-600';
+                            $cat_bg = 'bg-purple-50 border border-purple-100 text-purple-700 font-bold';
+                            $icon_bg = 'bg-purple-50 border border-purple-100 text-purple-600';
                         } elseif ($type_lower === 'proposal' || $type_lower === 'quote') {
-                            $cat_bg = 'bg-blue-100/75 text-blue-800 font-bold';
-                            $icon_bg = 'bg-blue-100/50 text-blue-600';
+                            $cat_bg = 'bg-blue-50 border border-blue-100 text-blue-700 font-bold';
+                            $icon_bg = 'bg-blue-50 border border-blue-100 text-blue-600';
                         } elseif ($type_lower === 'equipment' || $type_lower === 'gear') {
-                            $cat_bg = 'bg-amber-100/75 text-amber-800 font-bold';
-                            $icon_bg = 'bg-amber-100/50 text-amber-600';
+                            $cat_bg = 'bg-amber-50 border border-amber-100 text-amber-700 font-bold';
+                            $icon_bg = 'bg-amber-50 border border-amber-100 text-amber-600';
                         }
 
-                        // Status badges (Color psychology tints - Borderless Soft Fills)
-                        $status_bg = 'bg-zinc-100 text-zinc-650 font-semibold';
+                        // Status badges (Color psychology tints - Soft Fills with Faint Borders)
+                        $status_bg = 'bg-zinc-50 border border-zinc-200 text-zinc-650 font-semibold';
                         if ($status === 'Paid') {
-                            $status_bg = 'bg-emerald-100/75 text-emerald-800 font-bold';
+                            $status_bg = 'bg-emerald-50 border border-emerald-100 text-emerald-700 font-bold';
                         } elseif ($status === 'Signed') {
-                            $status_bg = 'bg-purple-100/75 text-purple-800 font-bold';
+                            $status_bg = 'bg-purple-50 border border-purple-100 text-purple-700 font-bold';
                         } elseif ($status === 'Sent' || $status === 'Active') {
-                            $status_bg = 'bg-blue-100/75 text-blue-800 font-bold';
+                            $status_bg = 'bg-blue-50 border border-blue-100 text-blue-700 font-bold';
                         } elseif ($status === 'Pending') {
-                            $status_bg = 'bg-amber-100/75 text-amber-800 font-bold';
+                            $status_bg = 'bg-amber-50 border border-amber-100 text-amber-700 font-bold';
                         }
 
                         $is_signed = ! empty( $doc['signed'] );
