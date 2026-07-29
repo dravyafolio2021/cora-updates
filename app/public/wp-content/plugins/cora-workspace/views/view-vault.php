@@ -220,7 +220,7 @@ foreach ( $cora_documents as $doc ) {
 
 <div id="cora-vault-wrapper" class="space-y-5 relative font-sans text-zinc-900 pb-10">
    <!-- Top Header & Navigation area (Shopify/Notion UI style alignment) -->
-   <div class="flex flex-col gap-4 border-b border-zinc-200/80 pb-0 mb-5">
+   <div class="flex flex-col gap-4 border-b border-zinc-200/80 pb-0 mb-5" style="padding-bottom: 0 !important;">
        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
            <div>
                <h1 class="text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">File Manager & Vault</h1>
