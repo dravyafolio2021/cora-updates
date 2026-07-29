@@ -266,48 +266,48 @@ foreach ( $cora_documents as $doc ) {
          ═════════════════════════════════════════════════════════════════════ -->
     <div id="cora-vault-view-dashboard" class="space-y-5">
         <!-- 4 KPI Cards Grid (Compact & Monochromatic Horizontal Spacing) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <!-- Card 1: Total Documents -->
-            <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 shadow-2xs hover:border-zinc-300 transition-all flex items-center gap-3.5">
-                <div class="w-10 h-10 rounded-xl bg-zinc-50 border border-zinc-100 text-zinc-750 flex items-center justify-center shrink-0">
-                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-3 sm:p-4 shadow-2xs hover:border-zinc-300 transition-all flex items-center gap-2.5 sm:gap-3.5">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-zinc-50 border border-zinc-100 text-zinc-750 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                 </div>
                 <div class="min-w-0 flex-1">
-                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Total Documents</span>
-                    <span id="kpi-total-docs-count" class="text-xl font-extrabold text-zinc-950 tracking-tight block mt-0.5"><?php echo $total_docs; ?></span>
+                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider block leading-tight">Total Docs</span>
+                    <span id="kpi-total-docs-count" class="text-lg sm:text-xl font-extrabold text-zinc-950 tracking-tight block mt-0.5"><?php echo $total_docs; ?></span>
                 </div>
             </div>
 
             <!-- Card 2: Proposals & Quotes -->
-            <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 shadow-2xs hover:border-zinc-300 transition-all flex items-center gap-3.5">
-                <div class="w-10 h-10 rounded-xl bg-zinc-50 border border-zinc-100 text-zinc-750 flex items-center justify-center shrink-0">
-                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line></svg>
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-3 sm:p-4 shadow-2xs hover:border-zinc-300 transition-all flex items-center gap-2.5 sm:gap-3.5">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-zinc-50 border border-zinc-100 text-zinc-750 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line></svg>
                 </div>
                 <div class="min-w-0 flex-1">
-                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Proposals & Quotes</span>
-                    <span id="kpi-proposals-count" class="text-xl font-extrabold text-zinc-950 tracking-tight block mt-0.5"><?php echo $proposal_count; ?></span>
+                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider block leading-tight">Proposals</span>
+                    <span id="kpi-proposals-count" class="text-lg sm:text-xl font-extrabold text-zinc-950 tracking-tight block mt-0.5"><?php echo $proposal_count; ?></span>
                 </div>
             </div>
 
             <!-- Card 3: Signed Contracts -->
-            <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 shadow-2xs hover:border-zinc-300 transition-all flex items-center gap-3.5">
-                <div class="w-10 h-10 rounded-xl bg-zinc-50 border border-zinc-100 text-zinc-750 flex items-center justify-center shrink-0">
-                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-3 sm:p-4 shadow-2xs hover:border-zinc-300 transition-all flex items-center gap-2.5 sm:gap-3.5">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-zinc-50 border border-zinc-100 text-zinc-750 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 </div>
                 <div class="min-w-0 flex-1">
-                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Signed Contracts</span>
-                    <span id="kpi-signed-count" class="text-xl font-extrabold text-zinc-950 tracking-tight block mt-0.5"><?php echo $signed_count; ?></span>
+                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider block leading-tight">Signed</span>
+                    <span id="kpi-signed-count" class="text-lg sm:text-xl font-extrabold text-zinc-950 tracking-tight block mt-0.5"><?php echo $signed_count; ?></span>
                 </div>
             </div>
 
             <!-- Card 4: Pending Receivables -->
-            <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 shadow-2xs hover:border-zinc-300 transition-all flex items-center gap-3.5">
-                <div class="w-10 h-10 rounded-xl bg-zinc-50 border border-zinc-100 text-zinc-750 flex items-center justify-center font-extrabold text-sm shrink-0">
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-3 sm:p-4 shadow-2xs hover:border-zinc-300 transition-all flex items-center gap-2.5 sm:gap-3.5">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-zinc-50 border border-zinc-100 text-zinc-750 flex items-center justify-center font-extrabold text-xs sm:text-sm shrink-0">
                     ₹
                 </div>
                 <div class="min-w-0 flex-1">
-                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Pending Receivables</span>
-                    <span id="kpi-receivables-amount" class="text-xl font-extrabold text-zinc-950 tracking-tight block mt-0.5">₹<?php echo number_format( $total_receivables ); ?></span>
+                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider block leading-tight">Receivables</span>
+                    <span id="kpi-receivables-amount" class="text-lg sm:text-xl font-extrabold text-zinc-950 tracking-tight block mt-0.5">₹<?php echo number_format( $total_receivables ); ?></span>
                 </div>
             </div>
         </div>
