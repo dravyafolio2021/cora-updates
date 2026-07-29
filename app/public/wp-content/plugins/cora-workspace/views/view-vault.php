@@ -581,7 +581,7 @@ foreach ( $cora_documents as $doc ) {
         <input type="hidden" id="studio-doc-id" name="studio_doc_id">
 
         <!-- STEP 1 SUB-PAGE: DOCUMENT TYPE SELECTION -->
-        <div id="sub-page-wiz-step-1" class="bg-white border border-zinc-200/80 rounded-3xl p-6 md:p-10 pb-24 sm:pb-28 shadow-xs space-y-6 w-full max-w-none">
+        <div id="sub-page-wiz-step-1" class="bg-white border border-zinc-200/80 rounded-3xl p-4 md:p-5 pb-20 md:pb-24 shadow-xs space-y-6 w-full max-w-none">
             <div class="border-b border-zinc-100 pb-5 space-y-3.5">
                 <div>
                     <span class="px-3.5 py-1.5 rounded-full bg-zinc-100 text-zinc-600 text-[11px] font-bold uppercase tracking-widest inline-block border border-zinc-200">Step 1 of 6</span>
@@ -715,7 +715,7 @@ foreach ( $cora_documents as $doc ) {
         </div>
 
         <!-- STEP 2 SUB-PAGE: CHOOSE VISUAL TEMPLATE BLUEPRINT -->
-        <div id="sub-page-wiz-step-2" class="hidden bg-white border border-zinc-200/80 rounded-3xl p-6 md:p-10 pb-24 sm:pb-28 shadow-xs space-y-6 w-full max-w-none">
+        <div id="sub-page-wiz-step-2" class="hidden bg-white border border-zinc-200/80 rounded-3xl p-4 md:p-5 pb-20 md:pb-24 shadow-xs space-y-6 w-full max-w-none">
             <div class="border-b border-zinc-100 pb-5 space-y-3.5">
                 <div>
                     <span class="px-3.5 py-1.5 rounded-full bg-zinc-100 text-zinc-600 text-[11px] font-bold uppercase tracking-widest inline-block border border-zinc-200">Step 2 of 6</span>
@@ -1523,7 +1523,7 @@ foreach ( $cora_documents as $doc ) {
         </div>
 
         <!-- STEP 5 SUB-PAGE: GENERATE DOCUMENT & DOCUMENT READY -->
-        <div id="sub-page-wiz-step-5" class="hidden bg-white border border-zinc-200/80 rounded-3xl p-6 md:p-12 pb-24 sm:pb-28 shadow-xs space-y-8 w-full max-w-none">
+        <div id="sub-page-wiz-step-5" class="hidden bg-white border border-zinc-200/80 rounded-3xl p-4 md:p-6 pb-20 md:pb-24 shadow-xs space-y-8 w-full max-w-none">
             <!-- Center Hero State -->
             <div class="text-center max-w-xl mx-auto space-y-3 py-4">
                 <div class="w-16 h-16 rounded-full bg-zinc-950 text-white flex items-center justify-center shadow-lg mx-auto border-4 border-zinc-100">
@@ -1591,7 +1591,7 @@ foreach ( $cora_documents as $doc ) {
         </div>
 
         <!-- STEP 6 SUB-PAGE: SAVE & SHARE WITH SECURITY -->
-        <div id="sub-page-wiz-step-6" class="hidden bg-white border border-zinc-200/80 rounded-3xl p-5 md:p-8 pb-24 sm:pb-28 shadow-xs space-y-6 w-full max-w-none">
+        <div id="sub-page-wiz-step-6" class="hidden bg-white border border-zinc-200/80 rounded-3xl p-4 md:p-5 pb-20 md:pb-24 shadow-xs space-y-6 w-full max-w-none">
             <!-- Header Bar -->
             <div class="border-b border-zinc-100 pb-4 flex items-center justify-between flex-wrap gap-3">
                 <div>
