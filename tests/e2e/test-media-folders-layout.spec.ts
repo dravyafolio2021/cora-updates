@@ -170,6 +170,23 @@ test.describe('Media Library - Dedicated Folders Layout', () => {
     expect(borderLeft).toBeTruthy();
   });
 
+  test('10. Verify Circular SVG Storage Ring Rendering', async ({ page }) => {
+    await page.evaluate(() => {
+      if (typeof (window as any).cmLoadStorage === 'function') {
+        (window as any).cmLoadStorage();
+      }
+    });
+
+    const storageWrap = page.locator('#cm-storage-wrap');
+    await expect(storageWrap).toBeVisible();
+
+    const storageRingSvg = page.locator('.cm-storage-ring-svg');
+    await expect(storageRingSvg).toBeVisible();
+
+    const ringFill = storageWrap.locator('#cm-ring-fill, .cm-ring-fill, .cm-storage-ring-fill').first();
+    await expect(ringFill).toBeVisible();
+  });
+
 });
 
 test.describe('Media Library - Mobile Viewport Layout', () => {
@@ -229,6 +246,28 @@ test.describe('Media Library - Mobile Viewport Layout', () => {
 
     const listContainer = page.locator('#cm-list');
     await expect(listContainer).toBeVisible();
+  });
+
+  test('5. Verify Mobile Bulk Bar Rendering without Horizontal Scroll', async ({ page }) => {
+    const bulkBtn = page.locator('#cm-header-top #cm-bulk-btn');
+    await expect(bulkBtn).toBeVisible();
+    await bulkBtn.click();
+
+    const bulkBar = page.locator('#cm-bulk-bar');
+    await expect(bulkBar).toBeVisible();
+    await expect(bulkBar).toHaveClass(/on/);
+
+    const isOverflowingHorizontally = await page.evaluate(() => {
+      return document.documentElement.scrollWidth > window.innerWidth;
+    });
+    expect(isOverflowingHorizontally).toBe(false);
+
+    const bulkBarBox = await bulkBar.boundingBox();
+    const viewportWidth = page.viewportSize()?.width || 390;
+    if (bulkBarBox) {
+      expect(bulkBarBox.x).toBeGreaterThanOrEqual(0);
+      expect(bulkBarBox.x + bulkBarBox.width).toBeLessThanOrEqual(viewportWidth + 1);
+    }
   });
 });
 

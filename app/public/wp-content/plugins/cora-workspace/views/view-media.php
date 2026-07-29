@@ -36,27 +36,9 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 .cm-sbar-w { height:3px; width:45px; background:#e4e4e7; border-radius:99px; overflow:hidden; }
 .cm-sbar   { height:100%; border-radius:99px; transition:width .4s; }
 
-#cm-storage-wrap { padding: 4px 9px; border-radius: 999px; font-size: 10.5px; font-weight: 600; transition: all .2s; border: 1px solid #e4e4e7; background: #fafafa; display: inline-flex; align-items: center; gap: 6px; }
-.cm-storage-dot { font-size: 8px; margin-right: 3px; }
-.cm-storage-pct-badge { font-weight: 700; padding: 1px 5px; border-radius: 4px; font-size: 10px; }
-
-/* Healthy (<70%) */
-.cm-storage-healthy { background: #ecfdf5 !important; border-color: #a7f3d0 !important; color: #047857 !important; }
-.cm-storage-healthy .cm-storage-dot { color: #10b981; }
-.cm-storage-healthy .cm-storage-pct-badge { background: #d1fae5; color: #065f46; }
-.cm-storage-healthy .cm-sbar { background: #10b981 !important; }
-
-/* Warning (70%-90%) */
-.cm-storage-warning { background: #fffbeb !important; border-color: #fde68a !important; color: #b45309 !important; }
-.cm-storage-warning .cm-storage-dot { color: #f59e0b; }
-.cm-storage-warning .cm-storage-pct-badge { background: #fef3c7; color: #92400e; }
-.cm-storage-warning .cm-sbar { background: #f59e0b !important; }
-
-/* Critical (>90%) */
-.cm-storage-critical { background: #fef2f2 !important; border-color: #fecaca !important; color: #b91c1c !important; }
-.cm-storage-critical .cm-storage-dot { color: #ef4444; }
-.cm-storage-critical .cm-storage-pct-badge { background: #fee2e2; color: #991b1b; }
-.cm-storage-critical .cm-sbar { background: #ef4444 !important; }
+#cm-storage-wrap { padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid #e4e4e7; background: #fff; display: inline-flex; align-items: center; gap: 6px; user-select: none; }
+.cm-storage-ring-svg { transform: rotate(-90deg); flex-shrink: 0; }
+.cm-ring-fill { transition: stroke-dasharray .4s ease, stroke .3s ease; }
 .cm-hbtn { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; border:1px solid #e4e4e7; background:#fff; color:#3f3f46; transition:all .12s; white-space:nowrap; }
 .cm-hbtn:hover { background:#f4f4f5; border-color:#d4d4d8; }
 .cm-hbtn.primary { background:#09090b; color:#fff; border-color:#09090b; }
@@ -450,8 +432,11 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 .cora-dark-theme .cm-ltable thead th { background:#1c1c1e; }
 .cora-dark-theme .cm-ltable tbody tr:hover { background:#1c1c1e; }
 .cora-dark-theme #cm-mobile-bottom-bar { background: rgba(17,17,19,0.95); border-color: #27272a; }
-.cora-dark-theme #cm-header-top #cm-storage-wrap { background: #1c1c1e; }
-.cora-dark-theme #cm-header-top #cm-storage-wrap .cm-h-storage-label { color: #a1a1aa; }
+.cora-dark-theme #cm-header-top #cm-storage-wrap { background: #1c1c1e; border-color: #27272a; color: #fafafa; }
+.cora-dark-theme #cm-storage-analytics-card { background: #18181b; border-color: #27272a; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.cora-dark-theme #cm-storage-analytics-card span { color: #fafafa; }
+.cora-dark-theme #cm-sa-free { color: #fafafa !important; }
+.cora-dark-theme .cm-ring-bg { stroke: #27272a; }
 
 /* ─── Mobile Filter Drawer & Chips ─────────────────────────────────────── */
 #cm-btn-mobile-filter { display: none; }
@@ -681,13 +666,37 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
         right: 12px;
         width: auto;
         z-index: 99999;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        background: #18181b;
+        color: #f4f4f5;
         border: 1px solid #3f3f46;
-        border-radius: 12px;
-        overflow-x: auto;
-        flex-wrap: nowrap;
-        box-sizing: border-box;
+        border-radius: 14px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.35);
         padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        overflow: hidden;
+        flex-wrap: wrap;
+        box-sizing: border-box;
+    }
+    #cm-bulk-bar .cm-bulk-row-1 {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+    #cm-bulk-bar .cm-bulk-row-2 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        width: 100%;
+    }
+    #cm-bulk-bar .cm-bulk-row-2 button,
+    #cm-bulk-bar .cm-bulk-row-2 select {
+        width: 100%;
+        justify-content: center;
+        padding: 6px 4px;
+        font-size: 10.5px;
     }
 
     #cm-root, #cm-canvas {
@@ -718,13 +727,28 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <div class="cm-h-sep"></div>
 
             <!-- Storage bar -->
-            <div class="cm-h-storage cm-storage-healthy" style="display:none" id="cm-storage-wrap">
-                <div class="cm-h-storage-label">
-                    <span id="cm-storage-status-dot" class="cm-storage-dot">●</span>
-                    <span id="cm-storage-lbl">—</span>
-                    <span id="cm-storage-pct" class="cm-storage-pct-badge">—</span>
+            <div class="cm-h-storage cm-storage-healthy" style="display:none;position:relative" id="cm-storage-wrap" onmouseenter="cmShowStorageAnalytics(true)" onmouseleave="cmShowStorageAnalytics(false)" onclick="cmToggleStorageAnalytics(event)">
+                <svg class="cm-storage-ring-svg" width="28" height="28" viewBox="0 0 36 36">
+                    <path class="cm-ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#e4e4e7" stroke-width="3" fill="none"/>
+                    <path id="cm-ring-fill" class="cm-ring-fill" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#10b981" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+                </svg>
+                <span id="cm-storage-pct" style="font-size:11px;font-weight:700">14.6%</span>
+
+                <!-- Hover / Click Detailed Analytics Popover Card -->
+                <div id="cm-storage-analytics-card" style="display:none;position:absolute;top:calc(100% + 8px);right:0;width:240px;background:#fff;border:1px solid #e4e4e7;border-radius:12px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,0.12);z-index:9999;pointer-events:none">
+                    <div style="font-size:11px;font-weight:700;color:#18181b;margin-bottom:4px;display:flex;justify-content:space-between">
+                        <span>Workspace Storage</span>
+                        <span id="cm-sa-pct-text" style="color:#10b981">14.6% Used</span>
+                    </div>
+                    <div style="font-size:10px;color:#71717a;margin-bottom:8px" id="cm-sa-human">— used of 5 GB</div>
+                    <div style="height:6px;width:100%;background:#f4f4f5;border-radius:99px;overflow:hidden;margin-bottom:8px">
+                        <div id="cm-sa-bar" style="height:100%;width:14.6%;background:#10b981;border-radius:99px"></div>
+                    </div>
+                    <div style="font-size:10px;color:#52525b;display:flex;justify-content:space-between">
+                        <span>Available:</span>
+                        <strong id="cm-sa-free" style="color:#09090b">—</strong>
+                    </div>
                 </div>
-                <div class="cm-sbar-w"><div class="cm-sbar" id="cm-storage-bar" style="width:0%"></div></div>
             </div>
 
             <!-- View toggle -->
@@ -782,14 +806,18 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 
         <!-- Bulk action bar -->
         <div id="cm-bulk-bar" class="cm-bulk-bar">
-            <span id="cm-bulk-ct" style="font-size:11px;font-weight:700;color:#f4f4f5">0 selected</span>
-            <button onclick="cmListAll(true)" class="cm-hbtn" style="font-size:11px;padding:4px 9px">Select All</button>
-            <select id="cm-bulk-folder" class="cm-sel" style="font-size:11px"><option value="">Move to folder…</option></select>
-            <button onclick="cmBulkMove()" class="cm-hbtn" style="font-size:11px;padding:4px 9px">Move</button>
-            <button onclick="cmBulkAddGallery()" class="cm-hbtn" style="font-size:11px;padding:4px 9px"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" style="display:inline;vertical-align:-2px;margin-right:2px"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> Add to Gallery</button>
-            <button onclick="cmBulkZip()" class="cm-hbtn" style="font-size:11px;padding:4px 9px"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" style="display:inline;vertical-align:-2px;margin-right:2px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download ZIP</button>
-            <button onclick="cmBulkDelete()" class="cm-hbtn" style="font-size:11px;padding:4px 9px;color:#f87171;border-color:#7f1d1d">Delete</button>
-            <button onclick="cmToggleBulk()" class="cm-hbtn" style="font-size:11px;padding:4px 9px;margin-left:auto">✕ Close</button>
+            <div class="cm-bulk-row-1" style="display:flex;align-items:center;gap:8px">
+                <span id="cm-bulk-ct" style="font-size:11px;font-weight:700;color:#f4f4f5">0 selected</span>
+                <button onclick="cmListAll(true)" class="cm-hbtn" style="font-size:11px;padding:4px 9px">Select All</button>
+                <button onclick="cmToggleBulk()" class="cm-hbtn" style="font-size:11px;padding:4px 9px;margin-left:auto">✕ Close</button>
+            </div>
+            <div class="cm-bulk-row-2" style="display:flex;align-items:center;gap:6px">
+                <select id="cm-bulk-folder" class="cm-sel" style="font-size:11px"><option value="">Move to folder…</option></select>
+                <button onclick="cmBulkMove()" class="cm-hbtn" style="font-size:11px;padding:4px 9px">Move</button>
+                <button onclick="cmBulkAddGallery()" class="cm-hbtn" style="font-size:11px;padding:4px 9px">Gallery</button>
+                <button onclick="cmBulkZip()" class="cm-hbtn" style="font-size:11px;padding:4px 9px">ZIP</button>
+                <button onclick="cmBulkDelete()" class="cm-hbtn" style="font-size:11px;padding:4px 9px;color:#f87171;border-color:#7f1d1d">Delete</button>
+            </div>
         </div>
     </div>
 
@@ -2691,24 +2719,97 @@ window.cmDeleteFolderFromSettings = function() {
 };
 
 // ── STORAGE ───────────────────────────────────────────────────────────────────
+window._cmStorageAnalyticsPinned = false;
+
+window.cmShowStorageAnalytics = function(show) {
+    var card = document.getElementById('cm-storage-analytics-card');
+    if (!card) return;
+    if (window._cmStorageAnalyticsPinned && !show) return;
+    card.style.display = show ? 'block' : 'none';
+};
+
+window.cmToggleStorageAnalytics = function(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    var card = document.getElementById('cm-storage-analytics-card');
+    if (!card) return;
+    window._cmStorageAnalyticsPinned = !window._cmStorageAnalyticsPinned;
+    card.style.display = window._cmStorageAnalyticsPinned ? 'block' : 'none';
+};
+
+document.addEventListener('click', function(e) {
+    var wrap = document.getElementById('cm-storage-wrap');
+    var card = document.getElementById('cm-storage-analytics-card');
+    if (card && wrap && !wrap.contains(e.target)) {
+        window._cmStorageAnalyticsPinned = false;
+        card.style.display = 'none';
+    }
+});
+
+function cmFormatBytes(b) {
+    if (!b || b <= 0) return '0 B';
+    var k = 1024, sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    var i = Math.floor(Math.log(b) / Math.log(k));
+    return parseFloat((b / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
 window.cmLoadStorage = function() {
     $.ajax({url:coraREData.ajaxUrl,type:'POST',data:{action:'cora_media_library_get_storage',nonce:coraREData.ajaxNonce},
-    success:function(r){if(!r.success)return;var d=r.data,p=Math.min(100,d.percent_used);
+    success:function(r){if(!r.success)return;var d=r.data,p=Math.min(100,Math.max(0,parseFloat(d.percent_used)||0));
+        var formattedPct = p.toFixed(1) + '%';
+        if (p % 1 === 0) formattedPct = p + '%';
         if (typeof d.total_bytes !== 'undefined') CM.storage_bytes = d.total_bytes;
         if (typeof d.limit_bytes !== 'undefined') CM.limit_bytes = d.limit_bytes;
-        document.getElementById('cm-storage-lbl').textContent=d.total_human+' / '+d.limit_human;
-        document.getElementById('cm-storage-pct').textContent=p+'%';
-        document.getElementById('cm-storage-bar').style.width=p+'%';
+
+        var strokeColor = '#10b981';
+        var statusClass = 'cm-storage-healthy';
+        if (p >= 90) {
+            strokeColor = '#ef4444';
+            statusClass = 'cm-storage-critical';
+        } else if (p >= 70) {
+            strokeColor = '#f59e0b';
+            statusClass = 'cm-storage-warning';
+        }
+
+        var ringFill = document.getElementById('cm-ring-fill');
+        if (ringFill) {
+            ringFill.setAttribute('stroke-dasharray', p + ', 100');
+            ringFill.setAttribute('stroke', strokeColor);
+        }
+
+        var storagePct = document.getElementById('cm-storage-pct');
+        if (storagePct) storagePct.textContent = formattedPct;
+
+        var saPctText = document.getElementById('cm-sa-pct-text');
+        if (saPctText) {
+            saPctText.textContent = formattedPct + ' Used';
+            saPctText.style.color = strokeColor;
+        }
+
+        var saHuman = document.getElementById('cm-sa-human');
+        if (saHuman) {
+            saHuman.textContent = (d.total_human || '0 B') + ' used of ' + (d.limit_human || 'Unlimited');
+        }
+
+        var saBar = document.getElementById('cm-sa-bar');
+        if (saBar) {
+            saBar.style.width = p + '%';
+            saBar.style.backgroundColor = strokeColor;
+        }
+
+        var saFree = document.getElementById('cm-sa-free');
+        if (saFree) {
+            if (typeof d.limit_bytes !== 'undefined' && typeof d.total_bytes !== 'undefined' && d.limit_bytes > 0) {
+                var freeBytes = Math.max(0, d.limit_bytes - d.total_bytes);
+                saFree.textContent = cmFormatBytes(freeBytes);
+            } else {
+                saFree.textContent = '—';
+            }
+        }
+
         var wrap = document.getElementById('cm-storage-wrap');
         if (wrap) {
             wrap.classList.remove('cm-storage-healthy', 'cm-storage-warning', 'cm-storage-critical');
-            if (p < 70) {
-                wrap.classList.add('cm-storage-healthy');
-            } else if (p >= 70 && p < 90) {
-                wrap.classList.add('cm-storage-warning');
-            } else {
-                wrap.classList.add('cm-storage-critical');
-            }
+            wrap.classList.add(statusClass);
             wrap.style.display = 'inline-flex';
         }
     }});
