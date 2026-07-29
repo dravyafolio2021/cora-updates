@@ -220,7 +220,7 @@ foreach ( $cora_documents as $doc ) {
 
 <div id="cora-vault-wrapper" class="space-y-5 relative font-sans text-zinc-900 pb-20">
    <!-- Top Header & Navigation area (Shopify/Notion UI style alignment) -->
-   <div class="flex flex-col gap-4 border-b border-zinc-200/80 pb-4 mb-5">
+   <div class="flex flex-col gap-4 border-b border-zinc-200/80 pb-0 mb-5">
        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
            <div>
                <h1 class="text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">File Manager & Vault</h1>
@@ -228,7 +228,7 @@ foreach ( $cora_documents as $doc ) {
            </div>
            
            <!-- Actions inline with title on desktop -->
-           <div class="flex items-center gap-2">
+           <div class="flex items-center gap-2 pb-2">
                <button onclick="coraCreateNewDocInStudio()" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-xs cursor-pointer whitespace-nowrap">
                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                    Create Document Wizard
@@ -245,21 +245,19 @@ foreach ( $cora_documents as $doc ) {
        </div>
 
        <!-- Segmented Switcher Tab Bar -->
-       <div class="flex items-center">
-           <div class="bg-zinc-150/70 p-1 rounded-xl border border-zinc-200/60 inline-flex items-center gap-0.5 shadow-3xs">
-               <button onclick="coraSwitchVaultView('vault')" id="vault-mode-btn-vault" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-white border border-zinc-200/50 shadow-2xs text-zinc-950 cursor-pointer flex items-center gap-1.5 whitespace-nowrap">
-                   <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                   Document Vault
-               </button>
-               <button onclick="coraSwitchVaultView('editor')" id="vault-mode-btn-editor" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-650 hover:text-zinc-950 hover:bg-white/40 cursor-pointer flex items-center gap-1.5 whitespace-nowrap">
-                   <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                   Document Studio Wizard
-               </button>
-               <button onclick="coraSwitchVaultView('esign')" id="vault-mode-btn-esign" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-650 hover:text-zinc-950 hover:bg-white/40 cursor-pointer flex items-center gap-1.5 whitespace-nowrap">
-                   <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                   E-Sign Audit Registry
-               </button>
-           </div>
+       <div class="flex items-center gap-1 sm:gap-2 -mb-px">
+           <button onclick="coraSwitchVaultView('vault')" id="vault-mode-btn-vault" class="flex items-center gap-1.5 pb-2.5 px-3.5 text-xs font-bold transition-all text-zinc-950 border-b-2 border-zinc-950 bg-transparent cursor-pointer whitespace-nowrap">
+               <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+               Document Vault
+           </button>
+           <button onclick="coraSwitchVaultView('editor')" id="vault-mode-btn-editor" class="flex items-center gap-1.5 pb-2.5 px-3.5 text-xs font-semibold text-zinc-500 hover:text-zinc-950 transition-all border-b-2 border-transparent bg-transparent cursor-pointer whitespace-nowrap">
+               <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+               Document Studio Wizard
+           </button>
+           <button onclick="coraSwitchVaultView('esign')" id="vault-mode-btn-esign" class="flex items-center gap-1.5 pb-2.5 px-3.5 text-xs font-semibold text-zinc-500 hover:text-zinc-950 transition-all border-b-2 border-transparent bg-transparent cursor-pointer whitespace-nowrap">
+               <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+               E-Sign Audit Registry
+           </button>
        </div>
    </div>
 
@@ -355,18 +353,34 @@ foreach ( $cora_documents as $doc ) {
                         $type_lower = strtolower($doc['type'] ?? '');
                         $status = $doc['status'] ?? 'Draft';
                         
-                        // Category soft badges & icons (borderless soft fills)
-                        $cat_bg = 'bg-zinc-100 border border-zinc-200/60 text-zinc-800';
-                        if ($type_lower === 'contract' || $type_lower === 'sla' || $type_lower === 'nda') {
-                            $cat_bg = 'bg-zinc-950 text-white border border-zinc-950';
-                        }
+                        // Category soft badges & icons (Color psychology tints)
+                        $cat_bg = 'bg-zinc-50 border border-zinc-200 text-zinc-600';
+                        $icon_bg = 'bg-zinc-50 border border-zinc-200/50 text-zinc-500';
                         
-                        $icon_bg = 'bg-zinc-50 border border-zinc-200/50 text-zinc-650';
+                        if ($type_lower === 'invoice') {
+                            $cat_bg = 'bg-emerald-50 border border-emerald-250/40 text-emerald-700';
+                            $icon_bg = 'bg-emerald-50/50 border border-emerald-100 text-emerald-600';
+                        } elseif ($type_lower === 'contract' || $type_lower === 'sla' || $type_lower === 'nda') {
+                            $cat_bg = 'bg-purple-50 border border-purple-250/40 text-purple-700';
+                            $icon_bg = 'bg-purple-50/50 border border-purple-100 text-purple-600';
+                        } elseif ($type_lower === 'proposal' || $type_lower === 'quote') {
+                            $cat_bg = 'bg-blue-50 border border-blue-250/40 text-blue-700';
+                            $icon_bg = 'bg-blue-50/50 border border-blue-100 text-blue-600';
+                        } elseif ($type_lower === 'equipment' || $type_lower === 'gear') {
+                            $cat_bg = 'bg-amber-50 border border-amber-250/40 text-amber-700';
+                            $icon_bg = 'bg-amber-50/50 border border-amber-100 text-amber-600';
+                        }
 
-                        // Status badges (borderless soft fills)
-                        $status_bg = 'bg-zinc-100 border border-zinc-200/50 text-zinc-700 font-semibold';
-                        if ($status === 'Signed' || $status === 'Paid') {
-                            $status_bg = 'bg-zinc-950 text-white border border-zinc-950 font-bold';
+                        // Status badges (Color psychology tints)
+                        $status_bg = 'bg-zinc-50 border border-zinc-200 text-zinc-650 font-semibold';
+                        if ($status === 'Paid') {
+                            $status_bg = 'bg-emerald-50 border border-emerald-250/40 text-emerald-700 font-bold';
+                        } elseif ($status === 'Signed') {
+                            $status_bg = 'bg-purple-50 border border-purple-250/40 text-purple-700 font-bold';
+                        } elseif ($status === 'Sent' || $status === 'Active') {
+                            $status_bg = 'bg-blue-50 border border-blue-250/40 text-blue-700 font-bold';
+                        } elseif ($status === 'Pending') {
+                            $status_bg = 'bg-amber-50 border border-amber-250/40 text-amber-700 font-bold';
                         }
 
                         $is_signed = ! empty( $doc['signed'] );
@@ -3020,7 +3034,7 @@ window.coraRenderPaperPreviewInStep5 = function() {
 
 // 1-CLICK CONVERT QUOTATION TO TAX INVOICE
 window.coraConvertQuoteToInvoice = function(docId) {
-    var doc = CORA_DOCUMENTS.find(function(d){ return d.id === docId; });
+    var doc = CORA_DOCUMENTS.find(function(d){ return String(d.id) === String(docId); });
     if (!doc) return;
 
     coraShowToast('Converting Quotation to GST Tax Invoice...');
@@ -3500,14 +3514,14 @@ window.coraSwitchVaultView = function(view, docId) {
     document.getElementById('cora-vault-view-esign').classList.add('hidden');
 
     document.querySelectorAll('[id^="vault-mode-btn-"]').forEach(function(b){
-        b.classList.remove('bg-white', 'border-zinc-200/50', 'shadow-2xs', 'font-bold', 'text-zinc-950');
-        b.classList.add('text-zinc-650', 'font-semibold');
+        b.classList.remove('text-zinc-950', 'border-zinc-950', 'font-bold');
+        b.classList.add('text-zinc-500', 'border-transparent', 'font-semibold');
     });
 
     var activeBtn = document.getElementById('vault-mode-btn-' + view);
     if (activeBtn) {
-        activeBtn.classList.add('bg-white', 'border-zinc-200/50', 'shadow-2xs', 'font-bold', 'text-zinc-950');
-        activeBtn.classList.remove('text-zinc-650', 'font-semibold');
+        activeBtn.classList.add('text-zinc-950', 'border-zinc-950', 'font-bold');
+        activeBtn.classList.remove('text-zinc-500', 'border-transparent', 'font-semibold');
     }
 
     if (view === 'vault') document.getElementById('cora-vault-view-dashboard').classList.remove('hidden');
@@ -3591,7 +3605,7 @@ window.coraCreateNewDocInStudio = function() {
 };
 
 window.coraOpenDocInStudio = function(docId) {
-    var doc = CORA_DOCUMENTS.find(function(d){ return d.id === docId; });
+    var doc = CORA_DOCUMENTS.find(function(d){ return String(d.id) === String(docId); });
     if (!doc) return;
     document.getElementById('studio-doc-id').value = doc.id;
     document.getElementById('studio-doc-number').value = doc.number || 'DOC-2026';
@@ -3763,7 +3777,7 @@ window.coraExportGSTR1 = function() {
 
 // 1. E-SIGN DRAWER
 window.coraOpenESignDrawer = function(docId) {
-    var doc = CORA_DOCUMENTS.find(function(d){ return d.id === docId; });
+    var doc = CORA_DOCUMENTS.find(function(d){ return String(d.id) === String(docId); });
     if (!doc) return;
 
     document.getElementById('esign-target-doc-id').value = doc.id;
@@ -3840,7 +3854,7 @@ window.coraSubmitESign = function() {
     
     // Update local CORA_DOCUMENTS in-place
     if (window.CORA_DOCUMENTS) {
-        var doc = window.CORA_DOCUMENTS.find(function(d){ return d.id === docId; });
+        var doc = window.CORA_DOCUMENTS.find(function(d){ return String(d.id) === String(docId); });
         if (doc) {
             doc.signed = true;
             doc.signed_at = new Date().toISOString().replace('T', ' ').split('.')[0];
@@ -3875,7 +3889,7 @@ window.coraSubmitESign = function() {
 
 // 2. SHARE DRAWER
 window.coraOpenShareDrawer = function(docId) {
-    var doc = CORA_DOCUMENTS.find(function(d){ return d.id === docId; });
+    var doc = CORA_DOCUMENTS.find(function(d){ return String(d.id) === String(docId); });
     if (!doc) return;
 
     document.getElementById('share-target-doc-id').value = doc.id;
@@ -3930,7 +3944,7 @@ window.coraSendShareEmail = function() {
 
 window.coraShareWhatsAppDirect = function() {
     var docId = document.getElementById('share-target-doc-id').value;
-    var doc = CORA_DOCUMENTS.find(function(d){ return d.id === docId; });
+    var doc = CORA_DOCUMENTS.find(function(d){ return String(d.id) === String(docId); });
     if (!doc) return;
 
     var shareUrl = document.getElementById('share-link-url').value;
@@ -3945,7 +3959,7 @@ window.coraShareWhatsAppDirect = function() {
 // 3. QUICK PREVIEW DRAWER
 var previewDrawerCurrentDocId = '';
 window.coraOpenDocPreviewDrawer = function(docId) {
-    var doc = CORA_DOCUMENTS.find(function(d){ return d.id === docId; });
+    var doc = CORA_DOCUMENTS.find(function(d){ return String(d.id) === String(docId); });
     if (!doc) return;
 
     previewDrawerCurrentDocId = doc.id;
@@ -4000,7 +4014,7 @@ window.coraOpenStudioFromPreviewDrawer = function() {
 
 // 4. DELETE CONFIRMATION DRAWER
 window.coraOpenDeleteDrawer = function(docId) {
-    var doc = CORA_DOCUMENTS.find(function(d){ return d.id === docId; });
+    var doc = CORA_DOCUMENTS.find(function(d){ return String(d.id) === String(docId); });
     if (!doc) return;
 
     document.getElementById('delete-target-doc-id').value = doc.id;
@@ -4092,7 +4106,7 @@ window.coraPopoverAction = function(action) {
 var shareModalCurrentDoc = null;
 
 window.coraOpenShareModal = function(docId) {
-    var doc = CORA_DOCUMENTS.find(function(d){ return d.id === docId; });
+    var doc = CORA_DOCUMENTS.find(function(d){ return String(d.id) === String(docId); });
     if (!doc) return;
 
     shareModalCurrentDoc = doc;
@@ -4155,7 +4169,7 @@ window.coraShareModalWhatsApp = function() {
 var deleteModalCurrentDocId = null;
 
 window.coraOpenDeleteModal = function(docId) {
-    var doc = CORA_DOCUMENTS.find(function(d){ return d.id === docId; });
+    var doc = CORA_DOCUMENTS.find(function(d){ return String(d.id) === String(docId); });
     if (!doc) return;
 
     deleteModalCurrentDocId = doc.id;
