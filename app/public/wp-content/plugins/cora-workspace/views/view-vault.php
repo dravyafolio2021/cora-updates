@@ -1750,7 +1750,7 @@ foreach ( $cora_documents as $doc ) {
 
         <!-- STICKY FLOATING BOTTOM WIZARD STEPPER DOCK -->
         <div class="sticky bottom-4 z-[8000] w-full max-w-4xl mx-auto font-sans">
-            <div class="bg-white/98 backdrop-blur-xl border border-zinc-200/80 rounded-2xl px-4 py-2.5 shadow-[0_8px_32px_-4px_rgba(0,0,0,0.12)]">
+            <div class="bg-white border border-zinc-200/80 rounded-2xl px-4 py-2.5 shadow-[0_-4px_24px_-2px_rgba(0,0,0,0.08),0_8px_32px_-4px_rgba(0,0,0,0.12)]">
                 <div class="flex items-center gap-3">
                     <!-- Previous Button -->
                     <button type="button" id="wiz-prev-step-btn" onclick="coraNavWizardStep(-1)" class="hidden w-8 h-8 rounded-lg border border-zinc-200 flex items-center justify-center text-zinc-500 bg-white hover:bg-zinc-50 cursor-pointer transition-all shrink-0">
