@@ -36,6 +36,28 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 .cm-h-storage-label { font-size:10px; color:#a1a1aa; font-weight:600; display:flex; justify-content:space-between; }
 .cm-sbar-w { height:3px; background:#f4f4f5; border-radius:99px; overflow:hidden; }
 .cm-sbar   { height:100%; background:#18181b; border-radius:99px; transition:width .4s; }
+
+#cm-storage-wrap { padding: 5px 10px; border-radius: 8px; transition: all .2s ease; border: 1px solid #e4e4e7; }
+.cm-storage-dot { font-size: 8px; margin-right: 3px; }
+.cm-storage-pct-badge { font-weight: 700; padding: 1px 5px; border-radius: 4px; font-size: 10px; }
+
+/* Healthy (<70%) */
+.cm-storage-healthy { background: #ecfdf5; border-color: #a7f3d0 !important; color: #047857 !important; }
+.cm-storage-healthy .cm-storage-dot { color: #10b981; }
+.cm-storage-healthy .cm-storage-pct-badge { background: #d1fae5; color: #065f46; }
+.cm-storage-healthy .cm-sbar { background: #10b981; }
+
+/* Warning (70%-90%) */
+.cm-storage-warning { background: #fffbeb; border-color: #fde68a !important; color: #b45309 !important; }
+.cm-storage-warning .cm-storage-dot { color: #f59e0b; }
+.cm-storage-warning .cm-storage-pct-badge { background: #fef3c7; color: #92400e; }
+.cm-storage-warning .cm-sbar { background: #f59e0b; }
+
+/* Critical (>90%) */
+.cm-storage-critical { background: #fef2f2; border-color: #fecaca !important; color: #b91c1c !important; }
+.cm-storage-critical .cm-storage-dot { color: #ef4444; }
+.cm-storage-critical .cm-storage-pct-badge { background: #fee2e2; color: #991b1b; }
+.cm-storage-critical .cm-sbar { background: #ef4444; }
 .cm-hbtn { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; border:1px solid #e4e4e7; background:#fff; color:#3f3f46; transition:all .12s; white-space:nowrap; }
 .cm-hbtn:hover { background:#f4f4f5; border-color:#d4d4d8; }
 .cm-hbtn.primary { background:#09090b; color:#fff; border-color:#09090b; }
@@ -83,6 +105,10 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
     cursor: pointer;
     transition: all .15s ease;
     user-select: none;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 .cm-fcard:hover {
     background: #fff;
@@ -103,6 +129,8 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
     align-items: center;
     gap: 10px;
     min-width: 0;
+    flex: 1;
+    overflow: hidden;
 }
 .cm-fcard-icon {
     width: 30px;
@@ -117,6 +145,8 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 }
 .cm-fcard-info {
     min-width: 0;
+    flex: 1;
+    overflow: hidden;
 }
 .cm-fcard-name {
     font-size: 12px;
@@ -125,6 +155,8 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    min-width: 0;
+    width: 100%;
 }
 .cm-fcard-ct {
     font-size: 10px;
@@ -593,10 +625,16 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 
     #cm-folders-section {
         padding: 12px 14px;
+        width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
     }
     #cm-folders-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         gap: 8px;
+        width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
     }
     .cm-fcard {
         padding: 8px 10px;
@@ -677,9 +715,13 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <div class="cm-h-sep"></div>
 
             <!-- Storage bar -->
-            <div class="cm-h-storage" style="display:none" id="cm-storage-wrap">
-                <div class="cm-h-storage-label"><span id="cm-storage-lbl">—</span><span id="cm-storage-pct">—</span></div>
-                <div class="cm-sbar-w" style="min-width:120px"><div class="cm-sbar" id="cm-storage-bar" style="width:0%"></div></div>
+            <div class="cm-h-storage cm-storage-healthy" style="display:none" id="cm-storage-wrap">
+                <div class="cm-h-storage-label">
+                    <span id="cm-storage-status-dot" class="cm-storage-dot">●</span>
+                    <span id="cm-storage-lbl">—</span>
+                    <span id="cm-storage-pct" class="cm-storage-pct-badge">—</span>
+                </div>
+                <div class="cm-sbar-w"><div class="cm-sbar" id="cm-storage-bar" style="width:0%"></div></div>
             </div>
 
             <!-- View toggle -->
@@ -1261,6 +1303,9 @@ var LABEL_MAP = {
 // ── INIT ────────────────────────────────────────────────────────────────────
 window.cmInit = function() {
     CM.view = localStorage.getItem('cora_media_view') || 'grid';
+    if (window.innerWidth <= 768) {
+        CM.view = 'grid';
+    }
     cmSetView(CM.view, true);
     cmLoadFolders();
     cmLoadGalleries();
@@ -2596,7 +2641,18 @@ window.cmLoadStorage = function() {
         document.getElementById('cm-storage-lbl').textContent=d.total_human+' / '+d.limit_human;
         document.getElementById('cm-storage-pct').textContent=p+'%';
         document.getElementById('cm-storage-bar').style.width=p+'%';
-        document.getElementById('cm-storage-wrap').style.display='flex';
+        var wrap = document.getElementById('cm-storage-wrap');
+        if (wrap) {
+            wrap.classList.remove('cm-storage-healthy', 'cm-storage-warning', 'cm-storage-critical');
+            if (p < 70) {
+                wrap.classList.add('cm-storage-healthy');
+            } else if (p >= 70 && p < 90) {
+                wrap.classList.add('cm-storage-warning');
+            } else {
+                wrap.classList.add('cm-storage-critical');
+            }
+            wrap.style.display = 'flex';
+        }
     }});
 };
 
