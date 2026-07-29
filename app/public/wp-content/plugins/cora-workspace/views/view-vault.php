@@ -228,16 +228,16 @@ foreach ( $cora_documents as $doc ) {
            </div>
            
            <!-- Actions inline with title on desktop -->
-           <div class="flex items-center gap-2 pb-2">
-               <button onclick="coraCreateNewDocInStudio()" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-xs cursor-pointer whitespace-nowrap">
+           <div class="flex items-center flex-wrap sm:flex-nowrap gap-2 pb-2 w-full sm:w-auto">
+               <button onclick="coraCreateNewDocInStudio()" class="hidden md:flex px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all items-center gap-1.5 shadow-xs cursor-pointer whitespace-nowrap">
                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                    Create Document Wizard
                </button>
-               <button onclick="coraExportVaultCSV()" class="px-3 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-semibold rounded-xl hover:bg-zinc-50 cursor-pointer shadow-xs flex items-center gap-1.5 whitespace-nowrap">
+               <button onclick="coraExportVaultCSV()" class="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-semibold rounded-xl hover:bg-zinc-50 cursor-pointer shadow-xs flex items-center gap-1.5 whitespace-nowrap">
                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                    CSV Export
                </button>
-               <button onclick="coraExportGSTR1()" class="px-3 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-semibold rounded-xl hover:bg-zinc-50 cursor-pointer shadow-xs flex items-center gap-1.5 whitespace-nowrap">
+               <button onclick="coraExportGSTR1()" class="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-semibold rounded-xl hover:bg-zinc-50 cursor-pointer shadow-xs flex items-center gap-1.5 whitespace-nowrap">
                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                    GSTR-1 Tax CSV
                </button>
@@ -250,7 +250,7 @@ foreach ( $cora_documents as $doc ) {
                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
                Document Vault
            </button>
-           <button onclick="coraSwitchVaultView('editor')" id="vault-mode-btn-editor" class="flex items-center gap-1.5 pb-2.5 px-3.5 text-xs font-semibold text-zinc-500 hover:text-zinc-950 transition-all border-b-2 border-transparent bg-transparent cursor-pointer whitespace-nowrap">
+           <button onclick="coraSwitchVaultView('editor')" id="vault-mode-btn-editor" class="hidden md:flex items-center gap-1.5 pb-2.5 px-3.5 text-xs font-semibold text-zinc-500 hover:text-zinc-950 transition-all border-b-2 border-transparent bg-transparent cursor-pointer whitespace-nowrap">
                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                Document Studio Wizard
            </button>
@@ -542,7 +542,6 @@ foreach ( $cora_documents as $doc ) {
                                 </button>
                             <?php endif; ?>
                             <button onclick="coraOpenDocPreviewDrawer('<?php echo esc_js( $doc['id'] ); ?>')" class="px-2 py-0.5 bg-white border border-zinc-200 text-zinc-800 rounded-md hover:bg-zinc-100 text-[10px] font-semibold cursor-pointer">View</button>
-                            <button onclick="coraOpenDocInStudio('<?php echo esc_js( $doc['id'] ); ?>')" class="px-2 py-0.5 bg-zinc-100 border border-zinc-300 text-zinc-950 rounded-md hover:bg-zinc-200 text-[10px] font-bold cursor-pointer">Edit</button>
                             <button onclick="coraOpenShareModal('<?php echo esc_js( $doc['id'] ); ?>')" class="p-1 bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-100 rounded-md cursor-pointer shrink-0" title="Share Document">
                                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
                             </button>
@@ -3863,6 +3862,13 @@ document.addEventListener('DOMContentLoaded', function() {
     var urlParams = new URLSearchParams(window.location.search);
     var savedTab = localStorage.getItem('cora_vault_tab');
     var coraView = urlParams.get('cora_view') || urlParams.get('vtab') || savedTab;
+    
+    // Disable Document Studio editor view on mobile viewports
+    var isMobile = window.innerWidth < 768;
+    if (isMobile && coraView === 'editor') {
+        coraView = 'vault';
+    }
+    
     var urlStep = urlParams.get('step');
     // Always read from localStorage — never wipe persisted step on refresh
     var localStep = localStorage.getItem('cora_wiz_step');
