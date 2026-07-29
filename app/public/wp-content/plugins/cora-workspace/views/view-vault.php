@@ -484,8 +484,8 @@ foreach ( $cora_documents as $doc ) {
         <div id="sub-page-wiz-step-1" class="bg-white border border-zinc-200/80 rounded-3xl p-6 md:p-10 pb-24 sm:pb-28 shadow-xs space-y-6 w-full max-w-none">
             <div class="border-b border-zinc-100 pb-5 space-y-3.5">
                 <div>
-                    <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest block">Step 1 of 6</span>
-                    <h3 class="text-xl font-black text-zinc-950 tracking-tight mt-0.5">What type of document are you creating?</h3>
+                    <span class="px-3.5 py-1.5 rounded-full bg-zinc-100 text-zinc-600 text-[11px] font-bold uppercase tracking-widest inline-block border border-zinc-200">Step 1 of 6</span>
+                    <h3 class="text-xl font-black text-zinc-950 tracking-tight mt-2">What type of document are you creating?</h3>
                     <p class="text-xs text-zinc-500 mt-1 leading-relaxed">Select a category below or search document types. In Step 2, you can choose visual blueprint templates.</p>
                 </div>
                 <div class="relative w-full max-w-sm">
@@ -494,95 +494,122 @@ foreach ( $cora_documents as $doc ) {
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pt-1">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
                 <!-- 1. Proposal & Quotation -->
-                <div onclick="coraSelectWizCategoryCard('proposal')" id="wiz-cat-card-proposal" class="cora-wiz-cat-card p-4.5 border-2 border-zinc-950 bg-zinc-50/80 rounded-2xl cursor-pointer transition-all space-y-2 shadow-xs hover:shadow-md">
-                    <div class="flex items-center justify-between">
-                        <span class="px-2.5 py-1 rounded-md bg-zinc-950 text-white text-[10px] font-extrabold uppercase tracking-wider">PROPOSAL</span>
-                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.6" fill="none" class="text-zinc-900"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/><path d="M17 21l1.5-1.5L20 21" stroke-linecap="round" stroke-linejoin="round"/><circle cx="18.5" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>
+                <div onclick="coraSelectWizCategoryCard('proposal')" id="wiz-cat-card-proposal" class="cora-wiz-cat-card flex items-center gap-4 p-4 border-2 border-zinc-950 bg-zinc-50/80 rounded-2xl cursor-pointer transition-all shadow-xs hover:shadow-md">
+                    <div class="w-11 h-11 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-700"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>
                     </div>
-                    <h4 class="font-extrabold text-zinc-950 text-sm">Proposal & Quotation</h4>
-                    <p class="text-zinc-500 text-xs leading-relaxed">Shoot packages, real estate listing media, commercial bids, and production estimates.</p>
+                    <div class="flex-1 min-w-0">
+                        <span class="px-2 py-0.5 rounded-md bg-zinc-950 text-white text-[9px] font-extrabold uppercase tracking-wider inline-block mb-1">Proposal</span>
+                        <h4 class="font-extrabold text-zinc-950 text-sm leading-tight">Proposal & Quotation</h4>
+                        <p class="text-zinc-500 text-[11px] leading-relaxed mt-0.5">Shoot packages, real estate listing media, commercial bids, and production estimates.</p>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
 
                 <!-- 2. Invoices & Receipts -->
-                <div onclick="coraSelectWizCategoryCard('invoice')" id="wiz-cat-card-invoice" class="cora-wiz-cat-card p-4.5 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-2 hover:shadow-md">
-                    <div class="flex items-center justify-between">
-                        <span class="px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-800 text-[10px] font-extrabold uppercase tracking-wider border border-zinc-200">TAX INVOICE</span>
-                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.6" fill="none" class="text-zinc-500"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="13" y2="11"/><line x1="8" y1="14" x2="16" y2="14"/><line x1="8" y1="17" x2="11" y2="17"/><path d="M14 17l1 1 2-2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div onclick="coraSelectWizCategoryCard('invoice')" id="wiz-cat-card-invoice" class="cora-wiz-cat-card flex items-center gap-4 p-4 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all hover:shadow-md">
+                    <div class="w-11 h-11 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-600"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="13" y2="11"/><line x1="8" y1="15" x2="16" y2="15"/><line x1="8" y1="18" x2="11" y2="18"/></svg>
                     </div>
-                    <h4 class="font-extrabold text-zinc-950 text-sm">Invoices & Receipts</h4>
-                    <p class="text-zinc-500 text-xs leading-relaxed">Retainer tax invoices, post-production final bills, deposit slips, and statutory GST notes.</p>
+                    <div class="flex-1 min-w-0">
+                        <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 text-[9px] font-extrabold uppercase tracking-wider border border-zinc-200 inline-block mb-1">Tax Invoice</span>
+                        <h4 class="font-extrabold text-zinc-950 text-sm leading-tight">Invoices & Receipts</h4>
+                        <p class="text-zinc-500 text-[11px] leading-relaxed mt-0.5">Retainer tax invoices, post-production final bills, deposit slips, and statutory GST notes.</p>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
 
                 <!-- 3. Contracts & SLAs -->
-                <div onclick="coraSelectWizCategoryCard('contract')" id="wiz-cat-card-contract" class="cora-wiz-cat-card p-4.5 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-2 hover:shadow-md">
-                    <div class="flex items-center justify-between">
-                        <span class="px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-800 text-[10px] font-extrabold uppercase tracking-wider border border-zinc-200">CONTRACT</span>
-                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.6" fill="none" class="text-zinc-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><path d="M18.5 19.5 Q19.5 18 20.5 19" stroke-linecap="round"/><circle cx="19" cy="20.2" r="0.6" fill="currentColor" stroke="none"/></svg>
+                <div onclick="coraSelectWizCategoryCard('contract')" id="wiz-cat-card-contract" class="cora-wiz-cat-card flex items-center gap-4 p-4 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all hover:shadow-md">
+                    <div class="w-11 h-11 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-600"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </div>
-                    <h4 class="font-extrabold text-zinc-950 text-sm">Contracts & SLAs</h4>
-                    <p class="text-zinc-500 text-xs leading-relaxed">Service level agreements, licensing rights, copyright release terms, and deliverables protection.</p>
+                    <div class="flex-1 min-w-0">
+                        <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 text-[9px] font-extrabold uppercase tracking-wider border border-zinc-200 inline-block mb-1">Contract</span>
+                        <h4 class="font-extrabold text-zinc-950 text-sm leading-tight">Contracts & SLAs</h4>
+                        <p class="text-zinc-500 text-[11px] leading-relaxed mt-0.5">Service level agreements, licensing rights, copyright release terms, and deliverables protection.</p>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
 
                 <!-- 4. Hiring & Offer Letters -->
-                <div onclick="coraSelectWizCategoryCard('offer')" id="wiz-cat-card-offer" class="cora-wiz-cat-card p-4.5 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-2 hover:shadow-md">
-                    <div class="flex items-center justify-between">
-                        <span class="px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-800 text-[10px] font-extrabold uppercase tracking-wider border border-zinc-200">OFFER LETTER</span>
-                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.6" fill="none" class="text-zinc-500"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/><path d="M8 15 C8 13.5 10 13 12 13 C14 13 16 13.5 16 15" stroke-linecap="round"/><circle cx="12" cy="11.5" r="1.8"/></svg>
+                <div onclick="coraSelectWizCategoryCard('offer')" id="wiz-cat-card-offer" class="cora-wiz-cat-card flex items-center gap-4 p-4 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all hover:shadow-md">
+                    <div class="w-11 h-11 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-600"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     </div>
-                    <h4 class="font-extrabold text-zinc-950 text-sm">Hiring & Offer Letters</h4>
-                    <p class="text-zinc-500 text-xs leading-relaxed">Associate photographer offers, editor contractor agreements, monthly studio retainers.</p>
+                    <div class="flex-1 min-w-0">
+                        <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 text-[9px] font-extrabold uppercase tracking-wider border border-zinc-200 inline-block mb-1">Offer Letter</span>
+                        <h4 class="font-extrabold text-zinc-950 text-sm leading-tight">Hiring & Offer Letters</h4>
+                        <p class="text-zinc-500 text-[11px] leading-relaxed mt-0.5">Associate photographer offers, editor contractor agreements, monthly studio retainers.</p>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
 
                 <!-- 5. NDA -->
-                <div onclick="coraSelectWizCategoryCard('nda')" id="wiz-cat-card-nda" class="cora-wiz-cat-card p-4.5 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-2 hover:shadow-md">
-                    <div class="flex items-center justify-between">
-                        <span class="px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-800 text-[10px] font-extrabold uppercase tracking-wider border border-zinc-200">NDA</span>
-                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.6" fill="none" class="text-zinc-500"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><rect x="8.5" y="13.5" width="7" height="5" rx="1"/><circle cx="12" cy="14.5" r="0.8" fill="currentColor" stroke="none"/><line x1="12" y1="15.3" x2="12" y2="17" stroke-linecap="round"/></svg>
+                <div onclick="coraSelectWizCategoryCard('nda')" id="wiz-cat-card-nda" class="cora-wiz-cat-card flex items-center gap-4 p-4 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all hover:shadow-md">
+                    <div class="w-11 h-11 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-600"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1" fill="currentColor" stroke="none"/><line x1="12" y1="17" x2="12" y2="19" stroke-linecap="round"/></svg>
                     </div>
-                    <h4 class="font-extrabold text-zinc-950 text-sm">NDA (Confidentiality)</h4>
-                    <p class="text-zinc-500 text-xs leading-relaxed">Mutual non-disclosure agreements, pre-release media confidentiality, trade secret protection.</p>
+                    <div class="flex-1 min-w-0">
+                        <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 text-[9px] font-extrabold uppercase tracking-wider border border-zinc-200 inline-block mb-1">NDA</span>
+                        <h4 class="font-extrabold text-zinc-950 text-sm leading-tight">NDA (Confidentiality)</h4>
+                        <p class="text-zinc-500 text-[11px] leading-relaxed mt-0.5">Mutual non-disclosure agreements, pre-release media confidentiality, trade secret protection.</p>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
 
                 <!-- 6. Service Agreement -->
-                <div onclick="coraSelectWizCategoryCard('service_agreement')" id="wiz-cat-card-service_agreement" class="cora-wiz-cat-card p-4.5 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-2 hover:shadow-md">
-                    <div class="flex items-center justify-between">
-                        <span class="px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-800 text-[10px] font-extrabold uppercase tracking-wider border border-zinc-200">SERVICE AGMT</span>
-                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.6" fill="none" class="text-zinc-500"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="14" x2="16" y2="14"/><path d="M8 17.5 Q10 16.5 12 17.5 Q14 18.5 16 17.5" stroke-linecap="round"/></svg>
+                <div onclick="coraSelectWizCategoryCard('service_agreement')" id="wiz-cat-card-service_agreement" class="cora-wiz-cat-card flex items-center gap-4 p-4 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all hover:shadow-md">
+                    <div class="w-11 h-11 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-600"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="16" y2="15"/><line x1="8" y1="19" x2="12" y2="19"/></svg>
                     </div>
-                    <h4 class="font-extrabold text-zinc-950 text-sm">Service Agreement</h4>
-                    <p class="text-zinc-500 text-xs leading-relaxed">Comprehensive client engagement contracts, scope definitions, and payment schedules.</p>
+                    <div class="flex-1 min-w-0">
+                        <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 text-[9px] font-extrabold uppercase tracking-wider border border-zinc-200 inline-block mb-1">Service Agmt</span>
+                        <h4 class="font-extrabold text-zinc-950 text-sm leading-tight">Service Agreement</h4>
+                        <p class="text-zinc-500 text-[11px] leading-relaxed mt-0.5">Comprehensive client engagement contracts, scope definitions, and payment schedules.</p>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
 
                 <!-- 7. Purchase Order -->
-                <div onclick="coraSelectWizCategoryCard('purchase_order')" id="wiz-cat-card-purchase_order" class="cora-wiz-cat-card p-4.5 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-2 hover:shadow-md">
-                    <div class="flex items-center justify-between">
-                        <span class="px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-800 text-[10px] font-extrabold uppercase tracking-wider border border-zinc-200">PURCHASE ORDER</span>
-                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.6" fill="none" class="text-zinc-500"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="14" x2="15" y2="14"/><line x1="9" y1="17" x2="12" y2="17"/><rect x="14" y="15.5" width="3" height="3" rx="0.5"/></svg>
+                <div onclick="coraSelectWizCategoryCard('purchase_order')" id="wiz-cat-card-purchase_order" class="cora-wiz-cat-card flex items-center gap-4 p-4 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all hover:shadow-md">
+                    <div class="w-11 h-11 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-600"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                     </div>
-                    <h4 class="font-extrabold text-zinc-950 text-sm">Purchase Order</h4>
-                    <p class="text-zinc-500 text-xs leading-relaxed">Equipment procurement orders, vendor requisitions, and gear purchase confirmations.</p>
+                    <div class="flex-1 min-w-0">
+                        <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 text-[9px] font-extrabold uppercase tracking-wider border border-zinc-200 inline-block mb-1">Purchase Order</span>
+                        <h4 class="font-extrabold text-zinc-950 text-sm leading-tight">Purchase Order</h4>
+                        <p class="text-zinc-500 text-[11px] leading-relaxed mt-0.5">Equipment procurement orders, vendor requisitions, and gear purchase confirmations.</p>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
 
                 <!-- 8. Receipt -->
-                <div onclick="coraSelectWizCategoryCard('receipt')" id="wiz-cat-card-receipt" class="cora-wiz-cat-card p-4.5 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-2 hover:shadow-md">
-                    <div class="flex items-center justify-between">
-                        <span class="px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-800 text-[10px] font-extrabold uppercase tracking-wider border border-zinc-200">RECEIPT</span>
-                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.6" fill="none" class="text-zinc-500"><path d="M5 2h14l1 4H4L5 2z"/><rect x="4" y="6" width="16" height="14" rx="1"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="16" x2="12" y2="16"/><path d="M13 16l1.5 1.5L17 14.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div onclick="coraSelectWizCategoryCard('receipt')" id="wiz-cat-card-receipt" class="cora-wiz-cat-card flex items-center gap-4 p-4 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all hover:shadow-md">
+                    <div class="w-11 h-11 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-600"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </div>
-                    <h4 class="font-extrabold text-zinc-950 text-sm">Payment Receipt</h4>
-                    <p class="text-zinc-500 text-xs leading-relaxed">Advance deposit receipts, interim payment vouchers, and payment confirmation slips.</p>
+                    <div class="flex-1 min-w-0">
+                        <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 text-[9px] font-extrabold uppercase tracking-wider border border-zinc-200 inline-block mb-1">Receipt</span>
+                        <h4 class="font-extrabold text-zinc-950 text-sm leading-tight">Payment Receipt</h4>
+                        <p class="text-zinc-500 text-[11px] leading-relaxed mt-0.5">Advance deposit receipts, interim payment vouchers, and payment confirmation slips.</p>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
 
                 <!-- 9. Custom Document -->
-                <div onclick="coraSelectWizCategoryCard('custom')" id="wiz-cat-card-custom" class="cora-wiz-cat-card p-4.5 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all space-y-2 hover:shadow-md">
-                    <div class="flex items-center justify-between">
-                        <span class="px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-800 text-[10px] font-extrabold uppercase tracking-wider border border-zinc-200">CUSTOM</span>
-                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.6" fill="none" class="text-zinc-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="11" y2="13"/><line x1="8" y1="17" x2="11" y2="17"/><line x1="14" y1="13" x2="14" y2="19"/><line x1="11" y1="16" x2="17" y2="16"/></svg>
+                <div onclick="coraSelectWizCategoryCard('custom')" id="wiz-cat-card-custom" class="cora-wiz-cat-card flex items-center gap-4 p-4 border-2 border-zinc-200 hover:border-zinc-400 rounded-2xl cursor-pointer transition-all hover:shadow-md">
+                    <div class="w-11 h-11 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-600"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     </div>
-                    <h4 class="font-extrabold text-zinc-950 text-sm">Custom Document</h4>
-                    <p class="text-zinc-500 text-xs leading-relaxed">Blank canvas blueprint for tailored studio documents and bespoke agreements.</p>
+                    <div class="flex-1 min-w-0">
+                        <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 text-[9px] font-extrabold uppercase tracking-wider border border-zinc-200 inline-block mb-1">Custom</span>
+                        <h4 class="font-extrabold text-zinc-950 text-sm leading-tight">Custom Document</h4>
+                        <p class="text-zinc-500 text-[11px] leading-relaxed mt-0.5">Blank canvas blueprint for tailored studio documents and bespoke agreements.</p>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
             </div>
 
@@ -590,7 +617,7 @@ foreach ( $cora_documents as $doc ) {
         <div id="sub-page-wiz-step-2" class="hidden bg-white border border-zinc-200/80 rounded-3xl p-6 md:p-10 pb-24 sm:pb-28 shadow-xs space-y-6 w-full max-w-none">
             <div class="border-b border-zinc-100 pb-5 space-y-3.5">
                 <div>
-                    <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest block">Step 2 of 6</span>
+                    <span class="px-3.5 py-1.5 rounded-full bg-zinc-100 text-zinc-600 text-[11px] font-bold uppercase tracking-widest inline-block border border-zinc-200">Step 2 of 6</span>
                     <h3 class="text-xl font-black text-zinc-950 tracking-tight mt-0.5">Choose a Visual Template Blueprint</h3>
                     <p class="text-xs text-zinc-500 mt-1 leading-relaxed">Below are visual paper preview cards for your selected category. Click any template to select it.</p>
                 </div>
@@ -1199,7 +1226,7 @@ foreach ( $cora_documents as $doc ) {
             <!-- Top Action Bar -->
             <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 flex items-center justify-between flex-wrap gap-4 shadow-xs">
                 <div>
-                    <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest block mb-0.5">Step 4 of 6</span>
+                    <span class="px-3.5 py-1.5 rounded-full bg-zinc-100 text-zinc-600 text-[11px] font-bold uppercase tracking-widest inline-block border border-zinc-200 mb-0.5">Step 4 of 6</span>
                     <h3 class="text-lg font-black text-zinc-950">Preview & Edit Document</h3>
                     <p class="text-xs text-zinc-500 mt-0.5">Review live paper layout, customize visual aesthetics, and fine-tune styling.</p>
                 </div>
@@ -1452,7 +1479,7 @@ foreach ( $cora_documents as $doc ) {
             <!-- Header Bar -->
             <div class="border-b border-zinc-100 pb-4 flex items-center justify-between flex-wrap gap-3">
                 <div>
-                    <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest block mb-0.5">Step 6 of 6</span>
+                    <span class="px-3.5 py-1.5 rounded-full bg-zinc-100 text-zinc-600 text-[11px] font-bold uppercase tracking-widest inline-block border border-zinc-200 mb-0.5">Step 6 of 6</span>
                     <h3 class="text-xl font-black text-zinc-950 tracking-tight">Save & Share with Security</h3>
                     <p class="text-xs text-zinc-500 mt-0.5 leading-relaxed">Save your document to vault, configure security protections, and share via email or WhatsApp.</p>
                 </div>
@@ -2384,14 +2411,26 @@ window.coraSelectWizCategoryCard = function(catKey) {
     document.getElementById('studio-doc-type').value = formattedType;
 
     document.querySelectorAll('.cora-wiz-cat-card').forEach(function(card){
-        card.classList.remove('border-zinc-950', 'bg-zinc-50/80');
+        card.classList.remove('border-zinc-950', 'bg-zinc-50/80', 'shadow-xs');
         card.classList.add('border-zinc-200');
+        // Reset badge to light style
+        var badge = card.querySelector('span');
+        if (badge) {
+            badge.classList.remove('bg-zinc-950', 'text-white');
+            badge.classList.add('bg-zinc-100', 'text-zinc-700', 'border', 'border-zinc-200');
+        }
     });
 
     var activeCard = document.getElementById('wiz-cat-card-' + catKey);
     if (activeCard) {
-        activeCard.classList.add('border-zinc-950', 'bg-zinc-50/80');
+        activeCard.classList.add('border-zinc-950', 'bg-zinc-50/80', 'shadow-xs');
         activeCard.classList.remove('border-zinc-200');
+        // Set badge to dark style
+        var activeBadge = activeCard.querySelector('span');
+        if (activeBadge) {
+            activeBadge.classList.add('bg-zinc-950', 'text-white');
+            activeBadge.classList.remove('bg-zinc-100', 'text-zinc-700', 'border', 'border-zinc-200');
+        }
     }
 
     coraPopulateVisualTemplateCards(catKey, CORA_STUDIO_STATE.templateFilter || 'all');
