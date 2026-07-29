@@ -335,7 +335,7 @@ foreach ( $cora_documents as $doc ) {
 
         <!-- Master Documents Table (Scrollable Container) -->
         <div class="bg-white border border-zinc-200/80 rounded-2xl shadow-xs overflow-hidden">
-            <div class="overflow-x-auto">
+            <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs min-w-[700px]">
                 <thead>
                     <tr class="bg-zinc-50/70 border-b border-zinc-200 text-[10px] font-extrabold text-zinc-500 uppercase tracking-wider">
@@ -453,6 +453,107 @@ foreach ( $cora_documents as $doc ) {
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            </div>
+
+            <!-- Mobile List View (Stacked professional list layout replacing horizontal tables on small viewports) -->
+            <div class="block md:hidden divide-y divide-zinc-100" id="cora-vault-mobile-list">
+                <?php foreach ( $cora_documents as $doc ) : 
+                    $type_lower = strtolower($doc['type'] ?? '');
+                    $status = $doc['status'] ?? 'Draft';
+                    
+                    // Category styling
+                    $cat_bg = 'bg-zinc-50 border border-zinc-200 text-zinc-650 font-semibold';
+                    if ($type_lower === 'invoice') {
+                        $cat_bg = 'bg-emerald-50 border border-emerald-100 text-emerald-700 font-bold';
+                    } elseif ($type_lower === 'contract' || $type_lower === 'sla' || $type_lower === 'nda') {
+                        $cat_bg = 'bg-purple-50 border border-purple-100 text-purple-700 font-bold';
+                    } elseif ($type_lower === 'proposal' || $type_lower === 'quote') {
+                        $cat_bg = 'bg-blue-50 border border-blue-100 text-blue-700 font-bold';
+                    } elseif ($type_lower === 'equipment' || $type_lower === 'gear') {
+                        $cat_bg = 'bg-amber-50 border border-amber-100 text-amber-700 font-bold';
+                    }
+
+                    // Status styling
+                    $status_bg = 'bg-zinc-50 border border-zinc-200 text-zinc-650 font-semibold';
+                    if ($status === 'Paid') {
+                        $status_bg = 'bg-emerald-50 border border-emerald-100 text-emerald-700 font-bold';
+                    } elseif ($status === 'Signed') {
+                        $status_bg = 'bg-purple-50 border border-purple-100 text-purple-700 font-bold';
+                    } elseif ($status === 'Sent' || $status === 'Active') {
+                        $status_bg = 'bg-blue-50 border border-blue-100 text-blue-700 font-bold';
+                    } elseif ($status === 'Pending') {
+                        $status_bg = 'bg-amber-50 border border-amber-100 text-amber-700 font-bold';
+                    }
+
+                    $is_signed = ! empty( $doc['signed'] );
+                    $is_proposal = $type_lower === 'proposal';
+                ?>
+                <div class="p-4 space-y-3 hover:bg-zinc-50/40 transition-colors cora-vault-row" data-type="<?php echo esc_attr( $type_lower ); ?>">
+                    <!-- Row 1: Doc Number, Category, Status -->
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-mono text-[9px] text-zinc-400 font-bold tracking-tight"><?php echo esc_html( $doc['number'] ?? 'DOC-2026' ); ?></span>
+                            <span class="px-2 py-0.5 rounded-full text-[8px] uppercase tracking-wider font-extrabold <?php echo $status_bg; ?>">
+                                <?php echo esc_html( $status ); ?>
+                            </span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full text-[8px] uppercase tracking-wider font-extrabold <?php echo $cat_bg; ?>">
+                            <?php echo esc_html( $doc['type'] ); ?>
+                        </span>
+                    </div>
+
+                    <!-- Row 2: Doc Title -->
+                    <div>
+                        <h4 class="font-bold text-zinc-950 text-xs hover:underline cursor-pointer" onclick="coraOpenDocPreviewDrawer('<?php echo esc_js( $doc['id'] ); ?>')">
+                            <?php echo esc_html( $doc['title'] ); ?>
+                        </h4>
+                    </div>
+
+                    <!-- Row 3: Client and Grand Total -->
+                    <div class="flex items-center justify-between text-xs">
+                        <div class="font-medium text-zinc-800 hover:underline cursor-pointer flex items-center gap-1 group" onclick="coraOpenClientProfileInCRM('<?php echo esc_js( $doc['client_name'] ); ?>')" title="Open Client CRM Profile">
+                            <span><?php echo esc_html( $doc['client_name'] ); ?></span>
+                            <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        </div>
+                        <div class="font-bold font-mono text-zinc-950">
+                            ₹<?php echo number_format( floatval( $doc['grand_total'] ?? $doc['amount'] ?? 0 ) ); ?>
+                        </div>
+                    </div>
+
+                    <!-- Row 4: E-Sign Status & Action Buttons -->
+                    <div class="flex items-center justify-between pt-2.5 border-t border-zinc-100 mt-1">
+                        <div>
+                            <?php if ( $is_signed ) : ?>
+                                <span class="text-zinc-950 font-bold text-[10px] flex items-center gap-0.5">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    Signed
+                                </span>
+                            <?php else : ?>
+                                <button onclick="coraOpenESignDrawer('<?php echo esc_js( $doc['id'] ); ?>')" class="px-2 py-0.5 rounded bg-white hover:bg-zinc-50 text-zinc-700 font-semibold text-[10px] border border-zinc-200 cursor-pointer transition-all shadow-3xs">
+                                    + E-Sign
+                                </button>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="flex items-center gap-1.5">
+                            <?php if ( $is_proposal ) : ?>
+                                <button onclick="coraConvertQuoteToInvoice('<?php echo esc_js( $doc['id'] ); ?>')" class="p-1 bg-zinc-950 text-white hover:bg-zinc-800 rounded-md cursor-pointer shadow-3xs" title="Convert to GST Invoice">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                </button>
+                            <?php endif; ?>
+                            <button onclick="coraOpenDocPreviewDrawer('<?php echo esc_js( $doc['id'] ); ?>')" class="px-2 py-0.5 bg-white border border-zinc-200 text-zinc-800 rounded-md hover:bg-zinc-100 text-[10px] font-semibold cursor-pointer">View</button>
+                            <button onclick="coraOpenDocInStudio('<?php echo esc_js( $doc['id'] ); ?>')" class="px-2 py-0.5 bg-zinc-100 border border-zinc-300 text-zinc-950 rounded-md hover:bg-zinc-200 text-[10px] font-bold cursor-pointer">Edit</button>
+                            <button onclick="coraOpenShareModal('<?php echo esc_js( $doc['id'] ); ?>')" class="p-1 bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-100 rounded-md cursor-pointer shrink-0" title="Share Document">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                            </button>
+                            <button onclick="coraToggleVaultPopover(event, '<?php echo esc_js( $doc['id'] ); ?>', <?php echo $is_proposal ? 'true' : 'false'; ?>)" class="p-1 text-zinc-400 hover:text-zinc-950 cursor-pointer rounded hover:bg-zinc-100 shrink-0">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
             </div>
 
             <!-- Table Footer & Pagination Bar -->
