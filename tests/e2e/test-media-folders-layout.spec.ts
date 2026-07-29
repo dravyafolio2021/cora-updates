@@ -15,7 +15,7 @@ test.describe('Media Library - Dedicated Folders Layout', () => {
     await expect(foldersSection).toBeVisible();
 
     // New folder CTA
-    const newFolderBtn = page.locator('button:has-text("New folder")');
+    const newFolderBtn = foldersSection.locator('button:has-text("New folder")');
     await expect(newFolderBtn).toBeVisible();
 
     // Folders Grid & All Media Card
@@ -69,7 +69,8 @@ test.describe('Media Library - Dedicated Folders Layout', () => {
   });
 
   test('5. Verify Centered Pop-Up Modal & Folder Creation', async ({ page }) => {
-    const newFolderBtn = page.locator('button:has-text("New folder")');
+    const foldersSection = page.locator('#cm-folders-section');
+    const newFolderBtn = foldersSection.locator('button:has-text("New folder")');
     await newFolderBtn.click();
 
     const folderModal = page.locator('#cm-folder-dlg');
@@ -135,4 +136,57 @@ test.describe('Media Library - Dedicated Folders Layout', () => {
   });
 
 });
+
+test.describe('Media Library - Mobile Viewport Layout', () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+    await page.goto('/workspace/media');
+    await page.waitForLoadState('networkidle');
+  });
+
+  test('1. Verify Mobile Header & Sticky Bottom Bar', async ({ page }) => {
+    const bottomBar = page.locator('#cm-mobile-bottom-bar');
+    await expect(bottomBar).toBeVisible();
+
+    const uploadBtn = bottomBar.locator('button:has-text("Upload")');
+    await expect(uploadBtn).toBeVisible();
+
+    const newFolderBtn = bottomBar.locator('button:has-text("New Folder")');
+    await expect(newFolderBtn).toBeVisible();
+  });
+
+  test('2. Verify Mobile Filter Drawer', async ({ page }) => {
+    const filterBtn = page.locator('#cm-btn-mobile-filter');
+    await expect(filterBtn).toBeVisible();
+
+    await filterBtn.click();
+
+    const filterDlg = page.locator('#cm-mobile-filter-dlg');
+    await expect(filterDlg).toBeVisible();
+    await expect(filterDlg).toHaveClass(/open/);
+  });
+
+  test('3. Verify Mobile Folders 2-column Grid', async ({ page }) => {
+    const foldersGrid = page.locator('#cm-folders-grid');
+    await expect(foldersGrid).toBeVisible();
+
+    const gridComputedColumns = await foldersGrid.evaluate((el) => {
+      return window.getComputedStyle(el).gridTemplateColumns;
+    });
+    const colCount = gridComputedColumns.split(' ').length;
+    expect(colCount).toBe(2);
+  });
+
+  test('4. Verify Mobile Touch List View card layout', async ({ page }) => {
+    const btnList = page.locator('#cm-btn-list');
+    await expect(btnList).toBeVisible();
+    await btnList.click();
+
+    const listContainer = page.locator('#cm-list');
+    await expect(listContainer).toBeVisible();
+  });
+});
+
 

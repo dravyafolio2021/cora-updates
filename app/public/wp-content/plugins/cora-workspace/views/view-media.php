@@ -195,6 +195,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 .cm-bulk-bar select.cm-sel { background:#27272a; border-color:#3f3f46; color:#f4f4f5; }
 .cm-bulk-bar .cm-hbtn { background:#27272a; border-color:#3f3f46; color:#f4f4f5; }
 .cm-bulk-bar .cm-hbtn:hover { background:#3f3f46; color:#fff; }
+#cm-mobile-bottom-bar { display: none; }
 .cm-cell:hover .cm-chk, .cm-chk.checked { display:flex; }
 
 /* ─── Media Card Metadata Footer ────────────────────────────────────────── */
@@ -417,8 +418,241 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 .cora-dark-theme .cm-h-title { color:#fafafa; }
 .cora-dark-theme .cm-ltable thead th { background:#1c1c1e; }
 .cora-dark-theme .cm-ltable tbody tr:hover { background:#1c1c1e; }
+.cora-dark-theme #cm-mobile-bottom-bar { background: rgba(17,17,19,0.95); border-color: #27272a; }
+.cora-dark-theme #cm-header-top #cm-storage-wrap { background: #1c1c1e; }
+.cora-dark-theme #cm-header-top #cm-storage-wrap .cm-h-storage-label { color: #a1a1aa; }
+
+/* ─── Mobile Filter Drawer & Chips ─────────────────────────────────────── */
+#cm-btn-mobile-filter { display: none; }
+#cm-mobile-filter-dlg {
+    position: fixed; inset: 0; z-index: 99999;
+    background: rgba(9, 9, 11, 0.6); backdrop-filter: blur(4px);
+    display: flex; align-items: flex-end; justify-content: center;
+    padding: 0; opacity: 0; pointer-events: none;
+    transition: opacity .25s ease-in-out;
+}
+#cm-mobile-filter-dlg.open {
+    opacity: 1; pointer-events: auto;
+}
+#cm-mobile-filter-card {
+    background: #fff; border-top-left-radius: 20px; border-top-right-radius: 20px;
+    width: 100%; max-width: 600px; max-height: 85vh;
+    box-shadow: 0 -10px 40px rgba(0,0,0,.2);
+    display: flex; flex-direction: column; overflow: hidden;
+    transform: translateY(100%); transition: transform .25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#cm-mobile-filter-dlg.open #cm-mobile-filter-card {
+    transform: translateY(0);
+}
+.cora-dark-theme #cm-mobile-filter-card {
+    background: #111113; border-color: #27272a; color: #fafafa;
+}
+
+.cm-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: #f4f4f5;
+    border: 1px solid #e4e4e7;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #18181b;
+    cursor: pointer;
+    transition: all .12s ease;
+}
+.cm-chip:hover {
+    background: #e4e4e7;
+    color: #09090b;
+}
+.cm-chip-close {
+    font-size: 10px;
+    color: #71717a;
+    font-weight: 700;
+    margin-left: 2px;
+}
+.cora-dark-theme .cm-chip {
+    background: #27272a;
+    border-color: #3f3f46;
+    color: #f4f4f5;
+}
+
+.cm-lmobile-sub { display: none; }
+.cm-lmain-sub-desktop { display: block; }
 
 /* ─── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    #cm-toolbar {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 10px 14px;
+    }
+    .cm-search-wrap {
+        flex: 1 1 auto;
+        width: calc(100% - 110px);
+        max-width: none;
+    }
+    #cm-btn-mobile-filter {
+        display: inline-flex !important;
+        flex-shrink: 0;
+    }
+    #cm-toolbar select.cm-sel {
+        display: none !important;
+    }
+
+    /* List Table Mobile Touch Card View */
+    .cm-ltable, .cm-ltable tbody {
+        display: block;
+        width: 100%;
+    }
+    .cm-ltable thead {
+        display: none !important;
+    }
+    .cm-ltable tbody tr {
+        display: flex;
+        flex-direction: column;
+        padding: 12px 42px 12px 12px;
+        border-bottom: 1px solid #f4f4f5;
+        position: relative;
+        box-sizing: border-box;
+        width: 100%;
+    }
+    .cm-ltable td.cm-lcell-author,
+    .cm-ltable td.cm-lcell-folder,
+    .cm-ltable td.cm-lcell-date,
+    .cm-ltable td.cm-lcell-size,
+    .cm-ltable td.cm-lcell-type,
+    .cm-ltable td.cm-lcell-chk {
+        display: none !important;
+    }
+    .cm-bulk-mode .cm-ltable td.cm-lcell-chk {
+        display: block !important;
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    .cm-ltable td.cm-lcell-main {
+        display: block;
+        padding: 0;
+        border: none;
+        width: 100%;
+    }
+    .cm-ltable td.cm-lcell-act {
+        display: block;
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        padding: 0;
+        border: none;
+    }
+    .cm-lmobile-sub {
+        display: flex !important;
+        font-size: 10.5px;
+        color: #71717a;
+        font-family: ui-monospace, monospace;
+        margin-top: 3px;
+        align-items: center;
+        gap: 4px;
+    }
+    .cm-lmain-sub-desktop {
+        display: none !important;
+    }
+    #cm-header-top {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 14px;
+    }
+    .cm-h-title {
+        font-size: 14px;
+    }
+    .cm-h-subtitle {
+        display: none;
+    }
+    #cm-header-top #cm-storage-wrap {
+        display: inline-flex !important;
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 8px;
+        background: #f4f4f5;
+        border-radius: 99px;
+        min-width: auto;
+    }
+    #cm-header-top #cm-storage-wrap .cm-h-storage-label {
+        font-size: 10px;
+        color: #52525b;
+        gap: 4px;
+    }
+    #cm-header-top #cm-storage-wrap .cm-sbar-w {
+        display: none;
+    }
+
+    #cm-folders-section {
+        padding: 12px 14px;
+    }
+    #cm-folders-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    .cm-fcard {
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+    .cm-fcard-name {
+        font-size: 11px;
+    }
+    .cm-fcard-opt {
+        padding: 4px 6px;
+        margin-left: 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #cm-mobile-bottom-bar {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 900;
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(8px);
+        border-top: 1px solid #e4e4e7;
+        padding: 10px 16px;
+        justify-content: space-between;
+        gap: 10px;
+        box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+    }
+    #cm-mobile-bottom-bar .cm-hbtn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    #cm-bulk-bar.on {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 950;
+        border-radius: 0;
+        margin: 0;
+        width: 100%;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        max-width: 100vw;
+        box-sizing: border-box;
+        padding: 10px 12px;
+    }
+
+    #cm-root {
+        padding-bottom: 60px;
+    }
+}
 @media(max-width:640px){
     #cm-grid { grid-template-columns:repeat(2,1fr); }
     #cm-detail { width:100vw; }
@@ -472,6 +706,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <input type="text" id="cm-search" class="cm-search" placeholder="Search files…" oninput="cmOnSearch(this.value)">
         </div>
+        <button id="cm-btn-mobile-filter" class="cm-hbtn" onclick="cmOpenMobileFilters()"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg> Filters <span id="cm-filter-count-badge" class="cm-bc-badge" style="display:none">0</span></button>
         <select id="cm-ft" class="cm-sel" onchange="cmFilter()">
             <option value="all">All Types</option>
             <option value="image">Images</option>
@@ -497,6 +732,8 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 .49-3.5"></path></svg>
             Reset
         </button>
+
+        <div id="cm-active-filter-chips" style="display:none;width:100%;flex-wrap:wrap;gap:6px;padding-top:6px"></div>
 
         <!-- Bulk action bar -->
         <div id="cm-bulk-bar" class="cm-bulk-bar">
@@ -602,6 +839,18 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <p style="font-size:15px;font-weight:700;margin:0">Drop files to upload</p>
             <p style="font-size:12px;margin:6px 0 0;opacity:.7">Images, Videos, Audio, PDFs — max 25 MB each</p>
         </div>
+    </div>
+
+    <!-- ─── MOBILE BOTTOM BAR ─────────────────────────────────── -->
+    <div id="cm-mobile-bottom-bar">
+        <button class="cm-hbtn" onclick="cmPromptFolder(null)">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            New Folder
+        </button>
+        <button class="cm-hbtn primary" onclick="document.getElementById('cm-file-input').click()">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            Upload
+        </button>
     </div>
 </div><!-- /cm-root -->
 
@@ -785,6 +1034,68 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
         <div class="btns">
             <button onclick="cmCancelConfirm()" class="cm-hbtn">Cancel</button>
             <button id="cm-confirm-ok" class="cm-hbtn" style="background:#dc2626;color:#fff;border-color:#dc2626">Delete Permanently</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ MOBILE FILTER DRAWER MODAL ═══════════════════════════════════════════ -->
+<div id="cm-mobile-filter-dlg" onclick="if(event.target===this)cmCloseMobileFilters()">
+    <div id="cm-mobile-filter-card">
+        <div class="cm-drawer-header">
+            <h3 style="margin:0;font-size:15px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:6px">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                Filter Media
+            </h3>
+            <button style="background:none;border:none;color:#a1a1aa;cursor:pointer;padding:4px" onclick="cmCloseMobileFilters()">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="cm-drawer-body" style="padding:20px;display:flex;flex-direction:column;gap:14px">
+            <div class="cm-field">
+                <label>Media Type</label>
+                <select id="cm-m-ft" class="cm-sel" style="width:100%">
+                    <option value="all">All Types</option>
+                    <option value="image">Images</option>
+                    <option value="video">Videos</option>
+                    <option value="audio">Audio</option>
+                    <option value="document">Documents</option>
+                </select>
+            </div>
+            <div class="cm-field">
+                <label>Culling Status</label>
+                <select id="cm-m-fculling" class="cm-sel" style="width:100%">
+                    <option value="">All Culling</option>
+                    <option value="starred">Starred (4+ Stars)</option>
+                    <option value="green">Approved</option>
+                    <option value="yellow">In Review</option>
+                    <option value="red">Rejected</option>
+                </select>
+            </div>
+            <div class="cm-field">
+                <label>Date Added</label>
+                <select id="cm-m-fd" class="cm-sel" style="width:100%">
+                    <option value="">All Dates</option>
+                </select>
+            </div>
+            <div class="cm-field">
+                <label>Document / Resolution Type</label>
+                <select id="cm-m-fdoctype" class="cm-sel" style="width:100%">
+                    <option value="">Resolution / Document</option>
+                    <?php foreach ($all_doc_types as $dt): ?><option value="<?php echo esc_attr($dt); ?>"><?php echo esc_html($dt); ?></option><?php endforeach; ?>
+                </select>
+            </div>
+            <?php if ($is_admin): ?>
+            <div class="cm-field">
+                <label>Uploader</label>
+                <select id="cm-m-fa" class="cm-sel" style="width:100%">
+                    <option value="">All Uploaders</option>
+                </select>
+            </div>
+            <?php endif; ?>
+        </div>
+        <div class="cm-drawer-footer" style="display:flex;gap:10px;justify-content:space-between">
+            <button onclick="cmResetMobileFilters()" class="cm-hbtn" style="flex:1;justify-content:center">Reset All</button>
+            <button onclick="cmApplyMobileFilters()" class="cm-hbtn primary" style="flex:1;justify-content:center">Apply Filters</button>
         </div>
     </div>
 </div>
@@ -1323,18 +1634,20 @@ window.cmRenderList = function(files) {
         
         var stars = f.rating ? ' <span style="color:#facc15">★' + f.rating + '</span>' : '';
         var dot = (f.label && f.label !== 'none' && LABEL_MAP[f.label]) ? '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:' + LABEL_MAP[f.label].hex + ';margin-right:4px"></span>' : '';
+        var subLine = [f.file_size_human, f.date_formatted, f.type_category].filter(Boolean).join(' • ');
 
         tr.innerHTML =
-            '<td><input type="checkbox" style="accent-color:#09090b;cursor:pointer;width:15px;height:15px"' + (CM.selIds.indexOf(f.id) > -1 ? ' checked' : '') + '></td>' +
-            '<td><div style="display:flex;align-items:center;gap:9px;min-width:0">' + lthumb +
-                '<div style="min-width:0;max-width:320px"><div style="font-weight:600;color:#18181b;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="' + esc(f.title || f.filename) + '">' + dot + esc(f.title || f.filename) + stars + '</div>' +
-                '<div style="font-size:10px;color:#a1a1aa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="' + esc(f.filename) + '">' + esc(f.filename) + '</div></div></div></td>' +
-            '<td>' + esc(f.author_name) + '</td>' +
-            '<td>' + (f.folder_name ? '<span style="background:#f4f4f5;color:#52525b;border-radius:4px;padding:2px 7px;font-size:10px">' + esc(f.folder_name) + '</span>' : '<span style="color:#d4d4d8">—</span>') + '</td>' +
-            '<td style="color:#71717a">' + esc(f.date_formatted) + '</td>' +
-            '<td style="color:#71717a;font-family:ui-monospace,monospace;font-size:11px">' + esc(f.file_size_human) + '</td>' +
-            '<td><span style="background:#f4f4f5;color:#52525b;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;text-transform:capitalize">' + esc(f.type_category) + '</span></td>' +
-            '<td style="text-align:right"><button class="cm-cell-opt" title="Actions" onclick="event.stopPropagation();cmShowContextMenu(event, ' + JSON.stringify(f).replace(/"/g, '&quot;') + ')">⋮</button></td>';
+            '<td class="cm-lcell-chk"><input type="checkbox" style="accent-color:#09090b;cursor:pointer;width:15px;height:15px"' + (CM.selIds.indexOf(f.id) > -1 ? ' checked' : '') + '></td>' +
+            '<td class="cm-lcell-main"><div style="display:flex;align-items:center;gap:10px;min-width:0">' + lthumb +
+                '<div style="min-width:0;flex:1"><div style="font-weight:600;color:#18181b;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="' + esc(f.title || f.filename) + '">' + dot + esc(f.title || f.filename) + stars + '</div>' +
+                '<div class="cm-lmain-sub-desktop" style="font-size:10px;color:#a1a1aa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="' + esc(f.filename) + '">' + esc(f.filename) + '</div>' +
+                '<div class="cm-lmobile-sub">' + esc(subLine) + '</div></div></div></td>' +
+            '<td class="cm-lcell-author">' + esc(f.author_name) + '</td>' +
+            '<td class="cm-lcell-folder">' + (f.folder_name ? '<span style="background:#f4f4f5;color:#52525b;border-radius:4px;padding:2px 7px;font-size:10px">' + esc(f.folder_name) + '</span>' : '<span style="color:#d4d4d8">—</span>') + '</td>' +
+            '<td class="cm-lcell-date" style="color:#71717a">' + esc(f.date_formatted) + '</td>' +
+            '<td class="cm-lcell-size" style="color:#71717a;font-family:ui-monospace,monospace;font-size:11px">' + esc(f.file_size_human) + '</td>' +
+            '<td class="cm-lcell-type"><span style="background:#f4f4f5;color:#52525b;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;text-transform:capitalize">' + esc(f.type_category) + '</span></td>' +
+            '<td class="cm-lcell-act" style="text-align:right"><button class="cm-cell-opt" title="Actions" onclick="event.stopPropagation();cmShowContextMenu(event, ' + JSON.stringify(f).replace(/"/g, '&quot;') + ')">⋮</button></td>';
         tr.querySelector('input[type=checkbox]').addEventListener('change', function(e) { cmToggleSel(f.id, e.target.checked); e.stopPropagation(); });
         tr.addEventListener('click', function(e) { if (e.target.type === 'checkbox') return; if (CM.bulk) { cmToggleSel(f.id, CM.selIds.indexOf(f.id) === -1); } else { cmOpenDetail(f); } });
         tr.addEventListener('contextmenu', function(e) { cmShowContextMenu(e, f); });
@@ -1778,23 +2091,104 @@ window.cmCreateFolder = function() {
 // ── FILTERS / SORT / PAGINATION ───────────────────────────────────────────────
 window.cmOnSearch = function(v) { clearTimeout(CM.searchT); CM.searchT=setTimeout(function(){CM.filters.q=v;CM.page=1;cmLoadFiles();},350); };
 window.cmFilter = function() {
-    CM.filters.type   = document.getElementById('cm-ft').value;
-    CM.filters.date   = document.getElementById('cm-fd').value;
-    var a = document.getElementById('cm-fa'); CM.filters.author = a ? a.value : '';
-    CM.page = 1; cmLoadFiles();
+    var ft = document.getElementById('cm-ft') ? document.getElementById('cm-ft').value : 'all';
+    var fc = document.getElementById('cm-fculling') ? document.getElementById('cm-fculling').value : '';
+    var fd = document.getElementById('cm-fd') ? document.getElementById('cm-fd').value : '';
+    var fdt = document.getElementById('cm-fdoctype') ? document.getElementById('cm-fdoctype').value : '';
+    var fa = document.getElementById('cm-fa') ? document.getElementById('cm-fa').value : '';
+    
+    CM.filters.type     = ft;
+    CM.filters.culling  = fc;
+    CM.filters.date     = fd;
+    CM.filters.doc_type = fdt;
+    CM.filters.author   = fa;
+
+    var mft = document.getElementById('cm-m-ft'); if (mft) mft.value = ft;
+    var mfc = document.getElementById('cm-m-fculling'); if (mfc) mfc.value = fc;
+    var mfd = document.getElementById('cm-m-fd'); if (mfd) mfd.value = fd;
+    var mfdt = document.getElementById('cm-m-fdoctype'); if (mfdt) mfdt.value = fdt;
+    var mfa = document.getElementById('cm-m-fa'); if (mfa) mfa.value = fa;
+
+    var activeCount = 0;
+    var chips = [];
+
+    if (ft && ft !== 'all') {
+        activeCount++;
+        var ftEl = document.getElementById('cm-ft');
+        var ftLabel = (ftEl && ftEl.selectedIndex >= 0) ? ftEl.options[ftEl.selectedIndex].text : ft;
+        chips.push({ key: 'type', label: ftLabel, reset: function() { var el = document.getElementById('cm-ft'); if (el) el.value = 'all'; cmFilter(); } });
+    }
+    if (fc && fc !== '') {
+        activeCount++;
+        var fcEl = document.getElementById('cm-fculling');
+        var fcLabel = (fcEl && fcEl.selectedIndex >= 0) ? fcEl.options[fcEl.selectedIndex].text : fc;
+        chips.push({ key: 'culling', label: fcLabel, reset: function() { var el = document.getElementById('cm-fculling'); if (el) el.value = ''; cmFilter(); } });
+    }
+    if (fd && fd !== '') {
+        activeCount++;
+        var fdEl = document.getElementById('cm-fd');
+        var fdLabel = (fdEl && fdEl.selectedIndex >= 0) ? fdEl.options[fdEl.selectedIndex].text : fd;
+        chips.push({ key: 'date', label: fdLabel, reset: function() { var el = document.getElementById('cm-fd'); if (el) el.value = ''; cmFilter(); } });
+    }
+    if (fdt && fdt !== '') {
+        activeCount++;
+        var fdtEl = document.getElementById('cm-fdoctype');
+        var fdtLabel = (fdtEl && fdtEl.selectedIndex >= 0) ? fdtEl.options[fdtEl.selectedIndex].text : fdt;
+        chips.push({ key: 'doc_type', label: fdtLabel, reset: function() { var el = document.getElementById('cm-fdoctype'); if (el) el.value = ''; cmFilter(); } });
+    }
+    if (fa && fa !== '') {
+        activeCount++;
+        var faEl = document.getElementById('cm-fa');
+        var faLabel = (faEl && faEl.selectedIndex >= 0) ? faEl.options[faEl.selectedIndex].text : fa;
+        chips.push({ key: 'author', label: faLabel, reset: function() { var el = document.getElementById('cm-fa'); if (el) el.value = ''; cmFilter(); } });
+    }
+
+    var badge = document.getElementById('cm-filter-count-badge');
+    if (badge) {
+        badge.textContent = activeCount;
+        badge.style.display = activeCount > 0 ? 'inline-block' : 'none';
+    }
+
+    var chipsContainer = document.getElementById('cm-active-filter-chips');
+    if (chipsContainer) {
+        if (chips.length > 0) {
+            chipsContainer.style.display = 'flex';
+            chipsContainer.innerHTML = '';
+            chips.forEach(function(chip) {
+                var btn = document.createElement('button');
+                btn.className = 'cm-chip';
+                btn.innerHTML = esc(chip.label) + ' <span class="cm-chip-close">✕</span>';
+                btn.onclick = function() { chip.reset(); };
+                chipsContainer.appendChild(btn);
+            });
+        } else {
+            chipsContainer.style.display = 'none';
+            chipsContainer.innerHTML = '';
+        }
+    }
+
+    CM.page = 1;
+    cmLoadFiles();
 };
 window.cmResetFilters = function() {
-    CM.filters = {q:'', type:'all', culling:'', date:'', author:''};
+    CM.filters = {q:'', type:'all', culling:'', date:'', author:'', doc_type:''};
     var searchEl = document.getElementById('cm-search'); if (searchEl) searchEl.value = '';
     var ftEl = document.getElementById('cm-ft'); if (ftEl) ftEl.value = 'all';
     var fcEl = document.getElementById('cm-fculling'); if (fcEl) fcEl.value = '';
     var fdEl = document.getElementById('cm-fd'); if (fdEl) fdEl.value = '';
     var fdtEl = document.getElementById('cm-fdoctype'); if (fdtEl) fdtEl.value = '';
     var faEl = document.getElementById('cm-fa'); if (faEl) faEl.value = '';
-    CM.page = 1;
-    cmLoadFiles();
+
+    var mftEl = document.getElementById('cm-m-ft'); if (mftEl) mftEl.value = 'all';
+    var mfcEl = document.getElementById('cm-m-fculling'); if (mfcEl) mfcEl.value = '';
+    var mfdEl = document.getElementById('cm-m-fd'); if (mfdEl) mfdEl.value = '';
+    var mfdtEl = document.getElementById('cm-m-fdoctype'); if (mfdtEl) mfdtEl.value = '';
+    var mfaEl = document.getElementById('cm-m-fa'); if (mfaEl) mfaEl.value = '';
+
+    cmFilter();
     coraShowToast('Filters reset.');
 };
+
 window.cmOnSortChange = function(val) {
     if (!val) return;
     var parts = val.split('-');
@@ -1806,6 +2200,7 @@ window.cmOnSortChange = function(val) {
 window.cmSort = function(col) { if(CM.sortBy===col) CM.sortDir=CM.sortDir==='ASC'?'DESC':'ASC'; else{CM.sortBy=col;CM.sortDir='DESC';} cmLoadFiles(); };
 window.cmUpdatePag = function() {
     var pag = document.getElementById('cm-pag');
+    if (!pag) return;
     if (CM.pages <= 1) { pag.style.display='none'; return; }
     pag.style.display = 'flex';
     document.getElementById('cm-pag-info').textContent = 'Page ' + CM.page + ' of ' + CM.pages + ' (' + CM.total + ' files)';
@@ -1813,12 +2208,84 @@ window.cmUpdatePag = function() {
     document.getElementById('cm-next').disabled = CM.page >= CM.pages;
 };
 window.cmPage = function(d) { var n=CM.page+d; if(n<1||n>CM.pages) return; CM.page=n; cmLoadFiles(); };
+
+window.cmOpenMobileFilters = function() {
+    var ft = document.getElementById('cm-ft');
+    var fc = document.getElementById('cm-fculling');
+    var fd = document.getElementById('cm-fd');
+    var fdt = document.getElementById('cm-fdoctype');
+    var fa = document.getElementById('cm-fa');
+
+    var mft = document.getElementById('cm-m-ft');
+    var mfc = document.getElementById('cm-m-fculling');
+    var mfd = document.getElementById('cm-m-fd');
+    var mfdt = document.getElementById('cm-m-fdoctype');
+    var mfa = document.getElementById('cm-m-fa');
+
+    if (ft && mft) mft.value = ft.value;
+    if (fc && mfc) mfc.value = fc.value;
+    if (fd && mfd) mfd.value = fd.value;
+    if (fdt && mfdt) mfdt.value = fdt.value;
+    if (fa && mfa) mfa.value = fa.value;
+
+    var dlg = document.getElementById('cm-mobile-filter-dlg');
+    if (dlg) dlg.classList.add('open');
+};
+
+window.cmCloseMobileFilters = function() {
+    var dlg = document.getElementById('cm-mobile-filter-dlg');
+    if (dlg) dlg.classList.remove('open');
+};
+
+window.cmApplyMobileFilters = function() {
+    var ft = document.getElementById('cm-ft');
+    var fc = document.getElementById('cm-fculling');
+    var fd = document.getElementById('cm-fd');
+    var fdt = document.getElementById('cm-fdoctype');
+    var fa = document.getElementById('cm-fa');
+
+    var mft = document.getElementById('cm-m-ft');
+    var mfc = document.getElementById('cm-m-fculling');
+    var mfd = document.getElementById('cm-m-fd');
+    var mfdt = document.getElementById('cm-m-fdoctype');
+    var mfa = document.getElementById('cm-m-fa');
+
+    if (ft && mft) ft.value = mft.value;
+    if (fc && mfc) fc.value = mfc.value;
+    if (fd && mfd) fd.value = mfd.value;
+    if (fdt && mfdt) fdt.value = mfdt.value;
+    if (fa && mfa) fa.value = mfa.value;
+
+    cmFilter();
+    cmCloseMobileFilters();
+};
+
+window.cmResetMobileFilters = function() {
+    cmResetFilters();
+    cmCloseMobileFilters();
+};
+
 window.cmLoadFilterOpts = function() {
     $.ajax({url:coraREData.ajaxUrl,type:'POST',data:{action:'cora_media_library_get_months',nonce:coraREData.ajaxNonce},
-    success:function(r){if(!r.success)return;var s=document.getElementById('cm-fd');(r.data.months||[]).forEach(function(m){s.innerHTML+='<option value="'+esc(m.value)+'">'+esc(m.label)+'</option>';});}});
+    success:function(r){if(!r.success)return;
+        var s=document.getElementById('cm-fd');
+        var ms=document.getElementById('cm-m-fd');
+        (r.data.months||[]).forEach(function(m){
+            var optHtml = '<option value="'+esc(m.value)+'">'+esc(m.label)+'</option>';
+            if(s) s.innerHTML += optHtml;
+            if(ms) ms.innerHTML += optHtml;
+        });
+    }});
     var as=document.getElementById('cm-fa');
-    if(as) $.ajax({url:coraREData.ajaxUrl,type:'POST',data:{action:'cora_media_library_get_uploaders',nonce:coraREData.ajaxNonce},
-    success:function(r){if(!r.success)return;(r.data.uploaders||[]).forEach(function(u){as.innerHTML+='<option value="'+u.id+'">'+esc(u.name)+'</option>';});}});
+    var mas=document.getElementById('cm-m-fa');
+    if(as || mas) $.ajax({url:coraREData.ajaxUrl,type:'POST',data:{action:'cora_media_library_get_uploaders',nonce:coraREData.ajaxNonce},
+    success:function(r){if(!r.success)return;
+        (r.data.uploaders||[]).forEach(function(u){
+            var optHtml = '<option value="'+u.id+'">'+esc(u.name)+'</option>';
+            if(as) as.innerHTML += optHtml;
+            if(mas) mas.innerHTML += optHtml;
+        });
+    }});
 };
 
 // ── BULK ──────────────────────────────────────────────────────────────────────
