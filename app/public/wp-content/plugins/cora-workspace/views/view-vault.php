@@ -353,34 +353,34 @@ foreach ( $cora_documents as $doc ) {
                         $type_lower = strtolower($doc['type'] ?? '');
                         $status = $doc['status'] ?? 'Draft';
                         
-                        // Category soft badges & icons (Color psychology tints)
-                        $cat_bg = 'bg-zinc-50 border border-zinc-200 text-zinc-600';
-                        $icon_bg = 'bg-zinc-50 border border-zinc-200/50 text-zinc-500';
+                        // Category soft badges & icons (Color psychology tints - Borderless Soft Fills)
+                        $cat_bg = 'bg-zinc-100 text-zinc-700 font-bold';
+                        $icon_bg = 'bg-zinc-105/60 text-zinc-500';
                         
                         if ($type_lower === 'invoice') {
-                            $cat_bg = 'bg-emerald-50 border border-emerald-250/40 text-emerald-700';
-                            $icon_bg = 'bg-emerald-50/50 border border-emerald-100 text-emerald-600';
+                            $cat_bg = 'bg-emerald-100/75 text-emerald-800 font-bold';
+                            $icon_bg = 'bg-emerald-100/50 text-emerald-600';
                         } elseif ($type_lower === 'contract' || $type_lower === 'sla' || $type_lower === 'nda') {
-                            $cat_bg = 'bg-purple-50 border border-purple-250/40 text-purple-700';
-                            $icon_bg = 'bg-purple-50/50 border border-purple-100 text-purple-600';
+                            $cat_bg = 'bg-purple-100/75 text-purple-800 font-bold';
+                            $icon_bg = 'bg-purple-100/50 text-purple-600';
                         } elseif ($type_lower === 'proposal' || $type_lower === 'quote') {
-                            $cat_bg = 'bg-blue-50 border border-blue-250/40 text-blue-700';
-                            $icon_bg = 'bg-blue-50/50 border border-blue-100 text-blue-600';
+                            $cat_bg = 'bg-blue-100/75 text-blue-800 font-bold';
+                            $icon_bg = 'bg-blue-100/50 text-blue-600';
                         } elseif ($type_lower === 'equipment' || $type_lower === 'gear') {
-                            $cat_bg = 'bg-amber-50 border border-amber-250/40 text-amber-700';
-                            $icon_bg = 'bg-amber-50/50 border border-amber-100 text-amber-600';
+                            $cat_bg = 'bg-amber-100/75 text-amber-800 font-bold';
+                            $icon_bg = 'bg-amber-100/50 text-amber-600';
                         }
 
-                        // Status badges (Color psychology tints)
-                        $status_bg = 'bg-zinc-50 border border-zinc-200 text-zinc-650 font-semibold';
+                        // Status badges (Color psychology tints - Borderless Soft Fills)
+                        $status_bg = 'bg-zinc-100 text-zinc-650 font-semibold';
                         if ($status === 'Paid') {
-                            $status_bg = 'bg-emerald-50 border border-emerald-250/40 text-emerald-700 font-bold';
+                            $status_bg = 'bg-emerald-100/75 text-emerald-800 font-bold';
                         } elseif ($status === 'Signed') {
-                            $status_bg = 'bg-purple-50 border border-purple-250/40 text-purple-700 font-bold';
+                            $status_bg = 'bg-purple-100/75 text-purple-800 font-bold';
                         } elseif ($status === 'Sent' || $status === 'Active') {
-                            $status_bg = 'bg-blue-50 border border-blue-250/40 text-blue-700 font-bold';
+                            $status_bg = 'bg-blue-100/75 text-blue-800 font-bold';
                         } elseif ($status === 'Pending') {
-                            $status_bg = 'bg-amber-50 border border-amber-250/40 text-amber-700 font-bold';
+                            $status_bg = 'bg-amber-100/75 text-amber-800 font-bold';
                         }
 
                         $is_signed = ! empty( $doc['signed'] );
@@ -399,21 +399,24 @@ foreach ( $cora_documents as $doc ) {
                             </div>
                         </td>
                         <td class="p-4 py-3.5">
-                            <span class="px-2.5 py-1 rounded-md text-[9px] font-bold <?php echo $cat_bg; ?> uppercase tracking-wider">
+                            <span class="px-2.5 py-1 rounded-full text-[9px] font-bold <?php echo $cat_bg; ?> uppercase tracking-wider">
                                 <?php echo esc_html( $doc['type'] ); ?>
                             </span>
                         </td>
                         <td class="p-4 py-3.5">
-                            <div class="font-semibold text-zinc-900"><?php echo esc_html( $doc['client_name'] ); ?></div>
+                            <div class="font-bold text-zinc-950 hover:underline cursor-pointer flex items-center gap-1.5 group" onclick="coraOpenClientProfileInCRM('<?php echo esc_js( $doc['client_name'] ); ?>')" title="Open Client CRM Profile">
+                                <span><?php echo esc_html( $doc['client_name'] ); ?></span>
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="opacity-0 group-hover:opacity-100 transition-opacity text-zinc-400 shrink-0"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            </div>
                             <?php if ( ! empty( $doc['client_gstin'] ) ) : ?>
-                                <div class="text-[10px] font-mono text-zinc-400"><?php echo esc_html( $doc['client_gstin'] ); ?></div>
+                                <div class="text-[10px] font-mono text-zinc-400 mt-0.5"><?php echo esc_html( $doc['client_gstin'] ); ?></div>
                             <?php endif; ?>
                         </td>
                         <td class="p-4 py-3.5 font-bold font-mono text-zinc-950 text-sm">
                             ₹<?php echo number_format( floatval( $doc['grand_total'] ?? $doc['amount'] ?? 0 ) ); ?>
                         </td>
                         <td class="p-4 py-3.5">
-                            <span class="px-2.5 py-1 rounded-md text-[9px] <?php echo $status_bg; ?> uppercase tracking-wider">
+                            <span class="px-2.5 py-1 rounded-full text-[9px] <?php echo $status_bg; ?> uppercase tracking-wider">
                                 <?php echo esc_html( $status ); ?>
                             </span>
                         </td>
@@ -3481,6 +3484,35 @@ window.coraToggleStep3Sidebar = function(side) {
                 btn.classList.add('bg-white', 'text-zinc-700', 'border-zinc-200/80');
             }
         }
+    }
+};
+
+// CRM DEEP NAVIGATION ROUTER
+window.coraOpenClientProfileInCRM = function(clientName) {
+    if (typeof window.coraNavigateTo === 'function') {
+        window.coraNavigateTo('clients');
+    }
+    
+    var client = (window.coraClients || []).find(function(c) {
+        return (c.names || '').toLowerCase().indexOf(clientName.toLowerCase()) > -1 ||
+               clientName.toLowerCase().indexOf((c.names || '').toLowerCase()) > -1;
+    });
+    
+    if (client && typeof window.coraOpenClientDetailsDrawer === 'function') {
+        setTimeout(function() {
+            window.coraOpenClientDetailsDrawer(client);
+        }, 100);
+    } else {
+        setTimeout(function() {
+            var mockId = 'client_1';
+            if (clientName.toLowerCase().indexOf('arjun') > -1) mockId = 'client_1';
+            else if (clientName.toLowerCase().indexOf('rohit') > -1) mockId = 'client_2';
+            else if (clientName.toLowerCase().indexOf('rajesh') > -1) mockId = 'client_3';
+            
+            if (typeof window.coraOpenClientLifecycle === 'function') {
+                window.coraOpenClientLifecycle(mockId);
+            }
+        }, 100);
     }
 };
 
