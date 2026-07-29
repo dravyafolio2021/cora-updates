@@ -693,18 +693,21 @@ foreach ( $cora_documents as $doc ) {
 
                 <!-- 2. LEFT PANEL - COMPONENT LIBRARY & DOCUMENT OUTLINE (DOCKED SIDEBAR) -->
                 <div id="step3-left-sidebar" class="w-full md:w-[280px] md:shrink-0 bg-white border border-zinc-200/80 rounded-3xl p-5 shadow-xs space-y-4 md:sticky md:top-4 self-start pointer-events-auto">
-                    <!-- Segmented Tab Header -->
-                    <div class="flex items-center justify-between border-b border-zinc-100 pb-3 gap-2">
-                        <div class="flex items-center bg-zinc-100 p-1 rounded-xl w-full">
-                            <button type="button" id="step3-tab-btn-components" onclick="coraSwitchStep3SidebarTab('components')" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all bg-white text-zinc-950 shadow-xs cursor-pointer text-center whitespace-nowrap">
-                                Component Library
-                            </button>
-                            <button type="button" id="step3-tab-btn-outline" onclick="coraSwitchStep3SidebarTab('outline')" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all text-zinc-500 hover:text-zinc-900 cursor-pointer text-center whitespace-nowrap">
-                                Document Outline
-                            </button>
-                        </div>
-                        <button type="button" onclick="coraToggleStep3Sidebar('left')" title="Close Sidebar" class="w-7 h-7 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600 hover:text-zinc-950 flex items-center justify-center transition-colors cursor-pointer shrink-0">
-                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    <!-- Sidebar Header (Title + Close button) -->
+                    <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
+                        <span class="text-xs font-black uppercase tracking-wider text-zinc-950">Document Builder</span>
+                        <button type="button" onclick="coraToggleStep3Sidebar('left')" title="Close Sidebar" class="w-6.5 h-6.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-500 hover:text-zinc-950 flex items-center justify-center transition-colors cursor-pointer shrink-0">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+
+                    <!-- Segmented Tab Switcher -->
+                    <div class="flex items-center bg-zinc-100 p-1 rounded-xl w-full">
+                        <button type="button" id="step3-tab-btn-components" onclick="coraSwitchStep3SidebarTab('components')" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all bg-white text-zinc-950 shadow-xs cursor-pointer text-center whitespace-nowrap">
+                            Blocks
+                        </button>
+                        <button type="button" id="step3-tab-btn-outline" onclick="coraSwitchStep3SidebarTab('outline')" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all text-zinc-500 hover:text-zinc-900 cursor-pointer text-center whitespace-nowrap">
+                            Outline
                         </button>
                     </div>
 
