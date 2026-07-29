@@ -489,7 +489,7 @@ foreach ( $cora_documents as $doc ) {
                     <p class="text-xs text-zinc-500 mt-1 leading-relaxed">Select a category below or search document types. In Step 2, you can choose visual blueprint templates.</p>
                 </div>
                 <div class="relative w-full max-w-sm">
-                    <input type="text" id="wiz-cat-search-input" onkeyup="coraFilterWizCategories(this.value)" placeholder="Search document types..." class="w-full pl-9.5 pr-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-medium outline-none focus:border-zinc-950 focus:bg-white transition-all">
+                    <input type="text" id="wiz-cat-search-input" onkeyup="coraFilterWizCategories(this.value)" placeholder="Search document types..." class="w-full pl-10 pr-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-medium outline-none focus:border-zinc-950 focus:bg-white transition-all">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="absolute left-3.5 top-2.5 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </div>
             </div>
