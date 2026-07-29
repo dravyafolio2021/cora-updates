@@ -2214,7 +2214,7 @@ foreach ( $cora_documents as $doc ) {
                     Print / Export PDF
                 </button>
                 <div class="flex items-center gap-2">
-                    <button id="preview-drawer-edit-btn" onclick="coraOpenStudioFromPreviewDrawer()" class="px-4 py-2.5 bg-zinc-100 border border-zinc-200 text-zinc-900 font-bold text-xs rounded-xl cursor-pointer hover:bg-zinc-200 transition-all">
+                    <button id="preview-drawer-edit-btn" onclick="coraOpenStudioFromPreviewDrawer()" class="hidden md:block px-4 py-2.5 bg-zinc-100 border border-zinc-200 text-zinc-900 font-bold text-xs rounded-xl cursor-pointer hover:bg-zinc-200 transition-all">
                         Edit Studio
                     </button>
                     <button onclick="coraCloseDocPreviewDrawer()" class="px-4 py-2.5 bg-zinc-100 text-zinc-700 font-semibold text-xs rounded-xl hover:bg-zinc-200 cursor-pointer">
@@ -4379,48 +4379,85 @@ window.coraOpenDocPreviewDrawer = function(docId) {
     document.getElementById('preview-drawer-badge').textContent = (doc.type || 'Document').toUpperCase();
 
     var grand = doc.grand_total || doc.amount || 0;
-    var html = '<div class="bg-zinc-50 p-4 rounded-2xl border border-zinc-200 space-y-1">' +
-               '<div class="flex justify-between items-center"><span class="font-mono text-zinc-500 font-bold">' + (doc.number||'DOC-2026') + '</span><span class="px-2 py-0.5 rounded bg-zinc-950 text-white font-extrabold text-[10px]">' + (doc.status||'Draft') + '</span></div>' +
-               '<h4 class="font-black text-zinc-950 text-sm mt-1">Client: ' + doc.client_name + '</h4>' +
-               (doc.client_email ? '<div class="text-zinc-500 font-mono">Email: ' + doc.client_email + '</div>' : '') +
-               (doc.client_gstin ? '<div class="text-zinc-500 font-mono">GSTIN: ' + doc.client_gstin + '</div>' : '') +
+    var isMobile = window.innerWidth < 768;
+
+    // 1. Clean Monochromatic Summary Metadata Block
+    var html = '<div class="space-y-4">' +
+               '  <div class="flex justify-between items-start border-b border-zinc-200/80 pb-3">' +
+               '    <div class="min-w-0 flex-1">' +
+               '      <span class="font-mono text-zinc-400 text-xs font-bold">' + (doc.number||'DOC-2026') + '</span>' +
+               '      <h4 class="font-black text-zinc-900 text-sm mt-0.5 truncate">Client: ' + doc.client_name + '</h4>' +
+               '    </div>' +
+               '    <span class="px-2.5 py-0.5 rounded bg-zinc-950 text-white font-extrabold text-[9px] uppercase tracking-wider shrink-0 ml-3">' + (doc.status||'Draft') + '</span>' +
+               '  </div>' +
+               '  <div class="grid grid-cols-2 gap-3 text-xs border-b border-zinc-200/80 pb-3">' +
+               (doc.client_email ? '    <div class="min-w-0"><span class="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block">Email Address</span><span class="font-semibold text-zinc-700 block truncate mt-1">' + doc.client_email + '</span></div>' : '') +
+               (doc.client_gstin ? '    <div class="min-w-0"><span class="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block">GSTIN Register</span><span class="font-mono text-zinc-700 block mt-1 truncate">' + doc.client_gstin + '</span></div>' : '') +
+               '  </div>' +
                '</div>';
 
-    html += '<div class="border border-zinc-200 rounded-xl overflow-hidden">' +
-            '<table class="w-full text-left border-collapse text-xs"><thead class="bg-zinc-100 border-b"><tr><th class="p-2.5">Scope Description</th><th class="p-2.5 text-center">Qty</th><th class="p-2.5 text-right">Rate</th><th class="p-2.5 text-right">Line Total</th></tr></thead><tbody>';
+    // 2. Line Items (Responsive: Vertical lists on mobile, table layout on desktop)
+    if (isMobile) {
+        html += '<div class="space-y-3 pt-2.5">' +
+                '  <h5 class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Line Items / Deliverables</h5>';
+        var items = doc.items || [ { desc: doc.title, qty: 1, rate: doc.amount||0 } ];
+        items.forEach(function(it){
+            var lTot = (it.qty||1) * (it.rate||0);
+            html += '  <div class="p-3.5 bg-zinc-50 border border-zinc-200/60 rounded-xl space-y-1.5 hover:bg-zinc-100/50 transition-colors">' +
+                    '    <div class="font-bold text-zinc-900 text-[11px] leading-snug break-words">' + it.desc + '</div>' +
+                    '    <div class="flex justify-between items-center text-[10px] text-zinc-500 font-medium">' +
+                    '      <span>' + (it.qty||1) + ' qty × ₹' + parseFloat(it.rate||0).toLocaleString() + '</span>' +
+                    '      <span class="font-bold text-zinc-950 font-mono text-[11px]">₹' + Math.round(lTot).toLocaleString() + '</span>' +
+                    '    </div>' +
+                    '  </div>';
+        });
+        html += '</div>';
+    } else {
+        html += '<div class="border border-zinc-200 rounded-xl overflow-hidden mt-3">' +
+                '  <table class="w-full text-left border-collapse text-xs">' +
+                '    <thead class="bg-zinc-50 border-b border-zinc-200"><tr><th class="p-3 text-zinc-500 uppercase tracking-wider font-extrabold text-[9px]">Scope Description</th><th class="p-3 text-center text-zinc-500 uppercase tracking-wider font-extrabold text-[9px]">Qty</th><th class="p-3 text-right text-zinc-500 uppercase tracking-wider font-extrabold text-[9px]">Rate</th><th class="p-3 text-right text-zinc-500 uppercase tracking-wider font-extrabold text-[9px]">Line Total</th></tr></thead>' +
+                '    <tbody class="divide-y divide-zinc-100">';
+        var items = doc.items || [ { desc: doc.title, qty: 1, rate: doc.amount||0 } ];
+        items.forEach(function(it){
+            var lTot = (it.qty||1) * (it.rate||0);
+            html += '    <tr class="hover:bg-zinc-50/50 transition-colors"><td class="p-3 font-semibold text-zinc-800">' + it.desc + '</td><td class="p-3 text-center font-bold text-zinc-700">' + (it.qty||1) + '</td><td class="p-3 text-right font-mono text-zinc-600">₹' + parseFloat(it.rate||0).toLocaleString() + '</td><td class="p-3 text-right font-mono font-bold text-zinc-950">₹' + Math.round(lTot).toLocaleString() + '</td></tr>';
+        });
+        html += '    </tbody>' +
+                '  </table>' +
+                '</div>';
+    }
 
-    var items = doc.items || [ { desc: doc.title, qty: 1, rate: doc.amount||0 } ];
-    items.forEach(function(it){
-        var lTot = (it.qty||1) * (it.rate||0);
-        html += '<tr class="border-b"><td class="p-2.5 font-semibold">' + it.desc + '</td><td class="p-2.5 text-center font-bold">' + (it.qty||1) + '</td><td class="p-2.5 text-right font-mono">₹' + parseFloat(it.rate||0).toLocaleString() + '</td><td class="p-2.5 text-right font-mono font-bold">₹' + Math.round(lTot).toLocaleString() + '</td></tr>';
-    });
-
-    html += '</tbody></table></div>';
-
-    html += '<div class="bg-zinc-50 p-4 rounded-2xl border border-zinc-200 text-right space-y-1">' +
-            '<div class="text-zinc-500">Taxable Amount: ₹' + Math.round(doc.amount||0).toLocaleString() + '</div>' +
-            '<div class="text-base font-black text-zinc-950">Grand Total (Incl. GST): ₹' + Math.round(grand).toLocaleString() + '</div>' +
+    // 3. Clean Totals summary card
+    html += '<div class="p-4 bg-zinc-50/60 border border-zinc-200/80 rounded-2xl flex flex-col items-end gap-1.5 mt-4">' +
+            '  <div class="text-[10px] text-zinc-500 font-semibold">Taxable Amount: <span class="font-mono text-zinc-700">₹' + Math.round(doc.amount||0).toLocaleString() + '</span></div>' +
+            '  <div class="text-xs sm:text-sm font-bold text-zinc-950">Grand Total (Incl. GST): <span class="font-mono text-sm sm:text-base font-black">₹' + Math.round(grand).toLocaleString() + '</span></div>' +
             '</div>';
 
-    // Admin E-Sign Audit Details
+    // 4. Admin E-Sign Audit Details (soft-emerald border stamp)
     if (doc.admin_signed) {
-        html += '<div class="bg-zinc-50 border border-zinc-200 p-4 rounded-2xl space-y-1 text-zinc-950 mb-3">' +
-                '<span class="text-[10px] font-extrabold uppercase tracking-widest block text-zinc-600">✓ Workspace Sign-off Verified</span>' +
-                '<div class="font-bold">Signed by: ' + (doc.admin_signer_name||'—') + ' (' + (doc.admin_signer_email||'—') + ')</div>' +
-                '<div class="font-mono text-[10px] text-zinc-500">Timestamp: ' + (doc.admin_signed_at||'—') + ' | IP: ' + (doc.admin_signer_ip||'127.0.0.1') + '</div>' +
-                '<div class="font-mono text-[10px] font-bold text-zinc-950 mt-1">Hash: ' + (doc.admin_verification_hash||'ESIGN-HASH-V1') + '</div>';
+        html += '<div class="bg-emerald-50/30 border border-emerald-100 p-4 rounded-2xl space-y-2.5 mt-4 text-zinc-950">' +
+                '  <div class="flex items-center gap-1.5 text-emerald-700 font-bold text-[10px] uppercase tracking-wider">' +
+                '    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg>' +
+                '    <span>Workspace Sign-off Verified</span>' +
+                '  </div>' +
+                '  <div class="text-xs font-semibold text-zinc-900">Signed by: ' + (doc.admin_signer_name||'—') + ' (' + (doc.admin_signer_email||'—') + ')</div>' +
+                '  <div class="font-mono text-[9px] text-zinc-500 space-y-1">' +
+                '    <div>Timestamp: ' + (doc.admin_signed_at||'—') + '</div>' +
+                '    <div>IP Address: ' + (doc.admin_signer_ip||'127.0.0.1') + '</div>' +
+                '    <div class="font-bold text-zinc-700 break-all">Hash: ' + (doc.admin_verification_hash||'ESIGN-HASH-V1') + '</div>' +
+                '  </div>';
         if (doc.admin_signature_data) {
-            html += '<div class="mt-2 pt-2 border-t border-zinc-200">' +
-                    '  <span class="text-[9px] font-extrabold uppercase tracking-wider block text-zinc-400">Workspace Stamp</span>' +
-                    '  <div class="mt-1 p-1 bg-white border border-zinc-200 rounded-xl inline-block">' +
-                    '    <img src="' + doc.admin_signature_data + '" class="h-10 object-contain block" style="max-height: 40px;" />' +
-                    '  </div>' +
-                    '</div>';
+            html += '  <div class="pt-2.5 border-t border-emerald-100/50">' +
+                    '    <span class="text-[8px] font-bold uppercase tracking-wider block text-zinc-400">Workspace Stamp</span>' +
+                    '    <div class="mt-1.5 p-1 bg-white border border-zinc-200/80 rounded-lg inline-block">' +
+                    '      <img src="' + doc.admin_signature_data + '" class="h-8 object-contain block" style="max-height: 32px;" />' +
+                    '    </div>' +
+                    '  </div>';
         }
         html += '</div>';
     }
 
-    // Client E-Sign Audit Details
+    // 5. Client E-Sign Audit Details (soft-purple border stamp)
     if (doc.client_signed || doc.signed) {
         var clName  = doc.client_signer_name || doc.signer_name || '—';
         var clEmail = doc.client_signer_email || doc.signer_email || '—';
@@ -4429,18 +4466,24 @@ window.coraOpenDocPreviewDrawer = function(docId) {
         var clHash  = doc.client_verification_hash || doc.verification_hash || 'ESIGN-HASH-V1';
         var clSigImg = doc.client_signature_data || doc.signature_data || doc.signature_image || '';
 
-        html += '<div class="bg-zinc-50 border border-zinc-200 p-4 rounded-2xl space-y-1 text-zinc-950">' +
-                '<span class="text-[10px] font-extrabold uppercase tracking-widest block text-zinc-600">✓ Client Sign-off Verified</span>' +
-                '<div class="font-bold">Signed by: ' + clName + ' (' + clEmail + ')</div>' +
-                '<div class="font-mono text-[10px] text-zinc-500">Timestamp: ' + clDate + ' | IP: ' + clIp + '</div>' +
-                '<div class="font-mono text-[10px] font-bold text-zinc-950 mt-1">Hash: ' + clHash + '</div>';
+        html += '<div class="bg-purple-50/30 border border-purple-100 p-4 rounded-2xl space-y-2.5 mt-4 text-zinc-950">' +
+                '  <div class="flex items-center gap-1.5 text-purple-700 font-bold text-[10px] uppercase tracking-wider">' +
+                '    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg>' +
+                '    <span>Client Sign-off Verified</span>' +
+                '  </div>' +
+                '  <div class="text-xs font-semibold text-zinc-900">Signed by: ' + clName + ' (' + clEmail + ')</div>' +
+                '  <div class="font-mono text-[9px] text-zinc-500 space-y-1">' +
+                '    <div>Timestamp: ' + clDate + '</div>' +
+                '    <div>IP Address: ' + clIp + '</div>' +
+                '    <div class="font-bold text-zinc-700 break-all">Hash: ' + clHash + '</div>' +
+                '  </div>';
         if (clSigImg) {
-            html += '<div class="mt-2 pt-2 border-t border-zinc-200">' +
-                    '  <span class="text-[9px] font-extrabold uppercase tracking-wider block text-zinc-400">Client Stamp</span>' +
-                    '  <div class="mt-1 p-1 bg-white border border-zinc-200 rounded-xl inline-block">' +
-                    '    <img src="' + clSigImg + '" class="h-10 object-contain block" style="max-height: 40px;" />' +
-                    '  </div>' +
-                    '</div>';
+            html += '  <div class="pt-2.5 border-t border-purple-100/50">' +
+                    '    <span class="text-[8px] font-bold uppercase tracking-wider block text-zinc-400">Client Stamp</span>' +
+                    '    <div class="mt-1.5 p-1 bg-white border border-zinc-200/80 rounded-lg inline-block">' +
+                    '      <img src="' + clSigImg + '" class="h-8 object-contain block" style="max-height: 32px;" />' +
+                    '    </div>' +
+                    '  </div>';
         }
         html += '</div>';
     }
