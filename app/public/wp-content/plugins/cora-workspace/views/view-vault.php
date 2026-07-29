@@ -264,7 +264,7 @@ foreach ( $cora_documents as $doc ) {
     <!-- ═════════════════════════════════════════════════════════════════════════
          VIEW 1: MASTER DOCUMENT VAULT DASHBOARD (COLORED BADGES ENHANCED)
          ═════════════════════════════════════════════════════════════════════ -->
-    <div id="cora-vault-view-dashboard" class="space-y-5">
+    <div id="cora-vault-view-dashboard" class="space-y-5 mt-0">
         <!-- 4 KPI Cards Grid (Compact & Monochromatic Horizontal Spacing) -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <!-- Card 1: Total Documents -->
@@ -576,7 +576,7 @@ foreach ( $cora_documents as $doc ) {
     <!-- ═════════════════════════════════════════════════════════════════════════
          VIEW 2: UNIFIED 6-STEP VISUAL GUIDED DOCUMENT WIZARD WITH STICKY DOCK
          ═════════════════════════════════════════════════════════════════════ -->
-    <div id="cora-vault-view-editor" class="hidden w-full max-w-none">
+    <div id="cora-vault-view-editor" class="hidden w-full max-w-none mt-0">
         <form id="cora-doc-wizard-form" data-autosave-module="vault_doc_wizard" class="w-full">
         <input type="hidden" id="studio-doc-id" name="studio_doc_id">
 
@@ -1930,7 +1930,7 @@ foreach ( $cora_documents as $doc ) {
     <!-- ═════════════════════════════════════════════════════════════════════════
          VIEW 3: E-SIGN LEGAL AUDIT REGISTRY
          ═════════════════════════════════════════════════════════════════════════ -->
-    <div id="cora-vault-view-esign" class="hidden space-y-6">
+    <div id="cora-vault-view-esign" class="hidden space-y-6 mt-0">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
                 <h2 class="text-base font-black text-zinc-950">E-Signature Audit Registry</h2>
