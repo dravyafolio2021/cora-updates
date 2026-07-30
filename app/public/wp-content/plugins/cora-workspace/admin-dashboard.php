@@ -10745,12 +10745,22 @@ if ( current_user_can( 'manage_options' ) ) :
         };
 
         // Close all drawers
+        const baseCloseAllDrawers = window.coraCloseAllDrawers;
         window.coraCloseAllDrawers = function() {
-            window.coraToggleCreateWorkspaceDrawer(false);
-            window.coraToggleEditWorkspaceDrawer(false);
-            if (window.coraCloseUpdateDrawer) {
-                window.coraCloseUpdateDrawer();
-            }
+            if (window.coraDrawerCloseTimer) clearTimeout(window.coraDrawerCloseTimer);
+            if (typeof baseCloseAllDrawers === 'function') baseCloseAllDrawers();
+            if (typeof window.coraToggleCreateWorkspaceDrawer === 'function') window.coraToggleCreateWorkspaceDrawer(false);
+            if (typeof window.coraToggleEditWorkspaceDrawer === 'function') window.coraToggleEditWorkspaceDrawer(false);
+            if (typeof window.coraCloseUpdateDrawer === 'function') window.coraCloseUpdateDrawer();
+            if (typeof window.coraCloseCustomActionDrawer === 'function') window.coraCloseCustomActionDrawer();
+
+            $('aside[id$="-drawer"], aside[id$="-sheet"], div[id$="-drawer"], div[id$="-sheet"], div[id$="-modal"], .cora-side-drawer').addClass('collapsed translate-x-full pointer-events-none');
+            window.coraDrawerCloseTimer = setTimeout(function() {
+                $('aside[id$="-drawer"].translate-x-full, aside[id$="-sheet"].translate-x-full, div[id$="-drawer"].translate-x-full, div[id$="-sheet"].translate-x-full, div[id$="-modal"].translate-x-full, .cora-side-drawer.translate-x-full').addClass('hidden');
+            }, 300);
+            const bd = document.getElementById('cora-drawer-backdrop');
+            if (bd) { bd.classList.add('hidden'); bd.style.pointerEvents = 'none'; bd.style.display = 'none'; }
+            $('body').removeClass('cora-drawer-open overflow-hidden');
         };
 
         // Create Workspace Submit

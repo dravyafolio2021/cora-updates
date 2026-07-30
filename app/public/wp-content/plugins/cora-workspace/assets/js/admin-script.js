@@ -10731,7 +10731,7 @@ jQuery(document).ready(function($) {
 
         if (!leadId || !newStage) return;
 
-        const card = $(`.cora-lead-card[data-id="${leadId}"]`);
+        const card = $(`.cora-kanban-column .cora-lead-card[data-id="${leadId}"]`);
         if (card.length) {
             const targetContainer = col.find('.cora-cards-container');
             targetContainer.find('.text-center').remove();
@@ -10802,15 +10802,52 @@ jQuery(document).ready(function($) {
     window.coraOpenLeadDetailDrawer = function(leadId) {
         window.coraShowSideDrawer('#cora-lead-detail-drawer');
 
-        // Fetch lead data or inspect existing cards
-        const card = $(`.cora-lead-card[data-id="${leadId}"]`);
+        // Always switch to Overview tab by default when opening the drawer
+        if (window.coraSwitchLeadDetailTab) {
+            window.coraSwitchLeadDetailTab('overview');
+        }
+
+        // Fetch lead data from the Kanban card's data attributes (the source of truth in DOM)
+        const card = $(`.cora-kanban-column .cora-lead-card[data-id="${leadId}"]`).first();
         if (card.length) {
+            const name = card.attr('data-name') || 'Lead Deal Panel';
+            const email = card.attr('data-email') || '';
+            const phone = card.attr('data-phone') || '';
+            const price = card.attr('data-price') || '0';
+            const score = card.attr('data-score') || 'warm';
+            const city = card.attr('data-city') || '';
+            const notes = card.attr('data-notes') || '';
+            const status = card.attr('data-status') || 'New Lead';
+
             $('#cora-drawer-lead-id').val(leadId);
-            $('#cora-drawer-lead-name').text(card.find('h4').text().trim() || 'Lead Deal Panel');
-            $('#cora-drawer-lead-email').text(card.find('p').first().text().trim() || '');
-            $('#cora-drawer-input-names').val(card.find('h4').text().trim());
-            $('#cora-drawer-input-email').val(card.find('p').first().text().trim());
-            $('#cora-drawer-stage-select').val(card.attr('data-status') || 'New Lead');
+            $('#cora-drawer-lead-name').text(name);
+            $('#cora-drawer-lead-email').text(city || 'Location TBD');
+            
+            // Dynamically update score badge
+            const scoreBadge = $('#cora-drawer-lead-score');
+            const scoreMap = {
+                hot:  { label: 'Hot',  cls: 'bg-rose-500/10 text-rose-600 border-rose-200 dark:text-rose-400 dark:border-rose-800' },
+                cold: { label: 'Cold', cls: 'bg-sky-500/10 text-sky-600 border-sky-200 dark:text-sky-400 dark:border-sky-800' },
+                warm: { label: 'Warm', cls: 'bg-amber-500/10 text-amber-600 border-amber-200 dark:text-amber-400 dark:border-amber-800' }
+            };
+            const isWon = (status === 'Converted');
+            if (isWon) {
+                scoreBadge.attr('class', 'px-2 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 border border-emerald-200 dark:text-emerald-400 dark:border-emerald-800 shrink-0').text('Won');
+            } else {
+                const sm = scoreMap[score] || scoreMap.warm;
+                scoreBadge.attr('class', 'px-2 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider border shrink-0 ' + sm.cls).text(sm.label);
+            }
+            
+            // Populate overview inputs
+            $('#cora-drawer-input-names').val(name);
+            $('#cora-drawer-input-email').val(email);
+            $('#cora-drawer-input-phone').val(phone);
+            $('#cora-drawer-input-price').val(price);
+            $('#cora-drawer-input-score').val(score);
+            $('#cora-drawer-input-city').val(city);
+            $('#cora-drawer-input-notes').val(notes);
+            
+            $('#cora-drawer-stage-select').val(status);
         }
     };
 
@@ -10863,12 +10900,42 @@ jQuery(document).ready(function($) {
 
     // Save Lead from Drawer
     window.coraSaveLeadFromDrawer = function() {
+        const nameInput = $('#cora-drawer-input-names');
+        const emailInput = $('#cora-drawer-input-email');
+        
+        nameInput.removeClass('border-rose-500');
+        emailInput.removeClass('border-rose-500');
+        
+        let hasError = false;
+        
+        const nameVal = (nameInput.val() || '').trim();
+        if (!nameVal) {
+            nameInput.addClass('border-rose-500');
+            hasError = true;
+        }
+        
+        const emailVal = (emailInput.val() || '').trim();
+        if (emailVal) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(emailVal)) {
+                emailInput.addClass('border-rose-500');
+                hasError = true;
+            }
+        }
+        
+        if (hasError) {
+            if (window.coraShowToast) {
+                window.coraShowToast('Please correct validation errors first.', 'error');
+            }
+            return;
+        }
+
         const formData = {
             action: 'cora_ajax_save_lead',
             security: window.coraData ? window.coraData.nonce : '',
             lead_id: $('#cora-drawer-lead-id').val(),
-            names: $('#cora-drawer-input-names').val(),
-            email: $('#cora-drawer-input-email').val(),
+            names: nameVal,
+            email: emailVal,
             phone: $('#cora-drawer-input-phone').val(),
             price: $('#cora-drawer-input-price').val(),
             score: $('#cora-drawer-input-score').val(),

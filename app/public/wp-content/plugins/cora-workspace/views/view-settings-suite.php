@@ -94,6 +94,11 @@ $cora_settings_tabs = array(
         'label' => 'Backup & Recovery',
         'desc'  => 'Local server & Google Drive exports',
         'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>'
+    ),
+    'updates'    => array(
+        'label' => 'Updates & Platform',
+        'desc'  => 'Click-to-update & GitHub sync',
+        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>'
     )
 );
 ?>
@@ -2390,6 +2395,205 @@ $cora_settings_tabs = array(
         <div id="cora-settings-panel-audit" class="cora-settings-panel space-y-6 max-w-full <?php echo $active_tab === 'audit' ? '' : 'hidden'; ?>">
             <?php include __DIR__ . '/view-audit-panel.php'; ?>
         </div>
+
+        <!-- TAB: UPDATES & PLATFORM -->
+        <div id="cora-settings-panel-updates" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'updates' ? '' : 'hidden'; ?>">
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-150 dark:border-zinc-800/40 pb-3 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 m-0">Software Updates</h3>
+                        <p class="text-xs text-zinc-500 m-0">Manage system versions, release channels, and automated feature shipments.</p>
+                    </div>
+                </div>
+                <div class="cora-shopify-card-body pt-6">
+                    <!-- Dynamic Status Container -->
+                    <div id="cora-updates-status-container" class="flex flex-col items-center justify-center text-center py-4 space-y-3 select-none">
+                        
+                        <!-- Default: Up-to-Date State -->
+                        <div id="cora-updates-state-uptodate" class="space-y-3">
+                            <div class="inline-flex p-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-650 dark:text-zinc-350 rounded-2xl mx-auto shadow-3xs">
+                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Your Workspace is Up to Date</h4>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 max-w-md mx-auto leading-relaxed">
+                                    You are running the latest stable release: <strong class="text-zinc-850 dark:text-zinc-200">v<?php echo esc_html( CORA_WORKSPACE_VERSION ); ?></strong>.<br>
+                                    Last checked: <span id="cora-last-check-text" class="font-medium"><?php 
+                                        $last_checked = get_option( 'cora_workspace_last_update_check_time', 'Never' );
+                                        if ( 'Never' !== $last_checked ) {
+                                            $last_checked = mysql2date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $last_checked );
+                                        }
+                                        echo esc_html( $last_checked );
+                                    ?></span>.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- State: Checking for Updates -->
+                        <div id="cora-updates-state-checking" class="hidden space-y-3">
+                            <div class="inline-flex p-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-2xl mx-auto">
+                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2.2" fill="none" class="animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Checking for Updates...</h4>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Connecting to the secure release shipment server.</p>
+                            </div>
+                        </div>
+
+                        <!-- State: Update Available -->
+                        <div id="cora-updates-state-available" class="hidden w-full text-left space-y-4">
+                            <div class="flex items-start gap-4 p-4 bg-zinc-50 dark:bg-zinc-900/60 rounded-xl border border-zinc-150 dark:border-zinc-800/60">
+                                <div class="p-2 bg-blue-500/10 text-blue-650 dark:text-blue-400 rounded-lg shrink-0">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                                </div>
+                                <div class="space-y-1">
+                                    <h4 class="text-xs font-bold text-blue-650 dark:text-blue-400 uppercase tracking-wider m-0">Update Available</h4>
+                                    <p class="text-xs font-semibold text-zinc-850 dark:text-zinc-200 m-0">
+                                        Cora Workspace Platform <span class="font-bold text-zinc-950 dark:text-white" id="cora-available-version-text">v2.3.6</span>
+                                    </p>
+                                    <p class="text-[10px] text-zinc-500 leading-normal">Your current installed version is v<?php echo esc_html( CORA_WORKSPACE_VERSION ); ?>.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <div class="text-xs font-bold text-zinc-700 dark:text-zinc-300 font-semibold mb-1">Changelog & Features:</div>
+                                <div id="cora-update-changelog-box" class="bg-zinc-50 dark:bg-zinc-900/60 p-4 rounded-xl border border-zinc-150 dark:border-zinc-800/60 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal prose prose-sm dark:prose-invert max-w-none">
+                                    <!-- Changelog inserted here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- State: Error State -->
+                        <div id="cora-updates-state-error" class="hidden space-y-3 max-w-md">
+                            <div class="inline-flex p-3 bg-red-500/10 text-red-650 dark:text-red-405 rounded-2xl mx-auto border border-red-200/20">
+                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Connection Failed</h4>
+                                <p id="cora-error-message-text" class="text-xs text-red-600 dark:text-red-450 mt-1 leading-relaxed">
+                                    Failed to query release details. Please make sure the local server is connected to the internet and can resolve GitHub APIs.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Footer Action Row -->
+                    <div class="border-t border-zinc-100 dark:border-zinc-850 pt-4 flex items-center justify-between flex-wrap gap-4 mt-6">
+                        <div class="text-[10px] text-zinc-400 select-none font-medium">
+                            Official Shipment Channel: Production Stable (GitHub)
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <!-- Check Button -->
+                            <button type="button" id="cora-btn-updates-check" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-97 select-none" onclick="coraCheckForUpdatesManual()">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" id="cora-icon-updates-check" class="shrink-0"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                                <span id="cora-btn-updates-check-label">Check for Updates</span>
+                            </button>
+
+                            <!-- Upgrade Button (hidden initially) -->
+                            <button type="button" id="cora-btn-updates-upgrade" class="hidden px-4.5 py-2 bg-zinc-950 hover:bg-zinc-850 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-97 select-none" onclick="coraTriggerInAppUpgradeManual()">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                                <span>Upgrade Workspace Now</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        function coraCheckForUpdatesManual() {
+            var $btn = jQuery('#cora-btn-updates-check');
+            var $icon = jQuery('#cora-icon-updates-check');
+            var $label = jQuery('#cora-btn-updates-check-label');
+            
+            $btn.prop('disabled', true);
+            $icon.addClass('animate-spin');
+            $label.text('Checking...');
+            
+            jQuery('#cora-updates-state-uptodate, #cora-updates-state-available, #cora-updates-state-error').addClass('hidden');
+            jQuery('#cora-updates-state-checking').removeClass('hidden');
+            jQuery('#cora-btn-updates-upgrade').addClass('hidden');
+            
+            jQuery.post(coraREData.ajaxUrl, {
+                action: 'cora_check_plugin_update',
+                nonce: coraREData.ajaxNonce
+            }, function(res) {
+                $btn.prop('disabled', false);
+                $icon.removeClass('animate-spin');
+                $label.text('Check for Updates');
+                jQuery('#cora-updates-state-checking').addClass('hidden');
+                
+                if (res.success) {
+                    jQuery('#cora-last-check-text').text(res.data.last_checked);
+                    
+                    if (res.data.update_available) {
+                        jQuery('#cora-available-version-text').text('v' + res.data.new_version);
+                        jQuery('#cora-update-changelog-box').html(res.data.changelog);
+                        
+                        jQuery('#cora-updates-state-available').removeClass('hidden');
+                        jQuery('#cora-btn-updates-upgrade').removeClass('hidden');
+                        
+                        if (window.coraShowToast) window.coraShowToast('New update v' + res.data.new_version + ' is available!', 'success');
+                    } else {
+                        jQuery('#cora-updates-state-uptodate').removeClass('hidden');
+                        if (window.coraShowToast) window.coraShowToast('Your workspace is already up to date.');
+                    }
+                } else {
+                    jQuery('#cora-error-message-text').text(res.data.message || 'Failed to check updates.');
+                    jQuery('#cora-updates-state-error').removeClass('hidden');
+                    if (window.coraShowToast) window.coraShowToast(res.data.message || 'Failed to check updates.', 'error');
+                }
+            }).fail(function() {
+                $btn.prop('disabled', false);
+                $icon.removeClass('animate-spin');
+                $label.text('Check for Updates');
+                jQuery('#cora-updates-state-checking').addClass('hidden');
+                
+                jQuery('#cora-error-message-text').text('Network connection failed. Could not query release server.');
+                jQuery('#cora-updates-state-error').removeClass('hidden');
+                if (window.coraShowToast) window.coraShowToast('Network error during updates check.', 'error');
+            });
+        }
+
+        function coraTriggerInAppUpgradeManual() {
+            var $btn = jQuery('#cora-btn-updates-upgrade');
+            
+            var upgradeAction = function() {
+                $btn.prop('disabled', true).html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="animate-spin shrink-0"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Upgrading...');
+                
+                if (window.coraShowToast) window.coraShowToast('Downloading and installing workspace update...', 'info');
+                
+                jQuery.post(coraREData.ajaxUrl, {
+                    action: 'cora_trigger_in_app_update',
+                    nonce: coraREData.ajaxNonce
+                }, function(res) {
+                    if (res.success) {
+                        if (window.coraShowToast) window.coraShowToast(res.data.message || 'Workspace upgraded successfully!', 'success');
+                        setTimeout(function() { window.location.reload(); }, 2000);
+                    } else {
+                        $btn.prop('disabled', false).html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><polyline points="18 15 12 9 6 15"></polyline></svg> <span>Upgrade Workspace Now</span>');
+                        if (window.coraShowToast) window.coraShowToast('Upgrade Failed: ' + (res.data ? res.data.message : 'Unknown error'), 'error');
+                    }
+                }).fail(function() {
+                    $btn.prop('disabled', false).html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><polyline points="18 15 12 9 6 15"></polyline></svg> <span>Upgrade Workspace Now</span>');
+                    if (window.coraShowToast) window.coraShowToast('Network error during upgrade.', 'error');
+                });
+            };
+
+            if (window.coraConfirm) {
+                window.coraConfirm({
+                    title: 'Upgrade Cora Workspace',
+                    message: 'Are you sure you want to upgrade the Cora workspace to the latest version? The screen will reload once complete.',
+                    okLabel: 'Yes, Upgrade'
+                }, upgradeAction);
+            } else if (confirm('Are you sure you want to upgrade the Cora workspace to the latest version? The screen will reload once complete.')) {
+                upgradeAction();
+            }
+        }
+        </script>
+
 
         <script>
         (function($) {

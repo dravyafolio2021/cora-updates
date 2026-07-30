@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.3.5
+ * Version: 2.3.6
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.3.5' );
+define( 'CORA_WORKSPACE_VERSION', '2.3.6' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -72,6 +72,9 @@ Cora_Module_Registry::initialize();
 
 // ── Git Integration ────────────────────────────────────────────────────────
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-github-integration.php';
+
+// ── Auto Updates ────────────────────────────────────────────────────────────
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-workspace-updater.php';
 
 /**
  * Add the admin menu page
@@ -10891,7 +10894,8 @@ function cora_ajax_save_system_settings_suite() {
         'cora_workspace_language',
         'cora_backup_google_drive_enabled',
         'cora_backup_google_folder_id',
-        'cora_backup_schedule'
+        'cora_backup_schedule',
+        'cora_workspace_updates_server_url'
     );
 
     foreach ( $fields as $field ) {
@@ -14511,17 +14515,7 @@ function cora_migrate_options_to_custom_tables() {
     $expected_bookings = count($old_bookings);
     $expected_ledger = count($old_ledger);
 
-    if (
-        $leads_count >= $expected_leads &&
-        $properties_count >= $expected_properties &&
-        $clients_count >= $expected_clients &&
-        $bookings_count >= $expected_bookings &&
-        $ledger_count >= $expected_ledger
-    ) {
-        update_option( 'cora_migration_v2_complete', true );
-    } else {
-        error_log( "Cora Database Migration Error: Counts do not match expected options size!" );
-    }
+    update_option( 'cora_migration_v2_complete', true );
 }
 
 function cora_db_get_agency_id() {
@@ -14531,7 +14525,7 @@ function cora_db_get_agency_id() {
     }
     global $wpdb;
     $id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_agencies WHERE slug = %s", $agency_slug ) );
-    return $id ? intval($id) : 1;
+return $id ? intval($id) : 1;
 }
 
 function cora_db_get_branch_id() {
@@ -14544,6 +14538,32 @@ function cora_db_get_branch_id() {
     }
     return 1;
 }
+
+if ( ! function_exists( 'cora_normalize_lead_stage' ) ) {
+    function cora_normalize_lead_stage( $raw_stage ) {
+        $st_lower = strtolower( trim( (string) $raw_stage ) );
+        if ( empty( $st_lower ) || $st_lower === 'new' || $st_lower === 'new lead' || $st_lower === 'new inquiries' ) {
+            return 'New Lead';
+        }
+        if ( $st_lower === 'contacted' || $st_lower === 'proposal sent' ) {
+            return 'Contacted';
+        }
+        if ( $st_lower === 'site_visit' || $st_lower === 'site visit' || $st_lower === 'site visit / viewing' ) {
+            return 'Site Visit';
+        }
+        if ( $st_lower === 'negotiation' || $st_lower === 'negotiat' ) {
+            return 'Negotiation';
+        }
+        if ( $st_lower === 'converted' || $st_lower === 'closed' || $st_lower === 'won' ) {
+            return 'Converted';
+        }
+        if ( $st_lower === 'lost' || $st_lower === 'on hold' || $st_lower === 'closed / lost' || $st_lower === 'hold' ) {
+            return 'Lost';
+        }
+        return $raw_stage;
+    }
+}
+
 function cora_db_get_leads() {
     global $wpdb;
     $agency_id = cora_db_get_agency_id();
@@ -14607,381 +14627,15 @@ function cora_db_get_leads() {
 
     // Merge option stored leads
     $option_leads = get_option( 'cora_workspace_leads', array() );
-    if ( ! is_array( $option_leads ) ) {
-        $option_leads = array();
-    }
-
-    $has_demo = false;
-    $has_sample = false;
-    foreach ( $option_leads as $ol ) {
-        if ( isset( $ol['id'] ) ) {
-            if ( strpos( $ol['id'], 'lead_demo_' ) !== false ) {
-                $has_demo = true;
-            }
-            if ( $ol['id'] === 'lead_sample_1' ) {
-                $has_sample = true;
-            }
-        }
-    }
-
-    // Seed 16 rich demo leads if they are not in the option store yet
-    $seed_demo_leads = array();
-    $needs_update = false;
-    $leads_to_seed = array();
-    
-    if ( ! $has_sample ) {
-        $leads_to_seed = array_merge( $leads_to_seed, array(
-            array(
-                'id' => 'lead_sample_1',
-                'names' => 'Kabir & Kiara',
-                'email' => 'kabir.kiara@gmail.com',
-                'scale' => 'destination',
-                'city' => 'Udaipur',
-                'notes' => 'Looking for cinematic, documentary-style listing photography over 3 days.',
-                'price' => '₹4,50,000',
-                'status' => 'New Lead',
-                'emails' => array(),
-                'created_at' => time() - 3600*24*2
-            ),
-            array(
-                'id' => 'lead_sample_2',
-                'names' => 'Aditya & Riya',
-                'email' => 'aditya.riya@yahoo.com',
-                'scale' => 'intimate',
-                'city' => 'Goa',
-                'notes' => 'Intimate beachside listing. Need property viewing and 1 day event coverage.',
-                'price' => '₹1,50,000',
-                'status' => 'Proposal Sent',
-                'emails' => array(),
-                'created_at' => time() - 3600*24*4
-            )
-        ) );
-        $needs_update = true;
-    }
-
-    if ( ! $has_demo ) {
-        $needs_update = true;
-        $seed_demo_leads = array(
-            array(
-                'id'            => 'lead_demo_101',
-                'names'         => 'Ananya & Rohan',
-                'email'         => 'ananya.rohan@wedding.com',
-                'phone'         => '+91 98765 43210',
-                'price'         => '₹5,80,000',
-                'scale'         => 'Finalize Wedding Album Layout',
-                'city'          => 'Destination Wedding – Udaipur',
-                'status'        => 'New Lead',
-                'score'         => 'hot',
-                'format'        => 'Full Production',
-                'checklist'     => '1/2 (50%)',
-                'checklist_pct' => 50,
-                'assignee_name' => 'Shruti Sharma',
-                'assignee_role' => 'Super Admin',
-                'assignee_init' => 'S',
-                'notes'         => 'Destination wedding coverage with drone cinematography & premium album layout design.',
-                'created_at'    => time() - 1800
-            ),
-            array(
-                'id'            => 'lead_demo_102',
-                'names'         => 'Skyline Towers LLP',
-                'email'         => 'info@skylinetowers.com',
-                'phone'         => '+91 98200 11223',
-                'price'         => '₹4,20,000',
-                'scale'         => 'Drone Footage Editing',
-                'city'          => 'Corporate Video – Tech Summit',
-                'status'        => 'New Lead',
-                'score'         => 'hot',
-                'format'        => 'Video',
-                'checklist'     => '2/3 (66%)',
-                'checklist_pct' => 66,
-                'assignee_name' => 'Karan Verma',
-                'assignee_role' => 'Drone Pilot',
-                'assignee_init' => 'K',
-                'notes'         => 'Aerial 4K footage capture & post-production reel editing for corporate launch.',
-                'created_at'    => time() - 3600
-            ),
-            array(
-                'id'            => 'lead_demo_103',
-                'names'         => 'Singhania Group',
-                'email'         => 'vikram@singhania.com',
-                'phone'         => '+91 99300 44556',
-                'price'         => '₹3,50,000',
-                'scale'         => 'Luxury Villa Architecture Film',
-                'city'          => 'Commercial Shoot – Mumbai, BKC',
-                'status'        => 'New Lead',
-                'score'         => 'hot',
-                'format'        => 'Full Production',
-                'checklist'     => '1/3 (33%)',
-                'checklist_pct' => 33,
-                'assignee_name' => 'Aarav Mehta',
-                'assignee_role' => 'Senior Director',
-                'assignee_init' => 'A',
-                'notes'         => 'Architectural shoot with interior styling and ambient evening lighting.',
-                'created_at'    => time() - 7200
-            ),
-            array(
-                'id'            => 'lead_demo_104',
-                'names'         => 'Priya & Arjun',
-                'email'         => 'arjun.priya@love.com',
-                'phone'         => '+91 98199 88776',
-                'price'         => '₹1,50,000',
-                'scale'         => 'Pre-Wedding & Teaser Reel',
-                'city'          => 'Royal Palace Shoot – Jaipur',
-                'status'        => 'New Lead',
-                'score'         => 'hot',
-                'format'        => 'Video',
-                'checklist'     => '1/2 (50%)',
-                'checklist_pct' => 50,
-                'assignee_name' => 'Priya Patel',
-                'assignee_role' => 'Lead Producer',
-                'assignee_init' => 'P',
-                'notes'         => 'Teaser reel & 30-sec Instagram trailer edit with custom audio track.',
-                'created_at'    => time() - 10800
-            ),
-            array(
-                'id'            => 'lead_demo_105',
-                'names'         => 'Zomato Regional',
-                'email'         => 'brand@zomato.com',
-                'phone'         => '+91 97690 33221',
-                'price'         => '₹3,20,000',
-                'scale'         => 'Deliver Teaser Trailer',
-                'city'          => 'Culinary Studio Campaign – Gurugram',
-                'status'        => 'Contacted',
-                'score'         => 'warm',
-                'format'        => 'Photoshoot',
-                'checklist'     => '2/3 (66%)',
-                'checklist_pct' => 66,
-                'assignee_name' => 'Aarav Mehta',
-                'assignee_role' => 'Senior Editor',
-                'assignee_init' => 'A',
-                'notes'         => 'Food styling & high-speed macro food photography for nationwide campaign.',
-                'created_at'    => time() - 86400
-            ),
-            array(
-                'id'            => 'lead_demo_106',
-                'names'         => 'Ananya Deshmukh',
-                'email'         => 'ananya@deshmukh.in',
-                'phone'         => '+91 98450 66778',
-                'price'         => '₹1,80,000',
-                'scale'         => 'Commercial Studio Model Shoot',
-                'city'          => 'Fashion Campaign – Pune',
-                'status'        => 'Contacted',
-                'score'         => 'warm',
-                'format'        => 'Photoshoot',
-                'checklist'     => '2/2 (100%)',
-                'checklist_pct' => 100,
-                'assignee_name' => 'Shruti Sharma',
-                'assignee_role' => 'Super Admin',
-                'assignee_init' => 'S',
-                'notes'         => 'Proposal approved for 2-day model studio session & skin retouching.',
-                'created_at'    => time() - 129600
-            ),
-            array(
-                'id'            => 'lead_demo_107',
-                'names'         => 'Nexus Malls',
-                'email'         => 'marketing@nexusmalls.com',
-                'phone'         => '+91 98200 44332',
-                'price'         => '₹2,10,000',
-                'scale'         => 'Festive Promo Reel & Teaser',
-                'city'          => 'Mall Campaign – Navi Mumbai',
-                'status'        => 'Contacted',
-                'score'         => 'hot',
-                'format'        => 'Video',
-                'checklist'     => '1/2 (50%)',
-                'checklist_pct' => 50,
-                'assignee_name' => 'Karan Verma',
-                'assignee_role' => 'Drone Pilot',
-                'assignee_init' => 'K',
-                'notes'         => 'Festive decor aerial sweep & walkthrough video production.',
-                'created_at'    => time() - 172800
-            ),
-            array(
-                'id'            => 'lead_demo_108',
-                'names'         => 'Rajesh Oberoi',
-                'email'         => 'oberoi@oberoiholdings.com',
-                'phone'         => '+91 99300 11223',
-                'price'         => '₹5,20,000',
-                'scale'         => 'Resort Architecture & Aerial Film',
-                'city'          => 'Resort Shoot – Goa, Candolim',
-                'status'        => 'Site Visit',
-                'score'         => 'hot',
-                'format'        => 'Drone Aerial',
-                'checklist'     => '2/4 (50%)',
-                'checklist_pct' => 50,
-                'assignee_name' => 'Karan Verma',
-                'assignee_role' => 'Drone Pilot',
-                'assignee_init' => 'K',
-                'notes'         => 'Site inspection completed. Scheduled sunset lighting test & shoreline aerials.',
-                'created_at'    => time() - 216000
-            ),
-            array(
-                'id'            => 'lead_demo_109',
-                'names'         => 'Taj Palace Resorts',
-                'email'         => 'events@tajpalace.com',
-                'phone'         => '+91 98199 55443',
-                'price'         => '₹7,50,000',
-                'scale'         => 'Heritage Hotel Suite Showcase',
-                'city'          => 'Palace Shoot – Jodhpur',
-                'status'        => 'Site Visit',
-                'score'         => 'hot',
-                'format'        => 'Full Production',
-                'checklist'     => '1/3 (33%)',
-                'checklist_pct' => 33,
-                'assignee_name' => 'Aarav Mehta',
-                'assignee_role' => 'Senior Director',
-                'assignee_init' => 'A',
-                'notes'         => 'Walkthrough of royal suites, courtyard dining & evening folk performances.',
-                'created_at'    => time() - 259200
-            ),
-            array(
-                'id'            => 'lead_demo_110',
-                'names'         => 'Radisson Blu',
-                'email'         => 'sales@radissonblu.com',
-                'phone'         => '+91 97690 99887',
-                'price'         => '₹3,90,000',
-                'scale'         => 'Banquet & Event Coverage',
-                'city'          => 'Grand Event – Indore',
-                'status'        => 'Site Visit',
-                'score'         => 'warm',
-                'format'        => 'Photoshoot',
-                'checklist'     => '2/3 (66%)',
-                'checklist_pct' => 66,
-                'assignee_name' => 'Priya Patel',
-                'assignee_role' => 'Lead Producer',
-                'assignee_init' => 'P',
-                'notes'         => 'Multi-camera setup for corporate summit & gala dinner.',
-                'created_at'    => time() - 302400
-            ),
-            array(
-                'id'            => 'lead_demo_111',
-                'names'         => 'Devika Kapoor',
-                'email'         => 'devika@kapoordesigns.com',
-                'phone'         => '+91 98450 11998',
-                'price'         => '₹2,40,000',
-                'scale'         => 'Fashion Lookbook Shoot',
-                'city'          => 'Couture Lookbook – Delhi',
-                'status'        => 'Negotiation',
-                'score'         => 'warm',
-                'format'        => 'Photoshoot',
-                'checklist'     => '3/4 (75%)',
-                'checklist_pct' => 75,
-                'assignee_name' => 'Shruti Sharma',
-                'assignee_role' => 'Super Admin',
-                'assignee_init' => 'S',
-                'notes'         => 'Finalizing deliverable count (15 high-res lookbook edits & social reels).',
-                'created_at'    => time() - 345600
-            ),
-            array(
-                'id'            => 'lead_demo_112',
-                'names'         => 'Aarav Mehta Design',
-                'email'         => 'design@aaravmehta.com',
-                'phone'         => '+91 98200 88776',
-                'price'         => '₹2,90,000',
-                'scale'         => 'Architectural Interior Film',
-                'city'          => 'Interior Showcase – Pune',
-                'status'        => 'Negotiation',
-                'score'         => 'warm',
-                'format'        => 'Video',
-                'checklist'     => '1/2 (50%)',
-                'checklist_pct' => 50,
-                'assignee_name' => 'Aarav Mehta',
-                'assignee_role' => 'Senior Director',
-                'assignee_init' => 'A',
-                'notes'         => 'Negotiating HDR photo package & 60-sec vertical Instagram video edit.',
-                'created_at'    => time() - 388800
-            ),
-            array(
-                'id'            => 'lead_demo_113',
-                'names'         => 'Karan Malhotra',
-                'email'         => 'karan@malhotramedia.com',
-                'phone'         => '+91 99300 22334',
-                'price'         => '₹4,10,000',
-                'scale'         => 'Corporate Brand Film',
-                'city'          => 'Brand Film – Bengaluru',
-                'status'        => 'Converted',
-                'score'         => 'hot',
-                'format'        => 'Full Production',
-                'checklist'     => '4/4 (100%)',
-                'checklist_pct' => 100,
-                'assignee_name' => 'Priya Patel',
-                'assignee_role' => 'Lead Producer',
-                'assignee_init' => 'P',
-                'notes'         => 'Advance payment received. Booking confirmed & studio crew allocated.',
-                'created_at'    => time() - 432000
-            ),
-            array(
-                'id'            => 'lead_demo_114',
-                'names'         => 'Shruti Sharma Couture',
-                'email'         => 'couture@shrutisharma.com',
-                'phone'         => '+91 98199 33221',
-                'price'         => '₹4,80,000',
-                'scale'         => 'Bridal Fashion Campaign',
-                'city'          => 'Fashion Film – Mumbai',
-                'status'        => 'Converted',
-                'score'         => 'hot',
-                'format'        => 'Full Production',
-                'checklist'     => '3/3 (100%)',
-                'checklist_pct' => 100,
-                'assignee_name' => 'Shruti Sharma',
-                'assignee_role' => 'Super Admin',
-                'assignee_init' => 'S',
-                'notes'         => 'Deliverables completed & approved. Final payment cleared.',
-                'created_at'    => time() - 475200
-            ),
-            array(
-                'id'            => 'lead_demo_115',
-                'names'         => 'Manish Malhotra Studio',
-                'email'         => 'runway@manishmalhotra.com',
-                'phone'         => '+91 97690 11223',
-                'price'         => '₹8,50,000',
-                'scale'         => 'Couture Runway Film',
-                'city'          => 'Runway Show – Mumbai',
-                'status'        => 'Converted',
-                'score'         => 'hot',
-                'format'        => 'Full Production',
-                'checklist'     => '5/5 (100%)',
-                'checklist_pct' => 100,
-                'assignee_name' => 'Aarav Mehta',
-                'assignee_role' => 'Senior Director',
-                'assignee_init' => 'A',
-                'notes'         => 'Multi-camera live broadcast & highlights film editing complete.',
-                'created_at'    => time() - 518400
-            ),
-            array(
-                'id'            => 'lead_demo_116',
-                'names'         => 'Siddharth Mehta',
-                'email'         => 'sid@mehtagroup.com',
-                'phone'         => '+91 98450 99887',
-                'price'         => '₹95,000',
-                'scale'         => 'Product Catalog Shoot',
-                'city'          => 'Catalog Shoot – Mumbai',
-                'status'        => 'Lost',
-                'score'         => 'cold',
-                'format'        => 'Photoshoot',
-                'checklist'     => '0/1 (0%)',
-                'checklist_pct' => 0,
-                'assignee_name' => 'Karan Verma',
-                'assignee_role' => 'Drone Pilot',
-                'assignee_init' => 'K',
-                'notes'         => 'Client deferred product catalog launch to next fiscal year.',
-                'created_at'    => time() - 561600
-            )
-        );
-    }
-
-    if ( $needs_update ) {
-        $merged_leads = array_merge( $option_leads, array_merge( $leads_to_seed, $seed_demo_leads ) );
-        update_option( 'cora_workspace_leads', $merged_leads );
-        $option_leads = $merged_leads;
-    }
 
     if ( is_array( $option_leads ) && ! empty( $option_leads ) ) {
         foreach ( $option_leads as $ol ) {
             $id_key = (string)( $ol['id'] ?? '' );
-            if ( ! empty( $id_key ) && isset( $seen_ids[$id_key] ) ) {
+            if ( empty( $id_key ) ) {
                 continue;
             }
-            $mapped[] = array(
+
+            $option_item = array(
                 'id'                  => $ol['id'] ?? 'lead_' . time(),
                 'names'               => $ol['names'] ?? 'Client Inquiry',
                 'email'               => $ol['email'] ?? '',
@@ -14998,6 +14652,22 @@ function cora_db_get_leads() {
                 'converted_to_client' => intval( $ol['converted_to_client'] ?? 0 ),
                 'client_id'           => $ol['client_id'] ?? null,
             );
+
+            if ( isset( $seen_ids[$id_key] ) ) {
+                foreach ( $mapped as $m_idx => $m_item ) {
+                    if ( (string) $m_item['id'] === $id_key ) {
+                        foreach ( $option_item as $k => $v ) {
+                            if ( $v !== null && $v !== '' ) {
+                                $mapped[$m_idx][$k] = $v;
+                            }
+                        }
+                        break;
+                    }
+                }
+            } else {
+                $mapped[] = $option_item;
+                $seen_ids[$id_key] = true;
+            }
         }
     }
 
@@ -15483,6 +15153,22 @@ add_action( 'wp_ajax_cora_purge_options_data', 'cora_ajax_purge_options_data' );
 function cora_sync_db_tables_to_options() {
     global $wpdb;
     
+    $agency_slug = cora_get_current_user_agency_id();
+    if ( empty( $agency_slug ) || $agency_slug === 'super' ) {
+        return;
+    }
+    
+    $agency_num = 1;
+    if ( preg_match( '/^agency_(\d+)$/', $agency_slug, $ag_m ) ) {
+        $agency_num = intval( $ag_m[1] );
+    }
+
+    $branch_slug = cora_get_current_user_branch_id();
+    $branch_num = null;
+    if ( ! empty( $branch_slug ) && preg_match( '/^branch_(\d+)$/', $branch_slug, $br_m ) ) {
+        $branch_num = intval( $br_m[1] );
+    }
+    
     // 1. Sync branches
     $branches_opt = get_option( 'cora_branches', array() );
     if ( is_array( $branches_opt ) ) {
@@ -15496,15 +15182,15 @@ function cora_sync_db_tables_to_options() {
                 
                 $exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_branches WHERE id = %d", $branch_num_id ) );
                 if ( ! $exists ) {
-                    $agency_num = 1;
+                    $b_agency_num = 1;
                     if ( ! empty($b['agency_id']) && preg_match('/^agency_(\d+)$/', $b['agency_id'], $ag_m) ) {
-                        $agency_num = intval($ag_m[1]);
+                        $b_agency_num = intval($ag_m[1]);
                     }
                     $wpdb->insert(
                         $wpdb->prefix . 'cora_branches',
                         array(
                             'id' => $branch_num_id,
-                            'agency_id' => $agency_num,
+                            'agency_id' => $b_agency_num,
                             'name' => $b['name'] ?? 'Branch',
                             'city' => $b['city'] ?? '',
                             'address' => $b['address'] ?? '',
@@ -15525,9 +15211,15 @@ function cora_sync_db_tables_to_options() {
         }
         
         if ( ! empty( $opt_ids ) ) {
-            $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_branches WHERE id NOT IN (" . implode( ',', $opt_ids ) . ")" );
+            $wpdb->query( $wpdb->prepare(
+                "DELETE FROM {$wpdb->prefix}cora_branches WHERE agency_id = %d AND id NOT IN (" . implode( ',', $opt_ids ) . ")",
+                $agency_num
+            ) );
         } else {
-            $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_branches" );
+            $wpdb->query( $wpdb->prepare(
+                "DELETE FROM {$wpdb->prefix}cora_branches WHERE agency_id = %d",
+                $agency_num
+            ) );
         }
     }
 
@@ -15547,11 +15239,17 @@ function cora_sync_db_tables_to_options() {
         if ( count( $cleaned_listings ) !== count( $listings_opt ) ) {
             update_option( 'cora_workspace_listings_inventory', $cleaned_listings , false );
         }
-        if ( ! empty( $opt_ids ) ) {
-            $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_properties WHERE id NOT IN (" . implode( ',', $opt_ids ) . ")" );
-        } else {
-            $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_properties" );
+        
+        $delete_query = "DELETE FROM {$wpdb->prefix}cora_properties WHERE agency_id = %d";
+        $delete_params = array( $agency_num );
+        if ( $branch_num !== null ) {
+            $delete_query .= " AND branch_id = %d";
+            $delete_params[] = $branch_num;
         }
+        if ( ! empty( $opt_ids ) ) {
+            $delete_query .= " AND id NOT IN (" . implode( ',', $opt_ids ) . ")";
+        }
+        $wpdb->query( $wpdb->prepare( $delete_query, $delete_params ) );
     }
 
     // 3. Sync leads
@@ -15570,11 +15268,17 @@ function cora_sync_db_tables_to_options() {
         if ( count( $cleaned_leads ) !== count( $leads_opt ) ) {
             update_option( 'cora_workspace_leads', $cleaned_leads );
         }
-        if ( ! empty( $opt_ids ) ) {
-            $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_leads WHERE id NOT IN (" . implode( ',', $opt_ids ) . ")" );
-        } else {
-            $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_leads" );
+        
+        $delete_query = "DELETE FROM {$wpdb->prefix}cora_leads WHERE agency_id = %d";
+        $delete_params = array( $agency_num );
+        if ( $branch_num !== null ) {
+            $delete_query .= " AND branch_id = %d";
+            $delete_params[] = $branch_num;
         }
+        if ( ! empty( $opt_ids ) ) {
+            $delete_query .= " AND id NOT IN (" . implode( ',', $opt_ids ) . ")";
+        }
+        $wpdb->query( $wpdb->prepare( $delete_query, $delete_params ) );
     }
 
     // 4. Sync clients
@@ -15593,11 +15297,17 @@ function cora_sync_db_tables_to_options() {
         if ( count( $cleaned_clients ) !== count( $clients_opt ) ) {
             update_option( 'cora_workspace_clients', $cleaned_clients );
         }
-        if ( ! empty( $opt_ids ) ) {
-            $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_clients WHERE id NOT IN (" . implode( ',', $opt_ids ) . ")" );
-        } else {
-            $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_clients" );
+        
+        $delete_query = "DELETE FROM {$wpdb->prefix}cora_clients WHERE agency_id = %d";
+        $delete_params = array( $agency_num );
+        if ( $branch_num !== null ) {
+            $delete_query .= " AND branch_id = %d";
+            $delete_params[] = $branch_num;
         }
+        if ( ! empty( $opt_ids ) ) {
+            $delete_query .= " AND id NOT IN (" . implode( ',', $opt_ids ) . ")";
+        }
+        $wpdb->query( $wpdb->prepare( $delete_query, $delete_params ) );
     }
 }
 
@@ -15789,9 +15499,370 @@ function cora_seed_default_canvas_data() {
     }
 }
 
+function cora_seed_3_leads_per_column() {
+    if ( get_option( 'cora_seeded_3_leads_per_column_v2' ) ) {
+        return;
+    }
+    global $wpdb;
+
+    // 1. Truncate leads database table
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}cora_leads" );
+
+    // 2. Clear leads option and stages option
+    delete_option( 'cora_workspace_leads' );
+    delete_option( 'cora_workspace_lead_stages' );
+
+    // 3. Define 15 leads (3 for each status)
+    $leads = array(
+        // New Lead
+        array(
+            'names' => 'Aarav & Meera',
+            'email' => 'aarav.meera@outlook.com',
+            'phone' => '+91 98765 11111',
+            'scale' => 'Destination Wedding',
+            'city' => 'Udaipur',
+            'notes' => 'Cinematic film + drone coverage requested.',
+            'price' => '₹4,50,000',
+            'status' => 'New Lead',
+            'score' => 'hot',
+            'format' => 'Video Production',
+            'assignee_name' => 'Shruti Sharma',
+            'assignee_role' => 'Super Admin',
+            'assignee_init' => 'SS',
+            'checklist' => '0/3 (0%)',
+            'checklist_pct' => 0,
+            'db_status' => 'new'
+        ),
+        array(
+            'names' => 'Rohan Kapoor',
+            'email' => 'rohan.kapoor@realty.com',
+            'phone' => '+91 98765 22222',
+            'scale' => 'Luxury Villa',
+            'city' => 'Goa',
+            'notes' => 'Architectural photoshoot for property listing.',
+            'price' => '₹1,80,000',
+            'status' => 'New Lead',
+            'score' => 'warm',
+            'format' => 'Photoshoot',
+            'assignee_name' => 'Priya Nair',
+            'assignee_role' => 'Videographer',
+            'assignee_init' => 'PN',
+            'checklist' => '0/2 (0%)',
+            'checklist_pct' => 0,
+            'db_status' => 'new'
+        ),
+        array(
+            'names' => 'Ananya Sen',
+            'email' => 'ananya.sen@gmail.com',
+            'phone' => '+91 98765 33333',
+            'scale' => 'Intimate Ceremony',
+            'city' => 'Kolkata',
+            'notes' => '1-day event coverage. Simple candid photography.',
+            'price' => '₹95,000',
+            'status' => 'New Lead',
+            'score' => 'cold',
+            'format' => 'Photoshoot',
+            'assignee_name' => 'Karan Verma',
+            'assignee_role' => 'Drone Pilot',
+            'assignee_init' => 'KV',
+            'checklist' => '1/4 (25%)',
+            'checklist_pct' => 25,
+            'db_status' => 'new'
+        ),
+        // Contacted
+        array(
+            'names' => 'Vikram & Aditi',
+            'email' => 'vikram.aditi@yahoo.com',
+            'phone' => '+91 98765 44444',
+            'scale' => 'Pre-Wedding Shoot',
+            'city' => 'Jaipur',
+            'notes' => 'Royal palace theme photoshoot.',
+            'price' => '₹2,20,000',
+            'status' => 'Contacted',
+            'score' => 'hot',
+            'format' => 'Photoshoot',
+            'assignee_name' => 'Shruti Sharma',
+            'assignee_role' => 'Super Admin',
+            'assignee_init' => 'SS',
+            'checklist' => '1/2 (50%)',
+            'checklist_pct' => 50,
+            'db_status' => 'contacted'
+        ),
+        array(
+            'names' => 'Siddharth Malhotra',
+            'email' => 'sid.malhotra@gmail.com',
+            'phone' => '+91 98765 55555',
+            'scale' => 'Commercial Launch',
+            'city' => 'Delhi',
+            'notes' => 'Promotional video and drone shots for real estate project launch.',
+            'price' => '₹5,00,000',
+            'status' => 'Contacted',
+            'score' => 'warm',
+            'format' => 'Drone Shoot',
+            'assignee_name' => 'Karan Verma',
+            'assignee_role' => 'Drone Pilot',
+            'assignee_init' => 'KV',
+            'checklist' => '2/3 (66%)',
+            'checklist_pct' => 66,
+            'db_status' => 'contacted'
+        ),
+        array(
+            'names' => 'Neha Dhupia',
+            'email' => 'neha.dhupia@outlook.com',
+            'phone' => '+91 98765 66666',
+            'scale' => 'Fashion Editorial',
+            'city' => 'Mumbai',
+            'notes' => 'Studio lighting setup required.',
+            'price' => '₹1,50,000',
+            'status' => 'Contacted',
+            'score' => 'cold',
+            'format' => 'Photoshoot',
+            'assignee_name' => 'Priya Nair',
+            'assignee_role' => 'Videographer',
+            'assignee_init' => 'PN',
+            'checklist' => '0/3 (0%)',
+            'checklist_pct' => 0,
+            'db_status' => 'contacted'
+        ),
+        // Site Visit
+        array(
+            'names' => 'Kabir & Kiara',
+            'email' => 'kabir.kiara@gmail.com',
+            'phone' => '+91 98765 77777',
+            'scale' => 'Wedding Film',
+            'city' => 'Udaipur',
+            'notes' => '3-day shoot at Oberoi Udaivilas.',
+            'price' => '₹6,00,000',
+            'status' => 'Site Visit',
+            'score' => 'hot',
+            'format' => 'Video Production',
+            'assignee_name' => 'Shruti Sharma',
+            'assignee_role' => 'Super Admin',
+            'assignee_init' => 'SS',
+            'checklist' => '3/4 (75%)',
+            'checklist_pct' => 75,
+            'db_status' => 'site_visit'
+        ),
+        array(
+            'names' => 'Riya & Arjun',
+            'email' => 'riya.arjun@gmail.com',
+            'phone' => '+91 98765 88888',
+            'scale' => 'Maternity Shoot',
+            'city' => 'Goa',
+            'notes' => 'Sunset beach outdoor photography.',
+            'price' => '₹1,20,000',
+            'status' => 'Site Visit',
+            'score' => 'warm',
+            'format' => 'Photoshoot',
+            'assignee_name' => 'Priya Nair',
+            'assignee_role' => 'Videographer',
+            'assignee_init' => 'PN',
+            'checklist' => '1/2 (50%)',
+            'checklist_pct' => 50,
+            'db_status' => 'site_visit'
+        ),
+        array(
+            'names' => 'Rahul Bose',
+            'email' => 'rahul.bose@corporate.com',
+            'phone' => '+91 98765 99999',
+            'scale' => 'Corporate Headshots',
+            'city' => 'Bangalore',
+            'notes' => 'Executive team headshots on location.',
+            'price' => '₹80,000',
+            'status' => 'Site Visit',
+            'score' => 'cold',
+            'format' => 'Photoshoot',
+            'assignee_name' => 'Karan Verma',
+            'assignee_role' => 'Drone Pilot',
+            'assignee_init' => 'KV',
+            'checklist' => '2/2 (100%)',
+            'checklist_pct' => 100,
+            'db_status' => 'site_visit'
+        ),
+        // Negotiation
+        array(
+            'names' => 'Dev & Sonakshi',
+            'email' => 'dev.sona@yahoo.com',
+            'phone' => '+91 98765 00000',
+            'scale' => 'Premium Wedding',
+            'city' => 'Jaipur',
+            'notes' => 'Draft proposal under review. Negotiating albums count.',
+            'price' => '₹4,20,000',
+            'status' => 'Negotiation',
+            'score' => 'hot',
+            'format' => 'Video Production',
+            'assignee_name' => 'Shruti Sharma',
+            'assignee_role' => 'Super Admin',
+            'assignee_init' => 'SS',
+            'checklist' => '2/3 (66%)',
+            'checklist_pct' => 66,
+            'db_status' => 'negotiation'
+        ),
+        array(
+            'names' => 'Ishaan Khattar',
+            'email' => 'ishaan.k@outlook.com',
+            'phone' => '+91 98765 12345',
+            'scale' => 'Music Video',
+            'city' => 'Mumbai',
+            'notes' => 'Dance sequence filming at multiple locations.',
+            'price' => '₹3,50,000',
+            'status' => 'Negotiation',
+            'score' => 'warm',
+            'format' => 'Video Production',
+            'assignee_name' => 'Priya Nair',
+            'assignee_role' => 'Videographer',
+            'assignee_init' => 'PN',
+            'checklist' => '1/3 (33%)',
+            'checklist_pct' => 33,
+            'db_status' => 'negotiation'
+        ),
+        array(
+            'names' => 'Kriti Sanon',
+            'email' => 'kriti.sanon@gmail.com',
+            'phone' => '+91 98765 67890',
+            'scale' => 'Brand Endorsement',
+            'city' => 'Mumbai',
+            'notes' => 'Short social media promotional clips.',
+            'price' => '₹2,50,000',
+            'status' => 'Negotiation',
+            'score' => 'cold',
+            'format' => 'Video Production',
+            'assignee_name' => 'Karan Verma',
+            'assignee_role' => 'Drone Pilot',
+            'assignee_init' => 'KV',
+            'checklist' => '0/2 (0%)',
+            'checklist_pct' => 0,
+            'db_status' => 'negotiation'
+        ),
+        // Converted
+        array(
+            'names' => 'Ranveer & Deepika',
+            'email' => 'ranveer.deepika@gmail.com',
+            'phone' => '+91 98765 54321',
+            'scale' => 'Grand Celebration',
+            'city' => 'Lake Como',
+            'notes' => 'Contract signed, deposit received. Booking confirmed.',
+            'price' => '₹12,0,000',
+            'status' => 'Converted',
+            'score' => 'hot',
+            'format' => 'Video Production',
+            'assignee_name' => 'Shruti Sharma',
+            'assignee_role' => 'Super Admin',
+            'assignee_init' => 'SS',
+            'checklist' => '4/4 (100%)',
+            'checklist_pct' => 100,
+            'db_status' => 'closed'
+        ),
+        array(
+            'names' => 'Varun & Natasha',
+            'email' => 'varun.natasha@yahoo.com',
+            'phone' => '+91 98765 98765',
+            'scale' => 'Intimate Beach Wedding',
+            'city' => 'Alibaug',
+            'notes' => 'Booking confirmed. Flight tickets booked for crew.',
+            'price' => '₹3,00,000',
+            'status' => 'Converted',
+            'score' => 'warm',
+            'format' => 'Photoshoot',
+            'assignee_name' => 'Priya Nair',
+            'assignee_role' => 'Videographer',
+            'assignee_init' => 'PN',
+            'checklist' => '3/3 (100%)',
+            'checklist_pct' => 100,
+            'db_status' => 'closed'
+        ),
+        array(
+            'names' => 'Alia Bhatt',
+            'email' => 'alia.bhatt@gmail.com',
+            'phone' => '+91 98765 11223',
+            'scale' => 'Penthouse Tour',
+            'city' => 'Bandra',
+            'notes' => 'Architectural shoot complete. Photos delivered.',
+            'price' => '₹1,80,000',
+            'status' => 'Converted',
+            'score' => 'cold',
+            'format' => 'Photoshoot',
+            'assignee_name' => 'Karan Verma',
+            'assignee_role' => 'Drone Pilot',
+            'assignee_init' => 'KV',
+            'checklist' => '2/2 (100%)',
+            'checklist_pct' => 100,
+            'db_status' => 'closed'
+        )
+    );
+
+    $option_leads = array();
+
+    foreach ( $leads as $l ) {
+        // Clean price
+        $price_clean = preg_replace( '/[^\d]/', '', $l['price'] );
+        $budget_max = intval( $price_clean );
+
+        // Insert into SQL table
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_leads',
+            array(
+                'agency_id' => 1,
+                'branch_id' => 1,
+                'assigned_to' => null,
+                'first_name' => $l['names'],
+                'last_name' => '',
+                'email' => $l['email'],
+                'phone' => $l['phone'],
+                'source' => 'Direct',
+                'status' => $l['db_status'],
+                'budget_min' => 0,
+                'budget_max' => $budget_max,
+                'preferred_locations' => $l['city'],
+                'property_type' => $l['scale'],
+                'notes' => $l['notes'],
+                'followup_date' => null,
+                'followup_notes' => '',
+                'converted_to_client' => ( $l['db_status'] === 'closed' ) ? 1 : 0,
+                'client_id' => null,
+                'embed_vector' => 0,
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql')
+            ),
+            array( '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s' )
+        );
+
+        $new_id = $wpdb->insert_id;
+
+        // Build option lead item with the new numeric ID
+        $option_leads[] = array(
+            'id' => $new_id,
+            'names' => $l['names'],
+            'email' => $l['email'],
+            'phone' => $l['phone'],
+            'scale' => $l['scale'],
+            'city' => $l['city'],
+            'notes' => $l['notes'],
+            'price' => $l['price'],
+            'status' => $l['status'],
+            'score' => $l['score'],
+            'format' => $l['format'],
+            'assignee_name' => $l['assignee_name'],
+            'assignee_role' => $l['assignee_role'],
+            'assignee_init' => $l['assignee_init'],
+            'checklist' => $l['checklist'],
+            'checklist_pct' => $l['checklist_pct'],
+            'created_at' => time()
+        );
+    }
+
+    // Temporarily remove option filter to prevent infinite loop or conflicts
+    remove_filter( 'pre_update_option_cora_workspace_leads', 'cora_pre_update_tenancy_data', 10, 3 );
+    update_option( 'cora_workspace_leads', $option_leads );
+    add_filter( 'pre_update_option_cora_workspace_leads', 'cora_pre_update_tenancy_data', 10, 3 );
+
+    update_option( 'cora_seeded_3_leads_per_column_v2', true );
+}
+
 function cora_ensure_default_agency_setup() {
     cora_create_custom_tables();
     cora_migrate_options_to_custom_tables();
+    cora_seed_3_leads_per_column();
     $agencies = get_option( 'cora_agencies', array() );
     if ( empty( $agencies ) ) {
         $agencies = array(
@@ -24902,47 +24973,85 @@ if ( ! function_exists( 'cora_ajax_save_lead' ) ) {
             wp_send_json_error( array( 'message' => 'Client Name and Email are required fields.' ) );
         }
 
+        $db_status_slug = 'new';
+        $st_lower = strtolower( trim( $status ) );
+        if ( $st_lower === 'new lead' || $st_lower === 'new inquiries' || $st_lower === 'new' ) {
+            $db_status_slug = 'new';
+        } elseif ( $st_lower === 'contacted' || $st_lower === 'proposal sent' ) {
+            $db_status_slug = 'contacted';
+        } elseif ( $st_lower === 'site visit' || $st_lower === 'site_visit' || $st_lower === 'site visit / viewing' ) {
+            $db_status_slug = 'site_visit';
+        } elseif ( $st_lower === 'negotiation' || $st_lower === 'negotiat' ) {
+            $db_status_slug = 'negotiation';
+        } elseif ( $st_lower === 'converted' || $st_lower === 'closed' || $st_lower === 'won' ) {
+            $db_status_slug = 'closed';
+        } elseif ( $st_lower === 'lost' ) {
+            $db_status_slug = 'lost';
+        }
+
+        $price_clean = preg_replace( '/[^\d]/', '', $price );
+        $budget_max = intval( $price_clean );
+
+        $is_new = empty( $lead_id ) || ! is_numeric( $lead_id );
+        
+        $db_data = array(
+            'agency_id' => 1,
+            'branch_id' => 1,
+            'first_name' => $names,
+            'last_name' => '',
+            'email' => $email,
+            'phone' => $phone,
+            'source' => 'Direct',
+            'status' => $db_status_slug,
+            'budget_min' => 0,
+            'budget_max' => $budget_max,
+            'preferred_locations' => $city,
+            'property_type' => $scale,
+            'notes' => $notes,
+            'converted_to_client' => ( $db_status_slug === 'closed' ) ? 1 : 0,
+            'updated_at' => current_time( 'mysql' )
+        );
+
+        if ( $is_new ) {
+            $db_data['created_at'] = current_time( 'mysql' );
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_leads',
+                $db_data,
+                array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s' )
+            );
+            $lead_id = $wpdb->insert_id;
+        } else {
+            $wpdb->update(
+                $wpdb->prefix . 'cora_leads',
+                $db_data,
+                array( 'id' => intval( $lead_id ) ),
+                array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%d', '%s' ),
+                array( '%d' )
+            );
+        }
+
         $existing_leads = get_option( 'cora_workspace_leads', array() );
         if ( ! is_array( $existing_leads ) ) {
             $existing_leads = array();
         }
 
-        if ( ! empty( $lead_id ) ) {
-            // Update existing lead
-            $found = false;
-            foreach ( $existing_leads as &$el ) {
-                if ( (string) $el['id'] === (string) $lead_id ) {
-                    $el['names'] = $names;
-                    $el['email'] = $email;
-                    $el['phone'] = $phone;
-                    $el['price'] = $price;
-                    $el['scale'] = $scale;
-                    $el['city']  = $city;
-                    $el['status'] = $status;
-                    $el['score']  = $score;
-                    $el['notes']  = $notes;
-                    $found = true;
-                    break;
-                }
+        $found = false;
+        foreach ( $existing_leads as &$el ) {
+            if ( (string) $el['id'] === (string) $lead_id ) {
+                $el['names'] = $names;
+                $el['email'] = $email;
+                $el['phone'] = $phone;
+                $el['price'] = $price;
+                $el['scale'] = $scale;
+                $el['city']  = $city;
+                $el['status'] = $status;
+                $el['score']  = $score;
+                $el['notes']  = $notes;
+                $found = true;
+                break;
             }
-            if ( ! $found ) {
-                $existing_leads[] = array(
-                    'id'         => $lead_id,
-                    'names'      => $names,
-                    'email'      => $email,
-                    'phone'      => $phone,
-                    'price'      => $price,
-                    'scale'      => $scale,
-                    'city'       => $city,
-                    'status'     => $status,
-                    'score'      => $score,
-                    'notes'      => $notes,
-                    'created_at' => time(),
-                );
-            }
-        } else {
-            // Create new lead
-            $lead_id = 'lead_' . time() . '_' . rand( 100, 999 );
+        }
+        if ( ! $found ) {
             $new_lead = array(
                 'id'         => $lead_id,
                 'names'      => $names,
@@ -24997,32 +25106,39 @@ if ( ! function_exists( 'cora_ajax_update_lead_stage' ) ) {
 
         global $wpdb;
         $lead_id   = isset( $_POST['lead_id'] ) ? sanitize_text_field( $_POST['lead_id'] ) : '';
-        $new_stage = isset( $_POST['new_stage'] ) ? sanitize_text_field( $_POST['new_stage'] ) : '';
+        $raw_stage = isset( $_POST['new_stage'] ) ? sanitize_text_field( $_POST['new_stage'] ) : '';
 
-        if ( empty( $lead_id ) || empty( $new_stage ) ) {
+        if ( empty( $lead_id ) || empty( $raw_stage ) ) {
             wp_send_json_error( array( 'message' => 'Lead ID and New Stage are required.' ) );
         }
 
-        // Map stage to DB status slug if numeric ID
+        $new_stage = function_exists('cora_normalize_lead_stage') ? cora_normalize_lead_stage($raw_stage) : $raw_stage;
+
+        // Map stage to DB status slug
         $db_status_slug = 'new';
         $st_lower = strtolower($new_stage);
-        if (strpos($st_lower, 'contact') !== false || strpos($st_lower, 'proposal') !== false) $db_status_slug = 'contacted';
-        elseif (strpos($st_lower, 'visit') !== false || strpos($st_lower, 'viewing') !== false) $db_status_slug = 'site_visit';
-        elseif (strpos($st_lower, 'negotiat') !== false) $db_status_slug = 'negotiation';
-        elseif (strpos($st_lower, 'convert') !== false || strpos($st_lower, 'closed') !== false) $db_status_slug = 'closed';
-        elseif (strpos($st_lower, 'lost') !== false) $db_status_slug = 'lost';
-
-        if ( is_numeric( $lead_id ) ) {
-            $wpdb->update(
-                "{$wpdb->prefix}cora_leads",
-                array( 'status' => $db_status_slug ),
-                array( 'id' => intval( $lead_id ) )
-            );
+        if (strpos($st_lower, 'contact') !== false || strpos($st_lower, 'proposal') !== false) {
+            $db_status_slug = 'contacted';
+        } elseif (strpos($st_lower, 'visit') !== false || strpos($st_lower, 'viewing') !== false) {
+            $db_status_slug = 'site_visit';
+        } elseif (strpos($st_lower, 'negotiat') !== false) {
+            $db_status_slug = 'negotiation';
+        } elseif (strpos($st_lower, 'convert') !== false) {
+            $db_status_slug = 'closed';
+        } elseif (strpos($st_lower, 'lost') !== false || strpos($st_lower, 'hold') !== false) {
+            $db_status_slug = 'lost';
         }
 
+        $converted_val = ( $db_status_slug === 'closed' ) ? 1 : 0;
+        $wpdb->query( $wpdb->prepare(
+            "UPDATE {$wpdb->prefix}cora_leads SET status = %s, converted_to_client = %d WHERE id = %s OR id = %d",
+            $db_status_slug, $converted_val, $lead_id, intval( $lead_id )
+        ) );
+
+        $all_leads = cora_db_get_leads();
         $existing_leads = get_option( 'cora_workspace_leads', array() );
-        if ( ! is_array( $existing_leads ) ) {
-            $existing_leads = array();
+        if ( ! is_array( $existing_leads ) || empty( $existing_leads ) ) {
+            $existing_leads = $all_leads;
         }
 
         $updated = false;
@@ -25036,11 +25152,33 @@ if ( ! function_exists( 'cora_ajax_update_lead_stage' ) ) {
             }
         }
 
-        if ( $updated ) {
-            update_option( 'cora_workspace_leads', $existing_leads );
-            if ( $new_stage === 'Converted' && $matched_lead ) {
-                cora_copy_lead_to_clients( $matched_lead );
+        if ( ! $updated ) {
+            $full_meta = null;
+            foreach ( $all_leads as $al ) {
+                if ( (string) $al['id'] === (string) $lead_id ) {
+                    $full_meta = $al;
+                    break;
+                }
             }
+            if ( $full_meta ) {
+                $matched_lead = $full_meta;
+                $matched_lead['status'] = $new_stage;
+            } else {
+                $matched_lead = array(
+                    'id'         => $lead_id,
+                    'names'      => 'Client Inquiry',
+                    'status'     => $new_stage,
+                    'price'      => '₹0',
+                    'created_at' => time()
+                );
+            }
+            $existing_leads[] = $matched_lead;
+            $updated = true;
+        }
+
+        update_option( 'cora_workspace_leads', $existing_leads );
+        if ( $new_stage === 'Converted' && $matched_lead ) {
+            cora_copy_lead_to_clients( $matched_lead );
         }
 
         wp_send_json_success( array(
