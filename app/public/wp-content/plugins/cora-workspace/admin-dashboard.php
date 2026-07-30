@@ -273,7 +273,15 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <script>
         window.$ = window.jQuery;
     </script>
-    
+
+    <!-- CRITICAL: Reset any WordPress admin-bar margin-top injected by wp_print_styles() -->
+    <style id="cora-adminbar-reset">
+        #wpadminbar { display: none !important; }
+        html { margin-top: 0 !important; padding-top: 0 !important; }
+        body { margin-top: 0 !important; padding-top: 0 !important; }
+        * html body { margin-top: 0 !important; }
+    </style>
+
     <style id="cora-workspace-custom-styles">
         /* === CORA SKELETON PRELOADING === */
         @keyframes cora-shimmer {
