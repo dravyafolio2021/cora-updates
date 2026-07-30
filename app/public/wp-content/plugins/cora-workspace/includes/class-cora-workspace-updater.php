@@ -242,6 +242,11 @@ class Cora_Workspace_Updater {
         $current->response[ $this->plugin_file ] = $obj;
         set_site_transient( 'update_plugins', $current );
 
+        // Reset OPcache memory file locks immediately before upgrade to prevent FPM renaming errors
+        if ( function_exists( 'opcache_reset' ) ) {
+            opcache_reset();
+        }
+
         // 3. Perform programmatic update using Plugin_Upgrader custom progress skin
         $skin = new Cora_Upgrade_Skin();
         $upgrader = new Plugin_Upgrader( $skin );
