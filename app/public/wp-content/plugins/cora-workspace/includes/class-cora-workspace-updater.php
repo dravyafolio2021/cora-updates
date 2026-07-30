@@ -24,6 +24,7 @@ class Cora_Workspace_Updater {
         // AJAX Actions for in-app / workspace dashboard checking and upgrading
         add_action( 'wp_ajax_cora_check_plugin_update', array( $this, 'ajax_check_plugin_update' ) );
         add_action( 'wp_ajax_cora_trigger_in_app_update', array( $this, 'ajax_trigger_in_app_update' ) );
+        add_action( 'wp_ajax_cora_get_upgrade_progress', array( $this, 'ajax_get_upgrade_progress' ) );
     }
 
     /**
@@ -174,18 +175,25 @@ class Cora_Workspace_Updater {
             wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
         }
 
+        // Initialize progress
+        update_option( 'cora_workspace_upgrade_progress', array( 'step' => 1, 'percent' => 5, 'status' => 'Connecting to GitHub updates server...' ) );
+
         // 1. Force update the site transient to ensure WordPress knows the download URL
         delete_transient( 'cora_workspace_update_info' );
         delete_site_transient( 'update_plugins' );
         
         $info = $this->fetch_remote_update_info( true );
         if ( ! $info ) {
+            update_option( 'cora_workspace_upgrade_progress', array( 'step' => -1, 'percent' => 0, 'status' => 'Failed: Connection to updates server failed.' ) );
             wp_send_json_error( array( 'message' => 'Failed to retrieve update details from server.' ) );
         }
 
         if ( ! version_compare( CORA_WORKSPACE_VERSION, $info['version'], '<' ) ) {
+            update_option( 'cora_workspace_upgrade_progress', array( 'step' => -1, 'percent' => 0, 'status' => 'Failed: Already up-to-date.' ) );
             wp_send_json_error( array( 'message' => 'Your workspace is already up-to-date (v' . CORA_WORKSPACE_VERSION . ').' ) );
         }
+
+        update_option( 'cora_workspace_upgrade_progress', array( 'step' => 2, 'percent' => 15, 'status' => 'Resolving dependency packages...' ) );
 
         // Trigger native WP update transient update
         wp_update_plugins();
@@ -197,30 +205,40 @@ class Cora_Workspace_Updater {
         include_once ABSPATH . 'wp-admin/includes/misc.php';
         include_once ABSPATH . 'wp-admin/includes/plugin.php';
 
+        update_option( 'cora_workspace_upgrade_progress', array( 'step' => 2, 'percent' => 20, 'status' => 'Requesting filesystem permissions...' ) );
+
         // Set up the filesystem credentials page URL for WP_Filesystem
         $url = wp_nonce_url( admin_url( 'admin-ajax.php?action=cora_trigger_in_app_update' ), 'cora_ajax_nonce' );
         $creds = request_filesystem_credentials( $url, '', false, false, null );
 
         if ( false === $creds ) {
+            update_option( 'cora_workspace_upgrade_progress', array( 'step' => -1, 'percent' => 0, 'status' => 'Failed: Filesystem credentials required.' ) );
             wp_send_json_error( array( 'message' => 'Filesystem credentials are required to upgrade the plugin.' ) );
         }
 
         if ( ! WP_Filesystem( $creds ) ) {
+            update_option( 'cora_workspace_upgrade_progress', array( 'step' => -1, 'percent' => 0, 'status' => 'Failed: Filesystem initialization failed.' ) );
             wp_send_json_error( array( 'message' => 'Failed to initialize WordPress filesystem.' ) );
         }
 
-        // 3. Perform programmatic update using Plugin_Upgrader quiet skin
-        $skin = new Automatic_Upgrader_Skin();
+        update_option( 'cora_workspace_upgrade_progress', array( 'step' => 3, 'percent' => 25, 'status' => 'Downloading update package (cora-workspace.zip)...' ) );
+
+        // 3. Perform programmatic update using Plugin_Upgrader custom progress skin
+        $skin = new Cora_Upgrade_Skin();
         $upgrader = new Plugin_Upgrader( $skin );
         
         // This will download, unzip, delete the old plugin directory and replace with new one.
         $result = $upgrader->upgrade( $this->plugin_file );
 
         if ( is_wp_error( $result ) ) {
+            update_option( 'cora_workspace_upgrade_progress', array( 'step' => -1, 'percent' => 0, 'status' => 'Failed: ' . $result->get_error_message() ) );
             wp_send_json_error( array( 'message' => $result->get_error_message() ) );
         } elseif ( ! $result ) {
+            update_option( 'cora_workspace_upgrade_progress', array( 'step' => -1, 'percent' => 0, 'status' => 'Failed: Upgrade directory not writable.' ) );
             wp_send_json_error( array( 'message' => 'Upgrade process failed. Please ensure the plugins directory is writable.' ) );
         } else {
+            update_option( 'cora_workspace_upgrade_progress', array( 'step' => 4, 'percent' => 95, 'status' => 'Reactivating workspace platform...' ) );
+
             // Success! Upgrade was successful.
             // Since WordPress deletes the old plugin folder and copies files, it might deactivate the plugin.
             // Let's reactivate the plugin to ensure uninterrupted service!
@@ -233,9 +251,67 @@ class Cora_Workspace_Updater {
                 cora_log_activity( 'Platform', 'Upgraded Cora Workspace Platform to v' . $info['version'] );
             }
 
+            update_option( 'cora_workspace_upgrade_progress', array( 'step' => 5, 'percent' => 100, 'status' => 'Successfully upgraded! Reloading...' ) );
+
             wp_send_json_success( array( 
                 'message' => 'Cora Workspace Platform successfully upgraded to v' . $info['version'] . '! Reloading dashboard...' 
             ) );
+        }
+    }
+
+    /**
+     * AJAX Action: Fetch current upgrade progress metrics
+     */
+    public function ajax_get_upgrade_progress() {
+        check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+        
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+        }
+
+        $progress = get_option( 'cora_workspace_upgrade_progress', array(
+            'step' => 0,
+            'percent' => 0,
+            'status' => 'Waiting to start...'
+        ) );
+
+        wp_send_json_success( $progress );
+    }
+}
+
+/**
+ * Custom WordPress Upgrader Skin to intercept feedback and report progress
+ */
+if ( class_exists( 'Automatic_Upgrader_Skin' ) && ! class_exists( 'Cora_Upgrade_Skin' ) ) {
+    class Cora_Upgrade_Skin extends Automatic_Upgrader_Skin {
+        public function feedback( $feedback, ...$args ) {
+            parent::feedback( $feedback, ...$args );
+            
+            $status = '';
+            $percent = 0;
+            
+            // Map common WordPress translation/string feedback keys during upgrade
+            if ( 'downloading_package' === $feedback || false !== strpos( $feedback, 'download' ) ) {
+                $status = 'Downloading package (cora-workspace.zip)...';
+                $percent = 35;
+            } elseif ( 'unpack_package' === $feedback || false !== strpos( $feedback, 'unpack' ) ) {
+                $status = 'Verifying and extracting package...';
+                $percent = 60;
+            } elseif ( 'remove_old' === $feedback || false !== strpos( $feedback, 'remove' ) ) {
+                $status = 'Backing up current workspace configuration...';
+                $percent = 80;
+            } elseif ( 'install_package' === $feedback || false !== strpos( $feedback, 'install' ) ) {
+                $status = 'Installing latest files...';
+                $percent = 90;
+            }
+            
+            if ( $percent > 0 ) {
+                update_option( 'cora_workspace_upgrade_progress', array(
+                    'step' => 3,
+                    'percent' => $percent,
+                    'status' => $status
+                ) );
+            }
         }
     }
 }

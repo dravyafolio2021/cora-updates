@@ -2468,6 +2468,28 @@ $cora_settings_tabs = array(
                             </div>
                         </div>
 
+                        <!-- State: Upgrade Progress Indicator -->
+                        <div id="cora-updates-state-progress" class="hidden w-full text-left space-y-4 animate-in fade-in duration-200">
+                            <div class="p-5 bg-zinc-50 dark:bg-zinc-900/60 rounded-xl border border-zinc-150 dark:border-zinc-800/60 space-y-4">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                                        <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.5" fill="none" class="animate-spin text-zinc-500 shrink-0"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                                        <span id="cora-upgrade-step-text">Initializing shipment...</span>
+                                    </span>
+                                    <span class="font-bold text-zinc-900 dark:text-zinc-100" id="cora-upgrade-percent-text">0%</span>
+                                </div>
+                                
+                                <!-- Progress Bar Container -->
+                                <div class="h-2 w-full bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                                    <div id="cora-upgrade-progress-bar" class="h-full bg-zinc-950 dark:bg-white w-0 transition-all duration-350 ease-out rounded-full"></div>
+                                </div>
+                                
+                                <p class="text-[10px] text-zinc-500 leading-normal m-0" id="cora-upgrade-desc-text">
+                                    Please do not close or reload this page. The system is downloading and extracting the latest workspace files.
+                                </p>
+                            </div>
+                        </div>
+
                         <!-- State: Error State -->
                         <div id="cora-updates-state-error" class="hidden space-y-3 max-w-md">
                             <div class="inline-flex p-3 bg-red-500/10 text-red-650 dark:text-red-405 rounded-2xl mx-auto border border-red-200/20">
@@ -2616,25 +2638,82 @@ $cora_settings_tabs = array(
 
         function coraTriggerInAppUpgradeManual() {
             var $btn = jQuery('#cora-btn-updates-upgrade');
+            var $checkBtn = jQuery('#cora-btn-updates-check');
             
             var upgradeAction = function() {
-                $btn.prop('disabled', true).html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="animate-spin shrink-0"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Upgrading...');
+                // Disable upgrade actions
+                $btn.prop('disabled', true).addClass('opacity-50 pointer-events-none');
+                $checkBtn.prop('disabled', true).addClass('opacity-50 pointer-events-none');
                 
-                if (window.coraShowToast) window.coraShowToast('Downloading and installing workspace update...', 'info');
+                // Hide current state containers
+                jQuery('#cora-updates-state-uptodate').addClass('hidden');
+                jQuery('#cora-updates-state-available').addClass('hidden');
+                
+                // Show progress bar container
+                var $progressContainer = jQuery('#cora-updates-state-progress');
+                $progressContainer.removeClass('hidden');
+                
+                // Setup elements
+                var $progressBar = jQuery('#cora-upgrade-progress-bar');
+                var $percentText = jQuery('#cora-upgrade-percent-text');
+                var $stepText = jQuery('#cora-upgrade-step-text');
+                
+                // Initialize display values
+                $progressBar.css('width', '5%');
+                $percentText.text('5%');
+                $stepText.text('Connecting to GitHub updates server...');
+                
+                var progressInterval = setInterval(function() {
+                    jQuery.post(coraREData.ajaxUrl, {
+                        action: 'cora_get_upgrade_progress',
+                        nonce: coraREData.ajaxNonce
+                    }, function(res) {
+                        if (res.success && res.data) {
+                            var pct = parseInt(res.data.percent || 0);
+                            var status = res.data.status || 'Upgrading...';
+                            
+                            $progressBar.css('width', pct + '%');
+                            $percentText.text(pct + '%');
+                            $stepText.text(status);
+                            
+                            if (pct >= 100) {
+                                clearInterval(progressInterval);
+                            }
+                        }
+                    });
+                }, 1200);
+                
+                if (window.coraShowToast) window.coraShowToast('Initiating workspace upgrade shipment...', 'info');
                 
                 jQuery.post(coraREData.ajaxUrl, {
                     action: 'cora_trigger_in_app_update',
                     nonce: coraREData.ajaxNonce
                 }, function(res) {
+                    clearInterval(progressInterval);
                     if (res.success) {
+                        $progressBar.css('width', '100%');
+                        $percentText.text('100%');
+                        $stepText.text('Upgrade completed successfully!');
                         if (window.coraShowToast) window.coraShowToast(res.data.message || 'Workspace upgraded successfully!', 'success');
                         setTimeout(function() { window.location.reload(); }, 2000);
                     } else {
-                        $btn.prop('disabled', false).html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><polyline points="18 15 12 9 6 15"></polyline></svg> <span>Upgrade Workspace Now</span>');
+                        $progressBar.css('width', '0%');
+                        $percentText.text('0%');
+                        $progressContainer.addClass('hidden');
+                        
+                        $btn.prop('disabled', false).removeClass('opacity-50 pointer-events-none');
+                        $checkBtn.prop('disabled', false).removeClass('opacity-50 pointer-events-none');
+                        jQuery('#cora-updates-state-available').removeClass('hidden');
+                        
                         if (window.coraShowToast) window.coraShowToast('Upgrade Failed: ' + (res.data ? res.data.message : 'Unknown error'), 'error');
                     }
                 }).fail(function() {
-                    $btn.prop('disabled', false).html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><polyline points="18 15 12 9 6 15"></polyline></svg> <span>Upgrade Workspace Now</span>');
+                    clearInterval(progressInterval);
+                    $progressContainer.addClass('hidden');
+                    $btn.prop('disabled', false).removeClass('opacity-50 pointer-events-none');
+                    $checkBtn.prop('disabled', false).removeClass('opacity-50 pointer-events-none');
+                    jQuery('#cora-updates-state-available').removeClass('hidden');
+                    
                     if (window.coraShowToast) window.coraShowToast('Network error during upgrade.', 'error');
                 });
             };
