@@ -204,6 +204,7 @@ class Cora_Workspace_Updater {
         include_once ABSPATH . 'wp-admin/includes/file.php';
         include_once ABSPATH . 'wp-admin/includes/misc.php';
         include_once ABSPATH . 'wp-admin/includes/plugin.php';
+        include_once CORA_WORKSPACE_PATH . 'includes/class-cora-upgrade-skin.php';
 
         update_option( 'cora_workspace_upgrade_progress', array( 'step' => 2, 'percent' => 20, 'status' => 'Requesting filesystem permissions...' ) );
 
@@ -279,41 +280,6 @@ class Cora_Workspace_Updater {
     }
 }
 
-/**
- * Custom WordPress Upgrader Skin to intercept feedback and report progress
- */
-if ( class_exists( 'Automatic_Upgrader_Skin' ) && ! class_exists( 'Cora_Upgrade_Skin' ) ) {
-    class Cora_Upgrade_Skin extends Automatic_Upgrader_Skin {
-        public function feedback( $feedback, ...$args ) {
-            parent::feedback( $feedback, ...$args );
-            
-            $status = '';
-            $percent = 0;
-            
-            // Map common WordPress translation/string feedback keys during upgrade
-            if ( 'downloading_package' === $feedback || false !== strpos( $feedback, 'download' ) ) {
-                $status = 'Downloading package (cora-workspace.zip)...';
-                $percent = 35;
-            } elseif ( 'unpack_package' === $feedback || false !== strpos( $feedback, 'unpack' ) ) {
-                $status = 'Verifying and extracting package...';
-                $percent = 60;
-            } elseif ( 'remove_old' === $feedback || false !== strpos( $feedback, 'remove' ) ) {
-                $status = 'Backing up current workspace configuration...';
-                $percent = 80;
-            } elseif ( 'install_package' === $feedback || false !== strpos( $feedback, 'install' ) ) {
-                $status = 'Installing latest files...';
-                $percent = 90;
-            }
-            
-            if ( $percent > 0 ) {
-                update_option( 'cora_workspace_upgrade_progress', array(
-                    'step' => 3,
-                    'percent' => $percent,
-                    'status' => $status
-                ) );
-            }
-        }
-    }
-}
+
 
 Cora_Workspace_Updater::get_instance();
