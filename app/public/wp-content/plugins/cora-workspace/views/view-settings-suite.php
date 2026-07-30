@@ -2505,6 +2505,29 @@ $cora_settings_tabs = array(
                     </div>
                 </div>
             </div>
+            
+            <!-- CUSTOM CONFIRMATION DIALOGUE OVERLAY -->
+            <div id="cora-update-confirm-modal" class="fixed inset-0 bg-zinc-950/40 dark:bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200 select-none">
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl max-w-sm w-full p-6 shadow-xl transform scale-95 transition-transform duration-200 space-y-4">
+                    <div class="flex items-start gap-3">
+                        <div class="p-2 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-xl shrink-0">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        </div>
+                        <div class="space-y-1">
+                            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Upgrade Workspace</h3>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 m-0 leading-normal">Are you sure you want to upgrade Cora Workspace to the latest version? The screen will automatically reload once the shipment is installed.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-end gap-2 pt-2">
+                        <button type="button" id="cora-update-confirm-cancel" class="px-3.5 py-2 border border-zinc-200 dark:border-zinc-800 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-850 text-zinc-700 dark:text-zinc-300 font-bold rounded-xl text-xs transition-all cursor-pointer" onclick="closeCoraUpdateConfirmModal()">
+                            Cancel
+                        </button>
+                        <button type="button" id="cora-update-confirm-ok" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-850 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer shadow-sm active:scale-97" onclick="confirmCoraUpdateAction()">
+                            Yes, Upgrade
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <script>
@@ -2562,6 +2585,35 @@ $cora_settings_tabs = array(
             });
         }
 
+        var confirmCoraUpdateCallback = null;
+
+        function openCoraUpdateConfirmModal(callback) {
+            confirmCoraUpdateCallback = callback;
+            var $modal = jQuery('#cora-update-confirm-modal');
+            $modal.removeClass('hidden');
+            setTimeout(function() {
+                $modal.removeClass('opacity-0').addClass('opacity-100');
+                $modal.find('> div').removeClass('scale-95').addClass('scale-100');
+            }, 10);
+        }
+
+        function closeCoraUpdateConfirmModal() {
+            var $modal = jQuery('#cora-update-confirm-modal');
+            $modal.removeClass('opacity-100').addClass('opacity-0');
+            $modal.find('> div').removeClass('scale-100').addClass('scale-95');
+            setTimeout(function() {
+                $modal.addClass('hidden');
+                confirmCoraUpdateCallback = null;
+            }, 200);
+        }
+
+        function confirmCoraUpdateAction() {
+            if (confirmCoraUpdateCallback) {
+                confirmCoraUpdateCallback();
+            }
+            closeCoraUpdateConfirmModal();
+        }
+
         function coraTriggerInAppUpgradeManual() {
             var $btn = jQuery('#cora-btn-updates-upgrade');
             
@@ -2587,15 +2639,7 @@ $cora_settings_tabs = array(
                 });
             };
 
-            if (window.coraConfirm) {
-                window.coraConfirm({
-                    title: 'Upgrade Cora Workspace',
-                    message: 'Are you sure you want to upgrade the Cora workspace to the latest version? The screen will reload once complete.',
-                    okLabel: 'Yes, Upgrade'
-                }, upgradeAction);
-            } else if (confirm('Are you sure you want to upgrade the Cora workspace to the latest version? The screen will reload once complete.')) {
-                upgradeAction();
-            }
+            openCoraUpdateConfirmModal(upgradeAction);
         }
         </script>
 
