@@ -224,6 +224,24 @@ class Cora_Workspace_Updater {
 
         update_option( 'cora_workspace_upgrade_progress', array( 'step' => 3, 'percent' => 25, 'status' => 'Downloading update package (cora-workspace.zip)...' ) );
 
+        // Force inject the update into WordPress site transient to guarantee upgrader resolves the package URL
+        $current = get_site_transient( 'update_plugins' );
+        if ( ! is_object( $current ) ) {
+            $current = new stdClass();
+        }
+        if ( ! isset( $current->response ) ) {
+            $current->response = array();
+        }
+        $obj = new stdClass();
+        $obj->slug = $this->plugin_slug;
+        $obj->plugin = $this->plugin_file;
+        $obj->new_version = $info['version'];
+        $obj->url = 'https://cora.ai';
+        $obj->package = $info['download_url'];
+        $obj->tested = $info['tested'];
+        $current->response[ $this->plugin_file ] = $obj;
+        set_site_transient( 'update_plugins', $current );
+
         // 3. Perform programmatic update using Plugin_Upgrader custom progress skin
         $skin = new Cora_Upgrade_Skin();
         $upgrader = new Plugin_Upgrader( $skin );
