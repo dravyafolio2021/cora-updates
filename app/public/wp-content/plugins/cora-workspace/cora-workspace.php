@@ -16549,6 +16549,122 @@ function cora_ajax_change_password() {
 }
 add_action( 'wp_ajax_cora_ajax_change_password', 'cora_ajax_change_password' );
 
+function cora_ajax_verify_current_password() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    
+    $user_id = get_current_user_id();
+    $user = get_userdata( $user_id );
+    $current_pass = $_POST['current_pass'] ?? '';
+    
+    if ( wp_check_password( $current_pass, $user->data->user_pass, $user_id ) ) {
+        wp_send_json_success( array( 'message' => 'Identity verified.' ) );
+    } else {
+        wp_send_json_error( array( 'message' => 'Incorrect password.' ) );
+    }
+}
+add_action( 'wp_ajax_cora_ajax_verify_current_password', 'cora_ajax_verify_current_password' );
+
+// ═══ CUSTOM USER STATUS AND LEAVE MANAGEMENT AJAX HANDLERS ═══════════════
+function cora_ajax_update_user_custom_status() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    
+    $user_id = get_current_user_id();
+    $status = sanitize_text_field( $_POST['status'] ?? 'Available' );
+    $message = sanitize_text_field( $_POST['message'] ?? '' );
+    
+    update_user_meta( $user_id, 'cora_custom_status', $status );
+    update_user_meta( $user_id, 'cora_custom_status_message', $message );
+    
+    cora_log_activity( 'User Management', 'Updated status to: ' . $status . ( ! empty( $message ) ? ' (' . $message . ')' : '' ) );
+    
+    wp_send_json_success( array( 'message' => 'Status updated successfully.' ) );
+}
+add_action( 'wp_ajax_cora_ajax_update_user_custom_status', 'cora_ajax_update_user_custom_status' );
+
+function cora_ajax_request_leave() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    
+    $user_id = get_current_user_id();
+    $user = get_userdata( $user_id );
+    $start_date = sanitize_text_field( $_POST['start_date'] ?? '' );
+    $end_date = sanitize_text_field( $_POST['end_date'] ?? '' );
+    $reason = sanitize_text_field( $_POST['reason'] ?? '' );
+    $type = sanitize_text_field( $_POST['type'] ?? 'Casual Leave' );
+    
+    if ( empty( $start_date ) || empty( $end_date ) || empty( $reason ) ) {
+        wp_send_json_error( array( 'message' => 'All fields are required.' ) );
+    }
+    
+    $leaves = get_option( 'cora_workspace_leave_requests', array() );
+    $new_leave = array(
+        'id' => uniqid(),
+        'user_id' => $user_id,
+        'user_name' => $user->display_name,
+        'start_date' => $start_date,
+        'end_date' => $end_date,
+        'reason' => $reason,
+        'type' => $type,
+        'status' => 'pending',
+        'submitted_at' => time()
+    );
+    
+    $leaves[] = $new_leave;
+    update_option( 'cora_workspace_leave_requests', $leaves );
+    
+    cora_log_activity( 'User Management', 'Requested ' . $type . ' from ' . $start_date . ' to ' . $end_date );
+    
+    wp_send_json_success( array( 'message' => 'Leave request submitted successfully.', 'leaves' => $leaves ) );
+}
+add_action( 'wp_ajax_cora_ajax_request_leave', 'cora_ajax_request_leave' );
+
+function cora_ajax_update_leave_status() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    
+    $user = wp_get_current_user();
+    $current_role = ! empty( $user->roles ) ? $user->roles[0] : '';
+    $is_admin = current_user_can('manage_options') || in_array( $current_role, array( 'administrator', 'cora_manager', 'super_admin', 'agency_owner' ) );
+    
+    if ( ! $is_admin ) {
+        wp_send_json_error( array( 'message' => 'Permission denied.' ) );
+    }
+    
+    $leave_id = sanitize_text_field( $_POST['leave_id'] ?? '' );
+    $status = sanitize_text_field( $_POST['status'] ?? '' );
+    
+    if ( empty( $leave_id ) || ! in_array( $status, array( 'approved', 'rejected' ) ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid parameters.' ) );
+    }
+    
+    $leaves = get_option( 'cora_workspace_leave_requests', array() );
+    $updated = false;
+    
+    foreach ( $leaves as &$leave ) {
+        if ( $leave['id'] === $leave_id ) {
+            $leave['status'] = $status;
+            $updated = true;
+            break;
+        }
+    }
+    
+    if ( $updated ) {
+        update_option( 'cora_workspace_leave_requests', $leaves );
+        cora_log_activity( 'User Management', 'Updated leave request ' . $leave_id . ' status to ' . $status );
+        wp_send_json_success( array( 'message' => 'Leave request updated.' ) );
+    }
+    
+    wp_send_json_error( array( 'message' => 'Request not found.' ) );
+}
+add_action( 'wp_ajax_cora_ajax_update_leave_status', 'cora_ajax_update_leave_status' );
+
 add_action( 'wp_ajax_cora_ajax_logout_other_sessions', 'cora_ajax_logout_other_sessions' );
 
 function cora_ajax_get_user_leads_count() {
@@ -20149,7 +20265,7 @@ function cora_rest_submit_form( $request ) {
         $one_minute_ago
     ) );
 
-    if ( intval( $recent_count ) >= 10 ) {
+    if ( intval( $recent_count ) >= 10 && ! current_user_can( 'manage_options' ) ) {
         return new WP_Error( 'rate_limited', 'Too many requests. Please wait before submitting again.', array( 'status' => 429 ) );
     }
 
@@ -21113,8 +21229,44 @@ function cora_rest_delete_clause( $request ) {
 
 function cora_rest_get_form_audit_log( $request ) {
     global $wpdb;
-    $logs = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_form_audit_log ORDER BY id DESC LIMIT 100", ARRAY_A );
-    return rest_ensure_response( $logs ?: array() );
+    
+    $page = intval( $request->get_param( 'page' ) );
+    if ( $page < 1 ) {
+        $page = 1;
+    }
+    
+    $per_page = intval( $request->get_param( 'per_page' ) );
+    if ( $per_page < 1 || $per_page > 100 ) {
+        $per_page = 10;
+    }
+    
+    $offset = ( $page - 1 ) * $per_page;
+    
+    $total_logs = intval( $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_audit_log" ) );
+    
+    $logs = $wpdb->get_results( $wpdb->prepare(
+        "SELECT l.*, u.display_name 
+         FROM {$wpdb->prefix}cora_form_audit_log l 
+         LEFT JOIN {$wpdb->users} u ON l.performed_by = u.ID 
+         ORDER BY l.id DESC 
+         LIMIT %d OFFSET %d",
+        $per_page,
+        $offset
+    ), ARRAY_A );
+    
+    foreach ( $logs as &$log ) {
+        if ( empty( $log['display_name'] ) ) {
+            $log['display_name'] = 'System';
+        }
+    }
+    
+    return rest_ensure_response( array(
+        'logs'        => $logs ?: array(),
+        'total'       => $total_logs,
+        'page'        => $page,
+        'per_page'    => $per_page,
+        'total_pages' => ceil( $total_logs / $per_page )
+    ) );
 }
 
 // ═══ DYNAMIC REMOTE PLUGIN UPDATER SYSTEM ═══

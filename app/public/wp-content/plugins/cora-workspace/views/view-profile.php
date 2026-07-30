@@ -9,7 +9,11 @@ $last_name  = get_user_meta( $user->ID, 'last_name', true );
 $phone      = get_user_meta( $user->ID, 'cora_phone', true );
 $avatar_url = get_user_meta( $user->ID, 'cora_avatar_url', true );
 
-// Generate circular initials fallback background color based on name hash
+// Custom Status Meta
+$custom_status = get_user_meta( $user->ID, 'cora_custom_status', true ) ?: 'Available';
+$custom_status_msg = get_user_meta( $user->ID, 'cora_custom_status_message', true ) ?: '';
+
+// Generate initials fallback background color based on name hash
 $full_name = trim( $user->display_name );
 if ( empty( $full_name ) ) {
     $full_name = $user->user_login;
@@ -39,6 +43,8 @@ $map = array(
 );
 $role_label = isset( $map[$role] ) ? $map[$role] : $role;
 
+$is_admin = current_user_can('manage_options') || in_array( $role, array( 'administrator', 'cora_manager', 'super_admin', 'agency_owner' ) );
+
 $agency_id = get_user_meta( $user->ID, 'cora_agency_id', true );
 $agencies  = cora_db_get_agencies();
 $agency_name = isset( $agencies[$agency_id] ) ? $agencies[$agency_id]['name'] : 'Default Agency';
@@ -53,189 +59,1097 @@ $joined_formatted = date( 'd/m/Y', strtotime( $joined_on ) );
 // Fetch active sessions
 $session_tokens = WP_Session_Tokens::get_instance( $user->ID );
 $sessions = $session_tokens->get_all();
+$session_count = count( $sessions );
+
+// Filter Attendance logs for current user
+$attendance_logs = get_option( 'cora_workspace_attendance_logs', array() );
+$user_attendance_logs = array();
+$today_punched_in = false;
+$today_punched_out = false;
+$today_date = date('Y-m-d');
+$user_email_lower = strtolower($user->user_email);
+$user_display_name_lower = strtolower($user->display_name);
+
+if ( is_array( $attendance_logs ) ) {
+    foreach ( $attendance_logs as $log ) {
+        $log_email = isset( $log['user_email'] ) ? strtolower($log['user_email']) : '';
+        $log_user = isset( $log['user'] ) ? strtolower($log['user']) : '';
+        if ( $log_email === $user_email_lower || $log_user === $user_display_name_lower ) {
+            $user_attendance_logs[] = $log;
+            
+            $timestamp = isset( $log['timestamp'] ) ? intval( $log['timestamp'] ) : 0;
+            if ($timestamp > 10000000000) {
+                $timestamp = intval($timestamp / 1000);
+            }
+            if ( date('Y-m-d', $timestamp) === $today_date ) {
+                if ( isset($log['type']) && $log['type'] === 'in' ) {
+                    $today_punched_in = true;
+                } elseif ( isset($log['type']) && $log['type'] === 'out' ) {
+                    $today_punched_out = true;
+                }
+            }
+        }
+    }
+}
+usort($user_attendance_logs, function($a, $b) {
+    $ta = isset( $a['timestamp'] ) ? intval( $a['timestamp'] ) : 0;
+    $tb = isset( $b['timestamp'] ) ? intval( $b['timestamp'] ) : 0;
+    return $tb - $ta;
+});
+$user_attendance_count = count( $user_attendance_logs );
+
+// Group user attendance logs by date for rendering check-in/out records
+$grouped_attendance = array();
+foreach ( $user_attendance_logs as $log ) {
+    $timestamp = isset( $log['timestamp'] ) ? intval( $log['timestamp'] ) : 0;
+    if ($timestamp > 10000000000) {
+        $timestamp = intval($timestamp / 1000);
+    }
+    $date_key = date('Y-m-d', $timestamp);
+    if ( ! isset( $grouped_attendance[$date_key] ) ) {
+        $grouped_attendance[$date_key] = array(
+            'date' => $date_key,
+            'in' => '—',
+            'out' => '—',
+            'geofence' => '—',
+            'distance' => '—'
+        );
+    }
+    $time_str = date('H:i:s', $timestamp);
+    if ( isset($log['type']) && $log['type'] === 'in' ) {
+        $grouped_attendance[$date_key]['in'] = $time_str;
+        $grouped_attendance[$date_key]['geofence'] = $log['geofence'] ?? '—';
+        $grouped_attendance[$date_key]['distance'] = $log['distance'] ?? '—';
+    } elseif ( isset($log['type']) && $log['type'] === 'out' ) {
+        $grouped_attendance[$date_key]['out'] = $time_str;
+    }
+}
+
+// Smart Activity Logger Engine (Last 7 Days, Deduplicated Major Actions)
+$all_activity_logs = function_exists('cora_db_get_activity_logs') ? cora_db_get_activity_logs() : array();
+$user_activity_logs = array();
+$seven_days_ago = time() - ( 7 * DAY_IN_SECONDS );
+
+if ( is_array( $all_activity_logs ) ) {
+    foreach ( $all_activity_logs as $log ) {
+        if ( isset( $log['user_id'] ) && intval( $log['user_id'] ) === intval( $user->ID ) ) {
+            $ts = isset( $log['timestamp'] ) ? intval( $log['timestamp'] ) : 0;
+            if ( $ts > 10000000000 ) {
+                $ts = intval( $ts / 1000 );
+            }
+            
+            // Only keep events from the last 7 days
+            if ( $ts >= $seven_days_ago ) {
+                $user_activity_logs[] = $log;
+            }
+        }
+    }
+}
+
+// Sort logs newest first
+usort($user_activity_logs, function($a, $b) {
+    $ta = isset( $a['timestamp'] ) ? intval( $a['timestamp'] ) : 0;
+    $tb = isset( $b['timestamp'] ) ? intval( $b['timestamp'] ) : 0;
+    return $tb - $ta;
+});
+
+// Deduplicate consecutive identical actions within 1 hour (Periodic filter)
+$filtered_logs = array();
+$last_seen = null;
+foreach ( $user_activity_logs as $log ) {
+    $ts = isset( $log['timestamp'] ) ? intval( $log['timestamp'] ) : 0;
+    if ($ts > 10000000000) {
+        $ts = intval($ts / 1000);
+    }
+    
+    $desc = $log['description'] ?? '';
+    $action = $log['action_type'] ?? '';
+    
+    if ( $last_seen && $last_seen['action_type'] === $action && $last_seen['description'] === $desc ) {
+        $last_ts = $last_seen['timestamp'];
+        if ($last_ts > 10000000000) {
+            $last_ts = intval($last_ts / 1000);
+        }
+        // Deduplicate events occurring within the same hour
+        if ( abs( $ts - $last_ts ) < HOUR_IN_SECONDS ) {
+            continue;
+        }
+    }
+    $filtered_logs[] = $log;
+    $last_seen = $log;
+}
+$user_activity_logs = $filtered_logs;
+$user_activity_count = count( $user_activity_logs );
+
+// Filter Client Tasks assigned to this user
+$all_tasks = get_option('cora_workspace_client_tasks', array());
+$user_tasks = array();
+if ( is_array( $all_tasks ) ) {
+    foreach ( $all_tasks as $task ) {
+        $assignee_id = isset( $task['assignee_id'] ) ? $task['assignee_id'] : '';
+        $assignee_name = isset( $task['assignee_name'] ) ? strtolower( $task['assignee_name'] ) : '';
+        
+        $is_assigned = false;
+        if ( $assignee_id === 'u1' && ( in_array('administrator', $user->roles) || in_array('cora_super_admin', $user->roles) ) ) {
+            $is_assigned = true;
+        } elseif ( strpos( $assignee_name, $user_display_name_lower ) !== false || 
+                  ( ! empty($first_name) && strpos( $assignee_name, strtolower($first_name) ) !== false ) ) {
+            $is_assigned = true;
+        }
+        
+        if ( $is_assigned ) {
+            $user_tasks[] = $task;
+        }
+    }
+}
+$user_task_count = count($user_tasks);
+
+// Filter Crew Shifts for current user
+$cora_crew_shifts = get_option( 'cora_crew_shifts', array() );
+$user_shifts = array();
+if ( is_array( $cora_crew_shifts ) ) {
+    foreach ( $cora_crew_shifts as $shift ) {
+        $crew = isset( $shift['crew'] ) ? $shift['crew'] : array();
+        $is_member = false;
+        foreach ( $crew as $cw ) {
+            $cw_lower = strtolower($cw);
+            if ( strpos( $cw_lower, $user_display_name_lower ) !== false || 
+                ( ! empty($first_name) && strpos( $cw_lower, strtolower($first_name) ) !== false ) ) {
+                $is_member = true;
+                break;
+            }
+        }
+        if ( $is_member ) {
+            $user_shifts[] = $shift;
+        }
+    }
+}
+$user_shift_count = count($user_shifts);
+
+// Fetch Leave Requests
+$leave_requests = get_option( 'cora_workspace_leave_requests', array() );
+$my_leaves = array();
+$team_pending_leaves = array();
+if ( is_array( $leave_requests ) ) {
+    foreach ( $leave_requests as $leave ) {
+        if ( intval( $leave['user_id'] ) === intval( $user->ID ) ) {
+            $my_leaves[] = $leave;
+        }
+        if ( $is_admin && $leave['status'] === 'pending' ) {
+            $team_pending_leaves[] = $leave;
+        }
+    }
+}
 ?>
 
+<style>
+    .profile-tab-btn.tab-active {
+        border-color: #09090b !important;
+        color: #09090b !important;
+    }
+    .dark .profile-tab-btn.tab-active {
+        border-color: #f4f4f5 !important;
+        color: #f4f4f5 !important;
+    }
+    .profile-pane {
+        display: none;
+    }
+    .profile-pane.pane-active {
+        display: block;
+        animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .cora-input {
+        background-color: #ffffff;
+        border: 1px solid #e4e4e7;
+        transition: all 0.2s ease;
+    }
+    .dark .cora-input {
+        background-color: #18181b;
+        border: 1px solid #27272a;
+        color: #f4f4f5;
+    }
+    .cora-input:focus {
+        border-color: #09090b;
+        box-shadow: 0 0 0 2px rgba(9, 9, 11, 0.05);
+    }
+    .dark .cora-input:focus {
+        border-color: #f4f4f5;
+        box-shadow: 0 0 0 2px rgba(244, 244, 245, 0.1);
+    }
+    .cora-glass-card {
+        background: #ffffff;
+        border: 1px solid #e4e4e7;
+        transition: all 0.25s ease;
+    }
+    .dark .cora-glass-card {
+        background: #18181b;
+        border: 1px solid #27272a;
+    }
+    .cora-glass-card:hover {
+        border-color: #d4d4d8;
+    }
+    .dark .cora-glass-card:hover {
+        border-color: #3f3f46;
+    }
+    .cora-status-dot {
+        box-shadow: 0 0 8px currentColor;
+    }
+
+    /* Bulletproof SaaS Drawer Engine CSS */
+    .cora-drawer-overlay {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background-color: rgba(9, 9, 11, 0.25) !important;
+        backdrop-filter: blur(4px) !important;
+        -webkit-backdrop-filter: blur(4px) !important;
+        z-index: 999999 !important;
+        display: flex !important;
+        justify-content: flex-end !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transition: opacity 0.3s ease !important;
+    }
+
+    .cora-drawer-overlay.drawer-open {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+
+    .cora-drawer-sheet {
+        background-color: #ffffff !important;
+        height: 100% !important;
+        width: 100% !important;
+        max-width: 460px !important;
+        box-shadow: -10px 0 25px -5px rgba(0, 0, 0, 0.08), -8px 0 10px -6px rgba(0, 0, 0, 0.08) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        transform: translateX(100%) !important;
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        border-left: 1px solid #e4e4e7 !important;
+    }
+
+    .dark .cora-drawer-sheet {
+        background-color: #18181b !important;
+        border-left: 1px solid #27272a !important;
+    }
+
+    .cora-drawer-overlay.drawer-open .cora-drawer-sheet {
+        transform: translateX(0) !important;
+    }
+
+    /* Hide scrollbars for chrome/safari/firefox */
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none !important;
+    }
+    .scrollbar-hide {
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
+    }
+
+    /* Mobile Responsive Tables to Cards Transformation */
+    @media (max-width: 767px) {
+        .responsive-table thead {
+            display: none !important;
+        }
+        .responsive-table tbody,
+        .responsive-table tr,
+        .responsive-table td {
+            display: block !important;
+            width: 100% !important;
+        }
+        .responsive-table tr {
+            background-color: #fafafa !important;
+            border: 1px solid #f4f4f5 !important;
+            border-radius: 12px !important;
+            padding: 12px 14px !important;
+            margin-bottom: 12px !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.01) !important;
+        }
+        .dark .responsive-table tr {
+            background-color: #202023 !important;
+            border: 1px solid #2d2d30 !important;
+        }
+        .responsive-table td {
+            border: 0 !important;
+            padding: 6px 0 !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            text-align: right !important;
+        }
+        .responsive-table td::before {
+            content: attr(data-label) !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            font-size: 9px !important;
+            color: #71717a !important;
+            text-align: left !important;
+            display: inline-block !important;
+        }
+        .dark .responsive-table td::before {
+            color: #a1a1aa !important;
+        }
+    }
+</style>
+
 <div class="space-y-6">
-    <div class="flex items-center justify-between">
-        <div class="cora-page-header flex items-center gap-3">
-            <span class="cora-page-emoji text-zinc-900 flex shrink-0">
-                <svg viewBox="0 0 24 24" width="30" height="30" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-            </span>
-            <div>
-                <h1 class="cora-page-title text-2xl font-bold tracking-tight text-zinc-900">My Profile</h1>
-                <p class="cora-section-desc text-xs text-zinc-500 mt-1">Manage your personal details, work credentials, and active login sessions.</p>
+    <!-- Redesigned Profile Header - 10X Premium Style -->
+    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs relative overflow-hidden">
+        <div class="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left z-10 w-full md:w-auto">
+            <!-- Premium Avatar with Edit Trigger -->
+            <div class="relative group cursor-pointer shrink-0">
+                <?php if ( ! empty( $avatar_url ) ) : ?>
+                    <img src="<?php echo esc_url( $avatar_url ); ?>" alt="Avatar" id="profile-avatar-img" class="w-24 h-24 rounded-full object-cover border-2 border-zinc-200 dark:border-zinc-800 shadow-sm transition-transform duration-300 group-hover:scale-105">
+                <?php else : ?>
+                    <div id="profile-avatar-fallback" class="w-24 h-24 rounded-full flex items-center justify-center text-white font-extrabold text-3xl border-2 border-zinc-200 dark:border-zinc-800 shadow-sm transition-transform duration-300 group-hover:scale-105" style="background-color: <?php echo esc_attr($color_hex); ?>">
+                        <?php echo esc_html( $initials ); ?>
+                    </div>
+                <?php endif; ?>
+                
+                <div class="absolute inset-0 bg-black/45 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300" onclick="document.getElementById('avatar-input').click()">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="#fff" stroke-width="2.2" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                </div>
+                <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="loadAvatarCrop(event)">
+            </div>
+            
+            <div class="space-y-2">
+                <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
+                    <h1 class="text-2xl font-extrabold text-zinc-900 dark:text-zinc-55 tracking-tight"><?php echo esc_html($full_name); ?></h1>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-sm">
+                        <?php echo esc_html($role_label); ?>
+                    </span>
+                    
+                    <!-- Dynamic Status Badge -->
+                    <?php
+                    $status_dot_color = 'text-zinc-400';
+                    $status_bg_color = 'bg-zinc-50 dark:bg-zinc-800 text-zinc-500';
+                    if ( $custom_status === 'Available' ) {
+                        $status_dot_color = 'text-emerald-500';
+                        $status_bg_color = 'bg-emerald-50/50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-405 border border-emerald-100/50 dark:border-emerald-900/30';
+                    } elseif ( in_array($custom_status, array('In a Shoot', 'Editing')) ) {
+                        $status_dot_color = 'text-amber-500';
+                        $status_bg_color = 'bg-amber-50/50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border border-amber-100/50 dark:border-amber-900/30';
+                    } elseif ( $custom_status === 'Do Not Disturb' ) {
+                        $status_dot_color = 'text-red-500';
+                        $status_bg_color = 'bg-red-50/50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-100/50 dark:border-red-900/30';
+                    }
+                    ?>
+                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase <?php echo $status_bg_color; ?>">
+                        <span class="w-1.5 h-1.5 rounded-full <?php echo $status_dot_color; ?> bg-current cora-status-dot"></span>
+                        <?php echo esc_html($custom_status); ?>
+                    </span>
+                </div>
+                
+                <?php if ( ! empty($custom_status_msg) ) : ?>
+                    <p class="text-xs text-zinc-600 dark:text-zinc-400 italic">"<?php echo esc_html($custom_status_msg); ?>"</p>
+                <?php endif; ?>
+                
+                <p class="text-xs text-zinc-500 dark:text-zinc-555 font-medium"><?php echo esc_html($branch_name); ?> · Office Workspace Roster · Joined <?php echo esc_html($joined_formatted); ?></p>
+            </div>
+        </div>
+
+        <!-- Premium Metric Blocks -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full md:w-auto z-10">
+            <div class="bg-zinc-50/30 dark:bg-zinc-800/10 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl p-3.5 text-center sm:text-left min-w-[110px]">
+                <span class="text-[9px] font-extrabold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest block">Attendance</span>
+                <span class="text-2xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight block mt-1"><?php echo $user_attendance_count; ?> <span class="text-xs text-zinc-400 font-bold">days</span></span>
+            </div>
+            <div class="bg-zinc-50/30 dark:bg-zinc-800/10 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl p-3.5 text-center sm:text-left min-w-[110px]">
+                <span class="text-[9px] font-extrabold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest block">My Tasks</span>
+                <span class="text-2xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight block mt-1"><?php echo $user_task_count; ?> <span class="text-xs text-zinc-400 font-bold">active</span></span>
+            </div>
+            <div class="bg-zinc-50/30 dark:bg-zinc-800/10 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl p-3.5 text-center sm:text-left min-w-[110px]">
+                <span class="text-[9px] font-extrabold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest block">Crew Shifts</span>
+                <span class="text-2xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight block mt-1"><?php echo $user_shift_count; ?> <span class="text-xs text-zinc-400 font-bold">roster</span></span>
+            </div>
+            <div class="bg-zinc-50/30 dark:bg-zinc-800/10 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl p-3.5 text-center sm:text-left min-w-[110px]">
+                <span class="text-[9px] font-extrabold text-zinc-400 dark:text-zinc-555 uppercase tracking-widest block">Audit Trail</span>
+                <span class="text-2xl font-black text-zinc-900 dark:text-zinc-55 tracking-tight block mt-1"><?php echo $user_activity_count; ?> <span class="text-xs text-zinc-400 font-bold">events</span></span>
             </div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Profile details & photo -->
-        <div class="lg:col-span-2 space-y-6">
-            <div class="cora-card bg-white border border-zinc-200/85 rounded-xl p-6 shadow-sm space-y-6">
-                <h3 class="text-sm font-bold text-zinc-900 border-b border-zinc-100 pb-3">Personal Information</h3>
-                
-                <div class="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
-                    <div class="relative group">
-                        <?php if ( ! empty( $avatar_url ) ) : ?>
-                            <img src="<?php echo esc_url( $avatar_url ); ?>" alt="Avatar" id="profile-avatar-img" class="w-20 h-20 rounded-full object-cover border border-zinc-200">
-                        <?php else : ?>
-                            <div id="profile-avatar-fallback" class="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-xl border border-zinc-200" style="background-color: <?php echo esc_attr($color_hex); ?>">
-                                <?php echo esc_html( $initials ); ?>
-                            </div>
-                        <?php endif; ?>
-                        <button onclick="document.getElementById('avatar-input').click()" class="absolute inset-0 bg-black/45 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="#fff" stroke-width="2" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                        </button>
-                        <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="loadAvatarCrop(event)">
-                    </div>
-                    
-                    <div class="flex-1 space-y-1">
-                        <h4 class="text-sm font-bold text-zinc-900"><?php echo esc_html($full_name); ?></h4>
-                        <p class="text-xs text-zinc-500"><?php echo esc_html($role_label); ?> · <?php echo esc_html($branch_name); ?></p>
-                        <p class="text-[10px] text-zinc-400">Max size 2MB. Square crop is forced.</p>
-                    </div>
+    <!-- Navigation Tabs -->
+    <div class="border-b border-zinc-200 dark:border-zinc-800 flex flex-nowrap overflow-x-auto gap-1 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+        <button onclick="switchProfileTab('tab-info')" id="btn-tab-info" class="profile-tab-btn shrink-0 border-b-2 border-transparent px-4 py-3 text-xs font-extrabold text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all flex items-center gap-2 cursor-pointer bg-transparent">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            Personal & Work Info
+        </button>
+        <button onclick="switchProfileTab('tab-status')" id="btn-tab-status" class="profile-tab-btn shrink-0 border-b-2 border-transparent px-4 py-3 text-xs font-extrabold text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all flex items-center gap-2 cursor-pointer bg-transparent">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            Duty Status & Leaves
+        </button>
+        <button onclick="switchProfileTab('tab-attendance')" id="btn-tab-attendance" class="profile-tab-btn shrink-0 border-b-2 border-transparent px-4 py-3 text-xs font-extrabold text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all flex items-center gap-2 cursor-pointer bg-transparent">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            Daily Attendance
+        </button>
+        <button onclick="switchProfileTab('tab-tasks')" id="btn-tab-tasks" class="profile-tab-btn shrink-0 border-b-2 border-transparent px-4 py-3 text-xs font-extrabold text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all flex items-center gap-2 cursor-pointer bg-transparent">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+            Tasks & Shifts
+        </button>
+        <button onclick="switchProfileTab('tab-activity')" id="btn-tab-activity" class="profile-tab-btn shrink-0 border-b-2 border-transparent px-4 py-3 text-xs font-extrabold text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all flex items-center gap-2 cursor-pointer bg-transparent">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            Activity Logs
+        </button>
+    </div>
+
+    <!-- Tab 1: Profile & Work Info -->
+    <div id="tab-info" class="profile-pane pane-active space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Personal details form -->
+                <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-6">
+                    <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Personal Details</h3>
+                    <form id="profile-info-form" onsubmit="coraSaveProfileInfo(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">First Name</label>
+                            <input type="text" id="profile-first-name" value="<?php echo esc_attr( $first_name ); ?>" required class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">Last Name</label>
+                            <input type="text" id="profile-last-name" value="<?php echo esc_attr( $last_name ); ?>" required class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">Email Address</label>
+                            <input type="email" value="<?php echo esc_attr( $user->user_email ); ?>" disabled class="cora-input w-full px-3 py-2.5 text-xs rounded-xl bg-zinc-50/50 dark:bg-zinc-800/40 text-zinc-500 dark:text-zinc-500 cursor-not-allowed border-dashed">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">Phone Number</label>
+                            <input type="text" id="profile-phone" value="<?php echo esc_attr( $phone ); ?>" class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none" placeholder="+91 99999 99999">
+                        </div>
+                        <div class="sm:col-span-2 flex justify-end">
+                            <button type="submit" class="px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-2xs">Save Changes</button>
+                        </div>
+                    </form>
                 </div>
 
-                <form id="profile-info-form" onsubmit="coraSaveProfileInfo(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1.5">First Name</label>
-                        <input type="text" id="profile-first-name" value="<?php echo esc_attr( $first_name ); ?>" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
+                <!-- SaaS Upgraded Security & Password Card -->
+                <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
+                    <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Security Credentials</h3>
+                    
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-2">
+                        <div class="space-y-1.5">
+                            <div class="flex items-center gap-2">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                <span class="text-xs font-extrabold text-zinc-800 dark:text-zinc-200">Account Password Protection</span>
+                            </div>
+                            <p class="text-[10px] text-zinc-500 dark:text-zinc-400">Encrypted with industry-standard hashing. Last active session audit is active.</p>
+                        </div>
+                        <button onclick="openPasswordDrawer()" class="px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-extrabold rounded-xl text-xs transition-all cursor-pointer border-0 shadow-xs">
+                            Update Account Password
+                        </button>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1.5">Last Name</label>
-                        <input type="text" id="profile-last-name" value="<?php echo esc_attr( $last_name ); ?>" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1.5">Email Address</label>
-                        <input type="email" value="<?php echo esc_attr( $user->user_email ); ?>" disabled class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg bg-zinc-50 text-zinc-500 cursor-not-allowed">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1.5">Phone Number</label>
-                        <input type="text" id="profile-phone" value="<?php echo esc_attr( $phone ); ?>" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950" placeholder="+91 99999 99999">
-                    </div>
-                    <div class="sm:col-span-2 flex justify-end">
-                        <button type="submit" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm">Save Changes</button>
-                    </div>
-                </form>
+                </div>
             </div>
 
-            <!-- Active Sessions list -->
-            <div class="cora-card bg-white border border-zinc-200/85 rounded-xl p-6 shadow-sm space-y-4">
-                <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
-                    <h3 class="text-sm font-bold text-zinc-900">Active Sessions</h3>
-                    <button onclick="coraLogOutOtherSessions()" class="text-zinc-600 hover:text-zinc-900 font-bold text-[10px] border border-zinc-200 px-2.5 py-1.5 rounded-lg bg-white hover:bg-zinc-50 cursor-pointer transition-colors shadow-sm">Log Out Other Sessions</button>
+            <!-- Work Information and Sessions Sidebar -->
+            <div class="space-y-6">
+                <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
+                    <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Work Information</h3>
+                    <div class="space-y-3.5 text-xs">
+                        <div class="flex justify-between">
+                            <span class="text-zinc-500 dark:text-zinc-400">Role</span>
+                            <span class="font-bold text-zinc-900 dark:text-zinc-200"><?php echo esc_html($role_label); ?></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-zinc-500 dark:text-zinc-400">Branch</span>
+                            <span class="font-bold text-zinc-900 dark:text-zinc-200"><?php echo esc_html($branch_name); ?></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-zinc-500 dark:text-zinc-400">Agency</span>
+                            <span class="font-bold text-zinc-900 dark:text-zinc-200"><?php echo esc_html($agency_name); ?></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-zinc-500 dark:text-zinc-400">Joined On</span>
+                            <span class="font-bold text-zinc-900 dark:text-zinc-200"><?php echo esc_html($joined_formatted); ?></span>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="divide-y divide-zinc-100">
-                    <?php
-                    $current_token = wp_get_session_token();
-                    foreach ( $sessions as $token_key => $sess ) :
-                        $is_current = ( $token_key === $current_token );
-                        $login_time = date( 'd M Y, H:i', $sess['login'] );
-                        // Parse simple device type
-                        $ua = $sess['ua'];
-                        $device = 'Unknown Browser';
-                        if ( strpos( $ua, 'Chrome' ) !== false ) $device = 'Chrome';
-                        elseif ( strpos( $ua, 'Firefox' ) !== false ) $device = 'Firefox';
-                        elseif ( strpos( $ua, 'Safari' ) !== false ) $device = 'Safari';
-                        
-                        $platform = 'Unknown OS';
-                        if ( strpos( $ua, 'Macintosh' ) !== false ) $platform = 'macOS';
-                        elseif ( strpos( $ua, 'Windows' ) !== false ) $platform = 'Windows';
-                        elseif ( strpos( $ua, 'iPhone' ) !== false ) $platform = 'iOS';
-                        elseif ( strpos( $ua, 'Android' ) !== false ) $platform = 'Android';
-                    ?>
-                        <div class="py-3 flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="text-zinc-400">
-                                    <?php if ( strpos( $ua, 'iPhone' ) !== false || strpos( $ua, 'Android' ) !== false ) : ?>
-                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
-                                    <?php else : ?>
-                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                                    <?php endif; ?>
-                                </div>
-                                <div>
-                                    <p class="text-xs font-semibold text-zinc-800"><?php echo esc_html( "$device on $platform" ); ?> <?php if ($is_current) : ?><span class="text-[9px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded ml-1.5">This device</span><?php endif; ?></p>
-                                    <p class="text-[10px] text-zinc-400"><?php echo esc_html($sess['ip']); ?> · Logged in: <?php echo esc_html($login_time); ?></p>
+
+                <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
+                    <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
+                        <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider text-[11px] text-zinc-400">Active Sessions</h3>
+                        <button onclick="coraLogOutOtherSessions()" class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white font-extrabold text-[9px] border border-zinc-200 dark:border-zinc-700 px-2 py-1 rounded-lg bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-2xs border-0 cursor-pointer">Logout Others</button>
+                    </div>
+                    
+                    <div class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                        <?php
+                        $current_token = wp_get_session_token();
+                        foreach ( $sessions as $token_key => $sess ) :
+                            $is_current = ( $token_key === $current_token );
+                            $login_time = date( 'd M H:i', $sess['login'] );
+                            $ua = $sess['ua'];
+                            $device = 'Browser';
+                            if ( strpos( $ua, 'Chrome' ) !== false ) $device = 'Chrome';
+                            elseif ( strpos( $ua, 'Firefox' ) !== false ) $device = 'Firefox';
+                            elseif ( strpos( $ua, 'Safari' ) !== false ) $device = 'Safari';
+                            
+                            $platform = 'OS';
+                            if ( strpos( $ua, 'Macintosh' ) !== false ) $platform = 'macOS';
+                            elseif ( strpos( $ua, 'Windows' ) !== false ) $platform = 'Windows';
+                            elseif ( strpos( $ua, 'iPhone' ) !== false ) $platform = 'iOS';
+                            elseif ( strpos( $ua, 'Android' ) !== false ) $platform = 'Android';
+                        ?>
+                            <div class="py-3 flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="text-zinc-500 dark:text-zinc-500">
+                                        <?php if ( strpos( $ua, 'iPhone' ) !== false || strpos( $ua, 'Android' ) !== false ) : ?>
+                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                                        <?php else : ?>
+                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-zinc-800 dark:text-zinc-200">
+                                            <?php echo esc_html( "$device on $platform" ); ?>
+                                            <?php if ($is_current) : ?>
+                                                <span class="text-[8px] font-extrabold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded-full border border-emerald-100/50 dark:border-emerald-900/30 ml-1">Current</span>
+                                            <?php endif; ?>
+                                        </p>
+                                        <p class="text-[9px] text-zinc-400 dark:text-zinc-500 font-medium"><?php echo esc_html($sess['ip']); ?> · <?php echo esc_html($login_time); ?></p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Work Info & Password Update side cards -->
-        <div class="space-y-6">
-            <!-- Work info details -->
-            <div class="cora-card bg-white border border-zinc-200/85 rounded-xl p-6 shadow-sm space-y-4">
-                <h3 class="text-sm font-bold text-zinc-900 border-b border-zinc-100 pb-3">Work Information</h3>
-                <div class="space-y-3.5 text-xs">
-                    <div class="flex justify-between">
-                        <span class="text-zinc-500">Role</span>
-                        <span class="font-semibold text-zinc-900"><?php echo esc_html($role_label); ?></span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-zinc-500">Branch</span>
-                        <span class="font-semibold text-zinc-900"><?php echo esc_html($branch_name); ?></span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-zinc-500">Agency</span>
-                        <span class="font-semibold text-zinc-900"><?php echo esc_html($agency_name); ?></span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-zinc-500">Joined On</span>
-                        <span class="font-semibold text-zinc-900"><?php echo esc_html($joined_formatted); ?></span>
-                    </div>
+    <!-- Tab 2: Duty Status & Leaves -->
+    <div id="tab-status" class="profile-pane space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Duty Status Manager Card -->
+            <div class="lg:col-span-1 space-y-6">
+                <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-5">
+                    <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Duty Status Settings</h3>
+                    
+                    <form id="profile-status-form" onsubmit="coraUpdateUserStatus(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">Availability Status</label>
+                            <select id="user-status-select" class="cora-input w-full px-3 py-2 text-xs rounded-xl focus:outline-none font-bold">
+                                <option value="Available" <?php selected($custom_status, 'Available'); ?>>Available / Active</option>
+                                <option value="In a Shoot" <?php selected($custom_status, 'In a Shoot'); ?>>In a Shoot</option>
+                                <option value="Editing" <?php selected($custom_status, 'Editing'); ?>>Editing / Productive</option>
+                                <option value="In a Meeting" <?php selected($custom_status, 'In a Meeting'); ?>>In a Meeting</option>
+                                <option value="Do Not Disturb" <?php selected($custom_status, 'Do Not Disturb'); ?>>Do Not Disturb</option>
+                                <option value="On Leave" <?php selected($custom_status, 'On Leave'); ?>>On Leave / Away</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">Status Description message</label>
+                            <input type="text" id="user-status-msg" value="<?php echo esc_attr($custom_status_msg); ?>" class="cora-input w-full px-3 py-2 text-xs rounded-xl focus:outline-none" placeholder="e.g. Scouting Udaipur wedding site...">
+                        </div>
+                        <button type="submit" class="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center justify-center gap-2">
+                            Update Status Broadcast
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Request Leave Request Card -->
+                <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
+                    <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Request Leave Facility</h3>
+                    
+                    <form id="leave-request-form" onsubmit="coraRequestLeave(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">Leave Type</label>
+                            <select id="leave-type" class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none">
+                                <option value="Casual Leave">Casual Leave</option>
+                                <option value="Medical Leave">Medical Leave / Sick</option>
+                                <option value="Earned Leave">Earned Leave</option>
+                                <option value="Unpaid Leave">Unpaid Leave</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">Start Date</label>
+                                <input type="date" id="leave-start" required class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">End Date</label>
+                                <input type="date" id="leave-end" required class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">Reason for request</label>
+                            <textarea id="leave-reason" required rows="2" class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none resize-none" placeholder="State reason for leave request..."></textarea>
+                        </div>
+                        <button type="submit" class="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-sm">
+                            Submit Request
+                        </button>
+                    </form>
                 </div>
             </div>
 
-            <!-- Password update form -->
-            <div class="cora-card bg-white border border-zinc-200/85 rounded-xl p-6 shadow-sm space-y-4">
-                <h3 class="text-sm font-bold text-zinc-900 border-b border-zinc-100 pb-3">Security & Password</h3>
-                <form id="profile-password-form" onsubmit="coraSaveProfilePassword(event)" class="space-y-4">
+            <!-- Leaves Board Column -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Administrative Approvals Board (Only for Admins) -->
+                <?php if ( $is_admin ) : ?>
+                    <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
+                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
+                            <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-50 uppercase tracking-wider text-[11px] text-zinc-400">Team Leave Approvals</h3>
+                            <span class="bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-400 text-[9px] font-black uppercase px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-900/30">
+                                <?php echo count($team_pending_leaves); ?> Pending
+                            </span>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <?php if ( empty($team_pending_leaves) ) : ?>
+                                <p class="text-xs text-zinc-400 dark:text-zinc-500 py-4 text-center">Zero pending leave requests to approve.</p>
+                            <?php else : ?>
+                                <?php foreach ( $team_pending_leaves as $request ) : 
+                                    $sub_time = date('d M Y, H:i', $request['submitted_at']);
+                                ?>
+                                    <div class="p-4 bg-zinc-50/50 dark:bg-zinc-800/20 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                        <div class="space-y-1">
+                                            <div class="flex items-center gap-2">
+                                                <h4 class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100"><?php echo esc_html($request['user_name']); ?></h4>
+                                                <span class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-305"><?php echo esc_html($request['type']); ?></span>
+                                            </div>
+                                            <p class="text-[10px] text-zinc-555 dark:text-zinc-400 font-medium">Dates: <?php echo esc_html($request['start_date']); ?> to <?php echo esc_html($request['end_date']); ?></p>
+                                            <p class="text-xs text-zinc-600 dark:text-zinc-350 italic mt-1 font-medium">"<?php echo esc_html($request['reason']); ?>"</p>
+                                            <span class="text-[8px] text-zinc-400 block pt-1">Submitted: <?php echo $sub_time; ?></span>
+                                        </div>
+                                        
+                                        <div class="flex gap-2 w-full sm:w-auto shrink-0 font-extrabold">
+                                            <button onclick="coraUpdateLeaveStatus('<?php echo $request['id']; ?>', 'rejected')" class="flex-1 sm:flex-none px-3.5 py-2 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-755 text-red-655 dark:text-red-400 rounded-xl text-[10px] transition-colors cursor-pointer border-0 font-extrabold">Reject</button>
+                                            <button onclick="coraUpdateLeaveStatus('<?php echo $request['id']; ?>', 'approved')" class="flex-1 sm:flex-none px-3.5 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 rounded-xl text-[10px] transition-colors cursor-pointer border-0 font-extrabold">Approve</button>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Personal Leave Requests History -->
+                <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
+                    <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">My Leave Applications</h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs responsive-table">
+                            <thead>
+                                <tr class="bg-zinc-50 dark:bg-zinc-800/80 text-zinc-500 dark:text-zinc-400 font-bold border-b border-zinc-200 dark:border-zinc-850">
+                                    <th class="p-3">Type</th>
+                                    <th class="p-3">Duration</th>
+                                    <th class="p-3">Reason</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3">Applied</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                                <?php if ( empty($my_leaves) ) : ?>
+                                    <tr>
+                                        <td colspan="5" class="p-4 text-center text-zinc-400 dark:text-zinc-500">No leave requests submitted yet.</td>
+                                    </tr>
+                                <?php else : ?>
+                                    <?php foreach ( $my_leaves as $leave ) : 
+                                        $applied_at = date('d M Y', $leave['submitted_at']);
+                                        $lbl_status = 'Pending';
+                                        $status_style = 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30';
+                                        if ( $leave['status'] === 'approved' ) {
+                                            $lbl_status = 'Approved';
+                                            $status_style = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-450 border border-emerald-100 dark:border-emerald-900/30';
+                                        } elseif ( $leave['status'] === 'rejected' ) {
+                                            $lbl_status = 'Rejected';
+                                            $status_style = 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400 border border-red-100 dark:border-red-900/30';
+                                        }
+                                    ?>
+                                        <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 text-zinc-700 dark:text-zinc-300">
+                                            <td class="p-3 font-semibold" data-label="Type"><?php echo esc_html($leave['type']); ?></td>
+                                            <td class="p-3 whitespace-nowrap font-medium" data-label="Duration"><?php echo esc_html($leave['start_date']); ?> to <?php echo esc_html($leave['end_date']); ?></td>
+                                            <td class="p-3 max-w-[200px] truncate" data-label="Reason"><?php echo esc_html($leave['reason']); ?></td>
+                                            <td class="p-3" data-label="Status">
+                                                <span class="px-2 py-0.5 rounded text-[8px] font-black uppercase <?php echo $status_style; ?>">
+                                                    <?php echo $lbl_status; ?>
+                                                </span>
+                                            </td>
+                                            <td class="p-3 text-zinc-500 dark:text-zinc-500" data-label="Applied"><?php echo $applied_at; ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 3: Daily Attendance Pane -->
+    <div id="tab-attendance" class="profile-pane space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Punch Widget -->
+            <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
+                <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400 font-extrabold font-bold">Today's Attendance</h3>
+                
+                <div class="space-y-4 py-2">
+                    <div class="flex items-center gap-3">
+                        <span class="relative flex h-3 w-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 <?php echo $today_punched_in && !$today_punched_out ? 'bg-emerald-400' : 'bg-zinc-300 dark:bg-zinc-650'; ?>"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 <?php echo $today_punched_in && !$today_punched_out ? 'bg-emerald-500' : 'bg-zinc-400'; ?>"></span>
+                        </span>
+                        <div>
+                            <p class="text-xs font-bold text-zinc-800 dark:text-zinc-200">
+                                <?php if ($today_punched_out) : ?>
+                                    Duty Completed
+                                <?php elseif ($today_punched_in) : ?>
+                                    Active Duty (Punched In)
+                                <?php else : ?>
+                                    Not Punched In
+                                <?php endif; ?>
+                            </p>
+                            <p class="text-[9px] text-zinc-500 dark:text-zinc-555">GPS geofenced coordinates punch validation is active</p>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-2 flex flex-col gap-2">
+                        <?php if ( ! $today_punched_in ) : ?>
+                            <button onclick="coraPunchAttendance('in')" class="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center justify-center gap-2">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+                                Punch Clock In
+                            </button>
+                        <?php elseif ( ! $today_punched_out ) : ?>
+                            <button onclick="coraPunchAttendance('out')" class="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center justify-center gap-2">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                                Punch Clock Out
+                            </button>
+                        <?php else : ?>
+                            <button disabled class="w-full py-2.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 font-extrabold rounded-xl text-xs cursor-not-allowed border-0">
+                                Punch Card Completed
+                            </button>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <div id="punch-status-text" class="text-[9px] text-zinc-500 font-bold text-center hidden"></div>
+                </div>
+            </div>
+            
+            <!-- Attendance History -->
+            <div class="lg:col-span-2 cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
+                <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Monthly Punch Card Records</h3>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs responsive-table">
+                        <thead>
+                            <tr class="bg-zinc-50 dark:bg-zinc-800/80 text-zinc-500 dark:text-zinc-400 font-bold border-b border-zinc-200 dark:border-zinc-850">
+                                <th class="p-3">Date</th>
+                                <th class="p-3">Punched In</th>
+                                <th class="p-3">Punched Out</th>
+                                <th class="p-3">GPS Geofence</th>
+                                <th class="p-3">Distance</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                            <?php if ( empty($grouped_attendance) ) : ?>
+                                <tr>
+                                    <td colspan="5" class="p-4 text-center text-zinc-400 dark:text-zinc-500">No punch card records found for this month.</td>
+                                </tr>
+                            <?php else : ?>
+                                <?php foreach ( $grouped_attendance as $record ) : 
+                                    $rec_date = date('d M Y', strtotime($record['date']));
+                                ?>
+                                    <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 text-zinc-700 dark:text-zinc-300">
+                                        <td class="p-3 font-semibold" data-label="Date"><?php echo $rec_date; ?></td>
+                                        <td class="p-3 text-emerald-600 dark:text-emerald-450 font-bold" data-label="Punched In"><?php echo esc_html($record['in']); ?></td>
+                                        <td class="p-3 text-zinc-500 dark:text-zinc-400" data-label="Punched Out"><?php echo esc_html($record['out']); ?></td>
+                                        <td class="p-3" data-label="GPS Geofence">
+                                            <span class="px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/50 text-zinc-800 dark:text-zinc-355">
+                                                <?php echo esc_html($record['geofence']); ?>
+                                            </span>
+                                        </td>
+                                        <td class="p-3 text-zinc-500 dark:text-zinc-500" data-label="Distance"><?php echo esc_html($record['distance']); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 4: Tasks & Shifts -->
+    <div id="tab-tasks" class="profile-pane space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Tasks Column -->
+            <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
+                <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">My Tasks</h3>
+                
+                <div class="space-y-3">
+                    <?php if ( empty($user_tasks) ) : ?>
+                        <p class="text-xs text-zinc-400 dark:text-zinc-500 py-4 text-center">No active tasks assigned to you.</p>
+                    <?php else : ?>
+                        <?php foreach ( $user_tasks as $task ) : 
+                            $priority = $task['priority'] ?? 'medium';
+                            $status = $task['status'] ?? 'todo';
+                            $due = !empty($task['due_date']) ? date('d M Y', strtotime($task['due_date'])) : 'No due date';
+                            
+                            $prio_class = 'bg-zinc-50 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700/50';
+                            if ( $priority === 'high' || $priority === 'urgent' ) {
+                                $prio_class = 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-800 dark:text-zinc-250 font-extrabold border-zinc-300 dark:border-zinc-700';
+                            }
+                            
+                            $status_label = 'To Do';
+                            $status_class = 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300';
+                            if ( $status === 'in_progress' || $status === 'inprogress' ) {
+                                $status_label = 'In Progress';
+                                $status_class = 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30';
+                            } elseif ( $status === 'client_review' || $status === 'review' ) {
+                                $status_label = 'Review';
+                                $status_class = 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 border border-blue-100 dark:border-blue-900/30';
+                            } elseif ( $status === 'done' ) {
+                                $status_label = 'Completed';
+                                $status_class = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-450 border border-emerald-100 dark:border-emerald-900/30';
+                            } elseif ( $status === 'blocked' ) {
+                                $status_label = 'Blocked';
+                                $status_class = 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-455 border border-red-100 dark:border-red-900/30';
+                            }
+                        ?>
+                            <div class="p-3.5 bg-zinc-50/50 dark:bg-zinc-800/20 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl space-y-2 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all">
+                                <div class="flex justify-between items-start gap-3">
+                                    <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 leading-tight"><?php echo esc_html($task['title']); ?></h4>
+                                    <span class="inline-flex shrink-0 px-2 py-0.5 rounded text-[8px] font-extrabold uppercase border <?php echo $prio_class; ?>"><?php echo esc_html($priority); ?></span>
+                                </div>
+                                <p class="text-[10px] text-zinc-500 dark:text-zinc-400 line-clamp-2"><?php echo esc_html($task['desc'] ?? 'No description provided.'); ?></p>
+                                <div class="flex justify-between items-center text-[10px] text-zinc-500 dark:text-zinc-500 pt-1">
+                                    <span>Due: <?php echo $due; ?></span>
+                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase <?php echo $status_class; ?>"><?php echo $status_label; ?></span>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Shifts Column -->
+            <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
+                <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">My Shifts Roster</h3>
+                
+                <div class="space-y-3">
+                    <?php if ( empty($user_shifts) ) : ?>
+                        <p class="text-xs text-zinc-400 dark:text-zinc-500 py-4 text-center">No shifts scheduled for your user profile.</p>
+                    <?php else : ?>
+                        <?php foreach ( $user_shifts as $shift ) : 
+                            $day_name = esc_html($shift['day'] ?? 'Monday');
+                            $activity = esc_html($shift['activity'] ?? 'General Duty');
+                            $start = esc_html($shift['start'] ?? '10:00 AM');
+                            $end = esc_html($shift['end'] ?? '06:00 PM');
+                            $venue = esc_html($shift['venue'] ?? 'Office / Main Branch');
+                        ?>
+                            <div class="p-3.5 bg-zinc-50/50 dark:bg-zinc-800/20 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl space-y-2">
+                                <div class="flex justify-between items-center gap-2">
+                                    <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/50"><?php echo $day_name; ?></span>
+                                    <span class="text-[10px] font-mono text-zinc-500 dark:text-zinc-500"><?php echo "$start - $end"; ?></span>
+                                </div>
+                                <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 mt-1"><?php echo $activity; ?></h4>
+                                <div class="flex items-center gap-1 text-[9px] text-zinc-500 dark:text-zinc-455 mt-1.5">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                    <span class="truncate"><?php echo $venue; ?></span>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 5: Smart Activity Logs (Piggy Nation & 7 Days Windowed) -->
+    <div id="tab-activity" class="profile-pane space-y-6">
+        <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-zinc-100 dark:border-zinc-800 pb-3">
+                <div>
+                    <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider text-[11px] text-zinc-400">My Activities & Logs</h3>
+                    <p class="text-[9px] text-zinc-450 mt-0.5 uppercase tracking-wider font-extrabold text-emerald-600 dark:text-emerald-450">Displaying major actions within a 7-day rolling window</p>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs responsive-table">
+                    <thead>
+                        <tr class="bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 font-bold border-b border-zinc-200 dark:border-zinc-850">
+                            <th class="p-3">Time</th>
+                            <th class="p-3">Event Type</th>
+                            <th class="p-3">Description</th>
+                            <th class="p-3">Source IP</th>
+                            <th class="p-3">Device / Platform</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activity-logs-table-body" class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                        <?php if ( empty($user_activity_logs) ) : ?>
+                            <tr>
+                                <td colspan="5" class="p-4 text-center text-zinc-400 dark:text-zinc-500">No activity events logged for your user profile in the last 7 days.</td>
+                            </tr>
+                        <?php else : ?>
+                            <?php foreach ( $user_activity_logs as $log ) : 
+                                $log_time = isset($log['timestamp']) ? date('d M Y, H:i', $log['timestamp']) : '—';
+                                $action_type = esc_html($log['action_type'] ?? 'Action');
+                                $desc = esc_html($log['description'] ?? '');
+                                $ip = esc_html($log['ip'] ?? '127.0.0.1');
+                                
+                                $device_raw = $log['device'] ?? '';
+                                $short_device = 'Browser';
+                                if (strpos($device_raw, 'Chrome') !== false) $short_device = 'Chrome';
+                                elseif (strpos($device_raw, 'Safari') !== false) $short_device = 'Safari';
+                                elseif (strpos($device_raw, 'Firefox') !== false) $short_device = 'Firefox';
+                                
+                                $short_os = 'OS';
+                                if (strpos($device_raw, 'Mac') !== false) $short_os = 'macOS';
+                                elseif (strpos($device_raw, 'Win') !== false) $short_os = 'Windows';
+                                elseif (strpos($device_raw, 'Android') !== false) $short_os = 'Android';
+                                elseif (strpos($device_raw, 'iPhone') !== false) $short_os = 'iOS';
+                            ?>
+                                <tr class="hover:bg-zinc-50/55 dark:hover:bg-zinc-800/30 text-zinc-700 dark:text-zinc-300">
+                                    <td class="p-3 whitespace-nowrap" data-label="Time"><?php echo $log_time; ?></td>
+                                    <td class="p-3 whitespace-nowrap" data-label="Event Type">
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/50 text-zinc-800 dark:text-zinc-300">
+                                            <?php echo $action_type; ?>
+                                        </span>
+                                    </td>
+                                    <td class="p-3" data-label="Description"><?php echo $desc; ?></td>
+                                    <td class="p-3 font-mono text-[10px]" data-label="Source IP"><?php echo $ip; ?></td>
+                                    <td class="p-3 whitespace-nowrap text-zinc-500 dark:text-zinc-500" data-label="Device/OS"><?php echo "$short_device on $short_os"; ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Dynamic Piggy Nation Footer -->
+            <div id="activity-pagination-container" class="pt-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
+                <span id="activity-pagination-info">Showing 1-10 of 10 entries</span>
+                <div class="flex items-center gap-2 font-extrabold">
+                    <button onclick="changeActivityPage(-1)" id="btn-activity-prev" class="px-3 py-1.5 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-zinc-755 dark:text-zinc-300 border-0">Previous</button>
+                    <button onclick="changeActivityPage(1)" id="btn-activity-next" class="px-3 py-1.5 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-zinc-755 dark:text-zinc-300 border-0">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ PREMIUM SAAS MULTI-STEP PASSWORD DRAWER SHEET ═════════════════════════ -->
+<div id="cora-password-drawer-sheet" class="cora-drawer-overlay">
+    <div class="cora-drawer-sheet" id="password-drawer-card">
+        <!-- Header -->
+        <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-850/40">
+            <div>
+                <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100">Update Account Password</h3>
+                <p class="text-[9px] text-zinc-450 mt-0.5 uppercase tracking-wider font-extrabold">Identity Verification & Reset</p>
+            </div>
+            <button class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-1 bg-transparent border-0" onclick="closePasswordDrawer()">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        
+        <!-- Steps Container -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+            <!-- Step 1: Current Password Verification -->
+            <div id="pass-step-1" class="space-y-4">
+                <div class="space-y-1.5">
+                    <span class="text-[9px] font-black uppercase text-zinc-455 tracking-wider">Step 01 of 02</span>
+                    <h4 class="text-xs font-black text-zinc-900 dark:text-zinc-55">Verify Your Current Identity</h4>
+                    <p class="text-[10px] text-zinc-500 dark:text-zinc-400 leading-relaxed">To ensure secure updates, confirm your current password before configuring new credentials.</p>
+                </div>
+                
+                <div class="space-y-3">
                     <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1.5">Current Password</label>
-                        <input type="password" id="profile-curr-pass" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-955">
+                        <label class="block text-[10px] font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider">Current Password</label>
+                        <input type="password" id="drawer-curr-pass" class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none" placeholder="Enter active password...">
+                    </div>
+                    
+                    <button onclick="verifyCurrentPasswordStep()" id="btn-verify-identity" class="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center justify-center gap-2">
+                        Verify Identity Credentials
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: New Password Setup (Hidden Initially) -->
+            <div id="pass-step-2" class="space-y-4" style="display: none;">
+                <div class="space-y-1.5">
+                    <span class="text-[9px] font-black uppercase text-emerald-600 dark:text-emerald-450 tracking-wider">Step 02 of 02 · Identity Verified</span>
+                    <h4 class="text-xs font-black text-zinc-900 dark:text-zinc-55">Set Up Your New Credentials</h4>
+                    <p class="text-[10px] text-zinc-500 dark:text-zinc-400 leading-relaxed">Choose a strong, unique password to replace your active workspace credentials.</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider">New Password</label>
+                        <input type="password" id="drawer-new-pass" oninput="validatePasswordStrength()" class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none" placeholder="At least 8 characters...">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1.5">New Password</label>
-                        <input type="password" id="profile-new-pass" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-955">
+                        <label class="block text-[10px] font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider">Confirm New Password</label>
+                        <input type="password" id="drawer-confirm-pass" oninput="validatePasswordStrength()" class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none" placeholder="Re-type new password...">
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-zinc-800 mb-1.5">Confirm New Password</label>
-                        <input type="password" id="profile-confirm-pass" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-955">
+                    
+                    <!-- Real-time Password Strength Indicator Bar -->
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between items-center text-[9px] font-extrabold uppercase">
+                            <span class="text-zinc-450">Strength Indicator</span>
+                            <span id="strength-label" class="text-zinc-400">Weak</span>
+                        </div>
+                        <div class="w-full h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                            <div id="strength-progress" class="w-1/4 h-full bg-red-500 transition-all duration-300"></div>
+                        </div>
                     </div>
-                    <button type="submit" class="w-full py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm">Update Password</button>
-                </form>
+
+                    <!-- Criteria Checklist -->
+                    <div class="space-y-2 py-2 bg-zinc-50/50 dark:bg-zinc-800/10 rounded-xl p-3 border border-zinc-100 dark:border-zinc-800/50">
+                        <p class="text-[9px] font-black uppercase text-zinc-455 tracking-wider mb-1.5">Requirements Checklist</p>
+                        <div class="grid grid-cols-2 gap-2 text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
+                            <div class="flex items-center gap-1.5" id="req-len">
+                                <span class="chk-icon text-zinc-350">•</span> At least 8 characters
+                            </div>
+                            <div class="flex items-center gap-1.5" id="req-up">
+                                <span class="chk-icon text-zinc-350">•</span> One uppercase letter
+                            </div>
+                            <div class="flex items-center gap-1.5" id="req-lo">
+                                <span class="chk-icon text-zinc-350">•</span> One lowercase letter
+                            </div>
+                            <div class="flex items-center gap-1.5" id="req-num">
+                                <span class="chk-icon text-zinc-350">•</span> One digit number
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="saveNewPasswordAction()" id="btn-save-new-pass" disabled class="w-full py-2.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-555 font-extrabold rounded-xl text-xs transition-colors cursor-not-allowed border-0 shadow-sm flex items-center justify-center gap-2">
+                        Apply Security Update
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <!-- ═══ AVATAR CROP DRAWER SHEET ═════════════════════════════════════════════ -->
-<div id="cora-avatar-crop-dlg" class="fixed inset-0 z-[99999] bg-zinc-900/40 backdrop-filter blur-[2px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="avatar-crop-card">
-        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
-            <h3 class="text-sm font-bold text-zinc-900">Crop Profile Photo</h3>
-            <button class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeAvatarCrop()">
+<div id="cora-avatar-crop-dlg" class="cora-drawer-overlay">
+    <div class="cora-drawer-sheet" id="avatar-crop-card">
+        <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-800/40">
+            <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100">Crop Profile Photo</h3>
+            <button class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-1 bg-transparent border-0" onclick="closeAvatarCrop()">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
         
-        <div class="flex-1 overflow-y-auto p-6 flex flex-col items-center justify-center bg-zinc-50/20">
-            <div class="relative w-72 h-72 border border-dashed border-zinc-300 rounded-lg overflow-hidden flex items-center justify-center bg-zinc-100">
+        <div class="flex-1 overflow-y-auto p-6 flex flex-col items-center justify-center bg-zinc-50/20 dark:bg-zinc-900/10">
+            <div class="relative w-72 h-72 border border-dashed border-zinc-300 dark:border-zinc-700 rounded-lg overflow-hidden flex items-center justify-center bg-zinc-100 dark:bg-zinc-800">
                 <canvas id="crop-canvas" class="max-w-full max-h-full"></canvas>
             </div>
-            <p class="text-[10px] text-zinc-400 mt-4 text-center">Drag inside the canvas selection window to adjust position before saving.</p>
+            <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-4 text-center">Drag inside the canvas selection window to adjust position before saving.</p>
         </div>
         
-        <div class="p-5 border-t border-zinc-200 bg-zinc-50/50 flex items-center justify-end gap-3">
-            <button onclick="closeAvatarCrop()" class="px-4 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-semibold rounded-lg text-xs transition-colors cursor-pointer shadow-sm">Cancel</button>
-            <button onclick="saveCroppedAvatar()" class="px-5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm">Apply Crop</button>
+        <div class="p-5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/40 flex items-center justify-end gap-3 font-extrabold">
+            <button onclick="closeAvatarCrop()" class="px-4 py-2 border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-750 text-zinc-700 dark:text-zinc-300 rounded-lg text-xs transition-colors cursor-pointer shadow-xs border-0">Cancel</button>
+            <button onclick="saveCroppedAvatar()" class="px-5 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 rounded-lg text-xs transition-colors cursor-pointer shadow-xs border-0">Apply Crop</button>
         </div>
     </div>
 </div>
@@ -245,6 +1159,328 @@ $sessions = $session_tokens->get_all();
     var cropCanvas = document.getElementById('crop-canvas');
     var cropCtx = cropCanvas.getContext('2d');
     var cropImg = new Image();
+
+    // Custom Profile Tab Switcher
+    function switchProfileTab(tabId) {
+        $('.profile-pane').removeClass('pane-active');
+        $('#' + tabId).addClass('pane-active');
+        
+        $('.profile-tab-btn').removeClass('tab-active');
+        $('#btn-' + tabId).addClass('tab-active');
+        
+        localStorage.setItem('cora_profile_active_tab', tabId);
+        
+        if (tabId === 'tab-activity') {
+            paginateActivityLogs();
+        }
+    }
+
+    $(document).ready(function() {
+        var activeTab = localStorage.getItem('cora_profile_active_tab') || 'tab-info';
+        switchProfileTab(activeTab);
+    });
+
+    // ─── DYNAMIC PAGINATION ENGINE FOR ACTIVITY LOGS ──────────────────────────
+    var activityCurrentPage = 1;
+    var activityRowsPerPage = 10;
+    
+    function paginateActivityLogs() {
+        var rows = $('#activity-logs-table-body tr');
+        var totalRows = rows.length;
+        
+        // Hide pagination footer if there are no logs or table is empty
+        if (totalRows <= 1 && rows.find('td').attr('colspan') !== undefined) {
+            $('#activity-pagination-container').hide();
+            return;
+        }
+        
+        $('#activity-pagination-container').show();
+        var totalPages = Math.ceil(totalRows / activityRowsPerPage);
+        if (totalPages < 1) totalPages = 1;
+        
+        if (activityCurrentPage < 1) activityCurrentPage = 1;
+        if (activityCurrentPage > totalPages) activityCurrentPage = totalPages;
+        
+        rows.hide();
+        var start = (activityCurrentPage - 1) * activityRowsPerPage;
+        var end = start + activityRowsPerPage;
+        
+        rows.slice(start, end).show();
+        
+        // Update footer description info
+        var showingStart = start + 1;
+        var showingEnd = Math.min(end, totalRows);
+        $('#activity-pagination-info').text(`Showing ${showingStart}-${showingEnd} of ${totalRows} entries (Last 7 Days)`);
+        
+        // Disable page buttons at endpoints
+        $('#btn-activity-prev').prop('disabled', activityCurrentPage === 1);
+        $('#btn-activity-next').prop('disabled', activityCurrentPage === totalPages);
+    }
+    
+    function changeActivityPage(dir) {
+        activityCurrentPage += dir;
+        paginateActivityLogs();
+    }
+
+    // ─── UPGRADED SAAS PASSWORD RESET ENGINE ─────────────────────────────────
+    function openPasswordDrawer() {
+        // Reset steps
+        $('#pass-step-1').show();
+        $('#pass-step-2').hide();
+        $('#drawer-curr-pass').val('');
+        $('#drawer-new-pass').val('');
+        $('#drawer-confirm-pass').val('');
+        
+        // Reset indicators
+        $('#strength-label').text('Weak').removeClass('text-amber-500 text-emerald-500').addClass('text-zinc-400');
+        $('#strength-progress').css('width', '25%').removeClass('bg-amber-500 bg-emerald-500').addClass('bg-red-500');
+        $('.chk-icon').text('•').removeClass('text-emerald-500').addClass('text-zinc-350');
+        $('#btn-save-new-pass').prop('disabled', true).removeClass('bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900').addClass('bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed');
+
+        // Slide open drawer using bulletproof class engine
+        $('#cora-password-drawer-sheet').addClass('drawer-open');
+    }
+
+    function closePasswordDrawer() {
+        $('#cora-password-drawer-sheet').removeClass('drawer-open');
+    }
+
+    function verifyCurrentPasswordStep() {
+        var curr = $('#drawer-curr-pass').val();
+        if (!curr) {
+            window.coraShowToast('Enter your current password.');
+            return;
+        }
+
+        var btn = $('#btn-verify-identity');
+        btn.prop('disabled', true).text('Verifying Credentials...');
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_verify_current_password',
+            current_pass: curr,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            btn.prop('disabled', false).text('Verify Identity Credentials');
+            if (res.success) {
+                window.coraShowToast('Identity verified successfully.');
+                $('#pass-step-1').fadeOut(200, function() {
+                    $('#pass-step-2').fadeIn(200);
+                });
+            } else {
+                window.coraShowToast(res.data.message || 'Incorrect password.');
+            }
+        });
+    }
+
+    function validatePasswordStrength() {
+        var pass = $('#drawer-new-pass').val();
+        var confirm = $('#drawer-confirm-pass').val();
+
+        // 1. Length Check
+        var lenVal = pass.length >= 8;
+        updateCheckmark('req-len', lenVal);
+
+        // 2. Uppercase Check
+        var upVal = /[A-Z]/.test(pass);
+        updateCheckmark('req-up', upVal);
+
+        // 3. Lowercase Check
+        var loVal = /[a-z]/.test(pass);
+        updateCheckmark('req-lo', loVal);
+
+        // 4. Number Check
+        var numVal = /[0-9]/.test(pass);
+        updateCheckmark('req-num', numVal);
+
+        // Calculate score
+        var score = 0;
+        if (lenVal) score++;
+        if (upVal) score++;
+        if (loVal) score++;
+        if (numVal) score++;
+
+        var strengthProgress = $('#strength-progress');
+        var strengthLabel = $('#strength-label');
+
+        if (score <= 1) {
+            strengthLabel.text('Weak').removeClass('text-amber-500 text-emerald-500').addClass('text-zinc-400');
+            strengthProgress.css('width', '25%').removeClass('bg-amber-500 bg-emerald-500').addClass('bg-red-500');
+        } else if (score < 4) {
+            strengthLabel.text('Medium').removeClass('text-zinc-400 text-emerald-500').addClass('text-amber-500');
+            strengthProgress.css('width', '60%').removeClass('bg-red-500 bg-emerald-500').addClass('bg-amber-500');
+        } else {
+            strengthLabel.text('Strong').removeClass('text-zinc-400 text-amber-500').addClass('text-emerald-500');
+            strengthProgress.css('width', '100%').removeClass('bg-red-500 bg-amber-500').addClass('bg-emerald-500');
+        }
+
+        // Match passwords and checklist checks to enable Apply button
+        var isMatch = pass === confirm && pass.length > 0;
+        var isValid = lenVal && upVal && loVal && numVal && isMatch;
+
+        var saveBtn = $('#btn-save-new-pass');
+        if (isValid) {
+            saveBtn.prop('disabled', false)
+                .removeClass('bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed')
+                .addClass('bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 cursor-pointer');
+        } else {
+            saveBtn.prop('disabled', true)
+                .removeClass('bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 cursor-pointer')
+                .addClass('bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed');
+        }
+    }
+
+    function updateCheckmark(id, isValid) {
+        var el = $('#' + id);
+        var chk = el.find('.chk-icon');
+        if (isValid) {
+            chk.text('✓').removeClass('text-zinc-350').addClass('text-emerald-500');
+            el.removeClass('text-zinc-500 dark:text-zinc-400').addClass('text-zinc-800 dark:text-zinc-200');
+        } else {
+            chk.text('•').removeClass('text-emerald-500').addClass('text-zinc-350');
+            el.removeClass('text-zinc-800 dark:text-zinc-200').addClass('text-zinc-500 dark:text-zinc-400');
+        }
+    }
+
+    function saveNewPasswordAction() {
+        var curr = $('#drawer-curr-pass').val();
+        var pass = $('#drawer-new-pass').val();
+        var btn = $('#btn-save-new-pass');
+
+        btn.prop('disabled', true).text('Updating Security Credentials...');
+        window.coraShowToast('Updating your workspace password...');
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_change_password',
+            current_pass: curr,
+            new_pass: pass,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            btn.prop('disabled', false).text('Apply Security Update');
+            if (res.success) {
+                window.coraShowToast('Password updated. Logging you out...');
+                setTimeout(function() {
+                    window.location.href = '<?php echo home_url( "/workspace/login?password_updated=1" ); ?>';
+                }, 1500);
+            } else {
+                window.coraShowToast(res.data.message || 'Failed to change password.');
+            }
+        });
+    }
+
+    // Update Status Broadcast Handler
+    function coraUpdateUserStatus(e) {
+        e.preventDefault();
+        var status = $('#user-status-select').val();
+        var msg = $('#user-status-msg').val().trim();
+        
+        window.coraShowToast('Broadcasting status update...');
+        
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_update_user_custom_status',
+            status: status,
+            message: msg,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast('Status broadcast updated successfully.');
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                window.coraShowToast(res.data.message || 'Failed to update status.');
+            }
+        });
+    }
+
+    // Submit Leave Request Facility Handler
+    function coraRequestLeave(e) {
+        e.preventDefault();
+        var type = $('#leave-type').val();
+        var start = $('#leave-start').val();
+        var end = $('#leave-end').val();
+        var reason = $('#leave-reason').val().trim();
+        
+        window.coraShowToast('Submitting leave request...');
+        
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_request_leave',
+            type: type,
+            start_date: start,
+            end_date: end,
+            reason: reason,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast('Leave request submitted successfully.');
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                window.coraShowToast(res.data.message || 'Failed to submit leave request.');
+            }
+        });
+    }
+
+    // Approve/Reject Leave Status Updates (Admins Only)
+    function coraUpdateLeaveStatus(leaveId, status) {
+        window.coraShowToast('Updating leave request status...');
+        
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_update_leave_status',
+            leave_id: leaveId,
+            status: status,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast('Leave request updated successfully.');
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                window.coraShowToast(res.data.message || 'Failed to update leave.');
+            }
+        });
+    }
+
+    // Clock In/Out punches with geofencing validation
+    function coraPunchAttendance(type) {
+        var statusDiv = $('#punch-status-text');
+        statusDiv.removeClass('text-red-500 dark:text-red-400 text-emerald-500').addClass('text-zinc-500').text('Acquiring verified location...').show();
+        
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+                var logData = {
+                    type: type,
+                    timestamp: Date.now(),
+                    lat: lat,
+                    lng: lng,
+                    user: 'Current User'
+                };
+                
+                $.post(coraREData.ajaxUrl, {
+                    action: 'cora_save_attendance',
+                    nonce: coraREData.ajaxNonce,
+                    log: JSON.stringify(logData)
+                }, function(res) {
+                    if (res.success) {
+                        window.coraShowToast("Punch logged successfully");
+                        statusDiv.removeClass('text-zinc-500').addClass('text-emerald-500').text('Logged punch successfully. Reloading...');
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1000);
+                    } else {
+                        statusDiv.removeClass('text-zinc-500').addClass('text-red-500 dark:text-red-400').text(res.data.message || 'Failed to save punch.');
+                    }
+                });
+            }, function(error) {
+                statusDiv.removeClass('text-zinc-500').addClass('text-red-500 dark:text-red-400').text('Location access denied or unavailable.');
+            });
+        } else {
+            statusDiv.removeClass('text-zinc-500').addClass('text-red-500 dark:text-red-400').text('Geolocation is not supported by your browser.');
+        }
+    }
 
     function loadAvatarCrop(e) {
         var file = e.target.files[0];
@@ -270,9 +1506,8 @@ $sessions = $session_tokens->get_all();
                 
                 cropCtx.drawImage(cropImg, x, y, size, size, 0, 0, 300, 300);
                 
-                // Slide open drawer
-                $('#cora-avatar-crop-dlg').css({'opacity': '1', 'pointer-events': 'auto'});
-                $('#avatar-crop-card').css('transform', 'translateX(0)');
+                // Slide open drawer using bulletproof class engine
+                $('#cora-avatar-crop-dlg').addClass('drawer-open');
             };
             cropImg.src = origImageSrc;
         };
@@ -280,10 +1515,7 @@ $sessions = $session_tokens->get_all();
     }
 
     function closeAvatarCrop() {
-        $('#avatar-crop-card').css('transform', 'translateX(100%)');
-        setTimeout(function() {
-            $('#cora-avatar-crop-dlg').css({'opacity': '0', 'pointer-events': 'none'});
-        }, 300);
+        $('#cora-avatar-crop-dlg').removeClass('drawer-open');
         $('#avatar-input').val('');
     }
 
@@ -327,40 +1559,6 @@ $sessions = $session_tokens->get_all();
                 window.coraShowToast('Profile updated successfully.');
             } else {
                 window.coraShowToast(res.data.message || 'Failed to update profile.');
-            }
-        });
-    }
-
-    function coraSaveProfilePassword(e) {
-        e.preventDefault();
-        var curr = $('#profile-curr-pass').val();
-        var pass = $('#profile-new-pass').val();
-        var confirm = $('#profile-confirm-pass').val();
-
-        if (pass !== confirm) {
-            window.coraShowToast('Passwords do not match.');
-            return;
-        }
-
-        var regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-        if (!regex.test(pass)) {
-            window.coraShowToast('Password must be at least 8 characters and contain one uppercase, one lowercase, and one number.');
-            return;
-        }
-
-        $.post(coraREData.ajaxUrl, {
-            action: 'cora_ajax_change_password',
-            current_pass: curr,
-            new_pass: pass,
-            nonce: coraREData.ajaxNonce
-        }, function(res) {
-            if (res.success) {
-                window.coraShowToast('Password updated. Logging you out...');
-                setTimeout(function() {
-                    window.location.href = '<?php echo home_url( "/workspace/login?password_updated=1" ); ?>';
-                }, 1500);
-            } else {
-                window.coraShowToast(res.data.message || 'Failed to change password.');
             }
         });
     }

@@ -35,12 +35,12 @@ test.describe('Cora Forms Security & AI Compatibility E2E tests', () => {
     // Verify we are back on the forms list state
     await page.waitForSelector('#forms-list-state:not(.hidden)', { state: 'visible' });
 
-    // Fetch the form ID from table row list card to test REST endpoints
-    const formRow = page.locator('#forms-list-body tr').filter({ hasText: testFormTitle }).first();
-    await expect(formRow).toBeVisible();
+    // Fetch the form card to test REST endpoints
+    const formCard = page.locator('#forms-list-body .form-card').filter({ hasText: testFormTitle }).first();
+    await expect(formCard).toBeVisible();
     
-    // Find the edit button inside this row and click to check block options
-    await formRow.locator('.btn-edit-form').click();
+    // Find the edit button inside this card and click to check block options
+    await formCard.locator('.btn-edit-form').click();
     await page.waitForSelector('#form-editor-state:not(.hidden)', { state: 'visible' });
 
     // Verify AI Purpose settings fields are visible next to inputs
@@ -81,9 +81,6 @@ test.describe('Cora Forms Security & AI Compatibility E2E tests', () => {
     // 3. Test Honeypot Spam Prevention
     console.log(`Verifying Honeypot block for form #${formId}`);
     const spamResponse = await page.request.post(`/wp-json/cora/v1/forms/${formId}/submit`, {
-      headers: {
-        'X-WP-Nonce': wpNonce
-      },
       data: {
         submitted_data: { "Contact Name": "Spammer Bot" },
         is_partial: 0,
@@ -93,15 +90,12 @@ test.describe('Cora Forms Security & AI Compatibility E2E tests', () => {
     expect(spamResponse.status()).toBe(400);
     const spamJson = await spamResponse.json();
     expect(spamJson.code).toBe('spam_detected');
-
+ 
     // 4. Test IP-based Rate Limiting (max 10 requests per minute)
     console.log(`Verifying IP rate limiting for form #${formId}`);
     let limited = false;
     for (let i = 0; i < 12; i++) {
       const submitRes = await page.request.post(`/wp-json/cora/v1/forms/${formId}/submit`, {
-        headers: {
-          'X-WP-Nonce': wpNonce
-        },
         data: {
           submitted_data: { "Contact Name": `Spam attempt ${i}` },
           is_partial: 0,
@@ -151,28 +145,25 @@ test.describe('Cora Forms Security & AI Compatibility E2E tests', () => {
     await expect(page.locator('#cora-toast-container')).toContainText('FigJam Prompt copied');
   });
 
-  test('Verify Bulk Operations selection and bulk actions bar', async ({ page }) => {
+  test('Verify Form Cards layout and card action buttons', async ({ page }) => {
     await login(page);
     await page.goto('/workspace/forms');
     await page.waitForLoadState('networkidle');
 
-    // 1. Check Select All checkbox is visible
-    const selectAll = page.locator('#select-all-forms');
-    await expect(selectAll).toBeVisible();
+    // 1. Verify the card grid container is visible
+    const cardsContainer = page.locator('#forms-list-body');
+    await expect(cardsContainer).toBeVisible();
 
-    // 2. Check select all checkbox
-    await selectAll.check();
+    // 2. Verify at least one form card is rendered
+    const firstCard = page.locator('#forms-list-body .form-card').first();
+    await expect(firstCard).toBeVisible();
 
-    // 3. Verify Bulk Actions Bar appears with selection count
-    const bulkBar = page.locator('#forms-bulk-actions-bar');
-    await expect(bulkBar).toBeVisible();
-
-    const selectedCountText = page.locator('#bulk-selected-count');
-    await expect(selectedCountText).toContainText('selected');
-
-    // 4. Test Clear selection button
-    await page.click('#btn-bulk-clear');
-    await expect(bulkBar).toBeHidden();
+    // 3. Verify card action buttons exist on the first card
+    await expect(firstCard.locator('.btn-edit-form')).toBeVisible();
+    await expect(firstCard.locator('.btn-view-subs')).toBeVisible();
+    await expect(firstCard.locator('.btn-view-live')).toBeVisible();
+    await expect(firstCard.locator('.btn-share-form')).toBeVisible();
+    await expect(firstCard.locator('.btn-delete-form')).toBeVisible();
   });
 
 });

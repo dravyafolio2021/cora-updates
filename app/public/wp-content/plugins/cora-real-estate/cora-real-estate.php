@@ -16700,8 +16700,44 @@ function cora_rest_delete_clause( $request ) {
 
 function cora_rest_get_form_audit_log( $request ) {
     global $wpdb;
-    $logs = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_form_audit_log ORDER BY id DESC LIMIT 100", ARRAY_A );
-    return rest_ensure_response( $logs ?: array() );
+    
+    $page = intval( $request->get_param( 'page' ) );
+    if ( $page < 1 ) {
+        $page = 1;
+    }
+    
+    $per_page = intval( $request->get_param( 'per_page' ) );
+    if ( $per_page < 1 || $per_page > 100 ) {
+        $per_page = 10;
+    }
+    
+    $offset = ( $page - 1 ) * $per_page;
+    
+    $total_logs = intval( $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_audit_log" ) );
+    
+    $logs = $wpdb->get_results( $wpdb->prepare(
+        "SELECT l.*, u.display_name 
+         FROM {$wpdb->prefix}cora_form_audit_log l 
+         LEFT JOIN {$wpdb->users} u ON l.performed_by = u.ID 
+         ORDER BY l.id DESC 
+         LIMIT %d OFFSET %d",
+        $per_page,
+        $offset
+    ), ARRAY_A );
+    
+    foreach ( $logs as &$log ) {
+        if ( empty( $log['display_name'] ) ) {
+            $log['display_name'] = 'System';
+        }
+    }
+    
+    return rest_ensure_response( array(
+        'logs'        => $logs ?: array(),
+        'total'       => $total_logs,
+        'page'        => $page,
+        'per_page'    => $per_page,
+        'total_pages' => ceil( $total_logs / $per_page )
+    ) );
 }
 
 // ═══ DYNAMIC REMOTE PLUGIN UPDATER SYSTEM ═══

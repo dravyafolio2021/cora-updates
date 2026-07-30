@@ -10,146 +10,107 @@ if ( ! defined( 'ABSPATH' ) ) {
     <!-- STATE 1: FORMS LIST VIEW -->
     <div id="forms-list-state" class="flex-1 flex flex-col overflow-y-auto p-6 md:p-8 gap-6">
         <!-- Header -->
-        <div class="flex items-center justify-between border-b border-zinc-200/60 pb-5">
-            <div>
-                <h1 class="text-xl font-bold tracking-tight text-zinc-900">Cora Forms</h1>
-                <p class="text-xs text-zinc-500 mt-1">Design and share Notion-style interactive forms. Automatically collect leads into your CRM database.</p>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-200/60 dark:border-zinc-800 pb-5 shrink-0 gap-4">
+            <div class="space-y-1">
+                <h1 class="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Cora Forms</h1>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 max-w-2xl">Design and share Notion-style interactive forms. Automatically collect leads into your CRM database.</p>
             </div>
-            <button id="btn-create-form" class="h-9 px-4 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium transition-all flex items-center gap-2">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <button id="btn-create-form" class="h-9 px-4 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-50 dark:hover:bg-zinc-200 dark:text-zinc-950 text-xs font-medium transition-all flex items-center justify-center gap-2 shrink-0 whitespace-nowrap w-full sm:w-auto hidden sm:flex">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 Create form
             </button>
+            <span class="flex sm:hidden items-center gap-1.5 text-[10px] text-zinc-400 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-800 rounded-lg px-3 py-2 w-full justify-center">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                Form editor available on desktop
+            </span>
         </div>
 
         <!-- Sub-page Tab Bar -->
-        <div class="flex items-center gap-1 border-b border-zinc-200/60 dark:border-zinc-800/60 pb-px mb-4">
-            <button id="tab-forms-list" class="cora-forms-tab flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50 -mb-px transition-all bg-transparent cursor-pointer">
+        <div class="flex items-center gap-1 border-b border-zinc-200/60 dark:border-zinc-800/60 pb-px mb-4 overflow-x-auto whitespace-nowrap scrollbar-none py-1 shrink-0 min-h-[44px]">
+            <button id="tab-forms-list" class="cora-forms-tab flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50 -mb-px transition-all bg-transparent cursor-pointer shrink-0" style="display: inline-flex !important; align-items: center !important; height: 36px !important; min-height: 36px !important; max-height: 36px !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 1rem !important; padding-right: 1rem !important; line-height: 1 !important; border-top: none !important; border-left: none !important; border-right: none !important; background: transparent !important; box-sizing: border-box !important; margin-bottom: -1px !important;">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                Forms List
+                <span>Forms List</span>
             </button>
-            <button id="tab-funnel-analytics" class="cora-forms-tab flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 -mb-px transition-all bg-transparent cursor-pointer">
+            <button id="tab-funnel-analytics" class="cora-forms-tab flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 -mb-px transition-all bg-transparent cursor-pointer shrink-0" style="display: inline-flex !important; align-items: center !important; height: 36px !important; min-height: 36px !important; max-height: 36px !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 1rem !important; padding-right: 1rem !important; line-height: 1 !important; border-top: none !important; border-left: none !important; border-right: none !important; background: transparent !important; box-sizing: border-box !important; margin-bottom: -1px !important;">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                Funnel Analytics
+                <span>Funnel Analytics</span>
             </button>
-            <button id="tab-clauses-library" class="cora-forms-tab flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 -mb-px transition-all bg-transparent cursor-pointer">
+            <button id="tab-clauses-library" class="cora-forms-tab flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 -mb-px transition-all bg-transparent cursor-pointer shrink-0" style="display: inline-flex !important; align-items: center !important; height: 36px !important; min-height: 36px !important; max-height: 36px !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 1rem !important; padding-right: 1rem !important; line-height: 1 !important; border-top: none !important; border-left: none !important; border-right: none !important; background: transparent !important; box-sizing: border-box !important; margin-bottom: -1px !important;">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                Clause Library
+                <span>Clause Library</span>
             </button>
-            <button id="tab-audit-logs" class="cora-forms-tab flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 -mb-px transition-all bg-transparent cursor-pointer">
+            <button id="tab-audit-logs" class="cora-forms-tab flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 -mb-px transition-all bg-transparent cursor-pointer shrink-0" style="display: inline-flex !important; align-items: center !important; height: 36px !important; min-height: 36px !important; max-height: 36px !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 1rem !important; padding-right: 1rem !important; line-height: 1 !important; border-top: none !important; border-left: none !important; border-right: none !important; background: transparent !important; box-sizing: border-box !important; margin-bottom: -1px !important;">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                Compliance Audit Log
+                <span>Compliance Audit Log</span>
             </button>
         </div>
 
         <!-- TAB CONTENT: FORMS LIST -->
         <div id="forms-list-tab-content" class="flex flex-col gap-6">
             <!-- Metrics Dashboard Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-4 flex flex-col gap-1">
-                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Forms</span>
-                    <span id="metric-total-forms" class="text-2xl font-bold text-zinc-900">0</span>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
+                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Total Forms</span>
+                    <span id="metric-total-forms" class="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50">0</span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-4 flex flex-col gap-1">
-                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Views</span>
-                    <span id="metric-total-views" class="text-2xl font-bold text-zinc-900">0</span>
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
+                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Total Views</span>
+                    <span id="metric-total-views" class="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50">0</span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-4 flex flex-col gap-1">
-                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Submissions</span>
-                    <span id="metric-total-submissions" class="text-2xl font-bold text-zinc-900">0</span>
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
+                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Submissions</span>
+                    <span id="metric-total-submissions" class="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50">0</span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-4 flex flex-col gap-1">
-                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Completion Rate</span>
-                    <span id="metric-completion-rate" class="text-2xl font-bold text-zinc-900">0%</span>
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
+                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Completion Rate</span>
+                    <span id="metric-completion-rate" class="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50">0%</span>
                 </div>
             </div>
 
-        <!-- Bulk Operations Bar -->
-        <div id="forms-bulk-actions-bar" class="hidden items-center justify-between px-5 py-3 bg-zinc-950 text-white rounded-xl mb-4 transition-all shadow-md">
-            <div class="flex items-center gap-3">
-                <span id="bulk-selected-count" class="text-xs font-semibold text-zinc-200 font-mono">0 selected</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <button id="btn-bulk-publish" class="h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border-0">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    Publish Selected
-                </button>
-                <button id="btn-bulk-draft" class="h-8 px-3 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border-0">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path></svg>
-                    Set as Draft
-                </button>
-                <button id="btn-bulk-delete" class="h-8 px-3 rounded-lg bg-red-600/90 hover:bg-red-600 text-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border-0">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                    Delete Selected
-                </button>
-                <button id="btn-bulk-clear" class="h-8 px-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white text-xs font-semibold transition-all cursor-pointer border-0" title="Deselect All">
-                    ✕
-                </button>
+        <!-- Cards Grid Container -->
+        <div id="forms-list-body" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Loading placeholder / Dynamic cards injection -->
+            <div class="col-span-full py-12 text-center text-xs text-zinc-400 dark:text-zinc-500">
+                Loading forms list...
             </div>
         </div>
-
-        <!-- Table Container -->
-        <div class="bg-white border border-zinc-200/80 rounded-xl overflow-hidden shadow-sm">
-            <div class="overflow-x-auto">
-                <table class="w-full border-collapse text-left">
-                    <thead>
-                        <tr class="bg-zinc-50 border-b border-zinc-200/80">
-                            <th class="w-12 px-4 py-3.5 text-center">
-                                <input type="checkbox" id="select-all-forms" class="w-4 h-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-500 cursor-pointer" title="Select All Forms" />
-                            </th>
-                            <th class="px-6 py-3.5 text-xs font-semibold text-zinc-500">Form Title</th>
-                            <th class="px-6 py-3.5 text-xs font-semibold text-zinc-500">Status</th>
-                            <th class="px-6 py-3.5 text-xs font-semibold text-zinc-500">Responses</th>
-                            <th class="px-6 py-3.5 text-xs font-semibold text-zinc-500">Created At</th>
-                            <th class="px-6 py-3.5 text-xs font-semibold text-zinc-500 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="forms-list-body" class="divide-y divide-zinc-100">
-                        <!-- Loading placeholder / Dynamic rows injection -->
-                        <tr>
-                            <td colspan="6" class="px-6 py-8 text-center text-xs text-zinc-400">Loading forms list...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB CONTENT: ADVANCED FUNNEL ANALYTICS -->
+    </div>    <!-- TAB CONTENT: ADVANCED FUNNEL ANALYTICS -->
         <div id="forms-funnel-tab-content" class="hidden flex-col gap-6">
             <!-- Header Controls -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-200/60 pb-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-200/60 dark:border-zinc-800 pb-5">
                 <div>
-                    <h3 class="text-sm font-bold text-zinc-950">Conversion Funnel & Drop-off Diagnostics</h3>
-                    <p class="text-[10px] text-zinc-500 mt-0.5">Analyze user friction, abandonment rates, and field-level drop-offs.</p>
+                    <h3 class="text-sm font-bold text-zinc-950 dark:text-zinc-50">Conversion Funnel & Drop-off Diagnostics</h3>
+                    <p class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Analyze user friction, abandonment rates, and field-level drop-offs.</p>
                 </div>
                 <!-- Form Selector Dropdown -->
                 <div class="flex items-center gap-2">
-                    <span class="text-xs font-semibold text-zinc-500">Select Form:</span>
-                    <select id="funnel-form-selector" class="h-9 px-3 rounded-lg border border-zinc-200 bg-white text-xs font-medium text-zinc-700 outline-none focus:border-zinc-300 w-56 cursor-pointer">
+                    <span class="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Select Form:</span>
+                    <select id="funnel-form-selector" class="h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs font-medium text-zinc-750 dark:text-zinc-200 outline-none focus:border-zinc-300 dark:focus:border-zinc-700 w-56 cursor-pointer">
                         <option value="all">All Forms (Aggregate)</option>
                     </select>
                 </div>
             </div>
 
             <!-- Funnel Metrics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Total Form Views</span>
-                    <span id="funnel-metric-views" class="text-2xl font-bold text-zinc-900">0</span>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
+                    <span class="text-[8.5px] sm:text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Total Form Views</span>
+                    <span id="funnel-metric-views" class="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50">0</span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Started Filling</span>
-                    <span id="funnel-metric-started" class="text-2xl font-bold text-zinc-900">0</span>
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
+                    <span class="text-[8.5px] sm:text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Started Filling</span>
+                    <span id="funnel-metric-started" class="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50">0</span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Submissions</span>
-                    <span id="funnel-metric-completed" class="text-2xl font-bold text-zinc-900">0</span>
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
+                    <span class="text-[8.5px] sm:text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Submissions</span>
+                    <span id="funnel-metric-completed" class="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50">0</span>
                 </div>
-                <div class="bg-white border border-zinc-200/80 rounded-xl p-4 flex flex-col gap-1 shadow-sm">
-                    <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Abandonment Rate</span>
-                    <span id="funnel-metric-abandonment" class="text-2xl font-bold text-zinc-900">0%</span>
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-sm">
+                    <span class="text-[8.5px] sm:text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Abandonment Rate</span>
+                    <span id="funnel-metric-abandonment" class="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50">0%</span>
                 </div>
             </div>
+
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                 <!-- Left 2 Cols: Funnel Steps -->
@@ -243,61 +204,51 @@ if ( ! defined( 'ABSPATH' ) ) {
 
         <!-- TAB CONTENT: CLAUSE LIBRARY -->
         <div id="forms-clauses-tab-content" class="hidden flex-col gap-6">
-            <div class="flex items-center justify-between border-b border-zinc-200/60 pb-5">
+            <div class="flex items-center justify-between border-b border-zinc-200/60 dark:border-zinc-800 pb-5">
                 <div>
-                    <h3 class="text-sm font-bold text-zinc-950">Clause Library & Automation Templates</h3>
-                    <p class="text-[10px] text-zinc-500 mt-0.5">Manage legal clauses and conditional text blocks to compile contract PDFs.</p>
+                    <h3 class="text-sm font-bold text-zinc-950 dark:text-zinc-50">Clause Library & Automation Templates</h3>
+                    <p class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Manage legal clauses and conditional text blocks to compile contract PDFs.</p>
                 </div>
-                <button id="btn-create-clause" class="h-8 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-medium transition-all flex items-center gap-1.5 cursor-pointer">
-                    <span>+</span> Add Clause
+                <button id="btn-create-clause" class="h-8 px-3.5 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-white text-white dark:text-zinc-900 text-[11px] font-semibold transition-all flex items-center gap-1.5 cursor-pointer border-0 whitespace-nowrap shrink-0">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>Add Clause</span>
                 </button>
             </div>
             
-            <div class="bg-white border border-zinc-200/80 rounded-xl overflow-hidden shadow-sm">
-                <table class="w-full border-collapse text-left">
-                    <thead>
-                        <tr class="bg-zinc-50 border-b border-zinc-200/80">
-                            <th class="px-6 py-3.5 text-xs font-semibold text-zinc-500">Key / Identifier</th>
-                            <th class="px-6 py-3.5 text-xs font-semibold text-zinc-500">Clause Title</th>
-                            <th class="px-6 py-3.5 text-xs font-semibold text-zinc-500">Snippet Content</th>
-                            <th class="px-6 py-3.5 text-xs font-semibold text-zinc-500 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="clauses-list-body" class="divide-y divide-zinc-100 text-xs">
-                        <tr>
-                            <td colspan="4" class="px-6 py-8 text-center text-zinc-400">No clauses created yet. Click "+ Add Clause" to start.</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div id="clauses-list-body" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div class="col-span-full py-16 text-center">
+                    <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="1.2" fill="none" class="mx-auto text-zinc-300 dark:text-zinc-700 mb-3"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    <p class="text-xs text-zinc-400 dark:text-zinc-500">No clauses created yet. Click "+ Add Clause" to start.</p>
+                </div>
             </div>
         </div>
 
         <!-- TAB CONTENT: COMPLIANCE AUDIT LOG -->
         <div id="forms-audit-tab-content" class="hidden flex-col gap-6">
-            <div class="flex items-center justify-between border-b border-zinc-200/60 pb-5">
+            <div class="flex items-center justify-between border-b border-zinc-200/60 dark:border-zinc-800 pb-5">
                 <div>
-                    <h3 class="text-sm font-bold text-zinc-950">GDPR Compliance & Field Audit Trail</h3>
-                    <p class="text-[10px] text-zinc-500 mt-0.5">Immutable record of data reads, exports, and verification checksum checks.</p>
+                    <h3 class="text-sm font-bold text-zinc-950 dark:text-zinc-50">GDPR Compliance & Field Audit Trail</h3>
+                    <p class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Immutable record of data reads, exports, and verification checksum checks.</p>
                 </div>
             </div>
             
-            <div class="bg-white border border-zinc-200/80 rounded-xl overflow-hidden shadow-sm">
-                <table class="w-full border-collapse text-left">
-                    <thead>
-                        <tr class="bg-zinc-50 border-b border-zinc-200/80">
-                            <th class="px-6 py-3.5 text-xs font-semibold text-zinc-500">Timestamp</th>
-                            <th class="px-6 py-3.5 text-xs font-semibold text-zinc-500">User / Reviewer</th>
-                            <th class="px-6 py-3.5 text-xs font-semibold text-zinc-500">Action Type</th>
-                            <th class="px-6 py-3.5 text-xs font-semibold text-zinc-500">Accessed / Target</th>
-                            <th class="px-6 py-3.5 text-xs font-semibold text-zinc-500">IP Address</th>
-                        </tr>
-                    </thead>
-                    <tbody id="audit-logs-body" class="divide-y divide-zinc-100 text-xs">
-                        <tr>
-                            <td colspan="5" class="px-6 py-8 text-center text-zinc-400">Loading audit log list...</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div id="audit-logs-body" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div class="col-span-full py-12 text-center text-xs text-zinc-400 dark:text-zinc-500">Loading audit log...</div>
+            </div>
+
+            <!-- Pagination controls -->
+            <div id="audit-logs-pagination" class="flex items-center justify-between pt-4">
+                <span id="audit-pagination-info" class="text-xs text-zinc-500 dark:text-zinc-400">Showing page 1 of 1 (Total 0 logs)</span>
+                <div class="flex items-center gap-2">
+                    <button id="btn-audit-prev" class="h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-350 hover:bg-zinc-50 dark:hover:bg-zinc-850 disabled:opacity-50 disabled:pointer-events-none text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer" disabled>
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        Prev
+                    </button>
+                    <button id="btn-audit-next" class="h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-350 hover:bg-zinc-50 dark:hover:bg-zinc-850 disabled:opacity-50 disabled:pointer-events-none text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer" disabled>
+                        Next
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1086,7 +1037,6 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
-
             <!-- Inspector Body -->
             <div class="flex-1 overflow-y-auto p-6 space-y-5" id="inspector-body-content">
                 <!-- Question & Answer Notion Cards -->
@@ -1095,30 +1045,94 @@ if ( ! defined( 'ABSPATH' ) ) {
     </div>
 
     <!-- CLAUSE EDITOR OVERLAY DRAWER -->
-    <div id="cora-clause-drawer" class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-white shadow-2xl border-l border-zinc-200 z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
-        <div class="p-5 border-b border-zinc-100 flex items-center justify-between">
+    <!-- Clause Drawer Backdrop -->
+    <div id="cora-clause-drawer-backdrop" class="fixed inset-0 bg-zinc-950/30 dark:bg-zinc-950/60 backdrop-blur-xs z-[49] hidden transition-opacity duration-300 opacity-0 pointer-events-none"></div>
+
+    <!-- Bottom Sheet (mobile) / Right Drawer (desktop) -->
+    <div id="cora-clause-drawer" class="hidden fixed z-50 transition-transform duration-300 ease-out
+        bg-white dark:bg-zinc-900 shadow-2xl border-zinc-200 dark:border-zinc-800 flex flex-col">
+
+        <!-- Mobile grab handle -->
+        <div class="flex justify-center pt-3 pb-1 md:hidden">
+            <div class="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
+        </div>
+
+        <!-- Header -->
+        <div class="px-5 pt-2 md:pt-5 pb-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
             <div>
-                <h3 class="text-sm font-bold text-zinc-900">Add Library Clause</h3>
-                <p class="text-[10px] text-zinc-400 mt-0.5">Define a reusable clause block</p>
+                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-50">Add Library Clause</h3>
+                <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">Pick a template or write a custom clause</p>
             </div>
-            <button id="btn-close-clause-drawer" class="h-8 w-8 rounded-lg hover:bg-zinc-50 flex items-center justify-center text-zinc-500">
+            <button id="btn-close-clause-drawer" class="h-8 w-8 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-500 dark:text-zinc-400 transition-colors cursor-pointer border-0 bg-transparent">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-        <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-4">
-            <div class="flex flex-col gap-1">
-                <label class="text-[10px] font-bold text-zinc-400 uppercase">Clause Key Identifier (lowercase, no spaces)</label>
-                <input id="drawer-clause-key" type="text" placeholder="e.g. swiss_aml_statement" class="h-9 px-3 rounded-lg border border-zinc-200 text-xs outline-none focus:border-zinc-300 w-full font-mono" />
+
+        <!-- Scrollable Body -->
+        <div class="flex-1 overflow-y-auto px-5 pt-4 pb-2 flex flex-col gap-4">
+
+            <!-- Quick-Select Template Chips -->
+            <div class="flex flex-col gap-2">
+                <label class="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Quick Templates</label>
+                <div class="flex flex-wrap gap-1.5" id="clause-template-chips">
+                    <button type="button" class="clause-chip h-7 px-2.5 rounded-full border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-[10px] font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-pointer flex items-center gap-1"
+                        data-key="gdpr_consent" data-title="GDPR Data Consent" data-text="By submitting this form, you consent to the processing of your personal data in accordance with the General Data Protection Regulation (EU) 2016/679. Your data will be processed solely for the stated purpose and will not be shared with third parties without your explicit consent.">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        GDPR Consent
+                    </button>
+                    <button type="button" class="clause-chip h-7 px-2.5 rounded-full border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-[10px] font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-pointer flex items-center gap-1"
+                        data-key="terms_acceptance" data-title="Terms & Conditions Acceptance" data-text="I have read and agree to the Terms and Conditions as outlined in the service agreement. I understand that my use of this service is governed by these terms and I accept all obligations therein.">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                        Terms & Conditions
+                    </button>
+                    <button type="button" class="clause-chip h-7 px-2.5 rounded-full border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-[10px] font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-pointer flex items-center gap-1"
+                        data-key="nda_clause" data-title="Non-Disclosure Agreement" data-text="The receiving party agrees to hold all confidential information in strict confidence and not to disclose such information to any third party without prior written consent. This obligation survives termination of the agreement.">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        NDA
+                    </button>
+                    <button type="button" class="clause-chip h-7 px-2.5 rounded-full border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-[10px] font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-pointer flex items-center gap-1"
+                        data-key="liability_waiver" data-title="Limitation of Liability" data-text="In no event shall either party be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or in connection with this agreement, regardless of the cause of action.">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        Liability Waiver
+                    </button>
+                    <button type="button" class="clause-chip h-7 px-2.5 rounded-full border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-[10px] font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-pointer flex items-center gap-1"
+                        data-key="data_retention" data-title="Data Retention Policy" data-text="Personal data collected through this form will be retained for a maximum period of 36 months from the date of submission. After this period, data will be securely deleted unless otherwise required by applicable law.">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        Data Retention
+                    </button>
+                    <button type="button" class="clause-chip h-7 px-2.5 rounded-full border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-[10px] font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-pointer flex items-center gap-1"
+                        data-key="aml_compliance" data-title="AML / KYC Compliance" data-text="The undersigned confirms compliance with all applicable Anti-Money Laundering (AML) and Know Your Customer (KYC) regulations. All information provided is accurate and complete to the best of their knowledge.">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                        AML / KYC
+                    </button>
+                </div>
             </div>
-            <div class="flex flex-col gap-1">
-                <label class="text-[10px] font-bold text-zinc-400 uppercase">Clause Title</label>
-                <input id="drawer-clause-title" type="text" placeholder="Swiss AML Compliance" class="h-9 px-3 rounded-lg border border-zinc-200 text-xs outline-none focus:border-zinc-300 w-full font-medium" />
+
+            <div class="h-px bg-zinc-100 dark:bg-zinc-800 -mx-1"></div>
+
+            <!-- Clause Key -->
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Clause Key</label>
+                <input id="drawer-clause-key" type="text" placeholder="e.g. swiss_aml_statement" class="h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 dark:focus:border-zinc-500 w-full font-mono placeholder:text-zinc-300 dark:placeholder:text-zinc-600 transition-colors" />
             </div>
-            <div class="flex flex-col gap-1">
-                <label class="text-[10px] font-bold text-zinc-400 uppercase">Clause Content Text</label>
-                <textarea id="drawer-clause-text" rows="8" placeholder="Enter clause legal text here..." class="p-3 rounded-lg border border-zinc-200 text-xs outline-none focus:border-zinc-300 w-full resize-none"></textarea>
+
+            <!-- Clause Title -->
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Clause Title</label>
+                <input id="drawer-clause-title" type="text" placeholder="e.g. GDPR Data Consent" class="h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 dark:focus:border-zinc-500 w-full font-medium placeholder:text-zinc-300 dark:placeholder:text-zinc-600 transition-colors" />
             </div>
-            <button id="btn-save-drawer-clause" class="h-9 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold transition-all">
+
+            <!-- Clause Content -->
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Content</label>
+                <textarea id="drawer-clause-text" rows="4" placeholder="Enter clause legal text here..." class="p-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 dark:focus:border-zinc-500 w-full resize-none placeholder:text-zinc-300 dark:placeholder:text-zinc-600 transition-colors leading-relaxed"></textarea>
+            </div>
+        </div>
+
+        <!-- Footer CTA — pb-20 on mobile gives clearance above the app nav -->
+        <div class="px-5 pt-4 pb-5 md:pb-5 pb-20 border-t border-zinc-100 dark:border-zinc-800" style="padding-bottom: max(1.25rem, calc(env(safe-area-inset-bottom, 0px) + 5rem));">
+            <button id="btn-save-drawer-clause" class="w-full h-10 rounded-xl bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-semibold transition-all cursor-pointer border-0 flex items-center justify-center gap-2">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 Save Clause
             </button>
         </div>
@@ -1269,6 +1283,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentEditingForm = null;
     let selectedBlockIndex = null;
     let autoSaveTimer = null;
+    let currentAuditPage = 1;
 
     const wpNonce = (typeof coraREData !== 'undefined' && coraREData.nonce) ? coraREData.nonce : ((typeof wpApiSettings !== 'undefined') ? wpApiSettings.nonce : '');
 
@@ -1492,6 +1507,174 @@ document.addEventListener('DOMContentLoaded', function() {
     if(tabFunnel) tabFunnel.addEventListener('click', function() { window.location.hash = '#funnel'; });
     if(tabClauses) tabClauses.addEventListener('click', function() { window.location.hash = '#clauses'; });
     if(tabAuditLogs) tabAuditLogs.addEventListener('click', function() { window.location.hash = '#audit-log'; });
+
+    jQuery(document).on('click', '#btn-audit-prev', function(e) {
+        e.preventDefault();
+        if (currentAuditPage > 1) {
+            fetchAuditLogs(currentAuditPage - 1);
+        }
+    });
+
+    jQuery(document).on('click', '#btn-audit-next', function(e) {
+        e.preventDefault();
+        fetchAuditLogs(currentAuditPage + 1);
+    });
+
+    // ── Clause Drawer: Open / Close / Save ──
+    const isMdBreakpoint = () => window.matchMedia('(min-width: 768px)').matches;
+
+    function openClauseDrawer() {
+        const drawer = document.getElementById('cora-clause-drawer');
+        const backdrop = document.getElementById('cora-clause-drawer-backdrop');
+        
+        if (!drawer) return;
+
+        // Reset base positioning classes
+        drawer.className = 'fixed z-50 transition-transform duration-300 ease-out bg-white dark:bg-zinc-900 shadow-2xl border-zinc-200 dark:border-zinc-800 flex flex-col pointer-events-auto';
+
+        if (isMdBreakpoint()) {
+            // Desktop side drawer
+            drawer.classList.add('inset-y-0', 'right-0', 'w-[450px]', 'border-l', 'translate-x-full');
+        } else {
+            // Mobile bottom sheet
+            drawer.classList.add('inset-x-0', 'bottom-0', 'max-h-[85vh]', 'rounded-t-2xl', 'border-t', 'translate-y-full');
+        }
+
+        drawer.classList.remove('hidden');
+
+        requestAnimationFrame(() => {
+            if (isMdBreakpoint()) {
+                drawer.classList.remove('translate-x-full');
+                drawer.classList.add('translate-x-0');
+            } else {
+                drawer.classList.remove('translate-y-full');
+                drawer.classList.add('translate-y-0');
+            }
+        });
+
+        if (backdrop) {
+            backdrop.classList.remove('hidden', 'pointer-events-none');
+            backdrop.classList.add('pointer-events-auto');
+            requestAnimationFrame(() => {
+                backdrop.classList.add('opacity-100');
+                backdrop.classList.remove('opacity-0');
+            });
+        }
+    }
+
+    function closeClauseDrawer() {
+        const drawer = document.getElementById('cora-clause-drawer');
+        const backdrop = document.getElementById('cora-clause-drawer-backdrop');
+
+        if (drawer) {
+            drawer.classList.remove('pointer-events-auto');
+            drawer.classList.add('pointer-events-none');
+            if (isMdBreakpoint()) {
+                drawer.classList.add('translate-x-full');
+                drawer.classList.remove('translate-x-0');
+            } else {
+                drawer.classList.add('translate-y-full');
+                drawer.classList.remove('translate-y-0');
+            }
+            setTimeout(() => {
+                drawer.classList.add('hidden');
+            }, 300);
+        }
+
+        if (backdrop) {
+            backdrop.classList.remove('pointer-events-auto');
+            backdrop.classList.add('pointer-events-none', 'opacity-0');
+            backdrop.classList.remove('opacity-100');
+            setTimeout(() => {
+                backdrop.classList.add('hidden');
+            }, 300);
+        }
+
+        // Reset form fields and chip selection
+        const keyInput = document.getElementById('drawer-clause-key');
+        const titleInput = document.getElementById('drawer-clause-title');
+        const textInput = document.getElementById('drawer-clause-text');
+        if (keyInput) keyInput.value = '';
+        if (titleInput) titleInput.value = '';
+        if (textInput) textInput.value = '';
+        document.querySelectorAll('.clause-chip').forEach(c => {
+            c.classList.remove('bg-zinc-900', 'dark:bg-zinc-100', 'text-white', 'dark:text-zinc-900', 'border-zinc-900', 'dark:border-zinc-100');
+            c.classList.add('bg-zinc-50', 'dark:bg-zinc-800', 'text-zinc-600', 'dark:text-zinc-300', 'border-zinc-200', 'dark:border-zinc-700');
+        });
+    }
+
+    // Template chip click → auto-fill fields
+    jQuery(document).on('click', '.clause-chip', function(e) {
+        e.preventDefault();
+        const chip = this;
+        // Deselect all chips
+        document.querySelectorAll('.clause-chip').forEach(c => {
+            c.classList.remove('bg-zinc-900', 'dark:bg-zinc-100', 'text-white', 'dark:text-zinc-900', 'border-zinc-900', 'dark:border-zinc-100');
+            c.classList.add('bg-zinc-50', 'dark:bg-zinc-800', 'text-zinc-600', 'dark:text-zinc-300', 'border-zinc-200', 'dark:border-zinc-700');
+        });
+        // Activate this chip
+        chip.classList.remove('bg-zinc-50', 'dark:bg-zinc-800', 'text-zinc-600', 'dark:text-zinc-300', 'border-zinc-200', 'dark:border-zinc-700');
+        chip.classList.add('bg-zinc-900', 'dark:bg-zinc-100', 'text-white', 'dark:text-zinc-900', 'border-zinc-900', 'dark:border-zinc-100');
+        // Fill form
+        const keyInput = document.getElementById('drawer-clause-key');
+        const titleInput = document.getElementById('drawer-clause-title');
+        const textInput = document.getElementById('drawer-clause-text');
+        if (keyInput) keyInput.value = chip.dataset.key || '';
+        if (titleInput) titleInput.value = chip.dataset.title || '';
+        if (textInput) textInput.value = chip.dataset.text || '';
+    });
+
+    jQuery(document).on('click', '#btn-create-clause', function(e) {
+        e.preventDefault();
+        openClauseDrawer();
+    });
+
+    jQuery(document).on('click', '#btn-close-clause-drawer', function(e) {
+        e.preventDefault();
+        closeClauseDrawer();
+    });
+
+    jQuery(document).on('click', '#cora-clause-drawer-backdrop', function() {
+        closeClauseDrawer();
+    });
+
+    jQuery(document).on('click', '#btn-save-drawer-clause', function(e) {
+        e.preventDefault();
+        const clauseKey = (document.getElementById('drawer-clause-key')?.value || '').trim();
+        const clauseTitle = (document.getElementById('drawer-clause-title')?.value || '').trim();
+        const clauseText = (document.getElementById('drawer-clause-text')?.value || '').trim();
+
+        if (!clauseKey || !clauseTitle || !clauseText) {
+            window.coraShowToast && window.coraShowToast("Please fill in all fields before saving.");
+            return;
+        }
+
+        const btn = this;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="animate-spin inline-block w-3.5 h-3.5 border-2 border-white/30 dark:border-zinc-900/30 border-t-white dark:border-t-zinc-900 rounded-full"></span> Saving...';
+
+        jQuery.ajax({
+            url: '/wp-json/cora/v1/forms/clauses',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ clause_key: clauseKey, title: clauseTitle, content_text: clauseText }),
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-WP-Nonce', wpNonce);
+            },
+            success: function() {
+                window.coraShowToast && window.coraShowToast("Clause saved successfully.");
+                closeClauseDrawer();
+                fetchClauses();
+            },
+            error: function() {
+                window.coraShowToast && window.coraShowToast("Failed to save clause. Please try again.");
+            },
+            complete: function() {
+                btn.disabled = false;
+                btn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg> Save Clause';
+            }
+        });
+    });
 
 
 function coraCopyTextToClipboard(text) {
@@ -1829,81 +2012,161 @@ function fetchClauses() {
 
 function renderClausesList(clauses) {
         const body = document.getElementById('clauses-list-body');
-        if (clauses.length === 0) {
+        if (!clauses || clauses.length === 0) {
             body.innerHTML = `
-                <tr>
-                    <td colspan="4" class="px-6 py-8 text-center text-zinc-400">No clauses created yet. Click "+ Add Clause" to start.</td>
-                </tr>`;
+                <div class="col-span-full py-16 text-center">
+                    <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="1.2" fill="none" class="mx-auto text-zinc-300 dark:text-zinc-700 mb-3"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    <p class="text-xs text-zinc-400 dark:text-zinc-500">No clauses created yet. Click "+ Add Clause" to start.</p>
+                </div>`;
             return;
         }
-        
+
         body.innerHTML = '';
         clauses.forEach(c => {
-            const tr = document.createElement('tr');
-            tr.className = 'hover:bg-zinc-50/50';
-            tr.innerHTML = `
-                <td class="px-6 py-4 font-mono text-zinc-650">${c.clause_key}</td>
-                <td class="px-6 py-4 font-semibold text-zinc-800">${c.title}</td>
-                <td class="px-6 py-4 text-zinc-500 max-w-xs truncate">${c.content_text}</td>
-                <td class="px-6 py-4 text-right">
-                    <button class="btn-delete-db-clause h-7 px-2 rounded-lg border border-zinc-200 hover:border-red-200 text-zinc-500 hover:text-red-650 bg-white cursor-pointer" data-id="${c.id}">Delete</button>
-                </td>
+            const card = document.createElement('div');
+            card.className = 'bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 flex flex-col gap-3 shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-700 transition-all';
+
+            const snippet = (c.content_text || '').length > 80 ? c.content_text.substring(0, 80) + '…' : (c.content_text || '—');
+
+            card.innerHTML = `
+                <div class="flex items-start justify-between gap-2">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 dark:text-zinc-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                        </div>
+                        <div class="min-w-0">
+                            <h4 class="text-[13px] font-semibold text-zinc-900 dark:text-zinc-100 truncate leading-tight">${c.title}</h4>
+                            <span class="font-mono text-[10px] text-zinc-400 dark:text-zinc-500">${c.clause_key}</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed line-clamp-3">${snippet}</p>
+                <div class="flex items-center justify-end pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                    <button class="btn-delete-db-clause h-7 px-2.5 rounded-lg bg-transparent hover:bg-red-50 dark:hover:bg-red-950/20 text-zinc-400 dark:text-zinc-500 hover:text-red-600 dark:hover:text-red-400 text-[10px] font-medium flex items-center gap-1 transition-all cursor-pointer border-0" data-id="${c.id}">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        Delete
+                    </button>
+                </div>
             `;
-            body.appendChild(tr);
+            body.appendChild(card);
         });
-        
+
         jQuery('.btn-delete-db-clause').off('click').on('click', function() {
             const cId = jQuery(this).data('id');
-            jQuery.ajax({
-                url: `/wp-json/cora/v1/forms/clauses/${cId}`,
-                method: 'DELETE',
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-WP-Nonce', wpNonce);
-                },
-                success: function() {
-                    window.coraShowToast && window.coraShowToast("Clause deleted successfully.");
-                    fetchClauses();
-                }
+            coraConfirmAction("Are you sure you want to delete this clause? This action is permanent.", function() {
+                jQuery.ajax({
+                    url: `/wp-json/cora/v1/forms/clauses/${cId}`,
+                    method: 'DELETE',
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-WP-Nonce', wpNonce);
+                    },
+                    success: function() {
+                        window.coraShowToast && window.coraShowToast("Clause deleted successfully.");
+                        fetchClauses();
+                    }
+                });
             });
         });
     }
 
-function fetchAuditLogs() {
+function fetchAuditLogs(page = 1) {
+        currentAuditPage = page;
         jQuery.ajax({
-            url: '/wp-json/cora/v1/forms/audit-log',
+            url: `/wp-json/cora/v1/forms/audit-log?page=${page}&per_page=10`,
             method: 'GET',
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-WP-Nonce', wpNonce);
             },
-            success: function(logs) {
+            success: function(response) {
+                const logs = Array.isArray(response) ? response : (response.logs || response.data || []);
+                const total = response.total !== undefined ? response.total : logs.length;
+                const totalPages = response.total_pages !== undefined ? response.total_pages : 1;
+                
                 renderAuditLogs(logs);
+                updateAuditPagination(total, totalPages);
             }
         });
     }
 
 function renderAuditLogs(logs) {
         const body = document.getElementById('audit-logs-body');
-        if (logs.length === 0) {
+        if (!body) return;
+        if (!logs || logs.length === 0) {
             body.innerHTML = `
-                <tr>
-                    <td colspan="5" class="px-6 py-8 text-center text-zinc-400">No audit log entries recorded.</td>
-                </tr>`;
+                <div class="col-span-full py-16 text-center">
+                    <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="1.2" fill="none" class="mx-auto text-zinc-300 dark:text-zinc-700 mb-3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    <p class="text-xs text-zinc-400 dark:text-zinc-500">No audit log entries recorded.</p>
+                </div>`;
             return;
         }
-        
+
         body.innerHTML = '';
         logs.forEach(l => {
-            const tr = document.createElement('tr');
-            tr.className = 'hover:bg-zinc-50/50';
-            tr.innerHTML = `
-                <td class="px-6 py-4 text-zinc-500">${l.created_at}</td>
-                <td class="px-6 py-4 font-semibold text-zinc-800">${l.display_name}</td>
-                <td class="px-6 py-4"><span class="px-1.5 py-0.5 rounded font-mono text-[9px] bg-zinc-100 text-zinc-650">${l.action_type}</span></td>
-                <td class="px-6 py-4 text-zinc-500">${l.field_label || 'Submission #' + l.submission_id}</td>
-                <td class="px-6 py-4 font-mono text-zinc-400">${l.ip_address}</td>
+            const card = document.createElement('div');
+            card.className = 'bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 flex flex-col gap-3 shadow-sm';
+
+            const reviewer = l.display_name || 'System';
+            const target = l.field_label || (l.submission_id ? 'Submission #' + l.submission_id : 'All Data');
+            const actionType = l.action_type || 'unknown';
+
+            // Action icon mapping
+            let actionIcon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+            if (actionType.includes('read') || actionType.includes('view')) {
+                actionIcon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+            } else if (actionType.includes('export') || actionType.includes('download')) {
+                actionIcon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
+            } else if (actionType.includes('verify') || actionType.includes('check')) {
+                actionIcon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>';
+            } else if (actionType.includes('submit')) {
+                actionIcon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>';
+            }
+
+            card.innerHTML = `
+                <div class="flex items-start justify-between gap-2">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 text-zinc-500 dark:text-zinc-400">
+                            ${actionIcon}
+                        </div>
+                        <div class="min-w-0">
+                            <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 uppercase">${actionType}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-1.5 text-[11px]">
+                    <div class="flex items-center justify-between">
+                        <span class="text-zinc-400 dark:text-zinc-500">User</span>
+                        <span class="font-medium text-zinc-800 dark:text-zinc-200 truncate ml-2">${reviewer}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-zinc-400 dark:text-zinc-500">Target</span>
+                        <span class="text-zinc-600 dark:text-zinc-350 truncate ml-2">${target}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-zinc-400 dark:text-zinc-500">IP</span>
+                        <span class="font-mono text-zinc-400 dark:text-zinc-500 truncate ml-2">${l.ip_address || '—'}</span>
+                    </div>
+                </div>
+                <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                    <span class="text-[10px] text-zinc-400 dark:text-zinc-500">${l.created_at || '—'}</span>
+                </div>
             `;
-            body.appendChild(tr);
+            body.appendChild(card);
         });
+    }
+
+function updateAuditPagination(total, totalPages) {
+        const info = document.getElementById('audit-pagination-info');
+        if (info) {
+            info.textContent = `Showing page ${currentAuditPage} of ${totalPages} (Total ${total} logs)`;
+        }
+        const btnPrev = document.getElementById('btn-audit-prev');
+        const btnNext = document.getElementById('btn-audit-next');
+        if (btnPrev) {
+            btnPrev.disabled = currentAuditPage <= 1;
+        }
+        if (btnNext) {
+            btnNext.disabled = currentAuditPage >= totalPages;
+        }
     }
 
 function coraConfirmAction(message, onConfirm) {
@@ -2162,67 +2425,71 @@ function executeBulkFormAction(action) {
 
 function renderFormsList() {
         const body = document.getElementById('forms-list-body');
-        const selectAll = document.getElementById('select-all-forms');
-        if (selectAll) selectAll.checked = false;
-        updateBulkActionBarState();
 
         if (formsData.length === 0) {
             body.innerHTML = `
-                <tr>
-                    <td colspan="6" class="px-6 py-8 text-center text-xs text-zinc-400">No forms found. Create one to get started.</td>
-                </tr>`;
+                <div class="col-span-full py-16 text-center">
+                    <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.2" fill="none" class="mx-auto text-zinc-300 dark:text-zinc-700 mb-3"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <p class="text-xs text-zinc-400 dark:text-zinc-500">No forms found. Create one to get started.</p>
+                </div>`;
             return;
         }
 
         body.innerHTML = '';
         formsData.forEach(form => {
-            const tr = document.createElement('tr');
-            tr.className = 'hover:bg-zinc-50/50 transition-colors';
-            tr.innerHTML = `
-                <td class="w-12 px-4 py-4 text-center">
-                    <input type="checkbox" class="form-select-checkbox w-4 h-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-500 cursor-pointer" data-id="${form.id}" />
-                </td>
-                <td class="px-6 py-4 text-xs font-medium text-zinc-900">${form.title}</td>
-                <td class="px-6 py-4 text-xs">
-                    <span class="px-2.5 py-0.5 rounded-full text-[9px] font-bold ${(form.status || 'draft') === 'published' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400' : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400'}">
-                        ${(form.status || 'draft').toUpperCase()}
-                    </span>
-                </td>
-                <td class="px-6 py-4 text-xs text-zinc-500">${form.submission_count || 0} responses</td>
-                <td class="px-6 py-4 text-xs text-zinc-500">${form.created_at}</td>
-                <td class="px-6 py-4 text-xs text-right">
-                    <div class="flex items-center justify-end gap-1.5">
-                        <button class="btn-view-live h-7 w-7 rounded-lg border border-zinc-200 hover:border-zinc-300 bg-white hover:bg-zinc-50 flex items-center justify-center text-zinc-500 hover:text-zinc-950 transition-all cursor-pointer" data-id="${form.id}" title="View Live Form">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                        </button>
-                        <button class="btn-share-form h-7 w-7 rounded-lg border border-zinc-200 hover:border-zinc-300 bg-white hover:bg-zinc-50 flex items-center justify-center text-zinc-500 hover:text-zinc-950 transition-all cursor-pointer" data-id="${form.id}" title="Copy Share Link">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                        </button>
-                        <button class="btn-edit-form h-7 w-7 rounded-lg border border-zinc-200 hover:border-zinc-300 bg-white hover:bg-zinc-50 flex items-center justify-center text-zinc-500 hover:text-zinc-950 transition-all cursor-pointer" data-id="${form.id}" title="Edit Form">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                        </button>
-                        <button class="btn-view-subs h-7 w-7 rounded-lg border border-zinc-200 hover:border-zinc-300 bg-white hover:bg-zinc-50 flex items-center justify-center text-zinc-500 hover:text-zinc-950 transition-all cursor-pointer" data-id="${form.id}" title="View Submissions">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
-                        </button>
-                        <button class="btn-delete-form h-7 w-7 rounded-lg border border-zinc-200 hover:border-red-200 bg-white hover:bg-red-50/50 flex items-center justify-center text-zinc-500 hover:text-red-650 transition-all cursor-pointer" data-id="${form.id}" title="Delete Form">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                        </button>
-                    </div>
-                </td>
-            `;
-            body.appendChild(tr);
-        });
+            const card = document.createElement('div');
+            card.className = 'form-card bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-5 flex flex-col gap-4 shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group';
+            card.setAttribute('data-form-id', form.id);
 
-        // Re-bind row checkbox change handlers
-        jQuery('.form-select-checkbox').on('change', function() {
-            const total = jQuery('.form-select-checkbox').length;
-            const checked = jQuery('.form-select-checkbox:checked').length;
-            const selectAllEl = document.getElementById('select-all-forms');
-            if (selectAllEl) {
-                selectAllEl.checked = total > 0 && total === checked;
-                selectAllEl.indeterminate = checked > 0 && checked < total;
-            }
-            updateBulkActionBarState();
+            const statusClass = (form.status || 'draft') === 'published'
+                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400'
+                : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400';
+            const statusText = (form.status || 'draft').toUpperCase();
+            const responses = form.submission_count || 0;
+            const created = form.created_at || '—';
+
+            card.innerHTML = `
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 dark:text-zinc-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                        </div>
+                        <div class="min-w-0">
+                            <h4 class="text-[13px] font-semibold text-zinc-900 dark:text-zinc-100 truncate leading-tight">${form.title}</h4>
+                            <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">${created}</p>
+                        </div>
+                    </div>
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold shrink-0 ${statusClass}">${statusText}</span>
+                </div>
+
+                <div class="flex items-center gap-4 text-[11px] text-zinc-500 dark:text-zinc-400">
+                    <div class="flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 dark:text-zinc-500"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+                        <span class="font-medium">${responses} response${responses !== 1 ? 's' : ''}</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-1.5 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                    <button class="btn-edit-form h-8 flex-1 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-white text-white dark:text-zinc-900 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer border-0" data-id="${form.id}" title="Edit Form">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        Edit
+                    </button>
+                    <button class="btn-view-subs h-8 flex-1 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-zinc-100 text-[11px] font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer" data-id="${form.id}" title="View Submissions">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+                        Responses
+                    </button>
+                    <button class="btn-view-live h-8 w-8 rounded-lg bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="${form.id}" title="View Live Form">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
+                    <button class="btn-share-form h-8 w-8 rounded-lg bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="${form.id}" title="Copy Share Link">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                    </button>
+                    <button class="btn-delete-form h-8 w-8 rounded-lg bg-transparent hover:bg-red-50 dark:hover:bg-red-950/20 text-zinc-400 dark:text-zinc-500 hover:text-red-600 dark:hover:text-red-400 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="${form.id}" title="Delete Form">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                    </button>
+                </div>
+            `;
+            body.appendChild(card);
         });
 
         // Attach listeners
@@ -2271,6 +2538,12 @@ function renderFormsList() {
     // --- Routing ---
     function handleRouting() {
         const hash = window.location.hash || '#list';
+
+        // Remove loading overlay if present when not editing
+        if (!hash.startsWith('#edit/')) {
+            const loadingOverlay = document.getElementById('forms-loading-overlay');
+            if (loadingOverlay) loadingOverlay.remove();
+        }
         
         if (listState) { listState.classList.add('hidden'); listState.classList.remove('flex'); }
         if (editorState) { editorState.classList.add('hidden'); editorState.classList.remove('flex'); }
@@ -3987,22 +4260,6 @@ function renderFormsList() {
         });
     }
 
-    // Bulk Operations Event Listeners
-    document.getElementById('select-all-forms')?.addEventListener('change', (e) => {
-        const checked = e.target.checked;
-        jQuery('.form-select-checkbox').prop('checked', checked);
-        updateBulkActionBarState();
-    });
-
-    document.getElementById('btn-bulk-publish')?.addEventListener('click', () => executeBulkFormAction('publish'));
-    document.getElementById('btn-bulk-draft')?.addEventListener('click', () => executeBulkFormAction('draft'));
-    document.getElementById('btn-bulk-delete')?.addEventListener('click', () => executeBulkFormAction('delete'));
-    document.getElementById('btn-bulk-clear')?.addEventListener('click', () => {
-        const selectAll = document.getElementById('select-all-forms');
-        if (selectAll) selectAll.checked = false;
-        jQuery('.form-select-checkbox').prop('checked', false);
-        updateBulkActionBarState();
-    });
 
     // Palette Items (Add & Drag)
     document.querySelectorAll('[data-add-type]').forEach(item => {

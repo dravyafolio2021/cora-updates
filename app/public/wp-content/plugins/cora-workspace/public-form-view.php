@@ -1235,7 +1235,7 @@ $description = isset( $settings['description'] ) ? $settings['description'] : ( 
                             }, 1500);
                         }
                     } else {
-                        showErrorBanner("Submission failed. Please try again.");
+                        showErrorBanner(data.message || "Submission failed. Please try again.");
                         btnNext.disabled = false;
                         btnNext.textContent = (formSettings && formSettings.submit_button_text) || 'Submit';
                     }
