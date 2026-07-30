@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.3.4
+ * Version: 2.3.5
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.3.4' );
+define( 'CORA_WORKSPACE_VERSION', '2.3.5' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -22338,8 +22338,122 @@ function cora_ajax_generate_review_report() {
         'generated_at'     => current_time( 'Y-m-d H:i:s' ),
     ];
 
-    cora_log_activity( 'Reviews & Feedback', 'Generated review performance report (' . $period . ')' );
-    wp_send_json_success( [ 'message' => 'Review performance report generated successfully!', 'report' => $summary ] );
+    // Compile and email the report to admin
+    $admin_email    = get_option( 'admin_email' );
+    $workspace_name = get_option( 'cora_workspace_name', 'Cora Studio' );
+    $subject = $workspace_name . ' — Review Performance Report (' . str_replace( '_', ' ', $period ) . ')';
+    $body  = "Review Performance Report\n";
+    $body .= "========================\n\n";
+    $body .= "Period: " . str_replace( '_', ' ', ucwords( $period ) ) . "\n";
+    $body .= "Generated: " . $summary['generated_at'] . "\n\n";
+    $body .= "Total Requests Sent: " . $summary['total_requests'] . "\n";
+    $body .= "Published 5-Star Reviews: " . $summary['published_5star'] . "\n";
+    $body .= "Private Shield Intercepts: " . $summary['private_shield'] . "\n";
+    $body .= "Review Conversion Rate: " . $summary['conversion_rate'] . "\n\n";
+    $body .= "— Sent automatically by " . $workspace_name;
+
+    wp_mail( $admin_email, $subject, $body );
+
+    cora_log_activity( 'Reviews & Feedback', 'Generated and emailed review performance report (' . $period . ') to ' . $admin_email );
+    wp_send_json_success( [ 'message' => 'Review performance report generated and emailed to ' . $admin_email . '!', 'report' => $summary ] );
+}
+
+/**
+ * AJAX Action: Delete Review Request Entry
+ */
+add_action( 'wp_ajax_cora_delete_review_request', 'cora_ajax_delete_review_request' );
+function cora_ajax_delete_review_request() {
+    $nonce = $_REQUEST['nonce'] ?? '';
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+        wp_send_json_error( [ 'message' => 'Security verification failed.' ] );
+    }
+    if ( ! is_user_logged_in() ) wp_send_json_error( [ 'message' => 'Unauthorized.' ] );
+
+    $request_id = sanitize_text_field( $_POST['request_id'] ?? '' );
+    if ( empty( $request_id ) ) {
+        wp_send_json_error( [ 'message' => 'Request ID is required.' ] );
+    }
+
+    $requests = get_option( 'cora_review_requests', [] );
+    $filtered = array_filter( $requests, function( $r ) use ( $request_id ) {
+        return ( $r['id'] ?? '' ) !== $request_id;
+    });
+
+    if ( count( $filtered ) === count( $requests ) ) {
+        wp_send_json_error( [ 'message' => 'Review entry not found.' ] );
+    }
+
+    update_option( 'cora_review_requests', array_values( $filtered ) );
+    cora_log_activity( 'Reviews & Feedback', 'Deleted review request entry: ' . $request_id );
+    wp_send_json_success( [ 'message' => 'Review entry deleted successfully.' ] );
+}
+
+/**
+ * Public AJAX Action: Submit Customer Review (No Auth Required)
+ */
+add_action( 'wp_ajax_nopriv_cora_submit_public_review', 'cora_ajax_submit_public_review' );
+add_action( 'wp_ajax_cora_submit_public_review', 'cora_ajax_submit_public_review' );
+function cora_ajax_submit_public_review() {
+    $request_id  = sanitize_text_field( $_POST['request_id'] ?? '' );
+    $rating      = intval( $_POST['rating'] ?? 5 );
+    $review_text = sanitize_textarea_field( $_POST['review_text'] ?? '' );
+    $attributes  = json_decode( stripslashes( $_POST['attributes'] ?? '[]' ), true );
+
+    $requests = get_option( 'cora_review_requests', [] );
+    $updated  = false;
+
+    foreach ( $requests as &$req ) {
+        if ( ( $req['id'] ?? '' ) === $request_id || empty( $request_id ) ) {
+            $req['rating']      = $rating;
+            $req['review_text'] = $review_text;
+            $req['attributes']  = is_array( $attributes ) ? array_map( 'sanitize_text_field', $attributes ) : [];
+            $req['is_private']  = $rating <= 3;
+            $req['status']      = $rating >= 4 ? 'Google 5-Star Published' : 'Private Shield Intercepted';
+            $req['submitted_at'] = current_time( 'Y-m-d H:i:s' );
+            $updated = true;
+            break;
+        }
+    }
+
+    if ( $updated ) {
+        update_option( 'cora_review_requests', $requests );
+        cora_log_activity( 'Reviews & Feedback', 'Customer submitted ' . $rating . '★ review (Request: ' . $request_id . ')' );
+        wp_send_json_success( [ 'message' => 'Review saved successfully!' ] );
+    } else {
+        wp_send_json_error( [ 'message' => 'Review request record not found.' ] );
+    }
+}
+
+/**
+ * Public Review Portal Template Loader
+ */
+add_action( 'init', 'cora_register_public_review_portal' );
+function cora_register_public_review_portal() {
+    if ( isset( $_GET['cora_page'] ) && $_GET['cora_page'] === 'review_portal' ) {
+        $file = plugin_dir_path( __FILE__ ) . 'views/view-public-review-portal.php';
+        if ( file_exists( $file ) ) {
+            include $file;
+            exit;
+        }
+    }
+}
+
+/**
+ * Cross-Module Integration Helper: Fetch Client Review History for CRM & Bookings
+ * 
+ * @param string $phone_or_email Phone number or email of the client
+ * @return array List of reviews for this client
+ */
+function cora_get_client_reviews( $phone_or_email = '' ) {
+    if ( empty( $phone_or_email ) ) return [];
+    $all = get_option( 'cora_review_requests', [] );
+    $clean_query = strtolower( preg_replace( '/[^a-z0-9]/i', '', $phone_or_email ) );
+    
+    return array_values( array_filter( $all, function( $r ) use ( $clean_query ) {
+        $p = strtolower( preg_replace( '/[^a-z0-9]/i', '', $r['client_phone'] ?? '' ) );
+        $e = strtolower( trim( $r['client_email'] ?? '' ) );
+        return ( ! empty( $p ) && strpos( $p, $clean_query ) !== false ) || ( ! empty( $e ) && $e === $clean_query );
+    }) );
 }
 
 

@@ -2846,7 +2846,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         
         <div class="flex lg:hidden w-full items-center justify-between bg-transparent py-0.5">
             <div onclick="document.getElementById('cora-mobile-menu-toggle').click();" class="flex items-center cursor-pointer select-none shrink-0 hover:opacity-85 transition-opacity pr-1.5">
-                <span class="tracking-[0.18em] font-black text-[13px] text-white">CORA</span>
+                <span class="tracking-normal font-black text-[13px] text-white">CORA</span>
             </div>
 
             <div onclick="window.coraOpenCommandPalette();" class="mx-2 flex items-center justify-between text-zinc-400 text-xs cursor-pointer" style="max-width: 248px; height: 32px; background-color: #343434e3; border-radius: 8px; border: none; padding: 0 10px; flex: 1;">
@@ -2854,15 +2854,15 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <span class="text-[11px]">Search anything...</span>
                 </div>
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-purple-400"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-white"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
             </div>
 
             <div class="flex items-center gap-2">
-                <button onclick="window.coraToggleNotificationDrawer(true);" class="relative p-1 text-zinc-400 hover:text-white transition-all cursor-pointer flex items-center justify-center shrink-0">
+                <button onclick="document.getElementById('cora-notif-bell-btn').click();" class="relative p-1 text-zinc-400 hover:text-white transition-all cursor-pointer flex items-center justify-center shrink-0">
                     <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                    <span class="absolute top-1 right-1 w-2 h-2 bg-purple-500 rounded-full border border-[#09090b]"></span>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-white rounded-full border border-[#09090b]"></span>
                 </button>
-                <div onclick="window.coraToggleProfilePopover(event);" class="flex items-center cursor-pointer shrink-0">
+                <div onclick="document.querySelector('.cora-header-profile-btn').click();" class="flex items-center cursor-pointer shrink-0">
                     <div class="bg-white text-black w-7 h-7 rounded-full flex items-center justify-center font-bold text-[11px]"><?php echo esc_html($cora_initials); ?></div>
                 </div>
             </div>
