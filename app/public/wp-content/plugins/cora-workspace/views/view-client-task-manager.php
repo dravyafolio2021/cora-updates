@@ -496,6 +496,38 @@ if (!defined('ABSPATH')) {
         justify-content: center !important;
     }
 }
+
+/* Responsive Page Header */
+@media (max-width: 640px) {
+    .cora-task-manager-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+        margin-bottom: 16px !important;
+    }
+    .cora-task-header-left h1 {
+        font-size: 20px !important;
+        line-height: 1.25 !important;
+        letter-spacing: -0.02em !important;
+    }
+    .cora-task-header-left p {
+        display: none !important; /* Hide bloated description on mobile */
+    }
+    .cora-task-header-right {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+        width: 100% !important;
+    }
+    .cora-task-header-right button {
+        width: 100% !important;
+        justify-content: center !important;
+        font-size: 11px !important;
+        padding: 0 8px !important;
+        height: 34px !important;
+        border-radius: 8px !important;
+    }
+}
 </style>
 
 <div class="cora-task-manager-wrap text-zinc-900 dark:text-zinc-100 font-sans px-3 sm:px-4 py-3 sm:py-4 max-w-[1700px] mx-auto pb-20 relative">
@@ -606,13 +638,13 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
                 My Tasks <span class="qf-count">0</span>
             </button>
             <button onclick="coraSetQuickFilter('overdue')" id="qf-overdue" class="qf-btn text-rose-600 border-rose-200 hover:bg-rose-50/50">
-                ⚠️ Overdue <span class="qf-count bg-rose-100 text-rose-750">0</span>
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Overdue <span class="qf-count bg-rose-100 text-rose-750">0</span>
             </button>
             <button onclick="coraSetQuickFilter('due_today')" id="qf-due_today" class="qf-btn text-amber-700 border-amber-200 hover:bg-amber-50/50">
-                ⏳ Due Today <span class="qf-count bg-amber-100 text-amber-800">0</span>
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Due Today <span class="qf-count bg-amber-100 text-amber-800">0</span>
             </button>
             <button onclick="coraSetQuickFilter('urgent_high')" id="qf-urgent_high" class="qf-btn text-red-600 border-red-200 hover:bg-red-50/50">
-                🔥 Urgent / High <span class="qf-count bg-red-100 text-red-750">0</span>
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Urgent / High <span class="qf-count bg-red-100 text-red-750">0</span>
             </button>
         </div>
         
@@ -2046,7 +2078,7 @@ function renderSingleColumnCards(col, colTasks, today, todayStr, tomorrowStr) {
             if (isCompleted) {
                 alertHtml = `<div class="text-[10.5px] font-bold text-emerald-700 bg-emerald-50/70 border border-emerald-100 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5">
                     <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <span>🎉 Excellent work, team!</span>
+                    <span>Excellent work, team!</span>
                 </div>`;
             } else if (t.due_date && t.due_date < todayStr) {
                 const daysOverdue = Math.floor((today - new Date(t.due_date + 'T00:00:00')) / (1000 * 60 * 60 * 24));
@@ -2057,11 +2089,12 @@ function renderSingleColumnCards(col, colTasks, today, todayStr, tomorrowStr) {
             } else if (t.due_date && t.due_date === todayStr) {
                 alertHtml = `<div class="text-[10.5px] font-bold text-amber-850 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5">
                     <svg class="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3" /></svg>
-                    <span>⚠️ Action Required: Due Today</span>
+                    <span>Action Required: Due Today</span>
                 </div>`;
             } else if (t.priority === 'urgent') {
                 alertHtml = `<div class="text-[10.5px] font-bold text-rose-700 bg-rose-50/70 border border-rose-100 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5">
-                    <span>🔥 Escalated urgent priority</span>
+                    <svg class="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    <span>Escalated urgent priority</span>
                 </div>`;
             }
 
@@ -2456,25 +2489,25 @@ window.coraQuickMoveTask = function(event, taskId, newStatus) {
         let guidelines = '';
         if (priority === 'urgent' || priority === 'high') {
             if (status === 'todo') {
-                guidelines = "🚨 **Urgent Task Awaiting Assignment**: This is a critical shoot deliverable. Assign team members immediately, double-check start dates, and dispatch immediate alerts.";
+                guidelines = "**Urgent Task Awaiting Assignment**: This is a critical shoot deliverable. Assign team members immediately, double-check start dates, and dispatch immediate alerts.";
             } else if (status === 'in_progress' || status === 'inprogress') {
-                guidelines = "⚡ **High-Priority Execution**: Co-worker is currently working on this task. Ensure technical review checklists are followed. Keep clients updated with draft previews to maintain quality.";
+                guidelines = "**High-Priority Execution**: Co-worker is currently working on this task. Ensure technical review checklists are followed. Keep clients updated with draft previews to maintain quality.";
             } else if (status === 'review' || status === 'client_review') {
-                guidelines = "🔍 **Client Feedback Stage**: Task is ready for client validation. Verify drive links and preview videos. Ensure co-founders are notified if revisions are requested.";
+                guidelines = "**Client Feedback Stage**: Task is ready for client validation. Verify drive links and preview videos. Ensure co-founders are notified if revisions are requested.";
             } else if (status === 'done') {
-                guidelines = "🎉 **Deliverables Dispatched**: Excellent work. Priority task marked as complete. WhatsApp and Email notifications have been archived.";
+                guidelines = "**Deliverables Dispatched**: Excellent work. Priority task marked as complete. WhatsApp and Email notifications have been archived.";
             } else {
-                guidelines = "⚠️ **Task Blocked**: High-priority block reported by a team member. Review workflow blockers immediately to avoid bottlenecking client deliverables.";
+                guidelines = "**Task Blocked**: High-priority block reported by a team member. Review workflow blockers immediately to avoid bottlenecking client deliverables.";
             }
         } else {
             if (status === 'todo') {
-                guidelines = "💡 **Standard Task Queue**: Ready to be processed. Map checklists, sync drive links, and notify teammates on next assignments.";
+                guidelines = "**Standard Task Queue**: Ready to be processed. Map checklists, sync drive links, and notify teammates on next assignments.";
             } else if (status === 'in_progress' || status === 'inprogress') {
-                guidelines = "⏱️ **Work In Progress**: Standard processing phase. Ensure subtasks are completed systematically to ensure smooth handoffs.";
+                guidelines = "**Work In Progress**: Standard processing phase. Ensure subtasks are completed systematically to ensure smooth handoffs.";
             } else if (status === 'done') {
-                guidelines = "✅ **Task Complete**: Subtasks checklist marked complete. Deliverables validated.";
+                guidelines = "**Task Complete**: Subtasks checklist marked complete. Deliverables validated.";
             } else {
-                guidelines = "📋 **Review & Blocked Guidelines**: Standard checking phase. Resolve any dependencies with team co-workers.";
+                guidelines = "**Review & Blocked Guidelines**: Standard checking phase. Resolve any dependencies with team co-workers.";
             }
         }
         
@@ -2750,7 +2783,7 @@ window.coraQuickMoveTask = function(event, taskId, newStatus) {
                 t.comments.push({
                     author: 'System Update',
                     time: timeStr,
-                    text: `🔧 ${log}`
+                    text: `System Update: ${log}`
                 });
             });
             coraTaskState.currentTaskComments = t.comments;
