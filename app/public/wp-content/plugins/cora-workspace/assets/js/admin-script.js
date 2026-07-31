@@ -404,7 +404,7 @@ jQuery(document).ready(function($) {
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         }
-        const drawer = $('#cora-maintenance-drawer, #cora-equipment-maintenance-drawer');
+        const drawer = $('#cora-maintenance-drawer, #cora-equipment-maintenance-drawer, #cora-log-maintenance-drawer');
         if (drawer.length) {
             drawer.removeClass('collapsed hidden');
         }
@@ -1681,7 +1681,7 @@ jQuery(document).ready(function($) {
             });
         });
 
-        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'shifts', 'vault', 'emails'];
+        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'shifts', 'vault', 'emails'];
         permissions['administrator'] = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'emails', 'ecosystem', 'mcp', 'super-admin', ...enterpriseNewModules];
         permissions['cora_super_admin'] = permissions['administrator'];
         permissions['cora_shruti'] = permissions['administrator'];
@@ -2760,7 +2760,7 @@ jQuery(document).ready(function($) {
 
     // Role Enforcement capability controller
     window.coraEnforcePermissions = function(role) {
-        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'shifts', 'vault', 'emails'];
+        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'shifts', 'vault', 'emails'];
         let allowed = (coraREData.userPermissions && coraREData.userPermissions[role]) ? coraREData.userPermissions[role] : [];
         
         if (!allowed || allowed.length === 0) {

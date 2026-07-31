@@ -13,7 +13,12 @@ test.describe('Leads Directory Pagination & Simplified Mobile Column Customizer'
     await page.goto('/workspace/leads');
     await page.waitForLoadState('networkidle');
 
-    // 1. Verify Pagination Bar elements in Leads Directory
+    // 1. Ensure Directory subtab is active
+    const dirTabBtn = page.locator('.cora-lead-subtab-btn[data-tab="directory"]');
+    await expect(dirTabBtn).toBeVisible({ timeout: 10000 });
+    await dirTabBtn.click();
+
+    // Verify Pagination Bar elements in Leads Directory
     const paginationBar = page.locator('#cora-directory-pagination');
     await expect(paginationBar).toBeVisible();
 

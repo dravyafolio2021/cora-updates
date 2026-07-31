@@ -293,439 +293,421 @@ if ( is_array( $cora_gear_maintenance ) ) {
 <div id="cora-equipment-view-wrapper" class="space-y-6 font-sans text-zinc-900 max-w-[1700px] mx-auto pb-12">
     
     <!-- ═══ 1. STANDARDIZED PAGE HEADER & CTA ACTION BAR ═════════════════════════════════ -->
-    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-zinc-200">
-        <div>
-            <div class="flex items-center gap-2.5">
-                <h1 class="text-2xl font-bold tracking-tight text-zinc-950">● Camera Equipment & Gear Inventory</h1>
-            </div>
-            <p class="text-xs font-medium text-zinc-500 mt-1">Manage studio camera gear assets, shoot checkouts, crew allocations, and financial maintenance costs.</p>
+    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4 w-full">
+        <div class="min-w-0">
+            <h1 class="text-lg sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 leading-snug">Camera Equipment & Gear Inventory</h1>
+            <p class="text-[11px] sm:text-xs text-zinc-550 dark:text-zinc-400 mt-0.5 sm:mt-1">Manage studio camera gear assets, shoot checkouts, crew allocations, and financial maintenance costs.</p>
         </div>
 
-        <div class="flex items-center gap-3 flex-wrap">
-            <button onclick="openCheckoutGearDrawer()" class="px-4 py-2.5 bg-white border border-zinc-200 hover:bg-zinc-100 hover:border-zinc-300 text-zinc-800 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center gap-2 cursor-pointer">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
+        <div class="flex items-center gap-2 shrink-0 flex-wrap">
+            <button onclick="openCheckoutGearDrawer()" class="flex-1 sm:flex-none px-3.5 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-850 text-zinc-800 dark:text-zinc-250 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center justify-center gap-2 cursor-pointer">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-450 dark:text-zinc-500 shrink-0"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
                 Check Out Gear
             </button>
-            <button onclick="openMaintenanceDrawer()" class="px-4 py-2.5 bg-white border border-zinc-200 hover:bg-zinc-100 hover:border-zinc-300 text-zinc-800 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center gap-2 cursor-pointer">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+            <button onclick="openMaintenanceDrawer()" class="flex-1 sm:flex-none px-3.5 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-850 text-zinc-800 dark:text-zinc-250 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center justify-center gap-2 cursor-pointer">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-450 dark:text-zinc-500 shrink-0"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
                 Log Repair & Cost
             </button>
             <!-- Primary Action CTA -->
-            <button onclick="openAddGearDrawer()" class="px-4.5 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <button onclick="openAddGearDrawer()" class="w-full sm:w-auto px-3.5 py-2 bg-zinc-950 dark:bg-white hover:bg-zinc-850 dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 Register New Gear
             </button>
         </div>
-    </header>
+    </div>
 
     <!-- ═══ 2. MONOCHROMATIC 4-KPI METRIC STAT CARDS ═════════════════════════════════ -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         <!-- 1. Total Asset Valuation -->
-        <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[110px]">
-            <div class="flex items-center justify-between">
-                <span class="text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-widest">Total Asset Valuation</span>
-                <span class="text-[9px] font-bold uppercase px-2.5 py-0.5 rounded-full text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-700/50">CapEx</span>
+        <div class="bg-white dark:bg-zinc-900 p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[100px] sm:min-h-[110px]">
+            <div class="flex items-start justify-between gap-2">
+                <span class="text-[9px] sm:text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-widest leading-tight">Total Asset Valuation</span>
+                <span class="text-[8px] sm:text-[9px] font-bold uppercase px-2 py-0.5 rounded-full text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-700/50 shrink-0">CapEx</span>
             </div>
-            <div class="mt-2.5">
-                <span id="kpi-total-val" class="text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight">₹<?php echo number_format( $total_capex_valuation ); ?></span>
-                <span class="text-[10px] text-zinc-400 dark:text-zinc-500 block mt-1 font-medium">Total acquisition cost</span>
+            <div class="mt-2">
+                <span id="kpi-total-val" class="text-base sm:text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight leading-none">₹<?php echo number_format( $total_capex_valuation ); ?></span>
+                <span class="text-[9px] sm:text-[10px] text-zinc-400 dark:text-zinc-500 block mt-1 font-medium">Total acquisition cost</span>
             </div>
         </div>
 
         <!-- 2. Available in Studio -->
-        <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[110px]">
-            <div class="flex items-center justify-between">
-                <span class="text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-widest">Available in Studio</span>
-                <span class="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase px-2.5 py-0.5 rounded-full text-emerald-700 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-900/30 shadow-3xs">
+        <div class="bg-white dark:bg-zinc-900 p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[100px] sm:min-h-[110px]">
+            <div class="flex items-start justify-between gap-2">
+                <span class="text-[9px] sm:text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-widest leading-tight">Available in Studio</span>
+                <span class="inline-flex items-center gap-1 text-[8px] sm:text-[9px] font-bold uppercase px-2 py-0.5 rounded-full text-emerald-700 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-900/30 shrink-0">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Ready
                 </span>
             </div>
-            <div class="mt-2.5">
-                <span id="kpi-avail-count" class="text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight"><?php echo $available_count; ?> <span class="text-sm font-semibold text-zinc-450">Items</span></span>
-                <span class="text-[10px] text-zinc-400 dark:text-zinc-500 block mt-1 font-medium">Ready in studio vault</span>
+            <div class="mt-2">
+                <span id="kpi-avail-count" class="text-lg sm:text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight leading-none"><?php echo $available_count; ?> <span class="text-xs sm:text-sm font-semibold text-zinc-450">Items</span></span>
+                <span class="text-[9px] sm:text-[10px] text-zinc-400 dark:text-zinc-500 block mt-1 font-medium">Ready in studio vault</span>
             </div>
         </div>
 
         <!-- 3. Checked Out on Shoots -->
-        <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[110px]">
-            <div class="flex items-center justify-between">
-                <span class="text-[10px] font-bold text-zinc-455 dark:text-zinc-500 uppercase tracking-widest">Checked Out</span>
-                <span class="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase px-2.5 py-0.5 rounded-full text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 shadow-3xs">
+        <div class="bg-white dark:bg-zinc-900 p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[100px] sm:min-h-[110px]">
+            <div class="flex items-start justify-between gap-2">
+                <span class="text-[9px] sm:text-[10px] font-bold text-zinc-455 dark:text-zinc-500 uppercase tracking-widest leading-tight">Checked Out</span>
+                <span class="inline-flex items-center gap-1 text-[8px] sm:text-[9px] font-bold uppercase px-2 py-0.5 rounded-full text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 shrink-0">
                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> On Field
                 </span>
             </div>
-            <div class="mt-2.5">
-                <span id="kpi-checkout-count" class="text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight"><?php echo $checked_out_count; ?> <span class="text-sm font-semibold text-zinc-455">Allocated</span></span>
-                <span class="text-[10px] text-zinc-450 dark:text-zinc-500 block mt-1 font-medium">Active shoot checkouts</span>
+            <div class="mt-2">
+                <span id="kpi-checkout-count" class="text-lg sm:text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight leading-none"><?php echo $checked_out_count; ?> <span class="text-xs sm:text-sm font-semibold text-zinc-455">Allocated</span></span>
+                <span class="text-[9px] sm:text-[10px] text-zinc-450 dark:text-zinc-500 block mt-1 font-medium">Active shoot checkouts</span>
             </div>
         </div>
 
         <!-- 4. Under Maintenance / Servicing -->
-        <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[110px]">
-            <div class="flex items-center justify-between">
-                <span class="text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-widest">In Repair</span>
-                <span class="text-[9px] font-bold uppercase px-2.5 py-0.5 rounded-full text-rose-700 dark:text-rose-455 bg-rose-50 dark:bg-rose-950/20 border border-rose-200/50 dark:border-rose-900/30 shadow-3xs">OpEx</span>
+        <div class="bg-white dark:bg-zinc-900 p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between min-h-[100px] sm:min-h-[110px]">
+            <div class="flex items-start justify-between gap-2">
+                <span class="text-[9px] sm:text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-widest leading-tight">In Repair</span>
+                <span class="text-[8px] sm:text-[9px] font-bold uppercase px-2 py-0.5 rounded-full text-rose-700 dark:text-rose-455 bg-rose-50 dark:bg-rose-950/20 border border-rose-200/50 dark:border-rose-900/30 shrink-0">OpEx</span>
             </div>
-            <div class="mt-2.5">
-                <span id="kpi-maint-count" class="text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight"><?php echo $maintenance_count; ?> <span class="text-sm font-semibold text-zinc-450">Item<?php echo $maintenance_count === 1 ? '' : 's'; ?></span></span>
-                <span class="text-[10px] text-zinc-400 dark:text-zinc-500 block mt-1 font-medium">Servicing Cost: ₹<?php echo number_format( $total_repair_expense ); ?></span>
+            <div class="mt-2">
+                <span id="kpi-maint-count" class="text-lg sm:text-2xl font-extrabold text-zinc-950 dark:text-zinc-50 tracking-tight leading-none"><?php echo $maintenance_count; ?> <span class="text-xs sm:text-sm font-semibold text-zinc-450">Item<?php echo $maintenance_count === 1 ? '' : 's'; ?></span></span>
+                <span class="text-[9px] sm:text-[10px] text-zinc-400 dark:text-zinc-500 block mt-1 font-medium">Servicing Cost: ₹<?php echo number_format( $total_repair_expense ); ?></span>
             </div>
         </div>
     </div>
 
     <!-- ═══ 3. STANDARDIZED PLATFORM SUB-TAB BAR ═════════════════════════════════ -->
-    <div class="cora-sub-tabs border-b border-zinc-200 flex gap-6 text-xs font-bold text-zinc-550 select-none pb-0.5">
-        <button id="tab-btn-registry" onclick="coraSwitchEquipmentTab('registry')" class="cora-eq-tab-btn active pb-2.5 border-b-2 border-zinc-950 text-zinc-950 cursor-pointer flex items-center gap-2">
-            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-            Gear Registry <span id="cnt-tab-registry" class="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-350 px-2 py-0.5 rounded-full border border-zinc-200/40 dark:border-zinc-700/40 font-mono"><?php echo count( $cora_studio_gear ); ?></span>
-        </button>
+    <div class="cora-sub-tabs border-b border-zinc-200 dark:border-zinc-800 overflow-x-auto select-none pb-0.5 -mb-px">
+        <div class="flex gap-5 text-xs font-bold text-zinc-450 dark:text-zinc-500 whitespace-nowrap min-w-max">
+            <button id="tab-btn-registry" onclick="coraSwitchEquipmentTab('registry')" class="cora-eq-tab-btn active pb-2.5 border-b-2 border-zinc-950 dark:border-white text-zinc-950 dark:text-white cursor-pointer flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                Gear Registry <span id="cnt-tab-registry" class="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-350 px-2 py-0.5 rounded-full border border-zinc-200/40 dark:border-zinc-700/40 font-mono"><?php echo count( $cora_studio_gear ); ?></span>
+            </button>
 
-        <button id="tab-btn-checkouts" onclick="coraSwitchEquipmentTab('checkouts')" class="cora-eq-tab-btn pb-2.5 border-b-2 border-transparent hover:text-zinc-900 text-zinc-500 cursor-pointer flex items-center gap-2">
-            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-            Shoot Checkouts <span id="cnt-tab-checkouts" class="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-350 px-2 py-0.5 rounded-full border border-zinc-200/40 dark:border-zinc-700/40 font-mono"><?php echo count( $cora_gear_checkouts ); ?></span>
-        </button>
+            <button id="tab-btn-checkouts" onclick="coraSwitchEquipmentTab('checkouts')" class="cora-eq-tab-btn pb-2.5 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-white text-zinc-450 dark:text-zinc-500 cursor-pointer flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                Shoot Checkouts <span id="cnt-tab-checkouts" class="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-350 px-2 py-0.5 rounded-full border border-zinc-200/40 dark:border-zinc-700/40 font-mono"><?php echo count( $cora_gear_checkouts ); ?></span>
+            </button>
 
-        <button id="tab-btn-maintenance" onclick="coraSwitchEquipmentTab('maintenance')" class="cora-eq-tab-btn pb-2.5 border-b-2 border-transparent hover:text-zinc-900 text-zinc-500 cursor-pointer flex items-center gap-2">
-            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-            Maintenance & Financial Ledger <span id="cnt-tab-maintenance" class="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-350 px-2 py-0.5 rounded-full border border-zinc-200/40 dark:border-zinc-700/40 font-mono"><?php echo count( $cora_gear_maintenance ); ?></span>
-        </button>
+            <button id="tab-btn-maintenance" onclick="coraSwitchEquipmentTab('maintenance')" class="cora-eq-tab-btn pb-2.5 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-white text-zinc-450 dark:text-zinc-500 cursor-pointer flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                Maintenance & Financial Ledger <span id="cnt-tab-maintenance" class="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-350 px-2 py-0.5 rounded-full border border-zinc-200/40 dark:border-zinc-700/40 font-mono"><?php echo count( $cora_gear_maintenance ); ?></span>
+            </button>
 
-        <button id="tab-btn-kits" onclick="coraSwitchEquipmentTab('kits')" class="cora-eq-tab-btn pb-2.5 border-b-2 border-transparent hover:text-zinc-900 text-zinc-500 cursor-pointer flex items-center gap-2">
-            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-            Studio Gear Kits <span id="cnt-tab-kits" class="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-350 px-2 py-0.5 rounded-full border border-zinc-200/40 dark:border-zinc-700/40 font-mono"><?php echo count( $cora_gear_kits ); ?></span>
-        </button>
+            <button id="tab-btn-kits" onclick="coraSwitchEquipmentTab('kits')" class="cora-eq-tab-btn pb-2.5 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-white text-zinc-450 dark:text-zinc-500 cursor-pointer flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                Studio Gear Kits <span id="cnt-tab-kits" class="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-350 px-2 py-0.5 rounded-full border border-zinc-200/40 dark:border-zinc-700/40 font-mono"><?php echo count( $cora_gear_kits ); ?></span>
+            </button>
+        </div>
     </div>
 
     <!-- ═══ 4. SUB-TAB PANELS CONTAINER ═════════════════════════════════════════════ -->
     
     <!-- SUB-TAB 1: GEAR REGISTRY -->
-    <div id="cora-eq-tab-registry" class="cora-eq-tab-content space-y-4">
-        <div class="flex items-center justify-between flex-wrap gap-4 pb-4 border-b border-zinc-100">
-                <div>
-                    <h3 class="text-sm font-bold text-zinc-950">Master Studio Camera & Equipment Registry</h3>
-                    <p class="text-xs text-zinc-500 mt-0.5">Asset serial tracking, condition grading, CapEx valuation and crew assignments.</p>
-                </div>
-                <div class="flex items-center gap-3">
-                    <div class="relative">
-                        <input type="text" id="gear-search-input" onkeyup="coraFilterGearTable()" placeholder="Search gear or serial #..." class="pl-8 pr-3 py-1.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:outline-none focus:border-zinc-400 w-60">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2.5 top-2.5 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    <div id="cora-eq-tab-registry" class="cora-eq-tab-content space-y-3 pt-3">
+        <!-- Row 1: Title -->
+        <div>
+            <h3 class="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white">Gear Registry</h3>
+            <p class="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-450 mt-0.5">Asset tracking, condition grading &amp; CapEx valuation.</p>
+        </div>
+        <!-- Row 2: Search + Filter -->
+        <div class="flex items-center gap-2 pb-3 border-b border-zinc-100 dark:border-zinc-800">
+            <div class="relative flex-1">
+                <input type="text" id="gear-search-input" onkeyup="coraFilterGearTable()" placeholder="Search gear or serial #..." class="w-full pl-7 pr-2 py-1.5 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-350 focus:bg-white">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2 top-2 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </div>
+            <select id="gear-category-filter" onchange="coraFilterGearTable()" class="shrink-0 px-2 py-1.5 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs font-semibold text-zinc-700 dark:text-zinc-300 focus:outline-none cursor-pointer">
+                <option value="">All Categories</option>
+                <option value="Camera">Camera</option>
+                <option value="Lens">Lens</option>
+                <option value="Lighting">Lighting</option>
+                <option value="Drone">Drone</option>
+                <option value="Audio">Audio</option>
+                <option value="Accessories">Accessories</option>
+            </select>
+        </div>
+
+        <div id="cora-gear-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <?php foreach ( $cora_studio_gear as $gear ) :
+                $status = $gear['status'] ?? 'Available';
+                $status_badge = '<span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full text-emerald-700 dark:text-emerald-450 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-250/20 dark:border-emerald-900/50 select-none"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Available</span>';
+                if ( $status === 'In Use' || $status === 'On Shoot' || $status === 'On-Site' || $status === 'Allocated' ) {
+                    $status_badge = '<span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full text-amber-700 dark:text-amber-450 bg-amber-50 dark:bg-amber-950/20 border border-amber-250/20 dark:border-amber-900/50 select-none"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> On Shoot</span>';
+                } elseif ( $status === 'Maintenance' || $status === 'In Repair' ) {
+                    $status_badge = '<span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full text-rose-700 dark:text-rose-455 bg-rose-50 dark:bg-rose-950/20 border border-rose-250/20 dark:border-rose-900/50 select-none"><span class="w-1.5 h-1.5 rounded-full bg-rose-550 animate-pulse"></span> In Repair</span>';
+                }
+
+                $category = $gear['category'] ?? 'Camera';
+                $cat_icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>';
+                if ( $category === 'Lens' )        $cat_icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>';
+                elseif ( $category === 'Lighting' ) $cat_icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line></svg>';
+                elseif ( $category === 'Drone' )    $cat_icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>';
+                elseif ( $category === 'Audio' )    $cat_icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>';
+
+                $img_html = '';
+                if ( ! empty( $gear['image'] ) ) {
+                    $img_src = $gear['image'];
+                    if ( strpos( $img_src, 'data:' ) === 0 || strpos( $img_src, 'http' ) === 0 ) $img_url = $img_src;
+                    elseif ( strpos( $img_src, '/' ) === 0 ) $img_url = $img_src;
+                    elseif ( strpos( $img_src, '/' ) !== false ) $img_url = '/wp-content/' . $img_src;
+                    else $img_url = '/wp-content/plugins/cora-workspace/assets/images/' . $img_src;
+                    $img_html = '<img src="' . esc_url( $img_url ) . '" class="w-10 h-10 rounded-xl object-cover shrink-0 border border-zinc-200 dark:border-zinc-800" alt="' . esc_attr( $gear['name'] ) . '">';
+                } else {
+                    $img_html = '<div class="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-750/60 flex items-center justify-center shrink-0">' . $cat_icon . '</div>';
+                }
+            ?>
+            <div id="gear-row-<?php echo esc_attr( $gear['id'] ); ?>" class="gear-table-row bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-sm transition-all flex flex-col gap-3">
+                <!-- Card Header: Image + Name + Status -->
+                <div class="flex items-start gap-3">
+                    <?php echo $img_html; ?>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-2">
+                            <span class="font-bold text-zinc-900 dark:text-white gear-item-name text-xs leading-snug"><?php echo esc_html( $gear['name'] ); ?></span>
+                            <?php echo $status_badge; ?>
+                        </div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-700/50 text-zinc-600 dark:text-zinc-400 gear-item-category"><?php echo esc_html( $gear['category'] ); ?></span>
+                            <span class="text-[9px] text-zinc-400 dark:text-zinc-500 font-mono gear-item-serial"><?php echo esc_html( $gear['serial'] ?? $gear['serial_no'] ?? '' ); ?></span>
+                        </div>
                     </div>
-                    <select id="gear-category-filter" onchange="coraFilterGearTable()" class="px-3 py-1.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-medium text-zinc-700 focus:outline-none cursor-pointer">
-                        <option value="">All Categories</option>
-                        <option value="Camera">Camera</option>
-                        <option value="Lens">Lens</option>
-                        <option value="Lighting">Lighting</option>
-                        <option value="Drone">Drone</option>
-                        <option value="Audio">Audio</option>
-                        <option value="Accessories">Accessories</option>
-                    </select>
+                </div>
+
+                <!-- Card Meta Grid -->
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="bg-zinc-50 dark:bg-zinc-800/40 rounded-xl p-2.5">
+                        <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">CapEx Value</div>
+                        <div class="font-mono font-bold text-zinc-900 dark:text-white text-xs mt-0.5">₹<?php echo number_format( floatval( $gear['capex'] ?? $gear['purchase_price'] ?? 0 ) ); ?></div>
+                    </div>
+                    <div class="bg-zinc-50 dark:bg-zinc-800/40 rounded-xl p-2.5">
+                        <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Condition</div>
+                        <div class="text-xs font-semibold text-zinc-700 dark:text-zinc-300 mt-0.5"><?php echo esc_html( $gear['condition'] ); ?></div>
+                    </div>
+                    <?php if ( ! empty( $gear['assigned'] ?? $gear['assigned_to'] ?? '' ) ) : ?>
+                    <div class="col-span-2 bg-zinc-50 dark:bg-zinc-800/40 rounded-xl p-2.5">
+                        <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Assigned To</div>
+                        <div class="text-xs font-semibold text-zinc-700 dark:text-zinc-300 mt-0.5"><?php echo esc_html( $gear['assigned'] ?? $gear['assigned_to'] ?? '' ); ?></div>
+                    </div>
+                    <?php endif; ?>
+                    <div class="bg-zinc-50 dark:bg-zinc-800/40 rounded-xl p-2.5">
+                        <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Purchased</div>
+                        <div class="font-mono text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5"><?php echo esc_html( $gear['purchase_date'] ?? 'N/A' ); ?></div>
+                    </div>
+                </div>
+
+                <!-- Card Footer: Actions -->
+                <div class="flex items-center gap-2 pt-1 border-t border-zinc-100 dark:border-zinc-800">
+                    <?php if ( $status === 'In Repair' || $status === 'Maintenance' ) : ?>
+                        <button onclick="openViewRepairDrawer('<?php echo esc_attr( $gear['id'] ); ?>')" class="flex-1 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-xs font-semibold transition-all cursor-pointer text-center">View Repair</button>
+                    <?php elseif ( $status === 'On Shoot' || $status === 'In Use' || $status === 'On-Site' || $status === 'Allocated' ) : ?>
+                        <button onclick="coraReturnCheckoutItem('', '<?php echo esc_attr( esc_js( $gear['name'] ) ); ?>', '<?php echo esc_attr( $gear['id'] ); ?>')" class="flex-1 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 rounded-lg text-xs font-semibold transition-all cursor-pointer text-center">Return</button>
+                    <?php else : ?>
+                        <button onclick="openCheckoutGearDrawer('<?php echo esc_attr( $gear['id'] ); ?>')" class="flex-1 px-3 py-1.5 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 rounded-lg text-xs font-semibold transition-all cursor-pointer text-center">Check Out</button>
+                    <?php endif; ?>
+
+                    <!-- More Options -->
+                    <div class="relative inline-block">
+                        <button onclick="coraToggleRowActions(event, '<?php echo esc_attr( $gear['id'] ); ?>')" class="w-7 h-7 inline-flex items-center justify-center border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 transition-all cursor-pointer">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                        </button>
+                        <div id="cora-row-actions-<?php echo esc_attr( $gear['id'] ); ?>" class="cora-row-actions-dropdown hidden absolute right-0 bottom-9 w-36 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-lg py-1.5 z-40 space-y-0.5">
+                            <?php if ( $status !== 'In Repair' && $status !== 'Maintenance' ) : ?>
+                                <button onclick="openMaintenanceDrawer('<?php echo esc_attr( $gear['id'] ); ?>'); coraHideAllDropdowns();" class="w-full text-left px-3 py-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-850 text-zinc-700 dark:text-zinc-300 text-xs font-semibold flex items-center gap-2 cursor-pointer">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                                    Log Repair
+                                </button>
+                            <?php endif; ?>
+                            <button onclick="openEditGearDrawer('<?php echo esc_attr( $gear['id'] ); ?>'); coraHideAllDropdowns();" class="w-full text-left px-3 py-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-850 text-zinc-700 dark:text-zinc-300 text-xs font-semibold flex items-center gap-2 cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                Edit Specs
+                            </button>
+                            <button onclick="coraDeleteGearItem('<?php echo esc_attr( $gear['id'] ); ?>'); coraHideAllDropdowns();" class="w-full text-left px-3 py-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-rose-700 dark:text-rose-400 text-xs font-semibold flex items-center gap-2 cursor-pointer border-t border-zinc-100 dark:border-zinc-800">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                Delete Item
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div class="border border-zinc-200/80 rounded-xl overflow-x-auto shadow-2xs">
-                <table class="w-full text-left border-collapse text-xs min-w-[1000px]">
-                    <thead>
-                        <tr class="bg-zinc-50/60 border-b border-zinc-200 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
-                            <th class="p-3.5">Equipment Unit</th>
-                            <th class="p-3.5">Serial No #</th>
-                            <th class="p-3.5">Category</th>
-                            <th class="p-3.5">Condition</th>
-                            <th class="p-3.5">CapEx Valuation</th>
-                            <th class="p-3.5">Status</th>
-                            <th class="p-3.5">Assigned Crew / Shoot</th>
-                            <th class="p-3.5 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cora-gear-tbody" class="divide-y divide-zinc-150 bg-white">
-                        <?php foreach ( $cora_studio_gear as $gear ) : 
-                            $status = $gear['status'] ?? 'Available';
-                            $status_badge = '<span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full text-emerald-700 bg-emerald-50 border border-emerald-250/30"><span class="w-1 h-1 rounded-full bg-emerald-500"></span> Available</span>';
-                            if ( $status === 'In Use' || $status === 'On Shoot' ) {
-                                $status_badge = '<span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full text-amber-700 bg-amber-50 border border-amber-250/30"><span class="w-1 h-1 rounded-full bg-amber-500 animate-pulse"></span> On Shoot</span>';
-                            } elseif ( $status === 'Maintenance' || $status === 'In Repair' ) {
-                                $status_badge = '<span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full text-rose-700 bg-rose-50 border border-rose-250/30"><span class="w-1 h-1 rounded-full bg-rose-500 animate-pulse"></span> In Repair</span>';
-                            }
-
-                            $category = $gear['category'] ?? 'Camera';
-                            $cat_icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>';
-                            if ( $category === 'Lens' ) {
-                                $cat_icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>';
-                            } elseif ( $category === 'Lighting' ) {
-                                $cat_icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line></svg>';
-                            } elseif ( $category === 'Drone' ) {
-                                $cat_icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>';
-                            } elseif ( $category === 'Audio' ) {
-                                $cat_icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>';
-                            }
-
-                            $img_html = '';
-                            if ( ! empty( $gear['image'] ) ) {
-                                $img_src = $gear['image'];
-                                if ( strpos( $img_src, 'data:' ) === 0 || strpos( $img_src, 'http' ) === 0 ) {
-                                    $img_url = $img_src;
-                                } elseif ( strpos( $img_src, '/' ) === 0 ) {
-                                    $img_url = $img_src;
-                                } elseif ( strpos( $img_src, '/' ) !== false ) {
-                                    $img_url = '/wp-content/' . $img_src;
-                                } else {
-                                    $img_url = '/wp-content/plugins/cora-workspace/assets/images/' . $img_src;
-                                }
-                                $img_html = '<img src="' . esc_url( $img_url ) . '" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-zinc-200" alt="' . esc_attr( $gear['name'] ) . '">';
-                            } else {
-                                $img_html = '<div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-800 border border-zinc-200 flex items-center justify-center shrink-0">' . $cat_icon . '</div>';
-                            }
-                        ?>
-                        <tr id="gear-row-<?php echo esc_attr( $gear['id'] ); ?>" class="gear-table-row hover:bg-zinc-50/60 transition-colors">
-                            <td class="p-3.5">
-                                <div class="flex items-center gap-3">
-                                    <?php echo $img_html; ?>
-                                    <div>
-                                        <div class="font-bold text-zinc-950 gear-item-name text-xs"><?php echo esc_html( $gear['name'] ); ?></div>
-                                        <div class="text-[10px] text-zinc-400 font-normal">Purchased: <?php echo esc_html( $gear['purchase_date'] ?? 'N/A' ); ?></div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="p-3.5 font-mono text-xs font-semibold text-zinc-700 gear-item-serial">
-                                <?php echo esc_html( $gear['serial'] ?? $gear['serial_no'] ?? '' ); ?>
-                            </td>
-                            <td class="p-3.5 gear-item-category">
-                                <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-zinc-100 border border-zinc-200 text-zinc-800">
-                                    <?php echo esc_html( $gear['category'] ); ?>
-                                </span>
-                            </td>
-                            <td class="p-3.5">
-                                <span class="text-xs text-zinc-600 font-medium">
-                                    <?php echo esc_html( $gear['condition'] ); ?>
-                                </span>
-                            </td>
-                            <td class="p-3.5 font-mono font-bold text-zinc-950 text-xs">
-                                ₹<?php echo number_format( floatval( $gear['capex'] ?? $gear['purchase_price'] ?? 0 ) ); ?>
-                            </td>
-                            <td class="p-3.5">
-                                <?php echo $status_badge; ?>
-                            </td>
-                            <td class="p-3.5 text-zinc-600 font-medium text-xs">
-                                <?php echo esc_html( $gear['assigned'] ?? $gear['assigned_to'] ?? '' ); ?>
-                            </td>
-                            <td class="p-3.5 text-right whitespace-nowrap">
-                                <div class="inline-flex items-center justify-end gap-2 w-full">
-                                    <?php if ( $status === 'In Repair' || $status === 'Maintenance' ) : ?>
-                                        <button onclick="openViewRepairDrawer('<?php echo esc_attr( $gear['id'] ); ?>')" title="View repair details" class="px-3 py-1 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs font-semibold transition-all cursor-pointer">
-                                            View Repair
-                                        </button>
-                                    <?php else : ?>
-                                        <button onclick="openCheckoutGearDrawer('<?php echo esc_attr( $gear['id'] ); ?>')" title="Check out gear to shoot" class="px-3 py-1 bg-zinc-950 text-white hover:bg-zinc-800 rounded-lg text-xs font-semibold transition-all cursor-pointer">
-                                            Check Out
-                                        </button>
-                                    <?php endif; ?>
-
-                                    <!-- Options Dropdown Menu Trigger -->
-                                    <div class="relative inline-block text-left">
-                                        <button onclick="coraToggleRowActions(event, '<?php echo esc_attr( $gear['id'] ); ?>')" title="More actions" class="w-7 h-7 inline-flex items-center justify-center border border-zinc-200 hover:border-zinc-350 hover:bg-zinc-50 rounded-lg text-zinc-500 hover:text-zinc-950 transition-all cursor-pointer">
-                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                                        </button>
-                                        
-                                        <!-- Popover Menu -->
-                                        <div id="cora-row-actions-<?php echo esc_attr( $gear['id'] ); ?>" class="cora-row-actions-dropdown hidden absolute right-0 mt-1.5 w-36 bg-white border border-zinc-200 rounded-xl shadow-lg py-1.5 z-40 space-y-0.5 text-left">
-                                            <?php if ( $status !== 'In Repair' && $status !== 'Maintenance' ) : ?>
-                                                <button onclick="openMaintenanceDrawer('<?php echo esc_attr( $gear['id'] ); ?>'); coraHideAllDropdowns();" class="w-full text-left px-3 py-1.5 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold flex items-center gap-2 cursor-pointer">
-                                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
-                                                    Log Repair
-                                                </button>
-                                            <?php endif; ?>
-                                            <button onclick="openEditGearDrawer('<?php echo esc_attr( $gear['id'] ); ?>'); coraHideAllDropdowns();" class="w-full text-left px-3 py-1.5 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold flex items-center gap-2 cursor-pointer">
-                                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                                Edit Specs
-                                            </button>
-                                            <button onclick="coraDeleteGearItem('<?php echo esc_attr( $gear['id'] ); ?>'); coraHideAllDropdowns();" class="w-full text-left px-3 py-1.5 hover:bg-rose-50 text-rose-700 text-xs font-semibold flex items-center gap-2 cursor-pointer border-t border-zinc-100">
-                                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                                Delete Item
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
+            <?php endforeach; ?>
+        </div>
     </div>
 
     <!-- SUB-TAB 2: SHOOT CHECKOUTS & ALLOCATIONS -->
-    <div id="cora-eq-tab-checkouts" class="cora-eq-tab-content space-y-4 hidden">
-        <div class="flex items-center justify-between flex-wrap gap-4 pb-4 border-b border-zinc-100">
-                <div>
-                    <h3 class="text-sm font-bold text-zinc-950">Active & Historic Shoot Gear Checkouts</h3>
-                    <p class="text-xs text-zinc-500 mt-0.5">Linking camera packages and kits directly to active shoots, client contracts & field operators.</p>
-                </div>
-                <button onclick="openCheckoutGearDrawer()" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-xs">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    New Shoot Checkout
-                </button>
+    <div id="cora-eq-tab-checkouts" class="cora-eq-tab-content space-y-3 hidden pt-3">
+        <!-- Row 1: Title -->
+        <div class="flex items-start justify-between">
+            <div>
+                <h3 class="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white">Shoot Checkouts</h3>
+                <p class="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-450 mt-0.5">Camera packages &amp; kits linked to active shoots &amp; field operators.</p>
             </div>
+        </div>
+        <!-- Row 2: CTA -->
+        <div class="pb-3 border-b border-zinc-100 dark:border-zinc-800">
+            <button onclick="openCheckoutGearDrawer()" class="w-full sm:w-auto px-3.5 py-2 bg-zinc-950 dark:bg-white hover:bg-zinc-850 dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                New Shoot Checkout
+            </button>
+        </div>
 
-            <div class="border border-zinc-200/80 rounded-xl overflow-x-auto shadow-2xs">
-                <table class="w-full text-left border-collapse text-xs min-w-[1000px]">
-                    <thead>
-                        <tr class="bg-zinc-50/60 border-b border-zinc-200 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
-                            <th class="p-3.5">Equipment / Package</th>
-                            <th class="p-3.5">Shoot Title & Client</th>
-                            <th class="p-3.5">Assigned DoP / Operator</th>
-                            <th class="p-3.5">Checkout Date</th>
-                            <th class="p-3.5">Return Due Date</th>
-                            <th class="p-3.5">Checkout Status</th>
-                            <th class="p-3.5 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cora-checkouts-tbody" class="divide-y divide-zinc-150 bg-white">
-                        <?php foreach ( $cora_gear_checkouts as $chk ) : 
-                            $chk_st = $chk['status'] ?? 'Active';
-                            $chk_badge = '<span class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-900"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Active Shoot</span>';
-                            if ( $chk_st === 'Returned' ) {
-                                $chk_badge = '<span class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-550"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Returned</span>';
-                            }
-                        ?>
-                        <tr id="checkout-row-<?php echo esc_attr( $chk['id'] ); ?>" class="hover:bg-zinc-50/60 transition-colors">
-                            <td class="p-3.5">
-                                <div class="font-bold text-zinc-950 text-xs"><?php echo esc_html( $chk['gear_name'] ); ?></div>
-                                <div class="text-[10px] text-zinc-400 font-mono">Serial: <?php echo esc_html( $chk['serial'] ); ?></div>
-                            </td>
-                            <td class="p-3.5">
-                                <div class="font-semibold text-zinc-900 text-xs"><?php echo esc_html( $chk['shoot_title'] ); ?></div>
-                                <div class="text-[10px] text-zinc-500">Client: <?php echo esc_html( $chk['client'] ); ?></div>
-                            </td>
-                            <td class="p-3.5 font-medium text-zinc-800 text-xs">
-                                <div class="flex items-center gap-1.5">
-                                    <span class="w-5 h-5 rounded-full bg-zinc-100 text-zinc-600 border border-zinc-200 text-[9px] font-bold flex items-center justify-center">
-                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                    </span>
-                                    <?php echo esc_html( $chk['dop_pilot'] ); ?>
-                                </div>
-                            </td>
-                            <td class="p-3.5 font-mono text-xs text-zinc-700">
-                                <?php echo esc_html( $chk['checkout_date'] ); ?>
-                            </td>
-                            <td class="p-3.5 font-mono text-xs font-bold text-zinc-900">
-                                <?php echo esc_html( $chk['return_due_date'] ); ?>
-                            </td>
-                            <td class="p-3.5">
-                                <span id="chk-status-badge-<?php echo esc_attr( $chk['id'] ); ?>"><?php echo $chk_badge; ?></span>
-                            </td>
-                            <td class="p-3.5 text-right">
-                                <?php if ( $chk_st === 'Active' ) : ?>
-                                    <button id="chk-return-btn-<?php echo esc_attr( $chk['id'] ); ?>" onclick="coraReturnCheckoutItem('<?php echo esc_attr( $chk['id'] ); ?>', '<?php echo esc_attr( $chk['gear_name'] ); ?>')" class="px-3 py-1 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold transition-all cursor-pointer">
-                                        Return to Studio
-                                    </button>
-                                <?php else : ?>
-                                    <span class="text-xs text-zinc-400 font-semibold italic">Checked In</span>
-                                <?php endif; ?>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+        <div id="cora-checkouts-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <?php foreach ( $cora_gear_checkouts as $chk ) :
+                $chk_st = $chk['status'] ?? 'Active';
+                $chk_badge = '<span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full text-amber-700 dark:text-amber-450 bg-amber-50 dark:bg-amber-950/20 border border-amber-250/20 dark:border-amber-900/50 select-none"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Active</span>';
+                if ( $chk_st === 'Returned' ) {
+                    $chk_badge = '<span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full text-zinc-550 dark:text-zinc-450 bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200/50 dark:border-zinc-700/50 select-none"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Returned</span>';
+                }
+            ?>
+            <div id="checkout-row-<?php echo esc_attr( $chk['id'] ); ?>" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-sm transition-all flex flex-col gap-3">
+                <!-- Header: Gear name + status badge -->
+                <div class="flex items-start justify-between gap-2">
+                    <div class="min-w-0">
+                        <div class="font-bold text-zinc-900 dark:text-white text-xs leading-snug"><?php echo esc_html( $chk['gear_name'] ); ?></div>
+                        <div class="font-mono text-[9px] text-zinc-400 dark:text-zinc-500 mt-0.5"><?php echo esc_html( $chk['serial'] ); ?></div>
+                    </div>
+                    <span id="chk-status-badge-<?php echo esc_attr( $chk['id'] ); ?>"><?php echo $chk_badge; ?></span>
+                </div>
+
+                <!-- Meta grid -->
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="col-span-2 bg-zinc-50 dark:bg-zinc-800/40 rounded-xl p-2.5">
+                        <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Shoot</div>
+                        <div class="text-xs font-semibold text-zinc-900 dark:text-white mt-0.5"><?php echo esc_html( $chk['shoot_title'] ); ?></div>
+                        <div class="text-[9px] text-zinc-500 dark:text-zinc-450 mt-0.5">Client: <?php echo esc_html( $chk['client'] ); ?></div>
+                    </div>
+                    <div class="bg-zinc-50 dark:bg-zinc-800/40 rounded-xl p-2.5">
+                        <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">DoP / Operator</div>
+                        <div class="text-xs font-semibold text-zinc-700 dark:text-zinc-300 mt-0.5"><?php echo esc_html( $chk['dop_pilot'] ); ?></div>
+                    </div>
+                    <div class="bg-zinc-50 dark:bg-zinc-800/40 rounded-xl p-2.5">
+                        <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Return Due</div>
+                        <div class="font-mono text-xs font-bold text-zinc-900 dark:text-white mt-0.5"><?php echo esc_html( $chk['return_due_date'] ); ?></div>
+                        <div class="font-mono text-[9px] text-zinc-400 dark:text-zinc-500">Out: <?php echo esc_html( $chk['checkout_date'] ); ?></div>
+                    </div>
+                </div>
+
+                <!-- Footer: Action -->
+                <div class="pt-1 border-t border-zinc-100 dark:border-zinc-800">
+                    <?php if ( $chk_st === 'Active' ) : ?>
+                        <button id="chk-return-btn-<?php echo esc_attr( $chk['id'] ); ?>" onclick="coraReturnCheckoutItem('<?php echo esc_attr( $chk['id'] ); ?>', '<?php echo esc_attr( $chk['gear_name'] ); ?>')" class="w-full px-3 py-1.5 bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-950 rounded-lg text-xs font-semibold transition-all cursor-pointer text-center">Return to Studio</button>
+                    <?php else : ?>
+                        <span class="block text-center text-xs text-zinc-400 dark:text-zinc-500 font-semibold italic py-1">Checked In</span>
+                    <?php endif; ?>
+                </div>
             </div>
+            <?php endforeach; ?>
+        </div>
     </div>
 
     <!-- SUB-TAB 3: MAINTENANCE & FINANCIAL LEDGER -->
-    <div id="cora-eq-tab-maintenance" class="cora-eq-tab-content space-y-4 hidden">
-        <div class="flex items-center justify-between flex-wrap gap-4 pb-4 border-b border-zinc-100">
-                <div>
-                    <h3 class="text-sm font-bold text-zinc-950">Equipment Servicing & Maintenance Financial Logs</h3>
-                    <p class="text-xs text-zinc-500 mt-0.5">Tracking repair history, vendor invoices, and automatic CapEx/OpEx financial sync.</p>
-                </div>
-                <button onclick="openMaintenanceDrawer()" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-xs">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
-                    Log Service Expense
-                </button>
+    <div id="cora-eq-tab-maintenance" class="cora-eq-tab-content space-y-3 hidden pt-3">
+        <!-- Row 1: Title -->
+        <div class="flex items-start justify-between">
+            <div>
+                <h3 class="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white">Maintenance &amp; Financial Ledger</h3>
+                <p class="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-450 mt-0.5">Repair history, vendor invoices &amp; CapEx/OpEx financial sync.</p>
             </div>
+        </div>
+        <!-- Row 2: CTA -->
+        <div class="pb-3 border-b border-zinc-100 dark:border-zinc-800">
+            <button onclick="openMaintenanceDrawer()" class="w-full sm:w-auto px-3.5 py-2 bg-zinc-950 dark:bg-white hover:bg-zinc-850 dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                Log Service Expense
+            </button>
+        </div>
 
-            <div class="border border-zinc-200/80 rounded-xl overflow-x-auto shadow-2xs">
-                <table class="w-full text-left border-collapse text-xs min-w-[1000px]">
-                    <thead>
-                        <tr class="bg-zinc-50/60 border-b border-zinc-200 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
-                            <th class="p-3.5">Equipment Unit</th>
-                            <th class="p-3.5">Repair / Service Type</th>
-                            <th class="p-3.5">Service Date</th>
-                            <th class="p-3.5">Vendor / Workshop</th>
-                            <th class="p-3.5">Repair Expense</th>
-                            <th class="p-3.5">Financial Ledger Sync</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cora-maintenance-tbody" class="divide-y divide-zinc-150 bg-white">
-                        <?php foreach ( $cora_gear_maintenance as $mnt ) : ?>
-                        <tr class="hover:bg-zinc-50/60 transition-colors">
-                            <td class="p-3.5 font-bold text-zinc-950 text-xs"><?php echo esc_html( $mnt['equipment'] ); ?></td>
-                            <td class="p-3.5 text-zinc-800 font-medium text-xs">
-                                <?php echo esc_html( $mnt['repair_type'] ); ?>
-                                <?php if ( ! empty( $mnt['notes'] ) ) : ?>
-                                    <div class="text-[10px] text-zinc-400 font-normal mt-0.5"><?php echo esc_html( $mnt['notes'] ); ?></div>
-                                <?php endif; ?>
-                            </td>
-                            <td class="p-3.5 font-mono text-xs text-zinc-700"><?php echo esc_html( $mnt['service_date'] ); ?></td>
-                            <td class="p-3.5 text-zinc-800 font-medium text-xs"><?php echo esc_html( $mnt['vendor'] ); ?></td>
-                            <td class="p-3.5 font-mono font-bold text-zinc-950 text-xs">₹<?php echo number_format( floatval( $mnt['repair_cost'] ) ); ?></td>
-                            <td class="p-3.5">
-                                <span class="text-xs font-semibold text-emerald-700 inline-flex items-center gap-1.5">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                    Synced to Financial Ledger
-                                </span>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+        <div id="cora-maintenance-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <?php foreach ( $cora_gear_maintenance as $mnt ) : ?>
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-sm transition-all flex flex-col gap-3">
+                <!-- Header -->
+                <div class="flex items-start justify-between gap-2">
+                    <div class="min-w-0">
+                        <div class="font-bold text-zinc-900 dark:text-white text-xs leading-snug"><?php echo esc_html( $mnt['equipment'] ); ?></div>
+                        <div class="text-[9px] text-zinc-500 dark:text-zinc-450 mt-0.5"><?php echo esc_html( $mnt['repair_type'] ); ?></div>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase px-2 py-0.5 rounded-full text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/40 dark:border-emerald-900/50 shrink-0">
+                        <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Synced
+                    </span>
+                </div>
+
+                <?php if ( ! empty( $mnt['notes'] ) ) : ?>
+                <p class="text-[10px] text-zinc-500 dark:text-zinc-450 leading-relaxed -mt-1"><?php echo esc_html( $mnt['notes'] ); ?></p>
+                <?php endif; ?>
+
+                <!-- Meta grid -->
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="bg-zinc-50 dark:bg-zinc-800/40 rounded-xl p-2.5">
+                        <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Repair Cost</div>
+                        <div class="font-mono font-bold text-zinc-900 dark:text-white text-xs mt-0.5">₹<?php echo number_format( floatval( $mnt['repair_cost'] ) ); ?></div>
+                    </div>
+                    <div class="bg-zinc-50 dark:bg-zinc-800/40 rounded-xl p-2.5">
+                        <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Service Date</div>
+                        <div class="font-mono text-xs text-zinc-600 dark:text-zinc-400 mt-0.5"><?php echo esc_html( $mnt['service_date'] ); ?></div>
+                    </div>
+                    <div class="col-span-2 bg-zinc-50 dark:bg-zinc-800/40 rounded-xl p-2.5">
+                        <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Vendor / Workshop</div>
+                        <div class="text-xs font-semibold text-zinc-700 dark:text-zinc-300 mt-0.5"><?php echo esc_html( $mnt['vendor'] ); ?></div>
+                    </div>
+                </div>
             </div>
+            <?php endforeach; ?>
+        </div>
     </div>
+
+
 
     <!-- SUB-TAB 4: STUDIO GEAR KITS -->
-    <div id="cora-eq-tab-kits" class="cora-eq-tab-content space-y-4 hidden">
-        <div class="flex items-center justify-between flex-wrap gap-4 pb-4 border-b border-zinc-100">
-                <div>
-                    <h3 class="text-sm font-bold text-zinc-950">Pre-Configured Studio Production Kits</h3>
-                    <p class="text-xs text-zinc-500 mt-0.5">Bundled equipment packages ready for instant 1-click shoot assignment.</p>
-                </div>
+    <div id="cora-eq-tab-kits" class="cora-eq-tab-content space-y-4 hidden pt-3">
+        <!-- Row 1: Title and Add Action -->
+        <div class="pb-3 border-b border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <h3 class="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white">Studio Gear Kits</h3>
+                <p class="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-450 mt-0.5">Bundled equipment packages ready for instant 1-click shoot assignment.</p>
             </div>
+            <button onclick="openCreateKitDrawer()" class="w-full sm:w-auto px-3.5 py-2 bg-zinc-950 dark:bg-white hover:bg-zinc-850 dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer border border-transparent">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Create Gear Kit
+            </button>
+        </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <?php foreach ( $cora_gear_kits as $kit ) : ?>
-                <div class="border border-zinc-200 rounded-2xl p-5 bg-white shadow-2xs space-y-4 flex flex-col justify-between hover:border-zinc-300 transition-all">
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-zinc-100 border border-zinc-200 text-zinc-800">
-                                <?php echo esc_html( $kit['category'] ); ?>
-                            </span>
-                            <span class="text-xs font-mono font-bold text-zinc-900">₹<?php echo number_format( floatval( $kit['daily_rate'] ) ); ?>/day</span>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-bold text-zinc-950"><?php echo esc_html( $kit['name'] ); ?></h4>
-                            <p class="text-xs text-zinc-500 mt-1 leading-relaxed"><?php echo esc_html( $kit['description'] ); ?></p>
-                        </div>
-                        <div class="space-y-1.5 pt-1">
-                            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Included Gear Units:</span>
-                            <div class="flex flex-wrap gap-1.5">
-                                <?php foreach ( (array)$kit['items'] as $it ) : ?>
-                                    <span class="px-2 py-0.5 bg-zinc-50 border border-zinc-200 rounded text-[11px] font-medium text-zinc-700"><?php echo esc_html( $it ); ?></span>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <?php foreach ( $cora_gear_kits as $kit ) : ?>
+            <div class="border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-5 bg-white dark:bg-zinc-900 shadow-2xs space-y-4 flex flex-col justify-between hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-sm transition-all">
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-700/50 text-zinc-650 dark:text-zinc-400">
+                            <?php echo esc_html( $kit['category'] ); ?>
+                        </span>
+                        <span class="text-xs sm:text-sm font-mono font-bold text-zinc-900 dark:text-white shrink-0">₹<?php echo number_format( floatval( $kit['daily_rate'] ?? 0 ) ); ?>/day</span>
                     </div>
-                    <div class="pt-3 border-t border-zinc-100">
-                        <button onclick="openCheckoutGearDrawer('[KIT] <?php echo esc_attr( $kit['name'] ); ?>')" class="w-full py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs">
-                            Allocate Kit to Shoot
-                        </button>
+                    <div>
+                        <h4 class="text-sm sm:text-base font-bold text-zinc-900 dark:text-white leading-snug"><?php echo esc_html( $kit['name'] ); ?></h4>
+                        <p class="text-[11px] sm:text-xs text-zinc-550 dark:text-zinc-400 mt-1 leading-relaxed"><?php echo esc_html( $kit['description'] ); ?></p>
+                    </div>
+                    <div class="space-y-1.5 pt-1">
+                        <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Included Gear Units:</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            <?php if ( ! empty( $kit['items'] ) && is_array( $kit['items'] ) ) : ?>
+                                <?php foreach ( $kit['items'] as $it ) : ?>
+                                    <span class="px-2 py-0.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full text-[10px] font-medium text-zinc-700 dark:text-zinc-300"><?php echo esc_html( $it ); ?></span>
+                                <?php endforeach; ?>
+                            <?php else : ?>
+                                <span class="text-[10px] text-zinc-400">No items configured in this kit.</span>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
-                <?php endforeach; ?>
+                <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                    <button onclick="openCheckoutGearDrawer('[KIT] <?php echo esc_attr( $kit['name'] ); ?>')" class="w-full py-2 bg-zinc-950 dark:bg-white hover:bg-zinc-850 dark:hover:bg-zinc-100 text-white dark:text-zinc-950 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2">
+                        Allocate Kit to Shoot
+                    </button>
+                </div>
             </div>
+            <?php endforeach; ?>
+        </div>
     </div>
 </div>
+
 
 <!-- ═══ 5. RIGHT-SLIDING SIDE DRAWER SHEETS ═════════════════════════════════════ -->
 
 <!-- 1. REGISTER NEW GEAR DRAWER -->
-<aside id="cora-add-gear-drawer" class="cora-drawer-sheet hidden fixed top-0 right-0 z-50 h-full w-[500px] max-w-[95vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+<aside id="cora-add-gear-drawer" class="cora-drawer-sheet hidden fixed top-0 right-0 z-[10000] h-full w-[500px] max-w-[95vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
         <div>
             <h3 class="text-sm font-bold text-zinc-950 flex items-center gap-2">
@@ -909,7 +891,7 @@ if ( is_array( $cora_gear_maintenance ) ) {
 </aside>
 
 <!-- 1.1 EDIT EXISTING GEAR DRAWER -->
-<aside id="cora-edit-gear-drawer" class="cora-drawer-sheet hidden fixed top-0 right-0 z-50 h-full w-[500px] max-w-[95vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+<aside id="cora-edit-gear-drawer" class="cora-drawer-sheet hidden fixed top-0 right-0 z-[10000] h-full w-[500px] max-w-[95vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
         <div>
             <h3 class="text-sm font-bold text-zinc-950 flex items-center gap-2">
@@ -1095,7 +1077,7 @@ if ( is_array( $cora_gear_maintenance ) ) {
 </aside>
 
 <!-- 2. SHOOT CHECKOUT & GEAR ASSIGNMENT DRAWER -->
-<aside id="cora-checkout-gear-drawer" class="cora-drawer-sheet hidden fixed top-0 right-0 z-50 h-full w-[460px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+<aside id="cora-checkout-gear-drawer" class="cora-drawer-sheet hidden fixed top-0 right-0 z-[10000] h-full w-[460px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
         <div>
             <h3 class="text-sm font-bold text-zinc-950 flex items-center gap-2">
@@ -1199,7 +1181,7 @@ if ( is_array( $cora_gear_maintenance ) ) {
 </aside>
 
 <!-- 3. LOG REPAIR & MAINTENANCE EXPENSE DRAWER -->
-<aside id="cora-log-maintenance-drawer" class="cora-drawer-sheet hidden fixed top-0 right-0 z-50 h-full w-[460px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+<aside id="cora-log-maintenance-drawer" class="cora-drawer-sheet hidden fixed top-0 right-0 z-[10000] h-full w-[460px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
         <div>
             <h3 class="text-sm font-bold text-zinc-950 flex items-center gap-2">
@@ -1267,7 +1249,7 @@ if ( is_array( $cora_gear_maintenance ) ) {
 </aside>
 
 <!-- 4. VIEW REPAIR DETAILS DRAWER -->
-<aside id="cora-view-repair-drawer" class="cora-drawer-sheet hidden fixed top-0 right-0 z-50 h-full w-[460px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+<aside id="cora-view-repair-drawer" class="cora-drawer-sheet hidden fixed top-0 right-0 z-[10000] h-full w-[460px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 shrink-0">
         <div>
             <h3 class="text-sm font-bold text-zinc-950 flex items-center gap-2">
@@ -1312,6 +1294,78 @@ if ( is_array( $cora_gear_maintenance ) ) {
     <div class="p-5 border-t border-zinc-150 bg-zinc-50/50 flex items-center justify-end shrink-0">
         <button type="button" onclick="closeGearDrawers()" class="px-5 py-2 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 cursor-pointer shadow-xs">Close Details</button>
     </div>
+</aside>
+
+<!-- 4.1 CREATE GEAR KIT DRAWER -->
+<aside id="cora-create-kit-drawer" class="cora-drawer-sheet hidden fixed top-0 right-0 z-[10000] h-full w-[500px] max-w-[95vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+    <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-950/50 shrink-0">
+        <div>
+            <h3 class="text-sm font-bold text-zinc-950 dark:text-white flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                Create Custom Gear Kit
+            </h3>
+            <p class="text-[11px] text-zinc-500 dark:text-zinc-450 mt-0.5">Bundle multiple inventory items into a single kit for quick allocation.</p>
+        </div>
+        <button type="button" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer p-1" onclick="closeGearDrawers()">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <form id="cora-create-kit-form" onsubmit="coraSubmitCreateKitForm(event)" class="flex-1 flex flex-col overflow-hidden">
+        <!-- Content Panel -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-5">
+            <div>
+                <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Kit Bundle Name *</label>
+                <input type="text" id="create-kit-name" required placeholder="e.g. Cinema Production Pro Bundle" class="w-full text-xs px-3.5 py-2.5 bg-white dark:bg-zinc-950 border border-zinc-250 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-xl focus:border-zinc-950 dark:focus:border-zinc-100 focus:ring-1 focus:ring-zinc-950 outline-none transition-all">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Category / Group *</label>
+                    <select id="create-kit-category" class="w-full text-xs px-3 py-2.5 bg-white dark:bg-zinc-950 border border-zinc-250 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-xl focus:border-zinc-950 dark:focus:border-zinc-100 focus:ring-1 focus:ring-zinc-950 outline-none transition-all">
+                        <option value="Cinema Production">Cinema Production</option>
+                        <option value="Aerial Cinematography">Aerial Cinematography</option>
+                        <option value="Lighting & Grip">Lighting & Grip</option>
+                        <option value="Audio Recording">Audio Recording</option>
+                        <option value="Custom Bundle">Custom Bundle</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Daily Rental Rate (₹) *</label>
+                    <input type="number" id="create-kit-daily-rate" required placeholder="e.g. 12000" class="w-full text-xs px-3.5 py-2.5 bg-white dark:bg-zinc-950 border border-zinc-250 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-xl focus:border-zinc-950 dark:focus:border-zinc-100 focus:ring-1 focus:ring-zinc-950 outline-none transition-all">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Kit Description</label>
+                <textarea id="create-kit-description" placeholder="Brief summary of what this kit includes and its main usage..." rows="3" class="w-full text-xs px-3.5 py-2.5 bg-white dark:bg-zinc-950 border border-zinc-250 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-xl focus:border-zinc-950 dark:focus:border-zinc-100 focus:ring-1 focus:ring-zinc-950 outline-none transition-all resize-none"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Select Included Gear Units *</label>
+                <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden max-h-[220px] overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800 bg-white dark:bg-zinc-950">
+                    <?php if ( ! empty( $cora_studio_gear ) && is_array( $cora_studio_gear ) ) : ?>
+                        <?php foreach ( $cora_studio_gear as $gear ) : ?>
+                            <label class="flex items-center gap-3 p-3 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all select-none">
+                                <input type="checkbox" name="kit_item_ids[]" value="<?php echo esc_attr( $gear['id'] ); ?>" class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-950 focus:ring-zinc-950 w-4 h-4 cursor-pointer">
+                                <div class="text-xs">
+                                    <div class="font-semibold text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $gear['name'] ); ?></div>
+                                    <div class="text-[10px] text-zinc-500 dark:text-zinc-450 mt-0.5"><?php echo esc_html( $gear['category'] ); ?> · SN: <?php echo esc_html( $gear['serial_no'] ?? $gear['serial'] ?? '-' ); ?></div>
+                                </div>
+                            </label>
+                        <?php endforeach; ?>
+                    <?php else : ?>
+                        <div class="p-4 text-center text-xs text-zinc-400 dark:text-zinc-500">No equipment items registered in the inventory yet.</div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/50 flex items-center justify-end gap-2.5 shrink-0">
+            <button type="button" onclick="closeGearDrawers()" class="px-4 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-bold rounded-xl cursor-pointer shadow-2xs">Cancel</button>
+            <button type="submit" class="px-5 py-2 bg-zinc-950 dark:bg-white hover:bg-zinc-900 dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold rounded-xl cursor-pointer shadow-xs border border-transparent">Create Kit Bundle</button>
+        </div>
+    </form>
 </aside>
 
 <!-- 5. CUSTOM CONFIRMATION DELETE MODAL (No Browser Defaults) -->
@@ -1360,7 +1414,7 @@ if (typeof window.ajaxurl === 'undefined') {
 window.coraRepairData = <?php echo json_encode( $initial_repair_data ); ?>;
 window.coraStudioGearList = <?php echo json_encode( $cora_studio_gear ); ?>;
 
-// Standardized Sub-Tab Switching Functionality
+// Standardized Sub-Tab Switching Functionality with Dynamic URL Persistence
 window.coraSwitchEquipmentTab = function(tabId) {
     // Hide all tab contents
     var contents = document.querySelectorAll('.cora-eq-tab-content');
@@ -1371,8 +1425,8 @@ window.coraSwitchEquipmentTab = function(tabId) {
     // Reset sub-tab button states
     var buttons = document.querySelectorAll('.cora-eq-tab-btn');
     buttons.forEach(function(btn) {
-        btn.classList.remove('active', 'border-b-2', 'border-zinc-950', 'text-zinc-950');
-        btn.classList.add('border-b-2', 'border-transparent', 'text-zinc-500');
+        btn.classList.remove('active', 'border-zinc-950', 'dark:border-white', 'text-zinc-950', 'dark:text-white');
+        btn.classList.add('border-transparent', 'text-zinc-450', 'dark:text-zinc-500');
     });
 
     // Show target panel & activate button
@@ -1381,10 +1435,51 @@ window.coraSwitchEquipmentTab = function(tabId) {
 
     if (target) target.classList.remove('hidden');
     if (targetBtn) {
-        targetBtn.classList.remove('border-transparent', 'text-zinc-500');
-        targetBtn.classList.add('active', 'border-zinc-950', 'text-zinc-950');
+        targetBtn.classList.remove('border-transparent', 'text-zinc-450', 'dark:text-zinc-500');
+        targetBtn.classList.add('active', 'border-zinc-950', 'dark:border-white', 'text-zinc-950', 'dark:text-white');
+    }
+
+    // Dynamic URL Update
+    if (typeof URLSearchParams !== 'undefined' && window.history && window.history.replaceState) {
+        var params = new URLSearchParams(window.location.search);
+        params.set('eq_tab', tabId);
+        var newUrl = window.location.pathname + '?' + params.toString() + window.location.hash;
+        window.history.replaceState({ path: newUrl }, '', newUrl);
+    } else {
+        window.location.hash = 'eq_tab=' + tabId;
     }
 };
+
+// Auto-activate tab from URL query parameter or hash on page load
+(function() {
+    var activeTab = null;
+    
+    // 1. Try URL Query Parameter
+    if (typeof URLSearchParams !== 'undefined') {
+        var params = new URLSearchParams(window.location.search);
+        activeTab = params.get('eq_tab');
+    }
+    
+    // 2. Try URL Hash
+    if (!activeTab && window.location.hash) {
+        var hash = window.location.hash;
+        if (hash.indexOf('eq_tab=') > -1) {
+            activeTab = hash.split('eq_tab=')[1];
+        } else if (hash.indexOf('#tab-') > -1) {
+            activeTab = hash.split('#tab-')[1];
+        } else if (hash.indexOf('#') > -1) {
+            activeTab = hash.replace('#', '');
+        }
+    }
+    
+    // Validate if it is one of the available tabs
+    var validTabs = ['registry', 'checkouts', 'maintenance', 'kits'];
+    if (activeTab && validTabs.indexOf(activeTab) > -1) {
+        setTimeout(function() {
+            window.coraSwitchEquipmentTab(activeTab);
+        }, 50);
+    }
+})();
 
 // Global Helper to Close All Drawers
 if (typeof window.coraCloseAllDrawers !== 'function') {
@@ -1401,193 +1496,281 @@ if (typeof window.coraCloseAllDrawers !== 'function') {
 }
 
 // Open Drawer Functions
-window.openAddGearDrawer = function() {
-    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('add');
-    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('edit');
-    if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
-    var backdrop = document.getElementById('cora-drawer-backdrop');
-    if (backdrop) backdrop.classList.remove('hidden');
-
-    var form = document.getElementById('cora-add-gear-form');
-    if (form) form.reset();
-
-    var preview = document.getElementById('add-gear-image-preview');
-    if (preview) {
-        preview.src = '';
-        preview.classList.add('hidden');
-    }
-    var placeholder = document.getElementById('add-gear-image-placeholder');
-    if (placeholder) placeholder.classList.remove('hidden');
-
-    var pathInput = document.getElementById('add-gear-image-path');
-    if (pathInput) pathInput.value = '';
-
-    var drawer = document.getElementById('cora-add-gear-drawer');
-    if (typeof window.setAddGearStep === 'function') window.setAddGearStep(1);
-    if (drawer) {
-        drawer.classList.remove('hidden');
-        drawer.classList.remove('collapsed');
-    }
-};
-
-window.openCheckoutGearDrawer = function(presetGearName) {
-    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('add');
-    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('edit');
-    if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
-    var backdrop = document.getElementById('cora-drawer-backdrop');
-    if (backdrop) backdrop.classList.remove('hidden');
-
-    if (presetGearName) {
-        var select = document.getElementById('checkout-gear-select');
-        if (select) {
-            for (var i = 0; i < select.options.length; i++) {
-                var optName = select.options[i].getAttribute('data-name') || '';
-                if (optName === presetGearName || optName.indexOf(presetGearName) !== -1 || select.options[i].value === presetGearName) {
-                    select.options[i].selected = true;
-                    break;
-                }
-            }
+// Open Drawer Functions protected from overrides using Object.defineProperty
+Object.defineProperty(window, 'openAddGearDrawer', {
+    value: function() {
+        if (typeof window.coraDebugLog === 'function') window.coraDebugLog('openAddGearDrawer triggered');
+        if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('add');
+        if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('edit');
+        if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
+        
+        var backdrop = document.getElementById('cora-drawer-backdrop');
+        if (backdrop) {
+            backdrop.classList.remove('hidden');
+            backdrop.style.display = 'block';
+            backdrop.style.pointerEvents = 'auto';
         }
-    }
 
-    var drawer = document.getElementById('cora-checkout-gear-drawer');
-    if (drawer) {
-        drawer.classList.remove('hidden');
-        drawer.classList.remove('collapsed');
-    }
-};
+        var form = document.getElementById('cora-add-gear-form');
+        if (form) form.reset();
 
-window.openMaintenanceDrawer = function(presetGearName) {
-    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('add');
-    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('edit');
-    if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
-    var backdrop = document.getElementById('cora-drawer-backdrop');
-    if (backdrop) backdrop.classList.remove('hidden');
-
-    if (presetGearName) {
-        var select = document.getElementById('mnt-gear-select');
-        if (select) {
-            for (var i = 0; i < select.options.length; i++) {
-                var optName = select.options[i].getAttribute('data-name') || '';
-                if (optName.indexOf(presetGearName) !== -1 || select.options[i].value === presetGearName) {
-                    select.options[i].selected = true;
-                    break;
-                }
-            }
-        }
-    }
-
-    var drawer = document.getElementById('cora-log-maintenance-drawer');
-    if (drawer) {
-        drawer.classList.remove('hidden');
-        drawer.classList.remove('collapsed');
-    }
-};
-
-window.openViewRepairDrawer = function(gearId) {
-    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('add');
-    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('edit');
-    if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
-    var backdrop = document.getElementById('cora-drawer-backdrop');
-    if (backdrop) backdrop.classList.remove('hidden');
-
-    var drawer = document.getElementById('cora-view-repair-drawer');
-    if (drawer) {
-        var details = (window.coraRepairData && window.coraRepairData[gearId]) ? window.coraRepairData[gearId] : null;
-        if (details) {
-            document.getElementById('view-repair-gear-name').textContent = details.name || 'Equipment Unit';
-            document.getElementById('view-repair-cost').textContent = '₹' + parseInt(details.cost || 0).toLocaleString();
-            document.getElementById('view-repair-date').textContent = details.date || 'N/A';
-            document.getElementById('view-repair-vendor').textContent = details.vendor || 'N/A';
-            document.getElementById('view-repair-notes').textContent = details.notes || 'No notes recorded.';
-        } else {
-            // Fallback default info for gear_aputure_300d if not found
-            if (gearId === 'gear_aputure_300d') {
-                document.getElementById('view-repair-gear-name').textContent = 'Aputure 300D II LED Light';
-                document.getElementById('view-repair-cost').textContent = '₹2,500';
-                document.getElementById('view-repair-date').textContent = '2025-02-11';
-                document.getElementById('view-repair-vendor').textContent = 'Light Source Delhi';
-                document.getElementById('view-repair-notes').textContent = 'Driver Issue';
-            } else {
-                document.getElementById('view-repair-gear-name').textContent = 'Equipment Unit';
-                document.getElementById('view-repair-cost').textContent = '₹0';
-                document.getElementById('view-repair-date').textContent = 'N/A';
-                document.getElementById('view-repair-vendor').textContent = 'N/A';
-                document.getElementById('view-repair-notes').textContent = 'No details found.';
-            }
-        }
-        drawer.classList.remove('hidden');
-        drawer.classList.remove('collapsed');
-    }
-};
-
-window.openEditGearDrawer = function(gearId) {
-    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('add');
-    if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('edit');
-    if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
-    var backdrop = document.getElementById('cora-drawer-backdrop');
-    if (backdrop) backdrop.classList.remove('hidden');
-
-    var drawer = document.getElementById('cora-edit-gear-drawer');
-    if (!drawer) return;
-
-    var item = null;
-    if (window.coraStudioGearList) {
-        for (var i = 0; i < window.coraStudioGearList.length; i++) {
-            if (window.coraStudioGearList[i].id === gearId) {
-                item = window.coraStudioGearList[i];
-                break;
-            }
-        }
-    }
-
-    if (item) {
-        document.getElementById('edit-gear-id').value = item.id;
-        document.getElementById('edit-gear-name').value = item.name || '';
-        document.getElementById('edit-gear-serial').value = item.serial || item.serial_no || '';
-        document.getElementById('edit-gear-category').value = item.category || 'Camera';
-        document.getElementById('edit-gear-capex').value = item.capex || item.purchase_price || 0;
-        document.getElementById('edit-gear-date').value = item.purchase_date || '';
-        document.getElementById('edit-gear-condition').value = item.condition || 'Excellent';
-        document.getElementById('edit-gear-status').value = item.status || 'Available';
-        document.getElementById('edit-gear-storage-location').value = item.storage_location || '';
-        document.getElementById('edit-gear-next-service').value = item.next_service_due || '';
-        document.getElementById('edit-gear-insurance').value = item.insurance_expiry || '';
-        document.getElementById('edit-gear-assigned').value = item.assigned || item.assigned_to || '';
-        document.getElementById('edit-gear-accessories').value = item.accessories_included || '';
-
-        var pathInput = document.getElementById('edit-gear-image-path');
-        var preview = document.getElementById('edit-gear-image-preview');
-        var placeholder = document.getElementById('edit-gear-image-placeholder');
-
-        if (pathInput) pathInput.value = item.image || '';
+        var preview = document.getElementById('add-gear-image-preview');
         if (preview) {
-            if (item.image) {
-                var imgSrc = item.image;
-                var imgUrl = '';
-                if (imgSrc.indexOf('data:') === 0 || imgSrc.indexOf('http') === 0) {
-                    imgUrl = imgSrc;
-                } else if (imgSrc.indexOf('/') === 0) {
-                    imgUrl = imgSrc;
-                } else if (imgSrc.indexOf('/') !== -1) {
-                    imgUrl = '/wp-content/' + imgSrc;
-                } else {
-                    imgUrl = '/wp-content/plugins/cora-workspace/assets/images/' + imgSrc;
+            preview.src = '';
+            preview.classList.add('hidden');
+        }
+        var placeholder = document.getElementById('add-gear-image-placeholder');
+        if (placeholder) placeholder.classList.remove('hidden');
+
+        var pathInput = document.getElementById('add-gear-image-path');
+        if (pathInput) pathInput.value = '';
+
+        var drawer = document.getElementById('cora-add-gear-drawer');
+        if (typeof window.setAddGearStep === 'function') window.setAddGearStep(1);
+        if (drawer) {
+            if (typeof window.coraDebugLog === 'function') window.coraDebugLog('Found add drawer. Initial classes: ' + drawer.className);
+            drawer.classList.remove('hidden');
+            drawer.classList.remove('collapsed');
+            drawer.classList.remove('translate-x-full');
+            drawer.classList.remove('pointer-events-none');
+            if (typeof window.coraDebugLog === 'function') window.coraDebugLog('Add drawer classes after open: ' + drawer.className);
+        } else {
+            if (typeof window.coraDebugLog === 'function') window.coraDebugLog('Add drawer NOT found in DOM!');
+        }
+        jQuery('body').addClass('cora-drawer-open overflow-hidden');
+    },
+    writable: false,
+    configurable: true
+});
+
+Object.defineProperty(window, 'openCheckoutGearDrawer', {
+    value: function(presetGearName) {
+        if (typeof window.coraDebugLog === 'function') window.coraDebugLog('openCheckoutGearDrawer triggered for: ' + presetGearName);
+        if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('add');
+        if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('edit');
+        if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
+        
+        var backdrop = document.getElementById('cora-drawer-backdrop');
+        if (backdrop) {
+            backdrop.classList.remove('hidden');
+            backdrop.style.display = 'block';
+            backdrop.style.pointerEvents = 'auto';
+        }
+
+        if (presetGearName) {
+            var select = document.getElementById('checkout-gear-select');
+            if (select) {
+                for (var i = 0; i < select.options.length; i++) {
+                    var optName = select.options[i].getAttribute('data-name') || '';
+                    if (optName === presetGearName || optName.indexOf(presetGearName) !== -1 || select.options[i].value === presetGearName) {
+                        select.options[i].selected = true;
+                        break;
+                    }
                 }
-                preview.src = imgUrl;
-                preview.classList.remove('hidden');
-                if (placeholder) placeholder.classList.add('hidden');
-            } else {
-                preview.src = '';
-                preview.classList.add('hidden');
-                if (placeholder) placeholder.classList.remove('hidden');
             }
         }
 
-        drawer.classList.remove('hidden');
-        drawer.classList.remove('collapsed');
-    }
-};
+        var drawer = document.getElementById('cora-checkout-gear-drawer');
+        if (drawer) {
+            if (typeof window.coraDebugLog === 'function') window.coraDebugLog('Found checkout drawer. Initial classes: ' + drawer.className);
+            drawer.classList.remove('hidden');
+            drawer.classList.remove('collapsed');
+            drawer.classList.remove('translate-x-full');
+            drawer.classList.remove('pointer-events-none');
+            if (typeof window.coraDebugLog === 'function') window.coraDebugLog('Checkout drawer classes after open: ' + drawer.className);
+        } else {
+            if (typeof window.coraDebugLog === 'function') window.coraDebugLog('Checkout drawer NOT found in DOM!');
+        }
+        jQuery('body').addClass('cora-drawer-open overflow-hidden');
+    },
+    writable: false,
+    configurable: true
+});
+
+Object.defineProperty(window, 'openMaintenanceDrawer', {
+    value: function(presetGearName) {
+        if (typeof window.coraDebugLog === 'function') window.coraDebugLog('openMaintenanceDrawer triggered for: ' + presetGearName);
+        if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('add');
+        if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('edit');
+        if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
+        
+        var backdrop = document.getElementById('cora-drawer-backdrop');
+        if (backdrop) {
+            backdrop.classList.remove('hidden');
+            backdrop.style.display = 'block';
+            backdrop.style.pointerEvents = 'auto';
+        }
+
+        if (presetGearName) {
+            var select = document.getElementById('mnt-gear-select');
+            if (select) {
+                for (var i = 0; i < select.options.length; i++) {
+                    var optName = select.options[i].getAttribute('data-name') || '';
+                    if (optName.indexOf(presetGearName) !== -1 || select.options[i].value === presetGearName) {
+                        select.options[i].selected = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        var drawer = document.getElementById('cora-log-maintenance-drawer');
+        if (drawer) {
+            if (typeof window.coraDebugLog === 'function') window.coraDebugLog('Found maintenance drawer. Initial classes: ' + drawer.className);
+            drawer.classList.remove('hidden');
+            drawer.classList.remove('collapsed');
+            drawer.classList.remove('translate-x-full');
+            drawer.classList.remove('pointer-events-none');
+            if (typeof window.coraDebugLog === 'function') window.coraDebugLog('Maintenance drawer classes after open: ' + drawer.className);
+        } else {
+            if (typeof window.coraDebugLog === 'function') window.coraDebugLog('Maintenance drawer NOT found in DOM!');
+        }
+        jQuery('body').addClass('cora-drawer-open overflow-hidden');
+    },
+    writable: false,
+    configurable: true
+});
+
+Object.defineProperty(window, 'openViewRepairDrawer', {
+    value: function(gearId) {
+        if (typeof window.coraDebugLog === 'function') window.coraDebugLog('openViewRepairDrawer triggered for: ' + gearId);
+        if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('add');
+        if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('edit');
+        if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
+        
+        var backdrop = document.getElementById('cora-drawer-backdrop');
+        if (backdrop) {
+            backdrop.classList.remove('hidden');
+            backdrop.style.display = 'block';
+            backdrop.style.pointerEvents = 'auto';
+        }
+
+        var drawer = document.getElementById('cora-view-repair-drawer');
+        if (drawer) {
+            if (typeof window.coraDebugLog === 'function') window.coraDebugLog('Found repair details drawer. Initial classes: ' + drawer.className);
+            var details = (window.coraRepairData && window.coraRepairData[gearId]) ? window.coraRepairData[gearId] : null;
+            if (details) {
+                document.getElementById('view-repair-gear-name').textContent = details.name || 'Equipment Unit';
+                document.getElementById('view-repair-cost').textContent = '₹' + parseInt(details.cost || 0).toLocaleString();
+                document.getElementById('view-repair-date').textContent = details.date || 'N/A';
+                document.getElementById('view-repair-vendor').textContent = details.vendor || 'N/A';
+                document.getElementById('view-repair-notes').textContent = details.notes || 'No notes recorded.';
+            } else {
+                if (gearId === 'gear_aputure_300d') {
+                    document.getElementById('view-repair-gear-name').textContent = 'Aputure 300D II LED Light';
+                    document.getElementById('view-repair-cost').textContent = '₹2,500';
+                    document.getElementById('view-repair-date').textContent = '2025-02-11';
+                    document.getElementById('view-repair-vendor').textContent = 'Light Source Delhi';
+                    document.getElementById('view-repair-notes').textContent = 'Driver Issue';
+                } else {
+                    document.getElementById('view-repair-gear-name').textContent = 'Equipment Unit';
+                    document.getElementById('view-repair-cost').textContent = '₹0';
+                    document.getElementById('view-repair-date').textContent = 'N/A';
+                    document.getElementById('view-repair-vendor').textContent = 'N/A';
+                    document.getElementById('view-repair-notes').textContent = 'No details found.';
+                }
+            }
+            drawer.classList.remove('hidden');
+            drawer.classList.remove('collapsed');
+            drawer.classList.remove('translate-x-full');
+            drawer.classList.remove('pointer-events-none');
+            if (typeof window.coraDebugLog === 'function') window.coraDebugLog('Repair drawer classes after open: ' + drawer.className);
+        } else {
+            if (typeof window.coraDebugLog === 'function') window.coraDebugLog('Repair drawer NOT found in DOM!');
+        }
+        jQuery('body').addClass('cora-drawer-open overflow-hidden');
+    },
+    writable: false,
+    configurable: true
+});
+
+Object.defineProperty(window, 'openEditGearDrawer', {
+    value: function(gearId) {
+        if (typeof window.coraDebugLog === 'function') window.coraDebugLog('openEditGearDrawer triggered for: ' + gearId);
+        if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('add');
+        if (typeof window.coraStopWebcam === 'function') window.coraStopWebcam('edit');
+        if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
+        
+        var backdrop = document.getElementById('cora-drawer-backdrop');
+        if (backdrop) {
+            backdrop.classList.remove('hidden');
+            backdrop.style.display = 'block';
+            backdrop.style.pointerEvents = 'auto';
+        }
+
+        var drawer = document.getElementById('cora-edit-gear-drawer');
+        if (!drawer) {
+            if (typeof window.coraDebugLog === 'function') window.coraDebugLog('Edit drawer element NOT found in DOM!');
+            return;
+        }
+
+        if (typeof window.coraDebugLog === 'function') window.coraDebugLog('Found edit drawer. Initial classes: ' + drawer.className);
+        var item = null;
+        if (window.coraStudioGearList) {
+            for (var i = 0; i < window.coraStudioGearList.length; i++) {
+                if (window.coraStudioGearList[i].id === gearId) {
+                    item = window.coraStudioGearList[i];
+                    break;
+                }
+            }
+        }
+
+        if (item) {
+            document.getElementById('edit-gear-id').value = item.id;
+            document.getElementById('edit-gear-name').value = item.name || '';
+            document.getElementById('edit-gear-serial').value = item.serial || item.serial_no || '';
+            document.getElementById('edit-gear-category').value = item.category || 'Camera';
+            document.getElementById('edit-gear-capex').value = item.capex || item.purchase_price || 0;
+            document.getElementById('edit-gear-date').value = item.purchase_date || '';
+            document.getElementById('edit-gear-condition').value = item.condition || 'Excellent';
+            document.getElementById('edit-gear-status').value = item.status || 'Available';
+            document.getElementById('edit-gear-storage-location').value = item.storage_location || '';
+            document.getElementById('edit-gear-next-service').value = item.next_service_due || '';
+            document.getElementById('edit-gear-insurance').value = item.insurance_expiry || '';
+            document.getElementById('edit-gear-assigned').value = item.assigned || item.assigned_to || '';
+            document.getElementById('edit-gear-accessories').value = item.accessories_included || '';
+
+            var pathInput = document.getElementById('edit-gear-image-path');
+            var preview = document.getElementById('edit-gear-image-preview');
+            var placeholder = document.getElementById('edit-gear-image-placeholder');
+
+            if (pathInput) pathInput.value = item.image || '';
+            if (preview) {
+                if (item.image) {
+                    var imgSrc = item.image;
+                    var imgUrl = '';
+                    if (imgSrc.indexOf('data:') === 0 || imgSrc.indexOf('http') === 0) {
+                        imgUrl = imgSrc;
+                    } else if (imgSrc.indexOf('/') === 0) {
+                        imgUrl = imgSrc;
+                    } else if (imgSrc.indexOf('/') !== -1) {
+                        imgUrl = '/wp-content/' + imgSrc;
+                    } else {
+                        imgUrl = '/wp-content/plugins/cora-workspace/assets/images/' + imgSrc;
+                    }
+                    preview.src = imgUrl;
+                    preview.classList.remove('hidden');
+                    if (placeholder) placeholder.classList.add('hidden');
+                } else {
+                    preview.src = '';
+                    preview.classList.add('hidden');
+                    if (placeholder) placeholder.classList.remove('hidden');
+                }
+            }
+
+            drawer.classList.remove('hidden');
+            drawer.classList.remove('collapsed');
+            drawer.classList.remove('translate-x-full');
+            drawer.classList.remove('pointer-events-none');
+            if (typeof window.coraDebugLog === 'function') window.coraDebugLog('Edit drawer classes after open: ' + drawer.className);
+        } else {
+            if (typeof window.coraDebugLog === 'function') window.coraDebugLog('Item data for ID ' + gearId + ' not found in coraStudioGearList!');
+        }
+        jQuery('body').addClass('cora-drawer-open overflow-hidden');
+    },
+    writable: false,
+    configurable: true
+});
 
 
 // Multi-step form state management
@@ -2157,6 +2340,83 @@ window.executeCoraDeleteGearItem = function() {
         });
     } else {
         closeCoraDeleteModal();
+        location.reload();
+    }
+};
+
+// Handle Create Custom Gear Kit Drawer Actions
+window.openCreateKitDrawer = function() {
+    if (typeof window.coraCloseAllDrawers === 'function') {
+        window.coraCloseAllDrawers();
+    }
+    var backdrop = document.getElementById('cora-drawer-backdrop');
+    if (backdrop) {
+        backdrop.classList.remove('hidden');
+        backdrop.style.display = 'block';
+        backdrop.style.pointerEvents = 'auto';
+    }
+    
+    var form = document.getElementById('cora-create-kit-form');
+    if (form) {
+        form.reset();
+    }
+
+    var drawer = document.getElementById('cora-create-kit-drawer');
+    if (drawer) {
+        drawer.classList.remove('hidden');
+        drawer.classList.remove('collapsed');
+        drawer.classList.remove('translate-x-full');
+        drawer.classList.remove('pointer-events-none');
+    }
+    jQuery('body').addClass('cora-drawer-open overflow-hidden');
+};
+
+window.coraSubmitCreateKitForm = function(e) {
+    e.preventDefault();
+    var name = document.getElementById('create-kit-name').value.trim();
+    var category = document.getElementById('create-kit-category').value;
+    var dailyRate = document.getElementById('create-kit-daily-rate').value.trim();
+    var description = document.getElementById('create-kit-description').value.trim();
+
+    var checkedItems = [];
+    var checkboxes = document.querySelectorAll('input[name="kit_item_ids[]"]:checked');
+    checkboxes.forEach(function(cb) {
+        checkedItems.push(cb.value);
+    });
+
+    if (!name) {
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast('Kit name is required.', 'error');
+        }
+        return;
+    }
+
+    var payload = {
+        action: 'cora_save_gear_kit',
+        security: (typeof coraData !== 'undefined' && coraData.nonce) ? coraData.nonce : '',
+        kit_name: name,
+        category: category,
+        daily_rate: dailyRate,
+        description: description,
+        item_ids: JSON.stringify(checkedItems)
+    };
+
+    if (typeof jQuery !== 'undefined') {
+        jQuery.post((typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'), payload, function(res) {
+            console.log('AJAX save kit response:', res);
+            if (res.success) {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('Gear kit created successfully.', 'success');
+                }
+                location.reload();
+            } else {
+                var msg = res.data && res.data.message ? res.data.message : 'Failed to create kit.';
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast(msg, 'error');
+                }
+            }
+        });
+    } else {
         location.reload();
     }
 };

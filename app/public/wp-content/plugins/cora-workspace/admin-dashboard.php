@@ -31,6 +31,7 @@ if ( ! function_exists( 'cora_is_super_owner' ) ) {
     }
 }
 
+$sub_page = $sub_page ?? $GLOBALS['sub_page'] ?? $_GET['sub_page'] ?? 'dashboard';
 // Define workspace context early to avoid undefined variable warnings in the JS data injection block
 $cora_active_workspace = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array( 'id' => 1, 'name' => 'Apex Realty Group', 'slug' => 'apex-realty', 'plan' => 'enterprise', 'status' => 'active' );
 $cora_user_workspaces   = function_exists( 'cora_get_user_workspaces' ) ? cora_get_user_workspaces( get_current_user_id() ) : array( $cora_active_workspace );
@@ -53,7 +54,7 @@ $cora_users = ( in_array( $sub_page, array( 'dashboard', 'bookings', 'team-roles
 $cora_workspace_listings = ( in_array( $sub_page, array( 'dashboard', 'equipment', 'leads', 'bookings' ) ) ) ? cora_db_get_properties() : array();
 $cora_permissions = get_option( 'cora_role_permissions', array() );
 // Auto-grant access to new enterprise modules for all active roles
-$cora_new_module_keys = array('event_timeline', 'event-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'vault', 'emails');
+$cora_new_module_keys = array('event_timeline', 'event-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'vault', 'emails');
 if ( is_array( $cora_permissions ) ) {
     foreach ( $cora_permissions as $r_key => $r_perms ) {
         if ( is_array( $r_perms ) ) {
@@ -3553,7 +3554,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         <?php foreach ( $group['items'] as $target => $item ) : 
                             $nav_url = home_url( '/workspace/' . $target );
                         ?>
-                        <a href="<?php echo esc_url( $nav_url ); ?>" class="cora-nav-item <?php echo $sub_page === $target ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer select-none no-underline text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white" data-target="<?php echo esc_attr($target); ?>" data-tooltip="<?php echo esc_attr($item['title']); ?>">
+                        <a href="<?php echo esc_url( $nav_url ); ?>" class="cora-nav-item <?php echo ( $sub_page === $target || str_replace('_', '-', $sub_page) === str_replace('_', '-', $target) ) ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer select-none no-underline text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white" data-target="<?php echo esc_attr($target); ?>" data-tooltip="<?php echo esc_attr($item['title']); ?>">
                             <div class="flex items-center gap-3 select-none">
                                 <span class="cora-nav-icon select-none">
                                     <?php echo $item['icon']; ?>
@@ -3744,7 +3745,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
 
         <!-- Dynamic Content Sections -->
-        <div class="cora-content-wrapper p-3.5 sm:p-6 md:p-8 max-w-full w-full flex-1 space-y-6 min-w-0">
+        <div class="cora-content-wrapper p-3 sm:p-5 md:p-6 max-w-full w-full flex-1 space-y-5 sm:space-y-6 min-w-0">
             <!-- CORA Global Skeleton Preloader -->
             <div id="cora-skeleton-overlay" class="hidden w-full" aria-hidden="true">
               <!-- Dashboard skeleton -->
@@ -3817,6 +3818,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 </button>
             </div>
             
+            <!-- DEBUG ROUTE: <?php echo esc_html( $sub_page ); ?> -->
             <!-- SECTION 1: DASHBOARD -->
             <?php if ( $sub_page === 'dashboard' ) : ?>
             <section id="cora-page-dashboard" class="cora-page-section cora-active space-y-6">
@@ -5622,7 +5624,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             <?php endif; ?>
 
             <!-- SECTION: CREW & SHIFT SCHEDULER -->
-            <?php if ( $sub_page === 'crew_scheduler' || $sub_page === 'crew-scheduler' || $sub_page === 'shifts' ) : ?>
+            <?php if ( $sub_page === 'crew_scheduler' || $sub_page === 'crew-scheduler' || $sub_page === 'team_scheduler' || $sub_page === 'team-scheduler' || $sub_page === 'shifts' ) : ?>
             <section id="cora-page-crew-scheduler" class="cora-page-section cora-active">
                 <?php include CORA_WORKSPACE_PATH . 'views/view-crew-scheduler.php'; ?>
             </section>

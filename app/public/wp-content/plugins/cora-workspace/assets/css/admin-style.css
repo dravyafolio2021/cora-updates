@@ -100,10 +100,11 @@ div.collapsed[id$="-modal"] {
     visibility: hidden !important;
 }
 
-/* Ensure open drawers are always interactive */
-aside:not(.collapsed),
+/* Ensure open drawers are always interactive and fully visible */
+aside:not(.collapsed):not(.hidden),
 div:not(.collapsed)[id$="-drawer"]:not(.hidden),
 div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
+    transform: translateX(0) !important;
     pointer-events: auto;
     visibility: visible;
 }

@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.4.4
+ * Version: 2.4.5
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.4.4' );
+define( 'CORA_WORKSPACE_VERSION', '2.4.5' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -848,6 +848,7 @@ function cora_real_estate_ai_handle_workspace_route() {
         if ( empty( $sub_page ) ) {
             $sub_page = 'dashboard';
         }
+        $GLOBALS['sub_page'] = $sub_page;
         if ( $sub_page === 'audit-panel' ) {
             wp_redirect( home_url( '/workspace/settings-suite?settings_tab=audit' ) );
             exit;
@@ -864,7 +865,7 @@ function cora_real_estate_ai_handle_workspace_route() {
         $new_enterprise_modules = array( 
             'event_timeline', 'event-timeline', 'multi-day-timeline', 
             'review_acquisition', 'review-acquisition', 'smart-reviews', 
-            'crew_scheduler', 'crew-scheduler', 'shifts', 
+            'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'shifts', 
             'blogs', 'content-suite', 'content_suite',
             'leads', 'client-leads', 'clients', 'bookings', 'photo-shoots',
             'financials', 'financial-overview', 'team-roles', 'user-roles',
@@ -7137,6 +7138,89 @@ function cora_auto_generate_client_tasks( $client_id, $client_name, $booking_tit
 
     $tasks = array_merge( $new_tasks, $tasks );
     update_option( 'cora_workspace_client_tasks', $tasks , false );
+}
+
+/**
+ * Automatically generates a default active itinerary timeline for a newly converted client project
+ */
+function cora_auto_generate_client_timeline( $client_id, $client_name, $booking_title, $client_phone = '' ) {
+    $cora_event_timelines = get_option('cora_event_timelines', array());
+    if ( ! is_array($cora_event_timelines) ) {
+        $cora_event_timelines = array();
+    }
+
+    // Check if timeline already exists for this client to prevent duplication
+    foreach ( $cora_event_timelines as $tl ) {
+        if ( isset($tl['client_id']) && (string)$tl['client_id'] === (string)$client_id ) {
+            return; // Timeline already exists
+        }
+    }
+
+    // Create 3 default day blocks
+    $blocks = array(
+        array(
+            'id'            => 'blk_' . uniqid(),
+            'day'            => 1,
+            'day_title'      => 'Day 1: Shoot Prep & Discovery',
+            'time_start'     => '09:00 AM',
+            'time_end'       => '11:00 AM',
+            'activity'       => 'Creative Concept Kickoff & Gear Setup',
+            'venue'          => 'Cora Studio & Production HQ',
+            'gps_url'        => 'https://maps.google.com/?q=Cora+Studio',
+            'type_tag'       => 'Creative Prep',
+            'duration_tag'   => '2.0 Hrs',
+            'dist_tag'       => '0.0 km',
+            'crew'           => array('Shruti Sharma (Super Admin)'),
+            'status'         => 'Upcoming'
+        ),
+        array(
+            'id'            => 'blk_' . uniqid(),
+            'day'            => 1,
+            'day_title'      => 'Day 1: Shoot Prep & Discovery',
+            'time_start'     => '01:00 PM',
+            'time_end'       => '05:00 PM',
+            'activity'       => 'Initial Location Scouting & Baseline Shoot',
+            'venue'          => 'Target Property Location',
+            'gps_url'        => 'https://maps.google.com/?q=Target+Property+Location',
+            'type_tag'       => 'On-Site Scout',
+            'duration_tag'   => '4.0 Hrs',
+            'dist_tag'       => '10.5 km',
+            'crew'           => array('Rohan Kapoor (Lead Photographer)'),
+            'status'         => 'Upcoming'
+        ),
+        array(
+            'id'            => 'blk_' . uniqid(),
+            'day'            => 2,
+            'day_title'      => 'Day 2: Main Production Shoot',
+            'time_start'     => '10:00 AM',
+            'time_end'       => '06:00 PM',
+            'activity'       => 'Complete Architectural & Drone Coverage',
+            'venue'          => 'Target Property Location',
+            'gps_url'        => 'https://maps.google.com/?q=Target+Property+Location',
+            'type_tag'       => 'Production Shoot',
+            'duration_tag'   => '8.0 Hrs',
+            'dist_tag'       => '10.5 km',
+            'crew'           => array('Karan Verma (Drone Pilot)', 'Priya Nair (Videographer)'),
+            'status'         => 'Upcoming'
+        )
+    );
+
+    $new_timeline = array(
+        'id'          => 'tl_' . uniqid(),
+        'client_id'   => $client_id,
+        'title'       => $booking_title,
+        'category'    => 'Real Estate Shoot',
+        'client_name' => $client_name,
+        'client_phone'=> $client_phone ?: '9876543210',
+        'total_days'  => 2,
+        'status'      => 'Active Live',
+        'token'       => 'tl_token_' . substr(md5(uniqid()), 0, 8),
+        'created_at'  => date('Y-m-d'),
+        'blocks'      => $blocks
+    );
+
+    array_unshift( $cora_event_timelines, $new_timeline );
+    update_option( 'cora_event_timelines', $cora_event_timelines );
 }
 
 /**
@@ -25687,7 +25771,9 @@ if ( ! function_exists( 'cora_ajax_convert_lead_to_client_suite' ) ) {
             array_unshift( $clients, $new_client );
             update_option( 'cora_workspace_clients', $clients );
 
-            cora_auto_generate_client_tasks( $new_client['id'], $new_client['names'], ($converted_lead['scale'] ?? 'Standard') . ' Shoot - ' . ($converted_lead['city'] ?? 'Mumbai') );
+            $booking_title = ($converted_lead['scale'] ?? 'Standard') . ' Shoot - ' . ($converted_lead['city'] ?? 'Mumbai');
+            cora_auto_generate_client_tasks( $new_client['id'], $new_client['names'], $booking_title );
+            cora_auto_generate_client_timeline( $new_client['id'], $new_client['names'], $booking_title, $converted_lead['phone'] ?? '' );
 
             wp_send_json_success( array(
                 'message' => 'Lead converted to active client successfully!',
@@ -28349,6 +28435,7 @@ function cora_ajax_save_gear_kit() {
     $kit_name    = sanitize_text_field( $_POST['kit_name'] ?? $_POST['name'] ?? '' );
     $category    = sanitize_text_field( $_POST['category'] ?? 'Camera Package' );
     $description = sanitize_textarea_field( $_POST['description'] ?? '' );
+    $daily_rate  = isset( $_POST['daily_rate'] ) ? floatval( $_POST['daily_rate'] ) : 0;
     
     // Parse item_ids (can be array, JSON string, or comma-separated string)
     $raw_item_ids = $_POST['item_ids'] ?? array();
@@ -28367,6 +28454,26 @@ function cora_ajax_save_gear_kit() {
 
     if ( empty( $kit_name ) ) {
         wp_send_json_error( array( 'message' => 'Kit name is required.' ) );
+    }
+
+    // Resolve human-readable item names from the studio gear registry
+    $studio_gear = get_option( 'cora_studio_gear', array() );
+    $gear_map = array();
+    if ( is_array( $studio_gear ) ) {
+        foreach ( $studio_gear as $gear ) {
+            if ( isset( $gear['id'] ) && isset( $gear['name'] ) ) {
+                $gear_map[$gear['id']] = $gear['name'];
+            }
+        }
+    }
+
+    $items = array();
+    foreach ( $item_ids as $id ) {
+        if ( isset( $gear_map[$id] ) ) {
+            $items[] = $gear_map[$id];
+        } else {
+            $items[] = $id; // fallback
+        }
     }
 
     $kits = get_option( 'cora_gear_kits', array() );
@@ -28390,6 +28497,8 @@ function cora_ajax_save_gear_kit() {
         $kits[$found_index]['category']    = $category;
         $kits[$found_index]['description'] = $description;
         $kits[$found_index]['item_ids']    = $item_ids;
+        $kits[$found_index]['items']       = $items;
+        $kits[$found_index]['daily_rate']  = $daily_rate;
         $kits[$found_index]['updated_at']  = date( 'Y-m-d H:i:s' );
         $saved_kit = $kits[$found_index];
     } else {
@@ -28400,6 +28509,9 @@ function cora_ajax_save_gear_kit() {
             'category'    => $category,
             'description' => $description,
             'item_ids'    => $item_ids,
+            'items'       => $items,
+            'daily_rate'  => $daily_rate,
+            'status'      => 'Available',
             'created_at'  => date( 'Y-m-d H:i:s' ),
             'updated_at'  => date( 'Y-m-d H:i:s' ),
         );
@@ -28423,7 +28535,9 @@ function cora_ajax_save_crew_shifts_list_handler() {
     $payload = stripslashes($_POST['payload'] ?? '');
     $data = json_decode($payload, true);
     if (is_array($data)) {
-        update_option('cora_crew_shifts', $data);
+        $active_industry = cora_get_active_industry();
+        update_option('cora_crew_shifts_' . $active_industry, $data);
+        update_option('cora_crew_shifts', $data); // fallback
         wp_send_json_success('Shifts updated');
     }
     wp_send_json_error('Invalid data');
@@ -28435,7 +28549,9 @@ function cora_ajax_save_event_timelines_list_handler() {
     $payload = stripslashes($_POST['payload'] ?? '');
     $data = json_decode($payload, true);
     if (is_array($data)) {
-        update_option('cora_event_timelines', $data);
+        $active_industry = cora_get_active_industry();
+        update_option('cora_event_timelines_' . $active_industry, $data);
+        update_option('cora_event_timelines', $data); // fallback
         wp_send_json_success('Timelines updated');
     }
     wp_send_json_error('Invalid data');
@@ -28452,4 +28568,41 @@ function cora_ajax_save_studio_gear_list_handler() {
         wp_send_json_success('Gear updated');
     }
     wp_send_json_error('Invalid data');
+}
+
+add_action('wp_ajax_cora_ajax_save_crew_member', 'cora_ajax_save_crew_member_handler');
+function cora_ajax_save_crew_member_handler() {
+    if (!current_user_can('read')) wp_send_json_error('Unauthorized');
+    $name = sanitize_text_field($_POST['name'] ?? '');
+    $role = sanitize_text_field($_POST['role'] ?? '');
+    $phone = sanitize_text_field($_POST['phone'] ?? '');
+    $rate = intval($_POST['rate'] ?? 22000);
+
+    if (empty($name)) {
+        wp_send_json_error('Name is required');
+    }
+
+    $cora_crew_members = get_option('cora_crew_members', array());
+    if (!is_array($cora_crew_members)) $cora_crew_members = array();
+
+    // Check if exists
+    $exists = false;
+    foreach ($cora_crew_members as $m) {
+        if (strtolower($m['name']) === strtolower($name)) {
+            $exists = true;
+            break;
+        }
+    }
+
+    if (!$exists) {
+        $cora_crew_members[] = array(
+            'name' => $name,
+            'role' => $role,
+            'phone' => $phone,
+            'rate' => $rate
+        );
+        update_option('cora_crew_members', $cora_crew_members);
+    }
+
+    wp_send_json_success(array('message' => 'Crew member saved', 'members' => $cora_crew_members));
 }

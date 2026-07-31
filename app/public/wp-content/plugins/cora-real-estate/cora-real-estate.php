@@ -30,31 +30,29 @@ Cora_Module_Registry::initialize();
 // ── Git Integration ────────────────────────────────────────────────────────
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-github-integration.php';
 
-/**
- * Add the admin menu page
- */
-function cora_real_estate_ai_admin_menu() {
-    add_menu_page(
-        __( 'Cora for Real Estate', 'cora-real-estate' ),
-        __( 'Cora AI', 'cora-real-estate' ),
-        'manage_options',
-        'cora-real-estate',
-        'cora_real_estate_ai_render_dashboard',
-        'dashicons-superhero', // Custom icon placeholder
-        2 // High position in the sidebar
-    );
+if ( ! function_exists( 'cora_real_estate_ai_admin_menu' ) ) {
+    function cora_real_estate_ai_admin_menu() {
+        add_menu_page(
+            __( 'Cora for Real Estate', 'cora-real-estate' ),
+            __( 'Cora AI', 'cora-real-estate' ),
+            'manage_options',
+            'cora-real-estate',
+            'cora_real_estate_ai_render_dashboard',
+            'dashicons-superhero', // Custom icon placeholder
+            2 // High position in the sidebar
+        );
+    }
 }
 add_action( 'admin_menu', 'cora_real_estate_ai_admin_menu' );
 
 /**
  * Render the dashboard page
  */
-/**
- * Render the dashboard page (redirects to the standalone workspace URL)
- */
-function cora_real_estate_ai_render_dashboard() {
-    wp_redirect( home_url( '/workspace' ) );
-    exit;
+if ( ! function_exists( 'cora_real_estate_ai_render_dashboard' ) ) {
+    function cora_real_estate_ai_render_dashboard() {
+        wp_redirect( home_url( '/workspace' ) );
+        exit;
+    }
 }
 add_action( 'admin_menu', 'cora_real_estate_ai_admin_menu' );
 
@@ -76,11 +74,13 @@ add_action( 'wp_head', function() {
 /**
  * 2. FAVICON — Replace the WordPress "W" favicon with the Cora logo on all pages.
  */
-function cora_whitelabel_favicon() {
-    $favicon_url = CORA_REAL_ESTATE_AI_URL . 'assets/images/cora-favicon.png';
-    echo '<link rel="icon" type="image/png" href="' . esc_url( $favicon_url ) . '" sizes="32x32">' . "\n";
-    echo '<link rel="shortcut icon" href="' . esc_url( $favicon_url ) . '">' . "\n";
-    echo '<link rel="apple-touch-icon" href="' . esc_url( $favicon_url ) . '">' . "\n";
+if ( ! function_exists( 'cora_whitelabel_favicon' ) ) {
+    function cora_whitelabel_favicon() {
+        $favicon_url = CORA_REAL_ESTATE_AI_URL . 'assets/images/cora-favicon.png';
+        echo '<link rel="icon" type="image/png" href="' . esc_url( $favicon_url ) . '" sizes="32x32">' . "\n";
+        echo '<link rel="shortcut icon" href="' . esc_url( $favicon_url ) . '">' . "\n";
+        echo '<link rel="apple-touch-icon" href="' . esc_url( $favicon_url ) . '">' . "\n";
+    }
 }
 add_action( 'wp_head',    'cora_whitelabel_favicon', 1 );
 add_action( 'admin_head', 'cora_whitelabel_favicon', 1 );
@@ -95,11 +95,13 @@ add_filter( 'the_generator', '__return_empty_string' );
 /**
  * 4. REMOVE VERSION NUMBERS from script/style query strings (?ver=X.X fingerprinting).
  */
-function cora_whitelabel_remove_version( $src ) {
-    if ( strpos( $src, '?ver=' ) || strpos( $src, '&ver=' ) ) {
-        $src = remove_query_arg( 'ver', $src );
+if ( ! function_exists( 'cora_whitelabel_remove_version' ) ) {
+    function cora_whitelabel_remove_version( $src ) {
+        if ( strpos( $src, '?ver=' ) || strpos( $src, '&ver=' ) ) {
+            $src = remove_query_arg( 'ver', $src );
+        }
+        return $src;
     }
-    return $src;
 }
 add_filter( 'style_loader_src',  'cora_whitelabel_remove_version', 9999 );
 add_filter( 'script_loader_src', 'cora_whitelabel_remove_version', 9999 );
@@ -165,53 +167,55 @@ add_filter( 'login_title', function( $login_title ) {
 add_filter( 'wp_die_handler', function() {
     return 'cora_custom_die_handler';
 } );
-function cora_custom_die_handler( $message, $title = '', $args = array() ) {
-    // Only intercept frontend; let admin/AJAX use default handler
-    if ( is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
-        _default_wp_die_handler( $message, $title, $args );
-        return;
+if ( ! function_exists( 'cora_custom_die_handler' ) ) {
+    function cora_custom_die_handler( $message, $title = '', $args = array() ) {
+        // Only intercept frontend; let admin/AJAX use default handler
+        if ( is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+            _default_wp_die_handler( $message, $title, $args );
+            return;
+        }
+        if ( is_wp_error( $message ) ) {
+            $message = $message->get_error_message();
+        }
+        $title   = empty( $title ) ? 'Error — Cora' : esc_html( $title ) . ' — Cora';
+        $message = wp_kses_post( $message );
+        $favicon = CORA_REAL_ESTATE_AI_URL . 'assets/images/cora-favicon.png';
+        status_header( isset( $args['response'] ) ? $args['response'] : 500 );
+        nocache_headers();
+        header( 'Content-Type: text/html; charset=utf-8' );
+        echo '<!DOCTYPE html><html lang="en"><head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>' . esc_html( $title ) . '</title>
+            <link rel="icon" type="image/png" href="' . esc_url( $favicon ) . '">
+            <style>
+                * { margin:0; padding:0; box-sizing:border-box; }
+                body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+                       background:#fafafa; display:flex; align-items:center;
+                       justify-content:center; min-height:100vh; color:#18181b; }
+                .cora-err { background:#fff; border:1px solid #e4e4e7; border-radius:12px;
+                    padding:40px 48px; max-width:480px; text-align:center;
+                    box-shadow:0 4px 24px rgba(0,0,0,.06); }
+                .cora-err-logo { width:48px; height:48px; margin:0 auto 20px;
+                    background-image:url(' . esc_url( $favicon ) . ');
+                    background-size:contain; background-repeat:no-repeat;
+                    background-position:center; }
+                h1 { font-size:18px; font-weight:700; margin-bottom:10px; }
+                p  { font-size:14px; color:#71717a; line-height:1.6; }
+                a  { display:inline-block; margin-top:24px; padding:9px 20px;
+                    background:#18181b; color:#fff; text-decoration:none;
+                    border-radius:8px; font-size:13px; font-weight:600; }
+            </style>
+        </head><body>
+            <div class="cora-err">
+                <div class="cora-err-logo"></div>
+                <h1>Something went wrong</h1>
+                <p>' . $message . '</p>
+                <a href="' . esc_url( home_url( '/workspace' ) ) . '">← Back to Dashboard</a>
+            </div>
+        </body></html>';
+        exit;
     }
-    if ( is_wp_error( $message ) ) {
-        $message = $message->get_error_message();
-    }
-    $title   = empty( $title ) ? 'Error — Cora' : esc_html( $title ) . ' — Cora';
-    $message = wp_kses_post( $message );
-    $favicon = CORA_REAL_ESTATE_AI_URL . 'assets/images/cora-favicon.png';
-    status_header( isset( $args['response'] ) ? $args['response'] : 500 );
-    nocache_headers();
-    header( 'Content-Type: text/html; charset=utf-8' );
-    echo '<!DOCTYPE html><html lang="en"><head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>' . esc_html( $title ) . '</title>
-        <link rel="icon" type="image/png" href="' . esc_url( $favicon ) . '">
-        <style>
-            * { margin:0; padding:0; box-sizing:border-box; }
-            body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-                   background:#fafafa; display:flex; align-items:center;
-                   justify-content:center; min-height:100vh; color:#18181b; }
-            .cora-err { background:#fff; border:1px solid #e4e4e7; border-radius:12px;
-                padding:40px 48px; max-width:480px; text-align:center;
-                box-shadow:0 4px 24px rgba(0,0,0,.06); }
-            .cora-err-logo { width:48px; height:48px; margin:0 auto 20px;
-                background-image:url(' . esc_url( $favicon ) . ');
-                background-size:contain; background-repeat:no-repeat;
-                background-position:center; }
-            h1 { font-size:18px; font-weight:700; margin-bottom:10px; }
-            p  { font-size:14px; color:#71717a; line-height:1.6; }
-            a  { display:inline-block; margin-top:24px; padding:9px 20px;
-                background:#18181b; color:#fff; text-decoration:none;
-                border-radius:8px; font-size:13px; font-weight:600; }
-        </style>
-    </head><body>
-        <div class="cora-err">
-            <div class="cora-err-logo"></div>
-            <h1>Something went wrong</h1>
-            <p>' . $message . '</p>
-            <a href="' . esc_url( home_url( '/workspace' ) ) . '">← Back to Dashboard</a>
-        </div>
-    </body></html>';
-    exit;
 }
 
 /**
@@ -248,26 +252,28 @@ add_action( 'wp_dashboard_setup', function() {
  */
 add_filter( 'elementor/notes/is_active', '__return_false' );
 
-function cora_disable_elementor_notes_scripts() {
-    wp_dequeue_script( 'elementor-pro-notes' );
-    wp_deregister_script( 'elementor-pro-notes' );
-    wp_dequeue_script( 'elementor-notes' );
-    wp_deregister_script( 'elementor-notes' );
-    wp_dequeue_script( 'notes' );
-    wp_deregister_script( 'notes' );
+if ( ! function_exists( 'cora_disable_elementor_notes_scripts' ) ) {
+    function cora_disable_elementor_notes_scripts() {
+        wp_dequeue_script( 'elementor-pro-notes' );
+        wp_deregister_script( 'elementor-pro-notes' );
+        wp_dequeue_script( 'elementor-notes' );
+        wp_deregister_script( 'elementor-notes' );
+        wp_dequeue_script( 'notes' );
+        wp_deregister_script( 'notes' );
 
-    // Dequeue all Elementor AI scripts — removes "Edit with AI" feature entirely
-    $ai_handles = array(
-        'elementor-ai',
-        'elementor-ai-layout',
-        'elementor-ai-media-library',
-        'elementor-ai-gutenberg',
-        'elementor-ai-admin',
-        'elementor-ai-unify-product-images',
-    );
-    foreach ( $ai_handles as $handle ) {
-        wp_dequeue_script( $handle );
-        wp_deregister_script( $handle );
+        // Dequeue all Elementor AI scripts — removes "Edit with AI" feature entirely
+        $ai_handles = array(
+            'elementor-ai',
+            'elementor-ai-layout',
+            'elementor-ai-media-library',
+            'elementor-ai-gutenberg',
+            'elementor-ai-admin',
+            'elementor-ai-unify-product-images',
+        );
+        foreach ( $ai_handles as $handle ) {
+            wp_dequeue_script( $handle );
+            wp_deregister_script( $handle );
+        }
     }
 }
 add_action( 'wp_enqueue_scripts', 'cora_disable_elementor_notes_scripts', 999 );

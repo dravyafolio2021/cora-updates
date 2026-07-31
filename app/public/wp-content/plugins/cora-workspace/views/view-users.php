@@ -1168,7 +1168,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 </div>
 
 <!-- ═══ OFFICE GEOFENCING DRAWER SHEET ═══════════════════════════════════════ -->
-<aside id="cora-geofence-drawer" class="collapsed fixed top-0 right-0 z-50 h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+<aside id="cora-geofence-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
     <!-- Header -->
     <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0">
         <div>
@@ -1263,7 +1263,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 </aside>
 
 <!-- ═══ AUTOMATED ATTENDANCE REPORT & SHARE SIDE DRAWER SHEET ═════════════════ -->
-<aside id="cora-attendance-reports-drawer" class="collapsed fixed top-0 right-0 z-50 h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+<aside id="cora-attendance-reports-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
     <!-- Drawer Header -->
     <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0">
         <div>
@@ -1389,7 +1389,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 </aside>
 
 <!-- ═══ INVITE USER DRAWER SHEET ═════════════════════════════════════════════ -->
-<aside id="cora-invite-user-drawer" class="collapsed fixed top-0 right-0 z-50 h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+<aside id="cora-invite-user-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
     <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-950/50 shrink-0">
         <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Invite Brokerage Member</h3>
         <button type="button" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-1" onclick="closeInviteDrawer()">
@@ -1452,7 +1452,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 </aside>
 
 <!-- ═══ EDIT USER DRAWER SHEET ═══════════════════════════════════════════════ -->
-<aside id="cora-edit-user-drawer" class="collapsed fixed top-0 right-0 z-50 h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+<aside id="cora-edit-user-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
         <!-- Mobile pull-down handle -->
         <div class="md:hidden flex justify-center pt-2 pb-0 cursor-pointer" onclick="closeEditUserDrawer()">
             <div class="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600"></div>
@@ -1678,7 +1678,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 </aside>
 
 <!-- ═══ EDIT CUSTOM ROLE DRAWER SHEET ════════════════════════════════════════ -->
-<aside id="cora-edit-custom-role-drawer" class="collapsed fixed top-0 right-0 z-50 h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+<aside id="cora-edit-custom-role-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
     <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-950/50 shrink-0">
         <div>
             <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
@@ -1760,7 +1760,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 </aside>
 
 <!-- ═══ CREATE CUSTOM ROLE DRAWER SHEET ══════════════════════════════════════ -->
-<aside id="cora-create-custom-role-drawer" class="collapsed fixed top-0 right-0 z-50 h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+<aside id="cora-create-custom-role-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
     <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-950/50 shrink-0">
         <div>
             <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
