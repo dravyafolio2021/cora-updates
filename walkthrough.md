@@ -329,6 +329,49 @@ Completely resolved the drawer sheet visibility bug, implemented custom gear kit
 | [cora-workspace.json](file:///Users/shrutian/Desktop/cora/updates/cora-workspace.json) | Incremented update version to `2.5.1` and updated changelog. |
 | [cora-workspace.zip](file:///Users/shrutian/Desktop/cora/updates/cora-workspace.zip) | Rebuilt distribution zip package. |
 
+***
+
+## Phase 8: Mobile Layout Overhaul, Status One-Tap Cycle, and Bottom Drawer Enhancements (v2.5.2)
+
+### 19. Notion/ClickUp-Inspired Mobile Flat List Layout
+- **Problem**: In mobile viewports, the task cards were styled with heavy individual boxes, borders, and shadows that cluttered the viewport and made reading the timeline confusing.
+- **Solution**:
+  - Replaced individual boxed cards with a single unified card container (`bg-white border border-zinc-200/80 rounded-2xl shadow-2xs divide-y divide-zinc-100 overflow-hidden`) for all tasks under each timeline header.
+  - Reduced screen clutter by displaying tasks in flat list rows separated by thin rules.
+
+### 20. One-Tap Status Cycling
+- **Problem**: Changing task status on mobile required opening the details drawer, going to the overview tab, clicking a dropdown selector, and saving, which was tedious for quick updates.
+- **Solution**:
+  - Integrated a direct one-tap cycle helper `window.coraCycleMobileStatus(event, taskId)` triggered by tapping the left status circle directly in the timeline task list.
+  - Cycles status state (`todo` -> `in_progress` -> `client_review` -> `done` -> `todo`), shows a custom monochromatic toast notification, and automatically triggers an AJAX update with an immediate view refresh.
+
+### 21. Priority Flags & Assignee Avatars Optimization
+- **Problem**: Text badges like "HIGH" or "URGENT" took up precious horizontal space on narrow screens.
+- **Solution**:
+  - Replaced text priority badges on mobile with a compact colored flag SVG icon (red/rose for urgent, amber/orange for high, grey for low/medium) on the right side of each task row.
+  - Replaced high-contrast black assignee initials badges with soft zinc-100 initials circles with clean borders.
+
+### 22. iOS-Style Bottom Drawer Layout & Backdrop
+- **Problem**: Modals and side drawers on mobile either overflowed or did not feel native.
+- **Solution**:
+  - Redesigned the task details panel for mobile viewports using a bottom sheet drawer style (`82vh` height, rounded top corners).
+  - Added a visual drag handlebar indicator at the top of the drawer sheet.
+  - Configured a blurred dark backdrop overlay (`rgba(9, 9, 11, 0.4) backdrop-filter: blur(4px)`) that slides up smoothly.
+  - Stretched the segmented controls tab buttons (`flex: 1 1 0%`) for a native-like segmented picker look.
+
+### 23. Version Bump & Distribution Archive (v2.5.2)
+- **Solution**:
+  - Incremented the plugin version from `2.5.1` to `2.5.2` in `cora-workspace.php`.
+  - Updated auto-update metadata in `updates/cora-workspace.json`.
+  - Package zip files will be built to bundle the version.
+
+### Files Modified
+| File | Changes |
+|------|---------|
+| [cora-workspace.php](file:///Users/shrutian/Desktop/cora/app/public/wp-content/plugins/cora-workspace/cora-workspace.php) | Incremented version to `2.5.2`. |
+| [cora-workspace.json](file:///Users/shrutian/Desktop/cora/updates/cora-workspace.json) | Incremented update version to `2.5.2` and updated changelog. |
+
+
 
 
 
