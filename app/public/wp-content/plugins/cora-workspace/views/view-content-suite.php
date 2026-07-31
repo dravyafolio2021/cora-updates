@@ -1068,10 +1068,8 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
     window.coraCalDayClick = function(e, dateStr) {
         if (e.target.closest('.cora-cal-event-card') || e.target.closest('button')) return;
         if (typeof window.openCreateArticleDrawer === 'function') {
-            window.openCreateArticleDrawer();
+            window.openCreateArticleDrawer(dateStr);
         }
-        const dateInput = document.getElementById('ca-date');
-        if (dateInput) dateInput.value = dateStr;
     };
 
     // ============================================================
@@ -1244,32 +1242,65 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
     }
 
     // Drawers
-    window.openCreateArticleDrawer = function(prefillDate) {
-        // Close any open drawers first
-        const existingSheets = document.querySelectorAll('.cora-bottom-sheet');
-        existingSheets.forEach(s => s.classList.add('collapsed'));
-        
-        // Clear all form fields
-        const fields = ['ca-title', 'ca-keyword', 'ca-date'];
-        fields.forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
-        const cb = document.getElementById('ca-ai-brief');
-        if(cb) cb.checked = false;
-
-        // Pre-fill date if provided (detect YYYY-MM-DD format)
-        if(prefillDate && /^\d{4}-\d{2}-\d{2}$/.test(prefillDate)) {
-            const dateEl = document.getElementById('ca-date');
-            if(dateEl) dateEl.value = prefillDate;
+    window.openCreateArticleDrawer = function(prefillDate, prefillStage) {
+        if (window.coraShowToast) {
+            window.coraShowToast('Creating new draft...', 'info');
         }
 
-        const drawer = document.getElementById('cora-create-article-sheet');
-        const backdrop = document.getElementById('cora-drawer-backdrop');
-        if(drawer) {
-            // Move to body so it escapes any overflow:hidden ancestor (WordPress admin)
-            if(drawer.parentNode !== document.body) document.body.appendChild(drawer);
-            if(backdrop && backdrop.parentNode !== document.body) document.body.appendChild(backdrop);
-            drawer.classList.remove('collapsed');
+        const ajaxUrl   = (window.coraREWPData && window.coraREWPData.ajaxUrl)   ? window.coraREWPData.ajaxUrl   :
+                          (window.coraREData   && window.coraREData.ajaxUrl)     ? window.coraREData.ajaxUrl     :
+                          (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php');
+        const ajaxNonce = (window.coraREWPData && window.coraREWPData.ajaxNonce) ? window.coraREWPData.ajaxNonce :
+                          (window.coraREData   && window.coraREData.ajaxNonce)   ? window.coraREData.ajaxNonce   : '';
+
+        const body = new URLSearchParams();
+        body.append('action', 'cora_create_article');
+        body.append('nonce', ajaxNonce);
+        body.append('security', ajaxNonce);
+        body.append('title', 'Untitled Draft');
+        body.append('status', 'draft');
+
+        if (prefillDate) {
+            body.append('publish_date', prefillDate);
         }
-        showBackdrop();
+        if (prefillStage) {
+            body.append('editorial_status', prefillStage);
+        }
+
+        fetch(ajaxUrl, { method: 'POST', credentials: 'same-origin', body: body })
+            .then(res => res.json())
+            .then(response => {
+                if (response && response.success && response.data && response.data.post_id) {
+                    const newId = response.data.post_id;
+                    if (window.coraShowToast) {
+                        window.coraShowToast('Draft created! Opening editor...', 'success');
+                    }
+                    
+                    // Close any open drawers
+                    if (typeof window.coraCloseAllDrawers === 'function') {
+                        window.coraCloseAllDrawers();
+                    }
+                    
+                    // Set flag so closing the editor will reload the list/board
+                    window.coraArticleSavedDuringSession = true;
+
+                    // Open editor
+                    if (typeof window.coraEditArticle === 'function') {
+                        window.coraEditArticle(newId);
+                    }
+                } else {
+                    const msg = (response && response.data) ? response.data : 'Failed to create article';
+                    if (window.coraShowToast) {
+                        window.coraShowToast(msg, 'error');
+                    }
+                }
+            })
+            .catch(err => {
+                if (window.coraShowToast) {
+                    window.coraShowToast('Network error creating article', 'error');
+                }
+                console.error(err);
+            });
     };
 
     window.closeCreateArticleDrawer = function() {

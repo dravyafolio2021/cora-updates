@@ -138,7 +138,7 @@ $stage_keys = array_keys($stages);
       </div>
       <div class="flex items-center gap-1">
         <span class="ct-stage-count px-2.5 py-0.5 rounded-full bg-white text-[11px] font-bold text-zinc-900 shadow-xs"><?php echo count($col_cards); ?></span>
-        <button class="p-1 text-zinc-400 hover:text-zinc-900 rounded hover:bg-white/60 transition-colors" title="Add to <?php echo $col_label; ?>" onclick="openCreateArticleDrawer()">
+        <button class="p-1 text-zinc-400 hover:text-zinc-900 rounded hover:bg-white/60 transition-colors" title="Add to <?php echo $col_label; ?>" onclick="openCreateArticleDrawer(null, '<?php echo esc_js($col_key); ?>')">
           <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         </button>
       </div>
@@ -241,7 +241,7 @@ $stage_keys = array_keys($stages);
 
     <!-- Column Footer Button -->
     <div class="p-2.5 rounded-b-2xl" style="background-color: <?php echo $style['header_bg']; ?>; border-top: 1px solid <?php echo $style['border']; ?>;">
-      <button class="w-full text-center text-xs font-semibold text-zinc-600 hover:text-zinc-900 py-1 hover:bg-white/60 rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer" onclick="openCreateArticleDrawer()">
+      <button class="w-full text-center text-xs font-semibold text-zinc-600 hover:text-zinc-900 py-1 hover:bg-white/60 rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer" onclick="openCreateArticleDrawer(null, '<?php echo esc_js($col_key); ?>')">
         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         Add to <?php echo $col_label; ?>
       </button>

@@ -1,11 +1,11 @@
 {
     "name": "Cora Workspace Platform",
     "slug": "cora-workspace",
-    "version": "2.5.3",
+    "version": "2.9.0",
     "download_url": "https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-workspace.zip",
     "tested": "6.7",
     "sections": {
         "description": "A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.",
-        "changelog": "<h4>2.5.3</h4><ul><li><strong>Leads CRM Visual Overhaul</strong>: Replaced icon buttons and complex layouts with flat, clean, Notion-inspired rows, thin SVGs, and consistent monochromatic borders.</li><li><strong>Team Member Assignment</strong>: Added a team member filter selector in the Leads CRM toolbar, Kanban cards, directory list, and drawers.</li><li><strong>One-Tap Lead Status Transition</strong>: Enabled quick status updates directly from the Kanban list and the main drawer interface.</li><li><strong>SLA & Priority Awareness</strong>: Integrated a prominent SLA status header card, dynamic activity logs, and real-time validation checks.</li></ul>"
+        "changelog": "<h4>2.9.0</h4><ul><li><strong>Mobile-First User Management</strong>: Complete redesign of the Users/Team module with a unified responsive filters toolbar, collapsible mobile filter panel, and mobile card grid layout for team members.</li><li><strong>Layout Polish</strong>: Introduced separate mobile and desktop headers with compact mobile tab navigation and floating 'More' dropdown for secondary tabs (Permissions, Attendance, Custom Roles).</li><li><strong>Filter Sync Engine</strong>: New bidirectional filter synchronization between desktop inline filters and mobile collapsible filter panel with clear-all support.</li><li><strong>Tab Navigation Overhaul</strong>: Synchronized tab active states across desktop and mobile navigation menus with deep-link support via URL query parameters.</li><li><strong>Attendance Quick Actions</strong>: Mobile topbar punch button and responsive punch popover.</li><li><strong>Leads CRM Refinements</strong>: Notion-inspired styling, team assignee support, quick status transitions, activity timeline logging, and SLA metrics.</li></ul>"
     }
 }

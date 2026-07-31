@@ -1494,8 +1494,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const closeConfirmModal = () => {
         if (confirmModal) {
-            confirmModal.classList.add('hidden');
-            confirmModal.classList.remove('flex');
+            confirmModal.classList.remove('pointer-events-auto', 'flex');
+            confirmModal.classList.add('hidden', 'pointer-events-none');
         }
     };
 
@@ -2187,8 +2187,8 @@ function coraConfirmAction(message, onConfirm) {
         confirmCallback = onConfirm;
         const modal = document.getElementById('cora-confirm-modal');
         if (modal) {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            modal.classList.remove('hidden', 'pointer-events-none');
+            modal.classList.add('flex', 'pointer-events-auto');
         }
     }
 
@@ -2216,9 +2216,13 @@ function deleteForm(id) {
         // Show backdrop and drawer
         const backdrop = document.getElementById('cora-submissions-backdrop');
         const drawer = document.getElementById('cora-submissions-drawer');
-        if (backdrop) backdrop.classList.remove('hidden');
+        if (backdrop) {
+            backdrop.classList.remove('hidden', 'pointer-events-none');
+            backdrop.classList.add('pointer-events-auto');
+        }
         if (drawer) {
-            drawer.classList.remove('hidden');
+            drawer.classList.remove('hidden', 'pointer-events-none');
+            drawer.classList.add('pointer-events-auto');
             // Force redraw/reflow for transition
             drawer.offsetHeight;
             drawer.classList.remove('translate-x-full');
@@ -2308,13 +2312,20 @@ function deleteForm(id) {
         const inspector = document.getElementById('cora-entry-inspector');
         
         if (drawer) {
-            drawer.classList.add('translate-x-full');
+            drawer.classList.remove('pointer-events-auto');
+            drawer.classList.add('translate-x-full', 'pointer-events-none');
             setTimeout(() => {
                 drawer.classList.add('hidden');
             }, 300);
         }
-        if (backdrop) backdrop.classList.add('hidden');
-        if (inspector) inspector.classList.add('translate-x-full');
+        if (backdrop) {
+            backdrop.classList.remove('pointer-events-auto');
+            backdrop.classList.add('hidden', 'pointer-events-none');
+        }
+        if (inspector) {
+            inspector.classList.remove('pointer-events-auto');
+            inspector.classList.add('translate-x-full', 'pointer-events-none');
+        }
     };
 
     window.openEntryInspector = function(sub, entryNumber) {
@@ -2359,7 +2370,8 @@ function deleteForm(id) {
 
         const inspector = document.getElementById('cora-entry-inspector');
         if (inspector) {
-            inspector.classList.remove('hidden');
+            inspector.classList.remove('hidden', 'pointer-events-none');
+            inspector.classList.add('pointer-events-auto');
             // Force redraw/reflow for transition
             inspector.offsetHeight;
             inspector.classList.remove('translate-x-full');
@@ -2369,7 +2381,8 @@ function deleteForm(id) {
     window.closeEntryInspector = function() {
         const inspector = document.getElementById('cora-entry-inspector');
         if (inspector) {
-            inspector.classList.add('translate-x-full');
+            inspector.classList.remove('pointer-events-auto');
+            inspector.classList.add('translate-x-full', 'pointer-events-none');
         }
     };
 
@@ -2628,6 +2641,7 @@ function renderFormsList() {
     }
 
     window.addEventListener('hashchange', handleRouting);
+    handleRouting(); // Process initial hash on page load
     
     // Initial fetch
     if (window.location.hash === '' || window.location.hash === '#list') {
@@ -4207,16 +4221,16 @@ function renderFormsList() {
 
         const modal = document.getElementById('cora-share-modal');
         if (modal) {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            modal.classList.remove('hidden', 'pointer-events-none');
+            modal.classList.add('flex', 'pointer-events-auto');
         }
     }
 
     function closeShareModal() {
         const modal = document.getElementById('cora-share-modal');
         if (modal) {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
+            modal.classList.remove('pointer-events-auto', 'flex');
+            modal.classList.add('hidden', 'pointer-events-none');
         }
     }
 

@@ -333,6 +333,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             }
             .cora-sidebar {
                 height: calc(100vh - 52px) !important;
+                top: 0 !important;
             }
         }
 

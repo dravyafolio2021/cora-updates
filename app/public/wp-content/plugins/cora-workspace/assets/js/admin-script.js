@@ -6431,6 +6431,7 @@ jQuery(document).ready(function($) {
             $('#cora-articles-table-body').closest('div').hide();
             $('.cora-page-header').hide();
             $('#cora-full-page-editor').removeClass('hidden').css('display', 'flex');
+            window.coraArticleSavedDuringSession = false;
         } else {
             $('#cora-full-page-editor').addClass('hidden').css('display', 'none');
             $('.cora-stat-card').parent().show();
@@ -6446,6 +6447,10 @@ jQuery(document).ready(function($) {
                 url.searchParams.delete('article_id');
                 window.history.pushState({}, '', url.toString());
             } catch(e){}
+
+            if (window.coraArticleSavedDuringSession) {
+                window.location.reload();
+            }
         }
     };
 
@@ -6855,6 +6860,7 @@ jQuery(document).ready(function($) {
                 }
                 $('#cora-editor-status').text('Saved at ' + new Date().toLocaleTimeString());
                 $('#cora-editor-save-status').html('<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block mr-1"></span>Saved');
+                window.coraArticleSavedDuringSession = true;
                 
                 if (!isAutoSave) {
                     window.coraShowToast(`Article ${status === 'publish' ? 'published' : 'saved'} successfully!`, 'success');
