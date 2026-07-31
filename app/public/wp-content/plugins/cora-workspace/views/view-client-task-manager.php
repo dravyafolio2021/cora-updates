@@ -128,18 +128,18 @@ if (!defined('ABSPATH')) {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 14px;
     width: 100%;
 }
 .cora-task-header-left {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 1px;
 }
 .cora-task-header-right {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 6px;
 }
 .cora-toolbar-search {
     position: relative;
@@ -174,39 +174,40 @@ if (!defined('ABSPATH')) {
     align-items: center !important;
     justify-content: center !important;
     white-space: nowrap !important;
-    gap: 8px;
-    height: 44px;
-    padding: 0 20px !important;
+    gap: 6px;
+    height: 32px;
+    padding: 0 14px !important;
     border: 1px solid #e4e4e7 !important;
-    border-radius: 12px !important;
+    border-radius: 10px !important;
     background-color: #ffffff !important;
-    color: #09090b !important;
-    font-size: 13px !important;
-    font-weight: 700 !important;
+    color: #18181b !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
     cursor: pointer;
     box-shadow: none !important;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
 }
 .cora-task-export-btn:hover {
     background-color: #f4f4f5 !important;
+    border-color: #d4d4d8 !important;
 }
 .cora-task-new-btn {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     white-space: nowrap !important;
-    gap: 8px;
-    height: 44px;
-    padding: 0 20px !important;
+    gap: 6px;
+    height: 32px;
+    padding: 0 14px !important;
     border: none !important;
-    border-radius: 12px !important;
+    border-radius: 10px !important;
     background-color: #09090b !important;
     color: #ffffff !important;
-    font-size: 13px !important;
+    font-size: 12px !important;
     font-weight: 700 !important;
     cursor: pointer;
     box-shadow: none !important;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
 }
 .cora-task-new-btn:hover {
     background-color: #27272a !important;
@@ -218,18 +219,19 @@ if (!defined('ABSPATH')) {
     flex-wrap: nowrap;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 12px;
     background-color: #ffffff;
     border: 1px solid #e4e4e7;
-    border-radius: 20px;
-    padding: 10px 20px;
+    border-radius: 14px;
+    padding: 7px 16px;
     box-shadow: none;
+    margin-bottom: 16px;
 }
 
 .cora-toolbar-left, .cora-toolbar-center, .cora-toolbar-right {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
 }
 
 .cora-toolbar-right {
@@ -242,26 +244,26 @@ if (!defined('ABSPATH')) {
     appearance: none !important;
     -webkit-appearance: none !important;
     background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2371717a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E") !important;
-    background-position: right 10px center !important;
+    background-position: right 8px center !important;
     background-repeat: no-repeat !important;
-    background-size: 12px !important;
-    padding-right: 28px !important;
-    padding-left: 14px !important;
-    padding-top: 6px !important;
-    padding-bottom: 6px !important;
-    background-color: #ffffff !important;
+    background-size: 11px !important;
+    padding-right: 24px !important;
+    padding-left: 10px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    background-color: #f9f9f9 !important;
     border: 1px solid #e4e4e7 !important;
-    border-radius: 12px !important; /* Rounded XL */
-    font-weight: 700 !important;
-    font-size: 12px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 11.5px !important;
     color: #18181b !important;
-    height: 38px !important;
-    max-width: 140px !important;
+    height: 30px !important;
+    max-width: 130px !important;
     text-overflow: ellipsis !important;
     outline: none !important;
     box-shadow: none !important;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
 }
 
 .cora-toolbar-wrapper select:hover {
@@ -445,13 +447,13 @@ if (!defined('ABSPATH')) {
 .cora-col-add-task-btn.btn-done:hover { background-color: rgba(5, 150, 105, 0.08); }
 </style>
 
-<div class="cora-task-manager-wrap text-zinc-900 dark:text-zinc-100 font-sans px-4 sm:px-5 md:px-6 py-4 sm:py-5 max-w-[1700px] mx-auto pb-20 relative">
+<div class="cora-task-manager-wrap text-zinc-900 dark:text-zinc-100 font-sans px-3 sm:px-4 py-3 sm:py-4 max-w-[1700px] mx-auto pb-20 relative">
 
     <!-- Page Header -->
     <div class="cora-task-manager-header">
         <div class="cora-task-header-left">
-            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-zinc-950 dark:text-zinc-50 leading-snug">Client Task Manager</h1>
-            <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1.5 leading-relaxed">Manage end-to-end client deliverables, shoot checklists, and staff assignments for 50+ active studio projects.</p>
+            <h1 class="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Client Task Manager</h1>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-snug">Manage end-to-end client deliverables, shoot checklists, and staff assignments for 50+ active studio projects.</p>
         </div>
         <div class="cora-task-header-right">
             <button onclick="coraOpenTemplateDrawer(event)" class="cora-task-export-btn">
@@ -474,7 +476,7 @@ if (!defined('ABSPATH')) {
     </div>
 
     <!-- Top Filter Toolbar -->
-    <div class="bg-white rounded-2xl border border-zinc-200/80 p-3 mb-6 cora-toolbar-wrapper">
+    <div class="cora-toolbar-wrapper">
         <!-- Left Group -->
         <div class="cora-toolbar-left">
             <span class="text-xs font-bold uppercase text-zinc-400 tracking-wider">Client</span>
