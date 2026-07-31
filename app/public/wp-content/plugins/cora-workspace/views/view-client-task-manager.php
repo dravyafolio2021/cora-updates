@@ -2318,7 +2318,6 @@ window.coraCycleMobileStatus = function(event, taskId) {
         }
     });
 };
-}
 
 function renderKanbanColumns(tasks) {
     const today = new Date();
