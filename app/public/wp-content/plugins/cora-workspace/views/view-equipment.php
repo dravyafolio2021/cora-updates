@@ -293,24 +293,24 @@ if ( is_array( $cora_gear_maintenance ) ) {
 <div id="cora-equipment-view-wrapper" class="space-y-6 font-sans text-zinc-900 max-w-[1700px] mx-auto pb-12">
     
     <!-- ═══ 1. STANDARDIZED PAGE HEADER & CTA ACTION BAR ═════════════════════════════════ -->
-    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4 w-full">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 w-full">
         <div class="min-w-0">
-            <h1 class="text-lg sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 leading-snug">Camera Equipment & Gear Inventory</h1>
-            <p class="text-[11px] sm:text-xs text-zinc-550 dark:text-zinc-400 mt-0.5 sm:mt-1">Manage studio camera gear assets, shoot checkouts, crew allocations, and financial maintenance costs.</p>
+            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-zinc-950 dark:text-zinc-50 leading-snug">Camera Equipment & Gear Inventory</h1>
+            <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1.5 leading-relaxed">Manage studio camera gear assets, shoot checkouts, crew allocations, and financial maintenance costs.</p>
         </div>
 
-        <div class="flex items-center gap-2 shrink-0 flex-wrap">
-            <button onclick="openCheckoutGearDrawer()" class="flex-1 sm:flex-none px-3.5 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-850 text-zinc-800 dark:text-zinc-250 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center justify-center gap-2 cursor-pointer">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-450 dark:text-zinc-500 shrink-0"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
+        <div class="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap">
+            <button onclick="openCheckoutGearDrawer()" class="flex-1 sm:flex-none px-5 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-850 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-full transition-all shadow-2xs flex items-center justify-center gap-2 cursor-pointer">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 dark:text-zinc-400 shrink-0"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
                 Check Out Gear
             </button>
-            <button onclick="openMaintenanceDrawer()" class="flex-1 sm:flex-none px-3.5 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-850 text-zinc-800 dark:text-zinc-250 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center justify-center gap-2 cursor-pointer">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-450 dark:text-zinc-500 shrink-0"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+            <button onclick="openMaintenanceDrawer()" class="flex-1 sm:flex-none px-5 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-850 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-full transition-all shadow-2xs flex items-center justify-center gap-2 cursor-pointer">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 dark:text-zinc-400 shrink-0"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
                 Log Repair & Cost
             </button>
             <!-- Primary Action CTA -->
-            <button onclick="openAddGearDrawer()" class="w-full sm:w-auto px-3.5 py-2 bg-zinc-950 dark:bg-white hover:bg-zinc-850 dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <button onclick="openAddGearDrawer()" class="w-full sm:w-auto px-5 py-2.5 bg-zinc-950 dark:bg-white hover:bg-zinc-850 dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold rounded-full transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 Register New Gear
             </button>
         </div>
