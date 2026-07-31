@@ -1223,13 +1223,6 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                          </span>
                      </div>
 
-                     <!-- Assignee & Action Button Row -->
-                     <div class="flex items-center justify-between gap-1.5 pt-2.5 border-t border-zinc-100 dark:border-zinc-800">
-                         <div class="flex items-center gap-2 min-w-0">
-                             <div class="w-6 h-6 rounded-full bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[9px] shrink-0 border border-zinc-200 dark:border-zinc-800">
-                                 <?php echo esc_html( $assignee_init ); ?>
-                             </div>
-                             <div class="min-w-0 flex flex-col">
                      <!-- Progress Checklist Row -->
                      <div class="space-y-1 -mt-0.5">
                          <div class="flex items-center justify-between text-[9px] font-semibold text-zinc-400 dark:text-zinc-500">
@@ -1240,9 +1233,8 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                              <div class="h-full rounded-full transition-all <?php echo $style['progress_bg']; ?>" style="width: <?php echo intval($checklist_pct); ?>%;"></div>
                          </div>
                      </div>
-                                         <?php
-                     $stage_info = $stage_action_map[$st] ?? $stage_action_map['New Lead'];
-                     ?>
+
+                     <?php $stage_info = $stage_action_map[$st] ?? $stage_action_map['New Lead']; ?>
 
                      <!-- Next Step Milestone Banner -->
                      <div class="flex items-center justify-between text-[9.5px] font-extrabold px-2.5 py-1 rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200/60 dark:border-zinc-700/60">
@@ -1277,7 +1269,10 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                              </button>
                          </div>
                      </div>            
-                  </div>
+                 </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>         </div>
         <!-- SERVER-SIDE PAGINATION BAR (DESKTOP & MOBILE) -->
         <div id="cora-directory-pagination" class="mt-4 p-3.5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3 text-xs select-none">
             <div class="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 font-medium">
