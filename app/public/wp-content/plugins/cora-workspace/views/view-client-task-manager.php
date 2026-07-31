@@ -76,9 +76,9 @@ if (!defined('ABSPATH')) {
     pointer-events: auto !important;
 }
 
-/* Responsive side drawer styling */
+/* Responsive drawer styling for all modes */
 @media (max-width: 768px) {
-    .cora-bottom-drawer.layout-side {
+    .cora-bottom-drawer.layout-side, .cora-bottom-drawer.layout-bottom {
         left: 12px !important;
         right: 12px !important;
         width: auto !important;
@@ -86,6 +86,19 @@ if (!defined('ABSPATH')) {
         top: 12px !important;
         bottom: 12px !important;
         height: calc(100vh - 24px) !important;
+        max-height: none !important;
+    }
+    .cora-bottom-drawer.layout-side {
+        transform: translateX(100%) !important;
+    }
+    .cora-bottom-drawer.layout-bottom {
+        transform: translateY(100%) !important;
+    }
+    .cora-bottom-drawer.layout-side.cora-drawer-open {
+        transform: translateX(0) !important;
+    }
+    .cora-bottom-drawer.layout-bottom.cora-drawer-open {
+        transform: translateY(0) !important;
     }
 }
 
@@ -222,25 +235,25 @@ if (!defined('ABSPATH')) {
     gap: 12px;
     background-color: #ffffff;
     border: 1px solid #e4e4e7;
-    border-radius: 14px;
-    padding: 7px 16px;
+    border-radius: 12px;
+    padding: 8px 12px;
     box-shadow: none;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
-.cora-toolbar-left, .cora-toolbar-center, .cora-toolbar-right {
+.cora-toolbar-search-wrap {
+    flex: 1;
+    max-width: 320px;
+}
+
+.cora-toolbar-filters-grid {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.cora-toolbar-right {
-    justify-content: flex-end;
-    flex-wrap: nowrap;
-}
-
 /* Custom Select Styling */
-.cora-toolbar-wrapper select {
+.cora-toolbar-wrapper select, .cora-client-select {
     appearance: none !important;
     -webkit-appearance: none !important;
     background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2371717a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E") !important;
@@ -258,7 +271,8 @@ if (!defined('ABSPATH')) {
     font-size: 11.5px !important;
     color: #18181b !important;
     height: 30px !important;
-    max-width: 130px !important;
+    min-width: 120px !important;
+    max-width: 150px !important;
     text-overflow: ellipsis !important;
     outline: none !important;
     box-shadow: none !important;
@@ -266,96 +280,74 @@ if (!defined('ABSPATH')) {
     transition: all 0.15s ease;
 }
 
-.cora-toolbar-wrapper select:hover {
+.cora-toolbar-wrapper select:hover, .cora-client-select:hover {
     background-color: #f4f4f5 !important;
     border-color: #d4d4d8 !important;
 }
 
-/* View Switcher segment */
-.cora-toolbar-wrapper .cora-view-switcher {
+/* Segmented View Switcher styling */
+.cora-view-switcher {
     display: flex;
     align-items: center;
-    gap: 24px;
-    background: none !important;
-    border-radius: 0;
+    gap: 2px;
+    background-color: #f4f4f5 !important;
+    padding: 3px !important;
+    border-radius: 10px !important;
+    border: 1px solid #e4e4e7 !important;
+    width: fit-content;
 }
 
-.cora-toolbar-wrapper .cora-view-switcher button {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-align: center !important;
-    white-space: normal !important;
-    height: auto !important;
-    overflow: visible !important;
+.cora-view-switcher button {
+    height: 28px !important;
+    padding: 0 14px !important;
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+    color: #52525b !important;
+    background: transparent !important;
     border: none !important;
-    background: none !important;
-    padding: 4px 0 !important;
-    font-size: 11px !important;
-    font-weight: 700 !important;
-    color: #71717a !important;
-    border-radius: 0 !important;
-    border-bottom: 2.5px solid transparent !important;
+    border-radius: 7px !important;
     cursor: pointer;
     transition: all 0.15s ease;
-    box-shadow: none !important;
-    line-height: 1.2 !important;
-}
-
-.cora-toolbar-wrapper .cora-view-switcher button span {
-    display: block !important;
     white-space: nowrap !important;
-    font-size: 11px !important;
-    line-height: 1.2 !important;
-}
-
-.cora-toolbar-wrapper .cora-view-switcher button.cora-active-tab {
-    background-color: transparent !important;
-    color: #09090b !important;
-    border-bottom-color: #09090b !important;
-    font-weight: 800 !important;
     box-shadow: none !important;
 }
 
-.cora-toolbar-wrapper .cora-view-switcher button:hover:not(.cora-active-tab) {
+.cora-view-switcher button.cora-active-tab {
+    background-color: #ffffff !important;
+    color: #09090b !important;
+    font-weight: 700 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.cora-view-switcher button:hover:not(.cora-active-tab) {
     color: #18181b !important;
 }
 
-.cora-task-settings-btn {
-    width: 38px;
-    height: 38px;
-    border: 1px solid #e4e4e7 !important;
-    border-radius: 12px !important;
-    background-color: #ffffff !important;
-    color: #71717a !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: none !important;
-    transition: all 0.2s ease;
-}
-.cora-task-settings-btn:hover {
-    background-color: #f4f4f5 !important;
-    color: #09090b !important;
-}
-
-/* Responsive collapse for small screens */
-@media (max-width: 1100px) {
+/* Responsive Styles */
+@media (max-width: 768px) {
     .cora-toolbar-wrapper {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        flex-wrap: wrap;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
     }
-    .cora-toolbar-left, .cora-toolbar-center, .cora-toolbar-right {
-        justify-content: center;
-        flex-wrap: wrap;
+    .cora-toolbar-search-wrap {
+        max-width: 100% !important;
+        width: 100% !important;
     }
-    .cora-toolbar-wrapper select {
-        max-width: none !important;
-        flex: 1;
+    .cora-toolbar-filters-grid {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+        width: 100% !important;
+    }
+    .cora-toolbar-filters-grid select {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+}
+@media (max-width: 580px) {
+    .cora-toolbar-filters-grid {
+        grid-template-columns: 1fr !important;
     }
 }
 
@@ -488,6 +480,23 @@ if (!defined('ABSPATH')) {
     background-color: #27272a;
     color: #ffffff;
 }
+
+/* Responsive Quick Filters */
+@media (max-width: 640px) {
+    .cora-quick-filters {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+    }
+    #cora-quick-filters-container {
+        gap: 6px !important;
+        width: 100% !important;
+    }
+    .qf-btn {
+        flex: 1 1 calc(50% - 6px) !important;
+        justify-content: center !important;
+    }
+}
 </style>
 
 <div class="cora-task-manager-wrap text-zinc-900 dark:text-zinc-100 font-sans px-3 sm:px-4 py-3 sm:py-4 max-w-[1700px] mx-auto pb-20 relative">
@@ -518,16 +527,8 @@ if (!defined('ABSPATH')) {
         </div>
     </div>
 
-    <!-- Top Filter Toolbar -->
-    <div class="cora-toolbar-wrapper">
-        <!-- Left Group -->
-        <div class="cora-toolbar-left">
-            <span class="text-xs font-bold uppercase text-zinc-400 tracking-wider">Client</span>
-            <select id="task-filter-client" onchange="coraFilterTasks()">
-                <option value="">All Clients</option>
-            </select>
-        </div>
-        
+    <!-- Tier 1: View Switcher & Client Selector -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3.5">
 <?php
 global $sub_page;
 $req_view = $_GET['view'] ?? '';
@@ -537,35 +538,43 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
     $default_task_view = 'bookings';
 }
 ?>
-
-        <!-- Center Group: View Switcher links -->
-        <div class="cora-toolbar-center">
+        <div class="cora-view-switcher-container overflow-x-auto">
             <div class="cora-view-switcher">
                 <button onclick="coraSwitchView('kanban')" id="btn-view-kanban" class="<?php echo $default_task_view === 'kanban' ? 'cora-active-tab' : ''; ?>">
-                    <span>Kanban</span>
-                    <span>Board</span>
+                    Kanban Board
                 </button>
                 <button onclick="coraSwitchView('bookings')" id="btn-view-bookings" class="<?php echo $default_task_view === 'bookings' ? 'cora-active-tab' : ''; ?>">
-                    <span>Booked</span>
-                    <span>Shoots</span>
+                    Booked Shoots
                 </button>
                 <button onclick="coraSwitchView('matrix')" id="btn-view-matrix" class="<?php echo $default_task_view === 'matrix' ? 'cora-active-tab' : ''; ?>">
-                    <span>Client</span>
-                    <span>Matrix</span>
+                    Client Matrix
                 </button>
                 <button onclick="coraSwitchView('roster')" id="btn-view-roster" class="<?php echo $default_task_view === 'roster' ? 'cora-active-tab' : ''; ?>">
-                    <span>Team</span>
-                    <span>Roster</span>
+                    Team Roster
                 </button>
             </div>
         </div>
+        
+        <div class="flex items-center gap-2 shrink-0">
+            <span class="text-[10px] font-bold uppercase text-zinc-400 tracking-wider">Client:</span>
+            <select id="task-filter-client" onchange="coraFilterTasks()" class="cora-client-select">
+                <option value="">All Clients</option>
+            </select>
+        </div>
+    </div>
 
-        <!-- Right Group -->
-        <div class="cora-toolbar-right">
+    <!-- Tier 2: Filters, Search & Sort Toolbar -->
+    <div class="cora-toolbar-wrapper">
+        <!-- Left Side: Search -->
+        <div class="cora-toolbar-search-wrap">
             <div class="cora-toolbar-search">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 <input type="text" id="task-search-input" placeholder="Search tasks, projects..." oninput="coraFilterTasks()">
             </div>
+        </div>
+
+        <!-- Right Side: Filter Dropdowns Grid -->
+        <div class="cora-toolbar-filters-grid">
             <select id="task-filter-category" onchange="coraFilterTasks()">
                 <option value="">All Projects</option>
                 <option value="Photo Shoot Prep">Photo Shoot Prep</option>
@@ -574,9 +583,11 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
                 <option value="Client Deliverables &amp; Vault">Client Deliverables &amp; Vault</option>
                 <option value="Client Communication">Client Communication</option>
             </select>
+            
             <select id="task-filter-assignee" onchange="coraFilterTasks()">
                 <option value="">All Assignees</option>
             </select>
+            
             <select id="task-filter-sort" onchange="coraFilterTasks()">
                 <option value="due_date_asc">Sort by: Due (Soonest)</option>
                 <option value="due_date_desc">Sort by: Due (Latest)</option>
@@ -630,7 +641,7 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
                     </button>
                 </div>
                 
-                <div class="border border-zinc-200 rounded-2xl overflow-hidden shadow-xs">
+                <div class="border border-zinc-200 rounded-2xl overflow-x-auto shadow-xs">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
                             <tr class="bg-zinc-100/80 border-b border-zinc-200 text-[10px] font-bold text-zinc-500 uppercase">
