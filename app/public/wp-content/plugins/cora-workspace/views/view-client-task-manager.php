@@ -170,8 +170,10 @@ if (!defined('ABSPATH')) {
     height: 14px;
 }
 .cora-task-export-btn {
-    display: flex;
-    align-items: center;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
     gap: 8px;
     height: 44px;
     padding: 0 20px !important;
@@ -189,8 +191,10 @@ if (!defined('ABSPATH')) {
     background-color: #f4f4f5 !important;
 }
 .cora-task-new-btn {
-    display: flex;
-    align-items: center;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
     gap: 8px;
     height: 44px;
     padding: 0 20px !important;
@@ -441,7 +445,7 @@ if (!defined('ABSPATH')) {
 .cora-col-add-task-btn.btn-done:hover { background-color: rgba(5, 150, 105, 0.08); }
 </style>
 
-<div class="cora-task-manager-wrap bg-zinc-50 min-h-screen text-zinc-900 font-sans px-2 py-4 max-w-[1700px] mx-auto pb-20 relative">
+<div class="cora-task-manager-wrap text-zinc-900 dark:text-zinc-100 font-sans px-4 sm:px-5 md:px-6 py-4 sm:py-5 max-w-[1700px] mx-auto pb-20 relative">
 
     <!-- Page Header -->
     <div class="cora-task-manager-header">
