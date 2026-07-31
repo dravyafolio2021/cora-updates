@@ -356,12 +356,6 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                     <span>Funnel & Analytics</span>
                 </div>
             </button>
-            <button type="button" class="cora-lead-subtab-btn shrink-0 px-3.5 py-1.5 text-xs font-medium rounded-lg text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 transition-all cursor-pointer" data-tab="activity" onclick="coraSwitchLeadSubtab('activity')">
-                <div class="flex items-center gap-2">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg>
-                    <span>Activity Log</span>
-                </div>
-            </button>
         </div>
 
         <div class="flex items-center gap-2 shrink-0 max-w-full">
