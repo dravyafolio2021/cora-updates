@@ -744,12 +744,19 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
         </button>
     </div>
 
+    <!-- Segmented Tabs Row -->
+    <div class="flex items-center gap-1 border-b border-zinc-200 bg-zinc-50 px-5 py-2.5 shrink-0 select-none">
+        <button type="button" onclick="coraSwitchTaskDetailTab('details')" id="tab-btn-details" class="task-detail-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-zinc-950 bg-white border border-zinc-200/80 shadow-2xs">Overview &amp; Details</button>
+        <button type="button" onclick="coraSwitchTaskDetailTab('checklist')" id="tab-btn-checklist" class="task-detail-tab-btn px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-zinc-500 hover:text-zinc-950 hover:bg-zinc-150/70">Subtask Checklist</button>
+        <button type="button" onclick="coraSwitchTaskDetailTab('activity')" id="tab-btn-activity" class="task-detail-tab-btn px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-zinc-500 hover:text-zinc-950 hover:bg-zinc-150/70">Activity &amp; Team Notes</button>
+    </div>
+
     <!-- Content Body -->
-    <div class="flex-1 overflow-y-auto p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+    <div class="flex-1 overflow-y-auto p-5 sm:p-6">
         <input type="hidden" id="detail-task-id" value="">
 
-        <!-- Left Column: Primary Task Parameters -->
-        <div class="space-y-6">
+        <!-- TAB 1: OVERVIEW & DETAILS -->
+        <div id="task-tab-pane-details" class="task-tab-pane space-y-5">
             <div>
                 <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-1.5">Task Title *</label>
                 <input type="text" id="detail-task-title" class="w-full text-lg font-bold text-zinc-950 border border-zinc-200 rounded-xl px-4 py-3 focus:outline-none focus:border-zinc-950 bg-zinc-50/50">
@@ -770,7 +777,7 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Status Stage</label>
-                    <select id="detail-task-status" class="w-full text-xs font-bold border-zinc-200 rounded-xl focus:ring-0 focus:border-zinc-950 bg-white py-2.5 px-3 cursor-pointer">
+                    <select id="detail-task-status" onchange="coraUpdateGuidelinesText($('#detail-task-priority').val(), this.value)" class="w-full text-xs font-bold border-zinc-200 rounded-xl focus:ring-0 focus:border-zinc-950 bg-white py-2.5 px-3 cursor-pointer">
                         <option value="todo">To Do</option>
                         <option value="in_progress">In Progress</option>
                         <option value="client_review">Client Review</option>
@@ -784,7 +791,7 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Priority Level</label>
-                    <select id="detail-task-priority" class="w-full text-xs font-bold border-zinc-200 rounded-xl focus:ring-0 focus:border-zinc-950 bg-white py-2.5 px-3 cursor-pointer">
+                    <select id="detail-task-priority" onchange="coraUpdateGuidelinesText(this.value, $('#detail-task-status').val())" class="w-full text-xs font-bold border-zinc-200 rounded-xl focus:ring-0 focus:border-zinc-950 bg-white py-2.5 px-3 cursor-pointer">
                         <option value="low">Low</option>
                         <option value="medium">Medium</option>
                         <option value="high">High</option>
@@ -798,6 +805,7 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
                 <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-1.5">Deliverable Asset / Drive URL</label>
                 <input type="url" id="detail-task-asset-url" placeholder="https://drive.google.com/... or https://proofing.studio/..." class="w-full text-xs font-medium border border-zinc-200 rounded-xl px-4 py-3 focus:outline-none focus:border-zinc-950 bg-zinc-50/50">
             </div>
+
             <div class="bg-zinc-50 p-4 rounded-2xl border border-zinc-200/80 space-y-4">
                 <!-- Email Alerts -->
                 <div class="space-y-3">
@@ -836,37 +844,81 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
                     </div>
                 </div>
             </div>
+
+            <!-- Collapsible Guidelines & Team Assistant Suggestions -->
+            <div class="border border-zinc-200/85 rounded-2xl bg-zinc-50/70 overflow-hidden shadow-3xs">
+                <button type="button" onclick="coraToggleGuidelines()" class="w-full flex items-center justify-between p-4 bg-zinc-50/30 text-left cursor-pointer hover:bg-zinc-100/50 transition-colors">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xs font-bold text-zinc-950 flex items-center gap-2">
+                            <svg class="w-4.5 h-4.5 text-zinc-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                            Task Guidelines &amp; Performance Suggestions
+                        </span>
+                    </div>
+                    <span id="cora-guidelines-chevron" class="text-zinc-400 transition-transform duration-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                    </span>
+                </button>
+                <div id="cora-guidelines-content" class="hidden border-t border-zinc-200 p-4 bg-white text-xs text-zinc-650 space-y-3.5">
+                    <div class="flex gap-2.5 items-start">
+                        <div class="w-5 h-5 rounded bg-zinc-950 text-white flex items-center justify-center shrink-0 text-[10px] font-black leading-none">AI</div>
+                        <div class="space-y-1">
+                            <p class="font-bold text-zinc-950 text-[11px]">Dynamic Co-Pilot SOP Suggestion</p>
+                            <p id="cora-guidelines-text">Select status/priority to see contextual guidance.</p>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-zinc-50 rounded-xl border border-zinc-150 flex items-center justify-between">
+                        <div class="pr-2">
+                            <p class="font-bold text-zinc-950 text-[11px]">Generate Standard Subtasks Checklist</p>
+                            <p class="text-[10px] text-zinc-500">Auto-inject standard steps based on current priority.</p>
+                        </div>
+                        <button type="button" onclick="coraAutoInjectSOPSteps()" class="px-2.5 py-1.5 bg-zinc-950 text-white font-bold text-[10px] rounded-lg hover:bg-zinc-800 transition-colors whitespace-nowrap cursor-pointer shadow-2xs">Inject Steps</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Right Column: Subtask Checklist & Activity Notes -->
-        <div class="space-y-6">
-            <!-- Subtasks Checklist Section -->
-            <div class="bg-zinc-50 p-5 rounded-2xl border border-zinc-200/80 space-y-3">
+        <!-- TAB 2: SUBTASK CHECKLIST -->
+        <div id="task-tab-pane-checklist" class="task-tab-pane space-y-5 hidden">
+            <div class="bg-zinc-50 p-5 rounded-2xl border border-zinc-200/80 space-y-4">
                 <div class="flex items-center justify-between">
                     <h3 class="text-xs font-bold text-zinc-950 uppercase tracking-wider">Subtask Checklist</h3>
                     <span class="text-[11px] font-bold text-zinc-500" id="detail-subtasks-count">0 steps</span>
                 </div>
-                <div class="space-y-2 max-h-56 overflow-y-auto" id="detail-subtasks-list">
+                <!-- Progress Bar -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between items-center text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                        <span>Task Progress</span>
+                        <span id="detail-subtasks-progress-text">0%</span>
+                    </div>
+                    <div class="w-full bg-zinc-200 rounded-full h-1.5 overflow-hidden">
+                        <div id="detail-subtasks-progress-bar" class="bg-zinc-950 h-full transition-all duration-350" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="space-y-2 max-h-[380px] overflow-y-auto pr-1" id="detail-subtasks-list">
                     <!-- Checklist items injected dynamically -->
                 </div>
                 <div class="flex items-center gap-2 pt-2 border-t border-zinc-200/60">
-                    <input type="text" id="detail-new-subtask-input" placeholder="Add checklist step (e.g. Sync audio &amp; video)..." class="flex-1 px-3.5 py-2 bg-white border border-zinc-200 rounded-xl text-xs font-medium focus:outline-none focus:border-zinc-950">
-                    <button type="button" onclick="coraAddDetailSubtask()" class="px-4 py-2 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer shrink-0">
+                    <input type="text" id="detail-new-subtask-input" placeholder="Add checklist step (e.g. Sync audio &amp; video)..." class="flex-1 px-3.5 py-2.5 bg-white border border-zinc-200 rounded-xl text-xs font-medium focus:outline-none focus:border-zinc-950">
+                    <button type="button" onclick="coraAddDetailSubtask()" class="px-4 py-2.5 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer shrink-0">
                         Add Step
                     </button>
                 </div>
             </div>
+        </div>
 
-            <!-- Activity Log & Comments Feed -->
-            <div class="bg-zinc-50 p-5 rounded-2xl border border-zinc-200/80 space-y-3">
-                <h3 class="text-xs font-bold text-zinc-950 uppercase tracking-wider">Activity Log &amp; Team Notes</h3>
-                <div class="space-y-2.5 max-h-48 overflow-y-auto" id="detail-comments-list">
+        <!-- TAB 3: ACTIVITY LOG & TEAM NOTES -->
+        <div id="task-tab-pane-activity" class="task-tab-pane space-y-5 hidden">
+            <div class="bg-zinc-50 p-5 rounded-2xl border border-zinc-200/80 space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-bold text-zinc-950 uppercase tracking-wider">Activity Log &amp; Team Notes</h3>
+                </div>
+                <div class="space-y-3 max-h-[380px] overflow-y-auto p-4 bg-white border border-zinc-200 rounded-xl" id="detail-comments-list">
                     <!-- Comments injected dynamically -->
                 </div>
                 <div class="space-y-2 pt-2 border-t border-zinc-200/60">
-                    <textarea id="detail-comment-input" rows="2" placeholder="Post a progress update or technical note for the team..." class="w-full px-3.5 py-2.5 bg-white border border-zinc-200 rounded-xl text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-950"></textarea>
+                    <textarea id="detail-comment-input" rows="3" placeholder="Post a progress update or technical note for the team..." class="w-full px-3.5 py-2.5 bg-white border border-zinc-200 rounded-xl text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-950 resize-none"></textarea>
                     <div class="flex justify-end">
-                        <button type="button" onclick="coraPostTaskComment()" class="px-4 py-2 bg-zinc-900 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer">
+                        <button type="button" onclick="coraPostTaskComment()" class="px-4 py-2.5 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer">
                             Post Note
                         </button>
                     </div>
@@ -2309,20 +2361,135 @@ window.coraQuickMoveTask = function(event, taskId, newStatus) {
         renderDetailSubtasks();
         renderDetailComments();
 
+        // Initialize Guidelines & Switch to first tab
+        coraSwitchTaskDetailTab('details');
+        coraUpdateGuidelinesText(t.priority, t.status);
+
         coraOpenDrawer(event, 'drawer-task-details');
+    };
+
+    // Segmented Tab Switching Controller
+    window.coraSwitchTaskDetailTab = function(tabId) {
+        $('.task-detail-tab-btn').removeClass('text-zinc-955 bg-white border border-zinc-200/80 shadow-2xs font-bold text-zinc-950')
+                                 .addClass('text-zinc-500 hover:text-zinc-955 hover:bg-zinc-150/70 hover:text-zinc-950 font-semibold');
+        $(`#tab-btn-${tabId}`).removeClass('text-zinc-500 hover:text-zinc-955 hover:bg-zinc-150/70 hover:text-zinc-950 font-semibold')
+                              .addClass('text-zinc-950 bg-white border border-zinc-200/80 shadow-2xs font-bold');
+
+        $('.task-tab-pane').addClass('hidden');
+        $(`#task-tab-pane-${tabId}`).removeClass('hidden');
+    };
+
+    // Collapsible guidelines toggle
+    window.coraToggleGuidelines = function() {
+        const content = document.getElementById('cora-guidelines-content');
+        const chevron = document.getElementById('cora-guidelines-chevron');
+        if (content && chevron) {
+            const isHidden = content.classList.contains('hidden');
+            if (isHidden) {
+                content.classList.remove('hidden');
+                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+    };
+
+    // Guidelines advice content selector
+    window.coraUpdateGuidelinesText = function(priority, status) {
+        priority = priority || 'medium';
+        status = status || 'todo';
+        let guidelines = '';
+        if (priority === 'urgent' || priority === 'high') {
+            if (status === 'todo') {
+                guidelines = "🚨 **Urgent Task Awaiting Assignment**: This is a critical shoot deliverable. Assign team members immediately, double-check start dates, and dispatch immediate alerts.";
+            } else if (status === 'in_progress' || status === 'inprogress') {
+                guidelines = "⚡ **High-Priority Execution**: Co-worker is currently working on this task. Ensure technical review checklists are followed. Keep clients updated with draft previews to maintain quality.";
+            } else if (status === 'review' || status === 'client_review') {
+                guidelines = "🔍 **Client Feedback Stage**: Task is ready for client validation. Verify drive links and preview videos. Ensure co-founders are notified if revisions are requested.";
+            } else if (status === 'done') {
+                guidelines = "🎉 **Deliverables Dispatched**: Excellent work. Priority task marked as complete. WhatsApp and Email notifications have been archived.";
+            } else {
+                guidelines = "⚠️ **Task Blocked**: High-priority block reported by a team member. Review workflow blockers immediately to avoid bottlenecking client deliverables.";
+            }
+        } else {
+            if (status === 'todo') {
+                guidelines = "💡 **Standard Task Queue**: Ready to be processed. Map checklists, sync drive links, and notify teammates on next assignments.";
+            } else if (status === 'in_progress' || status === 'inprogress') {
+                guidelines = "⏱️ **Work In Progress**: Standard processing phase. Ensure subtasks are completed systematically to ensure smooth handoffs.";
+            } else if (status === 'done') {
+                guidelines = "✅ **Task Complete**: Subtasks checklist marked complete. Deliverables validated.";
+            } else {
+                guidelines = "📋 **Review & Blocked Guidelines**: Standard checking phase. Resolve any dependencies with team co-workers.";
+            }
+        }
+        
+        const html = guidelines
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+        $('#cora-guidelines-text').html(html);
+    };
+
+    // SOP checklist step injection
+    window.coraAutoInjectSOPSteps = function() {
+        const priority = $('#detail-task-priority').val() || 'medium';
+        let steps = [];
+        if (priority === 'urgent' || priority === 'high') {
+            steps = [
+                "Verify client deliverables drive folder structure",
+                "Run QA check on color correction and audio sync",
+                "Upload high-resolution review export to proofing link",
+                "Send preview notification to workspace owner/client"
+            ];
+        } else {
+            steps = [
+                "Check client specifications document",
+                "Sort assets into main catalog folder",
+                "Begin baseline draft rendering",
+                "Log project updates in activity notes"
+            ];
+        }
+        
+        steps.forEach(text => {
+            if (!coraTaskState.currentTaskSubtasks.some(s => s.text === text)) {
+                coraTaskState.currentTaskSubtasks.push({
+                    text: text,
+                    completed: false
+                });
+            }
+        });
+        
+        renderDetailSubtasks();
+        
+        // Save changes immediately
+        const taskId = $('#detail-task-id').val();
+        const t = coraTaskState.tasks.find(x => String(x.id) === String(taskId));
+        if (t) {
+            t.subtasks = coraTaskState.currentTaskSubtasks;
+            coraAutoSaveTask(t);
+        }
+        
+        window.coraShowToast("Dynamic SOP checklist steps injected successfully!");
+        coraSwitchTaskDetailTab('checklist'); // focus to checklist tab
     };
 
     function renderDetailSubtasks() {
         const subtasks = coraTaskState.currentTaskSubtasks;
-        $('#detail-subtasks-count').text(`${subtasks.length} steps`);
+        const total = subtasks.length;
+        const completed = subtasks.filter(s => s.completed).length;
+        const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+        $('#detail-subtasks-count').text(`${total} steps`);
+        $('#detail-subtasks-progress-text').text(`${percent}%`);
+        $('#detail-subtasks-progress-bar').css('width', `${percent}%`);
 
         let html = '';
-        if (subtasks.length === 0) {
-            html = '<p class="text-xs text-zinc-400 italic py-1">No checklist steps added yet.</p>';
+        if (total === 0) {
+            html = '<p class="text-xs text-zinc-400 italic py-1 text-center">No checklist steps added yet.</p>';
         } else {
             subtasks.forEach((s, idx) => {
                 html += `
-                    <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-zinc-200/80 text-xs">
+                    <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-zinc-200/80 text-xs shadow-2xs hover:border-zinc-350 transition-all">
                         <label class="flex items-center gap-2.5 cursor-pointer min-w-0 flex-1">
                             <input type="checkbox" ${s.completed ? 'checked' : ''} onchange="coraToggleDetailSubtask(${idx})" class="w-4 h-4 rounded text-zinc-950 focus:ring-0 cursor-pointer">
                             <span class="font-bold text-zinc-800 truncate ${s.completed ? 'line-through text-zinc-400' : ''}">${escHtml(s.text)}</span>
@@ -2407,18 +2574,30 @@ window.coraQuickMoveTask = function(event, taskId, newStatus) {
         const comments = coraTaskState.currentTaskComments;
         let html = '';
         if (comments.length === 0) {
-            html = '<p class="text-xs text-zinc-400 italic py-1">No notes or comments posted yet.</p>';
+            html = '<p class="text-xs text-zinc-400 italic py-1 text-center">No notes or comments posted yet.</p>';
         } else {
             comments.forEach(c => {
-                html += `
-                    <div class="p-3.5 bg-white rounded-xl border border-zinc-200/80 text-xs space-y-1">
-                        <div class="flex items-center justify-between text-[10px] text-zinc-500 font-bold">
-                            <span>${escHtml(c.author || 'Team Member')}</span>
-                            <span>${escHtml(c.time || 'Just now')}</span>
+                const isSystem = c.author === 'System Update';
+                if (isSystem) {
+                    html += `
+                        <div class="p-2.5 bg-zinc-100 border border-zinc-200/80 rounded-xl text-[10.5px] text-zinc-500 font-bold flex items-center gap-2">
+                            <span class="text-zinc-400 shrink-0">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                            </span>
+                            <span class="flex-1">${escHtml(c.text)} (${escHtml(c.time)})</span>
                         </div>
-                        <p class="text-zinc-800 font-medium leading-relaxed">${escHtml(c.text)}</p>
-                    </div>
-                `;
+                    `;
+                } else {
+                    html += `
+                        <div class="p-3.5 bg-white rounded-xl border border-zinc-200/80 text-xs space-y-1 shadow-3xs">
+                            <div class="flex items-center justify-between text-[10px] text-zinc-500 font-bold">
+                                <span>${escHtml(c.author || 'Team Member')}</span>
+                                <span>${escHtml(c.time || 'Just now')}</span>
+                            </div>
+                            <p class="text-zinc-800 font-semibold leading-relaxed">${escHtml(c.text)}</p>
+                        </div>
+                    `;
+                }
             });
         }
         $('#detail-comments-list').html(html);
@@ -2482,6 +2661,46 @@ window.coraQuickMoveTask = function(event, taskId, newStatus) {
         const taskId = $('#detail-task-id').val();
         const t = coraTaskState.tasks.find(x => String(x.id) === String(taskId));
         if (!t) return;
+
+        // Dynamic System Log Generation
+        let activityLogs = [];
+        const prevStatus = t.status || 'todo';
+        const prevAssignee = t.assignee_id || '';
+        const prevPriority = t.priority || 'medium';
+        const prevDueDate = t.due_date || '';
+
+        const nextStatus = $('#detail-task-status').val();
+        const nextAssignee = $('#detail-task-assignee').val();
+        const nextPriority = $('#detail-task-priority').val();
+        const nextDueDate = $('#detail-task-due').val();
+
+        if (prevStatus !== nextStatus) {
+            activityLogs.push(`changed stage from '${prevStatus.toUpperCase()}' to '${nextStatus.toUpperCase()}'`);
+        }
+        if (prevAssignee !== nextAssignee) {
+            const nextAssigneeObj = coraTaskState.teamMembers.find(m => String(m.id) === String(nextAssignee));
+            const nextName = nextAssigneeObj ? nextAssigneeObj.name : 'Unassigned';
+            activityLogs.push(`assigned task to '${nextName}'`);
+        }
+        if (prevPriority !== nextPriority) {
+            activityLogs.push(`updated priority from '${prevPriority.toUpperCase()}' to '${nextPriority.toUpperCase()}'`);
+        }
+        if (prevDueDate !== nextDueDate) {
+            activityLogs.push(`changed due date to ${nextDueDate || 'None'}`);
+        }
+
+        if (activityLogs.length > 0) {
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            t.comments = t.comments || [];
+            activityLogs.forEach(log => {
+                t.comments.push({
+                    author: 'System Update',
+                    time: timeStr,
+                    text: `🔧 ${log}`
+                });
+            });
+            coraTaskState.currentTaskComments = t.comments;
+        }
 
         t.title = $('#detail-task-title').val().trim();
         t.assignee_id = $('#detail-task-assignee').val();
