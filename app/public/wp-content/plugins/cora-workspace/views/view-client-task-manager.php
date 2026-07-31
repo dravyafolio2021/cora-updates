@@ -64,20 +64,20 @@ if (!defined('ABSPATH')) {
     }
 }
 
-/* Soft overlay behind the active drawer (offset to not block sidebar) */
+/* Invisible click-outside interceptor backdrop behind the active drawer (offset to not block sidebar) */
 .cora-drawer-backdrop-overlay {
     position: fixed !important;
     top: 0 !important;
     left: 284px; /* offset to not block sidebar */
     width: calc(100vw - 284px);
     height: 100vh !important;
-    background-color: rgba(9, 9, 11, 0.15) !important; /* Soft neutral overlay */
-    backdrop-filter: blur(4px) !important; /* Soft premium blur */
-    -webkit-backdrop-filter: blur(4px) !important;
+    background-color: transparent !important; /* Completely transparent */
+    backdrop-filter: none !important; /* No blur */
+    -webkit-backdrop-filter: none !important;
     z-index: 99998 !important; /* Positioned just below drawer */
     opacity: 0 !important;
     visibility: hidden !important;
-    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), left 0.3s ease, width 0.3s ease, visibility 0.35s !important;
+    transition: opacity 0.3s ease, left 0.3s ease, width 0.3s ease, visibility 0.3s !important;
     pointer-events: none;
 }
 .cora-drawer-backdrop-overlay.active {
