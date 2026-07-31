@@ -61,67 +61,9 @@ $agency_branches = $branches;
 $cora_permissions = get_option( 'cora_role_permissions', array() );
 ?>
 
-<div class="space-y-6">
-    <!-- ── MOBILE HEADER (hidden on desktop) ── -->
-    <div class="flex md:hidden items-center justify-between gap-3 mb-2">
-        <div>
-            <h1 class="text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-100 leading-tight"><?php echo $is_studio_mode ? 'Crew' : 'Team'; ?></h1>
-            <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5"><?php echo $is_studio_mode ? 'Crew members &amp; permissions' : 'Team members &amp; permissions'; ?></p>
-        </div>
-        <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager' ) ) ) : ?>
-            <button onclick="openInviteDrawer()" class="shrink-0 bg-zinc-950 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer active:scale-95 flex items-center gap-2">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                <span class="hidden xs:inline">Invite</span>
-                <span class="xs:hidden">+</span>
-            </button>
-        <?php endif; ?>
-    </div>
-
-    <!-- ── MOBILE TAB NAVIGATION (hidden on desktop) ── -->
-    <div class="cora-sub-tabs-container flex md:hidden items-end gap-0 border-b border-zinc-200 dark:border-zinc-800 mb-4">
-        <!-- Primary tabs (always visible) -->
-        <div class="flex items-end gap-0 flex-1 overflow-x-auto no-scrollbar">
-            <button class="cora-sub-tab active flex items-center gap-1.5 px-3.5 pb-2.5 pt-1.5 text-xs font-semibold border-b-2 border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 transition-all cursor-pointer whitespace-nowrap" data-target="tab-active-members">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                Members
-                <span class="bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?php echo count($users); ?></span>
-            </button>
-            <button class="cora-sub-tab flex items-center gap-1.5 px-3.5 pb-2.5 pt-1.5 text-xs font-medium border-b-2 border-transparent text-zinc-550 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-all cursor-pointer whitespace-nowrap" data-target="tab-pending-invites">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                Invites
-                <?php $inv_count = count(array_filter($pending_invites, fn($i) => $i['status'] === 'pending')); if($inv_count > 0): ?>
-                <span class="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-[9px] font-bold px-1.5 py-0.5 rounded-full"><?php echo $inv_count; ?></span>
-                <?php endif; ?>
-            </button>
-        </div>
-        <!-- More → secondary tabs (Permissions, Attendance, Custom Roles) -->
-        <div class="relative shrink-0 pb-px" id="users-more-tab-wrapper">
-            <button onclick="toggleUsersMoreMenu()" id="users-more-tab-btn" class="flex items-center gap-1 px-3 pb-2.5 pt-1.5 text-xs font-medium text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors cursor-pointer whitespace-nowrap border-b-2 border-transparent" aria-label="More tabs">
-                More
-                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            </button>
-            <!-- More dropdown menu -->
-            <div id="users-more-menu" class="hidden absolute right-0 top-full mt-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-lg z-30 py-1 min-w-[200px]">
-                <button class="cora-sub-tab w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer transition-colors" data-target="tab-attendance-logs" onclick="closeUsersMoreMenu()">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    Attendance Logs
-                </button>
-                <button class="cora-sub-tab w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer transition-colors" data-target="tab-permissions-matrix" onclick="closeUsersMoreMenu()">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
-                    Permissions Matrix
-                </button>
-                <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_re_broker_owner', 'cora_studio_owner' ) ) ) : ?>
-                <button class="cora-sub-tab w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer transition-colors" data-target="tab-custom-roles" onclick="closeUsersMoreMenu()">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                    Custom Roles
-                </button>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-
-    <!-- ── DESKTOP HEADER (hidden on mobile) ── -->
-    <div class="hidden md:flex items-center justify-between mb-4">
+<div class="p-0 m-0 border-0 outline-none md:space-y-6 space-y-4">
+    <!-- Desktop Header -->
+    <div class="hidden md:flex items-center justify-between">
         <div class="cora-page-header flex items-center gap-3">
             <span class="cora-page-emoji text-zinc-900 flex shrink-0">
                 <svg viewBox="0 0 24 24" width="30" height="30" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -145,8 +87,33 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         <?php endif; ?>
     </div>
 
-    <!-- ── DESKTOP TAB NAVIGATION (hidden on mobile) ── -->
-    <div class="hidden md:flex cora-sub-tabs-container border-b border-zinc-200 dark:border-zinc-800 flex-row items-center gap-1.5 overflow-x-auto pb-px shrink-0 select-none no-scrollbar mb-4">
+    <!-- Mobile Header (Visible only on mobile) -->
+    <div class="flex md:hidden items-center justify-between gap-3 mb-2 px-4 py-3 border-b border-zinc-150 dark:border-zinc-800 bg-white dark:bg-zinc-900 select-none">
+        <div class="flex items-center gap-2">
+            <span class="text-zinc-900 dark:text-zinc-100 flex shrink-0">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+            </span>
+            <div>
+                <h1 class="text-sm font-bold tracking-tight text-zinc-900 dark:text-zinc-100"><?php echo $is_studio_mode ? 'Crew' : 'Team'; ?></h1>
+                <p class="text-[10px] text-zinc-400"><?php echo $is_studio_mode ? 'Add studio crew & manage permissions.' : 'Add brokerage team & manage permissions.'; ?></p>
+            </div>
+        </div>
+        
+        <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager' ) ) ) : ?>
+            <button onclick="openInviteDrawer()" class="bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-[10px] px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer active:scale-95 shadow-sm flex items-center gap-1">
+                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Invite
+            </button>
+        <?php endif; ?>
+    </div>
+
+    <!-- Desktop Sub Navigation Tabs -->
+    <div class="cora-sub-tabs-container hidden md:flex border-b border-zinc-200 dark:border-zinc-800 items-center gap-1.5 overflow-x-auto pb-px shrink-0 select-none no-scrollbar mb-4">
         <button class="cora-sub-tab active flex items-center gap-2 px-3 pb-2.5 pt-1 text-xs font-semibold border-b-2 border-zinc-950 dark:border-zinc-150 text-zinc-950 dark:text-zinc-150 transition-all cursor-pointer whitespace-nowrap animate-none" data-target="tab-active-members">
             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             Active Members
@@ -169,6 +136,48 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 Custom Roles
             </button>
         <?php endif; ?>
+    </div>
+
+    <!-- Mobile Sub Navigation Tabs -->
+    <div class="cora-sub-tabs-container flex md:hidden items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-px mb-4 px-4 bg-white dark:bg-zinc-900 relative select-none">
+        <div class="flex items-center gap-1.5">
+            <!-- Active Members tab -->
+            <button class="cora-sub-tab active flex items-center gap-1.5 px-2.5 pb-2 pt-1 text-[11px] font-semibold border-b-[1.5px] border-zinc-950 dark:border-zinc-150 text-zinc-950 dark:text-zinc-150 transition-all cursor-pointer whitespace-nowrap focus:outline-none focus:ring-0 outline-none shadow-none" data-target="tab-active-members">
+                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                Members
+            </button>
+            <!-- Pending Invitations tab -->
+            <button class="cora-sub-tab flex items-center gap-1.5 px-2.5 pb-2 pt-1 text-[11px] font-medium border-b-[1.5px] border-transparent text-zinc-550 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-all cursor-pointer whitespace-nowrap focus:outline-none focus:ring-0 outline-none shadow-none" data-target="tab-pending-invites">
+                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                Invites
+            </button>
+        </div>
+
+        <!-- More Button and Floating Dropdown Panel -->
+        <div class="relative pb-2">
+            <button id="mobile-tabs-more-btn" class="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium text-zinc-650 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-all cursor-pointer rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 focus:outline-none focus:ring-0 outline-none shadow-none">
+                <span>More</span>
+                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="transition-transform" id="more-chevron-icon"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+
+            <!-- Floating Right-Aligned Dropdown Menu Card -->
+            <div id="mobile-tabs-more-dropdown" class="hidden absolute right-0 top-full mt-1.5 z-30 w-48 bg-white dark:bg-zinc-900 border border-zinc-150 dark:border-zinc-800 rounded-lg shadow-md py-1 animate-in fade-in duration-100">
+                <button class="cora-sub-tab flex items-center gap-2 w-full px-3 py-2 text-left text-[11px] font-medium text-zinc-650 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer whitespace-nowrap focus:outline-none focus:ring-0 outline-none shadow-none" data-target="tab-permissions-matrix">
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+                    Permissions Matrix
+                </button>
+                <button class="cora-sub-tab flex items-center gap-2 w-full px-3 py-2 text-left text-[11px] font-medium text-zinc-650 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer whitespace-nowrap focus:outline-none focus:ring-0 outline-none shadow-none" data-target="tab-attendance-logs">
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    Attendance Logs
+                </button>
+                <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_re_broker_owner', 'cora_studio_owner' ) ) ) : ?>
+                    <button class="cora-sub-tab flex items-center gap-2 w-full px-3 py-2 text-left text-[11px] font-medium text-zinc-650 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer whitespace-nowrap focus:outline-none focus:ring-0 outline-none shadow-none" data-target="tab-custom-roles">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        Custom Roles
+                    </button>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
 
     <!-- TAB 1: ACTIVE MEMBERS -->
@@ -1886,14 +1895,20 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         var targetId = $(this).data('target');
         if (!targetId) return;
 
-        $('.cora-sub-tabs-container .cora-sub-tab')
-            .removeClass('active border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 font-semibold')
-            .addClass('border-transparent text-zinc-550 dark:text-zinc-400 font-medium');
-        
-        var $matchingTabs = $('.cora-sub-tabs-container .cora-sub-tab[data-target="' + targetId + '"]');
-        $matchingTabs
-            .addClass('active border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 font-semibold')
-            .removeClass('border-transparent text-zinc-550 dark:text-zinc-400 font-medium');
+        // Sync active states on all matching tab buttons
+        $('.cora-sub-tabs-container .cora-sub-tab').each(function() {
+            var $t = $(this);
+            if ($t.data('target') === targetId) {
+                $t.addClass('active border-zinc-950 dark:border-zinc-150 text-zinc-950 dark:text-zinc-150 font-semibold')
+                  .removeClass('border-transparent text-zinc-550 dark:text-zinc-400 font-medium');
+                if ($t.closest('#mobile-tabs-more-dropdown').length) {
+                    $t.addClass('bg-zinc-50 dark:bg-zinc-850');
+                }
+            } else {
+                $t.removeClass('active border-zinc-950 dark:border-zinc-150 text-zinc-950 dark:text-zinc-150 font-semibold bg-zinc-50 dark:bg-zinc-850')
+                  .addClass('border-transparent text-zinc-550 dark:text-zinc-400 font-medium');
+            }
+        });
         
         $('.cora-tab-content').addClass('hidden');
         $('#' + targetId).removeClass('hidden');
@@ -1922,6 +1937,48 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         var newUrl = new URL(window.location.href);
         newUrl.searchParams.set('tab', tabSlug);
         history.replaceState(null, '', newUrl.toString());
+
+        // Update "More" button text and state on mobile
+        var isDropdownTab = ['tab-permissions-matrix', 'tab-attendance-logs', 'tab-custom-roles'].includes(targetId);
+        var $moreBtn = $('#mobile-tabs-more-btn');
+        if (isDropdownTab) {
+            var tabName = $(this).text().trim();
+            $moreBtn.find('span').text(tabName);
+            $moreBtn.addClass('active border-zinc-950 dark:border-zinc-150 text-zinc-950 dark:text-zinc-150 font-semibold')
+                    .removeClass('text-zinc-650 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800');
+        } else {
+            $moreBtn.find('span').text('More');
+            $moreBtn.removeClass('active border-zinc-950 dark:border-zinc-150 text-zinc-950 dark:text-zinc-150 font-semibold')
+                    .addClass('text-zinc-650 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800');
+        }
+
+        // Close dropdown
+        $('#mobile-tabs-more-dropdown').addClass('hidden');
+        $('#more-chevron-icon').removeClass('rotate-180');
+    });
+
+    // Toggle Mobile "More" Tabs Dropdown Menu
+    $(document).on('click', '#mobile-tabs-more-btn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $dropdown = $('#mobile-tabs-more-dropdown');
+        var $chevron = $('#more-chevron-icon');
+        
+        if ($dropdown.hasClass('hidden')) {
+            $dropdown.removeClass('hidden');
+            $chevron.addClass('rotate-180');
+        } else {
+            $dropdown.addClass('hidden');
+            $chevron.removeClass('rotate-180');
+        }
+    });
+
+    // Close Mobile "More" dropdown on click outside
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#mobile-tabs-more-btn, #mobile-tabs-more-dropdown').length) {
+            $('#mobile-tabs-more-dropdown').addClass('hidden');
+            $('#more-chevron-icon').removeClass('rotate-180');
+        }
     });
 
     $(document).ready(function() {
@@ -1938,7 +1995,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                        (activeTab === 'pending-invites' && (slug === 'pending-invites' || target === 'tab-pending-invites'));
             });
             if ($matchingTab.length > 0) {
-                $matchingTab.trigger('click');
+                $matchingTab.first().trigger('click');
             }
         }
     });
