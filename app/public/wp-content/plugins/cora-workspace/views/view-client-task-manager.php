@@ -519,16 +519,18 @@ if (!defined('ABSPATH')) {
     }
 }
 
-/* Responsive Page Header */
-@media (max-width: 640px) {
+/* Responsive Page Header & Mobile Hide overrides */
+@media (max-width: 639px) {
     .cora-task-manager-header {
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 12px !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 8px !important;
         margin-bottom: 16px !important;
+        width: 100% !important;
     }
     .cora-task-header-left h1 {
-        font-size: 20px !important;
+        font-size: 18px !important;
         line-height: 1.25 !important;
         letter-spacing: -0.02em !important;
     }
@@ -536,18 +538,26 @@ if (!defined('ABSPATH')) {
         display: none !important; /* Hide bloated description on mobile */
     }
     .cora-task-header-right {
-        display: grid !important;
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 8px !important;
-        width: 100% !important;
+        display: flex !important;
+        gap: 6px !important;
+        width: auto !important;
     }
-    .cora-task-header-right button {
-        width: 100% !important;
-        justify-content: center !important;
+    .cora-task-header-right button:not(.cora-task-new-btn) {
+        display: none !important; /* Hide template, column config and export on mobile */
+    }
+    .cora-task-new-btn {
+        height: 30px !important;
+        padding: 0 10px !important;
         font-size: 11px !important;
-        padding: 0 8px !important;
-        height: 34px !important;
         border-radius: 8px !important;
+        background-color: #09090b !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+    }
+    
+    /* Utility class to hide bulky sections on mobile */
+    .cora-mobile-hide {
+        display: none !important;
     }
 }
 </style>
@@ -581,7 +591,7 @@ if (!defined('ABSPATH')) {
     </div>
 
     <!-- Tier 1: View Switcher & Client Selector -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3.5">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3.5 cora-mobile-hide">
 <?php
 global $sub_page;
 $req_view = $_GET['view'] ?? '';
@@ -617,7 +627,7 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
     </div>
 
     <!-- Tier 2: Filters, Search & Sort Toolbar -->
-    <div class="cora-toolbar-wrapper">
+    <div class="cora-toolbar-wrapper cora-mobile-hide">
         <!-- Left Side: Search -->
         <div class="cora-toolbar-search-wrap">
             <div class="cora-toolbar-search">
@@ -651,7 +661,7 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
     </div>
 
     <!-- Quick Filters bar under the main toolbar -->
-    <div class="cora-quick-filters mb-4 flex items-center justify-between">
+    <div class="cora-quick-filters mb-4 flex items-center justify-between cora-mobile-hide">
         <div class="flex items-center gap-1.5 flex-wrap" id="cora-quick-filters-container">
             <button onclick="coraSetQuickFilter('all')" id="qf-all" class="qf-btn active">
                 All Tasks <span class="qf-count">0</span>
@@ -2403,38 +2413,41 @@ function renderKanbanColumns(tasks) {
     if (isMobile) {
         shellContainer.addClass('cora-mobile-accordion-active');
         
-        let ongoingUrgent = [];
-        let pendingTasks = [];
-        let clientReview = [];
-        let completedTasks = [];
+        let overdueToday = [];
+        let upcoming = [];
+        let ongoing = [];
+        let completed = [];
 
         normalizedTasks.forEach(t => {
             const status = (t.status || '').toLowerCase();
-            const priority = (t.priority || '').toLowerCase();
-            
             if (status === 'done') {
-                completedTasks.push(t);
-            } else if (status === 'inprogress' || status === 'in_progress' || priority === 'urgent') {
-                ongoingUrgent.push(t);
-            } else if (status === 'client_review' || status === 'review') {
-                clientReview.push(t);
+                completed.push(t);
+            } else if (t.due_date) {
+                if (t.due_date <= todayStr) {
+                    overdueToday.push(t);
+                } else {
+                    upcoming.push(t);
+                }
             } else {
-                pendingTasks.push(t);
+                ongoing.push(t);
             }
         });
 
+        // Sort upcoming tasks by soonest due date
+        upcoming.sort((a, b) => (a.due_date || '').localeCompare(b.due_date || ''));
+
         window.coraMobileAccordionsOpen = window.coraMobileAccordionsOpen || {
-            ongoing: true,
-            pending: true,
-            review: true,
+            today: true,
+            upcoming: true,
+            ongoing: false,
             done: false
         };
 
         const accordionSections = [
-            { key: 'ongoing', name: 'Ongoing & Urgent', tasks: ongoingUrgent },
-            { key: 'pending', name: 'Pending Tasks', tasks: pendingTasks },
-            { key: 'review', name: 'Client Review', tasks: clientReview },
-            { key: 'done', name: 'Completed Tasks', tasks: completedTasks }
+            { key: 'today', name: 'Today & Overdue', tasks: overdueToday },
+            { key: 'upcoming', name: 'Upcoming Schedule', tasks: upcoming },
+            { key: 'ongoing', name: 'Ongoing / No Due Date', tasks: ongoing },
+            { key: 'done', name: 'Completed Tasks', tasks: completed }
         ];
 
         let html = '<div class="w-full flex flex-col gap-3">';
