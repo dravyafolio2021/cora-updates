@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.5.3
+ * Version: 2.5.4
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.5.3' );
+define( 'CORA_WORKSPACE_VERSION', '2.5.4' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -26556,6 +26556,41 @@ function cora_ajax_create_article() {
 
     update_post_meta( $post_id, '_cora_seo_score', 65 );
     update_post_meta( $post_id, '_cora_geo_score', 50 );
+
+    // --- SYNCHRONIZE TO CORA_CONTENT_ITEMS WORKFLOW TABLE ---
+    global $wpdb;
+    $content_table = $wpdb->prefix . 'cora_content_items';
+    $existing = $wpdb->get_var($wpdb->prepare("SELECT id FROM $content_table WHERE post_id = %d", $post_id));
+    
+    $workflow_stage = isset($_POST['editorial_status']) ? sanitize_text_field($_POST['editorial_status']) : 'idea';
+    if (!in_array($workflow_stage, array('idea', 'drafting', 'review', 'scheduled', 'published'))) {
+        $workflow_stage = 'idea';
+    }
+
+    if (!$existing) {
+        $wpdb->insert($content_table, array(
+            'title'             => $title,
+            'stage'             => $workflow_stage,
+            'priority'          => 'medium',
+            'industry'          => isset($_POST['industry']) ? sanitize_text_field($_POST['industry']) : 'both',
+            'post_id'           => $post_id,
+            'primary_keyword'   => isset($_POST['keyword']) ? sanitize_text_field($_POST['keyword']) : '',
+            'target_word_count' => 1200,
+            'writer_id'         => (isset($_POST['assignee_id']) && $_POST['assignee_id'] !== '') ? intval($_POST['assignee_id']) : get_current_user_id(),
+            'created_by'        => get_current_user_id(),
+            'created_at'        => current_time('mysql'),
+            'updated_at'        => current_time('mysql')
+        ));
+    } else {
+        $wpdb->update($content_table, array(
+            'title'             => $title,
+            'stage'             => $workflow_stage,
+            'primary_keyword'   => isset($_POST['keyword']) ? sanitize_text_field($_POST['keyword']) : '',
+            'updated_at'        => current_time('mysql')
+        ), array('post_id' => $post_id));
+    }
+    
+    update_post_meta($post_id, '_cora_workflow_stage', $workflow_stage);
 
     wp_send_json_success( array( 'post_id' => $post_id, 'message' => 'Saved successfully.' ) );
 }

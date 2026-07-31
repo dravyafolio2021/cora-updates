@@ -278,8 +278,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <!-- CRITICAL: Reset any WordPress admin-bar margin-top injected by wp_print_styles() -->
     <style id="cora-adminbar-reset">
         #wpadminbar { display: none !important; }
-        html { margin-top: 0 !important; padding-top: 0 !important; }
-        body { margin-top: 0 !important; padding-top: 0 !important; }
+        html, html.wp-toolbar { margin-top: 0 !important; padding-top: 0 !important; }
+        body, body.admin-bar { margin-top: 0 !important; padding-top: 0 !important; }
+        #wpcontent, #wpbody, #wpbody-content, #wpwrap { margin-top: 0 !important; padding-top: 0 !important; }
         * html body { margin-top: 0 !important; }
     </style>
 
@@ -3074,7 +3075,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     $cora_initials = strtoupper(substr($cora_display_name, 0, 1));
     ?>
     <!-- Global Brand & Customized Blocks Top Navbar (Shopify Style Unified Header) -->
-    <header id="cora-global-topbar" class="cora-topbar bg-[#09090b] dark:bg-zinc-950 text-white px-4 md:px-6 py-2.5 flex items-center justify-between border-b border-zinc-800/80 sticky top-0 z-50 shrink-0 select-none" style="background-color: #09090b !important;">
+    <header id="cora-global-topbar" class="cora-topbar bg-[#09090b] dark:bg-zinc-950 text-white px-4 md:px-6 py-2.5 flex items-center justify-between border-b border-zinc-800/80 sticky top-0 z-50 shrink-0 select-none" style="background-color: #09090b !important; z-index: 9999 !important;">
         <div class="hidden lg:flex w-full items-center justify-between">
         <!-- Left Section: Brand, Mobile Menu Toggle & Active Page Breadcrumb -->
         <div class="flex items-center gap-3 min-w-0">
@@ -3296,6 +3297,35 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             </div>
 
             <div class="flex items-center gap-2">
+                <!-- Mobile Punch Button and Popover -->
+                <div class="relative shrink-0" id="cora-mobile-punch-wrap">
+                    <button id="cora-mobile-punch-btn" onclick="event.stopPropagation(); toggleMobilePunchPopover();" class="p-1 text-zinc-400 hover:text-white transition-all cursor-pointer flex items-center justify-center shrink-0 relative" title="Log Attendance">
+                        <span id="cora-mobile-punch-dot" class="w-1.5 h-1.5 rounded-full bg-zinc-500 absolute top-0.5 right-0.5 transition-colors"></span>
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </button>
+                    <!-- Mobile Punch Popover -->
+                    <div id="cora-mobile-punch-popover" class="hidden absolute right-[-48px] top-full mt-2.5 w-60 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl z-[99] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                        <div class="px-4 py-3 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-950/40 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span id="cora-mobile-punch-popover-dot" class="w-2 h-2 rounded-full bg-zinc-300 dark:bg-zinc-600 shrink-0"></span>
+                                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider" id="cora-mobile-punch-popover-status">Not punched in</span>
+                            </div>
+                            <span class="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono" id="cora-mobile-punch-popover-time"></span>
+                        </div>
+                        <div class="p-3 space-y-2">
+                            <button onclick="headerLogPunch('in')" id="cora-mobile-punch-in" class="w-full bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer active:scale-95 flex items-center justify-center gap-1.5 shadow-sm">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                Punch In
+                            </button>
+                            <button onclick="headerLogPunch('out')" id="cora-mobile-punch-out" class="w-full bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer active:scale-95 flex items-center justify-center gap-1.5">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                                Punch Out
+                            </button>
+                            <p id="cora-mobile-punch-popover-feedback" class="text-[10px] text-center text-zinc-400 dark:text-zinc-500 hidden pt-1 pb-0.5"></p>
+                        </div>
+                    </div>
+                </div>
+
                 <button onclick="document.getElementById('cora-notif-bell-btn').click();" class="relative p-1 text-zinc-400 hover:text-white transition-all cursor-pointer flex items-center justify-center shrink-0">
                     <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
                     <span class="absolute top-1 right-1 w-2 h-2 bg-white rounded-full border border-[#09090b]"></span>
@@ -4116,57 +4146,64 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 
                 <!-- Premium Dynamic Quick Actions (Mobile-first Wrap Grid / Desktop Centered Grid) -->
                 <div class="w-full flex flex-col items-center justify-center gap-2.5 py-2 px-0 select-none" id="cora-quick-actions-bar">
-                    <!-- Predefined actions row (centered, wraps into exactly 2 rows on mobile) -->
-                    <div class="w-full flex flex-wrap items-center justify-center gap-2 px-4 md:w-auto">
-                        <span class="hidden md:inline-block text-xs font-bold text-zinc-850 dark:text-zinc-200 tracking-tight mr-1 select-none whitespace-nowrap">Quick actions:</span>
-                        
-                        <?php if ( $is_studio ) : ?>
-                            <button onclick="coraNavigateTo('bookings'); document.getElementById('cora-add-booking-btn')?.click();" class="flex justify-center items-center gap-1.5 px-3.5 py-1.5 border border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/70 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-[11px] font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
-                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-600 dark:text-zinc-300"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <?php if ( $is_studio ) : ?>
+                        <!-- Predefined actions Row 1 -->
+                        <div class="w-full flex flex-wrap items-center justify-center gap-2.5 px-4">
+                            <button onclick="coraNavigateTo('bookings'); document.getElementById('cora-add-booking-btn')?.click();" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 dark:text-zinc-400"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                                 Book a Shoot
                             </button>
-                            <button onclick="coraNavigateTo('equipment'); window.openAddGearDrawer?.();" class="flex justify-center items-center gap-1.5 px-3.5 py-1.5 border border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/70 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-[11px] font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
-                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                            <button onclick="coraNavigateTo('equipment'); window.openAddGearDrawer?.();" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 dark:text-zinc-400"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
                                 Register Gear
                             </button>
-                            <button onclick="coraNavigateTo('crew-scheduler')" class="flex justify-center items-center gap-1.5 px-3.5 py-1.5 border border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/70 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-[11px] font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
-                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            <button onclick="coraNavigateTo('crew-scheduler')" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 dark:text-zinc-400"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                                 Assign Crew
                             </button>
-                            <button onclick="coraNavigateTo('media')" class="flex justify-center items-center gap-1.5 px-3.5 py-1.5 border border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/70 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-[11px] font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
-                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        </div>
+                        <!-- Predefined actions Row 2 -->
+                        <div class="w-full flex flex-wrap items-center justify-center gap-2.5 px-4 mt-0.5">
+                            <button onclick="coraNavigateTo('media')" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 dark:text-zinc-400"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                                 Upload Media
                             </button>
-                            <button onclick="coraNavigateTo('invoicing')" class="flex justify-center items-center gap-1.5 px-3.5 py-1.5 border border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/70 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-[11px] font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
-                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line><line x1="6" y1="16" x2="10" y2="16"></line></svg>
+                            <button onclick="coraNavigateTo('invoicing')" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 dark:text-zinc-400"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line><line x1="6" y1="16" x2="10" y2="16"></line></svg>
                                 Create Invoice
                             </button>
-                        <?php else : ?>
-                            <button onclick="coraNavigateTo('bookings'); document.getElementById('cora-add-booking-btn')?.click();" class="flex justify-center items-center gap-1.5 px-3.5 py-1.5 border border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/70 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-[11px] font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
-                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-600 dark:text-zinc-300"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        </div>
+                    <?php else : ?>
+                        <!-- Predefined actions Row 1 -->
+                        <div class="w-full flex flex-wrap items-center justify-center gap-2.5 px-4">
+                            <button onclick="coraNavigateTo('bookings'); document.getElementById('cora-add-booking-btn')?.click();" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 dark:text-zinc-400"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                                 Schedule Showing
                             </button>
-                            <button onclick="coraNavigateTo('ai-assistants')" class="flex justify-center items-center gap-1.5 px-3.5 py-1.5 border border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/70 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-[11px] font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
-                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                            <button onclick="coraNavigateTo('ai-assistants')" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 dark:text-zinc-400"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                 Draft Captions
                             </button>
-                            <button onclick="coraNavigateTo('leads')" class="flex justify-center items-center gap-1.5 px-3.5 py-1.5 border border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/70 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-[11px] font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
-                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                            <button onclick="coraNavigateTo('leads')" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 dark:text-zinc-400"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
                                 Add Lead
                             </button>
-                            <button onclick="event.stopPropagation(); window.coraOpenCommandPalette();" class="flex justify-center items-center gap-1.5 px-3.5 py-1.5 border border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/70 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-[11px] font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
-                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                        </div>
+                        <!-- Predefined actions Row 2 -->
+                        <div class="w-full flex flex-wrap items-center justify-center gap-2.5 px-4 mt-0.5">
+                            <button onclick="event.stopPropagation(); window.coraOpenCommandPalette();" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 dark:text-zinc-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                                 Create Brochure
                             </button>
-                            <button onclick="coraNavigateTo('listings')" class="flex justify-center items-center gap-1.5 px-3.5 py-1.5 border border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/70 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-[11px] font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
-                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                            <button onclick="coraNavigateTo('listings')" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 dark:text-zinc-400"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                                 View Listings
                             </button>
-                        <?php endif; ?>
-                    </div>
+                        </div>
+                    <?php endif; ?>
 
                     <!-- Custom Shortcuts row (centered, sits on its own row below) -->
-                    <div class="flex flex-wrap items-center justify-center gap-2 w-full mt-0.5">
+                    <div class="flex flex-wrap items-center justify-center gap-2.5 w-full mt-0.5">
                         <!-- Custom Actions (from localStorage) -->
                         <div id="cora-custom-actions-container" class="contents"></div>
 
@@ -4268,7 +4305,7 @@ window.coraDeleteCustomAction=function(idx){var actions=JSON.parse(localStorage.
 
 window.coraRenderCustomActionsList=function(){var list=document.getElementById('cora-custom-actions-list');if(!list)return;var actions=JSON.parse(localStorage.getItem('cora_custom_quick_actions')||'[]');if(!actions.length){list.innerHTML='<p style="font-size:11px;color:#a1a1aa;text-align:center;padding:6px 0;">No shortcuts yet — add one above or pick a suggestion.</p>';return;}list.innerHTML='<div style="display:flex;flex-direction:column;gap:6px;">'+actions.map(function(a,i){var iconHtml=window.coraGetPageIconSvg(a.page);return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:#f4f4f5;border-radius:10px;"><div style="display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;align-items:center;color:#71717a;width:12px;height:12px;">'+iconHtml+'</span><span style="font-size:12px;font-weight:500;color:#3f3f46;">'+a.name+'</span></div><button onclick="window.coraDeleteCustomAction('+i+')" style="background:none;border:none;cursor:pointer;color:#a1a1aa;padding:2px;"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>';}).join('')+'</div>';};
 
-window.coraRenderCustomActions=function(){var c=document.getElementById('cora-custom-actions-container');if(!c)return;var actions=JSON.parse(localStorage.getItem('cora_custom_quick_actions')||'[]').slice(0,3);c.innerHTML=actions.map(function(a){return '<button onclick="coraNavigateTo(\''+a.page+'\')" class="inline-flex items-center gap-2 px-5 py-2.5 border border-zinc-200/80 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/50 hover:bg-zinc-50 rounded-full text-xs font-semibold text-zinc-650 transition-all cursor-pointer">'+a.name+'</button>';}).join('');};
+window.coraRenderCustomActions=function(){var c=document.getElementById('cora-custom-actions-container');if(!c)return;var actions=JSON.parse(localStorage.getItem('cora_custom_quick_actions')||'[]').slice(0,3);c.innerHTML=actions.map(function(a){return '<button onclick="coraNavigateTo(\''+a.page+'\')" class="inline-flex items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">'+a.name+'</button>';}).join('');};
 
 document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                 </script>
@@ -6035,7 +6072,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                     flex-direction: column !important;
                 }
                 .admin-bar .cora-main {
-                    height: calc(100vh - 84px) !important;
+                    height: calc(100vh - 52px) !important;
                 }
                 #editor-center-canvas {
                     height: calc(100vh - 200px) !important;
@@ -6043,8 +6080,8 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                     overflow-y: auto !important;
                 }
                 .admin-bar #editor-center-canvas {
-                    height: calc(100vh - 232px) !important;
-                    max-height: calc(100vh - 232px) !important;
+                    height: calc(100vh - 200px) !important;
+                    max-height: calc(100vh - 200px) !important;
                 }
                 #left-panel-content, #left-tab-settings, #left-tab-form, #left-tab-integ {
                     height: calc(100vh - 160px) !important;
@@ -6052,8 +6089,8 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                     overflow-y: auto !important;
                 }
                 .admin-bar #left-panel-content, .admin-bar #left-tab-settings, .admin-bar #left-tab-form, .admin-bar #left-tab-integ {
-                    height: calc(100vh - 192px) !important;
-                    max-height: calc(100vh - 192px) !important;
+                    height: calc(100vh - 160px) !important;
+                    max-height: calc(100vh - 160px) !important;
                 }
                 .cora-main {
                     overflow: hidden !important;
@@ -9996,21 +10033,38 @@ wp_print_footer_scripts();
         window.updateHeaderPunchState = function(status, timeStr) {
             _headerPunchState = { status: status, time: timeStr };
             localStorage.setItem('cora_punch_state', JSON.stringify(_headerPunchState));
+            
+            // Desktop elements
             const dot = document.getElementById('cora-header-punch-dot');
             const popDot = document.getElementById('cora-punch-popover-dot');
             const popStatus = document.getElementById('cora-punch-popover-status');
             const popTime = document.getElementById('cora-punch-popover-time');
+            
+            // Mobile elements
+            const mobDot = document.getElementById('cora-mobile-punch-dot');
+            const mobPopDot = document.getElementById('cora-mobile-punch-popover-dot');
+            const mobPopStatus = document.getElementById('cora-mobile-punch-popover-status');
+            const mobPopTime = document.getElementById('cora-mobile-punch-popover-time');
 
             if (status === 'in') {
                 if (dot) { dot.style.backgroundColor = '#22c55e'; }
                 if (popDot) { popDot.style.backgroundColor = '#22c55e'; }
                 if (popStatus) popStatus.textContent = 'Punched In';
+                
+                if (mobDot) { mobDot.style.backgroundColor = '#22c55e'; }
+                if (mobPopDot) { mobPopDot.style.backgroundColor = '#22c55e'; }
+                if (mobPopStatus) mobPopStatus.textContent = 'Punched In';
             } else {
                 if (dot) { dot.style.backgroundColor = '#71717a'; }
                 if (popDot) { popDot.style.backgroundColor = '#71717a'; }
                 if (popStatus) popStatus.textContent = 'Not punched in';
+                
+                if (mobDot) { mobDot.style.backgroundColor = '#71717a'; }
+                if (mobPopDot) { mobPopDot.style.backgroundColor = '#71717a'; }
+                if (mobPopStatus) mobPopStatus.textContent = 'Not punched in';
             }
             if (popTime && timeStr) popTime.textContent = timeStr;
+            if (mobPopTime && timeStr) mobPopTime.textContent = timeStr;
         };
 
         window.toggleHeaderPunchPopover = function() {
@@ -10018,7 +10072,18 @@ wp_print_footer_scripts();
             if (!pop) return;
             pop.classList.toggle('hidden');
             // Close other popovers
-            ['cora-header-profile-popover','cora-notif-dropdown','cora-workspace-popover','cora-profile-popover'].forEach(function(id) {
+            ['cora-mobile-punch-popover','cora-header-profile-popover','cora-notif-dropdown','cora-workspace-popover','cora-profile-popover'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+        };
+
+        window.toggleMobilePunchPopover = function() {
+            const pop = document.getElementById('cora-mobile-punch-popover');
+            if (!pop) return;
+            pop.classList.toggle('hidden');
+            // Close other popovers
+            ['cora-header-punch-popover','cora-header-profile-popover','cora-notif-dropdown','cora-workspace-popover','cora-profile-popover'].forEach(function(id) {
                 const el = document.getElementById(id);
                 if (el) el.classList.add('hidden');
             });
@@ -10026,7 +10091,9 @@ wp_print_footer_scripts();
 
         window.headerLogPunch = function(type) {
             const feedback = document.getElementById('cora-punch-popover-feedback');
+            const mobFeedback = document.getElementById('cora-mobile-punch-popover-feedback');
             if (feedback) { feedback.textContent = 'Acquiring GPS location...'; feedback.classList.remove('hidden'); }
+            if (mobFeedback) { mobFeedback.textContent = 'Acquiring GPS location...'; mobFeedback.classList.remove('hidden'); }
 
             function sendPunch(lat, lng) {
                 jQuery.post(coraREData.ajaxUrl, {
@@ -10039,16 +10106,23 @@ wp_print_footer_scripts();
                         const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                         window.updateHeaderPunchState(type, timeStr);
                         if (feedback) feedback.classList.add('hidden');
+                        if (mobFeedback) mobFeedback.classList.add('hidden');
                         window.coraShowToast(type === 'in' ? 'Punched in successfully ✓' : 'Punched out successfully ✓');
                         setTimeout(function() {
                             const pop = document.getElementById('cora-header-punch-popover');
                             if (pop) pop.classList.add('hidden');
+                            const mobPop = document.getElementById('cora-mobile-punch-popover');
+                            if (mobPop) mobPop.classList.add('hidden');
                         }, 600);
                     } else {
-                        if (feedback) feedback.textContent = res.data.message || 'Failed to save punch.';
+                        const errMsg = res.data.message || 'Failed to save punch.';
+                        if (feedback) feedback.textContent = errMsg;
+                        if (mobFeedback) mobFeedback.textContent = errMsg;
                     }
                 }).fail(function() {
-                    if (feedback) feedback.textContent = 'Network error. Please try again.';
+                    const errMsg = 'Network error. Please try again.';
+                    if (feedback) feedback.textContent = errMsg;
+                    if (mobFeedback) mobFeedback.textContent = errMsg;
                 });
             }
 
@@ -10118,6 +10192,14 @@ wp_print_footer_scripts();
                 const punchWrap = document.getElementById('cora-header-punch-wrap');
                 if (!punchWrap || !punchWrap.contains(e.target)) {
                     punchPopover.classList.add('hidden');
+                }
+            }
+
+            const mobPunchPopover = document.getElementById('cora-mobile-punch-popover');
+            if (mobPunchPopover && !mobPunchPopover.classList.contains('hidden')) {
+                const mobPunchWrap = document.getElementById('cora-mobile-punch-wrap');
+                if (!mobPunchWrap || !mobPunchWrap.contains(e.target)) {
+                    mobPunchPopover.classList.add('hidden');
                 }
             }
         });
