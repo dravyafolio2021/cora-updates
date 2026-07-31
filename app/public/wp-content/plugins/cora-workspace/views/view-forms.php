@@ -232,8 +232,25 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </div>
             </div>
             
-            <div id="audit-logs-body" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                <div class="col-span-full py-12 text-center text-xs text-zinc-400 dark:text-zinc-500">Loading audit log...</div>
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="border-b border-zinc-200 dark:border-zinc-800 text-zinc-400 dark:text-zinc-500 font-semibold bg-zinc-50/50 dark:bg-zinc-900/30">
+                                <th class="px-4 py-3">Activity</th>
+                                <th class="px-4 py-3">User</th>
+                                <th class="px-4 py-3">Target</th>
+                                <th class="px-4 py-3">IP Address</th>
+                                <th class="px-4 py-3">Date & Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-logs-body" class="divide-y divide-zinc-100 dark:divide-zinc-800/80">
+                            <tr>
+                                <td colspan="5" class="px-4 py-12 text-center text-zinc-400 dark:text-zinc-500">Loading audit log...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Pagination controls -->
@@ -2093,17 +2110,19 @@ function renderAuditLogs(logs) {
         if (!body) return;
         if (!logs || logs.length === 0) {
             body.innerHTML = `
-                <div class="col-span-full py-16 text-center">
-                    <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="1.2" fill="none" class="mx-auto text-zinc-300 dark:text-zinc-700 mb-3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                    <p class="text-xs text-zinc-400 dark:text-zinc-500">No audit log entries recorded.</p>
-                </div>`;
+                <tr>
+                    <td colspan="5" class="py-16 text-center">
+                        <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="1.2" fill="none" class="mx-auto text-zinc-300 dark:text-zinc-700 mb-3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        <p class="text-xs text-zinc-400 dark:text-zinc-500">No audit log entries recorded.</p>
+                    </td>
+                </tr>`;
             return;
         }
 
         body.innerHTML = '';
         logs.forEach(l => {
-            const card = document.createElement('div');
-            card.className = 'bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 flex flex-col gap-3 shadow-sm';
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-zinc-50/50 dark:hover:bg-zinc-900/30 transition-all';
 
             const reviewer = l.display_name || 'System';
             const target = l.field_label || (l.submission_id ? 'Submission #' + l.submission_id : 'All Data');
@@ -2121,36 +2140,29 @@ function renderAuditLogs(logs) {
                 actionIcon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>';
             }
 
-            card.innerHTML = `
-                <div class="flex items-start justify-between gap-2">
-                    <div class="flex items-center gap-2 min-w-0">
-                        <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 text-zinc-500 dark:text-zinc-400">
+            row.innerHTML = `
+                <td class="px-4 py-3 align-middle">
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 dark:text-zinc-400 shrink-0">
                             ${actionIcon}
                         </div>
-                        <div class="min-w-0">
-                            <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 uppercase">${actionType}</span>
-                        </div>
+                        <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-400 uppercase tracking-wide whitespace-nowrap">${actionType}</span>
                     </div>
-                </div>
-                <div class="space-y-1.5 text-[11px]">
-                    <div class="flex items-center justify-between">
-                        <span class="text-zinc-400 dark:text-zinc-500">User</span>
-                        <span class="font-medium text-zinc-800 dark:text-zinc-200 truncate ml-2">${reviewer}</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-zinc-400 dark:text-zinc-500">Target</span>
-                        <span class="text-zinc-600 dark:text-zinc-350 truncate ml-2">${target}</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-zinc-400 dark:text-zinc-500">IP</span>
-                        <span class="font-mono text-zinc-400 dark:text-zinc-500 truncate ml-2">${l.ip_address || '—'}</span>
-                    </div>
-                </div>
-                <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                    <span class="text-[10px] text-zinc-400 dark:text-zinc-500">${l.created_at || '—'}</span>
-                </div>
+                </td>
+                <td class="px-4 py-3 align-middle font-medium text-zinc-800 dark:text-zinc-200">
+                    ${reviewer}
+                </td>
+                <td class="px-4 py-3 align-middle text-zinc-600 dark:text-zinc-350">
+                    ${target}
+                </td>
+                <td class="px-4 py-3 align-middle font-mono text-zinc-450 dark:text-zinc-500 whitespace-nowrap">
+                    ${l.ip_address || '—'}
+                </td>
+                <td class="px-4 py-3 align-middle text-zinc-400 dark:text-zinc-500 whitespace-nowrap">
+                    ${l.created_at || '—'}
+                </td>
             `;
-            body.appendChild(card);
+            body.appendChild(row);
         });
     }
 
