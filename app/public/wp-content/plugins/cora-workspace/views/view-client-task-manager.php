@@ -436,6 +436,26 @@ if (!defined('ABSPATH')) {
 .cora-col-add-task-btn.btn-review:hover { background-color: rgba(37, 99, 235, 0.08); }
 .cora-col-add-task-btn.btn-done { color: #059669 !important; }
 .cora-col-add-task-btn.btn-done:hover { background-color: rgba(5, 150, 105, 0.08); }
+/* Column level search input */
+.cora-col-search-input {
+    width: 100% !important;
+    height: 28px !important;
+    padding-left: 10px !important;
+    padding-right: 28px !important;
+    border: 1px solid #e4e4e7 !important;
+    border-radius: 8px !important;
+    font-size: 11px !important;
+    background-color: #ffffff !important;
+    font-weight: 500 !important;
+    color: #18181b !important;
+    outline: none !important;
+    box-shadow: none !important;
+    transition: all 0.15s ease;
+}
+.cora-col-search-input:focus {
+    border-color: #09090b !important;
+    background-color: #ffffff !important;
+}
 
 /* Quick Filters buttons styling */
 .qf-btn {
@@ -1566,6 +1586,7 @@ document.addEventListener('click', function(e) {
 
         saveColumnsToStorage();
         coraRenderColumnsList();
+        $('#panel-view-kanban').empty();
         coraRenderTaskViews();
     };
 
@@ -1575,6 +1596,7 @@ document.addEventListener('click', function(e) {
 
         coraTaskState.columns[index].name = cleanName;
         saveColumnsToStorage();
+        $('#panel-view-kanban').empty();
         coraRenderTaskViews();
         coraPopulateFilters();
     };
@@ -1588,6 +1610,7 @@ document.addEventListener('click', function(e) {
         coraTaskState.columns.splice(index, 1);
         saveColumnsToStorage();
         coraRenderColumnsList();
+        $('#panel-view-kanban').empty();
         coraRenderTaskViews();
         coraPopulateFilters();
     };
@@ -1641,6 +1664,7 @@ document.addEventListener('click', function(e) {
         saveColumnsToStorage();
         $('#new-col-name').val('');
         coraRenderColumnsList();
+        $('#panel-view-kanban').empty();
         coraRenderTaskViews();
         coraPopulateFilters();
         window.coraShowToast("New column added successfully!");
@@ -1847,8 +1871,258 @@ function clientBadgeColor(clientName) {
     };
 }
 
+window.coraColumnQueries = window.coraColumnQueries || {};
+
+window.coraFilterColumnTasks = function(colKey, value) {
+    window.coraColumnQueries[colKey] = value.trim().toLowerCase();
+    
+    const tasks = getFilteredTasks();
+    const normalizedTasks = tasks.map(t => {
+        if (t.status === 'blocked') return { ...t, status: 'todo' };
+        return t;
+    });
+    
+    const col = coraTaskState.columns.find(c => c.key === colKey);
+    if (!col) return;
+    
+    let colTasks = normalizedTasks.filter(t => (t.status || 'todo') === colKey);
+    const query = window.coraColumnQueries[colKey] || '';
+    if (query) {
+        colTasks = colTasks.filter(t => 
+            (t.title || '').toLowerCase().includes(query) || 
+            (t.client_name || '').toLowerCase().includes(query) ||
+            (t.booking_title || '').toLowerCase().includes(query) ||
+            (t.assignee_name || '').toLowerCase().includes(query)
+        );
+    }
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayStr = today.toISOString().split('T')[0];
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    
+    renderSingleColumnCards(col, colTasks, today, todayStr, tomorrowStr);
+    
+    $(`#count-kanban-${colKey}`).text(colTasks.length);
+    $(`#sum-kanban-${colKey}`).text(colTasks.length);
+};
+
+function renderSingleColumnCards(col, colTasks, today, todayStr, tomorrowStr) {
+    if (!today) {
+        today = new Date();
+        today.setHours(0, 0, 0, 0);
+        todayStr = today.toISOString().split('T')[0];
+        
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrowStr = tomorrow.toISOString().split('T')[0];
+    }
+    
+    let html = '';
+    if (colTasks.length === 0) {
+        html = '<div class="text-center text-zinc-400 text-xs py-12 font-medium">No matching tasks</div>';
+    } else {
+        colTasks.forEach(t => {
+            const subtasks = t.subtasks || [];
+            const doneSub = subtasks.filter(s => s.completed).length;
+            
+            const clientNameStr = t.client_name || 'General';
+            const cColor = clientBadgeColor(clientNameStr);
+            
+            let suffix = '';
+            const clientLower = clientNameStr.toLowerCase();
+            if (clientLower.includes('towers') || clientLower.includes('estate') || clientLower.includes('group') || clientLower.includes('llp')) {
+                suffix = ' COMMERCIAL';
+            } else if (clientLower.includes('rohan') || clientLower.includes('priya') || clientLower.includes('wedding')) {
+                suffix = ' WEDDING';
+            }
+            const formattedClientName = clientNameStr.toUpperCase().replace(' LLP', '') + suffix;
+
+            const isCompleted = t.status === 'done';
+            
+            let topIcon = '';
+            if (isCompleted) {
+                topIcon = `<div class="w-4 h-4 rounded-full bg-white border border-emerald-500 text-emerald-500 flex items-center justify-center"><svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
+            } else {
+                let dotColor = 'bg-emerald-500';
+                if (t.priority === 'urgent') dotColor = 'bg-rose-500';
+                else if (t.priority === 'high') dotColor = 'bg-amber-500';
+                topIcon = `<div class="w-2.5 h-2.5 rounded-full ${dotColor}"></div>`;
+            }
+
+            let dueDateHtml = '';
+            if (t.due_date && !isCompleted) {
+                const due = new Date(t.due_date + 'T00:00:00');
+                const diffTime = due - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                const calSvg = (colorClass) => `<svg class="w-3 h-3 ${colorClass} inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
+
+                if (t.due_date < todayStr) {
+                    if (t.status === 'inprogress') {
+                        dueDateHtml = `<span class="text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-md flex items-center">${calSvg('text-rose-700')} Overdue</span>`;
+                    } else {
+                        dueDateHtml = `<span class="text-[10px] font-bold text-rose-600 flex items-center">${calSvg('text-rose-600')} Overdue</span>`;
+                    }
+                } else if (t.due_date === todayStr) {
+                    dueDateHtml = `<span class="text-[10px] font-bold text-amber-850 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md uppercase tracking-wide">DUE TODAY</span>`;
+                } else if (t.due_date === tomorrowStr) {
+                    dueDateHtml = `<span class="text-[10px] font-bold text-rose-650 flex items-center">${calSvg('text-rose-650')} Due in 1 day</span>`;
+                } else {
+                    dueDateHtml = `<span class="text-[10px] font-bold text-zinc-600 flex items-center">${calSvg('text-zinc-500')} Due in ${diffDays} days</span>`;
+                }
+            }
+
+            const deliverableHtml = t.deliverable_type 
+                ? `<span class="text-[10px] font-bold text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded-md border border-zinc-200/60">${escHtml(t.deliverable_type)}</span>` 
+                : '';
+
+            const taskCreatedMs = isNaN(t.id) ? Date.now() - 3 * 24 * 60 * 60 * 1000 : parseInt(t.id);
+            const diffCreatedMs = Date.now() - taskCreatedMs;
+            const daysActive = Math.floor(diffCreatedMs / (1000 * 60 * 60 * 24));
+            let durationBadge = '';
+            if (t.status === 'inprogress') {
+                durationBadge = daysActive > 0 
+                    ? `<span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span> Active ${daysActive}d</span>`
+                    : `<span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span> Active today</span>`;
+            }
+
+            let actionBtn = '';
+            if (!isCompleted) {
+                const currentIdx = coraTaskState.columns.findIndex(c => c.key === t.status);
+                if (currentIdx !== -1 && currentIdx < coraTaskState.columns.length - 1) {
+                    const nextCol = coraTaskState.columns[currentIdx + 1];
+                    let btnText = 'Next &rarr;';
+                    let btnColorClass = 'text-zinc-600 border-zinc-300 hover:bg-zinc-50';
+                    if (nextCol.key === 'inprogress' || nextCol.key === 'in_progress') {
+                        btnText = 'Start &rarr;';
+                        btnColorClass = 'text-amber-600 border-amber-300 hover:bg-amber-50';
+                    } else if (nextCol.key === 'review' || nextCol.key === 'client_review') {
+                        btnText = 'Review &rarr;';
+                        btnColorClass = 'text-blue-600 border-blue-300 hover:bg-blue-50';
+                    } else if (nextCol.key === 'done') {
+                        btnText = 'Complete &check;';
+                        btnColorClass = 'text-emerald-600 border-emerald-300 hover:bg-emerald-50';
+                    }
+                    actionBtn = `<button onclick="coraQuickMoveTask(event, '${t.id}', '${nextCol.key}')" class="text-[11px] font-bold ${btnColorClass} bg-white border px-3 py-1 rounded-lg transition-colors cursor-pointer flex items-center gap-1">${btnText}</button>`;
+                }
+            }
+
+            const assigneeName = t.assignee_name || 'Unassigned';
+            const assigneeInitial = assigneeName.charAt(0).toUpperCase();
+            let assigneeRole = 'Team Member';
+            if (assigneeName.includes('Karan')) assigneeRole = 'Drone Pilot';
+            else if (assigneeName.includes('Rohan')) assigneeRole = 'PM';
+            else if (assigneeName.includes('Aarav')) {
+                assigneeRole = isCompleted ? 'Senior Editor' : 'Editor';
+            } else if (assigneeName.includes('Shruti')) {
+                assigneeRole = t.status === 'in_progress' || t.status === 'inprogress' ? 'Designer' : 'Admin';
+            }
+
+            let progressBgClass = 'bg-zinc-950';
+            if (t.status === 'in_progress' || t.status === 'inprogress') progressBgClass = 'bg-amber-500';
+            else if (t.status === 'client_review' || t.status === 'review') progressBgClass = 'bg-blue-600';
+
+            let alertHtml = '';
+            if (isCompleted) {
+                alertHtml = `<div class="text-[10.5px] font-bold text-emerald-700 bg-emerald-50/70 border border-emerald-100 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5">
+                    <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span>🎉 Excellent work, team!</span>
+                </div>`;
+            } else if (t.due_date && t.due_date < todayStr) {
+                const daysOverdue = Math.floor((today - new Date(t.due_date + 'T00:00:00')) / (1000 * 60 * 60 * 24));
+                alertHtml = `<div class="text-[10.5px] font-bold text-rose-700 bg-rose-50/80 border border-rose-200 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5 animate-pulse">
+                    <svg class="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    <span>SLA Warning: Overdue ${daysOverdue || 1}d!</span>
+                </div>`;
+            } else if (t.due_date && t.due_date === todayStr) {
+                alertHtml = `<div class="text-[10.5px] font-bold text-amber-850 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5">
+                    <svg class="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3" /></svg>
+                    <span>⚠️ Action Required: Due Today</span>
+                </div>`;
+            } else if (t.priority === 'urgent') {
+                alertHtml = `<div class="text-[10.5px] font-bold text-rose-700 bg-rose-50/70 border border-rose-100 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5">
+                    <span>🔥 Escalated urgent priority</span>
+                </div>`;
+            }
+
+            html += `
+            <!-- Task Card -->
+            <div class="cora-task-card bg-white rounded-2xl border border-zinc-200/80 p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer space-y-2.5" data-id="${t.id}" draggable="true" ondragstart="coraTaskDragStart(event, this)" ondragend="coraTaskDragEnd(event, this)" onclick="coraOpenTaskDetailsDrawer(event, '${t.id}')">
+                
+                <!-- Header -->
+                <div class="flex justify-between items-start">
+                    <span class="uppercase font-extrabold text-[10px] px-2 py-0.5 rounded-md truncate max-w-[170px]" style="background-color: ${cColor.bg}; color: ${cColor.text};">
+                        ${escHtml(formattedClientName)}
+                    </span>
+                    <div class="shrink-0 mt-0.5">${topIcon}</div>
+                </div>
+
+                <!-- Title & Subtitle -->
+                <div class="space-y-0.5">
+                    <h4 class="text-sm font-bold text-zinc-950 leading-snug break-words ${isCompleted ? 'text-zinc-550 line-through' : ''}">
+                        ${escHtml(t.title)}
+                    </h4>
+                    ${t.booking_title ? `<div class="text-[11px] text-zinc-500 font-medium truncate">Shoot: ${escHtml(t.booking_title)}</div>` : ''}
+                </div>
+
+                <!-- Tags Row -->
+                <div class="flex items-center gap-1.5 flex-wrap pt-1">
+                    ${deliverableHtml}
+                    ${dueDateHtml}
+                    ${durationBadge}
+                </div>
+
+                <!-- Alerts & Notices -->
+                ${alertHtml}
+
+                <!-- Assignee Row -->
+                <div class="flex items-center justify-between pt-2">
+                    <div class="flex items-center gap-1.5 truncate pr-2">
+                        <div class="w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
+                            ${assigneeInitial}
+                        </div>
+                        <div class="flex flex-col truncate text-left">
+                            <span class="text-[11px] text-zinc-800 font-bold truncate leading-none">
+                                ${escHtml(assigneeName)}
+                            </span>
+                            <span class="text-[9px] text-zinc-400 font-semibold truncate mt-0.5">
+                                ${escHtml(assigneeRole)}
+                            </span>
+                        </div>
+                    </div>
+                    ${actionBtn ? `<div class="shrink-0">${actionBtn}</div>` : ''}
+                </div>
+
+                <!-- Footer: Checklist or Completed Date -->
+                ${!isCompleted && subtasks.length > 0 ? `
+                    <div class="space-y-1 pt-1.5">
+                        <div class="flex justify-between items-center text-[10px] font-medium text-zinc-500">
+                            <span>Checklist</span>
+                            <span>${doneSub}/${subtasks.length} (${Math.round((doneSub/subtasks.length)*100)}%)</span>
+                        </div>
+                        <div class="w-full bg-zinc-100 rounded-full h-1.5 overflow-hidden">
+                            <div class="${progressBgClass} h-1.5 rounded-full transition-all" style="width:${Math.round((doneSub/subtasks.length)*100)}%"></div>
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${isCompleted ? `
+                    <div class="pt-2 mt-2 border-t border-zinc-100 text-[10px] font-medium text-zinc-400">
+                        Completed on ${t.completed_date ? escHtml(t.completed_date) : todayStr}
+                    </div>
+                ` : ''}
+
+            </div>
+            `;
+        });
+    }
+    $(`#kanban-${col.key}`).html(html);
+}
+
 function renderKanbanColumns(tasks) {
-    let colHtml = '';
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
@@ -1863,269 +2137,83 @@ function renderKanbanColumns(tasks) {
         return t;
     });
 
+    const shellContainer = $('#panel-view-kanban');
+    if (shellContainer.children().length !== coraTaskState.columns.length) {
+        let colHtml = '';
+        coraTaskState.columns.forEach(col => {
+            let iconSvg = '';
+            if (col.icon === 'list') {
+                iconSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>`;
+            } else if (col.icon === 'clock') {
+                iconSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            } else if (col.icon === 'eye') {
+                iconSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>`;
+            } else if (col.icon === 'check') {
+                iconSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            } else {
+                iconSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>`;
+            }
+
+            colHtml += `
+            <div class="cora-kanban-col" data-status="${col.key}" ondragover="coraTaskDragOver(event, this)" ondragleave="coraTaskDragLeave(event, this)" ondrop="coraTaskDrop(event, this)">
+                <div class="mb-4 flex flex-col gap-3 shrink-0 px-1 pt-1">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <div class="cora-col-icon-circle ${col.color}">
+                                ${iconSvg}
+                            </div>
+                            <span class="text-xs font-black text-zinc-900 uppercase tracking-wider">${escHtml(col.name)}</span>
+                            <span class="text-[10px] text-zinc-500 font-bold bg-white border border-zinc-200/50 px-2 py-0.5 rounded-full" id="count-kanban-${col.key}">0</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="coraOpenCreateTaskDrawer(event, '${col.key}')" class="w-6 h-6 rounded-full border border-zinc-200 bg-white text-zinc-400 hover:text-zinc-900 transition-all flex items-center justify-center cursor-pointer font-bold text-xs" title="Quick Add Task">+</button>
+                            <button onclick="coraOpenColumnsManager(event)" class="text-zinc-400 hover:text-zinc-900 transition-colors p-1" title="Column Options">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] text-zinc-400 font-medium pt-2 border-t border-zinc-200/60">
+                        <span>Total Tasks</span>
+                        <span class="cora-col-sum-${col.key}" id="sum-kanban-${col.key}">0</span>
+                    </div>
+                    
+                    <!-- Column Level Search Box -->
+                    <div class="relative mt-1">
+                        <input type="text" id="col-search-${col.key}" placeholder="Filter column..." oninput="coraFilterColumnTasks('${col.key}', this.value)" class="cora-col-search-input" value="${escHtml(window.coraColumnQueries[col.key] || '')}">
+                        <svg class="w-3.5 h-3.5 absolute right-2.5 top-2.5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </div>
+                </div>
+                <div class="space-y-3.5 flex-1 overflow-y-auto pr-0.5" id="kanban-${col.key}">
+                    <!-- Tasks rendered dynamically -->
+                </div>
+                <button onclick="coraOpenCreateTaskDrawer(event, '${col.key}')" class="cora-col-add-task-btn btn-${col.key}">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                    Add Task
+                </button>
+            </div>
+            `;
+        });
+        shellContainer.html(colHtml);
+    }
+
     coraTaskState.columns.forEach(col => {
-        const colTasks = normalizedTasks.filter(t => (t.status || 'todo') === col.key);
+        const rawColTasks = normalizedTasks.filter(t => (t.status || 'todo') === col.key);
         
-        let iconSvg = '';
-        if (col.icon === 'list') {
-            iconSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>`;
-        } else if (col.icon === 'clock') {
-            iconSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
-        } else if (col.icon === 'eye') {
-            iconSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>`;
-        } else if (col.icon === 'check') {
-            iconSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
-        } else {
-            iconSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>`;
+        let colTasks = rawColTasks;
+        const colQuery = window.coraColumnQueries[col.key] || '';
+        if (colQuery) {
+            colTasks = colTasks.filter(t => 
+                (t.title || '').toLowerCase().includes(colQuery) || 
+                (t.client_name || '').toLowerCase().includes(colQuery) ||
+                (t.booking_title || '').toLowerCase().includes(colQuery) ||
+                (t.assignee_name || '').toLowerCase().includes(colQuery)
+            );
         }
-
-        colHtml += `
-        <div class="cora-kanban-col" data-status="${col.key}" ondragover="coraTaskDragOver(event, this)" ondragleave="coraTaskDragLeave(event, this)" ondrop="coraTaskDrop(event, this)">
-            <div class="mb-4 flex flex-col gap-3 shrink-0 px-1 pt-1">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2.5">
-                        <div class="cora-col-icon-circle ${col.color}">
-                            ${iconSvg}
-                        </div>
-                        <span class="text-xs font-black text-zinc-900 uppercase tracking-wider">${escHtml(col.name)}</span>
-                        <span class="text-[10px] text-zinc-500 font-bold bg-white border border-zinc-200/50 px-2 py-0.5 rounded-full" id="count-kanban-${col.key}">${colTasks.length}</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <button onclick="coraOpenCreateTaskDrawer(event, '${col.key}')" class="w-6 h-6 rounded-full border border-zinc-200 bg-white text-zinc-400 hover:text-zinc-900 transition-all flex items-center justify-center cursor-pointer font-bold text-xs" title="Quick Add Task">+</button>
-                        <button onclick="coraOpenColumnsManager(event)" class="text-zinc-400 hover:text-zinc-900 transition-colors p-1" title="Column Options">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" /></svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between text-[11px] text-zinc-400 font-medium pt-2 border-t border-zinc-200/60">
-                    <span>Total Tasks</span>
-                    <span class="cora-col-sum-${col.key}" id="sum-kanban-${col.key}">${colTasks.length}</span>
-                </div>
-            </div>
-            <div class="space-y-3.5 flex-1 overflow-y-auto pr-0.5" id="kanban-${col.key}">
-                <!-- Tasks rendered dynamically -->
-            </div>
-            <button onclick="coraOpenCreateTaskDrawer(event, '${col.key}')" class="cora-col-add-task-btn btn-${col.key}">
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                Add Task
-            </button>
-        </div>
-        `;
-    });
-    $('#panel-view-kanban').html(colHtml);
-
-    // Render cards into columns
-    coraTaskState.columns.forEach(col => {
-        const colTasks = normalizedTasks.filter(t => (t.status || 'todo') === col.key);
-        let html = '';
-        if (colTasks.length === 0) {
-            html = '<div class="text-center text-zinc-400 text-xs py-12 font-medium">No tasks in this stage</div>';
-        } else {
-        colTasks.forEach(t => {
-                const subtasks = t.subtasks || [];
-                const doneSub = subtasks.filter(s => s.completed).length;
-                
-                const clientNameStr = t.client_name || 'General';
-                const cColor = clientBadgeColor(clientNameStr);
-                
-                // Format client name to match mockup exactly
-                let suffix = '';
-                const clientLower = clientNameStr.toLowerCase();
-                if (clientLower.includes('towers') || clientLower.includes('estate') || clientLower.includes('group') || clientLower.includes('llp')) {
-                    suffix = ' COMMERCIAL';
-                } else if (clientLower.includes('rohan') || clientLower.includes('priya') || clientLower.includes('wedding')) {
-                    suffix = ' WEDDING';
-                }
-                const formattedClientName = clientNameStr.toUpperCase().replace(' LLP', '') + suffix;
-
-                const isCompleted = t.status === 'done';
-                
-                // Priority / Status icon (Top right)
-                let topIcon = '';
-                if (isCompleted) {
-                    topIcon = `<div class="w-4 h-4 rounded-full bg-white border border-emerald-500 text-emerald-500 flex items-center justify-center"><svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
-                } else {
-                    let dotColor = 'bg-emerald-500';
-                    if (t.priority === 'urgent') dotColor = 'bg-rose-500';
-                    else if (t.priority === 'high') dotColor = 'bg-amber-500';
-                    topIcon = `<div class="w-2.5 h-2.5 rounded-full ${dotColor}"></div>`;
-                }
-
-                // Due Date logic
-                let dueDateHtml = '';
-                if (t.due_date && !isCompleted) {
-                    const due = new Date(t.due_date + 'T00:00:00');
-                    const diffTime = due - today;
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                    
-                    const calSvg = (colorClass) => `<svg class="w-3 h-3 ${colorClass} inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
-
-                    if (t.due_date < todayStr) {
-                        if (t.status === 'inprogress') {
-                            dueDateHtml = `<span class="text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-md flex items-center">${calSvg('text-rose-700')} Overdue</span>`;
-                        } else {
-                            dueDateHtml = `<span class="text-[10px] font-bold text-rose-600 flex items-center">${calSvg('text-rose-600')} Overdue</span>`;
-                        }
-                    } else if (t.due_date === todayStr) {
-                        dueDateHtml = `<span class="text-[10px] font-bold text-amber-850 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md uppercase tracking-wide">DUE TODAY</span>`;
-                    } else if (t.due_date === tomorrowStr) {
-                        dueDateHtml = `<span class="text-[10px] font-bold text-rose-600 flex items-center">${calSvg('text-rose-650')} Due in 1 day</span>`;
-                    } else {
-                        dueDateHtml = `<span class="text-[10px] font-bold text-zinc-600 flex items-center">${calSvg('text-zinc-500')} Due in ${diffDays} days</span>`;
-                    }
-                }
-
-                // Deliverable
-                const deliverableHtml = t.deliverable_type 
-                    ? `<span class="text-[10px] font-bold text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded-md border border-zinc-200/60">${escHtml(t.deliverable_type)}</span>` 
-                    : '';
-
-                // Time / Duration calculations
-                const taskCreatedMs = isNaN(t.id) ? Date.now() - 3 * 24 * 60 * 60 * 1000 : parseInt(t.id);
-                const diffCreatedMs = Date.now() - taskCreatedMs;
-                const daysActive = Math.floor(diffCreatedMs / (1000 * 60 * 60 * 24));
-                let durationBadge = '';
-                if (t.status === 'inprogress') {
-                    durationBadge = daysActive > 0 
-                        ? `<span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span> Active ${daysActive}d</span>`
-                        : `<span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span> Active today</span>`;
-                }
-
-                // Action Buttons
-                let actionBtn = '';
-                if (!isCompleted) {
-                    const currentIdx = coraTaskState.columns.findIndex(c => c.key === t.status);
-                    if (currentIdx !== -1 && currentIdx < coraTaskState.columns.length - 1) {
-                        const nextCol = coraTaskState.columns[currentIdx + 1];
-                        let btnText = 'Next &rarr;';
-                        let btnColorClass = 'text-zinc-600 border-zinc-300 hover:bg-zinc-50';
-                        if (nextCol.key === 'inprogress' || nextCol.key === 'in_progress') {
-                            btnText = 'Start &rarr;';
-                            btnColorClass = 'text-amber-600 border-amber-300 hover:bg-amber-50';
-                        } else if (nextCol.key === 'review' || nextCol.key === 'client_review') {
-                            btnText = 'Review &rarr;';
-                            btnColorClass = 'text-blue-600 border-blue-300 hover:bg-blue-50';
-                        } else if (nextCol.key === 'done') {
-                            btnText = 'Complete &check;';
-                            btnColorClass = 'text-emerald-600 border-emerald-300 hover:bg-emerald-50';
-                        }
-                        actionBtn = `<button onclick="coraQuickMoveTask(event, '${t.id}', '${nextCol.key}')" class="text-[11px] font-bold ${btnColorClass} bg-white border px-3 py-1 rounded-lg transition-colors cursor-pointer flex items-center gap-1">${btnText}</button>`;
-                    }
-                }
-
-                // Assignee & Role mapping to match mockup exactly
-                const assigneeName = t.assignee_name || 'Unassigned';
-                const assigneeInitial = assigneeName.charAt(0).toUpperCase();
-                let assigneeRole = 'Team Member';
-                if (assigneeName.includes('Karan')) assigneeRole = 'Drone Pilot';
-                else if (assigneeName.includes('Rohan')) assigneeRole = 'PM';
-                else if (assigneeName.includes('Aarav')) {
-                    assigneeRole = isCompleted ? 'Senior Editor' : 'Editor';
-                } else if (assigneeName.includes('Shruti')) {
-                    assigneeRole = t.status === 'in_progress' || t.status === 'inprogress' ? 'Designer' : 'Admin';
-                }
-
-                // Progress bar color matching stage
-                let progressBgClass = 'bg-zinc-950';
-                if (t.status === 'in_progress' || t.status === 'inprogress') progressBgClass = 'bg-amber-500';
-                else if (t.status === 'client_review' || t.status === 'review') progressBgClass = 'bg-blue-600';
-
-                // Notice Warnings or Appreciation
-                let alertHtml = '';
-                if (isCompleted) {
-                    alertHtml = `<div class="text-[10.5px] font-bold text-emerald-700 bg-emerald-50/70 border border-emerald-100 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5">
-                        <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        <span>🎉 Excellent work, team!</span>
-                    </div>`;
-                } else if (t.due_date && t.due_date < todayStr) {
-                    const daysOverdue = Math.floor((today - new Date(t.due_date + 'T00:00:00')) / (1000 * 60 * 60 * 24));
-                    alertHtml = `<div class="text-[10.5px] font-bold text-rose-700 bg-rose-50/80 border border-rose-200 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5 animate-pulse">
-                        <svg class="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                        <span>SLA Warning: Overdue ${daysOverdue || 1}d!</span>
-                    </div>`;
-                } else if (t.due_date && t.due_date === todayStr) {
-                    alertHtml = `<div class="text-[10.5px] font-bold text-amber-850 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5">
-                        <svg class="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3" /></svg>
-                        <span>⚠️ Action Required: Due Today</span>
-                    </div>`;
-                } else if (t.priority === 'urgent') {
-                    alertHtml = `<div class="text-[10.5px] font-bold text-rose-700 bg-rose-50/70 border border-rose-100 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5">
-                        <span>🔥 Escalated urgent priority</span>
-                    </div>`;
-                }
-
-                html += `
-                <!-- Task Card -->
-                <div class="cora-task-card bg-white rounded-2xl border border-zinc-200/80 p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer space-y-2.5" data-id="${t.id}" draggable="true" ondragstart="coraTaskDragStart(event, this)" ondragend="coraTaskDragEnd(event, this)" onclick="coraOpenTaskDetailsDrawer(event, '${t.id}')">
-                    
-                    <!-- Header -->
-                    <div class="flex justify-between items-start">
-                        <span class="uppercase font-extrabold text-[10px] px-2 py-0.5 rounded-md truncate max-w-[170px]" style="background-color: ${cColor.bg}; color: ${cColor.text};">
-                            ${escHtml(formattedClientName)}
-                        </span>
-                        <div class="shrink-0 mt-0.5">${topIcon}</div>
-                    </div>
-
-                    <!-- Title & Subtitle -->
-                    <div class="space-y-0.5">
-                        <h4 class="text-sm font-bold text-zinc-950 leading-snug break-words ${isCompleted ? 'text-zinc-550 line-through' : ''}">
-                            ${escHtml(t.title)}
-                        </h4>
-                        ${t.booking_title ? `<div class="text-[11px] text-zinc-500 font-medium truncate">Shoot: ${escHtml(t.booking_title)}</div>` : ''}
-                    </div>
-
-                    <!-- Tags Row -->
-                    <div class="flex items-center gap-1.5 flex-wrap pt-1">
-                        ${deliverableHtml}
-                        ${dueDateHtml}
-                        ${durationBadge}
-                    </div>
-
-                    <!-- Alerts & Notices -->
-                    ${alertHtml}
-
-                    <!-- Assignee Row -->
-                    <div class="flex items-center justify-between pt-2">
-                        <div class="flex items-center gap-1.5 truncate pr-2">
-                            <div class="w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
-                                ${assigneeInitial}
-                            </div>
-                            <div class="flex flex-col truncate text-left">
-                                <span class="text-[11px] text-zinc-800 font-bold truncate leading-none">
-                                    ${escHtml(assigneeName)}
-                                </span>
-                                <span class="text-[9px] text-zinc-400 font-semibold truncate mt-0.5">
-                                    ${escHtml(assigneeRole)}
-                                </span>
-                            </div>
-                        </div>
-                        ${actionBtn ? `<div class="shrink-0">${actionBtn}</div>` : ''}
-                    </div>
-
-                    <!-- Footer: Checklist or Completed Date -->
-                    ${!isCompleted && subtasks.length > 0 ? `
-                        <div class="space-y-1 pt-1.5">
-                            <div class="flex justify-between items-center text-[10px] font-medium text-zinc-500">
-                                <span>Checklist</span>
-                                <span>${doneSub}/${subtasks.length} (${Math.round((doneSub/subtasks.length)*100)}%)</span>
-                            </div>
-                            <div class="w-full bg-zinc-100 rounded-full h-1.5 overflow-hidden">
-                                <div class="${progressBgClass} h-1.5 rounded-full transition-all" style="width:${Math.round((doneSub/subtasks.length)*100)}%"></div>
-                            </div>
-                        </div>
-                    ` : ''}
-
-                    ${isCompleted ? `
-                        <div class="pt-2 mt-2 border-t border-zinc-100 text-[10px] font-medium text-zinc-400">
-                            Completed on ${t.completed_date ? escHtml(t.completed_date) : todayStr}
-                        </div>
-                    ` : ''}
-
-                </div>
-                `;
-            });
-        }
-        $(`#kanban-${col.key}`).html(html);
+        
+        renderSingleColumnCards(col, colTasks, today, todayStr, tomorrowStr);
+        
+        $(`#count-kanban-${col.key}`).text(colTasks.length);
+        $(`#sum-kanban-${col.key}`).text(colTasks.length);
     });
 }
 
