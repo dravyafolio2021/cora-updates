@@ -1,11 +1,11 @@
 {
     "name": "Cora Workspace Platform",
     "slug": "cora-workspace",
-    "version": "2.2.1",
-    "download_url": "https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-workspace.zip",
+    "version": "2.4.4",
+    "download_url": "https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-workspace.zip",
     "tested": "6.7",
     "sections": {
         "description": "A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.",
-        "changelog": "<h4>2.2.1 — Industry Mode Switcher & Workspace Scoping</h4><ul><li><strong>Industry Mode Switcher</strong>: Dedicated Shruti Admin toggle in sidebar header to switch between Real Estate and Studio modes in 1 click.</li><li><strong>Independent Workspace Scoping</strong>: Multi-user workspace data isolation per domain slug (app.heycora.in/{{slug}}).</li><li><strong>Role Permission Seeding</strong>: Updated default capability matrices for all Real Estate and Studio roles.</li></ul>"
+        "changelog": "<h4>2.4.4 — Fail-safe transient injection & OPcache locks bypass</h4><ul><li><strong>OPcache Locks Bypass</strong>: Programmatically flush memory file locks during execution immediately before the extraction process, eliminating permission errors during file directory swap.</li><li><strong>Fail-safe transient injection</strong>: Implemented manual force transient updates injection prior to running WordPress programmatic updates, ensuring WordPress reliably finds and executes plugin package upgrades.</li><li><strong>Global Scope Class Declarations</strong>: Relocated `Cora_Upgrade_Skin` to a dedicated file at the global scope, resolving PHP class nesting compilation errors.</li><li><strong>Real-Time Upgrade Progress Bar</strong>: Custom percentage indicator showing the download, verify, backup, and extraction status in real-time.</li><li><strong>Custom Dialogue UI Integration</strong>: High-fidelity confirm modals replacing the browser-native dialog popup.</li></ul>"
     }
 }

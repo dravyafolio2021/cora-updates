@@ -10768,6 +10768,13 @@ jQuery(document).ready(function($) {
         const stage = $('#cora-lead-stage-filter').val() || 'all';
         const assignee = $('#cora-lead-assignee-filter').val() || 'all';
 
+        // Build contextual empty message
+        const emptyMsg = query
+            ? `No leads match "<strong>${query}</strong>". Try a different name or email.`
+            : 'No leads match the selected filters. Try broadening your search.';
+
+        // ── Card Grid ─────────────────────────────────────────────
+        let visibleCards = 0;
         $('.cora-lead-card').each(function() {
             const name = ($(this).attr('data-name') || '').toLowerCase();
             const email = ($(this).attr('data-email') || '').toLowerCase();
@@ -10780,12 +10787,24 @@ jQuery(document).ready(function($) {
 
             if (matchesQuery && matchesStage && matchesAssignee) {
                 $(this).removeClass('hidden');
+                visibleCards++;
             } else {
                 $(this).addClass('hidden');
             }
         });
 
-        $('#cora-leads-table-body tr').each(function() {
+        const $gridEmpty = $('#cora-grid-empty-state');
+        const $gridMsg   = $('#cora-grid-empty-msg');
+        if (visibleCards === 0 && $('.cora-lead-card').length > 0) {
+            $gridMsg.html(emptyMsg);
+            $gridEmpty.removeClass('hidden');
+        } else {
+            $gridEmpty.addClass('hidden');
+        }
+
+        // ── Table View ────────────────────────────────────────────
+        let visibleRows = 0;
+        $('#cora-leads-table-body tr:not(#cora-table-empty-state)').each(function() {
             const text = $(this).text().toLowerCase();
             const assignedTo = ($(this).attr('data-assigned-to') || '').toString().toLowerCase();
             const statusCell = $(this).find('td:nth-child(4)').text().toLowerCase();
@@ -10796,10 +10815,20 @@ jQuery(document).ready(function($) {
 
             if (matchesQuery && matchesStage && matchesAssignee) {
                 $(this).removeClass('hidden');
+                visibleRows++;
             } else {
                 $(this).addClass('hidden');
             }
         });
+
+        const $tableEmpty = $('#cora-table-empty-state');
+        const $tableMsg   = $('#cora-table-empty-msg');
+        if (visibleRows === 0 && $('#cora-leads-table-body tr:not(#cora-table-empty-state)').length > 0) {
+            $tableMsg.html(emptyMsg);
+            $tableEmpty.removeClass('hidden');
+        } else {
+            $tableEmpty.addClass('hidden');
+        }
     };
 
     // Update Lead Assignee

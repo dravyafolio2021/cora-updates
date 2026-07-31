@@ -187,57 +187,58 @@ window.coraUpdateStageBadgePreview = function(selectEl) {
     selectEl.className = cleanedClasses.join(' ') + ' ' + selectedVal;
 };
 
-window.coraSelectStageColor = function(buttonEl, badgeClass) {
-    const container = buttonEl.closest('.cora-color-picker-container');
-    if (!container) return;
-    const select = container.querySelector('.cora-stage-badge-select');
-    if (!select) return;
+// ============================================================
+// CORA STAGE COLOR PICKER — Native input[type=color] handler
+// ============================================================
 
-    select.value = badgeClass;
+window.coraStageColorChange = function(inputEl) {
+    var hex = inputEl.value;
+    var row = inputEl.closest('.cora-stage-config-row');
+    if (!row) return;
 
-    const event = new Event('change', { bubbles: true });
-    select.dispatchEvent(event);
+    // Update the visible swatch circle
+    var swatch = row.querySelector('.cora-stage-color-swatch');
+    if (swatch) swatch.style.background = hex;
 
-    container.querySelectorAll('.cora-color-pill').forEach(btn => {
-        btn.classList.remove('ring-2', 'ring-zinc-950', 'dark:ring-white', 'ring-offset-2', 'scale-110');
-    });
-    buttonEl.classList.add('ring-2', 'ring-zinc-950', 'dark:ring-white', 'ring-offset-2', 'scale-110');
-};
+    // Store hex on row for save handler
+    row.setAttribute('data-badge-hex', hex);
 
-window.coraCycleStageColor = function(buttonEl) {
-    const container = buttonEl.closest('.cora-stage-config-row');
-    if (!container) return;
-    const select = container.querySelector('.cora-stage-badge-select');
-    if (!select) return;
-
-    const options = Array.from(select.options);
-    let currIdx = options.findIndex(opt => opt.selected);
-    let nextIdx = (currIdx + 1) % options.length;
-    options.forEach(opt => opt.selected = false);
-    options[nextIdx].selected = true;
-    select.value = options[nextIdx].value;
-
-    const event = new Event('change', { bubbles: true });
-    select.dispatchEvent(event);
-
-    const bgMap = {
-        'blue': 'bg-blue-500',
-        'amber': 'bg-amber-500',
-        'purple': 'bg-purple-500',
-        'indigo': 'bg-indigo-500',
-        'emerald': 'bg-emerald-500',
-        'rose': 'bg-rose-500',
-        'zinc': 'bg-zinc-500'
-    };
-    let matchedColor = 'zinc';
-    for (let c in bgMap) {
-        if (select.value.includes(c)) {
-            matchedColor = c;
-            break;
+    // Try to match a known palette entry and sync the hidden badge select
+    var palette = [
+        ['#22c55e','bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'],
+        ['#f59e0b','bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800'],
+        ['#3b82f6','bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800'],
+        ['#8b5cf6','bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-200 dark:border-violet-800'],
+        ['#ec4899','bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-200 dark:border-pink-800'],
+        ['#f43f5e','bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800'],
+        ['#0ea5e9','bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-200 dark:border-sky-800'],
+        ['#6366f1','bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800'],
+        ['#a855f7','bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800'],
+        ['#f97316','bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800'],
+        ['#14b8a6','bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-200 dark:border-teal-800'],
+        ['#84cc16','bg-lime-500/10 text-lime-600 dark:text-lime-400 border-lime-200 dark:border-lime-800'],
+        ['#ef4444','bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800'],
+        ['#06b6d4','bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-200 dark:border-cyan-800'],
+        ['#d946ef','bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 border-fuchsia-200 dark:border-fuchsia-800'],
+        ['#71717a','bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800']
+    ];
+    var select = row.querySelector('.cora-stage-badge-select');
+    if (select) {
+        var matched = palette.find(function(e) { return e[0] === hex; });
+        if (matched) {
+            Array.from(select.options).forEach(function(opt) {
+                opt.selected = (opt.value === matched[1]);
+            });
         }
+        select.dispatchEvent(new Event('change', { bubbles: true }));
     }
-    buttonEl.className = `w-6 h-6 rounded-full ${bgMap[matchedColor]} ring-2 ring-zinc-950 dark:ring-white ring-offset-2 shrink-0 cursor-pointer shadow-2xs hover:scale-105 transition-all`;
 };
+
+// Kept for backward compat — unused but referenced by old HTML
+window.coraSelectStageColor = function() {};
+window.coraCycleStageColor  = function() {};
+window.coraOpenStagePicker  = function() {};
+
 </script>
 <?php
 
@@ -965,32 +966,45 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
             </div>
             <?php endforeach; ?>
         </div>
+    </div>
 
-        <!-- SUB-TAB 2: LEADS DIRECTORY (RESPONSIVE CARD GRID & VIEW SWITCHER) -->
+    <!-- SUB-TAB 2: LEADS DIRECTORY (RESPONSIVE CARD GRID & VIEW SWITCHER) -->
     <div id="cora-lead-pane-directory" class="cora-lead-tab-pane <?php echo ($cora_initial_subtab === 'directory') ? '' : 'hidden'; ?> space-y-4">
         
-        <!-- Directory Header Toolbar with View Mode Toggle -->
+        <!-- Directory Header Toolbar with View Mode Toggle + Column Density Picker -->
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs">
             <div class="flex items-center gap-2">
                 <span class="font-extrabold text-xs text-zinc-950 dark:text-white tracking-tight uppercase">Prospect Directory</span>
                 <span class="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-[10.5px] font-bold text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-700/60" id="cora-directory-total-badge"><?php echo count($cora_leads_raw); ?> Total Leads</span>
             </div>
 
-            <!-- View Mode Switcher: Cards Grid vs Table List -->
-            <div class="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl text-xs font-semibold self-end sm:self-auto">
-                <button type="button" id="cora-dir-view-btn-grid" class="px-3 py-1.5 rounded-lg transition-all cursor-pointer bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-extrabold shadow-2xs flex items-center gap-1.5" onclick="coraSwitchDirectoryViewMode('grid')">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect></svg>
-                    <span>Card Grid</span>
-                </button>
-                <button type="button" id="cora-dir-view-btn-table" class="px-3 py-1.5 rounded-lg transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 dark:hover:text-white flex items-center gap-1.5" onclick="coraSwitchDirectoryViewMode('table')">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-                    <span>Table List</span>
-                </button>
+            <!-- Col density + view switcher: desktop only (mobile always shows card grid) -->
+            <div class="hidden sm:flex items-center gap-2 self-end sm:self-auto flex-wrap justify-end">
+
+                <!-- Column Density Picker (only visible in card grid mode) -->
+                <div id="cora-dir-col-picker" class="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl text-xs font-semibold">
+                    <span class="px-1.5 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Cols</span>
+                    <button type="button" id="cora-dir-col-btn-1" class="w-7 h-7 rounded-lg transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 dark:hover:text-white font-bold text-[11px] flex items-center justify-center" onclick="coraSetGridColumns(1)" title="1 column">1</button>
+                    <button type="button" id="cora-dir-col-btn-2" class="w-7 h-7 rounded-lg transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 dark:hover:text-white font-bold text-[11px] flex items-center justify-center" onclick="coraSetGridColumns(2)" title="2 columns">2</button>
+                    <button type="button" id="cora-dir-col-btn-3" class="w-7 h-7 rounded-lg transition-all cursor-pointer bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-extrabold shadow-2xs flex items-center justify-center text-[11px]" onclick="coraSetGridColumns(3)" title="3 columns (max)">3</button>
+                </div>
+
+                <!-- View Mode Switcher: Cards Grid vs Table List -->
+                <div class="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl text-xs font-semibold">
+                    <button type="button" id="cora-dir-view-btn-grid" class="px-3 py-1.5 rounded-lg transition-all cursor-pointer bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-extrabold shadow-2xs flex items-center gap-1.5" onclick="coraSwitchDirectoryViewMode('grid')">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect></svg>
+                        <span>Card Grid</span>
+                    </button>
+                    <button type="button" id="cora-dir-view-btn-table" class="px-3 py-1.5 rounded-lg transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 dark:hover:text-white flex items-center gap-1.5" onclick="coraSwitchDirectoryViewMode('table')">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                        <span>Table List</span>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- VIEW MODE 1: DESKTOP & MOBILE RESPONSIVE CARD GRID (DEFAULT) -->
-        <div id="cora-directory-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <!-- VIEW MODE 1: DESKTOP & MOBILE RESPONSIVE CARD GRID (DEFAULT, MAX 3 COLS) -->
+        <div id="cora-directory-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <?php if ( empty($cora_leads_raw) ) : ?>
                 <div class="col-span-full p-8 text-center text-zinc-400 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl">
                     No leads registered in workspace yet. Click "Add Lead" to create your first inquiry.
@@ -1101,6 +1115,18 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                 </div>
                 <?php endforeach; ?>
             <?php endif; ?>
+            <!-- Filter empty state (shown by JS when search/filter yields 0 results) -->
+            <div id="cora-grid-empty-state" class="col-span-full hidden">
+                <div class="flex flex-col items-center justify-center gap-4 py-16 px-6 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl">
+                    <div class="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 dark:text-zinc-500"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-sm font-bold text-zinc-800 dark:text-zinc-200">No leads found</p>
+                        <p id="cora-grid-empty-msg" class="text-xs text-zinc-400 dark:text-zinc-500 mt-1">Try adjusting your search or filters.</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- VIEW MODE 2: TABLE LIST VIEW (OPTIONAL TOGGLE) -->
@@ -1258,141 +1284,24 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                             </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
+                        <!-- Filter empty state row (shown by JS) -->
+                        <tr id="cora-table-empty-state" class="hidden">
+                            <td colspan="9">
+                                <div class="flex flex-col items-center justify-center gap-3 py-14 px-6">
+                                    <div class="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 dark:text-zinc-500"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                    </div>
+                                    <div class="text-center">
+                                        <p class="text-sm font-bold text-zinc-800 dark:text-zinc-200">No leads found</p>
+                                        <p id="cora-table-empty-msg" class="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">Try adjusting your search or filters.</p>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-        </div>
-
-        <!-- Redesigned Mobile Card List View (Visible on Mobile Only) -->
-        <div class="block md:hidden space-y-3 px-0.5">
-            <?php if ( empty($cora_leads_raw) ) : ?>
-                <div class="p-6 text-center text-zinc-400 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl">
-                    No leads registered in workspace yet. Click "Add Lead" to create your first inquiry.
-                </div>
-            <?php else : ?>
-                <?php foreach ( $cora_leads_raw as $lead ) : 
-                    $st = $lead['status'] ?? 'New Lead';
-                    $style = $stage_styles[$st] ?? $fallback_style;
-                    $badge = $stages_summary[$st]['badge'] ?? 'bg-zinc-100 text-zinc-800';
-                    $score = strtolower($lead['score'] ?? 'warm');
-                    $is_won_lead = ( $st === 'Converted' );
-
-                    // Map left indicator stroke and score badge according to temperature psychology
-                    if ($is_won_lead) {
-                        $pill_class = 'bg-emerald-50/80 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300';
-                        $dot_color_class = 'bg-emerald-500';
-                        $score_label = 'Won';
-                        $score_icon = '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-                    } else if ($score === 'hot') {
-                        $pill_class = 'bg-rose-50/80 dark:bg-rose-950/20 text-rose-800 dark:text-rose-300';
-                        $dot_color_class = 'bg-rose-500';
-                        $score_label = 'Hot';
-                        $score_icon = '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2c.6 3.3 4 6 4 10a4 4 0 1 1-8 0c0-4 3.4-6.7 4-10z"></path></svg>';
-                    } else if ($score === 'cold') {
-                        $pill_class = 'bg-sky-50/80 dark:bg-sky-950/20 text-sky-800 dark:text-sky-300';
-                        $dot_color_class = 'bg-sky-500';
-                        $score_label = 'Cold';
-                        $score_icon = '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 12H4M12 20V4M17.66 17.66L6.34 6.34M17.66 6.34L6.34 17.66"/></svg>';
-                    } else {
-                        $pill_class = 'bg-amber-50/80 dark:bg-amber-950/20 text-amber-800 dark:text-amber-300';
-                        $dot_color_class = 'bg-amber-500';
-                        $score_label = 'Warm';
-                        $score_icon = '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line></svg>';
-                    }
-
-                    $format_tag = $lead['format'] ?? 'Photoshoot';
-                    $assignee_name = $lead['assignee_name'] ?? 'Shruti Sharma';
-                    $assignee_role = $lead['assignee_role'] ?? 'Super Admin';
-                    if ( $assignee_role === 'Super Admin' ) {
-                        $assignee_role = 'Admin';
-                    }
-                    $assignee_init = $lead['assignee_init'] ?? strtoupper(substr($lead['names'] ?? 'S', 0, 1));
-                    $checklist = $lead['checklist'] ?? '1/2 (50%)';
-                    $checklist_pct = $lead['checklist_pct'] ?? 50;
-                    $price_display = $lead['price'] ?? '0';
-                ?>
-                <div class="cora-lead-card bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col gap-3 relative" onclick="coraOpenLeadDetailDrawer('<?php echo esc_attr($lead['id']); ?>')">
-                     <!-- Top Row: Client Name & Temperature Badge -->
-                     <div class="flex items-center justify-between gap-2">
-                         <span class="font-bold text-[10px] uppercase tracking-wider truncate max-w-[160px] <?php echo $style['accent_color']; ?>">
-                             <?php echo esc_html( $lead['names'] ); ?>
-                         </span>
-                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold <?php echo $pill_class; ?>" title="<?php echo esc_attr($score_label); ?>">
-                             <?php echo $score_icon; ?>
-                             <?php echo esc_html($score_label); ?>
-                         </span>
-                     </div>
-
-                     <!-- Project Title & Location -->
-                     <div>
-                         <h4 class="font-bold text-zinc-950 dark:text-white text-[14px] tracking-tight leading-tight truncate">
-                             <?php echo esc_html( $lead['scale'] ?? 'Standard Shoot' ); ?>
-                         </h4>
-                         <p class="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium mt-0.5 truncate">
-                             <?php echo esc_html( $lead['city'] ?? 'Location TBD' ); ?>
-                         </p>
-                     </div>
-
-                     <!-- Price & Format Tag Row -->
-                     <div class="flex items-center justify-between gap-1.5">
-                         <span class="font-extrabold text-[13px] text-zinc-950 dark:text-white tracking-tight">
-                             <?php echo esc_html( $price_display ); ?>
-                         </span>
-                         <span class="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 font-semibold text-[9px] uppercase tracking-wider truncate max-w-[100px]">
-                             <?php echo esc_html( $format_tag ); ?>
-                         </span>
-                     </div>
-
-                     <!-- Progress Checklist Row -->
-                     <div class="space-y-1 -mt-0.5">
-                         <div class="flex items-center justify-between text-[9px] font-semibold text-zinc-400 dark:text-zinc-500">
-                             <span>Progress</span>
-                             <span class="text-zinc-500 dark:text-zinc-400"><?php echo esc_html( $checklist ); ?></span>
-                         </div>
-                         <div class="w-full h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                             <div class="h-full rounded-full transition-all <?php echo $style['progress_bg']; ?>" style="width: <?php echo intval($checklist_pct); ?>%;"></div>
-                         </div>
-                     </div>
-
-                     <?php $stage_info = $stage_action_map[$st] ?? $stage_action_map['New Lead']; ?>
-
-                     <!-- Next Step Milestone Banner -->
-                     <div class="flex items-center justify-between text-[9.5px] font-extrabold px-2.5 py-1 rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200/60 dark:border-zinc-700/60">
-                         <span class="text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[8.5px]">Next Action</span>
-                         <span class="text-zinc-900 dark:text-zinc-100 font-bold truncate max-w-[170px]"><?php echo esc_html($stage_info['next_step']); ?></span>
-                     </div>
-
-                     <!-- Assignee & Action Row -->
-                     <div class="flex items-center justify-between gap-1.5 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                         <div class="flex items-center gap-2 min-w-0">
-                             <div class="w-6 h-6 rounded-full bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[9px] shrink-0 border border-zinc-200 dark:border-zinc-800" title="Assigned to <?php echo esc_attr( $assignee_name ); ?>">
-                                 <?php echo esc_html( $assignee_init ); ?>
-                             </div>
-                             <div class="min-w-0 flex flex-col">
-                                 <?php $first_name = explode(' ', $assignee_name)[0]; ?>
-                                 <?php $display_role = ($assignee_role === 'Just Shruti' || $assignee_role === 'Super Admin') ? 'Admin' : $assignee_role; ?>
-                                 <span class="font-bold text-zinc-900 dark:text-white text-[11px] leading-none truncate"><?php echo esc_html( $first_name ); ?></span>
-                                 <span class="text-[9px] text-zinc-400 dark:text-zinc-500 leading-none mt-0.5"><?php echo esc_html( $display_role ); ?></span>
-                             </div>
-                         </div>
-
-                         <div class="flex items-center gap-1 shrink-0">
-                             <!-- Direct WhatsApp Shortcut -->
-                             <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $lead['phone'] ?? '919876543210'); ?>" target="_blank" onclick="event.stopPropagation()" class="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/80 flex items-center justify-center hover:bg-emerald-100 transition-colors shadow-2xs" title="Chat on WhatsApp">
-                                 <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.67-1.616-.919-2.213-.242-.58-.487-.502-.67-.511l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg>
-                             </a>
-
-                             <!-- Action CTA Button -->
-                             <button type="button" class="px-2.5 py-1.5 font-bold rounded-lg text-[10px] transition-all cursor-pointer flex items-center gap-1 shrink-0 shadow-2xs <?php echo $stage_info['cta_style']; ?>" onclick="event.stopPropagation(); coraOpenLeadDetailDrawer('<?php echo esc_attr($lead['id']); ?>')">
-                                 <?php echo $stage_info['cta_icon']; ?>
-                                 <span><?php echo esc_html($stage_info['cta_label']); ?></span>
-                             </button>
-                         </div>
-                     </div>            
-                 </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
+        </div><!-- /#cora-directory-table-container -->
         <!-- SERVER-SIDE PAGINATION BAR (DESKTOP & MOBILE) -->
         <div id="cora-directory-pagination" class="mt-4 p-3.5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3 text-xs select-none">
             <div class="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 font-medium">
@@ -2329,27 +2238,70 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                         <option value="default" selected>Default Gray</option>
                     </select>
 
+                    <?php
+                    /* Map saved badge class → hex for the native color input */
+                    $badge_val = $s_val['badge'] ?? '';
+                    $swatch_palette = [
+                        'emerald' => '#22c55e', 'amber'   => '#f59e0b', 'blue'    => '#3b82f6',
+                        'violet'  => '#8b5cf6', 'pink'    => '#ec4899', 'rose'    => '#f43f5e',
+                        'sky'     => '#0ea5e9', 'indigo'  => '#6366f1', 'purple'  => '#a855f7',
+                        'orange'  => '#f97316', 'teal'    => '#14b8a6', 'lime'    => '#84cc16',
+                        'red'     => '#ef4444', 'cyan'    => '#06b6d4', 'fuchsia' => '#d946ef',
+                        'zinc'    => '#71717a'
+                    ];
+                    $swatch_hex = '#71717a';
+                    foreach ($swatch_palette as $name => $hex) {
+                        if (strpos($badge_val, $name) !== false) { $swatch_hex = $hex; break; }
+                    }
+                    $picker_id = 'cora-color-input-' . sanitize_key($s_key);
+                    ?>
                     <div class="cora-color-picker-container flex items-center shrink-0">
+                        <!-- Hidden badge select — kept for save handler compatibility -->
                         <select class="cora-stage-badge-select hidden" onchange="coraUpdateStageBadgePreview(this)">
-                            <option value="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800" <?php echo (strpos($s_val['badge'] ?? '', 'blue') !== false) ? 'selected' : ''; ?>>Blue</option>
-                            <option value="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800" <?php echo (strpos($s_val['badge'] ?? '', 'amber') !== false) ? 'selected' : ''; ?>>Amber</option>
-                            <option value="bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800" <?php echo (strpos($s_val['badge'] ?? '', 'purple') !== false) ? 'selected' : ''; ?>>Purple</option>
-                            <option value="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800" <?php echo (strpos($s_val['badge'] ?? '', 'indigo') !== false) ? 'selected' : ''; ?>>Indigo</option>
-                            <option value="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800" <?php echo (strpos($s_val['badge'] ?? '', 'emerald') !== false) ? 'selected' : ''; ?>>Emerald</option>
-                            <option value="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800" <?php echo (strpos($s_val['badge'] ?? '', 'rose') !== false) ? 'selected' : ''; ?>>Rose</option>
-                            <option value="bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800" <?php echo (strpos($s_val['badge'] ?? '', 'zinc') !== false) ? 'selected' : ''; ?>>Zinc</option>
+                            <option value="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800" <?php echo (strpos($badge_val,'emerald')!==false)?'selected':'';?>>Emerald</option>
+                            <option value="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800" <?php echo (strpos($badge_val,'amber')!==false)?'selected':'';?>>Amber</option>
+                            <option value="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800" <?php echo (strpos($badge_val,'blue')!==false && strpos($badge_val,'sky')===false)?'selected':'';?>>Blue</option>
+                            <option value="bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-200 dark:border-violet-800" <?php echo (strpos($badge_val,'violet')!==false)?'selected':'';?>>Violet</option>
+                            <option value="bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-200 dark:border-pink-800" <?php echo (strpos($badge_val,'pink')!==false)?'selected':'';?>>Pink</option>
+                            <option value="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800" <?php echo (strpos($badge_val,'rose')!==false)?'selected':'';?>>Rose</option>
+                            <option value="bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-200 dark:border-sky-800" <?php echo (strpos($badge_val,'sky')!==false)?'selected':'';?>>Sky</option>
+                            <option value="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800" <?php echo (strpos($badge_val,'indigo')!==false)?'selected':'';?>>Indigo</option>
+                            <option value="bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800" <?php echo (strpos($badge_val,'purple')!==false)?'selected':'';?>>Purple</option>
+                            <option value="bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800" <?php echo (strpos($badge_val,'orange')!==false)?'selected':'';?>>Orange</option>
+                            <option value="bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-200 dark:border-teal-800" <?php echo (strpos($badge_val,'teal')!==false)?'selected':'';?>>Teal</option>
+                            <option value="bg-lime-500/10 text-lime-600 dark:text-lime-400 border-lime-200 dark:border-lime-800" <?php echo (strpos($badge_val,'lime')!==false)?'selected':'';?>>Lime</option>
+                            <option value="bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800" <?php echo (strpos($badge_val,'red')!==false)?'selected':'';?>>Red</option>
+                            <option value="bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-200 dark:border-cyan-800" <?php echo (strpos($badge_val,'cyan')!==false)?'selected':'';?>>Cyan</option>
+                            <option value="bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 border-fuchsia-200 dark:border-fuchsia-800" <?php echo (strpos($badge_val,'fuchsia')!==false)?'selected':'';?>>Fuchsia</option>
+                            <option value="bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800" <?php echo (strpos($badge_val,'zinc')!==false)?'selected':'';?>>Zinc</option>
                         </select>
-                        
-                        <?php
-                        $circle_bg = 'bg-zinc-500';
-                        if (strpos($s_val['badge'] ?? '', 'blue') !== false) $circle_bg = 'bg-blue-500';
-                        else if (strpos($s_val['badge'] ?? '', 'amber') !== false) $circle_bg = 'bg-amber-500';
-                        else if (strpos($s_val['badge'] ?? '', 'purple') !== false) $circle_bg = 'bg-purple-500';
-                        else if (strpos($s_val['badge'] ?? '', 'indigo') !== false) $circle_bg = 'bg-indigo-500';
-                        else if (strpos($s_val['badge'] ?? '', 'emerald') !== false) $circle_bg = 'bg-emerald-500';
-                        else if (strpos($s_val['badge'] ?? '', 'rose') !== false) $circle_bg = 'bg-rose-500';
-                        ?>
-                        <button type="button" class="w-6 h-6 rounded-full <?php echo $circle_bg; ?> ring-2 ring-zinc-950 dark:ring-white ring-offset-2 shrink-0 cursor-pointer shadow-2xs hover:scale-105 transition-all" title="Tap to change color theme" onclick="coraCycleStageColor(this)"></button>
+
+                        <!-- Native colour picker: hidden input + styled round swatch label -->
+                        <label for="<?php echo esc_attr($picker_id); ?>" class="cora-stage-color-swatch-label" title="Choose stage colour" style="display:flex;align-items:center;cursor:pointer;">
+                            <!-- The visible round swatch -->
+                            <span class="cora-stage-color-swatch" style="
+                                display:block;
+                                width:26px;height:26px;
+                                border-radius:50%;
+                                background:<?php echo esc_attr($swatch_hex); ?>;
+                                border:2px solid rgba(0,0,0,0.10);
+                                box-shadow:0 1px 3px rgba(0,0,0,0.10),inset 0 0 0 1.5px rgba(255,255,255,0.18);
+                                transition:transform 0.12s,box-shadow 0.12s;
+                                flex-shrink:0;
+                            "
+                            onmouseenter="this.style.transform='scale(1.12)';this.style.boxShadow='0 3px 8px rgba(0,0,0,0.18)'"
+                            onmouseleave="this.style.transform='scale(1)';this.style.boxShadow='0 1px 3px rgba(0,0,0,0.10),inset 0 0 0 1.5px rgba(255,255,255,0.18)'"
+                            ></span>
+                            <!-- The native colour picker — visually zero-size, clicks proxy from label -->
+                            <input
+                                type="color"
+                                id="<?php echo esc_attr($picker_id); ?>"
+                                class="cora-stage-native-color-input"
+                                value="<?php echo esc_attr($swatch_hex); ?>"
+                                oninput="coraStageColorChange(this)"
+                                style="width:0;height:0;padding:0;border:0;opacity:0;position:absolute;"
+                            >
+                        </label>
                     </div>
 
                     <!-- Monochromatic Toggle Switch -->
@@ -2407,26 +2359,71 @@ window.coraSwitchDirectoryViewMode = function(mode) {
     var tableContainer = document.getElementById('cora-directory-table-container');
     var gridBtn = document.getElementById('cora-dir-view-btn-grid');
     var tableBtn = document.getElementById('cora-dir-view-btn-table');
+    var colPicker = document.getElementById('cora-dir-col-picker');
     if (!gridContainer || !tableContainer) return;
 
     if (mode === 'grid') {
         gridContainer.classList.remove('hidden');
         tableContainer.classList.add('hidden');
+        if (colPicker) colPicker.classList.remove('hidden');
         if (gridBtn) {
             gridBtn.className = "px-3 py-1.5 rounded-lg transition-all cursor-pointer bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-extrabold shadow-2xs flex items-center gap-1.5";
         }
         if (tableBtn) {
             tableBtn.className = "px-3 py-1.5 rounded-lg transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 dark:hover:text-white flex items-center gap-1.5";
         }
+        // Restore saved column preference
+        var savedCols = parseInt(localStorage.getItem('cora_grid_cols') || '3');
+        window.coraSetGridColumns(savedCols, true);
     } else {
         gridContainer.classList.add('hidden');
         tableContainer.classList.remove('hidden');
+        if (colPicker) colPicker.classList.add('hidden');
         if (tableBtn) {
             tableBtn.className = "px-3 py-1.5 rounded-lg transition-all cursor-pointer bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-extrabold shadow-2xs flex items-center gap-1.5";
         }
         if (gridBtn) {
             gridBtn.className = "px-3 py-1.5 rounded-lg transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 dark:hover:text-white flex items-center gap-1.5";
         }
+    }
+};
+
+// Column density controller — max 3 columns, persists preference to localStorage
+window.coraSetGridColumns = function(cols, silent) {
+    var grid = document.getElementById('cora-directory-grid-container');
+    if (!grid) return;
+
+    // Clamp to valid range 1–3
+    cols = Math.min(3, Math.max(1, parseInt(cols) || 3));
+
+    // Remove all column classes then apply the chosen one
+    grid.classList.remove(
+        'grid-cols-1', 'grid-cols-2', 'grid-cols-3',
+        'md:grid-cols-1', 'md:grid-cols-2', 'md:grid-cols-3',
+        'lg:grid-cols-1', 'lg:grid-cols-2', 'lg:grid-cols-3'
+    );
+
+    var colMap = {
+        1: ['grid-cols-1'],
+        2: ['grid-cols-1', 'md:grid-cols-2'],
+        3: ['grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3']
+    };
+    (colMap[cols] || colMap[3]).forEach(function(c) { grid.classList.add(c); });
+
+    // Update active state on col picker buttons
+    [1, 2, 3].forEach(function(n) {
+        var btn = document.getElementById('cora-dir-col-btn-' + n);
+        if (!btn) return;
+        if (n === cols) {
+            btn.className = "w-7 h-7 rounded-lg transition-all cursor-pointer bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white font-extrabold shadow-2xs flex items-center justify-center text-[11px]";
+        } else {
+            btn.className = "w-7 h-7 rounded-lg transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 dark:hover:text-white font-bold text-[11px] flex items-center justify-center";
+        }
+    });
+
+    // Persist to localStorage unless this is a silent restore
+    if (!silent) {
+        try { localStorage.setItem('cora_grid_cols', cols); } catch(e) {}
     }
 };
 
@@ -2437,6 +2434,12 @@ jQuery(document).ready(function($) {
         if (typeof window.coraSwitchLeadSubtab === 'function') {
             window.coraSwitchLeadSubtab('directory');
         }
+    }
+
+    // Restore saved column preference on page load (grid is default view)
+    var savedCols = parseInt(localStorage.getItem('cora_grid_cols') || '3');
+    if (typeof window.coraSetGridColumns === 'function') {
+        window.coraSetGridColumns(savedCols, true);
     }
 });
 </script>
