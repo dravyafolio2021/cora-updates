@@ -358,6 +358,7 @@ if (!defined('ABSPATH')) {
     padding-bottom: 24px;
     align-items: stretch;
     width: 100%;
+    -webkit-overflow-scrolling: touch;
 }
 
 .cora-kanban-col {
@@ -369,6 +370,23 @@ if (!defined('ABSPATH')) {
     max-width: 300px;
     min-width: 300px;
     transition: all 0.2s ease;
+}
+
+@media (max-width: 640px) {
+    .cora-kanban-board {
+        gap: 12px !important;
+        scroll-snap-type: x mandatory !important;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+    .cora-kanban-col {
+        flex: 0 0 calc(100vw - 48px) !important;
+        max-width: calc(100vw - 48px) !important;
+        min-width: calc(100vw - 48px) !important;
+        scroll-snap-align: center !important;
+        padding: 12px !important;
+        border-radius: 16px !important;
+    }
 }
 
 /* Custom Kanban Colors & Borders for Task Manager */
