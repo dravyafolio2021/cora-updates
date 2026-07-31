@@ -156,20 +156,20 @@ if (!defined('ABSPATH')) {
 }
 .cora-toolbar-search {
     position: relative;
-    width: 220px;
+    width: 100%;
 }
 .cora-toolbar-search input {
     width: 100% !important;
-    height: 38px !important;
-    padding-left: 32px !important;
+    height: 32px !important;
+    padding-left: 30px !important;
     padding-right: 12px !important;
     border: 1px solid #e4e4e7 !important;
-    border-radius: 12px !important;
-    font-size: 12px !important;
+    border-radius: 8px !important;
+    font-size: 11.5px !important;
     background-color: #ffffff !important;
     outline: none !important;
     box-shadow: none !important;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
 }
 .cora-toolbar-search input:focus {
     border-color: #09090b !important;
@@ -177,10 +177,10 @@ if (!defined('ABSPATH')) {
 .cora-toolbar-search svg {
     position: absolute;
     left: 10px;
-    top: 12px;
+    top: 9px;
     color: #71717a !important;
-    width: 14px;
-    height: 14px;
+    width: 13px;
+    height: 13px;
 }
 .cora-task-export-btn {
     display: inline-flex !important;
@@ -243,7 +243,6 @@ if (!defined('ABSPATH')) {
 
 .cora-toolbar-search-wrap {
     flex: 1;
-    max-width: 320px;
 }
 
 .cora-toolbar-filters-grid {
