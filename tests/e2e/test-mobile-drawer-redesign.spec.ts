@@ -1,18 +1,18 @@
 import { test, expect } from '@playwright/test';
 import { login } from './helpers';
 
-test.describe('Mobile Side Drawer Responsive & Humanized UI', () => {
-  test('verify side drawer fills mobile viewport with sticky header, clean action buttons, and sticky footer', async ({ page }) => {
+test.describe('Mobile Side Drawer Responsive & Collapsible Accordion UI', () => {
+  test('verify side drawer with collapsible toggle cards, quick actions, and sticky footer', async ({ page }) => {
     // 1. Set iPhone 14 Pro Max viewport
     await page.setViewportSize({ width: 430, height: 932 });
     await login(page);
     await page.goto('/workspace/leads?subtab=directory');
     await page.waitForLoadState('networkidle');
 
-    // 2. Open Prospect Detail Drawer by clicking first lead row/card
-    const firstRow = page.locator('.cora-lead-row, .cora-lead-card').first();
-    await expect(firstRow).toBeVisible({ timeout: 15000 });
-    await firstRow.click();
+    // 2. Open Prospect Detail Drawer by clicking first lead card or table row
+    const firstItem = page.locator('.cora-lead-row, .cora-lead-card').first();
+    await expect(firstItem).toBeVisible({ timeout: 15000 });
+    await firstItem.click();
 
     const drawer = page.locator('#cora-lead-detail-drawer');
     await expect(drawer).toBeVisible({ timeout: 10000 });
@@ -24,24 +24,11 @@ test.describe('Mobile Side Drawer Responsive & Humanized UI', () => {
       expect(box.width).toBeLessThanOrEqual(430);
     }
 
-    // 4. Verify Close Button is visible & touchable
+    // 4. Verify Close Button is visible
     const closeBtn = drawer.locator('button[title="Close Drawer"]');
     await expect(closeBtn).toBeVisible();
 
-    // 5. Verify Simplified Human-Friendly Tab Header Pills (Details, Automations, Tasks, History)
-    await expect(drawer.locator('#cora-lead-detail-tab-btn-overview')).toContainText('Details');
-    await expect(drawer.locator('#cora-lead-detail-tab-btn-automation')).toContainText('Automations');
-    await expect(drawer.locator('#cora-lead-detail-tab-btn-checklist')).toContainText('Tasks');
-    await expect(drawer.locator('#cora-lead-detail-tab-btn-audit')).toContainText('History');
-
-    // 6. Verify Pipeline Stage & Team Member Selectors
-    const stageSelect = drawer.locator('#cora-drawer-stage-select');
-    await expect(stageSelect).toBeVisible();
-
-    const assigneeSelect = drawer.locator('#cora-drawer-input-assigned-to');
-    await expect(assigneeSelect).toBeVisible();
-
-    // 7. Verify 1-Tap Direct Client Action Bar (WhatsApp, Email, Convert)
+    // 5. Verify 1-Tap Quick Action Row (WhatsApp, Email, Convert)
     const whatsappBtn = drawer.locator('#cora-drawer-whatsapp-btn');
     await expect(whatsappBtn).toBeVisible();
 
@@ -51,14 +38,26 @@ test.describe('Mobile Side Drawer Responsive & Humanized UI', () => {
     const convertBtn = drawer.locator('#cora-convert-lead-btn');
     await expect(convertBtn).toBeVisible();
 
-    // 8. Verify Sticky Bottom Action Bar (Delete Lead, Cancel, Save Deal Changes)
+    // 6. Verify Collapsible Accordion toggling
+    const accordionHeader = drawer.locator('button:has-text("Deal Status & Assignee")');
+    await expect(accordionHeader).toBeVisible();
+
+    // Body should be hidden by default
+    const stageSelect = drawer.locator('#cora-drawer-stage-select');
+    await expect(stageSelect).toBeHidden();
+
+    // Click accordion header to expand
+    await accordionHeader.click();
+    await expect(stageSelect).toBeVisible();
+
+    // 7. Verify Sticky Bottom Action Bar (Delete Lead, Cancel, Save Deal Changes)
     const saveBtn = drawer.locator('button:has-text("Save Deal Changes")');
     await expect(saveBtn).toBeVisible();
 
     const deleteBtn = drawer.locator('button:has-text("Delete Lead")');
     await expect(deleteBtn).toBeVisible();
 
-    // Take screenshot of humanized mobile side drawer
-    await page.screenshot({ path: 'tests/e2e/mobile-drawer-humanized-screenshot.png' });
+    // Screenshot of Collapsible Accordion Drawer
+    await page.screenshot({ path: 'tests/e2e/mobile-drawer-accordion-screenshot.png' });
   });
 });

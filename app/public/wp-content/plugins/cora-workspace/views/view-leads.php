@@ -1555,112 +1555,167 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
         <input type="hidden" id="cora-drawer-lead-id" value="">
 
         <!-- TAB 1: DETAILS & CONTACT -->
-        <div id="cora-lead-detail-tab-overview" class="cora-lead-detail-tab-pane space-y-4 text-xs">
+        <div id="cora-lead-detail-tab-overview" class="cora-lead-detail-tab-pane space-y-3.5 text-xs">
             
-            <!-- SECTION 1: STATUS, ASSIGNEE & 1-TAP OUTREACH -->
-            <div class="p-4 bg-zinc-50 dark:bg-zinc-800/60 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 space-y-3.5">
-                <div class="flex items-center justify-between gap-2 border-b border-zinc-200/60 dark:border-zinc-700/60 pb-3">
-                    <span class="font-extrabold text-xs text-zinc-900 dark:text-white flex items-center gap-1.5">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-                        Deal Status & Assignee
-                    </span>
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 shadow-2xs">
-                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                        <span>SLA: <strong class="text-zinc-950 dark:text-white font-extrabold" id="cora-drawer-sla-timer">18m remaining</strong></span>
+            <!-- ALWAYS VISIBLE: 1-TAP QUICK ACTION BAR -->
+            <div class="p-3.5 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 rounded-2xl shadow-md space-y-2.5">
+                <div class="flex items-center justify-between gap-2">
+                    <span class="text-[10px] uppercase font-extrabold tracking-wider text-zinc-300 dark:text-zinc-600">Quick Outreach & Actions</span>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-zinc-800 dark:bg-zinc-200 text-zinc-200 dark:text-zinc-800">
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <span>SLA: <strong id="cora-drawer-sla-timer">18m remaining</strong></span>
                     </span>
                 </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block font-bold text-[11px] text-zinc-600 dark:text-zinc-400 mb-1">Pipeline Stage</label>
-                        <select id="cora-drawer-stage-select" class="w-full text-xs font-extrabold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 px-3 py-2.5 rounded-xl text-zinc-900 dark:text-white focus:outline-none cursor-pointer shadow-2xs" onchange="coraUpdateLeadStageFromDrawer()">
-                            <option value="New Lead">New Lead</option>
-                            <option value="Contacted">Proposal Sent</option>
-                            <option value="Site Visit">Site Visit / Viewing</option>
-                            <option value="Negotiation">Negotiation</option>
-                            <option value="Converted">Converted</option>
-                            <option value="Lost">Closed / Lost</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block font-bold text-[11px] text-zinc-600 dark:text-zinc-400 mb-1">Assigned Team Member</label>
-                        <select id="cora-drawer-input-assigned-to" class="w-full px-3 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white text-xs font-semibold focus:outline-none transition-colors cursor-pointer shadow-2xs" onchange="coraUpdateLeadAssignee(document.getElementById('cora-drawer-lead-id').value, this.value)">
-                            <?php foreach ( $cora_users_list as $u ) : ?>
-                                <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <a id="cora-drawer-whatsapp-btn" href="#" target="_blank" class="py-2.5 px-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="shrink-0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.67-1.616-.919-2.213-.242-.58-.487-.502-.67-.511l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg>
+                        <span>WhatsApp</span>
+                    </a>
+                    <a id="cora-drawer-sla-email-btn" href="#" target="_blank" class="py-2.5 px-2 bg-zinc-800 dark:bg-zinc-100 text-white dark:text-zinc-950 font-extrabold rounded-xl text-xs hover:bg-zinc-700 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        <span>Email</span>
+                    </a>
+                    <button type="button" id="cora-convert-lead-btn" class="py-2.5 px-2 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold rounded-xl text-xs transition-all shadow-sm cursor-pointer flex items-center justify-center gap-1" onclick="coraConvertCurrentLeadToClient()">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>Convert</span>
+                    </button>
                 </div>
+            </div>
 
-                <!-- 1-Tap Quick Action Row -->
-                <div class="pt-1">
-                    <label class="block font-bold text-[10px] text-zinc-400 uppercase tracking-wider mb-1.5">Direct Client Actions</label>
-                    <div class="grid grid-cols-3 gap-2">
-                        <a id="cora-drawer-whatsapp-btn" href="#" target="_blank" class="py-2.5 px-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="shrink-0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.67-1.616-.919-2.213-.242-.58-.487-.502-.67-.511l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg>
-                            <span>WhatsApp</span>
-                        </a>
-                        <a id="cora-drawer-sla-email-btn" href="#" target="_blank" class="py-2.5 px-2 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-700 font-bold rounded-xl text-xs hover:bg-zinc-100 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                            <span>Email</span>
-                        </a>
-                        <button type="button" id="cora-convert-lead-btn" class="py-2.5 px-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-extrabold rounded-xl text-xs hover:bg-zinc-800 transition-all shadow-2xs cursor-pointer flex items-center justify-center gap-1" onclick="coraConvertCurrentLeadToClient()">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            <span>Convert</span>
-                        </button>
+            <!-- ACCORDION SECTION 1: DEAL STATUS & OWNER ASSIGNMENT (COLLAPSED BY DEFAULT) -->
+            <div class="cora-accordion-card bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xs overflow-hidden">
+                <button type="button" class="w-full p-4 flex items-center justify-between gap-2 text-left cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors" onclick="coraToggleDrawerAccordion(this)">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white flex items-center justify-center shrink-0">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-extrabold text-xs text-zinc-900 dark:text-white">Deal Status & Assignee</h4>
+                            <p class="text-[10.5px] text-zinc-400 font-medium">Pipeline stage and team owner</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">Tap to Edit</span>
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" class="cora-accordion-icon text-zinc-400 transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                </button>
+                <div class="cora-accordion-body hidden p-4 pt-0 border-t border-zinc-100 dark:border-zinc-800/80 space-y-3 mt-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                        <div>
+                            <label class="block font-bold text-[11px] text-zinc-600 dark:text-zinc-400 mb-1">Pipeline Stage</label>
+                            <select id="cora-drawer-stage-select" class="w-full text-xs font-extrabold bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-3 py-2.5 rounded-xl text-zinc-900 dark:text-white focus:outline-none cursor-pointer" onchange="coraUpdateLeadStageFromDrawer()">
+                                <option value="New Lead">New Lead</option>
+                                <option value="Contacted">Proposal Sent</option>
+                                <option value="Site Visit">Site Visit / Viewing</option>
+                                <option value="Negotiation">Negotiation</option>
+                                <option value="Converted">Converted</option>
+                                <option value="Lost">Closed / Lost</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-[11px] text-zinc-600 dark:text-zinc-400 mb-1">Assigned Team Member</label>
+                            <select id="cora-drawer-input-assigned-to" class="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white text-xs font-semibold focus:outline-none transition-colors cursor-pointer" onchange="coraUpdateLeadAssignee(document.getElementById('cora-drawer-lead-id').value, this.value)">
+                                <?php foreach ( $cora_users_list as $u ) : ?>
+                                    <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- SECTION 2: CONTACT & DEAL PARAMETERS -->
-            <div class="p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs space-y-3.5">
-                <span class="font-extrabold text-xs text-zinc-900 dark:text-white flex items-center gap-1.5 border-b border-zinc-100 dark:border-zinc-800 pb-2.5">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                    Contact & Lead Details
-                </span>
-
-                <div>
-                    <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Full Name / Prospect Title</label>
-                    <input type="text" id="cora-drawer-input-names" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-medium focus:outline-none text-xs">
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Email Address</label>
-                        <input type="email" id="cora-drawer-input-email" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-medium focus:outline-none text-xs">
+            <!-- ACCORDION SECTION 2: CONTACT DETAILS & LOCATION (OPEN BY DEFAULT FOR INSTANT COMFORT) -->
+            <div class="cora-accordion-card bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xs overflow-hidden">
+                <button type="button" class="w-full p-4 flex items-center justify-between gap-2 text-left cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors" onclick="coraToggleDrawerAccordion(this)">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white flex items-center justify-center shrink-0">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-extrabold text-xs text-zinc-900 dark:text-white">Contact & Client Information</h4>
+                            <p class="text-[10.5px] text-zinc-400 font-medium">Name, email, phone & city</p>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Phone / WhatsApp</label>
-                        <input type="text" id="cora-drawer-input-phone" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-medium focus:outline-none text-xs">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" class="cora-accordion-icon text-zinc-400 transition-transform duration-200 transform rotate-180"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="cora-accordion-body p-4 pt-0 border-t border-zinc-100 dark:border-zinc-800/80 space-y-3 mt-3">
+                    <div class="pt-2">
+                        <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Full Name / Prospect Title</label>
+                        <input type="text" id="cora-drawer-input-names" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-medium focus:outline-none text-xs">
                     </div>
-                </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Deal Budget (₹)</label>
-                        <input type="text" id="cora-drawer-input-price" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-medium focus:outline-none text-xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Email Address</label>
+                            <input type="email" id="cora-drawer-input-email" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-medium focus:outline-none text-xs">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Phone / WhatsApp</label>
+                            <input type="text" id="cora-drawer-input-phone" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-medium focus:outline-none text-xs">
+                        </div>
                     </div>
+
                     <div>
-                        <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Priority Level</label>
-                        <select id="cora-drawer-input-score" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-medium focus:outline-none text-xs">
-                            <option value="hot">Hot (High Priority)</option>
-                            <option value="warm">Warm (Standard Interest)</option>
-                            <option value="cold">Cold (Low Priority)</option>
-                        </select>
+                        <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Target City / Location</label>
+                        <input type="text" id="cora-drawer-input-city" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-medium focus:outline-none text-xs">
                     </div>
-                </div>
-
-                <div>
-                    <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Target City / Location</label>
-                    <input type="text" id="cora-drawer-input-city" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-medium focus:outline-none text-xs">
-                </div>
-
-                <div>
-                    <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Deal Notes & Specifications</label>
-                    <textarea id="cora-drawer-input-notes" rows="3" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-medium focus:outline-none resize-none text-xs" placeholder="Client specifications, requested deliverables, shoot dates..."></textarea>
                 </div>
             </div>
+
+            <!-- ACCORDION SECTION 3: DEAL BUDGET & PRIORITY (COLLAPSED BY DEFAULT) -->
+            <div class="cora-accordion-card bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xs overflow-hidden">
+                <button type="button" class="w-full p-4 flex items-center justify-between gap-2 text-left cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors" onclick="coraToggleDrawerAccordion(this)">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white flex items-center justify-center shrink-0">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-extrabold text-xs text-zinc-900 dark:text-white">Deal Budget & Intent Priority</h4>
+                            <p class="text-[10.5px] text-zinc-400 font-medium">Value (₹) and priority level</p>
+                        </div>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" class="cora-accordion-icon text-zinc-400 transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="cora-accordion-body hidden p-4 pt-0 border-t border-zinc-100 dark:border-zinc-800/80 space-y-3 mt-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                        <div>
+                            <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Deal Budget (₹)</label>
+                            <input type="text" id="cora-drawer-input-price" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-medium focus:outline-none text-xs">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Priority Level</label>
+                            <select id="cora-drawer-input-score" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-medium focus:outline-none text-xs">
+                                <option value="hot">Hot (High Priority)</option>
+                                <option value="warm">Warm (Standard Interest)</option>
+                                <option value="cold">Cold (Low Priority)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACCORDION SECTION 4: NOTES & SHOOT SPECIFICATIONS (COLLAPSED BY DEFAULT) -->
+            <div class="cora-accordion-card bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xs overflow-hidden">
+                <button type="button" class="w-full p-4 flex items-center justify-between gap-2 text-left cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors" onclick="coraToggleDrawerAccordion(this)">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white flex items-center justify-center shrink-0">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-extrabold text-xs text-zinc-900 dark:text-white">Deal Notes & Shoot Specifications</h4>
+                            <p class="text-[10.5px] text-zinc-400 font-medium">Inquiry requirements & dates</p>
+                        </div>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" class="cora-accordion-icon text-zinc-400 transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="cora-accordion-body hidden p-4 pt-0 border-t border-zinc-100 dark:border-zinc-800/80 space-y-3 mt-3">
+                    <div class="pt-2">
+                        <textarea id="cora-drawer-input-notes" rows="3" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-medium focus:outline-none resize-none text-xs" placeholder="Client specifications, requested deliverables, shoot dates..."></textarea>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!-- TAB 2: WORKFLOWS & AUTOMATION -->
@@ -2195,6 +2250,22 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
 </aside>
 
 <script>
+window.coraToggleDrawerAccordion = function(btn) {
+    if (!btn) return;
+    var card = btn.closest('.cora-accordion-card');
+    if (!card) return;
+    var body = card.querySelector('.cora-accordion-body');
+    var icon = card.querySelector('.cora-accordion-icon');
+    if (!body) return;
+    if (body.classList.contains('hidden')) {
+        body.classList.remove('hidden');
+        if (icon) icon.classList.add('rotate-180');
+    } else {
+        body.classList.add('hidden');
+        if (icon) icon.classList.remove('rotate-180');
+    }
+};
+
 jQuery(document).ready(function($) {
     const urlParams = new URLSearchParams(window.location.search);
     let subtab = urlParams.get('subtab');
