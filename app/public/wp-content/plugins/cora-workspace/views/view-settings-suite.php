@@ -371,6 +371,12 @@ $cora_settings_tabs = array(
 .cora-card-chevron.active {
     transform: rotate(0deg) !important; /* Point up when expanded */
 }
+.cora-credential-input {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+}
 </style>
 
 <div class="cora-shopify-settings-theme"><div class="cora-page-header flex flex-row items-center justify-between gap-4 border-b border-zinc-150/70 dark:border-zinc-800/40 pb-4">

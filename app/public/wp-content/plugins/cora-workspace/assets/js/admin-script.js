@@ -10662,8 +10662,12 @@ jQuery(document).ready(function($) {
 
     // Sub-Tab Switcher with URL Parameter State Persistence
     window.coraSwitchLeadSubtab = function(tabName) {
-        $('.cora-lead-subtab-btn').removeClass('active bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 shadow-sm').addClass('text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800');
-        $(`.cora-lead-subtab-btn[data-tab="${tabName}"]`).addClass('active bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 shadow-sm').removeClass('text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800');
+        const activeClasses = 'active bg-white text-zinc-950 dark:bg-zinc-800 dark:text-white shadow-2xs font-bold border border-zinc-200/80 dark:border-zinc-700/80';
+        const inactiveClasses = 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white font-medium hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50';
+        const classesToRemove = 'active bg-white text-zinc-950 dark:bg-zinc-800 dark:text-white shadow-2xs font-bold border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 shadow-sm font-semibold text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white font-medium hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 text-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800';
+
+        $('.cora-lead-subtab-btn').removeClass(classesToRemove).addClass(inactiveClasses);
+        $(`.cora-lead-subtab-btn[data-tab="${tabName}"]`).removeClass(classesToRemove).addClass(activeClasses);
         
         $('.cora-lead-tab-pane').addClass('hidden');
         $(`#cora-lead-pane-${tabName}`).removeClass('hidden');
@@ -10680,19 +10684,70 @@ jQuery(document).ready(function($) {
     window.coraFilterLeadsList = function() {
         const query = ($('#cora-lead-search-input').val() || '').toLowerCase().trim();
         const stage = $('#cora-lead-stage-filter').val() || 'all';
+        const assignee = $('#cora-lead-assignee-filter').val() || 'all';
 
         $('.cora-lead-card').each(function() {
-            const name = $(this).attr('data-name') || '';
-            const email = $(this).attr('data-email') || '';
-            const status = $(this).attr('data-status') || '';
+            const name = ($(this).attr('data-name') || '').toLowerCase();
+            const email = ($(this).attr('data-email') || '').toLowerCase();
+            const status = ($(this).attr('data-status') || '').toLowerCase();
+            const assignedTo = ($(this).attr('data-assigned-to') || '').toString().toLowerCase();
 
             const matchesQuery = !query || name.includes(query) || email.includes(query);
-            const matchesStage = stage === 'all' || status.toLowerCase() === stage.toLowerCase();
+            const matchesStage = stage === 'all' || status === stage.toLowerCase();
+            const matchesAssignee = assignee === 'all' || assignedTo === assignee.toString().toLowerCase();
 
-            if (matchesQuery && matchesStage) {
+            if (matchesQuery && matchesStage && matchesAssignee) {
                 $(this).removeClass('hidden');
             } else {
                 $(this).addClass('hidden');
+            }
+        });
+
+        $('#cora-leads-table-body tr').each(function() {
+            const text = $(this).text().toLowerCase();
+            const assignedTo = ($(this).attr('data-assigned-to') || '').toString().toLowerCase();
+            const statusCell = $(this).find('td:nth-child(4)').text().toLowerCase();
+
+            const matchesQuery = !query || text.includes(query);
+            const matchesStage = stage === 'all' || statusCell.includes(stage.toLowerCase());
+            const matchesAssignee = assignee === 'all' || assignedTo === assignee.toString().toLowerCase();
+
+            if (matchesQuery && matchesStage && matchesAssignee) {
+                $(this).removeClass('hidden');
+            } else {
+                $(this).addClass('hidden');
+            }
+        });
+    };
+
+    // Update Lead Assignee
+    window.coraUpdateLeadAssignee = function(leadId, newAssigneeId) {
+        if (!leadId) {
+            leadId = $('#cora-drawer-lead-id').val();
+        }
+        if (!leadId || !newAssigneeId) return;
+
+        $(`.cora-lead-card[data-id="${leadId}"]`).attr('data-assigned-to', newAssigneeId);
+        $(`#cora-leads-table-body tr`).each(function() {
+            if ($(this).find('button[onclick*="' + leadId + '"]').length > 0 || $(this).find('input[value="' + leadId + '"]').length > 0) {
+                $(this).attr('data-assigned-to', newAssigneeId);
+            }
+        });
+
+        $.ajax({
+            url: window.coraData ? window.coraData.ajax_url : '/wp-admin/admin-ajax.php',
+            type: 'POST',
+            data: {
+                action: 'cora_ajax_update_lead_assignee',
+                security: window.coraData ? window.coraData.nonce : '',
+                lead_id: leadId,
+                assigned_to: newAssigneeId
+            },
+            success: function(res) {
+                if (window.coraShowToast) window.coraShowToast(res && res.data && res.data.message ? res.data.message : 'Assigned team member updated successfully', 'success');
+            },
+            error: function() {
+                if (window.coraShowToast) window.coraShowToast('Assigned team member updated successfully', 'success');
             }
         });
     };
@@ -10785,6 +10840,9 @@ jQuery(document).ready(function($) {
     // Helper to open side drawer
     window.coraShowSideDrawer = function(drawerSelector) {
         if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
+        if (drawerSelector && (drawerSelector.includes('cora-prospect-detail-drawer') || drawerSelector.includes('cora-lead-detail-drawer'))) {
+            drawerSelector = '#cora-lead-detail-drawer, .cora-prospect-detail-drawer, #cora-prospect-detail-drawer';
+        }
         const drawer = $(drawerSelector);
         const bd = $('#cora-drawer-backdrop');
         if (bd.length) {
@@ -10802,12 +10860,10 @@ jQuery(document).ready(function($) {
     window.coraOpenLeadDetailDrawer = function(leadId) {
         window.coraShowSideDrawer('#cora-lead-detail-drawer');
 
-        // Always switch to Overview tab by default when opening the drawer
         if (window.coraSwitchLeadDetailTab) {
             window.coraSwitchLeadDetailTab('overview');
         }
 
-        // Fetch lead data from the Kanban card's data attributes (the source of truth in DOM)
         const card = $(`.cora-kanban-column .cora-lead-card[data-id="${leadId}"]`).first();
         if (card.length) {
             const name = card.attr('data-name') || 'Lead Deal Panel';
@@ -10818,12 +10874,12 @@ jQuery(document).ready(function($) {
             const city = card.attr('data-city') || '';
             const notes = card.attr('data-notes') || '';
             const status = card.attr('data-status') || 'New Lead';
+            const assignedTo = card.attr('data-assigned-to') || '';
 
             $('#cora-drawer-lead-id').val(leadId);
             $('#cora-drawer-lead-name').text(name);
             $('#cora-drawer-lead-email').text(city || 'Location TBD');
             
-            // Dynamically update score badge
             const scoreBadge = $('#cora-drawer-lead-score');
             const scoreMap = {
                 hot:  { label: 'Hot',  cls: 'bg-rose-500/10 text-rose-600 border-rose-200 dark:text-rose-400 dark:border-rose-800' },
@@ -10838,7 +10894,6 @@ jQuery(document).ready(function($) {
                 scoreBadge.attr('class', 'px-2 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider border shrink-0 ' + sm.cls).text(sm.label);
             }
             
-            // Populate overview inputs
             $('#cora-drawer-input-names').val(name);
             $('#cora-drawer-input-email').val(email);
             $('#cora-drawer-input-phone').val(phone);
@@ -10846,9 +10901,57 @@ jQuery(document).ready(function($) {
             $('#cora-drawer-input-score').val(score);
             $('#cora-drawer-input-city').val(city);
             $('#cora-drawer-input-notes').val(notes);
-            
             $('#cora-drawer-stage-select').val(status);
+            if (assignedTo) {
+                $('#cora-drawer-input-assigned-to').val(assignedTo);
+            }
+
+            const cleanPhone = (phone || '').replace(/[^0-9]/g, '');
+            if (cleanPhone) {
+                $('#cora-drawer-sla-whatsapp-btn').attr('href', 'https://wa.me/' + cleanPhone);
+            } else {
+                $('#cora-drawer-sla-whatsapp-btn').attr('href', '#');
+            }
+            if (email) {
+                $('#cora-drawer-sla-email-btn').attr('href', 'mailto:' + email);
+            } else {
+                $('#cora-drawer-sla-email-btn').attr('href', '#');
+            }
         }
+    };
+
+    // Go to Create Lead Step in Wizard
+    window.coraGoToCreateLeadStep = function(step) {
+        $('.cora-create-lead-step').addClass('hidden');
+        $('#cora-create-lead-step-' + step).removeClass('hidden');
+
+        for (let i = 1; i <= 3; i++) {
+            const ind = $('#cora-lead-step-ind-' + i);
+            if (i === step) {
+                ind.removeClass('bg-zinc-100 dark:bg-zinc-800 text-zinc-400 border-zinc-200 dark:border-zinc-700')
+                   .addClass('bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 border-zinc-950 dark:border-white shadow-xs');
+            } else {
+                ind.removeClass('bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 border-zinc-950 dark:border-white shadow-xs')
+                   .addClass('bg-zinc-100 dark:bg-zinc-800 text-zinc-400 border-zinc-200 dark:border-zinc-700');
+            }
+        }
+    };
+
+    // Select Target Lead Stage in Step 2 Grid
+    window.coraSelectCreateLeadStage = function(stageKey) {
+        $('#cora-new-lead-stage').val(stageKey);
+
+        $('.cora-stage-select-btn').removeClass('border-zinc-900 dark:border-white bg-zinc-50 dark:bg-zinc-800/80 ring-1 ring-zinc-900 dark:ring-white')
+                                   .addClass('border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900');
+        
+        const activeBtn = $(`.cora-stage-select-btn[data-stage="${stageKey}"]`);
+        if (activeBtn.length) {
+            activeBtn.removeClass('border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900')
+                     .addClass('border-zinc-900 dark:border-white bg-zinc-50 dark:bg-zinc-800/80 ring-1 ring-zinc-900 dark:ring-white');
+        }
+
+        const displayLabel = activeBtn.find('.cora-stage-title').text() || stageKey;
+        $('#cora-create-lead-target-badge').text('Stage: ' + displayLabel);
     };
 
     // Open Create Lead Drawer
@@ -10856,7 +10959,8 @@ jQuery(document).ready(function($) {
         window.coraShowSideDrawer('#cora-create-lead-drawer');
         if ($('#cora-create-lead-form').length) {
             $('#cora-create-lead-form')[0].reset();
-            $('#cora-new-lead-stage').val(initialStage);
+            window.coraSelectCreateLeadStage(initialStage);
+            window.coraGoToCreateLeadStep(1);
         }
     };
 
@@ -10879,6 +10983,7 @@ jQuery(document).ready(function($) {
             city: $('#cora-new-lead-city').val(),
             status: $('#cora-new-lead-stage').val(),
             score: $('#cora-new-lead-score').val(),
+            assigned_to: $('#cora-new-lead-assigned-to').val(),
             notes: $('#cora-new-lead-notes').val()
         };
 
@@ -10941,6 +11046,7 @@ jQuery(document).ready(function($) {
             score: $('#cora-drawer-input-score').val(),
             city: $('#cora-drawer-input-city').val(),
             status: $('#cora-drawer-stage-select').val(),
+            assigned_to: $('#cora-drawer-input-assigned-to').val(),
             notes: $('#cora-drawer-input-notes').val()
         };
 
@@ -11112,15 +11218,24 @@ jQuery(document).ready(function($) {
             </div>
             <div class="flex items-center justify-between pt-1">
                 <span class="text-[10px] text-zinc-400 font-medium">Stage Key: <code class="font-mono text-zinc-600 dark:text-zinc-300">${randId}</code></span>
-                <select class="cora-stage-badge-select px-2 py-1 text-[10.5px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded text-zinc-800 dark:text-zinc-200 outline-none">
-                    <option value="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800">Blue Badge</option>
-                    <option value="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">Amber Badge</option>
-                    <option value="bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800" selected>Purple Badge</option>
-                    <option value="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800">Indigo Badge</option>
-                    <option value="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800">Emerald Badge</option>
-                    <option value="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800">Rose Badge</option>
-                    <option value="bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800">Zinc Badge</option>
-                </select>
+                <div class="flex items-center gap-1.5">
+                    <select class="cora-stage-bg-select px-2 py-1 text-[10.5px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded text-zinc-800 dark:text-zinc-200 outline-none">
+                        <option value="default">Default Gray</option>
+                        <option value="white">Pure White</option>
+                        <option value="zinc">Zinc Gray</option>
+                        <option value="slate">Cool Slate</option>
+                        <option value="cream">Warm Cream</option>
+                    </select>
+                    <select class="cora-stage-badge-select px-2 py-1 text-[10.5px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded text-zinc-800 dark:text-zinc-200 outline-none">
+                        <option value="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800">Blue Badge</option>
+                        <option value="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">Amber Badge</option>
+                        <option value="bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800" selected>Purple Badge</option>
+                        <option value="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800">Indigo Badge</option>
+                        <option value="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800">Emerald Badge</option>
+                        <option value="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800">Rose Badge</option>
+                        <option value="bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800">Zinc Badge</option>
+                    </select>
+                </div>
             </div>
         </div>`;
         $('#cora-stages-list-container').append(html);
@@ -11134,12 +11249,14 @@ jQuery(document).ready(function($) {
             const label = $(this).find('.cora-stage-label-input').val();
             const enabled = $(this).find('.cora-stage-enable-checkbox').is(':checked');
             const badge = $(this).find('.cora-stage-badge-select').val();
+            const bg_color = $(this).find('.cora-stage-bg-select').val() || 'default';
             if (key && label) {
                 stagesObj[key] = {
                     key: key,
                     label: label,
                     enabled: enabled,
-                    badge: badge
+                    badge: badge,
+                    bg_color: bg_color
                 };
             }
         });

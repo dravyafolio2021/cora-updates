@@ -68,5 +68,13 @@
   - [x] `cora_ajax_process_payout`: Registered actions `wp_ajax_cora_ajax_process_payout`, `wp_ajax_cora_process_payout`. Calculates net payout after split % and tax %, saves to `cora_payouts` option, and logs an outflow entry in `cora_financial_ledger`.
   - [x] `cora_ajax_generate_financial_pdf_report`: Registered actions `wp_ajax_cora_ajax_generate_financial_pdf_report`, `wp_ajax_cora_generate_financial_pdf_report`. Returns formatted financial statement payload for browser printing and CSV export.
 
+- [x] **Leads Persistence & Reseed**
+  - [x] Unconditionally set `cora_migration_v2_complete` at the end of custom table migrations.
+  - [x] Deactivate old legacy `cora-real-estate` plugin to prevent duplicate functions.
+  - [x] Clear `wp_cora_leads` and seed exactly 3 leads for each of the 5 statuses.
+  - [x] Verify persistence across refreshes.
+  - [x] All Playwright E2E tests pass.
+
+
 
 

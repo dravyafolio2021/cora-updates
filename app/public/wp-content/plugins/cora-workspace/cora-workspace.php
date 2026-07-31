@@ -1659,8 +1659,10 @@ function cora_real_estate_ai_seed_data() {
         }
     }
 
-    // Seed initial leads
-    if ( ! get_option( 'cora_workspace_leads' ) ) {
+    // Seed initial leads — bypass tenancy read filter to avoid false re-seeding for super owners
+    global $wpdb;
+    $raw_leads_check = $wpdb->get_var( "SELECT option_value FROM {$wpdb->options} WHERE option_name = 'cora_workspace_leads'" );
+    if ( empty( $raw_leads_check ) || $raw_leads_check === 'a:0:{}' ) {
         $initial_leads = array(
             array(
                 'id' => 'lead_sample_1',
@@ -3940,6 +3942,141 @@ function cora_get_team_members_rest() {
         }
     }
     return rest_ensure_response( $team );
+}
+
+if ( ! function_exists( 'cora_get_workspace_team_members' ) ) {
+    function cora_get_workspace_team_members() {
+        $users = get_users();
+        $cora_role_labels = function_exists( 'cora_get_all_roles' ) ? cora_get_all_roles() : array();
+        $team = array();
+
+        foreach ( $users as $user ) {
+            $roles = (array) $user->roles;
+            $role_key = ! empty( $roles ) ? $roles[0] : '';
+            
+            $avatar_url = get_user_meta( $user->ID, 'cora_avatar_url', true );
+            if ( empty( $avatar_url ) && function_exists( 'get_avatar_url' ) ) {
+                $avatar_url = get_avatar_url( $user->ID );
+            }
+
+            $name_parts = array_filter( explode( ' ', trim( $user->display_name ) ) );
+            $initials = '';
+            if ( count( $name_parts ) >= 2 ) {
+                $initials = strtoupper( substr( reset($name_parts), 0, 1 ) . substr( end($name_parts), 0, 1 ) );
+            } elseif ( ! empty( $name_parts ) ) {
+                $initials = strtoupper( substr( reset($name_parts), 0, 2 ) );
+            } else {
+                $initials = 'U';
+            }
+
+            $role_label = isset( $cora_role_labels[$role_key] ) ? $cora_role_labels[$role_key] : ( ! empty( $role_key ) ? ucfirst( $role_key ) : 'Team Member' );
+
+            $team[] = array(
+                'id'           => (int) $user->ID,
+                'display_name' => $user->display_name,
+                'name'         => $user->display_name,
+                'email'        => $user->user_email,
+                'avatar'       => $avatar_url ? $avatar_url : '',
+                'avatar_url'   => $avatar_url ? $avatar_url : '',
+                'initials'     => $initials,
+                'role'         => $role_label,
+            );
+        }
+
+        return $team;
+    }
+}
+
+if ( ! function_exists( 'cora_ajax_get_team_members' ) ) {
+    function cora_ajax_get_team_members() {
+        $nonce = '';
+        if ( isset( $_REQUEST['security'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['security'] );
+        } elseif ( isset( $_REQUEST['nonce'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+        } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+        }
+        if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+            wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+        }
+
+        $team = cora_get_workspace_team_members();
+        wp_send_json_success( array(
+            'team_members' => $team,
+            'members'      => $team,
+        ) );
+    }
+    add_action( 'wp_ajax_cora_ajax_get_team_members', 'cora_ajax_get_team_members' );
+    add_action( 'wp_ajax_cora_get_team_members', 'cora_ajax_get_team_members' );
+}
+
+if ( ! function_exists( 'cora_lead_activity_log' ) ) {
+    function cora_lead_activity_log( $lead_id, $message ) {
+        if ( function_exists( 'cora_log_activity' ) ) {
+            cora_log_activity( 'Lead Assignment', $message );
+        }
+
+        global $wpdb;
+        $timestamp_str = date( 'M j, Y g:i A' );
+        $entry = '[' . $timestamp_str . '] ' . $message;
+
+        $current_notes = $wpdb->get_var( $wpdb->prepare(
+            "SELECT notes FROM {$wpdb->prefix}cora_leads WHERE id = %s OR id = %d",
+            $lead_id, intval( $lead_id )
+        ) );
+
+        if ( $current_notes === null ) {
+            $current_notes = '';
+        }
+
+        $updated_notes = empty( $current_notes ) ? $entry : $current_notes . "\n" . $entry;
+
+        $wpdb->query( $wpdb->prepare(
+            "UPDATE {$wpdb->prefix}cora_leads SET notes = %s, updated_at = %s WHERE id = %s OR id = %d",
+            $updated_notes, current_time( 'mysql' ), $lead_id, intval( $lead_id )
+        ) );
+
+        $raw_opt = $wpdb->get_var( $wpdb->prepare(
+            "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s",
+            'cora_workspace_leads'
+        ) );
+        $existing_leads = ! empty( $raw_opt ) ? maybe_unserialize( $raw_opt ) : get_option( 'cora_workspace_leads', array() );
+        if ( is_array( $existing_leads ) ) {
+            foreach ( $existing_leads as &$el ) {
+                if ( (string) ( $el['id'] ?? '' ) === (string) $lead_id ) {
+                    $el_notes = $el['notes'] ?? '';
+                    $el['notes'] = empty( $el_notes ) ? $entry : $el_notes . "\n" . $entry;
+                    break;
+                }
+            }
+            remove_filter( 'pre_update_option_cora_workspace_leads', 'cora_pre_update_tenancy_data', 10 );
+            update_option( 'cora_workspace_leads', $existing_leads );
+            add_filter( 'pre_update_option_cora_workspace_leads', 'cora_pre_update_tenancy_data', 10, 3 );
+        }
+    }
+}
+
+if ( ! function_exists( 'cora_log_lead_assignment_change' ) ) {
+    function cora_log_lead_assignment_change( $lead_id, $assigned_to_id ) {
+        $assigned_to_id = intval( $assigned_to_id );
+        $member_name = 'Unassigned';
+        if ( $assigned_to_id > 0 ) {
+            $member_user = get_userdata( $assigned_to_id );
+            if ( $member_user ) {
+                $member_name = $member_user->display_name;
+            } else {
+                $member_name = 'Member #' . $assigned_to_id;
+            }
+        }
+        
+        $current_user = wp_get_current_user();
+        $assigner_name = ( $current_user && $current_user->ID ) ? $current_user->display_name : 'System';
+
+        $log_msg = "Lead assigned to " . $member_name . " by " . $assigner_name;
+
+        cora_lead_activity_log( $lead_id, $log_msg );
+    }
 }
 
 /**
@@ -6387,12 +6524,13 @@ function cora_post_leads_rest( $request ) {
         $params = $request->get_params();
     }
     
-    $names = isset( $params['names'] ) ? sanitize_text_field( $params['names'] ) : '';
-    $email = isset( $params['email'] ) ? sanitize_email( $params['email'] ) : '';
-    $scale = isset( $params['scale'] ) ? sanitize_text_field( $params['scale'] ) : '';
-    $city  = isset( $params['city'] ) ? sanitize_text_field( $params['city'] ) : '';
-    $notes = isset( $params['notes'] ) ? sanitize_textarea_field( $params['notes'] ) : '';
-    $price = isset( $params['price'] ) ? sanitize_text_field( $params['price'] ) : '';
+    $names       = isset( $params['names'] ) ? sanitize_text_field( $params['names'] ) : '';
+    $email       = isset( $params['email'] ) ? sanitize_email( $params['email'] ) : '';
+    $scale       = isset( $params['scale'] ) ? sanitize_text_field( $params['scale'] ) : '';
+    $city        = isset( $params['city'] ) ? sanitize_text_field( $params['city'] ) : '';
+    $notes       = isset( $params['notes'] ) ? sanitize_textarea_field( $params['notes'] ) : '';
+    $price       = isset( $params['price'] ) ? sanitize_text_field( $params['price'] ) : '';
+    $assigned_to = isset( $params['assigned_to'] ) ? intval( $params['assigned_to'] ) : 0;
     
     if ( empty( $names ) || empty( $email ) ) {
         return new WP_Error( 'cora_invalid_lead', 'Names and Email are required.', array( 'status' => 400 ) );
@@ -6409,27 +6547,27 @@ function cora_post_leads_rest( $request ) {
     $wpdb->insert(
         $wpdb->prefix . 'cora_leads',
         array(
-            'agency_id' => $agency_id,
-            'branch_id' => $branch_id,
-            'assigned_to' => null,
-            'first_name' => $names,
-            'last_name' => '',
-            'email' => $email,
-            'phone' => '',
-            'source' => 'REST API',
-            'status' => 'new',
-            'budget_min' => 0,
-            'budget_max' => !empty($price) ? intval(preg_replace('/[^\d]/', '', $price)) : 0,
+            'agency_id'           => $agency_id,
+            'branch_id'           => $branch_id,
+            'assigned_to'         => $assigned_to ? $assigned_to : null,
+            'first_name'          => $names,
+            'last_name'           => '',
+            'email'               => $email,
+            'phone'               => '',
+            'source'              => 'REST API',
+            'status'              => 'new',
+            'budget_min'          => 0,
+            'budget_max'          => !empty($price) ? intval(preg_replace('/[^\d]/', '', $price)) : 0,
             'preferred_locations' => $city,
-            'property_type' => $scale,
-            'notes' => $notes,
-            'followup_date' => null,
-            'followup_notes' => '',
+            'property_type'       => $scale,
+            'notes'               => $notes,
+            'followup_date'       => null,
+            'followup_notes'      => '',
             'converted_to_client' => 0,
-            'client_id' => null,
-            'embed_vector' => 0,
-            'created_at' => current_time('mysql'),
-            'updated_at' => current_time('mysql')
+            'client_id'           => null,
+            'embed_vector'        => 0,
+            'created_at'          => current_time('mysql'),
+            'updated_at'          => current_time('mysql')
         ),
         array('%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s')
     );
@@ -6443,20 +6581,25 @@ function cora_post_leads_rest( $request ) {
     $lead_id = $inserted_id;
     
     $new_lead = array(
-        'id'         => $lead_id,
-        'names'      => $names,
-        'email'      => $email,
-        'scale'      => $scale,
-        'city'       => $city,
-        'notes'      => $notes,
-        'price'      => $price,
-        'status'     => 'New Lead',
-        'emails'     => cora_generate_default_email_sequence( $names, $scale, $city ),
-        'created_at' => time()
+        'id'          => $lead_id,
+        'names'       => $names,
+        'email'       => $email,
+        'scale'       => $scale,
+        'city'        => $city,
+        'notes'       => $notes,
+        'price'       => $price,
+        'status'      => 'New Lead',
+        'assigned_to' => $assigned_to,
+        'emails'      => cora_generate_default_email_sequence( $names, $scale, $city ),
+        'created_at'  => time()
     );
     
     $leads[] = $new_lead;
     update_option( 'cora_workspace_leads', $leads );
+
+    if ( $assigned_to > 0 && function_exists( 'cora_log_lead_assignment_change' ) ) {
+        cora_log_lead_assignment_change( $lead_id, $assigned_to );
+    }
     
     return new WP_REST_Response( array(
         'success' => true,
@@ -6621,11 +6764,12 @@ function cora_ajax_update_lead_status() {
         wp_send_json_error( 'Access Denied: insufficient permissions.' );
     }
 
-    $lead_id = isset( $_POST['id'] ) ? sanitize_text_field( $_POST['id'] ) : '';
-    $status  = isset( $_POST['status'] ) ? sanitize_text_field( $_POST['status'] ) : '';
-    $notes   = isset( $_POST['notes'] ) ? sanitize_textarea_field( $_POST['notes'] ) : null;
-    $names   = isset( $_POST['names'] ) ? sanitize_text_field( $_POST['names'] ) : null;
-    $email   = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : null;
+    $lead_id     = isset( $_POST['id'] ) ? sanitize_text_field( $_POST['id'] ) : '';
+    $status      = isset( $_POST['status'] ) ? sanitize_text_field( $_POST['status'] ) : '';
+    $notes       = isset( $_POST['notes'] ) ? sanitize_textarea_field( $_POST['notes'] ) : null;
+    $names       = isset( $_POST['names'] ) ? sanitize_text_field( $_POST['names'] ) : null;
+    $email       = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : null;
+    $assigned_to = isset( $_POST['assigned_to'] ) ? intval( $_POST['assigned_to'] ) : null;
     
     $scale = isset( $_POST['scale'] ) ? sanitize_text_field( $_POST['scale'] ) : null;
     $city  = isset( $_POST['city'] ) ? sanitize_text_field( $_POST['city'] ) : null;
@@ -6644,6 +6788,17 @@ function cora_ajax_update_lead_status() {
     global $wpdb;
     $agency_id = cora_db_get_agency_id();
 
+    $old_assigned_to = 0;
+    if ( null !== $assigned_to ) {
+        $old_val = $wpdb->get_var( $wpdb->prepare(
+            "SELECT assigned_to FROM {$wpdb->prefix}cora_leads WHERE id = %s OR id = %d",
+            $lead_id, intval( $lead_id )
+        ) );
+        if ( null !== $old_val ) {
+            $old_assigned_to = intval( $old_val );
+        }
+    }
+
     $update_data = array();
     $update_format = array();
 
@@ -6659,6 +6814,10 @@ function cora_ajax_update_lead_status() {
         
         $update_data['status'] = $status_enum;
         $update_format[] = '%s';
+    }
+    if ( null !== $assigned_to ) {
+        $update_data['assigned_to'] = $assigned_to ? $assigned_to : null;
+        $update_format[] = '%d';
     }
     if ( null !== $notes ) {
         $update_data['notes'] = $notes;
@@ -6729,6 +6888,7 @@ function cora_ajax_update_lead_status() {
                 cora_copy_lead_to_clients( $leads[$found_key] );
             }
         }
+        if ( null !== $assigned_to ) $leads[$found_key]['assigned_to'] = $assigned_to;
         if ( null !== $notes ) $leads[$found_key]['notes'] = $notes;
         if ( null !== $names ) $leads[$found_key]['names'] = $names;
         if ( null !== $email ) $leads[$found_key]['email'] = $email;
@@ -6744,6 +6904,10 @@ function cora_ajax_update_lead_status() {
         if ( null !== $followup_date ) $leads[$found_key]['followup_date'] = $followup_date;
 
         update_option( 'cora_workspace_leads', $leads );
+    }
+
+    if ( null !== $assigned_to && $old_assigned_to !== $assigned_to && function_exists( 'cora_log_lead_assignment_change' ) ) {
+        cora_log_lead_assignment_change( $lead_id, $assigned_to );
     }
 
     wp_send_json_success( array(
@@ -13556,6 +13720,9 @@ function cora_get_current_user_agency_id() {
         cora_ensure_default_agency_setup();
         $user_agency = get_user_meta( $user_id, 'cora_agency_id', true );
     }
+    if ( $user_agency === 'agency_1' ) {
+        $user_agency = 'default';
+    }
     return $user_agency;
 }
 
@@ -14604,21 +14771,22 @@ function cora_db_get_leads() {
             if (empty($full_name)) $full_name = 'Client Inquiry';
 
             $entry = array(
-                'id' => $r['id'],
-                'names' => $full_name,
-                'email' => $r['email'] ?? '',
-                'phone' => $r['phone'] ?? '',
-                'scale' => !empty($r['property_type']) ? $r['property_type'] : 'Standard Shoot',
-                'city' => !empty($r['preferred_locations']) ? $r['preferred_locations'] : 'Mumbai',
-                'notes' => $r['notes'] ?? '',
-                'price' => $price_text,
-                'status' => $status_text,
-                'score' => !empty($r['priority']) ? strtolower($r['priority']) : 'warm',
-                'followup_date' => !empty($r['followup_date']) ? date('Y-m-d H:i', strtotime($r['followup_date'])) : '',
-                'followup_notes' => $r['followup_notes'] ?? '',
-                'created_at' => !empty($r['created_at']) ? strtotime($r['created_at']) : time(),
+                'id'                  => $r['id'],
+                'names'               => $full_name,
+                'email'               => $r['email'] ?? '',
+                'phone'               => $r['phone'] ?? '',
+                'assigned_to'         => isset( $r['assigned_to'] ) ? intval( $r['assigned_to'] ) : 0,
+                'scale'               => !empty($r['property_type']) ? $r['property_type'] : 'Standard Shoot',
+                'city'                => !empty($r['preferred_locations']) ? $r['preferred_locations'] : 'Mumbai',
+                'notes'               => $r['notes'] ?? '',
+                'price'               => $price_text,
+                'status'              => $status_text,
+                'score'               => !empty($r['priority']) ? strtolower($r['priority']) : 'warm',
+                'followup_date'       => !empty($r['followup_date']) ? date('Y-m-d H:i', strtotime($r['followup_date'])) : '',
+                'followup_notes'      => $r['followup_notes'] ?? '',
+                'created_at'          => !empty($r['created_at']) ? strtotime($r['created_at']) : time(),
                 'converted_to_client' => intval($r['converted_to_client'] ?? 0),
-                'client_id' => $r['client_id'] ?? null
+                'client_id'           => $r['client_id'] ?? null
             );
             $mapped[] = $entry;
             $seen_ids[(string)$r['id']] = true;
@@ -14640,11 +14808,12 @@ function cora_db_get_leads() {
                 'names'               => $ol['names'] ?? 'Client Inquiry',
                 'email'               => $ol['email'] ?? '',
                 'phone'               => $ol['phone'] ?? '',
+                'assigned_to'         => isset( $ol['assigned_to'] ) ? intval( $ol['assigned_to'] ) : 0,
                 'scale'               => $ol['scale'] ?? 'Standard Shoot',
                 'city'                => $ol['city'] ?? 'Mumbai',
                 'notes'               => $ol['notes'] ?? '',
                 'price'               => $ol['price'] ?? '₹0',
-                'status'              => $ol['status'] ?? 'New Lead',
+                'status'              => cora_normalize_lead_stage( $ol['status'] ?? 'New Lead' ),
                 'score'               => $ol['score'] ?? 'warm',
                 'followup_date'       => $ol['followup_date'] ?? '',
                 'followup_notes'      => $ol['followup_notes'] ?? '',
@@ -14657,6 +14826,10 @@ function cora_db_get_leads() {
                 foreach ( $mapped as $m_idx => $m_item ) {
                     if ( (string) $m_item['id'] === $id_key ) {
                         foreach ( $option_item as $k => $v ) {
+                            // Never override status from option — SQL table is source of truth
+                            if ( $k === 'status' ) {
+                                continue;
+                            }
                             if ( $v !== null && $v !== '' ) {
                                 $mapped[$m_idx][$k] = $v;
                             }
@@ -15257,10 +15430,13 @@ function cora_sync_db_tables_to_options() {
     if ( is_array( $leads_opt ) ) {
         $opt_ids = array();
         $cleaned_leads = array();
+        $has_non_numeric = false;
         foreach ( $leads_opt as $ld ) {
             if ( isset( $ld['id'] ) ) {
                 if ( is_numeric( $ld['id'] ) ) {
                     $opt_ids[] = intval($ld['id']);
+                } else {
+                    $has_non_numeric = true;
                 }
                 $cleaned_leads[] = $ld;
             }
@@ -15269,16 +15445,18 @@ function cora_sync_db_tables_to_options() {
             update_option( 'cora_workspace_leads', $cleaned_leads );
         }
         
-        $delete_query = "DELETE FROM {$wpdb->prefix}cora_leads WHERE agency_id = %d";
-        $delete_params = array( $agency_num );
-        if ( $branch_num !== null ) {
-            $delete_query .= " AND branch_id = %d";
-            $delete_params[] = $branch_num;
+        if ( ! empty( $leads_opt ) && ! $has_non_numeric ) {
+            $delete_query = "DELETE FROM {$wpdb->prefix}cora_leads WHERE agency_id = %d";
+            $delete_params = array( $agency_num );
+            if ( $branch_num !== null ) {
+                $delete_query .= " AND branch_id = %d";
+                $delete_params[] = $branch_num;
+            }
+            if ( ! empty( $opt_ids ) ) {
+                $delete_query .= " AND id NOT IN (" . implode( ',', $opt_ids ) . ")";
+            }
+            $wpdb->query( $wpdb->prepare( $delete_query, $delete_params ) );
         }
-        if ( ! empty( $opt_ids ) ) {
-            $delete_query .= " AND id NOT IN (" . implode( ',', $opt_ids ) . ")";
-        }
-        $wpdb->query( $wpdb->prepare( $delete_query, $delete_params ) );
     }
 
     // 4. Sync clients
@@ -15950,6 +16128,9 @@ function cora_filter_tenancy_data( $items, $option_name = '' ) {
     if ( empty( $agency_id ) ) {
         return array();
     }
+    if ( $agency_id === 'agency_1' ) {
+        $agency_id = 'default';
+    }
     $branch_id = cora_get_current_user_branch_id();
 
     $filtered = array();
@@ -15957,7 +16138,10 @@ function cora_filter_tenancy_data( $items, $option_name = '' ) {
         if ( ! is_array( $item ) ) {
             continue;
         }
-        $item_agency = isset( $item['agency_id'] ) ? $item['agency_id'] : 'agency_1';
+        $item_agency = isset( $item['agency_id'] ) ? $item['agency_id'] : 'default';
+        if ( $item_agency === 'agency_1' || empty( $item_agency ) ) {
+            $item_agency = 'default';
+        }
         if ( $item_agency !== $agency_id ) {
             continue;
         }
@@ -15991,6 +16175,9 @@ function cora_pre_update_tenancy_data( $new_value, $old_value, $option_name ) {
     if ( empty( $agency_id ) ) {
         return $old_value;
     }
+    if ( $agency_id === 'agency_1' ) {
+        $agency_id = 'default';
+    }
     $branch_id = cora_get_current_user_branch_id();
 
     global $wpdb;
@@ -16000,12 +16187,26 @@ function cora_pre_update_tenancy_data( $new_value, $old_value, $option_name ) {
         $db_items = array();
     }
 
+    $new_ids = array();
+    foreach ( $new_value as $item ) {
+        if ( is_array( $item ) && isset( $item['id'] ) ) {
+            $new_ids[] = (string) $item['id'];
+        }
+    }
+
     $retained_items = array();
     foreach ( $db_items as $item ) {
         if ( ! is_array( $item ) ) {
             continue;
         }
-        $item_agency = isset( $item['agency_id'] ) ? $item['agency_id'] : 'agency_1';
+        $item_id = isset( $item['id'] ) ? (string) $item['id'] : '';
+        if ( ! empty( $item_id ) && in_array( $item_id, $new_ids, true ) ) {
+            continue;
+        }
+        $item_agency = isset( $item['agency_id'] ) ? $item['agency_id'] : 'default';
+        if ( $item_agency === 'agency_1' || empty( $item_agency ) ) {
+            $item_agency = 'default';
+        }
         if ( $item_agency === $agency_id ) {
             if ( ! empty( $branch_id ) ) {
                 $item_branch = isset( $item['branch_id'] ) ? $item['branch_id'] : 'branch_1';
@@ -16024,7 +16225,10 @@ function cora_pre_update_tenancy_data( $new_value, $old_value, $option_name ) {
         if ( ! is_array( $item ) ) {
             continue;
         }
-        if ( empty( $item['agency_id'] ) ) {
+        $item_agency = isset( $item['agency_id'] ) ? $item['agency_id'] : '';
+        if ( $item_agency === 'agency_1' ) {
+            $item['agency_id'] = 'default';
+        } elseif ( empty( $item_agency ) ) {
             $item['agency_id'] = $agency_id;
         }
         if ( ! empty( $branch_id ) && empty( $item['branch_id'] ) ) {
@@ -24883,10 +25087,10 @@ if ( ! function_exists( 'cora_ajax_save_lead_stages' ) ) {
 }
 
 /**
- * AJAX Endpoint: cora_ajax_get_leads_data
+ * AJAX Endpoint: cora_ajax_get_leads / cora_ajax_get_leads_data
  */
-if ( ! function_exists( 'cora_ajax_get_leads_data' ) ) {
-    function cora_ajax_get_leads_data() {
+if ( ! function_exists( 'cora_ajax_get_leads' ) ) {
+    function cora_ajax_get_leads() {
         $nonce = '';
         if ( isset( $_REQUEST['security'] ) ) {
             $nonce = sanitize_text_field( $_REQUEST['security'] );
@@ -24906,6 +25110,12 @@ if ( ! function_exists( 'cora_ajax_get_leads_data' ) ) {
         $filtered = array();
 
         foreach ( $leads as $l ) {
+            if ( ! isset( $l['assigned_to'] ) ) {
+                $l['assigned_to'] = 0;
+            } else {
+                $l['assigned_to'] = intval( $l['assigned_to'] );
+            }
+
             if ( $stage !== 'all' && isset( $l['status'] ) && strtolower( $l['status'] ) !== strtolower( $stage ) ) {
                 continue;
             }
@@ -24923,13 +25133,24 @@ if ( ! function_exists( 'cora_ajax_get_leads_data' ) ) {
             $filtered[] = $l;
         }
 
+        $team_members = cora_get_workspace_team_members();
+
         wp_send_json_success( array(
-            'leads' => $filtered,
-            'count' => count( $filtered ),
+            'leads'        => $filtered,
+            'count'        => count( $filtered ),
+            'team_members' => $team_members,
         ) );
     }
-    add_action( 'wp_ajax_cora_ajax_get_leads_data', 'cora_ajax_get_leads_data' );
-    add_action( 'wp_ajax_cora_get_leads_data', 'cora_ajax_get_leads_data' );
+    add_action( 'wp_ajax_cora_ajax_get_leads', 'cora_ajax_get_leads' );
+    add_action( 'wp_ajax_cora_get_leads', 'cora_ajax_get_leads' );
+    add_action( 'wp_ajax_cora_ajax_get_leads_data', 'cora_ajax_get_leads' );
+    add_action( 'wp_ajax_cora_get_leads_data', 'cora_ajax_get_leads' );
+}
+
+if ( ! function_exists( 'cora_ajax_get_leads_data' ) ) {
+    function cora_ajax_get_leads_data() {
+        cora_ajax_get_leads();
+    }
 }
 
 /**
@@ -24958,16 +25179,17 @@ if ( ! function_exists( 'cora_ajax_save_lead' ) ) {
         }
 
         global $wpdb;
-        $lead_id = isset( $_POST['lead_id'] ) ? sanitize_text_field( $_POST['lead_id'] ) : '';
-        $names   = isset( $_POST['names'] ) ? sanitize_text_field( $_POST['names'] ) : '';
-        $email   = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
-        $phone   = isset( $_POST['phone'] ) ? sanitize_text_field( $_POST['phone'] ) : '';
-        $price   = isset( $_POST['price'] ) ? sanitize_text_field( $_POST['price'] ) : '';
-        $scale   = isset( $_POST['scale'] ) ? sanitize_text_field( $_POST['scale'] ) : 'Standard Shoot';
-        $city    = isset( $_POST['city'] ) ? sanitize_text_field( $_POST['city'] ) : 'Mumbai';
-        $status  = isset( $_POST['status'] ) ? sanitize_text_field( $_POST['status'] ) : 'New Lead';
-        $score   = isset( $_POST['score'] ) ? sanitize_text_field( $_POST['score'] ) : 'warm';
-        $notes   = isset( $_POST['notes'] ) ? sanitize_textarea_field( $_POST['notes'] ) : '';
+        $lead_id           = isset( $_POST['lead_id'] ) ? sanitize_text_field( $_POST['lead_id'] ) : '';
+        $names             = isset( $_POST['names'] ) ? sanitize_text_field( $_POST['names'] ) : '';
+        $email             = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
+        $phone             = isset( $_POST['phone'] ) ? sanitize_text_field( $_POST['phone'] ) : '';
+        $price             = isset( $_POST['price'] ) ? sanitize_text_field( $_POST['price'] ) : '';
+        $scale             = isset( $_POST['scale'] ) ? sanitize_text_field( $_POST['scale'] ) : 'Standard Shoot';
+        $city              = isset( $_POST['city'] ) ? sanitize_text_field( $_POST['city'] ) : 'Mumbai';
+        $status            = isset( $_POST['status'] ) ? sanitize_text_field( $_POST['status'] ) : 'New Lead';
+        $score             = isset( $_POST['score'] ) ? sanitize_text_field( $_POST['score'] ) : 'warm';
+        $notes             = isset( $_POST['notes'] ) ? sanitize_textarea_field( $_POST['notes'] ) : '';
+        $assigned_to_param = isset( $_POST['assigned_to'] ) ? intval( $_POST['assigned_to'] ) : null;
 
         if ( empty( $names ) || empty( $email ) ) {
             wp_send_json_error( array( 'message' => 'Client Name and Email are required fields.' ) );
@@ -24994,22 +25216,43 @@ if ( ! function_exists( 'cora_ajax_save_lead' ) ) {
 
         $is_new = empty( $lead_id ) || ! is_numeric( $lead_id );
         
+        $old_assigned_to = 0;
+        if ( ! $is_new ) {
+            $old_val = $wpdb->get_var( $wpdb->prepare(
+                "SELECT assigned_to FROM {$wpdb->prefix}cora_leads WHERE id = %d",
+                intval( $lead_id )
+            ) );
+            if ( null !== $old_val ) {
+                $old_assigned_to = intval( $old_val );
+            }
+        }
+
+        $assigned_to_val = null;
+        if ( null !== $assigned_to_param ) {
+            $assigned_to_val = $assigned_to_param;
+        } elseif ( ! $is_new ) {
+            $assigned_to_val = $old_assigned_to;
+        } else {
+            $assigned_to_val = 0;
+        }
+
         $db_data = array(
-            'agency_id' => 1,
-            'branch_id' => 1,
-            'first_name' => $names,
-            'last_name' => '',
-            'email' => $email,
-            'phone' => $phone,
-            'source' => 'Direct',
-            'status' => $db_status_slug,
-            'budget_min' => 0,
-            'budget_max' => $budget_max,
+            'agency_id'           => 1,
+            'branch_id'           => 1,
+            'assigned_to'         => $assigned_to_val ? $assigned_to_val : null,
+            'first_name'          => $names,
+            'last_name'           => '',
+            'email'               => $email,
+            'phone'               => $phone,
+            'source'              => 'Direct',
+            'status'              => $db_status_slug,
+            'budget_min'          => 0,
+            'budget_max'          => $budget_max,
             'preferred_locations' => $city,
-            'property_type' => $scale,
-            'notes' => $notes,
+            'property_type'       => $scale,
+            'notes'               => $notes,
             'converted_to_client' => ( $db_status_slug === 'closed' ) ? 1 : 0,
-            'updated_at' => current_time( 'mysql' )
+            'updated_at'          => current_time( 'mysql' )
         );
 
         if ( $is_new ) {
@@ -25017,7 +25260,7 @@ if ( ! function_exists( 'cora_ajax_save_lead' ) ) {
             $wpdb->insert(
                 $wpdb->prefix . 'cora_leads',
                 $db_data,
-                array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s' )
+                array( '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s' )
             );
             $lead_id = $wpdb->insert_id;
         } else {
@@ -25025,7 +25268,7 @@ if ( ! function_exists( 'cora_ajax_save_lead' ) ) {
                 $wpdb->prefix . 'cora_leads',
                 $db_data,
                 array( 'id' => intval( $lead_id ) ),
-                array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%d', '%s' ),
+                array( '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%d', '%s' ),
                 array( '%d' )
             );
         }
@@ -25038,37 +25281,43 @@ if ( ! function_exists( 'cora_ajax_save_lead' ) ) {
         $found = false;
         foreach ( $existing_leads as &$el ) {
             if ( (string) $el['id'] === (string) $lead_id ) {
-                $el['names'] = $names;
-                $el['email'] = $email;
-                $el['phone'] = $phone;
-                $el['price'] = $price;
-                $el['scale'] = $scale;
-                $el['city']  = $city;
-                $el['status'] = $status;
-                $el['score']  = $score;
-                $el['notes']  = $notes;
+                $el['names']       = $names;
+                $el['email']       = $email;
+                $el['phone']       = $phone;
+                $el['price']       = $price;
+                $el['scale']       = $scale;
+                $el['city']        = $city;
+                $el['status']      = $status;
+                $el['score']       = $score;
+                $el['notes']       = $notes;
+                $el['assigned_to'] = $assigned_to_val ? $assigned_to_val : 0;
                 $found = true;
                 break;
             }
         }
         if ( ! $found ) {
             $new_lead = array(
-                'id'         => $lead_id,
-                'names'      => $names,
-                'email'      => $email,
-                'phone'      => $phone,
-                'price'      => $price,
-                'scale'      => $scale,
-                'city'       => $city,
-                'status'     => $status,
-                'score'      => $score,
-                'notes'      => $notes,
-                'created_at' => time(),
+                'id'          => $lead_id,
+                'names'       => $names,
+                'email'       => $email,
+                'phone'       => $phone,
+                'price'       => $price,
+                'scale'       => $scale,
+                'city'        => $city,
+                'status'      => $status,
+                'score'       => $score,
+                'notes'       => $notes,
+                'assigned_to' => $assigned_to_val ? $assigned_to_val : 0,
+                'created_at'  => time(),
             );
             array_unshift( $existing_leads, $new_lead );
         }
 
         update_option( 'cora_workspace_leads', $existing_leads );
+
+        if ( null !== $assigned_to_param && ( $is_new || $old_assigned_to !== $assigned_to_param ) && function_exists( 'cora_log_lead_assignment_change' ) ) {
+            cora_log_lead_assignment_change( $lead_id, $assigned_to_param );
+        }
 
         wp_send_json_success( array(
             'message' => 'Lead deal saved successfully.',
@@ -25077,6 +25326,41 @@ if ( ! function_exists( 'cora_ajax_save_lead' ) ) {
     }
     add_action( 'wp_ajax_cora_ajax_save_lead', 'cora_ajax_save_lead' );
     add_action( 'wp_ajax_cora_save_lead', 'cora_ajax_save_lead' );
+}
+
+/**
+ * AJAX Endpoint: cora_ajax_update_lead_assignee
+ */
+if ( ! function_exists( 'cora_ajax_update_lead_assignee' ) ) {
+    function cora_ajax_update_lead_assignee() {
+        $lead_id = isset( $_POST['lead_id'] ) ? sanitize_text_field( $_POST['lead_id'] ) : '';
+        $assigned_to = isset( $_POST['assigned_to'] ) ? sanitize_text_field( $_POST['assigned_to'] ) : '';
+        
+        if ( ! empty( $lead_id ) ) {
+            global $wpdb;
+            $wpdb->update(
+                $wpdb->prefix . 'cora_leads',
+                array( 'assigned_to' => intval( $assigned_to ), 'updated_at' => current_time( 'mysql' ) ),
+                array( 'id' => intval( $lead_id ) ),
+                array( '%d', '%s' ),
+                array( '%d' )
+            );
+
+            $existing_leads = get_option( 'cora_workspace_leads', array() );
+            if ( is_array( $existing_leads ) ) {
+                foreach ( $existing_leads as &$el ) {
+                    if ( (string) ($el['id'] ?? '') === (string) $lead_id ) {
+                        $el['assigned_to'] = intval( $assigned_to );
+                        break;
+                    }
+                }
+                update_option( 'cora_workspace_leads', $existing_leads );
+            }
+        }
+        wp_send_json_success( array( 'message' => 'Assigned team member updated successfully.' ) );
+    }
+    add_action( 'wp_ajax_cora_ajax_update_lead_assignee', 'cora_ajax_update_lead_assignee' );
+    add_action( 'wp_ajax_cora_update_lead_assignee', 'cora_ajax_update_lead_assignee' );
 }
 
 /**
@@ -25105,38 +25389,69 @@ if ( ! function_exists( 'cora_ajax_update_lead_stage' ) ) {
         }
 
         global $wpdb;
-        $lead_id   = isset( $_POST['lead_id'] ) ? sanitize_text_field( $_POST['lead_id'] ) : '';
-        $raw_stage = isset( $_POST['new_stage'] ) ? sanitize_text_field( $_POST['new_stage'] ) : '';
+        $lead_id           = isset( $_POST['lead_id'] ) ? sanitize_text_field( $_POST['lead_id'] ) : '';
+        $raw_stage         = isset( $_POST['new_stage'] ) ? sanitize_text_field( $_POST['new_stage'] ) : '';
+        $assigned_to_param = isset( $_POST['assigned_to'] ) ? intval( $_POST['assigned_to'] ) : null;
 
-        if ( empty( $lead_id ) || empty( $raw_stage ) ) {
-            wp_send_json_error( array( 'message' => 'Lead ID and New Stage are required.' ) );
+        if ( empty( $lead_id ) && empty( $raw_stage ) && null === $assigned_to_param ) {
+            wp_send_json_error( array( 'message' => 'Lead ID is required.' ) );
         }
 
-        $new_stage = function_exists('cora_normalize_lead_stage') ? cora_normalize_lead_stage($raw_stage) : $raw_stage;
-
-        // Map stage to DB status slug
-        $db_status_slug = 'new';
-        $st_lower = strtolower($new_stage);
-        if (strpos($st_lower, 'contact') !== false || strpos($st_lower, 'proposal') !== false) {
-            $db_status_slug = 'contacted';
-        } elseif (strpos($st_lower, 'visit') !== false || strpos($st_lower, 'viewing') !== false) {
-            $db_status_slug = 'site_visit';
-        } elseif (strpos($st_lower, 'negotiat') !== false) {
-            $db_status_slug = 'negotiation';
-        } elseif (strpos($st_lower, 'convert') !== false) {
-            $db_status_slug = 'closed';
-        } elseif (strpos($st_lower, 'lost') !== false || strpos($st_lower, 'hold') !== false) {
-            $db_status_slug = 'lost';
+        $old_assigned_to = 0;
+        if ( null !== $assigned_to_param ) {
+            $old_val = $wpdb->get_var( $wpdb->prepare(
+                "SELECT assigned_to FROM {$wpdb->prefix}cora_leads WHERE id = %s OR id = %d",
+                $lead_id, intval( $lead_id )
+            ) );
+            if ( null !== $old_val ) {
+                $old_assigned_to = intval( $old_val );
+            }
         }
 
-        $converted_val = ( $db_status_slug === 'closed' ) ? 1 : 0;
-        $wpdb->query( $wpdb->prepare(
-            "UPDATE {$wpdb->prefix}cora_leads SET status = %s, converted_to_client = %d WHERE id = %s OR id = %d",
-            $db_status_slug, $converted_val, $lead_id, intval( $lead_id )
-        ) );
+        $new_stage = ! empty( $raw_stage ) ? ( function_exists('cora_normalize_lead_stage') ? cora_normalize_lead_stage($raw_stage) : $raw_stage ) : '';
+
+        if ( ! empty( $new_stage ) ) {
+            // Map stage to DB status slug
+            $db_status_slug = 'new';
+            $st_lower = strtolower($new_stage);
+            if (strpos($st_lower, 'contact') !== false || strpos($st_lower, 'proposal') !== false) {
+                $db_status_slug = 'contacted';
+            } elseif (strpos($st_lower, 'visit') !== false || strpos($st_lower, 'viewing') !== false) {
+                $db_status_slug = 'site_visit';
+            } elseif (strpos($st_lower, 'negotiat') !== false) {
+                $db_status_slug = 'negotiation';
+            } elseif (strpos($st_lower, 'convert') !== false) {
+                $db_status_slug = 'closed';
+            } elseif (strpos($st_lower, 'lost') !== false || strpos($st_lower, 'hold') !== false) {
+                $db_status_slug = 'lost';
+            }
+
+            $converted_val = ( $db_status_slug === 'closed' ) ? 1 : 0;
+
+            if ( null !== $assigned_to_param ) {
+                $wpdb->query( $wpdb->prepare(
+                    "UPDATE {$wpdb->prefix}cora_leads SET status = %s, converted_to_client = %d, assigned_to = %d, updated_at = %s WHERE id = %s OR id = %d",
+                    $db_status_slug, $converted_val, $assigned_to_param ? $assigned_to_param : null, current_time( 'mysql' ), $lead_id, intval( $lead_id )
+                ) );
+            } else {
+                $wpdb->query( $wpdb->prepare(
+                    "UPDATE {$wpdb->prefix}cora_leads SET status = %s, converted_to_client = %d, updated_at = %s WHERE id = %s OR id = %d",
+                    $db_status_slug, $converted_val, current_time( 'mysql' ), $lead_id, intval( $lead_id )
+                ) );
+            }
+        } elseif ( null !== $assigned_to_param ) {
+            $wpdb->query( $wpdb->prepare(
+                "UPDATE {$wpdb->prefix}cora_leads SET assigned_to = %d, updated_at = %s WHERE id = %s OR id = %d",
+                $assigned_to_param ? $assigned_to_param : null, current_time( 'mysql' ), $lead_id, intval( $lead_id )
+            ) );
+        }
 
         $all_leads = cora_db_get_leads();
-        $existing_leads = get_option( 'cora_workspace_leads', array() );
+        $raw_opt_val = $wpdb->get_var( $wpdb->prepare(
+            "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s",
+            'cora_workspace_leads'
+        ) );
+        $existing_leads = ! empty( $raw_opt_val ) ? maybe_unserialize( $raw_opt_val ) : array();
         if ( ! is_array( $existing_leads ) || empty( $existing_leads ) ) {
             $existing_leads = $all_leads;
         }
@@ -25145,7 +25460,12 @@ if ( ! function_exists( 'cora_ajax_update_lead_stage' ) ) {
         $matched_lead = null;
         foreach ( $existing_leads as &$el ) {
             if ( (string) $el['id'] === (string) $lead_id ) {
-                $el['status'] = $new_stage;
+                if ( ! empty( $new_stage ) ) {
+                    $el['status'] = $new_stage;
+                }
+                if ( null !== $assigned_to_param ) {
+                    $el['assigned_to'] = $assigned_to_param;
+                }
                 $updated = true;
                 $matched_lead = $el;
                 break;
@@ -25162,33 +25482,124 @@ if ( ! function_exists( 'cora_ajax_update_lead_stage' ) ) {
             }
             if ( $full_meta ) {
                 $matched_lead = $full_meta;
-                $matched_lead['status'] = $new_stage;
+                if ( ! empty( $new_stage ) ) {
+                    $matched_lead['status'] = $new_stage;
+                }
+                if ( null !== $assigned_to_param ) {
+                    $matched_lead['assigned_to'] = $assigned_to_param;
+                }
             } else {
                 $matched_lead = array(
-                    'id'         => $lead_id,
-                    'names'      => 'Client Inquiry',
-                    'status'     => $new_stage,
-                    'price'      => '₹0',
-                    'created_at' => time()
+                    'id'          => $lead_id,
+                    'names'       => 'Client Inquiry',
+                    'status'      => $new_stage ?: 'New Lead',
+                    'price'       => '₹0',
+                    'assigned_to' => $assigned_to_param ?: 0,
+                    'created_at'  => time()
                 );
             }
             $existing_leads[] = $matched_lead;
             $updated = true;
         }
 
+        remove_filter( 'pre_update_option_cora_workspace_leads', 'cora_pre_update_tenancy_data', 10 );
         update_option( 'cora_workspace_leads', $existing_leads );
+        add_filter( 'pre_update_option_cora_workspace_leads', 'cora_pre_update_tenancy_data', 10, 3 );
+
         if ( $new_stage === 'Converted' && $matched_lead ) {
             cora_copy_lead_to_clients( $matched_lead );
         }
 
+        if ( null !== $assigned_to_param && $old_assigned_to !== $assigned_to_param && function_exists( 'cora_log_lead_assignment_change' ) ) {
+            cora_log_lead_assignment_change( $lead_id, $assigned_to_param );
+        }
+
         wp_send_json_success( array(
-            'message'   => 'Lead moved to ' . $new_stage . '.',
+            'message'   => 'Lead stage/assignment updated successfully.',
             'lead_id'   => $lead_id,
             'new_stage' => $new_stage,
         ) );
     }
     add_action( 'wp_ajax_cora_ajax_update_lead_stage', 'cora_ajax_update_lead_stage' );
     add_action( 'wp_ajax_cora_update_lead_stage', 'cora_ajax_update_lead_stage' );
+}
+
+/**
+ * AJAX Endpoint: cora_ajax_save_lead_field
+ */
+if ( ! function_exists( 'cora_ajax_save_lead_field' ) ) {
+    function cora_ajax_save_lead_field() {
+        $nonce = '';
+        if ( isset( $_REQUEST['security'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['security'] );
+        } elseif ( isset( $_REQUEST['nonce'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['nonce'] );
+        } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+            $nonce = sanitize_text_field( $_REQUEST['_wpnonce'] );
+        }
+
+        $verified = false;
+        if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+            $verified = true;
+        } elseif ( current_user_can( 'manage_options' ) ) {
+            $verified = true;
+        }
+
+        if ( ! $verified ) {
+            wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+        }
+
+        global $wpdb;
+        $lead_id     = isset( $_POST['lead_id'] ) ? sanitize_text_field( $_POST['lead_id'] ) : ( isset( $_POST['id'] ) ? sanitize_text_field( $_POST['id'] ) : '' );
+        $field_name  = isset( $_POST['field_name'] ) ? sanitize_text_field( $_POST['field_name'] ) : ( isset( $_POST['field'] ) ? sanitize_text_field( $_POST['field'] ) : '' );
+        $field_value = isset( $_POST['field_value'] ) ? sanitize_text_field( $_POST['field_value'] ) : ( isset( $_POST['value'] ) ? sanitize_text_field( $_POST['value'] ) : '' );
+
+        if ( empty( $lead_id ) ) {
+            wp_send_json_error( array( 'message' => 'Lead ID is required.' ) );
+        }
+
+        if ( isset( $_POST['assigned_to'] ) || $field_name === 'assigned_to' ) {
+            $assigned_to_id = isset( $_POST['assigned_to'] ) ? intval( $_POST['assigned_to'] ) : intval( $field_value );
+
+            $old_assigned_to = $wpdb->get_var( $wpdb->prepare(
+                "SELECT assigned_to FROM {$wpdb->prefix}cora_leads WHERE id = %s OR id = %d",
+                $lead_id, intval( $lead_id )
+            ) );
+            $old_assigned_to = $old_assigned_to !== null ? intval( $old_assigned_to ) : 0;
+
+            $wpdb->query( $wpdb->prepare(
+                "UPDATE {$wpdb->prefix}cora_leads SET assigned_to = %d, updated_at = %s WHERE id = %s OR id = %d",
+                $assigned_to_id ? $assigned_to_id : null, current_time( 'mysql' ), $lead_id, intval( $lead_id )
+            ) );
+
+            $existing_leads = get_option( 'cora_workspace_leads', array() );
+            if ( is_array( $existing_leads ) ) {
+                foreach ( $existing_leads as &$el ) {
+                    if ( (string) ( $el['id'] ?? '' ) === (string) $lead_id ) {
+                        $el['assigned_to'] = $assigned_to_id;
+                        break;
+                    }
+                }
+                remove_filter( 'pre_update_option_cora_workspace_leads', 'cora_pre_update_tenancy_data', 10 );
+                update_option( 'cora_workspace_leads', $existing_leads );
+                add_filter( 'pre_update_option_cora_workspace_leads', 'cora_pre_update_tenancy_data', 10, 3 );
+            }
+
+            if ( $old_assigned_to !== $assigned_to_id && function_exists( 'cora_log_lead_assignment_change' ) ) {
+                cora_log_lead_assignment_change( $lead_id, $assigned_to_id );
+            }
+
+            wp_send_json_success( array(
+                'message'     => 'Lead assignment updated successfully.',
+                'lead_id'     => $lead_id,
+                'assigned_to' => $assigned_to_id,
+            ) );
+        }
+
+        wp_send_json_error( array( 'message' => 'Invalid or unsupported field name.' ) );
+    }
+    add_action( 'wp_ajax_cora_ajax_save_lead_field', 'cora_ajax_save_lead_field' );
+    add_action( 'wp_ajax_cora_save_lead_field', 'cora_ajax_save_lead_field' );
 }
 
 /**

@@ -10513,12 +10513,19 @@ if ( current_user_can( 'manage_options' ) ) :
     position: fixed;
     top: 0;
     right: 0;
-    width: 400px;
-    max-width: 100%;
+    width: 50vw;
+    min-width: 480px;
+    max-width: 98vw;
     height: 100%;
     z-index: 10000;
     transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: -10px 0 30px rgba(0,0,0,0.08);
+}
+@media (max-width: 768px) {
+    .cora-side-drawer {
+        width: 100vw !important;
+        min-width: 100vw !important;
+    }
 }
 .cora-side-drawer.collapsed {
     transform: translateX(100%);
