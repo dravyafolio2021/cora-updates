@@ -19,6 +19,42 @@ window.coraData = window.coraData || {};
 window.coraData.ajax_url = '<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>';
 window.coraData.nonce = '<?php echo wp_create_nonce( 'cora_ajax_nonce' ); ?>';
 
+// Immediate Window Global Subtab Switcher (guarantees availability before DOM ready)
+window.coraSwitchLeadSubtab = function(tabName) {
+    const activeClasses = 'active bg-white text-zinc-950 dark:bg-zinc-800 dark:text-white shadow-2xs font-bold border border-zinc-200/80 dark:border-zinc-700/80';
+    const inactiveClasses = 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white font-medium hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50';
+    const classesToRemove = 'active bg-white text-zinc-950 dark:bg-zinc-800 dark:text-white shadow-2xs font-bold border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 shadow-sm font-semibold text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white font-medium hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 text-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800';
+
+    if (window.jQuery) {
+        jQuery('.cora-lead-subtab-btn').removeClass(classesToRemove).addClass(inactiveClasses);
+        jQuery(`.cora-lead-subtab-btn[data-tab="${tabName}"]`).removeClass(classesToRemove).addClass(activeClasses);
+        jQuery('.cora-lead-tab-pane').addClass('hidden');
+        jQuery(`#cora-lead-pane-${tabName}`).removeClass('hidden');
+    } else {
+        document.querySelectorAll('.cora-lead-subtab-btn').forEach(b => {
+            const isTarget = b.getAttribute('data-tab') === tabName;
+            b.classList.remove('active', 'bg-white', 'text-zinc-950', 'dark:bg-zinc-800', 'dark:text-white', 'shadow-2xs', 'font-bold', 'border', 'border-zinc-200/80', 'dark:border-zinc-700/80');
+            if (isTarget) {
+                b.className += ' ' + activeClasses;
+            } else {
+                b.className += ' ' + inactiveClasses;
+            }
+        });
+        document.querySelectorAll('.cora-lead-tab-pane').forEach(p => p.classList.add('hidden'));
+        const pane = document.getElementById('cora-lead-pane-' + tabName);
+        if (pane) pane.classList.remove('hidden');
+    }
+
+    if (window.history && window.history.replaceState) {
+        try {
+            const url = new URL(window.location);
+            url.searchParams.set('sub_page', 'leads');
+            url.searchParams.set('subtab', tabName);
+            window.history.replaceState(null, '', url);
+        } catch(e){}
+    }
+};
+
 // In-Column Real-Time Search Handler (Immediate Window Global)
 window.coraToggleColumnSearch = function(btnEl) {
     const col = btnEl.closest('.cora-kanban-column');
@@ -263,6 +299,12 @@ foreach ( $cora_leads_raw as $l ) {
 }
 
 $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_leads_count ) * 100, 1 ) : 0;
+
+$cora_initial_subtab = sanitize_text_field( $_GET['subtab'] ?? '' );
+if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( 'kanban', 'directory', 'analytics', 'activity' ), true ) ) {
+    $is_mobile_ua = isset( $_SERVER['HTTP_USER_AGENT'] ) && preg_match( '/(mobile|android|iphone|ipad|ipod)/i', $_SERVER['HTTP_USER_AGENT'] );
+    $cora_initial_subtab = $is_mobile_ua ? 'directory' : 'kanban';
+}
 ?>
 
 <div id="cora-leads-module-container" class="space-y-6 select-none font-sans text-zinc-900 dark:text-zinc-100">    <!-- STANDARD PAGE HEADER -->
@@ -400,20 +442,24 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
     <!-- OPTIMIZED SEGMENTED TOOLBAR -->
     <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-3 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-2xs overflow-hidden">
         <div class="flex items-center gap-1 bg-zinc-100/80 dark:bg-zinc-800/80 p-1 rounded-xl shrink-0 overflow-x-auto max-w-full">
-            <button type="button" class="cora-lead-subtab-btn shrink-0 active px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer bg-white text-zinc-950 dark:bg-zinc-800 dark:text-white shadow-2xs border border-zinc-200/80 dark:border-zinc-700/80" data-tab="kanban" onclick="coraSwitchLeadSubtab('kanban')">
+            <?php
+            $active_cls = 'active bg-white text-zinc-950 dark:bg-zinc-800 dark:text-white shadow-2xs font-bold border border-zinc-200/80 dark:border-zinc-700/80';
+            $inactive_cls = 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white font-medium hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50';
+            ?>
+            <button type="button" class="cora-lead-subtab-btn shrink-0 px-3.5 py-1.5 text-xs rounded-lg transition-all cursor-pointer <?php echo ($cora_initial_subtab === 'kanban') ? $active_cls : $inactive_cls; ?>" data-tab="kanban" onclick="coraSwitchLeadSubtab('kanban')">
                 <div class="flex items-center gap-2">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="9" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
                     <span>Kanban Pipeline</span>
                     <span class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-zinc-100 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 border border-zinc-200/80 dark:border-zinc-700"><?php echo $total_leads_count; ?></span>
                 </div>
             </button>
-            <button type="button" class="cora-lead-subtab-btn shrink-0 px-3.5 py-1.5 text-xs font-medium rounded-lg text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 transition-all cursor-pointer" data-tab="directory" onclick="coraSwitchLeadSubtab('directory')">
+            <button type="button" class="cora-lead-subtab-btn shrink-0 px-3.5 py-1.5 text-xs rounded-lg transition-all cursor-pointer <?php echo ($cora_initial_subtab === 'directory') ? $active_cls : $inactive_cls; ?>" data-tab="directory" onclick="coraSwitchLeadSubtab('directory')">
                 <div class="flex items-center gap-2">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
                     <span>Leads Directory</span>
                 </div>
             </button>
-            <button type="button" class="cora-lead-subtab-btn shrink-0 px-3.5 py-1.5 text-xs font-medium rounded-lg text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 transition-all cursor-pointer" data-tab="analytics" onclick="coraSwitchLeadSubtab('analytics')">
+            <button type="button" class="cora-lead-subtab-btn shrink-0 px-3.5 py-1.5 text-xs rounded-lg transition-all cursor-pointer <?php echo ($cora_initial_subtab === 'analytics') ? $active_cls : $inactive_cls; ?>" data-tab="analytics" onclick="coraSwitchLeadSubtab('analytics')">
                 <div class="flex items-center gap-2">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                     <span>Funnel & Analytics</span>
@@ -451,7 +497,7 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
     </div>
 
     <!-- SUB-TAB 1: KANBAN PIPELINE BOARD -->
-    <div id="cora-lead-pane-kanban" class="cora-lead-tab-pane">
+    <div id="cora-lead-pane-kanban" class="cora-lead-tab-pane <?php echo ($cora_initial_subtab === 'kanban') ? '' : 'hidden'; ?>">
         <style>
             .cora-kanban-column {
                 width: 300px !important;
@@ -922,7 +968,7 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
     </div>
 
     <!-- SUB-TAB 2: LEADS DIRECTORY TABLE -->
-    <div id="cora-lead-pane-directory" class="cora-lead-tab-pane hidden space-y-4">
+    <div id="cora-lead-pane-directory" class="cora-lead-tab-pane <?php echo ($cora_initial_subtab === 'directory') ? '' : 'hidden'; ?> space-y-4">
         <!-- Redesigned Desktop Table View (Hidden on Mobile) -->
         <div class="hidden md:block bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 overflow-hidden shadow-xs">
             <div class="overflow-x-auto">
@@ -1263,7 +1309,7 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
     </div>
 
     <!-- SUB-TAB 3: FUNNEL & REVENUE ANALYTICS (ACTIONABLE VELOCITY HUB) -->
-    <div id="cora-lead-pane-analytics" class="cora-lead-tab-pane hidden space-y-6">
+    <div id="cora-lead-pane-analytics" class="cora-lead-tab-pane <?php echo ($cora_initial_subtab === 'analytics') ? '' : 'hidden'; ?> space-y-6">
         <!-- TOP PRIORITY DEAL SLA & ACTION LAUNCHERS -->
         <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm space-y-4">
             <div class="flex items-center justify-between">
@@ -1411,7 +1457,7 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
     </div>
 
     <!-- SUB-TAB 4: ACTIVITY & OUTREACH LOG -->
-    <div id="cora-lead-pane-activity" class="cora-lead-tab-pane hidden space-y-4">
+    <div id="cora-lead-pane-activity" class="cora-lead-tab-pane <?php echo ($cora_initial_subtab === 'activity') ? '' : 'hidden'; ?> space-y-4">
         <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-zinc-200/80 dark:border-zinc-800">
                 <div>
