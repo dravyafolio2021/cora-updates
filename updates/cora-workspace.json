@@ -1,11 +1,11 @@
 {
     "name": "Cora Workspace Platform",
     "slug": "cora-workspace",
-    "version": "2.5.2",
+    "version": "2.5.3",
     "download_url": "https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-workspace.zip",
     "tested": "6.7",
     "sections": {
         "description": "A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.",
-        "changelog": "<h4>2.5.2</h4><ul><li><strong>Bottom Drawer Layout Styling</strong>: Enhanced responsive drawer height (82vh), soft backdrop filter overlays, and segment buttons layout.</li><li><strong>Status One-Tap Cycle</strong>: Enabled direct timeline task status updating on tap.</li><li><strong>Clean Monochromatic Look</strong>: Refined list elements to align with Notion/Shopify design directives.</li></ul>"
+        "changelog": "<h4>2.5.3</h4><ul><li><strong>Leads CRM Visual Overhaul</strong>: Replaced icon buttons and complex layouts with flat, clean, Notion-inspired rows, thin SVGs, and consistent monochromatic borders.</li><li><strong>Team Member Assignment</strong>: Added a team member filter selector in the Leads CRM toolbar, Kanban cards, directory list, and drawers.</li><li><strong>One-Tap Lead Status Transition</strong>: Enabled quick status updates directly from the Kanban list and the main drawer interface.</li><li><strong>SLA & Priority Awareness</strong>: Integrated a prominent SLA status header card, dynamic activity logs, and real-time validation checks.</li></ul>"
     }
 }
