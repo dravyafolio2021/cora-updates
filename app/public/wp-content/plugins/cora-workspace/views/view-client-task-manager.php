@@ -445,6 +445,49 @@ if (!defined('ABSPATH')) {
 .cora-col-add-task-btn.btn-review:hover { background-color: rgba(37, 99, 235, 0.08); }
 .cora-col-add-task-btn.btn-done { color: #059669 !important; }
 .cora-col-add-task-btn.btn-done:hover { background-color: rgba(5, 150, 105, 0.08); }
+
+/* Quick Filters buttons styling */
+.qf-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 10px;
+    border: 1px solid #e4e4e7;
+    background-color: #ffffff;
+    color: #52525b;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.qf-btn:hover {
+    background-color: #f4f4f5;
+    color: #18181b;
+}
+.qf-btn.active {
+    background-color: #09090b;
+    border-color: #09090b;
+    color: #ffffff;
+}
+.qf-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    font-size: 9px;
+    font-weight: 700;
+    border-radius: 9999px;
+    background-color: #f4f4f5;
+    color: #71717a;
+}
+.qf-btn.active .qf-count {
+    background-color: #27272a;
+    color: #ffffff;
+}
 </style>
 
 <div class="cora-task-manager-wrap text-zinc-900 dark:text-zinc-100 font-sans px-3 sm:px-4 py-3 sm:py-4 max-w-[1700px] mx-auto pb-20 relative">
@@ -534,6 +577,38 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
             <select id="task-filter-assignee" onchange="coraFilterTasks()">
                 <option value="">All Assignees</option>
             </select>
+            <select id="task-filter-sort" onchange="coraFilterTasks()">
+                <option value="due_date_asc">Sort by: Due (Soonest)</option>
+                <option value="due_date_desc">Sort by: Due (Latest)</option>
+                <option value="priority_desc">Sort by: Priority (High &rarr; Low)</option>
+                <option value="title_asc">Sort by: Name (A-Z)</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Quick Filters bar under the main toolbar -->
+    <div class="cora-quick-filters mb-4 flex items-center justify-between">
+        <div class="flex items-center gap-1.5 flex-wrap" id="cora-quick-filters-container">
+            <button onclick="coraSetQuickFilter('all')" id="qf-all" class="qf-btn active">
+                All Tasks <span class="qf-count">0</span>
+            </button>
+            <button onclick="coraSetQuickFilter('my_tasks')" id="qf-my_tasks" class="qf-btn">
+                My Tasks <span class="qf-count">0</span>
+            </button>
+            <button onclick="coraSetQuickFilter('overdue')" id="qf-overdue" class="qf-btn text-rose-600 border-rose-200 hover:bg-rose-50/50">
+                ⚠️ Overdue <span class="qf-count bg-rose-100 text-rose-750">0</span>
+            </button>
+            <button onclick="coraSetQuickFilter('due_today')" id="qf-due_today" class="qf-btn text-amber-700 border-amber-200 hover:bg-amber-50/50">
+                ⏳ Due Today <span class="qf-count bg-amber-100 text-amber-800">0</span>
+            </button>
+            <button onclick="coraSetQuickFilter('urgent_high')" id="qf-urgent_high" class="qf-btn text-red-600 border-red-200 hover:bg-red-50/50">
+                🔥 Urgent / High <span class="qf-count bg-red-100 text-red-750">0</span>
+            </button>
+        </div>
+        
+        <div class="hidden sm:flex items-center gap-1.5 text-[11px] font-bold text-zinc-500">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Live Sync Active</span>
         </div>
     </div>
 
@@ -1076,6 +1151,7 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
 
 <!-- CLIENT TASK MANAGER SCRIPT ENGINE -->
 <script>
+window.cora_current_user_id = "<?php echo get_current_user_id(); ?>";
 // Dynamic Sidebar Width Calculator (Canvas Scoped Offset + 24px Gap)
 function getSidebarWidthOffset() {
     var sidebar = document.querySelector('.cora-sidebar') || document.querySelector('#cora-sidebar') || document.querySelector('aside.cora-sidebar');
@@ -1595,18 +1671,63 @@ document.addEventListener('click', function(e) {
         $('#detail-task-status').html(statusOpts);
     }
 
+    window.coraActiveQuickFilter = 'all';
+
+    window.coraSetQuickFilter = function(filterVal) {
+        window.coraActiveQuickFilter = filterVal;
+        $('.qf-btn').removeClass('active');
+        $(`#qf-${filterVal}`).addClass('active');
+        coraRenderTaskViews();
+    };
+
     function getFilteredTasks() {
         const query = ($('#task-search-input').val() || '').toLowerCase();
         const clientVal = $('#task-filter-client').val();
         const catVal = $('#task-filter-category').val();
         const assigneeVal = $('#task-filter-assignee').val();
-        return coraTaskState.tasks.filter(t => {
+        const sortVal = $('#task-filter-sort').val() || 'due_date_asc';
+        const activeQuickFilter = window.coraActiveQuickFilter || 'all';
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        let filtered = coraTaskState.tasks.filter(t => {
             if (query && !t.title.toLowerCase().includes(query) && !(t.client_name || '').toLowerCase().includes(query)) return false;
             if (clientVal && String(t.client_id) !== String(clientVal)) return false;
             if (catVal && t.deliverable_type !== catVal) return false;
             if (assigneeVal && String(t.assignee_id) !== String(assigneeVal)) return false;
+
+            // Interactive Quick Filters
+            if (activeQuickFilter === 'my_tasks' && String(t.assignee_id) !== String(window.cora_current_user_id)) return false;
+            if (activeQuickFilter === 'overdue') {
+                if (!t.due_date || t.due_date >= todayStr || t.status === 'done') return false;
+            }
+            if (activeQuickFilter === 'due_today') {
+                if (!t.due_date || t.due_date !== todayStr || t.status === 'done') return false;
+            }
+            if (activeQuickFilter === 'urgent_high') {
+                if (t.priority !== 'urgent' && t.priority !== 'high') return false;
+            }
+
             return true;
         });
+
+        // Apply sorting
+        filtered.sort((a, b) => {
+            if (sortVal === 'due_date_asc' || sortVal === 'due_date_desc') {
+                const valA = a.due_date ? new Date(a.due_date + 'T00:00:00').getTime() : Infinity;
+                const valB = b.due_date ? new Date(b.due_date + 'T00:00:00').getTime() : Infinity;
+                return sortVal === 'due_date_asc' ? valA - valB : valB - valA;
+            } else if (sortVal === 'priority_desc') {
+                const priorityMap = { urgent: 4, high: 3, medium: 2, low: 1 };
+                const weightA = priorityMap[a.priority] || 2;
+                const weightB = priorityMap[b.priority] || 2;
+                return weightB - weightA;
+            } else if (sortVal === 'title_asc') {
+                return (a.title || '').localeCompare(b.title || '');
+            }
+            return 0;
+        });
+
+        return filtered;
     }
 
     function getStatusBadge(status) {
@@ -1674,7 +1795,23 @@ document.addEventListener('click', function(e) {
         coraSwitchView('kanban');
     };
 
+    function coraUpdateQuickFilterCounts() {
+        const allTasks = coraTaskState.tasks || [];
+        const myTasks = allTasks.filter(t => String(t.assignee_id) === String(window.cora_current_user_id));
+        const todayStr = new Date().toISOString().split('T')[0];
+        const overdue = allTasks.filter(t => t.due_date && t.due_date < todayStr && t.status !== 'done');
+        const dueToday = allTasks.filter(t => t.due_date && t.due_date === todayStr && t.status !== 'done');
+        const urgentHigh = allTasks.filter(t => t.priority === 'urgent' || t.priority === 'high');
+
+        $('#qf-all .qf-count').text(allTasks.length);
+        $('#qf-my_tasks .qf-count').text(myTasks.length);
+        $('#qf-overdue .qf-count').text(overdue.length);
+        $('#qf-due_today .qf-count').text(dueToday.length);
+        $('#qf-urgent_high .qf-count').text(urgentHigh.length);
+    }
+
     window.coraRenderTaskViews = function() {
+        coraUpdateQuickFilterCounts();
         const tasks = getFilteredTasks();
         renderKanbanColumns(tasks);
         renderMatrixProjects(tasks);
@@ -1774,7 +1911,7 @@ function renderKanbanColumns(tasks) {
         if (colTasks.length === 0) {
             html = '<div class="text-center text-zinc-400 text-xs py-12 font-medium">No tasks in this stage</div>';
         } else {
-            colTasks.forEach(t => {
+        colTasks.forEach(t => {
                 const subtasks = t.subtasks || [];
                 const doneSub = subtasks.filter(s => s.completed).length;
                 
@@ -1832,7 +1969,18 @@ function renderKanbanColumns(tasks) {
                 const deliverableHtml = t.deliverable_type 
                     ? `<span class="text-[10px] font-bold text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded-md border border-zinc-200/60">${escHtml(t.deliverable_type)}</span>` 
                     : '';
-                
+
+                // Time / Duration calculations
+                const taskCreatedMs = isNaN(t.id) ? Date.now() - 3 * 24 * 60 * 60 * 1000 : parseInt(t.id);
+                const diffCreatedMs = Date.now() - taskCreatedMs;
+                const daysActive = Math.floor(diffCreatedMs / (1000 * 60 * 60 * 24));
+                let durationBadge = '';
+                if (t.status === 'inprogress') {
+                    durationBadge = daysActive > 0 
+                        ? `<span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span> Active ${daysActive}d</span>`
+                        : `<span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span> Active today</span>`;
+                }
+
                 // Action Buttons
                 let actionBtn = '';
                 if (!isCompleted) {
@@ -1872,6 +2020,30 @@ function renderKanbanColumns(tasks) {
                 if (t.status === 'in_progress' || t.status === 'inprogress') progressBgClass = 'bg-amber-500';
                 else if (t.status === 'client_review' || t.status === 'review') progressBgClass = 'bg-blue-600';
 
+                // Notice Warnings or Appreciation
+                let alertHtml = '';
+                if (isCompleted) {
+                    alertHtml = `<div class="text-[10.5px] font-bold text-emerald-700 bg-emerald-50/70 border border-emerald-100 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5">
+                        <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <span>🎉 Excellent work, team!</span>
+                    </div>`;
+                } else if (t.due_date && t.due_date < todayStr) {
+                    const daysOverdue = Math.floor((today - new Date(t.due_date + 'T00:00:00')) / (1000 * 60 * 60 * 24));
+                    alertHtml = `<div class="text-[10.5px] font-bold text-rose-700 bg-rose-50/80 border border-rose-200 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5 animate-pulse">
+                        <svg class="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        <span>SLA Warning: Overdue ${daysOverdue || 1}d!</span>
+                    </div>`;
+                } else if (t.due_date && t.due_date === todayStr) {
+                    alertHtml = `<div class="text-[10.5px] font-bold text-amber-850 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5">
+                        <svg class="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3" /></svg>
+                        <span>⚠️ Action Required: Due Today</span>
+                    </div>`;
+                } else if (t.priority === 'urgent') {
+                    alertHtml = `<div class="text-[10.5px] font-bold text-rose-700 bg-rose-50/70 border border-rose-100 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5">
+                        <span>🔥 Escalated urgent priority</span>
+                    </div>`;
+                }
+
                 html += `
                 <!-- Task Card -->
                 <div class="cora-task-card bg-white rounded-2xl border border-zinc-200/80 p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer space-y-2.5" data-id="${t.id}" draggable="true" ondragstart="coraTaskDragStart(event, this)" ondragend="coraTaskDragEnd(event, this)" onclick="coraOpenTaskDetailsDrawer(event, '${t.id}')">
@@ -1893,10 +2065,14 @@ function renderKanbanColumns(tasks) {
                     </div>
 
                     <!-- Tags Row -->
-                    <div class="flex items-center justify-between pt-1">
-                        <div>${deliverableHtml}</div>
-                        <div>${dueDateHtml}</div>
+                    <div class="flex items-center gap-1.5 flex-wrap pt-1">
+                        ${deliverableHtml}
+                        ${dueDateHtml}
+                        ${durationBadge}
                     </div>
+
+                    <!-- Alerts & Notices -->
+                    ${alertHtml}
 
                     <!-- Assignee Row -->
                     <div class="flex items-center justify-between pt-2">
