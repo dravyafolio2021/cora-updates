@@ -911,15 +911,23 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
     </div>
 
     <div class="flex-1 overflow-y-auto p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div>
-            <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-2">1. Select Target Client Booking *</label>
-            <select id="template-target-booking" class="w-full text-xs font-bold border-zinc-200 rounded-xl bg-zinc-50 focus:outline-none focus:border-zinc-950 p-3 cursor-pointer">
-                <option value="">Choose booking project...</option>
-            </select>
+        <div class="space-y-5">
+            <div>
+                <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-2">1. Select Target Client Booking *</label>
+                <select id="template-target-booking" class="w-full text-xs font-bold border-zinc-200 rounded-xl bg-zinc-50 focus:outline-none focus:border-zinc-950 p-3 cursor-pointer">
+                    <option value="">Choose booking project...</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-2">2. Assign Tasks To (Team Member)</label>
+                <select id="template-target-assignee" class="w-full text-xs font-bold border-zinc-200 rounded-xl bg-zinc-50 focus:outline-none focus:border-zinc-950 p-3 cursor-pointer">
+                    <option value="">Choose team member...</option>
+                </select>
+            </div>
         </div>
         
         <div>
-            <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-3">2. Choose Workflow Template</label>
+            <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-3">3. Choose Workflow Template</label>
             <div class="space-y-3">
                 <label class="flex items-start gap-3 p-4 border border-zinc-200 rounded-2xl cursor-pointer hover:border-zinc-950 hover:bg-zinc-50 transition-colors has-[:checked]:border-zinc-950 has-[:checked]:bg-zinc-50 shadow-2xs">
                     <input type="radio" name="workflow_tpl" value="wedding_photo" checked class="mt-1 text-zinc-950 focus:ring-0 border-zinc-300">
@@ -1259,19 +1267,87 @@ document.addEventListener('click', function(e) {
         currentTaskComments: []
     };
 
-    function normalizeData(tasks, teamMembers) {
-        if (tasks) {
-            tasks.forEach(t => {
-                if (t.assignee_name) {
-                    t.assignee_name = t.assignee_name.replace('Shruti Sharma', 'Shruti').replace(' (Super Admin)', '');
-                }
-            });
-        }
+    function normalizeData(tasks, teamMembers, clients, bookings) {
         if (teamMembers) {
             teamMembers.forEach(m => {
                 if (m.name) {
                     m.name = m.name.replace('Shruti Sharma', 'Shruti').replace(' (Super Admin)', '');
                 }
+            });
+        }
+        if (bookings) {
+            bookings.forEach(b => {
+                b.client_name = b.company_name ? b.company_name : ((b.first_name || b.last_name) ? (b.first_name + ' ' + b.last_name).trim() : 'General Booking');
+                if (clients) {
+                    const matchedClient = clients.find(c => {
+                        const nameA = c.name.toLowerCase();
+                        const nameB = b.client_name.toLowerCase();
+                        return nameA.includes(nameB) || nameB.includes(nameA);
+                    });
+                    if (matchedClient) {
+                        b.client_id = matchedClient.id;
+                    }
+                }
+            });
+        }
+        if (tasks) {
+            tasks.forEach(t => {
+                if (t.assignee_name) {
+                    t.assignee_name = t.assignee_name.replace('Shruti Sharma', 'Shruti').replace(' (Super Admin)', '');
+                }
+                
+                // Align assignee_id by checking display name matches
+                if (teamMembers) {
+                    const exists = teamMembers.some(m => String(m.id) === String(t.assignee_id));
+                    if (!exists && t.assignee_name) {
+                        const matchedMember = teamMembers.find(m => {
+                            const nameA = m.name.toLowerCase();
+                            const nameB = t.assignee_name.toLowerCase();
+                            return nameA.includes(nameB) || nameB.includes(nameA);
+                        });
+                        if (matchedMember) {
+                            t.assignee_id = matchedMember.id;
+                            t.assignee_name = matchedMember.name;
+                        }
+                    }
+                }
+
+                // Align client_id by name matching
+                if (clients && t.client_name) {
+                    const exists = clients.some(c => String(c.id) === String(t.client_id));
+                    if (!exists) {
+                        const matchedClient = clients.find(c => {
+                            const nameA = c.name.toLowerCase();
+                            const nameB = t.client_name.toLowerCase();
+                            return nameA.includes(nameB) || nameB.includes(nameA);
+                        });
+                        if (matchedClient) {
+                            t.client_id = matchedClient.id;
+                            t.client_name = matchedClient.name;
+                        }
+                    }
+                }
+
+                // Align booking_id by title matching
+                if (bookings && t.booking_title) {
+                    const exists = bookings.some(b => String(b.id) === String(t.booking_id));
+                    if (!exists) {
+                        const matchedBooking = bookings.find(b => {
+                            const titleA = b.title.toLowerCase();
+                            const titleB = t.booking_title.toLowerCase();
+                            return titleA.includes(titleB) || titleB.includes(titleA);
+                        });
+                        if (matchedBooking) {
+                            t.booking_id = matchedBooking.id;
+                            t.booking_title = matchedBooking.title;
+                        }
+                    }
+                }
+
+                // Normalize old/different status strings to match active columns
+                if (t.status === 'in_progress') t.status = 'inprogress';
+                if (t.status === 'client_review') t.status = 'review';
+                if (t.status === 'blocked') t.status = 'todo';
             });
         }
     }
@@ -1304,7 +1380,7 @@ document.addEventListener('click', function(e) {
                 coraTaskState.teamMembers = res.data.team_members || [];
                 coraTaskState.templates = res.data.templates || [];
 
-                normalizeData(coraTaskState.tasks, coraTaskState.teamMembers);
+                normalizeData(coraTaskState.tasks, coraTaskState.teamMembers, coraTaskState.clients, coraTaskState.bookings);
                 coraPopulateFilters();
                 coraRenderTaskViews();
             }
@@ -1473,7 +1549,7 @@ document.addEventListener('click', function(e) {
         coraTaskState.teamMembers.forEach(m => {
             staffSelectOpts += `<option value="${m.id}">${escHtml(m.name)} (${escHtml(m.role)})</option>`;
         });
-        $('#create-task-assignee, #detail-task-assignee').html(staffSelectOpts);
+        $('#create-task-assignee, #detail-task-assignee, #template-target-assignee').html(staffSelectOpts);
 
         // Dynamic detail status dropdown based on columns state
         let statusOpts = '';
@@ -1497,11 +1573,77 @@ document.addEventListener('click', function(e) {
         });
     }
 
+    function getStatusBadge(status) {
+        status = (status || '').toLowerCase().trim();
+        if (status === 'confirmed' || status === 'active') {
+            return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-800 border border-emerald-200/60">Confirmed</span>`;
+        } else if (status === 'completed' || status === 'done') {
+            return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-blue-50 text-blue-800 border border-blue-200/60">Completed</span>`;
+        } else if (status === 'editing' || status === 'in editing' || status === 'progress') {
+            return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-amber-50 text-amber-800 border border-amber-200/60">In Editing</span>`;
+        } else {
+            return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-zinc-50 text-zinc-800 border border-zinc-200/60">${escHtml(status)}</span>`;
+        }
+    }
+
+    function coraRenderBookingsTable() {
+        const query = ($('#task-search-input').val() || '').toLowerCase();
+        const clientVal = $('#task-filter-client').val();
+        
+        let filteredBookings = (cTaskState => {
+            return (cTaskState.bookings || []).filter(b => {
+                if (query && !b.title.toLowerCase().includes(query) && !(b.client_name || '').toLowerCase().includes(query) && !(b.location || '').toLowerCase().includes(query)) return false;
+                if (clientVal && String(b.client_id) !== String(clientVal)) return false;
+                return true;
+            });
+        })(coraTaskState);
+
+        let html = '';
+        if (filteredBookings.length === 0) {
+            html = `<tr>
+                <td colspan="6" class="p-8 text-center text-zinc-400">No matching shoot bookings found.</td>
+            </tr>`;
+        } else {
+            filteredBookings.forEach(b => {
+                const amountFormatted = b.amount ? parseFloat(b.amount).toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }) : '—';
+                const dateFormatted = b.start_date ? b.start_date : '—';
+                const badge = getStatusBadge(b.status);
+                const targetClientId = b.client_id || '';
+                
+                html += `
+                <tr class="hover:bg-zinc-50/70 transition-colors">
+                    <td class="p-3.5">
+                        <div class="font-extrabold text-zinc-950 text-sm">${escHtml(b.title)}</div>
+                        <div class="text-[11px] text-zinc-500">Client: ${escHtml(b.client_name)}</div>
+                    </td>
+                    <td class="p-3.5 text-zinc-600 font-medium">${escHtml(b.location || '—')}</td>
+                    <td class="p-3.5 font-semibold text-zinc-800">${escHtml(dateFormatted)}</td>
+                    <td class="p-3.5 font-bold font-mono text-zinc-950">${escHtml(amountFormatted)}</td>
+                    <td class="p-3.5">${badge}</td>
+                    <td class="p-3.5 text-right">
+                        <button onclick="coraFilterTasksByBooking('${b.id}', '${targetClientId}')" class="px-3 py-1.5 bg-zinc-900 text-white rounded-lg text-[11px] font-bold hover:bg-zinc-800 transition-colors cursor-pointer">
+                            View Tasks →
+                        </button>
+                    </td>
+                </tr>`;
+            });
+        }
+        $('#bookings-table-body').html(html);
+    }
+
+    window.coraFilterTasksByBooking = function(bookingId, clientId) {
+        if (clientId) {
+            $('#task-filter-client').val(clientId).trigger('change');
+        }
+        coraSwitchView('kanban');
+    };
+
     window.coraRenderTaskViews = function() {
         const tasks = getFilteredTasks();
         renderKanbanColumns(tasks);
         renderMatrixProjects(tasks);
         renderRosterTeam(tasks);
+        coraRenderBookingsTable();
     };
 
     // Subtask 3: Card Component & Render Function Redesign
@@ -1938,6 +2080,29 @@ window.coraQuickMoveTask = function(event, taskId, newStatus) {
         $('#detail-subtasks-list').html(html);
     }
 
+    function coraAutoSaveTask(t) {
+        if (!t) return;
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_save_client_task',
+            nonce: coraREData.ajaxNonce,
+            task: JSON.stringify(t),
+            notify_email: '0',
+            notify_wa: '0'
+        }, function(res) {
+            if (res && res.success) {
+                coraTaskState.tasks = res.data.tasks || coraTaskState.tasks;
+                const updatedT = coraTaskState.tasks.find(x => String(x.id) === String(t.id));
+                if (updatedT) {
+                    coraTaskState.currentTaskSubtasks = (updatedT.subtasks || []).map(s => ({ ...s }));
+                    coraTaskState.currentTaskComments = (updatedT.comments || []).map(c => ({ ...c }));
+                    renderDetailSubtasks();
+                    renderDetailComments();
+                }
+                coraRenderTaskViews();
+            }
+        });
+    }
+
     window.coraAddDetailSubtask = function() {
         const txt = $('#detail-new-subtask-input').val().trim();
         if (!txt) return;
@@ -1948,16 +2113,37 @@ window.coraQuickMoveTask = function(event, taskId, newStatus) {
         });
         $('#detail-new-subtask-input').val('');
         renderDetailSubtasks();
+
+        const taskId = $('#detail-task-id').val();
+        const t = coraTaskState.tasks.find(x => String(x.id) === String(taskId));
+        if (t) {
+            t.subtasks = coraTaskState.currentTaskSubtasks;
+            coraAutoSaveTask(t);
+        }
     };
 
     window.coraToggleDetailSubtask = function(idx) {
         coraTaskState.currentTaskSubtasks[idx].completed = !coraTaskState.currentTaskSubtasks[idx].completed;
         renderDetailSubtasks();
+
+        const taskId = $('#detail-task-id').val();
+        const t = coraTaskState.tasks.find(x => String(x.id) === String(taskId));
+        if (t) {
+            t.subtasks = coraTaskState.currentTaskSubtasks;
+            coraAutoSaveTask(t);
+        }
     };
 
     window.coraRemoveDetailSubtask = function(idx) {
         coraTaskState.currentTaskSubtasks.splice(idx, 1);
         renderDetailSubtasks();
+
+        const taskId = $('#detail-task-id').val();
+        const t = coraTaskState.tasks.find(x => String(x.id) === String(taskId));
+        if (t) {
+            t.subtasks = coraTaskState.currentTaskSubtasks;
+            coraAutoSaveTask(t);
+        }
     };
 
     function renderDetailComments() {
@@ -1991,7 +2177,14 @@ window.coraQuickMoveTask = function(event, taskId, newStatus) {
         });
         $('#detail-comment-input').val('');
         renderDetailComments();
-        window.coraShowToast("Note posted to task activity log.");
+
+        const taskId = $('#detail-task-id').val();
+        const t = coraTaskState.tasks.find(x => String(x.id) === String(taskId));
+        if (t) {
+            t.comments = coraTaskState.currentTaskComments;
+            coraAutoSaveTask(t);
+            window.coraShowToast("Note posted to task activity log.");
+        }
     };
 
     window.coraTriggerEmailReminder = function() {
@@ -2139,6 +2332,8 @@ window.coraQuickMoveTask = function(event, taskId, newStatus) {
     window.coraApplyTemplate = function() {
         const bookingId = $('#template-target-booking').val();
         const bookingObj = coraTaskState.bookings.find(b => String(b.id) === String(bookingId));
+        const assigneeId = $('#template-target-assignee').val();
+        const assigneeObj = coraTaskState.teamMembers.find(m => String(m.id) === String(assigneeId));
         const tplKey = $('input[name="workflow_tpl"]:checked').val() || 'wedding_photo';
 
         $.post(coraREData.ajaxUrl, {
@@ -2148,7 +2343,9 @@ window.coraQuickMoveTask = function(event, taskId, newStatus) {
             booking_id: bookingId,
             booking_title: bookingObj ? bookingObj.title : '',
             client_id: bookingObj ? bookingObj.client_id : '',
-            client_name: bookingObj ? bookingObj.client_name : ''
+            client_name: bookingObj ? bookingObj.client_name : '',
+            assignee_id: assigneeId || '',
+            assignee_name: assigneeObj ? assigneeObj.name : ''
         }, function(res) {
             if (res && res.success) {
                 window.coraShowToast(`Workflow template applied! Created ${res.data.count} linked tasks.`);

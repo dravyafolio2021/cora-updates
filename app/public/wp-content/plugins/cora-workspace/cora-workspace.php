@@ -10679,18 +10679,48 @@ function cora_ajax_fetch_client_tasks() {
     // Bookings
     $bookings = array();
     $bookings_table = $wpdb->prefix . 'cora_bookings';
+    $leads_table = $wpdb->prefix . 'cora_leads';
     if ( $wpdb->get_var("SHOW TABLES LIKE '{$bookings_table}'") === $bookings_table ) {
-        $db_bookings = $wpdb->get_results("SELECT id, title, lead_id as client_id FROM {$bookings_table} ORDER BY start_date DESC", ARRAY_A);
+        // Safe check for database columns to prevent SQL exceptions
+        $has_deal_type = $wpdb->get_var("SHOW COLUMNS FROM {$bookings_table} LIKE 'deal_type'");
+        $has_showing_date = $wpdb->get_var("SHOW COLUMNS FROM {$bookings_table} LIKE 'showing_date'");
+        $has_package_value = $wpdb->get_var("SHOW COLUMNS FROM {$bookings_table} LIKE 'package_value'");
+        $has_status = $wpdb->get_var("SHOW COLUMNS FROM {$bookings_table} LIKE 'status'");
+        
+        $select_fields = "b.id, b.lead_id as client_id";
+        if ( $has_deal_type ) $select_fields .= ", b.deal_type";
+        if ( $has_showing_date ) $select_fields .= ", b.showing_date";
+        if ( $has_package_value ) $select_fields .= ", b.package_value";
+        if ( $has_status ) $select_fields .= ", b.status";
+        
+        $order_by = $has_showing_date ? "ORDER BY b.showing_date DESC" : "";
+        
+        $query = "SELECT {$select_fields}, l.name as client_name 
+                  FROM {$bookings_table} b 
+                  LEFT JOIN {$leads_table} l ON b.lead_id = l.id 
+                  {$order_by}";
+                  
+        $db_bookings = $wpdb->get_results($query, ARRAY_A);
         if ( ! empty($db_bookings) ) {
-            $bookings = $db_bookings;
+            foreach ($db_bookings as $db_b) {
+                $bookings[] = array(
+                    'id' => $db_b['id'],
+                    'title' => ($db_b['deal_type'] ?? '') ?: ('Shoot Booking #' . $db_b['id']),
+                    'client_id' => $db_b['client_id'],
+                    'client_name' => $db_b['client_name'] ?: 'Client',
+                    'showing_date' => $db_b['showing_date'] ?? '',
+                    'package_value' => $db_b['package_value'] ?? '',
+                    'status' => $db_b['status'] ?? 'confirmed'
+                );
+            }
         }
     }
     if ( empty($bookings) ) {
         $bookings = array(
-            array('id' => 'b1', 'title' => 'Destination Wedding - Udaipur', 'client_id' => 'c1'),
-            array('id' => 'b2', 'title' => 'Corporate Video - Tech Summit', 'client_id' => 'c2'),
-            array('id' => 'b3', 'title' => 'Penthouse Architectural Shoot', 'client_id' => 'c3'),
-            array('id' => 'b4', 'title' => 'Quarterly Corporate Headshots', 'client_id' => 'c4')
+            array('id' => 'b1', 'title' => 'Destination Wedding - Udaipur', 'client_id' => 'c1', 'client_name' => 'Ananya & Rohan Wedding', 'showing_date' => '2026-07-20', 'package_value' => '580000', 'status' => 'completed'),
+            array('id' => 'b2', 'title' => 'Corporate Video - Tech Summit', 'client_id' => 'c2', 'client_name' => 'Skyline Towers LLP', 'showing_date' => '2026-07-23 (09:00 AM)', 'package_value' => '420000', 'status' => 'confirmed'),
+            array('id' => 'b3', 'title' => 'Penthouse Architectural Shoot', 'client_id' => 'c3', 'client_name' => 'Oberoi Luxury Estate', 'showing_date' => '2026-07-23 (02:00 PM)', 'package_value' => '450000', 'status' => 'confirmed'),
+            array('id' => 'b4', 'title' => 'Quarterly Corporate Headshots', 'client_id' => 'c4', 'client_name' => 'Apex Realty Group', 'showing_date' => date('Y-m-d', strtotime('+4 days')), 'package_value' => '120000', 'status' => 'confirmed')
         );
     }
 
@@ -10709,20 +10739,57 @@ function cora_ajax_fetch_client_tasks() {
                     'id' => 'b_' . $oc['id'],
                     'title' => ($oc['scale'] ?? 'Standard Shoot') . ' - ' . ($oc['city'] ?? 'Mumbai'),
                     'client_id' => $oc['id'],
-                    'client_name' => $oc['names'] ?? $oc['name'] ?? 'Client'
+                    'client_name' => $oc['names'] ?? $oc['name'] ?? 'Client',
+                    'showing_date' => '',
+                    'package_value' => '',
+                    'status' => 'confirmed'
                 );
             }
         }
     }
 
-    // Team Members
-    $team_members = array(
-        array('id' => 'u1', 'name' => 'Shruti Sharma (Super Admin)'),
-        array('id' => 'u4', 'name' => 'Rohan Kapoor (Lead Photographer)'),
-        array('id' => 'u3', 'name' => 'Aarav Mehta (Senior Editor)'),
-        array('id' => 'u5', 'name' => 'Priya Nair (Videographer)'),
-        array('id' => 'u2', 'name' => 'Karan Verma (Drone Pilot)')
-    );
+    // Team Members (Dynamically query from system users)
+    $team_members = array();
+    $wp_users = get_users( array( 'number' => 100, 'orderby' => 'display_name' ) );
+    if ( ! empty( $wp_users ) ) {
+        foreach ( $wp_users as $u ) {
+            $display_name = trim( $u->display_name ?: $u->user_login );
+            $role_name = 'Team Member';
+            if ( in_array( 'administrator', $u->roles ) || in_array( 'cora_super_admin', $u->roles ) ) {
+                $role_name = 'Super Admin';
+            } elseif ( in_array( 'cora_manager', $u->roles ) ) {
+                $role_name = 'Manager';
+            }
+            
+            // Contextual studio role mappings
+            if ( stripos( $display_name, 'Karan' ) !== false ) {
+                $role_name = 'Drone Pilot';
+            } elseif ( stripos( $display_name, 'Rohan' ) !== false ) {
+                $role_name = 'Lead Photographer';
+            } elseif ( stripos( $display_name, 'Aarav' ) !== false ) {
+                $role_name = 'Senior Editor';
+            } elseif ( stripos( $display_name, 'Priya' ) !== false ) {
+                $role_name = 'Videographer';
+            } elseif ( stripos( $display_name, 'Shruti' ) !== false ) {
+                $role_name = 'Super Admin';
+            }
+            
+            $team_members[] = array(
+                'id' => (string) $u->ID,
+                'name' => $display_name,
+                'role' => $role_name
+            );
+        }
+    }
+    if ( empty( $team_members ) ) {
+        $team_members = array(
+            array('id' => 'u1', 'name' => 'Shruti Sharma (Super Admin)', 'role' => 'Super Admin'),
+            array('id' => 'u4', 'name' => 'Rohan Kapoor (Lead Photographer)', 'role' => 'Lead Photographer'),
+            array('id' => 'u3', 'name' => 'Aarav Mehta (Senior Editor)', 'role' => 'Senior Editor'),
+            array('id' => 'u5', 'name' => 'Priya Nair (Videographer)', 'role' => 'Videographer'),
+            array('id' => 'u2', 'name' => 'Karan Verma (Drone Pilot)', 'role' => 'Drone Pilot')
+        );
+    }
 
     // Templates
     $templates = array(
@@ -11013,7 +11080,11 @@ function cora_ajax_apply_task_template() {
     $tasks = array_merge($tasks, $generated);
     update_option( 'cora_workspace_client_tasks', $tasks, false );
 
-    wp_send_json_success(array('message' => count($generated) . ' tasks generated successfully', 'count' => count($generated)));
+    wp_send_json_success(array(
+        'message' => count($generated) . ' tasks generated successfully',
+        'count' => count($generated),
+        'tasks' => $tasks
+    ));
 }
 
 /**
