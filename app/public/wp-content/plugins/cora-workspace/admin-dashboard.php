@@ -4115,9 +4115,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 </div><!-- end cora-search-container -->
                 
                 <!-- Premium Dynamic Quick Actions (Mobile-first Wrap Grid / Desktop Centered Grid) -->
-                <div class="w-full flex flex-col items-center justify-center gap-2.5 py-2 px-4 md:px-0 select-none" id="cora-quick-actions-bar">
+                <div class="w-full flex flex-col items-center justify-center gap-2.5 py-2 px-0 select-none" id="cora-quick-actions-bar">
                     <!-- Predefined actions row (centered, wraps into exactly 2 rows on mobile) -->
-                    <div class="flex flex-wrap items-center justify-center gap-2 max-w-[350px] sm:max-w-none">
+                    <div class="flex flex-wrap items-center justify-center gap-2 w-full">
                         <span class="hidden md:inline-block text-xs font-bold text-zinc-850 dark:text-zinc-200 tracking-tight mr-1 select-none whitespace-nowrap">Quick actions:</span>
                         
                         <?php if ( $is_studio ) : ?>

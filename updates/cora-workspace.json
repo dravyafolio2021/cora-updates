@@ -1,11 +1,11 @@
 {
     "name": "Cora Workspace Platform",
     "slug": "cora-workspace",
-    "version": "2.5.0",
+    "version": "2.5.1",
     "download_url": "https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-workspace.zip",
     "tested": "6.7",
     "sections": {
         "description": "A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.",
-        "changelog": "<h4>2.5.0 — Dashboard Quick Actions Wrap & Mobile Polish</h4><ul><li><strong>Quick Actions Layout</strong>: Updated the quick actions bar on the main dashboard to wrap buttons on mobile screens instead of overflowing or clipping.</li><li><strong>Mobile Layout Streamlining</strong>: Replaced cluttered card views with flat, Notion-style task list rows and clear chronological headers.</li><li><strong>iOS-Style Bottom Drawer</strong>: Re-engineered the task details drawer to slide up from the bottom on mobile viewports.</li></ul>"
+        "changelog": "<h4>2.5.1 — Dashboard Quick Actions Layout optimization</h4><ul><li><strong>Dashboard Quick Actions</strong>: Refined layout grid spacing, full-width responsiveness, and padding alignment.</li><li><strong>Mobile Layout Streamlining</strong>: Replaced cluttered card views with flat, Notion-style task list rows and clear chronological headers.</li><li><strong>iOS-Style Bottom Drawer</strong>: Re-engineered the task details drawer to slide up from the bottom on mobile viewports.</li></ul>"
     }
 }
