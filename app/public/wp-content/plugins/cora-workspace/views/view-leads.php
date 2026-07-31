@@ -1657,8 +1657,24 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                     </div>
 
                     <div>
-                        <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Target City / Location</label>
-                        <input type="text" id="cora-drawer-input-city" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-medium focus:outline-none text-xs">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <label class="block font-bold text-zinc-700 dark:text-zinc-300">Target City / Geo-Location</label>
+                            <button type="button" class="text-[10px] font-bold text-zinc-600 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white flex items-center gap-1 cursor-pointer" onclick="coraDetectCurrentGeoCity()">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                <span>Auto-Detect Geo</span>
+                            </button>
+                        </div>
+                        <input type="text" id="cora-drawer-input-city" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-medium focus:outline-none text-xs" placeholder="e.g. Mumbai, BKC / Bengaluru">
+                        
+                        <!-- Quick Studio Hub City Pills for Instant Selection -->
+                        <div class="flex items-center gap-1.5 flex-wrap pt-2">
+                            <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider">Quick Hubs:</span>
+                            <button type="button" class="px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10px] font-semibold transition-colors cursor-pointer" onclick="$('#cora-drawer-input-city').val('Mumbai')">Mumbai</button>
+                            <button type="button" class="px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10px] font-semibold transition-colors cursor-pointer" onclick="$('#cora-drawer-input-city').val('Bengaluru')">Bengaluru</button>
+                            <button type="button" class="px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10px] font-semibold transition-colors cursor-pointer" onclick="$('#cora-drawer-input-city').val('Goa')">Goa</button>
+                            <button type="button" class="px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10px] font-semibold transition-colors cursor-pointer" onclick="$('#cora-drawer-input-city').val('Delhi NCR')">Delhi NCR</button>
+                            <button type="button" class="px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[10px] font-semibold transition-colors cursor-pointer" onclick="$('#cora-drawer-input-city').val('Hyderabad')">Hyderabad</button>
+                        </div>
                     </div>
                 </div>
             </div>

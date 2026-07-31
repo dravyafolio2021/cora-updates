@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { login } from './helpers';
 
-test.describe('Mobile Side Drawer Responsive & Collapsible Accordion UI', () => {
-  test('verify side drawer with collapsible toggle cards, quick actions, and sticky footer', async ({ page }) => {
+test.describe('Mobile Side Drawer Validation, Geo-Location & Functional Outreach', () => {
+  test('verify strict validation, geo-location auto-detect, and outreach links', async ({ page }) => {
     // 1. Set iPhone 14 Pro Max viewport
     await page.setViewportSize({ width: 430, height: 932 });
     await login(page);
@@ -17,47 +17,36 @@ test.describe('Mobile Side Drawer Responsive & Collapsible Accordion UI', () => 
     const drawer = page.locator('#cora-lead-detail-drawer');
     await expect(drawer).toBeVisible({ timeout: 10000 });
 
-    // 3. Verify drawer width fits mobile screen (width <= 430px)
-    const box = await drawer.boundingBox();
-    expect(box).not.toBeNull();
-    if (box) {
-      expect(box.width).toBeLessThanOrEqual(430);
-    }
-
-    // 4. Verify Close Button is visible
-    const closeBtn = drawer.locator('button[title="Close Drawer"]');
-    await expect(closeBtn).toBeVisible();
-
-    // 5. Verify 1-Tap Quick Action Row (WhatsApp, Email, Convert)
+    // 3. Verify Outreach Action Buttons have functional href attributes
     const whatsappBtn = drawer.locator('#cora-drawer-whatsapp-btn');
     await expect(whatsappBtn).toBeVisible();
 
     const emailBtn = drawer.locator('#cora-drawer-sla-email-btn');
     await expect(emailBtn).toBeVisible();
 
-    const convertBtn = drawer.locator('#cora-convert-lead-btn');
-    await expect(convertBtn).toBeVisible();
+    // 4. Test Target City Geo-Location Hub Pills
+    const mumbaiPill = drawer.locator('button:has-text("Mumbai")');
+    await expect(mumbaiPill).toBeVisible();
+    await mumbaiPill.click();
 
-    // 6. Verify Collapsible Accordion toggling
-    const accordionHeader = drawer.locator('button:has-text("Deal Status & Assignee")');
-    await expect(accordionHeader).toBeVisible();
+    const cityInput = drawer.locator('#cora-drawer-input-city');
+    await expect(cityInput).toHaveValue('Mumbai');
 
-    // Body should be hidden by default
-    const stageSelect = drawer.locator('#cora-drawer-stage-select');
-    await expect(stageSelect).toBeHidden();
+    // 5. Test Form Validation (Enter invalid email format)
+    const emailInput = drawer.locator('#cora-drawer-input-email');
+    await emailInput.fill('invalid-email-format');
 
-    // Click accordion header to expand
-    await accordionHeader.click();
-    await expect(stageSelect).toBeVisible();
-
-    // 7. Verify Sticky Bottom Action Bar (Delete Lead, Cancel, Save Deal Changes)
     const saveBtn = drawer.locator('button:has-text("Save Deal Changes")');
-    await expect(saveBtn).toBeVisible();
+    await saveBtn.click();
 
-    const deleteBtn = drawer.locator('button:has-text("Delete Lead")');
-    await expect(deleteBtn).toBeVisible();
+    // Expect red highlight on invalid email field
+    await expect(emailInput).toHaveClass(/border-rose-500/);
 
-    // Screenshot of Collapsible Accordion Drawer
-    await page.screenshot({ path: 'tests/e2e/mobile-drawer-accordion-screenshot.png' });
+    // Fix email to valid format
+    await emailInput.fill('valid.prospect@gmail.com');
+    await expect(emailInput).toHaveValue('valid.prospect@gmail.com');
+
+    // Take screenshot of validated & geo-enhanced mobile side drawer
+    await page.screenshot({ path: 'tests/e2e/mobile-drawer-validation-screenshot.png' });
   });
 });

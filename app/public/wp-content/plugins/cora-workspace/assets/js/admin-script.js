@@ -10988,19 +10988,82 @@ jQuery(document).ready(function($) {
                 $('#cora-drawer-input-assigned-to').val(assignedTo);
             }
 
-            const cleanPhone = (phone || '').replace(/[^0-9]/g, '');
-            if (cleanPhone) {
-                $('#cora-drawer-sla-whatsapp-btn').attr('href', 'https://wa.me/' + cleanPhone);
-            } else {
-                $('#cora-drawer-sla-whatsapp-btn').attr('href', '#');
-            }
-            if (email) {
-                $('#cora-drawer-sla-email-btn').attr('href', 'mailto:' + email);
-            } else {
-                $('#cora-drawer-sla-email-btn').attr('href', '#');
+            if (window.coraUpdateDrawerOutreachLinks) {
+                window.coraUpdateDrawerOutreachLinks(phone, email, name);
             }
         }
     };
+
+    // Geo-Location Detection Function for Target City
+    window.coraDetectCurrentGeoCity = function() {
+        if (!navigator.geolocation) {
+            if (window.coraShowToast) window.coraShowToast('Geolocation is not supported by your browser.', 'error');
+            return;
+        }
+
+        if (window.coraShowToast) window.coraShowToast('Detecting current geo-location...', 'info');
+
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.address) {
+                            const detectedCity = data.address.city || data.address.town || data.address.suburb || data.address.state || 'Detected Location';
+                            $('#cora-drawer-input-city').val(detectedCity);
+                            if (window.coraShowToast) window.coraShowToast(`Geo-tagged location: ${detectedCity}`, 'success');
+                        } else {
+                            if (window.coraShowToast) window.coraShowToast(`Geo-coordinates locked (${lat.toFixed(2)}, ${lon.toFixed(2)})`, 'success');
+                        }
+                    })
+                    .catch(() => {
+                        if (window.coraShowToast) window.coraShowToast(`Geo-coordinates locked (${lat.toFixed(2)}, ${lon.toFixed(2)})`, 'success');
+                    });
+            },
+            function() {
+                if (window.coraShowToast) window.coraShowToast('Could not auto-detect location. Select a Quick Hub pill or type manually.', 'info');
+            },
+            { timeout: 8000 }
+        );
+    };
+
+    // Dynamic Outreach Link Updater
+    window.coraUpdateDrawerOutreachLinks = function(phone, email, name) {
+        const cleanPhone = (phone || '').replace(/[^0-9]/g, '');
+        const clientName = (name || 'Client').trim();
+        const greeting = encodeURIComponent(`Hi ${clientName}, following up on your shoot inquiry with Cora Studio.`);
+
+        const whatsappUrl = cleanPhone ? `https://wa.me/${cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone}?text=${greeting}` : '#';
+        const emailUrl = email ? `mailto:${email}?subject=Cora%20Studio%20Inquiry%20-%20${encodeURIComponent(clientName)}&body=Hi%20${encodeURIComponent(clientName)}%2C%0A%0AThank%20you%20for%20reaching%20out...` : '#';
+
+        $('#cora-drawer-whatsapp-btn, #cora-drawer-sla-whatsapp-btn').attr('href', whatsappUrl).off('click').on('click', function(e) {
+            if (!cleanPhone) {
+                e.preventDefault();
+                if (window.coraShowToast) window.coraShowToast('Please enter a valid phone number for WhatsApp outreach.', 'error');
+                $('#cora-drawer-input-phone').focus().addClass('ring-2 ring-rose-500');
+            }
+        });
+
+        $('#cora-drawer-sla-email-btn').attr('href', emailUrl).off('click').on('click', function(e) {
+            if (!email) {
+                e.preventDefault();
+                if (window.coraShowToast) window.coraShowToast('Please enter a valid email address for direct outreach.', 'error');
+                $('#cora-drawer-input-email').focus().addClass('ring-2 ring-rose-500');
+            }
+        });
+    };
+
+    // Real-time input change listeners for drawer fields
+    $(document).on('input', '#cora-drawer-input-phone, #cora-drawer-input-email, #cora-drawer-input-names', function() {
+        const p = $('#cora-drawer-input-phone').val();
+        const e = $('#cora-drawer-input-email').val();
+        const n = $('#cora-drawer-input-names').val();
+        if (window.coraUpdateDrawerOutreachLinks) {
+            window.coraUpdateDrawerOutreachLinks(p, e, n);
+        }
+    });
 
     // Go to Create Lead Step in Wizard
     window.coraGoToCreateLeadStep = function(step) {
@@ -11085,34 +11148,49 @@ jQuery(document).ready(function($) {
         });
     };
 
-    // Save Lead from Drawer
+    // Save Lead from Drawer with Strict Validation
     window.coraSaveLeadFromDrawer = function() {
         const nameInput = $('#cora-drawer-input-names');
         const emailInput = $('#cora-drawer-input-email');
+        const phoneInput = $('#cora-drawer-input-phone');
         
-        nameInput.removeClass('border-rose-500');
-        emailInput.removeClass('border-rose-500');
+        nameInput.removeClass('border-rose-500 ring-2 ring-rose-500');
+        emailInput.removeClass('border-rose-500 ring-2 ring-rose-500');
+        phoneInput.removeClass('border-rose-500 ring-2 ring-rose-500');
         
         let hasError = false;
+        let errorMessage = '';
         
         const nameVal = (nameInput.val() || '').trim();
-        if (!nameVal) {
-            nameInput.addClass('border-rose-500');
+        if (!nameVal || nameVal.length < 2) {
+            nameInput.addClass('border-rose-500 ring-2 ring-rose-500');
             hasError = true;
+            errorMessage = 'Full Name / Title is required (minimum 2 characters).';
         }
         
         const emailVal = (emailInput.val() || '').trim();
         if (emailVal) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(emailVal)) {
-                emailInput.addClass('border-rose-500');
+                emailInput.addClass('border-rose-500 ring-2 ring-rose-500');
                 hasError = true;
+                errorMessage = errorMessage || 'Please enter a valid email address (e.g. client@domain.com).';
+            }
+        }
+
+        const phoneVal = (phoneInput.val() || '').trim();
+        if (phoneVal) {
+            const cleanDigits = phoneVal.replace(/[^0-9]/g, '');
+            if (cleanDigits.length < 7 || cleanDigits.length > 15) {
+                phoneInput.addClass('border-rose-500 ring-2 ring-rose-500');
+                hasError = true;
+                errorMessage = errorMessage || 'Phone number must contain between 7 and 15 digits.';
             }
         }
         
         if (hasError) {
             if (window.coraShowToast) {
-                window.coraShowToast('Please correct validation errors first.', 'error');
+                window.coraShowToast(errorMessage || 'Please correct validation errors first.', 'error');
             }
             return;
         }
@@ -11123,7 +11201,7 @@ jQuery(document).ready(function($) {
             lead_id: $('#cora-drawer-lead-id').val(),
             names: nameVal,
             email: emailVal,
-            phone: $('#cora-drawer-input-phone').val(),
+            phone: phoneVal,
             price: $('#cora-drawer-input-price').val(),
             score: $('#cora-drawer-input-score').val(),
             city: $('#cora-drawer-input-city').val(),
@@ -11139,7 +11217,7 @@ jQuery(document).ready(function($) {
             success: function(res) {
                 if (res.success) {
                     if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
-                    if (window.coraShowToast) window.coraShowToast('Lead updated successfully', 'success');
+                    if (window.coraShowToast) window.coraShowToast('Lead record updated successfully', 'success');
                     setTimeout(() => window.location.reload(), 600);
                 } else {
                     if (window.coraShowToast) window.coraShowToast(res.data.message || 'Update failed', 'error');
