@@ -14,91 +14,53 @@ if (!defined('ABSPATH')) {
 ?>
 
 <style>
-/* ─── Bottom Sheet Drawer Engine (24px Sidebar Gap + No Shadow) ─────────────── */
+/* ─── Standard Side Drawer Sheet Engine (No Floating Gaps) ─────────────── */
 .cora-bottom-drawer {
     position: fixed !important;
-    padding: 0 !important;
-    margin: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    left: auto !important;
+    width: 600px !important; /* Standard width matching Leads/Scheduler panels */
+    max-width: 90vw !important;
+    height: 100vh !important;
     background-color: #ffffff !important;
-    border: 1px solid #e4e4e7 !important;
+    border-left: 1px solid #e4e4e7 !important;
+    border-top: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
     z-index: 99999 !important;
-    visibility: hidden !important; /* Completely hidden so zero peeking handle bars */
+    visibility: hidden !important;
     opacity: 0 !important;
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, left 0.3s ease, right 0.3s ease, top 0.3s ease, bottom 0.3s ease, width 0.3s ease, height 0.3s ease, visibility 0.35s !important;
+    transform: translateX(100%) !important;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, visibility 0.3s !important;
     display: flex !important;
     flex-direction: column !important;
     overflow: hidden !important;
     pointer-events: none;
+    box-shadow: -10px 0 25px -5px rgba(0, 0, 0, 0.05), -8px 0 10px -6px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Bottom Sheet Drawer Mode */
-.cora-bottom-drawer.layout-bottom {
-    bottom: 0 !important;
-    right: 24px !important;
-    left: 284px; /* Dynamic sidebar right edge + 24px gap */
-    height: 84vh !important;
-    max-height: 850px !important;
-    border-top-left-radius: 24px !important;
-    border-top-right-radius: 24px !important;
-    border-bottom-left-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-    transform: translateY(100vh) !important;
-    box-shadow: 0 -20px 25px -5px rgba(0, 0, 0, 0.08), 0 -8px 10px -6px rgba(0, 0, 0, 0.08) !important;
-}
-.cora-bottom-drawer.layout-bottom.cora-drawer-open {
-    transform: translateY(0) !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
+#drawer-task-details {
+    width: 720px !important; /* Wider drawer layout for the 2-column checklist details */
+    max-width: 95vw !important;
 }
 
-/* Right-Sliding Side Drawer Mode */
-.cora-bottom-drawer.layout-side {
-    top: 24px !important;
-    bottom: 24px !important;
-    right: 24px !important;
-    left: auto !important;
-    width: 720px !important;
-    max-width: calc(100vw - 340px) !important;
-    height: calc(100vh - 48px) !important;
-    max-height: none !important;
-    border-radius: 24px !important;
-    transform: translateX(100%) !important;
-    box-shadow: -10px 0 25px -5px rgba(0, 0, 0, 0.08), -8px 0 10px -6px rgba(0, 0, 0, 0.08) !important;
-}
-#drawer-create-task.layout-side, #drawer-workflow-templates.layout-side {
+#drawer-create-task, #drawer-template-picker, #drawer-manage-columns {
     width: 500px !important;
 }
-.cora-bottom-drawer.layout-side.cora-drawer-open {
+
+.cora-bottom-drawer.cora-drawer-open {
     transform: translateX(0) !important;
     visibility: visible !important;
     opacity: 1 !important;
     pointer-events: auto !important;
 }
 
-/* Responsive drawer styling for all modes */
 @media (max-width: 768px) {
-    .cora-bottom-drawer.layout-side, .cora-bottom-drawer.layout-bottom {
-        left: 12px !important;
-        right: 12px !important;
-        width: auto !important;
-        max-width: none !important;
-        top: 12px !important;
-        bottom: 12px !important;
-        height: calc(100vh - 24px) !important;
-        max-height: none !important;
-    }
-    .cora-bottom-drawer.layout-side {
-        transform: translateX(100%) !important;
-    }
-    .cora-bottom-drawer.layout-bottom {
-        transform: translateY(100%) !important;
-    }
-    .cora-bottom-drawer.layout-side.cora-drawer-open {
-        transform: translateX(0) !important;
-    }
-    .cora-bottom-drawer.layout-bottom.cora-drawer-open {
-        transform: translateY(0) !important;
+    .cora-bottom-drawer {
+        width: 100% !important;
+        max-width: 100vw !important;
     }
 }
 
@@ -764,34 +726,26 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
 <!-- Task Manager Drawer Overlay Backdrop -->
 <div id="cora-task-drawer-backdrop" class="cora-drawer-backdrop-overlay"></div>
 
-<!-- BOTTOM SHEET DRAWER 1: Task Workspace & Checklist (24px Sidebar Gap) -->
+<!-- DRAWER 1: Task Workspace & Checklist -->
 <div id="drawer-task-details" class="cora-bottom-drawer">
-    <!-- Pull Bar & Header -->
-    <div class="pt-3 px-6 pb-5 border-b border-zinc-200 bg-zinc-50/90 rounded-t-3xl shrink-0">
-        <div class="w-12 h-1.5 rounded-full bg-zinc-300 mx-auto mb-3"></div>
-        <div class="flex justify-between items-center">
-            <div class="flex items-center gap-3.5">
-                <div class="w-10 h-10 rounded-2xl bg-zinc-950 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                </div>
-                <div>
-                    <h2 class="text-base font-bold text-zinc-950">Task Workspace &amp; Checklist</h2>
-                    <p class="text-[11px] font-medium text-zinc-500">Configure task parameters, checklist steps, deliverable drive links &amp; activity notes.</p>
-                </div>
+    <!-- Header -->
+    <div class="p-5 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
+                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
             </div>
-            <div class="flex items-center gap-1">
-                <button type="button" onclick="coraToggleDrawerLayout(this)" class="p-2 rounded-xl hover:bg-zinc-200/80 text-zinc-500 hover:text-zinc-950 transition-colors cursor-pointer layout-toggle-btn" title="Toggle Layout (Side / Bottom)">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="14" y1="3" x2="14" y2="21"/></svg>
-                </button>
-                <button type="button" onclick="window.coraCloseAllDrawers()" class="p-2 rounded-xl hover:bg-zinc-200/80 text-zinc-400 hover:text-zinc-950 transition-colors cursor-pointer" title="Close Workspace Sheet (Esc)">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+            <div>
+                <h2 class="text-sm font-bold text-zinc-950 leading-none">Task Workspace &amp; Checklist</h2>
+                <p class="text-[10.5px] font-semibold text-zinc-400 mt-1.5">Configure task parameters, checklist steps, and notes.</p>
             </div>
         </div>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="p-1.5 rounded-lg hover:bg-zinc-200/80 text-zinc-400 hover:text-zinc-950 transition-colors cursor-pointer" title="Close Drawer (Esc)">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
     </div>
 
-    <!-- Wide 2-Column Content Body -->
-    <div class="flex-1 overflow-y-auto p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Content Body -->
+    <div class="flex-1 overflow-y-auto p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
         <input type="hidden" id="detail-task-id" value="">
 
         <!-- Left Column: Primary Task Parameters -->
@@ -937,32 +891,26 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
     </div>
 </div>
 
-<!-- BOTTOM SHEET DRAWER 2: Create Task (24px Sidebar Gap) -->
+<!-- DRAWER 2: Create New Client Task -->
 <div id="drawer-create-task" class="cora-bottom-drawer">
-    <div class="pt-3 px-6 pb-5 border-b border-zinc-200 bg-zinc-50/90 rounded-t-3xl shrink-0">
-        <div class="w-12 h-1.5 rounded-full bg-zinc-300 mx-auto mb-3"></div>
-        <div class="flex justify-between items-center">
-            <div class="flex items-center gap-3.5">
-                <div class="w-10 h-10 rounded-2xl bg-zinc-950 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg>
-                </div>
-                <div>
-                    <h2 class="text-base font-bold text-zinc-950">Create New Client Task</h2>
-                    <p class="text-[11px] font-medium text-zinc-500">Tied directly to client CRM &amp; shoot booking projects.</p>
-                </div>
+    <!-- Header -->
+    <div class="p-5 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
+                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg>
             </div>
-            <div class="flex items-center gap-1">
-                <button type="button" onclick="coraToggleDrawerLayout(this)" class="p-2 rounded-xl hover:bg-zinc-200/80 text-zinc-500 hover:text-zinc-950 transition-colors cursor-pointer layout-toggle-btn" title="Toggle Layout (Side / Bottom)">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="14" y1="3" x2="14" y2="21"/></svg>
-                </button>
-                <button type="button" onclick="window.coraCloseAllDrawers()" class="p-2 rounded-xl hover:bg-zinc-200/80 text-zinc-400 hover:text-zinc-950 transition-colors cursor-pointer" title="Close Workspace Sheet (Esc)">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+            <div>
+                <h2 class="text-sm font-bold text-zinc-950 leading-none">Create New Client Task</h2>
+                <p class="text-[10.5px] font-semibold text-zinc-400 mt-1.5">Tied directly to client CRM &amp; shoot booking projects.</p>
             </div>
         </div>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="p-1.5 rounded-lg hover:bg-zinc-200/80 text-zinc-400 hover:text-zinc-950 transition-colors cursor-pointer" title="Close Drawer (Esc)">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
     </div>
 
-    <div class="flex-1 overflow-y-auto p-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Content Body -->
+    <div class="flex-1 overflow-y-auto p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
         <div class="space-y-4">
             <div>
                 <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-1.5">Task Title *</label>
@@ -1044,36 +992,30 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
     </div>
 </div>
 
-<!-- BOTTOM SHEET DRAWER 3: Workflow Template Picker (24px Sidebar Gap) -->
+<!-- DRAWER 3: Apply Studio Workflow Template -->
 <div id="drawer-template-picker" class="cora-bottom-drawer">
-    <div class="pt-3 px-6 pb-5 border-b border-zinc-200 bg-zinc-50/90 rounded-t-3xl shrink-0">
-        <div class="w-12 h-1.5 rounded-full bg-zinc-300 mx-auto mb-3"></div>
-        <div class="flex justify-between items-center">
-            <div class="flex items-center gap-3.5">
-                <div class="w-10 h-10 rounded-2xl bg-zinc-950 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path></svg>
-                </div>
-                <div>
-                    <h2 class="text-base font-bold text-zinc-950">Apply Studio Workflow Template</h2>
-                    <p class="text-[11px] font-medium text-zinc-500">Auto-generate pre-configured deliverable task checklists.</p>
-                </div>
+    <!-- Header -->
+    <div class="p-5 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
+                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path></svg>
             </div>
-            <div class="flex items-center gap-1">
-                <button type="button" onclick="coraToggleDrawerLayout(this)" class="p-2 rounded-xl hover:bg-zinc-200/80 text-zinc-500 hover:text-zinc-950 transition-colors cursor-pointer layout-toggle-btn" title="Toggle Layout (Side / Bottom)">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="14" y1="3" x2="14" y2="21"/></svg>
-                </button>
-                <button type="button" onclick="window.coraCloseAllDrawers()" class="p-2 rounded-xl hover:bg-zinc-200/80 text-zinc-400 hover:text-zinc-950 transition-colors cursor-pointer" title="Close Workspace Sheet (Esc)">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+            <div>
+                <h2 class="text-sm font-bold text-zinc-950 leading-none">Apply Studio Workflow Template</h2>
+                <p class="text-[10.5px] font-semibold text-zinc-400 mt-1.5">Auto-generate pre-configured deliverable task checklists.</p>
             </div>
         </div>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="p-1.5 rounded-lg hover:bg-zinc-200/80 text-zinc-400 hover:text-zinc-950 transition-colors cursor-pointer" title="Close Drawer (Esc)">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
     </div>
 
-    <div class="flex-1 overflow-y-auto p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div class="space-y-5">
+    <!-- Content Body -->
+    <div class="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
+        <div class="space-y-4">
             <div>
                 <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-2">1. Select Target Client Booking *</label>
-                <select id="template-target-booking" class="w-full text-xs font-bold border-zinc-200 rounded-xl bg-zinc-50 focus:outline-none focus:border-zinc-950 p-3 cursor-pointer">
+                <select id="template-target-booking" class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-bold text-zinc-950 focus:outline-none focus:border-zinc-950 cursor-pointer">
                     <option value="">Choose booking project...</option>
                 </select>
             </div>
@@ -1128,32 +1070,27 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
         </button>
     </div>
 </div>
-<!-- BOTTOM SHEET DRAWER 4: Manage Columns (24px Sidebar Gap) -->
+
+<!-- DRAWER 4: Manage Kanban Columns -->
 <div id="drawer-manage-columns" class="cora-bottom-drawer">
-    <div class="pt-3 px-6 pb-5 border-b border-zinc-200 bg-zinc-50/90 rounded-t-3xl shrink-0">
-        <div class="w-12 h-1.5 rounded-full bg-zinc-300 mx-auto mb-3"></div>
-        <div class="flex justify-between items-center">
-            <div class="flex items-center gap-3.5">
-                <div class="w-10 h-10 rounded-2xl bg-zinc-950 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 10.5h10.75M9.5 15.5h10.75M9.5 5.5h10.75M3.5 5.5h1.5M3.5 10.5h1.5M3.5 15.5h1.5" /></svg>
-                </div>
-                <div>
-                    <h2 class="text-base font-bold text-zinc-950">Manage Kanban Columns</h2>
-                    <p class="text-[11px] font-medium text-zinc-500">Reorder, rename, add, or delete your workspace workflow stages.</p>
-                </div>
+    <!-- Header -->
+    <div class="p-5 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
+                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 10.5h10.75M9.5 15.5h10.75M9.5 5.5h10.75M3.5 5.5h1.5M3.5 10.5h1.5M3.5 15.5h1.5" /></svg>
             </div>
-            <div class="flex items-center gap-1">
-                <button type="button" onclick="coraToggleDrawerLayout(this)" class="p-2 rounded-xl hover:bg-zinc-200/80 text-zinc-500 hover:text-zinc-950 transition-colors cursor-pointer layout-toggle-btn" title="Toggle Layout (Side / Bottom)">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="14" y1="3" x2="14" y2="21"/></svg>
-                </button>
-                <button type="button" onclick="window.coraCloseAllDrawers()" class="p-2 rounded-xl hover:bg-zinc-200/80 text-zinc-400 hover:text-zinc-950 transition-colors cursor-pointer" title="Close Workspace Sheet (Esc)">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+            <div>
+                <h2 class="text-sm font-bold text-zinc-950 leading-none">Manage Kanban Columns</h2>
+                <p class="text-[10.5px] font-semibold text-zinc-400 mt-1.5">Reorder, rename, add, or delete your workflow stages.</p>
             </div>
         </div>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="p-1.5 rounded-lg hover:bg-zinc-200/80 text-zinc-400 hover:text-zinc-950 transition-colors cursor-pointer" title="Close Drawer (Esc)">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
     </div>
 
-    <div class="flex-1 overflow-y-auto p-8 space-y-6">
+    <!-- Content Body -->
+    <div class="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
         <!-- Columns List -->
         <div>
             <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-3">Active Workflow Columns</label>
@@ -1265,14 +1202,6 @@ document.addEventListener('click', function(e) {
         var offset = getSidebarWidthOffset();
         var el = document.getElementById(drawerId);
         if (el) {
-            // Apply layout styles dynamically
-            var layout = localStorage.getItem('cora_drawer_layout') || 'side';
-            if (layout === 'bottom') {
-                el.style.left = offset;
-            } else {
-                el.style.left = '';
-            }
-
             // Adjust backdrop left offset and width so sidebar remains accessible
             var backdrop = document.getElementById('cora-task-drawer-backdrop');
             if (backdrop) {
@@ -2706,49 +2635,6 @@ window.coraQuickMoveTask = function(event, taskId, newStatus) {
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    window.coraToggleDrawerLayout = function(btn) {
-        var drawers = document.querySelectorAll('.cora-bottom-drawer');
-        var currentLayout = localStorage.getItem('cora_drawer_layout') || 'side';
-        var newLayout = currentLayout === 'side' ? 'bottom' : 'side';
-        localStorage.setItem('cora_drawer_layout', newLayout);
-        
-        drawers.forEach(function(el) {
-            el.classList.remove('layout-side', 'layout-bottom');
-            el.classList.add('layout-' + newLayout);
-        });
-        
-        window.coraUpdateLayoutToggleButtons(newLayout);
-        
-        // Re-adjust any open drawer immediately
-        var openDrawer = document.querySelector('.cora-bottom-drawer.cora-drawer-open');
-        if (openDrawer) {
-            var offset = getSidebarWidthOffset();
-            if (newLayout === 'bottom') {
-                openDrawer.style.left = offset;
-            } else {
-                openDrawer.style.left = '';
-            }
-        }
-        
-        window.coraShowToast("Drawer orientation updated successfully!");
-    };
-
-    window.coraUpdateLayoutToggleButtons = function(layout) {
-        var btns = document.querySelectorAll('.layout-toggle-btn');
-        var sideIcon = '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="14" y1="3" x2="14" y2="21"/></svg>';
-        var bottomIcon = '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="14" x2="21" y2="14"/></svg>';
-        
-        btns.forEach(function(btn) {
-            if (layout === 'side') {
-                btn.innerHTML = bottomIcon;
-                btn.title = "Dock Drawer to Bottom";
-            } else {
-                btn.innerHTML = sideIcon;
-                btn.title = "Dock Drawer to Side";
-            }
-        });
-    };
-
     // Initialize on ready
     $(document).ready(function() {
         // Move backdrop and drawers to body to prevent stacking context clipping
@@ -2765,17 +2651,9 @@ window.coraQuickMoveTask = function(event, taskId, newStatus) {
             window.coraCloseAllDrawers();
         });
 
-        // Load saved layout style preference
-        var savedLayout = localStorage.getItem('cora_drawer_layout') || 'side';
-        var drawers = document.querySelectorAll('.cora-bottom-drawer');
-        drawers.forEach(function(el) {
-            el.classList.remove('layout-side', 'layout-bottom');
-            el.classList.add('layout-' + savedLayout);
-        });
-        window.coraUpdateLayoutToggleButtons(savedLayout);
-
         // MutationObserver to watch drawer state and toggle backdrop overlay
         var backdrop = document.getElementById('cora-task-drawer-backdrop');
+        var drawers = document.querySelectorAll('.cora-bottom-drawer');
         if (drawers.length > 0 && backdrop) {
             var observer = new MutationObserver(function() {
                 var anyOpen = Array.from(drawers).some(function(el) {
