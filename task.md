@@ -61,7 +61,8 @@
   - [x] CSS Drawer Styles & Canvas Width Isolation (`admin-dashboard.php`): Enforced `width: 500px !important`, `max-width: 90vw !important`, `top: 0`, `right: 0`, `z-index: 9999`, smooth `cubic-bezier(0.16, 1, 0.3, 1)` opening transitions, `box-shadow: -10px 0 30px rgba(0,0,0,0.15)` when open, and locked main workspace container width to 100% (`main, .cora-main-content, #cora-workspace-container { width: 100% !important; flex: 1 1 auto !important; }`).
   - [x] Global Drawer Controllers (`assets/js/admin-script.js`): Updated `window.coraCloseAllDrawers()` to hide `#cora-drawer-backdrop` and remove `cora-drawer-open` from `body`. Updated all drawer openers (`openInviteDrawer`, `openEditUserDrawer`, `openGeofenceDrawer`, `openCreateCustomRoleDrawer`, `openEditCustomRoleDrawer`, `openAttendanceReportsDrawer`, `coraToggleAddShowingDrawer`) to invoke `window.coraCloseAllDrawers()`, remove `.collapsed`, and show `#cora-drawer-backdrop`.
   - [x] Global Keyboard Shortcut: Added `Escape` key event listener (`e.key === 'Escape' || e.keyCode === 27`) to invoke `window.coraCloseAllDrawers()`.
-  - [x] **Financial Backend AJAX Handlers & Financial Intelligence Endpoints (`cora-workspace.php`)**
+
+- [x] **Financial Backend AJAX Handlers & Financial Intelligence Endpoints (`cora-workspace.php`)**
   - [x] `cora_ajax_get_financial_data`: Registered actions `wp_ajax_cora_ajax_get_financial_data`, `wp_ajax_cora_get_financial_data`, `wp_ajax_cora_fetch_financials`. Filters `cora_financial_ledger`, `cora_invoices`, `cora_payouts` by period, start_date, end_date, industry_scope, and status. Calculates `total_inflow`, `total_outflow`, `net_profit`, `margin_pct`, `pending_dues`, and `chart` data.
   - [x] `cora_ajax_add_ledger_entry`: Registered actions `wp_ajax_cora_ajax_add_ledger_entry`, `wp_ajax_cora_add_ledger_entry`. Validates `cora_ajax_nonce` and appends entry with id (uniqid), timestamp, user_id, user_name to `cora_financial_ledger` option.
   - [x] `cora_ajax_create_invoice`: Registered actions `wp_ajax_cora_ajax_create_invoice`, `wp_ajax_cora_create_invoice`. Validates nonce, computes deposit_amount and due_balance, generates unique invoice # (`INV-` + date + rand) and share token, and saves to `cora_invoices` option.
@@ -75,6 +76,10 @@
   - [x] Verify persistence across refreshes.
   - [x] All Playwright E2E tests pass.
 
-
-
-
+- [x] **Leads CRM Refactoring & Team Assignment (v2.5.3 Release)**
+  - [x] **Notion-Inspired Minimalist CRM Styling**: Replaced icon badges with clean inline gray tags, monochromatic table formatting, and subtle borders.
+  - [x] **Team Member Assignment Filter**: Toolbar dropdown and card avatars displaying assigned user, with list filter persistence.
+  - [x] **One-Tap Lead Status Transitions**: Trigger status cycles directly from Kanban boards and main drawer sheets.
+  - [x] **SLA Status Header Card**: Integrated visual SLA countdown status card at the top of detail drawers.
+  - [x] **Activity Timeline Logging**: Auto-generate activity logs for user assignments and status movements.
+  - [x] **Plugin Packaging & Updates Dispatch**: Bumped version to `2.5.3` and successfully released zip to sub-repository.

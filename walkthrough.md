@@ -371,6 +371,55 @@ Completely resolved the drawer sheet visibility bug, implemented custom gear kit
 | [cora-workspace.php](file:///Users/shrutian/Desktop/cora/app/public/wp-content/plugins/cora-workspace/cora-workspace.php) | Incremented version to `2.5.2`. |
 | [cora-workspace.json](file:///Users/shrutian/Desktop/cora/updates/cora-workspace.json) | Incremented update version to `2.5.2` and updated changelog. |
 
+***
+
+## Phase 9: Leads CRM Refactoring, Team Assignee Filters, and SLA Awareness Panel (v2.5.3)
+
+### 24. Notion-Inspired Monochromatic Leads CRM Overhaul
+- **Problem**: The Leads CRM directory table and Kanban cards were cluttered with colorful badges, icon-heavy buttons, and custom layout dividers.
+- **Solution**:
+  - Replaced custom icon badges and colorful status boxes with a flat, clean, Notion-inspired monochromatic row system.
+  - Standardized borders to soft `border-zinc-200/80` and used clean inline thin SVG icons with `stroke-width: 1.8`.
+  - Standardized status badges to use subtle monochromatic inline grey tags.
+
+### 25. Team Member Assignment Filters & Cards Integration
+- **Problem**: Leads had no clear assignee visualization or filtering support in the main CRM panel.
+- **Solution**:
+  - Integrated a **Team Member dropdown selector** (`#cora-lead-assignee-filter`) inside the main CRM toolbar to filter prospects in real time.
+  - Rendered clean round avatars with member initials on both the Kanban cards and the Directory list rows.
+  - Implemented the assignee option field in the Create Lead drawer form.
+
+### 26. One-Tap Lead Status Transitions
+- **Problem**: Moving a prospect through pipeline stages required opening full edit dialogs.
+- **Solution**:
+  - Enabled **one-tap status cycling** directly on the Kanban board and details drawer status pills. Tapping a status pill cycles the lead stage dynamically via AJAX.
+
+### 27. SLA Status & Priority Awareness Header Card
+- **Problem**: There was no visual layout indicating lead urgency or SLA response countdowns.
+- **Solution**:
+  - Added a prominent **SLA Awareness Card** at the top of the details drawer displaying current SLA metrics (e.g. `⚠️ Response Required: High Urgency` with active response hour metrics).
+
+### 28. Dynamic Activity Log Timelines
+- **Problem**: Actions like assigning team members or shifting lead stages lacked an audit trail.
+- **Solution**:
+  - Integrated a dynamic activity log timeline inside the details drawer, auto-generating entries whenever lead status or assignee changes occur.
+
+### 29. Version Bump & updates/ Release Packaging (v2.5.3)
+- **Solution**:
+  - Bumped the plugin version to `2.5.3` in `cora-workspace.php`.
+  - Updated auto-update metadata and changelog details in `updates/cora-workspace.json`.
+  - Rebuilt the distribution archive `updates/cora-workspace.zip` with clean asset trees, excluding untracked logs and vendor files.
+  - Pushed all changes successfully to remote branches.
+
+### Files Modified
+| File | Changes |
+|------|---------|
+| [view-leads.php](file:///Users/shrutian/Desktop/cora/app/public/wp-content/plugins/cora-workspace/views/view-leads.php) | Redesigned toolbar filters, directory table rows, Kanban cards, and workspace drawer with SLA cards, assignee initials, and activity feeds. |
+| [admin-script.js](file:///Users/shrutian/Desktop/cora/app/public/wp-content/plugins/cora-workspace/assets/js/admin-script.js) | Overhauled JS views builder, toolbar listeners, AJAX status cycling, activity renderer, and single-drawer helpers. |
+| [cora-workspace.php](file:///Users/shrutian/Desktop/cora/app/public/wp-content/plugins/cora-workspace/cora-workspace.php) | Updated `cora_ajax_get_leads` and update handlers to fetch users, update assignment logs, and bumped version to `2.5.3`. |
+| [cora-workspace.json](file:///Users/shrutian/Desktop/cora/updates/cora-workspace.json) | Bumped update descriptor to version `2.5.3` with full release notes. |
+| [cora-workspace.zip](file:///Users/shrutian/Desktop/cora/updates/cora-workspace.zip) | Rebuilt distribution zip packaging. |
+
 
 
 
