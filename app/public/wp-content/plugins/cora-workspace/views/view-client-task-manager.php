@@ -127,7 +127,7 @@ if (!defined('ABSPATH')) {
 .cora-task-manager-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     margin-bottom: 24px;
     width: 100%;
 }
@@ -147,11 +147,11 @@ if (!defined('ABSPATH')) {
 }
 .cora-task-header-search input {
     width: 100%;
-    height: 38px;
-    padding-left: 32px !important;
+    height: 44px;
+    padding-left: 36px !important;
     padding-right: 12px !important;
     border: 1px solid #e4e4e7 !important;
-    border-radius: 8px !important;
+    border-radius: 12px !important;
     font-size: 13px !important;
     background-color: #ffffff !important;
     outline: none !important;
@@ -163,8 +163,8 @@ if (!defined('ABSPATH')) {
 }
 .cora-task-header-search svg {
     position: absolute;
-    left: 10px;
-    top: 12px;
+    left: 12px;
+    top: 15px;
     color: #71717a;
     width: 14px;
     height: 14px;
@@ -172,15 +172,15 @@ if (!defined('ABSPATH')) {
 .cora-task-export-btn {
     display: flex;
     align-items: center;
-    gap: 6px;
-    height: 38px;
+    gap: 8px;
+    height: 44px;
     padding: 0 16px !important;
     border: 1px solid #e4e4e7 !important;
-    border-radius: 8px !important;
+    border-radius: 12px !important;
     background-color: #ffffff !important;
     color: #09090b !important;
     font-size: 13px !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     cursor: pointer;
     box-shadow: none !important;
     transition: all 0.2s ease;
@@ -191,15 +191,13 @@ if (!defined('ABSPATH')) {
 .cora-task-new-btn {
     display: flex;
     align-items: center;
-    gap: 6px;
-    height: 38px;
+    gap: 10px;
+    height: 44px;
     padding: 0 16px !important;
     border: none !important;
-    border-radius: 8px !important;
+    border-radius: 12px !important;
     background-color: #09090b !important;
     color: #ffffff !important;
-    font-size: 13px !important;
-    font-weight: 650 !important;
     cursor: pointer;
     box-shadow: none !important;
     transition: all 0.2s ease;
@@ -443,8 +441,11 @@ if (!defined('ABSPATH')) {
                 Export
             </button>
             <button onclick="coraOpenCreateTaskDrawer(event)" class="cora-task-new-btn">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                New Task
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <div class="flex flex-col text-left leading-[1.1] text-[11px] font-black uppercase tracking-wider">
+                    <span>New</span>
+                    <span>Task</span>
+                </div>
             </button>
         </div>
     </div>
