@@ -4022,7 +4022,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 <!-- Dynamic KPI Metrics Cards (Premium Responsive Layout: 2-Cols on Mobile, 4-Cols on Desktop) -->
                 <div class="w-full max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 select-none">
                     <?php foreach ( $telemetry_metrics as $idx => $metric ) : ?>
-                    <div class="bg-white/80 dark:bg-zinc-900/60 p-4 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-800/40 rounded-2xl flex items-center justify-between transition-all hover:scale-[1.01] hover:shadow-xs cursor-default <?php if ($idx >= 2) echo 'hidden md:flex'; ?>">
+                    <div class="bg-white/80 dark:bg-zinc-900/60 p-4 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-800/40 rounded-2xl flex items-center justify-between transition-all hover:scale-[1.01] hover:shadow-xs cursor-default">
                         <div class="space-y-1 min-w-0 pr-2">
                             <span class="block text-[9px] sm:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate"><?php echo esc_html( $metric['label'] ); ?></span>
                             <div class="flex items-baseline gap-1.5 flex-wrap">
