@@ -103,6 +103,22 @@ if (!defined('ABSPATH')) {
     .cora-drawer-handle {
         display: block !important;
     }
+
+    /* Clutter optimization */
+    .cora-drawer-header-badges {
+        display: none !important;
+    }
+    #detail-task-title {
+        font-size: 18px !important;
+        font-weight: 800 !important;
+    }
+    .task-detail-tab-btn {
+        flex: 1 1 0% !important;
+        text-align: center !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        font-size: 11px !important;
+    }
 }
 
 /* Invisible click-outside interceptor backdrop behind the active drawer (offset to not block sidebar) */
@@ -839,7 +855,7 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
     <!-- Compact Header with Inline Title -->
     <div class="px-6 py-4.5 border-b border-zinc-200/80 bg-white flex items-start justify-between shrink-0 gap-4">
         <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 mb-2">
+            <div class="cora-drawer-header-badges flex items-center gap-2 mb-2 flex-wrap">
                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9.5px] font-black uppercase tracking-widest bg-zinc-950 text-white leading-none" id="detail-header-status-pill">To Do</span>
                 <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9.5px] font-black uppercase tracking-widest leading-none border" id="detail-header-priority-pill" style="border-color: #d4d4d8; color: #71717a;">Medium</span>
                 <div class="flex items-center gap-1.5 ml-1" id="detail-project-badges">
