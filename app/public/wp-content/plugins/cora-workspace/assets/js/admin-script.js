@@ -10751,6 +10751,17 @@ jQuery(document).ready(function($) {
         });
     };
 
+    // Jump to Stage in Directory from Analytics
+    window.coraJumpToStageInDirectory = function(stageKey) {
+        if (typeof window.coraSwitchLeadSubtab === 'function') {
+            window.coraSwitchLeadSubtab('directory');
+        }
+        if (stageKey) {
+            $('#cora-lead-stage-filter').val(stageKey);
+            window.coraFilterLeadsList();
+        }
+    };
+
     // Filter Leads
     window.coraFilterLeadsList = function() {
         const query = ($('#cora-lead-search-input').val() || '').toLowerCase().trim();

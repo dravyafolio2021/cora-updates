@@ -421,30 +421,32 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
             </button>
         </div>
 
-        <div class="flex items-center gap-2 shrink-0 max-w-full">
-            <div class="relative w-48 sm:w-64">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">
+        <div class="flex flex-col md:flex-row items-stretch md:items-center gap-2.5 w-full md:w-auto shrink-0">
+            <div class="relative w-full md:w-64">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <input type="text" id="cora-lead-search-input" placeholder="Search leads by name, email, city..." 
-                       class="w-full pl-8 pr-3 py-1.5 text-xs bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white transition-all"
+                <input type="text" id="cora-lead-search-input" placeholder="🔍 Search leads by name, email, city..." 
+                       class="w-full pl-9 pr-3 py-2 md:py-1.5 text-xs bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white transition-all font-medium placeholder:text-zinc-400"
                        onkeyup="coraFilterLeadsList()">
             </div>
 
-            <select id="cora-lead-stage-filter" class="shrink-0 px-3 py-1.5 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer" onchange="coraFilterLeadsList()">
-                <option value="all">All Stages</option>
-                <?php foreach ( $stages_summary as $sk => $sd ) : ?>
-                    <option value="<?php echo esc_attr( $sk ); ?>"><?php echo esc_html( $sd['label'] ); ?></option>
-                <?php endforeach; ?>
-            </select>
+            <div class="grid grid-cols-2 md:flex md:items-center gap-2 w-full md:w-auto">
+                <select id="cora-lead-stage-filter" class="w-full md:w-auto shrink-0 px-2.5 sm:px-3 py-2 md:py-1.5 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-800 dark:text-zinc-200 font-medium focus:outline-none cursor-pointer truncate" onchange="coraFilterLeadsList()">
+                    <option value="all">All Stages</option>
+                    <?php foreach ( $stages_summary as $sk => $sd ) : ?>
+                        <option value="<?php echo esc_attr( $sk ); ?>"><?php echo esc_html( $sd['label'] ); ?></option>
+                    <?php endforeach; ?>
+                </select>
 
-            <select id="cora-lead-assignee-filter" class="shrink-0 px-3 py-1.5 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer" onchange="coraFilterLeadsList()">
-                <option value="all">All Team Members</option>
-                <?php foreach ( $cora_users_list as $u ) : ?>
-                    <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
-                <?php endforeach; ?>
-            </select>
+                <select id="cora-lead-assignee-filter" class="w-full md:w-auto shrink-0 px-2.5 sm:px-3 py-2 md:py-1.5 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-800 dark:text-zinc-200 font-medium focus:outline-none cursor-pointer truncate" onchange="coraFilterLeadsList()">
+                    <option value="all">All Team Members</option>
+                    <?php foreach ( $cora_users_list as $u ) : ?>
+                        <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
         </div>
     </div>
 
@@ -1260,13 +1262,79 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
         </div>
     </div>
 
-    <!-- SUB-TAB 3: FUNNEL & REVENUE ANALYTICS -->
+    <!-- SUB-TAB 3: FUNNEL & REVENUE ANALYTICS (ACTIONABLE VELOCITY HUB) -->
     <div id="cora-lead-pane-analytics" class="cora-lead-tab-pane hidden space-y-6">
+        <!-- TOP PRIORITY DEAL SLA & ACTION LAUNCHERS -->
+        <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="font-black text-sm text-zinc-950 dark:text-white tracking-tight flex items-center gap-2">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-amber-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        High-Priority Deal SLA & Next-Action Launchers
+                    </h3>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Real-time priority alerts to convert prospects faster before SLAs expire.</p>
+                </div>
+                <span class="text-[10px] font-bold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/50 px-2.5 py-1 rounded-full border border-rose-200/60 dark:border-rose-800/60 inline-flex items-center gap-1 shrink-0">
+                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span> Action Required
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                <!-- Action Launcher 1: New Inquiries -->
+                <div class="p-3.5 bg-zinc-50 dark:bg-zinc-800/60 rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 flex flex-col justify-between gap-3 group hover:border-zinc-400 dark:hover:border-zinc-600 transition-all">
+                    <div>
+                        <div class="flex items-center justify-between text-xs font-bold text-zinc-900 dark:text-white">
+                            <span class="flex items-center gap-1.5"><span class="text-amber-500">⚡</span> Uncontacted Leads</span>
+                            <span class="px-1.5 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 text-[10px]">High SLA</span>
+                        </div>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">2 fresh inquiries awaiting initial response (&lt; 30 min target).</p>
+                    </div>
+                    <button type="button" onclick="coraJumpToStageInDirectory('New Lead')" class="w-full py-1.5 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 font-bold rounded-lg text-xs hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all cursor-pointer shadow-2xs flex items-center justify-center gap-1">
+                        <span>Filter & Contact</span>
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </button>
+                </div>
+
+                <!-- Action Launcher 2: Negotiation -->
+                <div class="p-3.5 bg-zinc-50 dark:bg-zinc-800/60 rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 flex flex-col justify-between gap-3 group hover:border-zinc-400 dark:hover:border-zinc-600 transition-all">
+                    <div>
+                        <div class="flex items-center justify-between text-xs font-bold text-zinc-900 dark:text-white">
+                            <span class="flex items-center gap-1.5"><span class="text-rose-500">🔥</span> Negotiation Deals</span>
+                            <span class="px-1.5 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 text-[10px]">₹10.2L Value</span>
+                        </div>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">3 active proposals in final closing stage requiring follow-up.</p>
+                    </div>
+                    <button type="button" onclick="coraJumpToStageInDirectory('Negotiation')" class="w-full py-1.5 bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-zinc-950 font-bold rounded-lg text-xs transition-all cursor-pointer shadow-2xs flex items-center justify-center gap-1">
+                        <span>Review & Convert</span>
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </button>
+                </div>
+
+                <!-- Action Launcher 3: Site Visits -->
+                <div class="p-3.5 bg-zinc-50 dark:bg-zinc-800/60 rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 flex flex-col justify-between gap-3 group hover:border-zinc-400 dark:hover:border-zinc-600 transition-all">
+                    <div>
+                        <div class="flex items-center justify-between text-xs font-bold text-zinc-900 dark:text-white">
+                            <span class="flex items-center gap-1.5"><span>📅</span> Upcoming Visits</span>
+                            <span class="px-1.5 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-400 text-[10px]">Site Viewing</span>
+                        </div>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">3 client property viewings scheduled for this week.</p>
+                    </div>
+                    <button type="button" onclick="coraJumpToStageInDirectory('Site Visit')" class="w-full py-1.5 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 font-bold rounded-lg text-xs hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all cursor-pointer shadow-2xs flex items-center justify-center gap-1">
+                        <span>View Schedule</span>
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Stage Breakdown Bar -->
+            <!-- Stage Breakdown Bar (Interactive Click-to-Filter) -->
             <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm space-y-4">
                 <div class="flex items-center justify-between">
-                    <h3 class="font-bold text-sm text-zinc-900 dark:text-white">Pipeline Conversion Funnel</h3>
+                    <div>
+                        <h3 class="font-bold text-sm text-zinc-900 dark:text-white">Interactive Funnel Conversion Stage Breakdown</h3>
+                        <p class="text-[11px] text-zinc-400 mt-0.5">Click any stage bar to filter leads directly in Directory view.</p>
+                    </div>
                     <span class="text-xs text-zinc-400 font-medium"><?php echo $total_leads_count; ?> Total Deals</span>
                 </div>
 
@@ -1274,27 +1342,37 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                     <?php foreach ( $stages_summary as $k => $sd ) :
                         $pct = $total_leads_count > 0 ? round( ($sd['count'] / $total_leads_count) * 100, 1 ) : 0;
                     ?>
-                    <div>
+                    <div class="p-2 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-all cursor-pointer group" onclick="coraJumpToStageInDirectory('<?php echo esc_attr($k); ?>')" title="Click to filter <?php echo esc_attr($sd['label']); ?> deals">
                         <div class="flex items-center justify-between text-xs font-semibold mb-1">
-                            <span class="text-zinc-700 dark:text-zinc-300"><?php echo esc_html($sd['label']); ?></span>
-                            <span class="text-zinc-400"><?php echo $sd['count']; ?> deals (<?php echo $pct; ?>%) &bull; ₹<?php echo number_format($sd['value']); ?></span>
+                            <span class="text-zinc-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors flex items-center gap-1.5">
+                                <span><?php echo esc_html($sd['label']); ?></span>
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="opacity-0 group-hover:opacity-100 transition-opacity"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            </span>
+                            <span class="text-zinc-500 dark:text-zinc-400 font-mono text-[11px]"><?php echo $sd['count']; ?> deals (<?php echo $pct; ?>%) &bull; ₹<?php echo number_format($sd['value']); ?></span>
                         </div>
                         <div class="w-full h-2.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                            <div class="h-full bg-zinc-950 dark:bg-white rounded-full transition-all duration-500" style="width: <?php echo $pct; ?>%;"></div>
+                            <div class="h-full bg-zinc-950 dark:bg-white group-hover:bg-amber-500 rounded-full transition-all duration-500" style="width: <?php echo $pct; ?>%;"></div>
                         </div>
                     </div>
                     <?php endforeach; ?>
                 </div>
             </div>
 
-            <!-- Lead Channels & Sources -->
-            <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm space-y-4">
+            <!-- Lead Channels & Sources (Marked as COMING SOON) -->
+            <div id="cora-lead-channels-card" class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm space-y-4 relative overflow-hidden">
+                <!-- Coming Soon Overlay Badge Header -->
                 <div class="flex items-center justify-between">
-                    <h3 class="font-bold text-sm text-zinc-900 dark:text-white">Lead Acquisition Channels</h3>
-                    <span class="text-xs text-zinc-400 font-medium">Source Tracking</span>
+                    <div>
+                        <h3 class="font-bold text-sm text-zinc-900 dark:text-white">Lead Acquisition Channels</h3>
+                        <p class="text-[11px] text-zinc-400 mt-0.5">Multi-channel campaign & webhook attribution.</p>
+                    </div>
+                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 px-2.5 py-1 rounded-full shadow-2xs flex items-center gap-1">
+                        <span>✨ Coming Soon</span>
+                    </span>
                 </div>
 
-                <div class="space-y-3 pt-2">
+                <!-- Preview Content with Subtle Opacity overlay -->
+                <div class="space-y-3 pt-2 opacity-65 pointer-events-none select-none">
                     <div class="flex items-center justify-between p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-zinc-200/60 dark:border-zinc-800">
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-bold text-xs">WEB</div>
