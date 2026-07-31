@@ -121,6 +121,18 @@ if (!defined('ABSPATH')) {
     }
 }
 
+/* Custom dropdown indicator chevron for drawer selects */
+.cora-bottom-drawer select {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23a1a1aa' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.8' d='m6 8 4 4 4-4'/%3E%3C/svg%3E") !important;
+    background-position: right 2px center !important;
+    background-repeat: no-repeat !important;
+    background-size: 1.1em 1.1em !important;
+    padding-right: 18px !important;
+}
+
 /* Invisible click-outside interceptor backdrop behind the active drawer (offset to not block sidebar) */
 .cora-drawer-backdrop-overlay {
     position: fixed !important;
@@ -2732,7 +2744,8 @@ window.coraToggleMobileAccordion = function(element, sectionKey) {
 
         $('#detail-task-id').val(t.id);
         $('#detail-task-title').val(t.title);
-        $('#detail-task-assignee').val(t.assignee_id || '');
+        const assigneeIdVal = (!t.assignee_id || t.assignee_id == 0 || t.assignee_id == "0") ? "" : t.assignee_id;
+        $('#detail-task-assignee').val(assigneeIdVal);
         $('#detail-task-status').val(t.status || 'todo');
         $('#detail-task-due').val(t.due_date || '');
         $('#detail-task-priority').val(t.priority || 'medium');
