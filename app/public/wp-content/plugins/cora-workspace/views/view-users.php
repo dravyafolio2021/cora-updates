@@ -213,12 +213,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 </select>
             </div>
             <button onclick="clearMemberFilters()" class="w-full h-8 text-[11px] font-bold text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-250 transition-colors border border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer">
-                Clear Filters
-            </button>
-        </div>
-
-        <!-- ── MOBILE CARDS GRID (hidden on desktop) ── -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:hidden">
+                        <!-- ── MOBILE CARDS GRID (hidden on desktop) ── -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 md:hidden">
             <?php foreach ( $users as $u ) :
                 $u_role = ! empty( $u->roles ) ? $u->roles[0] : 'subscriber';
                 $u_role_lbl = isset( $role_labels[$u_role] ) ? $role_labels[$u_role] : $u_role;
@@ -259,7 +255,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 $name_initials = substr( $name_initials, 0, 2 );
                 $name_color = '#' . substr( md5( $u->display_name ), 0, 6 );
             ?>
-                <div class="active-member-row bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-sm p-3.5 flex items-center gap-3 cursor-pointer active:bg-zinc-50 dark:active:bg-zinc-800/60 transition-colors"
+                <div class="active-member-row bg-white dark:bg-zinc-950 border border-zinc-150 dark:border-zinc-800 rounded-xl p-3 flex items-center gap-2.5 transition-colors cursor-pointer active:bg-zinc-50 dark:active:bg-zinc-900 focus:outline-none outline-none"
                     data-name="<?php echo esc_attr(strtolower($u->display_name)); ?>"
                     data-email="<?php echo esc_attr(strtolower($u->user_email)); ?>"
                     data-role="<?php echo esc_attr($u_role); ?>"
@@ -269,24 +265,34 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     onclick="openEditUserDrawer(this)">
                     <!-- Avatar -->
                     <?php if ( ! empty($avatar) ) : ?>
-                        <img src="<?php echo esc_url($avatar); ?>" class="w-10 h-10 rounded-full object-cover shrink-0">
+                        <img src="<?php echo esc_url($avatar); ?>" class="w-8 h-8 rounded-full object-cover shrink-0">
                     <?php else : ?>
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 border border-zinc-100 dark:border-zinc-800" style="background-color: <?php echo esc_attr($name_color); ?>"><?php echo esc_html($name_initials); ?></div>
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 border border-zinc-100 dark:border-zinc-800/80" style="background-color: <?php echo esc_attr($name_color); ?>"><?php echo esc_html($name_initials); ?></div>
                     <?php endif; ?>
                     <!-- Info -->
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 justify-between">
                             <span class="font-bold text-xs text-zinc-900 dark:text-zinc-100 truncate"><?php echo esc_html($u->display_name); ?></span>
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-bold rounded-full whitespace-nowrap shrink-0 <?php echo $u_status === 'active' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400'; ?>">
-                                <span class="w-1.5 h-1.5 rounded-full <?php echo $u_status === 'active' ? 'bg-emerald-500' : 'bg-zinc-400'; ?> inline-block"></span>
+                            <?php 
+                            $status_classes = $u_status === 'active' 
+                                ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-450' 
+                                : 'bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-450';
+                            $dot_color = $u_status === 'active' ? 'bg-emerald-500' : 'bg-red-500';
+                            ?>
+                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 text-[9px] font-bold rounded-md whitespace-nowrap shrink-0 <?php echo $status_classes; ?>">
+                                <span class="w-1 h-1 rounded-full <?php echo $dot_color; ?> inline-block"></span>
                                 <?php echo esc_html(ucfirst($u_status)); ?>
                             </span>
                         </div>
-                        <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                            <span class="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400"><?php echo esc_html($u_role_lbl); ?></span>
+                        <div class="text-[10px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5"><?php echo esc_html($u->user_email); ?></div>
+                        <div class="flex flex-wrap items-center gap-1 mt-0.5">
+                            <span class="inline-flex items-center px-1.5 py-0.5 text-[9px] font-bold rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 whitespace-nowrap select-none">
+                                <?php echo esc_html($u_role_lbl); ?>
+                            </span>
                             <?php if ($u_branch_lbl && $u_branch_lbl !== '—') : ?>
-                            <span class="text-zinc-300 dark:text-zinc-650">·</span>
-                            <span class="text-[10px] text-zinc-400 dark:text-zinc-500"><?php echo esc_html($u_branch_lbl); ?></span>
+                            <span class="inline-flex items-center px-1.5 py-0.5 text-[9px] font-bold rounded bg-zinc-50 dark:bg-zinc-900 text-zinc-550 dark:text-zinc-400 whitespace-nowrap select-none border border-zinc-150 dark:border-zinc-800">
+                                <?php echo esc_html($u_branch_lbl); ?>
+                            </span>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -297,7 +303,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         </div>
 
         <!-- ── DESKTOP: FILTERS TOOLBAR (hidden on mobile) ── -->
-        <div class="hidden md:flex flex-row gap-4 items-center justify-between">
+        <div class="hidden md:flex bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex-row gap-4 items-center justify-between">
+
             <div class="flex flex-row flex-wrap gap-3 items-center flex-1">
                 <!-- Search bar -->
                 <div class="relative flex-1 min-w-[160px] max-w-xs">
