@@ -355,13 +355,13 @@ if (!defined('ABSPATH')) {
         display: flex !important;
         flex-direction: column !important;
         overflow-x: hidden !important;
-        gap: 12px !important;
+        gap: 20px !important;
         padding-left: 0 !important;
         padding-right: 0 !important;
         scroll-snap-type: none !important;
         width: 100% !important;
     }
-    .cora-mobile-accordion-active .cora-accordion-section {
+    .cora-mobile-accordion-active .cora-timeline-group {
         width: 100% !important;
         max-width: 100% !important;
         min-width: 0 !important;
@@ -2450,30 +2450,36 @@ function renderKanbanColumns(tasks) {
             { key: 'done', name: 'Completed Tasks', tasks: completed }
         ];
 
-        let html = '<div class="w-full flex flex-col gap-3">';
+        let html = '<div class="w-full flex flex-col gap-6 cora-mobile-timeline">';
         accordionSections.forEach(section => {
-            const isOpen = window.coraMobileAccordionsOpen[section.key];
+            // Only render sections that actually have tasks, or show a clean empty indicator for today/upcoming
+            if (section.tasks.length === 0 && section.key !== 'today' && section.key !== 'upcoming') {
+                return; // Hide empty ongoing / completed sections to keep it clean
+            }
+            
             let cardsHtml = '';
             if (section.tasks.length === 0) {
-                cardsHtml = '<div class="text-center text-zinc-400 text-xs py-8 font-medium">No tasks in this section</div>';
+                cardsHtml = '<div class="text-center text-zinc-400 text-xs py-6 bg-white border border-zinc-200/60 rounded-2xl">No tasks scheduled</div>';
             } else {
                 section.tasks.forEach(t => {
                     cardsHtml += renderMobileCard(t, today, todayStr, tomorrowStr);
                 });
             }
 
+            let badgeColor = 'bg-zinc-100 text-zinc-600 border-zinc-200';
+            let titleColor = 'text-zinc-500';
+            if (section.key === 'today') {
+                badgeColor = 'bg-rose-50 text-rose-700 border-rose-100';
+                titleColor = 'text-rose-600';
+            }
+
             html += `
-            <div class="cora-accordion-section border border-zinc-200 rounded-2xl overflow-hidden bg-white shadow-2xs">
-                <div onclick="window.coraToggleMobileAccordion(this, '${section.key}')" class="flex items-center justify-between p-3.5 bg-zinc-50 cursor-pointer select-none border-b border-zinc-100">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs font-bold text-zinc-800">${escHtml(section.name)}</span>
-                        <span class="text-[10px] text-zinc-500 font-bold bg-white border border-zinc-200/50 px-2 py-0.5 rounded-full">${section.tasks.length}</span>
-                    </div>
-                    <span class="cora-accordion-chevron text-zinc-400 transition-transform duration-200" style="transform: ${isOpen ? 'rotate(180deg)' : 'rotate(0deg)'}">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
-                    </span>
+            <div class="cora-timeline-group space-y-3">
+                <div class="flex items-center gap-2 px-1">
+                    <span class="text-[10.5px] font-black uppercase tracking-wider ${titleColor}">${escHtml(section.name)}</span>
+                    <span class="text-[9.5px] font-bold px-1.5 py-0.5 rounded-full border ${badgeColor}">${section.tasks.length}</span>
                 </div>
-                <div class="cora-accordion-content p-3.5 space-y-3.5 ${isOpen ? '' : 'hidden'}">
+                <div class="space-y-3.5">
                     ${cardsHtml}
                 </div>
             </div>
