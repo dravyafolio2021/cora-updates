@@ -5,11 +5,8 @@
  * Shows zero mentions of WordPress and has a clean, professional Notion-styled monochromatic UI.
  */
 
-// Get error details if logged in as administrator
-$show_details = false;
-if ( function_exists( 'current_user_can' ) && current_user_can( 'manage_options' ) ) {
-    $show_details = true;
-}
+$show_details = true;
+$error = error_get_last();
 
 // Set header status safely using native PHP functions
 if ( ! headers_sent() ) {

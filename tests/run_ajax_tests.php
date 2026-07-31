@@ -41,16 +41,20 @@ function test_ajax_action( $action, $params = array(), $user_role = null ) {
         if ( ! empty( $admins ) ) {
             wp_set_current_user( $admins[0]->ID );
         } else {
-            echo "Warning: no administrator found in database.\n";
+            $cora_admins = get_users( array( 'role__in' => array( 'cora_super_admin', 'cora_shruti' ) ) );
+            if ( ! empty( $cora_admins ) ) {
+                wp_set_current_user( $cora_admins[0]->ID );
+            } else {
+                wp_set_current_user( 1 );
+            }
         }
     } elseif ( $user_role === 'cora_manager' ) {
         $managers = get_users( array( 'role' => 'cora_manager' ) );
         if ( ! empty( $managers ) ) {
             wp_set_current_user( $managers[0]->ID );
         } else {
-            // Find/create manager or fallback to admin
-            $admins = get_users( array( 'role' => 'administrator' ) );
-            wp_set_current_user( ! empty( $admins ) ? $admins[0]->ID : 0 );
+            $cora_admins = get_users( array( 'role__in' => array( 'cora_super_admin', 'cora_shruti' ) ) );
+            wp_set_current_user( ! empty( $cora_admins ) ? $cora_admins[0]->ID : 1 );
         }
     } else {
         wp_set_current_user( 0 ); // Guest

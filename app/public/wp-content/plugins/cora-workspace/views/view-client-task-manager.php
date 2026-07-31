@@ -728,56 +728,65 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
 
 <!-- DRAWER 1: Task Workspace & Checklist -->
 <div id="drawer-task-details" class="cora-bottom-drawer">
-    <!-- Header -->
-    <div class="p-5 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
-                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+    <!-- Compact Header with Inline Title -->
+    <div class="px-5 py-4 border-b border-zinc-200/80 bg-white flex items-start justify-between shrink-0 gap-4">
+        <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9.5px] font-black uppercase tracking-widest bg-zinc-950 text-white leading-none" id="detail-header-status-pill">To Do</span>
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9.5px] font-black uppercase tracking-widest leading-none border" id="detail-header-priority-pill" style="border-color: #d4d4d8; color: #71717a;">Medium</span>
+                <div class="flex items-center gap-1.5 ml-1" id="detail-project-badges">
+                    <!-- Client & booking pills injected via JS -->
+                </div>
             </div>
-            <div>
-                <h2 class="text-sm font-bold text-zinc-950 leading-none">Task Workspace &amp; Checklist</h2>
-                <p class="text-[10.5px] font-semibold text-zinc-400 mt-1.5">Configure task parameters, checklist steps, and notes.</p>
-            </div>
+            <input type="text" id="detail-task-title" placeholder="Task title..." class="w-full text-[15px] font-bold text-zinc-950 bg-transparent border-0 p-0 focus:outline-none focus:ring-0 placeholder:text-zinc-300 truncate">
+            <input type="hidden" id="detail-task-id" value="">
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="p-1.5 rounded-lg hover:bg-zinc-200/80 text-zinc-400 hover:text-zinc-950 transition-colors cursor-pointer" title="Close Drawer (Esc)">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="p-1.5 rounded-lg hover:bg-zinc-100 text-zinc-400 hover:text-zinc-950 transition-colors cursor-pointer shrink-0 mt-0.5" title="Close (Esc)">
+            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
     </div>
 
-    <!-- Segmented Tabs Row -->
-    <div class="flex items-center gap-1 border-b border-zinc-200 bg-zinc-50 px-5 py-2.5 shrink-0 select-none">
-        <button type="button" onclick="coraSwitchTaskDetailTab('details')" id="tab-btn-details" class="task-detail-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-zinc-950 bg-white border border-zinc-200/80 shadow-2xs">Overview &amp; Details</button>
-        <button type="button" onclick="coraSwitchTaskDetailTab('checklist')" id="tab-btn-checklist" class="task-detail-tab-btn px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-zinc-500 hover:text-zinc-950 hover:bg-zinc-150/70">Subtask Checklist</button>
-        <button type="button" onclick="coraSwitchTaskDetailTab('activity')" id="tab-btn-activity" class="task-detail-tab-btn px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-zinc-500 hover:text-zinc-950 hover:bg-zinc-150/70">Activity &amp; Team Notes</button>
+    <!-- Underline Tabs -->
+    <div class="flex items-center gap-0 border-b border-zinc-200/80 bg-white px-5 shrink-0 select-none">
+        <button type="button" onclick="coraSwitchTaskDetailTab('details')" id="tab-btn-details" class="task-detail-tab-btn relative px-3.5 py-2.5 text-[11px] font-bold transition-all text-zinc-950 cursor-pointer">
+            Details
+            <span class="task-tab-underline absolute bottom-0 left-0 right-0 h-[2px] bg-zinc-950 rounded-full"></span>
+        </button>
+        <button type="button" onclick="coraSwitchTaskDetailTab('checklist')" id="tab-btn-checklist" class="task-detail-tab-btn relative px-3.5 py-2.5 text-[11px] font-semibold transition-all text-zinc-400 hover:text-zinc-700 cursor-pointer">
+            Checklist
+        </button>
+        <button type="button" onclick="coraSwitchTaskDetailTab('activity')" id="tab-btn-activity" class="task-detail-tab-btn relative px-3.5 py-2.5 text-[11px] font-semibold transition-all text-zinc-400 hover:text-zinc-700 cursor-pointer">
+            Activity
+        </button>
+        <button type="button" onclick="coraSwitchTaskDetailTab('notifications')" id="tab-btn-notifications" class="task-detail-tab-btn relative px-3.5 py-2.5 text-[11px] font-semibold transition-all text-zinc-400 hover:text-zinc-700 cursor-pointer">
+            Alerts
+        </button>
     </div>
 
     <!-- Content Body -->
-    <div class="flex-1 overflow-y-auto p-5 sm:p-6">
-        <input type="hidden" id="detail-task-id" value="">
+    <div class="flex-1 overflow-y-auto">
 
-        <!-- TAB 1: OVERVIEW & DETAILS -->
-        <div id="task-tab-pane-details" class="task-tab-pane space-y-5">
-            <div>
-                <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-1.5">Task Title *</label>
-                <input type="text" id="detail-task-title" class="w-full text-lg font-bold text-zinc-950 border border-zinc-200 rounded-xl px-4 py-3 focus:outline-none focus:border-zinc-950 bg-zinc-50/50">
-            </div>
-
-            <!-- Project Badges -->
-            <div class="flex items-center gap-2 flex-wrap" id="detail-project-badges">
-                <!-- Client & booking pills injected via JS -->
-            </div>
-
-            <!-- Meta Grid (2x2) -->
-            <div class="grid grid-cols-2 gap-4 bg-zinc-50 p-5 rounded-2xl border border-zinc-200/80">
-                <div>
-                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Assigned Staff</label>
-                    <select id="detail-task-assignee" class="w-full text-xs font-bold border-zinc-200 rounded-xl focus:ring-0 focus:border-zinc-950 bg-white py-2.5 px-3 cursor-pointer">
+        <!-- TAB 1: DETAILS (Linear-style property rows) -->
+        <div id="task-tab-pane-details" class="task-tab-pane">
+            <!-- Property Table -->
+            <div class="divide-y divide-zinc-100">
+                <!-- Assignee -->
+                <div class="flex items-center px-5 py-2.5 hover:bg-zinc-50/60 transition-colors">
+                    <div class="w-28 shrink-0 flex items-center gap-2 text-[11px] font-semibold text-zinc-400">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        Assignee
+                    </div>
+                    <select id="detail-task-assignee" class="flex-1 text-xs font-bold text-zinc-950 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer appearance-none">
                         <option value="">Unassigned</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Status Stage</label>
-                    <select id="detail-task-status" onchange="coraUpdateGuidelinesText($('#detail-task-priority').val(), this.value)" class="w-full text-xs font-bold border-zinc-200 rounded-xl focus:ring-0 focus:border-zinc-950 bg-white py-2.5 px-3 cursor-pointer">
+                <!-- Status -->
+                <div class="flex items-center px-5 py-2.5 hover:bg-zinc-50/60 transition-colors">
+                    <div class="w-28 shrink-0 flex items-center gap-2 text-[11px] font-semibold text-zinc-400">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        Status
+                    </div>
+                    <select id="detail-task-status" onchange="coraUpdateGuidelinesText($('#detail-task-priority').val(), this.value); coraUpdateHeaderPills();" class="flex-1 text-xs font-bold text-zinc-950 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer appearance-none">
                         <option value="todo">To Do</option>
                         <option value="in_progress">In Progress</option>
                         <option value="client_review">Client Review</option>
@@ -785,159 +794,168 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
                         <option value="done">Done</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Due Date</label>
-                    <input type="date" id="detail-task-due" class="w-full text-xs font-bold border-zinc-200 rounded-xl focus:ring-0 focus:border-zinc-950 bg-white py-2 px-3">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Priority Level</label>
-                    <select id="detail-task-priority" onchange="coraUpdateGuidelinesText(this.value, $('#detail-task-status').val())" class="w-full text-xs font-bold border-zinc-200 rounded-xl focus:ring-0 focus:border-zinc-950 bg-white py-2.5 px-3 cursor-pointer">
+                <!-- Priority -->
+                <div class="flex items-center px-5 py-2.5 hover:bg-zinc-50/60 transition-colors">
+                    <div class="w-28 shrink-0 flex items-center gap-2 text-[11px] font-semibold text-zinc-400">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/></svg>
+                        Priority
+                    </div>
+                    <select id="detail-task-priority" onchange="coraUpdateGuidelinesText(this.value, $('#detail-task-status').val()); coraUpdateHeaderPills();" class="flex-1 text-xs font-bold text-zinc-950 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer appearance-none">
                         <option value="low">Low</option>
                         <option value="medium">Medium</option>
                         <option value="high">High</option>
                         <option value="urgent">Urgent</option>
                     </select>
                 </div>
-            </div>
-
-            <!-- Deliverable Asset Drive/Proofing Link -->
-            <div>
-                <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-1.5">Deliverable Asset / Drive URL</label>
-                <input type="url" id="detail-task-asset-url" placeholder="https://drive.google.com/... or https://proofing.studio/..." class="w-full text-xs font-medium border border-zinc-200 rounded-xl px-4 py-3 focus:outline-none focus:border-zinc-950 bg-zinc-50/50">
-            </div>
-
-            <div class="bg-zinc-50 p-4 rounded-2xl border border-zinc-200/80 space-y-4">
-                <!-- Email Alerts -->
-                <div class="space-y-3">
-                    <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wider">Email Notifications</h4>
-                    <div class="flex items-center justify-between gap-3">
-                        <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-zinc-800">
-                            <input type="checkbox" id="detail-email-notify" checked class="w-4 h-4 rounded text-zinc-950 focus:ring-0 cursor-pointer">
-                            <span>Send instant HTML email alert to assignee on save</span>
-                        </label>
-                        <button type="button" onclick="coraTriggerEmailReminder()" class="px-3.5 py-2 bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-800 text-xs font-bold rounded-xl transition-colors cursor-pointer shrink-0 shadow-2xs">
-                            Send Email Alert Now
-                        </button>
+                <!-- Due Date -->
+                <div class="flex items-center px-5 py-2.5 hover:bg-zinc-50/60 transition-colors">
+                    <div class="w-28 shrink-0 flex items-center gap-2 text-[11px] font-semibold text-zinc-400">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                        Due Date
                     </div>
+                    <input type="date" id="detail-task-due" class="flex-1 text-xs font-bold text-zinc-950 bg-transparent border-0 p-0 focus:ring-0">
                 </div>
-
-                <hr class="border-zinc-200/70">
-
-                <!-- WhatsApp Alerts -->
-                <div class="space-y-3">
-                    <h4 class="text-xs font-bold text-zinc-950 uppercase tracking-wider flex items-center gap-1.5">
-                        <svg class="w-4 h-4 text-emerald-600 fill-current" viewBox="0 0 16 16"><path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/></svg>
-                        WhatsApp Notifications
-                    </h4>
-                    <div class="flex items-center justify-between gap-3">
-                        <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-zinc-800">
-                            <input type="checkbox" id="detail-wa-notify" checked class="w-4 h-4 rounded text-zinc-950 focus:ring-0 cursor-pointer">
-                            <span>Send WhatsApp update to assignee on save</span>
-                        </label>
-                        <button type="button" onclick="coraTriggerWhatsAppReminder()" class="px-3.5 py-2 bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-800 text-xs font-bold rounded-xl transition-colors cursor-pointer shrink-0 shadow-2xs">
-                            Send WhatsApp Alert Now
-                        </button>
+                <!-- Asset URL -->
+                <div class="flex items-center px-5 py-2.5 hover:bg-zinc-50/60 transition-colors">
+                    <div class="w-28 shrink-0 flex items-center gap-2 text-[11px] font-semibold text-zinc-400">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                        Asset Link
                     </div>
-                    <div class="pt-1 flex items-center gap-3">
-                        <label class="text-[11px] font-bold text-zinc-550 shrink-0">WhatsApp Number:</label>
-                        <input type="tel" id="detail-wa-phone" placeholder="e.g. +91 98765 43210" class="flex-1 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-xs font-bold text-zinc-950 focus:outline-none focus:border-zinc-950">
-                    </div>
+                    <input type="url" id="detail-task-asset-url" placeholder="Paste drive or proofing URL..." class="flex-1 text-xs font-medium text-zinc-700 bg-transparent border-0 p-0 focus:ring-0 focus:outline-none placeholder:text-zinc-300 truncate">
                 </div>
             </div>
 
-            <!-- Collapsible Guidelines & Team Assistant Suggestions -->
-            <div class="border border-zinc-200/85 rounded-2xl bg-zinc-50/70 overflow-hidden shadow-3xs">
-                <button type="button" onclick="coraToggleGuidelines()" class="w-full flex items-center justify-between p-4 bg-zinc-50/30 text-left cursor-pointer hover:bg-zinc-100/50 transition-colors">
-                    <div class="flex items-center gap-2.5">
-                        <span class="text-xs font-bold text-zinc-950 flex items-center gap-2">
-                            <svg class="w-4.5 h-4.5 text-zinc-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-                            Task Guidelines &amp; Performance Suggestions
-                        </span>
-                    </div>
-                    <span id="cora-guidelines-chevron" class="text-zinc-400 transition-transform duration-200">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+            <!-- Divider -->
+            <div class="border-t border-zinc-100"></div>
+
+            <!-- AI Co-Pilot Guidelines (compact) -->
+            <div class="px-5 py-3">
+                <button type="button" onclick="coraToggleGuidelines()" class="w-full flex items-center justify-between py-1 text-left cursor-pointer group">
+                    <span class="flex items-center gap-2 text-[11px] font-bold text-zinc-500 group-hover:text-zinc-700 transition-colors">
+                        <span class="w-4.5 h-4.5 rounded bg-zinc-950 text-white flex items-center justify-center text-[8px] font-black leading-none shrink-0">AI</span>
+                        Co-Pilot Suggestions
+                    </span>
+                    <span id="cora-guidelines-chevron" class="text-zinc-300 transition-transform duration-200">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                     </span>
                 </button>
-                <div id="cora-guidelines-content" class="hidden border-t border-zinc-200 p-4 bg-white text-xs text-zinc-650 space-y-3.5">
-                    <div class="flex gap-2.5 items-start">
-                        <div class="w-5 h-5 rounded bg-zinc-950 text-white flex items-center justify-center shrink-0 text-[10px] font-black leading-none">AI</div>
-                        <div class="space-y-1">
-                            <p class="font-bold text-zinc-950 text-[11px]">Dynamic Co-Pilot SOP Suggestion</p>
-                            <p id="cora-guidelines-text">Select status/priority to see contextual guidance.</p>
-                        </div>
+                <div id="cora-guidelines-content" class="hidden mt-2.5 space-y-2.5">
+                    <div class="p-3 bg-zinc-50 border border-zinc-200/70 rounded-xl text-[11px] text-zinc-600 leading-relaxed" id="cora-guidelines-text">
+                        Select status/priority to see contextual guidance.
                     </div>
-                    <div class="p-3 bg-zinc-50 rounded-xl border border-zinc-150 flex items-center justify-between">
-                        <div class="pr-2">
-                            <p class="font-bold text-zinc-950 text-[11px]">Generate Standard Subtasks Checklist</p>
-                            <p class="text-[10px] text-zinc-500">Auto-inject standard steps based on current priority.</p>
+                    <button type="button" onclick="coraAutoInjectSOPSteps()" class="w-full flex items-center justify-between p-2.5 bg-zinc-50 border border-zinc-200/70 rounded-xl hover:bg-zinc-100/70 transition-colors cursor-pointer group">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                            <span class="text-[10.5px] font-bold text-zinc-600 group-hover:text-zinc-800">Auto-generate SOP checklist steps</span>
                         </div>
-                        <button type="button" onclick="coraAutoInjectSOPSteps()" class="px-2.5 py-1.5 bg-zinc-950 text-white font-bold text-[10px] rounded-lg hover:bg-zinc-800 transition-colors whitespace-nowrap cursor-pointer shadow-2xs">Inject Steps</button>
-                    </div>
+                        <svg class="w-3 h-3 text-zinc-300 group-hover:text-zinc-500 transition-colors" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                    </button>
                 </div>
             </div>
         </div>
 
         <!-- TAB 2: SUBTASK CHECKLIST -->
-        <div id="task-tab-pane-checklist" class="task-tab-pane space-y-5 hidden">
-            <div class="bg-zinc-50 p-5 rounded-2xl border border-zinc-200/80 space-y-4">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-xs font-bold text-zinc-950 uppercase tracking-wider">Subtask Checklist</h3>
-                    <span class="text-[11px] font-bold text-zinc-500" id="detail-subtasks-count">0 steps</span>
+        <div id="task-tab-pane-checklist" class="task-tab-pane hidden">
+            <div class="px-5 py-3.5">
+                <!-- Header + Progress -->
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider" id="detail-subtasks-count">0 steps</span>
+                    <span class="text-[11px] font-black text-zinc-950 tabular-nums" id="detail-subtasks-progress-text">0%</span>
                 </div>
-                <!-- Progress Bar -->
-                <div class="space-y-1.5">
-                    <div class="flex justify-between items-center text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                        <span>Task Progress</span>
-                        <span id="detail-subtasks-progress-text">0%</span>
-                    </div>
-                    <div class="w-full bg-zinc-200 rounded-full h-1.5 overflow-hidden">
-                        <div id="detail-subtasks-progress-bar" class="bg-zinc-950 h-full transition-all duration-350" style="width: 0%"></div>
-                    </div>
+                <div class="w-full bg-zinc-100 rounded-full h-1 overflow-hidden mb-4">
+                    <div id="detail-subtasks-progress-bar" class="bg-zinc-950 h-full transition-all duration-300 rounded-full" style="width: 0%"></div>
                 </div>
-                <div class="space-y-2 max-h-[380px] overflow-y-auto pr-1" id="detail-subtasks-list">
+
+                <!-- Checklist Items -->
+                <div class="space-y-1.5 max-h-[420px] overflow-y-auto -mx-1 px-1" id="detail-subtasks-list">
                     <!-- Checklist items injected dynamically -->
                 </div>
-                <div class="flex items-center gap-2 pt-2 border-t border-zinc-200/60">
-                    <input type="text" id="detail-new-subtask-input" placeholder="Add checklist step (e.g. Sync audio &amp; video)..." class="flex-1 px-3.5 py-2.5 bg-white border border-zinc-200 rounded-xl text-xs font-medium focus:outline-none focus:border-zinc-950">
-                    <button type="button" onclick="coraAddDetailSubtask()" class="px-4 py-2.5 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer shrink-0">
-                        Add Step
+
+                <!-- Add Step -->
+                <div class="flex items-center gap-2 mt-3 pt-3 border-t border-zinc-100">
+                    <input type="text" id="detail-new-subtask-input" placeholder="Add a step..." class="flex-1 px-3 py-2 bg-zinc-50 border border-zinc-200/70 rounded-xl text-xs font-medium focus:outline-none focus:border-zinc-400 placeholder:text-zinc-300">
+                    <button type="button" onclick="coraAddDetailSubtask()" class="px-3.5 py-2 bg-zinc-950 text-white text-[11px] font-bold rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer shrink-0">
+                        Add
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- TAB 3: ACTIVITY LOG & TEAM NOTES -->
-        <div id="task-tab-pane-activity" class="task-tab-pane space-y-5 hidden">
-            <div class="bg-zinc-50 p-5 rounded-2xl border border-zinc-200/80 space-y-4">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-xs font-bold text-zinc-950 uppercase tracking-wider">Activity Log &amp; Team Notes</h3>
-                </div>
-                <div class="space-y-3 max-h-[380px] overflow-y-auto p-4 bg-white border border-zinc-200 rounded-xl" id="detail-comments-list">
+        <div id="task-tab-pane-activity" class="task-tab-pane hidden">
+            <div class="px-5 py-3.5">
+                <!-- Timeline Feed -->
+                <div class="space-y-2 max-h-[420px] overflow-y-auto -mx-1 px-1 mb-3" id="detail-comments-list">
                     <!-- Comments injected dynamically -->
                 </div>
-                <div class="space-y-2 pt-2 border-t border-zinc-200/60">
-                    <textarea id="detail-comment-input" rows="3" placeholder="Post a progress update or technical note for the team..." class="w-full px-3.5 py-2.5 bg-white border border-zinc-200 rounded-xl text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-950 resize-none"></textarea>
+                <!-- Compose -->
+                <div class="pt-3 border-t border-zinc-100 space-y-2">
+                    <textarea id="detail-comment-input" rows="2" placeholder="Write a note..." class="w-full px-3 py-2 bg-zinc-50 border border-zinc-200/70 rounded-xl text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-400 resize-none placeholder:text-zinc-300"></textarea>
                     <div class="flex justify-end">
-                        <button type="button" onclick="coraPostTaskComment()" class="px-4 py-2.5 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer">
+                        <button type="button" onclick="coraPostTaskComment()" class="px-3.5 py-2 bg-zinc-950 text-white text-[11px] font-bold rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer">
                             Post Note
                         </button>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- TAB 4: NOTIFICATION ALERTS -->
+        <div id="task-tab-pane-notifications" class="task-tab-pane hidden">
+            <div class="px-5 py-3.5 space-y-4">
+                <!-- Email -->
+                <div class="p-3.5 bg-zinc-50 border border-zinc-200/70 rounded-xl space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <span class="text-[11px] font-bold text-zinc-800">Email Notification</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="detail-email-notify" checked class="sr-only peer">
+                            <div class="w-8 h-[18px] bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-[14px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-[14px] after:w-[14px] after:transition-all peer-checked:bg-zinc-950 after:shadow-sm"></div>
+                        </label>
+                    </div>
+                    <p class="text-[10px] font-medium text-zinc-400 leading-relaxed">Dispatches an HTML email alert to the assigned team member when task is saved.</p>
+                    <button type="button" onclick="coraTriggerEmailReminder()" class="w-full px-3 py-2 bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-700 text-[10.5px] font-bold rounded-lg transition-colors cursor-pointer text-center">
+                        Send Email Alert Now
+                    </button>
+                </div>
+                <!-- WhatsApp -->
+                <div class="p-3.5 bg-zinc-50 border border-zinc-200/70 rounded-xl space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-emerald-600 fill-current" viewBox="0 0 16 16"><path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/></svg>
+                            <span class="text-[11px] font-bold text-zinc-800">WhatsApp Notification</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="detail-wa-notify" checked class="sr-only peer">
+                            <div class="w-8 h-[18px] bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-[14px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-[14px] after:w-[14px] after:transition-all peer-checked:bg-zinc-950 after:shadow-sm"></div>
+                        </label>
+                    </div>
+                    <p class="text-[10px] font-medium text-zinc-400 leading-relaxed">Sends a WhatsApp message to the assigned team member when task is saved.</p>
+                    <div class="flex items-center gap-2">
+                        <input type="tel" id="detail-wa-phone" placeholder="+91 98765 43210" class="flex-1 px-2.5 py-1.5 bg-white border border-zinc-200 rounded-lg text-xs font-bold text-zinc-950 focus:outline-none focus:border-zinc-400 placeholder:text-zinc-300">
+                    </div>
+                    <button type="button" onclick="coraTriggerWhatsAppReminder()" class="w-full px-3 py-2 bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-700 text-[10.5px] font-bold rounded-lg transition-colors cursor-pointer text-center">
+                        Send WhatsApp Alert Now
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Drawer Footer Actions -->
-    <div class="p-5 border-t border-zinc-200 bg-zinc-50 flex items-center justify-between shrink-0 rounded-b-none">
-        <button type="button" onclick="coraDeleteTaskFromDrawer()" class="px-4 py-2.5 border border-red-200 text-red-600 hover:bg-red-50 text-xs font-bold rounded-xl transition-colors cursor-pointer">
-            Delete Task
+    <!-- Drawer Footer -->
+    <div class="px-5 py-3 border-t border-zinc-200/80 bg-white flex items-center justify-between shrink-0">
+        <button type="button" onclick="coraDeleteTaskFromDrawer()" class="px-3 py-2 text-zinc-400 hover:text-red-600 text-[11px] font-bold rounded-lg hover:bg-red-50 transition-colors cursor-pointer">
+            <svg class="w-3.5 h-3.5 inline-block mr-1 -mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            Delete
         </button>
-        <div class="flex items-center gap-3">
-            <button type="button" onclick="window.coraCloseAllDrawers()" class="px-5 py-2.5 bg-white border border-zinc-200 text-zinc-800 text-xs font-bold rounded-xl hover:bg-zinc-100 transition-colors cursor-pointer">
+        <div class="flex items-center gap-2">
+            <button type="button" onclick="window.coraCloseAllDrawers()" class="px-4 py-2 bg-white border border-zinc-200 text-zinc-600 text-[11px] font-bold rounded-xl hover:bg-zinc-50 transition-colors cursor-pointer">
                 Cancel
             </button>
-            <button type="button" onclick="coraSaveTaskFromDrawer()" class="px-6 py-2.5 bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer shadow-sm">
-                Save Task Changes
+            <button type="button" onclick="coraSaveTaskFromDrawer()" class="px-5 py-2 bg-zinc-950 text-white text-[11px] font-bold rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer shadow-sm">
+                Save Changes
             </button>
         </div>
     </div>
@@ -2348,10 +2366,10 @@ window.coraQuickMoveTask = function(event, taskId, newStatus) {
 
         let badges = '';
         if (t.client_name) {
-            badges += `<span class="px-3 py-1 text-xs font-bold bg-zinc-100 text-zinc-800 rounded-lg border border-zinc-200">Client: ${escHtml(t.client_name)}</span>`;
+            badges += `<span class="px-1.5 py-0.5 text-[9px] font-bold bg-zinc-100 text-zinc-600 rounded leading-none">${escHtml(t.client_name)}</span>`;
         }
         if (t.booking_title) {
-            badges += `<span class="px-3 py-1 text-xs font-bold bg-zinc-950 text-white rounded-lg">Shoot: ${escHtml(t.booking_title)}</span>`;
+            badges += `<span class="px-1.5 py-0.5 text-[9px] font-bold bg-zinc-950 text-white rounded leading-none">${escHtml(t.booking_title)}</span>`;
         }
         $('#detail-project-badges').html(badges);
 
@@ -2361,7 +2379,8 @@ window.coraQuickMoveTask = function(event, taskId, newStatus) {
         renderDetailSubtasks();
         renderDetailComments();
 
-        // Initialize Guidelines & Switch to first tab
+        // Initialize header pills, guidelines & switch to first tab
+        coraUpdateHeaderPills();
         coraSwitchTaskDetailTab('details');
         coraUpdateGuidelinesText(t.priority, t.status);
 
@@ -2370,13 +2389,48 @@ window.coraQuickMoveTask = function(event, taskId, newStatus) {
 
     // Segmented Tab Switching Controller
     window.coraSwitchTaskDetailTab = function(tabId) {
-        $('.task-detail-tab-btn').removeClass('text-zinc-955 bg-white border border-zinc-200/80 shadow-2xs font-bold text-zinc-950')
-                                 .addClass('text-zinc-500 hover:text-zinc-955 hover:bg-zinc-150/70 hover:text-zinc-950 font-semibold');
-        $(`#tab-btn-${tabId}`).removeClass('text-zinc-500 hover:text-zinc-955 hover:bg-zinc-150/70 hover:text-zinc-950 font-semibold')
-                              .addClass('text-zinc-950 bg-white border border-zinc-200/80 shadow-2xs font-bold');
+        // Reset all tabs to inactive (underline style)
+        $('.task-detail-tab-btn').removeClass('text-zinc-950 font-bold').addClass('text-zinc-400 font-semibold');
+        $('.task-detail-tab-btn .task-tab-underline').remove();
 
+        // Activate selected tab
+        const $activeBtn = $(`#tab-btn-${tabId}`);
+        $activeBtn.removeClass('text-zinc-400 font-semibold').addClass('text-zinc-950 font-bold');
+        $activeBtn.append('<span class="task-tab-underline absolute bottom-0 left-0 right-0 h-[2px] bg-zinc-950 rounded-full"></span>');
+
+        // Switch tab panes
         $('.task-tab-pane').addClass('hidden');
         $(`#task-tab-pane-${tabId}`).removeClass('hidden');
+    };
+
+    // Header Status/Priority Pill Updater
+    window.coraUpdateHeaderPills = function() {
+        const status = $('#detail-task-status').val() || 'todo';
+        const priority = $('#detail-task-priority').val() || 'medium';
+
+        const statusLabels = { todo: 'To Do', in_progress: 'In Progress', client_review: 'Review', blocked: 'Blocked', done: 'Done' };
+        const statusStyles = {
+            todo: 'bg-zinc-950 text-white',
+            in_progress: 'bg-zinc-700 text-white',
+            client_review: 'bg-zinc-500 text-white',
+            blocked: 'bg-zinc-400 text-white',
+            done: 'bg-zinc-950 text-white'
+        };
+        const $statusPill = $('#detail-header-status-pill');
+        $statusPill.text(statusLabels[status] || status);
+        $statusPill.attr('class', 'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9.5px] font-black uppercase tracking-widest leading-none ' + (statusStyles[status] || statusStyles.todo));
+
+        const priorityLabels = { low: 'Low', medium: 'Medium', high: 'High', urgent: 'Urgent' };
+        const priorityBorders = {
+            low: 'border-zinc-200 text-zinc-400',
+            medium: 'border-zinc-300 text-zinc-500',
+            high: 'border-zinc-500 text-zinc-700',
+            urgent: 'border-zinc-950 text-zinc-950'
+        };
+        const $priorityPill = $('#detail-header-priority-pill');
+        $priorityPill.text(priorityLabels[priority] || priority);
+        $priorityPill.attr('class', 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9.5px] font-black uppercase tracking-widest leading-none border ' + (priorityBorders[priority] || priorityBorders.medium));
+        $priorityPill.removeAttr('style');
     };
 
     // Collapsible guidelines toggle
