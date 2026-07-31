@@ -273,24 +273,30 @@ if (!defined('ABSPATH')) {
 }
 
 .cora-toolbar-wrapper .cora-view-switcher button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
     border: none !important;
     background: none !important;
-    padding: 8px 0 !important;
-    font-size: 13px !important;
-    font-weight: 550 !important;
+    padding: 4px 0 !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
     color: #71717a !important;
     border-radius: 0 !important;
-    border-bottom: 2px solid transparent !important;
+    border-bottom: 2.5px solid transparent !important;
     cursor: pointer;
     transition: all 0.15s ease;
     box-shadow: none !important;
+    line-height: 1.2 !important;
 }
 
 .cora-toolbar-wrapper .cora-view-switcher button.cora-active-tab {
     background-color: transparent !important;
     color: #09090b !important;
     border-bottom-color: #09090b !important;
-    font-weight: 700 !important;
+    font-weight: 800 !important;
     box-shadow: none !important;
 }
 
@@ -299,10 +305,10 @@ if (!defined('ABSPATH')) {
 }
 
 .cora-task-settings-btn {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     border: 1px solid #e4e4e7 !important;
-    border-radius: 8px !important;
+    border-radius: 12px !important;
     background-color: #ffffff !important;
     color: #71717a !important;
     display: flex;
@@ -473,10 +479,22 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
         <!-- Center Group: View Switcher links -->
         <div class="cora-toolbar-center">
             <div class="cora-view-switcher">
-                <button onclick="coraSwitchView('kanban')" id="btn-view-kanban" class="<?php echo $default_task_view === 'kanban' ? 'cora-active-tab' : ''; ?>">Kanban Board</button>
-                <button onclick="coraSwitchView('bookings')" id="btn-view-bookings" class="<?php echo $default_task_view === 'bookings' ? 'cora-active-tab' : ''; ?>">Booked Shoots</button>
-                <button onclick="coraSwitchView('matrix')" id="btn-view-matrix" class="<?php echo $default_task_view === 'matrix' ? 'cora-active-tab' : ''; ?>">Client Matrix</button>
-                <button onclick="coraSwitchView('roster')" id="btn-view-roster" class="<?php echo $default_task_view === 'roster' ? 'cora-active-tab' : ''; ?>">Team Roster</button>
+                <button onclick="coraSwitchView('kanban')" id="btn-view-kanban" class="<?php echo $default_task_view === 'kanban' ? 'cora-active-tab' : ''; ?>">
+                    <span>Kanban</span>
+                    <span>Board</span>
+                </button>
+                <button onclick="coraSwitchView('bookings')" id="btn-view-bookings" class="<?php echo $default_task_view === 'bookings' ? 'cora-active-tab' : ''; ?>">
+                    <span>Booked</span>
+                    <span>Shoots</span>
+                </button>
+                <button onclick="coraSwitchView('matrix')" id="btn-view-matrix" class="<?php echo $default_task_view === 'matrix' ? 'cora-active-tab' : ''; ?>">
+                    <span>Client</span>
+                    <span>Matrix</span>
+                </button>
+                <button onclick="coraSwitchView('roster')" id="btn-view-roster" class="<?php echo $default_task_view === 'roster' ? 'cora-active-tab' : ''; ?>">
+                    <span>Team</span>
+                    <span>Roster</span>
+                </button>
             </div>
         </div>
 
