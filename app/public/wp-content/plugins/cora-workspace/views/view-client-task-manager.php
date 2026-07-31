@@ -2205,191 +2205,119 @@ function renderSingleColumnCards(col, colTasks, today, todayStr, tomorrowStr) {
 }
 
 function renderMobileCard(t, today, todayStr, tomorrowStr) {
-    const subtasks = t.subtasks || [];
-    const doneSub = subtasks.filter(s => s.completed).length;
-    
-    const clientNameStr = t.client_name || 'General';
-    const cColor = clientBadgeColor(clientNameStr);
-    
-    let suffix = '';
-    const clientLower = clientNameStr.toLowerCase();
-    if (clientLower.includes('towers') || clientLower.includes('estate') || clientLower.includes('group') || clientLower.includes('llp')) {
-        suffix = ' COMMERCIAL';
-    } else if (clientLower.includes('rohan') || clientLower.includes('priya') || clientLower.includes('wedding')) {
-        suffix = ' WEDDING';
-    }
-    const formattedClientName = clientNameStr.toUpperCase().replace(' LLP', '') + suffix;
-
     const isCompleted = t.status === 'done';
     
-    let topIcon = '';
+    // Status Icon
+    let statusIcon = '';
     if (isCompleted) {
-        topIcon = `<div class="w-4 h-4 rounded-full bg-white border border-emerald-500 text-emerald-500 flex items-center justify-center"><svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
+        statusIcon = `<svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+    } else if (t.status === 'in_progress' || t.status === 'inprogress') {
+        statusIcon = `<svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3"></path></svg>`;
+    } else if (t.status === 'client_review' || t.status === 'review') {
+        statusIcon = `<svg class="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h.01M12 12h.01M15 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+    } else if (t.status === 'blocked') {
+        statusIcon = `<svg class="w-5 h-5 text-rose-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>`;
     } else {
-        let dotColor = 'bg-emerald-500';
-        if (t.priority === 'urgent') dotColor = 'bg-rose-500';
-        else if (t.priority === 'high') dotColor = 'bg-amber-500';
-        topIcon = `<div class="w-2.5 h-2.5 rounded-full ${dotColor}"></div>`;
+        // default todo
+        statusIcon = `<svg class="w-5 h-5 text-zinc-300 hover:text-zinc-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle></svg>`;
     }
 
-    let dueDateHtml = '';
-    if (t.due_date && !isCompleted) {
-        const due = new Date(t.due_date + 'T00:00:00');
-        const diffTime = due - today;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        const calSvg = (colorClass) => `<svg class="w-3 h-3 ${colorClass} inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
-
-        if (t.due_date < todayStr) {
-            dueDateHtml = `<span class="text-[10px] font-bold text-rose-600 flex items-center">${calSvg('text-rose-600')} Overdue</span>`;
+    // Due date label
+    let dueBadgeHtml = '';
+    if (t.due_date) {
+        if (isCompleted) {
+            dueBadgeHtml = `<span class="text-[10px] text-zinc-400 font-semibold">Done</span>`;
+        } else if (t.due_date < todayStr) {
+            const daysOverdue = Math.floor((today - new Date(t.due_date + 'T00:00:00')) / (1000 * 60 * 60 * 24));
+            dueBadgeHtml = `<span class="text-[10px] text-rose-600 font-bold bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100 flex items-center gap-0.5"><svg class="w-3 h-3 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>Overdue ${daysOverdue || 1}d</span>`;
         } else if (t.due_date === todayStr) {
-            dueDateHtml = `<span class="text-[10px] font-bold text-amber-850 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md uppercase tracking-wide">DUE TODAY</span>`;
+            dueBadgeHtml = `<span class="text-[10px] text-amber-800 font-bold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">Today</span>`;
         } else if (t.due_date === tomorrowStr) {
-            dueDateHtml = `<span class="text-[10px] font-bold text-rose-655 flex items-center">${calSvg('text-rose-655')} Due in 1 day</span>`;
+            dueBadgeHtml = `<span class="text-[10px] text-zinc-600 font-semibold bg-zinc-55 px-1.5 py-0.5 rounded border border-zinc-200/60">Tomorrow</span>`;
         } else {
-            dueDateHtml = `<span class="text-[10px] font-bold text-zinc-600 flex items-center">${calSvg('text-zinc-500')} Due in ${diffDays} days</span>`;
+            dueBadgeHtml = `<span class="text-[10px] text-zinc-500 font-medium">${t.due_date.split('-').reverse().slice(0, 2).join('/')}</span>`;
         }
     }
 
-    const deliverableHtml = t.deliverable_type 
-        ? `<span class="text-[10px] font-bold text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded-md border border-zinc-200/60">${escHtml(t.deliverable_type)}</span>` 
-        : '';
+    // Client badge
+    const clientNameStr = t.client_name || 'General';
+    const cColor = clientBadgeColor(clientNameStr);
+    const clientBadge = `<span class="text-[9.5px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider" style="background-color: ${cColor.bg}; color: ${cColor.text}; max-width: 120px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${escHtml(clientNameStr)}</span>`;
 
-    const taskCreatedMs = isNaN(t.id) ? Date.now() - 3 * 24 * 60 * 60 * 1000 : parseInt(t.id);
-    const diffCreatedMs = Date.now() - taskCreatedMs;
-    const daysActive = Math.floor(diffCreatedMs / (1000 * 60 * 60 * 24));
-    let durationBadge = '';
-    if (t.status === 'inprogress' || t.status === 'in_progress') {
-        durationBadge = daysActive > 0 
-            ? `<span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span> Active ${daysActive}d</span>`
-            : `<span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span> Active today</span>`;
-    }
-
+    // Assignee avatar
     const assigneeName = t.assignee_name || 'Unassigned';
     const assigneeInitial = assigneeName.charAt(0).toUpperCase();
-    let assigneeRole = 'Team Member';
-    if (assigneeName.includes('Karan')) assigneeRole = 'Drone Pilot';
-    else if (assigneeName.includes('Rohan')) assigneeRole = 'PM';
-    else if (assigneeName.includes('Aarav')) {
-        assigneeRole = isCompleted ? 'Senior Editor' : 'Editor';
-    } else if (assigneeName.includes('Shruti')) {
-        assigneeRole = t.status === 'in_progress' || t.status === 'inprogress' ? 'Designer' : 'Admin';
+
+    // Priority badge / indicator
+    let priorityBadge = '';
+    if (t.priority === 'urgent') {
+        priorityBadge = `<span class="text-[9.5px] font-black uppercase text-rose-600 flex items-center gap-0.5 shrink-0"><svg class="w-3 h-3 text-rose-600 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M4 2v20h-2v-20h2zm18 4l-4 4 4 4h-14v-8h14z"/></svg>Urgent</span>`;
+    } else if (t.priority === 'high') {
+        priorityBadge = `<span class="text-[9.5px] font-black uppercase text-amber-600 flex items-center gap-0.5 shrink-0"><svg class="w-3 h-3 text-amber-600 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M4 2v20h-2v-20h2zm18 4l-4 4 4 4h-14v-8h14z"/></svg>High</span>`;
     }
-
-    let progressBgClass = 'bg-zinc-950';
-    if (t.status === 'in_progress' || t.status === 'inprogress') progressBgClass = 'bg-amber-500';
-    else if (t.status === 'client_review' || t.status === 'review') progressBgClass = 'bg-blue-600';
-
-    let alertHtml = '';
-    if (isCompleted) {
-        alertHtml = `<div class="text-[10.5px] font-bold text-emerald-700 bg-emerald-50/70 border border-emerald-100 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5">
-            <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <span>Excellent work, team!</span>
-        </div>`;
-    } else if (t.due_date && t.due_date < todayStr) {
-        const daysOverdue = Math.floor((today - new Date(t.due_date + 'T00:00:00')) / (1000 * 60 * 60 * 24));
-        alertHtml = `<div class="text-[10.5px] font-bold text-rose-700 bg-rose-50/80 border border-rose-200 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5 animate-pulse">
-            <svg class="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-            <span>SLA Warning: Overdue ${daysOverdue || 1}d!</span>
-        </div>`;
-    } else if (t.due_date && t.due_date === todayStr) {
-        alertHtml = `<div class="text-[10.5px] font-bold text-amber-850 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5">
-            <svg class="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3" /></svg>
-            <span>Action Required: Due Today</span>
-        </div>`;
-    } else if (t.priority === 'urgent') {
-        alertHtml = `<div class="text-[10.5px] font-bold text-rose-700 bg-rose-50/70 border border-rose-100 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 mt-1.5">
-            <svg class="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-            <span>Escalated urgent priority</span>
-        </div>`;
-    }
-
-    let statusOptionsHtml = '';
-    coraTaskState.columns.forEach(col => {
-        statusOptionsHtml += `<option value="${col.key}" ${t.status === col.key ? 'selected' : ''}>${escHtml(col.name)}</option>`;
-    });
 
     return `
-    <div class="cora-task-card bg-white rounded-2xl border border-zinc-200/80 p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer space-y-2.5" data-id="${t.id}" onclick="coraOpenTaskDetailsDrawer(event, '${t.id}')">
-        
-        <!-- Header -->
-        <div class="flex justify-between items-start">
-            <span class="uppercase font-extrabold text-[10px] px-2 py-0.5 rounded-md truncate max-w-[170px]" style="background-color: ${cColor.bg}; color: ${cColor.text};">
-                ${escHtml(formattedClientName)}
-            </span>
-            <div class="shrink-0 mt-0.5">${topIcon}</div>
-        </div>
-
-        <!-- Title & Subtitle -->
-        <div class="space-y-0.5">
-            <h4 class="text-sm font-bold text-zinc-950 leading-snug break-words ${isCompleted ? 'text-zinc-550 line-through' : ''}">
-                ${escHtml(t.title)}
-            </h4>
-            ${t.booking_title ? `<div class="text-[11px] text-zinc-500 font-medium truncate">Shoot: ${escHtml(t.booking_title)}</div>` : ''}
-        </div>
-
-        <!-- Tags Row -->
-        <div class="flex items-center gap-1.5 flex-wrap pt-1">
-            ${deliverableHtml}
-            ${dueDateHtml}
-            ${durationBadge}
-        </div>
-
-        <!-- Alerts & Notices -->
-        ${alertHtml}
-
-        <!-- Assignee Row -->
-        <div class="flex items-center justify-between pt-2">
-            <div class="flex items-center gap-1.5 truncate pr-2">
-                <div class="w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
-                    ${assigneeInitial}
-                </div>
-                <div class="flex flex-col truncate text-left">
-                    <span class="text-[11px] text-zinc-800 font-bold truncate leading-none">
-                        ${escHtml(assigneeName)}
-                    </span>
-                    <span class="text-[9px] text-zinc-400 font-semibold truncate mt-0.5">
-                        ${escHtml(assigneeRole)}
-                    </span>
+    <div class="cora-mobile-list-item flex items-center justify-between p-3.5 bg-white border border-zinc-200/80 rounded-xl hover:bg-zinc-50/50 transition-colors cursor-pointer select-none" data-id="${t.id}" onclick="coraOpenTaskDetailsDrawer(event, '${t.id}')">
+        <div class="flex items-center gap-3 min-w-0 flex-1">
+            <!-- Left status click area -->
+            <button onclick="window.coraCycleMobileStatus(event, '${t.id}')" class="p-1 rounded hover:bg-zinc-100/80 transition-colors flex items-center justify-center shrink-0 cursor-pointer" title="Change status">
+                ${statusIcon}
+            </button>
+            
+            <!-- Mid section: title and badges -->
+            <div class="min-w-0 flex-1 text-left space-y-1">
+                <h4 class="text-xs font-bold text-zinc-950 truncate leading-snug ${isCompleted ? 'text-zinc-400 line-through' : ''}">
+                    ${escHtml(t.title)}
+                </h4>
+                <div class="flex items-center gap-2 flex-wrap">
+                    ${clientBadge}
+                    ${dueBadgeHtml}
                 </div>
             </div>
         </div>
 
-        <!-- Footer: Checklist or Completed Date -->
-        ${!isCompleted && subtasks.length > 0 ? `
-            <div class="space-y-1 pt-1.5">
-                <div class="flex justify-between items-center text-[10px] font-medium text-zinc-500">
-                    <span>Checklist</span>
-                    <span>${doneSub}/${subtasks.length} (${Math.round((doneSub/subtasks.length)*100)}%)</span>
-                </div>
-                <div class="w-full bg-zinc-100 rounded-full h-1.5 overflow-hidden">
-                    <div class="${progressBgClass} h-1.5 rounded-full transition-all" style="width:${Math.round((doneSub/subtasks.length)*100)}%"></div>
-                </div>
-            </div>
-        ` : ''}
-
-        ${isCompleted ? `
-            <div class="pt-2 mt-2 border-t border-zinc-100 text-[10px] font-medium text-zinc-400">
-                Completed on ${t.completed_date ? escHtml(t.completed_date) : todayStr}
-            </div>
-        ` : ''}
-
-        <!-- Quick Actions Container -->
-        <div class="cora-mobile-quick-actions pt-2.5 mt-2.5 border-t border-zinc-100 flex items-center justify-between gap-2.5" onclick="event.stopPropagation()">
-            <div class="flex-1 flex flex-col gap-1">
-                <span class="text-[9px] uppercase tracking-wider text-zinc-400 font-bold text-left">Status</span>
-                <select onchange="window.coraQuickMoveTask(event, '${t.id}', this.value)" class="w-full bg-zinc-50 border border-zinc-200 text-[11px] font-bold rounded-lg px-2 py-1 focus:ring-0 cursor-pointer">
-                    ${statusOptionsHtml}
-                </select>
-            </div>
-            <div class="flex-1 flex flex-col gap-1">
-                <span class="text-[9px] uppercase tracking-wider text-zinc-400 font-bold text-left">Due Date</span>
-                <input type="date" value="${t.due_date || ''}" onchange="window.coraQuickRescheduleTask(event, '${t.id}', this.value)" class="w-full bg-zinc-50 border border-zinc-200 text-[11px] font-bold rounded-lg px-2 py-1 focus:ring-0 cursor-pointer">
+        <!-- Right section: assignee avatar & priority flag -->
+        <div class="flex items-center gap-3 shrink-0 ml-2">
+            ${priorityBadge}
+            <div class="w-5.5 h-5.5 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[9px] font-bold shrink-0" title="${escHtml(assigneeName)}">
+                ${assigneeInitial}
             </div>
         </div>
-
     </div>
     `;
+}
+
+window.coraCycleMobileStatus = function(event, taskId) {
+    event.stopPropagation();
+    const t = coraTaskState.tasks.find(x => String(x.id) === String(taskId));
+    if (!t) return;
+
+    const statuses = ['todo', 'in_progress', 'client_review', 'done'];
+    let currentIdx = statuses.indexOf(t.status || 'todo');
+    if (currentIdx === -1) currentIdx = 0;
+    
+    const nextStatus = statuses[(currentIdx + 1) % statuses.length];
+    t.status = nextStatus;
+
+    if (nextStatus === 'done') {
+        const d = new Date();
+        t.completed_date = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    } else {
+        t.completed_date = '';
+    }
+
+    $.post(coraREData.ajaxUrl, {
+        action: 'cora_save_client_task',
+        nonce: coraREData.ajaxNonce,
+        task: JSON.stringify(t)
+    }, function(res) {
+        if (res && res.success) {
+            if (window.coraShowToast) window.coraShowToast(`Moved task to ${nextStatus.replace('_', ' ').toUpperCase()}`);
+            coraTaskState.tasks = res.data.tasks || coraTaskState.tasks;
+            if (typeof coraRenderTaskViews === 'function') coraRenderTaskViews();
+        }
+    });
+};
 }
 
 function renderKanbanColumns(tasks) {
