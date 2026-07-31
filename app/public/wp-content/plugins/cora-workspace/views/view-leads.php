@@ -167,6 +167,41 @@ window.coraSelectStageColor = function(buttonEl, badgeClass) {
     });
     buttonEl.classList.add('ring-2', 'ring-zinc-950', 'dark:ring-white', 'ring-offset-2', 'scale-110');
 };
+
+window.coraCycleStageColor = function(buttonEl) {
+    const container = buttonEl.closest('.cora-stage-config-row');
+    if (!container) return;
+    const select = container.querySelector('.cora-stage-badge-select');
+    if (!select) return;
+
+    const options = Array.from(select.options);
+    let currIdx = options.findIndex(opt => opt.selected);
+    let nextIdx = (currIdx + 1) % options.length;
+    options.forEach(opt => opt.selected = false);
+    options[nextIdx].selected = true;
+    select.value = options[nextIdx].value;
+
+    const event = new Event('change', { bubbles: true });
+    select.dispatchEvent(event);
+
+    const bgMap = {
+        'blue': 'bg-blue-500',
+        'amber': 'bg-amber-500',
+        'purple': 'bg-purple-500',
+        'indigo': 'bg-indigo-500',
+        'emerald': 'bg-emerald-500',
+        'rose': 'bg-rose-500',
+        'zinc': 'bg-zinc-500'
+    };
+    let matchedColor = 'zinc';
+    for (let c in bgMap) {
+        if (select.value.includes(c)) {
+            matchedColor = c;
+            break;
+        }
+    }
+    buttonEl.className = `w-6 h-6 rounded-full ${bgMap[matchedColor]} ring-2 ring-zinc-950 dark:ring-white ring-offset-2 shrink-0 cursor-pointer shadow-2xs hover:scale-105 transition-all`;
+};
 </script>
 <?php
 
@@ -1195,8 +1230,33 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                          </div>
                      </div>            
                   </div>
-                  <?php endforeach; ?>
-            <?php endif; ?>
+        <!-- SERVER-SIDE PAGINATION BAR (DESKTOP & MOBILE) -->
+        <div id="cora-directory-pagination" class="mt-4 p-3.5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3 text-xs select-none">
+            <div class="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 font-medium">
+                <span id="cora-pagination-info">Showing 1–<?php echo min(25, count($cora_leads_raw)); ?> of <?php echo count($cora_leads_raw); ?> leads</span>
+                <span class="hidden sm:inline text-zinc-300 dark:text-zinc-700">|</span>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-[11px] font-semibold text-zinc-400">Per Page:</span>
+                    <select id="cora-pagination-per-page" class="px-2 py-1 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-800 dark:text-zinc-200 font-bold text-xs cursor-pointer outline-none" onchange="coraChangePerPage(this.value)">
+                        <option value="10">10</option>
+                        <option value="25" selected>25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1.5" id="cora-pagination-controls">
+                <button type="button" id="cora-pagination-prev" class="px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold rounded-xl text-xs hover:bg-zinc-200 dark:hover:bg-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center gap-1 cursor-pointer" onclick="coraGoToPage('prev')" disabled>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    <span>Prev</span>
+                </button>
+                <span id="cora-pagination-page-label" class="px-2 text-xs font-bold text-zinc-900 dark:text-white">Page 1 of 1</span>
+                <button type="button" id="cora-pagination-next" class="px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold rounded-xl text-xs hover:bg-zinc-200 dark:hover:bg-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center gap-1 cursor-pointer" onclick="coraGoToPage('next')">
+                    <span>Next</span>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1942,7 +2002,7 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
 
         <div id="cora-stages-list-container" class="space-y-2.5">
             <?php foreach ( $stages_config as $s_key => $s_val ) : ?>
-            <div class="cora-stage-config-row p-2.5 px-3 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex items-center justify-between gap-2.5 relative group"
+            <div class="cora-stage-config-row p-3 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex items-center justify-between gap-3 relative group min-h-[52px]"
                  draggable="true"
                  data-key="<?php echo esc_attr($s_key); ?>"
                  ondragstart="coraStageRowDragStart(event)"
@@ -1950,26 +2010,21 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                  ondrop="coraStageRowDrop(event)"
                  ondragend="coraStageRowDragEnd(event)">
                 
-                <!-- Left: Grip + Title Input + Key Tag -->
-                <div class="flex items-center gap-2 flex-1 min-w-0">
-                    <div class="w-6 h-6 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 flex items-center justify-center cursor-grab active:cursor-grabbing shrink-0 select-none transition-colors" title="Drag to reorder">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="9" cy="6" r="1.5"></circle><circle cx="15" cy="6" r="1.5"></circle><circle cx="9" cy="12" r="1.5"></circle><circle cx="15" cy="12" r="1.5"></circle><circle cx="9" cy="18" r="1.5"></circle><circle cx="15" cy="18" r="1.5"></circle></svg>
+                <!-- Left: Grip + Title Input -->
+                <div class="flex items-center gap-2.5 flex-1 min-w-0">
+                    <div class="w-7 h-7 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 flex items-center justify-center cursor-grab active:cursor-grabbing shrink-0 select-none transition-colors border border-zinc-200/60 dark:border-zinc-700/60" title="Drag to reorder">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="9" cy="6" r="1.5"></circle><circle cx="15" cy="6" r="1.5"></circle><circle cx="9" cy="12" r="1.5"></circle><circle cx="15" cy="12" r="1.5"></circle><circle cx="9" cy="18" r="1.5"></circle><circle cx="15" cy="18" r="1.5"></circle></svg>
                     </div>
-                    <input type="text" class="cora-stage-label-input px-2.5 py-1.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-zinc-900 dark:focus:border-zinc-100 rounded-lg font-bold text-zinc-900 dark:text-zinc-100 text-xs flex-1 min-w-0 outline-none transition-all" value="<?php echo esc_attr($s_val['label'] ?? $s_key); ?>" placeholder="Stage Title">
-                    <span class="text-[9.5px] font-mono text-zinc-400 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded shrink-0 hidden sm:inline-block"><?php echo esc_html($s_key); ?></span>
+                    <input type="text" class="cora-stage-label-input px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:border-zinc-900 dark:focus:border-zinc-100 rounded-xl font-bold text-zinc-900 dark:text-zinc-100 text-xs flex-1 min-w-0 outline-none transition-all" value="<?php echo esc_attr($s_val['label'] ?? $s_key); ?>" placeholder="Stage Title">
                 </div>
 
-                <!-- Right: Color Badge Select + Visibility Switch + Delete -->
-                <div class="flex items-center gap-2 shrink-0">
-                    <select class="cora-stage-bg-select px-2.5 py-1 text-[11px] font-bold rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 outline-none cursor-pointer transition-all" title="Column background theme">
-                        <option value="default" <?php echo (($s_val['bg_color'] ?? 'default') === 'default') ? 'selected' : ''; ?>>Default Gray</option>
-                        <option value="white" <?php echo (($s_val['bg_color'] ?? '') === 'white') ? 'selected' : ''; ?>>Pure White</option>
-                        <option value="zinc" <?php echo (($s_val['bg_color'] ?? '') === 'zinc') ? 'selected' : ''; ?>>Zinc Gray</option>
-                        <option value="slate" <?php echo (($s_val['bg_color'] ?? '') === 'slate') ? 'selected' : ''; ?>>Cool Slate</option>
-                        <option value="cream" <?php echo (($s_val['bg_color'] ?? '') === 'cream') ? 'selected' : ''; ?>>Warm Cream</option>
+                <!-- Right: Color Swatch + Toggle Switch + Delete -->
+                <div class="flex items-center gap-2.5 shrink-0">
+                    <select class="cora-stage-bg-select hidden">
+                        <option value="default" selected>Default Gray</option>
                     </select>
 
-                    <div class="cora-color-picker-container flex items-center gap-1.5 shrink-0" title="Badge color tag">
+                    <div class="cora-color-picker-container flex items-center shrink-0">
                         <select class="cora-stage-badge-select hidden" onchange="coraUpdateStageBadgePreview(this)">
                             <option value="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800" <?php echo (strpos($s_val['badge'] ?? '', 'blue') !== false) ? 'selected' : ''; ?>>Blue</option>
                             <option value="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800" <?php echo (strpos($s_val['badge'] ?? '', 'amber') !== false) ? 'selected' : ''; ?>>Amber</option>
@@ -1979,26 +2034,17 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                             <option value="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800" <?php echo (strpos($s_val['badge'] ?? '', 'rose') !== false) ? 'selected' : ''; ?>>Rose</option>
                             <option value="bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800" <?php echo (strpos($s_val['badge'] ?? '', 'zinc') !== false) ? 'selected' : ''; ?>>Zinc</option>
                         </select>
-                        <div class="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-950 p-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 select-none">
-                            <?php
-                            $colors = array(
-                                'blue'    => array( 'bg' => 'bg-blue-500 dark:bg-blue-400', 'class' => 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800' ),
-                                'amber'   => array( 'bg' => 'bg-amber-500 dark:bg-amber-400', 'class' => 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800' ),
-                                'purple'  => array( 'bg' => 'bg-purple-500 dark:bg-purple-400', 'class' => 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800' ),
-                                'indigo'  => array( 'bg' => 'bg-indigo-500 dark:bg-indigo-400', 'class' => 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800' ),
-                                'emerald' => array( 'bg' => 'bg-emerald-500 dark:bg-emerald-400', 'class' => 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' ),
-                                'rose'    => array( 'bg' => 'bg-rose-500 dark:bg-rose-400', 'class' => 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800' ),
-                                'zinc'    => array( 'bg' => 'bg-zinc-500 dark:bg-zinc-400', 'class' => 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800' )
-                            );
-                            foreach ($colors as $name => $info) {
-                                $is_active = (strpos($s_val['badge'] ?? '', $name) !== false);
-                                $active_classes = $is_active ? 'ring-2 ring-zinc-950 dark:ring-white ring-offset-2 scale-110' : '';
-                                ?>
-                                <button type="button" class="w-3.5 h-3.5 rounded-full <?php echo $info['bg']; ?> <?php echo $active_classes; ?> cora-color-pill cursor-pointer transition-all hover:scale-110 focus:outline-none" title="<?php echo ucfirst($name); ?>" onclick="coraSelectStageColor(this, '<?php echo $info['class']; ?>')"></button>
-                                <?php
-                            }
-                            ?>
-                        </div>
+                        
+                        <?php
+                        $circle_bg = 'bg-zinc-500';
+                        if (strpos($s_val['badge'] ?? '', 'blue') !== false) $circle_bg = 'bg-blue-500';
+                        else if (strpos($s_val['badge'] ?? '', 'amber') !== false) $circle_bg = 'bg-amber-500';
+                        else if (strpos($s_val['badge'] ?? '', 'purple') !== false) $circle_bg = 'bg-purple-500';
+                        else if (strpos($s_val['badge'] ?? '', 'indigo') !== false) $circle_bg = 'bg-indigo-500';
+                        else if (strpos($s_val['badge'] ?? '', 'emerald') !== false) $circle_bg = 'bg-emerald-500';
+                        else if (strpos($s_val['badge'] ?? '', 'rose') !== false) $circle_bg = 'bg-rose-500';
+                        ?>
+                        <button type="button" class="w-6 h-6 rounded-full <?php echo $circle_bg; ?> ring-2 ring-zinc-950 dark:ring-white ring-offset-2 shrink-0 cursor-pointer shadow-2xs hover:scale-105 transition-all" title="Tap to change color theme" onclick="coraCycleStageColor(this)"></button>
                     </div>
 
                     <!-- Monochromatic Toggle Switch -->
@@ -2008,7 +2054,7 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
                         <span class="cora-toggle-text text-[11px] font-bold text-zinc-600 dark:text-zinc-400 select-none w-8 text-left"><?php echo ( ! isset($s_val['enabled']) || $s_val['enabled'] ) ? 'Show' : 'Hide'; ?></span>
                     </label>
 
-                    <button type="button" class="w-7 h-7 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-transparent transition-all flex items-center justify-center cursor-pointer shrink-0" onclick="coraRemoveStageRow(this)" title="Delete stage">
+                    <button type="button" class="w-7 h-7 rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-transparent transition-all flex items-center justify-center cursor-pointer shrink-0" onclick="coraRemoveStageRow(this)" title="Delete stage">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                     </button>
                 </div>

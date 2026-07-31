@@ -25133,11 +25133,30 @@ if ( ! function_exists( 'cora_ajax_get_leads' ) ) {
             $filtered[] = $l;
         }
 
+        $paged    = isset( $_REQUEST['page'] ) ? max( 1, intval( $_REQUEST['page'] ) ) : ( isset( $_REQUEST['paged'] ) ? max( 1, intval( $_REQUEST['paged'] ) ) : 1 );
+        $per_page = isset( $_REQUEST['per_page'] ) ? intval( $_REQUEST['per_page'] ) : 25;
+        if ( $per_page <= 0 ) {
+            $per_page = 25;
+        }
+
+        $total_leads = count( $filtered );
+        $total_pages = max( 1, ceil( $total_leads / $per_page ) );
+        if ( $paged > $total_pages && $total_pages > 0 ) {
+            $paged = $total_pages;
+        }
+        $offset = ( $paged - 1 ) * $per_page;
+        $page_items = array_slice( $filtered, $offset, $per_page );
+
         $team_members = cora_get_workspace_team_members();
 
         wp_send_json_success( array(
-            'leads'        => $filtered,
-            'count'        => count( $filtered ),
+            'leads'        => $page_items,
+            'all_leads'    => $filtered,
+            'count'        => count( $page_items ),
+            'total_leads'  => $total_leads,
+            'total_pages'  => $total_pages,
+            'current_page' => $paged,
+            'per_page'     => $per_page,
             'team_members' => $team_members,
         ) );
     }

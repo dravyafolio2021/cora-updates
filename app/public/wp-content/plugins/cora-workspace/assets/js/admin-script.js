@@ -10696,6 +10696,61 @@ jQuery(document).ready(function($) {
         }
     });
 
+    // Pagination State & Handlers
+    window.coraCurrentLeadPage = 1;
+    window.coraLeadsPerPage = 25;
+    window.coraTotalLeadPages = 1;
+
+    window.coraChangePerPage = function(val) {
+        window.coraLeadsPerPage = parseInt(val) || 25;
+        window.coraCurrentLeadPage = 1;
+        window.coraFetchPaginatedLeads();
+    };
+
+    window.coraGoToPage = function(dir) {
+        if (dir === 'prev' && window.coraCurrentLeadPage > 1) {
+            window.coraCurrentLeadPage--;
+        } else if (dir === 'next' && window.coraCurrentLeadPage < window.coraTotalLeadPages) {
+            window.coraCurrentLeadPage++;
+        }
+        window.coraFetchPaginatedLeads();
+    };
+
+    window.coraFetchPaginatedLeads = function() {
+        const query = ($('#cora-lead-search-input').val() || '').trim();
+        const stage = $('#cora-lead-stage-filter').val() || 'all';
+        const assignee = $('#cora-lead-assignee-filter').val() || 'all';
+
+        const data = {
+            action: 'cora_ajax_get_leads',
+            security: window.cora_params ? window.cora_params.nonce : '',
+            search: query,
+            stage: stage,
+            assigned_to: assignee,
+            page: window.coraCurrentLeadPage,
+            per_page: window.coraLeadsPerPage
+        };
+
+        $.ajax({
+            url: window.cora_params ? window.cora_params.ajax_url : '/wp-admin/admin-ajax.php',
+            type: 'POST',
+            data: data,
+            success: function(res) {
+                if (res.success && res.data) {
+                    window.coraTotalLeadPages = res.data.total_pages || 1;
+                    const totalLeads = res.data.total_leads || 0;
+                    const startItem = totalLeads === 0 ? 0 : ((window.coraCurrentLeadPage - 1) * window.coraLeadsPerPage) + 1;
+                    const endItem = Math.min(window.coraCurrentLeadPage * window.coraLeadsPerPage, totalLeads);
+
+                    $('#cora-pagination-info').text(`Showing ${startItem}–${endItem} of ${totalLeads} leads`);
+                    $('#cora-pagination-page-label').text(`Page ${window.coraCurrentLeadPage} of ${window.coraTotalLeadPages}`);
+                    $('#cora-pagination-prev').prop('disabled', window.coraCurrentLeadPage <= 1);
+                    $('#cora-pagination-next').prop('disabled', window.coraCurrentLeadPage >= window.coraTotalLeadPages);
+                }
+            }
+        });
+    };
+
     // Filter Leads
     window.coraFilterLeadsList = function() {
         const query = ($('#cora-lead-search-input').val() || '').toLowerCase().trim();
