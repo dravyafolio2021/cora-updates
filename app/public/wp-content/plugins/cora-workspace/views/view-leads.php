@@ -236,7 +236,8 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
             <h1 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Client Leads (CRM)</h1>
             <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Nurture client inquiries, drag & drop deal stages, track funnel conversion, and close shoots.</p>
         </div>
-        <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
+        <!-- Desktop Action Bar -->
+        <div class="hidden sm:flex items-center gap-2 shrink-0">
             <button type="button" id="cora-top-header-activity-btn" class="px-3 py-2 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white font-semibold rounded-xl text-xs transition-all flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 dark:border-zinc-800 shadow-2xs" onclick="coraSwitchLeadSubtab('activity')">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg>
                 <span>Activity Log</span>
@@ -247,48 +248,75 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
             </button>
             <button type="button" class="px-3.5 py-2 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-800 font-semibold rounded-xl text-xs transition-all flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 dark:border-zinc-800 shadow-2xs" onclick="coraExportLeadsCSV()">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                Export CSV
+                <span>Export CSV</span>
             </button>
             <button type="button" class="px-4 py-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold rounded-xl text-xs hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all flex items-center gap-2 cursor-pointer shadow-xs" onclick="coraOpenCreateLeadDrawer()">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Add Lead
+                <span>Add Lead</span>
             </button>
+        </div>
+
+        <!-- Mobile Prioritized Actions (Priority 1: Add Lead, Priority 2: Customize Columns, Low Priority: Overflow Menu) -->
+        <div class="flex sm:hidden items-center gap-2 w-full">
+            <button type="button" class="flex-1 py-2.5 px-4 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold rounded-xl text-xs hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs" onclick="coraOpenCreateLeadDrawer()">
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Add Lead</span>
+            </button>
+            <button type="button" class="px-3 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold rounded-xl text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs" onclick="coraOpenManageStagesDrawer()">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <span>Columns</span>
+            </button>
+            <div class="relative">
+                <button type="button" id="cora-mobile-more-actions-btn" class="px-2.5 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold rounded-xl text-xs hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all flex items-center justify-center cursor-pointer shadow-2xs" onclick="coraToggleMobileActionsMenu(event)">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                </button>
+                <div id="cora-mobile-more-actions-popover" class="hidden absolute right-0 top-full mt-1.5 w-48 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-xl z-50 p-1.5 font-sans space-y-1">
+                    <button type="button" class="w-full px-3 py-2 text-left text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl flex items-center gap-2 cursor-pointer transition-colors" onclick="coraSwitchLeadSubtab('activity'); coraToggleMobileActionsMenu();">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg>
+                        <span>Activity Log</span>
+                    </button>
+                    <button type="button" class="w-full px-3 py-2 text-left text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl flex items-center gap-2 cursor-pointer transition-colors" onclick="coraExportLeadsCSV(); coraToggleMobileActionsMenu();">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Export CSV</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- TOP KPI STAT CARDS (CLEAN & NON-OVERLAPPING) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- TOP KPI STAT CARDS (2x2 GRID ON MOBILE FOR HIGH DECISION-MAKING & ZERO CLUTTER) -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         <!-- Card 1: Pipeline Value -->
-        <div class="p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col justify-between space-y-3">
+        <div class="p-3 sm:p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0">
             <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-                <span class="text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Pipeline Value</span>
-                <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center font-extrabold text-xs select-none">
+                <span class="text-[9.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 truncate">Pipeline Value</span>
+                <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center font-extrabold text-xs shrink-0 select-none">
                     ₹
                 </div>
             </div>
             <div>
-                <div class="text-2xl font-black tracking-tight text-zinc-950 dark:text-white truncate">₹<?php echo number_format( $pipeline_total_value ); ?></div>
-                <div class="mt-2">
-                    <span class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60 inline-flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active Deals
+                <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-white truncate">₹<?php echo number_format( $pipeline_total_value ); ?></div>
+                <div class="mt-1 sm:mt-2">
+                    <span class="text-[9px] sm:text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 sm:px-2.5 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60 inline-flex items-center gap-1 truncate max-w-full">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span> Active Deals
                     </span>
                 </div>
             </div>
         </div>
 
         <!-- Card 2: Total Inquiries -->
-        <div class="p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col justify-between space-y-3">
+        <div class="p-3 sm:p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0">
             <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-                <span class="text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Total Inquiries</span>
-                <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                <span class="text-[9.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 truncate">Total Inquiries</span>
+                <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
                 </div>
             </div>
             <div>
-                <div class="text-2xl font-black tracking-tight text-zinc-950 dark:text-white truncate"><?php echo $total_leads_count; ?></div>
-                <div class="mt-2">
-                    <span class="text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-0.5 rounded-full border border-zinc-200/60 dark:border-zinc-700 inline-flex items-center gap-1">
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2c.6 3.3 4 6 4 10a4 4 0 1 1-8 0c0-4 3.4-6.7 4-10z"></path></svg>
+                <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-white truncate"><?php echo $total_leads_count; ?></div>
+                <div class="mt-1 sm:mt-2">
+                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 px-2 sm:px-2.5 py-0.5 rounded-full border border-zinc-200/60 dark:border-zinc-700 inline-flex items-center gap-1 truncate max-w-full">
+                        <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M12 2c.6 3.3 4 6 4 10a4 4 0 1 1-8 0c0-4 3.4-6.7 4-10z"></path></svg>
                         <?php echo $hot_leads_count; ?> Hot Deals
                     </span>
                 </div>
@@ -296,18 +324,18 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
         </div>
 
         <!-- Card 3: Conversion Rate -->
-        <div class="p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col justify-between space-y-3">
+        <div class="p-3 sm:p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0">
             <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-                <span class="text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Conversion Rate</span>
-                <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                <span class="text-[9.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 truncate">Conversion Rate</span>
+                <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
                 </div>
             </div>
             <div>
-                <div class="text-2xl font-black tracking-tight text-zinc-950 dark:text-white truncate"><?php echo $conversion_rate; ?>%</div>
-                <div class="mt-2">
-                    <span class="text-[10px] font-bold text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/50 px-2.5 py-0.5 rounded-full border border-sky-200/60 dark:border-sky-800/60 inline-flex items-center gap-1">
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-white truncate"><?php echo $conversion_rate; ?>%</div>
+                <div class="mt-1 sm:mt-2">
+                    <span class="text-[9px] sm:text-[10px] font-bold text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/50 px-2 sm:px-2.5 py-0.5 rounded-full border border-sky-200/60 dark:border-sky-800/60 inline-flex items-center gap-1 truncate max-w-full">
+                        <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         <?php echo $converted_count; ?> Converted
                     </span>
                 </div>
@@ -315,18 +343,18 @@ $conversion_rate = $total_leads_count > 0 ? round( ( $converted_count / $total_l
         </div>
 
         <!-- Card 4: Avg Response Time -->
-        <div class="p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col justify-between space-y-3">
+        <div class="p-3 sm:p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0">
             <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-                <span class="text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Avg Response Time</span>
-                <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg>
+                <span class="text-[9.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 truncate">Avg Response</span>
+                <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg>
                 </div>
             </div>
             <div>
-                <div class="text-2xl font-black tracking-tight text-zinc-950 dark:text-white truncate">18 mins</div>
-                <div class="mt-2">
-                    <span class="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-0.5 rounded-full border border-zinc-200/60 dark:border-zinc-700 inline-flex items-center gap-1">
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-white truncate">18 mins</div>
+                <div class="mt-1 sm:mt-2">
+                    <span class="text-[9px] sm:text-[10px] font-bold text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 sm:px-2.5 py-0.5 rounded-full border border-zinc-200/60 dark:border-zinc-700 inline-flex items-center gap-1 truncate max-w-full">
+                        <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                         Target &lt; 30m
                     </span>
                 </div>

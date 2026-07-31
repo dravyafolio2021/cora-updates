@@ -10680,6 +10680,22 @@ jQuery(document).ready(function($) {
         }
     };
 
+    window.coraToggleMobileActionsMenu = function(e) {
+        if (e) e.stopPropagation();
+        const popover = $('#cora-mobile-more-actions-popover');
+        if (popover.hasClass('hidden')) {
+            popover.removeClass('hidden');
+        } else {
+            popover.addClass('hidden');
+        }
+    };
+
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#cora-mobile-more-actions-btn, #cora-mobile-more-actions-popover').length) {
+            $('#cora-mobile-more-actions-popover').addClass('hidden');
+        }
+    });
+
     // Filter Leads
     window.coraFilterLeadsList = function() {
         const query = ($('#cora-lead-search-input').val() || '').toLowerCase().trim();
