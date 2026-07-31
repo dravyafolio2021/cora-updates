@@ -16,7 +16,7 @@ test.describe('Mobile Search Bar & Actionable Deal Velocity Analytics Hub', () =
     // 1. Verify Full-Width Mobile Search Bar & Filter Grid
     const searchInput = page.locator('#cora-lead-search-input');
     await expect(searchInput).toBeVisible();
-    await expect(searchInput).toHaveAttribute('placeholder', '🔍 Search leads by name, email, city...');
+    await expect(searchInput).toHaveAttribute('placeholder', 'Search leads by name, email, city...');
 
     const stageFilter = page.locator('#cora-lead-stage-filter');
     await expect(stageFilter).toBeVisible();
@@ -31,6 +31,10 @@ test.describe('Mobile Search Bar & Actionable Deal Velocity Analytics Hub', () =
 
     const analyticsPane = page.locator('#cora-lead-pane-analytics');
     await expect(analyticsPane).not.toHaveClass(/hidden/);
+
+    // Verify pagination is NOT visible on analytics tab
+    const pagination = page.locator('#cora-directory-pagination');
+    await expect(pagination).not.toBeVisible();
 
     // 3. Verify High-Priority Action Launchers
     const actionLaunchers = page.locator('#cora-lead-pane-analytics button:has-text("Filter & Contact"), #cora-lead-pane-analytics button:has-text("Review & Convert")');

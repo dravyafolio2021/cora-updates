@@ -473,7 +473,7 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <input type="text" id="cora-lead-search-input" placeholder="🔍 Search leads by name, email, city..." 
+                <input type="text" id="cora-lead-search-input" placeholder="Search leads by name, email, city..." 
                        class="w-full pl-9 pr-3 py-2 md:py-1.5 text-xs bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-950 dark:focus:ring-white transition-all font-medium placeholder:text-zinc-400"
                        onkeyup="coraFilterLeadsList()">
             </div>
@@ -1272,7 +1272,7 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                  </div>
                 <?php endforeach; ?>
             <?php endif; ?>
-        </div>         </div>
+        </div>
         <!-- SERVER-SIDE PAGINATION BAR (DESKTOP & MOBILE) -->
         <div id="cora-directory-pagination" class="mt-4 p-3.5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3 text-xs select-none">
             <div class="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 font-medium">
@@ -1325,7 +1325,7 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                 <div class="p-3.5 bg-zinc-50 dark:bg-zinc-800/60 rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 flex flex-col justify-between gap-3 group hover:border-zinc-400 dark:hover:border-zinc-600 transition-all">
                     <div>
                         <div class="flex items-center justify-between text-xs font-bold text-zinc-900 dark:text-white">
-                            <span class="flex items-center gap-1.5"><span class="text-amber-500">⚡</span> Uncontacted Leads</span>
+                            <span class="flex items-center gap-1.5"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-amber-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Uncontacted Leads</span>
                             <span class="px-1.5 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 text-[10px]">High SLA</span>
                         </div>
                         <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">2 fresh inquiries awaiting initial response (&lt; 30 min target).</p>
@@ -1340,7 +1340,7 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                 <div class="p-3.5 bg-zinc-50 dark:bg-zinc-800/60 rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 flex flex-col justify-between gap-3 group hover:border-zinc-400 dark:hover:border-zinc-600 transition-all">
                     <div>
                         <div class="flex items-center justify-between text-xs font-bold text-zinc-900 dark:text-white">
-                            <span class="flex items-center gap-1.5"><span class="text-rose-500">🔥</span> Negotiation Deals</span>
+                            <span class="flex items-center gap-1.5"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-rose-500"><path d="M12 2c.6 3.3 4 6 4 10a4 4 0 1 1-8 0c0-4 3.4-6.7 4-10z"></path></svg> Negotiation Deals</span>
                             <span class="px-1.5 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 text-[10px]">₹10.2L Value</span>
                         </div>
                         <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">3 active proposals in final closing stage requiring follow-up.</p>
@@ -1355,7 +1355,7 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                 <div class="p-3.5 bg-zinc-50 dark:bg-zinc-800/60 rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 flex flex-col justify-between gap-3 group hover:border-zinc-400 dark:hover:border-zinc-600 transition-all">
                     <div>
                         <div class="flex items-center justify-between text-xs font-bold text-zinc-900 dark:text-white">
-                            <span class="flex items-center gap-1.5"><span>📅</span> Upcoming Visits</span>
+                            <span class="flex items-center gap-1.5"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-blue-500"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Upcoming Visits</span>
                             <span class="px-1.5 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-400 text-[10px]">Site Viewing</span>
                         </div>
                         <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">3 client property viewings scheduled for this week.</p>
