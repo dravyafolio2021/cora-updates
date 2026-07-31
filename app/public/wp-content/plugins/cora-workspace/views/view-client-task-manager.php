@@ -63,6 +63,47 @@ if (!defined('ABSPATH')) {
         max-width: 100vw !important;
     }
 }
+@media (max-width: 639px) {
+    .cora-bottom-drawer {
+        top: auto !important;
+        bottom: 0 !important;
+        right: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        height: 82vh !important;
+        border-top-left-radius: 20px !important;
+        border-top-right-radius: 20px !important;
+        border-left: none !important;
+        border-top: 1px solid #e4e4e7 !important;
+        transform: translateY(100%) !important;
+        box-shadow: 0 -8px 30px rgba(9, 9, 11, 0.15) !important;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, visibility 0.3s !important;
+    }
+    
+    .cora-bottom-drawer.cora-drawer-open {
+        transform: translateY(0) !important;
+    }
+
+    #drawer-task-details, #drawer-create-task, #drawer-template-picker, #drawer-manage-columns {
+        width: 100% !important;
+        max-width: 100vw !important;
+    }
+
+    /* Blur backdrop overlay on mobile */
+    .cora-drawer-backdrop-overlay {
+        left: 0 !important;
+        width: 100vw !important;
+        background-color: rgba(9, 9, 11, 0.4) !important;
+        backdrop-filter: blur(4px) !important;
+        -webkit-backdrop-filter: blur(4px) !important;
+    }
+
+    /* Pull handle indicator */
+    .cora-drawer-handle {
+        display: block !important;
+    }
+}
 
 /* Invisible click-outside interceptor backdrop behind the active drawer (offset to not block sidebar) */
 .cora-drawer-backdrop-overlay {
@@ -792,8 +833,11 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
 
 <!-- DRAWER 1: Task Workspace & Checklist -->
 <div id="drawer-task-details" class="cora-bottom-drawer">
+    <!-- Pull Drag Handle Indicator for Mobile Sheet -->
+    <div class="cora-drawer-handle w-12 h-1 bg-zinc-200 dark:bg-zinc-800 rounded-full mx-auto my-3 shrink-0 hidden"></div>
+    
     <!-- Compact Header with Inline Title -->
-    <div class="px-5 py-4 border-b border-zinc-200/80 bg-white flex items-start justify-between shrink-0 gap-4">
+    <div class="px-6 py-4.5 border-b border-zinc-200/80 bg-white flex items-start justify-between shrink-0 gap-4">
         <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 mb-2">
                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9.5px] font-black uppercase tracking-widest bg-zinc-950 text-white leading-none" id="detail-header-status-pill">To Do</span>
@@ -835,22 +879,22 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
             <!-- Property Table -->
             <div class="divide-y divide-zinc-100">
                 <!-- Assignee -->
-                <div class="flex items-center px-5 py-2.5 hover:bg-zinc-50/60 transition-colors">
-                    <div class="w-28 shrink-0 flex items-center gap-2 text-[11px] font-semibold text-zinc-400">
+                <div class="flex items-center px-6 py-3.5 hover:bg-zinc-50/60 transition-colors">
+                    <div class="w-28 shrink-0 flex items-center gap-2 text-[12px] font-semibold text-zinc-400">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                         Assignee
                     </div>
-                    <select id="detail-task-assignee" class="flex-1 text-xs font-bold text-zinc-950 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer appearance-none">
+                    <select id="detail-task-assignee" class="flex-1 text-[13px] font-bold text-zinc-950 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer appearance-none">
                         <option value="">Unassigned</option>
                     </select>
                 </div>
                 <!-- Status -->
-                <div class="flex items-center px-5 py-2.5 hover:bg-zinc-50/60 transition-colors">
-                    <div class="w-28 shrink-0 flex items-center gap-2 text-[11px] font-semibold text-zinc-400">
+                <div class="flex items-center px-6 py-3.5 hover:bg-zinc-50/60 transition-colors">
+                    <div class="w-28 shrink-0 flex items-center gap-2 text-[12px] font-semibold text-zinc-400">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                         Status
                     </div>
-                    <select id="detail-task-status" onchange="coraUpdateGuidelinesText($('#detail-task-priority').val(), this.value); coraUpdateHeaderPills();" class="flex-1 text-xs font-bold text-zinc-950 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer appearance-none">
+                    <select id="detail-task-status" onchange="coraUpdateGuidelinesText($('#detail-task-priority').val(), this.value); coraUpdateHeaderPills();" class="flex-1 text-[13px] font-bold text-zinc-950 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer appearance-none">
                         <option value="todo">To Do</option>
                         <option value="in_progress">In Progress</option>
                         <option value="client_review">Client Review</option>
@@ -859,12 +903,12 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
                     </select>
                 </div>
                 <!-- Priority -->
-                <div class="flex items-center px-5 py-2.5 hover:bg-zinc-50/60 transition-colors">
-                    <div class="w-28 shrink-0 flex items-center gap-2 text-[11px] font-semibold text-zinc-400">
+                <div class="flex items-center px-6 py-3.5 hover:bg-zinc-50/60 transition-colors">
+                    <div class="w-28 shrink-0 flex items-center gap-2 text-[12px] font-semibold text-zinc-400">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/></svg>
                         Priority
                     </div>
-                    <select id="detail-task-priority" onchange="coraUpdateGuidelinesText(this.value, $('#detail-task-status').val()); coraUpdateHeaderPills();" class="flex-1 text-xs font-bold text-zinc-950 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer appearance-none">
+                    <select id="detail-task-priority" onchange="coraUpdateGuidelinesText(this.value, $('#detail-task-status').val()); coraUpdateHeaderPills();" class="flex-1 text-[13px] font-bold text-zinc-950 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer appearance-none">
                         <option value="low">Low</option>
                         <option value="medium">Medium</option>
                         <option value="high">High</option>
@@ -872,20 +916,20 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
                     </select>
                 </div>
                 <!-- Due Date -->
-                <div class="flex items-center px-5 py-2.5 hover:bg-zinc-50/60 transition-colors">
-                    <div class="w-28 shrink-0 flex items-center gap-2 text-[11px] font-semibold text-zinc-400">
+                <div class="flex items-center px-6 py-3.5 hover:bg-zinc-50/60 transition-colors">
+                    <div class="w-28 shrink-0 flex items-center gap-2 text-[12px] font-semibold text-zinc-400">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                         Due Date
                     </div>
-                    <input type="date" id="detail-task-due" class="flex-1 text-xs font-bold text-zinc-950 bg-transparent border-0 p-0 focus:ring-0">
+                    <input type="date" id="detail-task-due" class="flex-1 text-[13px] font-bold text-zinc-950 bg-transparent border-0 p-0 focus:ring-0">
                 </div>
                 <!-- Asset URL -->
-                <div class="flex items-center px-5 py-2.5 hover:bg-zinc-50/60 transition-colors">
-                    <div class="w-28 shrink-0 flex items-center gap-2 text-[11px] font-semibold text-zinc-400">
+                <div class="flex items-center px-6 py-3.5 hover:bg-zinc-50/60 transition-colors">
+                    <div class="w-28 shrink-0 flex items-center gap-2 text-[12px] font-semibold text-zinc-400">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
                         Asset Link
                     </div>
-                    <input type="url" id="detail-task-asset-url" placeholder="Paste drive or proofing URL..." class="flex-1 text-xs font-medium text-zinc-700 bg-transparent border-0 p-0 focus:ring-0 focus:outline-none placeholder:text-zinc-300 truncate">
+                    <input type="url" id="detail-task-asset-url" placeholder="Paste drive or proofing URL..." class="flex-1 text-[13px] font-medium text-zinc-700 bg-transparent border-0 p-0 focus:ring-0 focus:outline-none placeholder:text-zinc-300 truncate">
                 </div>
             </div>
 
@@ -893,7 +937,7 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
             <div class="border-t border-zinc-100"></div>
 
             <!-- AI Co-Pilot Guidelines (compact) -->
-            <div class="px-5 py-3">
+            <div class="px-6 py-4.5 bg-zinc-50/50 border-t border-b border-zinc-100">
                 <button type="button" onclick="coraToggleGuidelines()" class="w-full flex items-center justify-between py-1 text-left cursor-pointer group">
                     <span class="flex items-center gap-2 text-[11px] font-bold text-zinc-500 group-hover:text-zinc-700 transition-colors">
                         <span class="w-4.5 h-4.5 rounded bg-zinc-950 text-white flex items-center justify-center text-[8px] font-black leading-none shrink-0">AI</span>
@@ -904,10 +948,10 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
                     </span>
                 </button>
                 <div id="cora-guidelines-content" class="hidden mt-2.5 space-y-2.5">
-                    <div class="p-3 bg-zinc-50 border border-zinc-200/70 rounded-xl text-[11px] text-zinc-600 leading-relaxed" id="cora-guidelines-text">
+                    <div class="p-3.5 bg-white border border-zinc-200/70 rounded-xl text-[11px] text-zinc-600 leading-relaxed" id="cora-guidelines-text">
                         Select status/priority to see contextual guidance.
                     </div>
-                    <button type="button" onclick="coraAutoInjectSOPSteps()" class="w-full flex items-center justify-between p-2.5 bg-zinc-50 border border-zinc-200/70 rounded-xl hover:bg-zinc-100/70 transition-colors cursor-pointer group">
+                    <button type="button" onclick="coraAutoInjectSOPSteps()" class="w-full flex items-center justify-between p-2.5 bg-white border border-zinc-200/70 rounded-xl hover:bg-zinc-50 transition-colors cursor-pointer group">
                         <div class="flex items-center gap-2">
                             <svg class="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                             <span class="text-[10.5px] font-bold text-zinc-600 group-hover:text-zinc-800">Auto-generate SOP checklist steps</span>
@@ -1009,13 +1053,13 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
     </div>
 
     <!-- Drawer Footer -->
-    <div class="px-5 py-3 border-t border-zinc-200/80 bg-white flex items-center justify-between shrink-0">
-        <button type="button" onclick="coraDeleteTaskFromDrawer()" class="px-3 py-2 text-zinc-400 hover:text-red-600 text-[11px] font-bold rounded-lg hover:bg-red-50 transition-colors cursor-pointer">
-            <svg class="w-3.5 h-3.5 inline-block mr-1 -mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+    <div class="px-6 py-4 border-t border-zinc-200/80 bg-zinc-50/40 flex items-center justify-between shrink-0">
+        <button type="button" onclick="coraDeleteTaskFromDrawer()" class="px-3 py-2 text-zinc-400 hover:text-red-650 text-[11px] font-bold rounded-lg hover:bg-red-50/50 transition-colors cursor-pointer flex items-center gap-1">
+            <svg class="w-3.5 h-3.5 text-zinc-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1v3M4 7h16"/></svg>
             Delete
         </button>
         <div class="flex items-center gap-2">
-            <button type="button" onclick="window.coraCloseAllDrawers()" class="px-4 py-2 bg-white border border-zinc-200 text-zinc-600 text-[11px] font-bold rounded-xl hover:bg-zinc-50 transition-colors cursor-pointer">
+            <button type="button" onclick="window.coraCloseAllDrawers()" class="px-4 py-2 bg-white border border-zinc-200 text-zinc-650 text-[11px] font-bold rounded-xl hover:bg-zinc-50 transition-colors cursor-pointer">
                 Cancel
             </button>
             <button type="button" onclick="coraSaveTaskFromDrawer()" class="px-5 py-2 bg-zinc-950 text-white text-[11px] font-bold rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer shadow-sm">
@@ -1027,6 +1071,9 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
 
 <!-- DRAWER 2: Create New Client Task -->
 <div id="drawer-create-task" class="cora-bottom-drawer">
+    <!-- Pull Drag Handle Indicator for Mobile Sheet -->
+    <div class="cora-drawer-handle w-12 h-1 bg-zinc-200 dark:bg-zinc-800 rounded-full mx-auto my-3 shrink-0 hidden"></div>
+    
     <!-- Header -->
     <div class="p-5 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-3">
