@@ -2270,66 +2270,68 @@ function renderSingleColumnCards(col, colTasks, today, todayStr, tomorrowStr) {
 function renderMobileCard(t, today, todayStr, tomorrowStr) {
     const isCompleted = t.status === 'done';
     
-    // Status Icon
+    // Status Icon - custom clean checkbox
     let statusIcon = '';
     if (isCompleted) {
         statusIcon = `<svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
     } else if (t.status === 'in_progress' || t.status === 'inprogress') {
-        statusIcon = `<svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3"></path></svg>`;
+        statusIcon = `<svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg>`;
     } else if (t.status === 'client_review' || t.status === 'review') {
-        statusIcon = `<svg class="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h.01M12 12h.01M15 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+        statusIcon = `<svg class="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg>`;
     } else if (t.status === 'blocked') {
         statusIcon = `<svg class="w-5 h-5 text-rose-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>`;
     } else {
-        // default todo
-        statusIcon = `<svg class="w-5 h-5 text-zinc-300 hover:text-zinc-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle></svg>`;
+        // default todo - clean thin zinc-300 circle
+        statusIcon = `<svg class="w-5 h-5 text-zinc-300 hover:text-zinc-500 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle></svg>`;
     }
 
-    // Due date label
+    // Due date label - clean text badge
     let dueBadgeHtml = '';
     if (t.due_date) {
         if (isCompleted) {
-            dueBadgeHtml = `<span class="text-[10px] text-zinc-400 font-semibold">Done</span>`;
+            dueBadgeHtml = `<span class="text-[10px] text-zinc-400 font-semibold">Completed</span>`;
         } else if (t.due_date < todayStr) {
             const daysOverdue = Math.floor((today - new Date(t.due_date + 'T00:00:00')) / (1000 * 60 * 60 * 24));
-            dueBadgeHtml = `<span class="text-[10px] text-rose-600 font-bold bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100 flex items-center gap-0.5"><svg class="w-3 h-3 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>Overdue ${daysOverdue || 1}d</span>`;
+            dueBadgeHtml = `<span class="text-[10px] text-rose-600 font-bold bg-rose-50/50 px-1.5 py-0.5 rounded flex items-center gap-0.5"><svg class="w-3 h-3 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>Overdue ${daysOverdue || 1}d</span>`;
         } else if (t.due_date === todayStr) {
-            dueBadgeHtml = `<span class="text-[10px] text-amber-800 font-bold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">Today</span>`;
+            dueBadgeHtml = `<span class="text-[10px] text-amber-850 font-bold bg-amber-50 px-1.5 py-0.5 rounded">Today</span>`;
         } else if (t.due_date === tomorrowStr) {
-            dueBadgeHtml = `<span class="text-[10px] text-zinc-600 font-semibold bg-zinc-55 px-1.5 py-0.5 rounded border border-zinc-200/60">Tomorrow</span>`;
+            dueBadgeHtml = `<span class="text-[10px] text-zinc-600 font-semibold bg-zinc-100 px-1.5 py-0.5 rounded">Tomorrow</span>`;
         } else {
             dueBadgeHtml = `<span class="text-[10px] text-zinc-500 font-medium">${t.due_date.split('-').reverse().slice(0, 2).join('/')}</span>`;
         }
     }
 
-    // Client badge
+    // Client label - very clean text label with subtle gray background
     const clientNameStr = t.client_name || 'General';
-    const cColor = clientBadgeColor(clientNameStr);
-    const clientBadge = `<span class="text-[9.5px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider" style="background-color: ${cColor.bg}; color: ${cColor.text}; max-width: 120px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${escHtml(clientNameStr)}</span>`;
+    const clientBadge = `<span class="text-[10px] font-bold text-zinc-500 bg-zinc-50 border border-zinc-200/60 px-1.5 py-0.5 rounded tracking-wide max-w-[140px] text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${escHtml(clientNameStr)}</span>`;
 
     // Assignee avatar
     const assigneeName = t.assignee_name || 'Unassigned';
     const assigneeInitial = assigneeName.charAt(0).toUpperCase();
 
-    // Priority badge / indicator
-    let priorityBadge = '';
+    // Priority flag - minimal SVG flag icon
+    let priorityIcon = '';
     if (t.priority === 'urgent') {
-        priorityBadge = `<span class="text-[9.5px] font-black uppercase text-rose-600 flex items-center gap-0.5 shrink-0"><svg class="w-3 h-3 text-rose-600 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M4 2v20h-2v-20h2zm18 4l-4 4 4 4h-14v-8h14z"/></svg>Urgent</span>`;
+        priorityIcon = `<svg class="w-4 h-4 text-rose-500 shrink-0" fill="currentColor" viewBox="0 0 24 24" title="Urgent Priority"><path d="M4 2v20h-2v-20h2zm18 4l-4 4 4 4h-14v-8h14z"/></svg>`;
     } else if (t.priority === 'high') {
-        priorityBadge = `<span class="text-[9.5px] font-black uppercase text-amber-600 flex items-center gap-0.5 shrink-0"><svg class="w-3 h-3 text-amber-600 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M4 2v20h-2v-20h2zm18 4l-4 4 4 4h-14v-8h14z"/></svg>High</span>`;
+        priorityIcon = `<svg class="w-4 h-4 text-amber-500 shrink-0" fill="currentColor" viewBox="0 0 24 24" title="High Priority"><path d="M4 2v20h-2v-20h2zm18 4l-4 4 4 4h-14v-8h14z"/></svg>`;
+    } else {
+        // low/medium - gray flag
+        priorityIcon = `<svg class="w-4 h-4 text-zinc-300 shrink-0" fill="currentColor" viewBox="0 0 24 24" title="Normal Priority"><path d="M4 2v20h-2v-20h2zm18 4l-4 4 4 4h-14v-8h14z"/></svg>`;
     }
 
     return `
-    <div class="cora-mobile-list-item flex items-center justify-between p-3.5 bg-white border border-zinc-200/80 rounded-xl hover:bg-zinc-50/50 transition-colors cursor-pointer select-none" data-id="${t.id}" onclick="coraOpenTaskDetailsDrawer(event, '${t.id}')">
-        <div class="flex items-center gap-3 min-w-0 flex-1">
+    <div class="cora-mobile-list-item flex items-center justify-between p-4 hover:bg-zinc-50/50 transition-colors cursor-pointer select-none" data-id="${t.id}" onclick="coraOpenTaskDetailsDrawer(event, '${t.id}')">
+        <div class="flex items-center gap-3.5 min-w-0 flex-1">
             <!-- Left status click area -->
-            <button onclick="window.coraCycleMobileStatus(event, '${t.id}')" class="p-1 rounded hover:bg-zinc-100/80 transition-colors flex items-center justify-center shrink-0 cursor-pointer" title="Change status">
+            <button onclick="window.coraCycleMobileStatus(event, '${t.id}')" class="p-0.5 rounded-full hover:bg-zinc-100 transition-colors flex items-center justify-center shrink-0 cursor-pointer" title="Change status">
                 ${statusIcon}
             </button>
             
             <!-- Mid section: title and badges -->
-            <div class="min-w-0 flex-1 text-left space-y-1">
-                <h4 class="text-xs font-bold text-zinc-950 truncate leading-snug ${isCompleted ? 'text-zinc-400 line-through' : ''}">
+            <div class="min-w-0 flex-1 text-left space-y-1.5">
+                <h4 class="text-[13px] font-bold text-zinc-900 truncate leading-snug ${isCompleted ? 'text-zinc-400 line-through font-normal' : ''}">
                     ${escHtml(t.title)}
                 </h4>
                 <div class="flex items-center gap-2 flex-wrap">
@@ -2340,9 +2342,9 @@ function renderMobileCard(t, today, todayStr, tomorrowStr) {
         </div>
 
         <!-- Right section: assignee avatar & priority flag -->
-        <div class="flex items-center gap-3 shrink-0 ml-2">
-            ${priorityBadge}
-            <div class="w-5.5 h-5.5 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[9px] font-bold shrink-0" title="${escHtml(assigneeName)}">
+        <div class="flex items-center gap-3 shrink-0 ml-3">
+            ${priorityIcon}
+            <div class="w-6 h-6 rounded-full bg-zinc-100 text-zinc-650 flex items-center justify-center text-[10px] font-extrabold shrink-0 border border-zinc-200" title="${escHtml(assigneeName)}">
                 ${assigneeInitial}
             </div>
         </div>
@@ -2449,7 +2451,7 @@ function renderKanbanColumns(tasks) {
             
             let cardsHtml = '';
             if (section.tasks.length === 0) {
-                cardsHtml = '<div class="text-center text-zinc-400 text-xs py-6 bg-white border border-zinc-200/60 rounded-2xl">No tasks scheduled</div>';
+                cardsHtml = '<div class="text-center text-zinc-400 text-xs py-6 bg-white font-medium">No tasks scheduled</div>';
             } else {
                 section.tasks.forEach(t => {
                     cardsHtml += renderMobileCard(t, today, todayStr, tomorrowStr);
@@ -2464,12 +2466,12 @@ function renderKanbanColumns(tasks) {
             }
 
             html += `
-            <div class="cora-timeline-group space-y-3">
+            <div class="cora-timeline-group space-y-2.5">
                 <div class="flex items-center gap-2 px-1">
                     <span class="text-[10.5px] font-black uppercase tracking-wider ${titleColor}">${escHtml(section.name)}</span>
                     <span class="text-[9.5px] font-bold px-1.5 py-0.5 rounded-full border ${badgeColor}">${section.tasks.length}</span>
                 </div>
-                <div class="space-y-3.5">
+                <div class="bg-white border border-zinc-200/80 rounded-2xl shadow-2xs divide-y divide-zinc-100 overflow-hidden">
                     ${cardsHtml}
                 </div>
             </div>
