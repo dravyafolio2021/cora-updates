@@ -273,11 +273,14 @@ if (!defined('ABSPATH')) {
 }
 
 .cora-toolbar-wrapper .cora-view-switcher button {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    white-space: normal !important;
+    height: auto !important;
+    overflow: visible !important;
     border: none !important;
     background: none !important;
     padding: 4px 0 !important;
@@ -289,6 +292,13 @@ if (!defined('ABSPATH')) {
     cursor: pointer;
     transition: all 0.15s ease;
     box-shadow: none !important;
+    line-height: 1.2 !important;
+}
+
+.cora-toolbar-wrapper .cora-view-switcher button span {
+    display: block !important;
+    white-space: nowrap !important;
+    font-size: 11px !important;
     line-height: 1.2 !important;
 }
 
