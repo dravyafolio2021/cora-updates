@@ -141,31 +141,31 @@ if (!defined('ABSPATH')) {
     align-items: center;
     gap: 12px;
 }
-.cora-task-header-search {
+.cora-toolbar-search {
     position: relative;
-    width: 240px;
+    width: 220px;
 }
-.cora-task-header-search input {
-    width: 100%;
-    height: 44px;
-    padding-left: 36px !important;
+.cora-toolbar-search input {
+    width: 100% !important;
+    height: 38px !important;
+    padding-left: 32px !important;
     padding-right: 12px !important;
     border: 1px solid #e4e4e7 !important;
     border-radius: 9999px !important;
-    font-size: 13px !important;
+    font-size: 12px !important;
     background-color: #ffffff !important;
     outline: none !important;
     box-shadow: none !important;
     transition: all 0.2s ease;
 }
-.cora-task-header-search input:focus {
+.cora-toolbar-search input:focus {
     border-color: #09090b !important;
 }
-.cora-task-header-search svg {
+.cora-toolbar-search svg {
     position: absolute;
-    left: 12px;
-    top: 15px;
-    color: #71717a;
+    left: 10px;
+    top: 12px;
+    color: #71717a !important;
     width: 14px;
     height: 14px;
 }
@@ -454,10 +454,14 @@ if (!defined('ABSPATH')) {
             <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1.5 leading-relaxed">Manage end-to-end client deliverables, shoot checklists, and staff assignments for 50+ active studio projects.</p>
         </div>
         <div class="cora-task-header-right">
-            <div class="cora-task-header-search">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" id="task-search-input" placeholder="Search tasks, projects..." oninput="coraFilterTasks()">
-            </div>
+            <button onclick="coraOpenTemplateDrawer(event)" class="cora-task-export-btn">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 dark:text-zinc-400 shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path></svg>
+                Apply Template
+            </button>
+            <button onclick="coraOpenColumnsManager(event)" class="cora-task-export-btn">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 dark:text-zinc-400 shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" /></svg>
+                Customize Columns
+            </button>
             <button onclick="coraExportTasks()" class="cora-task-export-btn">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 dark:text-zinc-400 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                 Export
@@ -513,6 +517,10 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
 
         <!-- Right Group -->
         <div class="cora-toolbar-right">
+            <div class="cora-toolbar-search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="task-search-input" placeholder="Search tasks, projects..." oninput="coraFilterTasks()">
+            </div>
             <select id="task-filter-category" onchange="coraFilterTasks()">
                 <option value="">All Projects</option>
                 <option value="Photo Shoot Prep">Photo Shoot Prep</option>
@@ -524,12 +532,6 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
             <select id="task-filter-assignee" onchange="coraFilterTasks()">
                 <option value="">All Assignees</option>
             </select>
-            <button onclick="coraOpenTemplateDrawer(event)" class="cora-task-settings-btn mr-1.5" title="Apply Workflow Template">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path></svg>
-            </button>
-            <button onclick="coraOpenColumnsManager(event)" class="cora-task-settings-btn" title="Manage Kanban Columns">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" /></svg>
-            </button>
         </div>
     </div>
 
