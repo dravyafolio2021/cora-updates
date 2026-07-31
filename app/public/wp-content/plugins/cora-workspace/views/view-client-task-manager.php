@@ -151,7 +151,7 @@ if (!defined('ABSPATH')) {
     padding-left: 36px !important;
     padding-right: 12px !important;
     border: 1px solid #e4e4e7 !important;
-    border-radius: 12px !important;
+    border-radius: 9999px !important;
     font-size: 13px !important;
     background-color: #ffffff !important;
     outline: none !important;
@@ -174,9 +174,9 @@ if (!defined('ABSPATH')) {
     align-items: center;
     gap: 8px;
     height: 44px;
-    padding: 0 16px !important;
+    padding: 0 20px !important;
     border: 1px solid #e4e4e7 !important;
-    border-radius: 12px !important;
+    border-radius: 9999px !important;
     background-color: #ffffff !important;
     color: #09090b !important;
     font-size: 13px !important;
@@ -191,13 +191,15 @@ if (!defined('ABSPATH')) {
 .cora-task-new-btn {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     height: 44px;
-    padding: 0 16px !important;
+    padding: 0 20px !important;
     border: none !important;
-    border-radius: 12px !important;
+    border-radius: 9999px !important;
     background-color: #09090b !important;
     color: #ffffff !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
     cursor: pointer;
     box-shadow: none !important;
     transition: all 0.2s ease;
@@ -444,8 +446,8 @@ if (!defined('ABSPATH')) {
     <!-- Page Header -->
     <div class="cora-task-manager-header">
         <div class="cora-task-header-left">
-            <h1 class="text-2xl font-bold text-zinc-900 tracking-tight">Client Task Manager</h1>
-            <p class="text-xs text-zinc-500">Manage end-to-end client deliverables, shoot checklists, and staff assignments for 50+ active studio projects.</p>
+            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-zinc-950 dark:text-zinc-50 leading-snug">Client Task Manager</h1>
+            <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1.5 leading-relaxed">Manage end-to-end client deliverables, shoot checklists, and staff assignments for 50+ active studio projects.</p>
         </div>
         <div class="cora-task-header-right">
             <div class="cora-task-header-search">
@@ -453,15 +455,12 @@ if (!defined('ABSPATH')) {
                 <input type="text" id="task-search-input" placeholder="Search tasks, projects..." oninput="coraFilterTasks()">
             </div>
             <button onclick="coraExportTasks()" class="cora-task-export-btn">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 dark:text-zinc-400 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                 Export
             </button>
             <button onclick="coraOpenCreateTaskDrawer(event)" class="cora-task-new-btn">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                <div class="flex flex-col text-left leading-[1.1] text-[11px] font-black uppercase tracking-wider">
-                    <span>New</span>
-                    <span>Task</span>
-                </div>
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                New Task
             </button>
         </div>
     </div>
