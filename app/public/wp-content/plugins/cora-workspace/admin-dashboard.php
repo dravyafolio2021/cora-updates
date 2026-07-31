@@ -4039,7 +4039,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
 
                 <!-- Centered Welcome Greeting Section with sparkle SVG -->
-                <div class="text-center pb-4 sm:pb-8 md:pb-12 px-4 space-y-1.5 sm:space-y-2 relative pt-6 sm:pt-10">
+                <div class="text-center px-4 space-y-1.5 sm:space-y-2 relative" style="padding-top: 120px !important; padding-bottom: 40px !important;">
                     <div class="inline-flex items-center justify-center gap-2.5 sm:gap-3">
                         <!-- Slate Charcoal Star Sparkle -->
                         <span class="text-zinc-900 dark:text-zinc-100 shrink-0">
