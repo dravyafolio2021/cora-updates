@@ -34,7 +34,7 @@ test.describe('Lead Management Mobile Screen Optimization', () => {
     await page.click('body', { position: { x: 10, y: 10 } });
 
     // 2. Verify 2x2 grid container for KPI cards on mobile
-    const kpiGrid = page.locator('.grid.grid-cols-2.lg\\:grid-cols-4').first();
+    const kpiGrid = page.locator('#cora-leads-module-container .grid.grid-cols-2.lg\\:grid-cols-4');
     await expect(kpiGrid).toBeVisible();
 
     // Take mobile screenshot
