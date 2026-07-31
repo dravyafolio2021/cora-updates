@@ -151,7 +151,7 @@ if (!defined('ABSPATH')) {
     padding-left: 32px !important;
     padding-right: 12px !important;
     border: 1px solid #e4e4e7 !important;
-    border-radius: 9999px !important;
+    border-radius: 12px !important;
     font-size: 12px !important;
     background-color: #ffffff !important;
     outline: none !important;
@@ -178,7 +178,7 @@ if (!defined('ABSPATH')) {
     height: 44px;
     padding: 0 20px !important;
     border: 1px solid #e4e4e7 !important;
-    border-radius: 9999px !important;
+    border-radius: 12px !important;
     background-color: #ffffff !important;
     color: #09090b !important;
     font-size: 13px !important;
@@ -199,7 +199,7 @@ if (!defined('ABSPATH')) {
     height: 44px;
     padding: 0 20px !important;
     border: none !important;
-    border-radius: 9999px !important;
+    border-radius: 12px !important;
     background-color: #09090b !important;
     color: #ffffff !important;
     font-size: 13px !important;
@@ -251,7 +251,7 @@ if (!defined('ABSPATH')) {
     padding-bottom: 6px !important;
     background-color: #ffffff !important;
     border: 1px solid #e4e4e7 !important;
-    border-radius: 9999px !important; /* Rounded full pill */
+    border-radius: 12px !important; /* Rounded XL */
     font-weight: 700 !important;
     font-size: 12px !important;
     color: #18181b !important;
