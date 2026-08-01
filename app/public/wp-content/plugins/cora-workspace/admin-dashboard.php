@@ -16,7 +16,7 @@ if ( ! function_exists( 'cora_is_super_owner' ) ) {
             return false;
         }
         $user_roles = (array) $user->roles;
-        if ( in_array( 'administrator', $user_roles, true ) || in_array( 'cora_shruti', $user_roles, true ) || in_array( 'cora_super_admin', $user_roles, true ) ) {
+        if ( in_array( 'administrator', $user_roles, true ) || in_array( 'cora_shruti', $user_roles, true ) ) {
             return true;
         }
         $super_logins = array( 'shruti', 'shrutian', 'cora', 'admin', 'superadmin', 'cora_admin' );

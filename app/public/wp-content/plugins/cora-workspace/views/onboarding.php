@@ -766,6 +766,27 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             line-height: 1.45;
         }
 
+        .industry-card.locked {
+            opacity: 0.55;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .coming-soon-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--border-light);
+            color: var(--text-secondary);
+            font-size: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2.2px 6px;
+            border-radius: 4px;
+            letter-spacing: 0.05em;
+            border: 1px solid var(--border-color);
+        }
+
         /* ── Activation State (Step 4) ─────────────────────────── */
         .activation-state {
             text-align: center;
@@ -1176,7 +1197,8 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                         <div class="industry-desc">Client leads, shoot scheduling, equipment tracking</div>
                     </div>
 
-                    <div class="industry-card" data-industry="marketing_agency" onclick="selectIndustry(this)">
+                    <div class="industry-card locked" data-industry="marketing_agency" onclick="selectIndustry(this)">
+                        <span class="coming-soon-badge">Coming Soon</span>
                         <div class="industry-icon">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M11 5L6 9H2v6h4l5 4V5z"/>
@@ -1188,7 +1210,8 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                         <div class="industry-desc">Client projects, tasks, campaign performance</div>
                     </div>
 
-                    <div class="industry-card" data-industry="it_services" onclick="selectIndustry(this)">
+                    <div class="industry-card locked" data-industry="it_services" onclick="selectIndustry(this)">
+                        <span class="coming-soon-badge">Coming Soon</span>
                         <div class="industry-icon">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
@@ -1200,7 +1223,8 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                         <div class="industry-desc">Projects, tickets, clients, team collaboration</div>
                     </div>
 
-                    <div class="industry-card" data-industry="healthcare_practice" onclick="selectIndustry(this)">
+                    <div class="industry-card locked" data-industry="healthcare_practice" onclick="selectIndustry(this)">
+                        <span class="coming-soon-badge">Coming Soon</span>
                         <div class="industry-icon">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -1586,6 +1610,9 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
     // ═══ STEP 3 — INDUSTRY SELECTION ═════════════════════════
 
     window.selectIndustry = function(card) {
+        if (card.classList.contains('locked')) {
+            return;
+        }
         var cards = document.querySelectorAll('.industry-card');
         cards.forEach(function(c) { c.classList.remove('selected'); });
         card.classList.add('selected');
