@@ -2406,54 +2406,15 @@ $cora_settings_tabs = array(
         </div>
 
         <!-- TAB: UPDATES & PLATFORM -->
-        <!-- TAB: UPDATES & PLATFORM -->
         <style>
-        .cora-update-timeline {
-            position: relative;
-            padding-left: 32px;
+        .cora-update-card-accordion {
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-        .cora-update-timeline::before {
-            content: '';
-            position: absolute;
-            top: 8px;
-            bottom: 8px;
-            left: 7px;
-            width: 1px;
-            background-color: #e4e4e7;
+        .cora-update-card-accordion:hover {
+            border-color: #d4d4d8;
         }
-        .dark .cora-update-timeline::before {
-            background-color: #27272a;
-        }
-        .cora-update-timeline-item {
-            position: relative;
-            margin-bottom: 32px;
-        }
-        .cora-update-timeline-item:last-child {
-            margin-bottom: 0;
-        }
-        .cora-update-timeline-dot {
-            position: absolute;
-            left: -32px;
-            top: 6px;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background-color: #ffffff;
-            border: 2px solid #e4e4e7;
-            z-index: 2;
-            transition: all 0.2s ease;
-        }
-        .dark .cora-update-timeline-dot {
-            background-color: #09090b;
-            border-color: #27272a;
-        }
-        .cora-update-timeline-item.active .cora-update-timeline-dot {
-            border-color: #18181b;
-            background-color: #18181b;
-        }
-        .dark .cora-update-timeline-item.active .cora-update-timeline-dot {
-            border-color: #f4f4f5;
-            background-color: #f4f4f5;
+        .dark .cora-update-card-accordion:hover {
+            border-color: #3f3f46;
         }
         .cora-update-accordion-content {
             max-height: 0;
@@ -2462,97 +2423,92 @@ $cora_settings_tabs = array(
             opacity: 0;
         }
         .cora-update-accordion-content.open {
-            max-height: 1000px;
+            max-height: 1200px;
             opacity: 1;
-        }
-        .cora-update-row-hover:hover {
-            border-color: #d4d4d8;
-            background-color: #fafafa;
-        }
-        .dark .cora-update-row-hover:hover {
-            border-color: #3f3f46;
-            background-color: rgba(39, 39, 42, 0.3);
         }
         </style>
 
         <div id="cora-settings-panel-updates" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'updates' ? '' : 'hidden'; ?>">
-            <div class="cora-shopify-card">
+            <div class="cora-shopify-card overflow-hidden relative">
+                <!-- Header -->
                 <div class="cora-shopify-card-header border-b border-zinc-150 dark:border-zinc-800/40 pb-3 flex items-center justify-between">
                     <div>
-                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 m-0">Software Updates</h3>
+                        <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Software Updates</h3>
                         <p class="text-xs text-zinc-500 m-0">Manage system versions, release channels, and automated feature shipments.</p>
                     </div>
                     <div class="relative hidden sm:block">
-                        <span class="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-950 text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                        <span class="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-950 text-xs font-bold text-zinc-700 dark:text-zinc-300 select-none">
                             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                             Production Stable
                         </span>
                     </div>
                 </div>
-                <div class="cora-shopify-card-body pt-6">
+
+                <div class="cora-shopify-card-body pt-5 relative">
                     <!-- Dynamic Status Container -->
                     <?php
                     $updater = Cora_Workspace_Updater::get_instance();
-                    $info = $updater->fetch_remote_update_info(); // Fetches from transient/cache
+                    $info = $updater->fetch_remote_update_info();
                     $update_available = ( $info && version_compare( CORA_WORKSPACE_VERSION, $info['version'], '<' ) );
                     ?>
-                    <div id="cora-updates-status-container" class="flex flex-col items-center justify-center text-center py-2 space-y-4 select-none">
+                    <div id="cora-updates-status-container" class="select-none mb-5">
                         
-                        <!-- Default: Up-to-Date State -->
-                        <div id="cora-updates-state-uptodate" class="space-y-3 <?php echo $update_available ? 'hidden' : ''; ?>">
-                            <div class="inline-flex p-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-650 dark:text-zinc-350 rounded-2xl mx-auto shadow-3xs">
-                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Your Workspace is Up to Date</h4>
-                                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 max-w-md mx-auto leading-relaxed">
-                                    You are running the latest stable release: <strong class="text-zinc-850 dark:text-zinc-200">v<?php echo esc_html( CORA_WORKSPACE_VERSION ); ?></strong>.<br>
-                                    Last checked: <span id="cora-last-check-text" class="font-medium"><?php 
-                                        $last_checked = get_option( 'cora_workspace_last_update_check_time', 'Never' );
-                                        if ( 'Never' !== $last_checked ) {
-                                            $last_checked = mysql2date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $last_checked );
-                                        }
-                                        echo esc_html( $last_checked );
-                                    ?></span>.
-                                </p>
+                        <!-- Default: Up-to-Date Compact Banner -->
+                        <div id="cora-updates-state-uptodate" class="<?php echo $update_available ? 'hidden' : ''; ?> p-4 bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/80 rounded-xl flex items-center justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/20">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 m-0 flex items-center gap-2">
+                                        <span>Your Workspace is Up to Date</span>
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold">v<?php echo esc_html( CORA_WORKSPACE_VERSION ); ?></span>
+                                    </h4>
+                                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 m-0">
+                                        Last checked: <span id="cora-last-check-text" class="font-medium"><?php 
+                                            $last_checked = get_option( 'cora_workspace_last_update_check_time', 'Never' );
+                                            if ( 'Never' !== $last_checked ) {
+                                                $last_checked = mysql2date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $last_checked );
+                                            }
+                                            echo esc_html( $last_checked );
+                                        ?></span>.
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
                         <!-- State: Checking for Updates -->
-                        <div id="cora-updates-state-checking" class="hidden space-y-3">
-                            <div class="inline-flex p-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-2xl mx-auto">
-                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2.2" fill="none" class="animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                        <div id="cora-updates-state-checking" class="hidden p-4 bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-xl flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0">
+                                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" fill="none" class="animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
                             </div>
                             <div>
-                                <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Checking for Updates...</h4>
-                                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Connecting to the secure release shipment server.</p>
+                                <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 m-0">Checking for Updates...</h4>
+                                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 m-0">Connecting to secure release shipment server.</p>
                             </div>
                         </div>
 
-                        <!-- State: Update Available Card -->
+                        <!-- State: Update Available Banner Card -->
                         <div id="cora-updates-state-available" class="<?php echo $update_available ? '' : 'hidden'; ?> w-full text-left animate-in fade-in duration-200">
-                            <div class="border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 bg-white dark:bg-zinc-950 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 shadow-3xs select-none">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 rounded-xl bg-zinc-950 dark:bg-zinc-100 flex items-center justify-center text-white dark:text-zinc-950 shrink-0 shadow-sm">
-                                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.2" fill="none" class="animate-pulse"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                            <div class="border border-blue-500/30 dark:border-blue-500/20 rounded-xl p-4 bg-blue-500/5 dark:bg-blue-500/10 flex items-center justify-between gap-4">
+                                <div class="flex items-center gap-3.5">
+                                    <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" fill="none" class="animate-pulse"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                                     </div>
                                     <div>
-                                        <span class="inline-block text-[9px] font-extrabold bg-zinc-950 text-white dark:bg-zinc-100 dark:text-zinc-950 px-2 py-0.5 rounded tracking-wide uppercase leading-none mb-1.5">UPDATE AVAILABLE</span>
-                                        <h3 class="text-sm font-bold text-zinc-900 dark:text-white leading-tight">Cora Workspace Platform <span id="cora-available-version-text">v<?php echo esc_html( $info['version'] ?? CORA_WORKSPACE_VERSION ); ?></span></h3>
-                                        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Your current installed version is v<?php echo esc_html( CORA_WORKSPACE_VERSION ); ?>.</p>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-[9px] font-extrabold bg-blue-600 text-white px-2 py-0.5 rounded tracking-wide uppercase leading-none">UPDATE AVAILABLE</span>
+                                            <span class="text-xs font-bold text-zinc-900 dark:text-white">v<?php echo esc_html( $info['version'] ?? CORA_WORKSPACE_VERSION ); ?></span>
+                                        </div>
+                                        <p class="text-[11px] text-zinc-600 dark:text-zinc-300 mt-1 m-0">Current installed version: <strong>v<?php echo esc_html( CORA_WORKSPACE_VERSION ); ?></strong></p>
                                     </div>
                                 </div>
-                                
-                                <button type="button" onclick="coraTriggerInAppUpgradeManual();" class="w-full sm:w-auto h-10 px-5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.98]">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="rotate-180"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"/></svg>
-                                    Upgrade Workspace Now
-                                </button>
                             </div>
                         </div>
 
                         <!-- State: Upgrade Progress Indicator -->
-                        <div id="cora-updates-state-progress" class="hidden w-full text-left space-y-4 animate-in fade-in duration-200">
-                            <div class="p-5 bg-zinc-50 dark:bg-zinc-900/60 rounded-xl border border-zinc-150 dark:border-zinc-800/60 space-y-4">
+                        <div id="cora-updates-state-progress" class="hidden w-full text-left space-y-3 animate-in fade-in duration-200">
+                            <div class="p-4 bg-zinc-50 dark:bg-zinc-900/60 rounded-xl border border-zinc-150 dark:border-zinc-800/60 space-y-3">
                                 <div class="flex items-center justify-between text-xs">
                                     <span class="font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                                         <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.5" fill="none" class="animate-spin text-zinc-500 shrink-0"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
@@ -2560,71 +2516,62 @@ $cora_settings_tabs = array(
                                     </span>
                                     <span class="font-bold text-zinc-900 dark:text-zinc-100" id="cora-upgrade-percent-text">0%</span>
                                 </div>
-                                
-                                <!-- Progress Bar Container -->
                                 <div class="h-2 w-full bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
                                     <div id="cora-upgrade-progress-bar" class="h-full bg-zinc-950 dark:bg-white w-0 transition-all duration-350 ease-out rounded-full"></div>
                                 </div>
-                                
                                 <p class="text-[10px] text-zinc-500 leading-normal m-0" id="cora-upgrade-desc-text">
-                                    Please do not close or reload this page. The system is downloading and extracting the latest workspace files.
+                                    Please do not close or reload this page. Extracting workspace files.
                                 </p>
                             </div>
                         </div>
 
                         <!-- State: Error State -->
-                        <div id="cora-updates-state-error" class="hidden space-y-3 max-w-md">
-                            <div class="inline-flex p-3 bg-red-500/10 text-red-650 dark:text-red-405 rounded-2xl mx-auto border border-red-200/20">
-                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Connection Failed</h4>
-                                <p id="cora-error-message-text" class="text-xs text-red-600 dark:text-red-450 mt-1 leading-relaxed">
-                                    Failed to query release details. Please make sure the local server is connected to the internet and can resolve GitHub APIs.
-                                </p>
-                            </div>
+                        <div id="cora-updates-state-error" class="hidden space-y-2 p-4 bg-red-500/5 dark:bg-red-500/10 border border-red-200 dark:border-red-800/30 rounded-xl">
+                            <h4 class="text-xs font-bold text-red-600 dark:text-red-400 m-0">Connection Failed</h4>
+                            <p id="cora-error-message-text" class="text-[11px] text-red-500 m-0">Failed to query release details from update server.</p>
                         </div>
 
                     </div>
 
-                    <!-- Changelog Timeline Accordion Section -->
-                    <div class="space-y-4 pt-4 border-t border-zinc-100 dark:border-zinc-850">
-                        <div class="flex items-center justify-between border-b border-zinc-150 dark:border-zinc-800/80 pb-3">
+                    <!-- Changelog Section -->
+                    <div class="space-y-3 pt-2">
+                        <div class="flex items-center justify-between border-b border-zinc-150 dark:border-zinc-800/80 pb-2.5">
                             <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider m-0">Changelog & Features</h4>
-                            <button type="button" id="cora-settings-expand-btn" onclick="coraToggleSettingsExpandAll(this);" class="h-8 px-3 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-850 text-zinc-750 dark:text-zinc-300 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-3xs">
+                            <button type="button" id="cora-settings-expand-btn" onclick="coraToggleSettingsExpandAll(this);" class="h-7 px-3 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-850 text-zinc-750 dark:text-zinc-300 rounded-lg text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-3xs">
                                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
                                 <span>Expand All</span>
                             </button>
                         </div>
 
-                        <!-- Dynamic Accordion Timeline -->
-                        <div id="cora-settings-changelog-timeline" class="py-2 space-y-3"></div>
+                        <!-- Dynamic Compact Version Cards -->
+                        <div id="cora-settings-changelog-timeline" class="space-y-2.5 py-1"></div>
 
-                        <!-- Hidden Raw Box Fallback for JS Parser -->
+                        <!-- Hidden Raw Box Fallback -->
                         <div id="cora-update-changelog-box" class="hidden">
                             <?php echo $info['sections']['changelog'] ?? ''; ?>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Footer Action Row -->
-                    <div class="border-t border-zinc-100 dark:border-zinc-850 pt-4 flex items-center justify-between flex-wrap gap-4 mt-6">
-                        <div class="text-[10px] text-zinc-400 select-none font-medium">
-                            Official Shipment Channel: Production Stable (GitHub)
-                        </div>
-                        
-                        <div class="flex items-center gap-2">
-                            <!-- Check Button -->
-                            <button type="button" id="cora-btn-updates-check" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-97 select-none" onclick="coraCheckForUpdatesManual()">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" id="cora-icon-updates-check" class="shrink-0"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
-                                <span id="cora-btn-updates-check-label">Check for Updates</span>
-                            </button>
+                <!-- STICKY BOTTOM CTA BAR -->
+                <div class="sticky bottom-0 z-30 bg-white/95 dark:bg-zinc-950/95 backdrop-blur border-t border-zinc-200 dark:border-zinc-800/80 px-6 py-3.5 flex items-center justify-between flex-wrap gap-4 select-none shadow-md mt-6">
+                    <div class="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span>Shipment Channel: <strong>Production Stable (GitHub)</strong></span>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <!-- Check Button -->
+                        <button type="button" id="cora-btn-updates-check" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-97 select-none" onclick="coraCheckForUpdatesManual()">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" id="cora-icon-updates-check" class="shrink-0"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                            <span id="cora-btn-updates-check-label">Check for Updates</span>
+                        </button>
 
-                            <!-- Upgrade Button (hidden initially unless update available) -->
-                            <button type="button" id="cora-btn-updates-upgrade" class="<?php echo $update_available ? '' : 'hidden'; ?> px-4.5 py-2 bg-zinc-950 hover:bg-zinc-850 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-97 select-none" onclick="coraTriggerInAppUpgradeManual()">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                                <span>Upgrade Workspace Now</span>
-                            </button>
-                        </div>
+                        <!-- Upgrade Button (sticky CTA) -->
+                        <button type="button" id="cora-btn-updates-upgrade" class="<?php echo $update_available ? '' : 'hidden'; ?> px-4.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-97 select-none" onclick="coraTriggerInAppUpgradeManual()">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                            <span>Upgrade Workspace Now</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -2666,17 +2613,16 @@ $cora_settings_tabs = array(
                 return versions;
             }
 
-            function coraToggleSettingsAccordion(itemId) {
-                const content = document.getElementById(`content-${itemId}`);
-                const chevron = document.getElementById(`chevron-${itemId}`);
+            function coraToggleVersionCard(rIdx) {
+                const content = document.getElementById(`content-ver-${rIdx}`);
+                const chevron = document.getElementById(`chevron-ver-${rIdx}`);
                 if (content && chevron) {
-                    const svg = chevron.querySelector('svg');
                     if (content.classList.contains('open')) {
                         content.classList.remove('open');
-                        if (svg) svg.style.transform = 'rotate(0deg)';
+                        chevron.style.transform = 'rotate(0deg)';
                     } else {
                         content.classList.add('open');
-                        if (svg) svg.style.transform = 'rotate(180deg)';
+                        chevron.style.transform = 'rotate(180deg)';
                     }
                 }
             }
@@ -2685,16 +2631,14 @@ $cora_settings_tabs = array(
                 const span = btn.querySelector('span');
                 const isExpand = span.innerText === 'Expand All';
                 const contents = document.querySelectorAll('#cora-settings-changelog-timeline .cora-update-accordion-content');
-                contents.forEach(content => {
-                    const itemId = content.id.replace('content-', '');
-                    const chevron = document.getElementById(`chevron-${itemId}`);
-                    const svg = chevron ? chevron.querySelector('svg') : null;
+                contents.forEach((content, index) => {
+                    const chevron = document.getElementById(`chevron-ver-${index}`);
                     if (isExpand) {
                         content.classList.add('open');
-                        if (svg) svg.style.transform = 'rotate(180deg)';
+                        if (chevron) chevron.style.transform = 'rotate(180deg)';
                     } else {
                         content.classList.remove('open');
-                        if (svg) svg.style.transform = 'rotate(0deg)';
+                        if (chevron) chevron.style.transform = 'rotate(0deg)';
                     }
                 });
                 if (isExpand) {
@@ -2720,62 +2664,65 @@ $cora_settings_tabs = array(
 
                 if (!releases || !releases.length) return;
 
-                let html = '<div class="cora-update-timeline">';
+                let html = '';
                 releases.forEach((rel, rIdx) => {
                     const isLatest = rIdx === 0;
+                    const mainTitle = rel.items[0] ? rel.items[0].title : 'Release Updates';
+                    
                     html += `
-                        <div class="cora-update-timeline-item ${isLatest ? 'active' : ''}">
-                            <div class="cora-update-timeline-dot"></div>
-                            <div class="flex flex-col md:flex-row gap-4 md:gap-6">
-                                <div class="w-24 shrink-0 pt-1 select-none">
-                                    <span class="text-sm font-extrabold text-zinc-900 dark:text-zinc-50">v${rel.version}</span>
-                                    ${isLatest ? '<span class="block mt-1 text-[9px] font-bold text-zinc-550 border border-zinc-200 dark:border-zinc-800 rounded px-1.5 py-0.5 w-max bg-zinc-50 dark:bg-zinc-950 uppercase tracking-wide">Latest</span>' : ''}
+                        <div class="cora-update-card-accordion border border-zinc-200 dark:border-zinc-800/80 rounded-xl bg-white dark:bg-zinc-900 overflow-hidden shadow-3xs">
+                            <!-- Version Card Header -->
+                            <div class="p-3 bg-zinc-50/80 dark:bg-zinc-900/80 hover:bg-zinc-100/70 dark:hover:bg-zinc-850 flex items-center justify-between cursor-pointer select-none" onclick="coraToggleVersionCard('${rIdx}')">
+                                <div class="flex items-center gap-2.5 min-w-0 pr-2">
+                                    <span class="px-2 py-0.5 rounded text-xs font-mono font-bold bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 shrink-0">v${rel.version}</span>
+                                    ${isLatest ? '<span class="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wide bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0">LATEST</span>' : ''}
+                                    <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200 truncate">${mainTitle}</span>
                                 </div>
-                                <div class="flex-1 space-y-3">
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <span class="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500">${rel.items.length} ${rel.items.length === 1 ? 'change' : 'changes'}</span>
+                                    <span id="chevron-ver-${rIdx}" class="text-zinc-400 transition-transform duration-200" style="display:inline-block; transform: ${isLatest ? 'rotate(180deg)' : 'rotate(0deg)'};">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"/></svg>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Collapsible List Body -->
+                            <div class="cora-update-accordion-content ${isLatest ? 'open' : ''} p-4 space-y-3 bg-white dark:bg-zinc-900 border-t border-zinc-150 dark:border-zinc-850" id="content-ver-${rIdx}">
                     `;
 
-                    rel.items.forEach((item, iIdx) => {
-                        let svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 dark:text-zinc-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
+                    rel.items.forEach((item) => {
+                        let svgIcon = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 dark:text-zinc-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
                         
                         const tLower = item.title.toLowerCase();
                         if (tLower.includes('lock') || tLower.includes('security') || tLower.includes('privilege') || tLower.includes('scoping')) {
-                            svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-amber-500"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+                            svgIcon = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-amber-500"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
                         } else if (tLower.includes('ui') || tLower.includes('redesign') || tLower.includes('onboarding') || tLower.includes('screen')) {
-                            svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-blue-500"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+                            svgIcon = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-blue-500"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
                         } else if (tLower.includes('fix') || tLower.includes('bug') || tLower.includes('hotfix')) {
-                            svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-emerald-500"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`;
+                            svgIcon = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-emerald-500"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`;
                         } else if (tLower.includes('optimization') || tLower.includes('speed') || tLower.includes('performance')) {
-                            svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-purple-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`;
+                            svgIcon = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-purple-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`;
                         }
 
-                        const itemId = `settings-acc-${rIdx}-${iIdx}`;
                         html += `
-                            <div class="cora-update-row-hover bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-xl p-4 cursor-pointer transition-all duration-200" onclick="coraToggleSettingsAccordion('${itemId}')">
-                                <div class="flex items-center justify-between gap-3 select-none">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-lg bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center shrink-0 border border-zinc-100 dark:border-zinc-700/50">
-                                            ${svgIcon}
-                                        </div>
-                                        <span class="text-xs font-bold text-zinc-900 dark:text-white">${item.title}</span>
-                                    </div>
-                                    <span class="text-zinc-400 dark:text-zinc-500 shrink-0" id="chevron-${itemId}">
-                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="transition-transform duration-300 transform" style="transform: rotate(180deg);"><polyline points="6 9 12 15 18 9"/></svg>
-                                    </span>
+                            <div class="flex items-start gap-2.5 text-xs leading-relaxed">
+                                <div class="w-6 h-6 rounded bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center shrink-0 mt-0.5 border border-zinc-200/60 dark:border-zinc-700/60">
+                                    ${svgIcon}
                                 </div>
-                                <div class="cora-update-accordion-content open mt-3 pl-11 text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed" id="content-${itemId}">
-                                    ${item.desc}
+                                <div class="flex-1">
+                                    <strong class="font-bold text-zinc-900 dark:text-zinc-100 mr-1">${item.title}:</strong>
+                                    <span class="text-zinc-600 dark:text-zinc-400">${item.desc}</span>
                                 </div>
                             </div>
                         `;
                     });
 
                     html += `
-                                </div>
                             </div>
                         </div>
                     `;
                 });
-                html += '</div>';
+
                 container.innerHTML = html;
             }
 
