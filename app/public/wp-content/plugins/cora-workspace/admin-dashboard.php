@@ -3268,7 +3268,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             </select>
                         </div>
 
-                        <?php if ( cora_is_super_owner() || in_array( $current_user_role, array('administrator','cora_super_admin') ) ) : ?>
+                        <?php if ( cora_is_super_owner() ) : ?>
                         <div class="border-t border-zinc-100 dark:border-zinc-850 my-1"></div>
                         <div class="px-2 py-1.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl space-y-1 select-none">
                             <div class="flex items-center justify-between px-1">
@@ -3547,7 +3547,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             </div>
             <?php endif; ?>
 
-            <?php if ( cora_is_super_owner() || in_array( $current_user_role, array('administrator', 'cora_super_admin') ) ) : ?>
+            <?php if ( cora_is_super_owner() ) : ?>
             <!-- Role Switcher Toggle Widget (Sidebar Header) -->
             <div class="px-3 pb-1 pt-1">
                 <div class="cora-role-switcher-card flex items-center justify-between gap-2 px-2.5 py-1.5 bg-zinc-100/70 hover:bg-zinc-100 dark:bg-zinc-900/80 dark:hover:bg-zinc-850 border border-zinc-200/80 dark:border-zinc-800 rounded-lg transition-all select-none">
@@ -3691,7 +3691,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         </select>
                     </div>
 
-                    <?php if ( cora_is_super_owner() || in_array( $current_user_role, array('administrator','cora_super_admin') ) ) : ?>
+                    <?php if ( cora_is_super_owner() ) : ?>
                     <div class="border-t border-zinc-100 dark:border-zinc-850 my-1"></div>
                     <div class="px-2 py-1.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl space-y-1 select-none">
                         <div class="flex items-center justify-between px-1">
@@ -3710,7 +3710,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <?php endif; ?>
                 </div>
 
-                <?php if ( in_array( $current_user_role, array( 'administrator', 'cora_shruti', 'cora_super_admin' ) ) ) : ?>
+                <?php if ( cora_is_super_owner() ) : ?>
                 <div class="border-t border-zinc-100 dark:border-zinc-850"></div>
                 <div id="cora-in-app-update-notice" class="hidden px-2 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl flex flex-col gap-1.5">
                     <div class="flex items-center gap-1.5">
@@ -10718,7 +10718,7 @@ wp_print_footer_scripts();
     });
 
     // Check for plugin updates in-app
-    <?php if ( in_array( $current_user_role, array( 'administrator', 'cora_shruti', 'cora_super_admin' ) ) ) : ?>
+    <?php if ( cora_is_super_owner() ) : ?>
     setTimeout(function() {
         $.post(coraREData.ajaxUrl, {
             action: 'cora_check_plugin_update',
