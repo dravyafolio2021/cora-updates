@@ -2824,13 +2824,17 @@ $cora_settings_tabs = array(
                 if (res.success) {
                     jQuery('#cora-last-check-text').text(res.data.last_checked);
                     
+                    if (res.data.changelog) {
+                        jQuery('#cora-update-changelog-box').html(res.data.changelog);
+                    }
+                    
+                    coraRenderSettingsUpdateTimeline();
+                    
                     if (res.data.update_available) {
                         jQuery('#cora-avail-ver-pill').text('v' + res.data.new_version);
                         jQuery('#cora-avail-target-ver').text('v' + res.data.new_version);
                         
                         if (res.data.changelog) {
-                            jQuery('#cora-update-changelog-box').html(res.data.changelog);
-                            
                             var tempDiv = document.createElement('div');
                             tempDiv.innerHTML = res.data.changelog;
                             var firstUl = tempDiv.querySelector('ul');
@@ -2839,15 +2843,16 @@ $cora_settings_tabs = array(
                             }
                         }
                         
-                        coraRenderSettingsUpdateTimeline();
-                        
                         jQuery('#cora-updates-state-available').removeClass('hidden');
+                        jQuery('#cora-updates-state-uptodate').addClass('hidden');
                         jQuery('#cora-btn-updates-upgrade').removeClass('hidden');
                         
                         if (window.coraShowToast) window.coraShowToast('New update v' + res.data.new_version + ' is available!', 'success');
                     } else {
                         jQuery('#cora-updates-state-uptodate').removeClass('hidden');
-                        if (window.coraShowToast) window.coraShowToast('Your workspace is already up to date.');
+                        jQuery('#cora-updates-state-available').addClass('hidden');
+                        jQuery('#cora-btn-updates-upgrade').addClass('hidden');
+                        if (window.coraShowToast) window.coraShowToast('Your workspace is up to date on v' + res.data.current_version + '.');
                     }
                 } else {
                         jQuery('#cora-updates-state-uptodate').removeClass('hidden');

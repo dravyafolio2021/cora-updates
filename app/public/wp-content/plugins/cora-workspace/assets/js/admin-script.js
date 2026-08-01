@@ -1040,13 +1040,12 @@ jQuery(document).ready(function($) {
     });
 
     $(document).on('click', function(e) {
-        // Close popover if clicked outside profile card area
-        if (!$(e.target).closest('#cora-profile-popover').length && !$(e.target).closest('.cora-user-settings-btn').length) {
-            $('#cora-profile-popover').addClass('hidden');
-        }
-        // Close header profile popover if clicked outside
-        if (!$(e.target).closest('#cora-header-profile-popover').length && !$(e.target).closest('.cora-header-profile-btn').length) {
-            $('#cora-header-profile-popover').addClass('hidden');
+        if (!$(e.target).closest('#cora-profile-popover, .cora-user-settings-btn, #cora-header-profile-popover, .cora-header-profile-btn, #cora-header-punch-popover, #cora-header-punch-btn, #cora-mobile-punch-popover, #cora-mobile-punch-btn, #cora-workspace-popover, .cora-workspace-card, #cora-sidebar-notif-popover, .cora-user-inbox').length) {
+            if (typeof window.coraCloseAllPopovers === 'function') {
+                window.coraCloseAllPopovers();
+            } else {
+                $('#cora-profile-popover, #cora-header-profile-popover, #cora-header-punch-popover, #cora-mobile-punch-popover, #cora-workspace-popover, #cora-sidebar-notif-popover').addClass('hidden');
+            }
         }
     });
 

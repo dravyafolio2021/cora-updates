@@ -44,6 +44,11 @@ class Cora_Workspace_Updater {
         $transient_key = 'cora_workspace_update_info';
         $info = get_transient( $transient_key );
 
+        // If cached info version is less than or equal to current version, force refetch
+        if ( is_array( $info ) && isset( $info['version'] ) && version_compare( $info['version'], CORA_WORKSPACE_VERSION, '<=' ) ) {
+            $force = true;
+        }
+
         if ( false === $info || $force ) {
             $url = $this->get_update_url();
             
@@ -71,8 +76,8 @@ class Cora_Workspace_Updater {
                 return false;
             }
 
-            // Cache it for 12 hours
-            set_transient( $transient_key, $info, 12 * HOUR_IN_SECONDS );
+            // Cache it for 5 minutes
+            set_transient( $transient_key, $info, 5 * MINUTE_IN_SECONDS );
             update_option( 'cora_workspace_last_update_check_time', current_time( 'mysql' ) );
         }
 
