@@ -102,122 +102,330 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             background-color: var(--bg-color);
             color: var(--text-primary);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             min-height: 100vh;
-            padding: 24px 16px;
+            margin: 0;
             transition: background-color 0.3s, color 0.3s;
             overflow-x: hidden;
         }
 
-        /* ── Layout Container ──────────────────────────────────── */
-        #onboarding-shell {
-            width: 100%;
-            max-width: 460px;
-            position: relative;
-        }
-
-        /* ── Step Progress Bar ─────────────────────────────────── */
-        .step-progress {
+        /* ── Layout Wrapper ────────────────────────────────────── */
+        #onboarding-page-container {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0;
-            margin-bottom: 32px;
-            padding: 0 20px;
+            min-height: 100vh;
+            width: 100%;
         }
 
-        .step-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--step-inactive);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        #onboarding-brand-sidebar {
+            width: 420px;
+            background: linear-gradient(135deg, #e8f7f2 0%, #fbfdfc 100%);
+            border-right: 1px solid var(--border-color);
+            padding: 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
             flex-shrink: 0;
             position: relative;
+            overflow: hidden;
         }
 
-        .step-dot.active {
-            background: var(--step-active);
-            width: 12px;
-            height: 12px;
-            box-shadow: 0 0 0 4px rgba(24,24,27,0.06);
+        .cora-dark-theme #onboarding-brand-sidebar {
+            background: linear-gradient(135deg, #0a1714 0%, #09090b 100%);
+            border-color: #27272a;
         }
 
-        .cora-dark-theme .step-dot.active {
-            box-shadow: 0 0 0 4px rgba(244,244,245,0.06);
-        }
-
-        .step-dot.done {
-            background: var(--step-done);
-        }
-
-        .step-line {
+        #onboarding-form-area {
             flex: 1;
-            height: 2px;
-            background: var(--step-inactive);
-            max-width: 48px;
-            transition: background 0.4s ease;
-        }
-
-        .step-line.done {
-            background: var(--step-done);
-        }
-
-        /* ── Card ──────────────────────────────────────────────── */
-        .ob-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 36px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 24px;
+            overflow-y: auto;
             position: relative;
-            overflow: hidden;
         }
 
-        /* ── Steps Container ───────────────────────────────────── */
-        .steps-viewport {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .step-panel {
-            display: none;
-            animation: fadeSlideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-
-        .step-panel.active {
-            display: block;
-        }
-
-        @keyframes fadeSlideIn {
-            from { opacity: 0; transform: translateX(24px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        /* ── Wordmark ──────────────────────────────────────────── */
-        .cora-wordmark {
+        /* ── Brand Sidebar Elements ────────────────────────────── */
+        .brand-sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-size: 11px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.12em;
+            color: var(--text-primary);
+            user-select: none;
+        }
+
+        .brand-sidebar-content {
+            margin-top: auto;
+            margin-bottom: auto;
+            max-width: 320px;
+            z-index: 2;
+        }
+
+        .brand-sidebar-title {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.15;
+            color: var(--text-primary);
+            margin-bottom: 14px;
+        }
+
+        .brand-title-accent {
+            font-family: Georgia, serif;
+            font-style: italic;
+            font-weight: 400;
+            color: var(--text-primary);
+        }
+
+        .brand-sidebar-desc {
+            font-size: 13px;
+            line-height: 1.6;
             color: var(--text-secondary);
-            margin-bottom: 28px;
+        }
+
+        /* ── CSS-only 3D Scene ─────────────────────────────────── */
+        .cora-scene-container {
+            position: relative;
+            width: 280px;
+            height: 200px;
+            margin: 40px auto 0 auto;
+            perspective: 800px;
+            z-index: 1;
+        }
+
+        .cora-scene-pedestal {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%) rotateX(65deg);
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.08);
+            border: 2.2px dashed rgba(16, 185, 129, 0.22);
+            box-shadow: 0 0 24px rgba(16, 185, 129, 0.04);
+        }
+
+        .cora-scene-logo-card {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 72px;
+            height: 72px;
+            border-radius: 16px;
+            background: #09090b;
+            color: #ffffff;
             display: flex;
             align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 32px rgba(9, 9, 11, 0.15);
+            animation: floatLogo 4.2s ease-in-out infinite;
+            z-index: 3;
+        }
+
+        .cora-dark-theme .cora-scene-logo-card {
+            background: #ffffff;
+            color: #09090b;
+            box-shadow: 0 12px 32px rgba(255, 255, 255, 0.08);
+        }
+
+        .cora-scene-widget {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.75);
+            border: 1.5px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+            padding: 14px;
+            box-shadow: 0 8px 32px rgba(9, 9, 11, 0.03);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 2;
+        }
+
+        .cora-dark-theme .cora-scene-widget {
+            background: rgba(17, 17, 19, 0.75);
+            border-color: rgba(16, 185, 129, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .widget-left {
+            bottom: 80px;
+            left: 15px;
+            width: 100px;
+            height: 64px;
+            animation: floatLeftWidget 4.8s ease-in-out infinite;
+            display: flex;
+            flex-direction: column;
             gap: 6px;
         }
 
-        .cora-wordmark svg { flex-shrink: 0; }
+        .widget-right {
+            bottom: 70px;
+            right: 15px;
+            width: 100px;
+            height: 64px;
+            animation: floatRightWidget 4.0s ease-in-out infinite;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 6px;
+        }
 
-        /* ── Typography ────────────────────────────────────────── */
+        .widget-profile-line {
+            height: 4px;
+            background: rgba(16, 185, 129, 0.2);
+            border-radius: 2px;
+        }
+
+        .line-short { width: 35%; }
+        .line-medium { width: 65%; }
+        .line-long { width: 85%; }
+
+        .widget-chart-bar {
+            width: 14px;
+            background: rgba(16, 185, 129, 0.25);
+            border-radius: 3px 3px 0 0;
+        }
+
+        @keyframes floatLogo {
+            0%, 100% { transform: translate(-50%, 0px); }
+            50% { transform: translate(-50%, -12px); }
+        }
+        @keyframes floatLeftWidget {
+            0%, 100% { transform: translateY(0px) rotate(-4deg); }
+            50% { transform: translateY(-9px) rotate(-1deg); }
+        }
+        @keyframes floatRightWidget {
+            0%, 100% { transform: translateY(0px) rotate(4deg); }
+            50% { transform: translateY(-8px) rotate(1deg); }
+        }
+
+        /* ── Onboarding Shell ──────────────────────────────────── */
+        #onboarding-shell {
+            width: 100%;
+            max-width: 480px;
+            transition: max-width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        .ob-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 4px 32px rgba(9, 9, 11, 0.03);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        /* ── Progress Indicator ────────────────────────────────── */
+        .step-progress-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 440px;
+            margin: 0 auto 36px auto;
+            padding: 0 4px;
+        }
+
+        .step-indicator-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-indicator-circle {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-tertiary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .step-indicator-label {
+            margin-top: 8px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .step-indicator-circle .step-check {
+            display: none;
+        }
+
+        .step-indicator-line {
+            flex: 1;
+            height: 2px;
+            background: var(--border-color);
+            margin: 0 -4px;
+            transform: translateY(-16px);
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .step-indicator-item.active .step-indicator-circle {
+            border-color: var(--text-primary);
+            background: var(--text-primary);
+            color: var(--card-bg);
+            box-shadow: 0 0 0 4px rgba(24,24,27,0.06);
+        }
+
+        .cora-dark-theme .step-indicator-item.active .step-indicator-circle {
+            box-shadow: 0 0 0 4px rgba(244,244,245,0.06);
+        }
+
+        .step-indicator-item.active .step-indicator-label {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .step-indicator-item.done .step-indicator-circle {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        .step-indicator-item.done .step-indicator-circle .step-num {
+            display: none;
+        }
+
+        .step-indicator-item.done .step-indicator-circle .step-check {
+            display: block;
+            color: #ffffff;
+        }
+
+        .step-indicator-item.done .step-indicator-label {
+            color: var(--text-secondary);
+        }
+
+        .step-indicator-line.done {
+            background: var(--accent);
+        }
+
+        /* ── Typography & Forms ────────────────────────────────── */
         .ob-title {
-            margin: 0 0 6px;
-            font-size: 22px;
+            margin: 0 0 8px;
+            font-size: 24px;
             font-weight: 800;
-            letter-spacing: -0.03em;
-            line-height: 1.25;
+            letter-spacing: -0.04em;
+            line-height: 1.2;
+            color: var(--text-primary);
         }
 
         .ob-subtitle {
@@ -227,77 +435,9 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             line-height: 1.5;
         }
 
-        /* ── Google Button ─────────────────────────────────────── */
-        .google-btn {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 11px 14px;
-            background: var(--card-bg);
-            border: 1.5px solid var(--border-color);
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            position: relative;
-        }
-
-        .google-btn:hover {
-            background: var(--input-hover-bg);
-            border-color: var(--card-hover-border);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-
-        .google-pill {
-            position: absolute;
-            top: -8px;
-            right: 12px;
-            background: var(--accent-bg);
-            color: var(--accent);
-            font-size: 9px;
-            font-weight: 700;
-            text-transform: uppercase;
-            padding: 2px 6px;
-            border-radius: 4px;
-            letter-spacing: 0.05em;
-            border: 1px solid rgba(16,185,129,0.2);
-        }
-
-        /* ── Divider ───────────────────────────────────────────── */
-        .divider {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 20px 0;
-            color: var(--text-tertiary);
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-        }
-
-        .divider::before, .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border-color);
-        }
-
-        /* ── Form Elements ─────────────────────────────────────── */
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             position: relative;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
         }
 
         label {
@@ -310,16 +450,37 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             color: var(--text-secondary);
         }
 
+        /* Input Prefix Styling */
+        .input-group-with-icon {
+            position: relative;
+        }
+
+        .input-group-with-icon .input-icon-prefix {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-group-with-icon input {
+            padding-left: 44px !important;
+        }
+
         input[type="text"],
         input[type="email"],
         input[type="password"],
         input[type="tel"] {
             width: 100%;
-            padding: 10px 14px;
+            padding: 11px 14px;
             font-size: 14px;
             background: var(--input-bg);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 10px;
             color: var(--text-primary);
             outline: none;
             transition: border-color 0.2s, box-shadow 0.2s;
@@ -328,17 +489,18 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
 
         input:focus {
             border-color: var(--text-primary);
-            box-shadow: 0 0 0 3px rgba(24,24,27,0.07);
+            box-shadow: 0 0 0 3px rgba(24,24,27,0.06);
         }
 
         .cora-dark-theme input:focus {
-            box-shadow: 0 0 0 3px rgba(244,244,245,0.05);
+            box-shadow: 0 0 0 3px rgba(244,244,245,0.04);
         }
 
         .pw-toggle {
             position: absolute;
-            right: 12px;
-            top: 31px;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
             background: none;
             border: none;
             color: var(--text-secondary);
@@ -346,34 +508,110 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             padding: 0;
             display: flex;
             align-items: center;
+            z-index: 5;
         }
 
         .pw-toggle:hover { color: var(--text-primary); }
 
-        /* ── Buttons ───────────────────────────────────────────── */
         .submit-btn {
             width: 100%;
-            padding: 11px;
+            padding: 12px;
             background: var(--btn-bg);
             color: var(--btn-text);
             border: none;
-            border-radius: 10px;
-            font-size: 13px;
+            border-radius: 12px;
+            font-size: 14px;
             font-weight: 700;
             cursor: pointer;
             transition: background 0.15s, transform 0.1s, opacity 0.2s;
-            margin-top: 4px;
+            margin-top: 8px;
             font-family: inherit;
-            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .submit-btn:hover { background: var(--btn-hover); }
         .submit-btn:active { transform: scale(0.98); }
         .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-        /* ── Footer Links ──────────────────────────────────────── */
+        .helper-text {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-top: 6px;
+        }
+
+        .step-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-tertiary);
+            margin-bottom: 8px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 24px 0;
+            color: var(--text-tertiary);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .google-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px;
+            background: var(--card-bg);
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .google-btn:hover {
+            background: var(--input-hover-bg);
+            border-color: var(--card-hover-border);
+            box-shadow: 0 2px 10px rgba(9, 9, 11, 0.04);
+        }
+
+        .google-pill {
+            position: absolute;
+            top: -8px;
+            right: 12px;
+            background: var(--accent-bg);
+            color: var(--accent);
+            font-size: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 4px;
+            letter-spacing: 0.05em;
+            border: 1px solid rgba(16,185,129,0.18);
+        }
+
         .footer-link {
-            margin-top: 22px;
+            margin-top: 24px;
             text-align: center;
             font-size: 12px;
             color: var(--text-secondary);
@@ -387,15 +625,26 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
 
         .footer-link a:hover { text-decoration: underline; }
 
-        /* ── Inbox State (Email Verify) ────────────────────────── */
+        .secure-footer-text {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-top: 20px;
+            font-weight: 500;
+        }
+
+        /* ── Inbox state ───────────────────────────────────────── */
         #inbox-state {
             display: none;
             text-align: center;
         }
 
         .inbox-icon {
-            width: 56px;
-            height: 56px;
+            width: 52px;
+            height: 52px;
             background: var(--bg-color);
             border: 1.5px solid var(--border-color);
             border-radius: 14px;
@@ -403,6 +652,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             align-items: center;
             justify-content: center;
             margin: 0 auto 20px;
+            color: var(--text-primary);
         }
 
         .inbox-title {
@@ -435,72 +685,83 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
 
         .resend-btn:hover { color: var(--text-primary); }
 
-        /* ── Industry Cards (Step 3) ───────────────────────────── */
+        /* ── Industry Grid & Cards (Step 3) ────────────────────── */
         .industry-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
         }
 
         .industry-card {
             border: 1.5px solid var(--border-color);
-            border-radius: 12px;
-            padding: 18px 20px;
+            border-radius: 14px;
+            padding: 24px 16px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
-            align-items: flex-start;
-            gap: 14px;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 12px;
+            background: var(--card-bg);
             position: relative;
         }
 
         .industry-card:hover {
             border-color: var(--card-hover-border);
             background: var(--input-hover-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(9, 9, 11, 0.03);
         }
 
         .industry-card.selected {
             border-color: var(--text-primary);
             background: var(--input-hover-bg);
+            box-shadow: 0 6px 20px rgba(9, 9, 11, 0.06);
         }
 
         .industry-card.selected::after {
             content: '';
             position: absolute;
             top: 12px;
-            right: 14px;
+            right: 12px;
             width: 8px;
             height: 8px;
             background: var(--accent);
             border-radius: 50%;
-            box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.18);
         }
 
         .industry-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
             background: var(--bg-color);
             border: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            color: var(--text-secondary);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
         }
 
-        .industry-info { flex: 1; min-width: 0; }
+        .industry-card.selected .industry-icon {
+            background: var(--text-primary);
+            color: var(--card-bg);
+            border-color: var(--text-primary);
+        }
 
         .industry-name {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             letter-spacing: -0.02em;
-            margin-bottom: 3px;
+            color: var(--text-primary);
         }
 
         .industry-desc {
-            font-size: 11.5px;
+            font-size: 11px;
             color: var(--text-secondary);
             line-height: 1.45;
         }
@@ -508,7 +769,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
         /* ── Activation State (Step 4) ─────────────────────────── */
         .activation-state {
             text-align: center;
-            padding: 20px 0;
+            padding: 24px 0;
         }
 
         .activation-spinner {
@@ -524,8 +785,8 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .activation-check {
-            width: 48px;
-            height: 48px;
+            width: 56px;
+            height: 56px;
             background: var(--accent);
             border-radius: 50%;
             display: none;
@@ -533,6 +794,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             justify-content: center;
             margin: 0 auto 24px;
             animation: scaleIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 0 8px rgba(16, 185, 129, 0.1);
         }
 
         @keyframes scaleIn {
@@ -541,10 +803,11 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
         }
 
         .activation-title {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 800;
-            letter-spacing: -0.03em;
+            letter-spacing: -0.04em;
             margin-bottom: 8px;
+            color: var(--text-primary);
         }
 
         .activation-sub {
@@ -553,7 +816,21 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             line-height: 1.5;
         }
 
-        /* ── Toast System ──────────────────────────────────────── */
+        .secure-badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--accent-bg);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent);
+            margin: 24px auto 0 auto;
+        }
+
+        /* ── Toast ─────────────────────────────────────────────── */
         #cora-toast-container {
             position: fixed;
             bottom: 24px;
@@ -577,53 +854,132 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             max-width: 340px;
         }
 
-        .cora-toast a { color: inherit; font-weight: 700; }
-
         @keyframes toastSlideIn {
             from { transform: translateY(20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
 
-        /* ── Helper ─────────────────────────────────────────────── */
-        .helper-text {
-            font-size: 11px;
-            color: var(--text-tertiary);
-            margin-top: 4px;
+        /* ── Responsive media breakpoints ──────────────────────── */
+        @media (max-width: 899px) {
+            #onboarding-page-container {
+                flex-direction: column;
+            }
+            #onboarding-brand-sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 36px 24px;
+                justify-content: center;
+                gap: 20px;
+            }
+            .brand-sidebar-content {
+                max-width: 100%;
+                margin: 0;
+            }
+            .cora-scene-container {
+                display: none;
+            }
+            #onboarding-form-area {
+                padding: 36px 16px;
+            }
+            #onboarding-shell {
+                max-width: 100% !important;
+            }
+            .industry-grid {
+                grid-template-columns: 1fr;
+            }
         }
-
-        .step-label {
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-tertiary);
-            margin-bottom: 14px;
-        }
-
-        /* ── Responsive ────────────────────────────────────────── */
-        @media (max-width: 480px) {
-            .ob-card { padding: 28px 20px; }
-            .form-row { grid-template-columns: 1fr; gap: 0; }
-            #onboarding-shell { max-width: 100%; }
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
 
-<div id="onboarding-shell">
-    <!-- Step Progress -->
-    <div class="step-progress" id="step-progress">
-        <div class="step-dot" data-step="1"></div>
-        <div class="step-line" data-line="1"></div>
-        <div class="step-dot" data-step="2"></div>
-        <div class="step-line" data-line="2"></div>
-        <div class="step-dot" data-step="3"></div>
-        <div class="step-line" data-line="3"></div>
-        <div class="step-dot" data-step="4"></div>
+<div id="onboarding-page-container">
+    <!-- Brand Sidebar -->
+    <div id="onboarding-brand-sidebar">
+        <div class="brand-sidebar-logo">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="margin-right:2px;">
+                <rect width="14" height="14" rx="3.5" fill="currentColor" opacity="0.12"/>
+                <rect x="3" y="3" width="3.5" height="3.5" rx="1" fill="currentColor"/>
+                <rect x="7.5" y="3" width="3.5" height="3.5" rx="1" fill="currentColor"/>
+                <rect x="3" y="7.5" width="3.5" height="3.5" rx="1" fill="currentColor"/>
+                <rect x="7.5" y="7.5" width="3.5" height="3.5" rx="1" fill="currentColor"/>
+            </svg>
+            <span>CORA</span> <span style="font-weight:400;color:var(--text-secondary);">PLATFORM</span>
+        </div>
+        
+        <div class="brand-sidebar-content">
+            <h1 class="brand-sidebar-title">Let's build <br><span class="brand-title-accent">your workspace</span></h1>
+            <p class="brand-sidebar-desc">Tell us a bit about your business so we can personalize your Cora experience.</p>
+        </div>
+        
+        <!-- CSS-only 3D Illustration Scene -->
+        <div class="cora-scene-container">
+            <div class="cora-scene-pedestal"></div>
+            <div class="cora-scene-logo-card">
+                <svg width="28" height="28" viewBox="0 0 14 14" fill="none">
+                    <rect x="3" y="3" width="3.5" height="3.5" rx="1" fill="currentColor"/>
+                    <rect x="7.5" y="3" width="3.5" height="3.5" rx="1" fill="currentColor"/>
+                    <rect x="3" y="7.5" width="3.5" height="3.5" rx="1" fill="currentColor"/>
+                    <rect x="7.5" y="7.5" width="3.5" height="3.5" rx="1" fill="currentColor"/>
+                </svg>
+            </div>
+            <div class="cora-scene-widget widget-left">
+                <div class="widget-profile-line line-short"></div>
+                <div class="widget-profile-line line-medium"></div>
+                <div class="widget-profile-line line-long"></div>
+            </div>
+            <div class="cora-scene-widget widget-right">
+                <div class="widget-chart-bar" style="height: 18px;"></div>
+                <div class="widget-chart-bar" style="height: 32px;"></div>
+                <div class="widget-chart-bar" style="height: 24px;"></div>
+            </div>
+        </div>
     </div>
+    
+    <!-- Form Area -->
+    <div id="onboarding-form-area">
+        <div id="onboarding-shell">
+            <!-- Step Progress -->
+            <div class="step-progress-indicator" id="step-progress">
+                <div class="step-indicator-item" data-step="1">
+                    <div class="step-indicator-circle">
+                        <span class="step-num">1</span>
+                        <svg class="step-check" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span class="step-indicator-label">Profile</span>
+                </div>
+                <div class="step-indicator-line" data-line="1"></div>
+                
+                <div class="step-indicator-item" data-step="2">
+                    <div class="step-indicator-circle">
+                        <span class="step-num">2</span>
+                        <svg class="step-check" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span class="step-indicator-label">Industry</span>
+                </div>
+                <div class="step-indicator-line" data-line="2"></div>
+                
+                <div class="step-indicator-item" data-step="3">
+                    <div class="step-indicator-circle">
+                        <span class="step-num">3</span>
+                        <svg class="step-check" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span class="step-indicator-label">Workspace</span>
+                </div>
+                <div class="step-indicator-line" data-line="3"></div>
+                
+                <div class="step-indicator-item" data-step="4">
+                    <div class="step-indicator-circle">
+                        <span class="step-num">4</span>
+                        <svg class="step-check" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span class="step-indicator-label">Finish</span>
+                </div>
+            </div>
 
-    <div class="ob-card">
-        <div class="cora-wordmark">
+            <div class="ob-card">
+                <div class="cora-wordmark" style="display:none;">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <rect width="14" height="14" rx="3.5" fill="currentColor" opacity="0.12"/>
                 <rect x="3" y="3" width="3.5" height="3.5" rx="1" fill="currentColor"/>
@@ -671,15 +1027,21 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                     <form id="onboarding-register-form" onsubmit="handleRegisterSubmit(event)" autocomplete="off">
                         <div class="form-group">
                             <label for="ob-email">Email Address</label>
-                            <input type="email" id="ob-email" required placeholder="jane@company.com" autocomplete="email">
+                            <div class="input-group-with-icon">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="input-icon-prefix"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                <input type="email" id="ob-email" required placeholder="jane@company.com" autocomplete="email">
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="ob-password">Password</label>
-                            <input type="password" id="ob-password" required placeholder="Min. 8 characters">
-                            <button type="button" class="pw-toggle" onclick="togglePw('ob-password','eye-1-open','eye-1-closed')">
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" id="eye-1-open"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" id="eye-1-closed" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                            </button>
+                            <div class="input-group-with-icon">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="input-icon-prefix"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                <input type="password" id="ob-password" required placeholder="Min. 8 characters">
+                                <button type="button" class="pw-toggle" onclick="togglePw('ob-password','eye-1-open','eye-1-closed')">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" id="eye-1-open"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" id="eye-1-closed" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                                </button>
+                            </div>
                         </div>
                         <button type="submit" class="submit-btn" id="ob-register-btn">Create Account</button>
                         
@@ -691,7 +1053,10 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                     <form id="onboarding-magic-form" onsubmit="handleObMagicSubmit(event)" style="display:none;" autocomplete="off">
                         <div class="form-group">
                             <label for="ob-magic-email">Email Address</label>
-                            <input type="email" id="ob-magic-email" required placeholder="jane@company.com" autocomplete="email">
+                            <div class="input-group-with-icon">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="input-icon-prefix"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                <input type="email" id="ob-magic-email" required placeholder="jane@company.com" autocomplete="email">
+                            </div>
                         </div>
                         <button type="submit" class="submit-btn" id="ob-magic-btn">Send Magic Link</button>
                         
@@ -735,74 +1100,135 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                 <form id="onboarding-business-form" onsubmit="handleBusinessSubmit(event)" autocomplete="off">
                     <div class="form-group">
                         <label for="ob-full-name">Your Full Name</label>
-                        <input type="text" id="ob-full-name" required placeholder="e.g. Jane Smith" value="<?php echo esc_attr( $user_display_name ); ?>">
+                        <div class="input-group-with-icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="input-icon-prefix"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <input type="text" id="ob-full-name" required placeholder="e.g. Jane Smith" value="<?php echo esc_attr( $user_display_name ); ?>">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="ob-business-name">Business Name</label>
-                        <input type="text" id="ob-business-name" required placeholder="e.g. Skyline Realty, Studio Light" value="<?php echo esc_attr( $has_business ); ?>">
+                        <div class="input-group-with-icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="input-icon-prefix"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                            <input type="text" id="ob-business-name" required placeholder="e.g. Skyline Realty, Studio Light" value="<?php echo esc_attr( $has_business ); ?>">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="ob-phone">Phone / WhatsApp <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--text-tertiary);">(optional)</span></label>
-                        <input type="tel" id="ob-phone" placeholder="+91 98765 43210">
+                        <div class="input-group-with-icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="input-icon-prefix"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            <input type="tel" id="ob-phone" placeholder="+91 98765 43210">
+                        </div>
                         <div class="helper-text">Used for client communication & WhatsApp integration</div>
                     </div>
                     <div class="form-group">
                         <label for="ob-contact-email">Contact Email</label>
-                        <input type="email" id="ob-contact-email" placeholder="hello@yourbusiness.com" value="<?php echo esc_attr( $user_email ); ?>">
+                        <div class="input-group-with-icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="input-icon-prefix"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            <input type="email" id="ob-contact-email" placeholder="hello@yourbusiness.com" value="<?php echo esc_attr( $user_email ); ?>">
+                        </div>
                         <div class="helper-text">Public email for your business profile</div>
                     </div>
-                    <button type="submit" class="submit-btn" id="ob-business-btn">Continue</button>
+                    <button type="submit" class="submit-btn" id="ob-business-btn">
+                        Continue
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </button>
+                    <div class="secure-footer-text">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        Your information is secure and private
+                    </div>
                 </form>
             </div>
 
             <!-- ═══ STEP 3 — INDUSTRY SELECTION ═══ -->
             <div class="step-panel" id="step-3" data-step="3">
-                <div class="step-label">Step 3 of 4</div>
-                <h2 class="ob-title">What's your industry?</h2>
-                <p class="ob-subtitle">We'll configure your workspace with the right tools, CRM pipeline, and team roles.</p>
+                <div class="step-label" style="text-align:center;">Step 3 of 4</div>
+                <h2 class="ob-title" style="text-align:center; margin-bottom: 8px;">What's your industry?</h2>
+                <p class="ob-subtitle" style="text-align:center; margin-bottom: 32px;">This helps us personalize your workspace with the right tools and templates.</p>
 
                 <div class="industry-grid" id="industry-grid">
                     <div class="industry-card" data-industry="real_estate" onclick="selectIndustry(this)">
                         <div class="industry-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
                                 <polyline points="9 22 9 12 15 12 15 22"/>
                             </svg>
                         </div>
-                        <div class="industry-info">
-                            <div class="industry-name">Real Estate Agency</div>
-                            <div class="industry-desc">Property listings, buyer leads, CRM pipeline, showing scheduler</div>
-                        </div>
+                        <div class="industry-name">Real Estate Agency</div>
+                        <div class="industry-desc">Property listings, buyer leads, CRM pipeline, showings</div>
                     </div>
 
                     <div class="industry-card" data-industry="photography_studio" onclick="selectIndustry(this)">
                         <div class="industry-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
                                 <circle cx="12" cy="13" r="4"/>
                             </svg>
                         </div>
-                        <div class="industry-info">
-                            <div class="industry-name">Photography Studio</div>
-                            <div class="industry-desc">Client leads, shoot scheduling, equipment tracking, team roles</div>
+                        <div class="industry-name">Photography Studio</div>
+                        <div class="industry-desc">Client leads, shoot scheduling, equipment tracking</div>
+                    </div>
+
+                    <div class="industry-card" data-industry="marketing_agency" onclick="selectIndustry(this)">
+                        <div class="industry-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                            </svg>
                         </div>
+                        <div class="industry-name">Marketing Agency</div>
+                        <div class="industry-desc">Client projects, tasks, campaign performance</div>
+                    </div>
+
+                    <div class="industry-card" data-industry="it_services" onclick="selectIndustry(this)">
+                        <div class="industry-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                <line x1="8" y1="21" x2="16" y2="21"/>
+                                <line x1="12" y1="17" x2="12" y2="21"/>
+                            </svg>
+                        </div>
+                        <div class="industry-name">IT Services</div>
+                        <div class="industry-desc">Projects, tickets, clients, team collaboration</div>
+                    </div>
+
+                    <div class="industry-card" data-industry="healthcare_practice" onclick="selectIndustry(this)">
+                        <div class="industry-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </div>
+                        <div class="industry-name">Healthcare Practice</div>
+                        <div class="industry-desc">Patient records, appointments, communication</div>
                     </div>
 
                     <div class="industry-card" data-industry="custom" onclick="selectIndustry(this)">
                         <div class="industry-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="3"/>
-                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="4" y1="21" x2="4" y2="14"/>
+                                <line x1="4" y1="10" x2="4" y2="3"/>
+                                <line x1="12" y1="21" x2="12" y2="12"/>
+                                <line x1="12" y1="8" x2="12" y2="3"/>
+                                <line x1="20" y1="21" x2="20" y2="16"/>
+                                <line x1="20" y1="12" x2="20" y2="3"/>
+                                <line x1="1" y1="14" x2="7" y2="14"/>
+                                <line x1="9" y1="8" x2="15" y2="8"/>
+                                <line x1="17" y1="16" x2="23" y2="16"/>
                             </svg>
                         </div>
-                        <div class="industry-info">
-                            <div class="industry-name">Custom / Self-Managed</div>
-                            <div class="industry-desc">Access all features from every industry. Configure your own workflow.</div>
-                        </div>
+                        <div class="industry-name">Custom / Other</div>
+                        <div class="industry-desc">Configure your workspace your own way</div>
                     </div>
                 </div>
 
-                <button type="button" class="submit-btn" id="ob-industry-btn" onclick="handleIndustrySubmit()" disabled>Continue</button>
+                <button type="button" class="submit-btn" id="ob-industry-btn" onclick="handleIndustrySubmit()" disabled>
+                    Continue
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </button>
+                <div class="secure-footer-text" style="margin-top:20px;">
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Your data is secure. We'll never share it with anyone.
+                </div>
             </div>
 
             <!-- ═══ STEP 4 — ACTIVATION ═══ -->
@@ -810,17 +1236,24 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                 <div class="activation-state" id="activation-state">
                     <div class="activation-spinner" id="activation-spinner"></div>
                     <div class="activation-check" id="activation-check">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="20 6 9 17 4 12"/>
                         </svg>
                     </div>
                     <div class="activation-title" id="activation-title">Setting up your workspace…</div>
                     <p class="activation-sub" id="activation-sub">Configuring features, CRM pipeline, and team roles for your industry.</p>
+                    
+                    <div class="secure-badge-pill" id="activation-secure-pill" style="display:none;">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-600 dark:text-emerald-450"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <span>Your data is secure. We'll never share it with anyone.</span>
+                    </div>
                 </div>
             </div>
 
         </div>
     </div>
+</div>
+</div>
 </div>
 
 <div id="cora-toast-container"></div>
@@ -869,6 +1302,17 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
         if (target) {
             target.classList.add('active');
         }
+        
+        // Dynamically adjust shell width for step 3 (industry grid) to prevent compression
+        var shell = document.getElementById('onboarding-shell');
+        if (shell) {
+            if (step === 3) {
+                shell.style.maxWidth = '840px';
+            } else {
+                shell.style.maxWidth = '480px';
+            }
+        }
+
         currentStep = step;
         updateStepProgress(step);
 
@@ -878,14 +1322,14 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
     }
 
     function updateStepProgress(step) {
-        var dots = document.querySelectorAll('.step-dot');
-        var lines = document.querySelectorAll('.step-line');
+        var items = document.querySelectorAll('.step-indicator-item');
+        var lines = document.querySelectorAll('.step-indicator-line');
 
-        dots.forEach(function(dot) {
-            var dotStep = parseInt(dot.getAttribute('data-step'));
-            dot.classList.remove('active', 'done');
-            if (dotStep < step) dot.classList.add('done');
-            else if (dotStep === step) dot.classList.add('active');
+        items.forEach(function(item) {
+            var itemStep = parseInt(item.getAttribute('data-step'));
+            item.classList.remove('active', 'done');
+            if (itemStep < step) item.classList.add('done');
+            else if (itemStep === step) item.classList.add('active');
         });
 
         lines.forEach(function(line) {
@@ -1166,6 +1610,11 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                 check.style.display = 'flex';
                 document.getElementById('activation-title').textContent = 'Your workspace is ready!';
                 document.getElementById('activation-sub').textContent = 'Redirecting you to your dashboard\u2026';
+                
+                var securePill = document.getElementById('activation-secure-pill');
+                if (securePill) {
+                    securePill.style.display = 'inline-flex';
+                }
 
                 setTimeout(function() {
                     window.location.href = res.data.redirect_url;
