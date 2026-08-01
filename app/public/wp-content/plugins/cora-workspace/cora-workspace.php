@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.9.26
+ * Version: 2.9.27
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.9.26' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.27' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -21940,7 +21940,7 @@ if ( ! class_exists( 'Cora_Workspace_Plugin_Updater' ) ) {
     }
 }
 
-$cora_workspace_updates_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-workspace.json' );
+$cora_workspace_updates_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-workspace.json' );
 new Cora_Workspace_Plugin_Updater( __FILE__, $cora_workspace_updates_url );
 
 /**
@@ -21961,8 +21961,8 @@ function cora_check_workspace_update_available( $force = false ) {
 
     $update_info = get_transient( $cache_key );
     if ( false === $update_info ) {
-        $update_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-workspace.json' );
-        $response = wp_remote_get( $update_url, array( 'timeout' => 10 ) );
+        $update_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-workspace.json' );
+        $response = wp_remote_get( add_query_arg( 'cb', time(), $update_url ), array( 'timeout' => 15 ) );
         if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
             $remote_data = json_decode( wp_remote_retrieve_body( $response ) );
             if ( $remote_data && ! empty( $remote_data->version ) ) {
@@ -22012,14 +22012,16 @@ function cora_ajax_trigger_workspace_update() {
     if ( ! current_user_can( 'manage_options' ) ) {
         wp_send_json_error( array( 'message' => 'Insufficient permissions.' ) );
     }
-    
-    $target_version = sanitize_text_field( $_POST['version'] ?? '' );
-    if ( empty( $target_version ) ) {
-        wp_send_json_error( array( 'message' => 'Target version required.' ) );
+
+    @set_time_limit( 300 );
+    if ( function_exists( 'wp_raise_memory_limit' ) ) {
+        wp_raise_memory_limit( 'admin' );
     }
     
-    $update_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-workspace.json' );
-    $response = wp_remote_get( $update_url, array( 'timeout' => 15 ) );
+    $target_version = sanitize_text_field( $_POST['version'] ?? '' );
+    
+    $update_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-workspace.json' );
+    $response = wp_remote_get( add_query_arg( 'cb', time(), $update_url ), array( 'timeout' => 20 ) );
     if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
         wp_send_json_error( array( 'message' => 'Failed to reach updates server.' ) );
     }
@@ -22029,7 +22031,7 @@ function cora_ajax_trigger_workspace_update() {
         wp_send_json_error( array( 'message' => 'Invalid update payload.' ) );
     }
     
-    if ( $remote_data->version !== $target_version ) {
+    if ( ! empty( $target_version ) && version_compare( $remote_data->version, $target_version, '<' ) ) {
         wp_send_json_error( array( 'message' => 'Version mismatch. Remote version is ' . $remote_data->version ) );
     }
     
@@ -22045,8 +22047,12 @@ function cora_ajax_trigger_workspace_update() {
     if ( ! $wp_filesystem ) {
         wp_send_json_error( array( 'message' => 'Failed to initialize WordPress Filesystem API.' ) );
     }
+
+    if ( function_exists( 'opcache_reset' ) ) {
+        @opcache_reset();
+    }
     
-    $temp_zip = download_url( $download_url );
+    $temp_zip = download_url( $download_url, 300 );
     if ( is_wp_error( $temp_zip ) ) {
         wp_send_json_error( array( 'message' => 'Failed to download update zip: ' . $temp_zip->get_error_message() ) );
     }
@@ -22061,14 +22067,28 @@ function cora_ajax_trigger_workspace_update() {
     }
     
     delete_transient( 'cora_workspace_update_check' );
+    delete_transient( 'cora_workspace_update_info' );
+    delete_site_transient( 'update_plugins' );
     wp_clean_plugins_cache();
+
+    // Ensure plugin remains active in active_plugins database option
+    $active_plugins = get_option( 'active_plugins', array() );
+    if ( ! in_array( 'cora-workspace/cora-workspace.php', $active_plugins, true ) ) {
+        $active_plugins[] = 'cora-workspace/cora-workspace.php';
+        update_option( 'active_plugins', $active_plugins );
+    }
+
+    clearstatcache();
+    if ( function_exists( 'opcache_reset' ) ) {
+        @opcache_reset();
+    }
     
-    cora_log_activity( 'System', 'Workspace updated automatically to version v' . $target_version );
+    cora_log_activity( 'System', 'Workspace updated automatically to version v' . $remote_data->version );
     
     $changelog = isset( $remote_data->sections->changelog ) ? $remote_data->sections->changelog : '';
-    cora_notify_admins_of_version_upgrade( $target_version, $changelog );
+    cora_notify_admins_of_version_upgrade( $remote_data->version, $changelog );
     
-    wp_send_json_success( array( 'message' => 'Workspace updated successfully!' ) );
+    wp_send_json_success( array( 'message' => 'Workspace updated successfully to v' . $remote_data->version . '!' ) );
 }
 add_action( 'wp_ajax_cora_trigger_workspace_update', 'cora_ajax_trigger_workspace_update' );
 

@@ -180,6 +180,12 @@ class Cora_Workspace_Updater {
             wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
         }
 
+        // Raise execution time & memory limits to handle 30MB download & extraction smoothly
+        @set_time_limit( 300 );
+        if ( function_exists( 'wp_raise_memory_limit' ) ) {
+            wp_raise_memory_limit( 'admin' );
+        }
+
         // Initialize progress
         update_option( 'cora_workspace_upgrade_progress', array( 'step' => 1, 'percent' => 5, 'status' => 'Connecting to GitHub updates server...' ) );
 
@@ -243,13 +249,13 @@ class Cora_Workspace_Updater {
         $obj->new_version = $info['version'];
         $obj->url = 'https://cora.ai';
         $obj->package = $info['download_url'];
-        $obj->tested = $info['tested'];
+        $obj->tested = $info['tested'] ?? '6.7';
         $current->response[ $this->plugin_file ] = $obj;
         set_site_transient( 'update_plugins', $current );
 
         // Reset OPcache memory file locks immediately before upgrade to prevent FPM renaming errors
         if ( function_exists( 'opcache_reset' ) ) {
-            opcache_reset();
+            @opcache_reset();
         }
 
         // 3. Perform programmatic update using Plugin_Upgrader custom progress skin
@@ -268,11 +274,17 @@ class Cora_Workspace_Updater {
         } else {
             update_option( 'cora_workspace_upgrade_progress', array( 'step' => 4, 'percent' => 95, 'status' => 'Reactivating workspace platform...' ) );
 
-            // Success! Upgrade was successful.
-            // Since WordPress deletes the old plugin folder and copies files, it might deactivate the plugin.
-            // Let's reactivate the plugin to ensure uninterrupted service!
-            if ( ! is_plugin_active( $this->plugin_file ) ) {
-                activate_plugin( $this->plugin_file );
+            // Reactivate plugin safely by updating active_plugins option directly in database,
+            // avoiding calling activate_plugin() which re-includes cora-workspace.php and causes fatal errors.
+            $active_plugins = get_option( 'active_plugins', array() );
+            if ( ! in_array( $this->plugin_file, $active_plugins, true ) ) {
+                $active_plugins[] = $this->plugin_file;
+                update_option( 'active_plugins', $active_plugins );
+            }
+
+            clearstatcache();
+            if ( function_exists( 'opcache_reset' ) ) {
+                @opcache_reset();
             }
 
             // Log activity
