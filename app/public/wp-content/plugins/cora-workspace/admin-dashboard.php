@@ -9803,6 +9803,273 @@ wp_print_footer_scripts();
         }
     };
 
+    window.coraReleasesData = [
+        {
+            version: '2.9.7',
+            date: 'August 1, 2026',
+            isLatest: true,
+            items: [
+                {
+                    title: 'Onboarding Input Validation',
+                    desc: 'Integrated strict JavaScript and PHP validation rules for Phone/WhatsApp and Contact Email inputs to reject malformed input strings.',
+                    icon: 'shield'
+                },
+                {
+                    title: 'Workspace Owner Role Enforcement',
+                    desc: 'Guaranteed all newly onboarded users are automatically assigned the "Workspace Owner" (cora_super_admin) role on final activation.',
+                    icon: 'zap'
+                },
+                {
+                    title: 'Role Invitation Improvements',
+                    desc: 'Empowered Workspace Owners and Administrators to invite other Managers and Branch Managers directly from the UI. Enabled auto-preselection of roles in the invite drawer based on active search filters or query parameters.',
+                    icon: 'users'
+                }
+            ]
+        },
+        {
+            version: '2.9.6',
+            date: 'July 31, 2026',
+            items: [
+                {
+                    title: 'Frictionless Multi-Step Onboarding Flow',
+                    desc: 'Completely replaced the legacy registration screen with a modern, frictionless 4-step onboarding wizard. Supports Google OAuth (with local testing mocks), Passwordless Magic Link authentication, profile/business details setup, and dynamic module activation.',
+                    icon: 'sparkles'
+                },
+                {
+                    title: 'Visual Theme Typos Fixed',
+                    desc: 'Rectified white-on-white rendering bugs and Tailwind typo classes in the Role Preview banner and settings popover menus.',
+                    icon: 'edit'
+                }
+            ]
+        },
+        {
+            version: '2.9.5',
+            date: 'July 28, 2026',
+            items: [
+                {
+                    title: 'PWA Custom Offline/Maintenance Page',
+                    desc: 'Integrated a premium monochromatic custom connection-idle/offline template served instantly by a robust Service Worker whenever the network is offline or the server undergoes momentary PHP-FPM recycle downtime during upgrades.',
+                    icon: 'wifi'
+                }
+            ]
+        },
+        {
+            version: '2.9.4',
+            date: 'July 25, 2026',
+            items: [
+                {
+                    title: 'Connection Recycle Resilience',
+                    desc: 'Implemented FPM/OPcache connection recovery logic. The auto-update interface now handles temporary PHP process restarts gracefully without triggering false-positive network connection failures.',
+                    icon: 'refresh'
+                }
+            ]
+        },
+        {
+            version: '2.9.2',
+            date: 'July 20, 2026',
+            items: [
+                {
+                    title: 'One-Click Auto-Updates',
+                    desc: 'Implemented a secure, full-screen step-by-step update interface triggered instantly via custom query parameters.',
+                    icon: 'zap'
+                }
+            ]
+        },
+        {
+            version: '2.9.1',
+            date: 'July 15, 2026',
+            items: [
+                {
+                    title: 'Query Parameter Redirection Preservation',
+                    desc: 'Fixed redirect query stripping in the workspace admin routing.',
+                    icon: 'link'
+                }
+            ]
+        },
+        {
+            version: '2.9.0',
+            date: 'July 10, 2026',
+            items: [
+                {
+                    title: 'Modularity Optimization',
+                    desc: 'Resolved cross-module script and layout interference by scoping tab switching, search/filter selectors, and dropdown toggle events inside the users view.',
+                    icon: 'code'
+                },
+                {
+                    title: 'Duplicate Script Loading Fix',
+                    desc: 'Eliminated redundant inline inclusion of admin-script.js in the dashboard template to resolve double-binding and double-firing click event listeners.',
+                    icon: 'file'
+                }
+            ]
+        }
+    ];
+
+    function parseChangelogHTML(htmlString) {
+        if (!htmlString) return [];
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlString, 'text/html');
+        const h4s = doc.querySelectorAll('h4');
+        const versions = [];
+        h4s.forEach(h4 => {
+            const version = h4.textContent.trim().replace(/^v/, '');
+            const ul = h4.nextElementSibling;
+            const items = [];
+            if (ul && ul.tagName === 'UL') {
+                const lis = ul.querySelectorAll('li');
+                lis.forEach(li => {
+                    const strong = li.querySelector('strong');
+                    let title = '';
+                    let description = li.textContent.trim();
+                    if (strong) {
+                        title = strong.textContent.replace(/:$/, '').trim();
+                        description = description.replace(strong.textContent, '').replace(/^:\s*/, '').trim();
+                    } else {
+                        const parts = description.split(':');
+                        if (parts.length > 1) {
+                            title = parts[0].trim();
+                            description = parts.slice(1).join(':').trim();
+                        } else {
+                            title = 'Platform Update';
+                        }
+                    }
+                    items.push({ title: title, desc: description });
+                });
+            }
+            versions.push({ version: version, items: items });
+        });
+        return versions;
+    }
+
+    window.coraRenderUpdateTimeline = function() {
+        const container = document.getElementById('cora-changelog-timeline-container');
+        if (!container) return;
+
+        let html = '<div class="cora-update-timeline">';
+        window.coraReleasesData.forEach((rel, rIdx) => {
+            const isLatest = rIdx === 0;
+            html += `
+                <div class="cora-update-timeline-item ${isLatest ? 'active' : ''}">
+                    <div class="cora-update-timeline-dot"></div>
+                    <div class="flex flex-col md:flex-row gap-4 md:gap-6">
+                        <!-- Left Version Tag -->
+                        <div class="w-24 shrink-0 pt-1 select-none">
+                            <span class="text-sm font-extrabold text-zinc-900 dark:text-zinc-50">${rel.version}</span>
+                            ${isLatest ? '<span class="block mt-1 text-[9px] font-bold text-zinc-550 border border-zinc-200 dark:border-zinc-800 rounded px-1.5 py-0.5 w-max bg-zinc-50 dark:bg-zinc-950 uppercase tracking-wide">Latest</span>' : ''}
+                        </div>
+                        
+                        <!-- Right Version Card List -->
+                        <div class="flex-1 space-y-3">
+            `;
+
+            rel.items.forEach((item, iIdx) => {
+                let svgIcon = '';
+                switch(item.icon) {
+                    case 'sparkles':
+                        svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500 dark:text-zinc-400"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+                        break;
+                    case 'edit':
+                        svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500 dark:text-zinc-400"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`;
+                        break;
+                    case 'wifi':
+                        svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500 dark:text-zinc-400"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20" stroke-width="2"></line></svg>`;
+                        break;
+                    case 'refresh':
+                        svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500 dark:text-zinc-400"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>`;
+                        break;
+                    case 'zap':
+                        svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500 dark:text-zinc-400"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`;
+                        break;
+                    case 'link':
+                        svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500 dark:text-zinc-400"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>`;
+                        break;
+                    case 'code':
+                        svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500 dark:text-zinc-400"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`;
+                        break;
+                    case 'shield':
+                        svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500 dark:text-zinc-400"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+                        break;
+                    case 'users':
+                        svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500 dark:text-zinc-400"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`;
+                        break;
+                    default:
+                        svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500 dark:text-zinc-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
+                }
+
+                const itemId = `accordion-${rIdx}-${iIdx}`;
+                html += `
+                    <div class="cora-update-row-hover bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-xl p-4 cursor-pointer transition-all duration-200" onclick="window.coraToggleUpdateAccordion('${itemId}')">
+                        <div class="flex items-center justify-between gap-3 select-none">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center shrink-0 border border-zinc-100 dark:border-zinc-700/50">
+                                    ${svgIcon}
+                                </div>
+                                <span class="text-xs font-bold text-zinc-900 dark:text-white">${item.title}</span>
+                            </div>
+                            <span class="text-zinc-400 dark:text-zinc-500 transition-transform duration-200 shrink-0" id="chevron-${itemId}" style="display: flex; align-items: center;">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="transition-transform duration-300 transform"><polyline points="6 9 12 15 18 9"/></svg>
+                            </span>
+                        </div>
+                        <div class="cora-update-accordion-content open mt-3 pl-11 text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed" id="content-${itemId}">
+                            ${item.desc}
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    };
+
+    window.coraToggleUpdateAccordion = function(itemId) {
+        const content = document.getElementById(`content-${itemId}`);
+        const chevron = document.getElementById(`chevron-${itemId}`);
+        if (content && chevron) {
+            const svg = chevron.querySelector('svg');
+            if (content.classList.contains('open')) {
+                content.classList.remove('open');
+                if (svg) svg.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('open');
+                if (svg) svg.style.transform = 'rotate(180deg)';
+            }
+        }
+    };
+
+    window.coraToggleAllAccordions = function(expand) {
+        const contents = document.querySelectorAll('.cora-update-accordion-content');
+        contents.forEach(content => {
+            const itemId = content.id.replace('content-', '');
+            const chevron = document.getElementById(`chevron-${itemId}`);
+            const svg = chevron ? chevron.querySelector('svg') : null;
+            if (expand) {
+                content.classList.add('open');
+                if (svg) svg.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.remove('open');
+                if (svg) svg.style.transform = 'rotate(0deg)';
+            }
+        });
+    };
+
+    window.coraToggleExpandAll = function(btn) {
+        const span = btn.querySelector('span');
+        const isExpand = span.innerText === 'Expand All';
+        window.coraToggleAllAccordions(isExpand);
+        if (isExpand) {
+            span.innerText = 'Collapse All';
+            btn.querySelector('svg').innerHTML = '<path d="M4 14h6v6M20 10h-6V4M14 10l7-7M10 14l-7 7"/>';
+        } else {
+            span.innerText = 'Expand All';
+            btn.querySelector('svg').innerHTML = '<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>';
+        }
+    };
+
     window.coraCheckForUpdatesNow = function() {
         if (window.coraShowToast) window.coraShowToast('Checking for platform updates...', 'info');
         const ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
@@ -9812,17 +10079,79 @@ wp_print_footer_scripts();
             action: 'cora_force_check_update',
             security: nonce
         }, function(res) {
+            const currentVer = '<?php echo esc_js(CORA_WORKSPACE_VERSION); ?>';
+            const badge = document.getElementById('cora-update-badge');
+            const titleElem = document.getElementById('cora-update-platform-title');
+            const mainBtn = document.getElementById('cora-update-main-btn');
+            const confirmBtn = document.getElementById('cora-update-confirm-btn');
+
             if (res.success && res.data && res.data.version && !res.data.up_to_date) {
-                const availElem = document.getElementById('cora-available-version-text');
-                const changelogElem = document.getElementById('cora-changelog-container');
-                const confirmBtn = document.getElementById('cora-update-confirm-btn');
-                if (availElem) availElem.innerText = 'v' + res.data.version;
-                if (changelogElem && res.data.changelog) changelogElem.innerHTML = res.data.changelog;
-                if (confirmBtn) confirmBtn.setAttribute('onclick', "window.coraExecuteWorkspaceUpdate('" + res.data.version + "');");
+                if (badge) {
+                    badge.innerText = 'UPDATE AVAILABLE';
+                    badge.className = 'inline-block text-[9px] font-extrabold bg-zinc-950 text-white dark:bg-zinc-100 dark:text-zinc-950 px-2 py-0.5 rounded tracking-wide uppercase leading-none mb-1.5';
+                }
+                if (titleElem) {
+                    titleElem.innerText = 'Cora Workspace Platform v' + res.data.version;
+                }
+                if (mainBtn) {
+                    mainBtn.style.display = '';
+                    mainBtn.setAttribute('onclick', "window.coraExecuteWorkspaceUpdate('" + res.data.version + "');");
+                }
+                if (confirmBtn) {
+                    confirmBtn.disabled = false;
+                    confirmBtn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="rotate-180"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"/></svg> Upgrade Workspace Now';
+                    confirmBtn.setAttribute('onclick', "window.coraExecuteWorkspaceUpdate('" + res.data.version + "');");
+                }
+
+                if (res.data.changelog) {
+                    const parsed = parseChangelogHTML(res.data.changelog);
+                    parsed.forEach(parsedRel => {
+                        const exists = window.coraReleasesData.some(r => r.version === parsedRel.version);
+                        if (!exists) {
+                            parsedRel.items.forEach(item => {
+                                const titleLower = item.title.toLowerCase();
+                                if (titleLower.includes('validation') || titleLower.includes('security')) {
+                                    item.icon = 'shield';
+                                } else if (titleLower.includes('onboarding') || titleLower.includes('wizard')) {
+                                    item.icon = 'sparkles';
+                                } else if (titleLower.includes('role') || titleLower.includes('invite')) {
+                                    item.icon = 'users';
+                                } else if (titleLower.includes('offline') || titleLower.includes('maintenance')) {
+                                    item.icon = 'wifi';
+                                } else if (titleLower.includes('recycle') || titleLower.includes('recovery') || titleLower.includes('resilience')) {
+                                    item.icon = 'refresh';
+                                } else if (titleLower.includes('link') || titleLower.includes('redirect')) {
+                                    item.icon = 'link';
+                                } else if (titleLower.includes('modularity') || titleLower.includes('optimization')) {
+                                    item.icon = 'code';
+                                } else {
+                                    item.icon = 'zap';
+                                }
+                            });
+                            window.coraReleasesData.unshift(parsedRel);
+                        }
+                    });
+                }
 
                 window.coraOpenUpdateDrawer();
                 if (window.coraShowToast) window.coraShowToast('New version v' + res.data.version + ' is available!', 'success');
             } else {
+                if (badge) {
+                    badge.innerText = 'FULLY UP TO DATE';
+                    badge.className = 'inline-block text-[9px] font-extrabold bg-emerald-600 text-white px-2 py-0.5 rounded tracking-wide uppercase leading-none mb-1.5';
+                }
+                if (titleElem) {
+                    titleElem.innerText = 'Cora Workspace Platform v' + currentVer;
+                }
+                if (mainBtn) {
+                    mainBtn.style.display = 'none';
+                }
+                if (confirmBtn) {
+                    confirmBtn.disabled = true;
+                    confirmBtn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Latest Version Installed';
+                }
+
+                window.coraOpenUpdateDrawer();
                 if (window.coraShowToast) window.coraShowToast('Workspace platform is fully up to date!', 'success');
             }
         }).fail(function() {
@@ -9836,6 +10165,9 @@ wp_print_footer_scripts();
         if (overlay && drawer) {
             overlay.classList.add('open');
             drawer.classList.add('open');
+            if (typeof window.coraRenderUpdateTimeline === 'function') {
+                window.coraRenderUpdateTimeline();
+            }
         }
     };
 
@@ -9850,12 +10182,24 @@ wp_print_footer_scripts();
 
     window.coraExecuteWorkspaceUpdate = function(version) {
         if (!version) return;
-        const btn = document.getElementById('cora-update-confirm-btn');
-        if (btn) {
-            btn.disabled = true;
-            btn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="animate-spin shrink-0"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Installing Update...';
-        }
+        const confirmBtn = document.getElementById('cora-update-confirm-btn');
+        const mainBtn = document.getElementById('cora-update-main-btn');
+        
+        const setBtnsLoading = function(isLoading) {
+            const spinner = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="animate-spin shrink-0"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> ';
+            if (confirmBtn) {
+                confirmBtn.disabled = isLoading;
+                confirmBtn.innerHTML = isLoading ? spinner + 'Installing Update...' : '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="rotate-180"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"/></svg> Upgrade Workspace Now';
+            }
+            if (mainBtn) {
+                mainBtn.disabled = isLoading;
+                mainBtn.innerHTML = isLoading ? spinner + 'Upgrading...' : '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="rotate-180"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"/></svg> Upgrade Now';
+            }
+        };
+
+        setBtnsLoading(true);
         window.coraShowToast('Downloading workspace update v' + version + '... please wait.');
+        
         jQuery.ajax({
             url: coraREData.ajaxUrl,
             type: 'POST',
@@ -9872,19 +10216,13 @@ wp_print_footer_scripts();
                 } else {
                     var msg = (res.data && res.data.message) ? res.data.message : 'Update failed. Please try again.';
                     window.coraShowToast(msg);
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg> Proceed with Update';
-                    }
+                    setBtnsLoading(false);
                 }
             },
             error: function(xhr, status) {
                 var errMsg = status === 'timeout' ? 'Update timed out. The server is taking too long — please try again.' : 'Network error. Could not reach the update server.';
                 window.coraShowToast(errMsg);
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg> Proceed with Update';
-                }
+                setBtnsLoading(false);
             }
         });
     };
@@ -10498,7 +10836,7 @@ if ( current_user_can( 'manage_options' ) ) :
     position: fixed;
     inset: 0;
     z-index: 99998;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(9, 9, 11, 0.4);
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.25s ease, visibility 0.25s ease;
@@ -10515,10 +10853,10 @@ if ( current_user_can( 'manage_options' ) ) :
     z-index: 99999;
     height: 100%;
     width: 100%;
-    max-width: 460px;
+    max-width: 960px;
     background: #ffffff;
     border-left: 1px solid #e4e4e7;
-    box-shadow: -8px 0 32px rgba(9, 9, 11, 0.08);
+    box-shadow: -10px 0 40px rgba(9, 9, 11, 0.08);
     transform: translateX(100%);
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
@@ -10527,117 +10865,196 @@ if ( current_user_can( 'manage_options' ) ) :
 .dark #cora-update-drawer {
     background: #09090b;
     border-left: 1px solid #27272a;
-    box-shadow: -8px 0 32px rgba(9, 9, 11, 0.4);
+    box-shadow: -10px 0 40px rgba(9, 9, 11, 0.4);
 }
 #cora-update-drawer.open {
     transform: translateX(0);
 }
-.cora-changelog-content h4 {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #18181b;
-    margin: 12px 0 6px 0;
+
+/* Timeline specific styles */
+.cora-update-timeline {
+    position: relative;
+    padding-left: 32px;
 }
-.dark .cora-changelog-content h4 {
-    color: #ffffff;
+.cora-update-timeline::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    left: 7px;
+    width: 1px;
+    background-color: #e4e4e7;
 }
-.cora-changelog-content h4:first-of-type {
-    margin-top: 0;
+.dark .cora-update-timeline::before {
+    background-color: #27272a;
 }
-.cora-changelog-content ul {
-    list-style-type: disc;
-    margin-left: 16px;
-    margin-bottom: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+.cora-update-timeline-item {
+    position: relative;
+    margin-bottom: 32px;
 }
-.cora-changelog-content li {
-    font-size: 11px;
-    color: #52525b;
+.cora-update-timeline-item:last-child {
+    margin-bottom: 0;
 }
-.dark .cora-changelog-content li {
-    color: #a1a1aa;
+.cora-update-timeline-dot {
+    position: absolute;
+    left: -32px;
+    top: 6px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    border: 2px solid #e4e4e7;
+    z-index: 2;
+    transition: all 0.2s ease;
 }
-.cora-changelog-content li strong {
-    color: #18181b;
+.dark .cora-update-timeline-dot {
+    background-color: #09090b;
+    border-color: #27272a;
 }
-.dark .cora-changelog-content li strong {
-    color: #f4f4f5;
+.cora-update-timeline-item.active .cora-update-timeline-dot {
+    border-color: #18181b;
+    background-color: #18181b;
+}
+.dark .cora-update-timeline-item.active .cora-update-timeline-dot {
+    border-color: #f4f4f5;
+    background-color: #f4f4f5;
+}
+
+/* Accordion transition styles */
+.cora-update-accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+    opacity: 0;
+}
+.cora-update-accordion-content.open {
+    max-height: 1000px;
+    opacity: 1;
+}
+
+/* Hover effects */
+.cora-update-row-hover:hover {
+    border-color: #d4d4d8;
+    background-color: #fafafa;
+}
+.dark .cora-update-row-hover:hover {
+    border-color: #3f3f46;
+    background-color: rgba(39, 39, 42, 0.3);
 }
 </style>
 
 <div id="cora-update-overlay" onclick="window.coraCloseUpdateDrawer();"></div>
 
-<div id="cora-update-drawer" class="text-zinc-800 dark:text-zinc-200">
+<div id="cora-update-drawer" class="text-zinc-850 dark:text-zinc-200">
     <!-- Header -->
-    <div class="flex items-center justify-between px-6 py-5 border-b border-zinc-150 dark:border-zinc-800/80 bg-zinc-50 dark:bg-zinc-900/50 flex-shrink-0">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center text-white dark:text-zinc-950">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-            </div>
-            <div>
-                <h3 class="text-sm font-bold leading-none text-zinc-900 dark:text-white">Workspace Update</h3>
-                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">Upgrade your core platform and modules</p>
-            </div>
+    <div class="flex items-center justify-between px-8 py-6 border-b border-zinc-150 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/20 flex-shrink-0">
+        <div class="space-y-1">
+            <h2 class="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">Software Updates</h2>
+            <p class="text-xs text-zinc-550 dark:text-zinc-400">Manage system versions, release channels, and automated feature shipments.</p>
         </div>
-        <button onclick="window.coraCloseUpdateDrawer();" class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700/80 border-none cursor-pointer flex items-center justify-center text-zinc-500 dark:text-zinc-400 transition-colors">
-            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+        
+        <div class="flex items-center gap-3">
+            <!-- Release Channel selector dropdown mockup -->
+            <div class="relative hidden sm:block">
+                <button type="button" class="flex items-center gap-3 px-4 py-2 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 text-left select-none outline-none">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    <div>
+                        <span class="block text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide leading-none">Release Channel</span>
+                        <span class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mt-0.5">Production Stable</span>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-450 ml-1"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+            </div>
+            
+            <button onclick="window.coraCloseUpdateDrawer();" class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700/80 border-none cursor-pointer flex items-center justify-center text-zinc-500 dark:text-zinc-400 transition-colors">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
     </div>
 
     <!-- Scrollable Content -->
-    <div class="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+    <div class="flex-1 overflow-y-auto px-8 py-6 space-y-6">
         
-        <!-- Version Specs Grid -->
-        <div class="grid grid-cols-2 gap-4 p-4 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-150 dark:border-zinc-800/80 rounded-xl select-none">
-            <div class="space-y-1">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Current version</span>
-                <p class="text-lg font-black font-mono text-zinc-650 dark:text-zinc-350"><?php echo esc_html( CORA_WORKSPACE_VERSION ); ?></p>
+        <!-- Status Card -->
+        <div class="border border-zinc-200 dark:border-zinc-850 rounded-xl p-5 bg-white dark:bg-zinc-950 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 shadow-3xs select-none">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-zinc-950 dark:bg-zinc-100 flex items-center justify-center text-white dark:text-zinc-950 shrink-0 shadow-sm">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.2" fill="none" class="animate-pulse"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                </div>
+                <div>
+                    <span id="cora-update-badge" class="inline-block text-[9px] font-extrabold bg-zinc-950 text-white dark:bg-zinc-100 dark:text-zinc-950 px-2 py-0.5 rounded tracking-wide uppercase leading-none mb-1.5">UPDATE AVAILABLE</span>
+                    <h3 id="cora-update-platform-title" class="text-sm font-bold text-zinc-900 dark:text-white leading-tight">Cora Workspace Platform v<?php echo esc_html($avail_ver); ?></h3>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Your current installed version is v<?php echo esc_html(CORA_WORKSPACE_VERSION); ?>.</p>
+                </div>
             </div>
-            <div class="space-y-1 border-l border-zinc-200 dark:border-zinc-800 pl-4">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-500">Available version</span>
-                <p id="cora-available-version-text" class="text-lg font-black font-mono text-emerald-600 dark:text-emerald-450">v<?php echo esc_html( $avail_ver ); ?></p>
+            
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5 w-full md:w-auto md:shrink-0">
+                <div class="hidden md:block h-8 w-px bg-zinc-200 dark:bg-zinc-850"></div>
+                <div class="flex items-center gap-2">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400 shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <div>
+                        <span class="block text-[9px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-wide leading-none">Released on</span>
+                        <span class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mt-0.5">May 21, 2025</span>
+                    </div>
+                </div>
+                <button type="button" onclick="window.coraExecuteWorkspaceUpdate('<?php echo esc_js($avail_ver); ?>');" id="cora-update-main-btn" class="w-full sm:w-auto h-10 px-4 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.98]">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="rotate-180"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"/></svg>
+                    Upgrade Now
+                </button>
             </div>
         </div>
 
-        <!-- Update Value Statement -->
-        <div class="space-y-2">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Why you should update</h4>
-            <p class="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
-                This hotfix introduces detailed release logs inside a new side-sliding drawer UI and integrates a stable 120-second timeout to prevent installation stalls on slower hosting connections.
-            </p>
-        </div>
+        <!-- Timeline Section -->
+        <div class="space-y-4 pt-2">
+            <div class="flex items-center justify-between border-b border-zinc-150 dark:border-zinc-850 pb-3">
+                <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-50">Changelog & Features</h4>
+                <button type="button" onclick="window.coraToggleExpandAll(this);" class="h-8 px-3 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-750 dark:text-zinc-300 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-3xs">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                    <span>Expand All</span>
+                </button>
+            </div>
 
-        <!-- Release Notes Changelog -->
-        <div class="space-y-2">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Release Notes</h4>
-            <div id="cora-changelog-container" class="cora-changelog-content text-xs text-zinc-650 dark:text-zinc-300 space-y-4 border border-zinc-150 dark:border-zinc-800/80 rounded-xl p-4 bg-zinc-50/20 dark:bg-zinc-950/20 leading-relaxed">
-                <?php echo wp_kses_post( $changelog_content ); ?>
+            <!-- Timeline items rendered dynamically by JavaScript -->
+            <div id="cora-changelog-timeline-container" class="py-2"></div>
+            
+            <div class="flex justify-center pt-2">
+                <button type="button" class="h-8 px-4 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-750 dark:text-zinc-300 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1">
+                    <span>View more improvements in v2.9.0</span>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
             </div>
         </div>
 
-        <!-- Safety Warning Callout -->
-        <div class="flex gap-3 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl text-[11px] text-amber-700 dark:text-amber-300/90 leading-relaxed">
-            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0 text-amber-600 dark:text-amber-450"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <!-- Safety Backup Tip -->
+        <div class="flex gap-3 p-4 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/80 rounded-xl text-xs text-zinc-550 dark:text-zinc-400 leading-relaxed">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-400"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8" stroke-width="2.5"/></svg>
             <div>
-                <strong class="font-bold">Recommendation:</strong> Please perform a quick file and database backup before proceeding with the upgrade to ensure recovery safety.
+                <strong class="font-bold text-zinc-700 dark:text-zinc-300">Recommendation:</strong> Please perform a database and file backup before proceeding with updates to ensure workspace restoration safety.
             </div>
         </div>
 
     </div>
 
     <!-- Sticky Footer Actions -->
-    <div class="p-6 border-t border-zinc-150 dark:border-zinc-800/80 bg-zinc-50 dark:bg-zinc-900/30 flex items-center gap-3 flex-shrink-0">
-        <button id="cora-update-confirm-btn" onclick="window.coraExecuteWorkspaceUpdate('<?php echo esc_js($avail_ver); ?>');" class="flex-1 h-10 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-950 text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.98]">
-            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-            Proceed with Update
-        </button>
-        <button onclick="window.coraCloseUpdateDrawer();" class="px-4 h-10 rounded-lg bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700/80 text-zinc-700 dark:text-zinc-300 text-xs font-bold transition-all cursor-pointer active:scale-[0.98]">
-            Cancel
-        </button>
+    <div class="p-6 border-t border-zinc-150 dark:border-zinc-850 bg-zinc-50/50 dark:bg-zinc-900/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 flex-shrink-0">
+        <div class="flex items-center gap-2 select-none">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+            <div>
+                <span class="block text-[8px] font-bold text-zinc-400 uppercase tracking-wide leading-none">Official Shipment Channel</span>
+                <span class="block text-[10px] font-bold text-zinc-550 dark:text-zinc-450 mt-0.5">Production Stable (GitHub)</span>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+            <button type="button" onclick="window.coraCheckForUpdatesNow();" class="flex-1 sm:flex-none h-10 px-4 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-750 dark:text-zinc-300 text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-3xs active:scale-[0.98]">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                Check for Updates
+            </button>
+            <button id="cora-update-confirm-btn" onclick="window.coraExecuteWorkspaceUpdate('<?php echo esc_js($avail_ver); ?>');" class="flex-1 sm:flex-none h-10 px-4 rounded-xl bg-zinc-950 hover:bg-zinc-900 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.98]">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="rotate-180"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"/></svg>
+                Upgrade Workspace Now
+            </button>
+        </div>
     </div>
 </div>
 <?php endif; ?>
