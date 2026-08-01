@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.9.5
+ * Version: 2.9.6
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.9.5' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.6' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -750,7 +750,7 @@ function cora_real_estate_ai_handle_workspace_route() {
     }
 
     if ( $is_workspace_route ) {
-        $public_subs = array( 'login', 'forgot-password', 'reset-password', 'setup-account', 'register', 'verify-pending' );
+        $public_subs = array( 'login', 'forgot-password', 'reset-password', 'setup-account', 'register', 'verify-pending', 'onboarding' );
 
         // ── Google OAuth — intercept BEFORE any login check (works for guests) ──────
         if ( isset( $path_parts[1] ) && $path_parts[1] === 'auth' ) {
@@ -769,6 +769,20 @@ function cora_real_estate_ai_handle_workspace_route() {
 
         // Active workspace context resolution
         $current_ws = cora_get_current_workspace_context();
+
+        // Allow logged-in users to access onboarding if not completed
+        if ( is_user_logged_in() && $sub_page === 'onboarding' ) {
+            $onboarding_done = get_user_meta( get_current_user_id(), 'cora_onboarding_completed', true );
+            if ( $onboarding_done === '1' ) {
+                $target_slug = isset( $current_ws['slug'] ) ? $current_ws['slug'] : 'workspace';
+                wp_redirect( home_url( '/' . $target_slug . '/dashboard' ) );
+                exit;
+            }
+            nocache_headers();
+            status_header( 200 );
+            include CORA_WORKSPACE_PATH . 'views/onboarding.php';
+            exit;
+        }
 
         // If logged in and hitting public auth pages, redirect to active workspace dashboard
         if ( is_user_logged_in() && in_array( $sub_page, $public_subs ) ) {
@@ -1342,10 +1356,50 @@ function cora_real_estate_ai_handle_email_verification() {
                 wp_set_auth_cookie( $user_id );
             }
             
-            wp_redirect( home_url( '/workspace/dashboard?cora_verified=true' ) );
+            // Route to onboarding if not completed, otherwise dashboard
+            $onb_done = get_user_meta( $user_id, 'cora_onboarding_completed', true );
+            if ( $onb_done !== '1' ) {
+                wp_redirect( home_url( '/workspace/onboarding?step=2' ) );
+            } else {
+                wp_redirect( home_url( '/workspace/dashboard?cora_verified=true' ) );
+            }
             exit;
         } else {
             wp_redirect( home_url( '/workspace/dashboard?cora_verified=error' ) );
+            exit;
+        }
+    }
+
+    // Catch Magic Link token
+    if ( ! empty( $_GET['cora_magic_token'] ) && ! empty( $_GET['cora_user_id'] ) ) {
+        $user_id   = intval( $_GET['cora_user_id'] );
+        $url_token = sanitize_text_field( $_GET['cora_magic_token'] );
+        
+        $saved_token  = get_user_meta( $user_id, 'cora_workspace_magic_token', true );
+        $saved_expiry = get_user_meta( $user_id, 'cora_workspace_magic_token_expiry', true );
+        
+        if ( $saved_token && $saved_token === $url_token && time() < intval( $saved_expiry ) ) {
+            update_user_meta( $user_id, 'cora_workspace_email_verified', '1' ); // Magic link counts as verified
+            delete_user_meta( $user_id, 'cora_workspace_magic_token' );
+            delete_user_meta( $user_id, 'cora_workspace_magic_token_expiry' );
+            
+            // Log user in automatically if not logged in
+            if ( ! is_user_logged_in() || get_current_user_id() !== $user_id ) {
+                wp_clear_auth_cookie();
+                wp_set_current_user( $user_id );
+                wp_set_auth_cookie( $user_id );
+            }
+            
+            // Redirect to onboarding step 2 if onboarding is not completed, else dashboard
+            $onb_done = get_user_meta( $user_id, 'cora_onboarding_completed', true );
+            if ( $onb_done !== '1' ) {
+                wp_redirect( home_url( '/workspace/onboarding?step=2' ) );
+            } else {
+                wp_redirect( home_url( '/workspace/dashboard?welcome=1' ) );
+            }
+            exit;
+        } else {
+            wp_redirect( home_url( '/workspace/login?error=magic_link_invalid' ) );
             exit;
         }
     }
@@ -23057,10 +23111,39 @@ function cora_get_client_reviews( $phone_or_email = '' ) {
 // ══════════════════════════════════════════════════════════════════════════════
 
 /**
+ * Helper to determine if we are running in a local/dev environment.
+ */
+function cora_is_local_environment() {
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    return ( 
+        strpos( $host, 'localhost' ) !== false || 
+        strpos( $host, '127.0.0.1' ) !== false || 
+        strpos( $host, '.local' ) !== false || 
+        strpos( $host, '.test' ) !== false
+    );
+}
+
+/**
  * Initiate Google OAuth — redirects browser to Google consent screen.
  */
 function cora_initiate_google_oauth() {
     $client_id = get_option( 'cora_google_client_id', '' );
+
+    // If local dev environment and client ID is empty, perform mock google auth redirection
+    if ( cora_is_local_environment() && empty( $client_id ) ) {
+        $state = bin2hex( random_bytes( 16 ) );
+        set_transient( 'cora_google_oauth_state_' . $state, '1', 15 * MINUTE_IN_SECONDS );
+        $mock_url = add_query_arg(
+            array(
+                'code'  => 'mock_local_code',
+                'state' => $state,
+            ),
+            home_url( '/workspace/auth/google/callback' )
+        );
+        wp_redirect( $mock_url );
+        exit;
+    }
+
     if ( empty( $client_id ) || ! get_option( 'cora_onboarding_google_enabled', 1 ) || ! get_option( 'cora_onboarding_enabled', 1 ) ) {
         wp_redirect( home_url( '/workspace/register?error=google_disabled' ) );
         exit;
@@ -23100,50 +23183,62 @@ function cora_handle_google_oauth_callback() {
         exit;
     }
 
-    // Exchange auth code for access token
-    $client_id     = get_option( 'cora_google_client_id', '' );
-    $client_secret = get_option( 'cora_google_client_secret', '' );
-    $redirect_uri  = home_url( '/workspace/auth/google/callback' );
+    $google_email  = '';
+    $google_name   = '';
+    $google_avatar = '';
+    $google_id     = '';
 
-    $token_response = wp_remote_post( 'https://oauth2.googleapis.com/token', array(
-        'timeout' => 15,
-        'body'    => array(
-            'code'          => $code,
-            'client_id'     => $client_id,
-            'client_secret' => $client_secret,
-            'redirect_uri'  => $redirect_uri,
-            'grant_type'    => 'authorization_code',
-        ),
-    ) );
+    if ( $code === 'mock_local_code' && cora_is_local_environment() ) {
+        $google_email  = 'mock.google.user@heycora.in';
+        $google_name   = 'Mock Google User';
+        $google_avatar = 'https://secure.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y';
+        $google_id     = '1234567890';
+    } else {
+        // Exchange auth code for access token
+        $client_id     = get_option( 'cora_google_client_id', '' );
+        $client_secret = get_option( 'cora_google_client_secret', '' );
+        $redirect_uri  = home_url( '/workspace/auth/google/callback' );
 
-    if ( is_wp_error( $token_response ) ) {
-        wp_redirect( home_url( '/workspace/register?error=oauth_token' ) );
-        exit;
+        $token_response = wp_remote_post( 'https://oauth2.googleapis.com/token', array(
+            'timeout' => 15,
+            'body'    => array(
+                'code'          => $code,
+                'client_id'     => $client_id,
+                'client_secret' => $client_secret,
+                'redirect_uri'  => $redirect_uri,
+                'grant_type'    => 'authorization_code',
+            ),
+        ) );
+
+        if ( is_wp_error( $token_response ) ) {
+            wp_redirect( home_url( '/workspace/register?error=oauth_token' ) );
+            exit;
+        }
+
+        $token_body   = json_decode( wp_remote_retrieve_body( $token_response ), true );
+        $access_token = $token_body['access_token'] ?? '';
+        if ( empty( $access_token ) ) {
+            wp_redirect( home_url( '/workspace/register?error=oauth_token' ) );
+            exit;
+        }
+
+        // Fetch user profile from Google
+        $profile_response = wp_remote_get( 'https://www.googleapis.com/oauth2/v2/userinfo', array(
+            'timeout' => 10,
+            'headers' => array( 'Authorization' => 'Bearer ' . $access_token ),
+        ) );
+
+        if ( is_wp_error( $profile_response ) ) {
+            wp_redirect( home_url( '/workspace/register?error=oauth_token' ) );
+            exit;
+        }
+
+        $profile       = json_decode( wp_remote_retrieve_body( $profile_response ), true );
+        $google_email  = sanitize_email( $profile['email'] ?? '' );
+        $google_name   = sanitize_text_field( $profile['name'] ?? '' );
+        $google_avatar = esc_url_raw( $profile['picture'] ?? '' );
+        $google_id     = sanitize_text_field( $profile['id'] ?? '' );
     }
-
-    $token_body   = json_decode( wp_remote_retrieve_body( $token_response ), true );
-    $access_token = $token_body['access_token'] ?? '';
-    if ( empty( $access_token ) ) {
-        wp_redirect( home_url( '/workspace/register?error=oauth_token' ) );
-        exit;
-    }
-
-    // Fetch user profile from Google
-    $profile_response = wp_remote_get( 'https://www.googleapis.com/oauth2/v2/userinfo', array(
-        'timeout' => 10,
-        'headers' => array( 'Authorization' => 'Bearer ' . $access_token ),
-    ) );
-
-    if ( is_wp_error( $profile_response ) ) {
-        wp_redirect( home_url( '/workspace/register?error=oauth_token' ) );
-        exit;
-    }
-
-    $profile       = json_decode( wp_remote_retrieve_body( $profile_response ), true );
-    $google_email  = sanitize_email( $profile['email'] ?? '' );
-    $google_name   = sanitize_text_field( $profile['name'] ?? '' );
-    $google_avatar = esc_url_raw( $profile['picture'] ?? '' );
-    $google_id     = sanitize_text_field( $profile['id'] ?? '' );
 
     if ( empty( $google_email ) ) {
         wp_redirect( home_url( '/workspace/register?error=oauth_token' ) );
@@ -23227,7 +23322,13 @@ function cora_handle_google_oauth_callback() {
     do_action( 'wp_login', $user->user_login, $user );
     cora_log_activity( 'Authentication', 'Logged in via Google OAuth.', $user->ID );
 
-    wp_redirect( home_url( '/workspace/dashboard?welcome=1' ) );
+    // Route new Google users to onboarding, existing users to dashboard
+    $onb_done = get_user_meta( $user->ID, 'cora_onboarding_completed', true );
+    if ( $onb_done !== '1' ) {
+        wp_redirect( home_url( '/workspace/onboarding?step=2' ) );
+    } else {
+        wp_redirect( home_url( '/workspace/dashboard?welcome=1' ) );
+    }
     exit;
 }
 
@@ -23250,15 +23351,16 @@ function cora_ajax_self_register() {
 
     // Sanitize inputs
     $name     = sanitize_text_field( $_POST['name']     ?? '' );
+    if ( empty( $name ) ) {
+        $name = 'Workspace Owner';
+    }
     $agency   = sanitize_text_field( $_POST['agency']   ?? '' );
     $email    = sanitize_email(      $_POST['email']    ?? '' );
     $industry = sanitize_text_field( $_POST['industry'] ?? 'real_estate' );
     $password = $_POST['password'] ?? '';
-    $confirm  = $_POST['confirm']  ?? '';
+    $confirm  = $_POST['confirm']  ?? $password;
 
     // Validate
-    if ( empty( $name ) )              { wp_send_json_error( array( 'message' => 'Full name is required.' ) ); }
-    if ( empty( $agency ) )            { wp_send_json_error( array( 'message' => 'Agency name is required.' ) ); }
     if ( ! is_email( $email ) )        { wp_send_json_error( array( 'message' => 'Please enter a valid email address.' ) ); }
     if ( strlen( $password ) < 8 )     { wp_send_json_error( array( 'message' => 'Password must be at least 8 characters.' ) ); }
     if ( $password !== $confirm )      { wp_send_json_error( array( 'message' => 'Passwords do not match.' ) ); }
@@ -23315,10 +23417,24 @@ function cora_ajax_self_register() {
     cora_send_verification_email( $user_id );
     cora_log_activity( 'User Onboarding', 'New workspace owner registered via email: ' . $email, $user_id );
 
-    wp_send_json_success( array(
+    $response = array(
         'message' => 'Account created! Please verify your email.',
         'email'   => $email,
-    ) );
+    );
+
+    if ( cora_is_local_environment() ) {
+        $token = get_user_meta( $user_id, 'cora_workspace_verification_token', true );
+        $verify_url = add_query_arg(
+            array(
+                'cora_verify_token' => $token,
+                'cora_user_id'      => $user_id,
+            ),
+            home_url( '/workspace' )
+        );
+        $response['dev_verify_url'] = $verify_url;
+    }
+
+    wp_send_json_success( $response );
 }
 add_action( 'wp_ajax_nopriv_cora_self_register', 'cora_ajax_self_register' );
 
@@ -23425,6 +23541,207 @@ function cora_ajax_onboarding_update_user() {
     }
 }
 add_action( 'wp_ajax_cora_onboarding_update_user', 'cora_ajax_onboarding_update_user' );
+
+/**
+ * AJAX — Save business details during onboarding (Step 2).
+ */
+function cora_ajax_onboarding_save_business() {
+    check_ajax_referer( 'cora_onboarding_nonce', 'nonce' );
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Authentication required.' ) );
+    }
+
+    $user_id       = get_current_user_id();
+    $full_name     = sanitize_text_field( $_POST['full_name'] ?? '' );
+    $business_name = sanitize_text_field( $_POST['business_name'] ?? '' );
+    $phone         = sanitize_text_field( $_POST['phone'] ?? '' );
+    $contact_email = sanitize_email( $_POST['contact_email'] ?? '' );
+
+    if ( empty( $business_name ) ) {
+        wp_send_json_error( array( 'message' => 'Business name is required.' ) );
+    }
+
+    if ( ! empty( $full_name ) ) {
+        $name_parts = explode( ' ', $full_name, 2 );
+        wp_update_user( array(
+            'ID'           => $user_id,
+            'display_name' => $full_name,
+            'first_name'   => $name_parts[0] ?? '',
+            'last_name'    => $name_parts[1] ?? '',
+        ) );
+    }
+
+    update_user_meta( $user_id, 'cora_workspace_agency_name', $business_name );
+    if ( ! empty( $phone ) ) {
+        update_user_meta( $user_id, 'cora_workspace_phone', $phone );
+    }
+    if ( ! empty( $contact_email ) ) {
+        update_user_meta( $user_id, 'cora_workspace_contact_email', $contact_email );
+    }
+
+    cora_log_activity( 'Onboarding', 'Business details saved: ' . $business_name, $user_id );
+    wp_send_json_success( array( 'message' => 'Business details saved.' ) );
+}
+add_action( 'wp_ajax_cora_onboarding_save_business', 'cora_ajax_onboarding_save_business' );
+
+/**
+ * AJAX — Activate workspace during onboarding (Step 4).
+ */
+function cora_ajax_onboarding_activate_workspace() {
+    check_ajax_referer( 'cora_onboarding_nonce', 'nonce' );
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Authentication required.' ) );
+    }
+
+    $user_id  = get_current_user_id();
+    $industry = sanitize_text_field( $_POST['industry'] ?? 'real_estate' );
+
+    // Validate industry
+    $allowed = array( 'real_estate', 'photography_studio', 'custom' );
+    if ( ! in_array( $industry, $allowed, true ) ) {
+        $industry = 'real_estate';
+    }
+
+    // For 'custom' mode, default to real_estate internally but store the preference
+    $active_industry = ( $industry === 'custom' ) ? 'real_estate' : $industry;
+    update_option( 'cora_workspace_industry', $active_industry );
+    update_user_meta( $user_id, 'cora_onboarding_industry_selected', $industry );
+
+    // Set up database tables for the selected module
+    if ( class_exists( 'Cora_Module_Registry' ) ) {
+        $module = Cora_Module_Registry::get_module( $active_industry );
+        if ( $module ) {
+            $module->setup_database_tables();
+        }
+    }
+
+    // Mark onboarding as complete
+    update_user_meta( $user_id, 'cora_onboarding_completed', '1' );
+    cora_log_activity( 'Onboarding', 'Workspace activated with industry: ' . $industry, $user_id );
+
+    $redirect_url = home_url( '/workspace/dashboard?welcome=1' );
+    wp_send_json_success( array(
+        'message'      => 'Workspace activated!',
+        'redirect_url' => $redirect_url,
+    ) );
+}
+add_action( 'wp_ajax_cora_onboarding_activate_workspace', 'cora_ajax_onboarding_activate_workspace' );
+
+/**
+ * AJAX — Request a passwordless magic link.
+ */
+function cora_ajax_request_magic_link() {
+    $nonce = $_POST['nonce'] ?? '';
+    if ( ! wp_verify_nonce( $nonce, 'cora_login_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed. Please refresh and try again.' ) );
+    }
+
+    $email = sanitize_email( $_POST['email'] ?? '' );
+    if ( ! is_email( $email ) ) {
+        wp_send_json_error( array( 'message' => 'Please enter a valid email address.' ) );
+    }
+
+    // Check if user exists
+    $user = get_user_by( 'email', $email );
+    $is_new_user = false;
+
+    if ( ! $user ) {
+        // Create new user (passwordless registration)
+        if ( ! get_option( 'cora_onboarding_enabled', 1 ) ) {
+            wp_send_json_error( array( 'message' => 'Registration is currently closed.' ) );
+        }
+
+        $username_base = sanitize_user( explode( '@', $email )[0] );
+        $username      = $username_base;
+        if ( username_exists( $username ) ) {
+            $username = $username_base . '_' . substr( md5( $email ), 0, 6 );
+        }
+
+        $default_role = sanitize_text_field( get_option( 'cora_onboarding_default_role', 'cora_super_admin' ) );
+        $user_id = wp_insert_user( array(
+            'user_login'   => $username,
+            'user_email'   => $email,
+            'role'         => $default_role,
+            'user_pass'    => wp_generate_password( 24 ),
+        ) );
+
+        if ( is_wp_error( $user_id ) ) {
+            wp_send_json_error( array( 'message' => $user_id->get_error_message() ) );
+        }
+
+        update_user_meta( $user_id, 'cora_workspace_email_verified', '0' );
+        update_user_meta( $user_id, 'cora_user_status', 'active' );
+        update_user_meta( $user_id, 'cora_auth_provider', 'magic_link' );
+
+        $duration = intval( get_option( 'cora_onboarding_account_duration', 0 ) );
+        if ( $duration > 0 ) {
+            update_user_meta( $user_id, 'cora_account_expires_at', time() + ( $duration * DAY_IN_SECONDS ) );
+        }
+
+        $user = get_user_by( 'id', $user_id );
+        $is_new_user = true;
+    } else {
+        // User exists, check status
+        if ( get_user_meta( $user->ID, 'cora_user_status', true ) === 'inactive' ) {
+            wp_send_json_error( array( 'message' => 'Your account is deactivated. Contact support.' ) );
+        }
+    }
+
+    // Generate token
+    $token = bin2hex( random_bytes( 16 ) );
+    update_user_meta( $user->ID, 'cora_workspace_magic_token', $token );
+    update_user_meta( $user->ID, 'cora_workspace_magic_token_expiry', time() + ( 15 * MINUTE_IN_SECONDS ) );
+
+    $magic_url = add_query_arg(
+        array(
+            'cora_magic_token' => $token,
+            'cora_user_id'     => $user->ID,
+        ),
+        home_url( '/workspace' )
+    );
+
+    // Send email (unless local, where we return it)
+    $to      = $email;
+    $subject = 'Your Cora Magic Login Link';
+    $headers = array('Content-Type: text/html; charset=UTF-8');
+    $message = '
+    <html>
+    <head>
+        <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #ffffff; color: #18181b; padding: 24px; }
+            .container { max-width: 500px; margin: 0 auto; border: 1px solid #e4e4e7; border-radius: 12px; padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+            h2 { font-size: 20px; font-weight: 600; margin-bottom: 12px; }
+            p { font-size: 13.5px; line-height: 1.6; color: #71717a; margin-bottom: 24px; }
+            .btn { display: inline-block; background: #18181b; color: #ffffff !important; text-decoration: none; font-size: 12px; font-weight: 600; padding: 12px 24px; border-radius: 8px; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Your Magic Login Link</h2>
+            <p>Click the button below to sign in to your Cora Workspace instantly. This link is valid for 15 minutes.</p>
+            <p><a href="' . esc_url( $magic_url ) . '" class="btn">Sign In to Cora</a></p>
+        </div>
+    </body>
+    </html>
+    ';
+
+    if ( ! cora_is_local_environment() ) {
+        wp_mail( $to, $subject, $message, $headers );
+    }
+
+    $response = array(
+        'message' => 'Magic login link sent! Please check your email.',
+        'email'   => $email,
+    );
+
+    if ( cora_is_local_environment() ) {
+        $response['dev_magic_url'] = $magic_url;
+    }
+
+    wp_send_json_success( $response );
+}
+add_action( 'wp_ajax_cora_request_magic_link', 'cora_ajax_request_magic_link' );
+add_action( 'wp_ajax_nopriv_cora_request_magic_link', 'cora_ajax_request_magic_link' );
 
 /**
  * AJAX — Onboarding modal quick register via email-only.

@@ -894,15 +894,15 @@ $cora_settings_tabs = array(
                 <div class="flex-1 overflow-y-auto p-6 space-y-5">
                     <div>
                         <label class="block text-xs font-bold text-zinc-800 mb-1.5">Branch Office Name</label>
-                        <input type="text" id="new-branch-name" required placeholder="e.g. Westside HQ" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-955">
+                        <input type="text" id="new-branch-name" required placeholder="e.g. Westside HQ" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-zinc-800 mb-1.5">City</label>
-                        <input type="text" id="new-branch-city" required placeholder="e.g. Mumbai" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-955">
+                        <input type="text" id="new-branch-city" required placeholder="e.g. Mumbai" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-zinc-800 mb-1.5">Office Address</label>
-                        <input type="text" id="new-branch-address" required placeholder="e.g. 402, Bandra Kurla Complex" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-955">
+                        <input type="text" id="new-branch-address" required placeholder="e.g. 402, Bandra Kurla Complex" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-zinc-800 mb-1.5">Assign Branch Manager</label>
@@ -939,15 +939,15 @@ $cora_settings_tabs = array(
                     
                     <div>
                         <label class="block text-xs font-bold text-zinc-800 mb-1.5">Branch Office Name</label>
-                        <input type="text" id="edit-branch-name" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-955">
+                        <input type="text" id="edit-branch-name" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-zinc-800 mb-1.5">City</label>
-                        <input type="text" id="edit-branch-city" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-955">
+                        <input type="text" id="edit-branch-city" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-zinc-800 mb-1.5">Office Address</label>
-                        <input type="text" id="edit-branch-address" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-955">
+                        <input type="text" id="edit-branch-address" required class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-zinc-800 mb-1.5">Assign Branch Manager</label>

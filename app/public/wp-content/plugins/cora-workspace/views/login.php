@@ -267,7 +267,7 @@
         <p class="subtitle">Enter your credentials to access the workspace.</p>
         
         <?php
-        $google_enabled  = get_option( 'cora_onboarding_google_enabled', 1 ) && ! empty( get_option( 'cora_google_client_id', '' ) );
+        $google_enabled  = ( get_option( 'cora_onboarding_google_enabled', 1 ) && ! empty( get_option( 'cora_google_client_id', '' ) ) ) || cora_is_local_environment();
         $google_auth_url = home_url( '/workspace/auth/google' );
         if ( $google_enabled ) :
         ?>
@@ -308,10 +308,26 @@
             </div>
             
         <button type="submit" class="submit-btn" id="login-btn">Sign In</button>
+        <div style="margin-top:16px; text-align:center; font-size:12px;">
+            <a href="#" onclick="toggleAuthMode('magic', event)" style="color:var(--text-secondary);text-decoration:none;font-weight:600;">Sign in with Magic Link →</a>
+        </div>
+        </form>
+
+        <form id="magic-link-form" onsubmit="handleMagicLinkSubmit(event)" style="display:none;">
+            <div class="form-group">
+                <label for="magic-email">Email Address</label>
+                <input type="email" id="magic-email" required placeholder="name@agency.com">
+            </div>
+            
+            <button type="submit" class="submit-btn" id="magic-btn">Send Magic Link</button>
+            
+            <div style="margin-top:16px; text-align:center; font-size:12px;">
+                <a href="#" onclick="toggleAuthMode('password', event)" style="color:var(--text-secondary);text-decoration:none;font-weight:600;">← Sign in with Password</a>
+            </div>
         </form>
         <div style="margin-top:20px; text-align:center; font-size:12px; color:var(--text-secondary);">
             Don't have an account?
-            <a href="<?php echo esc_url( home_url( '/workspace/register' ) ); ?>" style="color:var(--text-primary);font-weight:700;text-decoration:none;">Create workspace →</a>
+            <a href="<?php echo esc_url( home_url( '/workspace/onboarding' ) ); ?>" style="color:var(--text-primary);font-weight:700;text-decoration:none;">Create workspace →</a>
         </div>
     </div>
 
@@ -455,6 +471,53 @@
                 nonce: '<?php echo wp_create_nonce( "cora_login_nonce" ); ?>'
             }, function(res) {
                 showToast(res.data.message);
+            });
+        }
+
+        function toggleAuthMode(mode, e) {
+            if (e) e.preventDefault();
+            if (mode === 'magic') {
+                $('#login-form').hide();
+                $('#magic-link-form').show();
+            } else {
+                $('#login-form').show();
+                $('#magic-link-form').hide();
+            }
+        }
+
+        function handleMagicLinkSubmit(e) {
+            e.preventDefault();
+            var email = $('#magic-email').val().trim();
+            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showToast('Please enter a valid email address.');
+                return;
+            }
+
+            $('#magic-btn').prop('disabled', true).text('Sending link...');
+
+            $.post('<?php echo admin_url( 'admin-ajax.php' ); ?>', {
+                action: 'cora_request_magic_link',
+                email: email,
+                nonce: '<?php echo wp_create_nonce( "cora_login_nonce" ); ?>'
+            }, function(res) {
+                if (res.success) {
+                    showToast(res.data.message);
+                    if (res.data.dev_magic_url) {
+                        var oldNotice = $('#dev-magic-notice');
+                        if (oldNotice.length) oldNotice.remove();
+
+                        var devDiv = $('<div id="dev-magic-notice" style="margin-top:16px; padding: 12px; background: #fef08a; color: #854d0e; border: 1px solid #fef08a; border-radius: 8px; font-size: 11.5px; text-align: left; line-height: 1.4;"></div>')
+                            .html('<strong>[Dev Mode] Magic Link generated:</strong><br><a href="' + res.data.dev_magic_url + '" style="color:#854d0e; font-weight:700; text-decoration:underline;">Click here to simulate magic link login →</a>');
+                        $('#magic-link-form').append(devDiv);
+                    }
+                } else {
+                    showToast(res.data.message);
+                    $('#magic-btn').prop('disabled', false).text('Send Magic Link');
+                }
+            }).fail(function() {
+                showToast('Network error. Please try again.');
+                $('#magic-btn').prop('disabled', false).text('Send Magic Link');
             });
         }
     </script>

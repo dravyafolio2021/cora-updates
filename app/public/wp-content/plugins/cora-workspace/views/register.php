@@ -1,3 +1,9 @@
+<?php
+if ( get_option( 'cora_onboarding_enabled', 1 ) ) {
+    wp_redirect( home_url( '/workspace/onboarding' ) );
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
