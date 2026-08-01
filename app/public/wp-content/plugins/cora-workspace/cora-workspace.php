@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.9.25
+ * Version: 2.9.26
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.9.25' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.26' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -485,6 +485,16 @@ function cora_get_workspace_by_slug( $slug ) {
         }
     }
 
+    if ( in_array( strtolower( $slug ), array( 'workspace', 'apex-realty', 'default' ), true ) ) {
+        return array(
+            'id'     => 1,
+            'name'   => 'Apex Realty Group',
+            'slug'   => $slug,
+            'plan'   => 'enterprise',
+            'status' => 'active'
+        );
+    }
+
     return null;
 }
 
@@ -540,7 +550,7 @@ function cora_get_user_workspaces( $user_id = 0 ) {
         array(
             'id' => 1,
             'name' => 'Apex Realty Group',
-            'slug' => 'apex-realty',
+            'slug' => 'workspace',
             'plan' => 'enterprise',
             'status' => 'active'
         )
@@ -553,7 +563,11 @@ function cora_get_user_workspaces( $user_id = 0 ) {
 function cora_user_can_access_workspace( $user_id, $workspace_slug ) {
     $user = get_userdata( $user_id );
     if ( ! $user ) return false;
-    
+
+    if ( in_array( strtolower( $workspace_slug ), array( 'workspace', 'apex-realty', 'default' ), true ) ) {
+        return true;
+    }
+
     // Shruti / Super Admin can access ANY workspace
     if ( cora_is_super_owner( $user ) ) {
         return true;
@@ -604,7 +618,7 @@ function cora_get_current_workspace_context() {
     $default_ws = array(
         'id' => 1,
         'name' => 'Apex Realty Group',
-        'slug' => 'apex-realty',
+        'slug' => 'workspace',
         'plan' => 'enterprise',
         'status' => 'active'
     );

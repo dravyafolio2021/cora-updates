@@ -2453,27 +2453,28 @@ $cora_settings_tabs = array(
                     ?>
                     <div id="cora-updates-status-container" class="select-none mb-5">
                         
-                        <!-- Default: Up-to-Date Compact Banner -->
-                        <div id="cora-updates-state-uptodate" class="<?php echo $update_available ? 'hidden' : ''; ?> p-4 bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/80 rounded-xl flex items-center justify-between gap-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/20">
-                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                                </div>
-                                <div>
-                                    <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 m-0 flex items-center gap-2">
-                                        <span>Your Workspace is Up to Date</span>
-                                        <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold">v<?php echo esc_html( CORA_WORKSPACE_VERSION ); ?></span>
-                                    </h4>
-                                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 m-0">
-                                        Last checked: <span id="cora-last-check-text" class="font-medium"><?php 
-                                            $last_checked = get_option( 'cora_workspace_last_update_check_time', 'Never' );
-                                            if ( 'Never' !== $last_checked ) {
-                                                $last_checked = mysql2date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $last_checked );
-                                            }
-                                            echo esc_html( $last_checked );
-                                        ?></span>.
-                                    </p>
-                                </div>
+                        <!-- Default: Up-to-Date Card (No further updates available) -->
+                        <div id="cora-updates-state-uptodate" class="<?php echo $update_available ? 'hidden' : ''; ?> p-5 bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/20 shadow-3xs">
+                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 m-0 flex items-center gap-2">
+                                    <span>You are operating on the latest version</span>
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-500/20">v<?php echo esc_html( CORA_WORKSPACE_VERSION ); ?></span>
+                                </h4>
+                                <p class="text-xs text-zinc-600 dark:text-zinc-300 m-0 font-medium leading-relaxed">
+                                    No further updates are available at this time. Your workspace platform features, schema models, and security definitions are completely up to date.
+                                </p>
+                                <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1 m-0">
+                                    Last checked: <span id="cora-last-check-text" class="font-semibold text-zinc-600 dark:text-zinc-400"><?php 
+                                        $last_checked = get_option( 'cora_workspace_last_update_check_time', 'Never' );
+                                        if ( 'Never' !== $last_checked ) {
+                                            $last_checked = mysql2date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $last_checked );
+                                        }
+                                        echo esc_html( $last_checked );
+                                    ?></span>.
+                                </p>
                             </div>
                         </div>
 
@@ -2565,8 +2566,8 @@ $cora_settings_tabs = array(
 
                     </div>
 
-                    <!-- Changelog Section -->
-                    <div class="space-y-3 pt-2">
+                    <!-- Changelog Section (Hidden when on Latest Version) -->
+                    <div id="cora-settings-changelog-section" class="<?php echo $update_available ? '' : 'hidden'; ?> space-y-3 pt-2">
                         <div class="flex items-center justify-between border-b border-zinc-150 dark:border-zinc-800/80 pb-2.5">
                             <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider m-0">Changelog & Features</h4>
                             <button type="button" id="cora-settings-expand-btn" onclick="coraToggleSettingsExpandAll(this);" class="h-7 px-3 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-850 text-zinc-750 dark:text-zinc-300 rounded-lg text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-3xs">
@@ -2845,12 +2846,14 @@ $cora_settings_tabs = array(
                         
                         jQuery('#cora-updates-state-available').removeClass('hidden');
                         jQuery('#cora-updates-state-uptodate').addClass('hidden');
+                        jQuery('#cora-settings-changelog-section').removeClass('hidden');
                         jQuery('#cora-btn-updates-upgrade').removeClass('hidden');
                         
                         if (window.coraShowToast) window.coraShowToast('New update v' + res.data.new_version + ' is available!', 'success');
                     } else {
                         jQuery('#cora-updates-state-uptodate').removeClass('hidden');
                         jQuery('#cora-updates-state-available').addClass('hidden');
+                        jQuery('#cora-settings-changelog-section').addClass('hidden');
                         jQuery('#cora-btn-updates-upgrade').addClass('hidden');
                         if (window.coraShowToast) window.coraShowToast('Your workspace is up to date on v' + res.data.current_version + '.');
                     }
