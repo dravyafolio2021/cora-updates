@@ -27,7 +27,7 @@ if ( ! function_exists( 'cora_is_super_owner' ) ) {
         if ( in_array( strtolower( $user->user_email ), $super_emails, true ) || strpos( strtolower( $user->user_email ), '@heycora.in' ) !== false ) {
             return true;
         }
-        return user_can( $user, 'manage_options' );
+        return false;
     }
 }
 
@@ -3115,7 +3115,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             </div>
             <?php
             $update = cora_check_workspace_update_available();
-            if ( $update && current_user_can( 'manage_options' ) ) :
+            if ( $update && cora_is_super_owner() ) :
             ?>
                 <button onclick="event.stopPropagation(); window.coraOpenUpdateDrawer();" class="flex items-center gap-1.5 bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full tracking-wider hover:bg-emerald-900 transition-colors cursor-pointer select-none shrink-0 animate-pulse" title="View workspace update details and release notes for v<?php echo esc_attr($update['version']); ?>">
                     <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="animate-bounce shrink-0"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
@@ -10831,7 +10831,7 @@ body {
 
 <?php
 $update = cora_check_workspace_update_available();
-if ( current_user_can( 'manage_options' ) ) :
+if ( cora_is_super_owner() ) :
     $avail_ver = is_array( $update ) && ! empty( $update['version'] ) ? $update['version'] : CORA_WORKSPACE_VERSION;
     $changelog_content = is_array( $update ) && ! empty( $update['changelog'] ) ? $update['changelog'] : '<h4>v2.2.1 Release</h4><ul><li>Industry Mode Switcher with 1-click toggle.</li><li>Isolated workspace scoping per agency slug.</li><li>Seeded role capabilities for all Real Estate and Studio roles.</li></ul>';
 ?>
