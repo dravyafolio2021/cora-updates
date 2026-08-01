@@ -1294,10 +1294,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
 (function() {
     'use strict';
 
-    // ── Theme Detection ───────────────────────────────────────
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.body.classList.add('cora-dark-theme');
-    }
+    // ── Theme Standard (Light Mode) ───────────────────────────
 
     // ── State ─────────────────────────────────────────────────
     var currentStep = <?php echo intval( $initial_step ); ?>;

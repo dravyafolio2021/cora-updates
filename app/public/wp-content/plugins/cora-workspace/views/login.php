@@ -335,9 +335,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.body.classList.add('cora-dark-theme');
-        }
+        // Light mode standard
 
         $(document).ready(function() {
             var urlParams = new URLSearchParams(window.location.search);

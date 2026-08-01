@@ -3240,10 +3240,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             <span class="text-[10px] text-zinc-400 font-mono">⌘.</span>
                         </button>
 
-                        <button class="w-full text-left px-2.5 py-2 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-zinc-50 font-medium flex items-center gap-3 cursor-pointer transition-colors" onclick="$('#cora-workspace').toggleClass('cora-dark-theme'); window.coraShowToast('Theme switched!'); $('#cora-header-profile-popover').addClass('hidden');">
-                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v20"></path></svg>
-                            Appearance
-                        </button>
 
                         <div class="px-2 py-1.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl space-y-1 select-none my-0.5">
                             <div class="flex items-center justify-between px-1">
@@ -3663,10 +3659,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         <span class="text-[10px] text-zinc-400 font-mono">⌘.</span>
                     </button>
 
-                    <button class="w-full text-left px-2.5 py-2 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-zinc-50 font-medium flex items-center gap-3 cursor-pointer transition-colors" onclick="$('#cora-workspace').toggleClass('cora-dark-theme'); window.coraShowToast('Theme switched!'); $('#cora-profile-popover').addClass('hidden');">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v20"></path></svg>
-                        Appearance
-                    </button>
 
                     <div class="px-2 py-1.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl space-y-1 select-none my-0.5">
                         <div class="flex items-center justify-between px-1">

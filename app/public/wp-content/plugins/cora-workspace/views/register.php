@@ -391,10 +391,7 @@ $google_auth_url = home_url( '/workspace/auth/google' );
 
 <div id="cora-toast-container"></div>
 
-<script>
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.body.classList.add('cora-dark-theme');
-    }
+    // Light mode standard
 
     var registeredEmail = '';
 
