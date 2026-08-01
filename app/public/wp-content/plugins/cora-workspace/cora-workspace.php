@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.5.4' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.1' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -101,13 +101,13 @@ function cora_workspace_admin_init_redirect() {
         $redirect_url = home_url( '/workspace' );
         if ( ! empty( $sub ) ) {
             $redirect_url = home_url( '/workspace/' . $sub );
-            $query_args = $_GET;
-            unset( $query_args['page'] );
-            unset( $query_args['sub'] );
-            unset( $query_args['sub_page'] );
-            if ( ! empty( $query_args ) ) {
-                $redirect_url = add_query_arg( $query_args, $redirect_url );
-            }
+        }
+        $query_args = $_GET;
+        unset( $query_args['page'] );
+        unset( $query_args['sub'] );
+        unset( $query_args['sub_page'] );
+        if ( ! empty( $query_args ) ) {
+            $redirect_url = add_query_arg( $query_args, $redirect_url );
         }
         wp_redirect( $redirect_url );
         exit;
@@ -16410,8 +16410,11 @@ function cora_filter_workspace_branding_option( $value, $option_name ) {
         global $wpdb;
         $ws_value = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $ws_option_name ) );
         if ( null !== $ws_value ) {
-            return maybe_unserialize( $ws_value );
+            $value = maybe_unserialize( $ws_value );
         }
+    }
+    if ( $option_name === 'cora_sidebar_title' && ( empty( $value ) || strtolower( $value ) === 'cora' ) ) {
+        return 'Cora Real Estate';
     }
     return $value;
 }
@@ -17293,7 +17296,7 @@ function cora_ajax_save_branch() {
 
     $user = wp_get_current_user();
     $role = ! empty( $user->roles ) ? $user->roles[0] : '';
-    if ( ! in_array( $role, array( 'administrator', 'cora_manager' ) ) ) {
+    if ( ! in_array( $role, array( 'administrator', 'cora_manager', 'cora_shruti', 'cora_super_admin' ) ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
     }
 
@@ -17388,7 +17391,7 @@ function cora_ajax_delete_branch() {
 
     $user = wp_get_current_user();
     $role = ! empty( $user->roles ) ? $user->roles[0] : '';
-    if ( ! in_array( $role, array( 'administrator', 'cora_manager' ) ) ) {
+    if ( ! in_array( $role, array( 'administrator', 'cora_manager', 'cora_shruti', 'cora_super_admin' ) ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
     }
 
@@ -18706,7 +18709,7 @@ function cora_canvas_ajax_permission_check( $write = false ) {
     }
     $user = wp_get_current_user();
     $roles = (array) $user->roles;
-    if ( in_array( 'administrator', $roles ) || in_array( 'cora_super_admin', $roles ) || in_array( 'cora_manager', $roles ) ) {
+    if ( in_array( 'administrator', $roles ) || in_array( 'cora_super_admin', $roles ) || in_array( 'cora_shruti', $roles ) || in_array( 'cora_manager', $roles ) ) {
         return true;
     }
     if ( ! $write && in_array( 'cora_branch_manager', $roles ) ) {

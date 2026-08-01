@@ -32,6 +32,9 @@ if ( ! function_exists( 'cora_is_super_owner' ) ) {
 }
 
 $sub_page = $sub_page ?? $GLOBALS['sub_page'] ?? $_GET['sub_page'] ?? 'dashboard';
+$cora_auto_update = isset( $_GET['cora_auto_update'] ) && $_GET['cora_auto_update'] === '1';
+$cora_target_version = sanitize_text_field( $_GET['target_version'] ?? '' );
+$cora_user_can_update = cora_is_super_owner();
 // Define workspace context early to avoid undefined variable warnings in the JS data injection block
 $cora_active_workspace = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array( 'id' => 1, 'name' => 'Apex Realty Group', 'slug' => 'apex-realty', 'plan' => 'enterprise', 'status' => 'active' );
 $cora_user_workspaces   = function_exists( 'cora_get_user_workspaces' ) ? cora_get_user_workspaces( get_current_user_id() ) : array( $cora_active_workspace );
@@ -1557,7 +1560,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         [id*="drawer"].translate-x-full,
         [class*="drawer"].translate-x-full,
         #cora-custom-actions-drawer:not(.open),
-        #cora-notification-drawer.collapsed,
+        #cora-notif-dropdown.collapsed,
         #cora-ai-sidebar.collapsed,
         #drawer-article-leads.collapsed,
         #cora-media-library-drawer.collapsed,
@@ -2847,6 +2850,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     
     <!-- Pass WordPress environment variables to JavaScript -->
     <script>
+        window.coraAutoUpdateConfig = {
+            active: <?php echo ($cora_auto_update && !empty($cora_target_version)) ? 'true' : 'false'; ?>,
+            targetVersion: "<?php echo esc_js($cora_target_version); ?>",
+            userCanUpdate: <?php echo $cora_user_can_update ? 'true' : 'false'; ?>,
+            nonce: "<?php echo esc_js( wp_create_nonce( 'cora_ajax_nonce' ) ); ?>"
+        };
+
         var coraREData = {
             ajaxUrl: "<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>",
             siteUrl: "<?php echo esc_url( get_site_url() ); ?>",
@@ -3172,7 +3182,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
             <!-- Notifications Bell -->
             <div class="relative shrink-0">
-                <button id="cora-notif-bell-btn" onclick="window.coraToggleNotificationDrawer(true);" class="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-850 rounded-lg transition-all cursor-pointer flex items-center justify-center shrink-0" title="Notifications">
+                <button id="cora-notif-bell-btn" class="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-850 rounded-lg transition-all cursor-pointer flex items-center justify-center shrink-0" title="Notifications">
                     <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
@@ -3585,22 +3595,24 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         <?php foreach ( $group['items'] as $target => $item ) : 
                             $nav_url = home_url( '/workspace/' . $target );
                         ?>
-                        <a href="<?php echo esc_url( $nav_url ); ?>" class="cora-nav-item <?php echo ( $sub_page === $target || str_replace('_', '-', $sub_page) === str_replace('_', '-', $target) ) ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer select-none no-underline text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white" data-target="<?php echo esc_attr($target); ?>" data-tooltip="<?php echo esc_attr($item['title']); ?>">
-                            <div class="flex items-center gap-3 select-none">
-                                <span class="cora-nav-icon select-none">
-                                    <?php echo $item['icon']; ?>
+                        <li class="list-none" data-target="<?php echo esc_attr($target); ?>">
+                            <a href="<?php echo esc_url( $nav_url ); ?>" class="cora-nav-item <?php echo ( $sub_page === $target || str_replace('_', '-', $sub_page) === str_replace('_', '-', $target) ) ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer select-none no-underline text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white" data-target="<?php echo esc_attr($target); ?>" data-tooltip="<?php echo esc_attr($item['title']); ?>">
+                                <div class="flex items-center gap-3 select-none">
+                                    <span class="cora-nav-icon select-none">
+                                        <?php echo $item['icon']; ?>
+                                    </span>
+                                    <span class="cora-nav-text select-none font-medium"><?php echo esc_html($item['title']); ?></span>
+                                </div>
+                                <?php if ( ! empty( $item['soon'] ) ) : ?>
+                                <span class="cora-badge cora-badge-sidebar px-1.5 py-0.5 text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 rounded-full border border-zinc-200 dark:border-zinc-700 select-none flex items-center gap-1">
+                                    <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                    SOON
                                 </span>
-                                <span class="cora-nav-text select-none font-medium"><?php echo esc_html($item['title']); ?></span>
-                            </div>
-                            <?php if ( ! empty( $item['soon'] ) ) : ?>
-                            <span class="cora-badge cora-badge-sidebar px-1.5 py-0.5 text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 rounded-full border border-zinc-200 dark:border-zinc-700 select-none flex items-center gap-1">
-                                <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                                SOON
-                            </span>
-                            <?php elseif ( isset($item['badge']) && intval($item['badge']) > 0 ) : ?>
-                            <span class="cora-badge cora-badge-sidebar px-1.5 py-0.5 text-[10px] font-medium bg-zinc-200 text-zinc-800 rounded-full select-none"><?php echo intval($item['badge']); ?></span>
-                            <?php endif; ?>
-                        </a>
+                                <?php elseif ( isset($item['badge']) && intval($item['badge']) > 0 ) : ?>
+                                <span class="cora-badge cora-badge-sidebar px-1.5 py-0.5 text-[10px] font-medium bg-zinc-200 text-zinc-800 rounded-full select-none"><?php echo intval($item['badge']); ?></span>
+                                <?php endif; ?>
+                            </a>
+                        </li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
@@ -6000,6 +6012,80 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                             Feature Locked — Standard REST API & AI Assistant remain active
                         </div>
                     </div>
+
+                    <?php if ( current_user_can( 'manage_options' ) ) : ?>
+                    <!-- Developer Preview & Token Generation (Admins/Developers Only) -->
+                    <div class="bg-white dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs space-y-4 mt-6">
+                        <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between">
+                            <div>
+                                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Model Context Protocol (MCP) AI Tools Server</h3>
+                                <p class="text-xs text-zinc-500 mt-0.5">Connect your custom external AI agents directly with Cora's data schemas.</p>
+                            </div>
+                            <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-[9px] font-bold uppercase tracking-wider">Beta Gateway</span>
+                        </div>
+
+                        <div class="p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/40">
+                            <p class="text-xs text-zinc-650 dark:text-zinc-350 leading-relaxed">
+                                Cora exposes an <strong>MCP tool server</strong> endpoint. By registering this gateway in your local AI platform (like Claude Desktop or Cursor), your AI assistant can query listings, create leads, check audit logs, and retrieve workspace statistics in real-time.
+                            </p>
+                        </div>
+
+                        <!-- MCP Gateway URL -->
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300">MCP Gateway Endpoint URL</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="cora-mcp-gateway-url-direct" readonly value="<?php echo esc_url( $mcp_url ); ?>" class="w-full font-mono bg-zinc-55/40 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs px-3 py-2 outline-none">
+                                <button type="button" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraCopyToClipboardDirect('cora-mcp-gateway-url-direct')">Copy URL</button>
+                            </div>
+                        </div>
+
+                        <!-- MCP Secure Token -->
+                        <form id="cora-mcp-token-form" method="post" action="" class="space-y-4 pt-2">
+                            <?php wp_nonce_field( 'cora_save_mcp_token_direct', 'cora_mcp_nonce' ); ?>
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300">Secure Bearer Access Token</label>
+                                <div class="flex gap-2">
+                                    <input type="password" id="cora-mcp-access-token-direct" name="cora_mcp_access_token_direct" value="<?php echo esc_attr( $mcp_token ); ?>" class="w-full font-mono bg-white dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs px-3 py-2 outline-none cora-credential-input" oncopy="return false;" oncut="return false;" ondragstart="return false;" ondrop="return false;" autocomplete="off">
+                                    <button type="button" class="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraToggleTokenVisibilityDirect()">Show</button>
+                                    <button type="button" class="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraGenerateNewMCPTokenDirect()">Regenerate</button>
+                                    <button type="submit" name="cora_save_mcp_token_direct_submit" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 shadow-sm">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                                        Save Token
+                                    </button>
+                                </div>
+                                <p class="text-[10px] text-zinc-400 mt-1">Authenticate requests by sending this value in the HTTP header: <code>Authorization: Bearer &lt;token&gt;</code>.</p>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Configuration Example Card -->
+                    <div class="bg-white dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs space-y-4">
+                        <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+                            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Claude Desktop Integration Example</h3>
+                            <p class="text-xs text-zinc-500">Configure your local Claude client settings file to connect this tool provider.</p>
+                        </div>
+                        
+                        <div class="space-y-2 pt-2">
+                            <div class="bg-zinc-900 text-zinc-100 rounded-xl p-4 font-mono text-[10px] leading-relaxed overflow-x-auto shadow-inner relative">
+                                <button type="button" class="absolute top-3 right-3 px-2 py-1 bg-zinc-800 hover:bg-zinc-750 text-zinc-300 rounded text-[9px] cursor-pointer" onclick="coraCopyClaudeConfigDirect()">Copy Config</button>
+                                <pre id="cora-claude-config-code-direct"><code>{
+  "mcpServers": {
+    "cora-crm": {
+      "command": "curl",
+      "args": [
+        "-X", "POST",
+        "<?php echo esc_url( $mcp_url ); ?>",
+        "-H", "Authorization: Bearer <?php echo esc_attr( $mcp_token ); ?>",
+        "-H", "Content-Type: application/json",
+        "-d", "{\"jsonrpc\":\"2.0\",\"method\":\"tools/list\",\"id\":1}"
+      ]
+    }
+  }
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                 </div>
 
                 <script>
@@ -6295,7 +6381,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
 
 
     <!-- Notifications Side Drawer Panel -->
-    <aside id="cora-notification-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[400px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-all duration-300 ease-in-out">
+    <aside id="cora-notif-dropdown" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[400px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-all duration-300 ease-in-out">
         <div class="px-5 py-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/60 dark:bg-zinc-950/60 shrink-0 select-none">
             <div class="flex items-center gap-2">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-700 dark:text-zinc-300">
@@ -9262,6 +9348,8 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
 wp_print_media_templates();
 wp_print_footer_scripts();
 ?>
+<!-- Workspace Script -->
+<script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/admin-script.js?v=' . CORA_WORKSPACE_VERSION; ?>"></script>
 
 <script>
 (function() {
@@ -9369,7 +9457,7 @@ wp_print_footer_scripts();
     }
 
     window.coraToggleNotificationDrawer = function(forceShow) {
-        const drawer = document.getElementById('cora-notification-drawer');
+        const drawer = document.getElementById('cora-notif-dropdown');
         if (!drawer) return;
         const isCollapsed = drawer.classList.contains('collapsed');
         const shouldOpen = forceShow !== undefined ? forceShow : isCollapsed;
@@ -10158,6 +10246,15 @@ wp_print_footer_scripts();
                 inlinePalette.classList.remove('flex');
             }
 
+            // Close notification drawer when clicking outside
+            const notifDropdown = document.getElementById('cora-notif-dropdown');
+            if (notifDropdown && !notifDropdown.classList.contains('collapsed')) {
+                const bellBtn = document.getElementById('cora-notif-bell-btn');
+                if (!notifDropdown.contains(e.target) && (!bellBtn || !bellBtn.contains(e.target))) {
+                    window.coraToggleNotificationDrawer(false);
+                }
+            }
+
             // Close popovers when clicking outside
             const profilePopover = document.getElementById('cora-profile-popover');
             if (profilePopover && !profilePopover.classList.contains('hidden')) {
@@ -10231,98 +10328,49 @@ wp_print_footer_scripts();
         const sidebarSearchInput = document.getElementById('cora-sidebar-search-input');
         const sidebarNav = document.querySelector('.cora-sidebar-nav');
         const sidebarSearchResults = document.getElementById('cora-sidebar-search-results');
-        let sidebarSearchTimeout = null;
-        let sidebarActiveFetch = null;
 
-        function getSidebarIconSVG(name) {
-            const icons = {
-                'settings': `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`,
-                'lock': `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`,
-                'map-pin': `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`,
-                'image': `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`,
-                'user': `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
-                'layout': `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`,
-                'home': `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`,
-                'globe': `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`,
-                'server': `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>`,
-                'activity': `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>`
-            };
-            return icons[name] || `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
-        }
-
-        if (sidebarSearchInput && sidebarNav && sidebarSearchResults) {
+        if (sidebarSearchInput && sidebarNav) {
             sidebarSearchInput.addEventListener('input', function() {
-                const query = this.value.trim();
+                const query = this.value.trim().toLowerCase();
+                const navItems = sidebarNav.querySelectorAll('li[data-target]');
                 
-                if (sidebarSearchTimeout) clearTimeout(sidebarSearchTimeout);
-                if (sidebarActiveFetch) sidebarActiveFetch.abort();
-
                 if (query === '') {
+                    // Show all items and group labels
+                    navItems.forEach(item => item.classList.remove('hidden'));
+                    const groups = sidebarNav.querySelectorAll('.cora-nav-group');
+                    groups.forEach(group => {
+                        const label = group.querySelector('.cora-nav-group-label');
+                        if (label) label.classList.remove('hidden');
+                    });
+                    if (sidebarSearchResults) {
+                        sidebarSearchResults.classList.add('hidden');
+                        sidebarSearchResults.innerHTML = '';
+                    }
                     sidebarNav.classList.remove('hidden');
-                    sidebarSearchResults.classList.add('hidden');
-                    sidebarSearchResults.innerHTML = '';
                     return;
                 }
 
-                sidebarNav.classList.add('hidden');
-                sidebarSearchResults.classList.remove('hidden');
-                sidebarSearchResults.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-8 space-y-2 select-none">
-                        <div class="w-4 h-4 border-2 border-zinc-600 dark:border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span class="text-[10px] text-zinc-400 font-medium">Searching workspace...</span>
-                    </div>
-                `;
+                navItems.forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    const target = item.getAttribute('data-target') ? item.getAttribute('data-target').toLowerCase() : '';
+                    if (text.includes(query) || target.includes(query)) {
+                        item.classList.remove('hidden');
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                });
 
-                sidebarSearchTimeout = setTimeout(function() {
-                    const controller = new AbortController();
-                    sidebarActiveFetch = controller;
-
-                    const url = coraREData.ajaxUrl + '?action=cora_advanced_search&nonce=' + coraREData.ajaxNonce + '&q=' + encodeURIComponent(query) + '&filter=all';
-
-                    fetch(url, {
-                        method: 'GET',
-                        signal: controller.signal
-                    })
-                    .then(response => response.json())
-                    .then(res => {
-                        if (res.success && res.data && res.data.results && res.data.results.length > 0) {
-                            let html = `<div class="px-3 space-y-1.5">
-                                <div class="text-[9px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest mb-2 select-none">Quick Results</div>`;
-                            
-                            res.data.results.forEach(item => {
-                                html += `
-                                    <a href="${item.url}" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-zinc-100/70 dark:hover:bg-zinc-900/60 border border-transparent hover:border-zinc-200/50 dark:hover:border-zinc-800/50 transition-all text-decoration-none group">
-                                        <span class="w-8 h-8 rounded-lg bg-zinc-50 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 flex items-center justify-center border border-zinc-200/50 dark:border-zinc-800 shrink-0 group-hover:bg-white dark:group-hover:bg-zinc-955 transition-colors">
-                                            ${getSidebarIconSVG(item.icon)}
-                                        </span>
-                                        <div class="min-w-0 flex-1">
-                                            <div class="text-xs font-bold text-zinc-900 dark:text-white truncate">${item.title}</div>
-                                            <div class="text-[9px] text-zinc-450 dark:text-zinc-550 truncate mt-0.5">${item.description}</div>
-                                        </div>
-                                    </a>
-                                `;
-                            });
-                            
-                            html += `</div>`;
-                            sidebarSearchResults.innerHTML = html;
-                        } else {
-                            sidebarSearchResults.innerHTML = `
-                                <div class="p-6 text-center text-xs text-zinc-400 select-none border border-dashed border-zinc-200 dark:border-zinc-800/80 rounded-xl mx-3">
-                                    No quick results found.
-                                </div>
-                            `;
-                        }
-                    })
-                    .catch(err => {
-                        if (err.name !== 'AbortError') {
-                            sidebarSearchResults.innerHTML = `
-                                <div class="p-6 text-center text-xs text-zinc-400 select-none border border-dashed border-zinc-200 dark:border-zinc-800/80 rounded-xl mx-3">
-                                    Error loading search results.
-                                </div>
-                            `;
-                        }
-                    });
-                }, 200);
+                // Show/hide group labels based on whether they have visible children
+                const groups = sidebarNav.querySelectorAll('.cora-nav-group');
+                groups.forEach(group => {
+                    const visibleItems = Array.from(group.querySelectorAll('li[data-target]')).filter(item => !item.classList.contains('hidden'));
+                    const label = group.querySelector('.cora-nav-group-label');
+                    if (visibleItems.length === 0) {
+                        if (label) label.classList.add('hidden');
+                    } else {
+                        if (label) label.classList.remove('hidden');
+                    }
+                });
             });
         }
     });
@@ -11149,6 +11197,196 @@ if ( current_user_can( 'manage_options' ) ) :
 
 <!-- Global Drawer Backdrop -->
 <div id="cora-drawer-backdrop" onclick="window.coraCloseAllDrawers()" class="hidden fixed inset-0 bg-black/30 dark:bg-black/60 z-[9990] backdrop-blur-[1.5px] transition-opacity duration-200 cursor-pointer"></div>
+
+<?php if ( $cora_auto_update && ! empty( $cora_target_version ) ) : ?>
+<div id="cora-auto-update-overlay-panel" class="fixed inset-0 z-[999999] bg-zinc-50/90 dark:bg-zinc-950/95 backdrop-blur-md flex items-center justify-center select-none font-sans">
+    <style>
+        #cora-auto-update-overlay-panel {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        #cora-auto-update-overlay-panel .step-item {
+            transition: all 0.3s ease;
+        }
+    </style>
+    <div class="w-full max-w-md p-8 bg-white dark:bg-zinc-900 border border-zinc-150 dark:border-zinc-800/80 rounded-2xl shadow-2xl flex flex-col items-center text-center space-y-6">
+        
+        <!-- Logo Header -->
+        <div class="flex flex-col items-center space-y-2">
+            <span class="text-3xl font-black tracking-tight text-zinc-900 dark:text-white">cora</span>
+            <div class="px-2.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 rounded-full font-mono">
+                AUTO-UPGRADE ENGINE
+            </div>
+        </div>
+
+        <!-- Spinner & Status Title -->
+        <div class="flex flex-col items-center space-y-2">
+            <div id="cora-upgrade-spinner" class="w-12 h-12 flex items-center justify-center text-zinc-900 dark:text-white mb-2">
+                <svg class="animate-spin w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </div>
+            <h3 id="cora-upgrade-status-title" class="text-sm font-bold text-zinc-900 dark:text-white">Initializing Platform Upgrade...</h3>
+            <p id="cora-upgrade-status-desc" class="text-xs text-zinc-400">Target version: v<?php echo esc_html($cora_target_version); ?></p>
+        </div>
+
+        <!-- Step-by-Step Checklist -->
+        <div class="w-full text-left space-y-3 bg-zinc-50/50 dark:bg-zinc-950/40 p-4 border border-zinc-100 dark:border-zinc-800/80 rounded-xl">
+            <!-- Step 1 -->
+            <div id="cora-step-1" class="step-item flex items-center justify-between text-xs text-zinc-400 dark:text-zinc-500 font-medium">
+                <div class="flex items-center gap-2">
+                    <div class="step-icon w-5 h-5 rounded-full border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-[10px] font-bold">1</div>
+                    <span>Validating administrator authorization</span>
+                </div>
+                <span class="step-status text-[10px] uppercase font-bold tracking-wider">Pending...</span>
+            </div>
+            <!-- Step 2 -->
+            <div id="cora-step-2" class="step-item flex items-center justify-between text-xs text-zinc-400 dark:text-zinc-500 font-medium">
+                <div class="flex items-center gap-2">
+                    <div class="step-icon w-5 h-5 rounded-full border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-[10px] font-bold">2</div>
+                    <span>Downloading workspace update</span>
+                </div>
+                <span class="step-status text-[10px] uppercase font-bold tracking-wider">Pending...</span>
+            </div>
+            <!-- Step 3 -->
+            <div id="cora-step-3" class="step-item flex items-center justify-between text-xs text-zinc-400 dark:text-zinc-500 font-medium">
+                <div class="flex items-center gap-2">
+                    <div class="step-icon w-5 h-5 rounded-full border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-[10px] font-bold">3</div>
+                    <span>Extracting update packages</span>
+                </div>
+                <span class="step-status text-[10px] uppercase font-bold tracking-wider">Pending...</span>
+            </div>
+            <!-- Step 4 -->
+            <div id="cora-step-4" class="step-item flex items-center justify-between text-xs text-zinc-400 dark:text-zinc-500 font-medium">
+                <div class="flex items-center gap-2">
+                    <div class="step-icon w-5 h-5 rounded-full border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-[10px] font-bold">4</div>
+                    <span>Upgrading core modules & DB</span>
+                </div>
+                <span class="step-status text-[10px] uppercase font-bold tracking-wider">Pending...</span>
+            </div>
+        </div>
+
+        <!-- Failure Details or Exit Button -->
+        <div id="cora-upgrade-action-container" class="hidden w-full pt-2">
+            <button onclick="window.location.href='?page=cora-workspace'" class="w-full py-2 bg-zinc-950 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 text-xs font-bold rounded-lg transition-colors cursor-pointer shadow-sm">
+                Back to Workspace Dashboard
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+jQuery(document).ready(function($) {
+    const config = window.coraAutoUpdateConfig || {};
+    if (!config.active) return;
+
+    // Helper functions to update steps
+    function setStepStatus(stepNum, status, isSuccess = null) {
+        const stepRow = $('#cora-step-' + stepNum);
+        if (!stepRow.length) return;
+        
+        const statusSpan = stepRow.find('.step-status');
+        const iconDiv = stepRow.find('.step-icon');
+        
+        statusSpan.text(status);
+        
+        if (isSuccess === true) {
+            stepRow.removeClass('text-zinc-400 dark:text-zinc-500').addClass('text-zinc-900 dark:text-zinc-100 font-bold');
+            statusSpan.removeClass('text-zinc-400').addClass('text-emerald-500 font-bold');
+            iconDiv.html('<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="3" fill="none" class="text-emerald-500"><polyline points="20 6 9 17 4 12"></polyline></svg>')
+                   .addClass('border-emerald-500 bg-emerald-500/10')
+                   .removeClass('border-zinc-200 dark:border-zinc-800');
+        } else if (isSuccess === false) {
+            stepRow.removeClass('text-zinc-400 dark:text-zinc-500').addClass('text-red-650 dark:text-red-400 font-bold');
+            statusSpan.removeClass('text-zinc-400').addClass('text-red-500 font-bold');
+            iconDiv.html('<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="3" fill="none" class="text-red-500"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>')
+                   .addClass('border-red-500 bg-red-500/10')
+                   .removeClass('border-zinc-200 dark:border-zinc-800');
+        } else {
+            // Running/Active state
+            stepRow.removeClass('text-zinc-400 dark:text-zinc-500').addClass('text-zinc-900 dark:text-zinc-100 font-bold');
+            statusSpan.removeClass('text-zinc-400').addClass('text-zinc-850 dark:text-zinc-200 font-medium');
+            iconDiv.html('<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="3" fill="none" class="animate-spin text-zinc-900 dark:text-zinc-100"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>')
+                   .addClass('border-zinc-900 dark:border-zinc-100')
+                   .removeClass('border-zinc-200 dark:border-zinc-800');
+        }
+    }
+
+    function showFail(errMessage) {
+        $('#cora-upgrade-spinner').html('<svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2.5" fill="none" class="text-red-500"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>');
+        $('#cora-upgrade-status-title').text('Upgrade Failed').addClass('text-red-650 dark:text-red-400');
+        $('#cora-upgrade-status-desc').text(errMessage).addClass('text-red-550 dark:text-red-450/80');
+        $('#cora-upgrade-action-container').removeClass('hidden');
+        if (window.coraShowToast) window.coraShowToast(errMessage, 'error');
+    }
+
+    // Step 1: Validate authorization
+    setTimeout(function() {
+        if (!config.userCanUpdate) {
+            setStepStatus(1, 'Denied', false);
+            showFail('Access Denied: You must be logged in as an administrator to upgrade the workspace.');
+            return;
+        }
+        
+        setStepStatus(1, 'Passed', true);
+        
+        // Step 2: Trigger update AJAX
+        setStepStatus(2, 'Running...');
+        
+        const ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
+        
+        $.ajax({
+            url: ajaxUrl,
+            type: 'POST',
+            timeout: 120000,
+            data: {
+                action: 'cora_trigger_workspace_update',
+                version: config.targetVersion,
+                nonce: config.nonce
+            },
+            success: function(res) {
+                if (res.success) {
+                    setStepStatus(2, 'Complete', true);
+                    
+                    // Step 3: Extracting
+                    setStepStatus(3, 'Running...');
+                    setTimeout(function() {
+                        setStepStatus(3, 'Complete', true);
+                        
+                        // Step 4: Core & DB upgrading
+                        setStepStatus(4, 'Running...');
+                        setTimeout(function() {
+                            setStepStatus(4, 'Complete', true);
+                            
+                            // Success UI
+                            $('#cora-upgrade-spinner').html('<svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-500"><polyline points="20 6 9 17 4 12"></polyline></svg>');
+                            $('#cora-upgrade-status-title').text('Workspace Updated!').addClass('text-emerald-600 dark:text-emerald-450');
+                            $('#cora-upgrade-status-desc').text('Reloading workspace panel...').addClass('text-emerald-500');
+                            
+                            if (window.coraShowToast) window.coraShowToast('Workspace upgraded successfully to v' + config.targetVersion, 'success');
+                            
+                            setTimeout(function() {
+                                window.location.href = '?page=cora-workspace';
+                            }, 2000);
+                        }, 800);
+                    }, 800);
+                } else {
+                    setStepStatus(2, 'Failed', false);
+                    var msg = (res.data && res.data.message) ? res.data.message : 'Update failed during extraction.';
+                    showFail(msg);
+                }
+            },
+            error: function(xhr, status) {
+                setStepStatus(2, 'Failed', false);
+                var errMsg = status === 'timeout' ? 'Download timed out. The update server is taking too long.' : 'Network error. Could not reach the update server.';
+                showFail(errMsg);
+            }
+        });
+    }, 1000);
+});
+</script>
+<?php endif; ?>
 
 </body>
 </html>
