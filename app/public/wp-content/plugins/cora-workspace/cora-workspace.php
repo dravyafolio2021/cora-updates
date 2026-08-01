@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.9.0
+ * Version: 2.9.1
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2

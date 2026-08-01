@@ -1890,13 +1890,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     window.closeEditUserDrawer = closeEditUserDrawer;
 
     // Tab switching for User Management section (synchronized across mobile/desktop menus)
-    $(document).on('click', '.cora-sub-tabs-container .cora-sub-tab', function(e) {
+    $(document).on('click', '#cora-page-team-roles .cora-sub-tabs-container .cora-sub-tab', function(e) {
         e.preventDefault();
         var targetId = $(this).data('target');
         if (!targetId) return;
 
         // Sync active states on all matching tab buttons
-        $('.cora-sub-tabs-container .cora-sub-tab').each(function() {
+        $('#cora-page-team-roles .cora-sub-tabs-container .cora-sub-tab').each(function() {
             var $t = $(this);
             if ($t.data('target') === targetId) {
                 $t.addClass('active border-zinc-950 dark:border-zinc-150 text-zinc-950 dark:text-zinc-150 font-semibold')
@@ -1910,17 +1910,17 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             }
         });
         
-        $('.cora-tab-content').addClass('hidden');
+        $('#cora-page-team-roles .cora-tab-content').addClass('hidden');
         $('#' + targetId).removeClass('hidden');
 
         // Handle More dropdown active styling on mobile
         var isSecondary = ['tab-attendance-logs', 'tab-permissions-matrix', 'tab-custom-roles'].indexOf(targetId) !== -1;
         if (isSecondary) {
-            $('#users-more-tab-btn')
+            $('#cora-page-team-roles #users-more-tab-btn')
                 .addClass('active border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 font-semibold')
                 .removeClass('border-transparent text-zinc-400 dark:text-zinc-500 font-medium');
         } else {
-            $('#users-more-tab-btn')
+            $('#cora-page-team-roles #users-more-tab-btn')
                 .removeClass('active border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 font-semibold')
                 .addClass('border-transparent text-zinc-400 dark:text-zinc-500 font-medium');
         }
@@ -1940,7 +1940,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
         // Update "More" button text and state on mobile
         var isDropdownTab = ['tab-permissions-matrix', 'tab-attendance-logs', 'tab-custom-roles'].includes(targetId);
-        var $moreBtn = $('#mobile-tabs-more-btn');
+        var $moreBtn = $('#cora-page-team-roles #mobile-tabs-more-btn');
         if (isDropdownTab) {
             var tabName = $(this).text().trim();
             $moreBtn.find('span').text(tabName);
@@ -1953,16 +1953,16 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         }
 
         // Close dropdown
-        $('#mobile-tabs-more-dropdown').addClass('hidden');
-        $('#more-chevron-icon').removeClass('rotate-180');
+        $('#cora-page-team-roles #mobile-tabs-more-dropdown').addClass('hidden');
+        $('#cora-page-team-roles #more-chevron-icon').removeClass('rotate-180');
     });
 
     // Toggle Mobile "More" Tabs Dropdown Menu
-    $(document).on('click', '#mobile-tabs-more-btn', function(e) {
+    $(document).on('click', '#cora-page-team-roles #mobile-tabs-more-btn', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        var $dropdown = $('#mobile-tabs-more-dropdown');
-        var $chevron = $('#more-chevron-icon');
+        var $dropdown = $('#cora-page-team-roles #mobile-tabs-more-dropdown');
+        var $chevron = $('#cora-page-team-roles #more-chevron-icon');
         
         if ($dropdown.hasClass('hidden')) {
             $dropdown.removeClass('hidden');
@@ -1975,9 +1975,11 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
     // Close Mobile "More" dropdown on click outside
     $(document).on('click', function(e) {
-        if (!$(e.target).closest('#mobile-tabs-more-btn, #mobile-tabs-more-dropdown').length) {
-            $('#mobile-tabs-more-dropdown').addClass('hidden');
-            $('#more-chevron-icon').removeClass('rotate-180');
+        if ($('#cora-page-team-roles').is(':visible')) {
+            if (!$(e.target).closest('#mobile-tabs-more-btn, #mobile-tabs-more-dropdown').length) {
+                $('#cora-page-team-roles #mobile-tabs-more-dropdown').addClass('hidden');
+                $('#cora-page-team-roles #more-chevron-icon').removeClass('rotate-180');
+            }
         }
     });
 
@@ -1985,7 +1987,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         const params = new URLSearchParams(window.location.search);
         const activeTab = params.get('tab');
         if (activeTab) {
-            let $matchingTab = $('.cora-sub-tabs-container .cora-sub-tab').filter(function() {
+            let $matchingTab = $('#cora-page-team-roles .cora-sub-tabs-container .cora-sub-tab').filter(function() {
                 var target = $(this).data('target') || '';
                 var slug = target.replace(/^tab-/, '');
                 return target === activeTab ||
@@ -2074,8 +2076,10 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
     // Close dropdown menu when clicking outside
     $(document).on('click', function(e) {
-        if (!$(e.target).closest('#users-more-tab-wrapper').length) {
-            closeUsersMoreMenu();
+        if ($('#cora-page-team-roles').is(':visible')) {
+            if (!$(e.target).closest('#users-more-tab-wrapper').length) {
+                closeUsersMoreMenu();
+            }
         }
     });
 

@@ -9263,11 +9263,6 @@ wp_print_media_templates();
 wp_print_footer_scripts();
 ?>
 
-<!-- Workspace Script (Inlined for bulletproof execution) -->
-<script>
-    <?php include CORA_WORKSPACE_PATH . 'assets/js/admin-script.js'; ?>
-</script>
-
 <script>
 (function() {
     let coraNotifications = <?php echo json_encode( $cora_user_notifications ); ?> || [];
