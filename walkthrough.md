@@ -33,3 +33,27 @@ We have successfully resolved cross-module script and layout interference issues
   - `AJAX_TRIGGER_EXISTS: YES`
   - `AJAX_CHECK_EXISTS: YES`
   - `AJAX_PROGRESS_EXISTS: YES`
+
+---
+
+## 📦 Version 2.9.8 Release & Package Deployment
+
+### 1. Responsive Software Updates Layout Redesign
+- **Wider Drawer Sheet**: Adjusted maximum width to `960px` to comfortably display columns, dropdown selectors, and timeline elements on desktop screens while remaining fully responsive (100% width) on mobile devices.
+- **Mockup Components Integration**:
+  - **Header Section**: Rendered the mockup title `"Software Updates"` alongside the subtitle and a static `"Release Channel: Production Stable"` dropdown card.
+  - **Platform Available Card**: Designed the available updates container card featuring a rotate sync icon within a black rounded box, the `"UPDATE AVAILABLE"` (or `"FULLY UP TO DATE"`) pill, and a calendar released-on indicator.
+  - **Vertical timeline**: Formatted an axis line (`.cora-update-timeline::before`) and dot markers matching each release version from `2.9.8` down to `2.9.0`.
+
+### 2. Interactive Timeline Accordion Items
+- **Collapsible Cards**: Each release note is mapped to a clickable accordion row. Caret icon indicators rotate dynamically as accordion cards are toggled.
+- **Topic Icons mapping**: Mapped standard thin SVG vector icons (e.g. sparkles, code, shield, refresh, link, zap, users, wifi) based on the topic of changes.
+- **Expand All / Collapse All controls**: Added a master trigger button in the timeline header that expands or collapses all accordion rows simultaneously.
+
+### 3. Dynamic Live Changelog Parser
+- **DOMParser script**: Integrated a JavaScript parser inside `window.coraCheckForUpdatesNow` to decode HTML changelog markup received from the live updates server. If newer release versions exist, they are parsed and dynamically prepended onto the timeline in real-time.
+
+### 4. Release updates Deployment
+- Incremented plugin files and headers to **v2.9.8**.
+- Packaged clean update file `cora-workspace.zip` (15MB size) and updated the update manifest `cora-workspace.json`.
+- Committed and pushed release updates to both repositories (`dravyafolio2021/heycora` and `dravyafolio2021/cora-updates`). Workspaces are ready for upgrading!
