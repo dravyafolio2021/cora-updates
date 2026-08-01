@@ -2488,19 +2488,51 @@ $cora_settings_tabs = array(
                             </div>
                         </div>
 
-                        <!-- State: Update Available Banner Card -->
+                        <!-- State: Update Available Feature Spotlight Card -->
                         <div id="cora-updates-state-available" class="<?php echo $update_available ? '' : 'hidden'; ?> w-full text-left animate-in fade-in duration-200">
-                            <div class="border border-blue-500/30 dark:border-blue-500/20 rounded-xl p-4 bg-blue-500/5 dark:bg-blue-500/10 flex items-center justify-between gap-4">
-                                <div class="flex items-center gap-3.5">
-                                    <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" fill="none" class="animate-pulse"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-                                    </div>
-                                    <div>
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-[9px] font-extrabold bg-blue-600 text-white px-2 py-0.5 rounded tracking-wide uppercase leading-none">UPDATE AVAILABLE</span>
-                                            <span class="text-xs font-bold text-zinc-900 dark:text-white">v<?php echo esc_html( $info['version'] ?? CORA_WORKSPACE_VERSION ); ?></span>
+                            <div class="border border-emerald-500/30 dark:border-emerald-500/20 rounded-2xl p-5 bg-gradient-to-br from-emerald-500/5 via-emerald-500/10 to-transparent dark:from-emerald-500/10 dark:via-emerald-500/15 dark:to-transparent space-y-3.5 shadow-xs">
+                                <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-emerald-500/15">
+                                    <div class="flex items-center gap-3.5">
+                                        <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md">
+                                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                                         </div>
-                                        <p class="text-[11px] text-zinc-600 dark:text-zinc-300 mt-1 m-0">Current installed version: <strong>v<?php echo esc_html( CORA_WORKSPACE_VERSION ); ?></strong></p>
+                                        <div>
+                                            <div class="flex items-center gap-2 flex-wrap">
+                                                <span class="text-[9px] font-extrabold bg-emerald-600 text-white px-2.5 py-0.5 rounded-full tracking-wide uppercase leading-none shadow-3xs">NEW VERSION AVAILABLE</span>
+                                                <span class="text-sm font-black text-zinc-900 dark:text-white font-mono" id="cora-avail-ver-pill">v<?php echo esc_html( $info['version'] ?? CORA_WORKSPACE_VERSION ); ?></span>
+                                            </div>
+                                            <p class="text-xs text-zinc-600 dark:text-zinc-300 mt-1 m-0">
+                                                Upgrade from <span class="font-semibold text-zinc-800 dark:text-zinc-200">v<?php echo esc_html( CORA_WORKSPACE_VERSION ); ?></span> to <span class="font-bold text-emerald-600 dark:text-emerald-400 font-mono" id="cora-avail-target-ver">v<?php echo esc_html( $info['version'] ?? CORA_WORKSPACE_VERSION ); ?></span>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Quick Upgrade Action -->
+                                    <button type="button" onclick="coraTriggerInAppUpgradeManual()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center gap-2 shadow-md active:scale-97">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                                        <span>Upgrade Workspace Now</span>
+                                    </button>
+                                </div>
+
+                                <!-- What's New Highlights -->
+                                <div id="cora-avail-highlights-box" class="space-y-2 pt-1">
+                                    <h5 class="text-[11px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 m-0 flex items-center gap-1.5">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                        <span>What's New in this Release:</span>
+                                    </h5>
+                                    <div id="cora-avail-highlights-content" class="text-xs text-zinc-700 dark:text-zinc-200 space-y-1.5 m-0 font-medium">
+                                        <?php
+                                        if ( ! empty( $info['sections']['changelog'] ) ) {
+                                            preg_match( '/<ul>(.*?)<\/ul>/s', $info['sections']['changelog'], $matches );
+                                            if ( ! empty( $matches[0] ) ) {
+                                                echo $matches[0];
+                                            } else {
+                                                echo '<ul class="list-disc pl-4 space-y-1"><li>Performance optimizations, security patches, and workspace UI refinements.</li></ul>';
+                                            }
+                                        } else {
+                                            echo '<ul class="list-disc pl-4 space-y-1"><li>Performance optimizations, security patches, and workspace UI refinements.</li></ul>';
+                                        }
+                                        ?>
                                     </div>
                                 </div>
                             </div>
@@ -2654,12 +2686,21 @@ $cora_settings_tabs = array(
                 const container = document.getElementById('cora-settings-changelog-timeline');
                 if (!container) return;
 
-                let releases = window.coraReleasesData;
-                if (!releases || !releases.length) {
-                    const rawBox = document.getElementById('cora-update-changelog-box');
-                    if (rawBox && rawBox.innerHTML && typeof parseChangelogHTML === 'function') {
-                        releases = parseChangelogHTML(rawBox.innerHTML);
-                    }
+                let releases = [];
+                
+                // Always parse server raw box first
+                const rawBox = document.getElementById('cora-update-changelog-box');
+                if (rawBox && rawBox.innerHTML && typeof parseChangelogHTML === 'function') {
+                    releases = parseChangelogHTML(rawBox.innerHTML);
+                }
+
+                // Merge static releases if missing
+                if (window.coraReleasesData && Array.isArray(window.coraReleasesData)) {
+                    window.coraReleasesData.forEach(rel => {
+                        if (!releases.some(r => r.version === rel.version)) {
+                            releases.push(rel);
+                        }
+                    });
                 }
 
                 if (!releases || !releases.length) return;
@@ -2697,7 +2738,7 @@ $cora_settings_tabs = array(
                         const tLower = item.title.toLowerCase();
                         if (tLower.includes('lock') || tLower.includes('security') || tLower.includes('privilege') || tLower.includes('scoping')) {
                             svgIcon = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-amber-500"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
-                        } else if (tLower.includes('ui') || tLower.includes('redesign') || tLower.includes('onboarding') || tLower.includes('screen')) {
+                        } else if (tLower.includes('ui') || tLower.includes('redesign') || tLower.includes('onboarding') || tLower.includes('screen') || tLower.includes('bar')) {
                             svgIcon = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-blue-500"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
                         } else if (tLower.includes('fix') || tLower.includes('bug') || tLower.includes('hotfix')) {
                             svgIcon = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-emerald-500"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`;
@@ -2784,14 +2825,31 @@ $cora_settings_tabs = array(
                     jQuery('#cora-last-check-text').text(res.data.last_checked);
                     
                     if (res.data.update_available) {
-                        jQuery('#cora-available-version-text').text('v' + res.data.new_version);
-                        jQuery('#cora-update-changelog-box').html(res.data.changelog);
+                        jQuery('#cora-avail-ver-pill').text('v' + res.data.new_version);
+                        jQuery('#cora-avail-target-ver').text('v' + res.data.new_version);
+                        
+                        if (res.data.changelog) {
+                            jQuery('#cora-update-changelog-box').html(res.data.changelog);
+                            
+                            var tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = res.data.changelog;
+                            var firstUl = tempDiv.querySelector('ul');
+                            if (firstUl) {
+                                jQuery('#cora-avail-highlights-content').html(firstUl.outerHTML);
+                            }
+                        }
+                        
+                        coraRenderSettingsUpdateTimeline();
                         
                         jQuery('#cora-updates-state-available').removeClass('hidden');
                         jQuery('#cora-btn-updates-upgrade').removeClass('hidden');
                         
                         if (window.coraShowToast) window.coraShowToast('New update v' + res.data.new_version + ' is available!', 'success');
                     } else {
+                        jQuery('#cora-updates-state-uptodate').removeClass('hidden');
+                        if (window.coraShowToast) window.coraShowToast('Your workspace is already up to date.');
+                    }
+                } else {
                         jQuery('#cora-updates-state-uptodate').removeClass('hidden');
                         if (window.coraShowToast) window.coraShowToast('Your workspace is already up to date.');
                     }
