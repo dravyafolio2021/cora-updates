@@ -9607,7 +9607,7 @@ jQuery(document).ready(function($) {
                 var header = card.find('.cora-shopify-card-header');
                 var body = card.find('.cora-shopify-card-body');
                 if (body.length) {
-                    if (index === 0) {
+                    if (index === 0 || card.hasClass('expanded') || card.hasClass('start-expanded')) {
                         body.show();
                         header.find('.cora-card-chevron').addClass('active');
                         card.addClass('expanded');
@@ -11507,7 +11507,7 @@ jQuery(document).ready(function($) {
                 var header = card.find('.cora-shopify-card-header');
                 var body = card.find('.cora-shopify-card-body');
                 if (body.length) {
-                    if (index === 0) {
+                    if (index === 0 || card.hasClass('expanded') || card.hasClass('start-expanded')) {
                         body.show();
                         header.find('.cora-card-chevron').addClass('active');
                         card.addClass('expanded');

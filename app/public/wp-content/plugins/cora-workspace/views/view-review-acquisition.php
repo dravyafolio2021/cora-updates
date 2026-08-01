@@ -1044,7 +1044,7 @@ window.coraOpenSendReviewDrawer = function() {
         setTimeout(function() { backdrop.classList.remove('opacity-0'); }, 10);
     }
     if (drawer) {
-        drawer.classList.remove('hidden', 'pointer-events-none');
+        drawer.classList.remove('hidden', 'pointer-events-none', 'collapsed', 'translate-x-full');
         setTimeout(function() {
             drawer.classList.remove('opacity-0');
             drawer.classList.add('opacity-100');
