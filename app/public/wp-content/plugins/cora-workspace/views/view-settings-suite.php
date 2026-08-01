@@ -2428,8 +2428,8 @@ $cora_settings_tabs = array(
         }
         </style>
 
-        <div id="cora-settings-panel-updates" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'updates' ? '' : 'hidden'; ?>">
-            <div class="cora-shopify-card overflow-hidden relative">
+        <div id="cora-settings-panel-updates" class="cora-settings-panel space-y-6 max-w-3xl relative <?php echo $active_tab === 'updates' ? '' : 'hidden'; ?>">
+            <div class="cora-shopify-card">
                 <!-- Header -->
                 <div class="cora-shopify-card-header border-b border-zinc-150 dark:border-zinc-800/40 pb-3 flex items-center justify-between">
                     <div>
@@ -2552,27 +2552,27 @@ $cora_settings_tabs = array(
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- STICKY BOTTOM CTA BAR -->
-                <div class="sticky bottom-0 z-30 bg-white/95 dark:bg-zinc-950/95 backdrop-blur border-t border-zinc-200 dark:border-zinc-800/80 px-6 py-3.5 flex items-center justify-between flex-wrap gap-4 select-none shadow-md mt-6">
-                    <div class="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <span>Shipment Channel: <strong>Production Stable (GitHub)</strong></span>
-                    </div>
-                    
-                    <div class="flex items-center gap-2">
-                        <!-- Check Button -->
-                        <button type="button" id="cora-btn-updates-check" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-97 select-none" onclick="coraCheckForUpdatesManual()">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" id="cora-icon-updates-check" class="shrink-0"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
-                            <span id="cora-btn-updates-check-label">Check for Updates</span>
-                        </button>
+            <!-- FLOATING STICKY BOTTOM CTA BAR -->
+            <div class="sticky bottom-4 z-40 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border border-zinc-200 dark:border-zinc-800/90 px-5 py-3.5 rounded-2xl flex items-center justify-between flex-wrap gap-4 select-none shadow-xl transition-all">
+                <div class="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Shipment Channel: <strong class="text-zinc-800 dark:text-zinc-200">Production Stable (GitHub)</strong></span>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <!-- Check Button -->
+                    <button type="button" id="cora-btn-updates-check" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-97 select-none" onclick="coraCheckForUpdatesManual()">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" id="cora-icon-updates-check" class="shrink-0"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                        <span id="cora-btn-updates-check-label">Check for Updates</span>
+                    </button>
 
-                        <!-- Upgrade Button (sticky CTA) -->
-                        <button type="button" id="cora-btn-updates-upgrade" class="<?php echo $update_available ? '' : 'hidden'; ?> px-4.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-97 select-none" onclick="coraTriggerInAppUpgradeManual()">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                            <span>Upgrade Workspace Now</span>
-                        </button>
-                    </div>
+                    <!-- Upgrade Button (sticky CTA) -->
+                    <button type="button" id="cora-btn-updates-upgrade" class="<?php echo $update_available ? '' : 'hidden'; ?> px-4.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-97 select-none" onclick="coraTriggerInAppUpgradeManual()">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                        <span>Upgrade Workspace Now</span>
+                    </button>
                 </div>
             </div>
 
