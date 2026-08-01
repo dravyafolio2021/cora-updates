@@ -68,6 +68,7 @@ test.describe('Canvas Front-End Management System E2E Tests', () => {
 
     // Verify Level 2 headers (theme name may vary — just check element exists)
     await expect(page.locator('#dashboard-theme-name')).not.toBeEmpty();
+    const themeName = await page.locator('#dashboard-theme-name').innerText();
 
     // 4. Open New Page setup drawer (Level 2) — button is now #tab-action-pages
     await page.click('#tab-action-pages');
@@ -103,7 +104,7 @@ test.describe('Canvas Front-End Management System E2E Tests', () => {
     await page.waitForSelector('#canvas-level-3', { state: 'visible' });
 
     // Assert custom Level 3 top-bar contents
-    await expect(page.locator('#cora-topbar-theme-name')).toContainText('Cora Default Theme');
+    await expect(page.locator('#cora-topbar-theme-name')).toContainText(themeName.trim());
     
     // Close editor and return to Level 2
     const editorFrame = page.frameLocator('#elementor-editor-iframe');

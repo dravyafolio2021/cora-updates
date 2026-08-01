@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.9.21
+ * Version: 2.9.22
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.9.21' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.22' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -10100,6 +10100,61 @@ function cora_ajax_save_attendance() {
     wp_send_json_error( array( 'message' => 'Invalid log data' ) );
 }
 add_action( 'wp_ajax_cora_save_attendance', 'cora_ajax_save_attendance' );
+
+/**
+ * Helper — Resolve current authenticated user's active punch status for today.
+ */
+function cora_get_current_user_punch_status() {
+    if ( ! is_user_logged_in() ) {
+        return array( 'status' => 'out', 'time' => null );
+    }
+
+    $current_user = wp_get_current_user();
+    $logs = get_option( 'cora_workspace_attendance_logs', array() );
+    if ( ! is_array( $logs ) ) {
+        $logs = array();
+    }
+
+    $user_email = strtolower( trim( $current_user->user_email ) );
+    $user_display = strtolower( trim( $current_user->display_name ) );
+
+    $latest_log = null;
+    for ( $i = count( $logs ) - 1; $i >= 0; $i-- ) {
+        $log = $logs[$i];
+        $log_email = isset( $log['user_email'] ) ? strtolower( trim( $log['user_email'] ) ) : '';
+        $log_name = isset( $log['user'] ) ? strtolower( trim( $log['user'] ) ) : '';
+        
+        if ( ( ! empty( $log_email ) && $log_email === $user_email ) || ( ! empty( $log_name ) && $log_name === $user_display ) ) {
+            $latest_log = $log;
+            break;
+        }
+    }
+
+    if ( $latest_log && isset( $latest_log['type'] ) ) {
+        $ts = isset( $latest_log['timestamp'] ) ? intval( $latest_log['timestamp'] ) : 0;
+        if ( strlen( (string) $ts ) === 13 ) {
+            $ts = intval( $ts / 1000 );
+        }
+        $time_str = $ts ? date( 'g:i A', $ts ) : '';
+        return array(
+            'status' => ( $latest_log['type'] === 'in' ) ? 'in' : 'out',
+            'time'   => $time_str,
+        );
+    }
+
+    return array( 'status' => 'out', 'time' => null );
+}
+
+function cora_ajax_get_user_punch_status() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+
+    $res = cora_get_current_user_punch_status();
+    wp_send_json_success( $res );
+}
+add_action( 'wp_ajax_cora_get_user_punch_status', 'cora_ajax_get_user_punch_status' );
 
 /**
  * AJAX: Fetch & Filter Attendance Logs

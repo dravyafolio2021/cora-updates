@@ -4,6 +4,9 @@ import { login } from './helpers';
 test.describe('Canvas Advanced Extensions & Competitor Alignment E2E Tests', () => {
 
   test('Should test Draft Themes library and Theme Settings configuration', async ({ page }) => {
+    page.on('console', msg => console.log('CANVAS LOG:', msg.text()));
+    page.on('pageerror', err => console.error('CANVAS ERROR:', err.stack || err.message));
+
     // 1. Login and go to Canvas Hub
     await login(page);
     await page.goto('/workspace/canvas');

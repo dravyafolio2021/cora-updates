@@ -3159,8 +3159,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <span id="cora-header-punch-label" class="hidden sm:inline">Punch</span>
                 </button>
 
-                <!-- Punch Popover -->
-                <div id="cora-header-punch-popover" class="hidden absolute right-0 top-full mt-2 w-64 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl z-[80] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                <!-- Floating Viewport-Fixed Punch Popover -->
+                <div id="cora-header-punch-popover" class="hidden fixed top-14 right-12 md:right-24 w-64 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl z-[999999] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
                     <!-- Header -->
                     <div class="px-4 py-3 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-950/40 flex items-center justify-between">
                         <div class="flex items-center gap-2">
@@ -3319,7 +3319,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     </button>
                     <!-- Mobile Punch Popover -->
-                    <div id="cora-mobile-punch-popover" class="hidden absolute right-[-48px] top-full mt-2.5 w-60 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl z-[99] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div id="cora-mobile-punch-popover" class="hidden fixed top-14 right-12 w-60 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl z-[999999] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
                         <div class="px-4 py-3 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-950/40 flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <span id="cora-mobile-punch-popover-dot" class="w-2 h-2 rounded-full bg-zinc-300 dark:bg-zinc-600 shrink-0"></span>
@@ -10454,7 +10454,8 @@ wp_print_footer_scripts();
         // ======================================================
         // HEADER PUNCH IN / OUT WIDGET
         // ======================================================
-        var _headerPunchState = localStorage.getItem('cora_punch_state') ? JSON.parse(localStorage.getItem('cora_punch_state')) : { status: 'out', time: null };
+        <?php $db_punch_state = cora_get_current_user_punch_status(); ?>
+        var _headerPunchState = <?php echo json_encode( $db_punch_state ); ?>;
 
         window.updateHeaderPunchState = function(status, timeStr) {
             _headerPunchState = { status: status, time: timeStr };
@@ -10462,6 +10463,7 @@ wp_print_footer_scripts();
             
             // Desktop elements
             const dot = document.getElementById('cora-header-punch-dot');
+            const label = document.getElementById('cora-header-punch-label');
             const popDot = document.getElementById('cora-punch-popover-dot');
             const popStatus = document.getElementById('cora-punch-popover-status');
             const popTime = document.getElementById('cora-punch-popover-time');
@@ -10474,6 +10476,7 @@ wp_print_footer_scripts();
 
             if (status === 'in') {
                 if (dot) { dot.style.backgroundColor = '#22c55e'; }
+                if (label) { label.textContent = 'Punched In'; }
                 if (popDot) { popDot.style.backgroundColor = '#22c55e'; }
                 if (popStatus) popStatus.textContent = 'Punched In';
                 
@@ -10482,6 +10485,7 @@ wp_print_footer_scripts();
                 if (mobPopStatus) mobPopStatus.textContent = 'Punched In';
             } else {
                 if (dot) { dot.style.backgroundColor = '#71717a'; }
+                if (label) { label.textContent = 'Punch'; }
                 if (popDot) { popDot.style.backgroundColor = '#71717a'; }
                 if (popStatus) popStatus.textContent = 'Not punched in';
                 
@@ -10492,6 +10496,11 @@ wp_print_footer_scripts();
             if (popTime && timeStr) popTime.textContent = timeStr;
             if (mobPopTime && timeStr) mobPopTime.textContent = timeStr;
         };
+
+        // Initialize state on page load
+        if (_headerPunchState && _headerPunchState.status) {
+            window.updateHeaderPunchState(_headerPunchState.status, _headerPunchState.time || '');
+        }
 
         window.toggleHeaderPunchPopover = function() {
             const pop = document.getElementById('cora-header-punch-popover');

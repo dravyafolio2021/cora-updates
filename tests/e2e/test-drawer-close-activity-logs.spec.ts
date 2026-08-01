@@ -2,6 +2,9 @@ import { test, expect } from '@playwright/test';
 import { login } from './helpers';
 
 test('verify drawer sheets open and close cleanly, and activity log pane opens dynamically', async ({ page }) => {
+  page.on('console', msg => console.log('BROWSER LOG:', msg.text()));
+  page.on('pageerror', err => console.error('BROWSER ERROR:', err.stack || err.message));
+
   await login(page);
 
   await page.goto('/workspace/leads');
