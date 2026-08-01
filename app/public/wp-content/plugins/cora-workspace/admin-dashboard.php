@@ -11378,9 +11378,47 @@ jQuery(document).ready(function($) {
                 }
             },
             error: function(xhr, status) {
-                setStepStatus(2, 'Failed', false);
-                var errMsg = status === 'timeout' ? 'Download timed out. The update server is taking too long.' : 'Network error. Could not reach the update server.';
-                showFail(errMsg);
+                // Connection might terminate due to FPM/OPcache reload when plugin files are replaced.
+                // Wait 3.5 seconds and do a check via cora_force_check_update to see if it actually succeeded.
+                $('#cora-upgrade-status-desc').text('Network connection recycled. Verifying upgrade...').addClass('text-zinc-500');
+                
+                setTimeout(function() {
+                    $.ajax({
+                        url: ajaxUrl,
+                        type: 'POST',
+                        data: {
+                            action: 'cora_force_check_update',
+                            nonce: config.nonce
+                        },
+                        success: function(verRes) {
+                            if (verRes.success && (verRes.data.up_to_date || verRes.data.version === config.targetVersion || verRes.data.current_version === config.targetVersion)) {
+                                setStepStatus(2, 'Complete', true);
+                                setStepStatus(3, 'Complete', true);
+                                setStepStatus(4, 'Complete', true);
+                                
+                                $('#cora-upgrade-spinner').html('<svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-500"><polyline points="20 6 9 17 4 12"></polyline></svg>');
+                                $('#cora-upgrade-status-title').text('Workspace Updated!').addClass('text-emerald-600 dark:text-emerald-450');
+                                $('#cora-upgrade-status-desc').text('Reloading workspace panel...').addClass('text-emerald-500');
+                                
+                                if (window.coraShowToast) window.coraShowToast('Workspace upgraded successfully to v' + config.targetVersion, 'success');
+                                
+                                setTimeout(function() {
+                                    window.location.href = '?page=cora-workspace';
+                                }, 1500);
+                            } else {
+                                setStepStatus(2, 'Failed', false);
+                                var errMsg = status === 'timeout' ? 'Download timed out. The update server is taking too long.' : 'Network error during upgrade.';
+                                showFail(errMsg);
+                            }
+                        },
+                        error: function() {
+                            // If the site is still recycling, force reload as a fallback
+                            setTimeout(function() {
+                                window.location.href = '?page=cora-workspace';
+                            }, 1500);
+                        }
+                    });
+                }, 3500);
             }
         });
     }, 1000);

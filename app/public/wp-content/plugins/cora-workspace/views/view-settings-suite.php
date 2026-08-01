@@ -2718,12 +2718,57 @@ $cora_settings_tabs = array(
                     }
                 }).fail(function() {
                     clearInterval(progressInterval);
-                    $progressContainer.addClass('hidden');
-                    $btn.prop('disabled', false).removeClass('opacity-50 pointer-events-none');
-                    $checkBtn.prop('disabled', false).removeClass('opacity-50 pointer-events-none');
-                    jQuery('#cora-updates-state-available').removeClass('hidden');
                     
-                    if (window.coraShowToast) window.coraShowToast('Network error during upgrade.', 'error');
+                    // Connection might terminate due to FPM/OPcache reload when plugin files are replaced.
+                    // Wait 3.5 seconds and check if the upgrade actually completed successfully.
+                    $stepText.text('Verifying upgrade status...');
+                    if (window.coraShowToast) window.coraShowToast('Network connection recycled. Verifying upgrade...', 'info');
+                    
+                    setTimeout(function() {
+                        var targetVer = jQuery('#cora-available-version-text').text().trim().replace(/^v/, '');
+                        
+                        // 1. Check if the upgrade progress option completed on the server
+                        jQuery.post(coraREData.ajaxUrl, {
+                            action: 'cora_get_upgrade_progress',
+                            nonce: coraREData.ajaxNonce
+                        }, function(progressRes) {
+                            if (progressRes.success && progressRes.data && (parseInt(progressRes.data.percent) >= 95 || progressRes.data.step == 5)) {
+                                $progressBar.css('width', '100%');
+                                $percentText.text('100%');
+                                $stepText.text('Upgrade completed successfully!');
+                                if (window.coraShowToast) window.coraShowToast('Workspace upgraded successfully!', 'success');
+                                setTimeout(function() { window.location.reload(); }, 1500);
+                                return;
+                            }
+                            
+                            // 2. Check the version to see if files were updated
+                            jQuery.post(coraREData.ajaxUrl, {
+                                action: 'cora_force_check_update',
+                                nonce: coraREData.ajaxNonce
+                            }, function(verRes) {
+                                if (verRes.success && (verRes.data.up_to_date || verRes.data.version === targetVer || verRes.data.current_version === targetVer)) {
+                                    $progressBar.css('width', '100%');
+                                    $percentText.text('100%');
+                                    $stepText.text('Upgrade completed successfully!');
+                                    if (window.coraShowToast) window.coraShowToast('Workspace upgraded successfully!', 'success');
+                                    setTimeout(function() { window.location.reload(); }, 1500);
+                                } else {
+                                    // Actual network failure
+                                    $progressContainer.addClass('hidden');
+                                    $btn.prop('disabled', false).removeClass('opacity-50 pointer-events-none');
+                                    $checkBtn.prop('disabled', false).removeClass('opacity-50 pointer-events-none');
+                                    jQuery('#cora-updates-state-available').removeClass('hidden');
+                                    if (window.coraShowToast) window.coraShowToast('Network error during upgrade.', 'error');
+                                }
+                            }).fail(function() {
+                                // Fallback: reload page
+                                setTimeout(function() { window.location.reload(); }, 2000);
+                            });
+                        }).fail(function() {
+                            // Fallback: reload page
+                            setTimeout(function() { window.location.reload(); }, 2000);
+                        });
+                    }, 3500);
                 });
             };
 
