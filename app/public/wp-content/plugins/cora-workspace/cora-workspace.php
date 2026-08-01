@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.9.4
+ * Version: 2.9.5
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.9.4' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.5' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -631,14 +631,22 @@ function cora_real_estate_ai_handle_workspace_route() {
     
     // Intercept PWA Manifest and Service Worker to serve them from the root scope
     if ( $path === 'cora-service-worker.js' ) {
+        status_header( 200 );
         header( 'Content-Type: application/javascript' );
         header( 'Service-Worker-Allowed: /' );
         echo file_get_contents( CORA_WORKSPACE_PATH . 'assets/pwa/service-worker.js' );
         exit;
     }
     if ( $path === 'cora-manifest.json' ) {
+        status_header( 200 );
         header( 'Content-Type: application/json' );
         echo file_get_contents( CORA_WORKSPACE_PATH . 'assets/pwa/manifest.json' );
+        exit;
+    }
+    if ( $path === 'cora-offline.html' ) {
+        status_header( 200 );
+        header( 'Content-Type: text/html; charset=UTF-8' );
+        echo file_get_contents( CORA_WORKSPACE_PATH . 'assets/pwa/offline.html' );
         exit;
     }
 
@@ -4204,7 +4212,7 @@ function cora_canvas_theme_frontend_router() {
     // Ignore reserved paths
     $path_parts = explode( '/', $path );
     $first_part = isset( $path_parts[0] ) ? $path_parts[0] : '';
-    $reserved_paths = array( 'api', 'workspace', 'shared-doc', 'shared-portfolio', 'cora-service-worker.js', 'cora-manifest.json', 'wp-admin', 'wp-login.php' );
+    $reserved_paths = array( 'api', 'workspace', 'shared-doc', 'shared-portfolio', 'cora-service-worker.js', 'cora-manifest.json', 'cora-offline.html', 'wp-admin', 'wp-login.php' );
     if ( in_array( $first_part, $reserved_paths ) ) {
         return;
     }

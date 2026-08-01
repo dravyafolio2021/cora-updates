@@ -1,13 +1,15 @@
-// Simple service worker for Cora Admin PWA
-const CACHE_NAME = 'cora-workspace-v3';
+// Service worker for Cora Admin PWA
+const CACHE_NAME = 'cora-workspace-v4';
 const URLs_TO_CACHE = [
-  '/wp-content/plugins/cora-workspace/assets/pwa/manifest.json'
+  '/wp-content/plugins/cora-workspace/assets/pwa/manifest.json',
+  '/cora-offline.html'
 ];
 
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
+      // Pre-cache vital resources including the offline page
       return cache.addAll(URLs_TO_CACHE);
     })
   );
@@ -19,18 +21,33 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Network-First strategy for HTML pages to ensure updates are visible immediately
+  // Network-First strategy for HTML pages with Server Error & Offline fallback
   if (event.request.headers.get('accept')?.includes('text/html')) {
     event.respondWith(
       fetch(event.request)
         .then(response => {
+          // If response is successful, update cache copy and return it
           if (response.status === 200) {
             const copy = response.clone();
             caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+            return response;
           }
+          
+          // If we got a server error (e.g., 502 Bad Gateway, 503 Service Unavailable, 504 Timeout)
+          if (response.status >= 500) {
+            return caches.match(event.request).then(cachedResponse => {
+              return cachedResponse || caches.match('/cora-offline.html');
+            });
+          }
+          
           return response;
         })
-        .catch(() => caches.match(event.request))
+        .catch(() => {
+          // Network connection dropped, DNS name not resolved, or completely offline
+          return caches.match(event.request).then(cachedResponse => {
+            return cachedResponse || caches.match('/cora-offline.html');
+          });
+        })
     );
     return;
   }

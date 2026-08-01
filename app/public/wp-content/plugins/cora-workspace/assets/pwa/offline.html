@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace Connection Idle</title>
+    <style>
+        :root {
+            --bg-color: #fafafa;
+            --card-bg: #ffffff;
+            --text-main: #09090b;
+            --text-muted: #71717a;
+            --border-color: #e4e4e7;
+            --btn-bg: #09090b;
+            --btn-text: #ffffff;
+            --btn-border: #09090b;
+            --secondary-bg: #ffffff;
+            --secondary-text: #09090b;
+            --secondary-border: #e4e4e7;
+            --secondary-hover: #f4f4f5;
+            --status-glow: rgba(113, 113, 122, 0.2);
+            --status-color: #71717a;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #09090b;
+                --card-bg: #18181b;
+                --text-main: #f4f4f5;
+                --text-muted: #a1a1aa;
+                --border-color: #27272a;
+                --btn-bg: #f4f4f5;
+                --btn-text: #09090b;
+                --btn-border: #f4f4f5;
+                --secondary-bg: #18181b;
+                --secondary-text: #f4f4f5;
+                --secondary-border: #27272a;
+                --secondary-hover: #27272a;
+                --status-glow: rgba(161, 161, 170, 0.2);
+                --status-color: #a1a1aa;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 440px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px 32px;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--secondary-hover);
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--status-color);
+            border-radius: 50%;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.9);
+                box-shadow: 0 0 0 0 var(--status-glow);
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 0 0 6px var(--status-glow);
+            }
+            100% {
+                transform: scale(0.9);
+                box-shadow: 0 0 0 0 var(--status-glow);
+            }
+        }
+
+        .icon-container {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-color: var(--secondary-hover);
+            color: var(--text-main);
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin: 0 0 10px 0;
+        }
+
+        p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.55;
+            margin: 0 0 32px 0;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 38px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: 1px solid var(--btn-border);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-bg);
+            color: var(--secondary-text);
+            border: 1px solid var(--secondary-border);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-hover);
+        }
+
+        .footer-link {
+            display: inline-block;
+            margin-top: 24px;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--text-main);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                <span>SYSTEM IDLE</span>
+            </div>
+            
+            <div class="icon-container">
+                <!-- WiFi Off SVG -->
+                <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                    <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.5"></path>
+                    <path d="M5 12.5a10.94 10.94 0 0 1 5.83-2.84"></path>
+                    <path d="M7.34 6.34A16.84 16.84 0 0 1 12 5.5v0a16.8 16.8 0 0 1 8.87 2.5"></path>
+                    <path d="M9.05 16.57A4.87 4.87 0 0 1 12 15.5a4.87 4.87 0 0 1 2.95 1.07"></path>
+                    <line x1="12" y1="21" x2="12.01" y2="21"></line>
+                </svg>
+            </div>
+            
+            <h1>Workspace Connection Idle</h1>
+            <p>We are currently updating files or performing routine database syncs. Access will restore automatically in a few seconds.</p>
+            
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary" onclick="window.location.reload()">
+                    Retry Connection
+                </button>
+                <a href="/workspace" class="btn btn-secondary">
+                    Go to Workspace
+                </a>
+            </div>
+            
+            <a href="mailto:support@heycora.in?subject=Workspace%20Maintenance%20Query" class="footer-link">
+                Contact Platform Support &rarr;
+            </a>
+        </div>
+    </div>
+</body>
+</html>
