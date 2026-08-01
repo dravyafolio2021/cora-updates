@@ -56,7 +56,7 @@
 
 - [x] **Global Side Drawer Overlay & Canvas Layout Stability (`admin-dashboard.php`, `assets/js/admin-script.js`, `views/view-users.php`)**
   - [x] Implement language synchronization on page load in `admin-dashboard.php`
-  - [/] Mask credentials fields in `views/view-settings-suite.php` and add block/copy restrictions
+  - [x] Mask credentials fields in `views/view-settings-suite.php` and add block/copy restrictions
   - [x] Global Drawer Backdrop (`#cora-drawer-backdrop`) added right before closing `</body>` tag in `admin-dashboard.php` with backdrop blur, dark/light mode overlays, and `onclick="window.coraCloseAllDrawers()"`.
   - [x] CSS Drawer Styles & Canvas Width Isolation (`admin-dashboard.php`): Enforced `width: 500px !important`, `max-width: 90vw !important`, `top: 0`, `right: 0`, `z-index: 9999`, smooth `cubic-bezier(0.16, 1, 0.3, 1)` opening transitions, `box-shadow: -10px 0 30px rgba(0,0,0,0.15)` when open, and locked main workspace container width to 100% (`main, .cora-main-content, #cora-workspace-container { width: 100% !important; flex: 1 1 auto !important; }`).
   - [x] Global Drawer Controllers (`assets/js/admin-script.js`): Updated `window.coraCloseAllDrawers()` to hide `#cora-drawer-backdrop` and remove `cora-drawer-open` from `body`. Updated all drawer openers (`openInviteDrawer`, `openEditUserDrawer`, `openGeofenceDrawer`, `openCreateCustomRoleDrawer`, `openEditCustomRoleDrawer`, `openAttendanceReportsDrawer`, `coraToggleAddShowingDrawer`) to invoke `window.coraCloseAllDrawers()`, remove `.collapsed`, and show `#cora-drawer-backdrop`.
