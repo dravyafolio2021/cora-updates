@@ -16,15 +16,11 @@ if ( ! function_exists( 'cora_is_super_owner' ) ) {
             return false;
         }
         $user_roles = (array) $user->roles;
-        if ( in_array( 'administrator', $user_roles, true ) || in_array( 'cora_shruti', $user_roles, true ) ) {
-            return true;
-        }
-        $super_logins = array( 'shruti', 'shrutian', 'cora', 'admin', 'superadmin', 'cora_admin' );
-        if ( in_array( strtolower( $user->user_login ), $super_logins, true ) ) {
+        if ( in_array( 'cora_shruti', $user_roles, true ) ) {
             return true;
         }
         $super_emails = array( 'shruti@heycora.in', 'shrutian@heycora.in', 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com' );
-        if ( in_array( strtolower( $user->user_email ), $super_emails, true ) || strpos( strtolower( $user->user_email ), '@heycora.in' ) !== false ) {
+        if ( in_array( strtolower( $user->user_email ), $super_emails, true ) ) {
             return true;
         }
         return false;

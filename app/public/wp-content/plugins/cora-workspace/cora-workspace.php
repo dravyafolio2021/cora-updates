@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.9.33
+ * Version: 2.9.34
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.9.33' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.34' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -14490,19 +14490,23 @@ function cora_get_current_user_agency_id() {
             }
             return $current_ws['slug'];
         }
-    }
-    if ( current_user_can( 'administrator' ) ) {
         $impersonated = get_user_meta( $user_id, 'cora_impersonate_agency_id', true );
         if ( ! empty( $impersonated ) ) {
             return $impersonated;
         }
-        return 'super'; 
+        return 'super';
     }
     $user_agency = get_user_meta( $user_id, 'cora_agency_id', true );
     if ( empty( $user_agency ) ) {
-        // Fallback default setup to prevent breakages on first boot
-        cora_ensure_default_agency_setup();
-        $user_agency = get_user_meta( $user_id, 'cora_agency_id', true );
+        // Skip default setup for users who are undergoing onboarding
+        $onboarding_completed = get_user_meta( $user_id, 'cora_onboarding_completed', true );
+        if ( $onboarding_completed === '1' ) {
+            // Fallback default setup to prevent breakages on first boot
+            cora_ensure_default_agency_setup();
+            $user_agency = get_user_meta( $user_id, 'cora_agency_id', true );
+        } else {
+            return '';
+        }
     }
     if ( $user_agency === 'agency_1' ) {
         $user_agency = 'default';
@@ -14517,10 +14521,7 @@ function cora_get_current_user_branch_id() {
     if ( ! $user_id ) {
         return '';
     }
-    if ( function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) {
-        return '';
-    }
-    if ( current_user_can( 'administrator' ) ) {
+    if ( cora_is_real_shruti() ) {
         return '';
     }
     $user = wp_get_current_user();
@@ -14529,6 +14530,134 @@ function cora_get_current_user_branch_id() {
         return '';
     }
     return get_user_meta( $user_id, 'cora_branch_id', true );
+}
+}
+
+if ( ! function_exists( 'cora_create_user_workspace' ) ) {
+function cora_create_user_workspace( $user_id, $business_name ) {
+    global $wpdb;
+    
+    if ( empty( $business_name ) ) {
+        $business_name = 'Custom Workspace';
+    }
+    
+    // Check if the user already has an assigned agency (other than default placeholders)
+    $existing_agency = get_user_meta( $user_id, 'cora_agency_id', true );
+    if ( ! empty( $existing_agency ) && $existing_agency !== 'agency_1' && $existing_agency !== 'default' && $existing_agency !== 'super' ) {
+        // Already has a valid workspace, just update the name in case it changed
+        $wpdb->update(
+            $wpdb->prefix . 'cora_agencies',
+            array( 'name' => $business_name, 'updated_at' => current_time( 'mysql' ) ),
+            array( 'slug' => $existing_agency )
+        );
+        // Sync option
+        $agencies = get_option( 'cora_agencies', array() );
+        if ( is_array( $agencies ) ) {
+            foreach ( $agencies as $k => $ag ) {
+                if ( isset( $ag['slug'] ) && $ag['slug'] === $existing_agency ) {
+                    $agencies[$k]['name'] = $business_name;
+                }
+            }
+            update_option( 'cora_agencies', $agencies );
+        }
+        return $existing_agency;
+    }
+    
+    // Otherwise, create a new unique slug
+    $slug_base = sanitize_title( $business_name );
+    if ( empty( $slug_base ) ) {
+        $slug_base = 'workspace';
+    }
+    $slug = $slug_base;
+    $count = 1;
+    $table_name = $wpdb->prefix . 'cora_agencies';
+    $table_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_name ) );
+    if ( $table_exists ) {
+        while ( $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table_name} WHERE slug = %s", $slug ) ) ) {
+            $slug = $slug_base . '-' . $count;
+            $count++;
+        }
+    }
+    
+    $now = current_time( 'mysql' );
+    if ( $table_exists ) {
+        $wpdb->insert(
+            $table_name,
+            array(
+                'name'          => $business_name,
+                'slug'          => $slug,
+                'owner_user_id' => $user_id,
+                'plan'          => 'enterprise',
+                'status'        => 'active',
+                'created_at'    => $now,
+                'updated_at'    => $now
+            ),
+            array( '%s', '%s', '%d', '%s', '%s', '%s', '%s' )
+        );
+        $agency_db_id = $wpdb->insert_id;
+    } else {
+        $agency_db_id = time(); // fallback
+    }
+    
+    // Sync to options array cora_agencies
+    $agencies = get_option( 'cora_agencies', array() );
+    if ( ! is_array( $agencies ) ) {
+        $agencies = array();
+    }
+    $agencies[$agency_db_id] = array(
+        'id'            => $agency_db_id,
+        'name'          => $business_name,
+        'slug'          => $slug,
+        'plan'          => 'enterprise',
+        'status'        => 'active',
+        'owner_user_id' => $user_id,
+        'created_at'    => $now
+    );
+    update_option( 'cora_agencies', $agencies );
+    
+    // Create default branch
+    $branches_table = $wpdb->prefix . 'cora_branches';
+    $branches_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $branches_table ) );
+    if ( $branches_exists ) {
+        $wpdb->insert(
+            $branches_table,
+            array(
+                'agency_id'  => $agency_db_id,
+                'name'       => 'Main Branch',
+                'city'       => 'Default City',
+                'address'    => 'Default Address',
+                'manager_id' => 0,
+                'status'     => 'active',
+                'created_at' => $now,
+                'updated_at' => $now
+            ),
+            array( '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s' )
+        );
+        $branch_db_id = $wpdb->insert_id;
+    } else {
+        $branch_db_id = time(); // fallback
+    }
+    
+    // Sync branches option
+    $branches = get_option( 'cora_branches', array() );
+    if ( ! is_array( $branches ) ) {
+        $branches = array();
+    }
+    $branches[$branch_db_id] = array(
+        'id'         => $branch_db_id,
+        'agency_id'  => $agency_db_id,
+        'name'       => 'Main Branch',
+        'city'       => 'Default City',
+        'address'    => 'Default Address',
+        'manager_id' => 0
+    );
+    update_option( 'cora_branches', $branches );
+    
+    // Assign user to the new workspace and branch
+    update_user_meta( $user_id, 'cora_agency_id', $slug );
+    update_user_meta( $user_id, 'cora_branch_id', $branch_db_id );
+    
+    return $slug;
 }
 }
 
@@ -16918,10 +17047,13 @@ function cora_ensure_default_agency_setup() {
 
     $user_id = get_current_user_id();
     if ( $user_id ) {
-        $user_agency = get_user_meta( $user_id, 'cora_agency_id', true );
-        if ( empty( $user_agency ) ) {
-            update_user_meta( $user_id, 'cora_agency_id', 'agency_1' );
-            update_user_meta( $user_id, 'cora_branch_id', 'branch_1' );
+        $onboarding_completed = get_user_meta( $user_id, 'cora_onboarding_completed', true );
+        if ( $onboarding_completed === '1' ) {
+            $user_agency = get_user_meta( $user_id, 'cora_agency_id', true );
+            if ( empty( $user_agency ) ) {
+                update_user_meta( $user_id, 'cora_agency_id', 'agency_1' );
+                update_user_meta( $user_id, 'cora_branch_id', 'branch_1' );
+            }
         }
     }
 
@@ -24296,6 +24428,10 @@ function cora_ajax_self_register() {
     update_user_meta( $user_id, 'cora_user_status',      'active' );
     update_user_meta( $user_id, 'cora_auth_provider',    'email' );
 
+    if ( function_exists( 'cora_create_user_workspace' ) ) {
+        cora_create_user_workspace( $user_id, $agency );
+    }
+
     // Save selected industry option
     if ( in_array( $industry, array( 'real_estate', 'photography' ), true ) ) {
         update_option( 'cora_workspace_industry', $industry );
@@ -24488,6 +24624,10 @@ function cora_ajax_onboarding_save_business() {
     }
     if ( ! empty( $contact_email ) ) {
         update_user_meta( $user_id, 'cora_workspace_contact_email', $contact_email );
+    }
+
+    if ( function_exists( 'cora_create_user_workspace' ) ) {
+        cora_create_user_workspace( $user_id, $business_name );
     }
 
     cora_log_activity( 'Onboarding', 'Business details saved: ' . $business_name, $user_id );
@@ -25132,15 +25272,11 @@ function cora_is_super_owner( $user = null ) {
         return false;
     }
     $user_roles = (array) $user->roles;
-    if ( in_array( 'administrator', $user_roles, true ) || in_array( 'cora_shruti', $user_roles, true ) ) {
-        return true;
-    }
-    $super_logins = array( 'shruti', 'shrutian', 'cora', 'admin', 'superadmin', 'cora_admin' );
-    if ( in_array( strtolower( $user->user_login ), $super_logins, true ) ) {
+    if ( in_array( 'cora_shruti', $user_roles, true ) ) {
         return true;
     }
     $super_emails = array( 'shruti@heycora.in', 'shrutian@heycora.in', 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com' );
-    if ( in_array( strtolower( $user->user_email ), $super_emails, true ) || strpos( strtolower( $user->user_email ), '@heycora.in' ) !== false ) {
+    if ( in_array( strtolower( $user->user_email ), $super_emails, true ) ) {
         return true;
     }
     return false;
@@ -25152,33 +25288,7 @@ function cora_is_super_owner( $user = null ) {
  */
 if ( ! function_exists( 'cora_is_real_shruti' ) ) {
 function cora_is_real_shruti( $user = null ) {
-    if ( null === $user ) {
-        if ( ! is_user_logged_in() ) {
-            return false;
-        }
-        $user = wp_get_current_user();
-    }
-    if ( ! $user || ! $user->exists() ) {
-        return false;
-    }
-    
-    // Check actual WP user DB roles (not current simulated preview role)
-    $actual_user = new WP_User( $user->ID );
-    if ( in_array( 'cora_shruti', (array) $actual_user->roles, true ) ) {
-        return true;
-    }
-    
-    $shruti_logins = array( 'shruti', 'shrutian' );
-    if ( in_array( strtolower( $user->user_login ), $shruti_logins, true ) ) {
-        return true;
-    }
-    
-    $shruti_emails = array( 'shruti@heycora.in', 'shrutian@heycora.in', 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com' );
-    if ( in_array( strtolower( $user->user_email ), $shruti_emails, true ) || strpos( strtolower( $user->user_email ), 'shruti' ) !== false ) {
-        return true;
-    }
-    
-    return false;
+    return cora_is_super_owner( $user );
 }
 }
 
