@@ -859,6 +859,14 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             to { transform: translateY(0); opacity: 1; }
         }
 
+        /* Step Panel Visibility */
+        .step-panel {
+            display: none;
+        }
+        .step-panel.active {
+            display: block;
+        }
+
         /* ── Responsive media breakpoints ──────────────────────── */
         @media (max-width: 899px) {
             #onboarding-page-container {
