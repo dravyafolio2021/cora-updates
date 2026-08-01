@@ -2687,7 +2687,8 @@ $cora_settings_tabs = array(
                             </div>
 
                             <!-- Collapsible List Body -->
-                            <div class="cora-update-accordion-content ${isLatest ? 'open' : ''} p-4 space-y-3 bg-white dark:bg-zinc-900 border-t border-zinc-150 dark:border-zinc-850" id="content-ver-${rIdx}">
+                            <div class="cora-update-accordion-content ${isLatest ? 'open' : ''}" id="content-ver-${rIdx}">
+                                <div class="p-4 space-y-3 bg-white dark:bg-zinc-900 border-t border-zinc-150 dark:border-zinc-850">
                     `;
 
                     rel.items.forEach((item) => {
@@ -2718,6 +2719,7 @@ $cora_settings_tabs = array(
                     });
 
                     html += `
+                                </div>
                             </div>
                         </div>
                     `;
