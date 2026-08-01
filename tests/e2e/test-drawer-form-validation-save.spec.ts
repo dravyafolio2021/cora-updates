@@ -36,6 +36,11 @@ test('verify prospect drawer form validation and save functionality', async ({ p
     await page.locator('#cora-drawer-input-names').fill('Valid Enterprise Client');
     await emailInput.fill('contact@enterprise.com');
     await page.locator('#cora-drawer-input-phone').fill('+91 98765 43210');
+
+    // Expand Deal Budget accordion
+    await page.locator('button:has-text("Deal Budget & Intent Priority")').click();
+    await page.waitForTimeout(300);
+
     await page.locator('#cora-drawer-input-price').fill('450000');
 
     await saveBtn.click();
@@ -43,5 +48,5 @@ test('verify prospect drawer form validation and save functionality', async ({ p
     // Save Toast appears
     const toastContainer = page.locator('#cora-toast-container');
     await expect(toastContainer).toBeVisible({ timeout: 5000 });
-    await expect(toastContainer).toContainText('Lead updated successfully');
+    await expect(toastContainer).toContainText('Lead record updated successfully');
 });

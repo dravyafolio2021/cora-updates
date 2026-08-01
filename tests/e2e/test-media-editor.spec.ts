@@ -48,7 +48,7 @@ test('verify media library grid and image editor modal clipping', async ({ page 
     // If the selected item wasn't an image, let's try other cells
     const allCells = await page.locator('.cm-cell').all();
     for (let i = 1; i < allCells.length; i++) {
-      await allCells[i].click();
+      await allCells[i].click({ force: true });
       if (await editBtn.isVisible()) {
         console.log(`Found image at cell index ${i}`);
         break;
@@ -59,14 +59,13 @@ test('verify media library grid and image editor modal clipping', async ({ page 
   // If Edit button is still not visible, we can try to upload an actual image file
   if (!await editBtn.isVisible()) {
     console.log('No image cell found, uploading a test image...');
-    // Create a dummy image or upload one
-    // Let's check if there is an image in the project we can upload
-    const testImagePath = '/Users/shrutian/.gemini/antigravity/brain/587dd660-2d30-493a-9a58-9c57a142bb9d/cora_favicon_1783532866876.jpg';
+    // Use standard local favicon as test image
+    const testImagePath = '/Users/shrutian/Desktop/cora/app/public/wp-content/plugins/cora-workspace/assets/images/cora-favicon.png';
     await page.setInputFiles('#cm-file-input', testImagePath);
     await page.waitForTimeout(3000); // Wait for upload and render
     
     // Find the new image cell and click it
-    await page.locator('.cm-cell').first().click();
+    await page.locator('.cm-cell').first().click({ force: true });
     await expect(editBtn).toBeVisible();
   }
 

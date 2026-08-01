@@ -43,15 +43,15 @@ test.describe('Leads Directory Pagination & Simplified Mobile Column Customizer'
     await expect(customizerDrawer).toBeVisible({ timeout: 5000 });
     await expect(customizerDrawer).toContainText('Customize Pipeline Columns');
 
-    // 3. Verify simplified stage config rows (single color circle button per row)
+    // 3. Verify stage config rows and color swatches
     const stageRows = page.locator('.cora-stage-config-row');
     await expect(stageRows.first()).toBeVisible();
 
-    const colorCircleBtn = page.locator('.cora-stage-config-row button[title="Tap to change color theme"]');
-    await expect(colorCircleBtn.first()).toBeVisible();
+    const colorSwatch = page.locator('.cora-stage-config-row .cora-stage-color-swatch');
+    await expect(colorSwatch.first()).toBeVisible();
 
-    // Test color circle cycling
-    await colorCircleBtn.first().click();
+    // Test color swatch click
+    await colorSwatch.first().click();
 
     // Take screenshot of mobile Column Customizer drawer
     await page.screenshot({ path: 'tests/e2e/mobile-leads-pagination-customizer.png' });

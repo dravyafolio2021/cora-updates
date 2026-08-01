@@ -21,8 +21,14 @@ test.describe('Leads Directory UI Revamp & Responsiveness', () => {
     await dirTabBtn.click();
     await page.waitForTimeout(500);
 
+    // Toggle view mode to Table List
+    const tableBtn = page.locator('#cora-dir-view-btn-table');
+    await expect(tableBtn).toBeVisible();
+    await tableBtn.click();
+    await page.waitForTimeout(300);
+
     // Verify table container is visible on desktop
-    const desktopTableWrapper = page.locator('.hidden.md\\:block table');
+    const desktopTableWrapper = page.locator('#cora-directory-table-container');
     await expect(desktopTableWrapper).toBeVisible();
 
     // Verify column headers are rendered correctly
@@ -69,11 +75,11 @@ test.describe('Leads Directory UI Revamp & Responsiveness', () => {
     await page.waitForTimeout(500);
 
     // Verify table container is hidden on mobile
-    const desktopTableWrapper = page.locator('.hidden.md\\:block table');
-    await expect(desktopTableWrapper).toBeHidden();
+    const tableContainer = page.locator('#cora-directory-table-container');
+    await expect(tableContainer).toBeHidden();
 
     // Verify mobile cards list container is visible
-    const mobileCardsWrapper = page.locator('.block.md\\:hidden');
+    const mobileCardsWrapper = page.locator('#cora-directory-grid-container');
     await expect(mobileCardsWrapper).toBeVisible();
 
     // Verify card content renders (e.g., has name and details text)
