@@ -3513,7 +3513,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         </div>
 
         <div id="cora-sidebar-scroll-container" class="flex-1 flex flex-col min-h-0 overflow-y-auto overflow-x-visible">
-            <?php if ( cora_is_super_owner() ) :
+            <?php if ( cora_is_super_owner() && $cora_ws_slug !== 'super' ) :
                 $current_industry = cora_get_active_industry();
                 $re_url  = add_query_arg( 'set_industry', 'real_estate',       remove_query_arg( array('set_industry','industry') ) );
                 $stu_url = add_query_arg( 'set_industry', 'photography_studio', remove_query_arg( array('set_industry','industry') ) );
@@ -3539,7 +3539,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             </div>
             <?php endif; ?>
 
-            <?php if ( cora_is_super_owner() ) : ?>
+            <?php if ( cora_is_super_owner() && $cora_ws_slug !== 'super' ) : ?>
             <!-- Role Switcher Toggle Widget (Sidebar Header) -->
             <div class="px-3 pb-1 pt-1">
                 <div class="cora-role-switcher-card flex items-center justify-between gap-2 px-2.5 py-1.5 bg-zinc-100/70 hover:bg-zinc-100 dark:bg-zinc-900/80 dark:hover:bg-zinc-850 border border-zinc-200/80 dark:border-zinc-800 rounded-lg transition-all select-none">
@@ -3573,7 +3573,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 $active_industry = cora_get_active_industry();
                 $module = Cora_Module_Registry::get_module( $active_industry );
                 $nav_groups = array();
-                if ( $module ) {
+                if ( $module && $cora_ws_slug !== 'super' ) {
                     $nav_groups = $module->get_navigation_groups( $current_user_role );
                     // Inject active bookings badge count into whichever group contains 'bookings'
                     foreach ( $nav_groups as $g_key => $group ) {
