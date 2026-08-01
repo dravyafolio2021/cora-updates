@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.9.30
+ * Version: 2.9.31
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.9.30' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.31' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -1355,6 +1355,7 @@ function cora_send_verification_email( $user_id ) {
 /**
  * Catch verification token from URL
  */
+if ( ! function_exists( 'cora_real_estate_ai_handle_email_verification' ) ) {
 function cora_real_estate_ai_handle_email_verification() {
     if ( ! empty( $_GET['cora_verify_token'] ) && ! empty( $_GET['cora_user_id'] ) ) {
         $user_id = intval( $_GET['cora_user_id'] );
@@ -1421,11 +1422,13 @@ function cora_real_estate_ai_handle_email_verification() {
         }
     }
 }
+}
 add_action( 'init', 'cora_real_estate_ai_handle_email_verification' );
 
 /**
  * AJAX handler for resending verification email
  */
+if ( ! function_exists( 'cora_ajax_resend_verification' ) ) {
 function cora_ajax_resend_verification() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
     
@@ -1445,6 +1448,7 @@ function cora_ajax_resend_verification() {
     } else {
         wp_send_json_error( array( 'message' => 'Failed to dispatch verification email.' ) );
     }
+}
 }
 add_action( 'wp_ajax_cora_workspace_resend_verification', 'cora_ajax_resend_verification' );
 
