@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.9.32
+ * Version: 2.9.33
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.9.32' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.33' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -811,6 +811,15 @@ function cora_real_estate_ai_handle_workspace_route() {
         // Active workspace context resolution
         $current_ws = cora_get_current_workspace_context();
 
+        // Enforce onboarding for logged-in users who have not completed it
+        if ( is_user_logged_in() && $sub_page !== 'onboarding' ) {
+            $onboarding_done = get_user_meta( get_current_user_id(), 'cora_onboarding_completed', true );
+            if ( $onboarding_done !== '1' ) {
+                wp_redirect( home_url( '/workspace/onboarding' ) );
+                exit;
+            }
+        }
+
         // Allow logged-in users to access onboarding if not completed
         if ( is_user_logged_in() && $sub_page === 'onboarding' ) {
             $onboarding_done = get_user_meta( get_current_user_id(), 'cora_onboarding_completed', true );
@@ -1163,6 +1172,10 @@ function cora_real_estate_ai_login_redirect( $redirect_to, $request, $user ) {
         $allowed_roles = array( 'administrator', 'cora_manager', 'cora_branch_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor', 'cora_viewer' );
         foreach ( $allowed_roles as $role ) {
             if ( in_array( $role, (array) $user->roles ) ) {
+                $onb_done = get_user_meta( $user->ID, 'cora_onboarding_completed', true );
+                if ( $onb_done !== '1' ) {
+                    return home_url( '/workspace/onboarding' );
+                }
                 return home_url( '/workspace' );
             }
         }
@@ -1172,6 +1185,10 @@ function cora_real_estate_ai_login_redirect( $redirect_to, $request, $user ) {
             $allowed_roles = array( 'administrator', 'cora_manager', 'cora_branch_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor', 'cora_viewer' );
             foreach ( $allowed_roles as $role ) {
                 if ( in_array( $role, (array) $current_user->roles ) ) {
+                    $onb_done = get_user_meta( $current_user->ID, 'cora_onboarding_completed', true );
+                    if ( $onb_done !== '1' ) {
+                        return home_url( '/workspace/onboarding' );
+                    }
                     return home_url( '/workspace' );
                 }
             }
@@ -1194,7 +1211,12 @@ function cora_real_estate_ai_on_wp_login( $user_login, $user ) {
         $allowed_roles = array( 'administrator', 'cora_manager', 'cora_branch_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor', 'cora_viewer' );
         foreach ( $allowed_roles as $role ) {
             if ( in_array( $role, (array) $user->roles ) ) {
-                wp_redirect( home_url( '/workspace' ) );
+                $onb_done = get_user_meta( $user->ID, 'cora_onboarding_completed', true );
+                if ( $onb_done !== '1' ) {
+                    wp_redirect( home_url( '/workspace/onboarding' ) );
+                } else {
+                    wp_redirect( home_url( '/workspace' ) );
+                }
                 exit;
             }
         }
