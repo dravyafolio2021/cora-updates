@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.9.28
+ * Version: 2.9.29
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.9.28' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.29' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -1293,6 +1293,7 @@ function cora_real_estate_ai_user_register( $user_id ) {
 }
 add_action( 'user_register', 'cora_real_estate_ai_user_register' );
 
+if ( ! function_exists( 'cora_send_verification_email' ) ) {
 /**
  * Dispatch verification link via wp_mail to the newly registered user
  */
@@ -1347,6 +1348,7 @@ function cora_send_verification_email( $user_id ) {
     ';
     
     return wp_mail( $to, $subject, $message, $headers );
+}
 }
 
 /**
