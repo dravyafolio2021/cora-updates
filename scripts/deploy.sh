@@ -13,8 +13,8 @@ SSH_PORT="65002"
 LOCAL_ZIP="/Users/shrutian/Desktop/cora/updates/cora-workspace.zip"
 REMOTE_TMP="/tmp/cora-workspace-deploy.zip"
 
-MAIN_PATH="~/domains/heycora.in/public_html"
-DEMO_PATH="~/domains/heycora.in/public_html/demo"
+MAIN_PATH="/home/u484406462/domains/heycora.in/public_html"
+DEMO_PATH="/home/u484406462/domains/heycora.in/public_html/demo"
 
 # Targets
 TARGET=${1:-both}

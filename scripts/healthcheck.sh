@@ -9,8 +9,8 @@ SSH_USER="u484406462"
 SSH_IP="145.79.213.97"
 SSH_PORT="65002"
 
-MAIN_URL="https://app.heycora.in"
-DEMO_URL="https://app.heycora.in/demo"
+MAIN_URL="https://heycora.in"
+DEMO_URL="https://app.heycora.in"
 
 # Terminal formatting
 RED='\033[0;31m'
