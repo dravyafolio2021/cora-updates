@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.9.6
+ * Version: 2.9.7
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.9.6' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.7' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -23561,6 +23561,17 @@ function cora_ajax_onboarding_save_business() {
         wp_send_json_error( array( 'message' => 'Business name is required.' ) );
     }
 
+    if ( ! empty( $phone ) ) {
+        $phone_clean = preg_replace( '/[\s\-\+\(\)]/', '', $phone );
+        if ( ! preg_match( '/^\d{7,15}$/', $phone_clean ) ) {
+            wp_send_json_error( array( 'message' => 'Please enter a valid phone number (7 to 15 digits).' ) );
+        }
+    }
+
+    if ( ! empty( $contact_email ) && ! is_email( $contact_email ) ) {
+        wp_send_json_error( array( 'message' => 'Please enter a valid contact email address.' ) );
+    }
+
     if ( ! empty( $full_name ) ) {
         $name_parts = explode( ' ', $full_name, 2 );
         wp_update_user( array(
@@ -23617,6 +23628,13 @@ function cora_ajax_onboarding_activate_workspace() {
 
     // Mark onboarding as complete
     update_user_meta( $user_id, 'cora_onboarding_completed', '1' );
+
+    // Ensure the onboarded user has the Workspace Owner (cora_super_admin) role
+    $user = get_userdata( $user_id );
+    if ( $user && ! in_array( 'cora_super_admin', $user->roles, true ) ) {
+        $user->set_role( 'cora_super_admin' );
+    }
+
     cora_log_activity( 'Onboarding', 'Workspace activated with industry: ' . $industry, $user_id );
 
     $redirect_url = home_url( '/workspace/dashboard?welcome=1' );

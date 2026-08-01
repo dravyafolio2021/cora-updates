@@ -1088,6 +1088,19 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
         if (!fullName) { showToast('Please enter your full name.'); return; }
         if (!businessName) { showToast('Please enter your business name.'); return; }
 
+        if (phone) {
+            var phoneClean = phone.replace(/[\s\-\+\(\)]/g, '');
+            if (!/^\d{7,15}$/.test(phoneClean)) {
+                showToast('Please enter a valid phone number (7 to 15 digits).');
+                return;
+            }
+        }
+
+        if (contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) {
+            showToast('Please enter a valid contact email address.');
+            return;
+        }
+
         var btn = document.getElementById('ob-business-btn');
         btn.disabled = true;
         btn.textContent = 'Saving\u2026';

@@ -1439,15 +1439,20 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 $module = Cora_Module_Registry::get_module( $active_industry );
                 $roles_list = $module ? $module->get_industry_roles() : array();
                 
-                if ( $current_role === 'administrator' || $current_role === 'cora_manager' ) {
+                if ( $current_role === 'administrator' || $current_role === 'cora_manager' || $current_role === 'cora_super_admin' || cora_is_super_owner() ) {
                     echo '<option value="cora_branch_manager">Branch Manager</option>';
                 }
                 foreach ( $roles_list as $role_key => $role_label ) {
                     if ( ! cora_is_real_shruti() && in_array( $role_key, array( 'administrator', 'cora_shruti' ), true ) ) {
                         continue;
                     }
-                    if ( in_array( $role_key, array( 'administrator', 'cora_manager' ) ) ) {
+                    if ( $role_key === 'administrator' ) {
                         if ( ! cora_is_real_shruti() ) {
+                            continue;
+                        }
+                    }
+                    if ( $role_key === 'cora_manager' ) {
+                        if ( ! cora_is_real_shruti() && $current_role !== 'cora_super_admin' && $current_role !== 'administrator' && ! cora_is_super_owner() ) {
                             continue;
                         }
                     }
@@ -2000,6 +2005,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 $matchingTab.first().trigger('click');
             }
         }
+
+        const inviteRole = params.get('invite_role');
+        if (inviteRole) {
+            setTimeout(function() {
+                openInviteDrawer(inviteRole);
+            }, 100);
+        }
     });
 
     function filterActiveMembers() {
@@ -2119,11 +2131,17 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     }
 
     // Invite user drawer
-    function openInviteDrawer() {
+    function openInviteDrawer(role) {
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         } else {
             $('aside[id$="-drawer"]').addClass('collapsed');
+        }
+        var targetRole = role || $('#filter-role').val() || $('#filter-role-mobile').val() || '';
+        if (targetRole) {
+            $('#invite-role').val(targetRole);
+        } else {
+            $('#invite-role').val($('#invite-role option:first').val());
         }
         $('#cora-invite-user-drawer').removeClass('collapsed hidden');
         $('#cora-drawer-backdrop').removeClass('hidden').css({'display':'','pointer-events':''});
