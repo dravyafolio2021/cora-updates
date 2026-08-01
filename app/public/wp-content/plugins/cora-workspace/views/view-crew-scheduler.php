@@ -13,12 +13,12 @@ if ( ! function_exists( 'cora_resolve_staff_display_name' ) ) {
             if ( $u_info ) {
                 return trim($u_info->display_name ?: $u_info->user_login);
             }
-            return 'Karan Malhotra';
+            return 'Team Member';
         }
         if ( !empty($val) && is_string($val) && !is_numeric($val) ) {
             return trim($val);
         }
-        return 'Karan Malhotra';
+        return 'Team Member';
     }
 }
 
@@ -46,22 +46,6 @@ if ( ! function_exists( 'cora_get_valid_import_leads' ) ) {
                         'property_type' => 'Commercial 4K Video Shoot',
                         'preferred_locations' => 'DLF Cyber Park, Gurugram',
                         'phone' => '9811001122'
-                    ),
-                    array(
-                        'id' => 'lead_102',
-                        'first_name' => 'Priya',
-                        'last_name' => 'Sharma',
-                        'property_type' => 'Fashion Lookbook Campaign',
-                        'preferred_locations' => 'Cora Studio Suite 2, New Delhi',
-                        'phone' => '9822113344'
-                    ),
-                    array(
-                        'id' => 'lead_103',
-                        'first_name' => 'Vikram',
-                        'last_name' => 'Mehta',
-                        'property_type' => 'Corporate Executive Portraits',
-                        'preferred_locations' => 'Golf Course Road, Gurugram',
-                        'phone' => '9899887766'
                     )
                 );
             } else {
@@ -73,22 +57,6 @@ if ( ! function_exists( 'cora_get_valid_import_leads' ) ) {
                         'property_type' => 'Luxury Villa 4BHK Shoot',
                         'preferred_locations' => 'DLF Phase 5, Gurugram',
                         'phone' => '9811001122'
-                    ),
-                    array(
-                        'id' => 'lead_102',
-                        'first_name' => 'Ananya',
-                        'last_name' => 'Rao',
-                        'property_type' => 'Penthouse Walkthrough & Listing',
-                        'preferred_locations' => 'Vasant Vihar, New Delhi',
-                        'phone' => '9822113344'
-                    ),
-                    array(
-                        'id' => 'lead_103',
-                        'first_name' => 'Dev',
-                        'last_name' => 'Malhotra',
-                        'property_type' => 'Commercial Office Floor Site Visit',
-                        'preferred_locations' => 'Cyber City Tower B, Gurugram',
-                        'phone' => '9899887766'
                     )
                 );
             }
@@ -171,38 +139,6 @@ if ( empty( $cora_crew_shifts ) || ! is_array( $cora_crew_shifts ) ) {
                     'overtime_pay'  => 0,
                     'total_payout'  => 25000,
                     'status'        => 'Confirmed'
-                ),
-                array(
-                    'id'            => 'shift_302',
-                    'staff_name'    => 'Rohan Verma',
-                    'staff_role'    => 'Certified Drone Pilot',
-                    'staff_phone'   => '9811223344',
-                    'property_title'=> '4K Product Commercial & High-Speed B-Roll',
-                    'venue'         => 'Cora Workspace Studio 2, Gurugram',
-                    'date'          => '2026-07-23',
-                    'time_start'    => '02:00 PM',
-                    'time_end'      => '06:00 PM',
-                    'shift_type'    => 'Half-Day (4h)',
-                    'day_rate'      => 12000,
-                    'overtime_pay'  => 0,
-                    'total_payout'  => 12000,
-                    'status'        => 'On-Site'
-                ),
-                array(
-                    'id'            => 'shift_303',
-                    'staff_name'    => 'Rajesh Sharma',
-                    'staff_role'    => 'Lead Video Editor',
-                    'staff_phone'   => '9899001122',
-                    'property_title'=> 'Post-production Editorial & Color Grading',
-                    'venue'         => 'Cora Editing Suite 3, New Delhi',
-                    'date'          => '2026-07-24',
-                    'time_start'    => '10:00 AM',
-                    'time_end'      => '06:00 PM',
-                    'shift_type'    => 'Standard (8h)',
-                    'day_rate'      => 15000,
-                    'overtime_pay'  => 3000,
-                    'total_payout'  => 18000,
-                    'status'        => 'Scheduled'
                 )
             );
         } else {
@@ -223,38 +159,6 @@ if ( empty( $cora_crew_shifts ) || ! is_array( $cora_crew_shifts ) ) {
                     'overtime_pay'  => 0,
                     'total_payout'  => 25000,
                     'status'        => 'Confirmed'
-                ),
-                array(
-                    'id'            => 'shift_302',
-                    'staff_name'    => 'Rohan Verma',
-                    'staff_role'    => 'Certified Drone Pilot',
-                    'staff_phone'   => '9811223344',
-                    'property_title'=> 'Penthouse Walkthrough & Aerial Listing',
-                    'venue'         => 'Golf Course Road Penthouse, Gurugram',
-                    'date'          => '2026-07-23',
-                    'time_start'    => '02:00 PM',
-                    'time_end'      => '06:00 PM',
-                    'shift_type'    => 'Half-Day (4h)',
-                    'day_rate'      => 12000,
-                    'overtime_pay'  => 0,
-                    'total_payout'  => 12000,
-                    'status'        => 'On-Site'
-                ),
-                array(
-                    'id'            => 'shift_303',
-                    'staff_name'    => 'Rajesh Sharma',
-                    'staff_role'    => 'Field Property Inspector',
-                    'staff_phone'   => '9899001122',
-                    'property_title'=> 'Vasant Vihar Investor Property Site Visits',
-                    'venue'         => 'Block C, Vasant Vihar, New Delhi',
-                    'date'          => '2026-07-24',
-                    'time_start'    => '10:00 AM',
-                    'time_end'      => '06:00 PM',
-                    'shift_type'    => 'Standard (8h)',
-                    'day_rate'      => 15000,
-                    'overtime_pay'  => 3000,
-                    'total_payout'  => 18000,
-                    'status'        => 'Scheduled'
                 )
             );
         }

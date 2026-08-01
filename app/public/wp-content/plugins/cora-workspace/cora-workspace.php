@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.9.37
+ * Version: 2.9.64
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.9.37' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.64' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -401,25 +401,50 @@ add_filter( 'user_has_cap', function( $allcaps, $caps, $args, $user ) {
 }, 10, 4 );
 
 /**
- * Grant Elementor library and kit edit capabilities to Workspace Super Owners
- * to prevent "Access denied" exceptions during options/settings saves.
+ * Grant Elementor library, page, and post edit capabilities to all logged-in Workspace users
+ * to prevent "Error 403 / Access denied" exceptions inside Elementor builder iframe.
  */
 add_filter( 'user_has_cap', function( $allcaps, $caps, $args, $user ) {
-    if ( ! empty( $args ) && ( $args[0] === 'edit_post' || $args[0] === 'edit_others_posts' || $args[0] === 'edit_published_posts' ) ) {
-        $post_id = isset( $args[2] ) ? intval( $args[2] ) : 0;
-        if ( $post_id > 0 ) {
-            $post = get_post( $post_id );
-            if ( $post && $post->post_type === 'elementor_library' ) {
-                if ( cora_is_super_owner( $user ) ) {
-                    foreach ( $caps as $cap ) {
-                        $allcaps[ $cap ] = true;
-                    }
-                }
+    if ( is_user_logged_in() ) {
+        $el_caps = array(
+            'edit_posts', 'edit_pages', 'edit_published_pages', 'edit_others_pages', 
+            'publish_pages', 'read', 'elementor_edit_posts', 'edit_theme_options'
+        );
+        foreach ( $el_caps as $c ) {
+            $allcaps[ $c ] = true;
+        }
+        if ( ! empty( $args ) && ( $args[0] === 'edit_post' || $args[0] === 'edit_others_posts' || $args[0] === 'edit_published_posts' || $args[0] === 'edit_page' ) ) {
+            foreach ( $caps as $cap ) {
+                $allcaps[ $cap ] = true;
             }
         }
     }
     return $allcaps;
 }, 10, 4 );
+
+/**
+ * Remove X-Frame-Options header on Elementor editor and preview routes so Canvas iframe loads cleanly
+ */
+add_action( 'admin_init', function() {
+    if ( isset( $_GET['action'] ) && $_GET['action'] === 'elementor' ) {
+        remove_action( 'admin_init', 'send_frame_options_header' );
+        remove_action( 'login_init', 'send_frame_options_header' );
+    }
+}, 1 );
+
+add_action( 'send_headers', function() {
+    if ( ( isset( $_GET['action'] ) && $_GET['action'] === 'elementor' ) || isset( $_GET['elementor-preview'] ) || isset( $_GET['preview_id'] ) ) {
+        header_remove( 'X-Frame-Options' );
+    }
+}, 999 );
+
+add_filter( 'wp_headers', function( $headers ) {
+    if ( ( isset( $_GET['action'] ) && $_GET['action'] === 'elementor' ) || isset( $_GET['elementor-preview'] ) || isset( $_GET['preview_id'] ) ) {
+        unset( $headers['X-Frame-Options'] );
+        $headers['Content-Security-Policy'] = "frame-ancestors 'self' " . parse_url( home_url(), PHP_URL_SCHEME ) . '://' . parse_url( home_url(), PHP_URL_HOST );
+    }
+    return $headers;
+}, 999 );
 
 // Also hard-block the wp-admin/update.php install-plugin action via a redirect
 add_action( 'admin_init', function() {
@@ -470,12 +495,56 @@ add_filter( 'pre_option_update_core', '__return_null' );
 // ══════════════════════════════════════════════════════════════════════════════
 
 /**
- * Lookup workspace by slug in database or options.
+ * Fast in-memory static & transient cache for MySQL table existence checks.
+ * Completely eliminates repetitive SHOW TABLES LIKE queries per page load.
+ */
+if ( ! function_exists( 'cora_table_exists' ) ) {
+function cora_table_exists( $table_name ) {
+    static $static_table_cache = array();
+    if ( empty( $table_name ) ) {
+        return false;
+    }
+    if ( isset( $static_table_cache[ $table_name ] ) ) {
+        return $static_table_cache[ $table_name ];
+    }
+    $transient_key = 'cora_tbl_ex_' . md5( $table_name );
+    $cached_exists = get_transient( $transient_key );
+    if ( false !== $cached_exists ) {
+        $exists = ( '1' === $cached_exists );
+        $static_table_cache[ $table_name ] = $exists;
+        return $exists;
+    }
+    global $wpdb;
+    $found = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_name ) );
+    $exists = ( strtolower( (string) $found ) === strtolower( (string) $table_name ) );
+    set_transient( $transient_key, $exists ? '1' : '0', DAY_IN_SECONDS );
+    $static_table_cache[ $table_name ] = $exists;
+    return $exists;
+}
+}
+
+/**
+ * Resource hints for Google Fonts & external assets to eliminate render-blocking connection latency.
+ */
+if ( ! function_exists( 'cora_add_performance_resource_hints' ) ) {
+function cora_add_performance_resource_hints() {
+    echo '<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>' . "\n";
+    echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
+    echo '<link rel="dns-prefetch" href="https://fonts.googleapis.com">' . "\n";
+    echo '<link rel="dns-prefetch" href="https://fonts.gstatic.com">' . "\n";
+}
+add_action( 'wp_head', 'cora_add_performance_resource_hints', 1 );
+add_action( 'admin_head', 'cora_add_performance_resource_hints', 1 );
+}
+
+/**
+ * Lookup workspace by slug in database or options (cached).
  */
 if ( ! function_exists( 'cora_get_workspace_by_slug' ) ) {
 function cora_get_workspace_by_slug( $slug ) {
     if ( empty( $slug ) ) return null;
-    if ( strtolower( $slug ) === 'super' ) {
+    $slug_clean = strtolower( trim( $slug ) );
+    if ( $slug_clean === 'super' ) {
         return array(
             'id'     => 'super',
             'name'   => 'Platform Control Center',
@@ -484,13 +553,19 @@ function cora_get_workspace_by_slug( $slug ) {
             'status' => 'active'
         );
     }
+
+    static $slug_cache = array();
+    if ( isset( $slug_cache[ $slug_clean ] ) ) {
+        return $slug_cache[ $slug_clean ];
+    }
+
     global $wpdb;
     $table_name = $wpdb->prefix . 'cora_agencies';
     
-    $table_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_name ) );
-    if ( $table_exists ) {
-        $db_workspace = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_name} WHERE slug = %s", $slug ), ARRAY_A );
+    if ( cora_table_exists( $table_name ) ) {
+        $db_workspace = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_name} WHERE slug = %s", $slug_clean ), ARRAY_A );
         if ( $db_workspace ) {
+            $slug_cache[ $slug_clean ] = $db_workspace;
             return $db_workspace;
         }
     }
@@ -498,23 +573,42 @@ function cora_get_workspace_by_slug( $slug ) {
     $agencies = get_option( 'cora_agencies', array() );
     if ( is_array( $agencies ) ) {
         foreach ( $agencies as $ag ) {
-            if ( isset( $ag['slug'] ) && strtolower( $ag['slug'] ) === strtolower( $slug ) ) {
+            if ( isset( $ag['slug'] ) && strtolower( $ag['slug'] ) === $slug_clean ) {
+                $slug_cache[ $slug_clean ] = $ag;
                 return $ag;
             }
         }
     }
 
-    if ( in_array( strtolower( $slug ), array( 'workspace', 'apex-realty', 'default' ), true ) ) {
-        return array(
-            'id'     => 1,
-            'name'   => 'Apex Realty Group',
-            'slug'   => $slug,
-            'plan'   => 'enterprise',
-            'status' => 'active'
-        );
+    if ( is_user_logged_in() ) {
+        $user_agency = get_user_meta( get_current_user_id(), 'cora_workspace_agency_name', true );
+        if ( ! empty( $user_agency ) && ( sanitize_title( $user_agency ) === $slug_clean || $slug_clean === 'workspace' ) ) {
+            $res = array(
+                'id'     => get_current_user_id(),
+                'name'   => $user_agency,
+                'slug'   => $slug_clean,
+                'plan'   => 'enterprise',
+                'status' => 'active'
+            );
+            $slug_cache[ $slug_clean ] = $res;
+            return $res;
+        }
     }
 
-    return null;
+    $display_name = ucwords( str_replace( array( '-', '_' ), ' ', $slug_clean ) );
+    if ( in_array( $slug_clean, array( 'workspace', 'default' ), true ) ) {
+        $display_name = 'Cora Workspace';
+    }
+
+    $res = array(
+        'id'     => 1,
+        'name'   => $display_name,
+        'slug'   => $slug_clean,
+        'plan'   => 'enterprise',
+        'status' => 'active'
+    );
+    $slug_cache[ $slug_clean ] = $res;
+    return $res;
 }
 }
 
@@ -534,8 +628,7 @@ function cora_get_user_workspaces( $user_id = 0 ) {
 
     // If Shruti / Super Admin, return ALL registered workspaces
     if ( cora_is_super_owner( $user ) ) {
-        $table_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_name ) );
-        if ( $table_exists ) {
+        if ( cora_table_exists( $table_name ) ) {
             $workspaces = $wpdb->get_results( "SELECT * FROM {$table_name} ORDER BY name ASC", ARRAY_A );
             if ( ! empty( $workspaces ) ) return $workspaces;
         }
@@ -547,8 +640,7 @@ function cora_get_user_workspaces( $user_id = 0 ) {
     $assigned_agency_id = get_user_meta( $user_id, 'cora_agency_id', true );
     if ( empty( $assigned_agency_id ) ) {
         $cora_users_table = $wpdb->prefix . 'cora_users';
-        $user_table_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $cora_users_table ) );
-        if ( $user_table_exists ) {
+        if ( cora_table_exists( $cora_users_table ) ) {
             $cora_user = $wpdb->get_row( $wpdb->prepare( "SELECT agency_id FROM {$cora_users_table} WHERE wp_user_id = %d", $user_id ), ARRAY_A );
             if ( $cora_user ) {
                 $assigned_agency_id = $cora_user['agency_id'];
@@ -560,19 +652,21 @@ function cora_get_user_workspaces( $user_id = 0 ) {
         $ws = cora_get_workspace_by_slug( (string) $assigned_agency_id );
         if ( $ws ) return array( $ws );
 
-        $table_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_name ) );
-        if ( $table_exists ) {
+        if ( cora_table_exists( $table_name ) ) {
             $ws_db = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_name} WHERE id = %d", intval( $assigned_agency_id ) ), ARRAY_A );
             if ( $ws_db ) return array( $ws_db );
         }
     }
 
+    $user_agency  = get_user_meta( $user_id, 'cora_workspace_agency_name', true );
+    $default_name = ! empty( $user_agency ) ? $user_agency : 'Cora Workspace';
+    $default_slug = ! empty( $user_agency ) ? sanitize_title( $user_agency ) : 'workspace';
     return array(
         array(
-            'id' => 1,
-            'name' => 'Apex Realty Group',
-            'slug' => 'workspace',
-            'plan' => 'enterprise',
+            'id'     => $user_id ? $user_id : 1,
+            'name'   => $default_name,
+            'slug'   => $default_slug,
+            'plan'   => 'enterprise',
             'status' => 'active'
         )
     );
@@ -640,9 +734,11 @@ function cora_get_current_workspace_context() {
         return $user_workspaces[0];
     }
 
+    $user_agency = get_user_meta( get_current_user_id(), 'cora_workspace_agency_name', true );
+    $default_name = ! empty( $user_agency ) ? $user_agency : 'Cora Workspace';
     $default_ws = array(
         'id' => 1,
-        'name' => 'Apex Realty Group',
+        'name' => $default_name,
         'slug' => 'workspace',
         'plan' => 'enterprise',
         'status' => 'active'
@@ -793,6 +889,18 @@ function cora_real_estate_ai_handle_workspace_route() {
     if ( $is_workspace_route ) {
         $public_subs = array( 'login', 'forgot-password', 'reset-password', 'setup-account', 'register', 'verify-pending', 'onboarding' );
 
+        // ── Public Canvas Website Routes — intercept BEFORE any login check (allows guest visitors) ──────
+        if ( ( isset( $sub_page ) && ( $sub_page === 'site' || $sub_page === 'p' ) ) || $first_segment === 'site' ) {
+            if ( function_exists( 'cora_canvas_theme_frontend_router' ) ) {
+                cora_canvas_theme_frontend_router();
+            } else {
+                $ws_name = ! empty( $matched_workspace['name'] ) ? $matched_workspace['name'] : 'Workspace';
+                $ws_slug = ! empty( $matched_workspace['slug'] ) ? $matched_workspace['slug'] : 'workspace';
+                cora_render_default_workspace_welcome_site( $ws_name, $ws_slug );
+            }
+            exit;
+        }
+
         // ── Google OAuth — intercept BEFORE any login check (works for guests) ──────
         if ( isset( $path_parts[1] ) && $path_parts[1] === 'auth' ) {
             $auth_provider = isset( $path_parts[2] ) ? sanitize_text_field( $path_parts[2] ) : '';
@@ -863,6 +971,14 @@ function cora_real_estate_ai_handle_workspace_route() {
 
         // Allow administrators and custom photography roles to view workspace
         $user = wp_get_current_user();
+
+        // If this is a public front-end site request, render default site instead of access restricted
+        if ( isset( $sub_page ) && ( $sub_page === 'site' || $sub_page === 'p' || $first_segment === 'site' ) ) {
+            $ws_name = ! empty( $matched_workspace['name'] ) ? $matched_workspace['name'] : 'Workspace';
+            $ws_slug = ! empty( $matched_workspace['slug'] ) ? $matched_workspace['slug'] : 'workspace';
+            cora_render_default_workspace_welcome_site( $ws_name, $ws_slug );
+            exit;
+        }
 
         // Verify Workspace Level Access Control
         if ( $matched_workspace && ! cora_user_can_access_workspace( $user->ID, $matched_workspace['slug'] ) ) {
@@ -1774,11 +1890,7 @@ function cora_real_estate_ai_seed_data() {
     $existing_listings = get_option( 'cora_workspace_listings_inventory' );
     if ( ! is_array( $existing_listings ) || empty( $existing_listings ) || ( isset( $existing_listings[0]['category'] ) && in_array( $existing_listings[0]['category'], array( 'Camera', 'Lens', 'Drone', 'Gimbal', 'Light' ) ) ) ) {
         $equipment = array(
-            array( 'id' => 'eq1', 'name' => 'DLF Kings Court Penthouse', 'category' => 'Penthouse', 'rera_reg_id' => 'HR-ERA-2023-88', 'status' => 'Available', 'crew' => '', 'shoot' => '', 'sync_link' => '', 'notes' => 'Luxury penthouse with private terrace.' ),
-            array( 'id' => 'eq2', 'name' => 'Vatika City Apartment', 'category' => 'Apartment', 'rera_reg_id' => 'HR-ERA-2023-45', 'status' => 'Available', 'crew' => '', 'shoot' => '', 'sync_link' => '', 'notes' => 'Cozy family apartment.' ),
-            array( 'id' => 'eq3', 'name' => 'Tata Primanti Villa', 'category' => 'Villa', 'rera_reg_id' => 'HR-ERA-2023-12', 'status' => 'Available', 'crew' => '', 'shoot' => '', 'sync_link' => '', 'notes' => 'Spacious independent villa.' ),
-            array( 'id' => 'eq4', 'name' => 'Commercial Office Cyber City', 'category' => 'Commercial', 'rera_reg_id' => 'HR-ERA-2023-99', 'status' => 'Available', 'crew' => '', 'shoot' => '', 'sync_link' => '', 'notes' => 'Premium IT office space.' ),
-            array( 'id' => 'eq5', 'name' => 'Sohna Road Residential Plot', 'category' => 'Plot', 'rera_reg_id' => 'HR-ERA-2023-01', 'status' => 'Available', 'crew' => '', 'shoot' => '', 'sync_link' => '', 'notes' => 'Fenced corner residential plot.' )
+            array( 'id' => 'eq1', 'name' => 'DLF Kings Court Penthouse', 'category' => 'Penthouse', 'rera_reg_id' => 'HR-ERA-2023-88', 'status' => 'Available', 'crew' => '', 'shoot' => '', 'sync_link' => '', 'notes' => 'Luxury penthouse with private terrace.' )
         );
         update_option( 'cora_workspace_listings_inventory', $equipment , false );
     } else {
@@ -1850,18 +1962,6 @@ function cora_real_estate_ai_seed_data() {
                 'status' => 'New Lead',
                 'emails' => array(),
                 'created_at' => time() - 3600*24*2
-            ),
-            array(
-                'id' => 'lead_sample_2',
-                'names' => 'Aditya & Riya',
-                'email' => 'aditya.riya@yahoo.com',
-                'scale' => 'intimate',
-                'city' => 'Goa',
-                'notes' => 'Intimate beachside listing. Need property viewing and 1 day event coverage.',
-                'price' => '₹1,50,000',
-                'status' => 'Proposal Sent',
-                'emails' => array(),
-                'created_at' => time() - 3600*24*4
             )
         );
         update_option( 'cora_workspace_leads', $initial_leads );
@@ -1881,30 +1981,6 @@ function cora_real_estate_ai_seed_data() {
                 'status' => 'confirmed',
                 'deal_type' => 'Residential Buy',
                 'viewing_date' => '24th Jun, 2026'
-            ),
-            array(
-                'id' => 'client_2',
-                'names' => 'Rohit & Sneha',
-                'email' => 'rohit.sneha@outlook.com',
-                'scale' => 'destination',
-                'city' => 'Rambagh Palace, Jaipur',
-                'price' => '₹1,80,000',
-                'converted_at' => time() - 3600*24*15,
-                'status' => 'editing',
-                'deal_type' => 'Luxury Villa Sale',
-                'viewing_date' => '20th Jun, 2026'
-            ),
-            array(
-                'id' => 'client_3',
-                'names' => 'Rajesh Kumar (Office B)',
-                'email' => 'rk.enterprises@gmail.com',
-                'scale' => 'documentary',
-                'city' => 'Delhi Office',
-                'price' => '₹40,000',
-                'converted_at' => time() - 3600*24*20,
-                'status' => 'completed',
-                'deal_type' => 'Commercial Lease',
-                'viewing_date' => '15th Jun, 2026'
             )
         );
         update_option( 'cora_workspace_clients', $initial_clients );
@@ -1950,28 +2026,6 @@ function cora_real_estate_ai_seed_data() {
                 'content' => '<h3>Premium Commercial Office Lease Proposal</h3><p>We are pleased to submit this proposal for lease of premium commercial space in Cyber City. Details include:</p><ul><li>Super Built-up Area: 12,000 sq ft</li><li>2 Senior Managing Agents & 2 Senior Showing Assistants</li><li>1 Property Valuer for aerial capture</li><li>Fit-out Period: 45 working days</li><li>Covered Car Parking: 8 Reserved Bays</li></ul>',
                 'client_link' => 'lead_sample_1',
                 'secured_shares' => array()
-            ),
-            array(
-                'id' => 'doc_2',
-                'title' => 'Invoice: Apex Realty Group - Commercial Property Lease',
-                'type' => 'Invoice',
-                'amount' => '₹1,80,000',
-                'status' => 'Paid',
-                'created_date' => '2026-06-10',
-                'content' => '<h3>Commercial Office Commission Invoice</h3><p>Commission billing for successfully securing commercial tenant lease agreement at Ritz City Center.</p><p>Total Amount: ₹1,80,000 (Paid in full on June 12, 2026 via NEFT).</p>',
-                'client_link' => 'client_2',
-                'secured_shares' => array()
-            ),
-            array(
-                'id' => 'doc_3',
-                'title' => 'Contract: Delhi Fashion Week 2026 Agreement',
-                'type' => 'Contract',
-                'amount' => '₹40,000',
-                'status' => 'Signed',
-                'created_date' => '2026-06-18',
-                'content' => '<h3>Delhi Fashion Week Coverage Agreement</h3><p>This contract outlines the deliverables and terms for Delhi Fashion Week coverage.</p><p><strong>Deliverables:</strong> Runway images, backstage coverage, and social media reels.</p><p><strong>Payment Terms:</strong> 50% advance (received), 50% upon delivery.</p>',
-                'client_link' => 'client_3',
-                'secured_shares' => array()
             )
         );
         update_option( 'cora_workspace_vault_docs', $initial_docs , false );
@@ -1989,56 +2043,6 @@ function cora_real_estate_ai_seed_data() {
                 'category' => 'Advance Booking Fee',
                 'status' => 'Received',
                 'client_link' => 'client_1',
-            ),
-            array(
-                'id' => 'tx_2',
-                'date' => date( 'Y-m-d', time() - 3600*24*5 ),
-                'description' => 'Final Payment - Rajesh Kumar (Commercial Lease)',
-                'type' => 'Inflow',
-                'amount' => 40000,
-                'category' => 'Client Package Payment',
-                'status' => 'Received',
-                'client_link' => 'client_3',
-            ),
-            array(
-                'id' => 'tx_3',
-                'date' => date( 'Y-m-d', time() - 3600*24*3 ),
-                'description' => 'Co-Agent Split Payout - Rohit & Sneha Luxury Villa Sale',
-                'type' => 'Outflow',
-                'amount' => 15000,
-                'category' => 'Crew / Assistant Payout',
-                'status' => 'Paid',
-                'client_link' => 'client_2',
-            ),
-            array(
-                'id' => 'tx_4',
-                'date' => date( 'Y-m-d', time() - 3600*24*4 ),
-                'description' => 'Property Marketing - Digital Listing Ads (Penthouse Tour)',
-                'type' => 'Outflow',
-                'amount' => 3500,
-                'category' => 'Equipment Rental',
-                'status' => 'Paid',
-                'client_link' => 'client_1',
-            ),
-            array(
-                'id' => 'tx_5',
-                'date' => date( 'Y-m-d', time() - 3600*24*15 ),
-                'description' => 'Office Rent & Electricity - June 2026',
-                'type' => 'Outflow',
-                'amount' => 25000,
-                'category' => 'Office Rent / Utilities',
-                'status' => 'Paid',
-                'client_link' => '',
-            ),
-            array(
-                'id' => 'tx_6',
-                'date' => date( 'Y-m-d', time() - 3600*24*10 ),
-                'description' => 'Instagram Ads Campaign - Monsoon Leads Prep',
-                'type' => 'Outflow',
-                'amount' => 8000,
-                'category' => 'Marketing & Ads',
-                'status' => 'Paid',
-                'client_link' => '',
             )
         );
         update_option( 'cora_workspace_ledger', $initial_txs , false );
@@ -2086,32 +2090,6 @@ function cora_real_estate_ai_seed_data() {
                 ),
                 'likes' => array(),
                 'created_date' => '2026-06-20'
-            ),
-            array(
-                'id' => 'portfolio_sample_2',
-                'hash' => 'pre-listing-goa',
-                'title' => 'Site Walkthrough (Goa)',
-                'template' => 'carousel',
-                'password' => 'goa2026',
-                'client_email' => 'rohit.sneha@outlook.com',
-                'assets' => array(
-                    array(
-                        'id' => 'asset_sample_5',
-                        'name' => 'Sunset Beach Couple Portrait',
-                        'type' => 'image',
-                        'url' => 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?q=80&w=600&auto=format&fit=crop',
-                        'raw_url' => 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?q=80&w=600&auto=format&fit=crop'
-                    ),
-                    array(
-                        'id' => 'asset_sample_6',
-                        'name' => 'Goa Beach Landscape',
-                        'type' => 'image',
-                        'url' => 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=600&auto=format&fit=crop',
-                        'raw_url' => 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=600&auto=format&fit=crop'
-                    )
-                ),
-                'likes' => array(),
-                'created_date' => '2026-06-22'
             )
         );
         update_option( 'cora_workspace_portfolios', $initial_portfolios , false );
@@ -4403,6 +4381,251 @@ function cora_ajax_sync_google_doc() {
 add_action( 'wp_ajax_cora_sync_google_doc', 'cora_ajax_sync_google_doc' );
 
 /**
+ * Render default clean Welcome Site template for a workspace
+ */
+if ( ! function_exists( 'cora_render_default_workspace_welcome_site' ) ) {
+function cora_render_default_workspace_welcome_site( $ws_name = 'Cora Workspace', $ws_slug = 'workspace' ) {
+    $ws_name = ! empty( $ws_name ) ? esc_html( $ws_name ) : 'Workspace';
+    $ws_slug = ! empty( $ws_slug ) ? esc_attr( $ws_slug ) : 'workspace';
+    $tailwind_css_url = CORA_WORKSPACE_URL . 'assets/css/tailwind-built.css';
+    $dash_url = is_user_logged_in() ? home_url( '/' . $ws_slug . '/dashboard' ) : home_url( '/workspace/login' );
+    
+    // Clean any previous output buffer
+    while ( ob_get_level() > 0 ) {
+        ob_end_clean();
+    }
+    
+    status_header( 200 );
+    nocache_headers();
+    
+    ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $ws_name; ?> — Official Website</title>
+    <link rel="stylesheet" href="<?php echo $tailwind_css_url; ?>">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    </style>
+</head>
+<body class="bg-[#FBFaf7] text-zinc-900 antialiased min-h-screen flex flex-col justify-between">
+    
+    <!-- Top Navigation Header -->
+    <header class="w-full bg-white/90 backdrop-blur-md border-b border-zinc-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-zinc-900 text-white font-bold flex items-center justify-center text-sm shadow-sm">
+                    <?php echo strtoupper( substr( $ws_name, 0, 1 ) ); ?>
+                </div>
+                <span class="font-bold text-base text-zinc-900 tracking-tight"><?php echo $ws_name; ?></span>
+            </div>
+            
+            <nav class="hidden md:flex items-center gap-8 text-xs font-semibold text-zinc-600">
+                <a href="#" class="text-zinc-900 font-bold hover:text-black transition-colors">Home</a>
+                <a href="#about" class="hover:text-zinc-900 transition-colors">About Us</a>
+                <a href="#services" class="hover:text-zinc-900 transition-colors">Services</a>
+                <a href="#contact" class="hover:text-zinc-900 transition-colors">Contact</a>
+            </nav>
+            
+            <div class="flex items-center gap-3">
+                <a href="<?php echo $dash_url; ?>" class="px-4 py-2 bg-zinc-900 hover:bg-black text-white text-xs font-bold rounded-lg transition-all shadow-sm">
+                    Client Portal →
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Hero Container -->
+    <main class="flex-1">
+        <section class="max-w-5xl mx-auto px-6 py-20 text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-semibold mb-6">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Official Workspace Website
+            </div>
+            
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-zinc-900 tracking-tight leading-tight mb-6 max-w-3xl mx-auto">
+                Welcome to <span class="underline decoration-zinc-300 underline-offset-8"><?php echo $ws_name; ?></span>
+            </h1>
+            
+            <p class="text-base sm:text-lg text-zinc-600 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
+                Your primary digital hub for professional services, client management, and verified operational workflow.
+            </p>
+            
+            <div class="flex flex-wrap items-center justify-center gap-4">
+                <a href="#contact" class="px-6 py-3 bg-zinc-900 hover:bg-black text-white text-xs font-bold rounded-xl shadow-md transition-all">
+                    Get in Touch
+                </a>
+                <a href="<?php echo home_url( '/' . $ws_slug . '/canvas' ); ?>" class="px-6 py-3 bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-800 text-xs font-bold rounded-xl shadow-sm transition-all">
+                    Customize in Canvas Builder
+                </a>
+            </div>
+        </section>
+
+        <!-- Feature Cards -->
+        <section id="services" class="max-w-6xl mx-auto px-6 py-12 border-t border-zinc-200/80">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-sm hover:shadow-md transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200/80 flex items-center justify-center text-zinc-800 font-bold mb-4">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                    </div>
+                    <h3 class="font-bold text-sm text-zinc-900 mb-2">Tailored Operations</h3>
+                    <p class="text-xs text-zinc-500 leading-relaxed">
+                        Dedicated workflows and client tools designed for efficiency and modern delivery standards.
+                    </p>
+                </div>
+
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-sm hover:shadow-md transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200/80 flex items-center justify-center text-zinc-800 font-bold mb-4">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                    <h3 class="font-bold text-sm text-zinc-900 mb-2">Client Collaboration</h3>
+                    <p class="text-xs text-zinc-500 leading-relaxed">
+                        Real-time status tracking, document sharing, and unified communication channels.
+                    </p>
+                </div>
+
+                <div class="p-6 bg-white border border-zinc-200/80 rounded-2xl shadow-sm hover:shadow-md transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200/80 flex items-center justify-center text-zinc-800 font-bold mb-4">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                    </div>
+                    <h3 class="font-bold text-sm text-zinc-900 mb-2">Verified Experience</h3>
+                    <p class="text-xs text-zinc-500 leading-relaxed">
+                        Fast performance, responsive security, and clean modern aesthetic built for quality.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact CTA Section -->
+        <section id="contact" class="max-w-4xl mx-auto px-6 py-16 text-center">
+            <div class="bg-white border border-zinc-200/80 rounded-3xl p-10 shadow-sm">
+                <h2 class="text-2xl font-bold text-zinc-900 mb-3">Get in Touch</h2>
+                <p class="text-xs text-zinc-500 mb-6 max-w-md mx-auto">
+                    Have a question or request for <?php echo $ws_name; ?>? Reach out to our team directly.
+                </p>
+                <a href="mailto:info@heycora.in" class="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-900 hover:bg-black text-white text-xs font-bold rounded-xl transition-all shadow-sm">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    Send Message
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Clean Monochromatic Footer -->
+    <footer class="w-full bg-white border-t border-zinc-200 py-8">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+            <div>
+                © <?php echo date('Y'); ?> <strong class="text-zinc-800"><?php echo $ws_name; ?></strong>. All rights reserved.
+            </div>
+            <div class="flex items-center gap-6">
+                <span>Powered by <strong class="text-zinc-800">Cora Platform</strong></span>
+                <a href="<?php echo $dash_url; ?>" class="text-zinc-700 font-semibold hover:text-black">Dashboard Access</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
+    <?php
+    exit;
+}
+}
+
+/**
+ * Automatically provisions a default Canvas theme and associated pages for a tenant agency workspace if one does not exist.
+ */
+if ( ! function_exists( 'cora_provision_default_canvas_theme_for_agency' ) ) {
+function cora_provision_default_canvas_theme_for_agency( $agency_id ) {
+    global $wpdb;
+    $agency_id = intval( $agency_id );
+    if ( $agency_id <= 0 ) {
+        return 0;
+    }
+
+    // Check if theme already exists for this agency
+    $existing = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d LIMIT 1", $agency_id ) );
+    if ( $existing ) {
+        return intval( $existing );
+    }
+
+    // Get master default template theme to clone
+    $master_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY id ASC LIMIT 1", ARRAY_A );
+    if ( ! $master_theme ) {
+        $master_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes ORDER BY id ASC LIMIT 1", ARRAY_A );
+    }
+
+    $theme_name = 'Cora Default Theme';
+    $settings   = '{}';
+    $custom_css = '';
+    $custom_js  = '';
+    if ( $master_theme ) {
+        $theme_name = $master_theme['name'];
+        $settings   = $master_theme['settings'];
+        $custom_css = ! empty( $master_theme['custom_css'] ) ? $master_theme['custom_css'] : '';
+        $custom_js  = ! empty( $master_theme['custom_js'] ) ? $master_theme['custom_js'] : '';
+    }
+
+    $wpdb->insert(
+        $wpdb->prefix . 'cora_canvas_themes',
+        array(
+            'agency_id'    => $agency_id,
+            'name'         => $theme_name,
+            'status'       => 'live',
+            'version'      => '1.0.0',
+            'settings'     => $settings,
+            'custom_css'   => $custom_css,
+            'custom_js'    => $custom_js,
+            'created_at'   => current_time('mysql'),
+            'updated_at'   => current_time('mysql'),
+            'activated_at' => current_time('mysql'),
+        ),
+        array( '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
+    );
+    $new_theme_id = intval( $wpdb->insert_id );
+
+    if ( $new_theme_id > 0 && $master_theme ) {
+        $master_pages = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", intval( $master_theme['id'] ) ), ARRAY_A );
+        foreach ( $master_pages as $p ) {
+            $cloned_post_id = cora_duplicate_wp_post( $p['wp_post_id'] );
+            $wp_post_id = $cloned_post_id ? $cloned_post_id : $p['wp_post_id'];
+
+            if ( $wp_post_id ) {
+                wp_update_post( array(
+                    'ID'          => $wp_post_id,
+                    'post_status' => 'publish',
+                ) );
+            }
+
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_canvas_pages',
+                array(
+                    'agency_id'       => $agency_id,
+                    'theme_id'        => $new_theme_id,
+                    'wp_post_id'      => $wp_post_id,
+                    'title'           => $p['title'],
+                    'slug'            => $p['slug'],
+                    'status'          => 'published',
+                    'is_homepage'     => $p['is_homepage'],
+                    'template'        => $p['template'],
+                    'seo_title'       => $p['seo_title'],
+                    'seo_description' => $p['seo_description'],
+                    'seo_og_image'    => $p['seo_og_image'],
+                    'created_by'      => get_current_user_id(),
+                    'created_at'      => current_time('mysql'),
+                    'updated_at'      => current_time('mysql'),
+                ),
+                array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
+            );
+        }
+    }
+
+    return $new_theme_id;
+}
+}
+
+/**
  * Serve Canvas Themes dynamic frontend routing
  */
 if ( ! function_exists( 'cora_canvas_theme_frontend_router' ) ) {
@@ -4437,17 +4660,80 @@ function cora_canvas_theme_frontend_router() {
     $path = substr( $request_uri, strlen( $home_path ) );
     $path = trim( parse_url( $path, PHP_URL_PATH ), '/' );
 
-    // Ignore reserved paths
     $path_parts = explode( '/', $path );
-    $first_part = isset( $path_parts[0] ) ? $path_parts[0] : '';
+    $first_part  = isset( $path_parts[0] ) ? sanitize_title( $path_parts[0] ) : '';
+    $second_part = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : '';
+    $third_part  = isset( $path_parts[2] ) ? sanitize_title( $path_parts[2] ) : '';
+
     $reserved_paths = array( 'api', 'workspace', 'shared-doc', 'shared-portfolio', 'cora-service-worker.js', 'cora-manifest.json', 'cora-offline.html', 'wp-admin', 'wp-login.php' );
     if ( in_array( $first_part, $reserved_paths ) ) {
         return;
     }
 
+    // List of known admin dashboard subpages
+    $admin_subpages = array( 
+        'dashboard', 'canvas', 'users', 'financials', 'content-suite', 'content_suite',
+        'media', 'file-manager', 'vault', 'leads', 'forms', 'emails', 'settings-suite', 
+        'audit-panel', 'super-admin', 'profile', 'reviews-feedback', 'reviews_acquisition',
+        'property-listings', 'team-scheduler', 'crew-scheduler', 'client-task-manager', 
+        'ecosystem', 'tools', 'mcp', 'onboarding'
+    );
+
+    $matched_ws = cora_get_workspace_by_slug( $first_part );
+    $is_explicit_site_request = ( $first_part === 'site' || $second_part === 'site' || $second_part === 'p' );
+
+    // If first_part is a valid workspace slug and second_part is an admin subpage (or empty when accessing dashboard),
+    // skip canvas router so workspace handler can serve dashboard pages.
+    if ( $matched_ws && ! $is_explicit_site_request ) {
+        if ( empty( $second_part ) && is_user_logged_in() && ! isset( $_GET['cv_preview_theme'] ) && ! isset( $_GET['site'] ) ) {
+            return; // Serves admin dashboard
+        }
+        if ( in_array( $second_part, $admin_subpages ) ) {
+            return; // Serves admin subpage
+        }
+    }
+
     global $wpdb;
 
-    // Detect active theme ID (either preview or live)
+    // Resolve tenant agency ID, workspace info, and page slug from path
+    $target_agency_id = 0;
+    $target_page_slug = '';
+    $target_ws        = null;
+
+    if ( $first_part === 'site' ) {
+        // Format: /site/{workspace_slug} or /site/{workspace_slug}/{page_slug}
+        $target_ws = cora_get_workspace_by_slug( $second_part );
+        if ( $target_ws && ! empty( $target_ws['agency_id'] ) ) {
+            $target_agency_id = intval( $target_ws['agency_id'] );
+        }
+        $target_page_slug = $third_part;
+    } elseif ( $second_part === 'site' ) {
+        // Format: /{workspace_slug}/site or /{workspace_slug}/site/{page_slug}
+        $target_ws = cora_get_workspace_by_slug( $first_part );
+        if ( $target_ws && ! empty( $target_ws['agency_id'] ) ) {
+            $target_agency_id = intval( $target_ws['agency_id'] );
+        }
+        $target_page_slug = $third_part;
+    } elseif ( $matched_ws ) {
+        // Format: /{workspace_slug} or /{workspace_slug}/{page_slug}
+        $target_ws = $matched_ws;
+        if ( ! empty( $target_ws['agency_id'] ) ) {
+            $target_agency_id = intval( $target_ws['agency_id'] );
+        }
+        $target_page_slug = $second_part;
+    } else {
+        // Root / or custom page slug
+        $cora_ws = cora_get_current_workspace_context();
+        if ( ! empty( $cora_ws['agency_id'] ) ) {
+            $target_agency_id = intval( $cora_ws['agency_id'] );
+        }
+        $target_page_slug = $path;
+    }
+
+    $ws_name = ! empty( $target_ws['name'] ) ? $target_ws['name'] : ( ! empty( $second_part ) ? ucfirst( $second_part ) : 'Workspace' );
+    $ws_slug = ! empty( $target_ws['slug'] ) ? $target_ws['slug'] : ( ! empty( $second_part ) ? $second_part : 'workspace' );
+
+    // Detect active theme ID (either preview or live for resolved agency)
     $is_preview = false;
     $active_theme_id = 0;
     
@@ -4460,14 +4746,32 @@ function cora_canvas_theme_frontend_router() {
     }
     
     if ( ! $active_theme_id ) {
-        $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
-        if ( ! $live_theme ) {
-            $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes LIMIT 1", ARRAY_A );
+        if ( $target_agency_id > 0 ) {
+            $live_theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d AND status = 'live' ORDER BY id DESC LIMIT 1", $target_agency_id ), ARRAY_A );
+            if ( ! $live_theme ) {
+                $live_theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d ORDER BY id DESC LIMIT 1", $target_agency_id ), ARRAY_A );
+            }
+            if ( $live_theme ) {
+                $active_theme_id = intval( $live_theme['id'] );
+            } else {
+                // Auto-provision theme for new tenant workspace agency
+                $active_theme_id = cora_provision_default_canvas_theme_for_agency( $target_agency_id );
+            }
         }
-        $active_theme_id = $live_theme ? intval( $live_theme['id'] ) : 0;
+        if ( ! $active_theme_id ) {
+            $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
+            if ( ! $live_theme ) {
+                $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes ORDER BY id DESC LIMIT 1", ARRAY_A );
+            }
+            $active_theme_id = $live_theme ? intval( $live_theme['id'] ) : 0;
+        }
     }
 
     if ( ! $active_theme_id ) {
+        if ( $is_explicit_site_request || $matched_ws || $target_agency_id > 0 ) {
+            cora_render_default_workspace_welcome_site( $ws_name, $ws_slug );
+            exit;
+        }
         // Fallback if no theme exists - serve static index if front page
         if ( is_front_page() ) {
             $frontend_file = plugin_dir_path( __FILE__ ) . 'apex-realty-group/index.html';
@@ -4481,10 +4785,14 @@ function cora_canvas_theme_frontend_router() {
 
     // Match path in cora_canvas_pages
     $canvas_page = null;
-    if ( empty( $path ) ) {
+    if ( empty( $target_page_slug ) || $target_page_slug === 'home' ) {
         $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND is_homepage = 1 LIMIT 1", $active_theme_id ), ARRAY_A );
-    } else {
-        $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s LIMIT 1", $active_theme_id, $path ), ARRAY_A );
+    }
+    if ( ! $canvas_page && ! empty( $target_page_slug ) ) {
+        $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s LIMIT 1", $active_theme_id, $target_page_slug ), ARRAY_A );
+    }
+    if ( ! $canvas_page ) {
+        $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND is_homepage = 1 LIMIT 1", $active_theme_id ), ARRAY_A );
     }
 
     // Try by post ID if not found and is single page
@@ -4616,102 +4924,34 @@ BARSCRIPT;
 </body>
 </html>
 HTML;
+            exit;
         } else {
-            // It is an Elementor or standard page layout page.
-            
-            // Register front-end draft preview bar injector on wp_footer if previewing a draft theme
-            if ( $is_preview ) {
-                add_action( 'wp_footer', function() use ( $active_theme_id ) {
-                    $rest_url  = esc_url( rest_url( 'cora/v1/preview-bar-data' ) );
-                    $site_url  = esc_url( home_url() );
-                    $rest_json = json_encode( $rest_url );
-                    $site_json = json_encode( $site_url );
-                    $theme_json = json_encode( $active_theme_id );
-                    
-                    ?>
-                    <script id="cora-preview-bar-injector">
-                    (function(){
-                      var REST_BASE=<?php echo $rest_json; ?>;
-                      var SITE_URL=<?php echo $site_json; ?>;
-                      var themeId=<?php echo $theme_json; ?>;
-                      var params=new URLSearchParams(window.location.search);
-                      var previewThemeParam=params.get('cv_preview_theme');
-                      if(!previewThemeParam)return;
-                      fetch(REST_BASE+'?theme_id='+encodeURIComponent(themeId))
-                        .then(function(r){return r.ok?r.json():null;})
-                        .then(function(data){
-                          if(!data||data.code)return;
-                          var currentPath=window.location.pathname.replace(/^\/+|\/+$/g,'');
-                          var optionsHTML=data.pages.map(function(p){
-                            var slug=p.is_homepage? '' : (p.slug||'');
-                            var sel=(currentPath===slug||(p.is_homepage&&currentPath===''||currentPath==='/'))?' selected':'';
-                            return '<option value="'+slug+'"'+sel+'>'+p.title+'</option>';
-                          }).join('');
-                          var style=document.createElement('style');
-                          style.id='cora-preview-bar-style';
-                          style.textContent='#cora-preview-bar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);width:calc(100% - 40px);max-width:780px;height:56px;background:rgba(9,9,11,0.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);border-radius:9999px;box-shadow:0 20px 40px rgba(0,0,0,0.5);z-index:2147483647;display:flex;align-items:center;justify-content:space-between;padding:0 16px;color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:13px;animation:coraBarSlideUp 0.35s cubic-bezier(0.34,1.56,0.64,1) both}'
-                            +'@keyframes coraBarSlideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}'
-                            +'#cora-preview-bar .cpb-left{display:flex;align-items:center;gap:10px;min-width:0}'
-                            +'#cora-preview-bar .cpb-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:coraDotPulse 1.8s ease-in-out infinite}'
-                            +'@keyframes coraDotPulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.6)}50%{box-shadow:0 0 0 5px rgba(34,197,94,0)}}'
-                            +'#cora-preview-bar .cpb-label{font-size:11px;color:#a1a1aa;white-space:nowrap}'
-                            +'#cora-preview-bar .cpb-name{font-size:12px;font-weight:700;color:#fff;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}'
-                            +'#cora-preview-bar .cpb-divider{width:1px;height:20px;background:rgba(255,255,255,0.15)}'
-                            +'#cora-preview-bar .cpb-select{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:8px;padding:4px 8px;font-size:11px;font-weight:600;cursor:pointer;max-width:180px}'
-                            +'#cora-preview-bar .cpb-select option{background:#18181b;color:#fff}'
-                            +'#cora-preview-bar .cpb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}'
-                            +'#cora-preview-bar .cpb-exit{font-size:11px;font-weight:600;color:#a1a1aa;text-decoration:none;padding:6px 12px;border-radius:8px;transition:background 0.15s}'
-                            +'#cora-preview-bar .cpb-exit:hover{background:rgba(255,255,255,0.08);color:#fff}'
-                            +'#cora-preview-bar .cpb-publish{background:#fff;color:#09090b;border:none;border-radius:8px;padding:7px 14px;font-size:11px;font-weight:800;cursor:pointer;transition:all 0.15s}'
-                            +'#cora-preview-bar .cpb-publish:hover{background:#e4e4e7}'
-                            +'#cora-preview-bar .cpb-publish.confirming{background:#ef4444;color:#fff}';
-                          document.head.appendChild(style);
-                          var bar=document.createElement('div');
-                          bar.id='cora-preview-bar';
-                          bar.innerHTML='<div class="cpb-left"><span class="cpb-dot"></span><div><div class="cpb-label">Previewing Draft:</div><div class="cpb-name">'+data.theme_name+'</div></div></div>'
-                            +'<div class="cpb-left"><div class="cpb-divider"></div><select class="cpb-select" id="cpb-page-select">'+optionsHTML+'</select></div>'
-                            +'<div class="cpb-right"><a class="cpb-exit" href="'+data.canvas_url+'">← Exit</a><button class="cpb-publish" id="cpb-publish-btn">Publish</button></div>';
-                          document.body.appendChild(bar);
-                          document.getElementById('cpb-page-select').addEventListener('change',function(){
-                            var slug=this.value;
-                            window.location.href=SITE_URL+(slug?'/'+slug+'/':'/')+('?cv_preview_theme='+previewThemeParam);
-                          });
-                          var pub=document.getElementById('cpb-publish-btn'),confirming=false;
-                          pub.addEventListener('click',function(){
-                            if(!confirming){confirming=true;pub.textContent='Confirm Publish';pub.classList.add('confirming');setTimeout(function(){if(confirming){confirming=false;pub.textContent='Publish';pub.classList.remove('confirming');}},3000);return;}
-                            pub.disabled=true;pub.textContent='Publishing…';
-                            var fd=new FormData();fd.append('action','cora_ajax_activate_theme');fd.append('theme_id',previewThemeParam);fd.append('nonce',data.nonce);
-                            fetch(data.ajax_url,{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(res){
-                              if(res.success){pub.textContent='✓ Published!';setTimeout(function(){window.location.href=SITE_URL;},1200);}
-                              else{pub.textContent='Failed — retry';pub.disabled=false;}
-                            }).catch(function(){pub.textContent='Error — retry';pub.disabled=false;});
-                          });
-                        }).catch(function(){});
-                    })();
-                    </script>
-                    <?php
-                }, 100 );
-            }
-
-            // If the queried object does not match this page ID (e.g. we are on root /),
-            // we override the global query to point to this page and load the template-loader.php pipeline!
-            global $wp_query;
-            if ( $wp_query->get_queried_object_id() !== (int)$page_id ) {
-                // Prevent recursive loop by removing our template redirect hook before loading the template
-                remove_action( 'template_redirect', 'cora_canvas_theme_frontend_router', 3 );
-                
-                query_posts( array(
-                    'page_id'   => $page_id,
-                    'post_type' => 'page'
-                ) );
-
-                if ( file_exists( ABSPATH . WPINC . '/template-loader.php' ) ) {
-                    include( ABSPATH . WPINC . '/template-loader.php' );
-                    exit;
+            // Check if post exists with content
+            $post = $page_id ? get_post( $page_id ) : null;
+            if ( $post && ! empty( trim( $post->post_content ) ) ) {
+                $title = get_the_title( $page_id );
+                if ( empty( $title ) ) {
+                    $title = ! empty( $canvas_page['title'] ) ? $canvas_page['title'] : $ws_name;
                 }
+                $tailwind_css_url = CORA_WORKSPACE_URL . 'assets/css/tailwind-built.css';
+                $content = apply_filters( 'the_content', $post->post_content );
+                
+                while ( ob_get_level() > 0 ) {
+                    ob_end_clean();
+                }
+                status_header( 200 );
+                nocache_headers();
+                echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>' . esc_html( $title ) . '</title><link rel="stylesheet" href="' . esc_url( $tailwind_css_url ) . '"></head><body class="bg-[#FBFaf7] text-zinc-900 antialiased p-8"><div class="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-zinc-200">' . $content . '</div></body></html>';
+                exit;
+            } else {
+                cora_render_default_workspace_welcome_site( $ws_name, $ws_slug );
+                exit;
             }
         }
     }
+
+    cora_render_default_workspace_welcome_site( $ws_name, $ws_slug );
+    exit;
 }
 }
 add_action( 'template_redirect', 'cora_canvas_theme_frontend_router', 3 );
@@ -7370,7 +7610,7 @@ function cora_auto_generate_client_tasks( $client_id, $client_name, $booking_tit
             'booking_id' => $booking_id,
             'booking_title' => $booking_title,
             'assignee_id' => 'u1',
-            'assignee_name' => 'Shruti Sharma (Super Admin)',
+            'assignee_name' => 'Shruti  (Super Admin)',
             'deliverable_type' => 'Client Communication',
             'priority' => 'high',
             'due_date' => date('Y-m-d', strtotime('+3 days')),
@@ -7389,7 +7629,7 @@ function cora_auto_generate_client_tasks( $client_id, $client_name, $booking_tit
             'booking_id' => $booking_id,
             'booking_title' => $booking_title,
             'assignee_id' => 'u1',
-            'assignee_name' => 'Shruti Sharma (Super Admin)',
+            'assignee_name' => 'Shruti  (Super Admin)',
             'deliverable_type' => 'Admin',
             'priority' => 'high',
             'due_date' => date('Y-m-d', strtotime('+5 days')),
@@ -7470,7 +7710,7 @@ function cora_auto_generate_client_timeline( $client_id, $client_name, $booking_
             'type_tag'       => 'Creative Prep',
             'duration_tag'   => '2.0 Hrs',
             'dist_tag'       => '0.0 km',
-            'crew'           => array('Shruti Sharma (Super Admin)'),
+            'crew'           => array('Shruti  (Super Admin)'),
             'status'         => 'Upcoming'
         ),
         array(
@@ -10809,20 +11049,25 @@ add_action( 'wp_ajax_cora_generate_attendance_report', 'cora_ajax_generate_atten
  */
 if ( ! function_exists( 'cora_ajax_update_geofence' ) ) {
 function cora_ajax_update_geofence() {
-    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $nonce = isset( $_REQUEST['nonce'] ) ? $_REQUEST['nonce'] : ( isset( $_REQUEST['security'] ) ? $_REQUEST['security'] : '' );
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) ) {
+        if ( ! is_user_logged_in() ) {
+            wp_send_json_error( array( 'message' => 'Security check failed.' ) );
+        }
+    }
     
     // Check privileges
     $current_user = wp_get_current_user();
-    $allowed_roles = array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager' );
+    $allowed_roles = array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_re_broker_owner', 'cora_studio_owner', 'owner' );
     $user_roles = (array) $current_user->roles;
-    $is_allowed = false;
+    $is_allowed = cora_is_super_owner() || current_user_can( 'manage_options' ) || current_user_can( 'read' );
     foreach ( $allowed_roles as $role ) {
         if ( in_array( $role, $user_roles, true ) ) {
             $is_allowed = true;
             break;
         }
     }
-    if ( ! $is_allowed && ! current_user_can( 'manage_options' ) ) {
+    if ( ! $is_allowed ) {
         wp_send_json_error( array( 'message' => 'Unauthorized access.' ) );
     }
     
@@ -10916,8 +11161,13 @@ add_action( 'wp_ajax_cora_save_office_location', 'cora_ajax_save_office_location
  */
 if ( ! function_exists( 'cora_ajax_trigger_attendance_automation' ) ) {
 function cora_ajax_trigger_attendance_automation() {
-    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! current_user_can( 'read' ) ) {
+    $nonce = isset( $_REQUEST['nonce'] ) ? $_REQUEST['nonce'] : ( isset( $_REQUEST['security'] ) ? $_REQUEST['security'] : '' );
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) ) {
+        if ( ! is_user_logged_in() ) {
+            wp_send_json_error( array( 'message' => 'Security check failed.' ) );
+        }
+    }
+    if ( ! is_user_logged_in() ) {
         wp_send_json_error( array( 'message' => 'Unauthorized' ) );
     }
     
@@ -11122,16 +11372,9 @@ function cora_ajax_fetch_client_tasks() {
 
     $tasks = get_option('cora_workspace_client_tasks', array());
     if ( empty($tasks) ) {
-        // Provide 8-10 realistic default sample tasks
+        // Provide 1 clean default sample task
         $tasks = array(
-            array('id' => uniqid(), 'title' => 'Finalize Wedding Album Layout', 'client_id' => 'c1', 'client_name' => 'Ananya & Rohan Wedding', 'booking_id' => 'b1', 'booking_title' => 'Destination Wedding - Udaipur', 'assignee_id' => 'u1', 'assignee_name' => 'Shruti Sharma (Super Admin)', 'deliverable_type' => 'Print', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('+3 days')), 'status' => 'in_progress', 'desc' => 'Needs 40 pages max.', 'subtasks' => array( array('id' => uniqid(), 'text' => 'Select 100 best photos', 'completed' => true), array('id' => uniqid(), 'text' => 'Send for review', 'completed' => false) )),
-            array('id' => uniqid(), 'title' => 'Drone Footage Editing', 'client_id' => 'c2', 'client_name' => 'Skyline Towers Commercial', 'booking_id' => 'b2', 'booking_title' => 'Corporate Video - Tech Summit', 'assignee_id' => 'u2', 'assignee_name' => 'Karan Verma (Drone Pilot)', 'deliverable_type' => 'Video', 'priority' => 'medium', 'due_date' => date('Y-m-d', strtotime('+5 days')), 'status' => 'todo', 'desc' => 'Color grade D-Log footage.', 'subtasks' => array()),
-            array('id' => uniqid(), 'title' => 'Deliver Teaser Trailer', 'client_id' => 'c1', 'client_name' => 'Ananya & Rohan Wedding', 'booking_id' => 'b1', 'booking_title' => 'Destination Wedding - Udaipur', 'assignee_id' => 'u3', 'assignee_name' => 'Aarav Mehta (Senior Editor)', 'deliverable_type' => 'Video', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('+1 day')), 'status' => 'client_review', 'desc' => '1 minute Instagram reel.', 'subtasks' => array()),
-            array('id' => uniqid(), 'title' => 'Location Scouting', 'client_id' => 'c3', 'client_name' => 'Oberoi Luxury Estate', 'booking_id' => 'b3', 'booking_title' => 'Penthouse Architectural Shoot', 'assignee_id' => 'u4', 'assignee_name' => 'Rohan Kapoor (Lead Photographer)', 'deliverable_type' => 'Planning', 'priority' => 'medium', 'due_date' => date('Y-m-d', strtotime('+10 days')), 'status' => 'todo', 'desc' => 'Check sunlight angles.', 'subtasks' => array()),
-            array('id' => uniqid(), 'title' => 'Sign Commercial Contract', 'client_id' => 'c4', 'client_name' => 'Apex Realty Group', 'booking_id' => 'b4', 'booking_title' => 'Quarterly Corporate Headshots', 'assignee_id' => 'u1', 'assignee_name' => 'Shruti Sharma (Super Admin)', 'deliverable_type' => 'Admin', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('-1 days')), 'status' => 'blocked', 'desc' => 'Waiting for client signature.', 'subtasks' => array()),
-            array('id' => uniqid(), 'title' => 'Prepare Lighting Gear', 'client_id' => 'c3', 'client_name' => 'Oberoi Luxury Estate', 'booking_id' => 'b3', 'booking_title' => 'Penthouse Architectural Shoot', 'assignee_id' => 'u5', 'assignee_name' => 'Priya Nair (Videographer)', 'deliverable_type' => 'Prep', 'priority' => 'low', 'due_date' => date('Y-m-d', strtotime('+8 days')), 'status' => 'todo', 'desc' => 'Pack strobes and softboxes.', 'subtasks' => array()),
-            array('id' => uniqid(), 'title' => 'Backup RAW Files', 'client_id' => 'c1', 'client_name' => 'Ananya & Rohan Wedding', 'booking_id' => 'b1', 'booking_title' => 'Destination Wedding - Udaipur', 'assignee_id' => 'u3', 'assignee_name' => 'Aarav Mehta (Senior Editor)', 'deliverable_type' => 'Admin', 'priority' => 'high', 'due_date' => date('Y-m-d'), 'status' => 'done', 'desc' => 'Upload to NAS.', 'subtasks' => array()),
-            array('id' => uniqid(), 'title' => 'Client Onboarding Call', 'client_id' => 'c2', 'client_name' => 'Skyline Towers Commercial', 'booking_id' => 'b2', 'booking_title' => 'Corporate Video - Tech Summit', 'assignee_id' => 'u1', 'assignee_name' => 'Shruti Sharma (Super Admin)', 'deliverable_type' => 'Admin', 'priority' => 'medium', 'due_date' => date('Y-m-d', strtotime('+2 days')), 'status' => 'todo', 'desc' => 'Discuss project scope.', 'subtasks' => array()),
+            array('id' => 'task_sample_101', 'title' => 'Initial Project Onboarding & Scope', 'client_id' => 'c1', 'client_name' => 'Sample Client Account', 'booking_id' => 'b1', 'booking_title' => 'Project Kickoff & Deliverables', 'assignee_id' => 'u1', 'assignee_name' => 'Team Member', 'deliverable_type' => 'Planning', 'priority' => 'high', 'due_date' => date('Y-m-d', strtotime('+3 days')), 'status' => 'in_progress', 'desc' => 'Define project scope, timeline, and client deliverables.', 'subtasks' => array( array('id' => 'st_1', 'text' => 'Confirm project specifications', 'completed' => true), array('id' => 'st_2', 'text' => 'Send welcome briefing packet', 'completed' => false) ))
         );
         update_option( 'cora_workspace_client_tasks', $tasks, false );
     }
@@ -11151,7 +11394,7 @@ function cora_ajax_fetch_client_tasks() {
     }
     if ( empty($clients) ) {
         $leads_table = $wpdb->prefix . 'cora_leads';
-        if ( $wpdb->get_var("SHOW TABLES LIKE '{$leads_table}'") === $leads_table ) {
+        if ( cora_table_exists( $leads_table ) ) {
             $db_clients = $wpdb->get_results("SELECT id, name FROM {$leads_table} WHERE status = 'client' OR status = 'converted' ORDER BY name ASC", ARRAY_A);
             if ( ! empty($db_clients) ) {
                 $clients = $db_clients;
@@ -11171,7 +11414,7 @@ function cora_ajax_fetch_client_tasks() {
     $bookings = array();
     $bookings_table = $wpdb->prefix . 'cora_bookings';
     $leads_table = $wpdb->prefix . 'cora_leads';
-    if ( $wpdb->get_var("SHOW TABLES LIKE '{$bookings_table}'") === $bookings_table ) {
+    if ( cora_table_exists( $bookings_table ) ) {
         // Safe check for database columns to prevent SQL exceptions
         $has_deal_type = $wpdb->get_var("SHOW COLUMNS FROM {$bookings_table} LIKE 'deal_type'");
         $has_showing_date = $wpdb->get_var("SHOW COLUMNS FROM {$bookings_table} LIKE 'showing_date'");
@@ -11274,7 +11517,7 @@ function cora_ajax_fetch_client_tasks() {
     }
     if ( empty( $team_members ) ) {
         $team_members = array(
-            array('id' => 'u1', 'name' => 'Shruti Sharma (Super Admin)', 'role' => 'Super Admin'),
+            array('id' => 'u1', 'name' => 'Shruti  (Super Admin)', 'role' => 'Super Admin'),
             array('id' => 'u4', 'name' => 'Rohan Kapoor (Lead Photographer)', 'role' => 'Lead Photographer'),
             array('id' => 'u3', 'name' => 'Aarav Mehta (Senior Editor)', 'role' => 'Senior Editor'),
             array('id' => 'u5', 'name' => 'Priya Nair (Videographer)', 'role' => 'Videographer'),
@@ -14445,7 +14688,7 @@ function cora_get_agency_identifiers( $agency_id ) {
     $agency_ids = array( $agency_id );
     $agency_row = null;
     
-    $table_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->prefix . 'cora_agencies' ) );
+    $table_exists = cora_table_exists( $wpdb->prefix . 'cora_agencies' );
     if ( $table_exists ) {
         if ( is_numeric( $agency_id ) ) {
             $agency_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_agencies WHERE id = %d", intval( $agency_id ) ), ARRAY_A );
@@ -14571,7 +14814,7 @@ function cora_create_user_workspace( $user_id, $business_name ) {
     $slug = $slug_base;
     $count = 1;
     $table_name = $wpdb->prefix . 'cora_agencies';
-    $table_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_name ) );
+    $table_exists = cora_table_exists( $table_name );
     if ( $table_exists ) {
         while ( $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table_name} WHERE slug = %s", $slug ) ) ) {
             $slug = $slug_base . '-' . $count;
@@ -14617,7 +14860,7 @@ function cora_create_user_workspace( $user_id, $business_name ) {
     
     // Create default branch
     $branches_table = $wpdb->prefix . 'cora_branches';
-    $branches_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $branches_table ) );
+    $branches_exists = cora_table_exists( $branches_table );
     if ( $branches_exists ) {
         $wpdb->insert(
             $branches_table,
@@ -14665,9 +14908,9 @@ if ( ! function_exists( 'cora_create_custom_tables' ) ) {
 function cora_create_custom_tables() {
     global $wpdb;
     $theme_table = $wpdb->prefix . 'cora_canvas_themes';
-    $table_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $theme_table ) );
+    $table_exists = cora_table_exists( $theme_table );
     $forms_table = $wpdb->prefix . 'cora_forms';
-    $forms_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $forms_table ) );
+    $forms_exists = cora_table_exists( $forms_table );
     $has_agency_col = false;
     if ( $forms_exists ) {
         $has_agency_col = ! empty( $wpdb->get_results( "SHOW COLUMNS FROM {$forms_table} LIKE 'agency_id'" ) );
@@ -14716,6 +14959,8 @@ function cora_create_custom_tables() {
       agency_id bigint(20) unsigned NOT NULL,
       branch_id bigint(20) unsigned,
       role varchar(50) NOT NULL DEFAULT 'agent',
+      custom_role_id varchar(100) DEFAULT '',
+      is_primary_owner tinyint(1) NOT NULL DEFAULT 0,
       phone varchar(20),
       status varchar(20) NOT NULL DEFAULT 'active',
       invited_by bigint(20) unsigned,
@@ -14723,7 +14968,7 @@ function cora_create_custom_tables() {
       created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
       updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
       PRIMARY KEY  (id),
-      UNIQUE KEY wp_user_id (wp_user_id),
+      UNIQUE KEY user_agency (wp_user_id, agency_id),
       KEY agency_id (agency_id),
       KEY branch_id (branch_id)
     ) $charset_collate;";
@@ -16199,7 +16444,8 @@ function cora_sync_user_to_custom_table( $user_id ) {
     $phone = get_user_meta( $user_id, 'cora_phone', true );
     $status = (get_user_meta( $user_id, 'cora_user_status', true ) === 'inactive') ? 'inactive' : 'active';
 
-    $exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_users WHERE wp_user_id = %d", $user_id ) );
+    $agency_id = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1;
+    $exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_users WHERE wp_user_id = %d AND agency_id = %d", $user_id, $agency_id ) );
     if ( $exists ) {
         $wpdb->update(
             $wpdb->prefix . 'cora_users',
@@ -16210,7 +16456,7 @@ function cora_sync_user_to_custom_table( $user_id ) {
                 'branch_id' => $branch_new_id,
                 'updated_at' => current_time('mysql')
             ),
-            array( 'wp_user_id' => $user_id ),
+            array( 'id' => $exists ),
             array( '%s', '%s', '%s', '%d', '%s' ),
             array( '%d' )
         );
@@ -16219,11 +16465,11 @@ function cora_sync_user_to_custom_table( $user_id ) {
             $wpdb->prefix . 'cora_users',
             array(
                 'wp_user_id' => $user_id,
-                'agency_id' => 1,
-                'branch_id' => $branch_new_id,
-                'role' => $role_mapped,
-                'phone' => $phone ?: '',
-                'status' => $status,
+                'agency_id'  => $agency_id,
+                'branch_id'  => $branch_new_id,
+                'role'       => $role_mapped,
+                'phone'      => $phone ?: '',
+                'status'     => $status,
                 'invited_by' => 1,
                 'last_active' => current_time('mysql'),
                 'created_at' => current_time('mysql'),
@@ -16657,7 +16903,7 @@ function cora_seed_3_leads_per_column() {
             'status' => 'New Lead',
             'score' => 'hot',
             'format' => 'Video Production',
-            'assignee_name' => 'Shruti Sharma',
+            'assignee_name' => 'Shruti ',
             'assignee_role' => 'Super Admin',
             'assignee_init' => 'SS',
             'checklist' => '0/3 (0%)',
@@ -16712,7 +16958,7 @@ function cora_seed_3_leads_per_column() {
             'status' => 'Contacted',
             'score' => 'hot',
             'format' => 'Photoshoot',
-            'assignee_name' => 'Shruti Sharma',
+            'assignee_name' => 'Shruti ',
             'assignee_role' => 'Super Admin',
             'assignee_init' => 'SS',
             'checklist' => '1/2 (50%)',
@@ -16767,7 +17013,7 @@ function cora_seed_3_leads_per_column() {
             'status' => 'Site Visit',
             'score' => 'hot',
             'format' => 'Video Production',
-            'assignee_name' => 'Shruti Sharma',
+            'assignee_name' => 'Shruti ',
             'assignee_role' => 'Super Admin',
             'assignee_init' => 'SS',
             'checklist' => '3/4 (75%)',
@@ -16822,7 +17068,7 @@ function cora_seed_3_leads_per_column() {
             'status' => 'Negotiation',
             'score' => 'hot',
             'format' => 'Video Production',
-            'assignee_name' => 'Shruti Sharma',
+            'assignee_name' => 'Shruti ',
             'assignee_role' => 'Super Admin',
             'assignee_init' => 'SS',
             'checklist' => '2/3 (66%)',
@@ -16877,7 +17123,7 @@ function cora_seed_3_leads_per_column() {
             'status' => 'Converted',
             'score' => 'hot',
             'format' => 'Video Production',
-            'assignee_name' => 'Shruti Sharma',
+            'assignee_name' => 'Shruti ',
             'assignee_role' => 'Super Admin',
             'assignee_init' => 'SS',
             'checklist' => '4/4 (100%)',
@@ -17120,8 +17366,17 @@ function cora_filter_tenancy_data( $items, $option_name = '' ) {
 add_filter( 'option_cora_workspace_leads', 'cora_filter_tenancy_data' );
 add_filter( 'option_cora_workspace_clients', 'cora_filter_tenancy_data' );
 add_filter( 'option_cora_workspace_vault_docs', 'cora_filter_tenancy_data' );
+add_filter( 'option_cora_documents', 'cora_filter_tenancy_data' );
+add_filter( 'option_cora_workspace_client_tasks', 'cora_filter_tenancy_data' );
+add_filter( 'option_cora_review_requests', 'cora_filter_tenancy_data' );
+add_filter( 'option_cora_crew_shifts', 'cora_filter_tenancy_data' );
 add_filter( 'option_cora_workspace_portfolios', 'cora_filter_tenancy_data' );
 add_filter( 'option_cora_workspace_listings_inventory', 'cora_filter_tenancy_data' );
+add_filter( 'option_cora_workspace_ledger', 'cora_filter_tenancy_data' );
+add_filter( 'option_cora_studio_gear', 'cora_filter_tenancy_data' );
+add_filter( 'option_cora_gear_checkouts', 'cora_filter_tenancy_data' );
+add_filter( 'option_cora_gear_maintenance', 'cora_filter_tenancy_data' );
+add_filter( 'option_cora_gear_kits', 'cora_filter_tenancy_data' );
 
 // ── Tenancy Save Interception for Options ─────────────────────────────────────
 
@@ -17206,8 +17461,17 @@ function cora_pre_update_tenancy_data( $new_value, $old_value, $option_name ) {
 add_filter( 'pre_update_option_cora_workspace_leads', 'cora_pre_update_tenancy_data', 10, 3 );
 add_filter( 'pre_update_option_cora_workspace_clients', 'cora_pre_update_tenancy_data', 10, 3 );
 add_filter( 'pre_update_option_cora_workspace_vault_docs', 'cora_pre_update_tenancy_data', 10, 3 );
+add_filter( 'pre_update_option_cora_documents', 'cora_pre_update_tenancy_data', 10, 3 );
+add_filter( 'pre_update_option_cora_workspace_client_tasks', 'cora_pre_update_tenancy_data', 10, 3 );
+add_filter( 'pre_update_option_cora_review_requests', 'cora_pre_update_tenancy_data', 10, 3 );
+add_filter( 'pre_update_option_cora_crew_shifts', 'cora_pre_update_tenancy_data', 10, 3 );
 add_filter( 'pre_update_option_cora_workspace_portfolios', 'cora_pre_update_tenancy_data', 10, 3 );
 add_filter( 'pre_update_option_cora_workspace_listings_inventory', 'cora_pre_update_tenancy_data', 10, 3 );
+add_filter( 'pre_update_option_cora_workspace_ledger', 'cora_pre_update_tenancy_data', 10, 3 );
+add_filter( 'pre_update_option_cora_studio_gear', 'cora_pre_update_tenancy_data', 10, 3 );
+add_filter( 'pre_update_option_cora_gear_checkouts', 'cora_pre_update_tenancy_data', 10, 3 );
+add_filter( 'pre_update_option_cora_gear_maintenance', 'cora_pre_update_tenancy_data', 10, 3 );
+add_filter( 'pre_update_option_cora_gear_kits', 'cora_pre_update_tenancy_data', 10, 3 );
 
 // ── Workspace Branding Options Isolation ─────────────────────────────────────
 
@@ -17222,8 +17486,9 @@ function cora_filter_workspace_branding_option( $value, $option_name ) {
             $value = maybe_unserialize( $ws_value );
         }
     }
-    if ( $option_name === 'cora_sidebar_title' && ( empty( $value ) || strtolower( $value ) === 'cora' ) ) {
-        return 'Cora Real Estate';
+    if ( $option_name === 'cora_sidebar_title' && ( empty( $value ) || strtolower( $value ) === 'cora' || strtolower( $value ) === 'cora real estate' ) ) {
+        $ws_name = ( ! empty( $current_ws['name'] ) && strtolower( $current_ws['name'] ) !== 'apex realty group' && strtolower( $current_ws['name'] ) !== 'cora real estate' ) ? $current_ws['name'] : get_user_meta( get_current_user_id(), 'cora_workspace_agency_name', true );
+        return ! empty( $ws_name ) ? $ws_name : 'Cora Workspace';
     }
     return $value;
 }
@@ -17530,11 +17795,6 @@ function cora_ajax_accept_invitation() {
         wp_send_json_error( array( 'message' => 'Security check failed.' ) );
     }
 
-    $pass_valid = cora_validate_password( $password );
-    if ( $pass_valid !== true ) {
-        wp_send_json_error( array( 'message' => $pass_valid ) );
-    }
-
     $invitations = get_option( 'cora_invitations', array() );
     if ( ! isset( $invitations[ $token ] ) || $invitations[ $token ]['status'] !== 'pending' ) {
         wp_send_json_error( array( 'message' => 'Invalid or expired invitation token.' ) );
@@ -17544,15 +17804,77 @@ function cora_ajax_accept_invitation() {
     if ( time() > intval( $invite['expires_at'] ) ) {
         $invitations[ $token ]['status'] = 'expired';
         update_option( 'cora_invitations', $invitations );
-        wp_send_json_error( array( 'message' => 'This invitation link has expired. Request a new one from your admin.' ) );
+        wp_send_json_error( array( 'message' => 'This invitation link has expired. Request a new one from your workspace admin.' ) );
     }
 
     $email = $invite['email'];
+    $agency_id_num = intval( preg_replace( '/[^\d]/', '', $invite['agency_id'] ?? '1' ) );
+    $branch_id_num = intval( preg_replace( '/[^\d]/', '', $invite['branch_id'] ?? '1' ) );
+    if ( empty( $agency_id_num ) ) { $agency_id_num = 1; }
+
+    global $wpdb;
+    $cora_users_table = $wpdb->prefix . 'cora_users';
+
     if ( email_exists( $email ) ) {
-        wp_send_json_error( array( 'message' => 'A user with this email already exists.' ) );
+        // User already exists in WordPress (Cross-Workspace Membership case)
+        $existing_user = get_user_by( 'email', $email );
+        $user_id = $existing_user->ID;
+
+        // Check if user is already in cora_users for this agency
+        $already_member = $wpdb->get_var( $wpdb->prepare(
+            "SELECT id FROM {$cora_users_table} WHERE wp_user_id = %d AND agency_id = %d",
+            $user_id,
+            $agency_id_num
+        ) );
+
+        if ( ! $already_member ) {
+            $wpdb->insert(
+                $cora_users_table,
+                array(
+                    'wp_user_id' => $user_id,
+                    'agency_id'  => $agency_id_num,
+                    'branch_id'  => $branch_id_num,
+                    'role'       => $invite['role'],
+                    'status'     => 'active',
+                    'invited_by' => intval( $invite['invited_by'] ?? 1 ),
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                ),
+                array( '%d', '%d', '%d', '%s', '%s', '%d', '%s', '%s' )
+            );
+        }
+
+        // Mark invitation accepted
+        $invitations[ $token ]['status'] = 'accepted';
+        $invitations[ $token ]['accepted_at'] = time();
+        update_option( 'cora_invitations', $invitations );
+
+        cora_log_activity( 'Invitation', 'Accepted invitation and joined workspace as existing user.', $user_id );
+
+        // If not logged in, auto login
+        if ( ! is_user_logged_in() || get_current_user_id() !== $user_id ) {
+            clean_user_cache( $user_id );
+            wp_clear_auth_cookie();
+            wp_set_current_user( $user_id );
+            wp_set_auth_cookie( $user_id, true );
+            do_action( 'wp_login', $existing_user->user_login, $existing_user );
+        }
+
+        // Update active agency cookie
+        setcookie( 'cora_active_agency_id', 'agency_' . $agency_id_num, time() + 30 * DAY_IN_SECONDS, '/' );
+
+        wp_send_json_success( array(
+            'message'      => 'Welcome! You have joined the workspace.',
+            'redirect_url' => home_url( '/workspace/dashboard' )
+        ) );
     }
 
-    // Create user account
+    // New user registration flow
+    $pass_valid = cora_validate_password( $password );
+    if ( $pass_valid !== true ) {
+        wp_send_json_error( array( 'message' => $pass_valid ) );
+    }
+
     $username = sanitize_user( explode( '@', $email )[0] );
     if ( username_exists( $username ) ) {
         $username .= '_' . rand( 10, 99 );
@@ -17561,7 +17883,7 @@ function cora_ajax_accept_invitation() {
     $user_id = wp_insert_user( array(
         'user_login'   => $username,
         'user_email'   => $email,
-        'display_name' => $name,
+        'display_name' => ! empty( $name ) ? $name : $username,
         'user_pass'    => $password,
         'role'         => $invite['role']
     ) );
@@ -17570,19 +17892,36 @@ function cora_ajax_accept_invitation() {
         wp_send_json_error( array( 'message' => $user_id->get_error_message() ) );
     }
 
-    // Stamp tenancy metadata
-    update_user_meta( $user_id, 'cora_agency_id', $invite['agency_id'] );
-    update_user_meta( $user_id, 'cora_branch_id', $invite['branch_id'] );
+    // Insert into cora_users table for multi-workspace isolation
+    $wpdb->insert(
+        $cora_users_table,
+        array(
+            'wp_user_id' => $user_id,
+            'agency_id'  => $agency_id_num,
+            'branch_id'  => $branch_id_num,
+            'role'       => $invite['role'],
+            'status'     => 'active',
+            'invited_by' => intval( $invite['invited_by'] ?? 1 ),
+            'created_at' => current_time('mysql'),
+            'updated_at' => current_time('mysql')
+        ),
+        array( '%d', '%d', '%d', '%s', '%s', '%d', '%s', '%s' )
+    );
+
+    // Stamp user metadata
+    update_user_meta( $user_id, 'cora_agency_id', 'agency_' . $agency_id_num );
+    update_user_meta( $user_id, 'cora_branch_id', 'branch_' . $branch_id_num );
     update_user_meta( $user_id, 'cora_email_verified', true );
     update_user_meta( $user_id, 'cora_user_status', 'active' );
+    update_user_meta( $user_id, 'cora_onboarding_completed', '1' );
 
     // Update invitation status
     $invitations[ $token ]['status'] = 'accepted';
+    $invitations[ $token ]['accepted_at'] = time();
     update_option( 'cora_invitations', $invitations );
 
-    cora_log_activity( 'Invitation', 'Accepted invitation and created account.', $user_id );
+    cora_log_activity( 'Invitation', 'Accepted invitation and created new account.', $user_id );
 
-    // Send notification to inviter
     if ( ! empty( $invite['invited_by'] ) ) {
         cora_add_notification( $invite['invited_by'], 'Invitation Accepted', esc_html( $name ) . ' has accepted your invitation and joined the team.' );
     }
@@ -17596,6 +17935,8 @@ function cora_ajax_accept_invitation() {
     $user = get_userdata( $user_id );
     do_action( 'wp_login', $user->user_login, $user );
 
+    setcookie( 'cora_active_agency_id', 'agency_' . $agency_id_num, time() + 30 * DAY_IN_SECONDS, '/' );
+
     wp_send_json_success( array( 'redirect_url' => home_url( '/workspace/dashboard' ) ) );
 }
 }
@@ -17605,47 +17946,58 @@ if ( ! function_exists( 'cora_ajax_send_invitation' ) ) {
 function cora_ajax_send_invitation() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
     
-    // Check permission to invite (Agency Owner or Branch Manager)
     $user = wp_get_current_user();
     $role = ! empty( $user->roles ) ? $user->roles[0] : '';
     if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! in_array( $role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager' ) ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized access to user invitations.' ) );
     }
 
-    $email     = sanitize_email( $_POST['email'] ?? '' );
-    $first_name= sanitize_text_field( $_POST['first_name'] ?? '' );
-    $last_name = sanitize_text_field( $_POST['last_name'] ?? '' );
+    $email       = sanitize_email( $_POST['email'] ?? '' );
+    $first_name  = sanitize_text_field( $_POST['first_name'] ?? '' );
+    $last_name   = sanitize_text_field( $_POST['last_name'] ?? '' );
     $invite_role = sanitize_text_field( $_POST['role'] ?? '' );
-    $branch_id = sanitize_text_field( $_POST['branch_id'] ?? '' );
+    $branch_id   = sanitize_text_field( $_POST['branch_id'] ?? '' );
 
-    if ( empty( $email ) || empty( $first_name ) || empty( $last_name ) || empty( $invite_role ) ) {
-        wp_send_json_error( array( 'message' => 'All fields are required.' ) );
+    if ( empty( $email ) || empty( $invite_role ) ) {
+        wp_send_json_error( array( 'message' => 'Email address and role are required.' ) );
+    }
+
+    $agency_id_raw = cora_get_current_user_agency_id();
+    $agency_id_num = intval( preg_replace( '/[^\d]/', '', $agency_id_raw ) );
+    if ( empty( $agency_id_num ) ) { $agency_id_num = 1; }
+
+    global $wpdb;
+    $cora_users_table = $wpdb->prefix . 'cora_users';
+
+    // Single Primary Owner Rule Check
+    $is_owner_role = in_array( $invite_role, array( 'cora_super_admin', 'cora_workspace_owner', 'owner', 'cora_re_broker_owner', 'cora_studio_owner' ), true );
+    if ( $is_owner_role ) {
+        $existing_owner_count = $wpdb->get_var( $wpdb->prepare(
+            "SELECT COUNT(*) FROM {$cora_users_table} WHERE agency_id = %d AND (is_primary_owner = 1 OR role IN ('cora_super_admin', 'cora_workspace_owner', 'owner', 'cora_re_broker_owner', 'cora_studio_owner'))",
+            $agency_id_num
+        ) );
+        if ( intval( $existing_owner_count ) > 0 ) {
+            wp_send_json_error( array( 'message' => 'Each workspace can only have one primary Workspace Owner. To assign ownership to another member, please use Owner Transfer.' ) );
+        }
     }
 
     // Role hierarchy checks
     if ( $role === 'cora_branch_manager' ) {
-        // Branch managers can only invite Senior Agent or below, and branch is locked to theirs
         $allowed = array( 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor', 'cora_viewer' );
-        if ( ! in_array( $invite_role, $allowed ) ) {
+        if ( ! in_array( $invite_role, $allowed, true ) ) {
             wp_send_json_error( array( 'message' => 'You cannot invite members to this role.' ) );
         }
         $branch_id = cora_get_current_user_branch_id();
     }
 
-    // Check if email already exists
-    if ( email_exists( $email ) ) {
-        wp_send_json_error( array( 'message' => 'A user with this email already exists.' ) );
-    }
-
-    // Check for existing pending invitation
+    // Check for existing pending invitation in this agency
     $invitations = get_option( 'cora_invitations', array() );
     foreach ( $invitations as $inv ) {
-        if ( $inv['email'] === $email && $inv['status'] === 'pending' && time() < intval( $inv['expires_at'] ) ) {
-            wp_send_json_error( array( 'message' => 'An active invitation already exists for this email.' ) );
+        if ( $inv['email'] === $email && $inv['status'] === 'pending' && time() < intval( $inv['expires_at'] ) && ($inv['agency_id'] ?? '') === $agency_id_raw ) {
+            wp_send_json_error( array( 'message' => 'An active invitation already exists for this email address in this workspace.' ) );
         }
     }
 
-    $agency_id = cora_get_current_user_agency_id();
     $token = bin2hex( random_bytes( 16 ) );
     
     $invitations[ $token ] = array(
@@ -17653,23 +18005,59 @@ function cora_ajax_send_invitation() {
         'last_name'  => $last_name,
         'email'      => $email,
         'role'       => $invite_role,
-        'agency_id'  => $agency_id,
+        'agency_id'  => $agency_id_raw,
         'branch_id'  => $branch_id,
         'invited_by' => $user->ID,
-        'expires_at' => time() + 172800, // 48 hours
+        'expires_at' => time() + ( 7 * DAY_IN_SECONDS ), // 7 days
         'status'     => 'pending',
         'created_at' => time()
     );
 
     update_option( 'cora_invitations', $invitations );
 
-    cora_log_activity( 'Invitation', "Sent invitation link to {$email}." );
+    // Save to cora_invitations DB table
+    $wpdb->insert(
+        $wpdb->prefix . 'cora_invitations',
+        array(
+            'agency_id'  => $agency_id_num,
+            'branch_id'  => intval( preg_replace( '/[^\d]/', '', $branch_id ) ),
+            'email'      => $email,
+            'role'       => $invite_role,
+            'token'      => $token,
+            'invited_by' => $user->ID,
+            'status'     => 'pending',
+            'expires_at' => date( 'Y-m-d H:i:s', time() + ( 7 * DAY_IN_SECONDS ) ),
+            'created_at' => current_time('mysql')
+        ),
+        array( '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s' )
+    );
+
+    cora_log_activity( 'Invitation', "Sent workspace invitation to {$email} for role {$invite_role}." );
 
     $verification_link = home_url( '/workspace/setup-account?token=' . $token );
     update_option( 'cora_latest_verification_link', $verification_link );
     error_log( "Cora Sent Invitation Link: " . $verification_link );
 
-    wp_send_json_success( array( 'message' => 'Invitation sent successfully.' ) );
+    // Dispatch HTML email invitation via wp_mail
+    $subject = "You've been invited to join workspace on Cora";
+    $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+    $body = "
+    <div style='font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:560px;margin:0 auto;padding:32px;background:#FAFAFA;border-radius:12px;border:1px solid #E4E4E7;'>
+        <h2 style='color:#09090B;margin-top:0;font-size:20px;font-weight:700;'>Workspace Team Invitation</h2>
+        <p style='color:#52525B;font-size:14px;line-height:1.6;'>Hello,</p>
+        <p style='color:#52525B;font-size:14px;line-height:1.6;'>You have been invited to join the workspace as <strong>" . esc_html( $invite_role ) . "</strong> by " . esc_html( $user->display_name ?: $user->user_email ) . ".</p>
+        <div style='margin:28px 0;'>
+            <a href='" . esc_url( $verification_link ) . "' style='background:#09090B;color:#FFFFFF;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;display:inline-block;'>Accept Invitation & Setup Account →</a>
+        </div>
+        <p style='color:#A1A1AA;font-size:12px;'>Or copy and paste this URL into your browser: <br><a href='" . esc_url( $verification_link ) . "' style='color:#18181B;'>" . esc_url( $verification_link ) . "</a></p>
+    </div>";
+
+    @wp_mail( $email, $subject, $body, $headers );
+
+    wp_send_json_success( array(
+        'message' => 'Invitation sent successfully to ' . esc_html( $email ),
+        'verification_link' => $verification_link
+    ) );
 }
 }
 add_action( 'wp_ajax_cora_ajax_send_invitation', 'cora_ajax_send_invitation' );
@@ -17680,7 +18068,7 @@ function cora_ajax_cancel_invitation() {
     
     $user = wp_get_current_user();
     $role = ! empty( $user->roles ) ? $user->roles[0] : '';
-    if ( ! in_array( $role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) {
+    if ( ! in_array( $role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_studio_owner' ) ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
     }
 
@@ -17689,6 +18077,16 @@ function cora_ajax_cancel_invitation() {
     if ( isset( $invitations[ $token ] ) ) {
         $invitations[ $token ]['status'] = 'cancelled';
         update_option( 'cora_invitations', $invitations );
+
+        global $wpdb;
+        $wpdb->update(
+            $wpdb->prefix . 'cora_invitations',
+            array( 'status' => 'cancelled' ),
+            array( 'token' => $token ),
+            array( '%s' ),
+            array( '%s' )
+        );
+
         cora_log_activity( 'Invitation', "Cancelled invitation for {$invitations[$token]['email']}." );
         wp_send_json_success( array( 'message' => 'Invitation cancelled.' ) );
     }
@@ -17697,6 +18095,149 @@ function cora_ajax_cancel_invitation() {
 }
 }
 add_action( 'wp_ajax_cora_ajax_cancel_invitation', 'cora_ajax_cancel_invitation' );
+
+/**
+ * AJAX — Save Custom Role definition and permissions for active tenant workspace.
+ */
+if ( ! function_exists( 'cora_ajax_save_custom_role' ) ) {
+function cora_ajax_save_custom_role() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Authentication required.' ) );
+    }
+
+    $role_name   = sanitize_text_field( $_POST['role_name'] ?? '' );
+    $description = sanitize_text_field( $_POST['description'] ?? '' );
+    $permissions = isset( $_POST['permissions'] ) ? (array) $_POST['permissions'] : array();
+
+    if ( empty( $role_name ) ) {
+        wp_send_json_error( array( 'message' => 'Role name is required.' ) );
+    }
+
+    $agency_id_raw = cora_get_current_user_agency_id();
+    $option_key    = 'cora_custom_roles_' . preg_replace( '/[^\w]/', '_', $agency_id_raw );
+    $custom_roles  = get_option( $option_key, array() );
+
+    $role_key = 'custom_' . sanitize_title( $role_name );
+
+    $custom_roles[ $role_key ] = array(
+        'role_key'    => $role_key,
+        'role_name'   => $role_name,
+        'description' => $description,
+        'permissions' => array_map( 'sanitize_text_field', $permissions ),
+        'created_at'  => current_time('mysql')
+    );
+
+    update_option( $option_key, $custom_roles );
+
+    // Also update global custom roles array for backward compatibility
+    $global_custom = get_option( 'cora_custom_roles', array() );
+    $global_custom[ $role_key ] = array(
+        'role_key'  => $role_key,
+        'role_name' => $role_name
+    );
+    update_option( 'cora_custom_roles', $global_custom );
+
+    cora_log_activity( 'User Management', "Created custom role: {$role_name}" );
+    wp_send_json_success( array(
+        'message'  => 'Custom role saved successfully.',
+        'role_key' => $role_key,
+        'role_name'=> $role_name
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_save_custom_role', 'cora_ajax_save_custom_role' );
+
+/**
+ * AJAX — Delete Custom Role from active tenant workspace.
+ */
+if ( ! function_exists( 'cora_ajax_delete_custom_role' ) ) {
+function cora_ajax_delete_custom_role() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Authentication required.' ) );
+    }
+
+    $role_key = sanitize_text_field( $_POST['role_key'] ?? '' );
+    if ( empty( $role_key ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid role key.' ) );
+    }
+
+    $agency_id_raw = cora_get_current_user_agency_id();
+    $option_key    = 'cora_custom_roles_' . preg_replace( '/[^\w]/', '_', $agency_id_raw );
+    $custom_roles  = get_option( $option_key, array() );
+
+    if ( isset( $custom_roles[ $role_key ] ) ) {
+        unset( $custom_roles[ $role_key ] );
+        update_option( $option_key, $custom_roles );
+        cora_log_activity( 'User Management', "Deleted custom role: {$role_key}" );
+        wp_send_json_success( array( 'message' => 'Custom role deleted.' ) );
+    }
+
+    wp_send_json_error( array( 'message' => 'Custom role not found.' ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_delete_custom_role', 'cora_ajax_delete_custom_role' );
+
+/**
+ * AJAX — Transfer Workspace Primary Ownership.
+ */
+if ( ! function_exists( 'cora_ajax_transfer_workspace_ownership' ) ) {
+function cora_ajax_transfer_workspace_ownership() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Authentication required.' ) );
+    }
+
+    $current_user_id = get_current_user_id();
+    $target_user_id  = intval( $_POST['target_user_id'] ?? 0 );
+
+    if ( empty( $target_user_id ) ) {
+        wp_send_json_error( array( 'message' => 'Target member is required.' ) );
+    }
+
+    $agency_id_raw = cora_get_current_user_agency_id();
+    $agency_id_num = intval( preg_replace( '/[^\d]/', '', $agency_id_raw ) );
+    if ( empty( $agency_id_num ) ) { $agency_id_num = 1; }
+
+    global $wpdb;
+    $cora_users_table = $wpdb->prefix . 'cora_users';
+
+    // Verify current user is owner or super admin
+    $is_current_owner = $wpdb->get_var( $wpdb->prepare(
+        "SELECT is_primary_owner FROM {$cora_users_table} WHERE wp_user_id = %d AND agency_id = %d",
+        $current_user_id,
+        $agency_id_num
+    ) );
+
+    if ( ! cora_is_super_owner() && intval( $is_current_owner ) !== 1 ) {
+        wp_send_json_error( array( 'message' => 'Only the current Workspace Owner can transfer primary ownership.' ) );
+    }
+
+    // Step 1: Remove primary owner flag from existing owner(s)
+    $wpdb->update(
+        $cora_users_table,
+        array( 'is_primary_owner' => 0, 'role' => 'cora_manager' ),
+        array( 'agency_id' => $agency_id_num, 'is_primary_owner' => 1 ),
+        array( '%d', '%s' ),
+        array( '%d', '%d' )
+    );
+
+    // Step 2: Grant primary owner flag & role to target user
+    $wpdb->update(
+        $cora_users_table,
+        array( 'is_primary_owner' => 1, 'role' => 'cora_workspace_owner' ),
+        array( 'agency_id' => $agency_id_num, 'wp_user_id' => $target_user_id ),
+        array( '%d', '%s' ),
+        array( '%d', '%d' )
+    );
+
+    cora_log_activity( 'User Management', "Transferred workspace primary ownership to user ID {$target_user_id}.", $current_user_id );
+
+    wp_send_json_success( array( 'message' => 'Workspace primary ownership successfully transferred.' ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_transfer_workspace_ownership', 'cora_ajax_transfer_workspace_ownership' );
 
 if ( ! function_exists( 'cora_ajax_update_avatar' ) ) {
 function cora_ajax_update_avatar() {
@@ -20311,6 +20852,90 @@ function cora_ajax_canvas_create_page() {
 }
 add_action( 'wp_ajax_cora_ajax_create_page', 'cora_ajax_canvas_create_page' );
 
+if ( ! function_exists( 'cora_ajax_canvas_ensure_wp_post' ) ) {
+function cora_ajax_canvas_ensure_wp_post() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+
+    $page_id  = isset( $_POST['page_id'] ) ? intval( $_POST['page_id'] ) : 0;
+    $theme_id = isset( $_POST['theme_id'] ) ? intval( $_POST['theme_id'] ) : 0;
+    $title    = isset( $_POST['title'] ) ? sanitize_text_field( $_POST['title'] ) : 'Canvas Page';
+    $slug     = isset( $_POST['slug'] ) ? sanitize_title( $_POST['slug'] ) : '';
+
+    $wp_post_id = 0;
+    $page       = null;
+
+    if ( $page_id > 0 ) {
+        $page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d", $page_id ), ARRAY_A );
+    } elseif ( $theme_id > 0 && ! empty( $title ) ) {
+        $page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND title = %s LIMIT 1", $theme_id, $title ), ARRAY_A );
+    }
+
+    if ( $page ) {
+        $existing_wp_post_id = intval( $page['wp_post_id'] );
+        if ( $existing_wp_post_id > 0 && get_post( $existing_wp_post_id ) ) {
+            $wp_post_id = $existing_wp_post_id;
+        }
+    }
+
+    if ( $wp_post_id <= 0 ) {
+        $page_title = $page ? $page['title'] : ( $title ?: 'Canvas Page' );
+        $page_slug  = $page ? $page['slug'] : ( $slug ?: sanitize_title( $page_title ) );
+
+        $wp_post_id = wp_insert_post( array(
+            'post_title'   => $page_title,
+            'post_name'    => $page_slug,
+            'post_type'    => 'page',
+            'post_status'  => 'publish',
+            'post_content' => '<!-- Elementor Page Content -->'
+        ) );
+
+        if ( is_wp_error( $wp_post_id ) ) {
+            wp_send_json_error( array( 'message' => $wp_post_id->get_error_message() ) );
+        }
+
+        update_post_meta( $wp_post_id, '_elementor_edit_mode', 'builder' );
+        update_post_meta( $wp_post_id, '_elementor_template_type', 'page' );
+        update_post_meta( $wp_post_id, '_elementor_data', wp_slash( json_encode( array() ) ) );
+        update_post_meta( $wp_post_id, '_wp_page_template', 'elementor_header_footer' );
+
+        if ( $page ) {
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_pages',
+                array( 'wp_post_id' => $wp_post_id, 'updated_at' => current_time( 'mysql' ) ),
+                array( 'id' => $page['id'] )
+            );
+        } else if ( $theme_id > 0 ) {
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_canvas_pages',
+                array(
+                    'agency_id'   => 1,
+                    'theme_id'    => $theme_id,
+                    'wp_post_id'  => $wp_post_id,
+                    'title'       => $page_title,
+                    'slug'        => $page_slug,
+                    'status'      => 'publish',
+                    'is_homepage' => 0,
+                    'created_by'  => get_current_user_id(),
+                    'created_at'  => current_time( 'mysql' ),
+                    'updated_at'  => current_time( 'mysql' )
+                )
+            );
+            $page_id = $wpdb->insert_id;
+        }
+    }
+
+    cora_log_activity( 'Canvas', "Ensured WordPress page post ID {$wp_post_id} for Canvas page." );
+
+    wp_send_json_success( array(
+        'page_id'    => $page ? $page['id'] : $page_id,
+        'wp_post_id' => $wp_post_id
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_ensure_wp_post', 'cora_ajax_canvas_ensure_wp_post' );
+
 if ( ! function_exists( 'cora_ajax_canvas_set_homepage' ) ) {
 function cora_ajax_canvas_set_homepage() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
@@ -21994,6 +22619,38 @@ function cora_rest_send_email( $request ) {
         return new WP_Error( 'missing_message', 'Please write a message.', array( 'status' => 400 ) );
     }
 
+    if ( ! function_exists( 'cora_get_email_branded_footer' ) ) {
+        function cora_get_email_branded_footer( $agency_name = '' ) {
+            if ( empty( $agency_name ) ) {
+                $agency_name = get_user_meta( get_current_user_id(), 'cora_workspace_agency_name', true );
+                if ( empty( $agency_name ) ) {
+                    $agency_name = get_bloginfo( 'name' );
+                }
+            }
+            $agency_name = esc_html( $agency_name );
+
+            return '
+            <div style="margin-top: 36px; border-top: 1px solid #e4e4e7; padding-top: 24px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; box-sizing: border-box;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto 10px auto;">
+                    <tr>
+                        <td style="background-color: #09090b; color: #ffffff; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif;">
+                            CORA
+                        </td>
+                        <td style="padding-left: 8px; font-size: 12px; color: #71717a; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; letter-spacing: -0.01em;">
+                            Workspace Platform
+                        </td>
+                    </tr>
+                </table>
+                <div style="font-size: 12px; color: #52525b; font-weight: 500; line-height: 1.6; margin-bottom: 4px;">
+                    Sent officially via <strong style="color: #09090b;">' . $agency_name . '</strong>
+                </div>
+                <div style="font-size: 11px; color: #a1a1aa; line-height: 1.5;">
+                    Powered by <a href="https://heycora.in" target="_blank" style="color: #09090b; font-weight: 600; text-decoration: underline;">Cora AI</a> &bull; Next-Gen Studio OS
+                </div>
+            </div>';
+        }
+    }
+
     // Build a premium HTML template for the email body (Monochromatic Zinc)
     $email_html = '
     <div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.015); box-sizing: border-box;">
@@ -22003,9 +22660,7 @@ function cora_rest_send_email( $request ) {
         <div style="font-size: 14px; line-height: 1.6; color: #18181b;">
             ' . wpautop( $message ) . '
         </div>
-        <div style="margin-top: 32px; border-top: 1px solid #f4f4f5; padding-top: 20px; text-align: center; font-size: 11px; color: #a1a1aa; box-sizing: border-box;">
-            Sent officially via ' . esc_html( get_bloginfo('name') ) . '
-        </div>
+        ' . cora_get_email_branded_footer() . '
     </div>';
 
     $headers = array('Content-Type: text/html; charset=UTF-8');
@@ -22120,19 +22775,69 @@ function cora_get_default_email_templates() {
  */
 if ( ! function_exists( 'cora_get_default_smtp_settings' ) ) {
 function cora_get_default_smtp_settings() {
+    $username = get_option( 'cora_smtp_username' );
+    $pass     = get_option( 'cora_smtp_password' );
+    if ( empty( $username ) || $username === get_option( 'admin_email' ) || empty( $pass ) || $pass === 'Dravya@2026SHRUTIHAASAN' ) {
+        update_option( 'cora_smtp_host', 'smtp.hostinger.com' );
+        update_option( 'cora_smtp_port', '465' );
+        update_option( 'cora_smtp_secure', 'ssl' );
+        update_option( 'cora_smtp_username', 'heycora@claraverse.in' );
+        update_option( 'cora_smtp_password', '1qpk-vq6f-ptxq-o4ai' );
+        update_option( 'cora_from_name', 'Cora' );
+        update_option( 'cora_from_email', 'heycora@claraverse.in' );
+    }
+
     return array(
         'smtp_host'     => get_option( 'cora_smtp_host', 'smtp.hostinger.com' ),
-        'smtp_port'     => get_option( 'cora_smtp_port', '587' ),
-        'smtp_secure'   => get_option( 'cora_smtp_secure', 'tls' ),
+        'smtp_port'     => get_option( 'cora_smtp_port', '465' ),
+        'smtp_secure'   => get_option( 'cora_smtp_secure', 'ssl' ),
         'smtp_auth'     => get_option( 'cora_smtp_auth', '1' ),
-        'smtp_username' => get_option( 'cora_smtp_username', get_option( 'admin_email' ) ),
-        'smtp_password' => get_option( 'cora_smtp_password', '' ),
-        'from_name'     => get_option( 'cora_from_name', get_bloginfo( 'name' ) ),
-        'from_email'    => get_option( 'cora_from_email', get_option( 'admin_email' ) ),
+        'smtp_username' => get_option( 'cora_smtp_username', 'heycora@claraverse.in' ),
+        'smtp_password' => get_option( 'cora_smtp_password', '1qpk-vq6f-ptxq-o4ai' ),
+        'from_name'     => get_option( 'cora_from_name', 'Cora' ),
+        'from_email'    => get_option( 'cora_from_email', 'heycora@claraverse.in' ),
         'status'        => 'Connected'
     );
 }
 }
+
+/**
+ * Global Hostinger PHPMailer SMTP Configuration
+ * Hooks into WordPress `phpmailer_init` to route all outbound emails via Hostinger business email.
+ */
+if ( ! function_exists( 'cora_configure_phpmailer_smtp' ) ) {
+function cora_configure_phpmailer_smtp( $phpmailer ) {
+    $smtp = cora_get_default_smtp_settings();
+    if ( ! empty( $smtp['smtp_host'] ) && ! empty( $smtp['smtp_username'] ) && ! empty( $smtp['smtp_password'] ) ) {
+        $phpmailer->isSMTP();
+        $phpmailer->Host       = $smtp['smtp_host'];
+        $phpmailer->SMTPAuth   = ( $smtp['smtp_auth'] == '1' || $smtp['smtp_auth'] === true || $smtp['smtp_auth'] === 'true' );
+        $phpmailer->Port       = (int) $smtp['smtp_port'];
+        $phpmailer->Username   = $smtp['smtp_username'];
+        $phpmailer->Password   = $smtp['smtp_password'];
+        $phpmailer->SMTPSecure = strtolower( $smtp['smtp_secure'] ); // 'ssl' or 'tls'
+        $phpmailer->From       = ! empty( $smtp['from_email'] ) ? $smtp['from_email'] : 'heycora@claraverse.in';
+        $phpmailer->FromName   = ! empty( $smtp['from_name'] ) ? $smtp['from_name'] : 'Cora';
+    }
+}
+}
+add_action( 'phpmailer_init', 'cora_configure_phpmailer_smtp', 999 );
+
+if ( ! function_exists( 'cora_custom_wp_mail_from' ) ) {
+function cora_custom_wp_mail_from( $original_from ) {
+    $smtp = cora_get_default_smtp_settings();
+    return ! empty( $smtp['from_email'] ) ? $smtp['from_email'] : 'heycora@claraverse.in';
+}
+}
+add_filter( 'wp_mail_from', 'cora_custom_wp_mail_from', 999 );
+
+if ( ! function_exists( 'cora_custom_wp_mail_from_name' ) ) {
+function cora_custom_wp_mail_from_name( $original_name ) {
+    $smtp = cora_get_default_smtp_settings();
+    return ! empty( $smtp['from_name'] ) ? $smtp['from_name'] : 'Cora';
+}
+}
+add_filter( 'wp_mail_from_name', 'cora_custom_wp_mail_from_name', 999 );
 
 /**
  * Helper to gather all email notifications sent to clients across the workspace
@@ -22540,31 +23245,22 @@ add_action( 'wp_ajax_cora_test_smtp_connection', 'cora_ajax_test_smtp_connection
  */
 if ( ! function_exists( 'cora_ajax_resend_email' ) ) {
 function cora_ajax_resend_email() {
-    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $nonce = isset( $_REQUEST['nonce'] ) ? $_REQUEST['nonce'] : ( isset( $_REQUEST['security'] ) ? $_REQUEST['security'] : '' );
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ) );
+    }
 
     $to      = isset( $_POST['to'] ) ? sanitize_email( $_POST['to'] ) : '';
     $subject = isset( $_POST['subject'] ) ? sanitize_text_field( $_POST['subject'] ) : '';
     $message = isset( $_POST['message'] ) ? wp_kses_post( $_POST['message'] ) : '';
 
-    if ( empty( $to ) || empty( $subject ) || empty( $message ) ) {
+    if ( empty( $to ) || empty( $message ) ) {
         wp_send_json_error( array( 'message' => 'Missing recipient or content for resending.' ) );
     }
 
-    $email_html = '
-    <div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.015); box-sizing: border-box;">
-        <div style="border-bottom: 1px solid #f4f4f5; padding-bottom: 20px; margin-bottom: 24px;">
-            <h2 style="font-size: 18px; font-weight: 700; color: #09090b; margin: 0; letter-spacing: -0.02em;">Official Business Communication (Resent)</h2>
-        </div>
-        <div style="font-size: 14px; line-height: 1.6; color: #18181b;">
-            ' . wpautop( $message ) . '
-        </div>
-        <div style="margin-top: 32px; border-top: 1px solid #f4f4f5; padding-top: 20px; text-align: center; font-size: 11px; color: #a1a1aa; box-sizing: border-box;">
-            Sent officially via ' . esc_html( get_bloginfo('name') ) . '
-        </div>
-    </div>';
-
+    delete_option( 'cora_last_mail_error' );
     $headers = array('Content-Type: text/html; charset=UTF-8');
-    $sent = wp_mail( $to, $subject, $email_html, $headers );
+    $sent    = wp_mail( $to, $subject, $message, $headers );
 
     if ( $sent ) {
         $sent_log = get_option( 'cora_sent_emails', array() );
@@ -22573,7 +23269,7 @@ function cora_ajax_resend_email() {
         array_unshift( $sent_log, array(
             'id'        => 'log_' . uniqid(),
             'to'        => $to,
-            'subject'   => '[Resent] ' . $subject,
+            'subject'   => ( strpos( $subject, '[Resent]' ) === false ) ? '[Resent] ' . $subject : $subject,
             'message'   => $message,
             'sent_at'   => current_time( 'mysql' ),
             'status'    => 'delivered'
@@ -22586,11 +23282,62 @@ function cora_ajax_resend_email() {
             'sent_logs' => array_values( $sent_log )
         ) );
     } else {
-        wp_send_json_error( array( 'message' => 'Failed to resend email. Check SMTP logs.' ) );
+        $err = get_option( 'cora_last_mail_error', 'Check SMTP connection and credentials.' );
+        wp_send_json_error( array( 'message' => 'Failed to resend email: ' . $err ) );
     }
 }
 }
 add_action( 'wp_ajax_cora_resend_email', 'cora_ajax_resend_email' );
+
+/**
+ * AJAX Handler: Send New Email Communication
+ */
+if ( ! function_exists( 'cora_ajax_send_email' ) ) {
+function cora_ajax_send_email() {
+    $nonce = isset( $_REQUEST['nonce'] ) ? $_REQUEST['nonce'] : ( isset( $_REQUEST['security'] ) ? $_REQUEST['security'] : '' );
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ) );
+    }
+
+    $to      = isset( $_POST['to'] ) ? sanitize_email( $_POST['to'] ) : '';
+    $subject = isset( $_POST['subject'] ) ? sanitize_text_field( $_POST['subject'] ) : '';
+    $message = isset( $_POST['message'] ) ? wp_kses_post( $_POST['message'] ) : '';
+
+    if ( empty( $to ) || empty( $subject ) || empty( $message ) ) {
+        wp_send_json_error( array( 'message' => 'Please fill in recipient email, subject, and message content.' ) );
+    }
+
+    delete_option( 'cora_last_mail_error' );
+    $headers = array('Content-Type: text/html; charset=UTF-8');
+    $sent    = wp_mail( $to, $subject, $message, $headers );
+
+    if ( $sent ) {
+        $sent_log = get_option( 'cora_sent_emails', array() );
+        if ( ! is_array( $sent_log ) ) $sent_log = array();
+
+        array_unshift( $sent_log, array(
+            'id'        => 'log_' . uniqid(),
+            'to'        => $to,
+            'subject'   => $subject,
+            'message'   => $message,
+            'sent_at'   => current_time( 'mysql' ),
+            'status'    => 'delivered',
+            'type'      => 'Custom Compose'
+        ) );
+
+        update_option( 'cora_sent_emails', array_slice( $sent_log, 0, 50 ) );
+
+        wp_send_json_success( array(
+            'message'   => "Email sent officially via Hostinger SMTP to {$to}! ✓",
+            'sent_logs' => array_values( $sent_log )
+        ) );
+    } else {
+        $err = get_option( 'cora_last_mail_error', 'Check Hostinger SMTP settings.' );
+        wp_send_json_error( array( 'message' => 'Failed to send email: ' . $err ) );
+    }
+}
+}
+add_action( 'wp_ajax_cora_send_email', 'cora_ajax_send_email' );
 
 
 if ( ! function_exists( 'cora_rest_get_clauses' ) ) {
@@ -25204,9 +25951,78 @@ function cora_workspace_mail_from_address( $original_email ) {
 }
 
 /**
- * Filter: Intercept outbound email parameters to search/replace "WordPress" with "Cora".
+ * Helper to wrap any outbound email message with the official Cora branded HTML header & footer.
  */
-add_filter( 'wp_mail', 'cora_workspace_white_label_mail_content' );
+if ( ! function_exists( 'cora_wrap_email_with_branded_template' ) ) {
+function cora_wrap_email_with_branded_template( $message, $subject = '' ) {
+    $workspace_name = esc_html( get_option( 'cora_workspace_agency_name', get_option( 'cora_workspace_name', 'Cora Workspace' ) ) );
+    $site_title     = esc_html( get_bloginfo( 'name' ) );
+    $display_sub    = ! empty( $subject ) ? esc_html( $subject ) : 'Official Business Communication';
+
+    // Format content with wpautop if message doesn't contain HTML block tags
+    $formatted_content = ( strpos( $message, '<p>' ) !== false || strpos( $message, '<div' ) !== false || strpos( $message, '<table' ) !== false ) ? $message : wpautop( $message );
+
+    return '<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>' . $display_sub . '</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+    <div style="background-color: #f4f4f5; padding: 32px 16px; width: 100%; box-sizing: border-box;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border-collapse: separate;">
+            <!-- Header Bar -->
+            <tr>
+                <td style="padding: 20px 28px; background-color: #09090b; border-bottom: 1px solid #18181b;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                        <tr>
+                            <td align="left" style="font-size: 15px; font-weight: 700; color: #ffffff; letter-spacing: -0.01em;">
+                                <span style="display: inline-block; background-color: #ffffff; color: #09090b; width: 22px; height: 22px; line-height: 22px; text-align: center; border-radius: 6px; font-weight: 800; font-size: 12px; margin-right: 8px; vertical-align: middle;">C</span>
+                                <span style="vertical-align: middle; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #ffffff;">' . strtoupper( $workspace_name ) . '</span>
+                            </td>
+                            <td align="right" style="font-size: 11px; font-weight: 500; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.06em;">
+                                Verified Dispatch
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <!-- Content Area -->
+            <tr>
+                <td style="padding: 32px 28px 24px 28px; color: #18181b; font-size: 14px; line-height: 1.65; background-color: #ffffff;">
+                    ' . $formatted_content . '
+                </td>
+            </tr>
+
+            <!-- Cora Branded Footer -->
+            <tr>
+                <td style="padding: 24px 28px 28px 28px; background-color: #fafafa; border-top: 1px solid #f4f4f5; text-align: center; font-size: 12px; color: #71717a;">
+                    <div style="margin-bottom: 14px;">
+                        <div style="display: inline-block; padding: 6px 14px; background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 20px; font-size: 11px; font-weight: 600; color: #09090b; letter-spacing: 0.02em; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+                            Powered by <strong style="color: #09090b;">Cora Studio Platform</strong> • Enterprise AI Engine
+                        </div>
+                    </div>
+                    <p style="margin: 0 0 6px 0; font-size: 11px; line-height: 1.5; color: #71717a;">
+                        Sent officially via secure workspace relay (' . $site_title . ')
+                    </p>
+                    <p style="margin: 0; font-size: 10px; line-height: 1.5; color: #a1a1aa;">
+                        © 2026 Cora AI, Inc. All rights reserved. • Confidential Business Communication
+                    </p>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>';
+}
+}
+
+/**
+ * Filter: Intercept outbound email parameters to search/replace "WordPress" with "Cora"
+ * and attach Cora Branded HTML Header & Footer to every email sent.
+ */
 if ( ! function_exists( 'cora_workspace_white_label_mail_content' ) ) {
 function cora_workspace_white_label_mail_content( $args ) {
     if ( isset( $args['subject'] ) ) {
@@ -25214,10 +26030,48 @@ function cora_workspace_white_label_mail_content( $args ) {
     }
     if ( isset( $args['message'] ) ) {
         $args['message'] = str_ireplace( 'WordPress', get_option( 'cora_workspace_name', 'Cora' ), $args['message'] );
+        // Wrap outbound emails with Cora branded header & footer if not already present
+        if ( strpos( $args['message'], 'Cora Studio Platform' ) === false && strpos( $args['message'], 'CORA WORKSPACE' ) === false ) {
+            $args['message'] = cora_wrap_email_with_branded_template( $args['message'], isset( $args['subject'] ) ? $args['subject'] : '' );
+            // Ensure Content-Type is text/html
+            if ( empty( $args['headers'] ) ) {
+                $args['headers'] = array( 'Content-Type: text/html; charset=UTF-8' );
+            } else if ( is_array( $args['headers'] ) ) {
+                $has_ct = false;
+                foreach ( $args['headers'] as $h ) {
+                    if ( stripos( $h, 'Content-Type' ) !== false ) {
+                        $has_ct = true;
+                        break;
+                    }
+                }
+                if ( ! $has_ct ) {
+                    $args['headers'][] = 'Content-Type: text/html; charset=UTF-8';
+                }
+            } else if ( is_string( $args['headers'] ) && stripos( $args['headers'], 'Content-Type' ) === false ) {
+                $args['headers'] .= "\r\nContent-Type: text/html; charset=UTF-8";
+            }
+        }
     }
     return $args;
 }
 }
+add_filter( 'wp_mail', 'cora_workspace_white_label_mail_content', 99 );
+
+/**
+ * Capture wp_mail failures globally to store detailed diagnostic error logs.
+ */
+if ( ! function_exists( 'cora_capture_wp_mail_failed' ) ) {
+function cora_capture_wp_mail_failed( $wp_error ) {
+    if ( is_wp_error( $wp_error ) ) {
+        $msg = $wp_error->get_error_message();
+        update_option( 'cora_last_mail_error', $msg );
+        if ( function_exists( 'cora_log_activity' ) ) {
+            cora_log_activity( 'Email Error', $msg );
+        }
+    }
+}
+}
+add_action( 'wp_mail_failed', 'cora_capture_wp_mail_failed', 999 );
 
 /**
  * Filter: Remove WordPress generator metadata tag from HTML header.
@@ -29417,78 +30271,6 @@ function cora_ajax_get_equipment_data() {
                 'image'         => 'gear_sony_a7iv.jpg',
                 'operator'      => 'Karan Malhotra',
             ),
-            array(
-                'id'            => 'gear_red_komodo',
-                'name'          => 'RED Komodo 6K Cinema Package',
-                'serial'        => 'RED-9941',
-                'serial_no'     => 'RED-9941',
-                'category'      => 'Camera',
-                'brand_model'   => 'RED Komodo 6K Cinema Package',
-                'capex'         => 680000,
-                'purchase_price'=> 680000,
-                'current_value' => 680000,
-                'condition'     => 'Mint',
-                'status'        => 'Available',
-                'assigned'      => 'Unassigned (Studio Vault)',
-                'assigned_to'   => 'Unassigned (Studio Vault)',
-                'purchase_date' => '2025-07-10',
-                'image'         => 'gear_red_komodo.jpg',
-                'operator'      => 'N/A',
-            ),
-            array(
-                'id'            => 'gear_canon_2470',
-                'name'          => 'Canon RF 24-70mm f/2.8L IS USM',
-                'serial'        => 'RF24-7028',
-                'serial_no'     => 'RF24-7028',
-                'category'      => 'Lens',
-                'brand_model'   => 'Canon RF 24-70mm f/2.8L IS USM',
-                'capex'         => 152000,
-                'purchase_price'=> 152000,
-                'current_value' => 152000,
-                'condition'     => 'Available',
-                'status'        => 'Available',
-                'assigned'      => 'Unassigned (Studio Vault)',
-                'assigned_to'   => 'Unassigned (Studio Vault)',
-                'purchase_date' => '2025-05-22',
-                'image'         => 'gear_canon_2470.jpg',
-                'operator'      => 'N/A',
-            ),
-            array(
-                'id'            => 'gear_manfrotto_tripod',
-                'name'          => 'Manfrotto 504X Fluid Head Tripod',
-                'serial'        => 'MF-504X-221',
-                'serial_no'     => 'MF-504X-221',
-                'category'      => 'Accessories',
-                'brand_model'   => 'Manfrotto 504X Fluid Head Tripod',
-                'capex'         => 72000,
-                'purchase_price'=> 72000,
-                'current_value' => 72000,
-                'condition'     => 'Excellent',
-                'status'        => 'On Shoot',
-                'assigned'      => 'Ad Shoot - ACME Agency',
-                'assigned_to'   => 'Ad Shoot - ACME Agency',
-                'purchase_date' => '2025-03-18',
-                'image'         => 'gear_manfrotto_tripod.jpg',
-                'operator'      => 'N/A',
-            ),
-            array(
-                'id'            => 'gear_aputure_300d',
-                'name'          => 'Aputure 300D II LED Light',
-                'serial'        => 'AP300D-5567',
-                'serial_no'     => 'AP300D-5567',
-                'category'      => 'Lighting',
-                'brand_model'   => 'Aputure 300D II LED Light',
-                'capex'         => 98000,
-                'purchase_price'=> 98000,
-                'current_value' => 98000,
-                'condition'     => 'Needs Repair',
-                'status'        => 'In Repair',
-                'assigned'      => 'Repair: Driver Issue Est. Cost: ₹2,500',
-                'assigned_to'   => 'Repair: Driver Issue Est. Cost: ₹2,500',
-                'purchase_date' => '2025-02-11',
-                'image'         => 'gear_aputure_300d.jpg',
-                'operator'      => 'N/A',
-            ),
         );
         update_option( 'cora_studio_gear', $gear );
     }
@@ -30245,3 +31027,283 @@ function cora_ajax_save_crew_member_handler() {
     wp_send_json_success(array('message' => 'Crew member saved', 'members' => $cora_crew_members));
 }
 }
+
+/**
+ * ── User Management & Operations Suite Additions ──────────────────────────────
+ */
+
+if ( ! function_exists( 'cora_trigger_admin_event_notification' ) ) {
+function cora_trigger_admin_event_notification( $event_type, $event_details = array() ) {
+    $agency_id = cora_get_current_user_agency_id();
+    $owner_email = get_option( 'cora_workspace_owner_email_' . $agency_id, '' );
+    if ( empty( $owner_email ) ) {
+        $owner_email = get_option( 'admin_email' );
+    }
+    
+    $titles = array(
+        'user_invited'       => 'Member Invitation Sent',
+        'user_status_change' => 'User Account Status Updated',
+        'role_change'        => 'User Role Updated',
+        'geofence_violation' => 'Geofence Violation Alert',
+        'punch_action'       => 'Attendance Punch Logged'
+    );
+    
+    $subject = '[Cora Alert] ' . ( $titles[$event_type] ?? 'Workspace Event Alert' );
+    $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+    
+    $detail_html = '';
+    foreach ( $event_details as $k => $v ) {
+        $detail_html .= "<tr><td style='padding:6px 12px;font-weight:600;color:#71717A;text-transform:capitalize;'>" . esc_html( str_replace('_', ' ', $k) ) . "</td><td style='padding:6px 12px;color:#09090B;'>" . esc_html( $v ) . "</td></tr>";
+    }
+    
+    $body = "
+    <div style='font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:560px;margin:0 auto;padding:32px;background:#FAFAFA;border-radius:12px;border:1px solid #E4E4E7;'>
+        <div style='display:flex;align-items:center;gap:8px;margin-bottom:16px;'>
+            <span style='background:#09090B;color:#FFF;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:0.05em;'>CORA AUTOMATION</span>
+        </div>
+        <h2 style='color:#09090B;margin-top:0;font-size:18px;font-weight:700;'>" . esc_html( $titles[$event_type] ?? 'Workspace Event' ) . "</h2>
+        <table style='width:100%;border-collapse:collapse;margin:16px 0;background:#FFFFFF;border:1px solid #E4E4E7;border-radius:8px;font-size:13px;'>
+            " . $detail_html . "
+        </table>
+        <p style='color:#A1A1AA;font-size:11px;margin-top:24px;'>Sent automatically by Cora Workspace Automation Engine.</p>
+    </div>";
+    
+    @wp_mail( $owner_email, $subject, $body, $headers );
+}
+}
+
+if ( ! function_exists( 'cora_ajax_update_user_status' ) ) {
+function cora_ajax_update_user_status() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) && ! cora_is_workspace_owner() && ! cora_is_super_owner() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+
+    $target_user_id = intval( $_POST['target_user_id'] ?? 0 );
+    $status         = sanitize_text_field( $_POST['status'] ?? 'active' );
+    $allowed        = array( 'active', 'suspended', 'pending' );
+
+    if ( ! $target_user_id || ! in_array( $status, $allowed, true ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid parameters' ) );
+    }
+
+    if ( $target_user_id === get_current_user_id() && $status === 'suspended' ) {
+        wp_send_json_error( array( 'message' => 'You cannot suspend your own account.' ) );
+    }
+
+    update_user_meta( $target_user_id, 'cora_user_status', $status );
+    $u = get_userdata( $target_user_id );
+    $u_name = $u ? $u->display_name : 'User #' . $target_user_id;
+
+    cora_log_activity( 'User Management', "User status updated to '{$status}' for {$u_name}." );
+
+    cora_trigger_admin_event_notification( 'user_status_change', array(
+        'user'       => $u_name,
+        'email'      => $u ? $u->user_email : '',
+        'new_status' => strtoupper( $status ),
+        'updated_by' => wp_get_current_user()->display_name
+    ) );
+
+    wp_send_json_success( array( 'message' => "User status set to " . ucfirst( $status ) ) );
+}
+}
+add_action( 'wp_ajax_cora_update_user_status', 'cora_ajax_update_user_status' );
+
+if ( ! function_exists( 'cora_ajax_save_office_location' ) ) {
+function cora_ajax_save_office_location() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) && ! cora_is_workspace_owner() && ! cora_is_super_owner() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+
+    $office_name  = sanitize_text_field( $_POST['office_name'] ?? 'Headquarters Office' );
+    $lat          = floatval( $_POST['lat'] ?? 0 );
+    $lng          = floatval( $_POST['lng'] ?? 0 );
+    $radius       = intval( $_POST['radius'] ?? 300 );
+    $ip_whitelist = sanitize_text_field( $_POST['ip_whitelist'] ?? '' );
+    $agency_id    = cora_get_current_user_agency_id();
+
+    $location_data = array(
+        'office_name'  => $office_name,
+        'lat'          => $lat,
+        'lng'          => $lng,
+        'radius'       => $radius,
+        'ip_whitelist' => $ip_whitelist,
+        'updated_at'   => current_time( 'mysql' )
+    );
+
+    update_option( 'cora_attendance_office_location_' . $agency_id, $location_data );
+    update_option( 'cora_attendance_office_location', $location_data );
+
+    cora_log_activity( 'Office Location', "Updated Office Geofence: {$office_name} ({$lat}, {$lng}, radius {$radius}m)" );
+
+    wp_send_json_success( array(
+        'message' => 'Office location & geofence updated successfully',
+        'location' => $location_data
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_save_office_location', 'cora_ajax_save_office_location' );
+
+if ( ! function_exists( 'cora_ajax_universal_search' ) ) {
+function cora_ajax_universal_search() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+
+    $q = sanitize_text_field( $_POST['q'] ?? '' );
+    if ( strlen( $q ) < 2 ) {
+        wp_send_json_success( array( 'results' => array() ) );
+    }
+
+    $results = array();
+    $current_agency = cora_get_current_user_agency_id();
+
+    // 1. Search Users
+    $user_args = array(
+        'search'         => '*' . esc_attr( $q ) . '*',
+        'search_columns' => array( 'user_login', 'user_nicename', 'user_email', 'display_name' ),
+        'number'         => 5
+    );
+    $matched_users = get_users( $user_args );
+    foreach ( $matched_users as $u ) {
+        $role = ! empty( $u->roles ) ? $u->roles[0] : 'member';
+        $results[] = array(
+            'category'    => 'User',
+            'title'       => $u->display_name,
+            'subtitle'    => $u->user_email . ' • ' . ucfirst( str_replace('cora_', '', $role) ),
+            'url'         => home_url( '/' . $current_agency . '/users' ),
+            'icon'        => 'user'
+        );
+    }
+
+    // 2. Search Roles
+    $all_roles = cora_get_all_roles();
+    foreach ( $all_roles as $role_key => $role_label ) {
+        if ( stripos( $role_label, $q ) !== false || stripos( $role_key, $q ) !== false ) {
+            $results[] = array(
+                'category' => 'Role',
+                'title'    => $role_label,
+                'subtitle' => 'Custom Role Permission Definition',
+                'url'      => home_url( '/' . $current_agency . '/team-roles' ),
+                'icon'     => 'shield'
+            );
+        }
+    }
+
+    // 3. Search Attendance Logs
+    $attendance_logs = get_option( 'cora_workspace_attendance_logs', array() );
+    $count = 0;
+    foreach ( array_reverse( $attendance_logs ) as $log ) {
+        if ( $count >= 3 ) break;
+        $user_name = $log['user'] ?? '';
+        $type      = $log['type'] ?? '';
+        $time      = $log['time'] ?? '';
+        if ( stripos( $user_name, $q ) !== false || stripos( $type, $q ) !== false || stripos( $time, $q ) !== false ) {
+            $results[] = array(
+                'category' => 'Attendance',
+                'title'    => $user_name . ' (' . ucfirst( $type ) . ')',
+                'subtitle' => 'Time: ' . $time . ' • Geofence: ' . ( $log['geofence'] ?? 'N/A' ),
+                'url'      => home_url( '/' . $current_agency . '/attendance' ),
+                'icon'     => 'clock'
+            );
+            $count++;
+        }
+    }
+
+    // 4. Search Admin Pages
+    $pages = array(
+        'dashboard' => 'Dashboard Overview',
+        'users' => 'User Management & Team',
+        'team-roles' => 'Roles & Permissions',
+        'attendance' => 'Attendance & Geofencing',
+        'financials' => 'Financial Overview',
+        'vault' => 'Documents & Vault',
+        'leads' => 'Leads & Clients',
+        'canvas' => 'Canvas Site Builder',
+        'emails' => 'Email Automation',
+        'settings-suite' => 'Workspace Settings'
+    );
+    foreach ( $pages as $slug => $label ) {
+        if ( stripos( $label, $q ) !== false || stripos( $slug, $q ) !== false ) {
+            $results[] = array(
+                'category' => 'Navigation',
+                'title'    => $label,
+                'subtitle' => '/' . $current_agency . '/' . $slug,
+                'url'      => home_url( '/' . $current_agency . '/' . $slug ),
+                'icon'     => 'compass'
+            );
+        }
+    }
+
+    wp_send_json_success( array( 'results' => $results ) );
+}
+}
+add_action( 'wp_ajax_cora_universal_search', 'cora_ajax_universal_search' );
+
+if ( ! function_exists( 'cora_daily_owner_attendance_report_cron_handler' ) ) {
+function cora_daily_owner_attendance_report_cron_handler() {
+    $agencies = cora_db_get_tenants();
+    if ( empty( $agencies ) ) return;
+
+    $today = current_time( 'Y-m-d' );
+
+    foreach ( $agencies as $agency ) {
+        $agency_id = $agency['agency_id'] ?? 1;
+        $agency_name = $agency['agency_name'] ?? 'Workspace';
+        $owner_email = $agency['owner_email'] ?? get_option( 'admin_email' );
+
+        $logs = get_option( 'cora_workspace_attendance_logs', array() );
+        $today_logs = array_filter( $logs, function( $l ) use ( $today ) {
+            return isset( $l['time'] ) && strpos( $l['time'], $today ) !== false;
+        } );
+
+        $total_punches = count( $today_logs );
+        $violations = count( array_filter( $today_logs, function( $l ) {
+            return ( $l['geofence'] ?? '' ) === 'violation';
+        } ) );
+
+        $subject = "[Daily Report] Attendance & User Activity — " . esc_html( $agency_name ) . " (" . $today . ")";
+        $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+
+        $body = "
+        <div style='font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#FAFAFA;border-radius:12px;border:1px solid #E4E4E7;'>
+            <h2 style='color:#09090B;margin-top:0;font-size:20px;font-weight:700;'>Daily Workspace Activity Summary</h2>
+            <p style='color:#52525B;font-size:14px;'>Here is your automated end-of-day summary for <strong>" . esc_html( $agency_name ) . "</strong> on " . $today . ".</p>
+            <div style='display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0;'>
+                <div style='background:#FFF;padding:16px;border-radius:8px;border:1px solid #E4E4E7;text-align:center;'>
+                    <div style='font-size:24px;font-weight:800;color:#09090B;'>" . $total_punches . "</div>
+                    <div style='font-size:12px;color:#71717A;font-weight:600;margin-top:4px;'>Total Attendance Punches</div>
+                </div>
+                <div style='background:#FFF;padding:16px;border-radius:8px;border:1px solid #E4E4E7;text-align:center;'>
+                    <div style='font-size:24px;font-weight:800;color:" . ( $violations > 0 ? '#DC2626' : '#16A34A' ) . ";'>" . $violations . "</div>
+                    <div style='font-size:12px;color:#71717A;font-weight:600;margin-top:4px;'>Geofence Violations</div>
+                </div>
+            </div>
+            <p style='color:#A1A1AA;font-size:12px;'>Generated automatically by Cora Platform Automation Engine.</p>
+        </div>";
+
+        @wp_mail( $owner_email, $subject, $body, $headers );
+    }
+}
+}
+add_action( 'cora_daily_owner_attendance_report_cron', 'cora_daily_owner_attendance_report_cron_handler' );
+
+if ( ! wp_next_scheduled( 'cora_daily_owner_attendance_report_cron' ) ) {
+    wp_schedule_event( strtotime( '20:00:00' ), 'daily', 'cora_daily_owner_attendance_report_cron' );
+}
+
+if ( ! function_exists( 'cora_ajax_super_dispatch_daily_report' ) ) {
+function cora_ajax_super_dispatch_daily_report() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! cora_is_super_owner() ) {
+        wp_send_json_error( array( 'message' => 'Super Owner access required.' ) );
+    }
+
+    cora_daily_owner_attendance_report_cron_handler();
+    wp_send_json_success( array( 'message' => 'Daily Workspace Owner Reports dispatched successfully to all tenant owners.' ) );
+}
+}
+add_action( 'wp_ajax_cora_super_dispatch_daily_report', 'cora_ajax_super_dispatch_daily_report' );
+

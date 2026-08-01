@@ -44,105 +44,9 @@ if ( $cora_needs_init ) {
             'purchase_date' => '2025-08-15',
             'image'         => 'gear_sony_a7iv.jpg',
             'operator'      => 'Karan Malhotra',
-        ),
-        array(
-            'id'            => 'gear_red_komodo',
-            'name'          => 'RED Komodo 6K Cinema Package',
-            'serial'        => 'RED-9941',
-            'serial_no'     => 'RED-9941',
-            'category'      => 'Camera',
-            'capex'         => 680000,
-            'purchase_price'=> 680000,
-            'current_value' => 680000,
-            'condition'     => 'Mint',
-            'status'        => 'Available',
-            'assigned'      => 'Unassigned (Studio Vault)',
-            'assigned_to'   => 'Unassigned (Studio Vault)',
-            'purchase_date' => '2025-07-10',
-            'image'         => 'gear_red_komodo.jpg',
-            'operator'      => 'N/A',
-        ),
-        array(
-            'id'            => 'gear_canon_2470',
-            'name'          => 'Canon RF 24-70mm f/2.8L IS USM',
-            'serial'        => 'RF24-7028',
-            'serial_no'     => 'RF24-7028',
-            'category'      => 'Lens',
-            'capex'         => 152000,
-            'purchase_price'=> 152000,
-            'current_value' => 152000,
-            'condition'     => 'Available',
-            'status'        => 'Available',
-            'assigned'      => 'Unassigned (Studio Vault)',
-            'assigned_to'   => 'Unassigned (Studio Vault)',
-            'purchase_date' => '2025-05-22',
-            'image'         => 'gear_canon_2470.jpg',
-            'operator'      => 'N/A',
-        ),
-        array(
-            'id'            => 'gear_manfrotto_tripod',
-            'name'          => 'Manfrotto 504X Fluid Head Tripod',
-            'serial'        => 'MF-504X-221',
-            'serial_no'     => 'MF-504X-221',
-            'category'      => 'Accessories',
-            'capex'         => 72000,
-            'purchase_price'=> 72000,
-            'current_value' => 72000,
-            'condition'     => 'Excellent',
-            'status'        => 'On Shoot',
-            'assigned'      => 'Ad Shoot - ACME Agency',
-            'assigned_to'   => 'Ad Shoot - ACME Agency',
-            'purchase_date' => '2025-03-18',
-            'image'         => 'gear_manfrotto_tripod.jpg',
-            'operator'      => 'N/A',
-        ),
-        array(
-            'id'            => 'gear_aputure_300d',
-            'name'          => 'Aputure 300D II LED Light',
-            'serial'        => 'AP300D-5567',
-            'serial_no'     => 'AP300D-5567',
-            'category'      => 'Lighting',
-            'capex'         => 98000,
-            'purchase_price'=> 98000,
-            'current_value' => 98000,
-            'condition'     => 'Needs Repair',
-            'status'        => 'In Repair',
-            'assigned'      => 'Repair: Driver Issue Est. Cost: ₹2,500',
-            'assigned_to'   => 'Repair: Driver Issue Est. Cost: ₹2,500',
-            'purchase_date' => '2025-02-11',
-            'image'         => 'gear_aputure_300d.jpg',
-            'operator'      => 'N/A',
-        ),
+        )
     );
     update_option( 'cora_studio_gear', $cora_studio_gear );
-}
-
-// Check and pre-populate maintenance for Aputure 300D II LED Light
-$has_aputure_repair = false;
-if ( is_array( $cora_gear_maintenance ) ) {
-    foreach ( $cora_gear_maintenance as $maint ) {
-        if ( isset( $maint['gear_id'] ) && $maint['gear_id'] === 'gear_aputure_300d' ) {
-            $has_aputure_repair = true;
-            break;
-        }
-    }
-}
-if ( ! $has_aputure_repair ) {
-    if ( ! is_array( $cora_gear_maintenance ) ) {
-        $cora_gear_maintenance = array();
-    }
-    $cora_gear_maintenance[] = array(
-        'id'               => 'maint_aputure',
-        'gear_id'          => 'gear_aputure_300d',
-        'gear_name'        => 'Aputure 300D II LED Light',
-        'maintenance_type' => 'Driver Issue',
-        'cost'             => 2500,
-        'vendor'           => 'Light Source Delhi',
-        'notes'            => 'Driver Issue',
-        'serviced_date'    => '2025-02-11',
-        'created_at'       => '2025-02-11 12:00:00',
-    );
-    update_option( 'cora_gear_maintenance', $cora_gear_maintenance );
 }
 
 $initial_repair_data = array();
@@ -153,10 +57,10 @@ if ( is_array( $cora_gear_maintenance ) ) {
             if ( ! isset( $initial_repair_data[$gid] ) ) {
                 $initial_repair_data[$gid] = array(
                     'vendor' => $maint['vendor'] ?? '',
-                    'cost'   => floatval( $maint['cost'] ?? 0 ),
-                    'notes'  => $maint['notes'] ?? $maint['maintenance_type'] ?? '',
-                    'date'   => $maint['serviced_date'] ?? '',
-                    'name'   => $maint['gear_name'] ?? '',
+                    'cost'   => floatval( $maint['cost'] ?? $maint['repair_cost'] ?? 0 ),
+                    'notes'  => $maint['notes'] ?? $maint['maintenance_type'] ?? $maint['repair_type'] ?? '',
+                    'date'   => $maint['serviced_date'] ?? $maint['service_date'] ?? '',
+                    'name'   => $maint['gear_name'] ?? $maint['equipment'] ?? '',
                 );
             }
         }
@@ -168,39 +72,15 @@ if ( empty( $cora_gear_checkouts ) || ! is_array( $cora_gear_checkouts ) ) {
     $cora_gear_checkouts = array(
         array(
             'id'              => 'chk_501',
-            'gear_id'         => 'gear_101',
+            'gear_id'         => 'gear_sony_a7iv',
             'gear_name'       => 'Sony Alpha a7 IV Cinema Camera',
             'serial'          => 'SN-774921',
             'shoot_title'     => 'Wedding 4K Film - Rahul & Priya',
             'client'          => 'Rahul Sharma',
             'dop_pilot'       => 'Karan Malhotra',
-            'checkout_date'   => '2026-07-25',
-            'return_due_date' => '2026-07-28',
+            'checkout_date'   => date('Y-m-d', strtotime('-2 days')),
+            'return_due_date' => date('Y-m-d', strtotime('+2 days')),
             'status'          => 'Active'
-        ),
-        array(
-            'id'              => 'chk_502',
-            'gear_id'         => 'gear_103',
-            'gear_name'       => 'DJI Mavic 3 Pro Cine Drone',
-            'serial'          => 'DJI-88301',
-            'shoot_title'     => 'DLF Cyber City Commercial 4K',
-            'client'          => 'DLF Properties',
-            'dop_pilot'       => 'Rohan Verma',
-            'checkout_date'   => '2026-07-26',
-            'return_due_date' => '2026-07-27',
-            'status'          => 'Active'
-        ),
-        array(
-            'id'              => 'chk_503',
-            'gear_id'         => 'gear_104',
-            'gear_name'       => 'Canon RF 70-200mm f/2.8L IS USM Lens',
-            'serial'          => 'CN-11244',
-            'shoot_title'     => 'Luxury Penthouse Walkthrough',
-            'client'          => 'Oberoi Realty',
-            'dop_pilot'       => 'Amit Kumar',
-            'checkout_date'   => '2026-07-20',
-            'return_due_date' => '2026-07-22',
-            'status'          => 'Returned'
         )
     );
     update_option( 'cora_gear_checkouts', $cora_gear_checkouts );
@@ -211,25 +91,14 @@ if ( empty( $cora_gear_maintenance ) || ! is_array( $cora_gear_maintenance ) ) {
     $cora_gear_maintenance = array(
         array(
             'id'           => 'mnt_801',
-            'gear_id'      => 'gear_105',
-            'equipment'    => 'Aputure 600d Pro LED Light Kit (APT-6001)',
-            'repair_type'  => 'COB LED Array Replacement & Fan Cleaning',
-            'service_date' => '2026-07-24',
-            'vendor'       => 'Light Source India Tech',
-            'repair_cost'  => 18500,
+            'gear_id'      => 'gear_sony_a7iv',
+            'equipment'    => 'Sony Alpha a7 IV Cinema Camera (SN-774921)',
+            'repair_type'  => 'Sensor Calibration & Cleaning',
+            'service_date' => date('Y-m-d', strtotime('-5 days')),
+            'vendor'       => 'Sony Service Center',
+            'repair_cost'  => 4500,
             'sync_status'  => 'Synced to Financial Ledger',
-            'notes'        => 'Replaced overheating diode chip module under warranty extension.'
-        ),
-        array(
-            'id'           => 'mnt_802',
-            'gear_id'      => 'gear_102',
-            'equipment'    => 'RED Komodo 6K Cinema Package (RED-9941)',
-            'repair_type'  => 'Sensor Calibration & Firmware Upgrade',
-            'service_date' => '2026-06-15',
-            'vendor'       => 'RED Digital Cinema Service Center',
-            'repair_cost'  => 12000,
-            'sync_status'  => 'Synced to Financial Ledger',
-            'notes'        => 'Annual sensor cleaning and v2.1.4 color science update.'
+            'notes'        => 'Routine sensor cleaning and color calibration.'
         )
     );
     update_option( 'cora_gear_maintenance', $cora_gear_maintenance );
@@ -246,24 +115,6 @@ if ( empty( $cora_gear_kits ) || ! is_array( $cora_gear_kits ) ) {
             'items'       => array('Sony Alpha a7 IV', 'Canon RF 70-200mm f/2.8L', 'Sennheiser EW-DP Mic Set', 'Manfrotto Video Tripod'),
             'daily_rate'  => 15000,
             'status'      => 'Available'
-        ),
-        array(
-            'id'          => 'kit_202',
-            'name'        => 'Drone Aerial Survey & Promo Kit',
-            'category'    => 'Aerial Cinematography',
-            'description' => 'DGCA-ready 4K drone cinematography setup complete with high-bright smart controller, 4 intelligent flight batteries, and ND filters.',
-            'items'       => array('DJI Mavic 3 Pro Cine', 'Smart Controller', '4x Intelligent Batteries', 'PolarPro ND Filter Set'),
-            'daily_rate'  => 12500,
-            'status'      => 'In Use'
-        ),
-        array(
-            'id'          => 'kit_203',
-            'name'        => 'Studio Lighting & Grip Package',
-            'category'    => 'Lighting & Grip',
-            'description' => 'High-output key daylight fixture with parabolic softbox modifier, heavy-duty C-stands, and weighted sandbags.',
-            'items'       => array('Aputure 600d Pro', 'Light Dome III Softbox', '2x Heavy Duty C-Stands', '4x Sandbags & Cables'),
-            'daily_rate'  => 8000,
-            'status'      => 'Maintenance'
         )
     );
     update_option( 'cora_gear_kits', $cora_gear_kits );

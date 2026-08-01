@@ -303,17 +303,21 @@ jQuery(document).ready(function($) {
     });
 
     // Geofence Drawer Handlers
-    window.openGeofenceDrawer = function() {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        }
-        $('#cora-geofence-drawer').removeClass('collapsed hidden');
-        $('#cora-drawer-backdrop').removeClass('hidden');
-    };
+    if (typeof window.openGeofenceDrawer === 'undefined') {
+        window.openGeofenceDrawer = function() {
+            if (typeof window.coraCloseAllDrawers === 'function') {
+                window.coraCloseAllDrawers();
+            }
+            $('#cora-geofence-drawer').removeClass('collapsed hidden');
+            $('#cora-drawer-backdrop').removeClass('hidden');
+        };
+    }
 
-    window.closeGeofenceDrawer = function() {
-        window.coraCloseAllDrawers();
-    };
+    if (typeof window.closeGeofenceDrawer === 'undefined') {
+        window.closeGeofenceDrawer = function() {
+            window.coraCloseAllDrawers();
+        };
+    }
 
     // Create Custom Role Drawer Handlers
     window.openCreateCustomRoleDrawer = function(baseTemplate) {

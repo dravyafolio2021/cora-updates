@@ -1,5 +1,5 @@
 // Service worker for Cora Admin PWA
-const CACHE_NAME = 'cora-workspace-v4';
+const CACHE_NAME = 'cora-workspace-v5';
 const URLs_TO_CACHE = [
   '/wp-content/plugins/cora-workspace/assets/pwa/manifest.json',
   '/cora-offline.html'
@@ -18,6 +18,11 @@ self.addEventListener('install', event => {
 self.addEventListener('fetch', event => {
   // Only handle GET requests from the same origin
   if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin)) {
+    return;
+  }
+
+  // Bypass service worker completely for public Canvas site URLs
+  if (event.request.url.includes('/site/')) {
     return;
   }
 

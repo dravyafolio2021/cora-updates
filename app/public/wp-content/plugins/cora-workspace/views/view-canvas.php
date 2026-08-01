@@ -13,10 +13,23 @@ $user = wp_get_current_user();
 $current_role = ! empty( $user->roles ) ? $user->roles[0] : 'subscriber';
 $is_read_only = ( $current_role === 'cora_branch_manager' );
 
-// Fetch active theme
-$live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+$cora_canvas_ws   = cora_get_current_workspace_context();
+$cora_canvas_agency_id = ! empty( $cora_canvas_ws['agency_id'] ) ? intval( $cora_canvas_ws['agency_id'] ) : 0;
+$cora_canvas_slug      = ! empty( $cora_canvas_ws['slug'] ) ? $cora_canvas_ws['slug'] : 'workspace';
+
+// Fetch active theme for current agency
+$live_theme = null;
+if ( $cora_canvas_agency_id > 0 ) {
+    $live_theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d AND status = 'live' ORDER BY id DESC LIMIT 1", $cora_canvas_agency_id ), ARRAY_A );
+    if ( ! $live_theme ) {
+        $live_theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d ORDER BY id DESC LIMIT 1", $cora_canvas_agency_id ), ARRAY_A );
+    }
+}
 if ( ! $live_theme ) {
-    $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes LIMIT 1", ARRAY_A );
+    $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
+    if ( ! $live_theme ) {
+        $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes ORDER BY id DESC LIMIT 1", ARRAY_A );
+    }
 }
 $live_settings = $live_theme ? (json_decode($live_theme['settings'], true) ?: array()) : array();
 
@@ -420,7 +433,7 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.07 4.93l-1.41 1.41M5.34 18.66l-1.41 1.41M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M5.34 5.34L3.93 3.93M12 2v2M12 20v2"></path></svg>
                             Customize
                         </button>
-                        <a href="<?php echo home_url('/'); ?>" target="_blank" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-750 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5 no-underline">
+                        <a href="<?php echo home_url( '/site/' . esc_attr( $cora_canvas_slug ) ); ?>" target="_blank" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-750 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5 no-underline">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                             Preview
                         </a>
@@ -436,7 +449,7 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                                     <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                 </button>
                                 <div id="active-theme-dropdown" class="hidden absolute right-0 top-full mt-1.5 w-52 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-50 text-left font-sans select-none">
-                                    <a href="<?php echo home_url('/'); ?>" target="_blank" class="w-full px-3 py-2 text-xs text-zinc-850 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold transition-colors decoration-none">
+                                    <a href="<?php echo home_url( '/site/' . esc_attr( $cora_canvas_slug ) ); ?>" target="_blank" class="w-full px-3 py-2 text-xs text-zinc-850 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold transition-colors decoration-none">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                         View
                                     </a>
@@ -762,7 +775,7 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                 <?php if ( ! $is_read_only ) : ?>
                 <button id="activate-theme-header-btn" onclick="triggerActivateThemeFromHeader()" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all">Activate Theme</button>
                 <?php endif; ?>
-                <a id="preview-site-header-btn" href="<?php echo home_url('/'); ?>" target="_blank" class="px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 shadow-sm cursor-pointer transition-all hidden">Preview Site</a>
+                <a id="preview-site-header-btn" href="<?php echo home_url( '/site/' . esc_attr( $cora_canvas_slug ) ); ?>" target="_blank" class="px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 shadow-sm cursor-pointer transition-all hidden">Preview Site</a>
             </div>
         </div>
 
@@ -2079,6 +2092,11 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                 
                 <!-- Right: Navigator, Publish -->
                 <div class="flex items-center gap-2">
+                    <a id="cora-direct-elementor-btn" href="#" target="_blank" class="h-8 px-3 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors inline-flex items-center gap-1.5 border border-zinc-200 dark:border-zinc-700">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        Open Editor in New Tab
+                    </a>
+                    
                     <button onclick="toggleNavigatorPanel()" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>
                         Navigator
@@ -2114,12 +2132,19 @@ $cora_bookings_count = count( cora_db_get_bookings() );
 
             <!-- Error/Blocking Display -->
             <div id="elementor-blocking-msg" class="max-w-md p-6 bg-white border border-zinc-200 rounded-xl shadow-lg text-center space-y-4 hidden z-20">
-                <div class="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto">
-                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <div class="w-12 h-12 bg-zinc-100 text-zinc-900 rounded-full flex items-center justify-center mx-auto">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
                 </div>
-                <h4 class="text-sm font-bold text-zinc-900">Elementor Integration Required</h4>
-                <p class="text-xs text-zinc-500 leading-relaxed">Elementor is required for page editing. Please install and activate Elementor Page Builder plugin to edit canvas pages.</p>
-                <a href="<?php echo admin_url('plugins.php'); ?>" target="_blank" class="inline-block px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold transition-all">Install Elementor →</a>
+                <h4 class="text-sm font-bold text-zinc-900" id="elementor-blocking-title">Elementor Page Editor</h4>
+                <p class="text-xs text-zinc-500 leading-relaxed" id="elementor-blocking-desc">If your browser security settings block iframe embedding, click below to open Elementor directly in a new tab.</p>
+                <div class="flex items-center justify-center gap-3 pt-2">
+                    <a id="cora-direct-elementor-card-btn" href="#" target="_blank" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-all inline-flex items-center gap-1.5">
+                        Launch Direct Editor →
+                    </a>
+                    <button type="button" onclick="jQuery('#iframe-loader').removeClass('hidden'); jQuery('#elementor-blocking-msg').addClass('hidden'); jQuery('#elementor-editor-iframe').removeClass('hidden').attr('src', jQuery('#elementor-editor-iframe').attr('src'));" class="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 rounded-lg text-xs font-bold transition-all">
+                        Retry Loading
+                    </button>
+                </div>
             </div>
 
             <!-- Editor Iframe -->
@@ -4106,12 +4131,13 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                 ? `<span class="text-zinc-500 text-[11px]">${esc_html(p.content.replace(/<[^>]+>/g,'').substring(0,60))}…</span>`
                 : `<span class="text-zinc-300 text-[11px]">—</span>`;
             const homeBadge = p.is_homepage == 1
-                ? `<span class="ml-2 px-1.5 py-0.5 text-[8px] font-bold rounded-md bg-zinc-100 border border-zinc-200 text-zinc-500 inline-flex items-center gap-0.5"><svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Home</span>`
+                ? `<span class="ml-2 px-1.5 py-0.5 text-[8px] font-bold rounded-md bg-zinc-100 border border-zinc-200 text-zinc-500 inline-flex items-center gap-0.5"><svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Home</span>`
                 : '';
 
+            const wsSiteBase = `${coraREData.siteUrl}/site/<?php echo esc_js($cora_canvas_slug); ?>`;
             const previewUrl = p.is_homepage == 1
-                ? `${coraREData.siteUrl}/?cv_preview_theme=${canvasState.activeThemeId}`
-                : `${coraREData.siteUrl}/${p.slug}${p.slug.includes('?') ? '&' : '?'}cv_preview_theme=${canvasState.activeThemeId}`;
+                ? `${wsSiteBase}/?cv_preview_theme=${canvasState.activeThemeId}`
+                : `${wsSiteBase}/${p.slug}${p.slug.includes('?') ? '&' : '?'}cv_preview_theme=${canvasState.activeThemeId}`;
 
             body.append(`
                 <tr class="border-b border-zinc-100 hover:bg-zinc-50/60 group transition-colors">
@@ -4202,7 +4228,7 @@ $cora_bookings_count = count( cora_db_get_bookings() );
     }
 
     function getVisibilityPill(status, dateStr) {
-        if (status === 'published') {
+        if (status === 'published' || status === 'publish') {
             return '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-green-50 text-green-700 border border-green-200"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Visible</span>';
         } else if (status === 'scheduled') {
             return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-amber-50 text-amber-700 border border-amber-200 cursor-pointer" title="Scheduled for: ${dateStr}"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>Scheduled</span>`;
@@ -5619,7 +5645,6 @@ $cora_bookings_count = count( cora_db_get_bookings() );
     function openPageEditor(pageId, title, wpPostId, pageStatus, pageSlug) {
         canvasState.level = 3;
         canvasState.activePageId = pageId;
-        canvasState.activeWpPostId = wpPostId;
         canvasState.activePageStatus = pageStatus || 'draft';
         canvasState.activePageSlug   = pageSlug   || '';
 
@@ -5652,14 +5677,92 @@ $cora_bookings_count = count( cora_db_get_bookings() );
         jQuery('#elementor-editor-iframe').addClass('hidden');
         jQuery('#elementor-blocking-msg').addClass('hidden');
 
-        // Verify Elementor is loaded in WP
+        // Check if wpPostId is valid; if 0 or missing, provision via AJAX first
+        if (!wpPostId || wpPostId == 0 || wpPostId == '0' || wpPostId == 'null' || wpPostId == 'undefined') {
+            jQuery.post(coraREData.ajaxUrl, {
+                action: 'cora_ajax_ensure_wp_post',
+                page_id: pageId,
+                theme_id: canvasState.activeThemeId,
+                title: title,
+                slug: pageSlug,
+                nonce: coraREData.ajaxNonce
+            }, function(res) {
+                if (res && res.success && res.data && res.data.wp_post_id) {
+                    canvasState.activeWpPostId = res.data.wp_post_id;
+                    if (res.data.page_id) canvasState.activePageId = res.data.page_id;
+                    executeOpenPageEditor(canvasState.activeWpPostId, title);
+                } else {
+                    jQuery('#iframe-loader').addClass('hidden');
+                    jQuery('#elementor-blocking-title').text('Page Post Provisioning Error');
+                    jQuery('#elementor-blocking-desc').html((res && res.data && res.data.message) ? res.data.message : 'Could not initialize WordPress page post. Launch direct editor to verify page state.');
+                    jQuery('#elementor-blocking-msg').removeClass('hidden');
+                    if (typeof window.coraShowToast === 'function') {
+                        window.coraShowToast('Could not provision WordPress page post.', 'error');
+                    }
+                }
+            }).fail(function() {
+                jQuery('#iframe-loader').addClass('hidden');
+                jQuery('#elementor-blocking-title').text('Page Provisioning Error');
+                jQuery('#elementor-blocking-desc').html('Server connection failed while initializing page post.');
+                jQuery('#elementor-blocking-msg').removeClass('hidden');
+            });
+            return;
+        }
+
+        canvasState.activeWpPostId = wpPostId;
+        executeOpenPageEditor(wpPostId, title);
+    }
+
+    function executeOpenPageEditor(wpPostId, title) {
         const elementorUrl = coraREData.siteUrl + '/wp-admin/post.php?post=' + wpPostId + '&action=elementor';
+        jQuery('#cora-direct-elementor-btn').attr('href', elementorUrl);
+        jQuery('#cora-direct-elementor-card-btn').attr('href', elementorUrl);
         
         // Load target frame URL
         jQuery('#elementor-editor-iframe').attr('src', elementorUrl).off('load').on('load', function() {
             jQuery('#iframe-loader').addClass('hidden');
             jQuery('#elementor-editor-iframe').removeClass('hidden');
+
+            // Defensive error observer: check if Elementor threw 403 or preview error or redirected to WP Admin shell inside iframe
+            const iframe = this;
+            const checkIframeError = function() {
+                try {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    if (iframeDoc && iframeDoc.body) {
+                        const bodyText = iframeDoc.body.innerText || '';
+                        const hasErrorMsg = bodyText.includes('The preview could not be loaded') || bodyText.includes('error 403') || bodyText.includes('Error 403');
+                        const errorDialog = iframeDoc.querySelector('.elementor-dialog-type-alert, .elementor-error-dialog, #elementor-preview-debug-area');
+                        
+                        let isWpAdminShell = false;
+                        try {
+                            const iframeHref = (iframe.contentWindow && iframe.contentWindow.location.href) ? iframe.contentWindow.location.href : '';
+                            isWpAdminShell = iframeDoc.querySelector('#wpadminbar') !== null || iframeDoc.querySelector('#adminmenu') !== null || iframeHref.includes('/wp-admin/edit.php') || iframeHref.includes('/wp-admin/index.php');
+                        } catch(err) {}
+
+                        if (hasErrorMsg || errorDialog || isWpAdminShell) {
+                            jQuery('#elementor-editor-iframe').addClass('hidden');
+                            jQuery('#iframe-loader').addClass('hidden');
+                            if (isWpAdminShell) {
+                                jQuery('#elementor-blocking-title').text('WordPress Admin Redirect Intercepted');
+                                jQuery('#elementor-blocking-desc').html('WordPress redirected this page request to the admin dashboard instead of opening the Elementor builder canvas.<br><span class="font-semibold text-zinc-800">Launch direct editor in a new tab to edit this page seamlessly.</span>');
+                            } else {
+                                jQuery('#elementor-blocking-title').text('Preview Security Blocked (HTTP 403)');
+                                jQuery('#elementor-blocking-desc').html('Browser security or session timeout prevented embedding the editor in this window.<br><span class="font-semibold text-zinc-800">Launch direct editor in a new tab to continue seamlessly.</span>');
+                            }
+                            jQuery('#elementor-blocking-msg').removeClass('hidden');
+                            if (typeof window.coraShowToast === 'function') {
+                                window.coraShowToast(isWpAdminShell ? 'Admin dashboard redirect intercepted. Use "Launch Direct Editor".' : 'Editor preview blocked by browser security. Use "Launch Direct Editor".', 'warning');
+                            }
+                        }
+                    }
+                } catch (e) {
+                    // Cross-origin restrictions may prevent reading document text, handled by timeout fallback
+                }
+            };
+            setTimeout(checkIframeError, 800);
+            setTimeout(checkIframeError, 2500);
         });
+    }
 
         // Set timeout to handle offline/inactive blocking message if Elementor can't load
         setTimeout(function() {
@@ -5667,7 +5770,7 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                 jQuery('#iframe-loader').addClass('hidden');
                 jQuery('#elementor-blocking-msg').removeClass('hidden');
             }
-        }, 12000);
+        }, 8000);
         syncStateToUrl();
     }
 

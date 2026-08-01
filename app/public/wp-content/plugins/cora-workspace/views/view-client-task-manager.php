@@ -1569,7 +1569,7 @@ document.addEventListener('click', function(e) {
         if (teamMembers) {
             teamMembers.forEach(m => {
                 if (m.name) {
-                    m.name = m.name.replace('Shruti Sharma', 'Shruti').replace(' (Super Admin)', '');
+                    m.name = m.name.replace('Shruti ', 'Shruti').replace(' (Super Admin)', '');
                 }
             });
         }
@@ -1591,7 +1591,7 @@ document.addEventListener('click', function(e) {
         if (tasks) {
             tasks.forEach(t => {
                 if (t.assignee_name) {
-                    t.assignee_name = t.assignee_name.replace('Shruti Sharma', 'Shruti').replace(' (Super Admin)', '');
+                    t.assignee_name = t.assignee_name.replace('Shruti ', 'Shruti').replace(' (Super Admin)', '');
                 }
                 
                 // Align assignee_id by checking display name matches

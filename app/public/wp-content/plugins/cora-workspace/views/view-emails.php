@@ -398,71 +398,80 @@ if ( ! defined( 'ABSPATH' ) ) {
         <!-- SUB-TAB 5: SMTP & PROVIDER SETTINGS -->
         <div id="email-tab-settings" class="cora-email-tab-content hidden flex-1 flex-col space-y-6">
             <div class="max-w-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs">
-                <div class="border-b border-zinc-100 dark:border-zinc-800 pb-4 mb-5">
-                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
-                        Hostinger Business SMTP Credentials & Relay
-                    </h3>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Configure your official Hostinger SMTP mail relay details for guaranteed inbox deliverability.</p>
+                <div class="border-b border-zinc-100 dark:border-zinc-800 pb-4 mb-5 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                            Hostinger Business SMTP Credentials & Relay
+                        </h3>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Configure your official Hostinger SMTP mail relay details for guaranteed inbox deliverability.</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold shrink-0">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-emerald-600 dark:text-emerald-400"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        System Locked
+                    </span>
                 </div>
 
-                <form id="smtp-settings-form" class="space-y-4" onsubmit="saveSmtpSettings(event)">
+                <form id="smtp-settings-form" class="space-y-4" onsubmit="event.preventDefault();">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="space-y-1">
                             <label class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">SMTP Server Host *</label>
-                            <input type="text" id="smtp-host" value="smtp.hostinger.com" required
-                                   class="w-full h-10 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-xs font-semibold text-zinc-900 dark:text-zinc-100 outline-hidden" />
+                            <input type="text" id="smtp-host" value="<?php echo esc_attr(get_option('cora_smtp_host', 'smtp.hostinger.com')); ?>" readonly
+                                   class="w-full h-10 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-xs font-semibold text-zinc-500 dark:text-zinc-400 cursor-not-allowed outline-hidden" />
                         </div>
                         <div class="space-y-1">
                             <label class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">SMTP Port *</label>
-                            <input type="text" id="smtp-port" value="587" required
-                                   class="w-full h-10 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-xs font-semibold text-zinc-900 dark:text-zinc-100 outline-hidden" />
+                            <input type="text" id="smtp-port" value="<?php echo esc_attr(get_option('cora_smtp_port', '465')); ?>" readonly
+                                   class="w-full h-10 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-xs font-semibold text-zinc-500 dark:text-zinc-400 cursor-not-allowed outline-hidden" />
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="space-y-1">
                             <label class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Encryption Method</label>
-                            <select id="smtp-secure"
-                                    class="w-full h-10 px-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-xs font-semibold text-zinc-900 dark:text-zinc-100 outline-hidden">
-                                <option value="tls" selected>TLS / STARTTLS (Recommended Port 587)</option>
-                                <option value="ssl">SSL (Port 465)</option>
-                                <option value="none">None (Plaintext)</option>
+                            <?php $sec = get_option('cora_smtp_secure', 'ssl'); ?>
+                            <select id="smtp-secure" disabled
+                                    class="w-full h-10 px-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-xs font-semibold text-zinc-500 dark:text-zinc-400 cursor-not-allowed outline-hidden">
+                                <option value="ssl" <?php selected($sec, 'ssl'); ?>>SSL (Port 465 Recommended)</option>
+                                <option value="tls" <?php selected($sec, 'tls'); ?>>TLS / STARTTLS (Port 587)</option>
+                                <option value="none" <?php selected($sec, 'none'); ?>>None (Plaintext)</option>
                             </select>
                         </div>
                         <div class="space-y-1">
                             <label class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">SMTP Username *</label>
-                            <input type="email" id="smtp-username" value="<?php echo esc_attr(get_option('admin_email')); ?>" required
-                                   class="w-full h-10 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-xs font-semibold text-zinc-900 dark:text-zinc-100 outline-hidden" />
+                            <input type="email" id="smtp-username" value="<?php echo esc_attr(get_option('cora_smtp_username', 'heycora@claraverse.in')); ?>" readonly
+                                   class="w-full h-10 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-xs font-semibold text-zinc-500 dark:text-zinc-400 cursor-not-allowed outline-hidden" />
                         </div>
                     </div>
 
                     <div class="space-y-1">
                         <label class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">SMTP Password</label>
-                        <input type="password" id="smtp-password" placeholder="••••••••••••"
-                               class="w-full h-10 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-xs font-semibold text-zinc-900 dark:text-zinc-100 outline-hidden" />
+                        <input type="password" id="smtp-password" value="••••••••••••••••" readonly
+                               class="w-full h-10 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-xs font-semibold text-zinc-500 dark:text-zinc-400 cursor-not-allowed outline-hidden" />
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                         <div class="space-y-1">
                             <label class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Default From Name</label>
-                            <input type="text" id="smtp-from-name" value="<?php echo esc_attr(get_bloginfo('name')); ?>" required
-                                   class="w-full h-10 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-xs font-semibold text-zinc-900 dark:text-zinc-100 outline-hidden" />
+                            <input type="text" id="smtp-from-name" value="<?php echo esc_attr(get_option('cora_from_name', 'Cora')); ?>" readonly
+                                   class="w-full h-10 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-xs font-semibold text-zinc-500 dark:text-zinc-400 cursor-not-allowed outline-hidden" />
                         </div>
                         <div class="space-y-1">
                             <label class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Default From Email</label>
-                            <input type="email" id="smtp-from-email" value="<?php echo esc_attr(get_option('admin_email')); ?>" required
-                                   class="w-full h-10 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-xs font-semibold text-zinc-900 dark:text-zinc-100 outline-hidden" />
+                            <input type="email" id="smtp-from-email" value="<?php echo esc_attr(get_option('cora_from_email', 'heycora@claraverse.in')); ?>" readonly
+                                   class="w-full h-10 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-xs font-semibold text-zinc-500 dark:text-zinc-400 cursor-not-allowed outline-hidden" />
                         </div>
                     </div>
 
                     <div class="flex items-center justify-between pt-4 border-t border-zinc-100 dark:border-zinc-800">
-                        <button type="button" onclick="openSmtpTestDrawer()" class="h-10 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer">
+                        <button type="button" onclick="openSmtpTestDrawer()" class="h-10 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer flex items-center gap-2">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                             Run Connection Test
                         </button>
-                        <button type="submit" id="btn-save-smtp" class="h-10 px-6 rounded-xl bg-zinc-950 dark:bg-white hover:bg-zinc-900 dark:hover:bg-zinc-50 text-white dark:text-zinc-950 text-xs font-bold border-0 cursor-pointer shadow-xs">
-                            Save SMTP Settings
-                        </button>
+                        <div class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            Managed by System Administrator
+                        </div>
                     </div>
                 </form>
             </div>
@@ -601,12 +610,15 @@ jQuery(document).ready(function($) {
     function getAjaxNonce() {
         return window.coraAjaxNonce || (typeof coraREData !== 'undefined' ? coraREData.ajaxNonce : '') || (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : '');
     }
+    function getAjaxEndpoint() {
+        return (typeof ajaxurl !== 'undefined' && ajaxurl) ? ajaxurl : '/wp-admin/admin-ajax.php';
+    }
 
     // Load initial Email Module state
     function loadEmailDashboardData() {
         const nonce = getAjaxNonce();
         $.ajax({
-            url: typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php',
+            url: getAjaxEndpoint(),
             method: 'POST',
             data: {
                 action: 'cora_get_email_dashboard_data',
@@ -874,7 +886,7 @@ jQuery(document).ready(function($) {
         const body = $('#tpl-editor-body').val().trim();
 
         $.ajax({
-            url: ajaxurl,
+            url: getAjaxEndpoint(),
             method: 'POST',
             data: {
                 action: 'cora_save_email_template',
@@ -899,7 +911,7 @@ jQuery(document).ready(function($) {
     window.deleteEmailTemplate = function(tplId) {
         const performDelete = function() {
             $.ajax({
-                url: ajaxurl,
+                url: getAjaxEndpoint(),
                 method: 'POST',
                 data: {
                     action: 'cora_delete_email_template',
@@ -959,7 +971,7 @@ jQuery(document).ready(function($) {
         $btn.prop('disabled', true).text('Resending...');
 
         $.ajax({
-            url: ajaxurl,
+            url: getAjaxEndpoint(),
             method: 'POST',
             data: {
                 action: 'cora_resend_email',
@@ -1005,7 +1017,7 @@ jQuery(document).ready(function($) {
         $btn.prop('disabled', true).text('Saving...');
 
         $.ajax({
-            url: ajaxurl,
+            url: getAjaxEndpoint(),
             method: 'POST',
             data: {
                 action: 'cora_save_smtp_settings',
@@ -1059,7 +1071,7 @@ jQuery(document).ready(function($) {
         $console.html(`[PING] Connecting to smtp.hostinger.com:587...\n[AUTH] Verifying SSL/TLS handshake for ${testRecipient}...`);
 
         $.ajax({
-            url: ajaxurl,
+            url: getAjaxEndpoint(),
             method: 'POST',
             data: {
                 action: 'cora_test_smtp_connection',
@@ -1112,20 +1124,33 @@ jQuery(document).ready(function($) {
         `);
 
         $.ajax({
-            url: '/wp-json/cora/v1/emails/send',
+            url: getAjaxEndpoint(),
             method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ to, subject, message }),
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-WP-Nonce', window.coraRestNonce || '');
+            data: {
+                action: 'cora_send_email',
+                nonce: getAjaxNonce(),
+                security: getAjaxNonce(),
+                to: to,
+                subject: subject,
+                message: message
             },
             success: function(res) {
-                window.coraShowToast && window.coraShowToast("Email sent officially via Hostinger SMTP! ✓", "success");
-                resetEmailComposeForm();
-                loadEmailDashboardData();
+                if (res.success) {
+                    window.coraShowToast && window.coraShowToast(res.data.message || "Email sent officially via Hostinger SMTP! ✓", "success");
+                    resetEmailComposeForm();
+                    if (res.data.sent_logs) {
+                        emailData.sent_logs = res.data.sent_logs;
+                        renderEmailLogs();
+                        updateDashboardKPIs();
+                    } else {
+                        loadEmailDashboardData();
+                    }
+                } else {
+                    window.coraShowToast && window.coraShowToast(res.data.message || "Failed to send email. Check Hostinger SMTP settings.", "error");
+                }
             },
             error: function(err) {
-                const errMsg = err.responseJSON?.message || "Failed to send email. Check Hostinger SMTP settings.";
+                const errMsg = (err.responseJSON && err.responseJSON.message) ? err.responseJSON.message : "Failed to send email. Check Hostinger SMTP settings.";
                 window.coraShowToast && window.coraShowToast(errMsg, "error");
             },
             complete: function() {

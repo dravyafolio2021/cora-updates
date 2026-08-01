@@ -57,3 +57,62 @@ We have successfully resolved cross-module script and layout interference issues
 - Incremented plugin files and headers to **v2.9.8**.
 - Packaged clean update file `cora-workspace.zip` (15MB size) and updated the update manifest `cora-workspace.json`.
 - Committed and pushed release updates to both repositories (`dravyafolio2021/heycora` and `dravyafolio2021/cora-updates`). Workspaces are ready for upgrading!
+
+---
+
+## 📦 Version 2.9.43 Release: Dynamic Tenant Canvas Front-End Website Routing
+
+- **Tenant-Scoped Canvas Routing**: Refactored `cora_canvas_theme_frontend_router()` to support dynamic front-end public website URLs (`/site/{workspace_slug}` and `/site/{workspace_slug}/{page_slug}`).
+- **Strict Route Parsing**: Differentiates tenant website URLs from internal workspace admin dashboard routes (`/workspace_slug/dashboard`, `/workspace_slug/canvas`, etc.), ensuring zero interference with admin views.
+- **Dynamic Site Links**: Updated Canvas Builder theme preview and view buttons in `views/view-canvas.php` to resolve exact tenant URLs (`home_url('/site/' . $cora_ws_slug)`).
+- **Deployment**: Successfully packaged and deployed **v2.9.43** to both Demo (`https://heycora.in/demo`) and Production (`https://app.heycora.in`).
+
+---
+
+## 📦 Version 2.9.60 Release: User Management Drawer Accessibility & Inline Binding Fixes
+
+- **Edit User Drawer (`cora-edit-user-drawer`)**: Fixed inline CSS overrides during open/close events to strip `.collapsed` and `.hidden` classes and enforce `display: flex`, `visibility: visible`, and `transform: translateX(0)`.
+- **Edit Custom Role Drawer (`cora-edit-custom-role-drawer`)**: Standardized layout overrides to align with theme guidelines. Bound `openEditCustomRoleDrawer` and `closeEditCustomRoleDrawer` to the global `window` object to override legacy stubs.
+- **Attendance Reports Drawer (`cora-attendance-reports-drawer`)**: Corrected inline selectors and transition classes; bound open/close controls to `window` for reliable access during analytics lookup.
+- **Global Window Handler Registrations**: Registered all inline actions (`coraResendVerification`, `coraCancelInvitation`, `handleDuplicateCustomRole`, `handleDeleteCustomRole`, `triggerCronAction`) explicitly under the `window` namespace, resolving browser reference issues.
+- **Release & Deployment**: Deployed successfully to Demo (`heycora.in/demo`) and Production (`heycora.in`). Both environments verified active at `2.9.60` and passing all health checks ✅.
+
+---
+
+## 📦 Version 2.9.62 Release: Geofencing & Drawer Interaction Fixes
+
+- **Positioning & Interaction Locks**: Upgraded `openInviteDrawer`, `openEditUserDrawer`, and `openGeofenceDrawer` to explicitly remove `.translate-x-full` and `.pointer-events-none` classes from the side drawers. Added inline styling resets (`pointer-events: auto`, `transform: translateX(0)`) to override the global `admin-dashboard.php` CSS overlays that were forcing drawers to remain hidden and non-interactive.
+- **Consolidated Double Definitions**: Cleaned up the duplicate declarations of `openInviteDrawer()` and `closeInviteDrawer()` scripts in `views/view-users.php` to prevent scoping overrides and redundant visual transitions.
+- **Removed Double-Firing Click Handlers**: Removed the duplicate jQuery click listener for `.cora-edit-user-btn` which was causing race conditions when animating the user edit drawer sheet.
+- **Global Scope Window Assignment**: Exposed geofencing interactive functions (`selectGeofenceRadius`, `switchGeofenceMode`, `updateMapPreviewFromInput`, `handleSaveGeofence`) and toolbar filters (`toggleMobileFilters`, `clearFilters`) globally to the `window` namespace, resolving reference errors thrown by inline HTML attributes when clicked.
+- **Release & Deployment**:
+  - Incremented version to `2.9.62` in `cora-workspace.php` and updates manifest.
+  - Built package `cora-workspace.zip` (3.9M) and successfully deployed to Demo (`heycora.in/demo`) and Production (`heycora.in`). Both environments verified active at `2.9.62` and running flawlessly ✅.
+
+---
+
+## 📦 Version 2.9.63 Release: JS Syntax Error Resolution
+
+- **Syntax Fix**: Resolved a critical missing closing brace (`}`) for the `copyAttendanceShareLink()` function inside the script block of `views/view-users.php`. This syntax error had blocked browser JavaScript parsing, causing the entire UI (including page/tab navigation, buttons, and popups) to become frozen/unclickable.
+- **Verified Syntax Compilation**: Validated the entire javascript code block using Node's `vm.Script` syntax checker to ensure 100% correct parsing on page load.
+- **Release & Deployment**:
+  - Incremented version to `2.9.63` in `cora-workspace.php` and updates manifest.
+  - Successfully built and deployed to Demo (`heycora.in/demo`) and Production (`heycora.in`), verifying version `2.9.63` active and all interactive elements fully operational ✅.
+
+---
+
+## 📦 Version 2.9.64 Release: Geofencing Location Detection Option
+
+- **Detect Current Location**: Added an absolute location-crosshair icon button inside the geofencing address input field (`#geofence-address-input`) in `views/view-users.php`.
+- **Geolocation API Integration**: Implemented a geolocation handler `detectCurrentLocationForGeofence(event)` using the browser's native `navigator.geolocation.getCurrentPosition` API.
+- **Automatic Reverse Geocoding**:
+  - Automatically retrieves the user's current GPS latitude and longitude coordinates.
+  - Instantly populates the coordinates into the input field and updates the map preview.
+  - Dispatches a request to OpenStreetMap's Nominatim reverse-geocoding API to resolve the coordinates into a user-friendly street address (which automatically replaces the raw coordinates in the input box).
+- **Custom Toasts & Scope Binding**: Utilizes the monochromatic custom Toast notification system for loading state and coordinate retrieval success/failure, and binds all new handlers to the global `window` object scope.
+- **Release & Deployment**:
+  - Incremented versions to `2.9.64` in `cora-workspace.php` and updates manifest `cora-workspace.json`.
+  - Built and packaged `cora-workspace.zip`.
+  - Deployed release successfully to both Demo (`https://heycora.in/demo`) and Production (`https://heycora.in`) environments with all verification checks passing ✅.
+
+

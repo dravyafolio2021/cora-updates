@@ -804,7 +804,7 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                                     break;
                                 }
                             }
-                            $assignee_display_name = $assigned_user ? $assigned_user->display_name : ($lead['assignee_name'] ?? 'Shruti Sharma');
+                            $assignee_display_name = $assigned_user ? $assigned_user->display_name : ($lead['assignee_name'] ?? 'Shruti ');
                             $assignee_first_name = explode( ' ', $assignee_display_name )[0];
                             $assignee_role = $lead['assignee_role'] ?? 'Super Admin';
                             if ( $assignee_role === 'Super Admin' ) {
@@ -1046,7 +1046,7 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                             break;
                         }
                     }
-                    $assignee_display_name = $assigned_user ? $assigned_user->display_name : ($lead['assignee_name'] ?? 'Shruti Sharma');
+                    $assignee_display_name = $assigned_user ? $assigned_user->display_name : ($lead['assignee_name'] ?? 'Shruti ');
                     $assignee_initials = strtoupper( substr( $assignee_display_name, 0, 1 ) );
                     $price_display = $lead['price'] ?? '0';
                     $num_price = intval(preg_replace('/[^0-9]/', '', $price_display));
@@ -1179,7 +1179,7 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                                         break;
                                     }
                                 }
-                                $assignee_display_name = $assigned_user ? $assigned_user->display_name : ($lead['assignee_name'] ?? 'Shruti Sharma');
+                                $assignee_display_name = $assigned_user ? $assigned_user->display_name : ($lead['assignee_name'] ?? 'Shruti ');
                                 $assignee_initials = strtoupper( substr( $assignee_display_name, 0, 1 ) );
                             ?>
                             <tr class="hover:bg-zinc-50/65 dark:hover:bg-zinc-800/25 transition-colors cursor-pointer" data-assigned-to="<?php echo esc_attr( $assigned_to_id ); ?>" onclick="coraOpenLeadDetailDrawer('<?php echo esc_attr($lead['id']); ?>')">

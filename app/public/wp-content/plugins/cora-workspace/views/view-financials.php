@@ -43,8 +43,8 @@ if ( is_array( $invoices ) ) {
     }
 }
 if ( $kpi_receivables <= 0 ) {
-    $kpi_receivables = 95000;
-    $kpi_receivables_count = 4;
+    $kpi_receivables = 0;
+    $kpi_receivables_count = 0;
 }
 
 // Combination Chart Calculations: last 6 months dynamically (from current month back 5 months)

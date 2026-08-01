@@ -3360,9 +3360,16 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         $cora_ws_initial        = ! empty( $cora_ws_name ) ? strtoupper( substr( $cora_ws_name, 0, 1 ) ) : 'C';
         
         $sidebar_brand_logo = get_option( 'cora_brand_logo_url', '' );
-        $sidebar_brand_title = get_option( 'cora_sidebar_title', 'cora' );
-        if ( empty( $sidebar_brand_title ) ) {
-            $sidebar_brand_title = 'cora';
+        $sidebar_brand_title = get_option( 'cora_sidebar_title', '' );
+        if ( empty( $sidebar_brand_title ) || strtolower( $sidebar_brand_title ) === 'cora' || strtolower( $sidebar_brand_title ) === 'cora real estate' ) {
+            $user_agency = get_user_meta( get_current_user_id(), 'cora_workspace_agency_name', true );
+            if ( ! empty( $cora_ws_name ) && strtolower( $cora_ws_name ) !== 'workspace' && strtolower( $cora_ws_name ) !== 'apex realty group' && strtolower( $cora_ws_name ) !== 'cora real estate' ) {
+                $sidebar_brand_title = $cora_ws_name;
+            } elseif ( ! empty( $user_agency ) ) {
+                $sidebar_brand_title = $user_agency;
+            } else {
+                $sidebar_brand_title = ! empty( $cora_ws_name ) ? $cora_ws_name : 'Cora Workspace';
+            }
         }
         ?>
         <div class="cora-sidebar-top-container flex items-center justify-between gap-2 px-3 pt-2.5 pb-2 shrink-0 select-none">
@@ -3492,6 +3499,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         </div>
                     </div>
 
+                    <?php if ( cora_is_super_owner() ) : ?>
                     <!-- Create New Workspace Button -->
                     <div class="border-t border-zinc-100 dark:border-zinc-800/60 mt-3 pt-2">
                         <button type="button" class="w-full flex items-center gap-2.5 px-2 py-2 text-left hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-xl transition-all cursor-pointer group" onclick="event.stopPropagation(); window.coraToggleCreateWorkspaceDrawer(true);">
@@ -3501,6 +3509,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             <span class="text-xs font-semibold text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">Create New Workspace</span>
                         </button>
                     </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -3605,7 +3614,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase select-none"><?php echo esc_html($group['label']); ?></div>
                     <ul class="cora-nav-list space-y-0.5 mt-1 select-none">
                         <?php foreach ( $group['items'] as $target => $item ) : 
-                            $nav_url = home_url( '/workspace/' . $target );
+                            $nav_url = home_url( '/' . $cora_ws_slug . '/' . $target );
                         ?>
                         <li class="list-none" data-target="<?php echo esc_attr($target); ?>">
                             <a href="<?php echo esc_url( $nav_url ); ?>" class="cora-nav-item <?php echo ( $sub_page === $target || str_replace('_', '-', $sub_page) === str_replace('_', '-', $target) ) ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer select-none no-underline text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white" data-target="<?php echo esc_attr($target); ?>" data-tooltip="<?php echo esc_attr($item['title']); ?>">
@@ -3900,8 +3909,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 // Fallback sample bookings if database is empty
                 if ( empty( $all_bookings ) ) {
                     $today_date = date('Y-m-d');
-                    $tomorrow_date = date('Y-m-d', strtotime('+1 day'));
-                    $yesterday_date = date('Y-m-d', strtotime('-1 day'));
                     $all_bookings = array(
                         array(
                             'id' => 1,
@@ -3915,45 +3922,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             'deal_type' => $is_studio ? 'Wedding Shoot' : 'Luxury Villa Tour',
                             'notes' => 'Shoot at DLF Cyber City Phase 2',
                             'location' => 'DLF Cyber City'
-                        ),
-                        array(
-                            'id' => 2,
-                            'client_id' => 'client_102',
-                            'client_name' => 'Aditi Sen',
-                            'date' => $today_date,
-                            'time' => '14:30',
-                            'status' => 'editing',
-                            'assigned_agent' => 'Rohan Verma',
-                            'package_value' => '₹1,80,000',
-                            'deal_type' => $is_studio ? 'Fashion Portfolio' : 'Penthouse Showing',
-                            'notes' => 'Shoot in South Delhi Studio',
-                            'location' => 'Hauz Khas Studio'
-                        ),
-                        array(
-                            'id' => 3,
-                            'client_id' => 'client_103',
-                            'client_name' => 'Kabir Mehta',
-                            'date' => $tomorrow_date,
-                            'time' => '09:00',
-                            'status' => 'confirmed',
-                            'assigned_agent' => 'Shruti Gupta',
-                            'package_value' => '₹4,50,000',
-                            'deal_type' => $is_studio ? 'Corporate Event' : 'Commercial Lease',
-                            'notes' => 'Multi-day event setup',
-                            'location' => 'Taj Palace, Delhi'
-                        ),
-                        array(
-                            'id' => 4,
-                            'client_id' => 'client_104',
-                            'client_name' => 'Preeti Jha',
-                            'date' => $yesterday_date,
-                            'time' => '16:00',
-                            'status' => 'completed',
-                            'assigned_agent' => 'Karan Malhotra',
-                            'package_value' => '₹75,000',
-                            'deal_type' => $is_studio ? 'Pre-Wedding Shoot' : 'Residential Rent',
-                            'notes' => 'Return gear to vault',
-                            'location' => 'Studio Vault'
                         )
                     );
                 }

@@ -27,37 +27,6 @@ if ( empty( $cora_review_requests ) || ! is_array( $cora_review_requests ) ) {
             'sent_at'       => '2026-07-20 14:00',
             'responded_at'  => '2026-07-20 15:30',
             'channel'       => 'WhatsApp'
-        ),
-        array(
-            'id'            => 'rev_102',
-            'client_name'   => 'Apex Realty Group',
-            'client_phone'  => '9811223344',
-            'client_email'  => 'finance@apexrealty.com',
-            'project_title' => 'Commercial Lease Representation',
-            'category'      => 'Real Estate Brokerage',
-            'status'        => 'Google 5-Star Published',
-            'rating'        => 5,
-            'review_text'   => 'Professional commercial lease handling. Smooth paperwork and quick tenant placement.',
-            'is_private'    => false,
-            'sent_at'       => '2026-07-18 11:15',
-            'responded_at'  => '2026-07-18 12:45',
-            'channel'       => 'WhatsApp'
-        ),
-        array(
-            'id'            => 'rev_103',
-            'client_name'   => 'Priya Verma',
-            'client_phone'  => '9899001122',
-            'client_email'  => 'priya.v@example.com',
-            'project_title' => 'Residential Listing Shoot',
-            'category'      => 'Real Estate Media',
-            'status'        => 'Private Shield Intercepted',
-            'rating'        => 3,
-            'review_text'   => 'Photos were great but delivery was delayed by 1 day. Want to discuss before public post.',
-            'is_private'    => true,
-            'ticket_status' => 'Resolved Internally',
-            'sent_at'       => '2026-07-15 09:30',
-            'responded_at'  => '2026-07-15 10:10',
-            'channel'       => 'SMS'
         )
     );
     update_option( 'cora_review_requests', $cora_review_requests );

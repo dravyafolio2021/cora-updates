@@ -1223,10 +1223,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         <div id="geofence-address-container" class="space-y-1.5">
             <label class="block text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Office Address</label>
             <div class="relative">
-                <input type="text" id="geofence-address-input" oninput="updateMapPreviewFromInput()" placeholder="Enter office street address, landmark, or city..." class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 pl-9 pr-3 text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors">
+                <input type="text" id="geofence-address-input" oninput="updateMapPreviewFromInput()" placeholder="Enter office street address, landmark, or city..." class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 pl-9 pr-9 text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors">
                 <div class="absolute left-3 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                 </div>
+                <button type="button" onclick="detectCurrentLocationForGeofence(event)" title="Detect current location" class="absolute right-3 top-0 bottom-0 flex items-center text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer border-none bg-transparent p-0">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line></svg>
+                </button>
             </div>
         </div>
 
@@ -1883,16 +1886,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 </aside>
 
 <script>
-    window.openGeofenceDrawer = openGeofenceDrawer;
-    window.closeGeofenceDrawer = closeGeofenceDrawer;
-    window.openCreateCustomRoleDrawer = openCreateCustomRoleDrawer;
-    window.closeCreateCustomRoleDrawer = closeCreateCustomRoleDrawer;
-    window.openAttendanceReportsDrawer = openAttendanceReportsDrawer;
-    window.closeAttendanceReportsDrawer = closeAttendanceReportsDrawer;
-    window.openInviteDrawer = openInviteDrawer;
-    window.closeInviteDrawer = closeInviteDrawer;
-    window.openEditUserDrawer = openEditUserDrawer;
-    window.closeEditUserDrawer = closeEditUserDrawer;
+
 
     // Tab switching for User Management section (synchronized across mobile/desktop menus)
     $(document).on('click', '#cora-page-team-roles .cora-sub-tabs-container .cora-sub-tab', function(e) {
@@ -2135,28 +2129,48 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         } else {
-            $('aside[id$="-drawer"]').addClass('collapsed');
+            $('aside[id$="-drawer"]').addClass('collapsed hidden');
         }
         var targetRole = role || $('#filter-role').val() || $('#filter-role-mobile').val() || '';
-        if (targetRole) {
+        if (targetRole && $('#invite-role').length) {
             $('#invite-role').val(targetRole);
-        } else {
+        } else if ($('#invite-role option:first').length) {
             $('#invite-role').val($('#invite-role option:first').val());
         }
-        $('#cora-invite-user-drawer').removeClass('collapsed hidden');
-        $('#cora-drawer-backdrop').removeClass('hidden').css({'display':'','pointer-events':''});
+        $('#cora-invite-user-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('translate-x-0').css({
+            'display': 'flex',
+            'pointer-events': 'auto',
+            'transform': 'translateX(0)',
+            'visibility': 'visible'
+        });
+        $('#cora-drawer-backdrop').removeClass('hidden').css({
+            'display': 'block',
+            'pointer-events': 'auto'
+        });
     }
+    window.openInviteDrawer = openInviteDrawer;
 
     function closeInviteDrawer() {
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         } else {
-            $('#cora-invite-user-drawer').addClass('collapsed');
+            $('#cora-invite-user-drawer').addClass('collapsed hidden translate-x-full').removeClass('translate-x-0');
         }
+        $('#cora-invite-user-drawer').removeClass('translate-x-0').addClass('translate-x-full').css({
+            'display': 'none',
+            'pointer-events': 'none',
+            'transform': 'translateX(100%)',
+            'visibility': 'hidden'
+        });
+        $('#cora-drawer-backdrop').addClass('hidden').css({
+            'display': 'none',
+            'pointer-events': 'none'
+        });
         $('#invite-first-name').val('');
         $('#invite-last-name').val('');
         $('#invite-email').val('');
     }
+    window.closeInviteDrawer = closeInviteDrawer;
 
     function handleSendInvite(e) {
         e.preventDefault();
@@ -2215,17 +2229,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         $('#' + $(this).data('drawer-tab')).removeClass('hidden');
     });
 
-    $(document).on('click', '.cora-edit-user-btn', function(e) {
-        e.preventDefault();
-        var raw = $(this).attr('data-user');
-        if (!raw) return;
-        try {
-            var user = JSON.parse(raw);
-            openEditUserDrawer(user);
-        } catch(err) {
-            console.error('Error parsing user data:', err);
-        }
-    });
+
 
     var currentEditingUser = null;
     var currentEditingStatus = 'active';
@@ -2314,19 +2318,58 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         // Reset to Tab 1
         $('.drawer-edit-tab[data-drawer-tab="tab-edit-general"]').trigger('click');
 
-        $('#cora-edit-user-drawer').removeClass('collapsed hidden');
-        $('#cora-drawer-backdrop').removeClass('hidden').css({'display':'','pointer-events':''});
+        $('#cora-edit-user-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('translate-x-0').css({
+            'display': 'flex',
+            'pointer-events': 'auto',
+            'transform': 'translateX(0)',
+            'visibility': 'visible'
+        });
+        $('#cora-drawer-backdrop').removeClass('hidden').css({
+            'display': 'block',
+            'pointer-events': 'auto'
+        });
     }
     window.openEditUserDrawer = openEditUserDrawer;
     window.coraOpenEditUserDrawer = openEditUserDrawer;
     window.closeEditUserDrawer = closeEditUserDrawer;
 
+    window.toggleUserStatusAction = function() {
+        if (!currentEditingUser || !currentEditingUser.id) return;
+        var newStatus = (currentEditingStatus === 'active') ? 'suspended' : 'active';
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_update_user_status',
+            nonce: coraREData.nonce,
+            target_user_id: currentEditingUser.id,
+            status: newStatus
+        }, function(res) {
+            if (res.success) {
+                if (window.coraShowToast) window.coraShowToast(res.data.message || 'Status updated successfully.', 'success');
+                closeEditUserDrawer();
+                setTimeout(function() { window.location.reload(); }, 800);
+            } else {
+                if (window.coraShowToast) window.coraShowToast((res.data && res.data.message) ? res.data.message : 'Failed to update status.', 'error');
+            }
+        }, 'json').fail(function() {
+            if (window.coraShowToast) window.coraShowToast('Network error updating user status.', 'error');
+        });
+    };
+
     function closeEditUserDrawer() {
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         } else {
-            $('#cora-edit-user-drawer').addClass('collapsed');
+            $('#cora-edit-user-drawer').addClass('collapsed hidden translate-x-full').removeClass('translate-x-0');
         }
+        $('#cora-edit-user-drawer').removeClass('translate-x-0').addClass('translate-x-full').css({
+            'display': 'none',
+            'pointer-events': 'none',
+            'transform': 'translateX(100%)',
+            'visibility': 'hidden'
+        });
+        $('#cora-drawer-backdrop').addClass('hidden').css({
+            'display': 'none',
+            'pointer-events': 'none'
+        });
     }
 
     // Profile Avatar & Banner Helpers
@@ -2499,6 +2542,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             }
         });
     }
+    window.triggerPasswordResetForUser = triggerPasswordResetForUser;
 
     var coraPendingCancels = {};
     function coraCancelInvitation(token, btn) {
@@ -2524,6 +2568,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             }
         });
     }
+    window.coraCancelInvitation = coraCancelInvitation;
 
     function coraResendVerification(email) {
         window.coraShowToast('Resending invitation link...');
@@ -2539,6 +2584,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             }
         });
     }
+    window.coraResendVerification = coraResendVerification;
 
     // ==========================================
     // PERMISSIONS MATRIX TOOLBAR & ACTIONS HANDLERS
@@ -2714,16 +2760,34 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             }
         }
 
-        $('#cora-create-custom-role-drawer').removeClass('collapsed');
-        $('#cora-drawer-backdrop').removeClass('hidden').css({'display':'','pointer-events':''});
+        $('#cora-create-custom-role-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('translate-x-0').css({
+            'display': 'flex',
+            'pointer-events': 'auto',
+            'transform': 'translateX(0)',
+            'visibility': 'visible'
+        });
+        $('#cora-drawer-backdrop').removeClass('hidden').css({
+            'display': 'block',
+            'pointer-events': 'auto'
+        });
     }
 
     function closeCreateCustomRoleDrawer() {
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         } else {
-            $('#cora-create-custom-role-drawer').addClass('collapsed');
+            $('#cora-create-custom-role-drawer').addClass('collapsed hidden translate-x-full').removeClass('translate-x-0');
         }
+        $('#cora-create-custom-role-drawer').removeClass('translate-x-0').addClass('translate-x-full').css({
+            'display': 'none',
+            'pointer-events': 'none',
+            'transform': 'translateX(100%)',
+            'visibility': 'hidden'
+        });
+        $('#cora-drawer-backdrop').addClass('hidden').css({
+            'display': 'none',
+            'pointer-events': 'none'
+        });
     }
 
     window.openCreateCustomRoleDrawer = openCreateCustomRoleDrawer;
@@ -2747,17 +2811,37 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             $(this).prop('checked', perms.indexOf(val) !== -1 || perms.indexOf(val.replace('_', '-')) !== -1);
         });
 
-        $('#cora-edit-custom-role-drawer').removeClass('collapsed hidden');
-        $('#cora-drawer-backdrop').removeClass('hidden').css({'display':'','pointer-events':''});
+        $('#cora-edit-custom-role-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('translate-x-0').css({
+            'display': 'flex',
+            'pointer-events': 'auto',
+            'transform': 'translateX(0)',
+            'visibility': 'visible'
+        });
+        $('#cora-drawer-backdrop').removeClass('hidden').css({
+            'display': 'block',
+            'pointer-events': 'auto'
+        });
     }
+    window.openEditCustomRoleDrawer = openEditCustomRoleDrawer;
 
     function closeEditCustomRoleDrawer() {
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         } else {
-            $('#cora-edit-custom-role-drawer').addClass('collapsed');
+            $('#cora-edit-custom-role-drawer').addClass('collapsed hidden translate-x-full').removeClass('translate-x-0');
         }
+        $('#cora-edit-custom-role-drawer').removeClass('translate-x-0').addClass('translate-x-full').css({
+            'display': 'none',
+            'pointer-events': 'none',
+            'transform': 'translateX(100%)',
+            'visibility': 'hidden'
+        });
+        $('#cora-drawer-backdrop').addClass('hidden').css({
+            'display': 'none',
+            'pointer-events': 'none'
+        });
     }
+    window.closeEditCustomRoleDrawer = closeEditCustomRoleDrawer;
 
     $(document).on('click', '.cora-edit-custom-role-btn', function(e) {
         e.preventDefault();
@@ -2827,6 +2911,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             window.coraShowToast('Network error duplicating custom role.');
         });
     }
+    window.handleDuplicateCustomRole = handleDuplicateCustomRole;
 
     var coraPendingRoleDeletes = {};
     function handleDeleteCustomRole(roleKey, btn) {
@@ -2856,6 +2941,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             window.coraShowToast('Network error deleting role.');
         });
     }
+    window.handleDeleteCustomRole = handleDeleteCustomRole;
 
     // ==========================================
     // ATTENDANCE LOGS TAB LOGIC
@@ -2867,19 +2953,39 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         } else {
-            $('aside[id$="-drawer"]').addClass('collapsed');
+            $('aside[id$="-drawer"]').addClass('collapsed hidden');
         }
-        $('#cora-attendance-reports-drawer').removeClass('collapsed');
-        $('#cora-drawer-backdrop').removeClass('hidden').css({'display':'','pointer-events':''});
+        $('#cora-attendance-reports-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('translate-x-0').css({
+            'display': 'flex',
+            'pointer-events': 'auto',
+            'transform': 'translateX(0)',
+            'visibility': 'visible'
+        });
+        $('#cora-drawer-backdrop').removeClass('hidden').css({
+            'display': 'block',
+            'pointer-events': 'auto'
+        });
     }
+    window.openAttendanceReportsDrawer = openAttendanceReportsDrawer;
 
     function closeAttendanceReportsDrawer() {
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         } else {
-            $('#cora-attendance-reports-drawer').addClass('collapsed');
+            $('#cora-attendance-reports-drawer').addClass('collapsed hidden translate-x-full').removeClass('translate-x-0');
         }
+        $('#cora-attendance-reports-drawer').removeClass('translate-x-0').addClass('translate-x-full').css({
+            'display': 'none',
+            'pointer-events': 'none',
+            'transform': 'translateX(100%)',
+            'visibility': 'hidden'
+        });
+        $('#cora-drawer-backdrop').addClass('hidden').css({
+            'display': 'none',
+            'pointer-events': 'none'
+        });
     }
+    window.closeAttendanceReportsDrawer = closeAttendanceReportsDrawer;
 
     function handlePeriodFilterChange() {
         var val = $('#attendance-filter-period').val();
@@ -3118,12 +3224,14 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         $('#geofence-map-frame').attr('src', mapUrl);
     }
 
-    function openGeofenceDrawer() {
+    window.openGeofenceDrawer = function() {
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
+        } else {
+            jQuery('aside[id$="-drawer"]').addClass('collapsed hidden').css({'display':'none'});
         }
-        $('#geofence-address-input').val(coraGeofenceMeta.address || '');
-        $('#geofence-maps-url-input').val(coraGeofenceMeta.maps_url || '');
+        jQuery('#geofence-address-input').val(coraGeofenceMeta.address || '');
+        jQuery('#geofence-maps-url-input').val(coraGeofenceMeta.maps_url || '');
 
         var initialRadius = parseInt(coraGeofenceMeta.radius, 10) || 500;
         selectGeofenceRadius(initialRadius);
@@ -3134,17 +3242,35 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             switchGeofenceMode('address');
         }
 
-        $('#cora-geofence-drawer').removeClass('collapsed');
-        $('#cora-drawer-backdrop').removeClass('hidden').css({'display':'','pointer-events':''});
-    }
+        jQuery('#cora-geofence-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('translate-x-0').css({
+            'display': 'flex',
+            'pointer-events': 'auto',
+            'transform': 'translateX(0)',
+            'visibility': 'visible'
+        });
+        jQuery('#cora-drawer-backdrop').removeClass('hidden').css({
+            'display': 'block',
+            'pointer-events': 'auto'
+        });
+     };
 
-    function closeGeofenceDrawer() {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        } else {
-            $('#cora-geofence-drawer').addClass('collapsed');
-        }
-    }
+     window.closeGeofenceDrawer = function() {
+         if (typeof window.coraCloseAllDrawers === 'function') {
+             window.coraCloseAllDrawers();
+         } else {
+             jQuery('#cora-geofence-drawer').addClass('collapsed hidden translate-x-full').removeClass('translate-x-0');
+         }
+         jQuery('#cora-geofence-drawer').removeClass('translate-x-0').addClass('translate-x-full').css({
+             'display': 'none',
+             'pointer-events': 'none',
+             'transform': 'translateX(100%)',
+             'visibility': 'hidden'
+         });
+         jQuery('#cora-drawer-backdrop').addClass('hidden').css({
+             'display': 'none',
+             'pointer-events': 'none'
+         });
+     };
 
     function handleSaveGeofence(e) {
         if (e && e.preventDefault) e.preventDefault();
@@ -3215,6 +3341,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             }
         });
     }
+    window.triggerCronAction = triggerCronAction;
 
     // Export Table Records to CSV
     function exportAttendanceCSV() {
@@ -3365,6 +3492,84 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         });
     }
     window.copyAttendanceShareLink = copyAttendanceShareLink;
+
+    function detectCurrentLocationForGeofence(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        
+        if (!navigator.geolocation) {
+            if (window.coraShowToast) {
+                window.coraShowToast('Geolocation is not supported by your browser.', 'error');
+            }
+            return;
+        }
+
+        if (window.coraShowToast) {
+            window.coraShowToast('Requesting device location coordinates...', 'info');
+        }
+
+        var options = {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        };
+
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+            var coordsStr = lat.toFixed(6) + ', ' + lng.toFixed(6);
+
+            // Populate the address input field
+            $('#geofence-address-input').val(coordsStr);
+            
+            // Force preview map to update
+            updateMapPreviewFromInput();
+
+            if (window.coraShowToast) {
+                window.coraShowToast('Location detected successfully!', 'success');
+            }
+
+            // Attempt to reverse geocode using Nominatim API (OpenStreetMap)
+            fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data && data.display_name) {
+                        // Check if user has changed the input in the meantime
+                        if ($('#geofence-address-input').val() === coordsStr) {
+                            $('#geofence-address-input').val(data.display_name);
+                        }
+                    }
+                })
+                .catch(function(err) {
+                    console.log('Reverse geocoding failed, keeping raw coordinates:', err);
+                });
+
+        }, function(error) {
+            var errMsg = 'Unable to retrieve location details.';
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    errMsg = 'Location access denied. Please enable location permissions in your browser settings.';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errMsg = 'Location information is unavailable. Please try entering address manually.';
+                    break;
+                case error.TIMEOUT:
+                    errMsg = 'Location request timed out. Please try again.';
+                    break;
+            }
+            if (window.coraShowToast) {
+                window.coraShowToast(errMsg, 'error');
+            }
+        }, options);
+    }
+    window.detectCurrentLocationForGeofence = detectCurrentLocationForGeofence;
+
+    // Bind geofencing functions to window for inline HTML triggers
+    window.selectGeofenceRadius = selectGeofenceRadius;
+    window.switchGeofenceMode = switchGeofenceMode;
+    window.updateMapPreviewFromInput = updateMapPreviewFromInput;
+    window.handleSaveGeofence = handleSaveGeofence;
+    window.toggleMobileFilters = toggleMobileFilters;
+    window.clearFilters = clearFilters;
 
     $('#cora-user-punch-in-btn').on('click', function() { logUserPunch('in'); });
     $('#cora-user-punch-out-btn').on('click', function() { logUserPunch('out'); });

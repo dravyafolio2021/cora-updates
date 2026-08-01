@@ -223,7 +223,7 @@
             <p>We are currently updating files or performing routine database syncs. Access will restore automatically in a few seconds.</p>
             
             <div class="btn-group">
-                <button type="button" class="btn btn-primary" onclick="window.location.reload()">
+                <button type="button" class="btn btn-primary" onclick="forceRetryConnection()">
                     Retry Connection
                 </button>
                 <a href="/workspace" class="btn btn-secondary">
@@ -236,5 +236,27 @@
             </a>
         </div>
     </div>
+    <script>
+    function forceRetryConnection() {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for (let r of registrations) { r.unregister(); }
+                if ('caches' in window) {
+                    caches.keys().then(function(names) {
+                        return Promise.all(names.map(name => caches.delete(name)));
+                    }).then(function() {
+                        window.location.reload(true);
+                    });
+                } else {
+                    window.location.reload(true);
+                }
+            }).catch(function() {
+                window.location.reload(true);
+            });
+        } else {
+            window.location.reload(true);
+        }
+    }
+    </script>
 </body>
 </html>

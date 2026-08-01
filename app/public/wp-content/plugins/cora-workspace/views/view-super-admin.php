@@ -38,6 +38,9 @@ $roles_list = cora_get_all_roles();
         <button class="cora-sub-tab pb-2 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-zinc-200 text-zinc-500 cursor-pointer focus:outline-none" data-target="tab-super-users">
             Users
         </button>
+        <button class="cora-sub-tab pb-2 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-zinc-200 text-zinc-500 cursor-pointer focus:outline-none" data-target="tab-super-governance">
+            Attendance & Governance
+        </button>
     </div>
 
     <!-- TAB 1: WORKSPACES -->
@@ -150,6 +153,42 @@ $roles_list = cora_get_all_roles();
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 3: ATTENDANCE & GOVERNANCE -->
+    <div id="tab-super-governance" class="cora-tab-content hidden space-y-6">
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Cross-Tenant Daily Reports & Automation Controls</h2>
+                    <p class="text-xs text-zinc-500 mt-0.5">Manually trigger automated end-of-day attendance reports to Workspace Owners or manage global automation triggers.</p>
+                </div>
+                <button onclick="dispatchSuperDailyReports()" class="px-4 py-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 rounded-lg text-xs font-bold hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-xs cursor-pointer flex items-center gap-2">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 2L11 13"></path><path d="M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
+                    Dispatch Daily Reports Now
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-lg space-y-1">
+                    <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Scheduled Dispatch</div>
+                    <div class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Every Day at 8:00 PM</div>
+                    <div class="text-xs text-zinc-500">Automated WP Cron active</div>
+                </div>
+                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-lg space-y-1">
+                    <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">SMTP Relay Status</div>
+                    <div class="text-sm font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> Hostinger Business SMTP Active
+                    </div>
+                    <div class="text-xs text-zinc-500">heycora@claraverse.in (Port 465 SSL)</div>
+                </div>
+                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-lg space-y-1">
+                    <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Geofence Distance Enforcement</div>
+                    <div class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Strict Haversine Verified</div>
+                    <div class="text-xs text-zinc-500">Real-time GPS coordinate validation</div>
+                </div>
             </div>
         </div>
     </div>
@@ -622,6 +661,21 @@ window.submitNewWorkspace = function() {
         }
     }).fail(function() {
         if (window.coraShowToast) window.coraShowToast('Network error while creating workspace.', 'error');
+    });
+};
+
+window.dispatchSuperDailyReports = function() {
+    $.post(coraREData.ajaxUrl, {
+        action: 'cora_super_dispatch_daily_report',
+        nonce: coraREData.nonce
+    }, function(res) {
+        if (res.success) {
+            if (window.coraShowToast) window.coraShowToast(res.data.message || 'Daily reports dispatched to all workspace owners!', 'success');
+        } else {
+            if (window.coraShowToast) window.coraShowToast(res.data.message || 'Failed to dispatch reports.', 'error');
+        }
+    }).fail(function() {
+        if (window.coraShowToast) window.coraShowToast('Network error while dispatching reports.', 'error');
     });
 };
 </script>
