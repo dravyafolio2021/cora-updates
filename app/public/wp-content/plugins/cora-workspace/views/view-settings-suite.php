@@ -2406,12 +2406,87 @@ $cora_settings_tabs = array(
         </div>
 
         <!-- TAB: UPDATES & PLATFORM -->
+        <!-- TAB: UPDATES & PLATFORM -->
+        <style>
+        .cora-update-timeline {
+            position: relative;
+            padding-left: 32px;
+        }
+        .cora-update-timeline::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            bottom: 8px;
+            left: 7px;
+            width: 1px;
+            background-color: #e4e4e7;
+        }
+        .dark .cora-update-timeline::before {
+            background-color: #27272a;
+        }
+        .cora-update-timeline-item {
+            position: relative;
+            margin-bottom: 32px;
+        }
+        .cora-update-timeline-item:last-child {
+            margin-bottom: 0;
+        }
+        .cora-update-timeline-dot {
+            position: absolute;
+            left: -32px;
+            top: 6px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            border: 2px solid #e4e4e7;
+            z-index: 2;
+            transition: all 0.2s ease;
+        }
+        .dark .cora-update-timeline-dot {
+            background-color: #09090b;
+            border-color: #27272a;
+        }
+        .cora-update-timeline-item.active .cora-update-timeline-dot {
+            border-color: #18181b;
+            background-color: #18181b;
+        }
+        .dark .cora-update-timeline-item.active .cora-update-timeline-dot {
+            border-color: #f4f4f5;
+            background-color: #f4f4f5;
+        }
+        .cora-update-accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+            opacity: 0;
+        }
+        .cora-update-accordion-content.open {
+            max-height: 1000px;
+            opacity: 1;
+        }
+        .cora-update-row-hover:hover {
+            border-color: #d4d4d8;
+            background-color: #fafafa;
+        }
+        .dark .cora-update-row-hover:hover {
+            border-color: #3f3f46;
+            background-color: rgba(39, 39, 42, 0.3);
+        }
+        </style>
+
         <div id="cora-settings-panel-updates" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'updates' ? '' : 'hidden'; ?>">
             <div class="cora-shopify-card">
                 <div class="cora-shopify-card-header border-b border-zinc-150 dark:border-zinc-800/40 pb-3 flex items-center justify-between">
                     <div>
                         <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 m-0">Software Updates</h3>
                         <p class="text-xs text-zinc-500 m-0">Manage system versions, release channels, and automated feature shipments.</p>
+                    </div>
+                    <div class="relative hidden sm:block">
+                        <span class="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-950 text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            Production Stable
+                        </span>
                     </div>
                 </div>
                 <div class="cora-shopify-card-body pt-6">
@@ -2421,7 +2496,7 @@ $cora_settings_tabs = array(
                     $info = $updater->fetch_remote_update_info(); // Fetches from transient/cache
                     $update_available = ( $info && version_compare( CORA_WORKSPACE_VERSION, $info['version'], '<' ) );
                     ?>
-                    <div id="cora-updates-status-container" class="flex flex-col items-center justify-center text-center py-4 space-y-3 select-none">
+                    <div id="cora-updates-status-container" class="flex flex-col items-center justify-center text-center py-2 space-y-4 select-none">
                         
                         <!-- Default: Up-to-Date State -->
                         <div id="cora-updates-state-uptodate" class="space-y-3 <?php echo $update_available ? 'hidden' : ''; ?>">
@@ -2454,26 +2529,24 @@ $cora_settings_tabs = array(
                             </div>
                         </div>
 
-                        <!-- State: Update Available -->
-                        <div id="cora-updates-state-available" class="<?php echo $update_available ? '' : 'hidden'; ?> w-full text-left space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
-                            <div class="flex items-start gap-4 p-4 bg-zinc-50 dark:bg-zinc-900/60 rounded-xl border border-zinc-150 dark:border-zinc-800/60">
-                                <div class="p-2 bg-blue-500/10 text-blue-650 dark:text-blue-400 rounded-lg shrink-0">
-                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                        <!-- State: Update Available Card -->
+                        <div id="cora-updates-state-available" class="<?php echo $update_available ? '' : 'hidden'; ?> w-full text-left animate-in fade-in duration-200">
+                            <div class="border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 bg-white dark:bg-zinc-950 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 shadow-3xs select-none">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-xl bg-zinc-950 dark:bg-zinc-100 flex items-center justify-center text-white dark:text-zinc-950 shrink-0 shadow-sm">
+                                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.2" fill="none" class="animate-pulse"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                                    </div>
+                                    <div>
+                                        <span class="inline-block text-[9px] font-extrabold bg-zinc-950 text-white dark:bg-zinc-100 dark:text-zinc-950 px-2 py-0.5 rounded tracking-wide uppercase leading-none mb-1.5">UPDATE AVAILABLE</span>
+                                        <h3 class="text-sm font-bold text-zinc-900 dark:text-white leading-tight">Cora Workspace Platform <span id="cora-available-version-text">v<?php echo esc_html( $info['version'] ?? CORA_WORKSPACE_VERSION ); ?></span></h3>
+                                        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Your current installed version is v<?php echo esc_html( CORA_WORKSPACE_VERSION ); ?>.</p>
+                                    </div>
                                 </div>
-                                <div class="space-y-1">
-                                    <h4 class="text-xs font-bold text-blue-650 dark:text-blue-400 uppercase tracking-wider m-0">Update Available</h4>
-                                    <p class="text-xs font-semibold text-zinc-850 dark:text-zinc-200 m-0">
-                                        Cora Workspace Platform <span class="font-bold text-zinc-950 dark:text-white" id="cora-available-version-text">v<?php echo esc_html( $info['version'] ?? '2.3.6' ); ?></span>
-                                    </p>
-                                    <p class="text-[10px] text-zinc-500 leading-normal">Your current installed version is v<?php echo esc_html( CORA_WORKSPACE_VERSION ); ?>.</p>
-                                </div>
-                            </div>
-                            
-                            <div class="space-y-2">
-                                <div class="text-xs font-bold text-zinc-700 dark:text-zinc-300 font-semibold mb-1">Changelog & Features:</div>
-                                <div id="cora-update-changelog-box" class="bg-zinc-50 dark:bg-zinc-900/60 p-4 rounded-xl border border-zinc-150 dark:border-zinc-800/60 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal prose prose-sm dark:prose-invert max-w-none">
-                                    <?php echo $info['sections']['changelog'] ?? ''; ?>
-                                </div>
+                                
+                                <button type="button" onclick="coraTriggerInAppUpgradeManual();" class="w-full sm:w-auto h-10 px-5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.98]">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="rotate-180"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"/></svg>
+                                    Upgrade Workspace Now
+                                </button>
                             </div>
                         </div>
 
@@ -2514,6 +2587,25 @@ $cora_settings_tabs = array(
 
                     </div>
 
+                    <!-- Changelog Timeline Accordion Section -->
+                    <div class="space-y-4 pt-4 border-t border-zinc-100 dark:border-zinc-850">
+                        <div class="flex items-center justify-between border-b border-zinc-150 dark:border-zinc-800/80 pb-3">
+                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider m-0">Changelog & Features</h4>
+                            <button type="button" id="cora-settings-expand-btn" onclick="coraToggleSettingsExpandAll(this);" class="h-8 px-3 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-850 text-zinc-750 dark:text-zinc-300 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-3xs">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                                <span>Expand All</span>
+                            </button>
+                        </div>
+
+                        <!-- Dynamic Accordion Timeline -->
+                        <div id="cora-settings-changelog-timeline" class="py-2 space-y-3"></div>
+
+                        <!-- Hidden Raw Box Fallback for JS Parser -->
+                        <div id="cora-update-changelog-box" class="hidden">
+                            <?php echo $info['sections']['changelog'] ?? ''; ?>
+                        </div>
+                    </div>
+
                     <!-- Footer Action Row -->
                     <div class="border-t border-zinc-100 dark:border-zinc-850 pt-4 flex items-center justify-between flex-wrap gap-4 mt-6">
                         <div class="text-[10px] text-zinc-400 select-none font-medium">
@@ -2536,6 +2628,161 @@ $cora_settings_tabs = array(
                     </div>
                 </div>
             </div>
+
+            <script>
+            function parseChangelogHTML(htmlString) {
+                if (!htmlString) return [];
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlString, 'text/html');
+                const h4s = doc.querySelectorAll('h4');
+                const versions = [];
+                h4s.forEach(h4 => {
+                    const version = h4.textContent.trim().replace(/^v/, '');
+                    const ul = h4.nextElementSibling;
+                    const items = [];
+                    if (ul && ul.tagName === 'UL') {
+                        const lis = ul.querySelectorAll('li');
+                        lis.forEach(li => {
+                            const strong = li.querySelector('strong');
+                            let title = '';
+                            let description = li.textContent.trim();
+                            if (strong) {
+                                title = strong.textContent.replace(/:$/, '').trim();
+                                description = description.replace(strong.textContent, '').replace(/^:\s*/, '').trim();
+                            } else {
+                                const parts = description.split(':');
+                                if (parts.length > 1) {
+                                    title = parts[0].trim();
+                                    description = parts.slice(1).join(':').trim();
+                                } else {
+                                    title = 'Platform Update';
+                                }
+                            }
+                            items.push({ title: title, desc: description });
+                        });
+                    }
+                    versions.push({ version: version, items: items });
+                });
+                return versions;
+            }
+
+            function coraToggleSettingsAccordion(itemId) {
+                const content = document.getElementById(`content-${itemId}`);
+                const chevron = document.getElementById(`chevron-${itemId}`);
+                if (content && chevron) {
+                    const svg = chevron.querySelector('svg');
+                    if (content.classList.contains('open')) {
+                        content.classList.remove('open');
+                        if (svg) svg.style.transform = 'rotate(0deg)';
+                    } else {
+                        content.classList.add('open');
+                        if (svg) svg.style.transform = 'rotate(180deg)';
+                    }
+                }
+            }
+
+            function coraToggleSettingsExpandAll(btn) {
+                const span = btn.querySelector('span');
+                const isExpand = span.innerText === 'Expand All';
+                const contents = document.querySelectorAll('#cora-settings-changelog-timeline .cora-update-accordion-content');
+                contents.forEach(content => {
+                    const itemId = content.id.replace('content-', '');
+                    const chevron = document.getElementById(`chevron-${itemId}`);
+                    const svg = chevron ? chevron.querySelector('svg') : null;
+                    if (isExpand) {
+                        content.classList.add('open');
+                        if (svg) svg.style.transform = 'rotate(180deg)';
+                    } else {
+                        content.classList.remove('open');
+                        if (svg) svg.style.transform = 'rotate(0deg)';
+                    }
+                });
+                if (isExpand) {
+                    span.innerText = 'Collapse All';
+                    btn.querySelector('svg').innerHTML = '<path d="M4 14h6v6M20 10h-6V4M14 10l7-7M10 14l-7 7"/>';
+                } else {
+                    span.innerText = 'Expand All';
+                    btn.querySelector('svg').innerHTML = '<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>';
+                }
+            }
+
+            function coraRenderSettingsUpdateTimeline() {
+                const container = document.getElementById('cora-settings-changelog-timeline');
+                if (!container) return;
+
+                let releases = window.coraReleasesData;
+                if (!releases || !releases.length) {
+                    const rawBox = document.getElementById('cora-update-changelog-box');
+                    if (rawBox && rawBox.innerHTML && typeof parseChangelogHTML === 'function') {
+                        releases = parseChangelogHTML(rawBox.innerHTML);
+                    }
+                }
+
+                if (!releases || !releases.length) return;
+
+                let html = '<div class="cora-update-timeline">';
+                releases.forEach((rel, rIdx) => {
+                    const isLatest = rIdx === 0;
+                    html += `
+                        <div class="cora-update-timeline-item ${isLatest ? 'active' : ''}">
+                            <div class="cora-update-timeline-dot"></div>
+                            <div class="flex flex-col md:flex-row gap-4 md:gap-6">
+                                <div class="w-24 shrink-0 pt-1 select-none">
+                                    <span class="text-sm font-extrabold text-zinc-900 dark:text-zinc-50">v${rel.version}</span>
+                                    ${isLatest ? '<span class="block mt-1 text-[9px] font-bold text-zinc-550 border border-zinc-200 dark:border-zinc-800 rounded px-1.5 py-0.5 w-max bg-zinc-50 dark:bg-zinc-950 uppercase tracking-wide">Latest</span>' : ''}
+                                </div>
+                                <div class="flex-1 space-y-3">
+                    `;
+
+                    rel.items.forEach((item, iIdx) => {
+                        let svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 dark:text-zinc-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
+                        
+                        const tLower = item.title.toLowerCase();
+                        if (tLower.includes('lock') || tLower.includes('security') || tLower.includes('privilege') || tLower.includes('scoping')) {
+                            svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-amber-500"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+                        } else if (tLower.includes('ui') || tLower.includes('redesign') || tLower.includes('onboarding') || tLower.includes('screen')) {
+                            svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-blue-500"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+                        } else if (tLower.includes('fix') || tLower.includes('bug') || tLower.includes('hotfix')) {
+                            svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-emerald-500"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`;
+                        } else if (tLower.includes('optimization') || tLower.includes('speed') || tLower.includes('performance')) {
+                            svgIcon = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-purple-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`;
+                        }
+
+                        const itemId = `settings-acc-${rIdx}-${iIdx}`;
+                        html += `
+                            <div class="cora-update-row-hover bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-xl p-4 cursor-pointer transition-all duration-200" onclick="coraToggleSettingsAccordion('${itemId}')">
+                                <div class="flex items-center justify-between gap-3 select-none">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center shrink-0 border border-zinc-100 dark:border-zinc-700/50">
+                                            ${svgIcon}
+                                        </div>
+                                        <span class="text-xs font-bold text-zinc-900 dark:text-white">${item.title}</span>
+                                    </div>
+                                    <span class="text-zinc-400 dark:text-zinc-500 shrink-0" id="chevron-${itemId}">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="transition-transform duration-300 transform" style="transform: rotate(180deg);"><polyline points="6 9 12 15 18 9"/></svg>
+                                    </span>
+                                </div>
+                                <div class="cora-update-accordion-content open mt-3 pl-11 text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed" id="content-${itemId}">
+                                    ${item.desc}
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                container.innerHTML = html;
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(coraRenderSettingsUpdateTimeline, 50);
+            });
+            </script>
             
             <!-- CUSTOM CONFIRMATION DIALOGUE OVERLAY -->
             <div id="cora-update-confirm-modal" class="fixed inset-0 bg-zinc-950/40 dark:bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200 select-none">
