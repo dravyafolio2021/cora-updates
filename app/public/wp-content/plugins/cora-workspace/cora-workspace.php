@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.9.9
+ * Version: 2.9.10
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.9.9' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.10' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -21878,10 +21878,18 @@ new Cora_Workspace_Plugin_Updater( __FILE__, $cora_workspace_updates_url );
  * Check if a workspace update is available via the custom updates server
  */
 function cora_check_workspace_update_available( $force = false ) {
+    static $static_cache = null;
     $cache_key = 'cora_workspace_update_check';
+    
     if ( $force || isset( $_GET['force_update_check'] ) || isset( $_GET['check_update'] ) ) {
         delete_transient( $cache_key );
+        $static_cache = null;
     }
+
+    if ( ! $force && null !== $static_cache && ! isset( $_GET['force_update_check'] ) && ! isset( $_GET['check_update'] ) ) {
+        return $static_cache !== 'none' ? $static_cache : false;
+    }
+
     $update_info = get_transient( $cache_key );
     if ( false === $update_info ) {
         $update_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-workspace.json' );
@@ -21904,8 +21912,11 @@ function cora_check_workspace_update_available( $force = false ) {
         if ( ! $update_info ) {
             $update_info = 'none';
         }
-        set_transient( $cache_key, $update_info, 300 );
+        // Cache result for 12 hours instead of 5 minutes to prevent blocking queries
+        set_transient( $cache_key, $update_info, 12 * HOUR_IN_SECONDS );
     }
+    
+    $static_cache = $update_info;
     return $update_info !== 'none' ? $update_info : false;
 }
 

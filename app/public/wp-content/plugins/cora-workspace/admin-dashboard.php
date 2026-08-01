@@ -65,16 +65,16 @@ if ( is_array( $cora_permissions ) ) {
         }
     }
 }
-$cora_showing_assignments = get_option( 'cora_workspace_showing_assignments', array() );
-$cora_documents = get_option( 'cora_workspace_vault_docs', array() );
-$cora_portfolios = get_option( 'cora_workspace_portfolios', array() );
-$cora_workspace_leads = cora_db_get_leads();
-$cora_workspace_clients = cora_db_get_clients();
-$cora_workspace_attendance_logs = get_option( 'cora_workspace_attendance_logs', array() );
-$cora_workspace_client_tasks = get_option( 'cora_workspace_client_tasks', array() );
+$cora_showing_assignments = ( in_array( $sub_page, array( 'equipment', 'bookings', 'shifts', 'crew-scheduler', 'event-timeline' ) ) ) ? get_option( 'cora_workspace_showing_assignments', array() ) : array();
+$cora_documents = ( $sub_page === 'vault' ) ? get_option( 'cora_workspace_vault_docs', array() ) : array();
+$cora_portfolios = ( in_array( $sub_page, array( 'portfolio', 'dashboard' ) ) ) ? get_option( 'cora_workspace_portfolios', array() ) : array();
+$cora_workspace_leads = ( in_array( $sub_page, array( 'leads', 'dashboard', 'team-roles', 'feature-hub', 'equipment', 'bookings' ) ) ) ? cora_db_get_leads() : array();
+$cora_workspace_clients = ( in_array( $sub_page, array( 'bookings', 'dashboard', 'leads', 'equipment', 'financials', 'shifts', 'crew-scheduler' ) ) ) ? cora_db_get_clients() : array();
+$cora_workspace_attendance_logs = ( $sub_page === 'attendance' ) ? get_option( 'cora_workspace_attendance_logs', array() ) : array();
+$cora_workspace_client_tasks = ( in_array( $sub_page, array( 'client-task-manager', 'bookings', 'dashboard' ) ) ) ? get_option( 'cora_workspace_client_tasks', array() ) : array();
 
 // Pre-process equipment assignments dynamically from Leads and Clients databases
-if ( is_array( $cora_workspace_listings ) ) {
+if ( in_array( $sub_page, array( 'equipment', 'bookings' ) ) && is_array( $cora_workspace_listings ) ) {
     foreach ( $cora_workspace_listings as $key => $item ) {
         $assigned_showing_name = '';
         $assigned_crew_name = '';
@@ -132,37 +132,41 @@ if ( ! function_exists( 'cora_format_rupees' ) ) {
 }
 
 // Calculate dynamic metrics
-$dynamic_bookings_count = count( $cora_workspace_clients );
+$dynamic_bookings_count = 0;
 $dynamic_pending_count = 0;
 $dynamic_revenue_total = 0;
-foreach ( $cora_workspace_clients as $client ) {
-    if ( isset( $client['status'] ) && $client['status'] === 'editing' ) {
-        $dynamic_pending_count++;
-    }
-    $price_str = isset( $client['price'] ) ? $client['price'] : '';
-    $clean_price = preg_replace( '/[^\d]/', '', $price_str );
-    $dynamic_revenue_total += intval( $clean_price );
-}
-
 $dynamic_active_bookings_count = 0;
-foreach ( $cora_workspace_clients as $client ) {
-    if ( isset( $client['status'] ) && $client['status'] !== 'completed' ) {
-        $dynamic_active_bookings_count++;
+
+if ( in_array( $sub_page, array( 'dashboard', 'financials', 'bookings' ) ) ) {
+    $dynamic_bookings_count = count( $cora_workspace_clients );
+    foreach ( $cora_workspace_clients as $client ) {
+        if ( isset( $client['status'] ) && $client['status'] === 'editing' ) {
+            $dynamic_pending_count++;
+        }
+        $price_str = isset( $client['price'] ) ? $client['price'] : '';
+        $clean_price = preg_replace( '/[^\d]/', '', $price_str );
+        $dynamic_revenue_total += intval( $clean_price );
+    }
+
+    foreach ( $cora_workspace_clients as $client ) {
+        if ( isset( $client['status'] ) && $client['status'] !== 'completed' ) {
+            $dynamic_active_bookings_count++;
+        }
     }
 }
 
-$cora_financials = cora_db_get_ledger();
-$cora_gbp_profile       = get_option( 'cora_gbp_profile', array() );
+$cora_financials = ( in_array( $sub_page, array( 'dashboard', 'financials' ) ) ) ? cora_db_get_ledger() : array();
+$cora_gbp_profile       = ( in_array( $sub_page, array( 'gbp', 'dashboard' ) ) ) ? get_option( 'cora_gbp_profile', array() ) : array();
 $cora_gbp_is_connected  = ! empty( $cora_gbp_profile['connected'] ) &&
     ( ! empty( $cora_gbp_profile['location_name'] ) || ! empty( $cora_gbp_profile['place_id'] ) );
-$cora_gbp_review_replies = get_option( 'cora_gbp_review_replies', array() );
-$cora_gbp_posts         = get_option( 'cora_gbp_posts', array() );
-$cora_gbp_client_id     = get_option( 'cora_gbp_client_id', '' );
-$cora_gbp_client_secret = get_option( 'cora_gbp_client_secret', '' );
+$cora_gbp_review_replies = ( $sub_page === 'gbp' ) ? get_option( 'cora_gbp_review_replies', array() ) : array();
+$cora_gbp_posts         = ( $sub_page === 'gbp' ) ? get_option( 'cora_gbp_posts', array() ) : array();
+$cora_gbp_client_id     = ( $sub_page === 'gbp' ) ? get_option( 'cora_gbp_client_id', '' ) : '';
+$cora_gbp_client_secret = ( $sub_page === 'gbp' ) ? get_option( 'cora_gbp_client_secret', '' ) : '';
 $cora_gbp_has_credentials = ! empty( $cora_gbp_client_id ) && ! empty( $cora_gbp_client_secret );
-$cora_gbp_maps_api_key  = get_option( 'cora_gbp_maps_api_key', '' );
+$cora_gbp_maps_api_key  = ( in_array( $sub_page, array( 'gbp', 'dashboard' ) ) ) ? get_option( 'cora_gbp_maps_api_key', '' ) : '';
 $cora_gbp_has_maps_key  = ! empty( $cora_gbp_maps_api_key );
-$cora_gbp_tokens        = get_option( 'cora_gbp_tokens', array() );
+$cora_gbp_tokens        = ( $sub_page === 'gbp' ) ? get_option( 'cora_gbp_tokens', array() ) : array();
 $cora_gbp_is_authenticated = ! empty( $cora_gbp_tokens['access_token'] );
 $cora_gbp_connected_via = $cora_gbp_profile['connected_via'] ?? '';
 
