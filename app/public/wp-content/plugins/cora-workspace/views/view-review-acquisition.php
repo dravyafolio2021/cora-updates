@@ -496,32 +496,21 @@ $negative_pct = $total_requests > 0 ? round( ( $negative_count / $total_requests
             </div>
         </div>
 
-        <!-- Custom AI Generator Box (LOCKED FEATURE IN v2.4 WITH SLEEK BADGE) -->
+        <!-- Custom AI Generator Box -->
         <div class="relative border border-zinc-200/80 dark:border-zinc-800 rounded-2xl overflow-hidden bg-zinc-50/70 dark:bg-zinc-900/40 p-4 sm:p-5 space-y-3">
-            <!-- Lock Overlay Banner -->
-            <div class="flex items-center justify-between p-3 bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 rounded-xl shadow-xs mb-1">
-                <div class="flex items-center gap-2">
-                    <div class="w-6 h-6 rounded-full bg-amber-400 text-zinc-950 flex items-center justify-center font-bold text-xs shrink-0">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                    </div>
-                    <div>
-                        <div class="font-bold text-xs leading-tight">Pro Tier Custom AI Generator</div>
-                        <div class="text-[10px] text-zinc-400 dark:text-zinc-600">Locked in Standard Workspace tier — Upgrade to Cora AI Pro to unlock real-time prompt generation.</div>
-                    </div>
+            <!-- Custom AI Generator Form Elements -->
+            <div class="space-y-2.5">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 m-0">Generate Custom AI Snippet</h4>
+                    <span class="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60 text-[10px] font-bold">Coming Soon</span>
                 </div>
-                <span class="px-2.5 py-1 rounded-md bg-amber-400 text-zinc-950 text-[10px] font-extrabold uppercase tracking-wider shrink-0 cursor-pointer hover:bg-amber-300 transition-all" onclick="if(window.coraShowToast) window.coraShowToast('Cora AI Pro Tier required to unlock custom snippet generation.', 'info');">LOCKED</span>
-            </div>
-
-            <!-- Disabled Form Elements -->
-            <div class="opacity-50 pointer-events-none space-y-2.5">
-                <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 m-0">Generate Custom AI Snippet</h4>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    <input type="text" id="custom-ai-client-name" disabled placeholder="Client Name (e.g. Rahul Kapoor)" class="w-full px-3 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-sans text-zinc-900 dark:text-zinc-100">
-                    <input type="text" id="custom-ai-service" disabled placeholder="Key Highlight (e.g. Fast turnaround, great lighting)" class="w-full px-3 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-sans text-zinc-900 dark:text-zinc-100">
+                    <input type="text" id="custom-ai-client-name" placeholder="Client Name (e.g. Rahul Kapoor)" class="w-full px-3 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-sans text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-white">
+                    <input type="text" id="custom-ai-service" placeholder="Key Highlight (e.g. Fast turnaround, great lighting)" class="w-full px-3 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-sans text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-white">
                 </div>
-                <button type="button" disabled class="h-9 px-4 bg-zinc-400 dark:bg-zinc-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 cursor-not-allowed">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                    <span>Custom Generation Locked in Pro</span>
+                <button type="button" onclick="coraGenerateCustomAISnippet()" class="h-9 px-4 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-97">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    <span>Generate AI Review Snippet</span>
                 </button>
             </div>
             <div id="custom-ai-snippet-output" class="hidden p-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-mono text-zinc-800 dark:text-zinc-200"></div>
@@ -640,31 +629,16 @@ $negative_pct = $total_requests > 0 ? round( ( $negative_count / $total_requests
             </div>
         </div>
 
-        <!-- Custom Report Generator Box (LOCKED FEATURE IN v2.4 WITH SLEEK BADGE) -->
-        <div class="relative border border-zinc-200/80 dark:border-zinc-800 rounded-2xl overflow-hidden bg-zinc-50/70 dark:bg-zinc-900/40 p-4 sm:p-5 space-y-3">
-            <!-- Lock Overlay Banner -->
-            <div class="flex items-center justify-between p-3 bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 rounded-xl shadow-xs mb-1">
-                <div class="flex items-center gap-2">
-                    <div class="w-6 h-6 rounded-full bg-amber-400 text-zinc-950 flex items-center justify-center font-bold text-xs shrink-0">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                    </div>
-                    <div>
-                        <div class="font-bold text-xs leading-tight">Pro Tier Instant PDF Digest Engine</div>
-                        <div class="text-[10px] text-zinc-400 dark:text-zinc-600">Locked in Standard Workspace tier — Upgrade to Cora AI Pro to generate & download instant 30-day PDF digests.</div>
-                    </div>
-                </div>
-                <span class="px-2.5 py-1 rounded-md bg-amber-400 text-zinc-950 text-[10px] font-extrabold uppercase tracking-wider shrink-0 cursor-pointer hover:bg-amber-300 transition-all" onclick="if(window.coraShowToast) window.coraShowToast('Cora AI Pro Tier required to export instant 30-day reports.', 'info');">LOCKED</span>
-            </div>
-
-            <!-- Disabled Form Elements -->
-            <div class="opacity-50 pointer-events-none flex items-center justify-between flex-wrap gap-3 pt-1">
+        <!-- Custom Report Generator Box -->
+        <div class="relative border border-zinc-200/80 dark:border-zinc-800 rounded-2xl overflow-hidden bg-zinc-50/70 dark:bg-zinc-900/40 p-4 sm:p-5">
+            <div class="flex items-center justify-between flex-wrap gap-3">
                 <div>
                     <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 m-0">Generate Instant Performance Report</h4>
                     <p class="text-[11px] text-zinc-500 dark:text-zinc-400 m-0">Compile full review audit log into a clean report summary.</p>
                 </div>
-                <button type="button" disabled class="h-9 px-4 bg-zinc-400 dark:bg-zinc-700 text-white text-xs font-bold rounded-xl cursor-not-allowed flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                    <span>Report Generation Locked in Pro</span>
+                <button type="button" onclick="coraGenerateReviewReportAJAX('30days')" class="h-9 px-4 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-97">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    <span>Generate PDF Audit Report</span>
                 </button>
             </div>
         </div>

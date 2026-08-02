@@ -138,9 +138,9 @@ test.describe('Reviews & Feedback Module E2E Tests', () => {
     await page.locator('#cora-rev-panel-snippets button:has-text("Copy")').first().click();
     await page.waitForTimeout(300);
 
-    // Verify Pro Tier locked banner is displayed for custom generator
-    await expect(page.getByText('Pro Tier Custom AI Generator')).toBeVisible();
-    await expect(page.locator('#cora-rev-panel-snippets span:has-text("LOCKED")').first()).toBeVisible();
+    // Verify Custom AI Generator section is displayed
+    await expect(page.getByText('Generate Custom AI Snippet')).toBeVisible();
+    await expect(page.locator('#cora-rev-panel-snippets span:has-text("Coming Soon")').first()).toBeVisible();
   });
 
   test('7. Multi-Channel Triggers form and Hinglish preset', async ({ page }) => {
@@ -194,9 +194,9 @@ test.describe('Reviews & Feedback Module E2E Tests', () => {
     await expect(page.locator('#cora-rev-panel-reports span:text-is("Sentiment Index")')).toBeVisible();
     await expect(page.locator('#cora-rev-panel-reports span:text-is("Email Digest")')).toBeVisible();
 
-    // Verify Pro Tier locked banner is displayed for report export
-    await expect(page.getByText('Pro Tier Instant PDF Digest Engine')).toBeVisible();
-    await expect(page.locator('#cora-rev-panel-reports span:has-text("LOCKED")').first()).toBeVisible();
+    // Verify Generate PDF Report action card is visible
+    await expect(page.getByText('Generate Instant Performance Report')).toBeVisible();
+    await expect(page.locator('#cora-rev-panel-reports button:has-text("Generate PDF Audit Report")')).toBeVisible();
   });
 
 });

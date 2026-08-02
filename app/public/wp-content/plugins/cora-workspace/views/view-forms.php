@@ -3170,7 +3170,8 @@ function renderFormsList() {
                 if (typeof res === 'string') {
                     try { res = JSON.parse(res); } catch(e) {}
                 }
-                if (res && res.id) {
+                const isValidSave = res && res.id && !res.code;
+                if (isValidSave) {
                     currentEditingForm.id = res.id;
                     if (res.form_key) currentEditingForm.form_key = res.form_key;
                     if (!formsData) formsData = [];
@@ -3185,16 +3186,22 @@ function renderFormsList() {
                     if (typeof window.coraAutoSave !== 'undefined') {
                         window.coraAutoSave.clearLocalDraft('form_builder_draft');
                     }
-                }
-                setAutoSaveStatus('saved');
-                if (publish) {
-                    window._formIsDirty = false;
-                    updatePublishButtonState(false);
-                    window.coraShowToast && window.coraShowToast("Form published successfully!", "success");
-                    fetchForms();
+                    setAutoSaveStatus('saved');
+                    if (publish) {
+                        window._formIsDirty = false;
+                        updatePublishButtonState(false);
+                        window.coraShowToast && window.coraShowToast("Form published successfully!", "success");
+                        fetchForms();
+                    }
+                } else {
+                    setAutoSaveStatus('error');
+                    if (publish) {
+                        const errMsg = res && res.message ? res.message : "Failed to save form.";
+                        window.coraShowToast && window.coraShowToast(errMsg, "error");
+                    }
                 }
                 if (typeof callback === 'function') {
-                    callback(res);
+                    callback(isValidSave ? res : null);
                 }
             },
             error: function(err) {

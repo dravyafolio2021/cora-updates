@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.9.90
+ * Version: 2.9.92
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.9.90' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.92' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -22337,6 +22337,15 @@ function cora_rest_save_form( $request ) {
     global $wpdb;
     $params = $request->get_json_params();
     if ( empty( $params ) ) {
+        $params = $request->get_params();
+    }
+    if ( empty( $params ) ) {
+        $body = $request->get_body();
+        if ( ! empty( $body ) ) {
+            $params = json_decode( $body, true );
+        }
+    }
+    if ( empty( $params ) ) {
         return new WP_Error( 'bad_request', 'Missing form body', array( 'status' => 400 ) );
     }
 
@@ -22347,8 +22356,8 @@ function cora_rest_save_form( $request ) {
     if ( empty( $form_key ) ) {
         $form_key = 'frm_' . substr( md5( uniqid( $title . time(), true ) ), 0, 8 );
     }
-    $styling = isset( $params['styling'] ) ? json_encode( $params['styling'] ) : '{}';
-    $settings = isset( $params['settings'] ) ? json_encode( $params['settings'] ) : '{}';
+    $styling = isset( $params['styling'] ) ? ( is_string( $params['styling'] ) ? $params['styling'] : json_encode( $params['styling'] ) ) : '{}';
+    $settings = isset( $params['settings'] ) ? ( is_string( $params['settings'] ) ? $params['settings'] : json_encode( $params['settings'] ) ) : '{}';
     $blocks = isset( $params['blocks'] ) ? $params['blocks'] : array();
     $logic = isset( $params['logic'] ) ? $params['logic'] : array();
 
@@ -22384,6 +22393,10 @@ function cora_rest_save_form( $request ) {
         $id = $wpdb->insert_id;
     }
 
+    if ( ! $id ) {
+        return new WP_Error( 'db_error', 'Failed to save form to database', array( 'status' => 500 ) );
+    }
+
     // Update or insert blocks
     $blocks_row = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_form_blocks WHERE form_id = %d", $id ) );
     if ( $blocks_row ) {
@@ -22415,7 +22428,7 @@ function cora_rest_save_form( $request ) {
         array(
             'form_id'      => $id,
             'action_type'  => 'form_saved',
-            'details'      => 'Form saved and published: ' . $title,
+            'details'      => 'Form saved: ' . $title,
             'performed_by' => get_current_user_id(),
             'ip_address'   => $_SERVER['REMOTE_ADDR'] ?? '',
             'created_at'   => current_time('mysql')
@@ -22423,6 +22436,9 @@ function cora_rest_save_form( $request ) {
     );
 
     $form = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_forms WHERE id = %d", $id ), ARRAY_A );
+    if ( ! $form ) {
+        return new WP_Error( 'not_found', 'Saved form record not found', array( 'status' => 404 ) );
+    }
     $form['styling'] = json_decode( $form['styling'], true ) ?: array();
     $form['settings'] = json_decode( $form['settings'], true ) ?: array();
     $form['blocks'] = $blocks;
