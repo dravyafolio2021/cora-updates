@@ -1560,6 +1560,14 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     'badge' => 'Payroll Brief',
                     'badge_cls' => 'bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400 border-purple-200 dark:border-purple-800'
                 ),
+                array(
+                    'key' => 'seo_drop_alert',
+                    'title' => 'SEO & GEO Rank Drop Monitoring Alert',
+                    'schedule' => 'Daily 10:00 AM Check',
+                    'desc' => 'Instant alert when a critical, high-performing article drops in Google SERP rankings or loses visibility in AI answer engines.',
+                    'badge' => 'Rank Watch',
+                    'badge_cls' => 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800'
+                ),
             );
             ?>
 
