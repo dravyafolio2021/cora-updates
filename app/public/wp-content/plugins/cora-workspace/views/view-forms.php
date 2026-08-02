@@ -2604,6 +2604,7 @@ function renderFormsList() {
             }
             if (listTabContent) { listTabContent.classList.remove('hidden'); listTabContent.classList.add('flex'); }
             if (listState) listState.classList.remove('hidden');
+            fetchForms();
         } else if (hash === '#funnel') {
             if (tabFunnel) {
                 tabFunnel.classList.add('font-semibold', 'border-zinc-950', 'dark:border-zinc-50', 'text-zinc-950', 'dark:text-zinc-50');
@@ -4221,23 +4222,27 @@ function renderFormsList() {
     document.getElementById('btn-view-form')?.addEventListener('click', () => {
         if (!currentEditingForm) return;
 
-        const openWindow = (f) => {
-            let siteUrl = (typeof coraREData !== 'undefined' && coraREData.siteUrl) ? coraREData.siteUrl : '';
-            if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
-            const formKey = f.form_key || f.id;
-            window.open(siteUrl + '/shared-form/' + formKey, '_blank');
-        };
+        let siteUrl = (typeof coraREData !== 'undefined' && coraREData.siteUrl) ? coraREData.siteUrl : '';
+        if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
 
-        if (currentEditingForm.id) {
-            openWindow(currentEditingForm);
-        } else {
-            window.coraShowToast && window.coraShowToast("Publishing form to generate preview...", "info");
-            saveFormInternal(true, (res) => {
-                if (res && (res.form_key || res.id)) {
-                    openWindow(res);
+        // Pre-open blank tab synchronously in direct response to user gesture to prevent popup blocking
+        const win = window.open('about:blank', '_blank');
+
+        window.coraShowToast && window.coraShowToast("Publishing form to generate preview...", "info");
+        saveFormInternal(true, (res) => {
+            if (res && (res.form_key || res.id)) {
+                const formKey = res.form_key || res.id;
+                const targetUrl = siteUrl + '/shared-form/' + formKey;
+                if (win) {
+                    win.location.href = targetUrl;
+                } else {
+                    window.open(targetUrl, '_blank');
                 }
-            });
-        }
+            } else {
+                if (win) win.close();
+                window.coraShowToast && window.coraShowToast("Could not generate form preview", "error");
+            }
+        });
     });
 
     function openShareModal() {
