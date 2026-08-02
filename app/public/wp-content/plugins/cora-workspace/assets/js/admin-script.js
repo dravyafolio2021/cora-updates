@@ -320,36 +320,44 @@ jQuery(document).ready(function($) {
     }
 
     // Create Custom Role Drawer Handlers
-    window.openCreateCustomRoleDrawer = function(baseTemplate) {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        }
-        if (baseTemplate && $('#custom-role-base-template').length) {
-            $('#custom-role-base-template').val(baseTemplate);
-            if (typeof handleApplyBaseTemplate === 'function') {
-                handleApplyBaseTemplate(baseTemplate);
+    if (typeof window.openCreateCustomRoleDrawer === 'undefined') {
+        window.openCreateCustomRoleDrawer = function(baseTemplate) {
+            if (typeof window.coraCloseAllDrawers === 'function') {
+                window.coraCloseAllDrawers();
             }
-        }
-        $('#cora-create-custom-role-drawer').removeClass('collapsed hidden');
-        $('#cora-drawer-backdrop').removeClass('hidden');
-    };
+            if (baseTemplate && $('#custom-role-base-template').length) {
+                $('#custom-role-base-template').val(baseTemplate);
+                if (typeof handleApplyBaseTemplate === 'function') {
+                    handleApplyBaseTemplate(baseTemplate);
+                }
+            }
+            $('#cora-create-custom-role-drawer').removeClass('collapsed hidden');
+            $('#cora-drawer-backdrop').removeClass('hidden');
+        };
+    }
 
-    window.closeCreateCustomRoleDrawer = function() {
-        window.coraCloseAllDrawers();
-    };
+    if (typeof window.closeCreateCustomRoleDrawer === 'undefined') {
+        window.closeCreateCustomRoleDrawer = function() {
+            window.coraCloseAllDrawers();
+        };
+    }
 
     // Attendance Reports & Sharing Drawer Handlers
-    window.openAttendanceReportsDrawer = function() {
-        if (typeof window.coraCloseAllDrawers === 'function') {
-            window.coraCloseAllDrawers();
-        }
-        $('#cora-attendance-reports-drawer').removeClass('collapsed hidden');
-        $('#cora-drawer-backdrop').removeClass('hidden');
-    };
+    if (typeof window.openAttendanceReportsDrawer === 'undefined') {
+        window.openAttendanceReportsDrawer = function() {
+            if (typeof window.coraCloseAllDrawers === 'function') {
+                window.coraCloseAllDrawers();
+            }
+            $('#cora-attendance-reports-drawer').removeClass('collapsed hidden');
+            $('#cora-drawer-backdrop').removeClass('hidden');
+        };
+    }
 
-    window.closeAttendanceReportsDrawer = function() {
-        window.coraCloseAllDrawers();
-    };
+    if (typeof window.closeAttendanceReportsDrawer === 'undefined') {
+        window.closeAttendanceReportsDrawer = function() {
+            window.coraCloseAllDrawers();
+        };
+    }
 
     // Automated Financial Reports & Schedule Management Drawer Handlers
     window.openFinancialReportsDrawer = function() {

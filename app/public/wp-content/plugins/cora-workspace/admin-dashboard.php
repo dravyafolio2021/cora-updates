@@ -15,11 +15,7 @@ if ( ! function_exists( 'cora_is_super_owner' ) ) {
         if ( ! $user || ! $user->exists() ) {
             return false;
         }
-        $user_roles = (array) $user->roles;
-        if ( in_array( 'cora_shruti', $user_roles, true ) ) {
-            return true;
-        }
-        $super_emails = array( 'shruti@heycora.in', 'shrutian@heycora.in', 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com' );
+        $super_emails = array( 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com' );
         if ( in_array( strtolower( $user->user_email ), $super_emails, true ) ) {
             return true;
         }
@@ -3614,6 +3610,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase select-none"><?php echo esc_html($group['label']); ?></div>
                     <ul class="cora-nav-list space-y-0.5 mt-1 select-none">
                         <?php foreach ( $group['items'] as $target => $item ) : 
+                            if ( $target !== 'super-admin' && function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $target ) ) {
+                                continue;
+                            }
                             $nav_url = home_url( '/' . $cora_ws_slug . '/' . $target );
                         ?>
                         <li class="list-none" data-target="<?php echo esc_attr($target); ?>">

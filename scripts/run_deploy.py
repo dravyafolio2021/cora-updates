@@ -4,7 +4,7 @@ import os
 import sys
 
 # Script to run scripts/deploy.sh automatically by feeding password to ssh/scp prompts
-cmd = ["/Users/shrutian/Desktop/cora/scripts/deploy.sh", "both"]
+cmd = ["/Users/shrutian/Desktop/cora/scripts/deploy.sh", "demo"]
 password = b"Dravya@2026SHRUTIHAASAN\n"
 
 pid, fd = pty.fork()

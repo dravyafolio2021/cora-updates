@@ -390,7 +390,7 @@ $google_auth_url = home_url( '/workspace/auth/google' );
 </div>
 
 <div id="cora-toast-container"></div>
-
+<script>
     // Light mode standard
 
     var registeredEmail = '';

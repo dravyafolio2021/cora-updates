@@ -28,6 +28,8 @@
   - [x] DOM ready listener reads `tab` parameter and triggers `.trigger('click')` on matching `.cora-sub-tab` to restore active tab state on refresh.
 
 - [x] **Office Geofence CTA & Top Stat Row Integration (`views/view-users.php` & `assets/js/admin-script.js`)**
+  - [x] Task 5: Update views/view-users.php (Tenant isolation and key mappings for geofence settings retrieval).
+  - [x] Task 6: Update cora-workspace.php (Tenant-scoped updates for geofencing AJAX and save handlers).
   - [x] Attach `window.openGeofenceDrawer = openGeofenceDrawer` and `window.closeGeofenceDrawer = closeGeofenceDrawer` at top of script tag in `views/view-users.php`.
   - [x] 3rd stat card in `#tab-attendance-logs` displays `OFFICE GEOFENCING`, status badge (`500m Enforced` or `Not Configured`), current address subtitle, and CTA button with `onclick="openGeofenceDrawer()"`.
   - [x] Stat card container clickable via `onclick="openGeofenceDrawer()"`.

@@ -16,6 +16,17 @@ $active_industry = function_exists( 'cora_get_active_industry' )
         : get_option( 'cora_workspace_industry', 'real_estate' ) );
 $is_studio_mode = ( strpos( strtolower( $active_industry ), 'photo' ) !== false || strpos( strtolower( $active_industry ), 'studio' ) !== false );
 
+$feature_labels = array(
+    'crm_leads'         => $is_studio_mode ? 'Client Leads (CRM)' : 'Buyer Leads (CRM)',
+    'showings_bookings' => $is_studio_mode ? 'Shoots & Bookings' : 'Showings & Bookings',
+    'financials'        => 'Financials',
+    'media_vault'       => 'Media & Vault',
+    'equipment'         => $is_studio_mode ? 'Camera Equipment' : 'Property Listings',
+    'ai_suite'          => 'AI Suite',
+    'attendance'        => 'Attendance',
+    'quota_label'       => $is_studio_mode ? 'Max Shoot/Booking Quota (Monthly)' : 'Max Showing/Listing Quota (Monthly)'
+);
+
 // Build user roles labels dynamically (including custom roles)
 $role_labels = cora_get_all_roles();
 if ( ! cora_is_real_shruti() ) {
@@ -38,8 +49,9 @@ $all_wp_users = get_users( $user_query_args );
 // Filter by branch if current user is branch scoped
 $users = array();
 foreach ( $all_wp_users as $u ) {
-    $u_branch = get_user_meta( $u->ID, 'cora_branch_id', true );
-    if ( ! empty( $current_branch ) && $u_branch !== $current_branch ) {
+    $u_branch = cora_normalize_branch_id( get_user_meta( $u->ID, 'cora_branch_id', true ) );
+    $norm_current_branch = cora_normalize_branch_id( $current_branch );
+    if ( ! cora_is_workspace_owner() && ! empty( $current_branch ) && $u_branch !== $norm_current_branch ) {
         continue;
     }
     // Set default status if missing
@@ -79,7 +91,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             </div>
         </div>
         
-        <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager' ) ) ) : ?>
+        <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager', 'cora_workspace_owner', 'owner' ) ) ) : ?>
             <button onclick="openInviteDrawer()" class="bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs px-4 py-2 rounded-lg transition-colors cursor-pointer active:scale-95 shadow-sm flex items-center gap-2">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 Invite User
@@ -104,7 +116,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             </div>
         </div>
         
-        <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager' ) ) ) : ?>
+        <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager', 'cora_workspace_owner', 'owner' ) ) ) : ?>
             <button onclick="openInviteDrawer()" class="bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-[10px] px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer active:scale-95 shadow-sm flex items-center gap-1">
                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 Invite
@@ -130,7 +142,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
             Attendance Logs
         </button>
-        <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_re_broker_owner', 'cora_studio_owner' ) ) ) : ?>
+        <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_re_broker_owner', 'cora_studio_owner', 'cora_workspace_owner', 'owner' ) ) ) : ?>
             <button class="cora-sub-tab flex items-center gap-2 px-3 pb-2.5 pt-1 text-xs font-medium border-b-2 border-transparent text-zinc-550 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-all cursor-pointer whitespace-nowrap" data-target="tab-custom-roles">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 Custom Roles
@@ -170,7 +182,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     Attendance Logs
                 </button>
-                <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_re_broker_owner', 'cora_studio_owner' ) ) ) : ?>
+                <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_re_broker_owner', 'cora_studio_owner', 'cora_workspace_owner', 'owner' ) ) ) : ?>
                     <button class="cora-sub-tab flex items-center gap-2 w-full px-3 py-2 text-left text-[11px] font-medium text-zinc-650 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer whitespace-nowrap focus:outline-none focus:ring-0 outline-none shadow-none" data-target="tab-custom-roles">
                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                         Custom Roles
@@ -270,7 +282,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 $u_role = ! empty( $u->roles ) ? $u->roles[0] : 'subscriber';
                 $u_role_lbl = isset( $role_labels[$u_role] ) ? $role_labels[$u_role] : $u_role;
                 $u_branch_id = get_user_meta( $u->ID, 'cora_branch_id', true );
-                $u_branch_lbl = isset( $agency_branches[$u_branch_id] ) ? $agency_branches[$u_branch_id]['name'] : '—';
+                $norm_u_branch_key = 'branch_' . cora_normalize_branch_id( $u_branch_id );
+                $u_branch_lbl = isset( $agency_branches[$norm_u_branch_key] ) ? $agency_branches[$norm_u_branch_key]['name'] : '—';
                 $u_status = get_user_meta( $u->ID, 'cora_user_status', true ) ?: 'active';
                 $u_joined = date( 'd M Y', strtotime( $u->user_registered ) );
                 $avatar = get_user_meta( $u->ID, 'cora_avatar_url', true );
@@ -373,7 +386,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             $u_role = ! empty( $u->roles ) ? $u->roles[0] : 'subscriber';
                             $u_role_lbl = isset( $role_labels[$u_role] ) ? $role_labels[$u_role] : $u_role;
                             $u_branch_id = get_user_meta( $u->ID, 'cora_branch_id', true );
-                            $u_branch_lbl = isset( $agency_branches[$u_branch_id] ) ? $agency_branches[$u_branch_id]['name'] : '—';
+                            $norm_u_branch_key = 'branch_' . cora_normalize_branch_id( $u_branch_id );
+                            $u_branch_lbl = isset( $agency_branches[$norm_u_branch_key] ) ? $agency_branches[$norm_u_branch_key]['name'] : '—';
                             $u_status = get_user_meta( $u->ID, 'cora_user_status', true ) ?: 'active';
                             $u_joined = date( 'd M Y', strtotime( $u->user_registered ) );
                             $avatar = get_user_meta( $u->ID, 'cora_avatar_url', true );
@@ -575,6 +589,12 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         'team-roles' => 'Team & Roles',
                         'equipment'  => 'Camera Gear',
                     ),
+                    'SALES CHANNEL' => array(
+                        'canvas'             => 'Canvas',
+                        'forms'              => 'Forms',
+                        'emails'             => 'Emails',
+                        'review_acquisition' => 'Reviews',
+                    ),
                     'ADMINISTRATIVE' => array(
                         'financials' => 'Financials',
                         'settings'   => 'Settings',
@@ -589,7 +609,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     ),
                     'OPERATIONAL' => array(
                         'team-roles' => 'Team & Roles',
-                        'equipment'  => 'Equipment',
+                        'equipment'  => 'Property Listings',
+                    ),
+                    'SALES CHANNEL' => array(
+                        'canvas'             => 'Canvas',
+                        'forms'              => 'Forms',
+                        'emails'             => 'Emails',
+                        'review_acquisition' => 'Reviews',
                     ),
                     'ADMINISTRATIVE' => array(
                         'financials' => 'Financials',
@@ -663,7 +689,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             ? $_COOKIE['cora_workspace_industry'] 
                             : get_option( 'cora_workspace_industry', 'real_estate' );
                         $active_ind_clean = str_replace( '_', '-', strtolower( trim( $active_ind ) ) );
-                        $is_studio_ind = ( $active_ind_clean === 'photography' || $active_ind_clean === 'studio' );
+                        $is_studio_ind = $is_studio_mode;
 
                         $re_only_roles     = array('cora_branch_manager', 'cora_re_agent', 'cora_lead_coordinator');
                         $studio_only_roles = array('cora_studio_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor');
@@ -748,7 +774,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             <div>
                 <button type="button" onclick="openCreateCustomRoleDrawer()" class="bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs px-4 py-2.5 rounded-lg transition-colors cursor-pointer active:scale-95 shadow-sm flex items-center gap-2 whitespace-nowrap">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    + Create Custom Role
+                    Create Custom Role
                 </button>
             </div>
         </div>
@@ -915,15 +941,15 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
                                 // Feature tag mapping labels
                                 $perm_labels = array(
-                                    'crm_leads'         => 'CRM',
-                                    'crm'               => 'CRM',
-                                    'showings_bookings' => 'Showings',
-                                    'bookings'          => 'Showings',
+                                    'crm_leads'         => $is_studio_mode ? 'Client Leads' : 'Buyer Leads',
+                                    'crm'               => $is_studio_mode ? 'Client Leads' : 'Buyer Leads',
+                                    'showings_bookings' => $is_studio_mode ? 'Shoots' : 'Showings',
+                                    'bookings'          => $is_studio_mode ? 'Shoots' : 'Showings',
                                     'financials'        => 'Financials',
                                     'media_vault'       => 'Media',
                                     'media'             => 'Media',
                                     'vault'             => 'Media',
-                                    'equipment'         => 'Equipment',
+                                    'equipment'         => $is_studio_mode ? 'Camera Gear' : 'Property Listings',
                                     'ai_suite'          => 'AI Suite',
                                     'attendance'        => 'Attendance'
                                 );
@@ -987,30 +1013,84 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     <!-- TAB 5: ATTENDANCE LOGS -->
 <div id="tab-attendance-logs" class="cora-tab-content space-y-6 hidden">
     <?php
-    $is_attendance_admin = in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager' ) );
+    $is_attendance_admin = in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_workspace_owner', 'owner', 'cora_re_broker_owner', 'cora_studio_owner' ) );
     
-    // Retrieve office location settings
-    $office_address  = get_option( 'cora_office_address', '' );
-    $office_maps_url = get_option( 'cora_office_maps_url', '' );
-    $office_radius   = get_option( 'cora_geofence_radius', 500 );
-    $office_lat      = get_option( 'cora_office_lat', '' );
-    $office_lng      = get_option( 'cora_office_lng', '' );
+    $agency_id = cora_db_get_agency_id();
+    $agency_slug = cora_get_current_user_agency_id();
 
-    $legacy_loc = get_option( 'cora_attendance_office_location', array() );
-    if ( empty( $office_address ) && ! empty( $legacy_loc['address'] ) ) {
-        $office_address = $legacy_loc['address'];
+    // Retrieve tenant-isolated geofencing settings
+    $office_address  = get_option( 'cora_office_address_' . $agency_id, '' );
+    if ( empty( $office_address ) && ! empty( $agency_slug ) ) {
+        $office_address = get_option( 'cora_office_address_' . $agency_slug, '' );
     }
-    if ( empty( $office_maps_url ) && ! empty( $legacy_loc['maps_url'] ) ) {
-        $office_maps_url = $legacy_loc['maps_url'];
+
+    $office_maps_url = get_option( 'cora_office_maps_url_' . $agency_id, '' );
+    if ( empty( $office_maps_url ) && ! empty( $agency_slug ) ) {
+        $office_maps_url = get_option( 'cora_office_maps_url_' . $agency_slug, '' );
     }
-    if ( empty( $office_lat ) && ! empty( $legacy_loc['lat'] ) ) {
-        $office_lat = $legacy_loc['lat'];
+
+    $office_radius   = get_option( 'cora_geofence_radius_' . $agency_id, '' );
+    if ( empty( $office_radius ) && ! empty( $agency_slug ) ) {
+        $office_radius = get_option( 'cora_geofence_radius_' . $agency_slug, '' );
     }
-    if ( empty( $office_lng ) && ! empty( $legacy_loc['lng'] ) ) {
-        $office_lng = $legacy_loc['lng'];
+
+    $office_lat      = get_option( 'cora_office_lat_' . $agency_id, '' );
+    if ( empty( $office_lat ) && ! empty( $agency_slug ) ) {
+        $office_lat = get_option( 'cora_office_lat_' . $agency_slug, '' );
     }
-    if ( empty( $office_radius ) && ! empty( $legacy_loc['radius'] ) ) {
-        $office_radius = $legacy_loc['radius'];
+
+    $office_lng      = get_option( 'cora_office_lng_' . $agency_id, '' );
+    if ( empty( $office_lng ) && ! empty( $agency_slug ) ) {
+        $office_lng = get_option( 'cora_office_lng_' . $agency_slug, '' );
+    }
+
+    // Try tenant-isolated legacy locations first
+    $legacy_loc = get_option( 'cora_attendance_office_location_' . $agency_id );
+    if ( ( empty( $legacy_loc ) || ! is_array( $legacy_loc ) ) && ! empty( $agency_slug ) ) {
+        $legacy_loc = get_option( 'cora_attendance_office_location_' . $agency_slug );
+    }
+
+    if ( ! empty( $legacy_loc ) && is_array( $legacy_loc ) ) {
+        if ( empty( $office_address ) ) {
+            $office_address = ! empty( $legacy_loc['address'] ) ? $legacy_loc['address'] : ( ! empty( $legacy_loc['office_name'] ) ? $legacy_loc['office_name'] : '' );
+        }
+        if ( empty( $office_maps_url ) && ! empty( $legacy_loc['maps_url'] ) ) {
+            $office_maps_url = $legacy_loc['maps_url'];
+        }
+        if ( empty( $office_lat ) && ! empty( $legacy_loc['lat'] ) ) {
+            $office_lat = $legacy_loc['lat'];
+        }
+        if ( empty( $office_lng ) && ! empty( $legacy_loc['lng'] ) ) {
+            $office_lng = $legacy_loc['lng'];
+        }
+        if ( empty( $office_radius ) && ! empty( $legacy_loc['radius'] ) ) {
+            $office_radius = $legacy_loc['radius'];
+        }
+    }
+
+    // If still empty, fall back to global options
+    if ( empty( $office_address ) && empty( $office_lat ) ) {
+        $office_address  = get_option( 'cora_office_address', '' );
+        $office_maps_url = get_option( 'cora_office_maps_url', '' );
+        $office_radius   = get_option( 'cora_geofence_radius', 500 );
+        $office_lat      = get_option( 'cora_office_lat', '' );
+        $office_lng      = get_option( 'cora_office_lng', '' );
+
+        // If global is also empty, try global legacy
+        if ( empty( $office_address ) && empty( $office_lat ) ) {
+            $global_legacy = get_option( 'cora_attendance_office_location', array() );
+            if ( ! empty( $global_legacy ) && is_array( $global_legacy ) ) {
+                $office_address = ! empty( $global_legacy['address'] ) ? $global_legacy['address'] : ( ! empty( $global_legacy['office_name'] ) ? $global_legacy['office_name'] : '' );
+                $office_maps_url = ! empty( $global_legacy['maps_url'] ) ? $global_legacy['maps_url'] : '';
+                $office_lat = ! empty( $global_legacy['lat'] ) ? $global_legacy['lat'] : '';
+                $office_lng = ! empty( $global_legacy['lng'] ) ? $global_legacy['lng'] : '';
+                $office_radius = ! empty( $global_legacy['radius'] ) ? $global_legacy['radius'] : 500;
+            }
+        }
+    }
+
+    if ( empty( $office_radius ) ) {
+        $office_radius = 500;
     }
 
     $office_loc = array(
@@ -1442,7 +1522,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 $module = Cora_Module_Registry::get_module( $active_industry );
                 $roles_list = $module ? $module->get_industry_roles() : array();
                 
-                if ( $current_role === 'administrator' || $current_role === 'cora_manager' || $current_role === 'cora_super_admin' || cora_is_super_owner() ) {
+                if ( $current_role === 'administrator' || $current_role === 'cora_manager' || $current_role === 'cora_super_admin' || $current_role === 'cora_workspace_owner' || $current_role === 'owner' || cora_is_super_owner() ) {
                     echo '<option value="cora_branch_manager">Branch Manager</option>';
                 }
                 foreach ( $roles_list as $role_key => $role_label ) {
@@ -1455,7 +1535,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         }
                     }
                     if ( $role_key === 'cora_manager' ) {
-                        if ( ! cora_is_real_shruti() && $current_role !== 'cora_super_admin' && $current_role !== 'administrator' && ! cora_is_super_owner() ) {
+                        $is_owner = in_array( $current_role, array( 'cora_super_admin', 'cora_workspace_owner', 'owner', 'cora_re_broker_owner', 'cora_studio_owner' ), true );
+                        if ( ! cora_is_real_shruti() && $current_role !== 'cora_super_admin' && $current_role !== 'administrator' && ! cora_is_super_owner() && ! $is_owner ) {
                             continue;
                         }
                     }
@@ -1739,7 +1820,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         </div>
 
         <div>
-            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Max Shoot/Booking Quota (Monthly)</label>
+            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5"><?php echo esc_html( $feature_labels['quota_label'] ); ?></label>
             <input type="number" id="edit-custom-role-max-quota" min="0" placeholder="Unlimited (leave blank)" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
         </div>
 
@@ -1748,31 +1829,31 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             <div class="space-y-2 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 bg-zinc-50/50 dark:bg-zinc-950/50">
                 <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
                     <input type="checkbox" value="crm_leads" class="edit-custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
-                    <span>CRM & Leads</span>
+                    <span><?php echo esc_html( $feature_labels['crm_leads'] ); ?></span>
                 </label>
                 <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
                     <input type="checkbox" value="showings_bookings" class="edit-custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
-                    <span>Showings & Bookings</span>
+                    <span><?php echo esc_html( $feature_labels['showings_bookings'] ); ?></span>
                 </label>
                 <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
                     <input type="checkbox" value="financials" class="edit-custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
-                    <span>Financials</span>
+                    <span><?php echo esc_html( $feature_labels['financials'] ); ?></span>
                 </label>
                 <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
                     <input type="checkbox" value="media_vault" class="edit-custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
-                    <span>Media & Vault</span>
+                    <span><?php echo esc_html( $feature_labels['media_vault'] ); ?></span>
                 </label>
                 <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
                     <input type="checkbox" value="equipment" class="edit-custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
-                    <span>Equipment</span>
+                    <span><?php echo esc_html( $feature_labels['equipment'] ); ?></span>
                 </label>
                 <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
                     <input type="checkbox" value="ai_suite" class="edit-custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
-                    <span>AI Suite</span>
+                    <span><?php echo esc_html( $feature_labels['ai_suite'] ); ?></span>
                 </label>
                 <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
                     <input type="checkbox" value="attendance" class="edit-custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
-                    <span>Attendance</span>
+                    <span><?php echo esc_html( $feature_labels['attendance'] ); ?></span>
                 </label>
             </div>
         </div>
@@ -1834,7 +1915,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
         <!-- 4. Max Shoot/Booking Quota -->
         <div>
-            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Max Shoot/Booking Quota (Monthly)</label>
+            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5"><?php echo esc_html( $feature_labels['quota_label'] ); ?></label>
             <input type="number" id="custom-role-max-quota" min="0" placeholder="Unlimited (or e.g. 15)" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
         </div>
 
@@ -1844,31 +1925,31 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             <div class="space-y-2 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 bg-zinc-50/50 dark:bg-zinc-950/50 max-h-56 overflow-y-auto">
                 <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
                     <input type="checkbox" value="crm_leads" class="custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
-                    <span>CRM & Leads</span>
+                    <span><?php echo esc_html( $feature_labels['crm_leads'] ); ?></span>
                 </label>
                 <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
                     <input type="checkbox" value="showings_bookings" class="custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded" checked>
-                    <span>Showings & Bookings</span>
+                    <span><?php echo esc_html( $feature_labels['showings_bookings'] ); ?></span>
                 </label>
                 <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
                     <input type="checkbox" value="financials" class="custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
-                    <span>Financials</span>
+                    <span><?php echo esc_html( $feature_labels['financials'] ); ?></span>
                 </label>
                 <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
                     <input type="checkbox" value="media_vault" class="custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded" checked>
-                    <span>Media & Vault</span>
+                    <span><?php echo esc_html( $feature_labels['media_vault'] ); ?></span>
                 </label>
                 <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
                     <input type="checkbox" value="equipment" class="custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
-                    <span>Equipment</span>
+                    <span><?php echo esc_html( $feature_labels['equipment'] ); ?></span>
                 </label>
                 <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
                     <input type="checkbox" value="ai_suite" class="custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded">
-                    <span>AI Suite</span>
+                    <span><?php echo esc_html( $feature_labels['ai_suite'] ); ?></span>
                 </label>
                 <label class="flex items-center gap-2.5 text-xs text-zinc-800 dark:text-zinc-200 cursor-pointer hover:text-zinc-950">
                     <input type="checkbox" value="attendance" class="custom-role-perm-cb accent-zinc-950 dark:accent-zinc-100 rounded" checked>
-                    <span>Attendance</span>
+                    <span><?php echo esc_html( $feature_labels['attendance'] ); ?></span>
                 </label>
             </div>
         </div>
@@ -2618,11 +2699,11 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
     window.coraResetMatrixDefaults = function() {
         var defaultPermsMap = {
-            'cora_branch_manager': ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'portfolio', 'leads', 'settings'],
+            'cora_branch_manager': ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'portfolio', 'leads', 'settings', 'canvas', 'forms', 'emails', 'review_acquisition'],
             'cora_photographer': ['bookings', 'equipment', 'portfolio', 'leads'],
             'cora_editor': ['bookings', 'feature-hub', 'portfolio'],
             'cora_viewer': ['dashboard', 'bookings'],
-            'editor': ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings'],
+            'editor': ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'canvas', 'forms', 'emails', 'review_acquisition'],
             'author': ['dashboard', 'bookings', 'equipment'],
             'contributor': ['dashboard', 'bookings'],
             'subscriber': ['dashboard']

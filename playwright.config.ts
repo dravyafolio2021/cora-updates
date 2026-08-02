@@ -12,7 +12,7 @@ export default defineConfig({
   },
   reporter: 'list',
   use: {
-    baseURL: 'http://cora.local',
+    baseURL: process.env.BASE_URL || 'http://cora.local',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     headless: true,

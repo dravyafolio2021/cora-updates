@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.9.64
+ * Version: 2.9.72
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.9.64' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.72' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -878,11 +878,13 @@ function cora_real_estate_ai_handle_workspace_route() {
         $is_workspace_route = true;
         $sub_page = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : '';
     } else if ( ! empty( $first_segment ) && ! in_array( $first_segment, array( 'wp-admin', 'wp-includes', 'wp-content', 'wp-json', 'assets' ) ) ) {
-        $matched_workspace = cora_get_workspace_by_slug( $first_segment );
-        if ( $matched_workspace ) {
-            $is_workspace_route = true;
-            $GLOBALS['cora_active_workspace'] = $matched_workspace;
-            $sub_page = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : '';
+        if ( isset( $path_parts[0] ) && strpos( $path_parts[0], '.' ) === false ) {
+            $matched_workspace = cora_get_workspace_by_slug( $first_segment );
+            if ( $matched_workspace ) {
+                $is_workspace_route = true;
+                $GLOBALS['cora_active_workspace'] = $matched_workspace;
+                $sub_page = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : '';
+            }
         }
     }
 
@@ -984,8 +986,15 @@ function cora_real_estate_ai_handle_workspace_route() {
         if ( $matched_workspace && ! cora_user_can_access_workspace( $user->ID, $matched_workspace['slug'] ) ) {
             $user_ws = cora_get_user_workspaces( $user->ID );
             $fallback_slug = ! empty( $user_ws[0]['slug'] ) ? $user_ws[0]['slug'] : 'workspace';
+            $debug_msg = sprintf(
+                'Access Restricted. Debug info - User ID: %d, User Login: %s, Matched WS: %s, User Workspaces: %s',
+                $user->ID,
+                $user->user_login,
+                $matched_workspace['slug'],
+                print_r( $user_ws, true )
+            );
             wp_die(
-                __( 'Access Restricted: You do not have permission to access the requested workspace. You are being redirected to your workspace.', 'cora-workspace' ),
+                $debug_msg,
                 __( 'Access Restricted', 'cora-workspace' ),
                 array( 'response' => 403 )
             );
@@ -1047,51 +1056,18 @@ function cora_real_estate_ai_handle_workspace_route() {
         }
 
         // Role-based access control check (Server-Side)
-        $cora_permissions = get_option( 'cora_role_permissions', array() );
-        $current_user_role = ! empty( $user->roles ) ? $user->roles[0] : 'subscriber';
-        
-        $new_enterprise_modules = array( 
-            'event_timeline', 'event-timeline', 'multi-day-timeline', 
-            'review_acquisition', 'review-acquisition', 'smart-reviews', 
-            'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'shifts', 
-            'blogs', 'content-suite', 'content_suite',
-            'leads', 'client-leads', 'clients', 'bookings', 'photo-shoots',
-            'financials', 'financial-overview', 'team-roles', 'user-roles',
-            'equipment', 'camera-equipment', 'media', 'media-manager',
-            'tasks', 'client-task-manager', 'canvas', 'settings', 'settings-suite',
-            'profile', 'mcp', 'ecosystem', 'forms', 'emails', 'audit-panel', 'super-admin',
-            'portfolio', 'feature-hub', 'gbp', 'plugins', 'pages', 'comments',
-            'appearance', 'tools', 'media-editor', 'attendance', 'visual-builder'
-        );
-        
-        $allowed_features = isset( $cora_permissions[$current_user_role] ) ? $cora_permissions[$current_user_role] : array();
-        if ( empty( $allowed_features ) ) {
-            $allowed_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'attendance', 'tasks', 'visual-builder', 'audit-panel', 'media', 'canvas', 'forms', 'ecosystem', 'mcp', ...$new_enterprise_modules );
-        } else {
-            $allowed_features = array_unique( array_merge( $allowed_features, $new_enterprise_modules ) );
-        }
-        
-        if ( in_array( $current_user_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager' ) ) || cora_is_super_owner() || is_super_admin() || current_user_can( 'manage_options' ) ) {
-            $all_admin_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'attendance', 'tasks', 'visual-builder', 'audit-panel', 'media', 'canvas', 'forms', 'ecosystem', 'profile', 'mcp', ...$new_enterprise_modules );
-            foreach ( $all_admin_features as $feat ) {
-                if ( ! in_array( $feat, $allowed_features ) ) {
-                    $allowed_features[] = $feat;
-                }
-            }
-        }
-
+        $cora_ws_slug = ! empty( $matched_workspace['slug'] ) ? $matched_workspace['slug'] : 'workspace';
         if ( $sub_page === 'super-admin' ) {
             if ( ! cora_is_super_owner() ) {
-                wp_redirect( home_url( '/workspace/dashboard' ) );
+                wp_redirect( home_url( '/' . $cora_ws_slug . '/dashboard' ) );
                 exit;
             }
-            $allowed_features[] = 'super-admin';
-        }
-        
-        // Prevent accessing disallowed sub-pages
-        if ( $sub_page !== 'dashboard' && $sub_page !== 'feature-hub' && ! in_array( $sub_page, $allowed_features ) && ! in_array( $sub_page, $new_enterprise_modules ) && ! current_user_can('manage_options') && ! cora_is_super_owner() ) {
-            wp_redirect( home_url( '/workspace/dashboard' ) );
-            exit;
+        } else {
+            // Prevent accessing disallowed sub-pages
+            if ( $sub_page !== 'dashboard' && $sub_page !== 'setup-account' && function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $sub_page ) ) {
+                wp_redirect( home_url( '/' . $cora_ws_slug . '/dashboard' ) );
+                exit;
+            }
         }
 
         // ── INDUSTRY MODE SWITCHER (Server-side, reliable) ──────────────────────
@@ -1614,8 +1590,64 @@ add_action( 'init', 'cora_real_estate_ai_handle_email_verification' );
  */
 if ( ! function_exists( 'cora_ajax_resend_verification' ) ) {
 function cora_ajax_resend_verification() {
-    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $nonce = $_POST['nonce'] ?? '';
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_login_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ) );
+    }
     
+    // If email is passed, it is an administrator resending a pending invitation
+    $email = sanitize_email( $_POST['email'] ?? '' );
+    if ( ! empty( $email ) ) {
+        if ( ! is_user_logged_in() ) {
+            wp_send_json_error( array( 'message' => 'User not logged in.' ) );
+        }
+        if ( ! current_user_can( 'manage_options' ) && ! cora_is_workspace_owner() && ! cora_is_super_owner() ) {
+            wp_send_json_error( array( 'message' => 'Insufficient permissions to resend invitations.' ) );
+        }
+        
+        $invitations = get_option( 'cora_invitations', array() );
+        $found_token = '';
+        $found_inv = null;
+        foreach ( $invitations as $tok => $inv ) {
+            if ( $inv['email'] === $email && $inv['status'] === 'pending' ) {
+                $found_token = $tok;
+                $found_inv = $inv;
+                break;
+            }
+        }
+        
+        if ( $found_token ) {
+            $verification_link = home_url( '/workspace/setup-account?token=' . $found_token );
+            update_option( 'cora_latest_verification_link', $verification_link );
+            
+            $invite_role = $found_inv['role'] ?? 'member';
+            $inviter_id = $found_inv['invited_by'] ?? get_current_user_id();
+            $inviter = get_userdata( $inviter_id );
+            $inviter_name = $inviter ? ($inviter->display_name ?: $inviter->user_email) : 'Administrator';
+            
+            $subject = "Resent: You've been invited to join workspace on Cora";
+            $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+            $body = "
+            <div style='font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:560px;margin:0 auto;padding:32px;background:#FAFAFA;border-radius:12px;border:1px solid #E4E4E7;'>
+                <h2 style='color:#09090B;margin-top:0;font-size:20px;font-weight:700;'>Workspace Team Invitation</h2>
+                <p style='color:#52525B;font-size:14px;line-height:1.6;'>Hello,</p>
+                <p style='color:#52525B;font-size:14px;line-height:1.6;'>You have been invited to join the workspace as <strong>" . esc_html( $invite_role ) . "</strong> by " . esc_html( $inviter_name ) . ".</p>
+                <div style='margin:28px 0;'>
+                    <a href='" . esc_url( $verification_link ) . "' style='background:#09090B;color:#FFFFFF;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;display:inline-block;'>Accept Invitation & Setup Account →</a>
+                </div>
+                <p style='color:#A1A1AA;font-size:12px;'>Or copy and paste this URL into your browser: <br><a href='" . esc_url( $verification_link ) . "' style='color:#18181B;'>" . esc_url( $verification_link ) . "</a></p>
+            </div>";
+            
+            @wp_mail( $email, $subject, $body, $headers );
+            cora_log_activity( 'Invitation', "Resent verification/setup link to {$email}." );
+            error_log( "Cora Resent Invitation Link: " . $verification_link );
+            wp_send_json_success( array( 'message' => 'Invitation link resent successfully.' ) );
+        } else {
+            wp_send_json_error( array( 'message' => 'No pending invitation found for this email address.' ) );
+        }
+    }
+    
+    // Normal flow: logged in user resending verification to themselves
     $user_id = get_current_user_id();
     if ( ! $user_id ) {
         wp_send_json_error( array( 'message' => 'User not logged in.' ) );
@@ -1635,6 +1667,7 @@ function cora_ajax_resend_verification() {
 }
 }
 add_action( 'wp_ajax_cora_workspace_resend_verification', 'cora_ajax_resend_verification' );
+add_action( 'wp_ajax_cora_ajax_resend_verification', 'cora_ajax_resend_verification' );
 
 /**
  * Load custom login stylesheet for white-labeled login screen
@@ -1807,7 +1840,10 @@ function cora_get_all_roles() {
     }
     
     // Add custom roles
-    $custom = get_option( 'cora_custom_roles', array() );
+    $agency_id_raw = cora_get_current_user_agency_id();
+    $agency_suffix = ( ! empty( $agency_id_raw ) && $agency_id_raw !== 'super' ) ? '_' . preg_replace( '/[^\w]/', '_', $agency_id_raw ) : '';
+    $custom_roles_key = 'cora_custom_roles' . $agency_suffix;
+    $custom = get_option( $custom_roles_key, array() );
     if ( is_array( $custom ) ) {
         foreach ( $custom as $c ) {
             if ( ! empty( $c['role_key'] ) && ! empty( $c['role_name'] ) ) {
@@ -2128,7 +2164,7 @@ function cora_ajax_save_permissions_matrix() {
         wp_send_json_error( array( 'message' => 'Security check failed.' ) );
     }
 
-    if ( ! current_user_can( 'manage_options' ) ) {
+    if ( ! current_user_can( 'manage_options' ) && ! cora_is_workspace_owner() ) {
         wp_send_json_error( array( 'message' => 'Unauthorized access.' ) );
     }
 
@@ -10659,8 +10695,16 @@ function cora_ajax_save_attendance() {
         $new_log['user_email'] = $current_user->user_email;
         
         // Enforce Geofencing if configured
-        $office_loc = get_option( 'cora_attendance_office_location' );
-        if ( ! empty( $office_loc['lat'] ) && ! empty( $office_loc['lng'] ) ) {
+        $agency_id   = cora_db_get_agency_id();
+        $agency_slug = cora_get_current_user_agency_id();
+        $office_loc  = get_option( 'cora_attendance_office_location_' . $agency_id );
+        if ( ( empty( $office_loc ) || ! is_array( $office_loc ) ) && ! empty( $agency_slug ) ) {
+            $office_loc = get_option( 'cora_attendance_office_location_' . $agency_slug );
+        }
+        if ( empty( $office_loc ) || ! is_array( $office_loc ) ) {
+            $office_loc = get_option( 'cora_attendance_office_location' );
+        }
+        if ( ! empty( $office_loc ) && is_array( $office_loc ) && ! empty( $office_loc['lat'] ) && ! empty( $office_loc['lng'] ) ) {
             if ( empty( $new_log['lat'] ) || empty( $new_log['lng'] ) ) {
                 wp_send_json_error( array( 'message' => 'Punch denied. Location services must be enabled.' ) );
             }
@@ -11058,7 +11102,7 @@ function cora_ajax_update_geofence() {
     
     // Check privileges
     $current_user = wp_get_current_user();
-    $allowed_roles = array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_re_broker_owner', 'cora_studio_owner', 'owner' );
+    $allowed_roles = array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_re_broker_owner', 'cora_studio_owner', 'owner', 'cora_workspace_owner' );
     $user_roles = (array) $current_user->roles;
     $is_allowed = cora_is_super_owner() || current_user_can( 'manage_options' ) || current_user_can( 'read' );
     foreach ( $allowed_roles as $role ) {
@@ -11071,23 +11115,26 @@ function cora_ajax_update_geofence() {
         wp_send_json_error( array( 'message' => 'Unauthorized access.' ) );
     }
     
-    $address  = isset( $_POST['address'] ) ? sanitize_text_field( wp_unslash( $_POST['address'] ) ) : '';
-    $maps_url = isset( $_POST['maps_url'] ) ? sanitize_text_field( wp_unslash( $_POST['maps_url'] ) ) : '';
-    $radius   = isset( $_POST['radius'] ) ? intval( $_POST['radius'] ) : 500;
+    $address      = isset( $_POST['address'] ) ? sanitize_text_field( wp_unslash( $_POST['address'] ) ) : ( isset( $_POST['office_name'] ) ? sanitize_text_field( wp_unslash( $_POST['office_name'] ) ) : '' );
+    $maps_url     = isset( $_POST['maps_url'] ) ? sanitize_text_field( wp_unslash( $_POST['maps_url'] ) ) : '';
+    $radius       = isset( $_POST['radius'] ) ? intval( $_POST['radius'] ) : 500;
+    $ip_whitelist = isset( $_POST['ip_whitelist'] ) ? sanitize_text_field( wp_unslash( $_POST['ip_whitelist'] ) ) : '';
     
-    if ( empty( $address ) && empty( $maps_url ) ) {
-        wp_send_json_error( array( 'message' => 'Please provide an office address or a Google Maps link.' ) );
+    $lat = isset( $_POST['lat'] ) && $_POST['lat'] !== '' ? floatval( $_POST['lat'] ) : '';
+    $lng = isset( $_POST['lng'] ) && $_POST['lng'] !== '' ? floatval( $_POST['lng'] ) : '';
+    
+    if ( empty( $address ) && empty( $maps_url ) && ( empty( $lat ) || empty( $lng ) ) ) {
+        wp_send_json_error( array( 'message' => 'Please provide an office address, Google Maps link, or coordinates.' ) );
     }
     
-    $lat = '';
-    $lng = '';
-    
     // 1. Try parsing Google Maps URL if provided
-    if ( ! empty( $maps_url ) ) {
-        $coords = cora_parse_google_maps_url( $maps_url );
-        if ( $coords['success'] ) {
-            $lat = $coords['lat'];
-            $lng = $coords['lng'];
+    if ( empty( $lat ) || empty( $lng ) ) {
+        if ( ! empty( $maps_url ) ) {
+            $coords = cora_parse_google_maps_url( $maps_url );
+            if ( $coords['success'] ) {
+                $lat = $coords['lat'];
+                $lng = $coords['lng'];
+            }
         }
     }
     
@@ -11117,21 +11164,52 @@ function cora_ajax_update_geofence() {
         }
     }
     
-    // Save options as required
+    if ( empty( $address ) && ! empty( $lat ) && ! empty( $lng ) ) {
+        $address = $lat . ',' . $lng;
+    }
+    
+    // Get agency context
+    $agency_id   = cora_db_get_agency_id();
+    $agency_slug = cora_get_current_user_agency_id();
+
+    // Standardize combined array: include both 'address' and 'office_name' keys
+    $office_loc = array(
+        'lat'          => $lat,
+        'lng'          => $lng,
+        'address'      => ! empty( $address ) ? $address : $maps_url,
+        'office_name'  => ! empty( $address ) ? $address : $maps_url,
+        'maps_url'     => $maps_url,
+        'radius'       => $radius,
+        'ip_whitelist' => $ip_whitelist,
+        'updated_at'   => current_time( 'mysql' )
+    );
+
+    // Save tenant-isolated settings (by ID)
+    if ( ! empty( $agency_id ) ) {
+        update_option( 'cora_office_address_' . $agency_id, $address );
+        update_option( 'cora_office_maps_url_' . $agency_id, $maps_url );
+        update_option( 'cora_geofence_radius_' . $agency_id, $radius );
+        update_option( 'cora_office_lat_' . $agency_id, $lat );
+        update_option( 'cora_office_lng_' . $agency_id, $lng );
+        update_option( 'cora_attendance_office_location_' . $agency_id, $office_loc );
+    }
+
+    // Save tenant-isolated settings (by Slug)
+    if ( ! empty( $agency_slug ) ) {
+        update_option( 'cora_office_address_' . $agency_slug, $address );
+        update_option( 'cora_office_maps_url_' . $agency_slug, $maps_url );
+        update_option( 'cora_geofence_radius_' . $agency_slug, $radius );
+        update_option( 'cora_office_lat_' . $agency_slug, $lat );
+        update_option( 'cora_office_lng_' . $agency_slug, $lng );
+        update_option( 'cora_attendance_office_location_' . $agency_slug, $office_loc );
+    }
+
+    // Save global fallback options
     update_option( 'cora_office_address', $address );
     update_option( 'cora_office_maps_url', $maps_url );
     update_option( 'cora_geofence_radius', $radius );
     update_option( 'cora_office_lat', $lat );
     update_option( 'cora_office_lng', $lng );
-    
-    // Also save combined array for backwards compatibility with punch verification
-    $office_loc = array(
-        'lat'      => $lat,
-        'lng'      => $lng,
-        'address'  => ! empty( $address ) ? $address : $maps_url,
-        'maps_url' => $maps_url,
-        'radius'   => $radius
-    );
     update_option( 'cora_attendance_office_location', $office_loc );
     
     wp_send_json_success( array(
@@ -14758,6 +14836,18 @@ function cora_get_current_user_agency_id() {
 }
 }
 
+if ( ! function_exists( 'cora_normalize_branch_id' ) ) {
+function cora_normalize_branch_id( $branch_id ) {
+    if ( empty( $branch_id ) ) {
+        return '1';
+    }
+    if ( strpos( $branch_id, 'branch_' ) === 0 ) {
+        return substr( $branch_id, 7 );
+    }
+    return (string) $branch_id;
+}
+}
+
 if ( ! function_exists( 'cora_get_current_user_branch_id' ) ) {
 function cora_get_current_user_branch_id() {
     $user_id = get_current_user_id();
@@ -14767,9 +14857,13 @@ function cora_get_current_user_branch_id() {
     if ( cora_is_real_shruti() ) {
         return '';
     }
+    if ( cora_is_workspace_owner() ) {
+        return '';
+    }
     $user = wp_get_current_user();
     $role = ! empty( $user->roles ) ? $user->roles[0] : '';
-    if ( $role === 'cora_manager' ) {
+    $bypass_roles = array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_workspace_owner', 'owner', 'cora_re_broker_owner', 'cora_studio_owner' );
+    if ( in_array( $role, $bypass_roles, true ) ) {
         return '';
     }
     return get_user_meta( $user_id, 'cora_branch_id', true );
@@ -15850,6 +15944,155 @@ function cora_migrate_options_to_custom_tables() {
 }
 }
 
+if ( ! function_exists( 'cora_db_get_agency_id_by_slug' ) ) {
+function cora_db_get_agency_id_by_slug( $slug ) {
+    if ( $slug === 'super' || empty( $slug ) || $slug === 'agency_1' || $slug === '1' || $slug === 1 ) {
+        return 1;
+    }
+    if ( strpos( $slug, 'agency_' ) === 0 ) {
+        return intval( substr( $slug, 7 ) );
+    }
+    if ( is_numeric( $slug ) ) {
+        return intval( $slug );
+    }
+    global $wpdb;
+    $id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_agencies WHERE slug = %s", $slug ) );
+    return $id ? intval( $id ) : 1;
+}
+}
+
+if ( ! function_exists( 'cora_user_has_feature_access' ) ) {
+function cora_user_has_feature_access( $target, $user = null ) {
+    if ( ! $user ) {
+        $user = wp_get_current_user();
+    }
+    if ( ! $user || ! $user->ID ) {
+        return false;
+    }
+
+    // Super Admin / Platform Owner gets full access
+    if ( cora_is_super_owner( $user ) || is_super_admin( $user->ID ) ) {
+        return true;
+    }
+
+    $role = ! empty( $user->roles ) ? $user->roles[0] : 'subscriber';
+
+    // Admins and Workspace Owners get full access
+    $full_access_roles = array(
+        'administrator',
+        'cora_shruti',
+        'cora_super_admin',
+        'cora_workspace_owner',
+        'owner',
+        'cora_re_broker_owner',
+        'cora_studio_owner'
+    );
+    if ( in_array( $role, $full_access_roles, true ) || user_can( $user->ID, 'manage_options' ) ) {
+        return true;
+    }
+
+    // Retrieve permissions matrix
+    $cora_permissions = get_option( 'cora_role_permissions', array() );
+    $allowed = isset( $cora_permissions[$role] ) ? $cora_permissions[$role] : null;
+
+    // If no custom permissions are set for this role, fallback to default capabilities
+    if ( $allowed === null ) {
+        $default_perms = array(
+            'cora_branch_manager'         => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'portfolio', 'leads', 'settings', 'settings-suite', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp' ),
+            'cora_manager'                => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'portfolio', 'leads', 'settings', 'settings-suite', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp' ),
+            'cora_photographer'           => array( 'dashboard', 'bookings', 'equipment', 'portfolio', 'media', 'leads' ),
+            'cora_videographer'           => array( 'dashboard', 'bookings', 'equipment', 'portfolio', 'media' ),
+            'cora_drone_pilot'            => array( 'dashboard', 'bookings', 'equipment', 'portfolio', 'media' ),
+            'cora_editor'                 => array( 'dashboard', 'bookings', 'media-editor', 'vault', 'media' ),
+            'cora_re_showing_assistant'   => array( 'dashboard', 'bookings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks' ),
+            'cora_re_property_valuer'     => array( 'dashboard', 'portfolio', 'vault', 'tasks' ),
+            'cora_re_listing_coordinator' => array( 'dashboard', 'portfolio', 'leads', 'clients', 'tasks' ),
+            'cora_viewer'                 => array( 'dashboard', 'portfolio', 'bookings' ),
+            'subscriber'                  => array( 'dashboard' ),
+        );
+        $allowed = isset( $default_perms[$role] ) ? $default_perms[$role] : array( 'dashboard' );
+    }
+
+    // Map targets to their corresponding matrix capability keys
+    $map = array(
+        'dashboard'          => 'dashboard',
+        
+        // Showings CRM / Bookings
+        'bookings'           => 'bookings',
+        'calendar'           => 'bookings',
+        
+        // Feature Hub / Blogs / Portfolio
+        'feature-hub'        => 'feature-hub',
+        'feature_hub'        => 'feature-hub',
+        'portfolio'          => 'portfolio',
+        'blogs'              => 'feature-hub',
+        'content-suite'      => 'feature-hub',
+        'content_suite'      => 'feature-hub',
+        
+        // Leads & Clients
+        'leads'              => 'leads',
+        'client-leads'       => 'leads',
+        'clients'            => 'leads',
+        
+        // User & Roles
+        'team-roles'         => 'team-roles',
+        'user-roles'         => 'team-roles',
+        'users'              => 'team-roles',
+        
+        // Equipment / Property Listings
+        'equipment'          => 'equipment',
+        'camera-equipment'   => 'equipment',
+        'listings'           => 'equipment',
+        
+        // Financials
+        'financials'         => 'financials',
+        'financial-overview' => 'financials',
+        
+        // Settings
+        'settings'           => 'settings',
+        'settings-suite'     => 'settings',
+        'settings_suite'     => 'settings',
+        
+        // Other subpages fall back to general categories or dashboard
+        'vault'              => 'dashboard',
+        'media'              => 'dashboard',
+        'media-manager'      => 'dashboard',
+        'tasks'              => 'dashboard',
+        'client-task-manager'=> 'dashboard',
+        'canvas'             => 'dashboard',
+        'forms'              => 'dashboard',
+        'emails'             => 'dashboard',
+        'review_acquisition' => 'dashboard',
+        'review-acquisition' => 'dashboard',
+        'gbp'                => 'dashboard',
+        'mcp'                => 'dashboard',
+        'attendance'         => 'dashboard',
+    );
+
+    // For Studio Mode, map 'feature-hub' to 'portfolio'
+    $active_industry = cora_get_active_industry();
+    $is_studio = ( strpos( strtolower( $active_industry ), 'photo' ) !== false || strpos( strtolower( $active_industry ), 'studio' ) !== false );
+    if ( $is_studio ) {
+        $map['blogs']         = 'portfolio';
+        $map['content-suite'] = 'portfolio';
+        $map['content_suite'] = 'portfolio';
+        $map['feature-hub']   = 'portfolio';
+        $map['feature_hub']   = 'portfolio';
+        // leads is a column in Studio Mode
+        $map['leads']         = 'leads';
+        $map['clients']       = 'leads';
+    } else {
+        // leads is NOT a column in Real Estate Mode
+        $map['leads']         = 'dashboard';
+        $map['clients']       = 'dashboard';
+    }
+
+    $mapped_key = isset( $map[$target] ) ? $map[$target] : $target;
+
+    return in_array( $mapped_key, $allowed, true );
+}
+}
+
 if ( ! function_exists( 'cora_db_get_agency_id' ) ) {
 function cora_db_get_agency_id() {
     $agency_slug = cora_get_current_user_agency_id();
@@ -15912,7 +16155,7 @@ function cora_db_get_leads() {
     $query = "SELECT * FROM {$wpdb->prefix}cora_leads WHERE agency_id = %d";
     $params = array( $agency_id );
 
-    if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'super_admin', 'agency_owner' ) ) ) {
+    if ( ! cora_is_workspace_owner() && ! in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_workspace_owner', 'owner', 'cora_re_broker_owner', 'cora_studio_owner', 'cora_studio_manager', 'cora_re_managing_agent', 'super_admin', 'agency_owner' ), true ) ) {
         $query .= " AND branch_id = %d";
         $params[] = $branch_id;
     }
@@ -16030,7 +16273,7 @@ function cora_db_get_clients() {
     $query = "SELECT * FROM {$wpdb->prefix}cora_clients WHERE agency_id = %d";
     $params = array( $agency_id );
 
-    if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'super_admin', 'agency_owner' ) ) ) {
+    if ( ! cora_is_workspace_owner() && ! in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_workspace_owner', 'owner', 'cora_re_broker_owner', 'cora_studio_owner', 'cora_studio_manager', 'cora_re_managing_agent', 'super_admin', 'agency_owner' ), true ) ) {
         $query .= " AND branch_id = %d";
         $params[] = $branch_id;
     }
@@ -16073,7 +16316,7 @@ function cora_db_get_properties() {
     $query = "SELECT * FROM {$wpdb->prefix}cora_properties WHERE agency_id = %d";
     $params = array( $agency_id );
 
-    if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'super_admin', 'agency_owner' ) ) ) {
+    if ( ! cora_is_workspace_owner() && ! in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_workspace_owner', 'owner', 'cora_re_broker_owner', 'cora_studio_owner', 'cora_studio_manager', 'cora_re_managing_agent', 'super_admin', 'agency_owner' ), true ) ) {
         $query .= " AND branch_id = %d";
         $params[] = $branch_id;
     }
@@ -16124,7 +16367,7 @@ function cora_db_get_bookings() {
     $query = "SELECT * FROM {$wpdb->prefix}cora_bookings WHERE agency_id = %d";
     $params = array( $agency_id );
 
-    if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'super_admin', 'agency_owner' ) ) ) {
+    if ( ! cora_is_workspace_owner() && ! in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_workspace_owner', 'owner', 'cora_re_broker_owner', 'cora_studio_owner', 'cora_studio_manager', 'cora_re_managing_agent', 'super_admin', 'agency_owner' ), true ) ) {
         $query .= " AND branch_id = %d";
         $params[] = $branch_id;
     }
@@ -16169,7 +16412,7 @@ function cora_db_get_ledger() {
     $query = "SELECT * FROM {$wpdb->prefix}cora_ledger WHERE agency_id = %d";
     $params = array( $agency_id );
 
-    if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'super_admin', 'agency_owner' ) ) ) {
+    if ( ! cora_is_workspace_owner() && ! in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_workspace_owner', 'owner', 'cora_re_broker_owner', 'cora_studio_owner', 'cora_studio_manager', 'cora_re_managing_agent', 'super_admin', 'agency_owner' ), true ) ) {
         $query .= " AND branch_id = %d";
         $params[] = $branch_id;
     }
@@ -16265,7 +16508,7 @@ function cora_db_get_invitations() {
     $query = "SELECT * FROM {$wpdb->prefix}cora_invitations WHERE agency_id = %d";
     $params = array( $agency_id );
 
-    if ( ! in_array( $current_role, array( 'administrator', 'cora_manager', 'super_admin', 'agency_owner' ) ) ) {
+    if ( ! cora_is_workspace_owner() && ! in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_workspace_owner', 'owner', 'cora_re_broker_owner', 'cora_studio_owner', 'cora_studio_manager', 'cora_re_managing_agent', 'super_admin', 'agency_owner' ), true ) ) {
         $query .= " AND branch_id = %d";
         $params[] = $branch_id;
     }
@@ -16274,10 +16517,16 @@ function cora_db_get_invitations() {
 
     $mapped = array();
     if ( $rows ) {
+        $inv_options = get_option( 'cora_invitations', array() );
         foreach ( $rows as $r ) {
-            $mapped[$r['token']] = array(
+            $token = $r['token'];
+            $first_name = isset( $inv_options[$token]['first_name'] ) ? $inv_options[$token]['first_name'] : '';
+            $last_name = isset( $inv_options[$token]['last_name'] ) ? $inv_options[$token]['last_name'] : '';
+            $mapped[$token] = array(
                 'agency_id' => 'agency_' . $r['agency_id'],
                 'branch_id' => 'branch_' . $r['branch_id'],
+                'first_name' => $first_name,
+                'last_name'  => $last_name,
                 'email' => $r['email'],
                 'role' => $r['role'],
                 'invited_by' => $r['invited_by'],
@@ -16526,15 +16775,16 @@ function cora_sync_db_tables_to_options() {
         return;
     }
     
-    $agency_num = 1;
-    if ( preg_match( '/^agency_(\d+)$/', $agency_slug, $ag_m ) ) {
-        $agency_num = intval( $ag_m[1] );
-    }
+    $agency_num = cora_db_get_agency_id();
 
     $branch_slug = cora_get_current_user_branch_id();
     $branch_num = null;
-    if ( ! empty( $branch_slug ) && preg_match( '/^branch_(\d+)$/', $branch_slug, $br_m ) ) {
-        $branch_num = intval( $br_m[1] );
+    if ( ! empty( $branch_slug ) ) {
+        if ( preg_match( '/^branch_(\d+)$/', $branch_slug, $br_m ) ) {
+            $branch_num = intval( $br_m[1] );
+        } else {
+            $branch_num = intval( preg_replace( '/[^\d]/', '', $branch_slug ) );
+        }
     }
     
     // 1. Sync branches
@@ -17762,9 +18012,11 @@ function cora_ajax_resend_guest_verification() {
     // Locate invitation details
     $invitations = get_option( 'cora_invitations', array() );
     $found_token = '';
+    $found_inv = null;
     foreach ( $invitations as $tok => $inv ) {
         if ( $inv['email'] === $email && $inv['status'] === 'pending' ) {
             $found_token = $tok;
+            $found_inv = $inv;
             break;
         }
     }
@@ -17772,6 +18024,26 @@ function cora_ajax_resend_guest_verification() {
     if ( $found_token ) {
         $verification_link = home_url( '/workspace/setup-account?token=' . $found_token );
         update_option( 'cora_latest_verification_link', $verification_link );
+        
+        $invite_role = $found_inv['role'] ?? 'member';
+        $inviter_id = $found_inv['invited_by'] ?? 1;
+        $inviter = get_userdata( $inviter_id );
+        $inviter_name = $inviter ? ($inviter->display_name ?: $inviter->user_email) : 'Administrator';
+
+        $subject = "You've been invited to join workspace on Cora";
+        $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+        $body = "
+        <div style='font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:560px;margin:0 auto;padding:32px;background:#FAFAFA;border-radius:12px;border:1px solid #E4E4E7;'>
+            <h2 style='color:#09090B;margin-top:0;font-size:20px;font-weight:700;'>Workspace Team Invitation</h2>
+            <p style='color:#52525B;font-size:14px;line-height:1.6;'>Hello,</p>
+            <p style='color:#52525B;font-size:14px;line-height:1.6;'>You have been invited to join the workspace as <strong>" . esc_html( $invite_role ) . "</strong> by " . esc_html( $inviter_name ) . ".</p>
+            <div style='margin:28px 0;'>
+                <a href='" . esc_url( $verification_link ) . "' style='background:#09090B;color:#FFFFFF;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;display:inline-block;'>Accept Invitation & Setup Account →</a>
+            </div>
+            <p style='color:#A1A1AA;font-size:12px;'>Or copy and paste this URL into your browser: <br><a href='" . esc_url( $verification_link ) . "' style='color:#18181B;'>" . esc_url( $verification_link ) . "</a></p>
+        </div>";
+
+        @wp_mail( $email, $subject, $body, $headers );
         
         cora_log_activity( 'Invitation', "Resent verification/setup link to {$email}." );
         
@@ -17808,7 +18080,7 @@ function cora_ajax_accept_invitation() {
     }
 
     $email = $invite['email'];
-    $agency_id_num = intval( preg_replace( '/[^\d]/', '', $invite['agency_id'] ?? '1' ) );
+    $agency_id_num = cora_db_get_agency_id_by_slug( $invite['agency_id'] ?? '1' );
     $branch_id_num = intval( preg_replace( '/[^\d]/', '', $invite['branch_id'] ?? '1' ) );
     if ( empty( $agency_id_num ) ) { $agency_id_num = 1; }
 
@@ -17963,8 +18235,7 @@ function cora_ajax_send_invitation() {
     }
 
     $agency_id_raw = cora_get_current_user_agency_id();
-    $agency_id_num = intval( preg_replace( '/[^\d]/', '', $agency_id_raw ) );
-    if ( empty( $agency_id_num ) ) { $agency_id_num = 1; }
+    $agency_id_num = cora_db_get_agency_id();
 
     global $wpdb;
     $cora_users_table = $wpdb->prefix . 'cora_users';
@@ -18148,36 +18419,7 @@ function cora_ajax_save_custom_role() {
 }
 add_action( 'wp_ajax_cora_ajax_save_custom_role', 'cora_ajax_save_custom_role' );
 
-/**
- * AJAX — Delete Custom Role from active tenant workspace.
- */
-if ( ! function_exists( 'cora_ajax_delete_custom_role' ) ) {
-function cora_ajax_delete_custom_role() {
-    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! is_user_logged_in() ) {
-        wp_send_json_error( array( 'message' => 'Authentication required.' ) );
-    }
 
-    $role_key = sanitize_text_field( $_POST['role_key'] ?? '' );
-    if ( empty( $role_key ) ) {
-        wp_send_json_error( array( 'message' => 'Invalid role key.' ) );
-    }
-
-    $agency_id_raw = cora_get_current_user_agency_id();
-    $option_key    = 'cora_custom_roles_' . preg_replace( '/[^\w]/', '_', $agency_id_raw );
-    $custom_roles  = get_option( $option_key, array() );
-
-    if ( isset( $custom_roles[ $role_key ] ) ) {
-        unset( $custom_roles[ $role_key ] );
-        update_option( $option_key, $custom_roles );
-        cora_log_activity( 'User Management', "Deleted custom role: {$role_key}" );
-        wp_send_json_success( array( 'message' => 'Custom role deleted.' ) );
-    }
-
-    wp_send_json_error( array( 'message' => 'Custom role not found.' ) );
-}
-}
-add_action( 'wp_ajax_cora_ajax_delete_custom_role', 'cora_ajax_delete_custom_role' );
 
 /**
  * AJAX — Transfer Workspace Primary Ownership.
@@ -18197,8 +18439,7 @@ function cora_ajax_transfer_workspace_ownership() {
     }
 
     $agency_id_raw = cora_get_current_user_agency_id();
-    $agency_id_num = intval( preg_replace( '/[^\d]/', '', $agency_id_raw ) );
-    if ( empty( $agency_id_num ) ) { $agency_id_num = 1; }
+    $agency_id_num = cora_db_get_agency_id();
 
     global $wpdb;
     $cora_users_table = $wpdb->prefix . 'cora_users';
@@ -19842,11 +20083,11 @@ function cora_handle_api_v1_request( $path_parts ) {
         }
         $all_wp_users = get_users( $user_query_args );
         $users_list = array();
-        $my_branch = cora_get_current_user_branch_id();
+        $my_branch = cora_normalize_branch_id( cora_get_current_user_branch_id() );
 
         foreach ( $all_wp_users as $u ) {
-            $u_branch = get_user_meta( $u->ID, 'cora_branch_id', true );
-            if ( ! empty( $my_branch ) && $u_branch !== $my_branch ) {
+            $u_branch = cora_normalize_branch_id( get_user_meta( $u->ID, 'cora_branch_id', true ) );
+            if ( ! cora_is_workspace_owner() && ! empty( $my_branch ) && $u_branch !== $my_branch ) {
                 continue;
             }
             $status = get_user_meta( $u->ID, 'cora_user_status', true ) ?: 'active';
@@ -22818,6 +23059,7 @@ function cora_configure_phpmailer_smtp( $phpmailer ) {
         $phpmailer->SMTPSecure = strtolower( $smtp['smtp_secure'] ); // 'ssl' or 'tls'
         $phpmailer->From       = ! empty( $smtp['from_email'] ) ? $smtp['from_email'] : 'heycora@claraverse.in';
         $phpmailer->FromName   = ! empty( $smtp['from_name'] ) ? $smtp['from_name'] : 'Cora';
+        $phpmailer->Sender     = $phpmailer->From;
     }
 }
 }
@@ -25629,7 +25871,7 @@ function cora_ajax_add_custom_role() {
     $user = wp_get_current_user();
     $roles = (array) $user->roles;
     $main_role = ! empty( $roles[0] ) ? $roles[0] : '';
-    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! in_array( $main_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_re_broker_owner', 'cora_studio_owner' ), true ) ) {
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! in_array( $main_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_re_broker_owner', 'cora_studio_owner', 'cora_workspace_owner', 'owner' ), true ) ) {
         wp_send_json_error( array( 'message' => 'Insufficient permissions to manage custom roles.' ) );
     }
 
@@ -25655,7 +25897,11 @@ function cora_ajax_add_custom_role() {
     add_role( $role_key, $role_name, array( 'read' => true ) );
 
     // Save to custom roles option
-    $custom_roles = get_option( 'cora_custom_roles', array() );
+    $agency_id_raw = cora_get_current_user_agency_id();
+    $agency_suffix = ( ! empty( $agency_id_raw ) && $agency_id_raw !== 'super' ) ? '_' . preg_replace( '/[^\w]/', '_', $agency_id_raw ) : '';
+    
+    $custom_roles_key = 'cora_custom_roles' . $agency_suffix;
+    $custom_roles = get_option( $custom_roles_key, array() );
     if ( ! is_array( $custom_roles ) ) {
         $custom_roles = array();
     }
@@ -25670,15 +25916,31 @@ function cora_ajax_add_custom_role() {
     );
 
     $custom_roles[] = $new_role_entry;
-    update_option( 'cora_custom_roles', $custom_roles );
+    update_option( $custom_roles_key, $custom_roles );
+
+    // If tenant-scoped, also mirror to global custom roles for compatibility or global fallback
+    if ( ! empty( $agency_suffix ) ) {
+        $global_custom_roles = get_option( 'cora_custom_roles', array() );
+        if ( ! is_array( $global_custom_roles ) ) { $global_custom_roles = array(); }
+        $global_custom_roles[] = $new_role_entry;
+        update_option( 'cora_custom_roles', $global_custom_roles );
+    }
 
     // Update cora_role_permissions option
-    $cora_permissions = get_option( 'cora_role_permissions', array() );
+    $role_permissions_key = 'cora_role_permissions' . $agency_suffix;
+    $cora_permissions = get_option( $role_permissions_key, array() );
     if ( ! is_array( $cora_permissions ) ) {
         $cora_permissions = array();
     }
     $cora_permissions[$role_key] = $permissions;
-    update_option( 'cora_role_permissions', $cora_permissions );
+    update_option( $role_permissions_key, $cora_permissions );
+
+    if ( ! empty( $agency_suffix ) ) {
+        $global_permissions = get_option( 'cora_role_permissions', array() );
+        if ( ! is_array( $global_permissions ) ) { $global_permissions = array(); }
+        $global_permissions[$role_key] = $permissions;
+        update_option( 'cora_role_permissions', $global_permissions );
+    }
 
     cora_log_activity( 'User Management', "Created custom role: {$role_name} ({$role_key})." );
     wp_send_json_success( array( 
@@ -25688,6 +25950,7 @@ function cora_ajax_add_custom_role() {
 }
 }
 add_action( 'wp_ajax_cora_add_custom_role', 'cora_ajax_add_custom_role' );
+add_action( 'wp_ajax_cora_ajax_add_custom_role', 'cora_ajax_add_custom_role' );
 add_action( 'wp_ajax_cora_create_custom_role', 'cora_ajax_add_custom_role' );
 
 /**
@@ -25714,8 +25977,12 @@ function cora_ajax_save_custom_role_permissions() {
         wp_send_json_error( array( 'message' => 'Role identifier key is required.' ) );
     }
 
-    // Update cora_custom_roles option
-    $custom_roles = get_option( 'cora_custom_roles', array() );
+    // Save to custom roles option (tenant-scoped)
+    $agency_id_raw = cora_get_current_user_agency_id();
+    $agency_suffix = ( ! empty( $agency_id_raw ) && $agency_id_raw !== 'super' ) ? '_' . preg_replace( '/[^\w]/', '_', $agency_id_raw ) : '';
+
+    $custom_roles_key = 'cora_custom_roles' . $agency_suffix;
+    $custom_roles = get_option( $custom_roles_key, array() );
     if ( ! is_array( $custom_roles ) ) {
         $custom_roles = array();
     }
@@ -25744,15 +26011,58 @@ function cora_ajax_save_custom_role_permissions() {
             'permissions'   => $permissions
         );
     }
-    update_option( 'cora_custom_roles', $custom_roles );
+    update_option( $custom_roles_key, $custom_roles );
 
-    // Update cora_role_permissions option
-    $cora_permissions = get_option( 'cora_role_permissions', array() );
+    // If tenant-scoped, also mirror to global custom roles option
+    if ( ! empty( $agency_suffix ) ) {
+        $global_custom_roles = get_option( 'cora_custom_roles', array() );
+        if ( ! is_array( $global_custom_roles ) ) {
+            $global_custom_roles = array();
+        }
+        $global_updated = false;
+        foreach ( $global_custom_roles as &$gcr ) {
+            if ( $gcr['role_key'] === $role_key ) {
+                if ( ! empty( $role_name ) ) {
+                    $gcr['role_name'] = $role_name;
+                }
+                $gcr['access_level'] = $access_level;
+                $gcr['max_quota']    = $max_quota;
+                $gcr['permissions']  = $permissions;
+                $global_updated = true;
+                break;
+            }
+        }
+        unset( $gcr );
+        if ( ! $global_updated ) {
+            $global_custom_roles[] = array(
+                'role_key'      => $role_key,
+                'role_name'     => ! empty( $role_name ) ? $role_name : $role_key,
+                'access_level'  => $access_level,
+                'max_quota'     => $max_quota,
+                'permissions'   => $permissions
+            );
+        }
+        update_option( 'cora_custom_roles', $global_custom_roles );
+    }
+
+    // Update cora_role_permissions option (tenant-scoped)
+    $role_permissions_key = 'cora_role_permissions' . $agency_suffix;
+    $cora_permissions = get_option( $role_permissions_key, array() );
     if ( ! is_array( $cora_permissions ) ) {
         $cora_permissions = array();
     }
     $cora_permissions[$role_key] = $permissions;
-    update_option( 'cora_role_permissions', $cora_permissions );
+    update_option( $role_permissions_key, $cora_permissions );
+
+    // Also mirror to global role permissions option
+    if ( ! empty( $agency_suffix ) ) {
+        $global_permissions = get_option( 'cora_role_permissions', array() );
+        if ( ! is_array( $global_permissions ) ) {
+            $global_permissions = array();
+        }
+        $global_permissions[$role_key] = $permissions;
+        update_option( 'cora_role_permissions', $global_permissions );
+    }
 
     // Update WP role display name if changed
     if ( ! empty( $role_name ) && wp_roles()->is_role( $role_key ) ) {
@@ -25763,6 +26073,7 @@ function cora_ajax_save_custom_role_permissions() {
     wp_send_json_success( array( 'message' => 'Custom role permissions updated successfully!' ) );
 }
 }
+
 add_action( 'wp_ajax_cora_ajax_save_custom_role_permissions', 'cora_ajax_save_custom_role_permissions' );
 add_action( 'wp_ajax_cora_save_custom_role_permissions', 'cora_ajax_save_custom_role_permissions' );
 
@@ -25785,7 +26096,12 @@ function cora_ajax_duplicate_custom_role() {
         wp_send_json_error( array( 'message' => 'Source role key is required.' ) );
     }
 
-    $custom_roles = get_option( 'cora_custom_roles', array() );
+    // Get tenant scoped suffixes
+    $agency_id_raw = cora_get_current_user_agency_id();
+    $agency_suffix = ( ! empty( $agency_id_raw ) && $agency_id_raw !== 'super' ) ? '_' . preg_replace( '/[^\w]/', '_', $agency_id_raw ) : '';
+
+    $custom_roles_key = 'cora_custom_roles' . $agency_suffix;
+    $custom_roles = get_option( $custom_roles_key, array() );
     if ( ! is_array( $custom_roles ) ) {
         $custom_roles = array();
     }
@@ -25798,7 +26114,11 @@ function cora_ajax_duplicate_custom_role() {
         }
     }
 
-    $cora_permissions = get_option( 'cora_role_permissions', array() );
+    $role_permissions_key = 'cora_role_permissions' . $agency_suffix;
+    $cora_permissions = get_option( $role_permissions_key, array() );
+    if ( ! is_array( $cora_permissions ) ) {
+        $cora_permissions = array();
+    }
 
     if ( $source_role ) {
         $base_name    = $source_role['role_name'];
@@ -25841,14 +26161,31 @@ function cora_ajax_duplicate_custom_role() {
     );
 
     $custom_roles[] = $duplicated_entry;
-    update_option( 'cora_custom_roles', $custom_roles );
+    update_option( $custom_roles_key, $custom_roles );
 
-    // Update cora_role_permissions
-    if ( ! is_array( $cora_permissions ) ) {
-        $cora_permissions = array();
+    // If tenant-scoped, also mirror to global custom roles
+    if ( ! empty( $agency_suffix ) ) {
+        $global_custom_roles = get_option( 'cora_custom_roles', array() );
+        if ( ! is_array( $global_custom_roles ) ) {
+            $global_custom_roles = array();
+        }
+        $global_custom_roles[] = $duplicated_entry;
+        update_option( 'cora_custom_roles', $global_custom_roles );
     }
+
+    // Update cora_role_permissions option
     $cora_permissions[$new_role_key] = $permissions;
-    update_option( 'cora_role_permissions', $cora_permissions );
+    update_option( $role_permissions_key, $cora_permissions );
+
+    // Mirror to global role permissions option
+    if ( ! empty( $agency_suffix ) ) {
+        $global_permissions = get_option( 'cora_role_permissions', array() );
+        if ( ! is_array( $global_permissions ) ) {
+            $global_permissions = array();
+        }
+        $global_permissions[$new_role_key] = $permissions;
+        update_option( 'cora_role_permissions', $global_permissions );
+    }
 
     cora_log_activity( 'User Management', "Duplicated custom role {$source_role_key} to {$new_role_name} ({$new_role_key})." );
     wp_send_json_success( array( 
@@ -25870,7 +26207,7 @@ function cora_ajax_delete_custom_role() {
     $user = wp_get_current_user();
     $roles = (array) $user->roles;
     $main_role = ! empty( $roles[0] ) ? $roles[0] : '';
-    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! in_array( $main_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_re_broker_owner', 'cora_studio_owner' ), true ) ) {
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! in_array( $main_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_re_broker_owner', 'cora_studio_owner', 'cora_workspace_owner', 'owner' ), true ) ) {
         wp_send_json_error( array( 'message' => 'Insufficient permissions to delete custom roles.' ) );
     }
 
@@ -25891,24 +26228,54 @@ function cora_ajax_delete_custom_role() {
     // Remove WordPress role
     remove_role( $role_key );
 
-    // Remove from custom roles option
-    $custom_roles = get_option( 'cora_custom_roles', array() );
+    // Get tenant scoped suffixes
+    $agency_id_raw = cora_get_current_user_agency_id();
+    $agency_suffix = ( ! empty( $agency_id_raw ) && $agency_id_raw !== 'super' ) ? '_' . preg_replace( '/[^\w]/', '_', $agency_id_raw ) : '';
+
+    // Remove from custom roles option (tenant-scoped)
+    $custom_roles_key = 'cora_custom_roles' . $agency_suffix;
+    $custom_roles = get_option( $custom_roles_key, array() );
     if ( is_array( $custom_roles ) ) {
         foreach ( $custom_roles as $k => $c ) {
-            if ( $c['role_key'] === $role_key ) {
+            if ( isset( $c['role_key'] ) && $c['role_key'] === $role_key ) {
                 unset( $custom_roles[$k] );
                 break;
             }
         }
         $custom_roles = array_values( $custom_roles );
-        update_option( 'cora_custom_roles', $custom_roles );
+        update_option( $custom_roles_key, $custom_roles );
     }
 
-    // Remove from cora_role_permissions option
-    $cora_permissions = get_option( 'cora_role_permissions', array() );
+    // Also remove from global custom roles option for compatibility
+    if ( ! empty( $agency_suffix ) ) {
+        $global_custom_roles = get_option( 'cora_custom_roles', array() );
+        if ( is_array( $global_custom_roles ) ) {
+            foreach ( $global_custom_roles as $k => $c ) {
+                if ( isset( $c['role_key'] ) && $c['role_key'] === $role_key ) {
+                    unset( $global_custom_roles[$k] );
+                    break;
+                }
+            }
+            $global_custom_roles = array_values( $global_custom_roles );
+            update_option( 'cora_custom_roles', $global_custom_roles );
+        }
+    }
+
+    // Remove from cora_role_permissions option (tenant-scoped)
+    $role_permissions_key = 'cora_role_permissions' . $agency_suffix;
+    $cora_permissions = get_option( $role_permissions_key, array() );
     if ( is_array( $cora_permissions ) && isset( $cora_permissions[$role_key] ) ) {
         unset( $cora_permissions[$role_key] );
-        update_option( 'cora_role_permissions', $cora_permissions );
+        update_option( $role_permissions_key, $cora_permissions );
+    }
+
+    // Also remove from global role permissions option
+    if ( ! empty( $agency_suffix ) ) {
+        $global_permissions = get_option( 'cora_role_permissions', array() );
+        if ( is_array( $global_permissions ) && isset( $global_permissions[$role_key] ) ) {
+            unset( $global_permissions[$role_key] );
+            update_option( 'cora_role_permissions', $global_permissions );
+        }
     }
 
     cora_log_activity( 'User Management', "Deleted custom role: {$role_key}." );
@@ -25916,6 +26283,7 @@ function cora_ajax_delete_custom_role() {
 }
 }
 add_action( 'wp_ajax_cora_delete_custom_role', 'cora_ajax_delete_custom_role' );
+add_action( 'wp_ajax_cora_ajax_delete_custom_role', 'cora_ajax_delete_custom_role' );
 
 
 // ── Outgoing Emails White-Labeling System ───────────────────────────────────
@@ -26125,11 +26493,7 @@ function cora_is_super_owner( $user = null ) {
     if ( ! $user || ! $user->exists() ) {
         return false;
     }
-    $user_roles = (array) $user->roles;
-    if ( in_array( 'cora_shruti', $user_roles, true ) ) {
-        return true;
-    }
-    $super_emails = array( 'shruti@heycora.in', 'shrutian@heycora.in', 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com' );
+    $super_emails = array( 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com' );
     if ( in_array( strtolower( $user->user_email ), $super_emails, true ) ) {
         return true;
     }
@@ -26143,6 +26507,49 @@ function cora_is_super_owner( $user = null ) {
 if ( ! function_exists( 'cora_is_real_shruti' ) ) {
 function cora_is_real_shruti( $user = null ) {
     return cora_is_super_owner( $user );
+}
+}
+
+/**
+ * Check if the logged-in user is a workspace owner or administrator.
+ */
+if ( ! function_exists( 'cora_is_workspace_owner' ) ) {
+function cora_is_workspace_owner( $user = null ) {
+    if ( ! $user ) {
+        $user = wp_get_current_user();
+    }
+    if ( ! $user || ! $user->ID ) {
+        return false;
+    }
+
+    // Check if user is the owner of their agency
+    $user_agency = get_user_meta( $user->ID, 'cora_agency_id', true );
+    if ( ! empty( $user_agency ) ) {
+        global $wpdb;
+        $owner_id = null;
+        $table_exists = cora_table_exists( $wpdb->prefix . 'cora_agencies' );
+        if ( $table_exists ) {
+            if ( is_numeric( $user_agency ) ) {
+                $owner_id = $wpdb->get_var( $wpdb->prepare( "SELECT owner_user_id FROM {$wpdb->prefix}cora_agencies WHERE id = %d", intval( $user_agency ) ) );
+            } elseif ( strpos( $user_agency, 'agency_' ) === 0 ) {
+                $db_id = intval( substr( $user_agency, 7 ) );
+                $owner_id = $wpdb->get_var( $wpdb->prepare( "SELECT owner_user_id FROM {$wpdb->prefix}cora_agencies WHERE id = %d", $db_id ) );
+            } else {
+                $owner_id = $wpdb->get_var( $wpdb->prepare( "SELECT owner_user_id FROM {$wpdb->prefix}cora_agencies WHERE slug = %s", $user_agency ) );
+            }
+            if ( $owner_id && intval( $owner_id ) === intval( $user->ID ) ) {
+                return true;
+            }
+        }
+    }
+
+    $roles = (array) $user->roles;
+    $main_role = ! empty( $roles[0] ) ? $roles[0] : '';
+    $owner_roles = array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_re_broker_owner', 'cora_studio_owner', 'owner', 'cora_workspace_owner' );
+    if ( in_array( $main_role, $owner_roles, true ) ) {
+        return true;
+    }
+    return false;
 }
 }
 
@@ -31109,41 +31516,7 @@ function cora_ajax_update_user_status() {
 }
 add_action( 'wp_ajax_cora_update_user_status', 'cora_ajax_update_user_status' );
 
-if ( ! function_exists( 'cora_ajax_save_office_location' ) ) {
-function cora_ajax_save_office_location() {
-    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! current_user_can( 'manage_options' ) && ! cora_is_workspace_owner() && ! cora_is_super_owner() ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
-    }
 
-    $office_name  = sanitize_text_field( $_POST['office_name'] ?? 'Headquarters Office' );
-    $lat          = floatval( $_POST['lat'] ?? 0 );
-    $lng          = floatval( $_POST['lng'] ?? 0 );
-    $radius       = intval( $_POST['radius'] ?? 300 );
-    $ip_whitelist = sanitize_text_field( $_POST['ip_whitelist'] ?? '' );
-    $agency_id    = cora_get_current_user_agency_id();
-
-    $location_data = array(
-        'office_name'  => $office_name,
-        'lat'          => $lat,
-        'lng'          => $lng,
-        'radius'       => $radius,
-        'ip_whitelist' => $ip_whitelist,
-        'updated_at'   => current_time( 'mysql' )
-    );
-
-    update_option( 'cora_attendance_office_location_' . $agency_id, $location_data );
-    update_option( 'cora_attendance_office_location', $location_data );
-
-    cora_log_activity( 'Office Location', "Updated Office Geofence: {$office_name} ({$lat}, {$lng}, radius {$radius}m)" );
-
-    wp_send_json_success( array(
-        'message' => 'Office location & geofence updated successfully',
-        'location' => $location_data
-    ) );
-}
-}
-add_action( 'wp_ajax_cora_save_office_location', 'cora_ajax_save_office_location' );
 
 if ( ! function_exists( 'cora_ajax_universal_search' ) ) {
 function cora_ajax_universal_search() {

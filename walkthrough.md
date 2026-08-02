@@ -116,3 +116,85 @@ We have successfully resolved cross-module script and layout interference issues
   - Deployed release successfully to both Demo (`https://heycora.in/demo`) and Production (`https://heycora.in`) environments with all verification checks passing ✅.
 
 
+---
+
+## 📦 Version 2.9.70 Release: Custom Roles AJAX, Dynamic Industry Accessibility & Safety Guidelines
+
+### 1. Custom Roles AJAX Hooks & Legacy Cleanup
+- **AJAX Hook Registration**: Registered `wp_ajax_cora_ajax_add_custom_role` and `wp_ajax_cora_ajax_delete_custom_role` hooks in `cora-workspace.php` to prevent HTTP 400 Bad Request network errors during Custom Role creation/deletion.
+- **Legacy Duplicate Removal**: Deleted legacy duplicate definitions of `cora_ajax_delete_custom_role()` that overrode active tenant-scoped functionality due to defensive `function_exists` checks.
+- **Tenant-Scoped Deletion**: Updated custom role deletion logic in `cora-workspace.php` to scope option queries specifically under tenant-aware database keys (e.g. `cora_custom_roles_agency_X`) and remove roles from both local database entries and global compatibility fallbacks.
+
+### 2. Dynamic Industry-Scoped Feature Accessibility
+- **Centralized Label Resolver**: In `views/view-users.php`, implemented a dynamic `$feature_labels` array mapping core permissions keys (such as `crm_leads`, `showings_bookings`, and `equipment`) and monthly booking quotas to industry-specific labels based on the active workspace industry mode (`$is_studio_mode`).
+- **Dynamic Checkboxes**: Updated checkbox forms in both the Create Custom Role Drawer and Edit Custom Role Drawer to render dynamic titles based on the active industry (e.g. "Property Listings" / "Camera Equipment").
+- **Matrix Column Headers**: Replaced hardcoded columns in the Granular Permissions Matrix configuration using dynamic industry labels, converting "Equipment" to "Property Listings" when in Real Estate mode.
+- **Active Roles Summary Tags**: Configured active custom roles tags in the overview summary grid to resolve labels dynamically (e.g. "Camera Gear" vs "Property Listings").
+- **Photography Roles Rendering**: Fixed a buggy string check inside standard/custom roles matrix rendering where hyphens and underscores caused photography studio roles to be incorrectly filtered out.
+
+### 3. Safety Rules & Regression Safety
+- **Centralized Safety Rules**: Created `REGRESSION_RULES.md` in `.agents/` to enforce that all future versions and new industries register matched AJAX actions and define industry-specific labels dynamically.
+- **Release & Staging Deployment**:
+  - Incremented the Version header and constant to `2.9.70` in `cora-workspace.php`.
+  - Incremented the manifest version to `2.9.70` in `updates/cora-workspace.json` and appended the release changelog.
+  - Packaged the release via `scripts/build.sh` and deployed it to the demo environment via `scripts/run_deploy.py`.
+  - Verified environment health and plugin status with `scripts/run_healthcheck.py` showing all checks passed successfully.
+
+---
+
+## 22. Custom Roles AJAX Alignments & Dynamic Industry-Scoped Labels (`v2.9.70`)
+
+### Summary of Accomplishments:
+* **AJAX Hook Alignment**: Registered all client-side JS AJAX action hook variations (such as `cora_ajax_add_custom_role`) matching the `$.post` requests in the client code to resolve route mismatch issues.
+* **Dynamic Industry-Scoped Feature Accessibility**: Checked the active workspace industry (`cora_get_active_industry()`) to dynamically map capability settings throughout the UI based on whether the active industry is **Real Estate** or **Photography Studio**:
+  - **Checkboxes & Quotas in Drawers**: Create/Edit Custom Role drawer checkbox labels and maximum quota instructions automatically render as:
+    - Real Estate: `"Property Listings"`, `"Showings & Bookings"`, `"Max Showing/Listing Quota (Monthly)"`
+    - Photography Studio: `"Camera Equipment"`, `"Shoots & Bookings"`, `"Max Shoot/Booking Quota (Monthly)"`
+  - **Permissions Matrix & Overview Table**: Column headers, table labels, and role permission pills switch context dynamically to align with the active workspace industry.
+
+---
+
+## 23. E2E Suite Resiliency, Permissions Matrix Save Verification & Staging Execution (`v2.9.71`)
+
+### Summary of Accomplishments:
+* **Resilient Randomized Role Suffixes**: Updated the custom roles E2E test suite (`tests/e2e/custom-roles.spec.ts`) to use dynamic random naming conventions (`E2E RE Agent Role ${rand}`). This prevents database collision or test pollution issues on concurrent test runs or partial test failures.
+* **Granular Permissions Matrix E2E Verification**: Added a third E2E test `Verify Permissions Matrix Save E2E` that toggles capability matrix checkboxes and asserts that the Live Sync AJAX autosave pipeline responds with a successful `"Permissions matrix saved successfully"` toast feedback.
+* **Playwright Staging Target Overrides**: Configured `playwright.config.ts` to allow overriding the target URL using `process.env.BASE_URL` so tests can execute against any environment dynamically.
+* **Staging Environment Access Realignment**:
+  - Created a test admin user (`cora_admin` / `admin@cora.local`) on the remote staging site (`https://app.heycora.in`) via WP-CLI.
+  - Explicitly wrote `cora_email_verified = 1` and promoted user ID 9 to `administrator` to bypass email verification checks and grant the `manage_options` capability required to save the permissions matrix.
+* **Staging Verification**: Successfully ran E2E Playwright tests directly against the staging demo environment (`https://app.heycora.in`), verifying 100% success across all tests:
+  ```bash
+  BASE_URL=https://app.heycora.in npx playwright test tests/e2e/custom-roles.spec.ts
+  
+  Running 3 tests using 1 worker
+    ✓  1 [chromium] › tests/e2e/custom-roles.spec.ts:17:7 › Custom Roles & Dynamic Permissions E2E Tests › Create, Edit, Duplicate, and Delete Custom Role in Real Estate Workspace (23.3s)
+    ✓  2 [chromium] › tests/e2e/custom-roles.spec.ts:170:7 › Custom Roles & Dynamic Permissions E2E Tests › Verify Dynamic Feature Labels in Photography Studio Workspace (7.5s)
+    ✓  3 [chromium] › tests/e2e/custom-roles.spec.ts:207:7 › Custom Roles & Dynamic Permissions E2E Tests › Verify Permissions Matrix Save E2E (8.2s)
+  
+    3 passed (39.5s)
+  ```
+ ✅.
+
+---
+
+## 24. Defensive Redirect Variables, Workspace Owner Optimization & Staging Deploy (`v2.9.72`)
+
+### Summary of Accomplishments:
+* **Defensive Redirect Variables**: Initialized the `$public_subs` array defensively within the `cora-workspace.php` redirect handler checks to prevent potential PHP warning or fatal logs when handling unexpected route patterns.
+* **Workspace Owner Verification**: Optimized capability checks for editing permissions matrices to ensure the primary workspace owner can update configurations seamlessly.
+* **Version Alignment**: Incremented plugin headers and constant versions to `2.9.72`.
+* **Successful Build & Deployment**: Ran the compilation scripts to build a clean `cora-workspace.zip` and deployed it directly to `https://app.heycora.in`.
+* **Staging Verification**: Successfully set user `cora_admin` (ID 9) to `administrator` role on staging to grant permissions, then ran the E2E tests, verifying all three passed successfully on the live staging server:
+  ```bash
+  BASE_URL=https://app.heycora.in npx playwright test tests/e2e/custom-roles.spec.ts
+  
+  Running 3 tests using 1 worker
+    ✓  1 [chromium] › tests/e2e/custom-roles.spec.ts:17:7 › Custom Roles & Dynamic Permissions E2E Tests › Create, Edit, Duplicate, and Delete Custom Role in Real Estate Workspace (14.3s)
+    ✓  2 [chromium] › tests/e2e/custom-roles.spec.ts:170:7 › Custom Roles & Dynamic Permissions E2E Tests › Verify Dynamic Feature Labels in Photography Studio Workspace (5.2s)
+    ✓  3 [chromium] › tests/e2e/custom-roles.spec.ts:207:7 › Custom Roles & Dynamic Permissions E2E Tests › Verify Permissions Matrix Save E2E (6.2s)
+
+  3 passed (26.3s)
+  ```
+ ✅.
+

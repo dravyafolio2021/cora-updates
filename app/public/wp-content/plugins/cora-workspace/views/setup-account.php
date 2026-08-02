@@ -309,6 +309,7 @@
     <div id="cora-toast-container"></div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
         // Light mode standard
 
         function showToast(msg) {
