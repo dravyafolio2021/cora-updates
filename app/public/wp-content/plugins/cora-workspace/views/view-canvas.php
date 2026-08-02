@@ -55,12 +55,12 @@ $cora_bookings_count = count( cora_db_get_bookings() );
 ?>
 
 <!-- Include CodeMirror Assets for CSS/JS Editor -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
+<link rel="stylesheet" href="<?php echo CORA_WORKSPACE_URL . 'assets/css/codemirror.min.css'; ?>">
+<script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/codemirror.min.js'; ?>" defer></script>
+<script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/codemirror-mode-css.min.js'; ?>" defer></script>
+<script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/codemirror-mode-javascript.min.js'; ?>" defer></script>
+<script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/codemirror-mode-xml.min.js'; ?>" defer></script>
+<script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/codemirror-mode-htmlmixed.min.js'; ?>" defer></script>
 
 
 <style>

@@ -464,7 +464,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         <span class="esign-card-title">Prepared By (Workspace Signatory)</span>
                         <?php if ( ! empty($found_doc['admin_signed']) ) : ?>
                             <div class="esign-stamp-box">
-                                <img src="<?php echo esc_url($found_doc['admin_signature_data']); ?>" alt="Admin Signature Stamp">
+                                <img src="<?php echo esc_attr($found_doc['admin_signature_data']); ?>" alt="Admin Signature Stamp">
                             </div>
                             <div style="font-size: 12px; font-weight: 600; color: #18181b;">
                                 <?php echo esc_html($found_doc['admin_signer_name'] ?? 'Authorized representative'); ?>
@@ -494,7 +494,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         ?>
                             <div class="esign-stamp-box">
                                 <?php if ( ! empty($cl_sig) ) : ?>
-                                    <img src="<?php echo esc_url($cl_sig); ?>" alt="Client Signature Stamp">
+                                    <img src="<?php echo esc_attr($cl_sig); ?>" alt="Client Signature Stamp">
                                 <?php endif; ?>
                             </div>
                             <div style="font-size: 12px; font-weight: 600; color: #18181b;">

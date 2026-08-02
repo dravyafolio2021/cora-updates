@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cora OS Ecosystem Map</title>
     <!-- Tailwind CSS for rich aesthetics -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/tailwind-cdn.min.js'; ?>"></script>
     <script>
         tailwind.config = {
             theme: {

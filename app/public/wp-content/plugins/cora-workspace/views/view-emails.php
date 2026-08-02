@@ -406,10 +406,10 @@ if ( ! defined( 'ABSPATH' ) ) {
                         </h3>
                         <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Configure your official Hostinger SMTP mail relay details for guaranteed inbox deliverability.</p>
                     </div>
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold shrink-0">
+                    <button type="button" id="smtp-lock-badge" onclick="coraToggleSMTPLock()" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold shrink-0 cursor-pointer">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-emerald-600 dark:text-emerald-400"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                         System Locked
-                    </span>
+                    </button>
                 </div>
 
                 <form id="smtp-settings-form" class="space-y-4" onsubmit="event.preventDefault();">
@@ -468,10 +468,13 @@ if ( ! defined( 'ABSPATH' ) ) {
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                             Run Connection Test
                         </button>
-                        <div class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+                        <div id="smtp-admin-footer" class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                             Managed by System Administrator
                         </div>
+                        <button type="button" id="smtp-save-btn" onclick="coraSaveSMTPSettings()" class="hidden h-10 px-4 rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 text-xs font-semibold hover:bg-zinc-800 dark:hover:bg-zinc-200 cursor-pointer flex items-center gap-2">
+                            Save Settings
+                        </button>
                     </div>
                 </form>
             </div>
@@ -1170,4 +1173,108 @@ jQuery(document).ready(function($) {
     // INITIAL MOUNT LOAD
     loadEmailDashboardData();
 });
+
+/**
+ * SMTP Settings Unlock / Lock Toggle
+ * Toggles all SMTP form inputs between readonly/disabled locked state and editable state.
+ */
+let _smtpUnlocked = false;
+window.coraToggleSMTPLock = function() {
+    _smtpUnlocked = !_smtpUnlocked;
+    const $badge = $('#smtp-lock-badge');
+    const $footer = $('#smtp-admin-footer');
+    const $saveBtn = $('#smtp-save-btn');
+    const inputIds = ['#smtp-host', '#smtp-port', '#smtp-username', '#smtp-password', '#smtp-from-name', '#smtp-from-email'];
+    const lockedClasses = 'bg-zinc-50 dark:bg-zinc-950 text-zinc-500 dark:text-zinc-400 cursor-not-allowed';
+    const editableClasses = 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 cursor-text';
+
+    if (_smtpUnlocked) {
+        // Unlock all inputs
+        inputIds.forEach(function(id) {
+            $(id).removeAttr('readonly')
+                 .removeClass(lockedClasses)
+                 .addClass(editableClasses);
+        });
+        // Unlock select
+        $('#smtp-secure').removeAttr('disabled')
+             .removeClass(lockedClasses)
+             .addClass(editableClasses + ' cursor-pointer');
+        // Clear password placeholder so user can type fresh
+        $('#smtp-password').val('');
+        // Update badge to "Editing"
+        $badge.html(`
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-amber-500 dark:text-amber-400"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 5-5 5 5 0 0 1 5 5"></path></svg>
+            Editing
+        `).removeClass('bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300')
+          .addClass('bg-amber-50 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300');
+        // Hide admin footer, show save button
+        $footer.addClass('hidden');
+        $saveBtn.removeClass('hidden');
+        window.coraShowToast && window.coraShowToast('SMTP credentials unlocked for editing. Enter your details and click Save.', 'info');
+    } else {
+        // Re-lock all inputs
+        inputIds.forEach(function(id) {
+            $(id).attr('readonly', true)
+                 .removeClass(editableClasses)
+                 .addClass(lockedClasses);
+        });
+        $('#smtp-secure').attr('disabled', true)
+             .removeClass(editableClasses + ' cursor-pointer')
+             .addClass(lockedClasses);
+        // Reset password to masked
+        $('#smtp-password').val('••••••••••••••••');
+        // Restore badge
+        $badge.html(`
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-emerald-600 dark:text-emerald-400"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            System Locked
+        `).removeClass('bg-amber-50 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300')
+          .addClass('bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300');
+        // Show admin footer, hide save button
+        $footer.removeClass('hidden');
+        $saveBtn.addClass('hidden');
+    }
+};
+
+/**
+ * SMTP Settings AJAX Save
+ * Posts updated SMTP credentials to the backend and re-locks the form on success.
+ */
+window.coraSaveSMTPSettings = function() {
+    const data = {
+        action: 'cora_save_smtp_settings',
+        nonce: (typeof getAjaxNonce === 'function') ? getAjaxNonce() : (window.coraAjax && window.coraAjax.nonce ? window.coraAjax.nonce : ''),
+        smtp_host: $('#smtp-host').val(),
+        smtp_port: $('#smtp-port').val(),
+        smtp_secure: $('#smtp-secure').val(),
+        smtp_username: $('#smtp-username').val(),
+        smtp_password: $('#smtp-password').val(),
+        from_name: $('#smtp-from-name').val(),
+        from_email: $('#smtp-from-email').val()
+    };
+
+    const $btn = $('#smtp-save-btn');
+    $btn.prop('disabled', true).text('Saving...');
+
+    jQuery.ajax({
+        url: (typeof getAjaxEndpoint === 'function') ? getAjaxEndpoint() : (window.coraAjax && window.coraAjax.url ? window.coraAjax.url : '/wp-admin/admin-ajax.php'),
+        method: 'POST',
+        data: data,
+        success: function(res) {
+            if (res.success) {
+                window.coraShowToast && window.coraShowToast(res.data.message || 'SMTP Settings saved successfully.', 'success');
+                // Re-lock the form
+                _smtpUnlocked = true; // set true so toggle flips to locked
+                window.coraToggleSMTPLock();
+            } else {
+                window.coraShowToast && window.coraShowToast((res.data && res.data.message) || 'Failed to save SMTP settings.', 'error');
+            }
+        },
+        error: function() {
+            window.coraShowToast && window.coraShowToast('Network error saving SMTP settings.', 'error');
+        },
+        complete: function() {
+            $btn.prop('disabled', false).text('Save Settings');
+        }
+    });
+};
 </script>

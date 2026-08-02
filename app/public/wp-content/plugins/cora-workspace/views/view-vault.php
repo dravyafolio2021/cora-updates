@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 // Fetch documents from WP options or fallback to exact default sample documents from UI mockup
 $cora_documents = get_option( 'cora_documents', array() );
 
-if ( empty( $cora_documents ) || ! is_array( $cora_documents ) ) {
+if ( empty( $cora_documents ) || ! is_array( $cora_documents ) || count( $cora_documents ) <= 1 ) {
     $cora_documents = array(
         array(
             'id'             => 'doc_101',
@@ -37,8 +37,85 @@ if ( empty( $cora_documents ) || ! is_array( $cora_documents ) ) {
                 array( 'desc' => '3-Day Full Wedding Cinematography & Aerial Drone', 'sac' => '998381', 'qty' => 1, 'rate' => 300000, 'tax' => 18 ),
                 array( 'desc' => 'Candid Fine-Art Photography & Signature Album Box', 'sac' => '998381', 'qty' => 1, 'rate' => 150000, 'tax' => 18 )
             )
+        ),
+        array(
+            'id'             => 'doc_102',
+            'number'         => 'DOC-2026',
+            'title'          => 'Invoice: Apex Realty Commercial Lease',
+            'type'           => 'Invoice',
+            'client_name'    => 'Apex Realty Group',
+            'client_email'   => 'finance@apexrealty.com',
+            'client_phone'   => '9811223344',
+            'client_gstin'   => '27AAAAA0000B1Z3',
+            'client_address' => 'Andheri West, Mumbai, Maharashtra - 400053',
+            'pos_state'      => 'Maharashtra (27)',
+            'is_igst'        => true,
+            'amount'         => 180000,
+            'tax_amount'     => 32400,
+            'grand_total'    => 212400,
+            'deposit'        => 106200,
+            'currency'       => 'INR',
+            'upi_vpa'        => 'cora@icici',
+            'status'         => 'Paid',
+            'signed'         => true,
+            'signed_at'      => '2026-06-12 14:30:15',
+            'signer_name'    => 'Rajesh Sharma',
+            'signer_email'   => 'finance@apexrealty.com',
+            'signer_ip'      => '103.21.124.8',
+            'verification_hash' => 'ESIGN-HASH-A9F821C7B04',
+            'items'          => array(
+                array( 'desc' => 'Commercial Property Lease Brokerage Fee', 'sac' => '997212', 'qty' => 1, 'rate' => 180000, 'tax' => 18 )
+            )
+        ),
+        array(
+            'id'             => 'doc_103',
+            'number'         => 'DOC-2026',
+            'title'          => 'Contract: Delhi Fashion Week 2026 Agreement',
+            'type'           => 'Contract',
+            'client_name'    => 'Fashion Council India',
+            'client_email'   => 'contact@fashioncouncil.in',
+            'client_phone'   => '9876500000',
+            'client_gstin'   => '07AAAAA0000C1Z8',
+            'client_address' => 'Connaught Place, New Delhi - 110001',
+            'pos_state'      => 'Delhi (07)',
+            'is_igst'        => false,
+            'amount'         => 40000,
+            'tax_amount'     => 7200,
+            'grand_total'    => 47200,
+            'deposit'        => 23600,
+            'currency'       => 'INR',
+            'upi_vpa'        => 'cora@icici',
+            'status'         => 'Signed',
+            'signed'         => true,
+            'signed_at'      => '2026-06-14 10:15:00',
+            'signer_name'    => 'Fashion Council India',
+            'signer_email'   => 'contact@fashioncouncil.in',
+            'signer_ip'      => '103.21.124.9',
+            'verification_hash' => 'ESIGN-HASH-B88102C1F03',
+            'items'          => array(
+                array( 'desc' => 'Fashion Week SLA & Media Production Rights', 'sac' => '998381', 'qty' => 1, 'rate' => 40000, 'tax' => 18 )
+            )
         )
     );
+}
+
+// Ensure every document has a secure share hash for public view
+$cora_docs_updated = false;
+foreach ( $cora_documents as &$doc ) {
+    if ( empty( $doc['secured_shares'] ) || ! is_array( $doc['secured_shares'] ) ) {
+        $share_hash = wp_hash( $doc['id'] . 'secured_share_token' );
+        $doc['secured_shares'] = array(
+            array(
+                'hash' => $share_hash,
+                'email' => $doc['client_email'] ?: 'client@example.com',
+                'expiry_time' => 0,
+                'created_at' => time()
+            )
+        );
+        $cora_docs_updated = true;
+    }
+}
+if ( $cora_docs_updated ) {
     update_option( 'cora_documents', $cora_documents );
 }
 
@@ -53,7 +130,7 @@ foreach ( $cora_documents as $doc ) {
     if ( $t === 'proposal' || $t === 'quote' || $t === 'quotation' ) {
         $proposal_count++;
     }
-    if ( ! empty( $doc['signed'] ) && ( $t === 'contract' || $t === 'service agreement' || $t === 'nda' ) ) {
+    if ( ! empty( $doc['signed'] ) ) {
         $signed_count++;
     }
     if ( ( $doc['status'] ?? '' ) !== 'Paid' && ( $t === 'invoice' || $t === 'receipt' ) ) {
@@ -67,24 +144,42 @@ foreach ( $cora_documents as $doc ) {
    STRICT PRINT ENGINE: HIDES ALL SIDEBARS & WEBPAGE UI TO PRINT ONLY INVOICE
    ═══════════════════════════════════════════════════════════════════════════ */
 @media print {
-    body * {
-        visibility: hidden !important;
+    /* Hide wrappers that are not parents of the printable canvas */
+    #wpadminbar, #adminmenu, #adminmenuback, #wpfooter, .cora-sidebar, .cora-topbar {
+        display: none !important;
     }
-
-    #cora-printable-canvas, #cora-printable-canvas * {
-        visibility: visible !important;
+    /* Hide siblings of #cora-vault-wrapper and its parents */
+    #cora-workspace-container > *:not(#cora-page-vault),
+    #cora-page-vault > *:not(#cora-vault-wrapper),
+    #cora-vault-wrapper > *:not(#cora-printable-canvas) {
+        display: none !important;
     }
-
-    #cora-printable-canvas {
-        position: absolute !important;
-        left: 0 !important;
-        top: 0 !important;
-        width: 100% !important;
+    /* Clean margins on parent elements to prevent empty spaces */
+    html, body, #wpwrap, #wpcontent, #cora-workspace-container, #cora-page-vault, #cora-vault-wrapper {
         margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        border: none !important;
+        box-shadow: none !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+    #wpcontent {
+        margin-left: 0 !important;
+        padding: 0 !important;
+    }
+    /* Show printable canvas as normal block element */
+    #cora-printable-canvas {
+        display: block !important;
+        visibility: visible !important;
+        width: 100% !important;
+        max-width: 800px !important;
+        margin: 0 auto !important;
         padding: 30px !important;
+        background: #ffffff !important;
         box-shadow: none !important;
         border: none !important;
-        background: #ffffff !important;
     }
 }
 
@@ -276,6 +371,8 @@ foreach ( $cora_documents as $doc ) {
                             $status_bg = 'bg-emerald-50 border border-emerald-100 text-emerald-700 font-bold';
                         } elseif ($status === 'Signed') {
                             $status_bg = 'bg-purple-50 border border-purple-100 text-purple-700 font-bold';
+                        } elseif ($status === 'Partially Signed') {
+                            $status_bg = 'bg-indigo-50 border border-indigo-100 text-indigo-700 font-bold';
                         } elseif ($status === 'Sent' || $status === 'Active') {
                             $status_bg = 'bg-blue-50 border border-blue-100 text-blue-700 font-bold';
                         } elseif ($status === 'Pending') {
@@ -315,7 +412,7 @@ foreach ( $cora_documents as $doc ) {
                             ₹<?php echo number_format( floatval( $doc['grand_total'] ?? $doc['amount'] ?? 0 ) ); ?>
                         </td>
                         <td class="p-4 py-3.5">
-                            <span class="px-2.5 py-1 rounded-full text-[9px] <?php echo $status_bg; ?> uppercase tracking-wider">
+                            <span class="px-2.5 py-1 rounded-full text-[9px] <?php echo $status_bg; ?> uppercase tracking-wider whitespace-nowrap">
                                 <?php echo esc_html( $status ); ?>
                             </span>
                         </td>
@@ -378,6 +475,8 @@ foreach ( $cora_documents as $doc ) {
                         $status_bg = 'bg-emerald-50 border border-emerald-100 text-emerald-700 font-bold';
                     } elseif ($status === 'Signed') {
                         $status_bg = 'bg-purple-50 border border-purple-100 text-purple-700 font-bold';
+                    } elseif ($status === 'Partially Signed') {
+                        $status_bg = 'bg-indigo-50 border border-indigo-100 text-indigo-700 font-bold';
                     } elseif ($status === 'Sent' || $status === 'Active') {
                         $status_bg = 'bg-blue-50 border border-blue-100 text-blue-700 font-bold';
                     } elseif ($status === 'Pending') {
@@ -392,7 +491,7 @@ foreach ( $cora_documents as $doc ) {
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-1.5">
                             <span class="font-mono text-[9px] text-zinc-400 font-bold tracking-tight"><?php echo esc_html( $doc['number'] ?? 'DOC-2026' ); ?></span>
-                            <span class="px-2 py-0.5 rounded-full text-[8px] uppercase tracking-wider font-extrabold <?php echo $status_bg; ?>">
+                            <span class="px-2 py-0.5 rounded-full text-[8px] uppercase tracking-wider font-extrabold <?php echo $status_bg; ?> whitespace-nowrap">
                                 <?php echo esc_html( $status ); ?>
                             </span>
                         </div>
@@ -670,9 +769,9 @@ foreach ( $cora_documents as $doc ) {
                         </button>
                     </div>
 
-                    <button type="button" onclick="coraTriggerAIAssistant()" class="px-3.5 py-2 bg-zinc-900 hover:bg-black text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-xs transition-all cursor-pointer">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
-                        AI Assistant
+                    <button type="button" onclick="coraShowAILockedToast()" class="px-3.5 py-2 bg-zinc-100 border border-zinc-200 text-zinc-400 rounded-xl text-xs font-bold flex items-center gap-2 shadow-xs transition-all cursor-not-allowed" title="AI Assistant is currently locked">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        AI Assistant (Locked)
                     </button>
 
                     <button type="button" onclick="coraOpenDocSettingsDrawer()" class="px-3.5 py-2 bg-white border border-zinc-200 text-zinc-800 hover:bg-zinc-50 rounded-xl text-xs font-bold flex items-center gap-2 shadow-xs transition-all cursor-pointer">
@@ -986,12 +1085,36 @@ foreach ( $cora_documents as $doc ) {
 
                                 <div class="space-y-1 sm:col-span-2">
                                     <label class="block font-bold text-zinc-700 text-[11px]">Place of Supply (POS State for GST)</label>
-                                    <select id="studio-doc-pos" onchange="coraRecalculateStudioTotals()" class="w-full border border-zinc-200 rounded-xl p-2.5 bg-white outline-none focus:border-zinc-950 transition-colors font-semibold">
+                                    <select id="studio-doc-pos" onchange="coraTogglePOSCustomFields('studio-doc-pos', 'custom-pos-container'); coraRecalculateStudioTotals();" class="w-full border border-zinc-200 rounded-xl p-2.5 bg-white outline-none focus:border-zinc-950 transition-colors font-semibold">
                                         <option value="Delhi (07)">Delhi (07) - CGST (9%) + SGST (9%)</option>
                                         <option value="Haryana (06)">Haryana (06) - IGST (18%)</option>
+                                        <option value="Uttar Pradesh (09)">Uttar Pradesh (09) - IGST (18%)</option>
                                         <option value="Maharashtra (27)">Maharashtra (27) - IGST (18%)</option>
                                         <option value="Karnataka (29)">Karnataka (29) - IGST (18%)</option>
+                                        <option value="Gujarat (24)">Gujarat (24) - IGST (18%)</option>
+                                        <option value="Tamil Nadu (33)">Tamil Nadu (33) - IGST (18%)</option>
+                                        <option value="Telangana (36)">Telangana (36) - IGST (18%)</option>
+                                        <option value="West Bengal (19)">West Bengal (19) - IGST (18%)</option>
+                                        <option value="Rajasthan (08)">Rajasthan (08) - IGST (18%)</option>
+                                        <option value="Kerala (32)">Kerala (32) - IGST (18%)</option>
+                                        <option value="Andhra Pradesh (37)">Andhra Pradesh (37) - IGST (18%)</option>
+                                        <option value="CUSTOM">Custom State / Code...</option>
                                     </select>
+                                    
+                                    <div id="custom-pos-container" class="hidden grid grid-cols-2 gap-3 pt-2">
+                                        <div>
+                                            <label class="block font-bold text-zinc-700 text-[10px]">Custom State Name</label>
+                                            <input type="text" id="custom-pos-state" placeholder="e.g. Goa" oninput="coraOnCustomPosChange('wizard')" class="w-full border border-zinc-200 rounded-xl p-2.5 bg-white outline-none focus:border-zinc-950 transition-colors font-semibold">
+                                        </div>
+                                        <div>
+                                            <label class="block font-bold text-zinc-700 text-[10px]">State Code (2 Digits)</label>
+                                            <input type="text" id="custom-pos-code" placeholder="e.g. 30" oninput="coraOnCustomPosChange('wizard')" class="w-full border border-zinc-200 rounded-xl p-2.5 bg-white outline-none focus:border-zinc-950 transition-colors font-mono font-bold">
+                                        </div>
+                                        <div class="col-span-2 flex items-center gap-2 mt-1">
+                                            <input type="checkbox" id="custom-pos-is-igst" onchange="coraOnCustomPosChange('wizard')" class="rounded border-zinc-300 text-zinc-950 focus:ring-zinc-950">
+                                            <label for="custom-pos-is-igst" class="font-bold text-zinc-700 text-[10px] cursor-pointer selection-none">This is Inter-State (IGST 18%)</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -2088,6 +2211,103 @@ foreach ( $cora_documents as $doc ) {
 </div>
 
 <!-- ═════════════════════════════════════════════════════════════════════════
+     RIGHT-SLIDING SIDE DRAWER 2B: DOCUMENT SETTINGS DRAWER (#cora-doc-settings-drawer)
+     ═════════════════════════════════════════════════════════════════════════ -->
+<div id="cora-doc-settings-drawer" class="hidden fixed inset-0 z-[99999] overflow-hidden pointer-events-none">
+    <div onclick="coraCloseDocSettingsDrawer()" class="cora-drawer-backdrop absolute inset-0 bg-zinc-950/40 backdrop-blur-xs pointer-events-auto"></div>
+    <div class="cora-drawer-sheet absolute inset-y-0 right-0 max-w-full flex w-full sm:w-[460px] pointer-events-auto">
+        <div class="w-full bg-white border-l border-zinc-200 shadow-2xl flex flex-col justify-between overflow-y-auto p-6 md:p-8 space-y-6">
+            <div>
+                <div class="flex items-center justify-between border-b border-zinc-200/80 pb-4 mb-6">
+                    <div>
+                        <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest block">Configuration Hub</span>
+                        <h3 class="text-base font-black text-zinc-950 mt-0.5">Document Settings</h3>
+                    </div>
+                    <button onclick="coraCloseDocSettingsDrawer()" class="p-2 text-zinc-400 hover:text-zinc-950 text-base font-bold cursor-pointer rounded-lg hover:bg-zinc-100">✕</button>
+                </div>
+
+                <div class="space-y-5 text-xs">
+                    <div class="space-y-1.5">
+                        <label class="block font-bold text-zinc-800">Document Title</label>
+                        <input type="text" id="settings-doc-title" oninput="coraSyncSettingsToCanvas()" class="w-full border border-zinc-200 rounded-xl p-2.5 bg-white outline-none focus:border-zinc-950 transition-colors font-semibold">
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="block font-bold text-zinc-800">Document Reference #</label>
+                        <input type="text" id="settings-doc-number" oninput="coraSyncSettingsToCanvas()" class="w-full border border-zinc-200 rounded-xl p-2.5 bg-white outline-none focus:border-zinc-950 transition-colors font-mono font-bold">
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="block font-bold text-zinc-800">Prepared By</label>
+                        <input type="text" id="settings-doc-prepared" oninput="coraSyncSettingsToCanvas()" class="w-full border border-zinc-200 rounded-xl p-2.5 bg-white outline-none focus:border-zinc-950 transition-colors font-semibold">
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="block font-bold text-zinc-800">Document Date</label>
+                        <input type="date" id="settings-doc-date" oninput="coraSyncSettingsToCanvas()" class="w-full border border-zinc-200 rounded-xl p-2.5 bg-white outline-none focus:border-zinc-950 transition-colors font-semibold">
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="block font-bold text-zinc-800">Place of Supply (POS GST)</label>
+                        <select id="settings-doc-pos" onchange="coraTogglePOSCustomFields('settings-doc-pos', 'settings-custom-pos-container'); coraSyncSettingsToCanvas();" class="w-full border border-zinc-200 rounded-xl p-2.5 bg-white outline-none focus:border-zinc-950 transition-colors font-semibold">
+                            <option value="Delhi (07)">Delhi (07) - CGST (9%) + SGST (9%)</option>
+                            <option value="Haryana (06)">Haryana (06) - IGST (18%)</option>
+                            <option value="Uttar Pradesh (09)">Uttar Pradesh (09) - IGST (18%)</option>
+                            <option value="Maharashtra (27)">Maharashtra (27) - IGST (18%)</option>
+                            <option value="Karnataka (29)">Karnataka (29) - IGST (18%)</option>
+                            <option value="Gujarat (24)">Gujarat (24) - IGST (18%)</option>
+                            <option value="Tamil Nadu (33)">Tamil Nadu (33) - IGST (18%)</option>
+                            <option value="Telangana (36)">Telangana (36) - IGST (18%)</option>
+                            <option value="West Bengal (19)">West Bengal (19) - IGST (18%)</option>
+                            <option value="Rajasthan (08)">Rajasthan (08) - IGST (18%)</option>
+                            <option value="Kerala (32)">Kerala (32) - IGST (18%)</option>
+                            <option value="Andhra Pradesh (37)">Andhra Pradesh (37) - IGST (18%)</option>
+                            <option value="CUSTOM">Custom State / Code...</option>
+                        </select>
+                        
+                        <div id="settings-custom-pos-container" class="hidden grid grid-cols-2 gap-3 pt-2">
+                            <div>
+                                <label class="block font-bold text-zinc-700 text-[10px]">Custom State Name</label>
+                                <input type="text" id="settings-custom-pos-state" placeholder="e.g. Goa" oninput="coraOnCustomPosChange('settings')" class="w-full border border-zinc-200 rounded-xl p-2 bg-white outline-none focus:border-zinc-950 transition-colors font-semibold">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-zinc-700 text-[10px]">State Code (2 Digits)</label>
+                                <input type="text" id="settings-custom-pos-code" placeholder="e.g. 30" oninput="coraOnCustomPosChange('settings')" class="w-full border border-zinc-200 rounded-xl p-2 bg-white outline-none focus:border-zinc-950 transition-colors font-mono font-bold">
+                            </div>
+                            <div class="col-span-2 flex items-center gap-2 mt-1">
+                                <input type="checkbox" id="settings-custom-pos-is-igst" onchange="coraOnCustomPosChange('settings')" class="rounded border-zinc-300 text-zinc-950 focus:ring-zinc-950">
+                                <label for="settings-custom-pos-is-igst" class="font-bold text-zinc-700 text-[10px] cursor-pointer selection-none">This is Inter-State (IGST 18%)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-zinc-50 border border-zinc-200 p-4 rounded-2xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] font-bold text-zinc-400 uppercase block">Document Watermark</span>
+                                <h4 class="font-bold text-zinc-950 text-sm">Draft Watermark</h4>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="settings-doc-watermark" onchange="coraSyncSettingsToCanvas()" class="sr-only peer">
+                                <div id="settings-doc-watermark-track" class="w-10 h-5.5 bg-zinc-200 rounded-full transition-colors duration-200 relative p-0.5 peer-checked:bg-zinc-950">
+                                    <div id="settings-doc-watermark-knob" class="w-4.5 h-4.5 bg-white rounded-full shadow-md transition-transform duration-200 transform translate-x-0 peer-checked:translate-x-4.5"></div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-zinc-200 pt-4">
+                <button onclick="coraCloseDocSettingsDrawer()" class="w-full py-2 bg-zinc-950 hover:bg-black text-white font-bold text-xs rounded-xl transition-all cursor-pointer">
+                    Apply & Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═════════════════════════════════════════════════════════════════════════
      RIGHT-SLIDING SIDE DRAWER 3: DOCUMENT QUICK PREVIEW DRAWER (#cora-doc-preview-drawer)
      ═════════════════════════════════════════════════════════════════════════ -->
 <div id="cora-doc-preview-drawer" class="hidden fixed inset-0 z-[99999] overflow-hidden pointer-events-none">
@@ -2265,9 +2485,8 @@ foreach ( $cora_documents as $doc ) {
 
 <script>
 window.CORA_DOCUMENTS = <?php echo json_encode( $cora_documents ); ?>;
-
-// CORA STUDIO 6-STEP STATE ENGINE
-window.CORA_STUDIO_STATE = {
+var CORA_DOCUMENTS = window.CORA_DOCUMENTS;
+window.CORA_STUDIO_STATE = window.CORA_STUDIO_STATE || {
     currentStep: 1,
     totalSteps: 6,
     selectedCategory: 'proposal',
@@ -2289,6 +2508,7 @@ window.CORA_STUDIO_STATE = {
         items: []
     }
 };
+var CORA_STUDIO_STATE = window.CORA_STUDIO_STATE;
 
 var currentWizStep = 1;
 var selectedWizCat = 'proposal';
@@ -3369,16 +3589,41 @@ window.coraApplyShootDaysMultiplier = function(daysVal) {
 
 // DEDICATED PRINT FUNCTION
 window.coraPrintInvoiceOnly = function() {
-    var title = document.getElementById('studio-doc-title-input').value || 'Invoice';
-    var num = document.getElementById('studio-doc-number').value || 'DOC-2026';
-    var type = document.getElementById('studio-doc-type').value || 'Invoice';
-    var clientName = document.getElementById('studio-client-name').value || 'Client';
-    var clientGstin = document.getElementById('studio-client-gstin').value || '';
-    var clientPhone = document.getElementById('studio-client-phone').value || '';
-    var upi = document.getElementById('studio-doc-upi').value || 'cora@icici';
-    var subtotal = document.getElementById('summary-subtotal').textContent;
-    var grandtotal = document.getElementById('summary-grandtotal').textContent;
-    var deposit = document.getElementById('summary-deposit').textContent;
+    var doc = null;
+    var previewDrawer = document.getElementById('cora-doc-preview-drawer');
+    var isPreviewActive = previewDrawer && !previewDrawer.classList.contains('hidden');
+    
+    if (isPreviewActive && typeof previewDrawerCurrentDocId !== 'undefined' && previewDrawerCurrentDocId) {
+        doc = CORA_DOCUMENTS.find(function(d){ return String(d.id) === String(previewDrawerCurrentDocId); });
+    }
+    
+    if (!doc && window.CORA_STUDIO_STATE && window.CORA_STUDIO_STATE.documentData) {
+        doc = window.CORA_STUDIO_STATE.documentData;
+    }
+    
+    var title = doc ? doc.title : (document.getElementById('studio-doc-title-input') ? document.getElementById('studio-doc-title-input').value : 'Untitled Document');
+    var num = doc ? doc.number : (document.getElementById('studio-doc-number') ? document.getElementById('studio-doc-number').value : 'DOC-2026');
+    var type = doc ? doc.type : (document.getElementById('studio-doc-type') ? document.getElementById('studio-doc-type').value : 'Invoice');
+    var clientName = doc ? doc.client_name : (document.getElementById('studio-client-name') ? document.getElementById('studio-client-name').value : 'Client');
+    var clientEmail = doc ? doc.client_email : (document.getElementById('studio-client-email') ? document.getElementById('studio-client-email').value : '');
+    var clientGstin = doc ? doc.client_gstin : (document.getElementById('studio-client-gstin') ? document.getElementById('studio-client-gstin').value : '');
+    var clientPhone = doc ? doc.client_phone : (document.getElementById('studio-client-phone') ? document.getElementById('studio-client-phone').value : '');
+    var upi = doc ? doc.upi_vpa : (document.getElementById('studio-doc-upi') ? document.getElementById('studio-doc-upi').value : 'cora@icici');
+    
+    var subtotal, grandtotal, deposit;
+    if (doc) {
+        subtotal = '₹' + parseFloat(doc.amount || 0).toLocaleString();
+        grandtotal = '₹' + parseFloat(doc.grand_total || doc.amount || 0).toLocaleString();
+        deposit = '₹' + parseFloat(doc.deposit || (doc.grand_total ? doc.grand_total * 0.5 : 0)).toLocaleString();
+    } else {
+        var subtotalEl = document.getElementById('summary-subtotal');
+        var grandtotalEl = document.getElementById('summary-grandtotal');
+        var depositEl = document.getElementById('summary-deposit');
+        
+        subtotal = subtotalEl ? subtotalEl.textContent : '₹0';
+        grandtotal = grandtotalEl ? grandtotalEl.textContent : '₹0';
+        deposit = depositEl ? depositEl.textContent : '₹0';
+    }
 
     var printableCanvas = document.getElementById('cora-printable-canvas');
     if (!printableCanvas) return;
@@ -3402,14 +3647,29 @@ window.coraPrintInvoiceOnly = function() {
                '<table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 24px;">' +
                '<thead><tr style="background: #f4f4f5; border-bottom: 1px solid #e4e4e7;"><th style="padding: 10px; text-align: left;">Item Description</th><th style="padding: 10px; text-align: left;">SAC</th><th style="padding: 10px; text-align: center;">Qty</th><th style="padding: 10px; text-align: right;">Rate</th><th style="padding: 10px; text-align: right;">Amount</th></tr></thead><tbody>';
 
-    var rows = document.querySelectorAll('.cora-line-item-row');
-    rows.forEach(function(row){
-        var d = row.querySelector('.item-desc').value;
-        var s = row.querySelector('.item-sac').value;
-        var q = row.querySelector('.item-qty').value;
-        var r = row.querySelector('.item-rate').value;
-        var a = row.querySelector('.item-line-total').textContent;
-        html += '<tr style="border-bottom: 1px solid #f4f4f5;"><td style="padding: 10px; font-weight: 600;">' + d + '</td><td style="padding: 10px; font-family: monospace; font-size: 11px;">' + s + '</td><td style="padding: 10px; text-align: center; font-weight: 700;">' + q + '</td><td style="padding: 10px; text-align: right; font-family: monospace;">₹' + parseFloat(r).toLocaleString() + '</td><td style="padding: 10px; text-align: right; font-family: monospace; font-weight: 700;">' + a + '</td></tr>';
+    var items = [];
+    if (doc && doc.items) {
+        items = doc.items;
+    } else {
+        var rows = document.querySelectorAll('.cora-line-item-row');
+        rows.forEach(function(row){
+            var d = row.querySelector('.item-desc').value;
+            var s = row.querySelector('.item-sac').value;
+            var q = row.querySelector('.item-qty').value;
+            var r = row.querySelector('.item-rate').value;
+            var a = row.querySelector('.item-line-total').textContent;
+            items.push({ desc: d, sac: s, qty: q, rate: r, amount_formatted: a });
+        });
+    }
+
+    if (items.length === 0) {
+        var defaultRate = doc ? (doc.amount || 0) : 0;
+        items.push({ desc: title, sac: '998381', qty: 1, rate: defaultRate, amount_formatted: subtotal });
+    }
+
+    items.forEach(function(it){
+        var amt = it.amount_formatted || ('₹' + parseFloat((it.qty || 1) * (it.rate || 0)).toLocaleString());
+        html += '<tr style="border-bottom: 1px solid #f4f4f5;"><td style="padding: 10px; font-weight: 600;">' + it.desc + '</td><td style="padding: 10px; font-family: monospace; font-size: 11px;">' + (it.sac || '998381') + '</td><td style="padding: 10px; text-align: center; font-weight: 700;">' + (it.qty || 1) + '</td><td style="padding: 10px; text-align: right; font-family: monospace;">₹' + parseFloat(it.rate || 0).toLocaleString() + '</td><td style="padding: 10px; text-align: right; font-family: monospace; font-weight: 700;">' + amt + '</td></tr>';
     });
 
     html += '</tbody></table>' +
@@ -3536,12 +3796,165 @@ window.coraCanvasRedo = function() {
     coraShowToast('Redo action');
 };
 
-window.coraTriggerAIAssistant = function() {
-    coraShowToast('AI Assistant activated! Suggesting document scope & line items...');
+window.coraShowAILockedToast = function() {
+    coraShowToast('AI Assistant is currently offline and unavailable.');
+};
+
+window.coraTogglePOSCustomFields = function(selectId, containerId) {
+    var selectEl = document.getElementById(selectId);
+    var containerEl = document.getElementById(containerId);
+    if (!selectEl || !containerEl) return;
+    
+    if (selectEl.value === 'CUSTOM') {
+        containerEl.classList.remove('hidden');
+    } else {
+        containerEl.classList.add('hidden');
+    }
+};
+
+window.coraOnCustomPosChange = function(source) {
+    var s_state = document.getElementById('custom-pos-state');
+    var s_code = document.getElementById('custom-pos-code');
+    var s_igst = document.getElementById('custom-pos-is-igst');
+    
+    var w_state = document.getElementById('settings-custom-pos-state');
+    var w_code = document.getElementById('settings-custom-pos-code');
+    var w_igst = document.getElementById('settings-custom-pos-is-igst');
+    
+    if (source === 'wizard') {
+        if (w_state && s_state) w_state.value = s_state.value;
+        if (w_code && s_code) w_code.value = s_code.value;
+        if (w_igst && s_igst) w_igst.checked = s_igst.checked;
+    } else {
+        if (s_state && w_state) s_state.value = w_state.value;
+        if (s_code && w_code) s_code.value = w_code.value;
+        if (s_igst && w_igst) s_igst.checked = w_igst.checked;
+    }
+    
+    coraRecalculateStudioTotals();
 };
 
 window.coraOpenDocSettingsDrawer = function() {
+    // Populate drawer inputs from active inputs in Step 3
+    var docTitleInput = document.getElementById('studio-doc-title-input');
+    var docNumInput = document.getElementById('studio-doc-number');
+    var docPosSelect = document.getElementById('studio-doc-pos');
+    var watermarkToggle = document.getElementById('wiz-sec-watermark-toggle');
+    
+    if (docTitleInput) document.getElementById('settings-doc-title').value = docTitleInput.value;
+    if (docNumInput) document.getElementById('settings-doc-number').value = docNumInput.value;
+    if (docPosSelect) {
+        document.getElementById('settings-doc-pos').value = docPosSelect.value;
+        coraTogglePOSCustomFields('settings-doc-pos', 'settings-custom-pos-container');
+        if (docPosSelect.value === 'CUSTOM') {
+            document.getElementById('settings-custom-pos-state').value = document.getElementById('custom-pos-state').value;
+            document.getElementById('settings-custom-pos-code').value = document.getElementById('custom-pos-code').value;
+            document.getElementById('settings-custom-pos-is-igst').checked = document.getElementById('custom-pos-is-igst').checked;
+        }
+    }
+    
+    // Prepared by and date are dynamic elements in the cover page.
+    var prepEl = document.getElementById('canvas-prepared-by');
+    if (prepEl) document.getElementById('settings-doc-prepared').value = prepEl.textContent.trim();
+    
+    var dateEl = document.getElementById('canvas-doc-date');
+    if (dateEl) {
+        var dateText = dateEl.textContent.trim();
+        var parsedDate = new Date(dateText);
+        if (!isNaN(parsedDate.getTime())) {
+            var yyyy = parsedDate.getFullYear();
+            var mm = String(parsedDate.getMonth() + 1).padStart(2, '0');
+            var dd = String(parsedDate.getDate()).padStart(2, '0');
+            document.getElementById('settings-doc-date').value = yyyy + '-' + mm + '-' + dd;
+        } else {
+            document.getElementById('settings-doc-date').value = new Date().toISOString().split('T')[0];
+        }
+    }
+    
+    if (watermarkToggle) {
+        var isChecked = watermarkToggle.checked;
+        document.getElementById('settings-doc-watermark').checked = isChecked;
+        var knob = document.getElementById('settings-doc-watermark-knob');
+        var track = document.getElementById('settings-doc-watermark-track');
+        if (knob && track) {
+            if (isChecked) {
+                knob.style.transform = 'translateX(1.125rem)';
+                track.style.backgroundColor = '#09090b';
+            } else {
+                knob.style.transform = 'translateX(0)';
+                track.style.backgroundColor = '#e4e4e7';
+            }
+        }
+    }
+    
+    document.getElementById('cora-doc-settings-drawer').classList.remove('hidden', 'pointer-events-none');
     coraShowToast('Document Settings panel opened.');
+};
+
+window.coraCloseDocSettingsDrawer = function() {
+    document.getElementById('cora-doc-settings-drawer').classList.add('hidden', 'pointer-events-none');
+};
+
+window.coraSyncSettingsToCanvas = function() {
+    var title = document.getElementById('settings-doc-title').value;
+    var num = document.getElementById('settings-doc-number').value;
+    var prep = document.getElementById('settings-doc-prepared').value;
+    var dateVal = document.getElementById('settings-doc-date').value;
+    var pos = document.getElementById('settings-doc-pos').value;
+    var watermark = document.getElementById('settings-doc-watermark').checked;
+    
+    // Sync back to Step 3 elements
+    var docTitleInput = document.getElementById('studio-doc-title-input');
+    if (docTitleInput) {
+        docTitleInput.value = title;
+        coraSyncCanvasFields();
+    }
+    
+    var docNumInput = document.getElementById('studio-doc-number');
+    if (docNumInput) {
+        docNumInput.value = num;
+    }
+    
+    var docPosSelect = document.getElementById('studio-doc-pos');
+    if (docPosSelect) {
+        docPosSelect.value = pos;
+        coraTogglePOSCustomFields('studio-doc-pos', 'custom-pos-container');
+        if (pos === 'CUSTOM') {
+            document.getElementById('custom-pos-state').value = document.getElementById('settings-custom-pos-state').value;
+            document.getElementById('custom-pos-code').value = document.getElementById('settings-custom-pos-code').value;
+            document.getElementById('custom-pos-is-igst').checked = document.getElementById('settings-custom-pos-is-igst').checked;
+        }
+        coraRecalculateStudioTotals();
+    }
+    
+    var watermarkToggle = document.getElementById('wiz-sec-watermark-toggle');
+    if (watermarkToggle) {
+        watermarkToggle.checked = watermark;
+        coraToggleSecWatermark(watermark);
+    }
+    
+    var knob = document.getElementById('settings-doc-watermark-knob');
+    var track = document.getElementById('settings-doc-watermark-track');
+    if (knob && track) {
+        if (watermark) {
+            knob.style.transform = 'translateX(1.125rem)';
+            track.style.backgroundColor = '#09090b';
+        } else {
+            knob.style.transform = 'translateX(0)';
+            track.style.backgroundColor = '#e4e4e7';
+        }
+    }
+    
+    // Sync direct cover details
+    var prepEl = document.getElementById('canvas-prepared-by');
+    if (prepEl) prepEl.textContent = prep;
+    
+    var dateEl = document.getElementById('canvas-doc-date');
+    if (dateEl && dateVal) {
+        var d = new Date(dateVal);
+        var formatted = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        dateEl.textContent = formatted;
+    }
 };
 
 // LINE ITEMS DYNAMIC MANAGER
@@ -3590,7 +4003,18 @@ window.coraRecalculateStudioTotals = function() {
     });
 
     var pos = document.getElementById('studio-doc-pos').value;
-    var isIgst = pos.indexOf('Delhi') === -1;
+    var isIgst = true;
+    if (pos === 'CUSTOM') {
+        var customIgstCheck = document.getElementById('custom-pos-is-igst');
+        if (customIgstCheck) {
+            isIgst = customIgstCheck.checked;
+        } else {
+            var customState = (document.getElementById('custom-pos-state').value || '').toLowerCase();
+            isIgst = customState.indexOf('delhi') === -1;
+        }
+    } else {
+        isIgst = pos.indexOf('Delhi') === -1;
+    }
 
     var cgst = isIgst ? 0 : (taxTotal / 2);
     var sgst = isIgst ? 0 : (taxTotal / 2);
@@ -3853,13 +4277,17 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 window.coraCreateNewDocInStudio = function() {
-    document.getElementById('studio-doc-id').value = '';
-    document.getElementById('studio-doc-number').value = 'DOC-2026';
-    document.getElementById('studio-doc-title-input').value = 'Untitled Document';
-    document.getElementById('studio-doc-type').value = 'Proposal';
-    document.getElementById('studio-client-name').value = '';
-    document.getElementById('studio-client-email').value = '';
-    document.getElementById('studio-client-phone').value = '';
+    var setVal = function(id, val) {
+        var el = document.getElementById(id);
+        if (el) el.value = val;
+    };
+    setVal('studio-doc-id', '');
+    setVal('studio-doc-number', 'DOC-2026');
+    setVal('studio-doc-title-input', 'Untitled Document');
+    setVal('studio-doc-type', 'Proposal');
+    setVal('studio-client-name', '');
+    setVal('studio-client-email', '');
+    setVal('studio-client-phone', '');
     
     var tbody = document.getElementById('studio-line-items-body');
     if (tbody) {
@@ -3873,16 +4301,60 @@ window.coraCreateNewDocInStudio = function() {
 window.coraOpenDocInStudio = function(docId) {
     var doc = CORA_DOCUMENTS.find(function(d){ return String(d.id) === String(docId); });
     if (!doc) return;
-    document.getElementById('studio-doc-id').value = doc.id;
-    document.getElementById('studio-doc-number').value = doc.number || 'DOC-2026';
-    document.getElementById('paper-doc-number').textContent = doc.number || 'DOC-2026';
-    document.getElementById('studio-doc-title-input').value = doc.title;
-    document.getElementById('studio-doc-type').value = doc.type;
-    document.getElementById('studio-doc-status').value = doc.status || 'Draft';
-    document.getElementById('studio-client-name').value = doc.client_name || '';
-    document.getElementById('studio-client-email').value = doc.client_email || '';
-    document.getElementById('studio-client-phone').value = doc.client_phone || '';
-    document.getElementById('studio-doc-pos').value = doc.pos_state || 'Delhi (07)';
+
+    var setVal = function(id, val) {
+        var el = document.getElementById(id);
+        if (el) el.value = val;
+    };
+    var setTxt = function(id, txt) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = txt;
+    };
+    var setChecked = function(id, chk) {
+        var el = document.getElementById(id);
+        if (el) el.checked = chk;
+    };
+
+    setVal('studio-doc-id', doc.id);
+    setVal('studio-doc-number', doc.number || 'DOC-2026');
+    setTxt('paper-doc-number', doc.number || 'DOC-2026');
+    setVal('studio-doc-title-input', doc.title);
+    setVal('studio-doc-type', doc.type);
+    setVal('studio-doc-status', doc.status || 'Draft');
+    setVal('studio-client-name', doc.client_name || '');
+    setVal('studio-client-email', doc.client_email || '');
+    setVal('studio-client-phone', doc.client_phone || '');
+
+    var posState = doc.pos_state || 'Delhi (07)';
+    var posSelect = document.getElementById('studio-doc-pos');
+    var hasOption = false;
+    if (posSelect) {
+        for (var i = 0; i < posSelect.options.length; i++) {
+            if (posSelect.options[i].value === posState) {
+                hasOption = true;
+                break;
+            }
+        }
+        if (hasOption) {
+            posSelect.value = posState;
+            coraTogglePOSCustomFields('studio-doc-pos', 'custom-pos-container');
+        } else {
+            posSelect.value = 'CUSTOM';
+            coraTogglePOSCustomFields('studio-doc-pos', 'custom-pos-container');
+            var match = posState.match(/^([^(]+)\s*(?:\((\d+)\))?/);
+            if (match) {
+                var stateName = match[1].trim();
+                var stateCode = match[2] || '';
+                setVal('custom-pos-state', stateName);
+                setVal('custom-pos-code', stateCode);
+                setChecked('custom-pos-is-igst', stateName.toLowerCase().indexOf('delhi') === -1);
+                
+                setVal('settings-custom-pos-state', stateName);
+                setVal('settings-custom-pos-code', stateCode);
+                setChecked('settings-custom-pos-is-igst', stateName.toLowerCase().indexOf('delhi') === -1);
+            }
+        }
+    }
 
     var tbody = document.getElementById('studio-line-items-body');
     if (tbody) {
@@ -3892,7 +4364,15 @@ window.coraOpenDocInStudio = function(docId) {
         ];
         items.forEach(function(it){ coraAddStudioLineItem(it); });
     }
-    coraSwitchVaultView('editor', docId);
+
+    // Force editor to open directly on Step 3 for editing existing documents
+    if (doc.type) {
+        CORA_STUDIO_STATE.selectedCategory = doc.type.toLowerCase();
+        try {
+            localStorage.setItem('cora_wiz_state', JSON.stringify(CORA_STUDIO_STATE));
+        } catch(e) {}
+    }
+    coraSwitchVaultView('editor', docId, 3);
 };
 
 window.coraSaveStudioDocument = function() {
@@ -3905,6 +4385,11 @@ window.coraSaveStudioDocument = function() {
     var clientPhone = document.getElementById('studio-client-phone').value.trim();
     var clientGstin = document.getElementById('studio-client-gstin').value.trim();
     var posState = document.getElementById('studio-doc-pos').value;
+    if (posState === 'CUSTOM') {
+        var customState = document.getElementById('custom-pos-state').value.trim() || 'Custom';
+        var customCode = document.getElementById('custom-pos-code').value.trim() || '99';
+        posState = customState + ' (' + customCode + ')';
+    }
     var upiVpa = document.getElementById('studio-doc-upi').value.trim();
     var status = document.getElementById('studio-doc-status').value || 'Active';
 
@@ -4207,7 +4692,9 @@ window.coraOpenShareDrawer = function(docId) {
     document.getElementById('share-doc-title-display').textContent = doc.title;
     document.getElementById('share-email-input').value = doc.client_email || '';
 
-    var shareUrl = window.location.origin + window.location.pathname + '?cora_doc=' + doc.id + '&token=' + (doc.token || 'vtoken');
+    var siteUrl = (window.coraREData && window.coraREData.siteUrl) ? window.coraREData.siteUrl : window.location.origin;
+    var hash = (doc.secured_shares && doc.secured_shares.length > 0) ? doc.secured_shares[0].hash : ('share_' + doc.id);
+    var shareUrl = siteUrl.replace(/\/$/, "") + '/shared-doc/' + hash;
     document.getElementById('share-link-url').value = shareUrl;
 
     document.getElementById('cora-share-doc-drawer').classList.remove('hidden', 'pointer-events-none');
@@ -4514,7 +5001,9 @@ window.coraOpenShareModal = function(docId) {
         phoneBadge.className = 'text-[10px] font-bold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded border border-zinc-200';
     }
 
-    var shareUrl = window.location.origin + window.location.pathname + '?cora_doc=' + doc.id + '&token=' + (doc.token || 'vtoken');
+    var siteUrl = (window.coraREData && window.coraREData.siteUrl) ? window.coraREData.siteUrl : window.location.origin;
+    var hash = (doc.secured_shares && doc.secured_shares.length > 0) ? doc.secured_shares[0].hash : ('share_' + doc.id);
+    var shareUrl = siteUrl.replace(/\/$/, "") + '/shared-doc/' + hash;
     document.getElementById('share-modal-link-input').value = shareUrl;
 
     document.getElementById('cora-share-modal').classList.remove('hidden');
@@ -4532,10 +5021,34 @@ window.coraCopyShareModalLink = function() {
 };
 
 window.coraSendShareModalEmail = function() {
+    if (!shareModalCurrentDoc) return;
     var email = document.getElementById('share-modal-email-input').value.trim();
     if (!email) { coraShowToast('Recipient email required.'); return; }
-    coraShowToast('Share link sent to ' + email);
-    coraCloseShareModal();
+
+    coraShowToast('Sending e-sign request email...');
+    jQuery.ajax({
+        url: coraREData.ajaxUrl,
+        type: 'POST',
+        data: {
+            action: 'cora_share_document_email',
+            nonce: coraREData.ajaxNonce,
+            doc_id: shareModalCurrentDoc.id,
+            email: email,
+            message: 'Please review and e-sign this document.'
+        },
+        success: function(r) {
+            if (r.success) {
+                coraShowToast(r.data || 'Email sent successfully!');
+                coraCloseShareModal();
+                setTimeout(function(){ location.reload(); }, 600);
+            } else {
+                coraShowToast(r.data || 'Failed to send email.');
+            }
+        },
+        error: function() {
+            coraShowToast('Network error, email send failed.');
+        }
+    });
 };
 
 window.coraShareModalWhatsApp = function() {

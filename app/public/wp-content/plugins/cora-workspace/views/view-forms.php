@@ -321,6 +321,10 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
                     Share
                 </button>
+                <button id="btn-save-draft" class="h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                    Save Draft
+                </button>
                 <button id="btn-save-form" class="h-8 px-4 rounded-lg bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all cursor-pointer shadow-xs border-0">
                     Publish Form
                 </button>
@@ -1304,6 +1308,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const wpNonce = (typeof coraREData !== 'undefined' && coraREData.nonce) ? coraREData.nonce : ((typeof wpApiSettings !== 'undefined') ? wpApiSettings.nonce : '');
 
+    function getCoraRestUrl(path) {
+        let base = (typeof coraREData !== 'undefined' && coraREData.restUrl) ? coraREData.restUrl : '/wp-json/';
+        if (!base.endsWith('/')) base += '/';
+        if (path.startsWith('/')) path = path.slice(1);
+        return base + path;
+    }
+
     // --- Type Meta ---
     const TYPE_META = {
         text:           { label: 'Short Text',     badge: 'Text',     icon: 'T' },
@@ -1671,7 +1682,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.innerHTML = '<span class="animate-spin inline-block w-3.5 h-3.5 border-2 border-white/30 dark:border-zinc-900/30 border-t-white dark:border-t-zinc-900 rounded-full"></span> Saving...';
 
         jQuery.ajax({
-            url: '/wp-json/cora/v1/forms/clauses',
+            url: getCoraRestUrl('cora/v1/forms/clauses'),
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ clause_key: clauseKey, title: clauseTitle, content_text: clauseText }),
@@ -1725,7 +1736,7 @@ function coraCopyFallback(text) {
 
 function fetchForms() {
         jQuery.ajax({
-            url: '/wp-json/cora/v1/forms',
+            url: getCoraRestUrl('cora/v1/forms'),
             method: 'GET',
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-WP-Nonce', wpNonce);
@@ -1806,7 +1817,7 @@ function updateAdvancedFunnelData() {
 
         if (selectedId === 'all') {
             jQuery.ajax({
-                url: `/wp-json/cora/v1/forms/submissions`,
+                url: getCoraRestUrl('cora/v1/forms/submissions'),
                 method: 'GET',
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader('X-WP-Nonce', wpNonce);
@@ -1920,7 +1931,7 @@ function updateAdvancedFunnelData() {
             if (!formObj) return;
             
             jQuery.ajax({
-                url: `/wp-json/cora/v1/forms/${selectedId}/submissions`,
+                url: getCoraRestUrl(`cora/v1/forms/${selectedId}/submissions`),
                 method: 'GET',
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader('X-WP-Nonce', wpNonce);
@@ -2016,7 +2027,7 @@ function updateAdvancedFunnelData() {
 
 function fetchClauses() {
         jQuery.ajax({
-            url: '/wp-json/cora/v1/forms/clauses',
+            url: getCoraRestUrl('cora/v1/forms/clauses'),
             method: 'GET',
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-WP-Nonce', wpNonce);
@@ -2072,7 +2083,7 @@ function renderClausesList(clauses) {
             const cId = jQuery(this).data('id');
             coraConfirmAction("Are you sure you want to delete this clause? This action is permanent.", function() {
                 jQuery.ajax({
-                    url: `/wp-json/cora/v1/forms/clauses/${cId}`,
+                    url: getCoraRestUrl(`cora/v1/forms/clauses/${cId}`),
                     method: 'DELETE',
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-WP-Nonce', wpNonce);
@@ -2089,7 +2100,7 @@ function renderClausesList(clauses) {
 function fetchAuditLogs(page = 1) {
         currentAuditPage = page;
         jQuery.ajax({
-            url: `/wp-json/cora/v1/forms/audit-log?page=${page}&per_page=10`,
+            url: getCoraRestUrl(`cora/v1/forms/audit-log?page=${page}&per_page=10`),
             method: 'GET',
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-WP-Nonce', wpNonce);
@@ -2194,7 +2205,7 @@ function coraConfirmAction(message, onConfirm) {
 
 function deleteForm(id) {
         jQuery.ajax({
-            url: `/wp-json/cora/v1/forms/${id}`,
+            url: getCoraRestUrl(`cora/v1/forms/${id}`),
             method: 'DELETE',
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-WP-Nonce', wpNonce);
@@ -2232,7 +2243,7 @@ function deleteForm(id) {
         if (content) content.innerHTML = '<div class="text-xs text-zinc-400 text-center py-8">Loading submissions...</div>';
 
         jQuery.ajax({
-            url: `/wp-json/cora/v1/forms/${formId}/submissions`,
+            url: getCoraRestUrl(`cora/v1/forms/${formId}/submissions`),
             method: 'GET',
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-WP-Nonce', wpNonce);
@@ -2417,7 +2428,7 @@ function executeBulkFormAction(action) {
 
     const performRequest = () => {
         jQuery.ajax({
-            url: '/wp-json/cora/v1/forms/bulk',
+            url: getCoraRestUrl('cora/v1/forms/bulk'),
             method: 'POST',
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-WP-Nonce', wpNonce);
@@ -2887,13 +2898,16 @@ function renderFormsList() {
         switchLeftTab('fields');
         if (typeof renderLogicRules === 'function') renderLogicRules();
         
+        window._formIsDirty = true;
+        setAutoSaveStatus('unsaved');
+
         if (listState) listState.classList.add('hidden');
         if (editorState) { editorState.classList.remove('hidden'); editorState.classList.add('flex'); }
     }
 
     function loadFormIntoEditor(id) {
         jQuery.ajax({
-            url: `/wp-json/cora/v1/forms/${id}`,
+            url: getCoraRestUrl(`cora/v1/forms/${id}`),
             method: 'GET',
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-WP-Nonce', wpNonce);
@@ -3085,6 +3099,9 @@ function renderFormsList() {
         } else if (status === 'saved') {
             statusEl.classList.add('bg-emerald-50', 'text-emerald-700', 'dark:bg-emerald-950/60', 'dark:text-emerald-400');
             statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-0.5 animate-pulse"></span> Autosaved`;
+        } else if (status === 'unsaved') {
+            statusEl.classList.add('bg-zinc-100', 'text-zinc-600', 'dark:bg-zinc-800', 'dark:text-zinc-400');
+            statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-zinc-400 mr-0.5"></span> Unsaved Draft`;
         } else if (status === 'error') {
             statusEl.classList.add('bg-red-50', 'text-red-700', 'dark:bg-red-950/60', 'dark:text-red-400');
             statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-0.5"></span> Error`;
@@ -3124,7 +3141,7 @@ function renderFormsList() {
         }, 1500);
     }
 
-    function saveFormInternal(publish = false) {
+    function saveFormInternal(publish = false, callback = null) {
         clearTimeout(autoSaveTimer);
         if (!currentEditingForm) return;
 
@@ -3140,7 +3157,7 @@ function renderFormsList() {
         }
 
         jQuery.ajax({
-            url: '/wp-json/cora/v1/forms',
+            url: getCoraRestUrl('cora/v1/forms'),
             method: 'POST',
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-WP-Nonce', wpNonce);
@@ -3171,11 +3188,17 @@ function renderFormsList() {
                     window.coraShowToast && window.coraShowToast("Form published successfully!", "success");
                     fetchForms();
                 }
+                if (typeof callback === 'function') {
+                    callback(res);
+                }
             },
             error: function(err) {
                 setAutoSaveStatus('error');
                 if (publish) {
                     window.coraShowToast && window.coraShowToast("Failed to save form.", "error");
+                }
+                if (typeof callback === 'function') {
+                    callback(null);
                 }
             }
         });
@@ -4183,46 +4206,75 @@ function renderFormsList() {
         });
     }
 
+    document.getElementById('btn-save-draft')?.addEventListener('click', () => {
+        saveFormInternal(false, (res) => {
+            if (res) {
+                window.coraShowToast && window.coraShowToast("Draft saved successfully!", "success");
+            }
+        });
+    });
+
     document.getElementById('btn-save-form')?.addEventListener('click', () => {
         saveFormInternal(true);
     });
 
     document.getElementById('btn-view-form')?.addEventListener('click', () => {
-        if (!currentEditingForm || !currentEditingForm.id) {
-            window.coraShowToast && window.coraShowToast("Please save/publish the form first before viewing", "warning");
-            return;
+        if (!currentEditingForm) return;
+
+        const openWindow = (f) => {
+            let siteUrl = (typeof coraREData !== 'undefined' && coraREData.siteUrl) ? coraREData.siteUrl : '';
+            if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
+            const formKey = f.form_key || f.id;
+            window.open(siteUrl + '/shared-form/' + formKey, '_blank');
+        };
+
+        if (currentEditingForm.id) {
+            openWindow(currentEditingForm);
+        } else {
+            window.coraShowToast && window.coraShowToast("Publishing form to generate preview...", "info");
+            saveFormInternal(true, (res) => {
+                if (res && (res.form_key || res.id)) {
+                    openWindow(res);
+                }
+            });
         }
-        let siteUrl = coraREData.siteUrl || '';
-        if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
-        const formKey = currentEditingForm.form_key || currentEditingForm.id;
-        window.open(siteUrl + '/shared-form/' + formKey, '_blank');
     });
 
     function openShareModal() {
-        if (!currentEditingForm || !currentEditingForm.id) {
-            window.coraShowToast && window.coraShowToast("Please save the form first to share.", "error");
-            return;
-        }
+        if (!currentEditingForm) return;
 
-        let siteUrl = coraREData.siteUrl || '';
-        if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
-        const formKey = currentEditingForm.form_key || currentEditingForm.id;
-        const shareUrl = siteUrl + '/shared-form/' + formKey;
-        const embedCode = `<iframe src="${shareUrl}" width="100%" height="600" frameborder="0"></iframe>`;
+        const populateAndShowModal = (f) => {
+            let siteUrl = (typeof coraREData !== 'undefined' && coraREData.siteUrl) ? coraREData.siteUrl : '';
+            if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
+            const formKey = f.form_key || f.id;
+            const shareUrl = siteUrl + '/shared-form/' + formKey;
+            const embedCode = `<iframe src="${shareUrl}" width="100%" height="600" frameborder="0"></iframe>`;
 
-        const titleEl = document.getElementById('share-modal-title');
-        if (titleEl) titleEl.textContent = `Share: ${currentEditingForm.title || 'Untitled Form'}`;
+            const titleEl = document.getElementById('share-modal-title');
+            if (titleEl) titleEl.textContent = `Share: ${f.title || 'Untitled Form'}`;
 
-        const urlInp = document.getElementById('share-modal-url-input');
-        if (urlInp) urlInp.value = shareUrl;
+            const urlInp = document.getElementById('share-modal-url-input');
+            if (urlInp) urlInp.value = shareUrl;
 
-        const embedInp = document.getElementById('share-modal-embed-input');
-        if (embedInp) embedInp.value = embedCode;
+            const embedInp = document.getElementById('share-modal-embed-input');
+            if (embedInp) embedInp.value = embedCode;
 
-        const modal = document.getElementById('cora-share-modal');
-        if (modal) {
-            modal.classList.remove('hidden', 'pointer-events-none');
-            modal.classList.add('flex', 'pointer-events-auto');
+            const modal = document.getElementById('cora-share-modal');
+            if (modal) {
+                modal.classList.remove('hidden', 'pointer-events-none');
+                modal.classList.add('flex', 'pointer-events-auto');
+            }
+        };
+
+        if (currentEditingForm.id) {
+            populateAndShowModal(currentEditingForm);
+        } else {
+            window.coraShowToast && window.coraShowToast("Publishing form to generate share link...", "info");
+            saveFormInternal(true, (res) => {
+                if (res && (res.form_key || res.id)) {
+                    populateAndShowModal(res);
+                }
+            });
         }
     }
 
@@ -4270,8 +4322,15 @@ function renderFormsList() {
     });
 
     document.getElementById('btn-back-to-list')?.addEventListener('click', () => {
-        fetchForms();
-        window.location.hash = '#list';
+        if (window._formIsDirty || (currentEditingForm && !currentEditingForm.id)) {
+            saveFormInternal(false, () => {
+                fetchForms();
+                window.location.hash = '#list';
+            });
+        } else {
+            fetchForms();
+            window.location.hash = '#list';
+        }
     });
 
     // Use delegated event listeners on the stable module root so they survive listState.innerHTML replacement
@@ -4336,7 +4395,7 @@ function renderFormsList() {
         }
 
         jQuery.ajax({
-            url: `/wp-json/cora/v1/forms/${currentEditingForm.id}/submissions`,
+            url: getCoraRestUrl(`cora/v1/forms/${currentEditingForm.id}/submissions`),
             method: 'GET',
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-WP-Nonce', wpNonce);

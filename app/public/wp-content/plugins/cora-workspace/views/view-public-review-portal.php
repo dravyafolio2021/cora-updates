@@ -20,8 +20,8 @@ $workspace_name = get_option( 'cora_workspace_name', 'Cora Studio' );
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leave a Review — <?php echo esc_html( $workspace_name ); ?></title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/tailwind-cdn.min.js'; ?>"></script>
+    <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/confetti.browser.min.js'; ?>" defer></script>
     <style>
         .star-rating svg { transition: all 0.15s ease-in-out; }
         .star-rating button:hover svg,

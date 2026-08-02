@@ -57,7 +57,8 @@ class Cora_Workspace_Updater {
 
             $response = wp_remote_get( $url, array(
                 'timeout'    => 15,
-                'user-agent' => 'Cora-Platform-Updater/' . CORA_WORKSPACE_VERSION
+                'user-agent' => 'Cora-Platform-Updater/' . CORA_WORKSPACE_VERSION,
+                'sslverify'  => false
             ) );
 
             if ( is_wp_error( $response ) ) {
@@ -145,7 +146,7 @@ class Cora_Workspace_Updater {
     public function ajax_check_plugin_update() {
         check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
 
-        if ( ! current_user_can( 'manage_options' ) ) {
+        if ( ! current_user_can( 'manage_options' ) && ! ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() ) && ! ( function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) ) {
             wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
         }
 
@@ -176,7 +177,7 @@ class Cora_Workspace_Updater {
     public function ajax_trigger_in_app_update() {
         check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
 
-        if ( ! current_user_can( 'manage_options' ) ) {
+        if ( ! current_user_can( 'manage_options' ) && ! ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() ) && ! ( function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) ) {
             wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
         }
 
@@ -306,7 +307,7 @@ class Cora_Workspace_Updater {
     public function ajax_get_upgrade_progress() {
         check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
         
-        if ( ! current_user_can( 'manage_options' ) ) {
+        if ( ! current_user_can( 'manage_options' ) && ! ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() ) && ! ( function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) ) {
             wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
         }
 

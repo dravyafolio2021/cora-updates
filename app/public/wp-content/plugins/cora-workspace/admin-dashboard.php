@@ -258,15 +258,15 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     </script>
     
     <!-- Load QuillJS Rich Text ListingCoordinator -->
-    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <link href="<?php echo CORA_WORKSPACE_URL . 'assets/css/quill.snow.css'; ?>" rel="stylesheet">
+    <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/quill.min.js'; ?>" defer></script>
     
     <!-- Load ChartJS -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/chart.min.js'; ?>" defer></script>
     
     <!-- Load TomSelect -->
-    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.default.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+    <link href="<?php echo CORA_WORKSPACE_URL . 'assets/css/tom-select.default.min.css'; ?>" rel="stylesheet">
+    <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/tom-select.complete.min.js'; ?>" defer></script>
     
     <!-- WordPress Enqueued Styles/Scripts for Media Uploader -->
     <?php

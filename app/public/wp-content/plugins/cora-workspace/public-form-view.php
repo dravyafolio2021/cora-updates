@@ -25,7 +25,7 @@ $description = isset( $settings['description'] ) ? $settings['description'] : ( 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo esc_html( $form['title'] ); ?></title>
     <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/tailwind-cdn.min.js'; ?>"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;

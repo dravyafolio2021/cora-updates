@@ -110,7 +110,7 @@ $seo_keywords = get_post_meta( $attachment_id, '_cora_media_seo_keywords', true 
     <?php if ( ! empty($seo_keywords) ) : ?>
     <meta name="keywords" content="<?php echo esc_attr($seo_keywords); ?>">
     <?php endif; ?>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/tailwind-cdn.min.js'; ?>"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;

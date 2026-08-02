@@ -2858,10 +2858,6 @@ $cora_settings_tabs = array(
                         if (window.coraShowToast) window.coraShowToast('Your workspace is up to date on v' + res.data.current_version + '.');
                     }
                 } else {
-                        jQuery('#cora-updates-state-uptodate').removeClass('hidden');
-                        if (window.coraShowToast) window.coraShowToast('Your workspace is already up to date.');
-                    }
-                } else {
                     jQuery('#cora-error-message-text').text(res.data.message || 'Failed to check updates.');
                     jQuery('#cora-updates-state-error').removeClass('hidden');
                     if (window.coraShowToast) window.coraShowToast(res.data.message || 'Failed to check updates.', 'error');

@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.9.79
+ * Version: 2.9.88
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.9.79' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.88' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -850,8 +850,15 @@ function cora_real_estate_ai_handle_workspace_route() {
         wp_die( __( 'Invalid or secure portfolio link.', 'cora-workspace' ), __( 'Access Denied', 'cora-workspace' ), array( 'response' => 403 ) );
     }
 
+    $shared_form_idx = -1;
     if ( isset( $path_parts[0] ) && 'shared-form' === $path_parts[0] ) {
-        $identifier = isset( $path_parts[1] ) ? sanitize_text_field( $path_parts[1] ) : '';
+        $shared_form_idx = 1;
+    } else if ( isset( $path_parts[1] ) && 'shared-form' === $path_parts[1] ) {
+        $shared_form_idx = 2;
+    }
+
+    if ( $shared_form_idx !== -1 ) {
+        $identifier = isset( $path_parts[$shared_form_idx] ) ? sanitize_text_field( $path_parts[$shared_form_idx] ) : '';
         if ( ! empty( $identifier ) ) {
             global $wpdb;
             $form = null;
@@ -2782,7 +2789,7 @@ function cora_ajax_save_document() {
 
     if ( ! empty( $id ) ) {
         foreach ( $documents as &$doc ) {
-            if ( $doc['id'] === $id ) {
+            if ( (string)$doc['id'] === (string)$id ) {
                 $doc['title'] = $title;
                 $doc['type'] = $type;
                 $doc['amount'] = $amount;
@@ -2849,7 +2856,7 @@ function cora_ajax_share_document() {
     $share_link = '';
 
     foreach ( $documents as &$doc ) {
-        if ( $doc['id'] === $doc_id ) {
+        if ( (string)$doc['id'] === (string)$doc_id ) {
             $share_hash = wp_hash( $doc_id . time() . uniqid() );
             
             $expiry_time = 0;
@@ -8390,7 +8397,7 @@ function cora_ajax_send_document_email() {
 
     $found_key = null;
     foreach ( $documents as $key => $doc ) {
-        if ( isset( $doc['id'] ) && $doc['id'] === $doc_id ) {
+        if ( isset( $doc['id'] ) && (string)$doc['id'] === (string)$doc_id ) {
             $found_key = $key;
             break;
         }
@@ -17597,7 +17604,7 @@ function cora_filter_tenancy_data( $items, $option_name = '' ) {
 
     // Bypass tenancy filtering for public secure share pages and public portfolio liking AJAX
     $request_uri = $_SERVER['REQUEST_URI'] ?? '';
-    if ( false !== strpos( $request_uri, 'shared-doc' ) || false !== strpos( $request_uri, 'shared-portfolio' ) || ( defined( 'DOING_AJAX' ) && DOING_AJAX && isset( $_REQUEST['action'] ) && $_REQUEST['action'] === 'cora_toggle_portfolio_like' ) ) {
+    if ( false !== strpos( $request_uri, 'shared-doc' ) || false !== strpos( $request_uri, 'shared-portfolio' ) || ( defined( 'DOING_AJAX' ) && DOING_AJAX && isset( $_REQUEST['action'] ) && ( $_REQUEST['action'] === 'cora_toggle_portfolio_like' || $_REQUEST['action'] === 'cora_client_esign' ) ) ) {
         return $items;
     }
 
@@ -17656,6 +17663,9 @@ add_filter( 'option_cora_gear_kits', 'cora_filter_tenancy_data' );
 
 if ( ! function_exists( 'cora_pre_update_tenancy_data' ) ) {
 function cora_pre_update_tenancy_data( $new_value, $old_value, $option_name ) {
+    if ( defined( 'DOING_AJAX' ) && DOING_AJAX && isset( $_REQUEST['action'] ) && $_REQUEST['action'] === 'cora_client_esign' ) {
+        return $new_value;
+    }
     if ( ! is_array( $new_value ) ) {
         return $new_value;
     }
@@ -23066,6 +23076,7 @@ function cora_get_default_smtp_settings() {
     }
 
     return array(
+        'smtp_enabled'  => get_option( 'cora_smtp_enabled', '0' ),
         'smtp_host'     => get_option( 'cora_smtp_host', 'smtp.hostinger.com' ),
         'smtp_port'     => get_option( 'cora_smtp_port', '465' ),
         'smtp_secure'   => get_option( 'cora_smtp_secure', 'ssl' ),
@@ -23085,6 +23096,9 @@ function cora_get_default_smtp_settings() {
  */
 if ( ! function_exists( 'cora_configure_phpmailer_smtp' ) ) {
 function cora_configure_phpmailer_smtp( $phpmailer ) {
+    if ( get_option( 'cora_smtp_enabled', '0' ) !== '1' ) {
+        return;
+    }
     $smtp = cora_get_default_smtp_settings();
     if ( ! empty( $smtp['smtp_host'] ) && ! empty( $smtp['smtp_username'] ) && ! empty( $smtp['smtp_password'] ) ) {
         $phpmailer->isSMTP();
@@ -23097,6 +23111,14 @@ function cora_configure_phpmailer_smtp( $phpmailer ) {
         $phpmailer->From       = ! empty( $smtp['from_email'] ) ? $smtp['from_email'] : 'heycora@claraverse.in';
         $phpmailer->FromName   = ! empty( $smtp['from_name'] ) ? $smtp['from_name'] : 'Cora';
         $phpmailer->Sender     = $phpmailer->From;
+        // Bypass local SSL certificate verification failures
+        $phpmailer->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer'       => false,
+                'verify_peer_name'  => false,
+                'allow_self_signed' => true
+            )
+        );
     }
 }
 }
@@ -30311,6 +30333,14 @@ function cora_ajax_vault_save_document() {
             'content'        => $content,
             'created_at'     => date('Y-m-d'),
             'token'          => 'vtoken_' . bin2hex(random_bytes(6)),
+            'secured_shares' => array(
+                array(
+                    'hash'        => wp_hash( $id . time() . uniqid() ),
+                    'email'       => $client_email ?: 'client@example.com',
+                    'expiry_time' => 0,
+                    'created_at'  => time()
+                )
+            ),
             'signed'         => false,
             'items'          => $items
         );
@@ -30383,7 +30413,7 @@ function cora_ajax_sign_document() {
 
     $found = false;
     foreach ($docs as &$d) {
-        if ($d['id'] === $doc_id) {
+        if ( (string)$d['id'] === (string)$doc_id ) {
             $time_now = current_time('mysql');
             $ip_now   = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
             $hash_now = 'ESIGN-HASH-' . strtoupper(substr(md5($doc_id . $signer_name . time()), 0, 12));
@@ -30465,7 +30495,7 @@ function cora_ajax_client_esign() {
     $cora_docs = get_option('cora_documents', array());
     if ( is_array($cora_docs) ) {
         foreach ($cora_docs as &$d) {
-            if ($d['id'] === $doc_id) {
+            if ( (string)$d['id'] === (string)$doc_id ) {
                 // Verify hash exists in secured_shares
                 $hash_match = false;
                 if ( ! empty($d['secured_shares']) && is_array($d['secured_shares']) ) {
@@ -30512,7 +30542,7 @@ function cora_ajax_client_esign() {
     $vault_docs = get_option('cora_workspace_vault_docs', array());
     if ( is_array($vault_docs) ) {
         foreach ($vault_docs as &$d) {
-            if ($d['id'] === $doc_id) {
+            if ( (string)$d['id'] === (string)$doc_id ) {
                 $hash_match = false;
                 if ( ! empty($d['secured_shares']) && is_array($d['secured_shares']) ) {
                     foreach ($d['secured_shares'] as $sh) {
@@ -30586,7 +30616,7 @@ function cora_ajax_share_document_email() {
     $share_hash = '';
     
     foreach ($docs as &$d) {
-        if ($d['id'] === $doc_id) {
+        if ( (string)$d['id'] === (string)$doc_id ) {
             $found = true;
             
             // Check if secured_shares exists
