@@ -44,3 +44,11 @@ The Cora platform enforces a full 5-level Atomic Component Architecture defined 
 - **Scoped Namespacing**: All CSS styles, DOM selectors, JavaScript event listeners, and global variable keys must be strictly namespaced or scoped to their target component to prevent global collisions or cross-module interference.
 - **Zero Side Effects**: Modifying shared utilities, core tokens (`cora-design-tokens.js`), or AJAX routers (`cora-workspace.php`) requires auditing all dependent views to guarantee backward compatibility and zero side effects.
 - **Mandatory Regression Verification**: Before completing any task, execute regression verification checks across neighboring modules to confirm that existing workflows remain 100% functional and intact.
+
+## 8. Local Test Environment Credentials (`http://cora.local`)
+- **Login Portal URL**: `http://cora.local/workspace/login` or `http://cora.local/wp-login.php`
+- **Platform Super Admin (Shruti)**: Email: `admin@cora.local` | Username: `cora_admin` | Password: `cora_secure_pass_123`
+- **Real Estate Workspace Owner**: Email: `owner.realestate@cora.local` | Username: `re_owner` | Password: `cora_secure_pass_123` | Direct URL: `http://cora.local/workspace/dashboard?industry=real_estate`
+- **Photography Studio Workspace Owner**: Email: `owner.studio@cora.local` | Username: `studio_owner` | Password: `cora_secure_pass_123` | Direct URL: `http://cora.local/workspace/dashboard?industry=photography_studio`
+- **Provisioning Utility Script**: `php scripts/setup_local_accounts.php`
+

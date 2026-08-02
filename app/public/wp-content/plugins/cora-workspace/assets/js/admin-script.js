@@ -6437,12 +6437,25 @@ jQuery(document).ready(function($) {
 
     window.coraToggleContentDrawer = function(show) {
         if (show) {
+            // Lock content editor on mobile viewports (< 768px)
+            if (window.innerWidth < 768) {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('🔒 Content Editor is locked on mobile. Please open on a laptop or tablet screen (≥768px) to write and edit articles.', 'info');
+                }
+                return false;
+            }
+
             initListingCoordinatorComponentsIfNeeded();
             $('.cora-stat-card').parent().hide();
             $('#cora-articles-table-body').closest('div').hide();
             $('.cora-page-header').hide();
             $('#cora-full-page-editor').removeClass('hidden').css('display', 'flex');
             window.coraArticleSavedDuringSession = false;
+
+            // Inspector CLOSED BY DEFAULT when editor opens
+            if (typeof window.coraToggleArticleInspector === 'function') {
+                window.coraToggleArticleInspector(false);
+            }
         } else {
             $('#cora-full-page-editor').addClass('hidden').css('display', 'none');
             $('.cora-stat-card').parent().show();

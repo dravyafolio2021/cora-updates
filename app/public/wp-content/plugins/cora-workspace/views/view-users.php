@@ -73,6 +73,81 @@ $agency_branches = $branches;
 $cora_permissions = get_option( 'cora_role_permissions', array() );
 ?>
 
+<style>
+    /* Reset scroll blocks and heights on mobile screens */
+    @media (max-width: 1023px) {
+        html, body, #wpwrap, #wpbody, #wpbody-content, #wpcontent {
+            height: auto !important;
+            overflow: auto !important;
+        }
+        #cora-workspace {
+            height: auto !important;
+            min-height: 100vh !important;
+            overflow: visible !important;
+        }
+        .cora-main {
+            height: auto !important;
+            min-height: 100vh !important;
+            overflow-y: visible !important;
+        }
+    }
+
+    /* Hide scrollbars for chrome/safari/firefox */
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none !important;
+    }
+    .scrollbar-hide {
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
+    }
+
+    /* Mobile Responsive Tables to Cards Transformation */
+    @media (max-width: 767px) {
+        .responsive-table thead {
+            display: none !important;
+        }
+        .responsive-table tbody,
+        .responsive-table tr,
+        .responsive-table td {
+            display: block !important;
+            width: 100% !important;
+        }
+        .responsive-table tr {
+            background-color: #fafafa !important;
+            border: 1px solid #f4f4f5 !important;
+            border-radius: 12px !important;
+            padding: 12px 14px !important;
+            margin-bottom: 12px !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.01) !important;
+            text-align: left !important;
+        }
+        .dark .responsive-table tr {
+            background-color: #1a1a1e !important;
+            border: 1px solid #2d2d30 !important;
+        }
+        .responsive-table td {
+            border: 0 !important;
+            padding: 6px 0 !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            text-align: right !important;
+        }
+        .responsive-table td::before {
+            content: attr(data-label) !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            font-size: 9px !important;
+            color: #71717a !important;
+            text-align: left !important;
+            display: inline-block !important;
+        }
+        .dark .responsive-table td::before {
+            color: #a1a1aa !important;
+        }
+    }
+</style>
+
 <div class="p-0 m-0 border-0 outline-none md:space-y-6 space-y-4">
     <!-- Desktop Header -->
     <div class="hidden md:flex items-center justify-between">
@@ -100,7 +175,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     </div>
 
     <!-- Mobile Header (Visible only on mobile) -->
-    <div class="flex md:hidden items-center justify-between gap-3 mb-2 px-4 py-3 border-b border-zinc-150 dark:border-zinc-800 bg-white dark:bg-zinc-900 select-none">
+    <div class="flex md:hidden items-center justify-between gap-3 mb-2 px-4 py-3 border-b border-zinc-200/60 dark:border-zinc-800 bg-white dark:bg-zinc-900 select-none">
         <div class="flex items-center gap-2">
             <span class="text-zinc-900 dark:text-zinc-100 flex shrink-0">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -126,7 +201,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
     <!-- Desktop Sub Navigation Tabs -->
     <div class="cora-sub-tabs-container hidden md:flex border-b border-zinc-200 dark:border-zinc-800 items-center gap-1.5 overflow-x-auto pb-px shrink-0 select-none no-scrollbar mb-4">
-        <button class="cora-sub-tab active flex items-center gap-2 px-3 pb-2.5 pt-1 text-xs font-semibold border-b-2 border-zinc-950 dark:border-zinc-150 text-zinc-950 dark:text-zinc-150 transition-all cursor-pointer whitespace-nowrap animate-none" data-target="tab-active-members">
+        <button class="cora-sub-tab active flex items-center gap-2 px-3 pb-2.5 pt-1 text-xs font-semibold border-b-2 border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 transition-all cursor-pointer whitespace-nowrap animate-none" data-target="tab-active-members">
             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             Active Members
         </button>
@@ -148,13 +223,19 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 Custom Roles
             </button>
         <?php endif; ?>
+        <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_re_broker_owner', 'cora_studio_owner', 'cora_workspace_owner', 'owner', 'cora_manager' ) ) ) : ?>
+            <button class="cora-sub-tab flex items-center gap-2 px-3 pb-2.5 pt-1 text-xs font-medium border-b-2 border-transparent text-zinc-550 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-all cursor-pointer whitespace-nowrap" data-target="tab-owner-automations">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path></svg>
+                Automated Digests & Alerts
+            </button>
+        <?php endif; ?>
     </div>
 
     <!-- Mobile Sub Navigation Tabs -->
     <div class="cora-sub-tabs-container flex md:hidden items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-px mb-4 px-4 bg-white dark:bg-zinc-900 relative select-none">
         <div class="flex items-center gap-1.5">
             <!-- Active Members tab -->
-            <button class="cora-sub-tab active flex items-center gap-1.5 px-2.5 pb-2 pt-1 text-[11px] font-semibold border-b-[1.5px] border-zinc-950 dark:border-zinc-150 text-zinc-950 dark:text-zinc-150 transition-all cursor-pointer whitespace-nowrap focus:outline-none focus:ring-0 outline-none shadow-none" data-target="tab-active-members">
+            <button class="cora-sub-tab active flex items-center gap-1.5 px-2.5 pb-2 pt-1 text-[11px] font-semibold border-b-[1.5px] border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 transition-all cursor-pointer whitespace-nowrap focus:outline-none focus:ring-0 outline-none shadow-none" data-target="tab-active-members">
                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
                 Members
             </button>
@@ -173,7 +254,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             </button>
 
             <!-- Floating Right-Aligned Dropdown Menu Card -->
-            <div id="mobile-tabs-more-dropdown" class="hidden absolute right-0 top-full mt-1.5 z-30 w-48 bg-white dark:bg-zinc-900 border border-zinc-150 dark:border-zinc-800 rounded-lg shadow-md py-1 animate-in fade-in duration-100">
+            <div id="mobile-tabs-more-dropdown" class="hidden absolute right-0 top-full mt-1.5 z-30 w-48 bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 rounded-lg shadow-md py-1 animate-in fade-in duration-100">
                 <button class="cora-sub-tab flex items-center gap-2 w-full px-3 py-2 text-left text-[11px] font-medium text-zinc-650 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer whitespace-nowrap focus:outline-none focus:ring-0 outline-none shadow-none" data-target="tab-permissions-matrix">
                     <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
                     Permissions Matrix
@@ -188,6 +269,10 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         Custom Roles
                     </button>
                 <?php endif; ?>
+                <button class="cora-sub-tab flex items-center gap-2 w-full px-3 py-2 text-left text-[11px] font-medium text-zinc-650 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer whitespace-nowrap focus:outline-none focus:ring-0 outline-none shadow-none" data-target="tab-owner-automations">
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path></svg>
+                    Automated Digests
+                </button>
             </div>
         </div>
     </div>
@@ -195,20 +280,20 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     <!-- TAB 1: ACTIVE MEMBERS -->
     <div id="tab-active-members" class="cora-tab-content space-y-4">
         <!-- Filters Toolbar -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex flex-col gap-3">
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 md:p-4 shadow-sm flex flex-col gap-2.5 md:gap-3">
             <!-- Search bar & Mobile Toggle Row -->
-            <div class="flex flex-row items-center gap-3 w-full justify-between">
+            <div class="flex flex-row items-center gap-2 md:gap-3 w-full justify-between">
                 <div class="flex flex-row items-center gap-2 flex-1 min-w-0">
                     <!-- Search bar -->
                     <div class="relative flex-1 max-w-xs md:max-w-sm">
-                        <input type="text" id="member-search" oninput="filterActiveMembers()" class="w-full h-9 text-xs pl-8 pr-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 focus:border-zinc-400 focus:ring-0 focus:outline-none text-zinc-900 dark:text-zinc-100 transition-colors" placeholder="Search by name or email...">
+                        <input type="text" id="member-search" oninput="filterActiveMembers()" class="w-full h-9 text-xs pl-8 pr-3 rounded-lg border-0 bg-zinc-100/60 dark:bg-zinc-850/60 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:ring-0 focus:outline-none text-zinc-900 dark:text-zinc-100 transition-colors" placeholder="Search by name or email...">
                         <div class="absolute left-2.5 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         </div>
                     </div>
 
                     <!-- Mobile Filter Toggle Button -->
-                    <button type="button" id="mobile-filter-toggle" onclick="toggleMobileFilters()" class="md:hidden h-9 w-9 shrink-0 flex items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900 focus:outline-none focus:ring-0 transition-colors cursor-pointer" title="Toggle Filters">
+                    <button type="button" id="mobile-filter-toggle" onclick="toggleMobileFilters()" class="md:hidden h-9 w-9 shrink-0 flex items-center justify-center rounded-lg border-0 bg-zinc-100/60 dark:bg-zinc-850/60 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200/50 dark:hover:bg-zinc-700/50 focus:outline-none focus:ring-0 transition-colors cursor-pointer" title="Toggle Filters">
                         <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                     </button>
 
@@ -235,7 +320,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             <option value="inactive">Inactive</option>
                         </select>
                         <!-- Clear Filters Button (Desktop) -->
-                        <button type="button" onclick="clearFilters()" class="hidden border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 px-3 text-xs text-zinc-500 hover:text-zinc-950 dark:hover:text-zinc-150 hover:bg-zinc-50 dark:hover:bg-zinc-950 transition-colors focus:outline-none focus:ring-0 cursor-pointer" id="btn-clear-filters-desktop">Clear</button>
+                        <button type="button" onclick="clearFilters()" class="hidden border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 px-3 text-xs text-zinc-500 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-955 transition-colors focus:outline-none focus:ring-0 cursor-pointer" id="btn-clear-filters-desktop">Clear</button>
                     </div>
                 </div>
 
@@ -246,30 +331,30 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             </div>
 
             <!-- Collapsible Mobile Filters Panel -->
-            <div id="member-filter-panel" class="hidden md:hidden border-t border-zinc-150/60 dark:border-zinc-800/60 pt-3">
+            <div id="member-filter-panel" class="hidden md:hidden border-t border-zinc-200/60 dark:border-zinc-800/60 pt-3">
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                     <!-- Role Filter -->
-                    <select id="filter-role-mobile" onchange="syncFilterAndRun('role')" class="bg-zinc-50 dark:bg-zinc-950 border border-zinc-150 dark:border-zinc-800 text-xs rounded-lg px-2 py-1.5 h-9 w-full cursor-pointer text-zinc-700 dark:text-zinc-300 focus:border-zinc-400 focus:ring-0 focus:outline-none transition-colors">
+                    <select id="filter-role-mobile" onchange="syncFilterAndRun('role')" class="bg-zinc-100/60 dark:bg-zinc-850/60 border-0 text-xs rounded-lg px-2 py-1.5 h-9 w-full cursor-pointer text-zinc-700 dark:text-zinc-300 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:ring-0 focus:outline-none transition-colors">
                         <option value="">All Roles</option>
                         <?php foreach ( $role_labels as $key => $lbl ) : ?>
                             <option value="<?php echo esc_attr($key); ?>"><?php echo esc_html($lbl); ?></option>
                         <?php endforeach; ?>
                     </select>
                     <!-- Branch Filter -->
-                    <select id="filter-branch-mobile" onchange="syncFilterAndRun('branch')" class="bg-zinc-50 dark:bg-zinc-950 border border-zinc-150 dark:border-zinc-800 text-xs rounded-lg px-2 py-1.5 h-9 w-full cursor-pointer text-zinc-700 dark:text-zinc-300 focus:border-zinc-400 focus:ring-0 focus:outline-none transition-colors">
+                    <select id="filter-branch-mobile" onchange="syncFilterAndRun('branch')" class="bg-zinc-100/60 dark:bg-zinc-850/60 border-0 text-xs rounded-lg px-2 py-1.5 h-9 w-full cursor-pointer text-zinc-700 dark:text-zinc-300 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:ring-0 focus:outline-none transition-colors">
                         <option value="">All Branches</option>
                         <?php foreach ( $agency_branches as $b_id => $b ) : ?>
                             <option value="<?php echo esc_attr($b_id); ?>"><?php echo esc_html($b['name']); ?></option>
                         <?php endforeach; ?>
                     </select>
                     <!-- Status Filter -->
-                    <select id="filter-status-mobile" onchange="syncFilterAndRun('status')" class="bg-zinc-50 dark:bg-zinc-950 border border-zinc-150 dark:border-zinc-800 text-xs rounded-lg px-2 py-1.5 h-9 w-full cursor-pointer text-zinc-700 dark:text-zinc-300 focus:border-zinc-400 focus:ring-0 focus:outline-none transition-colors">
+                    <select id="filter-status-mobile" onchange="syncFilterAndRun('status')" class="bg-zinc-100/60 dark:bg-zinc-850/60 border-0 text-xs rounded-lg px-2 py-1.5 h-9 w-full cursor-pointer text-zinc-700 dark:text-zinc-300 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:ring-0 focus:outline-none transition-colors">
                         <option value="">All Statuses</option>
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
                     </select>
                     <!-- Clear Filters button -->
-                    <button type="button" onclick="clearFilters()" class="hidden h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-500 hover:text-zinc-950 dark:hover:text-zinc-150 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors focus:ring-0 focus:outline-none cursor-pointer flex items-center justify-center gap-1" id="btn-clear-filters-mobile">
+                    <button type="button" onclick="clearFilters()" class="hidden h-9 px-3 rounded-lg border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-500 hover:text-zinc-950 dark:hover:text-zinc-100 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors focus:ring-0 focus:outline-none cursor-pointer flex items-center justify-center gap-1" id="btn-clear-filters-mobile">
                         Clear Filters
                     </button>
                 </div>
@@ -319,7 +404,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 $name_initials = substr( $name_initials, 0, 2 );
                 $name_color = '#' . substr( md5( $u->display_name ), 0, 6 );
             ?>
-                <div class="active-member-row bg-white dark:bg-zinc-950 border border-zinc-150 dark:border-zinc-800 rounded-xl p-3 flex items-center gap-2.5 transition-colors cursor-pointer active:bg-zinc-50 dark:active:bg-zinc-900 focus:outline-none outline-none"
+                <div class="active-member-row bg-white dark:bg-zinc-900 border-0 rounded-xl p-2.5 flex items-center gap-2.5 transition-all cursor-pointer active:bg-zinc-100 dark:active:bg-zinc-800 focus:outline-none outline-none shadow-2xs hover:shadow-xs w-full max-w-[480px] mx-auto"
                     data-name="<?php echo esc_attr(strtolower($u->display_name)); ?>"
                     data-email="<?php echo esc_attr(strtolower($u->user_email)); ?>"
                     data-role="<?php echo esc_attr($u_role); ?>"
@@ -354,7 +439,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 <?php echo esc_html($u_role_lbl); ?>
                             </span>
                             <?php if ($u_branch_lbl && $u_branch_lbl !== '—') : ?>
-                            <span class="inline-flex items-center px-1.5 py-0.5 text-[9px] font-bold rounded bg-zinc-50 dark:bg-zinc-900 text-zinc-550 dark:text-zinc-400 whitespace-nowrap select-none border border-zinc-150 dark:border-zinc-800">
+                            <span class="inline-flex items-center px-1.5 py-0.5 text-[9px] font-bold rounded bg-zinc-50 dark:bg-zinc-900 text-zinc-550 dark:text-zinc-400 whitespace-nowrap select-none border border-zinc-200 dark:border-zinc-800">
                                 <?php echo esc_html($u_branch_lbl); ?>
                             </span>
                             <?php endif; ?>
@@ -432,7 +517,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                             <?php echo esc_html( $name_initials ); ?>
                                         </div>
                                     <?php endif; ?>
-                                    <span class="font-bold text-zinc-900 dark:text-zinc-150"><?php echo esc_html( $u->display_name ); ?></span>
+                                    <span class="font-bold text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $u->display_name ); ?></span>
                                 </td>
                                 <td class="px-5 py-3 text-zinc-500 font-medium"><?php echo esc_html( $u->user_email ); ?></td>
                                 <td class="px-5 py-3">
@@ -462,22 +547,22 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     <div id="tab-pending-invites" class="cora-tab-content space-y-4 hidden">
         <div class="bg-white border border-zinc-200/85 rounded-xl shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-zinc-200 text-xs text-left">
-                    <thead class="bg-zinc-50/50">
+                <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-xs text-left responsive-table">
+                    <thead class="bg-zinc-50/50 dark:bg-zinc-800/40">
                         <tr>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Name</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Email Address</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Role</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Branch</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Expiry</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Status</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-right">Actions</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Name</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Email Address</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Role</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Branch</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Expiry</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Status</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px] text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-zinc-100">
+                    <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
                         <?php if ( empty( $pending_invites ) ) : ?>
                             <tr>
-                                <td colspan="7" class="px-5 py-8 text-center text-zinc-400 font-medium">No pending invitations.</td>
+                                <td colspan="7" class="px-5 py-8 text-center text-zinc-400 dark:text-zinc-500 font-medium">No pending invitations.</td>
                             </tr>
                         <?php else : ?>
                             <?php foreach ( $pending_invites as $tok => $inv ) :
@@ -490,30 +575,38 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 }
                                 $expiry_date = date( 'd M Y, H:i', $inv['expires_at'] );
                             ?>
-                                <tr class="hover:bg-zinc-50/10">
-                                    <td class="px-5 py-3 font-bold text-zinc-900"><?php echo esc_html( $inv['first_name'] . ' ' . $inv['last_name'] ); ?></td>
-                                    <td class="px-5 py-3 text-zinc-500 font-medium"><?php echo esc_html( $inv['email'] ); ?></td>
-                                    <td class="px-5 py-3">
-                                        <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 text-zinc-700 whitespace-nowrap select-none">
+                                <tr class="hover:bg-zinc-50/10 dark:hover:bg-zinc-800/20 text-zinc-700 dark:text-zinc-300">
+                                    <td class="px-5 py-3 font-bold text-zinc-900 dark:text-zinc-100" data-label="Name"><?php echo esc_html( $inv['first_name'] . ' ' . $inv['last_name'] ); ?></td>
+                                    <td class="px-5 py-3 text-zinc-500 dark:text-zinc-400 font-medium" data-label="Email Address"><?php echo esc_html( $inv['email'] ); ?></td>
+                                    <td class="px-5 py-3" data-label="Role">
+                                        <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 whitespace-nowrap select-none">
                                             <?php echo esc_html($invite_role_lbl); ?>
                                         </span>
                                     </td>
-                                    <td class="px-5 py-3 font-semibold text-zinc-800"><?php echo esc_html($invite_branch_lbl); ?></td>
-                                    <td class="px-5 py-3 text-zinc-400 font-medium"><?php echo esc_html($expiry_date); ?></td>
-                                    <td class="px-5 py-3">
-                                        <span class="px-2 py-0.5 text-[9px] font-bold rounded-md <?php
-                                            if ( $status === 'accepted' ) echo 'bg-emerald-50 text-emerald-700';
-                                            elseif ( $status === 'pending' ) echo 'bg-amber-50 text-amber-700';
-                                            else echo 'bg-zinc-100 text-zinc-500';
-                                        ?>">
+                                    <td class="px-5 py-3 font-semibold text-zinc-800 dark:text-zinc-200" data-label="Branch"><?php echo esc_html($invite_branch_lbl); ?></td>
+                                    <td class="px-5 py-3 text-zinc-400 dark:text-zinc-500 font-medium" data-label="Expiry"><?php echo esc_html($expiry_date); ?></td>
+                                    <td class="px-5 py-3" data-label="Status">
+                                        <?php
+                                        $status_classes = 'bg-zinc-100 dark:bg-zinc-800 text-zinc-550 dark:text-zinc-400';
+                                        $dot_color = 'bg-zinc-400';
+                                        if ( $status === 'accepted' ) {
+                                            $status_classes = 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-450';
+                                            $dot_color = 'bg-emerald-500';
+                                        } elseif ( $status === 'pending' ) {
+                                            $status_classes = 'bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-450';
+                                            $dot_color = 'bg-amber-550';
+                                        }
+                                        ?>
+                                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 text-[9px] font-bold rounded-md whitespace-nowrap <?php echo $status_classes; ?>">
+                                            <span class="w-1 h-1 rounded-full <?php echo $dot_color; ?> inline-block"></span>
                                             <?php echo esc_html(ucfirst($status)); ?>
                                         </span>
                                     </td>
-                                    <td class="px-5 py-3 text-right">
+                                    <td class="px-5 py-3 text-right" data-label="Actions">
                                         <div class="flex items-center justify-end gap-2">
                                             <?php if ( $status === 'pending' ) : ?>
-                                                <button onclick="coraResendVerification('<?php echo esc_attr($inv['email']); ?>')" class="px-2 py-1 border border-zinc-200 rounded text-[10px] font-bold text-zinc-700 hover:bg-zinc-50 cursor-pointer">Resend</button>
-                                                <button onclick="coraCancelInvitation('<?php echo esc_attr($tok); ?>', this)" class="px-2 py-1 border border-zinc-200 rounded text-[10px] font-bold text-red-600 hover:bg-red-50 hover:border-red-200 cursor-pointer transition-all">Cancel</button>
+                                                <button onclick="coraResendVerification('<?php echo esc_attr($inv['email']); ?>')" class="px-2 py-1 border border-zinc-200 dark:border-zinc-800 rounded text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer shadow-sm">Resend</button>
+                                                <button onclick="coraCancelInvitation('<?php echo esc_attr($tok); ?>', this)" class="px-2 py-1 border border-zinc-200 dark:border-zinc-800 rounded text-[10px] font-bold text-red-655 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 hover:border-red-200 dark:hover:border-red-800 cursor-pointer transition-all shadow-sm">Cancel</button>
                                             <?php endif; ?>
                                         </div>
                                     </td>
@@ -546,32 +639,35 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 </div>
 
                 <!-- Action Controls Toolbar -->
-                <div class="flex flex-wrap items-center gap-2.5">
+                <div class="flex flex-col md:flex-row items-stretch md:items-center gap-2.5 w-full md:w-auto">
                     <!-- Quick Search input -->
-                    <div class="relative w-full sm:w-52">
+                    <div class="relative w-full md:w-52">
                         <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-zinc-400 dark:text-zinc-500">
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         </div>
                         <input type="text" id="matrix-role-search" placeholder="Search roles..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/70 rounded-lg text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-950 dark:focus:ring-zinc-100 transition-all">
                     </div>
 
-                    <!-- Reset Defaults Button -->
-                    <button type="button" id="matrix-reset-defaults-btn" onclick="coraResetMatrixDefaults()" class="px-3 py-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-750 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
-                        Reset Defaults
-                    </button>
+                    <!-- Row Action Buttons Grid (3-columns on mobile, flex row on desktop) -->
+                    <div class="grid grid-cols-3 md:flex items-center gap-2 md:gap-2.5 w-full md:w-auto">
+                        <!-- Reset Defaults Button -->
+                        <button type="button" id="matrix-reset-defaults-btn" onclick="coraResetMatrixDefaults()" class="px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-750 transition-colors flex items-center justify-center gap-1 md:gap-1.5 cursor-pointer shadow-2xs whitespace-nowrap">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                            <span class="truncate">Reset</span>
+                        </button>
 
-                    <!-- Grant All Button -->
-                    <button type="button" id="matrix-grant-all-btn" onclick="coraGrantAllSelectedRolePermissions()" class="px-3 py-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-750 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        Grant All (Selected Role)
-                    </button>
+                        <!-- Grant All Button -->
+                        <button type="button" id="matrix-grant-all-btn" onclick="coraGrantAllSelectedRolePermissions()" class="px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-750 transition-colors flex items-center justify-center gap-1 md:gap-1.5 cursor-pointer shadow-2xs whitespace-nowrap">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span class="truncate">Grant All</span>
+                        </button>
 
-                    <!-- Save Matrix Button -->
-                    <button type="button" id="matrix-save-btn" onclick="coraSavePermissionsMatrix()" class="px-3.5 py-1.5 text-xs font-bold text-white dark:text-zinc-950 bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-2xs">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                        Save Matrix
-                    </button>
+                        <!-- Save Matrix Button -->
+                        <button type="button" id="matrix-save-btn" onclick="coraSavePermissionsMatrix()" class="px-2 md:px-3.5 py-1.5 text-[11px] md:text-xs font-bold text-white dark:text-zinc-950 bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 rounded-lg transition-colors flex items-center justify-center gap-1 md:gap-1.5 cursor-pointer active:scale-95 shadow-2xs whitespace-nowrap">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                            <span class="truncate">Save</span>
+                        </button>
+                    </div>
                 </div>
             </div>
             
@@ -632,8 +728,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             }
             ?>
 
-            <!-- Matrix Table Container with Sticky Left Column -->
-            <div class="overflow-x-auto rounded-lg border border-zinc-200/80 dark:border-zinc-800 shadow-2xs">
+            <!-- Matrix Table Container with Sticky Left Column (Desktop) -->
+            <div class="hidden md:block overflow-x-auto rounded-lg border border-zinc-200/80 dark:border-zinc-800 shadow-2xs">
                 <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-xs text-left select-none border-collapse" id="cora-permissions-matrix-table">
                     <thead>
                         <!-- Row 1: Category Grouping Badges -->
@@ -756,6 +852,80 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Mobile Permissions Matrix Stacked Cards (Vertical Stack, No Horizontal Scroll) -->
+            <div class="md:hidden space-y-3.5">
+                <div class="grid grid-cols-1 gap-3.5 w-full">
+                    <?php foreach ($target_roles as $role_key => $role_name): 
+                        $allowed_features = isset($cora_permissions[$role_key]) ? $cora_permissions[$role_key] : array();
+                        
+                        $access_badge_label = 'Contributor';
+                        $access_badge_class = 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 font-semibold';
+                        
+                        if ( isset( $cora_custom_roles[$role_key] ) ) {
+                            $cdef = $cora_custom_roles[$role_key];
+                            $lvl = isset($cdef['access_level']) ? $cdef['access_level'] : 'contributor';
+                            if ($lvl === 'manager') {
+                                $access_badge_label = 'Manager';
+                                $access_badge_class = 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 font-bold';
+                            } elseif ($lvl === 'read_only') {
+                                $access_badge_label = 'Read-Only';
+                                $access_badge_class = 'bg-zinc-100/80 text-zinc-650 dark:bg-zinc-800/60 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-750 font-semibold';
+                            } else {
+                                $access_badge_label = 'Custom';
+                            }
+                        } else {
+                            if ( in_array($role_key, array('cora_branch_manager', 'editor')) ) {
+                                $access_badge_label = 'Manager';
+                                $access_badge_class = 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 font-bold';
+                            } elseif ( in_array($role_key, array('cora_viewer', 'subscriber')) ) {
+                                $access_badge_label = 'Read-Only';
+                                $access_badge_class = 'bg-zinc-100/80 text-zinc-655 dark:bg-zinc-800/60 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-750 font-semibold';
+                            }
+                        }
+                    ?>
+                        <div class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 rounded-xl p-3.5 shadow-2xs flex flex-col justify-between" data-mobile-role="<?php echo esc_attr($role_key); ?>">
+                            <div>
+                                <div class="flex items-center justify-between gap-3 pb-2.5 border-b border-zinc-200 dark:border-zinc-800 mb-2.5">
+                                    <span class="font-bold text-xs text-zinc-900 dark:text-zinc-100"><?php echo esc_html($role_name); ?></span>
+                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] shadow-2xs <?php echo esc_attr($access_badge_class); ?>">
+                                        <?php echo esc_html($access_badge_label); ?>
+                                    </span>
+                                </div>
+                                <div class="space-y-2">
+                                    <?php 
+                                    $cat_idx = 0;
+                                    foreach ( $categories as $cat_label => $cat_cols ) : 
+                                        $cat_idx++;
+                                        $accordion_id = "matrix-acc-{$role_key}-{$cat_idx}";
+                                    ?>
+                                        <div class="border border-zinc-200/60 dark:border-zinc-800 rounded-lg overflow-hidden bg-white dark:bg-zinc-950">
+                                            <button type="button" onclick="coraToggleMatrixAccordion('<?php echo $accordion_id; ?>')" class="w-full px-3 py-2 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/30 text-[10px] font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100/30 transition-colors select-none">
+                                                <span><?php echo esc_html( $cat_label ); ?></span>
+                                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="transition-transform duration-200 transform" id="arrow-<?php echo $accordion_id; ?>"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                            </button>
+                                            <div id="content-<?php echo $accordion_id; ?>" class="hidden px-3 py-2.5 space-y-2 border-t border-zinc-100 dark:border-zinc-900">
+                                                <?php foreach ( $cat_cols as $feature_key => $feature_label ) : 
+                                                    $checked = in_array($feature_key, $allowed_features) ? 'checked' : '';
+                                                ?>
+                                                    <label class="flex items-center justify-between gap-3 text-[11px] text-zinc-700 dark:text-zinc-300 cursor-pointer select-none">
+                                                        <span><?php echo esc_html($feature_label); ?></span>
+                                                        <input type="checkbox" <?php echo $checked; ?> 
+                                                            data-role-key="<?php echo esc_attr($role_key); ?>" 
+                                                            data-feature-key="<?php echo esc_attr($feature_key); ?>" 
+                                                            onchange="coraSyncMobileMatrixCheckbox(this)"
+                                                            class="cora-mobile-permission-checkbox accent-zinc-950 dark:accent-zinc-100 rounded cursor-pointer w-4 h-4">
+                                                    </label>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
     </div>
@@ -954,16 +1124,16 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                     'attendance'        => 'Attendance'
                                 );
                             ?>
-                            <tr class="hover:bg-zinc-50/30 dark:hover:bg-zinc-800/30">
-                                <td class="px-4 py-3">
+                                                        <tr class="hover:bg-zinc-50/30 dark:hover:bg-zinc-800/30">
+                                <td class="px-4 py-3" data-label="Role Name & Identifier">
                                     <span class="font-semibold text-zinc-800 dark:text-zinc-200 block"><?php echo esc_html( $role_name ); ?></span>
                                     <div class="flex items-center gap-1.5 mt-0.5">
                                         <code class="text-zinc-500 dark:text-zinc-400 font-mono text-[10px] bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded"><?php echo esc_html( $role_key ); ?></code>
                                         <span class="text-[10px] text-zinc-400">Template: <?php echo esc_html( ucfirst( str_replace( 'cora_', '', $base_tmpl ) ) ); ?></span>
                                     </div>
                                 </td>
-                                <td class="px-4 py-3">
-                                    <div class="flex flex-wrap gap-1 max-w-xs">
+                                <td class="px-4 py-3" data-label="Feature Permission Tags">
+                                    <div class="flex flex-wrap gap-1 max-w-xs md:justify-start justify-end">
                                         <?php if ( empty( $permissions ) ) : ?>
                                             <span class="text-[10px] text-zinc-400 italic">None assigned</span>
                                         <?php else : ?>
@@ -977,8 +1147,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                         <?php endif; ?>
                                     </div>
                                 </td>
-                                <td class="px-4 py-3">
-                                    <div class="flex items-center gap-1.5">
+                                <td class="px-4 py-3" data-label="Access Level & Quota">
+                                    <div class="flex items-center gap-1.5 md:justify-start justify-end">
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
                                             <?php echo esc_html( $access_lbl ); ?>
                                         </span>
@@ -987,7 +1157,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                         </span>
                                     </div>
                                 </td>
-                                <td class="px-4 py-3 text-right">
+                                <td class="px-4 py-3 text-right" data-label="Actions">
                                     <div class="flex items-center justify-end gap-1.5">
                                         <button type="button" data-custom-role="<?php echo $json_payload; ?>" class="cora-edit-custom-role-btn text-xs text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white font-semibold cursor-pointer transition-all flex items-center gap-1 px-2.5 py-1.5 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700">
                                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
@@ -996,7 +1166,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                         <button type="button" onclick="handleDuplicateCustomRole('<?php echo esc_attr( $role_key ); ?>')" title="Duplicate Role" class="cora-duplicate-custom-role-btn text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white cursor-pointer p-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
                                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                         </button>
-                                        <button type="button" onclick="handleDeleteCustomRole('<?php echo esc_attr( $role_key ); ?>', this)" title="Delete Role" class="text-red-650 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 cursor-pointer p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
+                                        <button type="button" onclick="handleDeleteCustomRole('<?php echo esc_attr( $role_key ); ?>', this)" title="Delete Role" class="text-red-655 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 cursor-pointer p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
                                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                         </button>
                                     </div>
@@ -1104,26 +1274,26 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
     <?php if ( $is_attendance_admin ) : ?>
         <!-- ANALYTICS CARDS (Admin only) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-4">
             <!-- Card 1: Total Active Today -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex items-center justify-between">
+            <div class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex items-center justify-between">
                 <div class="space-y-1">
-                    <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Active Today</span>
-                    <h3 class="text-xl font-extrabold text-zinc-900 dark:text-zinc-100" id="stat-active-today">0</h3>
+                    <span class="text-[9px] md:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Active Today</span>
+                    <h3 class="text-lg md:text-xl font-extrabold text-zinc-900 dark:text-zinc-100" id="stat-active-today">0</h3>
                 </div>
-                <div class="p-2 bg-zinc-50 dark:bg-zinc-950 rounded-lg text-zinc-650 dark:text-zinc-350">
-                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                <div class="p-1.5 bg-zinc-50 dark:bg-zinc-950 rounded-lg text-zinc-650 dark:text-zinc-350">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
                 </div>
             </div>
             
             <!-- Card 2: Late Check-ins -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex items-center justify-between">
+            <div class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex items-center justify-between">
                 <div class="space-y-1">
-                    <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Late Check-ins</span>
-                    <h3 class="text-xl font-extrabold text-zinc-900 dark:text-zinc-100" id="stat-late-punches">0</h3>
+                    <span class="text-[9px] md:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Late Check-ins</span>
+                    <h3 class="text-lg md:text-xl font-extrabold text-zinc-900 dark:text-zinc-100" id="stat-late-punches">0</h3>
                 </div>
-                <div class="p-2 bg-zinc-50 dark:bg-zinc-950 rounded-lg text-zinc-650 dark:text-zinc-350">
-                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <div class="p-1.5 bg-zinc-50 dark:bg-zinc-950 rounded-lg text-zinc-650 dark:text-zinc-350">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                 </div>
             </div>
 
@@ -1144,36 +1314,36 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 $current_address_txt = $office_loc['lat'] . ', ' . $office_loc['lng'];
             }
             ?>
-            <div onclick="openGeofenceDrawer()" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex flex-col justify-between cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors group">
+            <div onclick="openGeofenceDrawer()" class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex flex-col justify-between cursor-pointer hover:bg-zinc-50/50 dark:hover:bg-zinc-850/55 transition-colors group">
                 <div class="space-y-1 min-w-0">
                     <div class="flex items-center justify-between gap-1">
-                        <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate">OFFICE GEOFENCING</span>
-                        <span id="stat-geofence-status" class="inline-flex items-center px-1.5 py-0.5 text-[9px] font-bold rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60 shrink-0">
+                        <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate">GEOFENCING</span>
+                        <span id="stat-geofence-status" class="inline-flex items-center px-1.5 py-0.5 text-[8px] md:text-[9px] font-bold rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60 shrink-0">
                             <?php echo esc_html( $geofence_status_txt ); ?>
                         </span>
                     </div>
-                    <p id="cora-geofence-current-address" class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate" title="<?php echo esc_attr( $current_address_txt ); ?>">
+                    <p id="cora-geofence-current-address" class="text-[10px] md:text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate" title="<?php echo esc_attr( $current_address_txt ); ?>">
                         <?php echo esc_html( $current_address_txt ); ?>
                     </p>
                 </div>
-                <div class="mt-2.5 flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-zinc-850">
-                    <span class="text-[10px] font-bold text-zinc-900 dark:text-zinc-100 group-hover:underline flex items-center gap-1.5">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        Map & Settings
+                <div class="mt-2 flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-zinc-800">
+                    <span class="text-[9px] md:text-[10px] font-bold text-zinc-900 dark:text-zinc-100 group-hover:underline flex items-center gap-1">
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        Settings
                     </span>
-                    <div class="p-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-700 transition-colors">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    <div class="p-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-700 transition-colors">
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </div>
                 </div>
             </div>
 
             <!-- Card 4: Action / Email Test -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex items-center justify-between">
-                <div class="space-y-1 flex-1">
-                    <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Cron Automations</span>
-                    <div class="flex items-center gap-1.5 mt-0.5">
-                        <button onclick="triggerCronAction('admin_report')" class="text-[9px] px-2 py-0.5 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded font-bold text-zinc-750 dark:text-zinc-350 cursor-pointer">Daily Summary</button>
-                        <button onclick="triggerCronAction('morning_reminder')" class="text-[9px] px-2 py-0.5 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded font-bold text-zinc-750 dark:text-zinc-350 cursor-pointer">Reminder</button>
+            <div class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex flex-col justify-between">
+                <div class="space-y-1">
+                    <span class="text-[9px] md:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Cron Automations</span>
+                    <div class="flex flex-wrap items-center gap-1 mt-0.5">
+                        <button onclick="triggerCronAction('admin_report')" class="text-[8px] md:text-[9px] px-1.5 py-0.5 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer">Report</button>
+                        <button onclick="triggerCronAction('morning_reminder')" class="text-[8px] md:text-[9px] px-1.5 py-0.5 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer">Alert</button>
                     </div>
                 </div>
             </div>
@@ -1183,53 +1353,61 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     <!-- Full-Width Punch Log History Section -->
     <div class="space-y-4 w-full">
         <!-- Enhanced Attendance Filter Toolbar -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm space-y-3">
-            <div class="flex flex-col xl:flex-row gap-3 items-stretch xl:items-center justify-between">
-                <!-- Left Section: Search & Filters -->
-                <div class="flex flex-wrap items-center gap-2.5 flex-1 min-w-0">
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 md:p-4 shadow-sm flex flex-col gap-2.5 md:gap-3">
+            <!-- Search bar & Mobile Toggle Row -->
+            <div class="flex flex-row items-center gap-2 md:gap-3 w-full justify-between">
+                <div class="flex flex-row items-center gap-2 flex-1 min-w-0">
                     <!-- Search Input -->
-                    <div class="relative w-full sm:w-56 shrink-0">
-                        <input type="text" id="attendance-log-search" oninput="fetchAttendanceLogs()" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg h-9 pl-8 pr-3 text-xs bg-white dark:bg-zinc-950 focus:border-zinc-400 focus:outline-none text-zinc-900 dark:text-zinc-100 transition-colors" placeholder="Search employee...">
+                    <div class="relative flex-1 max-w-full md:max-w-sm">
+                        <input type="text" id="attendance-log-search" oninput="fetchAttendanceLogs()" class="w-full border-0 bg-zinc-100/60 dark:bg-zinc-850/60 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:outline-none rounded-lg h-9 pl-8 pr-3 text-xs text-zinc-900 dark:text-zinc-100 transition-colors" placeholder="Search employee...">
                         <div class="absolute left-2.5 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         </div>
                     </div>
 
-                    <!-- Employee Picker Dropdown -->
-                    <select id="attendance-filter-user" onchange="fetchAttendanceLogs()" class="h-9 px-3 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0">
-                        <option value="">All Team Members</option>
-                        <?php foreach ( $users as $u ) : ?>
-                            <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
-                        <?php endforeach; ?>
-                    </select>
+                    <!-- Mobile Filter Toggle Button -->
+                    <button type="button" id="attendance-filter-toggle" onclick="toggleAttendanceMobileFilters()" class="md:hidden h-9 w-9 shrink-0 flex items-center justify-center rounded-lg border-0 bg-zinc-100/60 dark:bg-zinc-850/60 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200/50 dark:hover:bg-zinc-700/50 focus:outline-none transition-colors cursor-pointer" title="Toggle Filters">
+                        <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                    </button>
 
-                    <!-- Period Direction Dropdown -->
-                    <select id="attendance-filter-period" onchange="handlePeriodFilterChange()" class="h-9 px-3 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0">
-                        <option value="all">All Time</option>
-                        <option value="today">Today</option>
-                        <option value="yesterday">Yesterday</option>
-                        <option value="this_week">This Week</option>
-                        <option value="this_month">This Month</option>
-                        <option value="custom">Custom Date Range</option>
-                    </select>
+                    <!-- Desktop Inline Filters -->
+                    <div class="hidden md:flex items-center gap-2.5 flex-1 min-w-0">
+                        <!-- Employee Picker Dropdown -->
+                        <select id="attendance-filter-user" onchange="fetchAttendanceLogs()" class="h-9 px-3 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0">
+                            <option value="">All Team Members</option>
+                            <?php foreach ( $users as $u ) : ?>
+                                <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
+                            <?php endforeach; ?>
+                        </select>
 
-                    <!-- Custom Date Range Inputs -->
-                    <div id="attendance-custom-date-container" class="hidden flex items-center gap-1.5 shrink-0">
-                        <input type="date" id="attendance-date-start" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors">
-                        <span class="text-xs font-medium text-zinc-400">to</span>
-                        <input type="date" id="attendance-date-end" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors">
+                        <!-- Period Direction Dropdown -->
+                        <select id="attendance-filter-period" onchange="handlePeriodFilterChange()" class="h-9 px-3 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0">
+                            <option value="all">All Time</option>
+                            <option value="today">Today</option>
+                            <option value="yesterday">Yesterday</option>
+                            <option value="this_week">This Week</option>
+                            <option value="this_month">This Month</option>
+                            <option value="custom">Custom Date Range</option>
+                        </select>
+
+                        <!-- Custom Date Range Inputs -->
+                        <div id="attendance-custom-date-container" class="hidden flex items-center gap-1.5 shrink-0">
+                            <input type="date" id="attendance-date-start" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors">
+                            <span class="text-xs font-medium text-zinc-400">to</span>
+                            <input type="date" id="attendance-date-end" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors">
+                        </div>
+
+                        <!-- Event Type Dropdown -->
+                        <select id="attendance-filter-event" onchange="fetchAttendanceLogs()" class="h-9 px-3 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0">
+                            <option value="all">All Event Types</option>
+                            <option value="in">Punch In</option>
+                            <option value="out">Punch Out</option>
+                        </select>
                     </div>
-
-                    <!-- Event Type Dropdown -->
-                    <select id="attendance-filter-event" onchange="fetchAttendanceLogs()" class="h-9 px-3 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0">
-                        <option value="all">All Event Types</option>
-                        <option value="in">Punch In</option>
-                        <option value="out">Punch Out</option>
-                    </select>
                 </div>
 
-                <!-- Right Section: CTAs -->
-                <div class="flex items-center gap-2 justify-end shrink-0 pt-2 xl:pt-0 border-t xl:border-t-0 border-zinc-100 dark:border-zinc-800">
+                <!-- Desktop CTAs -->
+                <div class="hidden md:flex items-center gap-2 justify-end shrink-0">
                     <button type="button" onclick="openAttendanceReportsDrawer()" class="h-9 px-3.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shrink-0 shadow-sm">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                         Automated Reports & Share
@@ -1240,12 +1418,61 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     </button>
                 </div>
             </div>
+
+            <!-- Collapsible Mobile Filters & Actions Panel -->
+            <div id="attendance-filter-panel" class="hidden md:hidden border-t border-zinc-200/60 dark:border-zinc-800/60 pt-2.5 space-y-2.5">
+                <div class="grid grid-cols-2 gap-2">
+                    <!-- Employee Picker Dropdown (Mobile) -->
+                    <select id="attendance-filter-user-mobile" onchange="syncAttendanceFilterAndRun('user')" class="bg-zinc-100/60 dark:bg-zinc-850/60 border-0 text-xs rounded-lg px-2.5 h-9 w-full cursor-pointer text-zinc-700 dark:text-zinc-300 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors">
+                        <option value="">All Team Members</option>
+                        <?php foreach ( $users as $u ) : ?>
+                            <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+
+                    <!-- Period Direction Dropdown (Mobile) -->
+                    <select id="attendance-filter-period-mobile" onchange="syncAttendanceFilterAndRun('period')" class="bg-zinc-100/60 dark:bg-zinc-850/60 border-0 text-xs rounded-lg px-2.5 h-9 w-full cursor-pointer text-zinc-700 dark:text-zinc-300 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors">
+                        <option value="all">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="yesterday">Yesterday</option>
+                        <option value="this_week">This Week</option>
+                        <option value="this_month">This Month</option>
+                        <option value="custom">Custom Date Range</option>
+                    </select>
+                </div>
+
+                <!-- Custom Date Range Inputs (Mobile) -->
+                <div id="attendance-custom-date-container-mobile" class="hidden flex items-center justify-between gap-1.5">
+                    <input type="date" id="attendance-date-start-mobile" onchange="syncAttendanceFilterAndRun('date-start')" class="h-9 px-2 bg-zinc-100/60 dark:bg-zinc-850/60 border-0 text-xs rounded-lg text-zinc-900 dark:text-zinc-100 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors flex-1">
+                    <span class="text-xs font-medium text-zinc-400">to</span>
+                    <input type="date" id="attendance-date-end-mobile" onchange="syncAttendanceFilterAndRun('date-end')" class="h-9 px-2 bg-zinc-100/60 dark:bg-zinc-850/60 border-0 text-xs rounded-lg text-zinc-900 dark:text-zinc-100 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors flex-1">
+                </div>
+
+                <!-- Event Type Dropdown (Mobile) -->
+                <select id="attendance-filter-event-mobile" onchange="syncAttendanceFilterAndRun('event')" class="bg-zinc-100/60 dark:bg-zinc-850/60 border-0 text-xs rounded-lg px-2.5 h-9 w-full cursor-pointer text-zinc-700 dark:text-zinc-300 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors">
+                    <option value="all">All Event Types</option>
+                    <option value="in">Punch In</option>
+                    <option value="out">Punch Out</option>
+                </select>
+
+                <!-- Mobile CTA Buttons Row -->
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-850">
+                    <button type="button" onclick="openAttendanceReportsDrawer()" class="h-9 bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                        <span class="truncate">Reports & Share</span>
+                    </button>
+                    <button type="button" onclick="exportAttendanceCSV()" class="h-9 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg text-xs font-bold text-zinc-800 dark:text-zinc-200 transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span class="truncate">Export CSV</span>
+                    </button>
+                </div>
+            </div>
         </div>
         
         <!-- Table card wrapper -->
         <div class="bg-white dark:bg-zinc-900 border border-zinc-200/85 dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-xs text-left">
+                <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-xs text-left responsive-table">
                     <thead class="bg-zinc-50/50 dark:bg-zinc-950">
                         <tr>
                             <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">User Name</th>
@@ -1263,6 +1490,106 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         </tr>
                     </tbody>
                 </table>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 6: AUTOMATED OWNER DIGESTS & ALERTS -->
+    <div id="tab-owner-automations" class="cora-tab-content space-y-4 hidden">
+        <div class="cora-card bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 md:p-5 shadow-sm space-y-5">
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-zinc-200/60 dark:border-zinc-800">
+                <div>
+                    <div class="flex items-center gap-2.5">
+                        <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-300"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path></svg>
+                            Autonomous Workspace Owner Automations
+                        </h3>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold border border-emerald-500/20">
+                            5 Active Workflows
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">Automated email reports, KPI digests, and security alerts delivered directly to the Workspace Owner account without manual checking.</p>
+                </div>
+            </div>
+
+            <!-- Automations Grid / Table -->
+            <?php
+            $current_agency_id = get_user_meta( get_current_user_id(), 'cora_user_agency_id', true );
+            if ( empty( $current_agency_id ) ) $current_agency_id = 1;
+            
+            $automation_items = array(
+                array(
+                    'key' => 'morning_brief',
+                    'title' => 'Morning Operational Readiness Brief',
+                    'schedule' => '08:30 AM Daily',
+                    'desc' => 'Active staff roster, today\'s scheduled bookings/showings, and pending admin approvals.',
+                    'badge' => 'Kickoff Brief',
+                    'badge_cls' => 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border-blue-200 dark:border-blue-800'
+                ),
+                array(
+                    'key' => 'midday_digest',
+                    'title' => 'Mid-Day Anomaly & Exception Digest',
+                    'schedule' => '14:00 PM Daily',
+                    'desc' => 'Late check-ins, GPS geofence location violations, and unassigned lead alerts.',
+                    'badge' => 'Guardrail Alert',
+                    'badge_cls' => 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-800'
+                ),
+                array(
+                    'key' => 'evening_kpi',
+                    'title' => 'Evening Business Intelligence Digest',
+                    'schedule' => '18:00 PM Daily',
+                    'desc' => 'Executive summary of daily revenue, billable hours vs scheduled, and team activity audit.',
+                    'badge' => 'Executive KPI',
+                    'badge_cls' => 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+                ),
+                array(
+                    'key' => 'security_alert',
+                    'title' => 'Security & Role Elevation Alert',
+                    'schedule' => 'Real-Time Trigger',
+                    'desc' => 'Immediate alert on custom role elevation, bulk permissions matrix saves, or login lockout thresholds.',
+                    'badge' => 'Real-Time Guard',
+                    'badge_cls' => 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border-rose-200 dark:border-rose-800'
+                ),
+                array(
+                    'key' => 'weekly_payroll',
+                    'title' => 'Weekly Payroll & Performance Digest',
+                    'schedule' => 'Sunday 21:00 PM',
+                    'desc' => '7-day timesheet compilation, regular vs overtime hours, and weekly performance highlights for Monday payroll.',
+                    'badge' => 'Payroll Brief',
+                    'badge_cls' => 'bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400 border-purple-200 dark:border-purple-800'
+                ),
+            );
+            ?>
+
+            <div class="space-y-3">
+                <?php foreach ( $automation_items as $item ) : 
+                    $is_enabled = cora_is_owner_automation_enabled( $item['key'], $current_agency_id );
+                ?>
+                    <div class="bg-zinc-50/70 dark:bg-zinc-950/60 border border-zinc-200/70 dark:border-zinc-800 rounded-xl p-3.5 md:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 transition-colors hover:border-zinc-300 dark:hover:border-zinc-700">
+                        <div class="space-y-1 flex-1 min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="font-bold text-xs text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $item['title'] ); ?></span>
+                                <span class="px-1.5 py-0.5 text-[9px] font-bold rounded border <?php echo esc_attr( $item['badge_cls'] ); ?>"><?php echo esc_html( $item['badge'] ); ?></span>
+                                <span class="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500">• <?php echo esc_html( $item['schedule'] ); ?></span>
+                            </div>
+                            <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed"><?php echo esc_html( $item['desc'] ); ?></p>
+                        </div>
+
+                        <div class="flex items-center gap-2 shrink-0 justify-end pt-2 md:pt-0 border-t md:border-t-0 border-zinc-100 dark:border-zinc-850">
+                            <button type="button" onclick="coraTestDispatchAutomation('<?php echo esc_attr( $item['key'] ); ?>')" class="px-2.5 py-1.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200 rounded-lg text-[10px] font-bold transition-colors flex items-center gap-1 cursor-pointer shadow-2xs">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                                Test Send Now
+                            </button>
+                            
+                            <label class="relative inline-flex items-center cursor-pointer select-none">
+                                <input type="checkbox" <?php echo $is_enabled ? 'checked' : ''; ?> onchange="coraToggleAutomation('<?php echo esc_attr( $item['key'] ); ?>', this.checked)" class="sr-only peer">
+                                <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:after:border-zinc-600 peer-checked:bg-zinc-950 dark:peer-checked:bg-zinc-100"></div>
+                            </label>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
             </div>
         </div>
     </div>
@@ -1518,19 +1845,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Operational Role</label>
             <select id="invite-role" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
                 <?php
-                $active_industry = get_option( 'cora_workspace_industry', 'real_estate' );
-                $module = Cora_Module_Registry::get_module( $active_industry );
-                $roles_list = $module ? $module->get_industry_roles() : array();
-                
-                if ( $current_role === 'administrator' || $current_role === 'cora_manager' || $current_role === 'cora_super_admin' || $current_role === 'cora_workspace_owner' || $current_role === 'owner' || cora_is_super_owner() ) {
-                    echo '<option value="cora_branch_manager">Branch Manager</option>';
-                }
-                foreach ( $roles_list as $role_key => $role_label ) {
-                    if ( ! cora_is_real_shruti() && in_array( $role_key, array( 'administrator', 'cora_shruti' ), true ) ) {
+                foreach ( $role_labels as $role_key => $role_label ) {
+                    if ( $role_key === 'cora_super_admin' ) {
                         continue;
                     }
-                    if ( $role_key === 'administrator' ) {
-                        if ( ! cora_is_real_shruti() ) {
+                    if ( $role_key === 'cora_branch_manager' ) {
+                        $can_invite_bm = ( $current_role === 'administrator' || $current_role === 'cora_manager' || $current_role === 'cora_super_admin' || $current_role === 'cora_workspace_owner' || $current_role === 'owner' || cora_is_super_owner() );
+                        if ( ! $can_invite_bm ) {
                             continue;
                         }
                     }
@@ -1543,7 +1864,6 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     echo '<option value="' . esc_attr( $role_key ) . '">' . esc_html( $role_label ) . '</option>';
                 }
                 ?>
-                <option value="cora_viewer">Viewer</option>
             </select>
         </div>
         <div>
@@ -1979,13 +2299,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         $('#cora-page-team-roles .cora-sub-tabs-container .cora-sub-tab').each(function() {
             var $t = $(this);
             if ($t.data('target') === targetId) {
-                $t.addClass('active border-zinc-950 dark:border-zinc-150 text-zinc-950 dark:text-zinc-150 font-semibold')
+                $t.addClass('active border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 font-semibold')
                   .removeClass('border-transparent text-zinc-550 dark:text-zinc-400 font-medium');
                 if ($t.closest('#mobile-tabs-more-dropdown').length) {
                     $t.addClass('bg-zinc-50 dark:bg-zinc-850');
                 }
             } else {
-                $t.removeClass('active border-zinc-950 dark:border-zinc-150 text-zinc-950 dark:text-zinc-150 font-semibold bg-zinc-50 dark:bg-zinc-850')
+                $t.removeClass('active border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 font-semibold bg-zinc-50 dark:bg-zinc-850')
                   .addClass('border-transparent text-zinc-550 dark:text-zinc-400 font-medium');
             }
         });
@@ -2024,11 +2344,11 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         if (isDropdownTab) {
             var tabName = $(this).text().trim();
             $moreBtn.find('span').text(tabName);
-            $moreBtn.addClass('active border-zinc-950 dark:border-zinc-150 text-zinc-950 dark:text-zinc-150 font-semibold')
+            $moreBtn.addClass('active border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 font-semibold')
                     .removeClass('text-zinc-650 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800');
         } else {
             $moreBtn.find('span').text('More');
-            $moreBtn.removeClass('active border-zinc-950 dark:border-zinc-150 text-zinc-950 dark:text-zinc-150 font-semibold')
+            $moreBtn.removeClass('active border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 font-semibold')
                     .addClass('text-zinc-650 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800');
         }
 
@@ -2761,11 +3081,131 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 $(this).hide();
             }
         });
+        // Sync mobile swipe cards filter
+        $('[data-mobile-role]').each(function() {
+            var roleKey = $(this).data('mobile-role') ? $(this).data('mobile-role').toLowerCase() : '';
+            var roleName = $(this).find('span').first().text().toLowerCase();
+            if (!query || roleName.indexOf(query) !== -1 || roleKey.indexOf(query) !== -1) {
+                $(this).show().addClass('shrink-0');
+            } else {
+                $(this).hide().removeClass('shrink-0');
+            }
+        });
     });
 
+    window.coraToggleMatrixAccordion = function(accordionId) {
+        var $content = $('#content-' + accordionId);
+        var $arrow = $('#arrow-' + accordionId);
+        if ($content.hasClass('hidden')) {
+            $content.removeClass('hidden');
+            $arrow.addClass('rotate-180');
+        } else {
+            $content.addClass('hidden');
+            $arrow.removeClass('rotate-180');
+        }
+    };
+
+    window.coraSyncMobileMatrixCheckbox = function(cb) {
+        var roleKey = $(cb).data('role-key');
+        var featureKey = $(cb).data('feature-key');
+        var isChecked = cb.checked;
+        
+        // Find corresponding desktop checkbox in table
+        var $desktopCb = $('#cora-permissions-matrix-table tbody tr[data-role="' + roleKey + '"]')
+            .find('input[data-feature="' + featureKey + '"]');
+        if ($desktopCb.length) {
+            $desktopCb.prop('checked', isChecked);
+            window.coraSavePermissionsMatrix();
+        }
+    };
+
     $(document).on('change', '.cora-permission-checkbox', function() {
+        // Sync desktop checkbox changes back to mobile checkbox
+        var roleKey = $(this).closest('tr').data('role');
+        var featureKey = $(this).data('feature');
+        var isChecked = this.checked;
+        var $mobileCb = $('input[data-role-key="' + roleKey + '"][data-feature-key="' + featureKey + '"]');
+        if ($mobileCb.length) {
+            $mobileCb.prop('checked', isChecked);
+        }
         window.coraSavePermissionsMatrix();
     });
+
+    // Attendance Logs Mobile Filter Toggle & Sync Handlers
+    window.toggleAttendanceMobileFilters = function() {
+        $('#attendance-filter-panel').toggleClass('hidden');
+        $('#attendance-filter-toggle').toggleClass('bg-zinc-200/60 dark:bg-zinc-700/60');
+    };
+
+    window.syncAttendanceFilterAndRun = function(type) {
+        if (type === 'user') {
+            $('#attendance-filter-user').val($('#attendance-filter-user-mobile').val());
+        } else if (type === 'period') {
+            var periodVal = $('#attendance-filter-period-mobile').val();
+            $('#attendance-filter-period').val(periodVal);
+            if (periodVal === 'custom') {
+                $('#attendance-custom-date-container-mobile').removeClass('hidden');
+                $('#attendance-custom-date-container').removeClass('hidden');
+            } else {
+                $('#attendance-custom-date-container-mobile').addClass('hidden');
+                $('#attendance-custom-date-container').addClass('hidden');
+            }
+        } else if (type === 'date-start') {
+            $('#attendance-date-start').val($('#attendance-date-start-mobile').val());
+        } else if (type === 'date-end') {
+            $('#attendance-date-end').val($('#attendance-date-end-mobile').val());
+        } else if (type === 'event') {
+            $('#attendance-filter-event').val($('#attendance-filter-event-mobile').val());
+        }
+        fetchAttendanceLogs();
+    };
+
+    var _origHandlePeriodFilterChange = window.handlePeriodFilterChange;
+    window.handlePeriodFilterChange = function() {
+        var periodVal = $('#attendance-filter-period').val();
+        $('#attendance-filter-period-mobile').val(periodVal);
+        if (periodVal === 'custom') {
+            $('#attendance-custom-date-container').removeClass('hidden');
+            $('#attendance-custom-date-container-mobile').removeClass('hidden');
+        } else {
+            $('#attendance-custom-date-container').addClass('hidden');
+            $('#attendance-custom-date-container-mobile').addClass('hidden');
+        }
+        if (typeof _origHandlePeriodFilterChange === 'function') {
+            _origHandlePeriodFilterChange();
+        } else {
+            fetchAttendanceLogs();
+        }
+    };
+
+    // Owner Automation Toggles & Test Dispatch Handlers
+    window.coraToggleAutomation = function(key, enable) {
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_toggle_owner_automation',
+            key: key,
+            enable: enable ? 1 : 0,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast(res.data.message);
+            }
+        });
+    };
+
+    window.coraTestDispatchAutomation = function(key) {
+        window.coraShowToast('Dispatching test report to Workspace Owner email...');
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_test_dispatch_automation',
+            key: key,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast(res.data.message);
+            } else {
+                window.coraShowToast(res.data.message || 'Dispatch failed.');
+            }
+        });
+    };
 
     // Custom Roles Handlers
     function handleApplyBaseTemplate(tmplKey) {
@@ -3142,19 +3582,19 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         if (isAttendanceAdmin) {
                             var geofenceLabel = '—';
                             if (log.geofence === 'verified') {
-                                geofenceLabel = '<span class="px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 rounded text-[9px] font-bold">Verified (' + (log.distance || '') + ')</span>';
+                                geofenceLabel = '<span class="px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-450 rounded text-[9px] font-bold">Verified (' + (log.distance || '') + ')</span>';
                             } else if (log.geofence === 'disabled') {
                                 geofenceLabel = '<span class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 rounded text-[9px] font-medium">Standard</span>';
                             }
-                            geofenceCell = '<td class="px-5 py-3">' + geofenceLabel + '</td>';
+                            geofenceCell = '<td class="px-5 py-3" data-label="Geofence Status">' + geofenceLabel + '</td>';
                         }
                         
                         tbody.append(`
                             <tr class="hover:bg-zinc-50/30 dark:hover:bg-zinc-850/30 transition-colors cora-attendance-row" data-user="${(log.user || '').toLowerCase()}">
-                                <td class="px-5 py-3 font-bold text-zinc-900 dark:text-zinc-100">${log.user}</td>
-                                <td class="px-5 py-3 text-zinc-500 dark:text-zinc-400 font-medium">${timeStr}</td>
-                                <td class="px-5 py-3">${typeLabel}</td>
-                                <td class="px-5 py-3 font-semibold">${locLink}</td>
+                                <td class="px-5 py-3 font-bold text-zinc-900 dark:text-zinc-100" data-label="User Name">${log.user}</td>
+                                <td class="px-5 py-3 text-zinc-500 dark:text-zinc-400 font-medium" data-label="Date & Time">${timeStr}</td>
+                                <td class="px-5 py-3" data-label="Event Type">${typeLabel}</td>
+                                <td class="px-5 py-3 font-semibold" data-label="GPS Coordinates">${locLink}</td>
                                 ${geofenceCell}
                             </tr>
                         `);

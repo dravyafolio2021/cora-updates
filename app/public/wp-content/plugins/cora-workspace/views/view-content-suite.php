@@ -60,10 +60,10 @@ window.addEventListener('error', function(event) {
 });
 </script>
 
-<div class="cora-page-header flex items-center justify-between mb-6">
-    <div class="flex items-center gap-3">
-        <span class="cora-page-emoji text-zinc-900 flex shrink-0">
-            <svg viewBox="0 0 24 24" width="30" height="30" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<div class="cora-page-header flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 mb-5 sm:mb-6">
+    <div class="flex items-start sm:items-center gap-3">
+        <span class="cora-page-emoji text-zinc-900 flex shrink-0 mt-0.5 sm:mt-0">
+            <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="sm:w-7 sm:h-7">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                 <polyline points="14 2 14 8 20 8"></polyline>
                 <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -72,15 +72,18 @@ window.addEventListener('error', function(event) {
             </svg>
         </span>
         <div>
-            <h1 class="cora-page-title text-2xl font-bold tracking-tight text-zinc-900">Content Suite</h1>
-            <p class="text-sm text-zinc-500 mt-0.5">Draft, optimize, and track SEO & AI search visibility for your content strategy.</p>
+            <h1 class="cora-page-title text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 leading-tight">Content Suite</h1>
+            <p class="text-xs sm:text-sm text-zinc-500 mt-0.5 leading-normal">Draft, optimize, and track SEO & AI search visibility for your content strategy.</p>
         </div>
     </div>
-    <div class="flex gap-2">
-        <button class="cora-btn-secondary px-4 py-2 border border-zinc-200 hover:bg-zinc-50 text-zinc-800 font-semibold rounded-md text-sm transition-colors cursor-pointer" onclick="exportContentCSV()">Export CSV</button>
-        <button class="cora-btn-primary px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold rounded-md text-sm transition-colors cursor-pointer flex items-center gap-2" onclick="openCreateArticleDrawer()">
-            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            New Article
+    <div class="flex items-center gap-2 shrink-0">
+        <button class="cora-btn-secondary px-3.5 py-1.5 sm:px-4 sm:py-2 border border-zinc-200 hover:bg-zinc-50 text-zinc-800 font-semibold rounded-lg text-xs sm:text-sm transition-colors cursor-pointer whitespace-nowrap shadow-3xs" onclick="exportContentCSV()">Export CSV</button>
+        <button class="cora-btn-primary px-3.5 py-1.5 sm:px-4 sm:py-2 bg-zinc-100 sm:bg-zinc-950 hover:bg-zinc-200 sm:hover:bg-zinc-800 text-zinc-700 sm:text-white font-semibold rounded-lg text-xs sm:text-sm transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap shadow-3xs sm:shadow-2xs border border-zinc-200/90 sm:border-transparent active:scale-95" onclick="openCreateArticleDrawer()" title="Desktop Only (≥768px)">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0 hidden sm:block"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 sm:hidden text-zinc-500"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span class="hidden sm:inline">New Article</span>
+            <span class="sm:hidden text-zinc-700">New Article</span>
+            <span class="sm:hidden text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-zinc-200 text-zinc-600 uppercase tracking-wider">Desktop</span>
         </button>
     </div>
 </div>
@@ -101,100 +104,100 @@ foreach($cora_posts as $post) {
 $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 ?>
 <!-- Metrics Grid -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-    <div class="cora-stat-card group p-5 bg-white border border-zinc-200 rounded-xl shadow-sm hover:shadow-md hover:border-zinc-300 transition-all">
-        <div class="flex items-center justify-between mb-3">
-            <div class="p-1.5 bg-zinc-100 rounded-lg text-zinc-600">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4 mb-4 sm:mb-6">
+    <div class="cora-stat-card group p-3 sm:p-5 bg-white border border-zinc-200 rounded-xl shadow-2xs hover:shadow-xs hover:border-zinc-300 transition-all">
+        <div class="flex items-center justify-between mb-1.5 sm:mb-3">
+            <div class="p-1 sm:p-1.5 bg-zinc-100 rounded-lg text-zinc-600">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="sm:w-4 sm:h-4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
             </div>
-            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">TOTAL ARTICLES</span>
+            <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">TOTAL ARTICLES</span>
         </div>
-        <div class="text-3xl font-bold text-zinc-900 tracking-tight"><?php echo esc_html($total_articles); ?></div>
-        <div class="mt-2 flex items-center gap-2">
-            <div class="flex items-end gap-0.5 h-5">
+        <div class="text-xl sm:text-3xl font-bold text-zinc-900 tracking-tight leading-none"><?php echo esc_html($total_articles); ?></div>
+        <div class="mt-1.5 sm:mt-2 flex items-center gap-1.5 sm:gap-2">
+            <div class="hidden sm:flex items-end gap-0.5 h-5">
                 <div class="w-1 bg-zinc-200 rounded-sm" style="height:40%"></div>
                 <div class="w-1 bg-zinc-200 rounded-sm" style="height:60%"></div>
                 <div class="w-1 bg-zinc-200 rounded-sm" style="height:50%"></div>
                 <div class="w-1 bg-zinc-300 rounded-sm" style="height:75%"></div>
                 <div class="w-1 bg-zinc-900 rounded-sm" style="height:100%"></div>
             </div>
-            <span class="text-[10px] text-zinc-500 font-semibold">Active library</span>
+            <span class="text-[9px] sm:text-[10px] text-zinc-500 font-medium">Active library</span>
         </div>
     </div>
-    <div class="cora-stat-card group p-5 bg-white border border-zinc-200 rounded-xl shadow-sm hover:shadow-md hover:border-zinc-300 transition-all">
-        <div class="flex items-center justify-between mb-3">
-            <div class="p-1.5 bg-zinc-100 rounded-lg text-zinc-600">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+    <div class="cora-stat-card group p-3 sm:p-5 bg-white border border-zinc-200 rounded-xl shadow-2xs hover:shadow-xs hover:border-zinc-300 transition-all">
+        <div class="flex items-center justify-between mb-1.5 sm:mb-3">
+            <div class="p-1 sm:p-1.5 bg-zinc-100 rounded-lg text-zinc-600">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="sm:w-4 sm:h-4"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
             </div>
-            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">PUBLISHED</span>
+            <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">PUBLISHED</span>
         </div>
-        <div class="text-3xl font-bold text-zinc-900 tracking-tight"><?php echo esc_html($published_count); ?></div>
-        <div class="mt-2 flex items-center gap-2">
-            <div class="flex items-end gap-0.5 h-5">
+        <div class="text-xl sm:text-3xl font-bold text-zinc-900 tracking-tight leading-none"><?php echo esc_html($published_count); ?></div>
+        <div class="mt-1.5 sm:mt-2 flex items-center gap-1.5 sm:gap-2">
+            <div class="hidden sm:flex items-end gap-0.5 h-5">
                 <div class="w-1 bg-zinc-200 rounded-sm" style="height:30%"></div>
                 <div class="w-1 bg-zinc-200 rounded-sm" style="height:50%"></div>
                 <div class="w-1 bg-zinc-200 rounded-sm" style="height:40%"></div>
                 <div class="w-1 bg-zinc-300 rounded-sm" style="height:80%"></div>
                 <div class="w-1 bg-zinc-900 rounded-sm" style="height:100%"></div>
             </div>
-            <span class="text-[10px] text-zinc-500 font-semibold">Live on site</span>
+            <span class="text-[9px] sm:text-[10px] text-zinc-500 font-medium">Live on site</span>
         </div>
     </div>
-    <div class="cora-stat-card group p-5 bg-white border border-zinc-200 rounded-xl shadow-sm hover:shadow-md hover:border-zinc-300 transition-all">
-        <div class="flex items-center justify-between mb-3">
-            <div class="p-1.5 bg-zinc-100 rounded-lg text-zinc-600">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+    <div class="cora-stat-card group p-3 sm:p-5 bg-white border border-zinc-200 rounded-xl shadow-2xs hover:shadow-xs hover:border-zinc-300 transition-all">
+        <div class="flex items-center justify-between mb-1.5 sm:mb-3">
+            <div class="p-1 sm:p-1.5 bg-zinc-100 rounded-lg text-zinc-600">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="sm:w-4 sm:h-4"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
             </div>
-            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">DRAFTS</span>
+            <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">DRAFTS</span>
         </div>
-        <div class="text-3xl font-bold text-zinc-900 tracking-tight"><?php echo esc_html($draft_count); ?></div>
-        <div class="mt-2 flex items-center gap-2">
-            <div class="flex items-end gap-0.5 h-5">
+        <div class="text-xl sm:text-3xl font-bold text-zinc-900 tracking-tight leading-none"><?php echo esc_html($draft_count); ?></div>
+        <div class="mt-1.5 sm:mt-2 flex items-center gap-1.5 sm:gap-2">
+            <div class="hidden sm:flex items-end gap-0.5 h-5">
                 <div class="w-1 bg-zinc-200 rounded-sm" style="height:70%"></div>
                 <div class="w-1 bg-zinc-200 rounded-sm" style="height:60%"></div>
                 <div class="w-1 bg-zinc-200 rounded-sm" style="height:80%"></div>
                 <div class="w-1 bg-zinc-300 rounded-sm" style="height:40%"></div>
                 <div class="w-1 bg-zinc-900 rounded-sm" style="height:20%"></div>
             </div>
-            <span class="text-[10px] text-zinc-500 font-semibold">In progress</span>
+            <span class="text-[9px] sm:text-[10px] text-zinc-500 font-medium">In progress</span>
         </div>
     </div>
-    <div class="cora-stat-card group p-5 bg-white border border-zinc-200 rounded-xl shadow-sm hover:shadow-md hover:border-zinc-300 transition-all">
-        <div class="flex items-center justify-between mb-3">
-            <div class="p-1.5 bg-zinc-100 rounded-lg text-zinc-600">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M3 3v18h18"></path><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path></svg>
+    <div class="cora-stat-card group p-3 sm:p-5 bg-white border border-zinc-200 rounded-xl shadow-2xs hover:shadow-xs hover:border-zinc-300 transition-all">
+        <div class="flex items-center justify-between mb-1.5 sm:mb-3">
+            <div class="p-1 sm:p-1.5 bg-zinc-100 rounded-lg text-zinc-600">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="sm:w-4 sm:h-4"><path d="M3 3v18h18"></path><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path></svg>
             </div>
-            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">AVG SEO SCORE</span>
+            <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">AVG SEO SCORE</span>
         </div>
-        <div class="text-3xl font-bold text-zinc-900 tracking-tight"><?php echo esc_html($avg_seo); ?></div>
-        <div class="mt-2 flex items-center gap-2">
-            <div class="flex items-end gap-0.5 h-5">
+        <div class="text-xl sm:text-3xl font-bold text-zinc-900 tracking-tight leading-none"><?php echo esc_html($avg_seo); ?></div>
+        <div class="mt-1.5 sm:mt-2 flex items-center gap-1.5 sm:gap-2">
+            <div class="hidden sm:flex items-end gap-0.5 h-5">
                 <div class="w-1 bg-zinc-200 rounded-sm" style="height:50%"></div>
                 <div class="w-1 bg-zinc-200 rounded-sm" style="height:50%"></div>
                 <div class="w-1 bg-zinc-200 rounded-sm" style="height:70%"></div>
                 <div class="w-1 bg-zinc-300 rounded-sm" style="height:85%"></div>
                 <div class="w-1 bg-zinc-900 rounded-sm" style="height:100%"></div>
             </div>
-            <span class="text-[10px] text-zinc-500 font-semibold">↑ 3% this week</span>
+            <span class="text-[9px] sm:text-[10px] text-zinc-500 font-medium">↑ 3% this week</span>
         </div>
     </div>
-    <div class="cora-stat-card group p-5 bg-white border border-zinc-200 rounded-xl shadow-sm hover:shadow-md hover:border-zinc-300 transition-all">
-        <div class="flex items-center justify-between mb-3">
-            <div class="p-1.5 bg-zinc-100 rounded-lg text-zinc-600">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+    <div class="cora-stat-card group p-3 sm:p-5 bg-white border border-zinc-200 rounded-xl shadow-2xs hover:shadow-xs hover:border-zinc-300 transition-all col-span-2 sm:col-span-1">
+        <div class="flex items-center justify-between mb-1.5 sm:mb-3">
+            <div class="p-1 sm:p-1.5 bg-zinc-100 rounded-lg text-zinc-600">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="sm:w-4 sm:h-4"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             </div>
-            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">TOTAL LEADS</span>
+            <span class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">TOTAL LEADS</span>
         </div>
-        <div class="text-3xl font-bold text-zinc-900 tracking-tight"><?php echo esc_html($total_leads); ?></div>
-        <div class="mt-2 flex items-center gap-2">
-            <div class="flex items-end gap-0.5 h-5">
+        <div class="text-xl sm:text-3xl font-bold text-zinc-900 tracking-tight leading-none"><?php echo esc_html($total_leads); ?></div>
+        <div class="mt-1.5 sm:mt-2 flex items-center gap-1.5 sm:gap-2">
+            <div class="hidden sm:flex items-end gap-0.5 h-5">
                 <div class="w-1 bg-zinc-200 rounded-sm" style="height:20%"></div>
                 <div class="w-1 bg-zinc-200 rounded-sm" style="height:40%"></div>
                 <div class="w-1 bg-zinc-200 rounded-sm" style="height:60%"></div>
                 <div class="w-1 bg-zinc-300 rounded-sm" style="height:80%"></div>
                 <div class="w-1 bg-zinc-900 rounded-sm" style="height:100%"></div>
             </div>
-            <span class="text-[10px] text-zinc-500 font-semibold">From content</span>
+            <span class="text-[9px] sm:text-[10px] text-zinc-500 font-medium">From content</span>
         </div>
     </div>
 </div>
@@ -268,173 +271,271 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                     <option value="<?php echo esc_attr($u->ID); ?>"><?php echo esc_html($u->display_name); ?></option>
                 <?php endforeach; ?>
             </select>
-            <button onclick="openCreateArticleDrawer()" class="flex-1 justify-center sm:flex-none bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all shadow-xs flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <button onclick="openCreateArticleDrawer()" class="flex-1 justify-center sm:flex-none bg-zinc-100 sm:bg-zinc-900 hover:bg-zinc-200 sm:hover:bg-zinc-800 text-zinc-700 sm:text-white text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all shadow-3xs sm:shadow-xs flex items-center gap-1.5 cursor-pointer whitespace-nowrap border border-zinc-200/90 sm:border-transparent active:scale-95" title="Desktop Only (≥768px)">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0 hidden sm:block"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 sm:hidden text-zinc-500"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                 <span>New Article</span>
+                <span class="sm:hidden text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-zinc-200 text-zinc-600 uppercase tracking-wider">Desktop</span>
             </button>
         </div>
     </div>
 
-    <!-- Articles Table Container -->
-    <div class="border border-zinc-200/80 rounded-xl bg-white shadow-2xs overflow-hidden overflow-x-auto">
-        <table class="w-full text-left border-collapse min-w-[980px]">
-            <thead>
-                <tr class="bg-zinc-50/60 border-b border-zinc-200/80 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-                    <th class="py-3 px-3.5 w-9 text-center"><input type="checkbox" class="rounded border-zinc-300 accent-zinc-900 cursor-pointer" id="ct-select-all" onclick="toggleSelectAll(this)"></th>
-                    <th class="py-3 px-3.5 min-w-[280px]">ARTICLE</th>
-                    <th class="py-3 px-3.5 min-w-[120px]">AUTHOR</th>
-                    <th class="py-3 px-3.5 min-w-[110px]">STATUS</th>
-                    <th class="py-3 px-3.5 min-w-[110px]">
-                        SEO
-                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="inline text-zinc-400 ml-0.5 shrink-0" title="11-Point On-Page SEO Score"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
-                    </th>
-                    <th class="py-3 px-3.5 min-w-[110px]">
-                        GEO / AI
-                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="inline text-zinc-400 ml-0.5 shrink-0" title="Generative AI & LLM Search Citation Score"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
-                    </th>
-                    <th class="py-3 px-3.5 min-w-[90px]">
-                        LEADS/CR
-                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="inline text-zinc-400 ml-0.5 shrink-0" title="Conversion Rate & Inbound Lead Inquiries"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
-                    </th>
-                    <th class="py-3 px-3.5 min-w-[110px]">MODIFIED</th>
-                    <th class="py-3 px-3.5 min-w-[120px] text-right pr-5">ACTIONS</th>
-                </tr>
-            </thead>
-            <tbody id="cora-content-table-body" class="divide-y divide-zinc-100 text-xs text-zinc-700">
-                <?php if (empty($cora_posts)): ?>
-                    <tr>
-                        <td colspan="9" class="py-20 text-center">
-                            <div class="max-w-sm mx-auto">
-                                <div class="w-16 h-16 bg-zinc-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                    <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                                </div>
-                                <h3 class="text-sm font-bold text-zinc-900 mb-1">No articles yet</h3>
-                                <p class="text-xs text-zinc-500 mb-4">Start building your content library. Create your first article to track SEO performance and AI search visibility.</p>
-                                <button onclick="openCreateArticleDrawer()" class="bg-zinc-900 hover:bg-zinc-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer">
-                                    Create First Article
-                                </button>
-                            </div>
-                        </td>
+    <!-- Articles Container (Desktop Table + Mobile Cards Stack) -->
+    <div class="border border-zinc-200/80 rounded-xl bg-white shadow-2xs overflow-hidden">
+        
+        <!-- Desktop Table View -->
+        <div class="hidden sm:block overflow-x-auto">
+            <table class="w-full text-left border-collapse min-w-[980px]">
+                <thead>
+                    <tr class="bg-zinc-50/60 border-b border-zinc-200/80 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+                        <th class="py-3 px-3.5 w-9 text-center"><input type="checkbox" class="rounded border-zinc-300 accent-zinc-900 cursor-pointer" id="ct-select-all" onclick="toggleSelectAll(this)"></th>
+                        <th class="py-3 px-3.5 min-w-[280px]">ARTICLE</th>
+                        <th class="py-3 px-3.5 min-w-[120px]">AUTHOR</th>
+                        <th class="py-3 px-3.5 min-w-[110px]">STATUS</th>
+                        <th class="py-3 px-3.5 min-w-[110px]">
+                            SEO
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="inline text-zinc-400 ml-0.5 shrink-0" title="11-Point On-Page SEO Score"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                        </th>
+                        <th class="py-3 px-3.5 min-w-[110px]">
+                            GEO / AI
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="inline text-zinc-400 ml-0.5 shrink-0" title="Generative AI & LLM Search Citation Score"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                        </th>
+                        <th class="py-3 px-3.5 min-w-[90px]">
+                            LEADS/CR
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="inline text-zinc-400 ml-0.5 shrink-0" title="Conversion Rate & Inbound Lead Inquiries"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                        </th>
+                        <th class="py-3 px-3.5 min-w-[110px]">MODIFIED</th>
+                        <th class="py-3 px-3.5 min-w-[120px] text-right pr-5">ACTIONS</th>
                     </tr>
-                <?php else: ?>
-                    <?php foreach($cora_posts as $post): 
-                        $seo_score = intval(get_post_meta($post->ID, '_cora_seo_score', true)) ?: rand(65, 91);
-                        $geo_score = intval(get_post_meta($post->ID, '_cora_geo_score', true)) ?: rand(45, 80);
-                        $word_count = str_word_count(strip_tags($post->post_content));
-                        $lead_count = cora_db_get_article_lead_count($post->ID);
-                        $is_published = $post->post_status === 'publish';
-                        $editorial_status = get_post_meta($post->ID, '_cora_editorial_status', true) ?: ($is_published ? 'published' : 'draft');
-                        $assignee_id = get_post_meta($post->ID, '_cora_assignee_id', true);
-                        $assignee = $assignee_id ? get_userdata($assignee_id) : null;
-                        $assignee_name = $assignee ? $assignee->display_name : 'Unassigned';
-                        $assignee_initial = strtoupper(substr($assignee_name, 0, 1));
-                        $thumbnail_url = get_the_post_thumbnail_url($post->ID, 'thumbnail');
-                        $modified_date = get_the_modified_date('M j, Y', $post->ID);
-                        $modified_diff = human_time_diff(get_the_modified_time('U', $post->ID), current_time('timestamp')) . ' ago';
-                        
-                        $seo_lbl = ($seo_score >= 80) ? 'Excellent' : (($seo_score >= 60) ? 'Good' : (($seo_score >= 50) ? 'Average' : 'Needs Work'));
-                        $seo_bar_cls = ($seo_score >= 80) ? 'bg-emerald-500' : (($seo_score >= 50) ? 'bg-amber-500' : 'bg-red-500');
-
-                        $geo_lbl = ($geo_score >= 75) ? 'Good' : (($geo_score >= 45) ? 'Average' : 'Needs Work');
-                        $geo_bar_cls = ($geo_score >= 75) ? 'bg-zinc-900' : (($geo_score >= 45) ? 'bg-zinc-500' : 'bg-red-500');
-                    ?>
-                    <tr class="group hover:bg-zinc-50/70 transition-colors ct-row border-b border-zinc-100 last:border-b-0" data-status="<?php echo esc_attr($editorial_status); ?>" data-author="<?php echo esc_attr($assignee_id); ?>" data-title="<?php echo esc_attr(strtolower($post->post_title)); ?>">
-                        <td class="py-3.5 px-3.5 text-center"><input type="checkbox" class="rounded border-zinc-300 ct-row-checkbox accent-zinc-900 cursor-pointer" value="<?php echo $post->ID; ?>" onchange="updateBulkActions()"></td>
-                        <td class="py-3.5 px-3.5">
-                            <div class="flex items-center gap-3">
-                                <?php if($thumbnail_url): ?>
-                                    <img src="<?php echo esc_url($thumbnail_url); ?>" class="w-8 h-8 rounded-lg object-cover bg-zinc-100 border border-zinc-200/60 shrink-0">
-                                <?php else: ?>
-                                    <div class="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200/60 flex items-center justify-center text-zinc-500 shrink-0">
-                                        <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                </thead>
+                <tbody id="cora-content-table-body" class="divide-y divide-zinc-100 text-xs text-zinc-700">
+                    <?php if (empty($cora_posts)): ?>
+                        <tr>
+                            <td colspan="9" class="py-20 text-center">
+                                <div class="max-w-sm mx-auto">
+                                    <div class="w-16 h-16 bg-zinc-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                        <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                                     </div>
-                                <?php endif; ?>
-                                <div class="min-w-0 flex-1">
-                                    <div class="font-bold text-zinc-900 text-xs line-clamp-1 hover:text-zinc-700 cursor-pointer leading-snug" title="<?php echo esc_attr($post->post_title); ?>" onclick="switchSuiteTab('ct-seo'); openSEOAnalysis(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>');"><?php echo esc_html($post->post_title); ?></div>
-                                    <div class="text-[11px] text-zinc-400 font-normal mt-0.5"><?php echo number_format($word_count); ?> words &bull; ID #<?php echo $post->ID; ?></div>
+                                    <h3 class="text-sm font-bold text-zinc-900 mb-1">No articles yet</h3>
+                                    <p class="text-xs text-zinc-500 mb-4">Start building your content library. Create your first article to track SEO performance and AI search visibility.</p>
+                                    <button onclick="openCreateArticleDrawer()" class="bg-zinc-900 hover:bg-zinc-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer">
+                                        Create First Article
+                                    </button>
                                 </div>
-                            </div>
-                        </td>
-                        <td class="py-3.5 px-3.5">
-                            <div class="flex items-center gap-2">
-                                <div class="w-6 h-6 rounded-full bg-zinc-100 text-zinc-600 font-bold text-[10px] flex items-center justify-center shrink-0 border border-zinc-200/60"><?php echo esc_html($assignee_initial); ?></div>
-                                <div>
-                                    <div class="text-xs font-semibold text-zinc-800 line-clamp-1"><?php echo esc_html($assignee_name); ?></div>
-                                    <button class="text-[10px] font-medium text-zinc-400 hover:text-zinc-700 cursor-pointer block leading-none mt-0.5" onclick="openContentBriefDrawer(<?php echo $post->ID; ?>)">Assign</button>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="py-3.5 px-3.5">
-                            <?php if($editorial_status === 'published'): ?>
-                                <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded text-[10px] font-bold tracking-wider uppercase inline-block">PUBLISHED</span>
-                                <span class="text-[10px] text-zinc-400 font-normal block mt-0.5">Live</span>
-                            <?php elseif($editorial_status === 'pending_review'): ?>
-                                <span class="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200/60 rounded text-[10px] font-bold tracking-wider uppercase inline-block">IN REVIEW</span>
-                                <span class="text-[10px] text-zinc-400 font-normal block mt-0.5">Pending</span>
-                            <?php elseif($editorial_status === 'approved'): ?>
-                                <span class="px-2 py-0.5 bg-zinc-800 text-white rounded text-[10px] font-bold tracking-wider uppercase inline-block">APPROVED</span>
-                                <span class="text-[10px] text-zinc-400 font-normal block mt-0.5">Approved</span>
-                            <?php else: ?>
-                                <span class="px-2 py-0.5 bg-zinc-100 text-zinc-700 border border-zinc-200/60 rounded text-[10px] font-bold tracking-wider uppercase inline-block">DRAFT</span>
-                                <span class="text-[10px] text-zinc-400 font-normal block mt-0.5">Draft</span>
-                            <?php endif; ?>
-                        </td>
-                        <td class="py-3.5 px-3.5">
-                            <div class="flex items-center gap-1.5">
-                                <span class="text-xs font-bold text-zinc-900 w-5 text-right shrink-0"><?php echo $seo_score; ?></span>
-                                <div class="w-12 h-1 bg-zinc-100 rounded-full overflow-hidden shrink-0">
-                                    <div class="h-full rounded-full <?php echo $seo_bar_cls; ?>" style="width:<?php echo $seo_score; ?>%"></div>
-                                </div>
-                            </div>
-                            <span class="text-[10px] font-normal text-zinc-400 block mt-0.5"><?php echo $seo_lbl; ?></span>
-                        </td>
-                        <td class="py-3.5 px-3.5">
-                            <div class="flex items-center gap-1.5">
-                                <span class="text-xs font-bold text-zinc-900 w-5 text-right shrink-0"><?php echo $geo_score; ?></span>
-                                <div class="w-12 h-1 bg-zinc-100 rounded-full overflow-hidden shrink-0">
-                                    <div class="h-full rounded-full <?php echo $geo_bar_cls; ?>" style="width:<?php echo $geo_score; ?>%"></div>
-                                </div>
-                            </div>
-                            <span class="text-[10px] font-normal text-zinc-400 block mt-0.5"><?php echo $geo_lbl; ?></span>
-                        </td>
-                        <td class="py-3.5 px-3.5 text-xs">
-                            <div class="font-bold text-zinc-900"><?php echo $lead_count; ?></div>
-                            <div class="text-[10px] text-zinc-400 font-normal block mt-0.5">0.0%</div>
-                        </td>
-                        <td class="py-3.5 px-3.5 text-xs">
-                            <div class="font-normal text-zinc-700"><?php echo $modified_date; ?></div>
-                            <div class="text-[10px] text-zinc-400 font-normal block mt-0.5"><?php echo $modified_diff; ?></div>
-                        </td>
-                        <td class="py-2.5 px-3.5 text-right pr-5">
-                            <div class="flex items-center justify-end gap-1.5">
-                                <button type="button" class="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer shadow-xs" title="Edit Article" onclick="coraEditArticle(<?php echo $post->ID; ?>)">
-                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                    Edit
-                                </button>
-                                <button type="button" class="px-2.5 py-1 rounded-lg border border-zinc-200/80 bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer shadow-2xs" title="SEO Analysis" onclick="openSEOAnalysisTab(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
-                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                                    SEO
-                                </button>
-                            </div>
-                            <div class="flex items-center justify-end gap-2 text-[10px] font-medium text-zinc-400 mt-1">
-                                <button type="button" class="hover:text-zinc-700 flex items-center gap-0.5 cursor-pointer" onclick="openContentBriefDrawer(<?php echo $post->ID; ?>)">
-                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                    Brief
-                                </button>
-                                <span class="text-zinc-300">&bull;</span>
-                                <a href="<?php echo get_permalink($post->ID); ?>" target="_blank" class="hover:text-zinc-700 flex items-center gap-0.5" title="View Live">
-                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 0 0 2 2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                                    View
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                            </td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach($cora_posts as $post): 
+                            $seo_score = intval(get_post_meta($post->ID, '_cora_seo_score', true)) ?: rand(65, 91);
+                            $geo_score = intval(get_post_meta($post->ID, '_cora_geo_score', true)) ?: rand(45, 80);
+                            $word_count = str_word_count(strip_tags($post->post_content));
+                            $lead_count = cora_db_get_article_lead_count($post->ID);
+                            $is_published = $post->post_status === 'publish';
+                            $editorial_status = get_post_meta($post->ID, '_cora_editorial_status', true) ?: ($is_published ? 'published' : 'draft');
+                            $assignee_id = get_post_meta($post->ID, '_cora_assignee_id', true);
+                            $assignee = $assignee_id ? get_userdata($assignee_id) : null;
+                            $assignee_name = $assignee ? $assignee->display_name : 'Unassigned';
+                            $assignee_initial = strtoupper(substr($assignee_name, 0, 1));
+                            $thumbnail_url = get_the_post_thumbnail_url($post->ID, 'thumbnail');
+                            $modified_date = get_the_modified_date('M j, Y', $post->ID);
+                            $modified_diff = human_time_diff(get_the_modified_time('U', $post->ID), current_time('timestamp')) . ' ago';
+                            
+                            $seo_lbl = ($seo_score >= 80) ? 'Excellent' : (($seo_score >= 60) ? 'Good' : (($seo_score >= 50) ? 'Average' : 'Needs Work'));
+                            $seo_bar_cls = ($seo_score >= 80) ? 'bg-emerald-500' : (($seo_score >= 50) ? 'bg-amber-500' : 'bg-red-500');
 
-        <!-- Table Footer / Pagination Bar (Screenshot 2) -->
+                            $geo_lbl = ($geo_score >= 75) ? 'Good' : (($geo_score >= 45) ? 'Average' : 'Needs Work');
+                            $geo_bar_cls = ($geo_score >= 75) ? 'bg-zinc-900' : (($geo_score >= 45) ? 'bg-zinc-500' : 'bg-red-500');
+                        ?>
+                        <tr class="group hover:bg-zinc-50/70 transition-colors ct-row border-b border-zinc-100 last:border-b-0" data-status="<?php echo esc_attr($editorial_status); ?>" data-author="<?php echo esc_attr($assignee_id); ?>" data-title="<?php echo esc_attr(strtolower($post->post_title)); ?>">
+                            <td class="py-3.5 px-3.5 text-center"><input type="checkbox" class="rounded border-zinc-300 ct-row-checkbox accent-zinc-900 cursor-pointer" value="<?php echo $post->ID; ?>" onchange="updateBulkActions()"></td>
+                            <td class="py-3.5 px-3.5">
+                                <div class="flex items-center gap-3">
+                                    <?php if($thumbnail_url): ?>
+                                        <img src="<?php echo esc_url($thumbnail_url); ?>" class="w-8 h-8 rounded-lg object-cover bg-zinc-100 border border-zinc-200/60 shrink-0">
+                                    <?php else: ?>
+                                        <div class="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200/60 flex items-center justify-center text-zinc-500 shrink-0">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                        </div>
+                                    <?php endif; ?>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-bold text-zinc-900 text-xs line-clamp-1 hover:text-zinc-700 cursor-pointer leading-snug" title="<?php echo esc_attr($post->post_title); ?>" onclick="switchSuiteTab('ct-seo'); openSEOAnalysis(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>');"><?php echo esc_html($post->post_title); ?></div>
+                                        <div class="text-[11px] text-zinc-400 font-normal mt-0.5"><?php echo number_format($word_count); ?> words &bull; ID #<?php echo $post->ID; ?></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-3.5 px-3.5">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-zinc-100 text-zinc-600 font-bold text-[10px] flex items-center justify-center shrink-0 border border-zinc-200/60"><?php echo esc_html($assignee_initial); ?></div>
+                                    <div>
+                                        <div class="text-xs font-semibold text-zinc-800 line-clamp-1"><?php echo esc_html($assignee_name); ?></div>
+                                        <button class="text-[10px] font-medium text-zinc-400 hover:text-zinc-700 cursor-pointer block leading-none mt-0.5" onclick="openContentBriefDrawer(<?php echo $post->ID; ?>)">Assign</button>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-3.5 px-3.5">
+                                <?php if($editorial_status === 'published'): ?>
+                                    <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded text-[10px] font-bold tracking-wider uppercase inline-block">PUBLISHED</span>
+                                    <span class="text-[10px] text-zinc-400 font-normal block mt-0.5">Live</span>
+                                <?php elseif($editorial_status === 'pending_review'): ?>
+                                    <span class="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200/60 rounded text-[10px] font-bold tracking-wider uppercase inline-block">IN REVIEW</span>
+                                    <span class="text-[10px] text-zinc-400 font-normal block mt-0.5">Pending</span>
+                                <?php elseif($editorial_status === 'approved'): ?>
+                                    <span class="px-2 py-0.5 bg-zinc-800 text-white rounded text-[10px] font-bold tracking-wider uppercase inline-block">APPROVED</span>
+                                    <span class="text-[10px] text-zinc-400 font-normal block mt-0.5">Approved</span>
+                                <?php else: ?>
+                                    <span class="px-2 py-0.5 bg-zinc-100 text-zinc-700 border border-zinc-200/60 rounded text-[10px] font-bold tracking-wider uppercase inline-block">DRAFT</span>
+                                    <span class="text-[10px] text-zinc-400 font-normal block mt-0.5">Draft</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="py-3.5 px-3.5">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-xs font-bold text-zinc-900 w-5 text-right shrink-0"><?php echo $seo_score; ?></span>
+                                    <div class="w-12 h-1 bg-zinc-100 rounded-full overflow-hidden shrink-0">
+                                        <div class="h-full rounded-full <?php echo $seo_bar_cls; ?>" style="width:<?php echo $seo_score; ?>%"></div>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-normal text-zinc-400 block mt-0.5"><?php echo $seo_lbl; ?></span>
+                            </td>
+                            <td class="py-3.5 px-3.5">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-xs font-bold text-zinc-900 w-5 text-right shrink-0"><?php echo $geo_score; ?></span>
+                                    <div class="w-12 h-1 bg-zinc-100 rounded-full overflow-hidden shrink-0">
+                                        <div class="h-full rounded-full <?php echo $geo_bar_cls; ?>" style="width:<?php echo $geo_score; ?>%"></div>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-normal text-zinc-400 block mt-0.5"><?php echo $geo_lbl; ?></span>
+                            </td>
+                            <td class="py-3.5 px-3.5 text-xs">
+                                <div class="font-bold text-zinc-900"><?php echo $lead_count; ?></div>
+                                <div class="text-[10px] text-zinc-400 font-normal block mt-0.5">0.0%</div>
+                            </td>
+                            <td class="py-3.5 px-3.5 text-xs">
+                                <div class="font-normal text-zinc-700"><?php echo $modified_date; ?></div>
+                                <div class="text-[10px] text-zinc-400 font-normal block mt-0.5"><?php echo $modified_diff; ?></div>
+                            </td>
+                            <td class="py-2.5 px-3.5 text-right pr-5">
+                                <div class="flex items-center justify-end gap-1.5">
+                                    <button type="button" class="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer shadow-xs" title="Edit Article" onclick="coraEditArticle(<?php echo $post->ID; ?>)">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                        Edit
+                                    </button>
+                                    <button type="button" class="px-2.5 py-1 rounded-lg border border-zinc-200/80 bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer shadow-2xs" title="SEO Analysis" onclick="openSEOAnalysisTab(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                        SEO
+                                    </button>
+                                </div>
+                                <div class="flex items-center justify-end gap-2 text-[10px] font-medium text-zinc-400 mt-1">
+                                    <button type="button" class="hover:text-zinc-700 flex items-center gap-0.5 cursor-pointer" onclick="openContentBriefDrawer(<?php echo $post->ID; ?>)">
+                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                        Brief
+                                    </button>
+                                    <span class="text-zinc-300">&bull;</span>
+                                    <a href="<?php echo get_permalink($post->ID); ?>" target="_blank" class="hover:text-zinc-700 flex items-center gap-0.5" title="View Live">
+                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 0 0 2 2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                        View
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mobile Article Card Stack View (Spaced Standalone Cards) -->
+        <div id="cora-content-mobile-cards" class="block sm:hidden flex flex-col gap-3 p-3 bg-zinc-50/60 rounded-xl border-t sm:border-t-0 border-zinc-200/60">
+            <?php if (empty($cora_posts)): ?>
+                <div class="p-8 text-center bg-white rounded-xl border border-zinc-200/80">
+                    <div class="w-12 h-12 bg-zinc-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    </div>
+                    <h3 class="text-xs font-bold text-zinc-900 mb-1">No articles yet</h3>
+                    <button onclick="openCreateArticleDrawer()" class="bg-zinc-100 text-zinc-700 text-xs font-bold px-3.5 py-1.5 rounded-lg mt-2 cursor-pointer shadow-3xs border border-zinc-200 flex items-center gap-1.5 mx-auto active:scale-95" title="Desktop Only (≥768px)">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <span>Create Article</span>
+                        <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-zinc-200 text-zinc-600 uppercase tracking-wider">Desktop Only</span>
+                    </button>
+                </div>
+            <?php else: ?>
+                <?php foreach($cora_posts as $post): 
+                    $seo_score = intval(get_post_meta($post->ID, '_cora_seo_score', true)) ?: rand(65, 91);
+                    $geo_score = intval(get_post_meta($post->ID, '_cora_geo_score', true)) ?: rand(45, 80);
+                    $word_count = str_word_count(strip_tags($post->post_content));
+                    $is_published = $post->post_status === 'publish';
+                    $editorial_status = get_post_meta($post->ID, '_cora_editorial_status', true) ?: ($is_published ? 'published' : 'draft');
+                    $assignee_id = get_post_meta($post->ID, '_cora_assignee_id', true);
+                    $assignee = $assignee_id ? get_userdata($assignee_id) : null;
+                    $assignee_name = $assignee ? $assignee->display_name : 'Unassigned';
+                    $assignee_initial = strtoupper(substr($assignee_name, 0, 1));
+                    $modified_diff = human_time_diff(get_the_modified_time('U', $post->ID), current_time('timestamp')) . ' ago';
+                ?>
+                <div class="p-4 bg-white border border-zinc-200/90 rounded-xl shadow-2xs hover:shadow-xs hover:border-zinc-300 transition-all ct-card flex flex-col gap-3" data-status="<?php echo esc_attr($editorial_status); ?>" data-author="<?php echo esc_attr($assignee_id); ?>" data-title="<?php echo esc_attr(strtolower($post->post_title)); ?>">
+                    <!-- Top Row: Checkbox, Title & Status Pill -->
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex items-start gap-2.5 min-w-0">
+                            <input type="checkbox" class="rounded border-zinc-300 ct-row-checkbox accent-zinc-900 cursor-pointer mt-0.5" value="<?php echo $post->ID; ?>" onchange="updateBulkActions()">
+                            <div class="min-w-0">
+                                <h4 class="font-bold text-zinc-900 text-xs line-clamp-2 leading-snug cursor-pointer hover:text-zinc-700" onclick="coraEditArticle(<?php echo $post->ID; ?>)"><?php echo esc_html($post->post_title); ?></h4>
+                                <div class="text-[10px] text-zinc-400 mt-1 flex items-center gap-1.5 flex-wrap">
+                                    <span><?php echo number_format($word_count); ?> words</span>
+                                    <span>&bull;</span>
+                                    <span>ID #<?php echo $post->ID; ?></span>
+                                    <span>&bull;</span>
+                                    <span><?php echo $modified_diff; ?></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="shrink-0">
+                            <?php if($editorial_status === 'published'): ?>
+                                <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-md text-[9px] font-bold uppercase tracking-wider">PUBLISHED</span>
+                            <?php elseif($editorial_status === 'pending_review'): ?>
+                                <span class="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200/60 rounded-md text-[9px] font-bold uppercase tracking-wider">REVIEW</span>
+                            <?php elseif($editorial_status === 'approved'): ?>
+                                <span class="px-2 py-0.5 bg-zinc-800 text-white rounded-md text-[9px] font-bold uppercase tracking-wider">APPROVED</span>
+                            <?php else: ?>
+                                <span class="px-2 py-0.5 bg-zinc-100 text-zinc-700 border border-zinc-200/60 rounded-md text-[9px] font-bold uppercase tracking-wider">DRAFT</span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <!-- Middle Row: Author Avatar & SEO/GEO Scores -->
+                    <div class="flex items-center justify-between text-[11px] pt-1.5 border-t border-zinc-100">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 rounded-full bg-zinc-100 text-zinc-700 font-bold text-[10px] flex items-center justify-center shrink-0 border border-zinc-200/70 shadow-3xs"><?php echo esc_html($assignee_initial); ?></div>
+                            <span class="text-xs font-semibold text-zinc-800 truncate max-w-[120px]"><?php echo esc_html($assignee_name); ?></span>
+                        </div>
+
+                        <div class="flex items-center gap-1.5">
+                            <span class="px-2 py-0.5 rounded-md bg-zinc-100/80 text-zinc-800 font-bold text-[10px] border border-zinc-200/60">SEO <?php echo $seo_score; ?></span>
+                            <span class="px-2 py-0.5 rounded-md bg-zinc-100/80 text-zinc-800 font-bold text-[10px] border border-zinc-200/60">GEO <?php echo $geo_score; ?></span>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Row: Action Buttons -->
+                    <div class="flex items-center justify-between pt-2 border-t border-zinc-100">
+                        <div class="flex items-center gap-2.5 text-[11px] font-semibold text-zinc-400">
+                            <button type="button" class="hover:text-zinc-800 flex items-center gap-1 cursor-pointer transition-colors" onclick="openContentBriefDrawer(<?php echo $post->ID; ?>)">Brief</button>
+                            <span class="text-zinc-300">&bull;</span>
+                            <a href="<?php echo get_permalink($post->ID); ?>" target="_blank" class="hover:text-zinc-800 flex items-center gap-1 transition-colors">View</a>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <button type="button" class="px-2.5 py-1.5 rounded-lg bg-zinc-100/90 text-zinc-500 hover:text-zinc-800 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border border-zinc-200/80 active:scale-95" onclick="coraEditArticle(<?php echo $post->ID; ?>)" title="Desktop Only (≥768px)">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                <span>Edit</span>
+                            </button>
+                            <button type="button" class="px-3 py-1.5 rounded-lg border border-zinc-200/90 bg-white hover:bg-zinc-50 text-zinc-800 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-3xs active:scale-95" onclick="openSEOAnalysisTab(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
+                                SEO
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+
+        <!-- Table Footer / Pagination Bar -->
         <div class="p-3.5 border-t border-zinc-200/80 bg-white flex items-center justify-between text-xs text-zinc-500 font-normal select-none">
             <div id="ct-pagination-info">Showing 1 to 6 of <?php echo $total_cnt; ?> articles</div>
             <div class="flex items-center gap-3">
@@ -452,10 +553,30 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     </div>
 </div>
 <!-- PANEL: SEO Analyzer -->
-<div id="panel-ct-seo" class="cora-ct-panel hidden">
-    <div class="flex gap-4 items-start">
-        <!-- Left: Article List -->
-        <div id="seo-sidebar" class="w-[260px] shrink-0 bg-white border border-zinc-200/80 rounded-xl shadow-2xs sticky top-4 max-h-[calc(100vh-140px)] flex flex-col overflow-hidden transition-all duration-300" style="width: 260px; min-width: 260px;">
+<div id="panel-ct-seo" class="cora-ct-panel hidden w-full max-w-full">
+    <div class="flex flex-col md:flex-row gap-4 items-stretch md:items-start min-w-0 overflow-hidden w-full max-w-full">
+
+        <!-- Mobile: Article Selector Dropdown (visible only on mobile) -->
+        <div id="seo-mobile-article-selector" class="w-full md:hidden bg-white border border-zinc-200/80 rounded-xl shadow-2xs p-3 shrink-0">
+            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Select Article to Audit</label>
+            <div class="relative">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none z-10"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <select id="seo-mobile-article-dropdown" class="w-full pl-9 pr-8 py-2.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-900 bg-zinc-50/80 focus:bg-white focus:outline-none focus:border-zinc-400 transition-all cursor-pointer appearance-none" onchange="coraMobileSEOArticleSelected(this)">
+                    <option value="" disabled selected>Choose an article...</option>
+                    <?php foreach($cora_posts as $post):
+                        $seo_scr = intval(get_post_meta($post->ID, '_cora_seo_score', true)) ?: 75;
+                    ?>
+                    <option value="<?php echo $post->ID; ?>" data-title="<?php echo esc_attr($post->post_title); ?>" data-score="<?php echo $seo_scr; ?>">
+                        <?php echo esc_html($post->post_title); ?> — SEO <?php echo $seo_scr; ?>/100
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+        </div>
+
+        <!-- Left: Article List (Desktop Only) -->
+        <div id="seo-sidebar" class="hidden md:flex w-[260px] shrink-0 bg-white border border-zinc-200/80 rounded-xl shadow-2xs sticky top-4 max-h-[calc(100vh-140px)] flex-col overflow-hidden transition-all duration-300" style="width: 260px; min-width: 260px;">
             <!-- Header -->
             <div id="seo-sidebar-header" class="p-3 border-b border-zinc-200/80 bg-zinc-50/70 flex items-center justify-between">
                 <div class="flex items-center gap-2 overflow-hidden seo-sidebar-text">
@@ -519,13 +640,14 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         </div>
         
         <!-- Right: Analysis Area -->
-        <div class="flex-1 min-w-0 bg-white border border-zinc-200/80 rounded-xl shadow-2xs p-5 max-h-[calc(100vh-180px)] overflow-y-auto" id="seo-analysis-container">
+        <div class="flex-1 min-w-0 w-full max-w-full bg-white border border-zinc-200/80 rounded-xl shadow-2xs p-3 sm:p-5 md:max-h-[calc(100vh-180px)] overflow-y-auto overflow-x-hidden" id="seo-analysis-container">
             <div class="text-center text-zinc-500 py-28 max-w-sm mx-auto">
                 <div class="w-16 h-16 bg-zinc-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </div>
                 <h3 class="text-sm font-bold text-zinc-900 mb-1">Select an Article to Audit</h3>
-                <p class="text-xs text-zinc-500 mb-4">Choose an article from the left list to view its real-time 11-point SEO audit, AI search visibility signals, and meta optimizations.</p>
+                <p class="text-xs text-zinc-500 mb-4 hidden md:block">Choose an article from the left list to view its real-time 11-point SEO audit, AI search visibility signals, and meta optimizations.</p>
+                <p class="text-xs text-zinc-500 mb-4 md:hidden">Choose an article from the dropdown above to view its SEO audit report.</p>
             </div>
         </div>
     </div>
@@ -1243,6 +1365,13 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 
     // Drawers
     window.openCreateArticleDrawer = function(prefillDate, prefillStage) {
+        if (window.innerWidth < 768) {
+            if (window.coraShowToast) {
+                window.coraShowToast('🔒 Article Creation & Editor are locked on mobile. Please open on a laptop or tablet screen (≥768px).', 'info');
+            }
+            return false;
+        }
+
         if (window.coraShowToast) {
             window.coraShowToast('Creating new draft...', 'info');
         }
@@ -1448,6 +1577,17 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         }, 1100);
     };
 
+    // Mobile dropdown handler for SEO article selection
+    window.coraMobileSEOArticleSelected = function(selectEl) {
+        const selectedOption = selectEl.options[selectEl.selectedIndex];
+        if (!selectedOption || !selectedOption.value) return;
+        const articleId = selectedOption.value;
+        const title = selectedOption.dataset.title || selectedOption.textContent.split(' \u2014 ')[0].trim();
+        if (typeof window.openSEOAnalysis === 'function') {
+            window.openSEOAnalysis(articleId, title);
+        }
+    };
+
     window.openSEOAnalysis = function(articleId, title) {
         window._currentSEOArticleId = articleId;
         // Highlight active item in left sidebar list
@@ -1458,6 +1598,12 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 btn.classList.remove('active', 'bg-zinc-50', 'border-zinc-200', 'shadow-2xs');
             }
         });
+
+        // Sync mobile dropdown selector to match active article
+        const mobileDropdown = document.getElementById('seo-mobile-article-dropdown');
+        if (mobileDropdown) {
+            mobileDropdown.value = String(articleId);
+        }
 
         if (typeof window.getFilteredSEOArticles === 'function') {
             const filtered = window.getFilteredSEOArticles();
@@ -1478,12 +1624,12 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 
         // Render inline analysis workspace frame
         container.innerHTML = `
-            <div class="space-y-6">
+            <div class="space-y-4 sm:space-y-6 max-w-full overflow-hidden">
                 <!-- Header Bar -->
-                <div class="flex items-start justify-between pb-2">
-                    <div>
+                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-2">
+                    <div class="min-w-0">
                         <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">SEO & AI AUDIT WORKSPACE</div>
-                        <h2 class="text-xl font-bold text-zinc-900 leading-tight">${escJsHtml(title)}</h2>
+                        <h2 class="text-lg sm:text-xl font-bold text-zinc-900 leading-tight line-clamp-2">${escJsHtml(title)}</h2>
                         <div class="text-xs text-zinc-500 mt-1 flex items-center gap-2 flex-wrap font-medium">
                             <span>Article ID #${articleId}</span>
                             <span class="text-zinc-300">&bull;</span>
@@ -1492,7 +1638,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                             <span id="inline-last-analyzed">Last Analyzed: --</span>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 shrink-0">
+                    <div class="flex items-center gap-2 shrink-0 flex-wrap">
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-50 text-zinc-800 border border-zinc-200/90 text-xs font-bold shadow-2xs">
                             <svg viewBox="0 0 24 24" width="13" height="13" class="shrink-0"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
                             Google Verified
@@ -1503,7 +1649,8 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                         </button>
                         <button id="btn-run-audit-seo" class="bg-zinc-900 hover:bg-zinc-800 text-white font-semibold px-3.5 py-1.5 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-xs" onclick="triggerSEOAnalysis(${articleId}, this)">
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                            <span>Run 11-Point Audit</span>
+                            <span class="hidden sm:inline">Run 11-Point Audit</span>
+                            <span class="sm:hidden">Run Audit</span>
                         </button>
                     </div>
                 </div>
@@ -1536,12 +1683,12 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 </div>
 
                 <!-- 4-Metric Top Bar -->
-                <div class="grid grid-cols-4 gap-4">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                     <!-- Metric 1: Overall SEO Score -->
-                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-4 flex flex-col justify-between shadow-2xs relative overflow-hidden">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-bold text-zinc-900">Overall SEO Score</span>
-                            <span id="inline-seo-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">Good</span>
+                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs relative overflow-hidden">
+                        <div class="flex items-center justify-between mb-2 gap-1.5">
+                            <span class="text-xs font-bold text-zinc-900 truncate">Overall SEO Score</span>
+                            <span id="inline-seo-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">Good</span>
                         </div>
                         <div class="flex items-center gap-3 my-1">
                             <div class="relative w-12 h-12 shrink-0 flex items-center justify-center">
@@ -1560,13 +1707,13 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                     </div>
 
                     <!-- Metric 2: GEO AI Visibility -->
-                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-4 flex flex-col justify-between shadow-2xs">
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900">
+                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs overflow-hidden">
+                        <div class="flex items-center justify-between mb-2 gap-1.5">
+                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 truncate min-w-0">
                                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                                 GEO / AI Visibility
                             </div>
-                            <span id="inline-geo-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200/60">Average</span>
+                            <span id="inline-geo-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200/60">Average</span>
                         </div>
                         <div>
                             <div class="text-2xl font-bold text-zinc-900" id="inline-geo-score">72%</div>
@@ -1575,13 +1722,13 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                     </div>
 
                     <!-- Metric 3: Focus Keyword Density -->
-                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-4 flex flex-col justify-between shadow-2xs">
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900">
+                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs overflow-hidden">
+                        <div class="flex items-center justify-between mb-2 gap-1.5">
+                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 truncate min-w-0">
                                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
                                 Focus Keyword Density
                             </div>
-                            <span id="inline-kw-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">Good</span>
+                            <span id="inline-kw-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">Good</span>
                         </div>
                         <div>
                             <div class="text-2xl font-bold text-zinc-900" id="inline-kw-density">1.4%</div>
@@ -1590,13 +1737,13 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                     </div>
 
                     <!-- Metric 4: Readability & Depth -->
-                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-4 flex flex-col justify-between shadow-2xs">
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900">
+                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs overflow-hidden">
+                        <div class="flex items-center justify-between mb-2 gap-1.5">
+                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 truncate min-w-0">
                                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                                 Readability & Depth
                             </div>
-                            <span id="inline-read-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">Good</span>
+                            <span id="inline-read-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">Good</span>
                         </div>
                         <div>
                             <div class="text-2xl font-bold text-zinc-900" id="inline-readability-score">78<span class="text-xs text-zinc-400 font-normal"> /100</span></div>
@@ -1609,12 +1756,12 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 <div class="tab-panels-wrapper space-y-4">
                     <!-- Tab 1: 11-Point On-Page SEO Checklist -->
                     <div id="panel-tab-checklist" class="seo-report-panel space-y-4">
-                        <div class="border border-zinc-200 rounded-xl p-5 bg-white shadow-2xs space-y-5">
+                        <div class="border border-zinc-200 rounded-xl p-3.5 sm:p-5 bg-white shadow-2xs space-y-5">
                             <div class="text-xs font-bold text-zinc-900 uppercase tracking-wider">11-POINT ON-PAGE SEO CHECKLIST</div>
                             
-                            <div class="grid grid-cols-12 gap-6 items-center">
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 sm:gap-6 items-center">
                                 <!-- Left side: Circular ring gauge -->
-                                <div class="col-span-4 bg-zinc-50 border border-zinc-200 rounded-xl p-5 flex flex-col items-center justify-center text-center">
+                                <div class="sm:col-span-4 bg-zinc-50 border border-zinc-200 rounded-xl p-4 sm:p-5 flex flex-col items-center justify-center text-center">
                                     <div class="relative w-24 h-24 flex items-center justify-center my-2">
                                         <svg width="96" height="96" viewBox="0 0 64 64" class="-rotate-90">
                                             <circle cx="32" cy="32" r="26" stroke="#e4e4e7" stroke-width="5" fill="none"/>
@@ -1628,12 +1775,12 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="text-base font-bold text-zinc-900 mt-1" id="inline-checklist-score-num">8 / 11 Checks Passed</div>
-                                    <p class="text-xs text-zinc-500 mt-1 max-w-[200px]" id="inline-checklist-subtext">Great job! Most of your on-page SEO looks good.</p>
+                                    <div class="text-sm sm:text-base font-bold text-zinc-900 mt-1" id="inline-checklist-score-num">8 / 11 Checks Passed</div>
+                                    <p class="text-xs text-zinc-500 mt-1 max-w-[200px] break-words" id="inline-checklist-subtext">Great job! Most of your on-page SEO looks good.</p>
                                 </div>
 
                                 <!-- Right side grid: 2-column grid of checklist summary categories -->
-                                <div class="col-span-8 grid grid-cols-2 gap-3" id="inline-seo-checklist-categories">
+                                <div class="sm:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-3" id="inline-seo-checklist-categories">
                                     <!-- Category 1: Title & Meta -->
                                     <div class="p-3 border border-zinc-200 rounded-xl bg-white hover:border-zinc-300 transition-all cursor-pointer flex items-center justify-between group" onclick="toggleChecklistCategory(this, 'cat-title-meta')">
                                         <div class="flex items-center gap-2.5">
@@ -1827,7 +1974,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-5">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                                 <!-- Left Column -->
                                 <div class="space-y-4">
                                     <!-- Focus Keyword -->
@@ -1927,7 +2074,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                 </span>
                             </div>
                             <p class="text-xs text-zinc-500">Real-time user experience metrics measured via Chrome UX telemetry and PageSpeed API simulation.</p>
-                            <div class="grid grid-cols-4 gap-4 pt-2">
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-2">
                                 <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50 flex flex-col justify-between">
                                     <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Performance Score</div>
                                     <div class="text-2xl font-bold text-zinc-900 mt-2" id="inline-cwv-perf">92%</div>
@@ -1956,7 +2103,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                     <div id="panel-tab-structure" class="seo-report-panel hidden space-y-4">
                         <div class="border border-zinc-200 rounded-xl p-5 bg-white shadow-2xs space-y-4">
                             <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Content Structure & Media Analytics</h3>
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50 space-y-1">
                                     <div class="text-[10px] font-bold text-zinc-400 uppercase">Word Count & Reading Time</div>
                                     <div class="text-xl font-bold text-zinc-900" id="inline-struct-words">1,842 words</div>
@@ -1999,7 +2146,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                     <div id="panel-tab-backlinks" class="seo-report-panel hidden space-y-4">
                         <div class="border border-zinc-200 rounded-xl p-5 bg-white shadow-2xs space-y-4">
                             <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Internal & External Link Profile</h3>
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50 space-y-1">
                                     <div class="text-[10px] font-bold text-zinc-400 uppercase">Internal Links</div>
                                     <div class="text-xl font-bold text-zinc-900">4 contextual links</div>
@@ -2528,15 +2675,15 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 if (seoBadge) {
                     if (score >= 80) {
                         seoBadge.innerText = 'Good';
-                        seoBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60';
+                        seoBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60';
                         if (seoRing) seoRing.setAttribute('stroke', '#10b981');
                     } else if (score >= 50) {
                         seoBadge.innerText = 'Average';
-                        seoBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/60';
+                        seoBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/60';
                         if (seoRing) seoRing.setAttribute('stroke', '#f59e0b');
                     } else {
                         seoBadge.innerText = 'Poor';
-                        seoBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200/60';
+                        seoBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200/60';
                         if (seoRing) seoRing.setAttribute('stroke', '#ef4444');
                     }
                 }
@@ -2546,13 +2693,13 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 if (geoBadge) {
                     if (geoVal >= 75) {
                         geoBadge.innerText = 'High';
-                        geoBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60';
+                        geoBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60';
                     } else if (geoVal >= 45) {
                         geoBadge.innerText = 'Average';
-                        geoBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/60';
+                        geoBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/60';
                     } else {
                         geoBadge.innerText = 'Low';
-                        geoBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200/60';
+                        geoBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200/60';
                     }
                 }
 
@@ -2561,13 +2708,13 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 if (kwBadge) {
                     if (kwDensityVal >= 0.8 && kwDensityVal <= 2.5) {
                         kwBadge.innerText = 'Good';
-                        kwBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60';
+                        kwBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60';
                     } else if (kwDensityVal < 0.8) {
                         kwBadge.innerText = 'Low';
-                        kwBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/60';
+                        kwBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/60';
                     } else {
                         kwBadge.innerText = 'High';
-                        kwBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200/60';
+                        kwBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200/60';
                     }
                 }
 
@@ -2576,13 +2723,13 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 if (readBadge) {
                     if (fleschVal >= 70) {
                         readBadge.innerText = 'Good';
-                        readBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60';
+                        readBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60';
                     } else if (fleschVal >= 50) {
                         readBadge.innerText = 'Fair';
-                        readBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/60';
+                        readBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/60';
                     } else {
                         readBadge.innerText = 'Poor';
-                        readBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200/60';
+                        readBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200/60';
                     }
                 }
 
@@ -2710,8 +2857,15 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
     };
 
     window.renderCTTable = function() {
-        const filtered = window.getFilteredCTRows();
-        const total = filtered.length;
+        const filteredRows = window.getFilteredCTRows();
+        const filteredCards = Array.from(document.querySelectorAll('.ct-card')).filter(card => {
+            const statusMatch = (_ctCurrentStatus === 'all' || card.dataset.status === _ctCurrentStatus);
+            const authorMatch = (_ctCurrentAuthor === 'all' || card.dataset.author === _ctCurrentAuthor);
+            const searchMatch = (!_ctSearchQuery || (card.dataset.title || '').includes(_ctSearchQuery));
+            return statusMatch && authorMatch && searchMatch;
+        });
+
+        const total = filteredRows.length;
         
         let pageSize = _ctPageSize === 'all' ? total : parseInt(_ctPageSize, 10);
         if (isNaN(pageSize) || pageSize <= 0) pageSize = total;
@@ -2723,7 +2877,10 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         const endIdx   = (pageSize >= total) ? total : Math.min(startIdx + pageSize, total);
 
         document.querySelectorAll('.ct-row').forEach(r => r.style.display = 'none');
-        filtered.slice(startIdx, endIdx).forEach(r => r.style.display = '');
+        filteredRows.slice(startIdx, endIdx).forEach(r => r.style.display = '');
+
+        document.querySelectorAll('.ct-card').forEach(c => c.style.display = 'none');
+        filteredCards.slice(startIdx, endIdx).forEach(c => c.style.display = '');
 
         const infoEl = document.getElementById('ct-pagination-info');
         if (infoEl) {

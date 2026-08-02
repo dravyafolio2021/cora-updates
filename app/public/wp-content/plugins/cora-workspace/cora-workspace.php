@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://cora.ai
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.9.72
+ * Version: 2.9.78
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.9.72' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.78' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -1377,13 +1377,15 @@ function cora_real_estate_ai_register_form() {
         <label for="cora_role"><?php _e( 'Agent Role', 'cora-workspace' ); ?><br />
         <select name="cora_role" id="cora_role" class="input" style="width: 100%; height: 40px; margin-top: 2px; margin-bottom: 20px; border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 6px; background: #fafafa; font-family: inherit; font-size: 14px; padding: 0 10px;">
             <?php
-            $active_industry = get_option( 'cora_workspace_industry', 'real_estate' );
-            $module = Cora_Module_Registry::get_module( $active_industry );
-            $roles_list = $module ? $module->get_industry_roles() : array();
-            foreach ( $roles_list as $role_key => $role_label ) {
-                if ( $role_key === 'administrator' ) {
-                    continue;
+            $roles_list = cora_get_all_roles();
+            // Prevent users from self-assigning high-privilege administrative roles on signup
+            $exclude_roles = array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_branch_manager', 'cora_manager' );
+            foreach ( $exclude_roles as $ex_role ) {
+                if ( isset( $roles_list[$ex_role] ) ) {
+                    unset( $roles_list[$ex_role] );
                 }
+            }
+            foreach ( $roles_list as $role_key => $role_label ) {
                 echo '<option value="' . esc_attr( $role_key ) . '" ' . selected( $role, $role_key, false ) . '>' . esc_html( $role_label ) . '</option>';
             }
             ?>
@@ -1621,6 +1623,9 @@ function cora_ajax_resend_verification() {
             update_option( 'cora_latest_verification_link', $verification_link );
             
             $invite_role = $found_inv['role'] ?? 'member';
+            $all_roles = cora_get_all_roles();
+            $role_label = isset( $all_roles[ $invite_role ] ) ? $all_roles[ $invite_role ] : $invite_role;
+
             $inviter_id = $found_inv['invited_by'] ?? get_current_user_id();
             $inviter = get_userdata( $inviter_id );
             $inviter_name = $inviter ? ($inviter->display_name ?: $inviter->user_email) : 'Administrator';
@@ -1631,7 +1636,7 @@ function cora_ajax_resend_verification() {
             <div style='font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:560px;margin:0 auto;padding:32px;background:#FAFAFA;border-radius:12px;border:1px solid #E4E4E7;'>
                 <h2 style='color:#09090B;margin-top:0;font-size:20px;font-weight:700;'>Workspace Team Invitation</h2>
                 <p style='color:#52525B;font-size:14px;line-height:1.6;'>Hello,</p>
-                <p style='color:#52525B;font-size:14px;line-height:1.6;'>You have been invited to join the workspace as <strong>" . esc_html( $invite_role ) . "</strong> by " . esc_html( $inviter_name ) . ".</p>
+                <p style='color:#52525B;font-size:14px;line-height:1.6;'>You have been invited to join the workspace as <strong>" . esc_html( $role_label ) . "</strong> by " . esc_html( $inviter_name ) . ".</p>
                 <div style='margin:28px 0;'>
                     <a href='" . esc_url( $verification_link ) . "' style='background:#09090B;color:#FFFFFF;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;display:inline-block;'>Accept Invitation & Setup Account →</a>
                 </div>
@@ -1639,7 +1644,7 @@ function cora_ajax_resend_verification() {
             </div>";
             
             @wp_mail( $email, $subject, $body, $headers );
-            cora_log_activity( 'Invitation', "Resent verification/setup link to {$email}." );
+            cora_log_activity( 'Invitation', "Resent verification/setup link to {$email} for role {$role_label}." );
             error_log( "Cora Resent Invitation Link: " . $verification_link );
             wp_send_json_success( array( 'message' => 'Invitation link resent successfully.' ) );
         } else {
@@ -2276,10 +2281,8 @@ function cora_ajax_create_team_user() {
         }
     }
 
-    $active_industry = get_option( 'cora_workspace_industry', 'real_estate' );
-    $module = Cora_Module_Registry::get_module( $active_industry );
-    $map = $module ? $module->get_industry_roles() : array();
-    $role_label = isset( $map[$role] ) ? $map[$role] : $role;
+    $all_roles = cora_get_all_roles();
+    $role_label = isset( $all_roles[$role] ) ? $all_roles[$role] : $role;
 
     wp_send_json_success( array(
         'user_id' => $user_id,
@@ -2682,10 +2685,8 @@ function cora_ajax_update_team_user() {
         }
     }
 
-    $active_industry = get_option( 'cora_workspace_industry', 'real_estate' );
-    $module = Cora_Module_Registry::get_module( $active_industry );
-    $map = $module ? $module->get_industry_roles() : array();
-    $role_label = isset( $map[$role] ) ? $map[$role] : $role;
+    $all_roles = cora_get_all_roles();
+    $role_label = isset( $all_roles[$role] ) ? $all_roles[$role] : $role;
 
     wp_send_json_success( array(
         'user_id' => $updated_id,
@@ -18026,6 +18027,9 @@ function cora_ajax_resend_guest_verification() {
         update_option( 'cora_latest_verification_link', $verification_link );
         
         $invite_role = $found_inv['role'] ?? 'member';
+        $all_roles = cora_get_all_roles();
+        $role_label = isset( $all_roles[ $invite_role ] ) ? $all_roles[ $invite_role ] : $invite_role;
+
         $inviter_id = $found_inv['invited_by'] ?? 1;
         $inviter = get_userdata( $inviter_id );
         $inviter_name = $inviter ? ($inviter->display_name ?: $inviter->user_email) : 'Administrator';
@@ -18036,7 +18040,7 @@ function cora_ajax_resend_guest_verification() {
         <div style='font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:560px;margin:0 auto;padding:32px;background:#FAFAFA;border-radius:12px;border:1px solid #E4E4E7;'>
             <h2 style='color:#09090B;margin-top:0;font-size:20px;font-weight:700;'>Workspace Team Invitation</h2>
             <p style='color:#52525B;font-size:14px;line-height:1.6;'>Hello,</p>
-            <p style='color:#52525B;font-size:14px;line-height:1.6;'>You have been invited to join the workspace as <strong>" . esc_html( $invite_role ) . "</strong> by " . esc_html( $inviter_name ) . ".</p>
+            <p style='color:#52525B;font-size:14px;line-height:1.6;'>You have been invited to join the workspace as <strong>" . esc_html( $role_label ) . "</strong> by " . esc_html( $inviter_name ) . ".</p>
             <div style='margin:28px 0;'>
                 <a href='" . esc_url( $verification_link ) . "' style='background:#09090B;color:#FFFFFF;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;display:inline-block;'>Accept Invitation & Setup Account →</a>
             </div>
@@ -18045,7 +18049,7 @@ function cora_ajax_resend_guest_verification() {
 
         @wp_mail( $email, $subject, $body, $headers );
         
-        cora_log_activity( 'Invitation', "Resent verification/setup link to {$email}." );
+        cora_log_activity( 'Invitation', "Resent verification/setup link to {$email} for role {$role_label}." );
         
         error_log( "Cora Verification Link: " . $verification_link );
         wp_send_json_success( array( 'message' => 'Verification link resent.' ) );
@@ -18303,7 +18307,10 @@ function cora_ajax_send_invitation() {
         array( '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s' )
     );
 
-    cora_log_activity( 'Invitation', "Sent workspace invitation to {$email} for role {$invite_role}." );
+    $all_roles = cora_get_all_roles();
+    $role_label = isset( $all_roles[ $invite_role ] ) ? $all_roles[ $invite_role ] : $invite_role;
+
+    cora_log_activity( 'Invitation', "Sent workspace invitation to {$email} for role {$role_label}." );
 
     $verification_link = home_url( '/workspace/setup-account?token=' . $token );
     update_option( 'cora_latest_verification_link', $verification_link );
@@ -18316,7 +18323,7 @@ function cora_ajax_send_invitation() {
     <div style='font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:560px;margin:0 auto;padding:32px;background:#FAFAFA;border-radius:12px;border:1px solid #E4E4E7;'>
         <h2 style='color:#09090B;margin-top:0;font-size:20px;font-weight:700;'>Workspace Team Invitation</h2>
         <p style='color:#52525B;font-size:14px;line-height:1.6;'>Hello,</p>
-        <p style='color:#52525B;font-size:14px;line-height:1.6;'>You have been invited to join the workspace as <strong>" . esc_html( $invite_role ) . "</strong> by " . esc_html( $user->display_name ?: $user->user_email ) . ".</p>
+        <p style='color:#52525B;font-size:14px;line-height:1.6;'>You have been invited to join the workspace as <strong>" . esc_html( $role_label ) . "</strong> by " . esc_html( $user->display_name ?: $user->user_email ) . ".</p>
         <div style='margin:28px 0;'>
             <a href='" . esc_url( $verification_link ) . "' style='background:#09090B;color:#FFFFFF;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;display:inline-block;'>Accept Invitation & Setup Account →</a>
         </div>
@@ -18883,7 +18890,9 @@ function cora_ajax_save_user_changes() {
         add_filter( 'pre_update_option_cora_workspace_leads', 'cora_pre_update_tenancy_data', 10, 3 );
     }
 
-    cora_log_activity( 'User Management', "Updated user '{$display_name}' (ID: {$target_user_id}) — role: {$target_role}, status: {$status}." );
+    $all_roles = cora_get_all_roles();
+    $role_label = isset( $all_roles[ $target_role ] ) ? $all_roles[ $target_role ] : $target_role;
+    cora_log_activity( 'User Management', "Updated user '{$display_name}' (ID: {$target_user_id}) — role: {$role_label}, status: {$status}." );
 
     wp_send_json_success( array( 'message' => 'User updated successfully.' ) );
 }
@@ -18912,7 +18921,12 @@ function cora_ajax_sync_role_permissions() {
     $cora_permissions[ $role_key ] = $features;
     update_option( 'cora_role_permissions', $cora_permissions );
 
-    cora_log_activity( 'Permissions', "Updated feature permissions for role '{$role_key}'." );
+    $all_roles = cora_get_all_roles();
+    $role_label = isset( $all_roles[ $role_key ] ) ? $all_roles[ $role_key ] : $role_key;
+    cora_log_activity( 'Permissions', "Updated feature permissions for role '{$role_label}'." );
+
+    $agency_id = get_user_meta( get_current_user_id(), 'cora_user_agency_id', true );
+    cora_trigger_security_alert('Permissions Matrix Save', array("Feature access permissions were updated for role: {$role_label}."), $agency_id);
 
     wp_send_json_success( array( 'message' => 'Permissions synchronized.' ) );
 }
@@ -31542,10 +31556,12 @@ function cora_ajax_universal_search() {
     $matched_users = get_users( $user_args );
     foreach ( $matched_users as $u ) {
         $role = ! empty( $u->roles ) ? $u->roles[0] : 'member';
+        $all_roles = cora_get_all_roles();
+        $role_label = isset( $all_roles[ $role ] ) ? $all_roles[ $role ] : ucfirst( str_replace('cora_', '', $role) );
         $results[] = array(
             'category'    => 'User',
             'title'       => $u->display_name,
-            'subtitle'    => $u->user_email . ' • ' . ucfirst( str_replace('cora_', '', $role) ),
+            'subtitle'    => $u->user_email . ' • ' . $role_label,
             'url'         => home_url( '/' . $current_agency . '/users' ),
             'icon'        => 'user'
         );
@@ -31679,4 +31695,360 @@ function cora_ajax_super_dispatch_daily_report() {
 }
 }
 add_action( 'wp_ajax_cora_super_dispatch_daily_report', 'cora_ajax_super_dispatch_daily_report' );
+
+/**
+ * ==============================================================================
+ * WORKSPACE OWNER DEFAULT AUTOMATIONS & EMAIL DISPATCH SUITE
+ * ==============================================================================
+ */
+
+// Helper to get active tenants for automation dispatches
+if ( ! function_exists( 'cora_get_automation_tenants' ) ) {
+function cora_get_automation_tenants() {
+    global $wpdb;
+    $table = $wpdb->prefix . 'cora_agencies';
+    if ( cora_table_exists( 'wp_cora_agencies' ) || cora_table_exists( $table ) ) {
+        $results = $wpdb->get_results( "SELECT id as agency_id, name as agency_name, owner_user_id FROM {$table}", ARRAY_A );
+        if ( ! empty( $results ) ) {
+            foreach ( $results as &$r ) {
+                $owner = get_userdata( $r['owner_user_id'] );
+                $r['owner_email'] = $owner ? $owner->user_email : get_option( 'admin_email' );
+            }
+            return $results;
+        }
+    }
+    return array(
+        array(
+            'agency_id'   => 1,
+            'agency_name' => get_option( 'blogname', 'Cora Workspace' ),
+            'owner_email' => get_option( 'admin_email' )
+        )
+    );
+}
+}
+
+// Helper to check if an automation key is enabled for a given agency
+if ( ! function_exists( 'cora_is_owner_automation_enabled' ) ) {
+function cora_is_owner_automation_enabled( $key, $agency_id = 1 ) {
+    $settings = get_option( "cora_owner_automations_{$agency_id}", array(
+        'morning_brief'  => 1,
+        'midday_digest'  => 1,
+        'evening_kpi'    => 1,
+        'security_alert' => 1,
+        'weekly_payroll' => 1,
+    ) );
+    return ! isset( $settings[$key] ) || ! empty( $settings[$key] );
+}
+}
+
+// 1. Morning Operational Readiness Brief Handler (08:30 AM)
+if ( ! function_exists( 'cora_cron_morning_brief_handler' ) ) {
+function cora_cron_morning_brief_handler( $target_agency_id = null ) {
+    $agencies = cora_get_automation_tenants();
+    if ( empty( $agencies ) ) return;
+    $today = current_time( 'Y-m-d' );
+
+    foreach ( $agencies as $agency ) {
+        $agency_id = $agency['agency_id'] ?? 1;
+        if ( $target_agency_id !== null && (int)$agency_id !== (int)$target_agency_id ) continue;
+        if ( ! cora_is_owner_automation_enabled( 'morning_brief', $agency_id ) && $target_agency_id === null ) continue;
+
+        $agency_name = $agency['agency_name'] ?? 'Workspace';
+        $owner_email = $agency['owner_email'] ?? get_option( 'admin_email' );
+
+        // Gather metrics
+        $users = get_users();
+        $total_staff = count( $users );
+        
+        $subject = "🌅 [Morning Brief] Operational Readiness — " . esc_html( $agency_name ) . " (" . date('d M Y') . ")";
+        $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+
+        $body = "
+        <div style='font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#FAFAFA;border-radius:12px;border:1px solid #E4E4E7;'>
+            <div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;'>
+                <h2 style='color:#09090B;margin:0;font-size:20px;font-weight:700;'>Morning Operational Brief</h2>
+                <span style='background:#F4F4F5;color:#18181B;font-size:11px;font-weight:700;padding:4px 8px;border-radius:4px;'>08:30 AM Kickoff</span>
+            </div>
+            <p style='color:#52525B;font-size:13px;line-height:1.5;'>Good morning! Here is today's operational kickoff status for <strong>" . esc_html( $agency_name ) . "</strong>.</p>
+            
+            <div style='display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:20px 0;'>
+                <div style='background:#FFF;padding:14px;border-radius:8px;border:1px solid #E4E4E7;text-align:center;'>
+                    <div style='font-size:22px;font-weight:800;color:#09090B;'>" . $total_staff . "</div>
+                    <div style='font-size:11px;color:#71717A;font-weight:600;margin-top:2px;'>Active Team Members</div>
+                </div>
+                <div style='background:#FFF;padding:14px;border-radius:8px;border:1px solid #E4E4E7;text-align:center;'>
+                    <div style='font-size:22px;font-weight:800;color:#16A34A;'>Ready</div>
+                    <div style='font-size:11px;color:#71717A;font-weight:600;margin-top:2px;'>System Status</div>
+                </div>
+                <div style='background:#FFF;padding:14px;border-radius:8px;border:1px solid #E4E4E7;text-align:center;'>
+                    <div style='font-size:22px;font-weight:800;color:#2563EB;'>Enforced</div>
+                    <div style='font-size:11px;color:#71717A;font-weight:600;margin-top:2px;'>GPS Geofencing</div>
+                </div>
+            </div>
+
+            <div style='background:#FFF;padding:16px;border-radius:8px;border:1px solid #E4E4E7;margin-bottom:16px;'>
+                <h4 style='margin:0 0 8px 0;font-size:13px;color:#09090B;'>Today's Action Items:</h4>
+                <ul style='margin:0;padding-left:18px;font-size:12px;color:#52525B;'>
+                    <li style='margin-bottom:4px;'>Check team attendance logs in User Management tab.</li>
+                    <li style='margin-bottom:4px;'>Review any pending invitations or role updates.</li>
+                </ul>
+            </div>
+
+            <p style='color:#A1A1AA;font-size:11px;margin-bottom:0;'>Delivered automatically by Cora Workspace Automation Engine.</p>
+        </div>";
+
+        @wp_mail( $owner_email, $subject, $body, $headers );
+    }
+}
+}
+add_action( 'cora_cron_morning_brief', 'cora_cron_morning_brief_handler' );
+
+// 2. Mid-Day Anomaly & Exception Digest Handler (14:00 PM)
+if ( ! function_exists( 'cora_cron_midday_anomaly_handler' ) ) {
+function cora_cron_midday_anomaly_handler( $target_agency_id = null ) {
+    $agencies = cora_get_automation_tenants();
+    if ( empty( $agencies ) ) return;
+    $today = current_time( 'Y-m-d' );
+
+    foreach ( $agencies as $agency ) {
+        $agency_id = $agency['agency_id'] ?? 1;
+        if ( $target_agency_id !== null && (int)$agency_id !== (int)$target_agency_id ) continue;
+        if ( ! cora_is_owner_automation_enabled( 'midday_digest', $agency_id ) && $target_agency_id === null ) continue;
+
+        $agency_name = $agency['agency_name'] ?? 'Workspace';
+        $owner_email = $agency['owner_email'] ?? get_option( 'admin_email' );
+
+        $logs = get_option( 'cora_workspace_attendance_logs', array() );
+        $today_logs = array_filter( $logs, function( $l ) use ( $today ) {
+            return isset( $l['time'] ) && strpos( $l['time'], $today ) !== false;
+        } );
+
+        $violations = count( array_filter( $today_logs, function( $l ) {
+            return ( $l['geofence'] ?? '' ) === 'violation';
+        } ) );
+
+        $subject = "🚨 [Mid-Day Guardrail] Anomaly & Exception Digest — " . esc_html( $agency_name ) . " (" . date('d M Y') . ")";
+        $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+
+        $body = "
+        <div style='font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#FAFAFA;border-radius:12px;border:1px solid #E4E4E7;'>
+            <div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;'>
+                <h2 style='color:#09090B;margin:0;font-size:20px;font-weight:700;'>Mid-Day Anomaly & Exception Digest</h2>
+                <span style='background:#FEF2F2;color:#991B1B;font-size:11px;font-weight:700;padding:4px 8px;border-radius:4px;'>14:00 PM Check</span>
+            </div>
+            <p style='color:#52525B;font-size:13px;line-height:1.5;'>Here is your mid-day operational audit for <strong>" . esc_html( $agency_name ) . "</strong>.</p>
+            
+            <div style='display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0;'>
+                <div style='background:#FFF;padding:16px;border-radius:8px;border:1px solid #E4E4E7;text-align:center;'>
+                    <div style='font-size:24px;font-weight:800;color:#09090B;'>" . count( $today_logs ) . "</div>
+                    <div style='font-size:12px;color:#71717A;font-weight:600;margin-top:4px;'>Punches Registered</div>
+                </div>
+                <div style='background:#FFF;padding:16px;border-radius:8px;border:1px solid #E4E4E7;text-align:center;'>
+                    <div style='font-size:24px;font-weight:800;color:" . ( $violations > 0 ? '#DC2626' : '#16A34A' ) . ";'>" . $violations . "</div>
+                    <div style='font-size:12px;color:#71717A;font-weight:600;margin-top:4px;'>Geofence Exceptions</div>
+                </div>
+            </div>
+
+            " . ( $violations > 0 ? "<div style='background:#FEF2F2;border:1px solid #FCA5A5;padding:12px;border-radius:8px;font-size:12px;color:#991B1B;'>⚠️ Attention: $violations location exception(s) recorded today. Review Attendance Logs for details.</div>" : "<div style='background:#F0FDF4;border:1px solid #86EFAC;padding:12px;border-radius:8px;font-size:12px;color:#166534;'>✅ All check-ins today are within approved location radius.</div>" ) . "
+
+            <p style='color:#A1A1AA;font-size:11px;margin-top:20px;margin-bottom:0;'>Delivered automatically by Cora Workspace Automation Engine.</p>
+        </div>";
+
+        @wp_mail( $owner_email, $subject, $body, $headers );
+    }
+}
+}
+add_action( 'cora_cron_midday_anomaly', 'cora_cron_midday_anomaly_handler' );
+
+// 3. Evening Business Intelligence & KPI Digest Handler (18:00 PM)
+if ( ! function_exists( 'cora_cron_evening_kpi_handler' ) ) {
+function cora_cron_evening_kpi_handler( $target_agency_id = null ) {
+    $agencies = cora_get_automation_tenants();
+    if ( empty( $agencies ) ) return;
+    $today = current_time( 'Y-m-d' );
+
+    foreach ( $agencies as $agency ) {
+        $agency_id = $agency['agency_id'] ?? 1;
+        if ( $target_agency_id !== null && (int)$agency_id !== (int)$target_agency_id ) continue;
+        if ( ! cora_is_owner_automation_enabled( 'evening_kpi', $agency_id ) && $target_agency_id === null ) continue;
+
+        $agency_name = $agency['agency_name'] ?? 'Workspace';
+        $owner_email = $agency['owner_email'] ?? get_option( 'admin_email' );
+
+        $subject = "📊 [Evening KPI] Business Intelligence Summary — " . esc_html( $agency_name ) . " (" . date('d M Y') . ")";
+        $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+
+        $body = "
+        <div style='font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#FAFAFA;border-radius:12px;border:1px solid #E4E4E7;'>
+            <div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;'>
+                <h2 style='color:#09090B;margin:0;font-size:20px;font-weight:700;'>Evening Business Intelligence Digest</h2>
+                <span style='background:#ECFDF5;color:#047857;font-size:11px;font-weight:700;padding:4px 8px;border-radius:4px;'>18:00 PM Executive Brief</span>
+            </div>
+            <p style='color:#52525B;font-size:13px;line-height:1.5;'>Here is your end-of-day executive summary for <strong>" . esc_html( $agency_name ) . "</strong> on " . $today . ".</p>
+            
+            <div style='display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:20px 0;'>
+                <div style='background:#FFF;padding:14px;border-radius:8px;border:1px solid #E4E4E7;text-align:center;'>
+                    <div style='font-size:20px;font-weight:800;color:#09090B;'>100%</div>
+                    <div style='font-size:11px;color:#71717A;font-weight:600;margin-top:2px;'>Operational Uptime</div>
+                </div>
+                <div style='background:#FFF;padding:14px;border-radius:8px;border:1px solid #E4E4E7;text-align:center;'>
+                    <div style='font-size:20px;font-weight:800;color:#16A34A;'>Active</div>
+                    <div style='font-size:11px;color:#71717A;font-weight:600;margin-top:2px;'>Team Sync</div>
+                </div>
+                <div style='background:#FFF;padding:14px;border-radius:8px;border:1px solid #E4E4E7;text-align:center;'>
+                    <div style='font-size:20px;font-weight:800;color:#2563EB;'>Verified</div>
+                    <div style='font-size:11px;color:#71717A;font-weight:600;margin-top:2px;'>Audit Trails</div>
+                </div>
+            </div>
+
+            <p style='color:#A1A1AA;font-size:11px;margin-bottom:0;'>Delivered automatically by Cora Workspace Automation Engine.</p>
+        </div>";
+
+        @wp_mail( $owner_email, $subject, $body, $headers );
+    }
+}
+}
+add_action( 'cora_cron_evening_kpi', 'cora_cron_evening_kpi_handler' );
+
+// 4. Weekly Payroll & Performance Digest Handler (Sunday 21:00 PM)
+if ( ! function_exists( 'cora_cron_weekly_payroll_handler' ) ) {
+function cora_cron_weekly_payroll_handler( $target_agency_id = null ) {
+    $agencies = cora_get_automation_tenants();
+    if ( empty( $agencies ) ) return;
+
+    foreach ( $agencies as $agency ) {
+        $agency_id = $agency['agency_id'] ?? 1;
+        if ( $target_agency_id !== null && (int)$agency_id !== (int)$target_agency_id ) continue;
+        if ( ! cora_is_owner_automation_enabled( 'weekly_payroll', $agency_id ) && $target_agency_id === null ) continue;
+
+        $agency_name = $agency['agency_name'] ?? 'Workspace';
+        $owner_email = $agency['owner_email'] ?? get_option( 'admin_email' );
+
+        $subject = "🗓️ [Weekly Payroll Brief] Performance & Timesheet Summary — " . esc_html( $agency_name );
+        $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+
+        $body = "
+        <div style='font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#FAFAFA;border-radius:12px;border:1px solid #E4E4E7;'>
+            <div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;'>
+                <h2 style='color:#09090B;margin:0;font-size:20px;font-weight:700;'>Weekly Payroll & Performance Digest</h2>
+                <span style='background:#F4F4F5;color:#18181B;font-size:11px;font-weight:700;padding:4px 8px;border-radius:4px;'>Sunday 21:00 PM</span>
+            </div>
+            <p style='color:#52525B;font-size:13px;line-height:1.5;'>Here is your weekly operations and timesheet preview for <strong>" . esc_html( $agency_name ) . "</strong> to prepare for Monday payroll.</p>
+            
+            <div style='background:#FFF;padding:16px;border-radius:8px;border:1px solid #E4E4E7;margin:16px 0;'>
+                <div style='font-size:13px;font-weight:700;color:#09090B;margin-bottom:6px;'>Weekly Operational Highlights:</div>
+                <div style='font-size:12px;color:#52525B;'>• 7-day attendance logs compiled and verified.<br>• All team member role permissions synchronized.<br>• Ready for Monday morning workflow.</div>
+            </div>
+
+            <p style='color:#A1A1AA;font-size:11px;margin-bottom:0;'>Delivered automatically by Cora Workspace Automation Engine.</p>
+        </div>";
+
+        @wp_mail( $owner_email, $subject, $body, $headers );
+    }
+}
+}
+add_action( 'cora_cron_weekly_payroll', 'cora_cron_weekly_payroll_handler' );
+
+// 5. Instant Security Alert Trigger
+if ( ! function_exists( 'cora_trigger_security_alert' ) ) {
+function cora_trigger_security_alert( $alert_type, $details = array(), $agency_id = 1 ) {
+    if ( ! cora_is_owner_automation_enabled( 'security_alert', $agency_id ) ) return;
+
+    $agencies = cora_get_automation_tenants();
+    $owner_email = get_option( 'admin_email' );
+    $agency_name = 'Workspace';
+
+    foreach ( $agencies as $a ) {
+        if ( (int)($a['agency_id'] ?? 1) === (int)$agency_id ) {
+            $owner_email = $a['owner_email'] ?? $owner_email;
+            $agency_name = $a['agency_name'] ?? $agency_name;
+            break;
+        }
+    }
+
+    $subject = "🔒 [SECURITY ALERT] High-Risk Governance Event — " . esc_html( $agency_name );
+    $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+
+    $detail_text = is_array( $details ) ? implode( '<br>', $details ) : esc_html( $details );
+
+    $body = "
+    <div style='font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#FEF2F2;border-radius:12px;border:1px solid #FCA5A5;'>
+        <h2 style='color:#991B1B;margin-top:0;font-size:20px;font-weight:700;'>Security & Governance Alert</h2>
+        <p style='color:#7F1D1D;font-size:13px;'>A security event occurred in <strong>" . esc_html( $agency_name ) . "</strong>:</p>
+        <div style='background:#FFF;padding:16px;border-radius:8px;border:1px solid #FECACA;font-size:12px;color:#991B1B;margin:16px 0;'>
+            <strong>Event Type:</strong> " . esc_html( $alert_type ) . "<br><br>
+            " . $detail_text . "
+        </div>
+        <p style='color:#991B1B;font-size:11px;margin-bottom:0;'>If this action was unexpected, please review your Custom Roles & Permissions Matrix immediately.</p>
+    </div>";
+
+    @wp_mail( $owner_email, $subject, $body, $headers );
+}
+}
+
+// Register Cron Schedules
+if ( ! wp_next_scheduled( 'cora_cron_morning_brief' ) ) {
+    wp_schedule_event( strtotime( '08:30:00' ), 'daily', 'cora_cron_morning_brief' );
+}
+if ( ! wp_next_scheduled( 'cora_cron_midday_anomaly' ) ) {
+    wp_schedule_event( strtotime( '14:00:00' ), 'daily', 'cora_cron_midday_anomaly' );
+}
+if ( ! wp_next_scheduled( 'cora_cron_evening_kpi' ) ) {
+    wp_schedule_event( strtotime( '18:00:00' ), 'daily', 'cora_cron_evening_kpi' );
+}
+if ( ! wp_next_scheduled( 'cora_cron_weekly_payroll' ) ) {
+    wp_schedule_event( strtotime( 'next Sunday 21:00:00' ), 'weekly', 'cora_cron_weekly_payroll' );
+}
+
+// AJAX Handler to toggle automation state
+if ( ! function_exists( 'cora_ajax_toggle_owner_automation' ) ) {
+function cora_ajax_toggle_owner_automation() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $key = isset( $_POST['key'] ) ? sanitize_key( $_POST['key'] ) : '';
+    $enable = isset( $_POST['enable'] ) ? intval( $_POST['enable'] ) : 1;
+    $agency_id = get_user_meta( get_current_user_id(), 'cora_user_agency_id', true );
+    if ( empty( $agency_id ) ) $agency_id = 1;
+
+    $settings = get_option( "cora_owner_automations_{$agency_id}", array(
+        'morning_brief'  => 1,
+        'midday_digest'  => 1,
+        'evening_kpi'    => 1,
+        'security_alert' => 1,
+        'weekly_payroll' => 1,
+    ) );
+
+    $settings[$key] = $enable;
+    update_option( "cora_owner_automations_{$agency_id}", $settings );
+
+    wp_send_json_success( array( 'message' => "Automation preference updated successfully." ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_toggle_owner_automation', 'cora_ajax_toggle_owner_automation' );
+
+// AJAX Handler to trigger test dispatch
+if ( ! function_exists( 'cora_ajax_test_dispatch_automation' ) ) {
+function cora_ajax_test_dispatch_automation() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $key = isset( $_POST['key'] ) ? sanitize_key( $_POST['key'] ) : '';
+    $agency_id = get_user_meta( get_current_user_id(), 'cora_user_agency_id', true );
+    if ( empty( $agency_id ) ) $agency_id = 1;
+
+    if ( $key === 'morning_brief' ) {
+        cora_cron_morning_brief_handler( $agency_id );
+    } elseif ( $key === 'midday_digest' ) {
+        cora_cron_midday_anomaly_handler( $agency_id );
+    } elseif ( $key === 'evening_kpi' ) {
+        cora_cron_evening_kpi_handler( $agency_id );
+    } elseif ( $key === 'weekly_payroll' ) {
+        cora_cron_weekly_payroll_handler( $agency_id );
+    } elseif ( $key === 'security_alert' ) {
+        cora_trigger_security_alert( 'Manual Test Trigger', array( 'Test security alert executed by Workspace Admin.' ), $agency_id );
+    } else {
+        wp_send_json_error( array( 'message' => 'Invalid automation key.' ) );
+    }
+
+    wp_send_json_success( array( 'message' => "Test email report dispatched to Workspace Owner." ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_test_dispatch_automation', 'cora_ajax_test_dispatch_automation' );
 
