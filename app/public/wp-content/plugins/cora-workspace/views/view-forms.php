@@ -3160,12 +3160,16 @@ function renderFormsList() {
         jQuery.ajax({
             url: getCoraRestUrl('cora/v1/forms'),
             method: 'POST',
+            dataType: 'json',
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-WP-Nonce', wpNonce);
             },
             data: JSON.stringify(currentEditingForm),
             contentType: 'application/json',
             success: function(res) {
+                if (typeof res === 'string') {
+                    try { res = JSON.parse(res); } catch(e) {}
+                }
                 if (res && res.id) {
                     currentEditingForm.id = res.id;
                     if (res.form_key) currentEditingForm.form_key = res.form_key;
@@ -4225,13 +4229,23 @@ function renderFormsList() {
         let siteUrl = (typeof coraREData !== 'undefined' && coraREData.siteUrl) ? coraREData.siteUrl : '';
         if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
 
+        // If form is already saved (has ID or form_key) and not dirty, view immediately in new tab
+        if (currentEditingForm.id && (currentEditingForm.form_key || currentEditingForm.id) && !window._formIsDirty) {
+            const formKey = currentEditingForm.form_key || currentEditingForm.id;
+            window.open(siteUrl + '/shared-form/' + formKey, '_blank');
+            return;
+        }
+
         // Pre-open blank tab synchronously in direct response to user gesture to prevent popup blocking
         const win = window.open('about:blank', '_blank');
 
         window.coraShowToast && window.coraShowToast("Publishing form to generate preview...", "info");
         saveFormInternal(true, (res) => {
-            if (res && (res.form_key || res.id)) {
-                const formKey = res.form_key || res.id;
+            if (typeof res === 'string') {
+                try { res = JSON.parse(res); } catch(e) {}
+            }
+            const formKey = (res && (res.form_key || res.id)) || currentEditingForm.form_key || currentEditingForm.id;
+            if (formKey) {
                 const targetUrl = siteUrl + '/shared-form/' + formKey;
                 if (win) {
                     win.location.href = targetUrl;
@@ -4271,13 +4285,17 @@ function renderFormsList() {
             }
         };
 
-        if (currentEditingForm.id) {
+        if (currentEditingForm.id && (currentEditingForm.form_key || currentEditingForm.id)) {
             populateAndShowModal(currentEditingForm);
         } else {
             window.coraShowToast && window.coraShowToast("Publishing form to generate share link...", "info");
             saveFormInternal(true, (res) => {
-                if (res && (res.form_key || res.id)) {
-                    populateAndShowModal(res);
+                if (typeof res === 'string') {
+                    try { res = JSON.parse(res); } catch(e) {}
+                }
+                const formObj = (res && (res.form_key || res.id)) ? res : currentEditingForm;
+                if (formObj && (formObj.form_key || formObj.id)) {
+                    populateAndShowModal(formObj);
                 }
             });
         }
