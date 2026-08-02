@@ -1,7 +1,7 @@
 {
     "name": "Cora Workspace Platform",
     "slug": "cora-workspace",
-    "version": "2.9.91",
+    "version": "2.9.92",
     "download_url": "https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-workspace.zip",
     "tested": "6.7",
     "sections": {
