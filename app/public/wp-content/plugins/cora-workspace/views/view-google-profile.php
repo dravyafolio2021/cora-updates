@@ -243,9 +243,15 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
         </div>
         
         <!-- Footer -->
-        <div class="p-5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/40 flex items-center justify-end gap-3 font-extrabold">
-            <button onclick="coraGbpToggleKeysPanel()" class="px-4 py-2 border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-850 hover:bg-zinc-50 dark:hover:bg-zinc-750 text-zinc-700 dark:text-zinc-300 rounded-lg text-xs transition-colors cursor-pointer border-0 shadow-xs">Cancel</button>
-            <button onclick="coraGbpSaveApiKeys()" class="px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-extrabold rounded-xl transition-colors shadow-sm flex items-center gap-2 cursor-pointer border-0">Save Changes</button>
+        <div class="p-5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/40 flex items-center justify-between gap-3 font-extrabold">
+            <button onclick="coraGbpAuthorizeDemo()" type="button" class="px-3.5 py-2 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 rounded-xl text-xs transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                1-Click Demo Setup
+            </button>
+            <div class="flex items-center gap-2">
+                <button onclick="coraGbpToggleKeysPanel()" class="px-4 py-2 border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-850 hover:bg-zinc-50 dark:hover:bg-zinc-750 text-zinc-700 dark:text-zinc-300 rounded-lg text-xs transition-colors cursor-pointer border-0 shadow-xs">Cancel</button>
+                <button onclick="coraGbpSaveApiKeys()" class="px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-extrabold rounded-xl transition-colors shadow-sm flex items-center gap-2 cursor-pointer border-0">Save Changes</button>
+            </div>
         </div>
     </div>
 </div>
@@ -498,12 +504,31 @@ window.coraGbpSaveApiKeys = function() {
         $('#cora-gbp-keys-panel').removeClass('drawer-open');
         setTimeout(function() { window.location.reload(); }, 600);
     });
+window.coraGbpAuthorizeDemo = function() {
+    window.coraShowToast("Authorizing Demo Business Listing...");
+    $.post(coraREData.ajaxUrl, {
+        action: 'cora_gbp_authorize_demo',
+        security: coraREData.ajaxNonce
+    }, function(res) {
+        if (res.success) {
+            window.coraShowToast("Demo Business Listing Connected!");
+            setTimeout(function() { window.location.reload(); }, 400);
+        } else {
+            window.coraShowToast(res.data.message || 'Failed to connect demo listing.');
+        }
+    });
 };
 
 window.coraGbpConnectPlatformGoogleOAuth = function() {
     var clientId = "<?php echo esc_js($cora_gbp_client_id); ?>";
     if (!clientId) {
-        window.coraShowToast("Google Platform OAuth Client ID is missing.");
+        window.coraShowToast("Google Client ID required. Opening API credentials configuration...");
+        if (typeof window.coraGbpToggleKeysPanel === 'function') {
+            window.coraGbpToggleKeysPanel();
+            setTimeout(function() {
+                $('#cora-gbp-input-client-id').focus();
+            }, 300);
+        }
         return;
     }
     var redirectUri = encodeURIComponent("<?php echo home_url('/workspace/auth/google/callback'); ?>");
