@@ -117,12 +117,14 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
         justify-content: flex-end !important;
         opacity: 0 !important;
         pointer-events: none !important;
-        transition: opacity 0.3s ease !important;
+        visibility: hidden !important;
+        transition: opacity 0.3s ease, visibility 0.3s ease !important;
     }
 
     .cora-drawer-overlay.drawer-open {
         opacity: 1 !important;
         pointer-events: auto !important;
+        visibility: visible !important;
     }
 
     .cora-drawer-sheet {
@@ -504,6 +506,8 @@ window.coraGbpSaveApiKeys = function() {
         $('#cora-gbp-keys-panel').removeClass('drawer-open');
         setTimeout(function() { window.location.reload(); }, 600);
     });
+};
+
 window.coraGbpAuthorizeDemo = function() {
     window.coraShowToast("Authorizing Demo Business Listing...");
     $.post(coraREData.ajaxUrl, {

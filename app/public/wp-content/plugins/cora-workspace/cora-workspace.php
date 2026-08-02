@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: Cora Workspace Platform
- * Plugin URI: https://cora.ai
- * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, onboarding, and auto-updates.
- * Version: 2.9.93
- * Author: Cora AI Team
- * Author URI: https://cora.ai
+ * Plugin URI: https://heycora.in
+ * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
+ * Version: 2.9.94
+ * Author: Cora Studio Platform Team
+ * Author URI: https://heycora.in
  * License: GPL2
  */
 
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.9.93' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.94' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
