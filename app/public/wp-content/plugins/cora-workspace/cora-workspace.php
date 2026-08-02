@@ -7227,7 +7227,7 @@ function cora_current_user_can_manage_leads() {
         return false;
     }
     $user = wp_get_current_user();
-    $allowed_roles = array( 'administrator', 'cora_manager' );
+    $allowed_roles = array( 'administrator', 'cora_manager', 'cora_super_admin' );
     foreach ( $allowed_roles as $role ) {
         if ( in_array( $role, (array) $user->roles ) ) {
             return true;
@@ -16420,6 +16420,29 @@ function cora_db_get_ledger() {
 
     $query .= " ORDER BY transaction_date DESC";
     $rows = $wpdb->get_results( $wpdb->prepare( $query, $params ), ARRAY_A );
+
+    if ( empty( $rows ) && ! get_option( 'cora_ledger_seeded_demo_agency_' . $agency_id ) ) {
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_ledger',
+            array(
+                'agency_id'        => $agency_id,
+                'branch_id'        => $branch_id ?: 1,
+                'type'             => 'inflow',
+                'amount'           => 1000000, // ₹10,000 in cents
+                'description'      => 'Demo Entry: Workspace Setup & Welcome Advance',
+                'lead_id'          => null,
+                'client_id'        => null,
+                'status'           => 'received',
+                'category'         => 'Inflows & Retainers',
+                'transaction_date' => date( 'Y-m-d' ),
+                'created_by'       => get_current_user_id() ?: 1,
+                'created_at'       => current_time( 'mysql' ),
+                'updated_at'       => current_time( 'mysql' )
+            )
+        );
+        update_option( 'cora_ledger_seeded_demo_agency_' . $agency_id, '1' );
+        $rows = $wpdb->get_results( $wpdb->prepare( $query, $params ), ARRAY_A );
+    }
 
     $mapped = array();
     if ( $rows ) {
@@ -27238,7 +27261,7 @@ function cora_ajax_get_financial_data() {
     $period         = isset( $_REQUEST['period'] ) ? sanitize_text_field( $_REQUEST['period'] ) : 'all';
     $start_date     = isset( $_REQUEST['start_date'] ) ? sanitize_text_field( $_REQUEST['start_date'] ) : '';
     $end_date       = isset( $_REQUEST['end_date'] ) ? sanitize_text_field( $_REQUEST['end_date'] ) : '';
-    $industry_scope = isset( $_REQUEST['industry_scope'] ) ? sanitize_text_field( $_REQUEST['industry_scope'] ) : 'all';
+    $industry_scope = isset( $_REQUEST['industry_scope'] ) ? sanitize_text_field( $_REQUEST['industry_scope'] ) : ( function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'all' );
     $status         = isset( $_REQUEST['status'] ) ? sanitize_text_field( $_REQUEST['status'] ) : '';
 
     // Read from the database ledger table instead of the option array
@@ -27321,8 +27344,16 @@ function cora_ajax_get_financial_data() {
         if ( null !== $end_ts   && $ts > 0 && $ts > $end_ts )   continue;
 
         $ind = strtolower( trim( $inv['industry'] ?? '' ) );
-        if ( $industry_scope !== 'all' && ! empty( $ind ) && $ind !== 'all' && $ind !== strtolower( $industry_scope ) ) {
-            continue;
+        if ( $industry_scope !== 'all' && ! empty( $ind ) && $ind !== 'all' ) {
+            $matches = false;
+            if ( $industry_scope === 'photography_studio' || $industry_scope === 'studio' ) {
+                $matches = ( $ind === 'studio' || $ind === 'photography_studio' );
+            } else {
+                $matches = ( $ind === 'real_estate' || $ind === 'realestate' );
+            }
+            if ( ! $matches ) {
+                continue;
+            }
         }
 
         $inv_status = strtolower( trim( $inv['status'] ?? 'unpaid' ) );
@@ -28956,6 +28987,191 @@ function cora_ajax_test_send_financial_report() {
 }
 }
 add_action( 'wp_ajax_cora_test_send_financial_report', 'cora_ajax_test_send_financial_report' );
+
+/**
+ * AJAX Endpoint: cora_ajax_get_crew_shifts
+ * Fetches crew shifts to pre-fill process payout details
+ */
+if ( ! function_exists( 'cora_ajax_get_crew_shifts' ) ) {
+function cora_ajax_get_crew_shifts() {
+    $nonce = sanitize_text_field( $_REQUEST['security'] ?? $_REQUEST['nonce'] ?? '' );
+    if ( $nonce && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+    }
+
+    $studio_shifts = get_option( 'cora_crew_shifts_photography_studio', array() );
+    $re_shifts     = get_option( 'cora_crew_shifts_real_estate', array() );
+    $fallback      = get_option( 'cora_crew_shifts', array() );
+
+    $all_shifts = array_merge(
+        is_array( $studio_shifts ) ? $studio_shifts : array(),
+        is_array( $re_shifts ) ? $re_shifts : array(),
+        is_array( $fallback ) ? $fallback : array()
+    );
+
+    wp_send_json_success( array_values( $all_shifts ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_get_crew_shifts', 'cora_ajax_get_crew_shifts' );
+add_action( 'wp_ajax_cora_get_crew_shifts', 'cora_ajax_get_crew_shifts' );
+
+/**
+ * AJAX Endpoint: cora_ajax_send_invoice_reminder
+ * Sends an email reminder for outstanding invoice balance
+ */
+if ( ! function_exists( 'cora_ajax_send_invoice_reminder' ) ) {
+function cora_ajax_send_invoice_reminder() {
+    $nonce = sanitize_text_field( $_REQUEST['security'] ?? $_REQUEST['nonce'] ?? '' );
+    if ( $nonce && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+    }
+
+    $invoice_id = sanitize_text_field( $_POST['invoice_id'] ?? '' );
+    $invoices   = get_option( 'cora_invoices', array() );
+    $invoice    = null;
+
+    foreach ( (array) $invoices as $inv ) {
+        if ( isset( $inv['id'] ) && $inv['id'] === $invoice_id ) {
+            $invoice = $inv;
+            break;
+        }
+    }
+
+    if ( ! $invoice ) {
+        wp_send_json_error( array( 'message' => 'Invoice not found.' ) );
+    }
+
+    $recipient = $invoice['client_email'] ?? '';
+    if ( ! $recipient ) {
+        wp_send_json_error( array( 'message' => 'Client email is missing.' ) );
+    }
+
+    $site_name = get_bloginfo( 'name' );
+    $subject   = sprintf( 'Payment Reminder: Invoice %s — %s', $invoice['invoice_number'], $site_name );
+
+    $body  = '<html><head><meta charset="utf-8"><style>';
+    $body .= 'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#F9F6F0;margin:0;padding:0;}';
+    $body .= '.wrap{max-width:600px;margin:40px auto;background:#fff;border:1px solid #e4e4e7;border-radius:12px;overflow:hidden;}';
+    $body .= '.header{background:#18181b;padding:24px;color:#fff;}';
+    $body .= '.header h2{margin:0;font-size:18px;}';
+    $body .= '.body{padding:24px;font-size:13px;color:#3f3f46;line-height:1.6;}';
+    $body .= '.kpi-box{background:#f4f4f5;border-radius:8px;padding:16px;margin:16px 0;}';
+    $body .= '</style></head><body>';
+    $body .= '<div class="wrap">';
+    $body .= '<div class="header"><h2>Payment Reminder from ' . esc_html( $site_name ) . '</h2></div>';
+    $body .= '<div class="body">';
+    $body .= '<p>Hi ' . esc_html( $invoice['client_name'] ) . ',</p>';
+    $body .= '<p>This is a friendly reminder that payment for invoice <strong>' . esc_html( $invoice['invoice_number'] ) . '</strong> is pending.</p>';
+    $body .= '<div class="kpi-box">';
+    $body .= '<strong>Service:</strong> ' . esc_html( $invoice['package_name'] ?? $invoice['description'] ?? 'Shoot Booking' ) . '<br>';
+    $body .= '<strong>Total Amount:</strong> ₹' . number_format( $invoice['total_amount'], 2 ) . '<br>';
+    $body .= '<strong>Due Date:</strong> ' . esc_html( $invoice['due_date'] ) . '<br>';
+    $body .= '<strong>Status:</strong> ' . esc_html( ucfirst( $invoice['status'] ) ) . '<br>';
+    $body .= '</div>';
+    $body .= '<p>Please process the payment at your earliest convenience. Thank you!</p>';
+    $body .= '</div></div></body></html>';
+
+    $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+    $sent    = wp_mail( $recipient, $subject, $body, $headers );
+
+    if ( $sent ) {
+        wp_send_json_success( array( 'message' => 'Reminder email sent to ' . $recipient ) );
+    } else {
+        wp_send_json_error( array( 'message' => 'Failed to send email. Check mail settings.' ) );
+    }
+}
+}
+add_action( 'wp_ajax_cora_ajax_send_invoice_reminder', 'cora_ajax_send_invoice_reminder' );
+add_action( 'wp_ajax_cora_send_invoice_reminder', 'cora_ajax_send_invoice_reminder' );
+
+/**
+ * AJAX Endpoint: cora_ajax_update_invoice_status
+ * Updates invoice status and auto-logs reconciliation in ledger
+ */
+if ( ! function_exists( 'cora_ajax_update_invoice_status' ) ) {
+function cora_ajax_update_invoice_status() {
+    $nonce = sanitize_text_field( $_REQUEST['security'] ?? $_REQUEST['nonce'] ?? '' );
+    if ( $nonce && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ), 403 );
+    }
+
+    $invoice_id = sanitize_text_field( $_POST['invoice_id'] ?? '' );
+    $status     = sanitize_text_field( $_POST['status'] ?? 'paid' );
+
+    $invoices = get_option( 'cora_invoices', array() );
+    $updated  = false;
+    $target_invoice = null;
+
+    foreach ( $invoices as $key => $inv ) {
+        if ( isset( $inv['id'] ) && $inv['id'] === $invoice_id ) {
+            $invoices[$key]['status'] = $status;
+            $invoices[$key]['due_balance'] = ( $status === 'paid' ) ? 0.0 : $inv['total_amount'];
+            $updated  = true;
+            $target_invoice = $invoices[$key];
+            break;
+        }
+    }
+
+    if ( $updated ) {
+        update_option( 'cora_invoices', $invoices );
+
+        // Coworker reconciliation: automatically generate cash inflow ledger entry
+        if ( $status === 'paid' && $target_invoice ) {
+            global $wpdb;
+            $agency_id    = cora_db_get_agency_id();
+            $branch_id    = cora_db_get_branch_id();
+            $amount_cents = intval( $target_invoice['total_amount'] * 100 );
+            $description  = 'Payment for Invoice ' . $target_invoice['invoice_number'] . ' - ' . $target_invoice['client_name'];
+
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_ledger',
+                array(
+                    'agency_id'        => $agency_id,
+                    'branch_id'        => $branch_id,
+                    'type'             => 'inflow',
+                    'amount'           => $amount_cents,
+                    'description'      => $description,
+                    'lead_id'          => null,
+                    'client_id'        => null,
+                    'status'           => 'received',
+                    'category'         => 'Inflows & Retainers',
+                    'transaction_date' => date( 'Y-m-d' ),
+                    'created_by'       => get_current_user_id(),
+                    'created_at'       => current_time( 'mysql' ),
+                    'updated_at'       => current_time( 'mysql' )
+                ),
+                array( '%d', '%d', '%s', '%d', '%s', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s' )
+            );
+            $new_id = $wpdb->insert_id;
+
+            $transactions = get_option( 'cora_workspace_ledger', array() );
+            if ( ! is_array( $transactions ) ) {
+                $transactions = array();
+            }
+            $transactions[] = array(
+                'id'          => $new_id,
+                'date'        => date( 'Y-m-d' ),
+                'description' => $description,
+                'type'        => 'inflow',
+                'amount'      => $target_invoice['total_amount'],
+                'category'    => 'Inflows & Retainers',
+                'status'      => 'received',
+                'client_link' => ''
+            );
+            update_option( 'cora_workspace_ledger', $transactions, false );
+        }
+
+        wp_send_json_success( array(
+            'message' => 'Invoice status updated' . ( $status === 'paid' ? ' and auto-reconciled with ledger.' : '.' ),
+            'invoice' => $target_invoice
+        ) );
+    } else {
+        wp_send_json_error( array( 'message' => 'Invoice not found.' ) );
+    }
+}
+}
+add_action( 'wp_ajax_cora_ajax_update_invoice_status', 'cora_ajax_update_invoice_status' );
+add_action( 'wp_ajax_cora_update_invoice_status', 'cora_ajax_update_invoice_status' );
 
 /**
  * Core email sender for financial reports.

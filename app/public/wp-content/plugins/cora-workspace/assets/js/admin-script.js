@@ -5503,16 +5503,16 @@ jQuery(document).ready(function($) {
 
                 tbody.append(`
                     <tr class="hover:bg-zinc-50/40 transition-colors">
-                        <td class="px-4 py-3.5 whitespace-nowrap text-zinc-550">${dateStr}</td>
-                        <td class="px-4 py-3.5 font-semibold text-zinc-900">
+                        <td data-label="Date" class="px-4 py-3.5 whitespace-nowrap text-zinc-550">${dateStr}</td>
+                        <td data-label="Description" class="px-4 py-3.5 font-semibold text-zinc-900">
                             <div>${tx.description || ''}</div>
                             ${linkedText}
                         </td>
-                        <td class="px-4 py-3.5 whitespace-nowrap"><span class="px-2 py-1 rounded bg-zinc-100 text-zinc-655 text-[10px] font-medium">${tx.category || 'Other'}</span></td>
-                        <td class="px-4 py-3.5 whitespace-nowrap font-bold text-zinc-900">${amtStr}</td>
-                        <td class="px-4 py-3.5 whitespace-nowrap">${typeBadge}</td>
-                        <td class="px-4 py-3.5 whitespace-nowrap">${statusBadge}</td>
-                        <td class="px-4 py-3.5 whitespace-nowrap text-right">
+                        <td data-label="Category" class="px-4 py-3.5 whitespace-nowrap"><span class="px-2 py-1 rounded bg-zinc-100 text-zinc-655 text-[10px] font-medium">${tx.category || 'Other'}</span></td>
+                        <td data-label="Type" class="px-4 py-3.5 whitespace-nowrap">${typeBadge}</td>
+                        <td data-label="Amount" class="px-4 py-3.5 whitespace-nowrap font-bold text-zinc-900">${amtStr}</td>
+                        <td data-label="Status" class="px-4 py-3.5 whitespace-nowrap">${statusBadge}</td>
+                        <td data-label="Actions" class="px-4 py-3.5 whitespace-nowrap text-right">
                             <div class="flex items-center justify-end gap-2">
                                 <button class="px-2 py-1 border border-zinc-200 hover:bg-zinc-50 rounded text-zinc-600 hover:text-zinc-900 font-semibold transition-colors cursor-pointer" onclick="coraOpenTransactionDrawerForEdit('${tx.id}')">Edit</button>
                                 <button class="px-2 py-1 border border-zinc-200 hover:bg-zinc-100 hover:text-red-600 rounded text-zinc-500 font-semibold transition-colors cursor-pointer" onclick="coraDeleteTransaction('${tx.id}')">Delete</button>

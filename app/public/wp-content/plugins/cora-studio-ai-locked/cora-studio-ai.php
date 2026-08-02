@@ -2040,7 +2040,7 @@ function cora_current_user_can_manage_leads() {
         return false;
     }
     $user = wp_get_current_user();
-    $allowed_roles = array( 'administrator', 'cora_manager' );
+    $allowed_roles = array( 'administrator', 'cora_manager', 'cora_super_admin' );
     foreach ( $allowed_roles as $role ) {
         if ( in_array( $role, (array) $user->roles ) ) {
             return true;

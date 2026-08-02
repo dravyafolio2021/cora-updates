@@ -43,7 +43,7 @@ $accounts = array(
         'email'    => 'owner.realestate@cora.local',
         'password' => 'cora_secure_pass_123',
         'display'  => 'Real Estate Workspace Owner',
-        'role'     => 'cora_manager',
+        'role'     => 'cora_super_admin',
         'agency_id'=> 1,
         'industry' => 'real_estate'
     ),
@@ -52,7 +52,7 @@ $accounts = array(
         'email'    => 'owner.studio@cora.local',
         'password' => 'cora_secure_pass_123',
         'display'  => 'Photography Studio Workspace Owner',
-        'role'     => 'cora_manager',
+        'role'     => 'cora_super_admin',
         'agency_id'=> 2,
         'industry' => 'photography_studio'
     ),
@@ -118,6 +118,8 @@ foreach ($accounts as $acc) {
     }
     
     // Set user industry meta preference & auto-verify email for local testing
+    $agency_slug = ( $acc['agency_id'] == 1 ) ? 'real-estate' : 'studio';
+    update_user_meta($user_id, 'cora_agency_id', $agency_slug);
     update_user_meta($user_id, 'cora_user_agency_id', $acc['agency_id']);
     update_user_meta($user_id, 'cora_preferred_industry', $acc['industry']);
     update_user_meta($user_id, 'cora_email_verified', 1);
