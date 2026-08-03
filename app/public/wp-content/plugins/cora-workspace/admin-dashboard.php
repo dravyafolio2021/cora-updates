@@ -3716,8 +3716,28 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         'label' => 'Platform Administration',
                         'items' => array(
                             'super-admin' => array(
-                                'title' => 'Control Center',
-                                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>'
+                                'title' => 'Workspaces',
+                                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>'
+                            ),
+                            'super-users' => array(
+                                'title' => 'Users',
+                                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+                            ),
+                            'super-appeals' => array(
+                                'title' => 'Reactivation Appeals',
+                                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>'
+                            ),
+                            'super-governance' => array(
+                                'title' => 'Governance',
+                                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>'
+                            ),
+                            'super-announcements' => array(
+                                'title' => 'Broadcast Console',
+                                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>'
+                            ),
+                            'super-health' => array(
+                                'title' => 'System Health',
+                                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>'
                             )
                         )
                     );
@@ -3730,7 +3750,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase select-none"><?php echo esc_html($group['label']); ?></div>
                     <ul class="cora-nav-list space-y-0.5 mt-1 select-none">
                         <?php foreach ( $group['items'] as $target => $item ) : 
-                            if ( $target !== 'super-admin' && function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $target ) ) {
+                            $super_pages = array( 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health' );
+                            if ( ! in_array( $target, $super_pages ) && function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $target ) ) {
                                 continue;
                             }
                             $nav_url = home_url( '/' . $cora_ws_slug . '/' . $target );
@@ -6358,7 +6379,9 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             <?php endif; ?>
 
             <!-- SECTION: SUPER ADMIN PANEL -->
-            <?php if ( $sub_page === 'super-admin' && cora_is_super_owner() ) : ?>
+            <?php 
+            $super_pages = array( 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health' );
+            if ( in_array( $sub_page, $super_pages ) && cora_is_super_owner() ) : ?>
             <section id="cora-page-super-admin" class="cora-page-section cora-active space-y-6">
                 <?php include CORA_WORKSPACE_PATH . 'views/view-super-admin.php'; ?>
             </section>

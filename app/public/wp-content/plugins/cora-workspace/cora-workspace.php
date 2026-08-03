@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.1.15
+ * Version: 3.1.16
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.1.15' );
+define( 'CORA_WORKSPACE_VERSION', '3.1.16' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -1256,7 +1256,8 @@ function cora_real_estate_ai_handle_workspace_route() {
 
         // Role-based access control check (Server-Side)
         $cora_ws_slug = ! empty( $matched_workspace['slug'] ) ? $matched_workspace['slug'] : 'workspace';
-        if ( $sub_page === 'super-admin' ) {
+        $super_pages = array( 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health' );
+        if ( in_array( $sub_page, $super_pages ) ) {
             if ( ! cora_is_super_owner() ) {
                 wp_redirect( home_url( '/' . $cora_ws_slug . '/dashboard' ) );
                 exit;
@@ -4938,7 +4939,8 @@ function cora_canvas_theme_frontend_router() {
     $admin_subpages = array( 
         'dashboard', 'canvas', 'users', 'financials', 'content-suite', 'content_suite',
         'media', 'file-manager', 'vault', 'leads', 'forms', 'emails', 'settings-suite', 
-        'audit-panel', 'super-admin', 'profile', 'reviews-feedback', 'reviews_acquisition',
+        'audit-panel', 'super-admin', 'super-users', 'super-appeals', 'super-governance', 
+        'super-announcements', 'super-health', 'profile', 'reviews-feedback', 'reviews_acquisition',
         'property-listings', 'team-scheduler', 'crew-scheduler', 'client-task-manager', 
         'ecosystem', 'tools', 'mcp', 'onboarding'
     );

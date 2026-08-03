@@ -11,6 +11,12 @@ if ( ! cora_is_super_owner() ) {
 
 // Pre-fetch dynamic roles list to pass to JavaScript
 $roles_list = cora_get_all_roles();
+
+// Parse active sub-page to show correct tab
+$active_sub_page = isset( $GLOBALS['sub_page'] ) ? $GLOBALS['sub_page'] : ( isset( $_GET['sub_page'] ) ? sanitize_key( $_GET['sub_page'] ) : 'super-admin' );
+if ( empty( $active_sub_page ) || $active_sub_page === 'dashboard' ) {
+    $active_sub_page = 'super-admin';
+}
 ?>
 
 <!-- Platform Admin View Container -->
@@ -32,28 +38,28 @@ $roles_list = cora_get_all_roles();
 
     <!-- Sub Navigation Tabs -->
     <div class="cora-sub-tabs border-b border-zinc-200 dark:border-zinc-800 flex gap-4 text-xs font-bold text-zinc-500 select-none pb-0.5">
-        <button class="cora-sub-tab active pb-2 border-b-2 border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50 cursor-pointer focus:outline-none" data-target="tab-super-workspaces">
+        <button class="cora-sub-tab <?php echo $active_sub_page === 'super-admin' ? 'active border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50' : 'border-transparent text-zinc-500'; ?> pb-2 border-b-2 cursor-pointer focus:outline-none" data-target="tab-super-workspaces">
             Workspaces
         </button>
-        <button class="cora-sub-tab pb-2 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-zinc-200 text-zinc-500 cursor-pointer focus:outline-none" data-target="tab-super-users">
+        <button class="cora-sub-tab <?php echo $active_sub_page === 'super-users' ? 'active border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50' : 'border-transparent text-zinc-500'; ?> pb-2 border-b-2 cursor-pointer focus:outline-none" data-target="tab-super-users">
             Users
         </button>
-        <button class="cora-sub-tab pb-2 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-zinc-200 text-zinc-500 cursor-pointer focus:outline-none flex items-center gap-1.5" data-target="tab-super-appeals">
+        <button class="cora-sub-tab <?php echo $active_sub_page === 'super-appeals' ? 'active border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50' : 'border-transparent text-zinc-500'; ?> pb-2 border-b-2 cursor-pointer focus:outline-none flex items-center gap-1.5" data-target="tab-super-appeals">
             Reactivation Appeals <span id="super-appeals-badge" class="px-1.5 py-0.5 rounded-full text-[9.5px] font-bold bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 hidden">0</span>
         </button>
-        <button class="cora-sub-tab pb-2 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-zinc-200 text-zinc-500 cursor-pointer focus:outline-none" data-target="tab-super-governance">
+        <button class="cora-sub-tab <?php echo $active_sub_page === 'super-governance' ? 'active border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50' : 'border-transparent text-zinc-500'; ?> pb-2 border-b-2 cursor-pointer focus:outline-none" data-target="tab-super-governance">
             Attendance & Governance
         </button>
-        <button class="cora-sub-tab pb-2 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-zinc-200 text-zinc-500 cursor-pointer focus:outline-none" data-target="tab-super-announcements">
+        <button class="cora-sub-tab <?php echo $active_sub_page === 'super-announcements' ? 'active border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50' : 'border-transparent text-zinc-500'; ?> pb-2 border-b-2 cursor-pointer focus:outline-none" data-target="tab-super-announcements">
             Broadcast Console
         </button>
-        <button class="cora-sub-tab pb-2 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-zinc-200 text-zinc-500 cursor-pointer focus:outline-none" data-target="tab-super-health">
+        <button class="cora-sub-tab <?php echo $active_sub_page === 'super-health' ? 'active border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50' : 'border-transparent text-zinc-500'; ?> pb-2 border-b-2 cursor-pointer focus:outline-none" data-target="tab-super-health">
             System Health & Metrics
         </button>
     </div>
 
     <!-- TAB 1: WORKSPACES -->
-    <div id="tab-super-workspaces" class="cora-tab-content space-y-4">
+    <div id="tab-super-workspaces" class="cora-tab-content space-y-4 <?php echo $active_sub_page === 'super-admin' ? '' : 'hidden'; ?>">
         <!-- Filters Toolbar -->
         <div class="bg-white dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex flex-wrap gap-4 items-center justify-between">
             <div class="flex flex-wrap gap-3 items-center flex-1 max-w-2xl">
@@ -121,7 +127,7 @@ $roles_list = cora_get_all_roles();
     </div>
 
     <!-- TAB 2: USERS -->
-    <div id="tab-super-users" class="cora-tab-content space-y-4 hidden">
+    <div id="tab-super-users" class="cora-tab-content space-y-4 <?php echo $active_sub_page === 'super-users' ? '' : 'hidden'; ?>">
         <!-- Filters Toolbar -->
         <div class="bg-white dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex flex-wrap gap-4 items-center justify-between">
             <div class="flex flex-wrap gap-3 items-center flex-1 max-w-2xl">
@@ -174,7 +180,7 @@ $roles_list = cora_get_all_roles();
     </div>
 
     <!-- TAB 3: REACTIVATION APPEALS -->
-    <div id="tab-super-appeals" class="cora-tab-content hidden space-y-4">
+    <div id="tab-super-appeals" class="cora-tab-content space-y-4 <?php echo $active_sub_page === 'super-appeals' ? '' : 'hidden'; ?>">
         <div class="bg-white dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex items-center justify-between">
             <div>
                 <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Suspension Reactivation Appeals</h2>
@@ -208,7 +214,7 @@ $roles_list = cora_get_all_roles();
     </div>
 
     <!-- TAB 4: ATTENDANCE & GOVERNANCE -->
-    <div id="tab-super-governance" class="cora-tab-content hidden space-y-6">
+    <div id="tab-super-governance" class="cora-tab-content space-y-6 <?php echo $active_sub_page === 'super-governance' ? '' : 'hidden'; ?>">
         <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-4">
             <div class="flex items-center justify-between">
                 <div>
@@ -244,7 +250,7 @@ $roles_list = cora_get_all_roles();
     </div>
 
     <!-- TAB 5: BROADCAST ANNOUNCEMENTS -->
-    <div id="tab-super-announcements" class="cora-tab-content hidden space-y-6">
+    <div id="tab-super-announcements" class="cora-tab-content space-y-6 <?php echo $active_sub_page === 'super-announcements' ? '' : 'hidden'; ?>">
         <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-4">
             <div>
                 <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Global Platform Broadcast Console</h2>
@@ -289,7 +295,7 @@ $roles_list = cora_get_all_roles();
     </div>
 
     <!-- TAB 6: SYSTEM HEALTH & METRICS -->
-    <div id="tab-super-health" class="cora-tab-content hidden space-y-6">
+    <div id="tab-super-health" class="cora-tab-content space-y-6 <?php echo $active_sub_page === 'super-health' ? '' : 'hidden'; ?>">
         <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-4">
             <div class="flex items-center justify-between">
                 <div>
@@ -358,18 +364,10 @@ jQuery(document).ready(function($) {
     $('.cora-sub-tabs button').on('click', function() {
         const target = $(this).data('target');
         if (!target) return;
-        
-        $('.cora-sub-tabs button').removeClass('active border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50')
-                                 .addClass('border-transparent text-zinc-500');
-        $(this).addClass('active border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50')
-               .removeClass('border-transparent text-zinc-500');
-        
-        $('.cora-tab-content').addClass('hidden');
-        $('#' + target).removeClass('hidden');
-
-        if (target === 'tab-super-health') {
-            loadHealthMetrics();
-        }
+        const pageSlug = target.replace('tab-super-', 'super-');
+        const finalSlug = pageSlug === 'super-workspaces' ? 'super-admin' : pageSlug;
+        const wsSlug = coraREData.activeWorkspace ? coraREData.activeWorkspace.slug : 'super';
+        window.location.href = coraREData.siteUrl + '/' + wsSlug + '/' + finalSlug;
     });
 
     // Helper: Escape HTML strings for safety
@@ -965,6 +963,9 @@ jQuery(document).ready(function($) {
 
     // Run dynamic retrieval on mount
     loadPlatformData();
+    if (coraREData.currentPage === 'super-health') {
+        loadHealthMetrics();
+    }
 });
 
 window.openAppealReviewDrawer = function(appealId) {
