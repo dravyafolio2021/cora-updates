@@ -44,6 +44,12 @@ $roles_list = cora_get_all_roles();
         <button class="cora-sub-tab pb-2 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-zinc-200 text-zinc-500 cursor-pointer focus:outline-none" data-target="tab-super-governance">
             Attendance & Governance
         </button>
+        <button class="cora-sub-tab pb-2 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-zinc-200 text-zinc-500 cursor-pointer focus:outline-none" data-target="tab-super-announcements">
+            Broadcast Console
+        </button>
+        <button class="cora-sub-tab pb-2 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-zinc-200 text-zinc-500 cursor-pointer focus:outline-none" data-target="tab-super-health">
+            System Health & Metrics
+        </button>
     </div>
 
     <!-- TAB 1: WORKSPACES -->
@@ -236,6 +242,106 @@ $roles_list = cora_get_all_roles();
             </div>
         </div>
     </div>
+
+    <!-- TAB 5: BROADCAST ANNOUNCEMENTS -->
+    <div id="tab-super-announcements" class="cora-tab-content hidden space-y-6">
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-4">
+            <div>
+                <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Global Platform Broadcast Console</h2>
+                <p class="text-xs text-zinc-500 mt-0.5">Publish top-bar message banners across all tenant workspaces to communicate system updates, maintenance alerts, or notifications.</p>
+            </div>
+            
+            <div class="space-y-4 pt-4 border-t border-zinc-100 dark:border-zinc-800 max-w-2xl">
+                <!-- Announcement text -->
+                <div class="space-y-1.5">
+                    <label class="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Broadcast Text Message</label>
+                    <textarea id="cora-broadcast-text" rows="3" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs bg-white dark:bg-zinc-950 focus:border-zinc-400 dark:focus:border-zinc-600 focus:outline-none text-zinc-900 dark:text-zinc-100 font-medium" placeholder="Enter broadcast announcement text..."><?php echo esc_textarea( get_option( 'cora_announcement_text', '' ) ); ?></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Banner style type -->
+                    <div class="space-y-1.5">
+                        <label class="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Visual Alert Theme</label>
+                        <select id="cora-broadcast-type" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
+                            <?php $curr_type = get_option( 'cora_announcement_type', 'info' ); ?>
+                            <option value="info" <?php echo $curr_type === 'info' ? 'selected' : ''; ?>>Monochromatic Zinc (Information)</option>
+                            <option value="warning" <?php echo $curr_type === 'warning' ? 'selected' : ''; ?>>Warm Amber Accent (System Alert)</option>
+                            <option value="success" <?php echo $curr_type === 'success' ? 'selected' : ''; ?>>Sleek Emerald Accent (Success/Feature Release)</option>
+                        </select>
+                    </div>
+
+                    <!-- Active status checkbox -->
+                    <div class="space-y-1.5 flex flex-col justify-end">
+                        <div class="flex items-center gap-2.5 py-2">
+                            <input type="checkbox" id="cora-broadcast-active" value="1" <?php checked( get_option( 'cora_announcement_active', '0' ), '1' ); ?> class="w-4 h-4 rounded border-zinc-300 text-zinc-950 focus:ring-zinc-950 cursor-pointer">
+                            <label for="cora-broadcast-active" class="text-xs font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer select-none">Enable Public Broadcasting</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button onclick="saveGlobalAnnouncement()" class="px-4 py-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 rounded-lg text-xs font-bold hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-xs cursor-pointer">
+                        Save and Broadcast Banner
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 6: SYSTEM HEALTH & METRICS -->
+    <div id="tab-super-health" class="cora-tab-content hidden space-y-6">
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Platform Specs & Resource Auditing</h2>
+                    <p class="text-xs text-zinc-500 mt-0.5">Real-time computation of hosting infrastructure size, dynamic table indexes, and workspace attachments usage.</p>
+                </div>
+                <button onclick="loadHealthMetrics()" class="px-4 py-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 rounded-lg text-xs font-bold hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-xs cursor-pointer flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                    Refresh Health Metrics
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                <!-- DB Size widget -->
+                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-xl space-y-1">
+                    <div class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">MySQL Database Footprint</div>
+                    <div id="metric-db-size" class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">-- MB</div>
+                    <div class="text-[10px] text-zinc-500">Total data and index allocation</div>
+                </div>
+                <!-- File Storage widget -->
+                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-xl space-y-1">
+                    <div class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">Media Vault Allocation</div>
+                    <div id="metric-storage-size" class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">-- MB</div>
+                    <div class="text-[10px] text-zinc-500">Tenant media library uploads</div>
+                </div>
+                <!-- Workspaces count -->
+                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-xl space-y-1">
+                    <div class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">Active Workspaces</div>
+                    <div id="metric-workspaces" class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">--</div>
+                    <div class="text-[10px] text-zinc-500">Provisioned multi-tenant directories</div>
+                </div>
+                <!-- Users count -->
+                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-xl space-y-1">
+                    <div class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">Registered Users</div>
+                    <div id="metric-users" class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">--</div>
+                    <div class="text-[10px] text-zinc-500">Across all platform organizations</div>
+                </div>
+                <!-- PHP version info -->
+                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-xl space-y-1">
+                    <div class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">PHP Runtime</div>
+                    <div id="metric-php-version" class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">PHP --</div>
+                    <div class="text-[10px] text-zinc-500">Active server engine specifications</div>
+                </div>
+                <!-- WordPress core info -->
+                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-xl space-y-1">
+                    <div class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">WordPress Core</div>
+                    <div id="metric-wp-version" class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">WP --</div>
+                    <div class="text-[10px] text-zinc-500">System core framework version</div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -260,6 +366,10 @@ jQuery(document).ready(function($) {
         
         $('.cora-tab-content').addClass('hidden');
         $('#' + target).removeClass('hidden');
+
+        if (target === 'tab-super-health') {
+            loadHealthMetrics();
+        }
     });
 
     // Helper: Escape HTML strings for safety
@@ -785,6 +895,73 @@ jQuery(document).ready(function($) {
             }
         });
     }
+
+    // POST: Save Global Announcement settings
+    window.saveGlobalAnnouncement = function() {
+        const text = $('#cora-broadcast-text').val().trim();
+        const type = $('#cora-broadcast-type').val();
+        const active = $('#cora-broadcast-active').is(':checked') ? '1' : '0';
+
+        if (window.coraShowToast) {
+            window.coraShowToast('Saving announcement settings...', 'info');
+        }
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_super_save_announcement',
+            security: coraREData.ajaxNonce,
+            announcement_active: active,
+            announcement_text: text,
+            announcement_type: type
+        }, function(res) {
+            if (res.success) {
+                if (window.coraShowToast) {
+                    window.coraShowToast(res.data.message || 'Announcement settings published successfully.', 'success');
+                }
+            } else {
+                const errorMsg = res.data || 'Failed to save announcement settings.';
+                if (window.coraShowToast) {
+                    window.coraShowToast(errorMsg, 'error');
+                }
+            }
+        }).fail(function() {
+            if (window.coraShowToast) {
+                window.coraShowToast('Network error while saving announcement settings.', 'error');
+            }
+        });
+    };
+
+    // GET: Retrieve Platform Health & Metrics
+    window.loadHealthMetrics = function() {
+        // Reset display values to loader skeletons / indicators
+        $('#metric-db-size').text('-- MB');
+        $('#metric-storage-size').text('-- MB');
+        $('#metric-workspaces').text('--');
+        $('#metric-users').text('--');
+        $('#metric-php-version').text('PHP --');
+        $('#metric-wp-version').text('WP --');
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_super_get_metrics',
+            security: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success && res.data) {
+                $('#metric-db-size').text(res.data.db_size_mb + ' MB');
+                $('#metric-storage-size').text(res.data.storage_size_mb + ' MB');
+                $('#metric-workspaces').text(res.data.total_workspaces);
+                $('#metric-users').text(res.data.total_users);
+                $('#metric-php-version').text('PHP ' + res.data.php_version);
+                $('#metric-wp-version').text('WP ' + res.data.wp_version);
+            } else {
+                if (window.coraShowToast) {
+                    window.coraShowToast(res.data || 'Failed to load system metrics.', 'error');
+                }
+            }
+        }).fail(function() {
+            if (window.coraShowToast) {
+                window.coraShowToast('Network error while loading system metrics.', 'error');
+            }
+        });
+    };
 
     // Run dynamic retrieval on mount
     loadPlatformData();

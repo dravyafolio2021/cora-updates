@@ -3129,7 +3129,81 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     }
     $cora_display_name = $current_wp_user->display_name ? $current_wp_user->display_name : ($current_wp_user->first_name ? $current_wp_user->first_name : 'Dravya Bansal');
     $cora_initials = strtoupper(substr($cora_display_name, 0, 1));
+
+    // Impersonation banner check
+    $is_impersonating = false;
+    $impersonator_display_name = '';
+    if ( ! empty( $_COOKIE['cora_impersonator_wp_user_id'] ) ) {
+        $cookie_value = sanitize_text_field( $_COOKIE['cora_impersonator_wp_user_id'] );
+        $parts = explode( '|', $cookie_value );
+        if ( count( $parts ) === 2 ) {
+            $impersonator_id = intval( $parts[0] );
+            $hash = $parts[1];
+            $expected_hash = hash_hmac( 'sha256', $impersonator_id, wp_salt( 'auth' ) );
+            if ( hash_equals( $expected_hash, $hash ) ) {
+                $impersonator_user = get_userdata( $impersonator_id );
+                if ( $impersonator_user && cora_is_super_owner( $impersonator_user ) ) {
+                    $is_impersonating = true;
+                    $impersonator_display_name = $impersonator_user->display_name ? $impersonator_user->display_name : $impersonator_user->user_login;
+                }
+            }
+        }
+    }
+
+    // Global announcement banner check
+    $announcement_active = get_option( 'cora_announcement_active', '0' );
+    $announcement_text   = get_option( 'cora_announcement_text', '' );
+    $announcement_type   = get_option( 'cora_announcement_type', 'info' );
     ?>
+
+    <?php if ( $is_impersonating ) : ?>
+    <div id="cora-impersonation-safety-banner" class="bg-zinc-950 dark:bg-zinc-900 text-white border-b border-zinc-800 px-4 py-2 flex items-center justify-between text-xs select-none sticky top-0 z-[10000] shadow-sm">
+        <div class="flex items-center gap-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+            <span>You are currently impersonating <strong><?php echo esc_html( $cora_display_name ); ?></strong>. Actions affect their live tenant settings. (Original admin: <strong><?php echo esc_html( $impersonator_display_name ); ?></strong>)</span>
+        </div>
+        <a href="<?php echo esc_url( admin_url( 'admin-ajax.php?action=cora_super_switch_back&security=' . wp_create_nonce( 'cora_ajax_nonce' ) ) ); ?>" class="px-2.5 py-1 border border-zinc-700 hover:border-zinc-550 rounded-lg font-bold text-[10px] bg-zinc-900 hover:bg-zinc-850 active:scale-95 transition-all text-white no-underline shrink-0">
+            Exit Impersonation
+        </a>
+    </div>
+    <?php endif; ?>
+
+    <?php if ( $announcement_active === '1' && ! empty( $announcement_text ) ) : ?>
+    <?php 
+    $ann_bg = 'bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-zinc-200 dark:border-zinc-800';
+    if ( $announcement_type === 'warning' ) {
+        $ann_bg = 'bg-amber-50/80 dark:bg-amber-950/20 text-amber-900 dark:text-amber-300 border-amber-200/80 dark:border-amber-900/40';
+    } elseif ( $announcement_type === 'success' ) {
+        $ann_bg = 'bg-emerald-50/80 dark:bg-emerald-950/20 text-emerald-900 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-900/40';
+    }
+    $announcement_hash = md5( $announcement_text );
+    ?>
+    <div id="cora-global-announcement-banner" data-hash="<?php echo esc_attr( $announcement_hash ); ?>" class="hidden <?php echo esc_attr( $ann_bg ); ?> border-b px-4 py-2 flex items-center justify-between text-xs select-none sticky top-0 z-[9998] shadow-xs">
+        <div class="flex items-center gap-2">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span><?php echo esc_html( $announcement_text ); ?></span>
+        </div>
+        <button onclick="dismissCoraAnnouncement('<?php echo esc_attr( $announcement_hash ); ?>')" class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 cursor-pointer transition-colors shrink-0">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+    <script>
+    (function() {
+        const hash = '<?php echo esc_js( $announcement_hash ); ?>';
+        if (localStorage.getItem('cora_ann_dismissed_' + hash) !== 'true') {
+            document.getElementById('cora-global-announcement-banner').classList.remove('hidden');
+        }
+    })();
+    function dismissCoraAnnouncement(hash) {
+        localStorage.setItem('cora_ann_dismissed_' + hash, 'true');
+        const banner = document.getElementById('cora-global-announcement-banner');
+        if (banner) {
+            banner.classList.add('hidden');
+        }
+    }
+    </script>
+    <?php endif; ?>
+
     <!-- Global Brand & Customized Blocks Top Navbar (Shopify Style Unified Header) -->
     <header id="cora-global-topbar" class="cora-topbar bg-[#09090b] dark:bg-zinc-950 text-white px-4 md:px-6 py-2.5 flex items-center justify-between border-b border-zinc-800/80 sticky top-0 z-50 shrink-0 select-none" style="background-color: #09090b !important; z-index: 9999 !important;">
         <div class="hidden lg:flex w-full items-center justify-between">

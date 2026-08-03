@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.1.14
+ * Version: 3.1.15
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.1.14' );
+define( 'CORA_WORKSPACE_VERSION', '3.1.15' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -28027,6 +28027,99 @@ function cora_ajax_super_update_user() {
 }
 }
 add_action( 'wp_ajax_cora_super_update_user', 'cora_ajax_super_update_user' );
+
+/**
+ * AJAX Callback: Save global announcement settings.
+ */
+if ( ! function_exists( 'cora_ajax_super_save_announcement' ) ) {
+function cora_ajax_super_save_announcement() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! cora_is_super_owner() ) {
+        wp_send_json_error( 'Unauthorized access.' );
+    }
+
+    $active = isset( $_POST['announcement_active'] ) ? sanitize_text_field( $_POST['announcement_active'] ) : '0';
+    $text   = isset( $_POST['announcement_text'] ) ? sanitize_text_field( $_POST['announcement_text'] ) : '';
+    $type   = isset( $_POST['announcement_type'] ) ? sanitize_text_field( $_POST['announcement_type'] ) : 'info';
+
+    update_option( 'cora_announcement_active', $active );
+    update_option( 'cora_announcement_text', $text );
+    update_option( 'cora_announcement_type', $type );
+
+    wp_send_json_success( array( 'message' => 'Announcement settings saved successfully.' ) );
+}
+}
+add_action( 'wp_ajax_cora_super_save_announcement', 'cora_ajax_super_save_announcement' );
+
+/**
+ * AJAX Callback: Retrieve system metrics and health overview.
+ */
+if ( ! function_exists( 'cora_ajax_super_get_metrics' ) ) {
+function cora_ajax_super_get_metrics() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! cora_is_super_owner() ) {
+        wp_send_json_error( 'Unauthorized access.' );
+    }
+
+    global $wpdb;
+    
+    // 1. Calculate database size
+    $db_size_bytes = 0;
+    $tables = $wpdb->get_results( "SHOW TABLE STATUS", ARRAY_A );
+    if ( is_array( $tables ) ) {
+        foreach ( $tables as $table ) {
+            $db_size_bytes += (int) ( $table['Data_length'] ?? 0 ) + (int) ( $table['Index_length'] ?? 0 );
+        }
+    }
+    $db_size_mb = round( $db_size_bytes / ( 1024 * 1024 ), 2 );
+
+    // 2. Count total registered workspaces
+    $agencies_table = $wpdb->prefix . 'cora_agencies';
+    $total_workspaces = 0;
+    if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $agencies_table ) ) ) {
+        $total_workspaces = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$agencies_table}" );
+    } else {
+        $agencies = get_option( 'cora_agencies', array() );
+        $total_workspaces = count( $agencies );
+    }
+
+    // 3. Count active users
+    $total_users = count( get_users() );
+
+    // 4. Calculate total storage space in upload folder
+    $upload_dir = wp_upload_dir();
+    $cora_upload_path = $upload_dir['basedir'] . '/cora-workspace';
+    $storage_size_bytes = 0;
+    if ( is_dir( $cora_upload_path ) ) {
+        try {
+            $files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $cora_upload_path ) );
+            foreach ( $files as $file ) {
+                if ( $file->isFile() ) {
+                    $storage_size_bytes += $file->getSize();
+                }
+            }
+        } catch ( Exception $e ) {
+            // Silence if folder doesn't exist yet
+        }
+    }
+    $storage_size_mb = round( $storage_size_bytes / ( 1024 * 1024 ), 2 );
+
+    // 5. System specifications/info
+    $php_version = phpversion();
+    $wp_version = get_bloginfo( 'version' );
+
+    wp_send_json_success( array(
+        'db_size_mb'       => $db_size_mb,
+        'total_workspaces' => $total_workspaces,
+        'total_users'      => $total_users,
+        'storage_size_mb'  => $storage_size_mb,
+        'php_version'      => $php_version,
+        'wp_version'       => $wp_version
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_super_get_metrics', 'cora_ajax_super_get_metrics' );
+
 
 /**
  * AJAX Callback: Impersonate user.
