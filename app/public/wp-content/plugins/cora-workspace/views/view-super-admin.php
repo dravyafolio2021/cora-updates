@@ -296,6 +296,93 @@ if ( empty( $active_sub_page ) || $active_sub_page === 'dashboard' ) {
 
     <!-- TAB 6: SYSTEM HEALTH & METRICS -->
     <div id="tab-super-health" class="cora-tab-content space-y-6 <?php echo $active_sub_page === 'super-health' ? '' : 'hidden'; ?>">
+        <!-- Live Platform Monitor Card -->
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                        Live Platform Monitor
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                    </h2>
+                    <p class="text-xs text-zinc-500 mt-0.5">Real-time user presence, activity heatmap, and platform usage feed.</p>
+                </div>
+                <button onclick="loadLiveMonitor()" class="p-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors border border-transparent hover:border-zinc-200 dark:hover:border-zinc-700" title="Refresh Live Data">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                </button>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="p-4 rounded-lg border border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-800/20">
+                    <div class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Users Online</div>
+                    <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100" id="live-stat-online">0</div>
+                    <div class="text-[10px] text-zinc-500 mt-1">Currently connected</div>
+                </div>
+                <div class="p-4 rounded-lg border border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-800/20">
+                    <div class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Active Now</div>
+                    <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100" id="live-stat-active">0</div>
+                    <div class="text-[10px] text-zinc-500 mt-1">Interacting &lt; 60s</div>
+                </div>
+                <div class="p-4 rounded-lg border border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-800/20">
+                    <div class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Actions Today</div>
+                    <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100" id="live-stat-actions">0</div>
+                    <div class="text-[10px] text-zinc-500 mt-1">Total logged events</div>
+                </div>
+                <div class="p-4 rounded-lg border border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-800/20">
+                    <div class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Peak Hour</div>
+                    <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100" id="live-stat-peak">--</div>
+                    <div class="text-[10px] text-zinc-500 mt-1">Highest activity window</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Online Users & Heatmap -->
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-3">Online Users</h3>
+                        <div class="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-white dark:bg-zinc-900">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse text-xs">
+                                    <thead>
+                                        <tr class="bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-800">
+                                            <th class="px-4 py-2.5 font-medium text-zinc-500 dark:text-zinc-400">User</th>
+                                            <th class="px-4 py-2.5 font-medium text-zinc-500 dark:text-zinc-400">Workspace</th>
+                                            <th class="px-4 py-2.5 font-medium text-zinc-500 dark:text-zinc-400">Current Screen</th>
+                                            <th class="px-4 py-2.5 font-medium text-zinc-500 dark:text-zinc-400">Status</th>
+                                            <th class="px-4 py-2.5 font-medium text-zinc-500 dark:text-zinc-400">Last Seen</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="live-online-users-body" class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                                        <tr>
+                                            <td colspan="5" class="px-4 py-6 text-center text-zinc-400">No users currently online</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-3">24-Hour Activity Heatmap</h3>
+                        <div id="live-heatmap-container" class="space-y-1 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Feed -->
+                <div>
+                    <h3 class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-3">Recent Activity Feed</h3>
+                    <div id="live-activity-feed" class="max-h-[320px] overflow-y-auto pr-2 custom-scrollbar space-y-1">
+                        <div class="text-center text-zinc-400 dark:text-zinc-500 py-6 text-xs">No recent activity recorded.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <hr class="border-zinc-200 dark:border-zinc-800/60 my-8">
         <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-4">
             <div class="flex items-center justify-between">
                 <div>
@@ -344,6 +431,24 @@ if ( empty( $active_sub_page ) || $active_sub_page === 'dashboard' ) {
                     <div class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">WordPress Core</div>
                     <div id="metric-wp-version" class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">WP --</div>
                     <div class="text-[10px] text-zinc-500">System core framework version</div>
+                </div>
+                <!-- Server Disk space info -->
+                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-xl space-y-1">
+                    <div class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">Server Disk partition</div>
+                    <div id="metric-disk-usage" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono py-1.5 truncate">--</div>
+                    <div class="text-[10px] text-zinc-500">Partition capacity usage details</div>
+                </div>
+                <!-- PHP memory footprint -->
+                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-xl space-y-1">
+                    <div class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">PHP Memory Limit</div>
+                    <div id="metric-memory-usage" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono py-1.5 truncate">--</div>
+                    <div class="text-[10px] text-zinc-500">Peak request vs PHP maximum limit</div>
+                </div>
+                <!-- CPU load and OS -->
+                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-xl space-y-1">
+                    <div class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">Server Load & OS</div>
+                    <div id="metric-system-software" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono py-1.5 truncate">--</div>
+                    <div id="metric-load-avg" class="text-[10px] text-zinc-500 font-semibold mt-0.5">Load Average: --</div>
                 </div>
             </div>
         </div>
@@ -570,8 +675,8 @@ jQuery(document).ready(function($) {
                     <td class="px-5 py-3.5">${statusBadge}</td>
                     <td class="px-5 py-3.5 text-zinc-500 dark:text-zinc-400 font-medium">${escapeHtml(ws.owner_email || '—')}</td>
                     <td class="px-5 py-3.5 text-zinc-400 dark:text-zinc-500 font-medium">${formatDate(ws.created_at)}</td>
-                    <td class="px-5 py-3.5 text-right">
-                        <div class="flex items-center justify-end gap-2">
+                    <td class="px-4 py-3.5 text-right">
+                        <div class="flex items-center justify-end flex-wrap gap-1.5">
                             <button onclick="toggleWorkspaceStatus(${ws.id}, '${ws.status === 'active' ? 'suspended' : 'active'}')" class="px-2.5 py-1 border rounded-lg text-[10px] font-bold bg-white dark:bg-zinc-900 hover:bg-zinc-50 cursor-pointer shadow-sm active:scale-95 transition-all ${toggleClass}">
                                 ${toggleLabel}
                             </button>
@@ -583,10 +688,15 @@ jQuery(document).ready(function($) {
                                 <option value="enterprise" ${ws.plan === 'enterprise' ? 'selected' : ''}>Enterprise</option>
                             </select>
 
+                            <button onclick="openManageWorkspaceDrawer(${ws.id})" class="px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer shadow-sm active:scale-95 transition-all inline-flex items-center gap-1">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                                Settings
+                            </button>
+
                             ${ws.owner_user_id ? `
-                            <button onclick="impersonateUser(${ws.owner_user_id})" class="px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer shadow-sm active:scale-95 transition-all inline-flex items-center gap-1.5">
+                            <button onclick="impersonateUser(${ws.owner_user_id})" class="px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer shadow-sm active:scale-95 transition-all inline-flex items-center gap-1">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                                Impersonate Owner
+                                Impersonate
                             </button>
                             ` : ''}
                         </div>
@@ -937,6 +1047,10 @@ jQuery(document).ready(function($) {
         $('#metric-users').text('--');
         $('#metric-php-version').text('PHP --');
         $('#metric-wp-version').text('WP --');
+        $('#metric-disk-usage').text('--');
+        $('#metric-memory-usage').text('--');
+        $('#metric-system-software').text('--');
+        $('#metric-load-avg').text('Load Average: --');
 
         $.post(coraREData.ajaxUrl, {
             action: 'cora_super_get_metrics',
@@ -949,6 +1063,10 @@ jQuery(document).ready(function($) {
                 $('#metric-users').text(res.data.total_users);
                 $('#metric-php-version').text('PHP ' + res.data.php_version);
                 $('#metric-wp-version').text('WP ' + res.data.wp_version);
+                $('#metric-disk-usage').text(res.data.disk_usage || 'Not available');
+                $('#metric-memory-usage').text(res.data.memory_usage || 'Not available');
+                $('#metric-system-software').text(res.data.system_software || '--');
+                $('#metric-load-avg').text('Load Average: ' + (res.data.load_avg || '--'));
             } else {
                 if (window.coraShowToast) {
                     window.coraShowToast(res.data || 'Failed to load system metrics.', 'error');
@@ -961,10 +1079,140 @@ jQuery(document).ready(function($) {
         });
     };
 
+    // ── Live Platform Monitor ──────────────────────────────────
+    let liveMonitorInterval = null;
+
+    window.loadLiveMonitor = function() {
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_super_get_live_monitor',
+            security: coraREData.ajaxNonce
+        }, function(res) {
+            if (!res.success || !res.data) return;
+            const d = res.data;
+            
+            // Summary cards
+            $('#live-stat-online').text(d.summary.total_online);
+            $('#live-stat-active').text(d.summary.total_active);
+            $('#live-stat-actions').text(d.summary.total_actions_today);
+            $('#live-stat-peak').text(d.summary.peak_hour || '--');
+            
+            // Online users table
+            if (d.online_users && d.online_users.length > 0) {
+                let html = '';
+                d.online_users.forEach(u => {
+                    const statusDot = u.status === 'active' 
+                        ? '<span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>'
+                        : '<span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-400"></span>';
+                    const statusLabel = u.status === 'active' ? 'Active' : 'Idle';
+                    const timeSince = u.last_seen ? formatTimeAgo(u.last_seen) : '—';
+                    html += `<tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/20 transition-colors">
+                        <td class="px-4 py-2.5 font-semibold text-zinc-900 dark:text-zinc-100">${escapeHtml(u.display_name || '—')}</td>
+                        <td class="px-4 py-2.5 text-zinc-500 dark:text-zinc-400 font-mono text-[10px]">${escapeHtml(u.agency_name || '—')}</td>
+                        <td class="px-4 py-2.5 text-zinc-600 dark:text-zinc-300">${escapeHtml(u.current_screen || 'Dashboard')}</td>
+                        <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 text-zinc-600 dark:text-zinc-300">${statusDot} ${statusLabel}</span></td>
+                        <td class="px-4 py-2.5 text-zinc-400 dark:text-zinc-500">${timeSince}</td>
+                    </tr>`;
+                });
+                $('#live-online-users-body').html(html);
+            } else {
+                $('#live-online-users-body').html('<tr><td colspan="5" class="px-4 py-6 text-center text-zinc-400">No users currently online</td></tr>');
+            }
+            
+            // Heatmap
+            renderHeatmap(d.heatmap || {});
+            
+            // Activity feed
+            renderActivityFeed(d.recent_activity || []);
+        });
+    };
+
+    function renderHeatmap(heatmap) {
+        const container = $('#live-heatmap-container');
+        const currentHour = new Date().getHours();
+        let maxCount = 0;
+        for (let h = 0; h < 24; h++) {
+            const key = String(h).padStart(2, '0');
+            const val = parseInt(heatmap[key]) || 0;
+            if (val > maxCount) maxCount = val;
+        }
+        if (maxCount === 0) maxCount = 1; // prevent div by zero
+        
+        let html = '';
+        for (let h = 0; h < 24; h++) {
+            const key = String(h).padStart(2, '0');
+            const count = parseInt(heatmap[key]) || 0;
+            const pct = Math.round((count / maxCount) * 100);
+            const isCurrent = h === currentHour;
+            const hourLabel = h === 0 ? '12 AM' : h < 12 ? h + ' AM' : h === 12 ? '12 PM' : (h-12) + ' PM';
+            const highlight = isCurrent ? 'bg-zinc-100/80 dark:bg-zinc-800/40 rounded' : '';
+            html += `<div class="flex items-center gap-2 py-0.5 px-1 ${highlight}">
+                <span class="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 w-12 shrink-0 text-right">${hourLabel}</span>
+                <div class="flex-1 h-3.5 bg-zinc-100 dark:bg-zinc-800/60 rounded-sm overflow-hidden">
+                    <div class="h-full bg-zinc-700 dark:bg-zinc-300 rounded-sm transition-all" style="width:${pct}%"></div>
+                </div>
+                <span class="text-[10px] font-mono text-zinc-400 w-6 text-right">${count}</span>
+            </div>`;
+        }
+        container.html(html);
+    }
+
+    function renderActivityFeed(activities) {
+        const container = $('#live-activity-feed');
+        if (!activities || activities.length === 0) {
+            container.html('<div class="text-center text-zinc-400 dark:text-zinc-500 py-6 text-xs">No recent activity recorded.</div>');
+            return;
+        }
+        let html = '';
+        activities.forEach(a => {
+            html += `<div class="flex items-start gap-3 py-2 border-b border-zinc-100 dark:border-zinc-800/60 last:border-0">
+                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-500 shrink-0"></span>
+                <div class="flex-1 min-w-0">
+                    <span class="font-semibold text-zinc-800 dark:text-zinc-200">${escapeHtml(a.user_display_name || 'System')}</span>
+                    <span class="text-zinc-500 dark:text-zinc-400 ml-1">${escapeHtml(a.description || a.action_type)}</span>
+                    <span class="ml-1.5 text-[10px] font-mono text-zinc-400 dark:text-zinc-500">${escapeHtml(a.agency_name || '')}</span>
+                </div>
+                <span class="text-[10px] text-zinc-400 dark:text-zinc-500 shrink-0 whitespace-nowrap">${a.time_ago || '—'}</span>
+            </div>`;
+        });
+        container.html(html);
+    }
+
+    function formatTimeAgo(dateStr) {
+        if (!dateStr) return '—';
+        try {
+            const d = new Date(dateStr.replace(/-/g, '/'));
+            const now = new Date();
+            const diffSec = Math.round((now - d) / 1000);
+            if (diffSec < 30) return 'Just now';
+            if (diffSec < 60) return diffSec + 's ago';
+            if (diffSec < 3600) return Math.floor(diffSec / 60) + 'm ago';
+            if (diffSec < 86400) return Math.floor(diffSec / 3600) + 'h ago';
+            return Math.floor(diffSec / 86400) + 'd ago';
+        } catch(e) { return '—'; }
+    }
+
+    // Auto-refresh controller with visibility API
+    function startLiveMonitorRefresh() {
+        if (liveMonitorInterval) clearInterval(liveMonitorInterval);
+        liveMonitorInterval = setInterval(function() {
+            if (document.visibilityState === 'visible') {
+                loadLiveMonitor();
+            }
+        }, 30000);
+    }
+
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible' && coraREData.currentPage === 'super-health') {
+            loadLiveMonitor();
+        }
+    });
+
     // Run dynamic retrieval on mount
     loadPlatformData();
     if (coraREData.currentPage === 'super-health') {
         loadHealthMetrics();
+        loadLiveMonitor();
+        startLiveMonitorRefresh();
     }
 });
 
@@ -1087,6 +1335,95 @@ window.dispatchSuperDailyReports = function() {
         }
     }).fail(function() {
         if (window.coraShowToast) window.coraShowToast('Network error while dispatching reports.', 'error');
+    });
+};
+
+let currentManagingWorkspaceId = null;
+
+window.openManageWorkspaceDrawer = function(workspaceId) {
+    const ws = rawWorkspaces.find(w => w.id === workspaceId);
+    if (!ws) {
+        if (window.coraShowToast) window.coraShowToast('Workspace data not found.', 'error');
+        return;
+    }
+
+    currentManagingWorkspaceId = workspaceId;
+
+    // Set Header
+    $('#manage-ws-title').text(ws.name);
+    $('#manage-ws-slug-info').text('app.heycora.in/' + ws.slug);
+
+    // Set Quotas
+    $('#manage-ws-max-users').val(ws.max_users_limit || 5);
+    $('#manage-ws-storage-mb').val(ws.storage_limit_mb || 1024);
+    $('#manage-ws-max-emails').val(ws.max_emails_limit || 200);
+    $('#manage-ws-rag-token-quota').val(ws.rag_token_quota || 100000);
+
+    // Set Toggles
+    $('#manage-ws-enable-leads').prop('checked', ws.enable_leads !== false);
+    $('#manage-ws-enable-clients').prop('checked', ws.enable_clients !== false);
+    $('#manage-ws-enable-properties').prop('checked', ws.enable_properties !== false);
+    $('#manage-ws-enable-bookings').prop('checked', ws.enable_bookings !== false);
+    $('#manage-ws-enable-ledger').prop('checked', ws.enable_ledger !== false);
+    $('#manage-ws-enable-documents').prop('checked', ws.enable_documents !== false);
+
+    // Open Drawer
+    $('#cora-manage-workspace-drawer').removeClass('translate-x-full');
+    $('#cora-manage-workspace-overlay').removeClass('hidden');
+};
+
+window.closeManageWorkspaceDrawer = function() {
+    $('#cora-manage-workspace-drawer').addClass('translate-x-full');
+    $('#cora-manage-workspace-overlay').addClass('hidden');
+    currentManagingWorkspaceId = null;
+};
+
+window.saveWorkspaceSettings = function() {
+    if (!currentManagingWorkspaceId) return;
+
+    const maxUsers = $('#manage-ws-max-users').val();
+    const storageLimit = $('#manage-ws-storage-mb').val();
+    const maxEmails = $('#manage-ws-max-emails').val();
+    const ragTokenQuota = $('#manage-ws-rag-token-quota').val();
+
+    const enableLeads = $('#manage-ws-enable-leads').is(':checked');
+    const enableClients = $('#manage-ws-enable-clients').is(':checked');
+    const enableProperties = $('#manage-ws-enable-properties').is(':checked');
+    const enableBookings = $('#manage-ws-enable-bookings').is(':checked');
+    const enableLedger = $('#manage-ws-enable-ledger').is(':checked');
+    const enableDocuments = $('#manage-ws-enable-documents').is(':checked');
+
+    const saveBtn = $('#manage-ws-save-btn');
+    const originalHtml = saveBtn.html();
+    saveBtn.prop('disabled', true).html('Saving...');
+
+    $.post(coraREData.ajaxUrl, {
+        action: 'cora_super_update_workspace',
+        security: coraREData.ajaxNonce,
+        id: currentManagingWorkspaceId,
+        max_users_limit: maxUsers,
+        storage_limit_mb: storageLimit,
+        max_emails_limit: maxEmails,
+        rag_token_quota: ragTokenQuota,
+        enable_leads: enableLeads,
+        enable_clients: enableClients,
+        enable_properties: enableProperties,
+        enable_bookings: enableBookings,
+        enable_ledger: enableLedger,
+        enable_documents: enableDocuments
+    }, function(res) {
+        saveBtn.prop('disabled', false).html(originalHtml);
+        if (res.success) {
+            if (window.coraShowToast) window.coraShowToast('Workspace settings saved successfully.', 'success');
+            closeManageWorkspaceDrawer();
+            if (typeof loadPlatformData === 'function') loadPlatformData();
+        } else {
+            const errorMsg = (res.data && res.data.message) ? res.data.message : 'Failed to save settings.';
+            if (window.coraShowToast) window.coraShowToast(errorMsg, 'error');
+        }
+    }).fail(function() {
+        saveBtn.prop('disabled', false).html(originalHtml);
+        if (window.coraShowToast) window.coraShowToast('Network error while saving settings.', 'error');
     });
 };
 </script>
@@ -1225,3 +1562,139 @@ window.dispatchSuperDailyReports = function() {
         </button>
     </div>
 </div>
+
+<!-- Manage Workspace Settings Right-Sliding Drawer -->
+<div id="cora-manage-workspace-overlay" onclick="closeManageWorkspaceDrawer()" class="hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-[9990] transition-opacity duration-300"></div>
+
+<div id="cora-manage-workspace-drawer" class="fixed top-0 right-0 h-full w-full sm:w-120 bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 flex flex-col">
+    <!-- Header -->
+    <div class="px-6 py-4 border-b border-zinc-100 dark:border-zinc-850 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2.5">
+            <span class="p-2 bg-zinc-100 dark:bg-zinc-900 rounded-lg text-zinc-900 dark:text-zinc-100">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </span>
+            <div>
+                <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-50" id="manage-ws-title">Manage Workspace</h3>
+                <p class="text-xs text-zinc-500 font-mono" id="manage-ws-slug-info">app.heycora.in/slug</p>
+            </div>
+        </div>
+        <button onclick="closeManageWorkspaceDrawer()" class="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors cursor-pointer">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <!-- Body Form -->
+    <div class="flex-1 overflow-y-auto p-6 space-y-6">
+        <!-- Resource Quotas Section -->
+        <div>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3.5">Resource Quotas & Limits</h4>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-600 dark:text-zinc-400 mb-1">Max Users</label>
+                    <input type="number" id="manage-ws-max-users" min="1" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs bg-white dark:bg-zinc-900 focus:border-zinc-400 outline-none text-zinc-900 dark:text-zinc-100 font-mono" placeholder="5">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-600 dark:text-zinc-400 mb-1">Storage Limit (MB)</label>
+                    <input type="number" id="manage-ws-storage-mb" min="10" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs bg-white dark:bg-zinc-900 focus:border-zinc-400 outline-none text-zinc-900 dark:text-zinc-100 font-mono" placeholder="1024">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-600 dark:text-zinc-400 mb-1">Max Emails / Month</label>
+                    <input type="number" id="manage-ws-max-emails" min="0" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs bg-white dark:bg-zinc-900 focus:border-zinc-400 outline-none text-zinc-900 dark:text-zinc-100 font-mono" placeholder="200">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-600 dark:text-zinc-400 mb-1">RAG Token Limit</label>
+                    <input type="number" id="manage-ws-rag-token-quota" min="1000" step="50000" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs bg-white dark:bg-zinc-900 focus:border-zinc-400 outline-none text-zinc-900 dark:text-zinc-100 font-mono" placeholder="100000">
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Flags Section -->
+        <div>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3.5">Feature Governance Flags</h4>
+            <div class="space-y-2.5">
+                <!-- Leads -->
+                <div class="flex items-center justify-between p-3 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-zinc-50/20 dark:bg-zinc-900/10">
+                    <div>
+                        <h5 class="text-xs font-bold text-zinc-800 dark:text-zinc-200">Leads Management</h5>
+                        <p class="text-[10px] text-zinc-400 dark:text-zinc-500">Enable leads table, details inspection, and client funnels.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="manage-ws-enable-leads" class="sr-only peer">
+                        <div class="w-8 h-4.5 bg-zinc-200 dark:bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all dark:after:border-zinc-650 peer-checked:bg-zinc-950 dark:peer-checked:bg-white peer-checked:after:border-transparent"></div>
+                    </label>
+                </div>
+
+                <!-- Clients -->
+                <div class="flex items-center justify-between p-3 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-zinc-50/20 dark:bg-zinc-900/10">
+                    <div>
+                        <h5 class="text-xs font-bold text-zinc-800 dark:text-zinc-200">Clients Directory</h5>
+                        <p class="text-[10px] text-zinc-400 dark:text-zinc-500">Enable client records database and workspace accounts.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="manage-ws-enable-clients" class="sr-only peer">
+                        <div class="w-8 h-4.5 bg-zinc-200 dark:bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all dark:after:border-zinc-650 peer-checked:bg-zinc-950 dark:peer-checked:bg-white peer-checked:after:border-transparent"></div>
+                    </label>
+                </div>
+
+                <!-- Portfolios / Properties -->
+                <div class="flex items-center justify-between p-3 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-zinc-50/20 dark:bg-zinc-900/10">
+                    <div>
+                        <h5 class="text-xs font-bold text-zinc-800 dark:text-zinc-200">Portfolios & Properties</h5>
+                        <p class="text-[10px] text-zinc-400 dark:text-zinc-500">Enable properties portfolio catalog and listing manager.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="manage-ws-enable-properties" class="sr-only peer">
+                        <div class="w-8 h-4.5 bg-zinc-200 dark:bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all dark:after:border-zinc-650 peer-checked:bg-zinc-950 dark:peer-checked:bg-white peer-checked:after:border-transparent"></div>
+                    </label>
+                </div>
+
+                <!-- Bookings -->
+                <div class="flex items-center justify-between p-3 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-zinc-50/20 dark:bg-zinc-900/10">
+                    <div>
+                        <h5 class="text-xs font-bold text-zinc-800 dark:text-zinc-200">Booking Engine</h5>
+                        <p class="text-[10px] text-zinc-400 dark:text-zinc-500">Enable shoot schedules and calendar event slots.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="manage-ws-enable-bookings" class="sr-only peer">
+                        <div class="w-8 h-4.5 bg-zinc-200 dark:bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all dark:after:border-zinc-650 peer-checked:bg-zinc-950 dark:peer-checked:bg-white peer-checked:after:border-transparent"></div>
+                    </label>
+                </div>
+
+                <!-- Financials / Ledger -->
+                <div class="flex items-center justify-between p-3 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-zinc-50/20 dark:bg-zinc-900/10">
+                    <div>
+                        <h5 class="text-xs font-bold text-zinc-800 dark:text-zinc-200">Financials & Ledger</h5>
+                        <p class="text-[10px] text-zinc-400 dark:text-zinc-500">Enable invoice listings, GST math breakdowns, and ledgers.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="manage-ws-enable-ledger" class="sr-only peer">
+                        <div class="w-8 h-4.5 bg-zinc-200 dark:bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all dark:after:border-zinc-650 peer-checked:bg-zinc-950 dark:peer-checked:bg-white peer-checked:after:border-transparent"></div>
+                    </label>
+                </div>
+
+                <!-- Documents Vault -->
+                <div class="flex items-center justify-between p-3 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-zinc-50/20 dark:bg-zinc-900/10">
+                    <div>
+                        <h5 class="text-xs font-bold text-zinc-800 dark:text-zinc-200">Document Vault & E-Sign</h5>
+                        <p class="text-[10px] text-zinc-400 dark:text-zinc-500">Enable contract uploads, agreements registry, and e-signatures.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="manage-ws-enable-documents" class="sr-only peer">
+                        <div class="w-8 h-4.5 bg-zinc-200 dark:bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all dark:after:border-zinc-650 peer-checked:bg-zinc-950 dark:peer-checked:bg-white peer-checked:after:border-transparent"></div>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="p-6 border-t border-zinc-100 dark:border-zinc-850 bg-zinc-50/50 dark:bg-zinc-900/40 flex items-center justify-end gap-3 shrink-0">
+        <button onclick="closeManageWorkspaceDrawer()" class="px-4 py-2 text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer">
+            Cancel
+        </button>
+        <button id="manage-ws-save-btn" onclick="saveWorkspaceSettings()" class="px-5 py-2.5 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold text-xs rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 active:scale-[0.98] transition-all cursor-pointer shadow-sm">
+            Save Settings
+        </button>
+    </div>
+</div>
+

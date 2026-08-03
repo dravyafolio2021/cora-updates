@@ -1,3 +1,25 @@
+# RAG Knowledge Base Integration: Release v3.1.24
+
+We have successfully integrated a robust, tenant-isolated RAG (Retrieval-Augmented Generation) Knowledge Base system. This system allows workspaces to index and ingest text snippets, external URLs, and blog posts to contextually ground Cora's AI generation pipelines.
+
+## 1. Core Feature Additions
+* **Database Schema (`wp_cora_rag_knowledge`)**: Provisioned a highly performant indexing table with structured columns for `agency_id`, `title`, `content`, `source_type` (`text`, `url`, `article`), `source_id`, `token_count`, and MySQL timestamps.
+* **Granular Quota Limits (`rag_token_quota`)**: Configured strict workspace token limits based on plan subscriptions (Free: 100K, Pro: 500K, Enterprise: 2.5M). Included adjustable controls inside the Super Admin "Manage Workspace" slider drawer.
+* **Automated WP Blog Sync (`save_post` & deletion hooks)**: Configured background action hooks to automatically ingest, sync, or delete WordPress blog posts in the RAG index as they are created, updated, or trashed in the editor, estimating tokens based on word counts.
+* **Secure AJAX Controllers (`cora_save_rag_resource` & `cora_delete_rag_resource`)**: Implemented REST AJAX handlers validating token size increases against available quotas and verifying workspace tenancy before completing edits or deletions.
+* **Notion-Style UI Panel (`views/view-rag.php`)**: Built a visual workspace page with modern layout:
+  * *Telemetry Cards*: Highlighting Total Resources count, Quota progress bar, and channel source breakdown.
+  * *Interactive Table*: Notion-style clean lines, sorting, local search, and state badge pills.
+  * *Action Drawer*: Slide-sheet form supporting raw text uploads and web crawling targets with native Toast system validation.
+* **Custom Confirmation Overlays (Design Rule 1 Enforcement)**: Replaced browser-native confirm alerts with a dedicated, custom monochromatic modal popup (`cora-rag-confirm-drawer`) using zinc-neutral shades, SVG warning paths, and safe callback bindings.
+
+## 2. Release & Verification
+* **Build**: Successfully built version `3.1.24` with complete version alignment and safety guards analysis (541 functions, 617 guards).
+* **Deploy**: Deployed the zip package (`cora-workspace.zip`) to the staging environment (`stagging.heycora.in`).
+* **Verification**: Confirmed successful remote activation, cache flushes, and database upgrades.
+
+---
+
 # Client-Side Caching Prevention: Release v3.0.6
 
 We have successfully resolved the issue where newly created forms did not show up in the forms list when navigating back from the editor without a manual page refresh.

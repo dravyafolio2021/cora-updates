@@ -125,3 +125,26 @@
   - [x] Zip, package and deploy version `3.0.6` to Demo and Production environments.
   - [x] Execute LiteSpeed Cache flush on remote servers via PHP eval and verify the updated forms propagate immediately.
 
+- [x] **AI Tools Workspace & Staging Impersonation Bug Fixes (v3.1.22 Release)**
+  - [x] Deployed ElevenLabs speech synthesis and unlocked the AI Tools sidebar page.
+  - [x] Fixed provider dropdown list deprecations and disabled non-functional NVIDIA NIM models.
+  - [x] Replaced thinking text with dynamic ticking stopwatch progress indicator showing round-trip latency.
+  - [x] Implemented resilient 3-stage fallback routing (Gemini -> Groq Llama -> OpenRouter Llama) to handle API outages.
+  - [x] Unlocked the secondary Model Context Protocol gateway panel for workspace owners.
+  - [x] Synchronized active workspace cookies during impersonation switching and restored them on switch back.
+  - [x] Added dynamic redirect fallbacks in the router to recover from restricted workspace paths without showing a 403 screen.
+  - [x] Implemented unrestricted staging/local access checks inside `cora_user_can_access_workspace()` bypassing 403 barriers for testing (restricting allowed hosts to `stagging.heycora.in` and `cora.local`).
+  - [x] Removed dummy fallbacks from bento dashboard widgets (Today's Timeline, Cash Overview, Attention Required, Smart Tasks, and AI Inbox) and replaced them with fully dynamic empty states for clean, fresh workspaces.
+  - [x] Deployed version `3.1.22` successfully via password pseudoterminal wrapper to the staging directory `/home/u484406462/domains/heycora.in/public_html/stagging`.
+
+- [x] **Workspace-Isolated RAG Knowledge Base & Quota Management (v3.1.23 Release)**
+  - [x] Add `wp_cora_rag_knowledge` table schema to plugin table creation.
+  - [x] Implement `rag_token_quota` plan defaults and setting checks in backend.
+  - [x] Add `save_post` and deletion filters to automatically synchronize blog articles.
+  - [x] Implement AJAX endpoints for adding (with quota checks), editing, and deleting knowledge base resources.
+  - [x] Register `rag` subpage inside sidebar menus for Real Estate and Photography Studio.
+  - [x] Add RAG settings control to Super Admin Workspace drawer and database save action.
+  - [x] Create UI panel `views/view-rag.php` featuring Notion-style layout, telemetry cards, resources list, and sliding drawers.
+  - [x] Rebuild, package, and deploy version `3.1.23` to staging.
+
+

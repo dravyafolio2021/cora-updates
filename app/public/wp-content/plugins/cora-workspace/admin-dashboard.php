@@ -4176,26 +4176,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 // Load database records dynamically
                 $cora_studio_gear = get_option( 'cora_studio_gear', array() );
                 $all_bookings = function_exists('cora_db_get_bookings') ? cora_db_get_bookings() : array();
-                
-                // Fallback sample bookings if database is empty
-                if ( empty( $all_bookings ) ) {
-                    $today_date = date('Y-m-d');
-                    $all_bookings = array(
-                        array(
-                            'id' => 1,
-                            'client_id' => 'client_101',
-                            'client_name' => 'Rahul Sharma',
-                            'date' => $today_date,
-                            'time' => '11:30',
-                            'status' => 'confirmed',
-                            'assigned_agent' => 'Karan Malhotra',
-                            'package_value' => '₹2,50,000',
-                            'deal_type' => $is_studio ? 'Wedding Shoot' : 'Luxury Villa Tour',
-                            'notes' => 'Shoot at DLF Cyber City Phase 2',
-                            'location' => 'DLF Cyber City'
-                        )
-                    );
-                }
 
                 $clients_by_id = array();
                 if ( is_array( $cora_workspace_clients ) ) {
@@ -4542,12 +4522,13 @@ window.coraGetPageIconSvg = function(page) {
         case 'ai-assistants': return '<svg viewBox="0 0 24 24" '+stroke+'><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M12 2v6M8 5h8"></path><circle cx="8" cy="16" r="1"></circle><circle cx="16" cy="16" r="1"></circle></svg>';
         case 'analytics': return '<svg viewBox="0 0 24 24" '+stroke+'><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>';
         case 'integrations': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>';
+        case 'knowledge-base': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>';
         default: return '<svg viewBox="0 0 24 24" '+stroke+'><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
     }
 };
 
-var CORA_ALL_PAGES=[{value:'bookings',label:'Bookings / Calendar'},{value:'leads',label:'Leads'},{value:'clients',label:'Clients'},{value:'listings',label:'Listings'},{value:'equipment',label:'Equipment / Gear'},{value:'crew-scheduler',label:'Crew Scheduler'},{value:'media',label:'Media Library'},{value:'financials',label:'Financials'},{value:'content-suite',label:'Content Suite'},{value:'forms',label:'Forms & Contracts'},{value:'settings-suite',label:'Settings'},{value:'ai-assistants',label:'AI Assistants'},{value:'analytics',label:'Analytics & Reports'},{value:'integrations',label:'Integrations'}];
-var CORA_PRESETS=[{name:'Book a Shoot',page:'bookings'},{name:'Check Financials',page:'financials'},{name:'Add New Lead',page:'leads'},{name:'Upload Media',page:'media'},{name:'View Crew',page:'crew-scheduler'},{name:'AI Assistants',page:'ai-assistants'},{name:'Content Suite',page:'content-suite'},{name:'View Listings',page:'listings'}];
+var CORA_ALL_PAGES=[{value:'bookings',label:'Bookings / Calendar'},{value:'leads',label:'Leads'},{value:'clients',label:'Clients'},{value:'listings',label:'Listings'},{value:'equipment',label:'Equipment / Gear'},{value:'crew-scheduler',label:'Crew Scheduler'},{value:'media',label:'Media Library'},{value:'financials',label:'Financials'},{value:'content-suite',label:'Content Suite'},{value:'forms',label:'Forms & Contracts'},{value:'settings-suite',label:'Settings'},{value:'ai-assistants',label:'AI Assistants'},{value:'analytics',label:'Analytics & Reports'},{value:'integrations',label:'Integrations'},{value:'knowledge-base',label:'RAG Knowledge Base'}];
+var CORA_PRESETS=[{name:'Book a Shoot',page:'bookings'},{name:'Check Financials',page:'financials'},{name:'Add New Lead',page:'leads'},{name:'Upload Media',page:'media'},{name:'View Crew',page:'crew-scheduler'},{name:'AI Assistants',page:'ai-assistants'},{name:'Content Suite',page:'content-suite'},{name:'View Listings',page:'listings'},{name:'RAG Knowledge Base',page:'knowledge-base'}];
 
 window.coraFilterPages=function(q){var drop=document.getElementById('cora-page-list-drop');var items=document.getElementById('cora-page-list-items');if(!drop||!items)return;drop.style.display='block';var filtered=q?CORA_ALL_PAGES.filter(function(p){return p.label.toLowerCase().indexOf(q.toLowerCase())>-1;}):CORA_ALL_PAGES;if(!filtered.length){items.innerHTML='<p style="font-size:11px;color:#a1a1aa;padding:10px 12px;">No pages found</p>';return;}items.innerHTML=filtered.map(function(p){var iconHtml=window.coraGetPageIconSvg(p.value);return '<button type="button" onclick="window.coraSelectPage(\''+p.value+'\',\''+p.label.replace(/'/g,"\\'")+'\')" style="display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:8px 12px;font-size:12px;background:none;border:none;cursor:pointer;color:#3f3f46;" onmouseover="this.style.background=\'#f4f4f5\'" onmouseout="this.style.background=\'none\'"><span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;color:#71717a;">'+iconHtml+'</span><span>'+p.label+'</span></button>';}).join('');};
 
@@ -4591,9 +4572,6 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                         }
                     }
                 }
-                if ($mtd_received == 0) { $mtd_received = 482000; }
-                if ($expected_amount == 0) { $expected_amount = 95000; }
-                if ($overdue_amount == 0) { $overdue_amount = 18000; }
                 ?>
                 <div class="cora-bento-grid pt-4 sm:pt-6 gap-5">
                      <!-- CARD 1: Today's Timeline (Spans 2 Columns) -->
@@ -4725,30 +4703,33 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                                         }
                                     }
                                 }
-                                if ( empty( $attention_clients ) ) {
-                                    $attention_clients = array(
-                                        array('names' => 'Apex Realty Partners', 'reason' => $is_studio ? 'Shoot Proposal Sent' : 'Proposal not opened', 'time_ago' => '2d'),
-                                        array('names' => 'Sunrise Developers', 'reason' => 'Follow up due today', 'time_ago' => 'Today'),
-                                        array('names' => 'DLF Group', 'reason' => 'Contract review pending', 'time_ago' => '1d')
-                                    );
-                                }
-                                foreach ( array_slice($attention_clients, 0, 3) as $client ) :
-                                    $c_name = $client['names'] ?? 'Client';
-                                    $c_reason = $client['reason'] ?? ($is_studio ? 'Shoot confirmation' : 'Lead follow-up');
-                                    $c_time = $client['time_ago'] ?? '1d';
-                                    $badge_cls = 'text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800';
-                                    if (strtolower($c_time) === 'today') {
-                                        $badge_cls = 'text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20';
-                                    }
-                                ?>
-                                    <div class="flex items-center justify-between text-xs gap-2">
-                                        <div class="flex flex-col min-w-0">
-                                            <strong class="font-bold text-zinc-855 dark:text-zinc-100 truncate text-[11px]"><?php echo esc_html($c_name); ?></strong>
-                                            <span class="text-[10px] text-zinc-455 dark:text-zinc-500 truncate"><?php echo esc_html($c_reason); ?></span>
+                                if ( empty( $attention_clients ) ) : ?>
+                                    <div class="flex flex-col items-center justify-center py-6 text-center">
+                                        <div class="h-10 w-10 rounded-full bg-zinc-50 dark:bg-zinc-850 border border-zinc-200 dark:border-zinc-800/45 flex items-center justify-center mb-2">
+                                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                                         </div>
-                                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full shrink-0 <?php echo $badge_cls; ?>"><?php echo esc_html($c_time); ?></span>
+                                        <h4 class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">All caught up</h4>
+                                        <p class="text-[9px] text-zinc-455 dark:text-zinc-500 mt-0.5 max-w-[180px]">No immediate follow ups required.</p>
                                     </div>
-                                <?php endforeach; ?>
+                                <?php else : 
+                                    foreach ( array_slice($attention_clients, 0, 3) as $client ) :
+                                        $c_name = $client['names'] ?? 'Client';
+                                        $c_reason = $client['reason'] ?? ($is_studio ? 'Shoot confirmation' : 'Lead follow-up');
+                                        $c_time = $client['time_ago'] ?? '1d';
+                                        $badge_cls = 'text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800';
+                                        if (strtolower($c_time) === 'today') {
+                                            $badge_cls = 'text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20';
+                                        }
+                                    ?>
+                                        <div class="flex items-center justify-between text-xs gap-2">
+                                            <div class="flex flex-col min-w-0">
+                                                <strong class="font-bold text-zinc-855 dark:text-zinc-100 truncate text-[11px]"><?php echo esc_html($c_name); ?></strong>
+                                                <span class="text-[10px] text-zinc-455 dark:text-zinc-500 truncate"><?php echo esc_html($c_reason); ?></span>
+                                            </div>
+                                            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full shrink-0 <?php echo $badge_cls; ?>"><?php echo esc_html($c_time); ?></span>
+                                        </div>
+                                    <?php endforeach;
+                                endif; ?>
                             </div>
                         </div>
 
@@ -4770,65 +4751,77 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                                     </div>
                                     <div class="flex flex-col">
                                         <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Smart Tasks</h3>
-                                        <span class="text-[11px] text-zinc-450 dark:text-zinc-500 font-medium">Recommended pipeline actions</span>
-                                    </div>
-                                </div>
-                            </div>
+                                <div class="space-y-3.5">
+                                <?php
+                                $smart_tasks = array();
+                                if ( $is_studio ) {
+                                    if ( ! empty( $all_bookings ) ) {
+                                        $first_bk = reset( $all_bookings );
+                                        $c_name = $first_bk['client_name'] ?? 'Client';
+                                        $smart_tasks[] = array(
+                                            'title' => 'Assign Crew Shift',
+                                            'desc'  => 'For ' . $c_name . ' shoot',
+                                            'url'   => "coraNavigateTo('crew-scheduler')",
+                                            'icon'  => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>'
+                                        );
+                                    }
+                                    if ( ! empty( $cora_workspace_listings ) ) {
+                                        $first_gear = reset( $cora_workspace_listings );
+                                        $g_name = $first_gear['name'] ?? 'Gear';
+                                        $smart_tasks[] = array(
+                                            'title' => 'Check in ' . $g_name,
+                                            'desc'  => $g_name . ' verification',
+                                            'url'   => "coraNavigateTo('equipment')",
+                                            'icon'  => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg>'
+                                        );
+                                    }
+                                } else {
+                                    if ( ! empty( $all_bookings ) ) {
+                                        $first_bk = reset( $all_bookings );
+                                        $c_name = $first_bk['client_name'] ?? 'Client';
+                                        $smart_tasks[] = array(
+                                            'title' => 'Draft Tour Captions',
+                                            'desc'  => 'For ' . $c_name . ' Tour',
+                                            'url'   => "coraNavigateTo('ai-assistants')",
+                                            'icon'  => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>'
+                                        );
+                                    }
+                                    if ( ! empty( $cora_workspace_listings ) ) {
+                                        $first_prop = reset( $cora_workspace_listings );
+                                        $p_name = $first_prop['name'] ?? 'Property';
+                                        $smart_tasks[] = array(
+                                            'title' => 'Create Listing Brochure',
+                                            'desc'  => 'For ' . $p_name . ' listing',
+                                            'url'   => "window.coraOpenCommandPalette()",
+                                            'icon'  => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>'
+                                        );
+                                    }
+                                }
 
-                            <div class="space-y-3.5">
-                                <?php if ( $is_studio ) : ?>
-                                    <div class="flex items-start gap-2.5 p-2 bg-zinc-55/35 dark:bg-zinc-850/20 border border-transparent rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/45 transition-all cursor-pointer" onclick="coraNavigateTo('crew-scheduler')">
-                                        <div class="h-6 w-6 rounded-lg bg-blue-50 dark:bg-blue-950/20 text-blue-500 dark:text-blue-400 flex items-center justify-center shrink-0">
-                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                                if ( empty( $smart_tasks ) ) : ?>
+                                    <div class="flex flex-col items-center justify-center py-6 text-center">
+                                        <div class="h-10 w-10 rounded-full bg-zinc-50 dark:bg-zinc-850 border border-zinc-200 dark:border-zinc-800/45 flex items-center justify-center mb-2">
+                                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26C17.81 13.47 19 11.38 19 9a7 7 0 0 0-7-7z"></path></svg>
                                         </div>
-                                        <div class="flex-1 min-w-0 pr-1 flex items-center justify-between">
-                                            <div class="flex flex-col min-w-0">
-                                                <span class="text-[11px] font-bold text-zinc-800 dark:text-zinc-100 leading-tight">Assign Crew Shift</span>
-                                                <span class="text-[9px] text-zinc-450 dark:text-zinc-500 truncate mt-0.5">For today's DLF shoot</span>
-                                            </div>
-                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 shrink-0"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                                        </div>
+                                        <h4 class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">No smart tasks</h4>
+                                        <p class="text-[9px] text-zinc-455 dark:text-zinc-500 mt-0.5 max-w-[180px]">Add bookings or listings to see recommendations.</p>
                                     </div>
-
-                                    <div class="flex items-start gap-2.5 p-2 bg-zinc-55/35 dark:bg-zinc-850/20 border border-transparent rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/45 transition-all cursor-pointer" onclick="coraNavigateTo('equipment')">
-                                        <div class="h-6 w-6 rounded-lg bg-blue-50 dark:bg-blue-950/20 text-blue-500 dark:text-blue-400 flex items-center justify-center shrink-0">
-                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg>
-                                        </div>
-                                        <div class="flex-1 min-w-0 pr-1 flex items-center justify-between">
-                                            <div class="flex flex-col min-w-0">
-                                                <span class="text-[11px] font-bold text-zinc-800 dark:text-zinc-100 leading-tight">Check in Sony a7 IV</span>
-                                                <span class="text-[9px] text-zinc-455 dark:text-zinc-500 truncate mt-0.5">Rahul & Priya shoot complete</span>
+                                <?php else : 
+                                    foreach ( $smart_tasks as $task ) : ?>
+                                        <div class="flex items-start gap-2.5 p-2 bg-zinc-55/35 dark:bg-zinc-850/20 border border-transparent rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/45 transition-all cursor-pointer" onclick="<?php echo $task['url']; ?>">
+                                            <div class="h-6 w-6 rounded-lg bg-blue-50 dark:bg-blue-950/20 text-blue-500 dark:text-blue-400 flex items-center justify-center shrink-0 font-bold text-[11px]">
+                                                <?php echo $task['icon']; ?>
                                             </div>
-                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 shrink-0"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                                        </div>
-                                    </div>
-                                <?php else : ?>
-                                    <div class="flex items-start gap-2.5 p-2 bg-zinc-55/35 dark:bg-zinc-850/20 border border-transparent rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/45 transition-all cursor-pointer" onclick="coraNavigateTo('ai-assistants')">
-                                        <div class="h-6 w-6 rounded-lg bg-blue-50 dark:bg-blue-950/20 text-blue-500 dark:text-blue-400 flex items-center justify-center shrink-0">
-                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                                        </div>
-                                        <div class="flex-1 min-w-0 pr-1 flex items-center justify-between">
-                                            <div class="flex flex-col min-w-0">
-                                                <span class="text-[11px] font-bold text-zinc-800 dark:text-zinc-100 leading-tight">Draft Tour Captions</span>
-                                                <span class="text-[9px] text-zinc-455 dark:text-zinc-500 truncate mt-0.5">For DLF Cyber City Tour</span>
+                                            <div class="flex-1 min-w-0 pr-1 flex items-center justify-between">
+                                                <div class="flex flex-col min-w-0">
+                                                    <span class="text-[11px] font-bold text-zinc-800 dark:text-zinc-100 leading-tight"><?php echo esc_html( $task['title'] ); ?></span>
+                                                    <span class="text-[9px] text-zinc-455 dark:text-zinc-500 truncate mt-0.5"><?php echo esc_html( $task['desc'] ); ?></span>
+                                                </div>
+                                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 shrink-0"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                             </div>
-                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 shrink-0"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                         </div>
-                                    </div>
-
-                                    <div class="flex items-start gap-2.5 p-2 bg-zinc-55/35 dark:bg-zinc-850/20 border border-transparent rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/45 transition-all cursor-pointer" onclick="window.coraOpenCommandPalette()">
-                                        <div class="h-6 w-6 rounded-lg bg-blue-50 dark:bg-blue-950/20 text-blue-500 dark:text-blue-400 flex items-center justify-center shrink-0">
-                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
-                                        </div>
-                                        <div class="flex-1 min-w-0 pr-1 flex items-center justify-between">
-                                            <div class="flex flex-col min-w-0">
-                                                <span class="text-[11px] font-bold text-zinc-800 dark:text-zinc-100 leading-tight">Create Listing Brochure</span>
-                                                <span class="text-[9px] text-zinc-455 dark:text-zinc-500 truncate mt-0.5">For DLF Villa listing</span>
-                                            </div>
-                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 shrink-0"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                                        </div>
-                                    </div>
-                                <?php endif; ?>
+                                    <?php endforeach;
+                                endif; ?>
                             </div>
                         </div>
 
@@ -4853,27 +4846,35 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                                         <span class="text-[11px] text-zinc-455 dark:text-zinc-500 font-medium">Pending system updates</span>
                                     </div>
                                 </div>
-                                <span class="h-5 w-5 rounded-full bg-purple-50 dark:bg-purple-950/20 text-purple-600 dark:text-purple-400 font-bold text-[10px] flex items-center justify-center shrink-0">2</span>
+                                <span class="h-5 w-5 rounded-full bg-purple-50 dark:bg-purple-950/20 text-purple-600 dark:text-purple-400 font-bold text-[10px] flex items-center justify-center shrink-0"><?php echo intval($cora_unread_count); ?></span>
                             </div>
 
                             <div class="space-y-3">
-                                <div class="flex items-start gap-2.5 p-2 bg-zinc-50/30 dark:bg-zinc-850/20 border border-zinc-100/60 dark:border-zinc-800/30 rounded-xl">
-                                    <div class="h-6 w-6 rounded-lg bg-purple-50 dark:bg-purple-950/20 text-purple-500 dark:text-purple-400 flex items-center justify-center shrink-0 font-bold text-[11px]">i</div>
-                                    <div class="flex flex-col min-w-0 flex-1">
-                                        <strong class="text-[11px] font-bold text-zinc-800 dark:text-zinc-100 truncate"><?php echo $is_studio ? "Crew has not confirmed" : "Photographer has not confirmed"; ?></strong>
-                                        <span class="text-[9px] text-zinc-455 dark:text-zinc-500 truncate">Shoot scheduled at 11:30 AM</span>
+                                <?php if ( empty( $cora_user_notifications ) ) : ?>
+                                    <div class="flex flex-col items-center justify-center py-8 text-center">
+                                        <div class="h-10 w-10 rounded-full bg-zinc-50 dark:bg-zinc-850 border border-zinc-200 dark:border-zinc-800/45 flex items-center justify-center mb-2">
+                                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                        </div>
+                                        <h4 class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">Your inbox is clear</h4>
+                                        <p class="text-[9px] text-zinc-455 dark:text-zinc-500 mt-0.5 max-w-[180px]">No pending system updates or alerts.</p>
                                     </div>
-                                    <span class="text-[9px] text-zinc-455 shrink-0">2h ago</span>
-                                </div>
-
-                                <div class="flex items-start gap-2.5 p-2 bg-zinc-50/30 dark:bg-zinc-850/20 border border-zinc-100/60 dark:border-zinc-800/30 rounded-xl">
-                                    <div class="h-6 w-6 rounded-lg bg-purple-50 dark:bg-purple-950/20 text-purple-500 dark:text-purple-400 flex items-center justify-center shrink-0 font-bold text-[11px]">?</div>
-                                    <div class="flex flex-col min-w-0 flex-1">
-                                        <strong class="text-[11px] font-bold text-zinc-800 dark:text-zinc-100 truncate">Client reschedule request</strong>
-                                        <span class="text-[9px] text-zinc-455 dark:text-zinc-500 truncate">Sunrise Developers</span>
-                                    </div>
-                                    <span class="text-[9px] text-zinc-455 shrink-0">4h ago</span>
-                                </div>
+                                <?php else : 
+                                    foreach ( array_slice( $cora_user_notifications, 0, 2 ) as $notif ) : 
+                                        $n_title = $notif['title'] ?? 'Notification';
+                                        $n_body = $notif['body'] ?? '';
+                                        $n_time = isset( $notif['timestamp'] ) ? human_time_diff( $notif['timestamp'], current_time( 'timestamp' ) ) . ' ago' : 'Just now';
+                                        $n_icon = (strpos(strtolower($n_title), 'request') !== false || strpos(strtolower($n_title), 'appeal') !== false) ? '?' : 'i';
+                                    ?>
+                                        <div class="flex items-start gap-2.5 p-2 bg-zinc-50/30 dark:bg-zinc-850/20 border border-zinc-100/60 dark:border-zinc-800/30 rounded-xl">
+                                            <div class="h-6 w-6 rounded-lg bg-purple-50 dark:bg-purple-950/20 text-purple-500 dark:text-purple-400 flex items-center justify-center shrink-0 font-bold text-[11px]"><?php echo $n_icon; ?></div>
+                                            <div class="flex flex-col min-w-0 flex-1">
+                                                <strong class="text-[11px] font-bold text-zinc-800 dark:text-zinc-100 truncate"><?php echo esc_html($n_title); ?></strong>
+                                                <span class="text-[9px] text-zinc-455 dark:text-zinc-500 truncate"><?php echo esc_html($n_body); ?></span>
+                                            </div>
+                                            <span class="text-[9px] text-zinc-455 shrink-0"><?php echo esc_html($n_time); ?></span>
+                                        </div>
+                                    <?php endforeach; 
+                                endif; ?>
                             </div>
                         </div>
 
@@ -6204,177 +6205,14 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             <!-- SECTION: AI TOOLS MCP -->
             <?php if ( $sub_page === 'mcp' ) : ?>
             <section id="cora-page-mcp" class="cora-page-section cora-active space-y-6">
-                <?php
-                // Fetch/generate token
-                $mcp_token = get_option( 'cora_mcp_access_token' );
-                if ( empty( $mcp_token ) ) {
-                    $mcp_token = bin2hex( wp_generate_password( 32, false ) );
-                    update_option( 'cora_mcp_access_token', $mcp_token );
-                }
-                $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
-                ?>
-                <div class="cora-page-header flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div class="flex items-center gap-3">
-                        <span class="cora-page-emoji text-zinc-900 flex shrink-0">
-                            <svg viewBox="0 0 24 24" width="30" height="30" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
-                                <rect x="9" y="9" width="6" height="6"></rect>
-                                <line x1="9" y1="1" x2="9" y2="4"></line>
-                                <line x1="15" y1="1" x2="15" y2="4"></line>
-                                <line x1="9" y1="20" x2="9" y2="23"></line>
-                                <line x1="15" y1="20" x2="15" y2="23"></line>
-                                <line x1="20" y1="9" x2="23" y2="9"></line>
-                                <line x1="20" y1="15" x2="23" y2="15"></line>
-                                <line x1="1" y1="9" x2="4" y2="9"></line>
-                                <line x1="1" y1="15" x2="4" y2="15"></line>
-                            </svg>
-                        </span>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h1 class="cora-page-title text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 m-0">AI Tools MCP</h1>
-                                <span class="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 text-[10px] font-bold border border-zinc-200 dark:border-zinc-700 flex items-center gap-1">
-                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                                    Coming Soon
-                                </span>
-                            </div>
-                            <p class="text-sm text-zinc-500 mt-0.5">Model Context Protocol server settings for external AI integrations.</p>
-                        </div>
-                    </div>
-                </div>
+                <?php include CORA_WORKSPACE_PATH . 'views/view-mcp.php'; ?>
+            </section>
+            <?php endif; ?>
 
-                <div class="space-y-6 max-w-3xl mt-6">
-                    <!-- Locked / Coming Soon Feature Card -->
-                    <div class="p-8 text-center bg-white dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xs flex flex-col items-center justify-center space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-400 shadow-2xs">
-                            <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                        </div>
-                        <div class="space-y-1.5 max-w-md">
-                            <h3 class="text-lg font-bold text-zinc-900 dark:text-zinc-100 m-0">AI Tools MCP Gateway — Coming Soon</h3>
-                            <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed m-0">
-                                Direct integration with external AI clients (like Claude Desktop, Cursor, and custom local LLM agents) via Model Context Protocol (MCP) is currently under active development and will be available in an upcoming platform release.
-                            </p>
-                        </div>
-                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">
-                            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                            Feature Locked — Standard REST API & AI Assistant remain active
-                        </div>
-                    </div>
-
-                    <?php if ( current_user_can( 'manage_options' ) ) : ?>
-                    <!-- Developer Preview & Token Generation (Admins/Developers Only) -->
-                    <div class="bg-white dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs space-y-4 mt-6">
-                        <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between">
-                            <div>
-                                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Model Context Protocol (MCP) AI Tools Server</h3>
-                                <p class="text-xs text-zinc-500 mt-0.5">Connect your custom external AI agents directly with Cora's data schemas.</p>
-                            </div>
-                            <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-[9px] font-bold uppercase tracking-wider">Beta Gateway</span>
-                        </div>
-
-                        <div class="p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/40">
-                            <p class="text-xs text-zinc-650 dark:text-zinc-350 leading-relaxed">
-                                Cora exposes an <strong>MCP tool server</strong> endpoint. By registering this gateway in your local AI platform (like Claude Desktop or Cursor), your AI assistant can query listings, create leads, check audit logs, and retrieve workspace statistics in real-time.
-                            </p>
-                        </div>
-
-                        <!-- MCP Gateway URL -->
-                        <div class="space-y-2">
-                            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300">MCP Gateway Endpoint URL</label>
-                            <div class="flex gap-2">
-                                <input type="text" id="cora-mcp-gateway-url-direct" readonly value="<?php echo esc_url( $mcp_url ); ?>" class="w-full font-mono bg-zinc-55/40 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs px-3 py-2 outline-none">
-                                <button type="button" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraCopyToClipboardDirect('cora-mcp-gateway-url-direct')">Copy URL</button>
-                            </div>
-                        </div>
-
-                        <!-- MCP Secure Token -->
-                        <form id="cora-mcp-token-form" method="post" action="" class="space-y-4 pt-2">
-                            <?php wp_nonce_field( 'cora_save_mcp_token_direct', 'cora_mcp_nonce' ); ?>
-                            <div class="space-y-2">
-                                <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300">Secure Bearer Access Token</label>
-                                <div class="flex gap-2">
-                                    <input type="password" id="cora-mcp-access-token-direct" name="cora_mcp_access_token_direct" value="<?php echo esc_attr( $mcp_token ); ?>" class="w-full font-mono bg-white dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs px-3 py-2 outline-none cora-credential-input" oncopy="return false;" oncut="return false;" ondragstart="return false;" ondrop="return false;" autocomplete="off">
-                                    <button type="button" class="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraToggleTokenVisibilityDirect()">Show</button>
-                                    <button type="button" class="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraGenerateNewMCPTokenDirect()">Regenerate</button>
-                                    <button type="submit" name="cora_save_mcp_token_direct_submit" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 shadow-sm">
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                                        Save Token
-                                    </button>
-                                </div>
-                                <p class="text-[10px] text-zinc-400 mt-1">Authenticate requests by sending this value in the HTTP header: <code>Authorization: Bearer &lt;token&gt;</code>.</p>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Configuration Example Card -->
-                    <div class="bg-white dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs space-y-4">
-                        <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-                            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Claude Desktop Integration Example</h3>
-                            <p class="text-xs text-zinc-500">Configure your local Claude client settings file to connect this tool provider.</p>
-                        </div>
-                        
-                        <div class="space-y-2 pt-2">
-                            <div class="bg-zinc-900 text-zinc-100 rounded-xl p-4 font-mono text-[10px] leading-relaxed overflow-x-auto shadow-inner relative">
-                                <button type="button" class="absolute top-3 right-3 px-2 py-1 bg-zinc-800 hover:bg-zinc-750 text-zinc-300 rounded text-[9px] cursor-pointer" onclick="coraCopyClaudeConfigDirect()">Copy Config</button>
-                                <pre id="cora-claude-config-code-direct"><code>{
-  "mcpServers": {
-    "cora-crm": {
-      "command": "curl",
-      "args": [
-        "-X", "POST",
-        "<?php echo esc_url( $mcp_url ); ?>",
-        "-H", "Authorization: Bearer <?php echo esc_attr( $mcp_token ); ?>",
-        "-H", "Content-Type: application/json",
-        "-d", "{\"jsonrpc\":\"2.0\",\"method\":\"tools/list\",\"id\":1}"
-      ]
-    }
-  }
-}</code></pre>
-                            </div>
-                        </div>
-                    </div>
-                    <?php endif; ?>
-                </div>
-
-                <script>
-                    function coraCopyToClipboardDirect(inputId) {
-                        var copyText = document.getElementById(inputId);
-                        copyText.select();
-                        copyText.setSelectionRange(0, 99999);
-                        navigator.clipboard.writeText(copyText.value);
-                        window.coraShowToast("Copied to clipboard.");
-                    }
-
-                    function coraToggleTokenVisibilityDirect() {
-                        var x = document.getElementById("cora-mcp-access-token-direct");
-                        if (x.type === "password") {
-                            x.type = "text";
-                        } else {
-                            x.type = "password";
-                        }
-                    }
-
-                    function coraGenerateNewMCPTokenDirect() {
-                        window.coraConfirmAction(
-                            'Regenerate MCP Token',
-                            'Are you sure you want to regenerate the secure token? Current active AI tools connections will immediately fail authentication.',
-                            function() {
-                                var chars = 'abcdef0123456789';
-                                var newToken = '';
-                                for (var i = 0; i < 32; i++) {
-                                    newToken += chars.charAt(Math.floor(Math.random() * chars.length));
-                                }
-                                document.getElementById("cora-mcp-access-token-direct").value = newToken;
-                                window.coraShowToast("New secure token generated. Save to persist.");
-                            }
-                        );
-                    }
-
-                    function coraCopyClaudeConfigDirect() {
-                        var codeText = document.getElementById("cora-claude-config-code-direct").innerText;
-                        navigator.clipboard.writeText(codeText);
-                        window.coraShowToast("Claude configuration copied to clipboard.");
-                    }
-                </script>
+            <!-- SECTION: RAG KNOWLEDGE BASE -->
+            <?php if ( $sub_page === 'knowledge-base' ) : ?>
+            <section id="cora-page-knowledge-base" class="cora-page-section cora-active space-y-6">
+                <?php include CORA_WORKSPACE_PATH . 'views/view-rag.php'; ?>
             </section>
             <?php endif; ?>
 

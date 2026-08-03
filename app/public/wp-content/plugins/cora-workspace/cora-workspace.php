@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.1.17
+ * Version: 3.1.26
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,11 +15,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.1.17' );
+define( 'CORA_WORKSPACE_VERSION', '3.1.26' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
-define( 'CORA_PLATFORM_GEMINI_API_KEY', 'AQ.Ab8RN6JVCEB9NSWEVuX0b8DwAq3asrliMSxc1tEivGxQhivPkQ' );
+define( 'CORA_PLATFORM_GEMINI_API_KEY', 'AQ.Ab8RN6LQyWhTU1-DnmLErK_xsadod4eOu1ixRCN-5K1LwVOmfg' );
+define( 'CORA_PLATFORM_OPENAI_API_KEY', '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' );
+define( 'CORA_PLATFORM_GROQ_API_KEY', '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' );
+define( 'CORA_PLATFORM_OPENROUTER_API_KEY', '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' );
+define( 'CORA_PLATFORM_ELEVENLABS_API_KEY', 'sk_45e1f8470453f6b63681f12e2e359c7f1d019b0fb2e8a0d5' );
+define( 'CORA_PLATFORM_NVIDIA_GLM_KEY', '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' );
+define( 'CORA_PLATFORM_NVIDIA_MINIMAX_KEY', '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' );
+define( 'CORA_PLATFORM_NVIDIA_MOONSHOT_KEY', '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' );
+define( 'CORA_PLATFORM_NVIDIA_DEEPSEEK_FLASH_KEY', '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' );
+define( 'CORA_PLATFORM_NVIDIA_DEEPSEEK_PRO_KEY', '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' );
+define( 'CORA_PLATFORM_NVIDIA_GEMMA_KEY', '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' );
+define( 'CORA_PLATFORM_NVIDIA_GPT_20B_KEY', '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' );
+define( 'CORA_PLATFORM_NVIDIA_GPT_120B_KEY', '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' );
+define( 'CORA_PLATFORM_NVIDIA_LLAMA_GUARD_KEY', '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' );
+define( 'CORA_PLATFORM_NVIDIA_LLAMA_33_KEY', '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' );
+define( 'CORA_PLATFORM_NVIDIA_LLAMA_1B_KEY', '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' );
+define( 'CORA_PLATFORM_NVIDIA_LLAMA_3B_KEY', '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' );
+define( 'CORA_PLATFORM_NVIDIA_LLAMA_70B_KEY', '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' );
+define( 'CORA_PLATFORM_NVIDIA_LLAMA_8B_KEY', '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' );
 
 // ── Foundation Migration: cora_re_* → cora_workspace_* ───────────────────────
 // Runs once on activation to migrate all legacy option keys from the old
@@ -847,6 +865,15 @@ function cora_get_user_workspaces( $user_id = 0 ) {
  */
 if ( ! function_exists( 'cora_user_can_access_workspace' ) ) {
 function cora_user_can_access_workspace( $user_id, $workspace_slug ) {
+    // Unrestricted access for local testing and staging environments
+    $host = isset( $_SERVER['HTTP_HOST'] ) ? strtolower( $_SERVER['HTTP_HOST'] ) : '';
+    if ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || 
+         strpos( $host, 'stagging.heycora.in' ) !== false || 
+         strpos( $host, 'cora.local' ) !== false || 
+         strpos( $host, 'local' ) !== false ) {
+        return true;
+    }
+
     $user = get_userdata( $user_id );
     if ( ! $user ) return false;
 
@@ -1188,7 +1215,19 @@ function cora_real_estate_ai_handle_workspace_route() {
         // Verify Workspace Level Access Control
         if ( $matched_workspace && ! cora_user_can_access_workspace( $user->ID, $matched_workspace['slug'] ) ) {
             $user_ws = cora_get_user_workspaces( $user->ID );
-            $fallback_slug = ! empty( $user_ws[0]['slug'] ) ? $user_ws[0]['slug'] : 'workspace';
+            if ( ! empty( $user_ws ) ) {
+                $fallback_slug = ! empty( $user_ws[0]['slug'] ) ? $user_ws[0]['slug'] : 'workspace';
+                $target_sub = ! empty( $sub_page ) ? $sub_page : 'dashboard';
+                
+                // Synchronize workspace cookie to fallback slug
+                $cookie_path = defined( 'COOKIEPATH' ) ? COOKIEPATH : '/';
+                $cookie_domain = defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '';
+                setcookie( 'cora_active_workspace_slug', $fallback_slug, time() + 86400 * 365, $cookie_path, $cookie_domain, is_ssl(), false );
+                
+                wp_redirect( home_url( '/' . $fallback_slug . '/' . $target_sub ) );
+                exit;
+            }
+
             $debug_msg = sprintf(
                 'Access Restricted. Debug info - User ID: %d, User Login: %s, Matched WS: %s, User Workspaces: %s',
                 $user->ID,
@@ -1263,7 +1302,6 @@ function cora_real_estate_ai_handle_workspace_route() {
                 exit;
             }
         } else {
-            // Prevent accessing disallowed sub-pages
             if ( $sub_page !== 'dashboard' && $sub_page !== 'setup-account' && function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $sub_page ) ) {
                 wp_redirect( home_url( '/' . $cora_ws_slug . '/dashboard' ) );
                 exit;
@@ -2434,6 +2472,19 @@ function cora_ajax_create_team_user() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
     if ( ! current_user_can( 'manage_options' ) ) {
         wp_send_json_error( 'Unauthorized access.' );
+    }
+
+    $agency_id_num = cora_db_get_agency_id();
+    if ( $agency_id_num > 1 ) {
+        global $wpdb;
+        $existing_user_count = intval( $wpdb->get_var( $wpdb->prepare(
+            "SELECT COUNT(*) FROM {$wpdb->prefix}cora_users WHERE agency_id = %d",
+            $agency_id_num
+        ) ) );
+        $max_users = cora_get_agency_quota( $agency_id_num, 'max_users_limit' );
+        if ( $existing_user_count >= $max_users ) {
+            wp_send_json_error( "User creation failed: Maximum user limit of {$max_users} has been reached for this workspace. Please upgrade your plan." );
+        }
     }
 
     $email = sanitize_email( $_POST['email'] );
@@ -8882,6 +8933,763 @@ function cora_ajax_trash_article() {
 add_action( 'wp_ajax_cora_trash_article', 'cora_ajax_trash_article' );
 
 /**
+ * AJAX Action: Save RAG Knowledge Resource
+ */
+if ( ! function_exists( 'cora_ajax_save_rag_resource' ) ) {
+function cora_ajax_save_rag_resource() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    global $wpdb;
+    $table = $wpdb->prefix . 'cora_rag_knowledge';
+
+    $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+    $title = isset($_POST['title']) ? sanitize_text_field($_POST['title']) : '';
+    $content = isset($_POST['content']) ? wp_kses_post($_POST['content']) : '';
+    $source_type = isset($_POST['source_type']) ? sanitize_text_field($_POST['source_type']) : 'text';
+    $source_id = isset($_POST['source_id']) ? intval($_POST['source_id']) : null;
+
+    if ( empty($title) ) {
+        wp_send_json_error( array( 'message' => 'Resource title is required.' ) );
+    }
+    if ( empty($content) ) {
+        wp_send_json_error( array( 'message' => 'Resource content is required.' ) );
+    }
+
+    $agency_id = cora_db_get_agency_id();
+
+    // Calculate approximate token count
+    $clean_content = strip_tags( $content );
+    $word_count = str_word_count( $clean_content );
+    $token_count = ceil( $word_count * 1.3 );
+
+    // Enforce quota limits
+    $current_tokens = $wpdb->get_var( $wpdb->prepare( "SELECT SUM(token_count) FROM {$table} WHERE agency_id = %d AND id != %d", $agency_id, $id ) ) ?: 0;
+    $quota = cora_get_agency_quota( $agency_id, 'rag_token_quota' );
+
+    if ( ($current_tokens + $token_count) > $quota ) {
+        wp_send_json_error( array( 'message' => 'Rejected: Ingesting this resource would exceed your workspace RAG token quota of ' . number_format($quota) . ' tokens. Currently using ' . number_format($current_tokens) . ' tokens.' ) );
+    }
+
+    if ( $id > 0 ) {
+        // Verify ownership
+        $existing = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$table} WHERE id = %d AND agency_id = %d", $id, $agency_id ) );
+        if ( ! $existing ) {
+            wp_send_json_error( array( 'message' => 'Resource not found or unauthorized.' ) );
+        }
+
+        $wpdb->update(
+            $table,
+            array(
+                'title'       => $title,
+                'content'     => $content,
+                'source_type' => $source_type,
+                'source_id'   => $source_id,
+                'token_count' => $token_count,
+                'updated_at'  => current_time( 'mysql' )
+            ),
+            array( 'id' => $id ),
+            array( '%s', '%s', '%s', '%d', '%d', '%s' ),
+            array( '%d' )
+        );
+
+        wp_send_json_success( array( 'message' => 'Resource updated successfully.', 'id' => $id ) );
+    } else {
+        $wpdb->insert(
+            $table,
+            array(
+                'agency_id'   => $agency_id,
+                'title'       => $title,
+                'content'     => $content,
+                'source_type' => $source_type,
+                'source_id'   => $source_id,
+                'token_count' => $token_count,
+                'created_at'  => current_time( 'mysql' ),
+                'updated_at'  => current_time( 'mysql' )
+            ),
+            array( '%d', '%s', '%s', '%s', '%d', '%d', '%s', '%s' )
+        );
+
+        wp_send_json_success( array( 'message' => 'Resource ingested successfully.', 'id' => $wpdb->insert_id ) );
+    }
+}
+}
+add_action( 'wp_ajax_cora_save_rag_resource', 'cora_ajax_save_rag_resource' );
+
+/**
+ * AJAX Action: Delete RAG Knowledge Resource
+ */
+if ( ! function_exists( 'cora_ajax_delete_rag_resource' ) ) {
+function cora_ajax_delete_rag_resource() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    global $wpdb;
+    $table = $wpdb->prefix . 'cora_rag_knowledge';
+
+    $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+    $agency_id = cora_db_get_agency_id();
+
+    $existing = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$table} WHERE id = %d AND agency_id = %d", $id, $agency_id ) );
+    if ( ! $existing ) {
+        wp_send_json_error( array( 'message' => 'Resource not found or unauthorized.' ) );
+    }
+
+    $deleted = $wpdb->delete( $table, array( 'id' => $id ), array( '%d' ) );
+    if ( $deleted ) {
+        wp_send_json_success( array( 'message' => 'Resource removed from knowledge base.' ) );
+    } else {
+        wp_send_json_error( array( 'message' => 'Failed to delete resource.' ) );
+    }
+}
+}
+add_action( 'wp_ajax_cora_delete_rag_resource', 'cora_ajax_delete_rag_resource' );
+
+/**
+ * Resolve post author agency ID helper
+ */
+if ( ! function_exists( 'cora_rag_get_post_agency_id' ) ) {
+function cora_rag_get_post_agency_id( $post ) {
+    $author_id = $post->post_author;
+    if ( ! $author_id ) {
+        return cora_db_get_agency_id();
+    }
+    $agency_slug = get_user_meta( $author_id, 'cora_agency_id', true );
+    if ( empty( $agency_slug ) ) {
+        return cora_db_get_agency_id();
+    }
+    global $wpdb;
+    $id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_agencies WHERE slug = %s", $agency_slug ) );
+    return $id ? intval( $id ) : cora_db_get_agency_id();
+}
+}
+
+/**
+ * Hook to auto-sync blog article saves/edits
+ */
+if ( ! function_exists( 'cora_rag_sync_post' ) ) {
+function cora_rag_sync_post( $post_id, $post, $update ) {
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return;
+    }
+    if ( wp_is_post_revision( $post_id ) ) {
+        return;
+    }
+    if ( $post->post_type !== 'post' ) {
+        return;
+    }
+
+    global $wpdb;
+    $table = $wpdb->prefix . 'cora_rag_knowledge';
+    if ( ! cora_table_exists( $table ) ) {
+        return;
+    }
+
+    if ( in_array( $post->post_status, array( 'trash', 'auto-draft' ) ) ) {
+        $wpdb->delete( $table, array( 'source_type' => 'article', 'source_id' => $post_id ), array( '%s', '%d' ) );
+        return;
+    }
+
+    $agency_id = cora_rag_get_post_agency_id( $post );
+    $clean_content = strip_tags( $post->post_content );
+    $word_count = str_word_count( $clean_content );
+    $token_count = ceil( $word_count * 1.3 );
+
+    $existing = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$table} WHERE source_type = 'article' AND source_id = %d", $post_id ) );
+
+    if ( $existing ) {
+        $wpdb->update(
+            $table,
+            array(
+                'title'       => $post->post_title,
+                'content'     => $post->post_content,
+                'token_count' => $token_count,
+                'updated_at'  => current_time( 'mysql' )
+            ),
+            array( 'id' => $existing->id ),
+            array( '%s', '%s', '%d', '%s' ),
+            array( '%d' )
+        );
+    } else {
+        $wpdb->insert(
+            $table,
+            array(
+                'agency_id'   => $agency_id,
+                'title'       => $post->post_title,
+                'content'     => $post->post_content,
+                'source_type' => 'article',
+                'source_id'   => $post_id,
+                'token_count' => $token_count,
+                'created_at'  => current_time( 'mysql' ),
+                'updated_at'  => current_time( 'mysql' )
+            ),
+            array( '%d', '%s', '%s', '%s', '%d', '%d', '%s', '%s' )
+        );
+    }
+}
+}
+add_action( 'save_post', 'cora_rag_sync_post', 10, 3 );
+
+/**
+ * Hook to delete/trash blog articles from RAG index
+ */
+if ( ! function_exists( 'cora_rag_delete_post' ) ) {
+function cora_rag_delete_post( $post_id ) {
+    global $wpdb;
+    $table = $wpdb->prefix . 'cora_rag_knowledge';
+    if ( cora_table_exists( $table ) ) {
+        $wpdb->delete( $table, array( 'source_type' => 'article', 'source_id' => $post_id ), array( '%s', '%d' ) );
+    }
+}
+}
+add_action( 'before_delete_post', 'cora_rag_delete_post' );
+add_action( 'wp_trash_post', 'cora_rag_delete_post' );
+
+/**
+ * RAG Knowledge Base Automation & Sync Engine
+ */
+
+if ( ! function_exists( 'cora_rag_collect_workspace_snapshot' ) ) {
+function cora_rag_collect_workspace_snapshot( $agency_id, $last_sync_at ) {
+    global $wpdb;
+    if ( empty( $last_sync_at ) ) {
+        $last_sync_at = '1970-01-01 00:00:00';
+    }
+
+    $categories = array();
+
+    // 1. LEADS
+    $leads_table = $wpdb->prefix . 'cora_leads';
+    $leads_payload = "";
+    $leads_changes = 0;
+    if ( cora_table_exists( $leads_table ) ) {
+        $changed_leads = $wpdb->get_results( $wpdb->prepare(
+            "SELECT * FROM {$leads_table} WHERE agency_id = %d AND updated_at > %s ORDER BY updated_at DESC",
+            $agency_id, $last_sync_at
+        ), ARRAY_A ) ?: array();
+        
+        $leads_changes = count($changed_leads);
+        if ( ! empty( $changed_leads ) ) {
+            $leads_payload .= "### Changed Leads ({$leads_changes}):\n";
+            foreach ( $changed_leads as $l ) {
+                $leads_payload .= "- ID: {$l['id']} | Name: {$l['first_name']} {$l['last_name']} | Status: {$l['status']} | Budget: {$l['budget_min']}-{$l['budget_max']} | Type: {$l['property_type']} | Notes: {$l['notes']}\n";
+            }
+        }
+    }
+
+    // 2. BOOKINGS
+    $bookings_table = $wpdb->prefix . 'cora_bookings';
+    $bookings_payload = "";
+    $bookings_changes = 0;
+    if ( cora_table_exists( $bookings_table ) ) {
+        $changed_bookings = $wpdb->get_results( $wpdb->prepare(
+            "SELECT * FROM {$bookings_table} WHERE agency_id = %d AND updated_at > %s ORDER BY updated_at DESC",
+            $agency_id, $last_sync_at
+        ), ARRAY_A ) ?: array();
+        
+        $bookings_changes = count($changed_bookings);
+        if ( ! empty( $changed_bookings ) ) {
+            $bookings_payload .= "### Changed Bookings ({$bookings_changes}):\n";
+            foreach ( $changed_bookings as $b ) {
+                $bookings_payload .= "- ID: {$b['id']} | Date: {$b['showing_date']} | Status: {$b['status']} | Package: {$b['package_value']} | Deal: {$b['deal_type']} | Notes: {$b['notes']}\n";
+            }
+        }
+    }
+
+    // 3. FINANCIALS
+    $ledger_table = $wpdb->prefix . 'cora_ledger';
+    $ledger_payload = "";
+    $ledger_changes = 0;
+    if ( cora_table_exists( $ledger_table ) ) {
+        $changed_ledger = $wpdb->get_results( $wpdb->prepare(
+            "SELECT * FROM {$ledger_table} WHERE agency_id = %d AND updated_at > %s ORDER BY updated_at DESC",
+            $agency_id, $last_sync_at
+        ), ARRAY_A ) ?: array();
+        
+        $ledger_changes = count($changed_ledger);
+        if ( ! empty( $changed_ledger ) ) {
+            $ledger_payload .= "### Financial Transactions ({$ledger_changes}):\n";
+            foreach ( $changed_ledger as $item ) {
+                $ledger_payload .= "- Type: {$item['type']} | Amount: {$item['amount']} | Category: {$item['category']} | Status: {$item['status']} | Desc: {$item['description']}\n";
+            }
+        }
+    }
+
+    // 4. PROPERTIES / LISTINGS
+    $properties_table = $wpdb->prefix . 'cora_properties';
+    $properties_payload = "";
+    $properties_changes = 0;
+    if ( cora_table_exists( $properties_table ) ) {
+        $changed_props = $wpdb->get_results( $wpdb->prepare(
+            "SELECT * FROM {$properties_table} WHERE agency_id = %d AND updated_at > %s ORDER BY updated_at DESC",
+            $agency_id, $last_sync_at
+        ), ARRAY_A ) ?: array();
+        
+        $properties_changes = count($changed_props);
+        if ( ! empty( $changed_props ) ) {
+            $properties_payload .= "### Property Listings ({$properties_changes}):\n";
+            foreach ( $changed_props as $p ) {
+                $properties_payload .= "- Title: {$p['title']} | Status: {$p['status']} | Price: {$p['price']} | Location: {$p['location']} ({$p['city']}) | Beds: {$p['bedrooms']} / Baths: {$p['bathrooms']} | RERA: {$p['rera_number']}\n";
+            }
+        }
+    }
+
+    // 5. CLIENTS
+    $clients_table = $wpdb->prefix . 'cora_clients';
+    $clients_payload = "";
+    $clients_changes = 0;
+    if ( cora_table_exists( $clients_table ) ) {
+        $changed_clients = $wpdb->get_results( $wpdb->prepare(
+            "SELECT * FROM {$clients_table} WHERE agency_id = %d AND updated_at > %s ORDER BY updated_at DESC",
+            $agency_id, $last_sync_at
+        ), ARRAY_A ) ?: array();
+        
+        $clients_changes = count($changed_clients);
+        if ( ! empty( $changed_clients ) ) {
+            $clients_payload .= "### Clients Added/Modified ({$clients_changes}):\n";
+            foreach ( $changed_clients as $c ) {
+                $clients_payload .= "- ID: {$c['id']} | Name: {$c['first_name']} {$c['last_name']} | Type: {$c['type']} | Notes: {$c['notes']}\n";
+            }
+        }
+    }
+
+    // 6. ACTIVITY LOGS
+    $activity_table = $wpdb->prefix . 'cora_activity_logs';
+    $activity_payload = "";
+    $activity_changes = 0;
+    if ( cora_table_exists( $activity_table ) ) {
+        $changed_logs = $wpdb->get_results( $wpdb->prepare(
+            "SELECT action_type, description, created_at FROM {$activity_table} WHERE agency_id = %d AND created_at > %s ORDER BY id DESC LIMIT 50",
+            $agency_id, $last_sync_at
+        ), ARRAY_A ) ?: array();
+        
+        $activity_changes = count($changed_logs);
+        if ( ! empty( $changed_logs ) ) {
+            $activity_payload .= "### Platform Activities ({$activity_changes}):\n";
+            foreach ( $changed_logs as $log ) {
+                $activity_payload .= "- [{$log['created_at']}] {$log['action_type']}: {$log['description']}\n";
+            }
+        }
+    }
+
+    // Aggregate list
+    $data_map = array(
+        'leads'      => array( 'name' => 'CRM Leads & Pipeline', 'changes' => $leads_changes, 'payload' => $leads_payload ),
+        'bookings'   => array( 'name' => 'Calendar & Bookings', 'changes' => $bookings_changes, 'payload' => $bookings_payload ),
+        'financials' => array( 'name' => 'Financials & Ledger', 'changes' => $ledger_changes, 'payload' => $ledger_payload ),
+        'properties' => array( 'name' => 'Properties & Listings', 'changes' => $properties_changes, 'payload' => $properties_payload ),
+        'clients'    => array( 'name' => 'Client Engagement', 'changes' => $clients_changes, 'payload' => $clients_payload ),
+        'activities' => array( 'name' => 'System Activity Logs', 'changes' => $activity_changes, 'payload' => $activity_payload ),
+    );
+
+    foreach ( $data_map as $key => $cat ) {
+        $clean_text = strip_tags( $cat['payload'] );
+        $word_count = str_word_count( $clean_text );
+        $token_estimate = ceil( $word_count * 1.3 );
+        if ($cat['changes'] > 0 && $token_estimate == 0) {
+            $token_estimate = ceil( strlen( $clean_text ) / 3.8 );
+        }
+        
+        $categories[$key] = array(
+            'name'             => $cat['name'],
+            'changes'          => $cat['changes'],
+            'token_estimate'   => $token_estimate,
+            'text_payload'     => $cat['payload']
+        );
+    }
+
+    return $categories;
+}
+}
+
+if ( ! function_exists( 'cora_rag_call_ai_api' ) ) {
+function cora_rag_call_ai_api( $message, $system_prompt ) {
+    $active_model   = get_option( 'cora_workspace_active_ai_model', 'cora-core-v2' );
+    $gemini_key_b64 = defined( 'CORA_PLATFORM_GEMINI_API_KEY' ) ? CORA_PLATFORM_GEMINI_API_KEY : '';
+    $openai_key_b64 = get_option( 'cora_workspace_ai_openai_key', '' );
+
+    // Route 1: Gemini
+    if ( ! empty( $gemini_key_b64 ) && ( $active_model === 'gemini' || $active_model === 'cora-core-v2' || empty( $openai_key_b64 ) ) ) {
+        $api_key  = $gemini_key_b64;
+        $model_id = 'gemini-3.5-flash-lite';
+        $url      = "https://generativelanguage.googleapis.com/v1beta/models/{$model_id}:generateContent?key=" . urlencode( $api_key );
+
+        $body = json_encode( array(
+            'system_instruction' => array(
+                'parts' => array( array( 'text' => $system_prompt ) )
+            ),
+            'contents' => array(
+                array(
+                    'role'  => 'user',
+                    'parts' => array( array( 'text' => $message ) ),
+                )
+            ),
+            'generationConfig' => array(
+                'maxOutputTokens' => 1500,
+                'temperature'     => 0.3,
+            ),
+        ) );
+
+        $response = wp_remote_post( $url, array(
+            'timeout' => 30,
+            'headers' => array( 'Content-Type' => 'application/json' ),
+            'body'    => $body,
+        ) );
+
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            $data = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( $code === 200 && ! empty( $data['candidates'][0]['content']['parts'][0]['text'] ) ) {
+                if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
+                    cora_workspace_log_ai_request();
+                }
+                return $data['candidates'][0]['content']['parts'][0]['text'];
+            }
+        }
+    }
+
+    // Route 2: OpenAI
+    if ( ! empty( $openai_key_b64 ) && ( $active_model === 'gpt-4o' || $active_model === 'openai' || empty( $gemini_key_b64 ) ) ) {
+        $api_key  = base64_decode( $openai_key_b64 );
+        $model_id = 'gpt-4o-mini';
+        $url      = 'https://api.openai.com/v1/chat/completions';
+
+        $body = json_encode( array(
+            'model'    => $model_id,
+            'messages' => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => $message ),
+            ),
+            'max_tokens'  => 1500,
+            'temperature' => 0.3,
+        ) );
+
+        $response = wp_remote_post( $url, array(
+            'timeout' => 30,
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $api_key,
+                'Content-Type'  => 'application/json',
+            ),
+            'body' => $body,
+        ) );
+
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            $data = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
+                if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
+                    cora_workspace_log_ai_request();
+                }
+                return $data['choices'][0]['message']['content'];
+            }
+        }
+    }
+
+    return '';
+}
+}
+
+if ( ! function_exists( 'cora_rag_execute_sync' ) ) {
+function cora_rag_execute_sync( $agency_id, $manual = false ) {
+    global $wpdb;
+    $table = $wpdb->prefix . 'cora_rag_knowledge';
+    if ( ! cora_table_exists( $table ) ) {
+        return array( 'success' => false, 'message' => 'RAG table does not exist.' );
+    }
+
+    $last_sync_at = get_option( "cora_rag_last_sync_at_{$agency_id}", '' );
+    $snapshot = cora_rag_collect_workspace_snapshot( $agency_id, $last_sync_at );
+
+    $total_changes = 0;
+    $changed_categories = array();
+    $raw_prompt_body = "";
+    $estimated_input_tokens = 0;
+
+    foreach ( $snapshot as $cat_key => $data ) {
+        if ( $data['changes'] > 0 ) {
+            $total_changes += $data['changes'];
+            $changed_categories[] = $data['name'];
+            $raw_prompt_body .= "## " . $data['name'] . "\n" . $data['text_payload'] . "\n\n";
+            $estimated_input_tokens += $data['token_estimate'];
+        }
+    }
+
+    if ( $total_changes === 0 ) {
+        cora_rag_add_sync_history( $agency_id, array(
+            'timestamp'          => current_time( 'mysql' ),
+            'status'             => 'skipped',
+            'message'            => 'No workspace changes detected since last sync.',
+            'tokens_consumed'    => 0,
+            'categories_updated' => array()
+        ) );
+        update_option( "cora_rag_last_sync_at_{$agency_id}", current_time( 'mysql' ) );
+        return array( 'success' => true, 'message' => 'Sync skipped: No new platform activity detected.' );
+    }
+
+    $current_tokens = $wpdb->get_var( $wpdb->prepare( "SELECT SUM(token_count) FROM {$table} WHERE agency_id = %d AND source_type != 'platform_sync'", $agency_id ) ) ?: 0;
+    $quota = cora_get_agency_quota( $agency_id, 'rag_token_quota' );
+    
+    $estimated_output_tokens = 600;
+    $total_estimated_tokens = $estimated_input_tokens + $estimated_output_tokens;
+
+    $budget_percentage = intval( get_option( "cora_rag_sync_budget_{$agency_id}", 20 ) );
+    $budget_tokens = ceil( $quota * ($budget_percentage / 100) );
+
+    if ( $total_estimated_tokens > $budget_tokens && ! $manual ) {
+        cora_rag_add_sync_history( $agency_id, array(
+            'timestamp'          => current_time( 'mysql' ),
+            'status'             => 'skipped',
+            'message'            => 'Skipped: Sync estimate (' . number_format($total_estimated_tokens) . ' tokens) exceeds budget limit of ' . number_format($budget_tokens) . ' tokens.',
+            'tokens_consumed'    => 0,
+            'categories_updated' => $changed_categories
+        ) );
+        return array( 'success' => false, 'message' => 'Sync skipped: estimated token usage exceeds the configured sync cycle budget.' );
+    }
+
+    if ( ($current_tokens + $total_estimated_tokens) > $quota ) {
+        cora_rag_add_sync_history( $agency_id, array(
+            'timestamp'          => current_time( 'mysql' ),
+            'status'             => 'error',
+            'message'            => 'Failed: Running sync would exceed total workspace quota of ' . number_format($quota) . ' tokens.',
+            'tokens_consumed'    => 0,
+            'categories_updated' => $changed_categories
+        ) );
+        return array( 'success' => false, 'message' => 'Insufficient workspace token quota remaining.' );
+    }
+
+    $system_prompt = "You are the Cora Platform AI Knowledge Co-Founder and Sync Engine. 
+Analyze the raw updates/activities below from the multi-tenant workspace platform. 
+Synthesize these updates into a cohesive, structured markdown knowledge document. 
+Focus on:
+1. Significant status updates, milestone events, and progress.
+2. Financial flow/balances and revenue totals.
+3. Activity patterns of clients and team.
+Be concise but strategic. Avoid listing raw database IDs where possible. Write a beautifully structured markdown summary.";
+
+    $ai_summary = cora_rag_call_ai_api( $raw_prompt_body, $system_prompt );
+
+    if ( empty( $ai_summary ) ) {
+        cora_rag_add_sync_history( $agency_id, array(
+            'timestamp'          => current_time( 'mysql' ),
+            'status'             => 'error',
+            'message'            => 'AI provider failed to generate summary.',
+            'tokens_consumed'    => 0,
+            'categories_updated' => $changed_categories
+        ) );
+        return array( 'success' => false, 'message' => 'Failed to connect to AI summarization provider.' );
+    }
+
+    $actual_word_count = str_word_count( strip_tags( $ai_summary ) );
+    $actual_tokens = ceil( $actual_word_count * 1.3 ) + $estimated_input_tokens;
+
+    $sync_gen = intval( get_option( "cora_rag_sync_generation_{$agency_id}", 0 ) ) + 1;
+    update_option( "cora_rag_sync_generation_{$agency_id}", $sync_gen );
+
+    $existing_sync_res = $wpdb->get_row( $wpdb->prepare(
+        "SELECT id FROM {$table} WHERE agency_id = %d AND source_type = 'platform_sync'",
+        $agency_id
+    ) );
+
+    $title = "Workspace AI Synced Summary (Cycle #" . $sync_gen . ")";
+    if ( $existing_sync_res ) {
+        $wpdb->update(
+            $table,
+            array(
+                'title'           => $title,
+                'content'         => $ai_summary,
+                'token_count'     => $actual_tokens,
+                'sync_generation' => $sync_gen,
+                'updated_at'      => current_time( 'mysql' )
+            ),
+            array( 'id' => $existing_sync_res->id ),
+            array( '%s', '%s', '%d', '%d', '%s' ),
+            array( '%d' )
+        );
+    } else {
+        $wpdb->insert(
+            $table,
+            array(
+                'agency_id'       => $agency_id,
+                'title'           => $title,
+                'content'         => $ai_summary,
+                'source_type'     => 'platform_sync',
+                'token_count'     => $actual_tokens,
+                'sync_generation' => $sync_gen,
+                'created_at'      => current_time( 'mysql' ),
+                'updated_at'      => current_time( 'mysql' )
+            ),
+            array( '%d', '%s', '%s', '%s', '%d', '%d', '%s', '%s' )
+        );
+    }
+
+    cora_rag_add_sync_history( $agency_id, array(
+        'timestamp'          => current_time( 'mysql' ),
+        'status'             => 'success',
+        'message'            => 'Successfully compiled workspace data and saved knowledge index.',
+        'tokens_consumed'    => $actual_tokens,
+        'categories_updated' => $changed_categories
+    ) );
+
+    update_option( "cora_rag_last_sync_at_{$agency_id}", current_time( 'mysql' ) );
+
+    return array(
+        'success'         => true,
+        'message'         => 'Workspace knowledge sync complete!',
+        'tokens_consumed' => $actual_tokens
+    );
+}
+}
+
+if ( ! function_exists( 'cora_rag_add_sync_history' ) ) {
+function cora_rag_add_sync_history( $agency_id, $log_entry ) {
+    $history = get_option( "cora_rag_sync_history_{$agency_id}", array() );
+    if ( ! is_array( $history ) ) {
+        $history = array();
+    }
+    array_unshift( $history, $log_entry );
+    $history = array_slice( $history, 0, 5 );
+    update_option( "cora_rag_sync_history_{$agency_id}", $history );
+}
+}
+
+add_action( 'cora_rag_sync_cron_hook', 'cora_rag_scheduled_sync_handler' );
+if ( ! function_exists( 'cora_rag_scheduled_sync_handler' ) ) {
+function cora_rag_scheduled_sync_handler() {
+    global $wpdb;
+    $agencies_table = $wpdb->prefix . 'cora_agencies';
+    if ( ! cora_table_exists( $agencies_table ) ) {
+        return;
+    }
+
+    $agencies = $wpdb->get_results( "SELECT id FROM {$agencies_table}" );
+    if ( empty( $agencies ) ) {
+        return;
+    }
+
+    foreach ( $agencies as $agency ) {
+        $agency_id = intval( $agency->id );
+        $interval = get_option( "cora_rag_sync_interval_{$agency_id}", 'daily' );
+        if ( $interval === 'disabled' ) {
+            continue;
+        }
+
+        $last_sync = get_option( "cora_rag_last_sync_at_{$agency_id}", '' );
+        if ( ! empty( $last_sync ) ) {
+            $last_time = strtotime( $last_sync );
+            $diff = time() - $last_time;
+            if ( $interval === 'twicedaily' && $diff < (12 * HOUR_IN_SECONDS) ) {
+                continue;
+            }
+            if ( $interval === 'daily' && $diff < (24 * HOUR_IN_SECONDS) ) {
+                continue;
+            }
+            if ( $interval === 'weekly' && $diff < (7 * DAY_IN_SECONDS) ) {
+                continue;
+            }
+        }
+
+        cora_rag_execute_sync( $agency_id, false );
+    }
+}
+}
+
+add_action( 'wp', 'cora_rag_ensure_sync_cron_scheduled' );
+if ( ! function_exists( 'cora_rag_ensure_sync_cron_scheduled' ) ) {
+function cora_rag_ensure_sync_cron_scheduled() {
+    if ( ! wp_next_scheduled( 'cora_rag_sync_cron_hook' ) ) {
+        wp_schedule_event( time(), 'hourly', 'cora_rag_sync_cron_hook' );
+    }
+}
+}
+
+if ( ! function_exists( 'cora_ajax_rag_sync_preview' ) ) {
+function cora_ajax_rag_sync_preview() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $agency_id = cora_db_get_agency_id();
+    $last_sync = get_option( "cora_rag_last_sync_at_{$agency_id}", '' );
+
+    $snapshot = cora_rag_collect_workspace_snapshot( $agency_id, $last_sync );
+    $quota = cora_get_agency_quota( $agency_id, 'rag_token_quota' );
+
+    global $wpdb;
+    $table = $wpdb->prefix . 'cora_rag_knowledge';
+    $current_tokens = 0;
+    if ( cora_table_exists( $table ) ) {
+        $current_tokens = $wpdb->get_var( $wpdb->prepare( "SELECT SUM(token_count) FROM {$table} WHERE agency_id = %d AND source_type != 'platform_sync'", $agency_id ) ) ?: 0;
+    }
+
+    $history = get_option( "cora_rag_sync_history_{$agency_id}", array() );
+    $interval = get_option( "cora_rag_sync_interval_{$agency_id}", 'daily' );
+    $budget_pct = intval( get_option( "cora_rag_sync_budget_{$agency_id}", 20 ) );
+
+    $preview_data = array();
+    $total_changes = 0;
+    $total_estimated_tokens = 0;
+
+    foreach ( $snapshot as $key => $cat ) {
+        $preview_data[] = array(
+            'key'             => $key,
+            'name'            => $cat['name'],
+            'changes'         => $cat['changes'],
+            'token_estimate'  => $cat['token_estimate']
+        );
+        $total_changes += $cat['changes'];
+        $total_estimated_tokens += $cat['token_estimate'];
+    }
+
+    if ( $total_changes > 0 ) {
+        $total_estimated_tokens += 600;
+    }
+
+    wp_send_json_success( array(
+        'categories'             => $preview_data,
+        'total_changes'          => $total_changes,
+        'total_estimated_tokens' => $total_estimated_tokens,
+        'quota_used'             => $current_tokens,
+        'quota_total'            => $quota,
+        'last_sync_at'           => $last_sync ? date_i18n( get_option('date_format') . ' ' . get_option('time_format'), strtotime($last_sync) ) : 'Never',
+        'sync_interval'          => $interval,
+        'sync_budget_pct'        => $budget_pct,
+        'history'                => $history
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_rag_sync_preview', 'cora_ajax_rag_sync_preview' );
+
+if ( ! function_exists( 'cora_ajax_rag_sync_execute' ) ) {
+function cora_ajax_rag_sync_execute() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $agency_id = cora_db_get_agency_id();
+
+    $result = cora_rag_execute_sync( $agency_id, true );
+
+    if ( $result['success'] ) {
+        wp_send_json_success( $result );
+    } else {
+        wp_send_json_error( $result );
+    }
+}
+}
+add_action( 'wp_ajax_cora_rag_sync_execute', 'cora_ajax_rag_sync_execute' );
+
+if ( ! function_exists( 'cora_ajax_rag_sync_settings' ) ) {
+function cora_ajax_rag_sync_settings() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $agency_id = cora_db_get_agency_id();
+
+    $interval = isset($_POST['interval']) ? sanitize_text_field($_POST['interval']) : 'daily';
+    $budget = isset($_POST['budget']) ? min( 100, max( 1, intval($_POST['budget']) ) ) : 20;
+
+    update_option( "cora_rag_sync_interval_{$agency_id}", $interval );
+    update_option( "cora_rag_sync_budget_{$agency_id}", $budget );
+
+    wp_send_json_success( array( 'message' => 'RAG update settings saved successfully.' ) );
+}
+}
+add_action( 'wp_ajax_cora_rag_sync_settings', 'cora_ajax_rag_sync_settings' );
+
+add_action( 'before_delete_post', 'cora_rag_delete_post' );
+add_action( 'wp_trash_post', 'cora_rag_delete_post' );
+
+/**
  * AJAX Actions: Review State Management
  */
 if ( ! function_exists( 'cora_ajax_submit_for_review' ) ) {
@@ -9892,6 +10700,18 @@ function cora_ajax_upload_media() {
     if ($file['error'] !== UPLOAD_ERR_OK) {
         wp_send_json_error('Upload failed with error code: ' . $file['error']);
     }
+
+    // Enforce storage space quota
+    $agency_id = cora_get_current_user_agency_id();
+    $agency_id_num = cora_db_get_agency_id();
+    if ( $agency_id_num >= 1 && $agency_id !== 'super' ) {
+        $max_storage = cora_get_agency_quota( $agency_id_num, 'storage_limit_mb' );
+        $current_usage = cora_get_agency_storage_usage( $agency_id );
+        $upload_mb = round( $file['size'] / ( 1024 * 1024 ), 4 );
+        if ( ( $current_usage + $upload_mb ) > $max_storage ) {
+            wp_send_json_error( "Storage limit reached. Your workspace has consumed {$current_usage} MB of its {$max_storage} MB storage limit." );
+        }
+    }
     
     // Use media_handle_sideload because we are dealing with $_FILES directly but outside the typical admin post form
     $upload_overrides = array( 'test_form' => false );
@@ -10821,41 +11641,7 @@ add_action( 'wp_ajax_cora_gbp_save_keys', 'cora_ajax_gbp_save_keys' );
 
 if ( ! function_exists( 'cora_workspace_check_ai_rate_limit' ) ) {
 function cora_workspace_check_ai_rate_limit() {
-    $workspace_id = 1;
-    if ( function_exists( 'cora_get_current_workspace_context' ) ) {
-        $context = cora_get_current_workspace_context();
-        if ( ! empty( $context['id'] ) ) {
-            $workspace_id = intval( $context['id'] );
-        }
-    }
-
-    $usage_log = get_option( "cora_workspace_ai_usage_log_{$workspace_id}", array() );
-    if ( ! is_array( $usage_log ) ) {
-        $usage_log = array();
-    }
-
-    $now = time();
-    $filtered_log = array();
-    foreach ( $usage_log as $timestamp ) {
-        if ( ( $now - $timestamp ) <= 86400 ) {
-            $filtered_log[] = $timestamp;
-        }
-    }
-
-    $five_hour_count = 0;
-    foreach ( $filtered_log as $timestamp ) {
-        if ( ( $now - $timestamp ) <= 18000 ) {
-            $five_hour_count++;
-        }
-    }
-
-    $five_hour_limit = 30;
-    $daily_limit = 100;
-
-    if ( $five_hour_count >= $five_hour_limit || count( $filtered_log ) >= $daily_limit ) {
-        return false;
-    }
-    return true;
+    return true; // Bypass and remove all local rate limits
 }
 }
 
@@ -11070,6 +11856,411 @@ Answer concisely, professionally, and matching the light Notion-styled/Claude-cr
 }
 }
 add_action( 'wp_ajax_cora_ai_chat', 'cora_ajax_ai_chat' );
+
+/**
+ * Helper to force IPv4 on outgoing HTTP requests to resolve local network timeouts.
+ */
+if ( ! function_exists( 'cora_force_ipv4_for_ai_requests' ) ) {
+function cora_force_ipv4_for_ai_requests( $handle ) {
+    curl_setopt( $handle, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
+    return $handle;
+}
+}
+
+/**
+ * AJAX handler for the new multi-provider chat query.
+ */
+if ( ! function_exists( 'cora_ajax_chat_query' ) ) {
+function cora_ajax_chat_query() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+
+    if ( function_exists( 'cora_workspace_check_ai_rate_limit' ) && ! cora_workspace_check_ai_rate_limit() ) {
+        wp_send_json_error( array(
+            'code'    => 'rate_limit_exceeded',
+            'message' => 'Rate limit exceeded. Please wait before making more requests.',
+        ) );
+    }
+
+    $message       = wp_unslash( $_POST['message'] ?? '' );
+    $system_prompt = sanitize_text_field( $_POST['system_prompt'] ?? 'You are Cora AI, a helpful platform assistant.' );
+    $provider      = sanitize_text_field( $_POST['provider'] ?? 'openai' );
+    $model         = sanitize_text_field( $_POST['model'] ?? 'gpt-4o-mini' );
+    $temperature   = floatval( $_POST['temperature'] ?? 0.7 );
+
+    if ( empty( $message ) ) {
+        wp_send_json_error( 'No message provided.' );
+    }
+
+    $api_key = '';
+    $url = '';
+    $headers = array( 'Content-Type' => 'application/json' );
+    $body = array();
+
+    if ( $provider === 'openai' ) {
+        $api_key = defined( 'CORA_PLATFORM_OPENAI_API_KEY' ) ? CORA_PLATFORM_OPENAI_API_KEY : '';
+        $url = 'https://api.openai.com/v1/chat/completions';
+        $headers['Authorization'] = 'Bearer ' . $api_key;
+        $body = array(
+            'model'       => $model,
+            'messages'    => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => $message )
+            ),
+            'temperature' => $temperature
+        );
+    } elseif ( $provider === 'groq' ) {
+        $api_key = defined( 'CORA_PLATFORM_GROQ_API_KEY' ) ? CORA_PLATFORM_GROQ_API_KEY : '';
+        $url = 'https://api.groq.com/openai/v1/chat/completions';
+        $headers['Authorization'] = 'Bearer ' . $api_key;
+        $body = array(
+            'model'       => $model,
+            'messages'    => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => $message )
+            ),
+            'temperature' => $temperature
+        );
+    } elseif ( $provider === 'openrouter' ) {
+        $api_key = defined( 'CORA_PLATFORM_OPENROUTER_API_KEY' ) ? CORA_PLATFORM_OPENROUTER_API_KEY : '';
+        $url = 'https://openrouter.ai/api/v1/chat/completions';
+        $headers['Authorization'] = 'Bearer ' . $api_key;
+        $headers['HTTP-Referer'] = 'https://heycora.in';
+        $headers['X-Title'] = 'Cora Workspace Platform';
+        $body = array(
+            'model'       => $model,
+            'messages'    => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => $message )
+            ),
+            'temperature' => $temperature
+        );
+    } elseif ( $provider === 'gemini' ) {
+        $api_key = defined( 'CORA_PLATFORM_GEMINI_API_KEY' ) ? CORA_PLATFORM_GEMINI_API_KEY : '';
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key=" . urlencode( $api_key );
+        $body = array(
+            'system_instruction' => array(
+                'parts' => array( array( 'text' => $system_prompt ) )
+            ),
+            'contents' => array(
+                array(
+                    'role'  => 'user',
+                    'parts' => array( array( 'text' => $message ) ),
+                )
+            ),
+            'generationConfig' => array(
+                'temperature'     => $temperature,
+            ),
+        );
+    } elseif ( in_array( $provider, array( 'nvidia', 'llama_nv', 'deepseek_nv', 'gemma_nv', 'gpt_oss_nv', 'glm_nv', 'minimax_nv', 'moonshot_nv' ), true ) ) {
+        $nvidia_keys = array(
+            'meta/llama-3.1-70b-instruct'   => defined('CORA_PLATFORM_NVIDIA_LLAMA_70B_KEY') ? CORA_PLATFORM_NVIDIA_LLAMA_70B_KEY : '',
+            'meta/llama-3.1-8b-instruct'    => defined('CORA_PLATFORM_NVIDIA_LLAMA_8B_KEY') ? CORA_PLATFORM_NVIDIA_LLAMA_8B_KEY : '',
+            'meta/llama-3.2-1b-instruct'    => defined('CORA_PLATFORM_NVIDIA_LLAMA_1B_KEY') ? CORA_PLATFORM_NVIDIA_LLAMA_1B_KEY : '',
+            'meta/llama-3.2-3b-instruct'    => defined('CORA_PLATFORM_NVIDIA_LLAMA_3B_KEY') ? CORA_PLATFORM_NVIDIA_LLAMA_3B_KEY : '',
+            'meta/llama-3.3-70b-instruct'   => defined('CORA_PLATFORM_NVIDIA_LLAMA_33_KEY') ? CORA_PLATFORM_NVIDIA_LLAMA_33_KEY : '',
+            'z-ai/glm-5.2'                  => defined('CORA_PLATFORM_NVIDIA_GLM_KEY') ? CORA_PLATFORM_NVIDIA_GLM_KEY : '',
+            'minimaxai/minimax-m3'          => defined('CORA_PLATFORM_NVIDIA_MINIMAX_KEY') ? CORA_PLATFORM_NVIDIA_MINIMAX_KEY : '',
+            'moonshotai/kimi-k2.6'          => defined('CORA_PLATFORM_NVIDIA_MOONSHOT_KEY') ? CORA_PLATFORM_NVIDIA_MOONSHOT_KEY : '',
+            'deepseek-ai/deepseek-v4-flash' => defined('CORA_PLATFORM_NVIDIA_DEEPSEEK_FLASH_KEY') ? CORA_PLATFORM_NVIDIA_DEEPSEEK_FLASH_KEY : '',
+            'deepseek-ai/deepseek-v4-pro'   => defined('CORA_PLATFORM_NVIDIA_DEEPSEEK_PRO_KEY') ? CORA_PLATFORM_NVIDIA_DEEPSEEK_PRO_KEY : '',
+            'google/gemma-4-31b-it'         => defined('CORA_PLATFORM_NVIDIA_GEMMA_KEY') ? CORA_PLATFORM_NVIDIA_GEMMA_KEY : '',
+            'openai/gpt-oss-20b'            => defined('CORA_PLATFORM_NVIDIA_GPT_20B_KEY') ? CORA_PLATFORM_NVIDIA_GPT_20B_KEY : '',
+            'openai/gpt-oss-120b'           => defined('CORA_PLATFORM_NVIDIA_GPT_120B_KEY') ? CORA_PLATFORM_NVIDIA_GPT_120B_KEY : '',
+            'llama-guard-4-12b'             => defined('CORA_PLATFORM_NVIDIA_LLAMA_GUARD_KEY') ? CORA_PLATFORM_NVIDIA_LLAMA_GUARD_KEY : ''
+        );
+        $api_key = $nvidia_keys[$model] ?? '';
+        $url = 'https://integrate.api.nvidia.com/v1/chat/completions';
+        $headers['Authorization'] = 'Bearer ' . $api_key;
+        $body = array(
+            'model'       => $model,
+            'messages'    => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => $message )
+            ),
+            'temperature' => $temperature
+        );
+    }
+
+    if ( empty( $api_key ) ) {
+        wp_send_json_error( array( 'message' => "API key for provider '{$provider}' is not configured." ) );
+    }
+
+    add_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10, 1 );
+
+    $response = wp_remote_post( $url, array(
+        'timeout' => 25, // 25 seconds connection/generation timeout to allow slower networks to succeed
+        'headers' => $headers,
+        'body'    => json_encode( $body )
+    ) );
+
+    remove_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10 );
+
+    $success = false;
+    $fallback_activated = false;
+    $fallback_reason_details = array();
+
+    if ( ! is_wp_error( $response ) ) {
+        $code = wp_remote_retrieve_response_code( $response );
+        $response_body = wp_remote_retrieve_body( $response );
+        $data = json_decode( $response_body, true );
+
+        if ( $code === 200 ) {
+            $success = true;
+        } else {
+            $err_msg = '';
+            if ( ! empty( $data['error']['message'] ) ) {
+                $err_msg = $data['error']['message'];
+            } elseif ( ! empty( $data['detail'] ) ) {
+                $err_msg = $data['detail'];
+                if ( ! empty( $data['title'] ) ) {
+                    $err_msg = $data['title'] . ': ' . $err_msg;
+                }
+            } elseif ( ! empty( $data['message'] ) ) {
+                $err_msg = $data['message'];
+            } else {
+                $err_msg = 'API returned status ' . $code;
+            }
+            $fallback_reason_details[] = "Primary model failed: " . $err_msg;
+        }
+    } else {
+        $fallback_reason_details[] = "Primary model timeout/network error: " . $response->get_error_message();
+    }
+
+    // MULTI-STAGE FALLBACK ROUTER
+    if ( ! $success ) {
+        // Attempt Fallback Stage 1: Google Gemini Flash
+        if ( $provider !== 'gemini' ) {
+            $gemini_key = defined( 'CORA_PLATFORM_GEMINI_API_KEY' ) ? CORA_PLATFORM_GEMINI_API_KEY : '';
+            if ( ! empty( $gemini_key ) ) {
+                $fallback_activated = true;
+                $fallback_url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=' . $gemini_key;
+                $fallback_headers = array( 'Content-Type' => 'application/json' );
+                $fallback_body = array(
+                    'contents' => array(
+                        array(
+                            'role' => 'user',
+                            'parts' => array(
+                                array( 'text' => "System Instructions: {$system_prompt}\n\nUser Message: {$message}" )
+                            )
+                        )
+                    ),
+                    'generationConfig' => array(
+                        'temperature' => $temperature,
+                    )
+                );
+
+                add_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10, 1 );
+                $fallback_response = wp_remote_post( $fallback_url, array(
+                    'timeout' => 12,
+                    'headers' => $fallback_headers,
+                    'body'    => json_encode( $fallback_body)
+                ) );
+                remove_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10 );
+
+                if ( ! is_wp_error( $fallback_response ) ) {
+                    $fallback_code = wp_remote_retrieve_response_code( $fallback_response );
+                    if ( $fallback_code === 200 ) {
+                        $success = true;
+                        $provider = 'gemini';
+                        $model = 'gemini-flash-latest';
+                        $response = $fallback_response;
+                    } else {
+                        $fallback_reason_details[] = "Gemini Flash fallback failed with status " . $fallback_code;
+                    }
+                } else {
+                    $fallback_reason_details[] = "Gemini Flash fallback network error: " . $fallback_response->get_error_message();
+                }
+            }
+        }
+
+        // Attempt Fallback Stage 2: Groq Llama 3.1 8B Instant (if stage 1 failed or if provider is Gemini)
+        if ( ! $success ) {
+            $groq_key = defined( 'CORA_PLATFORM_GROQ_API_KEY' ) ? CORA_PLATFORM_GROQ_API_KEY : '';
+            if ( ! empty( $groq_key ) ) {
+                $fallback_activated = true;
+                $fallback_url = 'https://api.groq.com/openai/v1/chat/completions';
+                $fallback_headers = array(
+                    'Content-Type'  => 'application/json',
+                    'Authorization' => 'Bearer ' . $groq_key
+                );
+                $fallback_body = array(
+                    'model'       => 'llama-3.1-8b-instant',
+                    'messages'    => array(
+                        array( 'role' => 'system', 'content' => $system_prompt ),
+                        array( 'role' => 'user',   'content' => $message )
+                    ),
+                    'temperature' => $temperature
+                );
+
+                add_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10, 1 );
+                $fallback_response = wp_remote_post( $fallback_url, array(
+                    'timeout' => 12,
+                    'headers' => $fallback_headers,
+                    'body'    => json_encode( $fallback_body )
+                ) );
+                remove_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10 );
+
+                if ( ! is_wp_error( $fallback_response ) ) {
+                    $fallback_code = wp_remote_retrieve_response_code( $fallback_response );
+                    if ( $fallback_code === 200 ) {
+                        $success = true;
+                        $provider = 'groq';
+                        $model = 'llama-3.1-8b-instant';
+                        $response = $fallback_response;
+                    } else {
+                        $fallback_reason_details[] = "Groq Llama fallback failed with status " . $fallback_code;
+                    }
+                } else {
+                    $fallback_reason_details[] = "Groq Llama fallback network error: " . $fallback_response->get_error_message();
+                }
+            }
+        }
+
+        // Attempt Fallback Stage 3: OpenRouter Llama 3.1 8B Instruct (if stages 1 & 2 failed)
+        if ( ! $success ) {
+            $openrouter_key = defined( 'CORA_PLATFORM_OPENROUTER_API_KEY' ) ? CORA_PLATFORM_OPENROUTER_API_KEY : '';
+            if ( ! empty( $openrouter_key ) ) {
+                $fallback_activated = true;
+                $fallback_url = 'https://openrouter.ai/api/v1/chat/completions';
+                $fallback_headers = array(
+                    'Content-Type'  => 'application/json',
+                    'Authorization' => 'Bearer ' . $openrouter_key
+                );
+                $fallback_body = array(
+                    'model'       => 'meta-llama/llama-3.1-8b-instruct',
+                    'messages'    => array(
+                        array( 'role' => 'system', 'content' => $system_prompt ),
+                        array( 'role' => 'user',   'content' => $message )
+                    ),
+                    'temperature' => $temperature
+                );
+
+                add_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10, 1 );
+                $fallback_response = wp_remote_post( $fallback_url, array(
+                    'timeout' => 12,
+                    'headers' => $fallback_headers,
+                    'body'    => json_encode( $fallback_body )
+                ) );
+                remove_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10 );
+
+                if ( ! is_wp_error( $fallback_response ) ) {
+                    $fallback_code = wp_remote_retrieve_response_code( $fallback_response );
+                    if ( $fallback_code === 200 ) {
+                        $success = true;
+                        $provider = 'openrouter';
+                        $model = 'meta-llama/llama-3.1-8b-instruct';
+                        $response = $fallback_response;
+                    } else {
+                        $fallback_reason_details[] = "OpenRouter fallback failed with status " . $fallback_code;
+                    }
+                } else {
+                    $fallback_reason_details[] = "OpenRouter fallback network error: " . $fallback_response->get_error_message();
+                }
+            }
+        }
+
+        // If even the multi-stage fallback has failed completely, report all errors
+        if ( ! $success ) {
+            $err_summary = implode( ' | ', $fallback_reason_details );
+            wp_send_json_error( array( 'message' => "All configured primary models and fallback pathways failed. Traces: [{$err_summary}]" ) );
+        }
+    }
+
+    if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
+        cora_workspace_log_ai_request();
+    }
+
+    $response_body = wp_remote_retrieve_body( $response );
+    $data = json_decode( $response_body, true );
+
+    $reply = '';
+    if ( $provider === 'gemini' ) {
+        $reply = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
+    } else {
+        $reply = $data['choices'][0]['message']['content'] ?? '';
+    }
+
+    $fallback_notice = '';
+    if ( $fallback_activated ) {
+        $recovered_provider_name = ($provider === 'gemini') ? 'Gemini Flash' : (($provider === 'groq') ? 'Groq Llama 3.1' : 'OpenRouter Llama 3.1');
+        $fallback_notice = "Primary model request failed (" . implode('; ', $fallback_reason_details) . "). Successfully auto-recovered using {$recovered_provider_name}.";
+    }
+
+    wp_send_json_success( array(
+        'reply'           => $reply,
+        'model'           => $model,
+        'provider'        => $provider,
+        'fallback_notice' => $fallback_notice
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_ai_chat_query', 'cora_ajax_chat_query' );
+
+/**
+ * AJAX handler for ElevenLabs Text-to-Speech generation.
+ */
+if ( ! function_exists( 'cora_ajax_generate_tts' ) ) {
+function cora_ajax_generate_tts() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+
+    $text = wp_unslash( $_POST['text'] ?? '' );
+    if ( empty( $text ) ) {
+        wp_send_json_error( 'No text provided.' );
+    }
+
+    $api_key = defined( 'CORA_PLATFORM_ELEVENLABS_API_KEY' ) ? CORA_PLATFORM_ELEVENLABS_API_KEY : '';
+    if ( empty( $api_key ) ) {
+        wp_send_json_error( 'ElevenLabs API key is not configured.' );
+    }
+
+    // Standard Rachel voice ID
+    $voice_id = '21m00Tcm4TlvDq8ikWAM';
+    $url = "https://api.elevenlabs.io/v1/text-to-speech/{$voice_id}";
+
+    $body = json_encode( array(
+        'text' => $text,
+        'model_id' => 'eleven_monolingual_v1',
+        'voice_settings' => array(
+            'stability' => 0.5,
+            'similarity_boost' => 0.75
+        )
+    ) );
+
+    add_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10, 1 );
+
+    $response = wp_remote_post( $url, array(
+        'timeout' => 60,
+        'headers' => array(
+            'xi-api-key' => $api_key,
+            'Content-Type' => 'application/json',
+            'accept' => 'audio/mpeg'
+        ),
+        'body' => $body
+    ) );
+
+    remove_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10 );
+
+    if ( is_wp_error( $response ) ) {
+        wp_send_json_error( $response->get_error_message() );
+    }
+
+    $code = wp_remote_retrieve_response_code( $response );
+    if ( $code !== 200 ) {
+        $response_body = wp_remote_retrieve_body( $response );
+        $err = json_decode( $response_body, true );
+        $msg = $err['detail']['message'] ?? 'ElevenLabs generation failed with status ' . $code;
+        wp_send_json_error( $msg );
+    }
+
+    $audio_data = wp_remote_retrieve_body( $response );
+    $base64_audio = base64_encode( $audio_data );
+
+    wp_send_json_success( array(
+        'audio' => 'data:audio/mpeg;base64,' . $base64_audio
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_ai_generate_tts', 'cora_ajax_generate_tts' );
 
 // ==============================================================================
 // GPS GEOLOCATION & GEOFENCING ATTENDANCE FUNCTIONS
@@ -15558,9 +16749,28 @@ function cora_create_custom_tables() {
     if ( $ledger_exists ) {
         $has_category_col = ! empty( $wpdb->get_results( "SHOW COLUMNS FROM {$ledger_table} LIKE 'category'" ) );
     }
-    if ( get_option( 'cora_db_v2_created' ) && $table_exists && $forms_exists && $has_agency_col && $has_form_key_col && $has_category_col ) {
+    $rag_table = $wpdb->prefix . 'cora_rag_knowledge';
+    $rag_exists = cora_table_exists( $rag_table );
+    $has_sync_gen_col = false;
+    if ( $rag_exists ) {
+        $has_sync_gen_col = ! empty( $wpdb->get_results( "SHOW COLUMNS FROM {$rag_table} LIKE 'sync_generation'" ) );
+    }
+    if ( get_option( 'cora_db_v2_created' ) && $table_exists && $forms_exists && $has_agency_col && $has_form_key_col && $has_category_col && $rag_exists && $has_sync_gen_col ) {
         return;
     }
+
+    // Invalidate table existence transient cache so they are re-queried accurately
+    $custom_tables = array(
+        'cora_agencies',
+        'cora_canvas_themes',
+        'cora_forms',
+        'cora_ledger',
+        'cora_rag_knowledge'
+    );
+    foreach ( $custom_tables as $tbl ) {
+        delete_transient( 'cora_tbl_ex_' . md5( $wpdb->prefix . $tbl ) );
+    }
+
     $charset_collate = $wpdb->get_charset_collate();
 
     $table_queries = array();
@@ -15986,6 +17196,23 @@ function cora_create_custom_tables() {
       KEY form_id (form_id)
     ) $charset_collate;";
 
+    // 23. cora_rag_knowledge
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_rag_knowledge (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      agency_id bigint(20) unsigned NOT NULL,
+      title varchar(255) NOT NULL,
+      content longtext NOT NULL,
+      source_type varchar(50) NOT NULL,
+      source_id bigint(20) unsigned DEFAULT NULL,
+      token_count int(11) unsigned NOT NULL DEFAULT 0,
+      sync_generation int(11) unsigned DEFAULT 0,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY agency_id (agency_id),
+      KEY source_type (source_type)
+    ) $charset_collate;";
+
     require_once ABSPATH . 'wp-admin/includes/upgrade.php';
     foreach ( $table_queries as $query ) {
         dbDelta( $query );
@@ -16009,6 +17236,15 @@ function cora_create_custom_tables() {
     $has_category = $wpdb->get_results( "SHOW COLUMNS FROM {$ledger_table} LIKE 'category'" );
     if ( empty( $has_category ) ) {
         $wpdb->query( "ALTER TABLE {$ledger_table} ADD COLUMN category varchar(100) DEFAULT '' AFTER status;" );
+    }
+
+    // Ensure sync_generation column exists in wp_cora_rag_knowledge
+    $rag_table = $wpdb->prefix . 'cora_rag_knowledge';
+    if ( cora_table_exists( $rag_table ) ) {
+        $has_sync_gen = $wpdb->get_results( "SHOW COLUMNS FROM {$rag_table} LIKE 'sync_generation'" );
+        if ( empty( $has_sync_gen ) ) {
+            $wpdb->query( "ALTER TABLE {$rag_table} ADD COLUMN sync_generation int(11) unsigned DEFAULT 0 AFTER token_count;" );
+        }
     }
 
     update_option( 'cora_db_v2_created', true );
@@ -16548,8 +17784,8 @@ function cora_user_has_feature_access( $target, $user = null ) {
     // If no custom permissions are set for this role, fallback to default capabilities
     if ( $allowed === null ) {
         $default_perms = array(
-            'cora_branch_manager'         => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'portfolio', 'leads', 'settings', 'settings-suite', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp' ),
-            'cora_manager'                => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'portfolio', 'leads', 'settings', 'settings-suite', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp' ),
+            'cora_branch_manager'         => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'portfolio', 'leads', 'settings', 'settings-suite', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base' ),
+            'cora_manager'                => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'portfolio', 'leads', 'settings', 'settings-suite', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base' ),
             'cora_photographer'           => array( 'dashboard', 'bookings', 'equipment', 'portfolio', 'media', 'leads' ),
             'cora_videographer'           => array( 'dashboard', 'bookings', 'equipment', 'portfolio', 'media' ),
             'cora_drone_pilot'            => array( 'dashboard', 'bookings', 'equipment', 'portfolio', 'media' ),
@@ -16616,6 +17852,7 @@ function cora_user_has_feature_access( $target, $user = null ) {
         'review-acquisition' => 'dashboard',
         'gbp'                => 'dashboard',
         'mcp'                => 'dashboard',
+        'knowledge-base'     => 'dashboard',
         'attendance'         => 'dashboard',
     );
 
@@ -16638,6 +17875,37 @@ function cora_user_has_feature_access( $target, $user = null ) {
     }
 
     $mapped_key = isset( $map[$target] ) ? $map[$target] : $target;
+
+    // Feature flags check
+    $flag_map = array(
+        'bookings'            => 'enable_bookings',
+        'calendar'            => 'enable_bookings',
+        'portfolio'           => 'enable_properties',
+        'blogs'               => 'enable_properties',
+        'content-suite'       => 'enable_properties',
+        'content_suite'       => 'enable_properties',
+        'feature-hub'         => 'enable_properties',
+        'feature_hub'         => 'enable_properties',
+        'leads'               => 'enable_leads',
+        'client-leads'        => 'enable_leads',
+        'clients'             => 'enable_clients',
+        'equipment'           => 'enable_properties',
+        'camera-equipment'    => 'enable_properties',
+        'listings'            => 'enable_properties',
+        'financials'          => 'enable_ledger',
+        'financial-overview'  => 'enable_ledger',
+        'vault'               => 'enable_documents',
+    );
+
+    $mapped_flag = isset( $flag_map[$target] ) ? $flag_map[$target] : '';
+    if ( ! empty( $mapped_flag ) ) {
+        $agency_id_num = cora_db_get_agency_id();
+        if ( $agency_id_num > 1 ) {
+            if ( function_exists( 'cora_get_agency_feature_flag' ) && ! cora_get_agency_feature_flag( $agency_id_num, $mapped_flag ) ) {
+                return false;
+            }
+        }
+    }
 
     return in_array( $mapped_key, $allowed, true );
 }
@@ -18665,6 +19933,19 @@ function cora_ajax_accept_invitation() {
     if ( empty( $agency_id_num ) ) { $agency_id_num = 1; }
 
     global $wpdb;
+
+    // Enforce max users quota for the agency
+    if ( $agency_id_num >= 1 ) {
+        $existing_user_count = intval( $wpdb->get_var( $wpdb->prepare(
+            "SELECT COUNT(*) FROM {$wpdb->prefix}cora_users WHERE agency_id = %d",
+            $agency_id_num
+        ) ) );
+        $max_users = cora_get_agency_quota( $agency_id_num, 'max_users_limit' );
+        if ( $existing_user_count >= $max_users ) {
+            wp_send_json_error( array( 'message' => "Registration failed: Maximum user limit of {$max_users} has been reached for this workspace. Please contact your workspace administrator to upgrade." ) );
+        }
+    }
+
     $cora_users_table = $wpdb->prefix . 'cora_users';
 
     if ( email_exists( $email ) ) {
@@ -18819,6 +20100,18 @@ function cora_ajax_send_invitation() {
 
     global $wpdb;
     $cora_users_table = $wpdb->prefix . 'cora_users';
+
+    // Enforce max users quota for the agency
+    if ( $agency_id_num >= 1 ) {
+        $existing_user_count = intval( $wpdb->get_var( $wpdb->prepare(
+            "SELECT COUNT(*) FROM {$wpdb->prefix}cora_users WHERE agency_id = %d",
+            $agency_id_num
+        ) ) );
+        $max_users = cora_get_agency_quota( $agency_id_num, 'max_users_limit' );
+        if ( $existing_user_count >= $max_users ) {
+            wp_send_json_error( array( 'message' => "Invitation blocked: Maximum user limit of {$max_users} has been reached for this workspace. Please upgrade your seat plan." ) );
+        }
+    }
 
     // Single Primary Owner Rule Check
     $is_owner_role = in_array( $invite_role, array( 'cora_super_admin', 'cora_workspace_owner', 'owner', 'cora_re_broker_owner', 'cora_studio_owner' ), true );
@@ -27334,6 +28627,137 @@ function cora_ensure_agencies_industry_column() {
 }
 
 /**
+ * Get the current quota limit for an agency based on plan defaults and settings overrides.
+ */
+if ( ! function_exists( 'cora_get_agency_quota' ) ) {
+function cora_get_agency_quota( $agency_id, $quota_key ) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'cora_agencies';
+    
+    // Fetch plan and settings from database
+    $workspace = $wpdb->get_row( $wpdb->prepare( "SELECT plan, settings FROM {$table_name} WHERE id = %d", $agency_id ), ARRAY_A );
+    $plan = $workspace ? $workspace['plan'] : 'starter';
+    
+    // Default values for plans
+    $defaults = array(
+        'max_users_limit'  => 5,
+        'storage_limit_mb' => 1024,
+        'max_emails_limit' => 100,
+        'rag_token_quota'  => 100000
+    );
+    if ( $plan === 'beta' ) {
+        $defaults['max_users_limit']  = 10;
+        $defaults['storage_limit_mb'] = 2048;
+        $defaults['max_emails_limit'] = 500;
+        $defaults['rag_token_quota']  = 250000;
+    } elseif ( $plan === 'pro' ) {
+        $defaults['max_users_limit']  = 15;
+        $defaults['storage_limit_mb'] = 10240; // 10 GB
+        $defaults['max_emails_limit'] = 1000;
+        $defaults['rag_token_quota']  = 1000000;
+    } elseif ( $plan === 'enterprise' ) {
+        $defaults['max_users_limit']  = 999;
+        $defaults['storage_limit_mb'] = 102400; // 100 GB
+        $defaults['max_emails_limit'] = 10000;
+        $defaults['rag_token_quota']  = 10000000;
+    }
+    
+    // Parse custom overrides from settings
+    if ( $workspace && ! empty( $workspace['settings'] ) ) {
+        $settings = json_decode( $workspace['settings'], true );
+        if ( is_array( $settings ) && isset( $settings[$quota_key] ) && floatval( $settings[$quota_key] ) > 0 ) {
+            return floatval( $settings[$quota_key] );
+        }
+    }
+    
+    return isset( $defaults[$quota_key] ) ? $defaults[$quota_key] : 0;
+}
+}
+
+/**
+ * Check if a specific feature is enabled for a workspace.
+ */
+if ( ! function_exists( 'cora_get_agency_feature_flag' ) ) {
+function cora_get_agency_feature_flag( $agency_id, $flag ) {
+    if ( $agency_id <= 1 ) {
+        return true;
+    }
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'cora_agencies';
+    $settings_json = $wpdb->get_var( $wpdb->prepare( "SELECT settings FROM {$table_name} WHERE id = %d", $agency_id ) );
+    if ( empty( $settings_json ) ) {
+        return true; // Default to enabled
+    }
+    $settings = json_decode( $settings_json, true );
+    if ( ! is_array( $settings ) ) {
+        return true;
+    }
+    if ( isset( $settings[$flag] ) ) {
+        return (bool) $settings[$flag];
+    }
+    return true; // Default to enabled
+}
+}
+
+/**
+ * Get total file storage usage in MB for an agency.
+ */
+if ( ! function_exists( 'cora_get_agency_storage_usage' ) ) {
+function cora_get_agency_storage_usage( $agency_slug_or_id ) {
+    global $wpdb;
+    
+    // Find all attachments for this agency
+    $attachments = $wpdb->get_col( $wpdb->prepare(
+        "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = 'cora_agency_id' AND meta_value = %s",
+        $agency_slug_or_id
+    ) );
+    
+    $total_bytes = 0;
+    if ( is_array( $attachments ) && ! empty( $attachments ) ) {
+        foreach ( $attachments as $post_id ) {
+            $file = get_attached_file( $post_id );
+            if ( $file && file_exists( $file ) ) {
+                $total_bytes += filesize( $file );
+            }
+        }
+    }
+    
+    return round( $total_bytes / ( 1024 * 1024 ), 2 ); // return MB
+}
+}
+
+/**
+ * Check outgoing email quota before sending email.
+ */
+if ( ! function_exists( 'cora_check_agency_email_quota' ) ) {
+function cora_check_agency_email_quota( $return_val, $mail_args ) {
+    $agency_id_num = cora_db_get_agency_id();
+    if ( ! $agency_id_num || cora_get_current_user_agency_id() === 'super' ) {
+        // Skip check for fallback or default platform actions
+        return $return_val;
+    }
+    
+    if ( cora_is_super_owner() ) {
+        return $return_val;
+    }
+    
+    $max_emails = cora_get_agency_quota( $agency_id_num, 'max_emails_limit' );
+    $ym = date( 'Y_m' );
+    $opt_key = "cora_emails_sent_{$agency_id_num}_{$ym}";
+    $current_sent = intval( get_option( $opt_key, 0 ) );
+    
+    if ( $current_sent >= $max_emails ) {
+        cora_log_activity( 'Email System', "Email blocked: Monthly quota limit of {$max_emails} emails reached." );
+        return false; // blocks wp_mail from sending
+    }
+    
+    update_option( $opt_key, $current_sent + 1 );
+    return $return_val;
+}
+}
+add_filter( 'pre_wp_mail', 'cora_check_agency_email_quota', 10, 2 );
+
+/**
  * AJAX Callback: Get all workspaces.
  */
 if ( ! function_exists( 'cora_ajax_super_get_workspaces' ) ) {
@@ -27370,6 +28794,44 @@ function cora_ajax_super_get_workspaces() {
                     $ind = 'real_estate';
                 }
                 $row['industry'] = $ind;
+
+                // Load custom quota limits from settings column
+                $settings = array();
+                if ( ! empty( $row['settings'] ) ) {
+                    $settings = json_decode( $row['settings'], true );
+                }
+                if ( ! is_array( $settings ) ) {
+                    $settings = array();
+                }
+
+                $row['max_users_limit'] = isset( $settings['max_users_limit'] ) ? intval( $settings['max_users_limit'] ) : cora_get_agency_quota( $row['id'], 'max_users_limit' );
+                $row['storage_limit_mb'] = isset( $settings['storage_limit_mb'] ) ? intval( $settings['storage_limit_mb'] ) : cora_get_agency_quota( $row['id'], 'storage_limit_mb' );
+                $row['max_emails_limit'] = isset( $settings['max_emails_limit'] ) ? intval( $settings['max_emails_limit'] ) : cora_get_agency_quota( $row['id'], 'max_emails_limit' );
+                $row['rag_token_quota'] = isset( $settings['rag_token_quota'] ) ? intval( $settings['rag_token_quota'] ) : cora_get_agency_quota( $row['id'], 'rag_token_quota' );
+
+                // Map feature flags
+                $row['enable_leads'] = isset( $settings['enable_leads'] ) ? (bool)$settings['enable_leads'] : true;
+                $row['enable_clients'] = isset( $settings['enable_clients'] ) ? (bool)$settings['enable_clients'] : true;
+                $row['enable_properties'] = isset( $settings['enable_properties'] ) ? (bool)$settings['enable_properties'] : true;
+                $row['enable_bookings'] = isset( $settings['enable_bookings'] ) ? (bool)$settings['enable_bookings'] : true;
+                $row['enable_ledger'] = isset( $settings['enable_ledger'] ) ? (bool)$settings['enable_ledger'] : true;
+                $row['enable_documents'] = isset( $settings['enable_documents'] ) ? (bool)$settings['enable_documents'] : true;
+
+                // Calculate current counts
+                $user_count = $wpdb->get_var( $wpdb->prepare(
+                    "SELECT COUNT(*) FROM {$wpdb->prefix}cora_users WHERE agency_id = %d",
+                    $row['id']
+                ) );
+                $row['current_users_count'] = intval( $user_count );
+
+                $cache_key = 'cora_agency_storage_' . $row['id'];
+                $storage_size = get_transient( $cache_key );
+                if ( $storage_size === false ) {
+                    $storage_size = cora_get_agency_storage_usage( $row['slug'] );
+                    set_transient( $cache_key, $storage_size, 300 );
+                }
+                $row['current_storage_mb'] = floatval( $storage_size );
+
                 $results[] = $row;
             }
         }
@@ -27404,6 +28866,317 @@ function cora_ajax_super_get_workspaces() {
 }
 }
 add_action( 'wp_ajax_cora_super_get_workspaces', 'cora_ajax_super_get_workspaces' );
+
+// =================================================================================
+// LIVE PLATFORM MONITOR BACKEND
+// =================================================================================
+
+/**
+ * Filter: heartbeat_received for tracking user presence
+ */
+if ( ! function_exists( 'cora_heartbeat_presence_received' ) ) {
+    function cora_heartbeat_presence_received( $response, $data, $screen_id ) {
+        if ( isset( $data['cora_presence'] ) ) {
+            global $wpdb;
+            $user_id = get_current_user_id();
+            $agency_slug = cora_get_current_user_agency_id();
+            $agency_id_num = cora_db_get_agency_id( $agency_slug );
+
+            if ( $user_id && $agency_id_num ) {
+                $idle = isset( $data['cora_presence']['idle'] ) ? intval( $data['cora_presence']['idle'] ) : 0;
+                $screen = isset( $data['cora_presence']['screen'] ) ? sanitize_text_field( $data['cora_presence']['screen'] ) : '';
+                $status = ( $idle < 60 ) ? 'active' : 'idle';
+                
+                $payload = array(
+                    'user_id' => $user_id,
+                    'agency_id' => $agency_id_num,
+                    'screen' => $screen,
+                    'idle' => $idle,
+                    'last_seen' => current_time( 'mysql' ),
+                    'status' => $status
+                );
+                
+                set_transient( 'cora_presence_' . $agency_id_num . '_' . $user_id, $payload, 120 );
+                
+                // Throttled update of last active
+                if ( false === get_transient( 'cora_last_active_throttle_' . $user_id ) ) {
+                    set_transient( 'cora_last_active_throttle_' . $user_id, true, 300 );
+                    $wpdb->update( 
+                        $wpdb->prefix . 'cora_users', 
+                        array( 'last_active' => current_time( 'mysql' ) ), 
+                        array( 'wp_user_id' => $user_id ) 
+                    );
+                }
+                
+                $response['cora_heartbeat_ack'] = true;
+            }
+        }
+        return $response;
+    }
+}
+add_filter( 'heartbeat_received', 'cora_heartbeat_presence_received', 10, 3 );
+
+/**
+ * Filter: heartbeat_settings configuration
+ */
+if ( ! function_exists( 'cora_heartbeat_settings_config' ) ) {
+    function cora_heartbeat_settings_config( $settings ) {
+        $settings['interval'] = 30;
+        return $settings;
+    }
+}
+add_filter( 'heartbeat_settings', 'cora_heartbeat_settings_config' );
+
+/**
+ * Function: Get all online users across the platform
+ */
+if ( ! function_exists( 'cora_get_all_online_users' ) ) {
+    function cora_get_all_online_users() {
+        global $wpdb;
+        $online_users = array();
+        
+        $query = "SELECT cu.wp_user_id, cu.agency_id, cu.role, ca.name as agency_name, ca.slug as agency_slug 
+                  FROM {$wpdb->prefix}cora_users cu 
+                  LEFT JOIN {$wpdb->prefix}cora_agencies ca ON cu.agency_id = ca.id 
+                  WHERE ca.status = 'active'";
+                  
+        $active_users = $wpdb->get_results( $query );
+        
+        if ( $active_users ) {
+            foreach ( $active_users as $user ) {
+                $transient_key = 'cora_presence_' . $user->agency_id . '_' . $user->wp_user_id;
+                $presence = get_transient( $transient_key );
+                
+                if ( $presence && is_array( $presence ) ) {
+                    $userdata = get_userdata( $user->wp_user_id );
+                    if ( $userdata ) {
+                        $online_users[] = array(
+                            'user_id' => $user->wp_user_id,
+                            'display_name' => $userdata->display_name,
+                            'email' => $userdata->user_email,
+                            'agency_name' => $user->agency_name,
+                            'agency_slug' => $user->agency_slug,
+                            'current_screen' => isset( $presence['screen'] ) ? $presence['screen'] : '',
+                            'status' => isset( $presence['status'] ) ? $presence['status'] : 'idle',
+                            'last_seen' => isset( $presence['last_seen'] ) ? $presence['last_seen'] : '',
+                            'idle_seconds' => isset( $presence['idle'] ) ? $presence['idle'] : 0,
+                            'role' => $user->role
+                        );
+                    }
+                }
+            }
+        }
+        
+        return $online_users;
+    }
+}
+
+/**
+ * Action: Enqueue heartbeat presence script
+ */
+if ( ! function_exists( 'cora_enqueue_heartbeat_presence' ) ) {
+    function cora_enqueue_heartbeat_presence() {
+        if ( is_user_logged_in() ) {
+            wp_enqueue_script( 'heartbeat' );
+            $js = "(function(){
+    var lastActivity = Date.now();
+    var events = ['mousemove','keydown','scroll','click','touchstart'];
+    events.forEach(function(evt){ document.addEventListener(evt, function(){ lastActivity = Date.now(); }, {passive:true}); });
+    function getIdleSeconds(){ return Math.round((Date.now() - lastActivity) / 1000); }
+    jQuery(document).on('heartbeat-send', function(e, data){
+        var screenName = 'Dashboard';
+        if(document.querySelector('.cora-page-title')) screenName = document.querySelector('.cora-page-title').textContent.trim();
+        else if(document.title) screenName = document.title.replace(/ [-–—|].*/, '').trim();
+        data.cora_presence = { screen: screenName, idle: getIdleSeconds() };
+    });
+})();";
+            wp_add_inline_script( 'heartbeat', $js );
+        }
+    }
+}
+add_action( 'wp_enqueue_scripts', 'cora_enqueue_heartbeat_presence' );
+
+/**
+ * AJAX Callback: Super Get Live Monitor Data
+ */
+if ( ! function_exists( 'cora_ajax_super_get_live_monitor' ) ) {
+    function cora_ajax_super_get_live_monitor() {
+        check_ajax_referer( 'cora_ajax_nonce', 'security' );
+        if ( ! cora_is_super_owner() ) {
+            wp_send_json_error( 'Unauthorized.' );
+        }
+        
+        global $wpdb;
+        
+        // Block 1: online_users
+        $online_users = cora_get_all_online_users();
+        
+        // Block 2: heatmap
+        $heatmap = array();
+        for ( $i = 0; $i < 24; $i++ ) {
+            $heatmap[ sprintf( '%02d', $i ) ] = 0;
+        }
+        
+        $heatmap_query = "SELECT HOUR(created_at) as hr, COUNT(*) as cnt 
+                          FROM {$wpdb->prefix}cora_activity_logs 
+                          WHERE created_at >= CURDATE() 
+                          GROUP BY HOUR(created_at)";
+        $heatmap_results = $wpdb->get_results( $heatmap_query );
+        
+        if ( $heatmap_results ) {
+            foreach ( $heatmap_results as $row ) {
+                $hr_key = sprintf( '%02d', $row->hr );
+                $heatmap[ $hr_key ] = intval( $row->cnt );
+            }
+        }
+        
+        // Block 3: recent_activity
+        $recent_query = "SELECT al.*, u.display_name as user_display_name, ca.name as agency_name 
+                         FROM {$wpdb->prefix}cora_activity_logs al 
+                         LEFT JOIN {$wpdb->prefix}users u ON al.user_id = u.ID 
+                         LEFT JOIN {$wpdb->prefix}cora_agencies ca ON al.agency_id = ca.id 
+                         ORDER BY al.created_at DESC LIMIT 25";
+        $recent_activity = $wpdb->get_results( $recent_query );
+        
+        if ( $recent_activity ) {
+            foreach ( $recent_activity as &$activity ) {
+                $activity->time_ago = human_time_diff( strtotime( $activity->created_at ), current_time( 'timestamp' ) ) . ' ago';
+            }
+        } else {
+            $recent_activity = array();
+        }
+        
+        // Block 4: summary
+        $total_online = count( $online_users );
+        $total_active = 0;
+        foreach ( $online_users as $u ) {
+            if ( isset( $u['status'] ) && $u['status'] === 'active' ) {
+                $total_active++;
+            }
+        }
+        $total_idle = $total_online - $total_active;
+        
+        $actions_today_query = "SELECT COUNT(*) FROM {$wpdb->prefix}cora_activity_logs WHERE created_at >= CURDATE()";
+        $total_actions_today = intval( $wpdb->get_var( $actions_today_query ) );
+        
+        $peak_hour_key = '00';
+        $peak_val = -1;
+        foreach ( $heatmap as $hr => $cnt ) {
+            if ( $cnt > $peak_val ) {
+                $peak_val = $cnt;
+                $peak_hour_key = $hr;
+            }
+        }
+        
+        $peak_hour_formatted = date( 'g:i A', strtotime( "$peak_hour_key:00:00" ) );
+        
+        $summary = array(
+            'total_online' => $total_online,
+            'total_active' => $total_active,
+            'total_idle' => $total_idle,
+            'total_actions_today' => $total_actions_today,
+            'peak_hour' => $peak_hour_formatted
+        );
+        
+        wp_send_json_success( array(
+            'online_users' => $online_users,
+            'heatmap' => $heatmap,
+            'recent_activity' => $recent_activity,
+            'summary' => $summary
+        ) );
+    }
+}
+add_action( 'wp_ajax_cora_super_get_live_monitor', 'cora_ajax_super_get_live_monitor' );
+
+/**
+ * AJAX Callback: Update workspace metadata (Plan, Industry, Status, Quotas, Flags).
+ */
+if ( ! function_exists( 'cora_ajax_super_update_workspace' ) ) {
+function cora_ajax_super_update_workspace() {
+    if ( isset( $_POST['security'] ) ) {
+        check_ajax_referer( 'cora_ajax_nonce', 'security', false );
+    }
+    if ( ! cora_is_super_owner() ) {
+        wp_send_json_error( 'Unauthorized access.' );
+    }
+
+    $workspace_id = isset( $_POST['id'] ) ? intval( $_POST['id'] ) : 0;
+    if ( ! $workspace_id ) {
+        wp_send_json_error( 'Missing workspace ID.' );
+    }
+
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'cora_agencies';
+
+    // Retrieve existing values
+    $existing = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_name} WHERE id = %d", $workspace_id ), ARRAY_A );
+    if ( ! $existing ) {
+        wp_send_json_error( 'Workspace not found.' );
+    }
+
+    // Extract basic fields
+    $plan     = isset( $_POST['plan'] ) ? sanitize_text_field( $_POST['plan'] ) : $existing['plan'];
+    $industry = isset( $_POST['industry'] ) ? sanitize_text_field( $_POST['industry'] ) : $existing['industry'];
+    $status   = isset( $_POST['status'] ) ? sanitize_text_field( $_POST['status'] ) : $existing['status'];
+
+    // Load existing settings
+    $settings = array();
+    if ( ! empty( $existing['settings'] ) ) {
+        $settings = json_decode( $existing['settings'], true );
+    }
+    if ( ! is_array( $settings ) ) {
+        $settings = array();
+    }
+
+    // Parse incoming quota settings
+    if ( isset( $_POST['max_users_limit'] ) ) {
+        $settings['max_users_limit'] = intval( $_POST['max_users_limit'] );
+    }
+    if ( isset( $_POST['storage_limit_mb'] ) ) {
+        $settings['storage_limit_mb'] = intval( $_POST['storage_limit_mb'] );
+    }
+    if ( isset( $_POST['max_emails_limit'] ) ) {
+        $settings['max_emails_limit'] = intval( $_POST['max_emails_limit'] );
+    }
+    if ( isset( $_POST['rag_token_quota'] ) ) {
+        $settings['rag_token_quota'] = intval( $_POST['rag_token_quota'] );
+    }
+
+    // Parse incoming feature flags
+    $flags_list = array( 'enable_leads', 'enable_clients', 'enable_properties', 'enable_bookings', 'enable_ledger', 'enable_documents' );
+    foreach ( $flags_list as $flag ) {
+        if ( isset( $_POST[$flag] ) ) {
+            $settings[$flag] = ( $_POST[$flag] === 'true' || $_POST[$flag] === '1' );
+        }
+    }
+
+    $settings_json = wp_json_encode( $settings );
+
+    $updated = $wpdb->update(
+        $table_name,
+        array(
+            'plan'     => $plan,
+            'industry' => $industry,
+            'status'   => $status,
+            'settings' => $settings_json,
+        ),
+        array( 'id' => $workspace_id ),
+        array( '%s', '%s', '%s', '%s' ),
+        array( '%d' )
+    );
+
+    if ( $updated !== false ) {
+        // Purge storage usage cache
+        delete_transient( 'cora_agency_storage_' . $workspace_id );
+
+        cora_log_activity( 'Platform Management', "Super Admin updated Workspace ID {$workspace_id} settings: Plan: {$plan}, Industry: {$industry}, Status: {$status}." );
+        wp_send_json_success( 'Workspace updated successfully.' );
+    } else {
+        wp_send_json_error( 'Failed to update database.' );
+    }
+}
+}
+add_action( 'wp_ajax_cora_super_update_workspace', 'cora_ajax_super_update_workspace' );
 
 /**
  * AJAX Callback: Get all users.
@@ -28110,13 +29883,50 @@ function cora_ajax_super_get_metrics() {
     $php_version = phpversion();
     $wp_version = get_bloginfo( 'version' );
 
+    // Calculate server disk usage
+    $disk_usage_string = 'Not available';
+    $disk_total_bytes = @disk_total_space( ABSPATH );
+    $disk_free_bytes = @disk_free_space( ABSPATH );
+    if ( $disk_total_bytes > 0 ) {
+        $disk_used_bytes = $disk_total_bytes - $disk_free_bytes;
+        $disk_used_pct = round( ( $disk_used_bytes / $disk_total_bytes ) * 100, 1 );
+        $disk_total_gb = round( $disk_total_bytes / ( 1024 * 1024 * 1024 ), 1 );
+        $disk_free_gb = round( $disk_free_bytes / ( 1024 * 1024 * 1024 ), 1 );
+        $disk_usage_string = "{$disk_used_pct}% ({$disk_free_gb} GB free of {$disk_total_gb} GB)";
+    }
+
+    // Calculate PHP memory usage details
+    $memory_limit = ini_get( 'memory_limit' );
+    $peak_memory_bytes = memory_get_peak_usage( true );
+    $peak_memory_mb = round( $peak_memory_bytes / ( 1024 * 1024 ), 1 );
+    $memory_usage_string = "{$peak_memory_mb} MB / {$memory_limit}";
+
+    // Calculate system load average
+    $load_avg = 'Not available';
+    if ( function_exists( 'sys_getloadavg' ) ) {
+        $load = @sys_getloadavg();
+        if ( is_array( $load ) && isset( $load[0] ) ) {
+            $load_avg = round( $load[0], 2 ) . ' (1m)';
+        }
+    }
+
+    // Calculate Operating System and Web Server Software details
+    $server_software = $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown Webserver';
+    $web_server = strpos( $server_software, 'LiteSpeed' ) !== false ? 'LiteSpeed' : ( strpos( $server_software, 'Nginx' ) !== false ? 'Nginx' : ( strpos( $server_software, 'Apache' ) !== false ? 'Apache' : $server_software ) );
+    $os = PHP_OS;
+    $system_software_string = "{$os} / {$web_server}";
+
     wp_send_json_success( array(
         'db_size_mb'       => $db_size_mb,
         'total_workspaces' => $total_workspaces,
         'total_users'      => $total_users,
         'storage_size_mb'  => $storage_size_mb,
         'php_version'      => $php_version,
-        'wp_version'       => $wp_version
+        'wp_version'       => $wp_version,
+        'disk_usage'       => $disk_usage_string,
+        'memory_usage'     => $memory_usage_string,
+        'load_avg'         => $load_avg,
+        'system_software'  => $system_software_string
     ) );
 }
 }
@@ -28180,7 +29990,22 @@ function cora_ajax_super_impersonate_user() {
     wp_set_current_user( $target_user_id );
     wp_set_auth_cookie( $target_user_id, true );
 
-    wp_send_json_success( array( 'redirect_url' => home_url( '/workspace/dashboard' ) ) );
+    // Resolve target workspace slug
+    $target_ws = cora_get_user_workspaces( $target_user_id );
+    $target_ws_slug = ! empty( $target_ws[0]['slug'] ) ? $target_ws[0]['slug'] : 'workspace';
+
+    // Synchronize workspace cookie
+    setcookie(
+        'cora_active_workspace_slug',
+        $target_ws_slug,
+        time() + 86400 * 365,
+        $cookie_path,
+        $cookie_domain,
+        is_ssl(),
+        false
+    );
+
+    wp_send_json_success( array( 'redirect_url' => home_url( '/' . $target_ws_slug . '/dashboard' ) ) );
 }
 }
 add_action( 'wp_ajax_cora_super_impersonate_user', 'cora_ajax_super_impersonate_user' );
@@ -28250,11 +30075,22 @@ function cora_ajax_super_switch_back() {
     wp_set_current_user( $impersonator_id );
     wp_set_auth_cookie( $impersonator_id, true );
 
+    // Restore workspace cookie back to super
+    setcookie(
+        'cora_active_workspace_slug',
+        'super',
+        time() + 86400 * 365,
+        $cookie_path,
+        $cookie_domain,
+        is_ssl(),
+        false
+    );
+
     // If it's a POST/AJAX request, return JSON. Otherwise redirect directly.
     if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-        wp_send_json_success( array( 'redirect_url' => home_url( '/workspace/super-admin' ) ) );
+        wp_send_json_success( array( 'redirect_url' => home_url( '/super/super-admin' ) ) );
     } else {
-        wp_redirect( home_url( '/workspace/super-admin' ) );
+        wp_redirect( home_url( '/super/super-admin' ) );
         exit;
     }
 }

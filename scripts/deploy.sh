@@ -15,6 +15,7 @@ REMOTE_TMP="/tmp/cora-workspace-deploy.zip"
 
 MAIN_PATH="/home/u484406462/domains/heycora.in/public_html"
 DEMO_PATH="/home/u484406462/domains/heycora.in/public_html/demo"
+STAGING_PATH="/home/u484406462/domains/heycora.in/public_html/stagging"
 
 # Targets
 TARGET=${1:-both}
@@ -104,11 +105,13 @@ if [ "$TARGET" = "main" ]; then
     deploy_site "Main Production" "$MAIN_PATH"
 elif [ "$TARGET" = "demo" ]; then
     deploy_site "Demo Environment" "$DEMO_PATH"
+elif [ "$TARGET" = "staging" ]; then
+    deploy_site "Staging Environment" "$STAGING_PATH"
 elif [ "$TARGET" = "both" ]; then
     deploy_site "Demo Environment" "$DEMO_PATH"
     deploy_site "Main Production" "$MAIN_PATH"
 else
-    echo "ERROR: Invalid target. Choose 'main', 'demo', or 'both'." >&2
+    echo "ERROR: Invalid target. Choose 'main', 'demo', 'staging', or 'both'." >&2
     exit 1
 fi
 
