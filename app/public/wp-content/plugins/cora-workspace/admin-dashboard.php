@@ -3767,9 +3767,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 #cora-feedback-trigger {
                     background-color: #25d366 !important;
                     color: #ffffff !important;
-                    border: 1px solid #128c7e !important;
+                    border: none !important;
                     font-weight: 700 !important;
-                    box-shadow: 0 1px 3px rgba(37, 211, 102, 0.2), 0 1px 2px rgba(0,0,0,0.05) !important;
+                    box-shadow: 0 1px 3px rgba(37, 211, 102, 0.15) !important;
                     display: inline-flex !important;
                     align-items: center !important;
                     justify-content: center !important;
@@ -3779,8 +3779,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     transition: all 0.2s ease-in-out !important;
                 }
                 #cora-feedback-trigger:hover {
-                    background-color: #128c7e !important;
-                    border-color: #075e54 !important;
+                    background-color: #20ba5a !important;
                     color: #ffffff !important;
                 }
                 
@@ -3788,11 +3787,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 .cora-dark-theme #cora-feedback-trigger {
                     background-color: #25d366 !important;
                     color: #ffffff !important;
-                    border-color: #128c7e !important;
+                    border: none !important;
                 }
                 .cora-dark-theme #cora-feedback-trigger:hover {
-                    background-color: #128c7e !important;
-                    border-color: #075e54 !important;
+                    background-color: #20ba5a !important;
                     color: #ffffff !important;
                 }
                 
@@ -3827,8 +3825,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             ?>
             <div class="cora-user-footer px-4 py-3 flex items-center justify-between border-t border-zinc-200/50 dark:border-zinc-800/40 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/30 transition-colors duration-200 cursor-pointer relative z-[60]" onclick="event.stopPropagation(); $('#cora-profile-popover').toggleClass('hidden'); $('#cora-sidebar-notif-popover').addClass('hidden'); $('#cora-workspace-popover').addClass('hidden');">
                 <!-- Dynamic Feedback Pill (Sticky Arc) inside profile footer -->
-                <button type="button" id="cora-feedback-trigger" class="absolute -top-2.5 right-14 h-5 px-2 flex items-center justify-center gap-1.5 text-[9px] font-bold shadow-2xs hover:scale-[1.02] active:scale-[0.98] cursor-pointer z-[65]" onclick="window.coraOpenFeedbackDrawer(event)">
-                    <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" class="shrink-0 text-white">
+                <button type="button" id="cora-feedback-trigger" class="absolute -top-2.5 right-14 h-5 px-2.5 flex items-center justify-center gap-1.5 text-[9px] font-bold shadow-2xs hover:scale-[1.02] active:scale-[0.98] cursor-pointer z-[65]" onclick="window.coraOpenFeedbackDrawer(event)">
+                    <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor" class="shrink-0 text-white">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M18.403 5.633A8.919 8.919 0 0 0 12.053 3c-4.948 0-8.976 4.027-8.978 8.977 0 1.58.413 3.125 1.2 4.488l-1.276 4.66 4.77-1.252a8.936 8.936 0 0 0 4.283 1.093h.004c4.947 0 8.975-4.027 8.977-8.977a8.926 8.926 0 0 0-2.63-6.353zM12.053 19.31a7.432 7.432 0 0 1-3.79-1.042l-.272-.162-2.82.74.752-2.748-.177-.282a7.43 7.43 0 0 1-1.139-3.934c.002-4.103 3.342-7.443 7.447-7.443a7.402 7.402 0 0 1 5.263 2.183 7.404 7.404 0 0 1 2.181 5.266c-.002 4.104-3.343 7.444-7.445 7.444zm4.079-5.571c-.223-.112-1.322-.653-1.526-.728-.205-.074-.354-.112-.503.112-.149.224-.577.728-.707.877-.13.15-.26.168-.484.056-.223-.112-.942-.347-1.794-1.108-.663-.592-1.11-1.322-1.24-1.546-.13-.223-.014-.344.098-.456.1-.1.223-.26.335-.392.112-.13.149-.224.223-.373.075-.149.038-.28-.018-.392-.056-.112-.503-1.213-.689-1.66-.182-.439-.366-.38-.503-.387-.13-.007-.28-.007-.429-.007-.15 0-.391.056-.596.28-.205.224-.782.766-.782 1.867 0 1.102.8 2.167.912 2.316.112.15 1.574 2.404 3.814 3.37.533.23 1.012.38 1.397.502.535.17 1.02.146 1.405.089.43-.064 1.322-.54 1.507-1.062.187-.523.187-.972.13-1.062-.056-.09-.205-.149-.43-.262z"/>
                     </svg>
                     <span class="cora-feedback-btn-text">Feedback</span>
