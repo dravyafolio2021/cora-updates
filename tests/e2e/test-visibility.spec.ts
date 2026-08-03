@@ -21,8 +21,12 @@ test('Diagnose forms page with super admin preview', async ({ page }) => {
   await page.waitForTimeout(2000);
 
   // Switch role to cora_super_admin
+  console.log("Opening bottom profile popover...");
+  await page.click('.cora-user-footer');
+  await expect(page.locator('#cora-profile-popover')).toBeVisible();
+
   console.log("Selecting cora_super_admin role preview...");
-  const dropdown = page.locator('.cora-role-switcher-card .cora-role-preview-select');
+  const dropdown = page.locator('#cora-profile-popover .cora-role-preview-select');
   await dropdown.selectOption('cora_super_admin');
   await page.waitForTimeout(4000);
 

@@ -3142,6 +3142,35 @@ function renderFormsList() {
         }, 1500);
     }
 
+    function showSaveErrorToast(err, res = null) {
+        let reason = "";
+        if (res) {
+            reason = res.message || res.error || (res.code ? `Code: ${res.code}` : "");
+        }
+        if (!reason && err) {
+            if (err.responseJSON && err.responseJSON.message) {
+                reason = err.responseJSON.message;
+            } else if (err.responseJSON && err.responseJSON.code) {
+                reason = `Code: ${err.responseJSON.code}`;
+            } else if (err.responseText) {
+                try {
+                    const parsed = JSON.parse(err.responseText);
+                    reason = parsed.message || parsed.error || (parsed.code ? `Code: ${parsed.code}` : "");
+                } catch(e) {
+                    if (err.responseText.length < 100) {
+                        reason = err.responseText.trim();
+                    }
+                }
+            }
+            if (!reason && err.statusText) {
+                reason = `${err.statusText} (${err.status})`;
+            }
+        }
+        
+        const fullMsg = reason ? `Failed to save form: ${reason}` : "Failed to save form.";
+        window.coraShowToast && window.coraShowToast(fullMsg, "error");
+    }
+
     function saveFormInternal(publish = false, callback = null) {
         clearTimeout(autoSaveTimer);
         if (!currentEditingForm) return;
@@ -3195,9 +3224,8 @@ function renderFormsList() {
                     }
                 } else {
                     setAutoSaveStatus('error');
-                    if (publish) {
-                        const errMsg = res && res.message ? res.message : "Failed to save form.";
-                        window.coraShowToast && window.coraShowToast(errMsg, "error");
+                    if (publish || callback) {
+                        showSaveErrorToast(null, res);
                     }
                 }
                 if (typeof callback === 'function') {
@@ -3206,8 +3234,8 @@ function renderFormsList() {
             },
             error: function(err) {
                 setAutoSaveStatus('error');
-                if (publish) {
-                    window.coraShowToast && window.coraShowToast("Failed to save form.", "error");
+                if (publish || callback) {
+                    showSaveErrorToast(err, null);
                 }
                 if (typeof callback === 'function') {
                     callback(null);

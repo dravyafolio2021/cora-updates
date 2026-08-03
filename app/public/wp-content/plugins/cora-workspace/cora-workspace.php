@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 2.9.94
+ * Version: 2.9.100
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.9.94' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.100' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -595,20 +595,20 @@ function cora_get_workspace_by_slug( $slug ) {
         }
     }
 
-    $display_name = ucwords( str_replace( array( '-', '_' ), ' ', $slug_clean ) );
     if ( in_array( $slug_clean, array( 'workspace', 'default' ), true ) ) {
         $display_name = 'Cora Workspace';
+        $res = array(
+            'id'     => 1,
+            'name'   => $display_name,
+            'slug'   => $slug_clean,
+            'plan'   => 'enterprise',
+            'status' => 'active'
+        );
+        $slug_cache[ $slug_clean ] = $res;
+        return $res;
     }
 
-    $res = array(
-        'id'     => 1,
-        'name'   => $display_name,
-        'slug'   => $slug_clean,
-        'plan'   => 'enterprise',
-        'status' => 'active'
-    );
-    $slug_cache[ $slug_clean ] = $res;
-    return $res;
+    return null;
 }
 }
 
@@ -759,6 +759,14 @@ function cora_real_estate_ai_handle_workspace_route() {
     $path = trim( parse_url( $path, PHP_URL_PATH ), '/' );
 
     $path_parts = explode( '/', $path );
+    
+    // Bypass standalone router for REST API or WP admin/AJAX requests
+    if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+        return;
+    }
+    if ( in_array( 'wp-json', $path_parts, true ) || in_array( 'wp-admin', $path_parts, true ) || in_array( 'admin-ajax.php', $path_parts, true ) ) {
+        return;
+    }
     
     // Intercept REST API v1 requests
     if ( isset( $path_parts[0] ) && 'api' === $path_parts[0] && isset( $path_parts[1] ) && 'v1' === $path_parts[1] ) {
@@ -917,6 +925,11 @@ function cora_real_estate_ai_handle_workspace_route() {
             if ( $auth_provider === 'google' ) {
                 nocache_headers();
                 if ( $auth_step === 'callback' ) {
+                    // Check if this is a GBP OAuth callback returning to auth/google/callback
+                    if ( isset( $_GET['code'] ) && ( ( isset( $_GET['scope'] ) && strpos( $_GET['scope'], 'business.manage' ) !== false ) || empty( $_GET['state'] ) || ! get_transient( 'cora_google_oauth_state_' . ( $_GET['state'] ?? '' ) ) ) ) {
+                        wp_redirect( home_url( '/workspace/gbp?' . ( $_SERVER['QUERY_STRING'] ?? '' ) ) );
+                        exit;
+                    }
                     cora_handle_google_oauth_callback();
                 } else {
                     cora_initiate_google_oauth();
@@ -1103,7 +1116,9 @@ function cora_real_estate_ai_handle_workspace_route() {
         if ( ( strpos( $_SERVER['REQUEST_URI'] ?? '', '/workspace/auth/google/callback' ) !== false || $sub_page === 'auth' || $sub_page === 'gbp' ) && isset( $_GET['code'] ) ) {
             $client_id     = cora_gbp_get_client_id();
             $client_secret = cora_gbp_get_client_secret();
-            $redirect_uri  = home_url( '/workspace/auth/google/callback' );
+            $redirect_uri  = ( strpos( $_SERVER['REQUEST_URI'] ?? '', '/workspace/auth/google/callback' ) !== false )
+                ? home_url( '/workspace/auth/google/callback' )
+                : home_url( '/workspace/gbp' );
             $code          = sanitize_text_field( $_GET['code'] );
 
             $response = wp_remote_post( 'https://oauth2.googleapis.com/token', array(
@@ -9869,6 +9884,12 @@ add_action( 'wp_ajax_cora_gbp_disconnect', 'cora_ajax_gbp_disconnect' );
 
 if ( ! function_exists( 'cora_gbp_get_client_id' ) ) {
 function cora_gbp_get_client_id() {
+    if ( defined( 'CORA_GOOGLE_CLIENT_ID' ) && ! empty( CORA_GOOGLE_CLIENT_ID ) ) {
+        return CORA_GOOGLE_CLIENT_ID;
+    }
+    if ( defined( 'GOOGLE_CLIENT_ID' ) && ! empty( GOOGLE_CLIENT_ID ) ) {
+        return GOOGLE_CLIENT_ID;
+    }
     $cid = get_option( 'cora_gbp_client_id', '' );
     if ( ! empty( $cid ) ) return $cid;
     $cid_legacy = get_option( 'cora_google_client_id', '' );
@@ -9878,6 +9899,12 @@ function cora_gbp_get_client_id() {
 
 if ( ! function_exists( 'cora_gbp_get_client_secret' ) ) {
 function cora_gbp_get_client_secret() {
+    if ( defined( 'CORA_GOOGLE_CLIENT_SECRET' ) && ! empty( CORA_GOOGLE_CLIENT_SECRET ) ) {
+        return CORA_GOOGLE_CLIENT_SECRET;
+    }
+    if ( defined( 'GOOGLE_CLIENT_SECRET' ) && ! empty( GOOGLE_CLIENT_SECRET ) ) {
+        return GOOGLE_CLIENT_SECRET;
+    }
     $sec = get_option( 'cora_gbp_client_secret', '' );
     if ( ! empty( $sec ) ) return $sec;
     $sec_legacy = get_option( 'cora_google_client_secret', '' );
@@ -9887,6 +9914,12 @@ function cora_gbp_get_client_secret() {
 
 if ( ! function_exists( 'cora_gbp_get_maps_api_key' ) ) {
 function cora_gbp_get_maps_api_key() {
+    if ( defined( 'CORA_GOOGLE_MAPS_API_KEY' ) && ! empty( CORA_GOOGLE_MAPS_API_KEY ) ) {
+        return CORA_GOOGLE_MAPS_API_KEY;
+    }
+    if ( defined( 'GOOGLE_MAPS_API_KEY' ) && ! empty( GOOGLE_MAPS_API_KEY ) ) {
+        return GOOGLE_MAPS_API_KEY;
+    }
     $key = get_option( 'cora_google_maps_api_key', '' );
     return ! empty( $key ) ? $key : get_option( 'cora_gbp_maps_api_key', '' );
 }
@@ -9953,16 +9986,16 @@ function cora_ajax_gbp_save_api_credentials() {
     }
     // Save Maps API Key (primary — enables business search)
     $maps_key = sanitize_text_field( $_POST['maps_key'] ?? '' );
-    if ( ! empty( $maps_key ) ) {
+    if ( ! empty( $maps_key ) && str_replace( array('•', '*'), '', $maps_key ) !== '' ) {
         update_option( 'cora_gbp_maps_api_key', $maps_key );
     }
     // Save OAuth credentials (optional — enables review/post management)
     $client_id     = sanitize_text_field( $_POST['client_id'] ?? '' );
     $client_secret = sanitize_text_field( $_POST['client_secret'] ?? '' );
-    if ( ! empty( $client_id ) ) {
+    if ( ! empty( $client_id ) && str_replace( array('•', '*'), '', $client_id ) !== '' ) {
         update_option( 'cora_gbp_client_id', $client_id );
     }
-    if ( ! empty( $client_secret ) ) {
+    if ( ! empty( $client_secret ) && str_replace( array('•', '*'), '', $client_secret ) !== '' ) {
         update_option( 'cora_gbp_client_secret', $client_secret );
     }
     if ( empty( $maps_key ) && empty( $client_id ) ) {
@@ -9981,12 +10014,44 @@ if ( ! function_exists( 'cora_ajax_gbp_search_places' ) ) {
 function cora_ajax_gbp_search_places() {
     $query   = sanitize_text_field( $_POST['query'] ?? '' );
     $api_key = cora_gbp_get_maps_api_key();
-    if ( empty( $api_key ) ) {
-        wp_send_json_error( 'Google Maps API Key is not configured. Ask your platform admin to add it in Settings.' );
-    }
     if ( strlen( $query ) < 2 ) {
         wp_send_json_error( 'Please enter at least 2 characters to search.' );
     }
+
+    $cora_is_local = cora_is_local_environment();
+    $mock_fallback = function( $q ) {
+        $clean_query = sanitize_text_field( $q );
+        return array(
+            array(
+                'id' => 'place_mock_local_1',
+                'displayName' => array( 'text' => ucwords( $clean_query ) . ' Creative Studio' ),
+                'primaryTypeDisplayName' => array( 'text' => 'Photography Studio' ),
+                'formattedAddress' => 'DLF Cyber City, Phase III, Gurugram, Haryana 122002, India',
+                'nationalPhoneNumber' => '+91 124 555 0192',
+                'websiteUri' => 'https://' . sanitize_title( $clean_query ) . '.local',
+                'rating' => 4.9,
+                'userRatingCount' => 48,
+            ),
+            array(
+                'id' => 'place_mock_local_2',
+                'displayName' => array( 'text' => ucwords( $clean_query ) . ' Productions & Media' ),
+                'primaryTypeDisplayName' => array( 'text' => 'Commercial Media & Video' ),
+                'formattedAddress' => 'Sector 27, Golf Course Road, Gurugram, Haryana 122009, India',
+                'nationalPhoneNumber' => '+91 124 555 0143',
+                'websiteUri' => 'https://media.' . sanitize_title( $clean_query ) . '.local',
+                'rating' => 4.7,
+                'userRatingCount' => 29,
+            ),
+        );
+    };
+
+    if ( empty( $api_key ) ) {
+        if ( $cora_is_local ) {
+            wp_send_json_success( $mock_fallback( $query ) );
+        }
+        wp_send_json_error( 'Google Maps API Key is not configured. Ask your platform admin to add it in Settings.' );
+    }
+
     // Google Places API (New) — Text Search
     $response = wp_remote_post(
         'https://places.googleapis.com/v1/places:searchText',
@@ -10004,14 +10069,24 @@ function cora_ajax_gbp_search_places() {
             ) ),
         )
     );
+
     if ( is_wp_error( $response ) ) {
+        if ( $cora_is_local ) {
+            wp_send_json_success( $mock_fallback( $query ) );
+        }
         wp_send_json_error( 'Could not reach Google: ' . $response->get_error_message() );
     }
+
     $code = wp_remote_retrieve_response_code( $response );
     $body = json_decode( wp_remote_retrieve_body( $response ), true );
+
     if ( $code >= 400 || isset( $body['error'] ) ) {
+        if ( $cora_is_local ) {
+            wp_send_json_success( $mock_fallback( $query ) );
+        }
         wp_send_json_error( $body['error']['message'] ?? 'Google Places API error (code ' . $code . '). Check your API key and ensure the Places API (New) is enabled.' );
     }
+
     wp_send_json_success( $body['places'] ?? array() );
 }
 }
@@ -10199,6 +10274,61 @@ function cora_ajax_gbp_fetch_reviews() {
     $access_token = cora_gbp_get_valid_access_token();
     
     if ( ! $access_token ) {
+        $place_id = $profile['place_id'] ?? '';
+        $api_key  = cora_gbp_get_maps_api_key();
+        
+        if ( ! empty( $place_id ) && ! empty( $api_key ) && strpos( $place_id, 'place_' ) === false ) {
+            $url = 'https://places.googleapis.com/v1/places/' . urlencode( $place_id );
+            $response = wp_remote_get( $url, array(
+                'timeout' => 15,
+                'headers' => array(
+                    'Content-Type'     => 'application/json',
+                    'X-Goog-Api-Key'   => $api_key,
+                    'X-Goog-FieldMask' => 'reviews,rating,userRatingCount,displayName',
+                ),
+            ) );
+            
+            if ( ! is_wp_error( $response ) ) {
+                $code = wp_remote_retrieve_response_code( $response );
+                $body = json_decode( wp_remote_retrieve_body( $response ), true );
+                
+                if ( $code < 400 && ! empty( $body['reviews'] ) ) {
+                    $rating_map = array(
+                        5 => 'FIVE',
+                        4 => 'FOUR',
+                        3 => 'THREE',
+                        2 => 'TWO',
+                        1 => 'ONE'
+                    );
+                    $reviews = array();
+                    foreach ( $body['reviews'] as $rev ) {
+                        $name_parts = explode( '/', $rev['name'] ?? '' );
+                        $rev_id = end( $name_parts ) ?: uniqid( 'rev_' );
+                        $rating_val = intval( $rev['rating'] ?? 5 );
+                        $rating_str = $rating_map[ $rating_val ] ?? 'FIVE';
+                        
+                        $reviews[] = array(
+                            'reviewId'   => $rev_id,
+                            'authorName' => $rev['authorAttribution']['displayName'] ?? 'Google User',
+                            'starRating' => $rating_str,
+                            'comment'    => $rev['text']['text'] ?? ( $rev['originalText']['text'] ?? 'No comment text provided.' ),
+                            'createTime' => $rev['publishTime'] ?? date('c'),
+                            'reviewer'   => array(
+                                'displayName'     => $rev['authorAttribution']['displayName'] ?? 'Google User',
+                                'profilePhotoUri' => $rev['authorAttribution']['photoUri'] ?? ''
+                            )
+                        );
+                    }
+                    
+                    wp_send_json_success( array(
+                        'reviews'            => $reviews,
+                        'average_rating'     => floatval( $body['rating'] ?? ( $profile['rating'] ?? 5.0 ) ),
+                        'total_review_count' => intval( $body['userRatingCount'] ?? ( $profile['review_count'] ?? count($reviews) ) ),
+                    ) );
+                }
+            }
+        }
+
         // Fallback for listings connected via Places Search or Manual Listing
         if ( ! empty( $profile['business_name'] ) ) {
             $b_name = $profile['business_name'];
@@ -10476,13 +10606,13 @@ function cora_ajax_gbp_save_keys() {
     $client_secret = sanitize_text_field( $_POST['client_secret'] ?? '' );
     $api_key       = sanitize_text_field( $_POST['api_key'] ?? '' );
 
-    if ( ! empty( $client_id ) ) {
+    if ( ! empty( $client_id ) && str_replace( array('•', '*'), '', $client_id ) !== '' ) {
         update_option( 'cora_gbp_client_id', $client_id );
     }
-    if ( ! empty( $client_secret ) ) {
+    if ( ! empty( $client_secret ) && str_replace( array('•', '*'), '', $client_secret ) !== '' ) {
         update_option( 'cora_gbp_client_secret', $client_secret );
     }
-    if ( ! empty( $api_key ) ) {
+    if ( ! empty( $api_key ) && str_replace( array('•', '*'), '', $api_key ) !== '' ) {
         update_option( 'cora_google_maps_api_key', $api_key );
     }
 
@@ -15060,10 +15190,18 @@ function cora_create_custom_tables() {
     $forms_table = $wpdb->prefix . 'cora_forms';
     $forms_exists = cora_table_exists( $forms_table );
     $has_agency_col = false;
+    $has_form_key_col = false;
     if ( $forms_exists ) {
         $has_agency_col = ! empty( $wpdb->get_results( "SHOW COLUMNS FROM {$forms_table} LIKE 'agency_id'" ) );
+        $has_form_key_col = ! empty( $wpdb->get_results( "SHOW COLUMNS FROM {$forms_table} LIKE 'form_key'" ) );
     }
-    if ( get_option( 'cora_db_v2_created' ) && $table_exists && $forms_exists && $has_agency_col ) {
+    $ledger_table = $wpdb->prefix . 'cora_ledger';
+    $ledger_exists = cora_table_exists( $ledger_table );
+    $has_category_col = false;
+    if ( $ledger_exists ) {
+        $has_category_col = ! empty( $wpdb->get_results( "SHOW COLUMNS FROM {$ledger_table} LIKE 'category'" ) );
+    }
+    if ( get_option( 'cora_db_v2_created' ) && $table_exists && $forms_exists && $has_agency_col && $has_form_key_col && $has_category_col ) {
         return;
     }
     $charset_collate = $wpdb->get_charset_collate();
@@ -17638,6 +17776,7 @@ function cora_ensure_default_agency_setup() {
     cora_sync_db_tables_to_options();
 }
 }
+add_action( 'init', 'cora_create_custom_tables', 0 );
 add_action( 'init', 'cora_ensure_default_agency_setup', 5 );
 
 // ── Tenancy Query Filtering for Options ──────────────────────────────────────
@@ -22336,7 +22475,16 @@ function cora_get_bip_problems_html() {
 if ( ! function_exists( 'cora_rest_get_forms' ) ) {
 function cora_rest_get_forms( $request ) {
     global $wpdb;
-    $forms = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_forms ORDER BY id DESC", ARRAY_A );
+    $user_agency = cora_get_current_user_agency_id();
+    if ( $user_agency === 'super' ) {
+        $forms = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_forms ORDER BY id DESC", ARRAY_A );
+    } else {
+        $agency_id = cora_db_get_agency_id();
+        $forms = $wpdb->get_results( $wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}cora_forms WHERE agency_id = %d ORDER BY id DESC",
+            $agency_id
+        ), ARRAY_A );
+    }
     if ( is_array( $forms ) ) {
         foreach ( $forms as &$form ) {
             if ( empty( $form['form_key'] ) ) {
@@ -22395,6 +22543,15 @@ function cora_rest_save_form( $request ) {
     $logic = isset( $params['logic'] ) ? $params['logic'] : array();
 
     if ( $id > 0 ) {
+        // check ownership
+        $user_agency = cora_get_current_user_agency_id();
+        if ( $user_agency !== 'super' ) {
+            $agency_db_id = cora_db_get_agency_id();
+            $form_owner = $wpdb->get_var( $wpdb->prepare( "SELECT agency_id FROM {$wpdb->prefix}cora_forms WHERE id = %d", $id ) );
+            if ( ! $form_owner || intval( $form_owner ) !== $agency_db_id ) {
+                return new WP_Error( 'forbidden', 'You do not have permission to modify this form.', array( 'status' => 403 ) );
+            }
+        }
         // Update
         $wpdb->update(
             $wpdb->prefix . 'cora_forms',
@@ -22410,10 +22567,11 @@ function cora_rest_save_form( $request ) {
         );
     } else {
         // Insert
+        $agency_db_id = cora_db_get_agency_id();
         $wpdb->insert(
             $wpdb->prefix . 'cora_forms',
             array(
-                'agency_id'  => 1,
+                'agency_id'  => $agency_db_id,
                 'form_key'   => $form_key,
                 'title'      => $title,
                 'status'     => $status,
@@ -22427,7 +22585,7 @@ function cora_rest_save_form( $request ) {
     }
 
     if ( ! $id ) {
-        return new WP_Error( 'db_error', 'Failed to save form to database', array( 'status' => 500 ) );
+        return new WP_Error( 'db_error', 'Failed to save form to database: ' . $wpdb->last_error, array( 'status' => 500 ) );
     }
 
     // Update or insert blocks
@@ -22489,6 +22647,16 @@ function cora_rest_get_form( $request ) {
     if ( ! $form ) {
         return new WP_Error( 'not_found', 'Form not found', array( 'status' => 404 ) );
     }
+    
+    // Tenancy Check
+    $user_agency = cora_get_current_user_agency_id();
+    if ( $user_agency !== 'super' ) {
+        $agency_id = cora_db_get_agency_id();
+        if ( intval( $form['agency_id'] ) !== $agency_id ) {
+            return new WP_Error( 'forbidden', 'You do not have permission to access this form.', array( 'status' => 403 ) );
+        }
+    }
+
     $form['styling'] = json_decode( $form['styling'], true ) ?: array();
     $form['settings'] = json_decode( $form['settings'], true ) ?: array();
 
@@ -22504,6 +22672,17 @@ if ( ! function_exists( 'cora_rest_delete_form' ) ) {
 function cora_rest_delete_form( $request ) {
     global $wpdb;
     $id = intval( $request->get_param('id') );
+
+    // Tenancy Check
+    $user_agency = cora_get_current_user_agency_id();
+    if ( $user_agency !== 'super' ) {
+        $agency_id = cora_db_get_agency_id();
+        $form_owner = $wpdb->get_var( $wpdb->prepare( "SELECT agency_id FROM {$wpdb->prefix}cora_forms WHERE id = %d", $id ) );
+        if ( ! $form_owner || intval( $form_owner ) !== $agency_id ) {
+            return new WP_Error( 'forbidden', 'You do not have permission to delete this form.', array( 'status' => 403 ) );
+        }
+    }
+
     $wpdb->delete( $wpdb->prefix . 'cora_forms', array( 'id' => $id ) );
     $wpdb->delete( $wpdb->prefix . 'cora_form_blocks', array( 'form_id' => $id ) );
     $wpdb->delete( $wpdb->prefix . 'cora_form_submissions', array( 'form_id' => $id ) );
@@ -22521,6 +22700,21 @@ function cora_rest_bulk_forms( $request ) {
 
     if ( empty( $action ) || empty( $ids ) ) {
         return new WP_Error( 'bad_request', 'Missing bulk action or valid form IDs', array( 'status' => 400 ) );
+    }
+
+    // Tenancy Check
+    $user_agency = cora_get_current_user_agency_id();
+    if ( $user_agency !== 'super' ) {
+        $agency_id = cora_db_get_agency_id();
+        $placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+        $valid_ids = $wpdb->get_col( $wpdb->prepare(
+            "SELECT id FROM {$wpdb->prefix}cora_forms WHERE id IN ($placeholders) AND agency_id = %d",
+            ...array_merge( $ids, array( $agency_id ) )
+        ) );
+        $ids = array_map( 'intval', $valid_ids );
+        if ( empty( $ids ) ) {
+            return rest_ensure_response( array( 'success' => true, 'action' => $action, 'count' => 0 ) );
+        }
     }
 
     $id_placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
@@ -22547,6 +22741,17 @@ if ( ! function_exists( 'cora_rest_get_form_submissions' ) ) {
 function cora_rest_get_form_submissions( $request ) {
     global $wpdb;
     $id = intval( $request->get_param('id') );
+    
+    // Tenancy Check
+    $user_agency = cora_get_current_user_agency_id();
+    if ( $user_agency !== 'super' ) {
+        $agency_id = cora_db_get_agency_id();
+        $form_owner = $wpdb->get_var( $wpdb->prepare( "SELECT agency_id FROM {$wpdb->prefix}cora_forms WHERE id = %d", $id ) );
+        if ( intval( $form_owner ) !== intval( $agency_id ) ) {
+            return new WP_Error( 'forbidden', 'You do not have permission to view submissions for this form.', array( 'status' => 403 ) );
+        }
+    }
+    
     $subs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_form_submissions WHERE form_id = %d ORDER BY id DESC", $id ), ARRAY_A );
     if ( is_array( $subs ) ) {
         foreach ( $subs as &$sub ) {
@@ -22562,7 +22767,23 @@ function cora_rest_get_form_submissions( $request ) {
 if ( ! function_exists( 'cora_rest_get_all_form_submissions' ) ) {
 function cora_rest_get_all_form_submissions( $request ) {
     global $wpdb;
-    $subs = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_form_submissions ORDER BY id DESC", ARRAY_A );
+    
+    // Tenancy Check
+    $user_agency = cora_get_current_user_agency_id();
+    if ( $user_agency !== 'super' ) {
+        $agency_id = cora_db_get_agency_id();
+        $subs = $wpdb->get_results( $wpdb->prepare(
+            "SELECT s.* 
+             FROM {$wpdb->prefix}cora_form_submissions s
+             INNER JOIN {$wpdb->prefix}cora_forms f ON s.form_id = f.id
+             WHERE f.agency_id = %d
+             ORDER BY s.id DESC",
+            $agency_id
+        ), ARRAY_A );
+    } else {
+        $subs = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_form_submissions ORDER BY id DESC", ARRAY_A );
+    }
+    
     if ( is_array( $subs ) ) {
         foreach ( $subs as &$sub ) {
             $sub['submitted_data'] = json_decode( $sub['submitted_data'], true ) ?: array();
@@ -23774,17 +23995,42 @@ function cora_rest_get_form_audit_log( $request ) {
     
     $offset = ( $page - 1 ) * $per_page;
     
-    $total_logs = intval( $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_audit_log" ) );
-    
-    $logs = $wpdb->get_results( $wpdb->prepare(
-        "SELECT l.*, u.display_name 
-         FROM {$wpdb->prefix}cora_form_audit_log l 
-         LEFT JOIN {$wpdb->users} u ON l.performed_by = u.ID 
-         ORDER BY l.id DESC 
-         LIMIT %d OFFSET %d",
-        $per_page,
-        $offset
-    ), ARRAY_A );
+    // Tenancy Check
+    $user_agency = cora_get_current_user_agency_id();
+    if ( $user_agency !== 'super' ) {
+        $agency_id = cora_db_get_agency_id();
+        $total_logs = intval( $wpdb->get_var( $wpdb->prepare(
+            "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_audit_log l 
+             INNER JOIN {$wpdb->prefix}cora_forms f ON l.form_id = f.id 
+             WHERE f.agency_id = %d",
+            $agency_id
+        ) ) );
+        
+        $logs = $wpdb->get_results( $wpdb->prepare(
+            "SELECT l.*, u.display_name 
+             FROM {$wpdb->prefix}cora_form_audit_log l 
+             INNER JOIN {$wpdb->prefix}cora_forms f ON l.form_id = f.id
+             LEFT JOIN {$wpdb->users} u ON l.performed_by = u.ID 
+             WHERE f.agency_id = %d
+             ORDER BY l.id DESC 
+             LIMIT %d OFFSET %d",
+            $agency_id,
+            $per_page,
+            $offset
+        ), ARRAY_A );
+    } else {
+        $total_logs = intval( $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_audit_log" ) );
+        
+        $logs = $wpdb->get_results( $wpdb->prepare(
+            "SELECT l.*, u.display_name 
+             FROM {$wpdb->prefix}cora_form_audit_log l 
+             LEFT JOIN {$wpdb->users} u ON l.performed_by = u.ID 
+             ORDER BY l.id DESC 
+             LIMIT %d OFFSET %d",
+            $per_page,
+            $offset
+        ), ARRAY_A );
+    }
     
     foreach ( $logs as &$log ) {
         if ( empty( $log['display_name'] ) ) {
@@ -26614,7 +26860,7 @@ function cora_is_super_owner( $user = null ) {
     if ( ! $user || ! $user->exists() ) {
         return false;
     }
-    $super_emails = array( 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com' );
+    $super_emails = array( 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com', 'admin@cora.local' );
     if ( in_array( strtolower( $user->user_email ), $super_emails, true ) ) {
         return true;
     }

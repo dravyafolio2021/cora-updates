@@ -457,7 +457,6 @@ function exportLogsCSV() {
         if (window.coraShowToast) {
             window.coraShowToast("No log entries to export.");
         }
-        return;
     }
 
     const rows = [

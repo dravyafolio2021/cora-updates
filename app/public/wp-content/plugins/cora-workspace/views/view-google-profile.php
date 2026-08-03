@@ -22,6 +22,14 @@ $cora_gbp_client_id     = function_exists('cora_gbp_get_client_id') ? cora_gbp_g
 $cora_gbp_client_secret = function_exists('cora_gbp_get_client_secret') ? cora_gbp_get_client_secret() : get_option( 'cora_google_client_secret', '' );
 $cora_google_maps_key   = function_exists('cora_gbp_get_maps_api_key') ? cora_gbp_get_maps_api_key() : get_option( 'cora_gbp_maps_api_key', '' );
 
+$has_custom_client_id     = ( defined('CORA_GOOGLE_CLIENT_ID') && CORA_GOOGLE_CLIENT_ID ) || ( defined('GOOGLE_CLIENT_ID') && GOOGLE_CLIENT_ID ) || ( get_option('cora_gbp_client_id') && get_option('cora_gbp_client_id') !== '549640424566-ubjlnonb70i19q7koa7oa8dhr9cgl7om.apps.googleusercontent.com' ) || ( get_option('cora_google_client_id') && get_option('cora_google_client_id') !== '549640424566-ubjlnonb70i19q7koa7oa8dhr9cgl7om.apps.googleusercontent.com' );
+$has_custom_client_secret = ( defined('CORA_GOOGLE_CLIENT_SECRET') && CORA_GOOGLE_CLIENT_SECRET ) || ( defined('GOOGLE_CLIENT_SECRET') && GOOGLE_CLIENT_SECRET ) || ( get_option('cora_gbp_client_secret') && get_option('cora_gbp_client_secret') !== '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' ) || ( get_option('cora_google_client_secret') && get_option('cora_google_client_secret') !== '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' );
+$has_custom_maps_key      = ( defined('CORA_GOOGLE_MAPS_API_KEY') && CORA_GOOGLE_MAPS_API_KEY ) || ( defined('GOOGLE_MAPS_API_KEY') && GOOGLE_MAPS_API_KEY ) || get_option('cora_google_maps_api_key') || get_option('cora_gbp_maps_api_key');
+
+$display_client_id     = $has_custom_client_id ? '••••••••••••••••••••••••' : $cora_gbp_client_id;
+$display_client_secret = $has_custom_client_secret ? '••••••••••••••••••••••••' : '';
+$display_maps_key      = $has_custom_maps_key ? '••••••••••••••••••••••••' : '';
+
 $cora_gbp_is_connected  = ! empty( $cora_gbp_profile['business_name'] );
 $cora_gbp_is_auth       = ! empty( $cora_gbp_tokens['access_token'] );
 
@@ -211,11 +219,22 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
         <div class="flex-1 overflow-y-auto p-6 space-y-6 select-none">
             <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">Enter your Google Cloud project credentials to enable live Google Business Profile sync and Places search. These keys are secured and applied globally.</p>
             
+            <div class="p-3.5 bg-zinc-50 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/80 dark:border-zinc-800 space-y-2">
+                <span class="text-[9px] font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider block">Google Cloud OAuth Redirect URI</span>
+                <p class="text-[10px] text-zinc-550 dark:text-zinc-400 leading-relaxed font-medium">To avoid redirect mismatch errors, copy this URL and add it under <strong>Authorized redirect URIs</strong> in your Google Cloud Console Credentials page:</p>
+                <div class="flex items-center justify-between gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2 font-mono text-[9px] text-zinc-700 dark:text-zinc-350 select-all">
+                    <span class="truncate" id="cora-gbp-redirect-uri"><?php echo esc_html(home_url('/workspace/gbp')); ?></span>
+                    <button type="button" onclick="navigator.clipboard.writeText('<?php echo esc_js(home_url('/workspace/gbp')); ?>'); window.coraShowToast('Redirect URI copied!');" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer bg-transparent border-0 p-0.5 shrink-0 flex items-center justify-center">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                </div>
+            </div>
+
             <div class="space-y-4">
                 <div>
                     <label class="block text-[10px] font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider">Google OAuth Client ID</label>
                     <div class="relative">
-                        <input type="password" id="cora-gbp-input-client-id" value="<?php echo esc_attr($cora_gbp_client_id); ?>" placeholder="e.g. 123456-abc.apps.googleusercontent.com" class="cora-input w-full rounded-xl pl-3 pr-10 py-2.5 text-xs font-mono focus:outline-none">
+                        <input type="password" id="cora-gbp-input-client-id" value="<?php echo esc_attr($display_client_id); ?>" placeholder="e.g. 123456-abc.apps.googleusercontent.com" class="cora-input w-full rounded-xl pl-3 pr-10 py-2.5 text-xs font-mono focus:outline-none">
                         <button type="button" onclick="coraToggleGbpInputMask('cora-gbp-input-client-id')" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-transparent border-0 cursor-pointer p-0.5">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
@@ -225,7 +244,7 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
                 <div>
                     <label class="block text-[10px] font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider">Google OAuth Client Secret</label>
                     <div class="relative">
-                        <input type="password" id="cora-gbp-input-client-secret" value="<?php echo esc_attr($cora_gbp_client_secret); ?>" placeholder="GOCSPX-..." class="cora-input w-full rounded-xl pl-3 pr-10 py-2.5 text-xs font-mono focus:outline-none">
+                        <input type="password" id="cora-gbp-input-client-secret" value="<?php echo esc_attr($display_client_secret); ?>" placeholder="GOCSPX-..." class="cora-input w-full rounded-xl pl-3 pr-10 py-2.5 text-xs font-mono focus:outline-none">
                         <button type="button" onclick="coraToggleGbpInputMask('cora-gbp-input-client-secret')" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-transparent border-0 cursor-pointer p-0.5">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
@@ -235,7 +254,7 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
                 <div>
                     <label class="block text-[10px] font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider">Google Maps / Places API Key (Optional)</label>
                     <div class="relative">
-                        <input type="password" id="cora-gbp-input-api-key" value="<?php echo esc_attr($cora_google_maps_key); ?>" placeholder="AIzaSy..." class="cora-input w-full rounded-xl pl-3 pr-10 py-2.5 text-xs font-mono focus:outline-none">
+                        <input type="password" id="cora-gbp-input-api-key" value="<?php echo esc_attr($display_maps_key); ?>" placeholder="AIzaSy..." class="cora-input w-full rounded-xl pl-3 pr-10 py-2.5 text-xs font-mono focus:outline-none">
                         <button type="button" onclick="coraToggleGbpInputMask('cora-gbp-input-api-key')" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-transparent border-0 cursor-pointer p-0.5">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
@@ -260,55 +279,100 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
 <?php endif; ?>
 
 <?php if ( ! $cora_gbp_is_connected ) : ?>
-<!-- ===== UNCONNECTED STATE: Search & Connect Your Real Business ===== -->
-<div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl shadow-xs overflow-hidden max-w-2xl mx-auto my-8">
-    <div class="p-8 text-center space-y-6">
-        
-        <div class="w-14 h-14 rounded-2xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 mx-auto flex items-center justify-center shadow-sm">
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    <?php if ( $cora_gbp_is_auth ) : ?>
+    <!-- ===== STATE: AUTHENTICATED BUT NOT CONNECTED (CHOOSE LOCATION) ===== -->
+    <div class="max-w-4xl mx-auto my-8 space-y-8 text-left">
+        <div class="text-center space-y-2">
+            <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-50">Select Your Google Business Location</h2>
+            <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">Your Google Account has been authenticated successfully. Please choose which Google Business Profile location you want to link to Cora:</p>
         </div>
 
-        <div class="space-y-2 max-w-md mx-auto">
-            <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-50">Connect Your Business Profile</h2>
-            <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 leading-relaxed">Enter your exact business name below to connect your listing to Cora Workspace.</p>
+        <div id="cora-gbp-location-picker" class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            <!-- Dynamically populated by JS coraGbpLoadAccounts() -->
+            <div class="col-span-full py-12 flex flex-col items-center justify-center gap-3 text-zinc-400">
+                <svg class="animate-spin text-zinc-500" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                <span class="text-xs font-bold uppercase tracking-wider">Fetching Google Business Locations...</span>
+            </div>
         </div>
 
-        <!-- Search Input Box -->
-        <div class="max-w-lg mx-auto space-y-3">
-            <div class="flex gap-2">
-                <div class="flex-1 relative">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input
-                        type="text"
-                        id="cora-gbp-search-q"
-                        placeholder="Enter your exact business name"
-                        class="cora-input w-full pl-9 pr-4 py-3 text-xs font-medium rounded-xl focus:outline-none transition-all"
-                        onkeydown="if(event.key==='Enter') coraGbpSearchRealBusiness()"
-                        autocomplete="off"
-                    >
+        <div class="pt-6 text-center">
+            <button onclick="coraGbpDisconnect()" class="px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-extrabold rounded-xl transition-all cursor-pointer border-0 shadow-xs">
+                Disconnect Google Account
+            </button>
+        </div>
+    </div>
+    <?php else : ?>
+    <!-- ===== UNCONNECTED STATE: TWO-WAY CONNECTION OPTIONS ===== -->
+    <div class="max-w-4xl mx-auto my-8 space-y-8">
+        <div class="text-center space-y-2">
+            <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-50">Connect Your Google Business Profile</h2>
+            <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">Select one of the options below to sync your Google Maps business listing, read reviews, and manage your online reputation.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Card 1: Google Places Search (Recommended & Quick) -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl p-6 shadow-xs flex flex-col justify-between space-y-4">
+                <div class="space-y-3">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shadow-2xs">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Option 1: Quick Search &amp; Connect</h3>
+                            <span class="px-2 py-0.5 text-[8px] font-black bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-md uppercase tracking-wider">Recommended</span>
+                        </div>
+                        <p class="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">Search your business name in Google Places. Syncs real-time review ratings instantly without Google account login or OAuth credentials.</p>
+                    </div>
                 </div>
-                <button id="cora-gbp-search-btn" onclick="coraGbpSearchRealBusiness()" class="px-5 py-3 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-extrabold rounded-xl transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer shadow-sm border-0">
-                    Connect Listing
-                </button>
+
+                <!-- Search Input Box -->
+                <div class="space-y-3 pt-2">
+                    <div class="flex gap-2">
+                        <div class="flex-1 relative">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <input
+                                type="text"
+                                id="cora-gbp-search-q"
+                                placeholder="Enter business name..."
+                                class="cora-input w-full pl-8 pr-3 py-2.5 text-xs font-medium rounded-xl focus:outline-none transition-all"
+                                onkeydown="if(event.key==='Enter') coraGbpSearchRealBusiness()"
+                                autocomplete="off"
+                            >
+                        </div>
+                        <button id="cora-gbp-search-btn" onclick="coraGbpSearchRealBusiness()" class="px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-extrabold rounded-xl transition-all whitespace-nowrap cursor-pointer shadow-xs border-0">
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Google OAuth Authorization -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl p-6 shadow-xs flex flex-col justify-between space-y-4">
+                <div class="space-y-3">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shadow-2xs">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Option 2: 1-Click Google OAuth</h3>
+                        <p class="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">Log in using your official Google Workspace / Google Account to reply directly to reviews and write Maps updates from Cora. Requires OAuth Client ID config.</p>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button onclick="coraGbpConnectPlatformGoogleOAuth()" class="w-full justify-center px-4 py-2.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-150 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-xs font-extrabold rounded-xl transition-all shadow-xs flex items-center gap-2 cursor-pointer border-0">
+                        <svg viewBox="0 0 24 24" width="14" height="14" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                        Sign in with Google Account
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- Search Results Panel (Container for dynamically loaded places) -->
-        <div id="cora-gbp-search-results-wrap" class="pt-2 space-y-3 text-left"></div>
-
-        <div class="pt-6 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <span class="text-xs font-bold text-zinc-500">Connect via 1-Click Google OAuth:</span>
-            <button onclick="coraGbpConnectPlatformGoogleOAuth()" class="px-5 py-2.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-150 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-xs font-extrabold rounded-xl transition-all shadow-xs flex items-center gap-2 cursor-pointer border-0">
-                <svg viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                Sign in with Google Account
-            </button>
-        </div>
-
+        <div id="cora-gbp-search-results-wrap" class="space-y-3 text-left"></div>
     </div>
-</div>
-
+    <?php endif; ?>
 <?php else : ?>
-<!-- ===== CONNECTED MANAGEMENT DASHBOARD ===== -->
+
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     
     <!-- Left Column (2 Cols): Reviews Inbox & Maps Publisher -->
@@ -535,7 +599,7 @@ window.coraGbpConnectPlatformGoogleOAuth = function() {
         }
         return;
     }
-    var redirectUri = encodeURIComponent("<?php echo home_url('/workspace/auth/google/callback'); ?>");
+    var redirectUri = encodeURIComponent("<?php echo home_url('/workspace/gbp'); ?>");
     var scope = encodeURIComponent("https://www.googleapis.com/auth/business.manage");
     var authUrl = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=" + clientId + "&redirect_uri=" + redirectUri + "&scope=" + scope + "&access_type=offline&prompt=consent";
     

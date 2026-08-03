@@ -24,11 +24,9 @@ else:
             sys.stdout.buffer.write(chunk)
             sys.stdout.flush()
             
-            # Watch for password prompts in the accumulated buffer
-            prompts_count = output.lower().count(b"password:")
-            if prompts_count > password_sent_count:
+            # Watch for password prompts in chunk
+            if b"password:" in chunk.lower():
                 os.write(fd, password)
-                password_sent_count = prompts_count
         except OSError:
             break
 

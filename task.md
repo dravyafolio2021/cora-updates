@@ -85,3 +85,16 @@
   - [x] **SLA Status Header Card**: Integrated visual SLA countdown status card at the top of detail drawers.
   - [x] **Activity Timeline Logging**: Auto-generate activity logs for user assignments and status movements.
   - [x] **Plugin Packaging & Updates Dispatch**: Bumped version to `2.5.3` and successfully released zip to sub-repository.
+
+- [x] **Forms Tenant-Scoped Security & Data Isolation (v2.9.100 Release)**
+  - [x] Resolve subsite AJAX REST 302 redirects by bypassing handled workspace routing checks for REST and AJAX endpoints.
+  - [x] Implement secure dynamic user-agency mapping inside `cora_rest_save_form` and `cora_rest_get_forms` instead of hardcoding default fallback ID `1`.
+  - [x] Run E2E test suites to verify forms creation, draft status, and list rendering compile and execute cleanly.
+  - [x] Query remote demo database to migrate and assign existing form records (like `frm_58795621`) to `agency_id = 4` to match active workspace `/test-1/` owner.
+  - [x] Build, package, and deploy plugin version `2.9.100` to Demo and Main Production servers.
+  - [x] Run remote Playwright validation to verify forms count and cards list load successfully in the live user dashboard (`TOTAL FORMS: 5`).
+
+- [x] **E2E Test Suite Failures Resolution**
+  - [x] Fix Audit Logs CSV Export E2E Failure in `views/view-audit-panel.php`.
+  - [x] Fix Visibility Test Switcher E2E Failure in `tests/e2e/test-visibility.spec.ts`.
+  - [x] Execute E2E verification tests locally to verify success.

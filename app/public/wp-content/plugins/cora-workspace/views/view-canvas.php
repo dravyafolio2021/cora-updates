@@ -5711,7 +5711,7 @@ $cora_bookings_count = count( cora_db_get_bookings() );
 
         canvasState.activeWpPostId = wpPostId;
         executeOpenPageEditor(wpPostId, title);
-    }
+    // }
 
     function executeOpenPageEditor(wpPostId, title) {
         const elementorUrl = coraREData.siteUrl + '/wp-admin/post.php?post=' + wpPostId + '&action=elementor';
