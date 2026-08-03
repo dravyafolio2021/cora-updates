@@ -115,16 +115,68 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
    hidden by Cora's Tailwind resets or overflow rules.
    ===================================================================== */
 
-/* Force the media modal toolbar and select button to always be visible */
-.media-modal .media-frame-toolbar,
-.media-modal .media-toolbar,
-.media-modal .media-toolbar-primary,
-.media-modal .button.media-button,
-.media-modal .button.media-button-select {
+/* Force the media modal toolbar and select button to always be visible and positioned correctly */
+.media-modal .media-frame-toolbar {
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    height: 60px !important;
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
     pointer-events: auto !important;
+    z-index: 100000 !important;
+    overflow: visible !important;
+}
+
+.media-modal .media-frame-toolbar .media-toolbar {
+    height: 60px !important;
+    line-height: 60px !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+.media-modal .media-frame-toolbar .media-toolbar-primary {
+    float: right !important;
+    display: flex !important;
+    align-items: center !important;
+    height: 60px !important;
+    padding: 0 24px !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+.media-modal .media-frame-toolbar .button.media-button,
+.media-modal .media-frame-toolbar .button.media-button-select,
+.media-modal .media-frame-toolbar .media-button,
+.media-modal .media-frame-toolbar .media-button-select {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    
+    /* Force absolute placement at the bottom-right of the footer toolbar to bypass any hidden nested parent containers */
+    position: absolute !important;
+    right: 24px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 1000000 !important;
+}
+
+.media-modal .media-frame-toolbar button.button-primary:disabled,
+.media-modal .media-frame-toolbar button.media-button-select:disabled,
+.media-modal .media-frame-toolbar .media-button:disabled,
+.media-modal .media-frame-toolbar .media-button-select:disabled {
+    opacity: 0.45 !important;
+    cursor: not-allowed !important;
+    background: #71717a !important;
+    border-color: #71717a !important;
+    pointer-events: none !important;
 }
 
 /* Ensure the attachment sidebar is scrollable so button is reachable */

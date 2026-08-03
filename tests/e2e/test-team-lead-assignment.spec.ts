@@ -29,6 +29,12 @@ test.describe('Lead Management Subtabs & Team Lead Assignment', () => {
     const teamFilter = page.locator('#cora-lead-assignee-filter');
     await expect(teamFilter).toBeVisible();
 
+    // Switch to table view to ensure table headers are visible
+    const tableViewBtn = page.locator('#cora-dir-view-btn-table');
+    await expect(tableViewBtn).toBeVisible();
+    await tableViewBtn.click();
+    await page.waitForTimeout(300);
+
     // 4. Verify "Assigned To" header in directory table
     const assignedHeader = page.locator('th:has-text("Assigned To")');
     await expect(assignedHeader).toBeVisible();

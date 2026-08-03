@@ -459,7 +459,7 @@ $google_auth_url = home_url( '/workspace/auth/google' );
         formData.append('confirm', confirm);
         formData.append('nonce', '<?php echo wp_create_nonce( "cora_login_nonce" ); ?>');
 
-        fetch('<?php echo admin_url( "admin-ajax.php" ); ?>', {
+        fetch('<?php echo esc_url( cora_get_origin_relative_url( admin_url( "admin-ajax.php" ) ) ); ?>', {
             method: 'POST',
             body: formData
         })
@@ -487,7 +487,7 @@ $google_auth_url = home_url( '/workspace/auth/google' );
         formData.append('action', 'cora_ajax_resend_verification');
         formData.append('email', registeredEmail);
         formData.append('nonce', '<?php echo wp_create_nonce( "cora_login_nonce" ); ?>');
-        fetch('<?php echo admin_url( "admin-ajax.php" ); ?>', { method: 'POST', body: formData })
+        fetch('<?php echo esc_url( cora_get_origin_relative_url( admin_url( "admin-ajax.php" ) ) ); ?>', { method: 'POST', body: formData })
         .then(function(r) { return r.json(); })
         .then(function(res) { showToast(res.data.message || 'Link sent!'); });
     }

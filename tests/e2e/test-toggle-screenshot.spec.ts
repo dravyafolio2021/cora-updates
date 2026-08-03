@@ -14,15 +14,15 @@ test('capture automation tab toggle switches screenshot', async ({ page }) => {
   await page.waitForTimeout(500);
 
   // Click on the first lead card to open the drawer
-  const reviewBtn = page.locator('.cora-lead-card button:has-text("Review")').first();
-  await reviewBtn.click();
+  const leadCard = page.locator('.cora-lead-card').first();
+  await leadCard.click();
 
   // Wait for drawer
   const drawer = page.locator('#cora-lead-detail-drawer');
   await expect(drawer).toBeVisible();
 
   // Click Automation tab
-  const autoTab = page.locator('.cora-tab-btn[data-tab="automation"]');
+  const autoTab = page.locator('#cora-lead-detail-tab-btn-automation');
   await autoTab.click();
 
   // Wait for automation tab content

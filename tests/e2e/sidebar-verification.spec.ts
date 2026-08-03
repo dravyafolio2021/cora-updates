@@ -33,8 +33,8 @@ test('verify sidebar branding and collapsibility', async ({ page }) => {
 });
 
 test('verify sidebar simple search filtering', async ({ page }) => {
-  await login(page);
-  await page.goto('/workspace/dashboard');
+  await login(page, 'owner.realestate@cora.local', 'cora_secure_pass_123');
+  await page.goto('/workspace/dashboard?industry=real_estate');
   
   await page.waitForSelector('.cora-sidebar');
   

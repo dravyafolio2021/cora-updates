@@ -1054,12 +1054,16 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             height: 60px !important;
             border-top: 1px solid #e4e4e7 !important;
             background: #ffffff !important;
-            left: 200px !important;
+            left: 0 !important; /* Force full-width so buttons are not clipped */
+            right: 0 !important;
             box-shadow: none !important;
+            overflow: visible !important;
+            z-index: 100000 !important;
         }
 
         .media-frame.hide-menu .media-frame-toolbar {
             left: 0 !important;
+            right: 0 !important;
         }
 
         /* Eliminate duplicate borders in bottom toolbar */
@@ -1067,13 +1071,62 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             border-top: none !important;
             background: transparent !important;
             box-shadow: none !important;
+            height: 60px !important;
+            line-height: 60px !important;
+            display: block !important;
+            visibility: visible !important;
         }
 
-        .media-toolbar-primary {
-            padding: 12px 24px !important;
+        .media-frame-toolbar .media-toolbar-primary {
             float: right !important;
             display: flex !important;
             align-items: center !important;
+            height: 60px !important;
+            padding: 0 24px !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        /* Force primary select buttons in bottom toolbar to always display correctly */
+        .media-frame-toolbar button,
+        .media-frame-toolbar .button,
+        .media-frame-toolbar .button-primary,
+        .media-frame-toolbar .media-button,
+        .media-frame-toolbar .media-button-select {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            position: absolute !important;
+            right: 24px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            z-index: 1000000 !important;
+            background: #09090b !important;
+            border-color: #09090b !important;
+            color: #ffffff !important;
+            height: 36px !important;
+            line-height: 36px !important;
+            padding: 0 16px !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            font-size: 13px !important;
+            cursor: pointer !important;
+            box-sizing: border-box !important;
+        }
+
+        .media-frame-toolbar button:disabled,
+        .media-frame-toolbar .button:disabled,
+        .media-frame-toolbar .button-primary:disabled,
+        .media-frame-toolbar .media-button:disabled,
+        .media-frame-toolbar .media-button-select:disabled {
+            opacity: 0.45 !important;
+            cursor: not-allowed !important;
+            background: #71717a !important;
+            border-color: #71717a !important;
+            pointer-events: none !important;
         }
 
         /* Modern Monochromatic Buttons */

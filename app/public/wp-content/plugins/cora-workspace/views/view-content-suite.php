@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <script>
 window.coraREWPData = window.coraREWPData || {};
-window.coraREWPData.ajaxUrl = window.coraREWPData.ajaxUrl || '<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>';
+window.coraREWPData.ajaxUrl = window.coraREWPData.ajaxUrl || '<?php echo esc_url( cora_get_origin_relative_url( admin_url( 'admin-ajax.php' ) ) ); ?>';
 window.coraREWPData.ajaxNonce = '<?php echo wp_create_nonce( 'cora_ajax_nonce' ); ?>';
 
 if (typeof window.coraREData !== 'undefined') {

@@ -1142,32 +1142,74 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             align-items: center !important;
         }
 
-        /* Bottom Action Toolbar */
+        /* Bottom Action Toolbar - hide the broken WP default toolbar;
+           our JS injects a custom .cora-media-select-btn instead */
         .media-frame-toolbar {
             bottom: 0 !important;
             height: 60px !important;
             border-top: 1px solid #e4e4e7 !important;
             background: #ffffff !important;
-            left: 200px !important;
+            left: 0 !important;
+            right: 0 !important;
             box-shadow: none !important;
+            overflow: visible !important;
         }
 
         .media-frame.hide-menu .media-frame-toolbar {
             left: 0 !important;
         }
 
-        /* Eliminate duplicate borders in bottom toolbar */
         .media-frame-toolbar .media-toolbar {
             border-top: none !important;
             background: transparent !important;
             box-shadow: none !important;
         }
 
-        .media-toolbar-primary {
-            padding: 12px 24px !important;
+        .media-frame-toolbar .media-toolbar-primary {
             float: right !important;
             display: flex !important;
             align-items: center !important;
+            height: 60px !important;
+            padding: 0 24px !important;
+        }
+
+        /* Custom injected CTA button - ensure no stylesheet can override */
+        .cora-media-select-btn {
+            position: absolute !important;
+            bottom: 12px !important;
+            right: 24px !important;
+            z-index: 9999999 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 36px !important;
+            padding: 0 20px !important;
+            background: #09090b !important;
+            color: #ffffff !important;
+            border: 1px solid #09090b !important;
+            border-radius: 8px !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            font-family: Inter, system-ui, -apple-system, sans-serif !important;
+            cursor: pointer !important;
+            letter-spacing: -0.01em !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12) !important;
+            line-height: 36px !important;
+            transition: opacity 0.15s ease, background 0.15s ease !important;
+            box-sizing: border-box !important;
+            text-transform: none !important;
+            text-decoration: none !important;
+            white-space: nowrap !important;
+        }
+
+        .cora-media-select-btn:disabled {
+            opacity: 0.4 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+        }
+
+        .cora-media-select-btn:not(:disabled):hover {
+            background: #27272a !important;
         }
 
         /* Modern Monochromatic Buttons */
@@ -2861,9 +2903,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         };
 
         var coraREData = {
-            ajaxUrl: "<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>",
-            siteUrl: "<?php echo esc_url( get_site_url() ); ?>",
-            restUrl: "<?php echo esc_url( rest_url() ); ?>",
+            ajaxUrl: "<?php echo esc_url( cora_get_origin_relative_url( admin_url( 'admin-ajax.php' ) ) ); ?>",
+            siteUrl: "<?php echo esc_url( cora_get_origin_relative_url( get_site_url() ) ); ?>",
+            restUrl: "<?php echo esc_url( cora_get_origin_relative_url( rest_url() ) ); ?>",
             nonce: "<?php echo esc_js( wp_create_nonce( 'wp_rest' ) ); ?>",
             ajaxNonce: "<?php echo esc_js( wp_create_nonce( 'cora_ajax_nonce' ) ); ?>",
             currentRole: "<?php echo esc_js( $current_user_role ); ?>",
@@ -2993,7 +3035,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 e.preventDefault();
                 var $btn = $(this);
                 $btn.prop('disabled', true).text('Switching...');
-                var ajaxUrl = window.coraConfig ? window.coraConfig.ajaxUrl : '<?php echo esc_url( admin_url( "admin-ajax.php" ) ); ?>';
+                var ajaxUrl = window.coraConfig ? window.coraConfig.ajaxUrl : '<?php echo esc_url( cora_get_origin_relative_url( admin_url( "admin-ajax.php" ) ) ); ?>';
                 var nonce = $btn.data('nonce');
                 $.ajax({
                     url: ajaxUrl,
@@ -3140,14 +3182,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
         <!-- Right Section: Actions, Role Selector, Custom Blocks & User Pill -->
         <div class="cora-topbar-actions flex items-center gap-2 md:gap-3 shrink-0">
-            <!-- Ask Cora AI Custom Block Button -->
-            <button id="cora-quick-ai-btn" class="cora-btn-secondary px-3 py-1.5 text-xs font-bold border border-zinc-200 rounded-lg hover:bg-zinc-100 transition-all active:scale-[0.98] inline-flex items-center gap-1.5 text-zinc-900 bg-white shadow-sm cursor-pointer shrink-0" title="Ask Cora AI (Press ⌘J)">
+            <button id="cora-quick-ai-btn" class="cora-btn-secondary px-2.5 py-1.5 text-xs font-bold border border-zinc-200 rounded-lg hover:bg-zinc-100 transition-all active:scale-[0.98] inline-flex items-center gap-1.5 text-zinc-900 bg-white shadow-sm cursor-pointer shrink-0" title="Cora AI (Coming Soon)">
                 <span class="cora-btn-icon text-zinc-600 flex shrink-0">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
                     </svg>
                 </span>
-                <span class="hidden sm:inline">Ask Cora AI</span>
+                <span class="hidden sm:inline">Cora AI</span>
+                <span class="px-1 py-0.5 text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 rounded border border-zinc-200 dark:border-zinc-700 leading-none select-none uppercase tracking-wider scale-95 origin-left">Soon</span>
             </button>
 
             <!-- Punch In / Out Header Quick Button -->
@@ -3668,6 +3710,20 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                 <div class="border-t border-zinc-100 dark:border-zinc-800"></div>
 
+                <!-- Workspace Connection Status Indicator -->
+                <?php
+                $cora_gemini_key_saved = ! empty( get_option( 'cora_workspace_ai_gemini_key', '' ) );
+                ?>
+                <div class="flex items-center justify-between px-2.5 py-1.5 text-xs select-none">
+                    <span class="text-zinc-500 dark:text-zinc-400 font-medium">Workspace Status</span>
+                    <span class="flex items-center gap-1.5 font-bold text-zinc-800 dark:text-zinc-200">
+                        <span class="w-2 h-2 rounded-full <?php echo $cora_gemini_key_saved ? 'bg-emerald-500 animate-pulse' : 'bg-zinc-400'; ?>"></span>
+                        <?php echo $cora_gemini_key_saved ? 'Connected' : 'Not Configured'; ?>
+                    </span>
+                </div>
+
+                <div class="border-t border-zinc-100 dark:border-zinc-800"></div>
+
                 <!-- Menu Items List -->
                 <div class="flex flex-col gap-0.5">
                     <button class="w-full text-left px-2.5 py-2 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-zinc-50 font-medium flex items-center gap-3 cursor-pointer transition-colors" onclick="coraNavigateTo('profile'); $('#cora-profile-popover').addClass('hidden');">
@@ -3707,6 +3763,22 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         </select>
                     </div>
 
+                    <!-- Active AI Model Selector -->
+                    <?php
+                    $cora_active_ai_model = get_option( 'cora_workspace_active_ai_model', 'cora-core-v2' );
+                    ?>
+                    <div class="px-2 py-1.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl space-y-1 select-none my-0.5">
+                        <div class="flex items-center justify-between px-1">
+                            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">AI Model</span>
+                            <span class="text-[9px] font-bold px-1.5 py-0.2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-950 rounded uppercase">Active</span>
+                        </div>
+                        <select id="cora-ai-model-selector" class="w-full bg-white dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-semibold rounded-lg px-2 py-1.5 outline-none cursor-pointer transition-colors">
+                            <option value="cora-core-v2" <?php selected( $cora_active_ai_model, 'cora-core-v2' ); ?>>Gemini 3.5 Flash (Auto)</option>
+                            <option value="gemini" <?php selected( $cora_active_ai_model, 'gemini' ); ?>>Gemini 3.5 Flash</option>
+                            <option value="gpt-4o" <?php selected( $cora_active_ai_model, 'gpt-4o' ); ?>>GPT-4o</option>
+                        </select>
+                    </div>
+
                     <?php if ( cora_is_super_owner() ) : ?>
                     <div class="border-t border-zinc-100 dark:border-zinc-800 my-1"></div>
                     <div class="px-2 py-1.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl space-y-1 select-none">
@@ -3739,6 +3811,48 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     </button>
                 </div>
                 <?php endif; ?>
+
+                <div class="border-t border-zinc-100 dark:border-zinc-800"></div>
+
+                <!-- Quota Metrics Section -->
+                <div class="px-2 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl space-y-3 select-none">
+                    <!-- Storage Quota -->
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-between text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
+                            <span>Storage Usage</span>
+                            <span>4.2 GB of 10 GB (42%)</span>
+                        </div>
+                        <div class="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                            <div class="bg-zinc-900 dark:bg-zinc-100 h-full rounded-full" style="width: 42%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- AI Usage Quotas (Dynamic limits) -->
+                    <?php
+                    $usage_stats = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'five_hour_count' => 0, 'five_hour_limit' => 30, 'daily_count' => 0, 'daily_limit' => 100 );
+                    $daily_percent = min(100, round(($usage_stats['daily_count'] / $usage_stats['daily_limit']) * 100));
+                    $five_hour_percent = min(100, round(($usage_stats['five_hour_count'] / $usage_stats['five_hour_limit']) * 100));
+                    ?>
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-between text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
+                            <span>AI Requests (Daily)</span>
+                            <span><?php echo esc_html( $usage_stats['daily_count'] ); ?> / <?php echo esc_html( $usage_stats['daily_limit'] ); ?></span>
+                        </div>
+                        <div class="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                            <div class="bg-zinc-950 dark:bg-white h-full rounded-full" style="width: <?php echo esc_attr( $daily_percent ); ?>%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-between text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
+                            <span>AI Requests (5h Window)</span>
+                            <span><?php echo esc_html( $usage_stats['five_hour_count'] ); ?> / <?php echo esc_html( $usage_stats['five_hour_limit'] ); ?></span>
+                        </div>
+                        <div class="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                            <div class="bg-zinc-950 dark:bg-white h-full rounded-full" style="width: <?php echo esc_attr( $five_hour_percent ); ?>%;"></div>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="border-t border-zinc-100 dark:border-zinc-800"></div>
 
@@ -9426,7 +9540,7 @@ wp_print_media_templates();
 wp_print_footer_scripts();
 ?>
 <!-- Workspace Script -->
-<script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/admin-script.js?v=' . CORA_WORKSPACE_VERSION; ?>"></script>
+<script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/admin-script.js?v=' . CORA_WORKSPACE_VERSION; ?>" defer></script>
 
 <script>
 (function() {
@@ -9686,10 +9800,10 @@ wp_print_footer_scripts();
         <!-- Footer Bar -->
         <div class="border-t border-zinc-100 dark:border-zinc-800/40 px-4 py-2.5 bg-zinc-50/50 dark:bg-zinc-900/40 flex items-center justify-between shrink-0">
             <span class="text-xs text-zinc-450 dark:text-zinc-400 font-medium">Need help finding something?</span>
-            <button type="button" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 font-semibold text-xs rounded-lg transition-colors shadow-sm flex items-center gap-1.5 cursor-pointer" onclick="window.coraTriggerCommandAI()">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                Ask Cora
-            </button>
+            <a href="https://wa.me/918708528105?text=Hi%20Cora%20Team%2C%20I%27d%20like%20to%20report%20a%20bug%20on%20the%20platform." target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-lg transition-colors shadow-sm flex items-center gap-1.5 cursor-pointer decoration-none" style="text-decoration: none;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="shrink-0"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.713-1.455L0 24zm6.59-4.846c1.66.986 3.284 1.483 4.805 1.484 5.429-.002 9.843-4.417 9.845-9.848.001-2.63-1.019-5.1-2.868-6.953C16.578 1.984 14.105 1.01 11.5 1.01c-5.432 0-9.848 4.416-9.85 9.849-.001 1.702.469 3.366 1.36 4.818l-.988 3.606 3.702-.971c1.45.89 2.973 1.342 4.323 1.342zm11.238-7.51c-.302-.151-1.785-.882-2.057-.981-.273-.099-.471-.148-.669.151-.197.299-.767.971-.94 1.169-.173.199-.347.223-.649.072-.302-.151-1.273-.469-2.427-1.496-.897-.8-1.503-1.788-1.679-2.09-.176-.302-.019-.465.132-.614.136-.134.302-.352.453-.529.151-.176.202-.302.302-.503.101-.202.051-.377-.025-.529-.076-.151-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.785-.73 2.033-1.433.248-.704.248-1.307.173-1.433-.075-.125-.272-.2-.574-.352z"/></svg>
+                Report Bug
+            </a>
         </div>
 
     </div>
@@ -9785,22 +9899,31 @@ wp_print_footer_scripts();
     let selectedIndex = -1;
     let searchDebounceTimeout = null;
     let currentFilter = 'all';
+    let searchRequestId = 0;
 
     window.coraOpenCommandPalette = function() {
         const palette = document.getElementById('cora-command-palette');
         const input = document.getElementById('cora-command-input');
         if (!palette) return;
 
+        const alreadyActive = palette.classList.contains('active');
+
         palette.classList.add('active');
         palette.classList.remove('hidden');
-        if (input) {
-            input.value = '';
-            input.focus();
-        }
-        selectedIndex = -1;
         
-        // Load initial suggestions
-        coraPerformCommandSearch('');
+        if (!alreadyActive) {
+            if (input) {
+                input.value = '';
+                input.focus();
+            }
+            selectedIndex = -1;
+            // Load initial suggestions
+            coraPerformCommandSearch('');
+        } else {
+            if (input) {
+                input.focus();
+            }
+        }
     };
 
     window.coraCloseCommandPalette = function() {
@@ -10352,10 +10475,54 @@ wp_print_footer_scripts();
         return icons[name] || icons['settings'];
     }
 
+    const coraSearchCache = {};
+
+    function renderSearchDOM(data, resultsContainer, isInline) {
+        if (data.success && data.data && data.data.results && data.data.results.length > 0) {
+            let html = '<div class="space-y-0.5">';
+            data.data.results.forEach((item, index) => {
+                html += `
+                    <a href="${item.url}" class="cora-command-item flex items-center justify-between p-2.5 rounded-xl transition-all duration-150 cursor-pointer text-decoration-none group" data-index="${index}">
+                        <div class="flex items-center gap-3">
+                            <span class="w-9 h-9 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/50 group-hover:bg-white group-hover:border-zinc-300 transition-colors">
+                                ${getIconSVG(item.icon)}
+                            </span>
+                            <div class="space-y-0.5">
+                                <div class="text-xs font-bold text-zinc-900">${item.title}</div>
+                                <p class="text-[10px] text-zinc-400 line-clamp-1">${item.description}</p>
+                            </div>
+                        </div>
+                        <span class="text-zinc-300 group-hover:text-zinc-800 transition-colors">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></span >
+                        </span>
+                    </a>
+                `;
+            });
+            html += '</div>';
+            resultsContainer.innerHTML = html;
+            if (!isInline) selectedIndex = -1;
+        } else {
+            resultsContainer.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 text-center">
+                    <svg class="text-zinc-300 mb-2" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <span class="text-xs font-semibold text-zinc-850">No results found</span>
+                    <p class="text-[10px] text-zinc-455 mt-0.5">There are no results matching to the query. Try searching with other filters or keywords</p>
+                </div>
+            `;
+            if (!isInline) selectedIndex = -1;
+        }
+    }
+
     function coraPerformCommandSearch(query, isInline = false) {
         const parentPalette = document.getElementById(isInline ? 'cora-inline-command-palette' : 'cora-command-palette');
         const resultsContainer = parentPalette ? parentPalette.querySelector(isInline ? '#cora-inline-command-results' : '#cora-command-results') : null;
         if (!resultsContainer) return;
+
+        const cacheKey = query + '_' + currentFilter;
+        if (coraSearchCache[cacheKey]) {
+            renderSearchDOM(coraSearchCache[cacheKey], resultsContainer, isInline);
+            return;
+        }
 
         resultsContainer.innerHTML = `
             <div class="flex flex-col items-center justify-center py-10 space-y-2">
@@ -10364,6 +10531,7 @@ wp_print_footer_scripts();
             </div>
         `;
 
+        const thisRequestId = ++searchRequestId;
         const url = coraREData.ajaxUrl + '?action=cora_advanced_search&nonce=' + coraREData.ajaxNonce + '&q=' + encodeURIComponent(query) + '&filter=' + currentFilter;
         
         fetch(url, {
@@ -10371,41 +10539,14 @@ wp_print_footer_scripts();
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success && data.data && data.data.results && data.data.results.length > 0) {
-                let html = '<div class="space-y-0.5">';
-                data.data.results.forEach((item, index) => {
-                    html += `
-                        <a href="${item.url}" class="cora-command-item flex items-center justify-between p-2.5 rounded-xl transition-all duration-150 cursor-pointer text-decoration-none group" data-index="${index}">
-                            <div class="flex items-center gap-3">
-                                <span class="w-9 h-9 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/50 group-hover:bg-white group-hover:border-zinc-300 transition-colors">
-                                    ${getIconSVG(item.icon)}
-                                </span>
-                                <div class="space-y-0.5">
-                                    <div class="text-xs font-bold text-zinc-900">${item.title}</div>
-                                    <p class="text-[10px] text-zinc-400 line-clamp-1">${item.description}</p>
-                                </div>
-                            </div>
-                            <span class="text-zinc-300 group-hover:text-zinc-800 transition-colors">
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></span >
-                            </span>
-                        </a>
-                    `;
-                });
-                html += '</div>';
-                resultsContainer.innerHTML = html;
-                if (!isInline) selectedIndex = -1;
-            } else {
-                resultsContainer.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-12 text-center">
-                        <svg class="text-zinc-300 mb-2" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <span class="text-xs font-semibold text-zinc-850">No results found</span>
-                        <p class="text-[10px] text-zinc-455 mt-0.5">Try searching with other filters or keywords</p>
-                    </div>
-                `;
-                if (!isInline) selectedIndex = -1;
+            if (thisRequestId !== searchRequestId) return;
+            if (data.success) {
+                coraSearchCache[cacheKey] = data;
             }
+            renderSearchDOM(data, resultsContainer, isInline);
         })
         .catch(err => {
+            if (thisRequestId !== searchRequestId) return;
             console.error('Advanced Search Error:', err);
             resultsContainer.innerHTML = `
                 <div class="flex flex-col items-center justify-center py-10 text-center">
@@ -10780,10 +10921,47 @@ wp_print_footer_scripts();
             });
         });
 
-        // Sidebar Menu Search Filtering (Dynamic quick search)
+        // Sidebar Menu Search Filtering (Dynamic unified search)
         const sidebarSearchInput = document.getElementById('cora-sidebar-search-input');
         const sidebarNav = document.querySelector('.cora-sidebar-nav');
         const sidebarSearchResults = document.getElementById('cora-sidebar-search-results');
+        let sidebarSearchDebounceTimeout = null;
+        let sidebarSearchRequestId = 0;
+
+        function renderSidebarSearchDOM(data, resultsContainer) {
+            if (!resultsContainer) return;
+            if (data.success && data.data && data.data.results && data.data.results.length > 0) {
+                let html = '<ul class="space-y-0.5 mt-1">';
+                data.data.results.forEach(item => {
+                    html += `
+                        <li class="list-none">
+                            <a href="${item.url}" class="cora-nav-item flex items-center justify-between px-3 py-2.5 text-sm rounded-lg cursor-pointer select-none no-underline text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white group">
+                                <div class="flex items-center gap-3 select-none min-w-0">
+                                    <span class="cora-nav-icon select-none text-zinc-500 group-hover:text-zinc-950 dark:group-hover:text-white shrink-0">
+                                        ${getIconSVG(item.icon)}
+                                    </span>
+                                    <div class="flex flex-col min-w-0">
+                                        <span class="cora-nav-text select-none font-semibold text-xs leading-normal truncate text-zinc-800 dark:text-zinc-200 group-hover:text-zinc-950 dark:group-hover:text-white">${item.title}</span>
+                                        <span class="text-[9px] text-zinc-400 dark:text-zinc-500 font-normal leading-normal truncate">${item.description}</span>
+                                    </div>
+                                </div>
+                                <span class="text-[8px] font-bold tracking-wider text-zinc-400 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-850 px-1 py-0.5 rounded uppercase shrink-0">${item.category}</span>
+                            </a>
+                        </li>
+                    `;
+                });
+                html += '</ul>';
+                resultsContainer.innerHTML = html;
+            } else {
+                resultsContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-8 text-center px-3">
+                        <svg class="text-zinc-400 mb-2" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <span class="text-[11px] font-bold text-zinc-800 dark:text-zinc-200 leading-normal">There are no results matching to the query</span>
+                        <p class="text-[9px] text-zinc-450 mt-0.5 leading-normal">Try searching other keywords</p>
+                    </div>
+                `;
+            }
+        }
 
         if (sidebarSearchInput && sidebarNav) {
             sidebarSearchInput.addEventListener('input', function() {
@@ -10791,12 +10969,12 @@ wp_print_footer_scripts();
                 const navItems = sidebarNav.querySelectorAll('li[data-target]');
                 
                 if (query === '') {
-                    // Show all items and group labels
                     navItems.forEach(item => item.classList.remove('hidden'));
                     const groups = sidebarNav.querySelectorAll('.cora-nav-group');
                     groups.forEach(group => {
                         const label = group.querySelector('.cora-nav-group-label');
                         if (label) label.classList.remove('hidden');
+                        group.classList.remove('hidden');
                     });
                     if (sidebarSearchResults) {
                         sidebarSearchResults.classList.add('hidden');
@@ -10806,27 +10984,37 @@ wp_print_footer_scripts();
                     return;
                 }
 
+                // Client-side filtering of sidebar menu items matching the query text
+                let matchedAny = false;
                 navItems.forEach(item => {
                     const text = item.textContent.toLowerCase();
-                    const target = item.getAttribute('data-target') ? item.getAttribute('data-target').toLowerCase() : '';
-                    if (text.includes(query) || target.includes(query)) {
+                    if (text.includes(query)) {
                         item.classList.remove('hidden');
+                        matchedAny = true;
                     } else {
                         item.classList.add('hidden');
                     }
                 });
 
-                // Show/hide group labels based on whether they have visible children
+                // Dynamically hide/show navigation groups based on matching items
                 const groups = sidebarNav.querySelectorAll('.cora-nav-group');
                 groups.forEach(group => {
-                    const visibleItems = Array.from(group.querySelectorAll('li[data-target]')).filter(item => !item.classList.contains('hidden'));
+                    const visibleItems = group.querySelectorAll('li[data-target]:not(.hidden)');
                     const label = group.querySelector('.cora-nav-group-label');
                     if (visibleItems.length === 0) {
+                        group.classList.add('hidden');
                         if (label) label.classList.add('hidden');
                     } else {
+                        group.classList.remove('hidden');
                         if (label) label.classList.remove('hidden');
                     }
                 });
+
+                // Hide search results container since we are filtering the main list in place
+                if (sidebarSearchResults) {
+                    sidebarSearchResults.classList.add('hidden');
+                }
+                sidebarNav.classList.remove('hidden');
             });
         }
     });
@@ -11789,7 +11977,7 @@ if ( cora_is_super_owner() ) :
                     </button>
                     <div class="px-0.5 flex flex-col items-center text-center">
                         <span class="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 leading-none">Instant Reply</span>
-                        <span class="text-[8px] font-medium text-zinc-400 dark:text-zinc-500 mt-0.5">Under 5 mins</span>
+                        <span class="text-[8px] font-medium text-zinc-400 dark:text-zinc-500 mt-0.5">Under 1 hour</span>
                     </div>
                 </div>
 

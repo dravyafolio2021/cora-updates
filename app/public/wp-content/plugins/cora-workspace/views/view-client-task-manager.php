@@ -46,7 +46,11 @@ if (!defined('ABSPATH')) {
     max-width: 95vw !important;
 }
 
-#drawer-create-task, #drawer-template-picker, #drawer-manage-columns {
+#drawer-create-task {
+    width: 600px !important;
+}
+
+#drawer-template-picker, #drawer-manage-columns {
     width: 500px !important;
 }
 
@@ -900,10 +904,10 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
     </div>
 
     <!-- Content Body -->
-    <div class="flex-1 overflow-y-auto">
+    <div class="flex-1 overflow-y-auto overflow-x-hidden">
 
         <!-- TAB 1: DETAILS (Linear-style property rows) -->
-        <div id="task-tab-pane-details" class="task-tab-pane">
+        <div id="task-tab-pane-details" class="task-tab-pane overflow-x-hidden">
             <!-- Property Table -->
             <div class="divide-y divide-zinc-100">
                 <!-- Assignee -->
@@ -991,7 +995,7 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
         </div>
 
         <!-- TAB 2: SUBTASK CHECKLIST -->
-        <div id="task-tab-pane-checklist" class="task-tab-pane hidden">
+        <div id="task-tab-pane-checklist" class="task-tab-pane overflow-x-hidden hidden">
             <div class="px-5 py-3.5">
                 <!-- Header + Progress -->
                 <div class="flex items-center justify-between mb-1.5">
@@ -1018,7 +1022,7 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
         </div>
 
         <!-- TAB 3: ACTIVITY LOG & TEAM NOTES -->
-        <div id="task-tab-pane-activity" class="task-tab-pane hidden">
+        <div id="task-tab-pane-activity" class="task-tab-pane overflow-x-hidden hidden">
             <div class="px-5 py-3.5">
                 <!-- Timeline Feed -->
                 <div class="space-y-2 max-h-[420px] overflow-y-auto -mx-1 px-1 mb-3" id="detail-comments-list">
@@ -1037,7 +1041,7 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
         </div>
 
         <!-- TAB 4: NOTIFICATION ALERTS -->
-        <div id="task-tab-pane-notifications" class="task-tab-pane hidden">
+        <div id="task-tab-pane-notifications" class="task-tab-pane overflow-x-hidden hidden">
             <div class="px-5 py-3.5 space-y-4">
                 <!-- Email -->
                 <div class="p-3.5 bg-zinc-50 border border-zinc-200/70 rounded-xl space-y-2.5">
@@ -1069,7 +1073,7 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
                         </label>
                     </div>
                     <p class="text-[10px] font-medium text-zinc-400 leading-relaxed">Sends a WhatsApp message to the assigned team member when task is saved.</p>
-                    <div class="flex items-center gap-2">
+                    <div id="detail-wa-phone-container" class="flex items-center gap-2">
                         <input type="tel" id="detail-wa-phone" placeholder="+91 98765 43210" class="flex-1 px-2.5 py-1.5 bg-white border border-zinc-200 rounded-lg text-xs font-bold text-zinc-950 focus:outline-none focus:border-zinc-400 placeholder:text-zinc-300">
                     </div>
                     <button type="button" onclick="coraTriggerWhatsAppReminder()" class="w-full px-3 py-2 bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-700 text-[10.5px] font-bold rounded-lg transition-colors cursor-pointer text-center">
@@ -1119,31 +1123,20 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
     </div>
 
     <!-- Content Body -->
-    <div class="flex-1 overflow-y-auto p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+    <div class="flex-1 overflow-y-auto p-5 sm:p-6 flex flex-col space-y-4">
+        <!-- Section 1: Task Details -->
         <div class="space-y-4">
+            <h3 class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">1. Task Details</h3>
+            <!-- Title -->
             <div>
-                <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-1.5">Task Title *</label>
-                <input type="text" id="create-task-title" placeholder="e.g. Export final 4K video reel" class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-bold text-zinc-950 focus:outline-none focus:border-zinc-950">
+                <label class="block text-xs font-semibold text-zinc-700 mb-1.5">Task Title *</label>
+                <input type="text" id="create-task-title" placeholder="e.g. Export final 4K video reel" class="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm font-medium text-zinc-900 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all placeholder:text-zinc-400">
             </div>
-            <div>
-                <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-1.5">Client &amp; Shoot Booking</label>
-                <select id="create-task-booking" class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-bold text-zinc-950 focus:outline-none focus:border-zinc-950 cursor-pointer">
-                    <option value="">General Project / Unlinked</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-1.5">Assign To Staff</label>
-                <select id="create-task-assignee" class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-bold text-zinc-950 focus:outline-none focus:border-zinc-950 cursor-pointer">
-                    <option value="">Unassigned</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
+            <!-- Category, Priority, Due Date Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                    <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-1.5">Deliverable Type</label>
-                    <select id="create-task-category" class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-bold text-zinc-950 focus:outline-none focus:border-zinc-950 cursor-pointer">
+                    <label class="block text-xs font-semibold text-zinc-700 mb-1.5">Deliverable Type</label>
+                    <select id="create-task-category" class="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all cursor-pointer">
                         <option value="Photo Shoot Prep">Photo Shoot Prep</option>
                         <option value="Video Production">Video Production</option>
                         <option value="Post-Production &amp; Editing">Post-Production &amp; Editing</option>
@@ -1152,39 +1145,73 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-1.5">Priority Level</label>
-                    <select id="create-task-priority" class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-bold text-zinc-950 focus:outline-none focus:border-zinc-950 cursor-pointer">
+                    <label class="block text-xs font-semibold text-zinc-700 mb-1.5">Priority Level</label>
+                    <select id="create-task-priority" class="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all cursor-pointer">
                         <option value="low">Low</option>
                         <option value="medium" selected>Medium</option>
                         <option value="high">High</option>
                         <option value="urgent">Urgent</option>
                     </select>
                 </div>
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-700 mb-1.5">Due Date</label>
+                    <input type="date" id="create-task-due" class="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all">
+                </div>
+            </div>
+        </div>
+
+        <div class="border-t border-zinc-100 my-4"></div>
+
+        <!-- Section 2: Relationships -->
+        <div class="space-y-4">
+            <h3 class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">2. Relationships</h3>
+            <div>
+                <label class="block text-xs font-semibold text-zinc-700 mb-1.5">Client &amp; Shoot Booking</label>
+                <select id="create-task-booking" class="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all cursor-pointer">
+                    <option value="">General Project / Unlinked</option>
+                </select>
             </div>
             <div>
-                <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-1.5">Due Date</label>
-                <input type="date" id="create-task-due" class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-bold text-zinc-950 focus:outline-none focus:border-zinc-950">
+                <label class="block text-xs font-semibold text-zinc-700 mb-1.5">Assign To Staff</label>
+                <select id="create-task-assignee" class="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all cursor-pointer">
+                    <option value="">Unassigned</option>
+                </select>
             </div>
+        </div>
+
+        <div class="border-t border-zinc-100 my-4"></div>
+
+        <!-- Section 3: Description -->
+        <div class="space-y-4">
+            <h3 class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">3. Description</h3>
             <div>
-                <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-1.5">Description (Optional)</label>
-                <textarea id="create-task-desc" rows="3" placeholder="Specific guidelines or technical parameters for the team..." class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-medium text-zinc-950 focus:outline-none focus:border-zinc-950"></textarea>
+                <label class="block text-xs font-semibold text-zinc-700 mb-1.5">Description (Optional)</label>
+                <textarea id="create-task-desc" rows="3" placeholder="Specific guidelines or technical parameters for the team..." class="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all placeholder:text-zinc-400"></textarea>
             </div>
-            <div class="pt-2 space-y-3">
-                <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-zinc-800">
+        </div>
+
+        <div class="border-t border-zinc-100 my-4"></div>
+
+        <!-- Section 4: Notifications -->
+        <div class="space-y-4">
+            <h3 class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">4. Notifications</h3>
+            <div class="p-3 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-3">
+                <label class="flex items-center gap-2.5 cursor-pointer text-xs font-medium text-zinc-800">
                     <input type="checkbox" id="create-task-email-notify" checked class="w-4 h-4 rounded text-zinc-950 focus:ring-0 cursor-pointer">
                     <span>Send HTML email notification to assigned staff member</span>
                 </label>
-                <div class="pt-1 flex flex-col gap-2">
-                    <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-zinc-800">
+                <div class="border-t border-zinc-200/60 my-2"></div>
+                <div class="flex flex-col gap-2">
+                    <label class="flex items-center gap-2.5 cursor-pointer text-xs font-medium text-zinc-800">
                         <input type="checkbox" id="create-task-wa-notify" checked class="w-4 h-4 rounded text-zinc-950 focus:ring-0 cursor-pointer">
                         <span class="flex items-center gap-1.5">
                             <svg class="w-4 h-4 text-emerald-600 fill-current" viewBox="0 0 16 16"><path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/></svg>
                             Send WhatsApp notification text to assignee
                         </span>
                     </label>
-                    <div class="flex items-center gap-3 pl-6">
-                        <label class="text-[11px] font-bold text-zinc-550 shrink-0">WhatsApp Number:</label>
-                        <input type="tel" id="create-task-wa-phone" placeholder="e.g. +91 98765 43210" class="flex-1 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-xs font-bold text-zinc-950 focus:outline-none focus:border-zinc-950">
+                    <div id="wa-phone-container" class="mt-2 pl-6 transition-all duration-300">
+                        <label class="block text-[11px] font-semibold text-zinc-500 mb-1.5">WhatsApp Number</label>
+                        <input type="tel" id="create-task-wa-phone" placeholder="e.g. +91 98765 43210" class="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-900 focus:outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all placeholder:text-zinc-400">
                     </div>
                 </div>
             </div>
@@ -2751,6 +2778,13 @@ window.coraToggleMobileAccordion = function(element, sectionKey) {
         $('#detail-task-priority').val(t.priority || 'medium');
         $('#detail-task-asset-url').val(t.asset_url || '');
         $('#detail-wa-phone').val(t.whatsapp_phone || '');
+        const hasPhone = !!t.whatsapp_phone;
+        $('#detail-wa-notify').prop('checked', hasPhone);
+        if (hasPhone) {
+            $('#detail-wa-phone-container').show();
+        } else {
+            $('#detail-wa-phone-container').hide();
+        }
 
         let badges = '';
         if (t.client_name) {
@@ -3310,6 +3344,22 @@ window.coraToggleMobileAccordion = function(element, sectionKey) {
         window.coraLoadClientTasks();
         $('#cora-task-drawer-backdrop').on('click', function() {
             window.coraCloseAllDrawers();
+        });
+
+        // WhatsApp Notify change handlers for drawers
+        $(document).on('change', '#create-task-wa-notify', function() {
+            if ($(this).is(':checked')) {
+                $('#wa-phone-container').slideDown(200);
+            } else {
+                $('#wa-phone-container').slideUp(200);
+            }
+        });
+        $(document).on('change', '#detail-wa-notify', function() {
+            if ($(this).is(':checked')) {
+                $('#detail-wa-phone-container').slideDown(200);
+            } else {
+                $('#detail-wa-phone-container').slideUp(200);
+            }
         });
 
         // MutationObserver to watch drawer state and toggle backdrop overlay

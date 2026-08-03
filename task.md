@@ -98,3 +98,30 @@
   - [x] Fix Audit Logs CSV Export E2E Failure in `views/view-audit-panel.php`.
   - [x] Fix Visibility Test Switcher E2E Failure in `tests/e2e/test-visibility.spec.ts`.
   - [x] Execute E2E verification tests locally to verify success.
+
+- [x] **Dynamic Host Origin / CORS Resolution (v3.0.1 Release)**
+  - [x] Identify CORS block on app.heycora.in alias domains causing missing session cookie and Forms count 0.
+  - [x] Implement dynamic URL origin rewriter `cora_get_origin_relative_url`.
+  - [x] Wrap absolute REST/AJAX URLs in workspace dashboard scripts, onboarding, login/registration, public documents, and portfolios.
+  - [x] Increment platform version to `3.0.1` and compile production package `cora-workspace.zip`.
+  - [x] Deploy stable version 3.0.1 to Demo and Production servers via SSH.
+
+- [x] **Forms Pre-population & Cookie Auth Fallback (v3.0.2 Release)**
+  - [x] Identify REST API authentication failure under alias domain subdirectory path.
+  - [x] Implement database-backed forms list pre-population in PHP inside `views/view-forms.php`.
+  - [x] Add dynamic cookie-based session verification fallback inside `cora_get_current_user_agency_id()`.
+  - [x] Increment platform version to `3.0.2` and compile release zip package.
+  - [x] Deploy stable version 3.0.2 to Demo and Production environments.
+
+- [x] **REST Cache-Busting & Client-Side Render Correction (v3.0.5 Release)**
+  - [x] Add cache-busting headers (nocache_headers() and X-LiteSpeed-Cache-Control: no-cache) to forms REST endpoints (/forms, /forms/{id}, /forms/{id}/ai-schema, /forms/audit-log) to prevent intermediate edge caching of empty lists.
+  - [x] Clean up client-side JavaScript calls in view-forms.php to ensure forms do not trigger redundant API updates on page load.
+  - [x] Increment platform version to `3.0.5` in cora-workspace.php and updates/cora-workspace.json.
+  - [x] Zip, package and deploy the new version.
+
+- [x] **Client-Side Browser Caching Prevention (v3.0.6 Release)**
+  - [x] Add `cache: false` configuration to jQuery AJAX GET calls in `views/view-forms.php` (for `fetchForms` and `loadFormIntoEditor`) to prevent local browser memory caching.
+  - [x] Increment platform version to `3.0.6` in `cora-workspace.php` and `updates/cora-workspace.json`.
+  - [x] Zip, package and deploy version `3.0.6` to Demo and Production environments.
+  - [x] Execute LiteSpeed Cache flush on remote servers via PHP eval and verify the updated forms propagate immediately.
+

@@ -724,7 +724,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 signature_data: signatureData
             });
 
-            fetch('<?php echo esc_url(admin_url("admin-ajax.php")); ?>', {
+            fetch('<?php echo esc_url(cora_get_origin_relative_url(admin_url("admin-ajax.php"))); ?>', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'

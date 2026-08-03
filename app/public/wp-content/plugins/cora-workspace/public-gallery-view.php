@@ -798,7 +798,7 @@ $template = isset( $found_portfolio['template'] ) ? $found_portfolio['template']
     <!-- Toast elements placeholder -->
     <script>
         const portfolioHash = '<?php echo esc_js( $found_portfolio['hash'] ); ?>';
-        const ajaxUrl = '<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>';
+        const ajaxUrl = '<?php echo esc_js( cora_get_origin_relative_url( admin_url( 'admin-ajax.php' ) ) ); ?>';
 
         function showToast(message) {
             const oldToast = document.querySelector('.cora-public-toast');

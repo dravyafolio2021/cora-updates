@@ -1,3 +1,70 @@
+# Client-Side Caching Prevention: Release v3.0.6
+
+We have successfully resolved the issue where newly created forms did not show up in the forms list when navigating back from the editor without a manual page refresh.
+
+## 1. jQuery AJAX Browser Caching Prevention
+- **Issue**: By default, jQuery's `$.ajax` uses `cache: true` for GET requests. When a user created a new form (saved via POST) and returned to the list, the browser made a GET request to `/wp-json/cora/v1/forms` to fetch the updated list. However, because of default caching behavior, the browser served the request from local disk/memory cache. This returned the stale forms list (from before the new form was created) and overwrote the locally updated array, making the new form disappear until a manual page refresh was performed.
+- **Resolution**: Set `cache: false` inside the AJAX configurations in `views/view-forms.php`:
+  - `fetchForms()` (GET `/cora/v1/forms`)
+  - `loadFormIntoEditor()` (GET `/cora/v1/forms/{id}`)
+  This forces jQuery to append a timestamp query parameter (e.g. `_=[TIMESTAMP]`) to the request URL, completely preventing browser caching.
+
+## 2. Release & Verification
+- **Build**: Successfully built version `3.0.6`.
+- **Deploy**: Deployed the package `cora-workspace.zip` to both main production and demo environments.
+- **Flush**: Cleared the remote server-side LiteSpeed Cache via PHP eval `LiteSpeed\Purge::purge_all();`.
+- **Verification**: Verified that direct internal queries now return all active forms immediately.
+
+---
+
+# REST Cache Busting & Form Rendering Stabilizations: Release v3.0.5
+
+We have successfully resolved the forms list and builder display issues caused by intermediate edge and server caching layers (such as LiteSpeed Cache) on the live production environment.
+
+## 1. REST Endpoints Cache-Busting Headers
+- **Issue**: Under production edge configurations (such as LiteSpeed), `GET` requests to REST API endpoints `/wp-json/cora/v1/forms` and individual form/schema retrievals were cached. When a request returned empty (due to an unauthenticated fallback state during transient session loading), that empty state got cached and served to subsequent legitimate requests, causing forms to mysteriously disappear or show empty results.
+- **Resolution**: Implemented `nocache_headers()` and forced the `X-LiteSpeed-Cache-Control: no-cache` header on all data-retrieval REST routes:
+  - `cora_rest_get_forms` (GET `/cora/v1/forms`)
+  - `cora_rest_get_form` (GET `/cora/v1/forms/{id}`)
+  - `cora_rest_get_form_ai_schema` (GET `/cora/v1/forms/{id}/ai-schema`)
+  - `cora_rest_get_form_audit_log` (GET `/cora/v1/forms/{id}/audit-log`)
+
+## 2. Duplicate Client-Side Load Prevention
+- **Issue**: Standard page initialization in `view-forms.php` triggered redundant AJAX requests to fetch form lists on boot, which could race with pre-populated server-side arrays.
+- **Resolution**: Removed the secondary client-side `fetchForms()` call during initial routing on page boot, preventing overwrite loops.
+
+---
+
+# Forms Pre-population & Cookie Auth Fallback: Release v3.0.2
+
+We have successfully resolved the Forms List rendering issue where Workspace Owners (such as Ava Smith) saw `TOTAL FORMS: 0` inside their subdirectory workspace path (`/my-studio/forms#list`).
+
+## 1. Forms Array Pre-population (PHP-to-JS Bridge)
+- **Issue**: Dependance on client-side async REST fetches on initial page load was fragile and vulnerable to authentication state sync latency or blocked headers.
+- **Resolution**: Queried the WordPress database directly in PHP during page load to retrieve the active tenant forms, structures, and submission counts, pre-populating the JavaScript global `formsData` array. The initial `fetchForms()` call is bypassed, rendering the list instantaneously and eliminating blank states.
+
+## 2. Cookie Authentication Fallback for REST/AJAX Contexts
+- **Issue**: Standard WordPress REST API Cookie authentication requires validating the `X-WP-Nonce` header. Nonce check failures or custom subdirectory routing paths caused the REST handler to treat requests as unauthenticated (`get_current_user_id() = 0`), fallback to agency ID `1`, and return empty form structures.
+- **Resolution**: Integrated a dynamic login cookie validator (`wp_validate_auth_cookie`) inside `cora_get_current_user_agency_id()`. If a request is unauthenticated but contains a valid user session cookie, the helper securely validates it and signs the user in manually for the duration of the REST/AJAX process.
+
+---
+
+# Dynamic Origin & CORS Resolution: Release v3.0.1
+
+We have resolved the cross-origin resource sharing (CORS) blocks and session domain mismatches that occurred when users accessed the workspace platform via alias domains (such as `app.heycora.in`).
+
+## 1. Dynamic Origin Helper Integration
+- **Issue**: Under WordPress default behavior, localized script variables and inline dashboard parameters generated absolute URLs pointing to the primary site URL (`https://heycora.in`). When users accessed the platform using an alias domain (e.g. `app.heycora.in`), AJAX/REST requests were blocked by the browser's CORS policy, and session authentication cookies were omitted, rendering the logged-in user as unauthenticated (returning no forms and reporting total forms as `0`).
+- **Resolution**:
+  - Implemented the utility helper `cora_get_origin_relative_url( $url )` which inspects the active request host (`$_SERVER['HTTP_HOST']`) and scheme, dynamically rewriting primary URLs to match the visitor's request origin.
+  - Wrapped all localized REST/AJAX script variables, inline dashboard parameters, and fallback urls in the onboarding, login, register, reset password, guest esign document view, public portfolio gallery, and elementor reskin scripts with `cora_get_origin_relative_url()`.
+
+## 2. Release & Verification
+- **Build**: Successfully built the production-stable package version `3.0.1`.
+- **Deploy**: Deployed the update package (`cora-workspace.zip`) to both Main Production and Demo environments via SSH, clearing WordPress rewrite cache hooks.
+
+---
+
 # Forms Tenant Isolation, Security, and Data Isolation: Release v2.9.100
 
 We have successfully resolved the forms builder workspace tenant isolation issues, implemented secure dynamic tenant workspace filters for form saving/retrieval operations, resolved REST subpath redirection rules, and verified forms list rendering on the live production/demo environment.

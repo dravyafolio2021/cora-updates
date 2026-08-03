@@ -357,7 +357,7 @@
 
             $('#submit-btn').prop('disabled', true).text('Creating account...');
 
-            $.post('<?php echo admin_url( 'admin-ajax.php' ); ?>', {
+            $.post('<?php echo esc_url( cora_get_origin_relative_url( admin_url( 'admin-ajax.php' ) ) ); ?>', {
                 action: 'cora_ajax_accept_invitation',
                 name: name,
                 password: pass,

@@ -218,6 +218,18 @@ test.describe('Tier 6: New Refinements E2E Tests', () => {
   });
 
   test('6. Advanced Command Search Modal (Command Palette) Keyboard Validation', async ({ page }) => {
+    page.on('console', msg => console.log('BROWSER LOG:', msg.text()));
+    page.on('pageerror', exception => {
+      console.log(`Uncaught exception: "${exception.message}"`);
+    });
+    page.on('response', response => {
+      if (response.url().includes('admin-ajax.php')) {
+        console.log(`AJAX RESPONSE: ${response.url()} -> Status: ${response.status()}`);
+        response.text().then(text => {
+          console.log(`AJAX BODY START: ${text.substring(0, 200)}`);
+        }).catch(() => {});
+      }
+    });
     await page.goto('/workspace/settings-suite');
 
     // 1. Click sidebar search bar -> opens command palette modal
@@ -236,8 +248,9 @@ test.describe('Tier 6: New Refinements E2E Tests', () => {
     await page.fill('#cora-command-input', 'Password');
     await page.waitForTimeout(300); // Wait for debounce and REST fetch
 
-    // 5. Verify results contain Password Policy item
+    // 5. Verify results contain Password Policy item and General Settings has been filtered out
     await expect(page.locator('#cora-command-results')).toContainText('Password Policy');
+    await expect(page.locator('#cora-command-results')).not.toContainText('General Settings');
 
     // 6. Test arrow keys down navigation
     await page.keyboard.press('ArrowDown');

@@ -280,7 +280,7 @@ jQuery(document).ready(function($) {
     });
 
     window.coraCloseAllDrawers = function() {
-        $('aside[id$="-drawer"], aside[id$="-sheet"], div[id$="-drawer"], div[id$="-sheet"], div[id$="-modal"]').addClass('collapsed');
+        $('aside[id$="-drawer"], aside[id$="-sheet"], div[id$="-drawer"], div[id$="-sheet"], div[id$="-modal"]').addClass('collapsed translate-x-full');
         $('#cora-media-library-drawer, #cora-ai-tone-drawer, #cora-email-template-drawer, #cora-email-detail-drawer, #cora-smtp-test-drawer, #email-detail-drawer').addClass('translate-x-full pointer-events-none');
         const bd = document.getElementById('cora-drawer-backdrop');
         if(bd) { bd.classList.add('hidden'); bd.style.pointerEvents = 'none'; bd.style.display = ''; }
@@ -945,12 +945,12 @@ jQuery(document).ready(function($) {
         }
     };
 
-    // Toggle button opens the sidebar
+    // Toggle button opens the sidebar (Coming Soon)
     $('#cora-quick-ai-btn').on('click', function(e) {
         e.preventDefault();
-        const sidebar = $('#cora-ai-sidebar');
-        const isCollapsed = sidebar.hasClass('collapsed');
-        coraToggleSidebar(isCollapsed);
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast("Cora AI feature is coming soon!");
+        }
     });
 
     // Search bar opens the command palette modal (excluding sidebar search input container)
@@ -995,30 +995,52 @@ jQuery(document).ready(function($) {
         // Appending typing loader
         const typingId = 'typing-' + Date.now();
         chat.append(`
-            <div class="chat-bubble ai animate-pulse" id="${typingId}">
-                <span style="font-size: 11px; color: rgba(0,0,0,0.45);">Cora is thinking...</span>
+            <div class="chat-bubble ai animate-pulse p-3.5 space-y-2 rounded-xl bg-zinc-50 border border-zinc-100 dark:bg-zinc-900/60 dark:border-zinc-800" id="${typingId}">
+                <div class="flex items-center gap-1.5 mb-1 select-none">
+                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 animate-bounce" style="animation-delay: 0ms;"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 animate-bounce" style="animation-delay: 150ms;"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 animate-bounce" style="animation-delay: 300ms;"></span>
+                    <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider ml-1">Cora is thinking</span>
+                </div>
+                <div class="space-y-1.5 w-44">
+                    <div class="h-2 bg-zinc-200 dark:bg-zinc-800 rounded w-5/6"></div>
+                    <div class="h-2 bg-zinc-200 dark:bg-zinc-800 rounded w-full"></div>
+                    <div class="h-2 bg-zinc-200 dark:bg-zinc-800 rounded w-2/3"></div>
+                </div>
             </div>
         `);
         chat.scrollTop(chat[0].scrollHeight);
 
-        // Simulated AI response
-        setTimeout(function() {
-            let reply = "I've searched your workspace but couldn't find details for that request. Try: 'Draft reminder for Ananya' or 'Check Rohit'.";
-            
-            const normalizedText = text.toLowerCase();
-            if (normalizedText.includes('ananya') || normalizedText.includes('maternity') || normalizedText.includes('remind')) {
-                reply = "*WhatsApp Draft generated for Ananya Sharma:*\n\n\"Namaste Ananya! This is Cora from Delhi Office. Just reminding you of our outdoor maternity shoot scheduled for tomorrow at 4:00 PM at Lodhi Gardens. Please let us know if you need any adjustments. See you there!\"";
-            } else if (normalizedText.includes('rohit') || normalizedText.includes('listing') || normalizedText.includes('jaipur')) {
-                reply = "Booking Found: *Rohit & Sneha (Jaipur Luxury Villa Sale)*.\n\n*Status:* Editing\n*AI Action Recommendation:* Social Media caption generator ready. Let me know if you want me to write Instagram caption drafts for this shoot.";
-            } else if (normalizedText.includes('hi') || normalizedText.includes('hello')) {
-                reply = "Hello! I am Cora, your brokerage AI Assistant. I can help you draft reminders, check showing schedules, or suggest SEO keywords.";
+        // Actual AJAX call to backend
+        $.ajax({
+            url: coraREWPData.ajaxUrl,
+            method: 'POST',
+            data: {
+                action: 'cora_ai_chat',
+                security: coraREWPData.ajaxNonce,
+                message: text
+            },
+            success: function(response) {
+                $(`#${typingId}`).remove();
+                if (response.success && response.data && response.data.reply) {
+                    // Simple formatting helper
+                    let reply = response.data.reply
+                        .replace(/\n/g, '<br>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>');
+                    chat.append(`<div class="chat-bubble ai">${reply}</div>`);
+                } else {
+                    const err = (response.data && response.data.message) ? response.data.message : 'Something went wrong. Please try again.';
+                    chat.append(`<div class="chat-bubble ai error text-red-500">${err}</div>`);
+                }
+                chat.scrollTop(chat[0].scrollHeight);
+            },
+            error: function() {
+                $(`#${typingId}`).remove();
+                chat.append(`<div class="chat-bubble ai error text-red-500">Connection error. Please try again.</div>`);
+                chat.scrollTop(chat[0].scrollHeight);
             }
-
-            // Remove loader and append reply
-            $(`#${typingId}`).remove();
-            chat.append(`<div class="chat-bubble ai">${reply}</div>`);
-            chat.scrollTop(chat[0].scrollHeight);
-        }, 800);
+        });
     }
 
     // 9. Premium AI Modules Switch Toggles
@@ -1099,12 +1121,11 @@ jQuery(document).ready(function($) {
             'gemini':        'Cora AI · Gemini',
             'gpt-4o':        'Cora AI · GPT-4o'
         };
-        // Silently persist preference via AJAX (no user-facing loading state)
         $.ajax({
             url: coraREWPData.ajaxUrl,
             method: 'POST',
             data: {
-                action: 'cora_re_save_ai_keys',
+                action: 'cora_workspace_save_ai_keys',
                 security: coraREWPData.ajaxNonce,
                 provider: 'gemini',
                 api_key: '',
@@ -1133,12 +1154,12 @@ jQuery(document).ready(function($) {
             }
         }
 
-        // 3. AI Chat Sidebar Toggle shortcut: Cmd + J or Ctrl + J
+        // 3. AI Chat Sidebar Toggle shortcut: Cmd + J or Ctrl + J (Coming Soon)
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'j') {
             e.preventDefault();
-            const sidebar = $('#cora-ai-sidebar');
-            const isCollapsed = sidebar.hasClass('collapsed');
-            coraToggleSidebar(isCollapsed);
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast("Cora AI feature is coming soon!");
+            }
         }
 
         // 4. Close popover & drawers: Escape
@@ -8758,6 +8779,84 @@ jQuery(document).ready(function($) {
                 var attachment = frame.state().get('selection').first().toJSON();
                 $('#' + fieldId).val(attachment.url).trigger('change');
             });
+            frame.on('open', function() {
+                // Inject a custom floating CTA button into the modal
+                // because WP's default toolbar button gets hidden by CSS conflicts
+                setTimeout(function() {
+                    var modal = frame.$el;
+                    if (!modal || !modal.length) return;
+                    // Remove any previous injected button
+                    modal.find('.cora-media-select-btn').remove();
+
+                    var btn = $('<button type="button" class="cora-media-select-btn" disabled>Use this asset</button>');
+                    btn.css({
+                        position: 'absolute',
+                        bottom: '12px',
+                        right: '24px',
+                        zIndex: '9999999',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '36px',
+                        padding: '0 20px',
+                        background: '#09090b',
+                        color: '#ffffff',
+                        border: '1px solid #09090b',
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+                        cursor: 'pointer',
+                        transition: 'opacity 0.15s ease, background 0.15s ease',
+                        opacity: '0.4',
+                        pointerEvents: 'none',
+                        letterSpacing: '-0.01em',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+                        lineHeight: '36px'
+                    });
+
+                    // Append to the media-modal-content wrapper for absolute positioning
+                    var modalContent = modal.find('.media-modal-content');
+                    if (modalContent.length) {
+                        modalContent.css('position', 'relative');
+                        modalContent.append(btn);
+                    } else {
+                        modal.append(btn);
+                    }
+
+                    // Enable/disable based on selection state
+                    function updateBtnState() {
+                        var selection = frame.state().get('selection');
+                        if (selection && selection.length > 0) {
+                            btn.prop('disabled', false).css({ opacity: '1', pointerEvents: 'auto', cursor: 'pointer' });
+                        } else {
+                            btn.prop('disabled', true).css({ opacity: '0.4', pointerEvents: 'none', cursor: 'not-allowed' });
+                        }
+                    }
+
+                    // Listen to selection changes
+                    frame.state().get('selection').on('add remove reset', updateBtnState);
+                    updateBtnState();
+
+                    // Hover effect
+                    btn.on('mouseenter', function() {
+                        if (!btn.prop('disabled')) $(this).css('background', '#27272a');
+                    }).on('mouseleave', function() {
+                        $(this).css('background', '#09090b');
+                    });
+
+                    // Click handler: trigger the same action as the original WP select button
+                    btn.on('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        var selection = frame.state().get('selection');
+                        if (selection && selection.length > 0) {
+                            frame.trigger('select');
+                            frame.close();
+                        }
+                    });
+                }, 150);
+            });
             frame.open();
         } else {
             window.coraShowToast('Media library not available.');
@@ -9000,11 +9099,81 @@ jQuery(document).ready(function($) {
         if (typeof wp !== 'undefined' && wp.media) {
             var frame = wp.media({
                 title: 'Upload Media',
-                button: { text: 'Upload' },
+                button: { text: 'Insert Media' },
                 multiple: true
             });
             frame.on('select', function() {
                 window.location.reload();
+            });
+            frame.on('open', function() {
+                setTimeout(function() {
+                    var modal = frame.$el;
+                    if (!modal || !modal.length) return;
+                    modal.find('.cora-media-select-btn').remove();
+
+                    var btn = $('<button type="button" class="cora-media-select-btn" disabled>Insert Media</button>');
+                    btn.css({
+                        position: 'absolute',
+                        bottom: '12px',
+                        right: '24px',
+                        zIndex: '9999999',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '36px',
+                        padding: '0 20px',
+                        background: '#09090b',
+                        color: '#ffffff',
+                        border: '1px solid #09090b',
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+                        cursor: 'pointer',
+                        transition: 'opacity 0.15s ease, background 0.15s ease',
+                        opacity: '0.4',
+                        pointerEvents: 'none',
+                        letterSpacing: '-0.01em',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+                        lineHeight: '36px'
+                    });
+
+                    var modalContent = modal.find('.media-modal-content');
+                    if (modalContent.length) {
+                        modalContent.css('position', 'relative');
+                        modalContent.append(btn);
+                    } else {
+                        modal.append(btn);
+                    }
+
+                    function updateBtnState() {
+                        var selection = frame.state().get('selection');
+                        if (selection && selection.length > 0) {
+                            btn.prop('disabled', false).css({ opacity: '1', pointerEvents: 'auto', cursor: 'pointer' });
+                        } else {
+                            btn.prop('disabled', true).css({ opacity: '0.4', pointerEvents: 'none', cursor: 'not-allowed' });
+                        }
+                    }
+
+                    frame.state().get('selection').on('add remove reset', updateBtnState);
+                    updateBtnState();
+
+                    btn.on('mouseenter', function() {
+                        if (!btn.prop('disabled')) $(this).css('background', '#27272a');
+                    }).on('mouseleave', function() {
+                        $(this).css('background', '#09090b');
+                    });
+
+                    btn.on('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        var selection = frame.state().get('selection');
+                        if (selection && selection.length > 0) {
+                            frame.trigger('select');
+                            frame.close();
+                        }
+                    });
+                }, 150);
             });
             frame.open();
         } else {
@@ -11520,6 +11689,8 @@ jQuery(document).ready(function($) {
         const subtab = urlParams.get('subtab');
         if (subtab && ['kanban', 'directory', 'analytics', 'activity'].includes(subtab)) {
             window.coraSwitchLeadSubtab(subtab);
+        } else if (window.innerWidth < 768) {
+            window.coraSwitchLeadSubtab('directory');
         }
 
         // Initialize Settings Suite Accordion

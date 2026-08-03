@@ -308,9 +308,11 @@
             </div>
             
         <button type="submit" class="submit-btn" id="login-btn">Sign In</button>
+        <!--
         <div style="margin-top:16px; text-align:center; font-size:12px;">
             <a href="#" onclick="toggleAuthMode('magic', event)" style="color:var(--text-secondary);text-decoration:none;font-weight:600;">Sign in with Magic Link →</a>
         </div>
+        -->
         </form>
 
         <form id="magic-link-form" onsubmit="handleMagicLinkSubmit(event)" style="display:none;">
@@ -433,7 +435,7 @@
 
             $('#login-btn').prop('disabled', true).text('Signing in...');
 
-            $.post('<?php echo admin_url( 'admin-ajax.php' ); ?>', {
+            $.post('<?php echo esc_url( cora_get_origin_relative_url( admin_url( 'admin-ajax.php' ) ) ); ?>', {
                 action: 'cora_ajax_login',
                 email: email,
                 password: password,
@@ -463,7 +465,7 @@
 
         function coraResendVerification(email) {
             showToast('Sending verification link...');
-            $.post('<?php echo admin_url( 'admin-ajax.php' ); ?>', {
+            $.post('<?php echo esc_url( cora_get_origin_relative_url( admin_url( 'admin-ajax.php' ) ) ); ?>', {
                 action: 'cora_ajax_resend_verification',
                 email: email,
                 nonce: '<?php echo wp_create_nonce( "cora_login_nonce" ); ?>'
@@ -494,7 +496,7 @@
 
             $('#magic-btn').prop('disabled', true).text('Sending link...');
 
-            $.post('<?php echo admin_url( 'admin-ajax.php' ); ?>', {
+            $.post('<?php echo esc_url( cora_get_origin_relative_url( admin_url( 'admin-ajax.php' ) ) ); ?>', {
                 action: 'cora_request_magic_link',
                 email: email,
                 nonce: '<?php echo wp_create_nonce( "cora_login_nonce" ); ?>'

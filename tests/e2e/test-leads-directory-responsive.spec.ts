@@ -7,11 +7,21 @@ test.describe('Leads Directory UI Revamp & Responsiveness', () => {
     page.on('pageerror', exception => {
       console.log(`Uncaught exception: "${exception.message}"`);
     });
+    page.on('console', msg => console.log('BROWSER LOG:', msg.text()));
     // Set desktop resolution
     await page.setViewportSize({ width: 1280, height: 800 });
     await login(page);
     await page.goto('/workspace/leads');
     await page.waitForLoadState('networkidle');
+
+    const scripts = await page.evaluate(() => {
+      const els = Array.from(document.querySelectorAll('script'));
+      return els.map(el => el.innerHTML).filter(html => html.includes('coraSwitchDirectoryViewMode'));
+    });
+    console.log("MATCHING SCRIPTS FOUND IN DOM:", scripts.length, scripts);
+
+    const htmlContent = await page.content();
+    require('fs').writeFileSync('/Users/shrutian/.gemini/antigravity/brain/587f1814-a612-4759-bd45-72efd0915829/scratch/page_source.html', htmlContent, 'utf8');
 
     // Wait for subtab buttons to render in DOM
     const dirTabBtn = page.locator('.cora-lead-subtab-btn[data-tab="directory"]');

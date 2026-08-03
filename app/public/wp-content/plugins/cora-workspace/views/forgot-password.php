@@ -203,7 +203,7 @@
 
             $('#submit-btn').prop('disabled', true).text('Sending reset link...');
 
-            $.post('<?php echo admin_url( 'admin-ajax.php' ); ?>', {
+            $.post('<?php echo esc_url( cora_get_origin_relative_url( admin_url( 'admin-ajax.php' ) ) ); ?>', {
                 action: 'cora_ajax_forgot_password',
                 email: email,
                 nonce: '<?php echo wp_create_nonce( "cora_login_nonce" ); ?>'

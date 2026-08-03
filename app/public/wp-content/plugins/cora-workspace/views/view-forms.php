@@ -1297,10 +1297,41 @@ if ( ! defined( 'ABSPATH' ) ) {
         </button>
     </div>
 </div>
+<?php
+global $wpdb;
+$agency_id = cora_db_get_agency_id();
+$forms_db = $wpdb->get_results( $wpdb->prepare(
+    "SELECT * FROM {$wpdb->prefix}cora_forms WHERE agency_id = %d ORDER BY id DESC",
+    $agency_id
+), ARRAY_A );
+$prepopulated_forms = array();
+if ( is_array( $forms_db ) ) {
+    foreach ( $forms_db as $form ) {
+        if ( empty( $form['form_key'] ) ) {
+            $form['form_key'] = 'frm_' . substr( md5( $form['id'] . $form['title'] ), 0, 8 );
+            $wpdb->update( $wpdb->prefix . 'cora_forms', array( 'form_key' => $form['form_key'] ), array( 'id' => $form['id'] ) );
+        }
+        $form['styling'] = json_decode( $form['styling'], true ) ?: array();
+        $form['settings'] = json_decode( $form['settings'], true ) ?: array();
+        
+        // Fetch blocks
+        $blocks_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_form_blocks WHERE form_id = %d", $form['id'] ), ARRAY_A );
+        $form['blocks'] = $blocks_row ? (json_decode( $blocks_row['blocks_json'], true ) ?: array()) : array();
+        $form['logic'] = $blocks_row ? (json_decode( $blocks_row['logic_json'], true ) ?: array()) : array();
+        
+        // Get response count
+        $resp_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_submissions WHERE form_id = %d", $form['id'] ) );
+        $form['submission_count'] = intval( $resp_count );
+        
+        $prepopulated_forms[] = $form;
+    }
+}
+?>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    let formsData = [];
+    let formsData = <?php echo json_encode( $prepopulated_forms ); ?>;
+    let initialLoad = true;
     let currentEditingForm = null;
     let selectedBlockIndex = null;
     let autoSaveTimer = null;
@@ -1735,9 +1766,17 @@ function coraCopyFallback(text) {
     }
 
 function fetchForms() {
+        if (initialLoad && formsData && formsData.length > 0) {
+            initialLoad = false;
+            renderFormsList();
+            updateMetrics();
+            return;
+        }
+        initialLoad = false;
         jQuery.ajax({
             url: getCoraRestUrl('cora/v1/forms'),
             method: 'GET',
+            cache: false,
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-WP-Nonce', wpNonce);
             },
@@ -2654,13 +2693,6 @@ function renderFormsList() {
 
     window.addEventListener('hashchange', handleRouting);
     handleRouting(); // Process initial hash on page load
-    
-    // Initial fetch
-    if (window.location.hash === '' || window.location.hash === '#list') {
-        fetchForms();
-    } else {
-        fetchForms(); // fetch forms anyway to populate list when going back
-    }
 
     // --- New Builder Code ---
     function switchEditorView(view) {
@@ -2910,6 +2942,7 @@ function renderFormsList() {
         jQuery.ajax({
             url: getCoraRestUrl(`cora/v1/forms/${id}`),
             method: 'GET',
+            cache: false,
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-WP-Nonce', wpNonce);
             },

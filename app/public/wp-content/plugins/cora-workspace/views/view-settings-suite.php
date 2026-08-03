@@ -1295,6 +1295,8 @@ $cora_settings_tabs = array(
                         <input type="text" disabled placeholder="e.g. 1093847291039" class="bg-zinc-50 dark:bg-zinc-900 text-zinc-300 dark:text-zinc-700 cursor-not-allowed border-zinc-200 dark:border-zinc-800 placeholder:text-zinc-300 dark:placeholder:text-zinc-700">
                     </div>
                 </div> <!-- close Grid 2 -->
+
+
                 </div> <!-- close cora-shopify-card-body -->
             </div> <!-- close cora-shopify-card -->
         </div> <!-- close cora-settings-panel-brand -->

@@ -10,9 +10,9 @@ test('verify clean non-technical prospect detail workspace drawer', async ({ pag
     await page.waitForLoadState('networkidle');
 
     // Wait for Kanban board to load
-    const reviewBtn = page.locator('.cora-lead-card button:has-text("Review")').first();
-    await expect(reviewBtn).toBeVisible({ timeout: 10000 });
-    await reviewBtn.click();
+    const leadCard = page.locator('.cora-lead-card').first();
+    await expect(leadCard).toBeVisible({ timeout: 10000 });
+    await leadCard.click();
     await page.waitForTimeout(400);
 
     const drawer = page.locator('#cora-lead-detail-drawer');

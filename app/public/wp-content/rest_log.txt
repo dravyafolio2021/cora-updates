@@ -1,0 +1,97 @@
+--- REST REQUEST TO GET FORMS ---
+Time: 2026-08-03 05:34:40
+User ID from get_current_user_id(): 25
+User Agency: studio
+Agency ID resolved: 2
+Cookies: Array
+(
+    [wordpress_test_cookie] => WP Cookie check
+    [cora_active_workspace_slug] => default
+    [cora_workspace_industry] => photography_studio
+    [wordpress_logged_in_a8d6c1a807ecdd90c0e8cabba5d7777f] => studio_owner|1786944691|syQj81wHE3eF3QLpcyryPvBoQBXZ4HRlu0YlVezDvL0|6525f7ca64181c113bdc54c18c3b52cd43bdce90142ace56a235757902d05263
+)
+
+Headers: Array
+(
+    [cookie] => Array
+        (
+            [0] => wordpress_test_cookie=WP%20Cookie%20check; cora_active_workspace_slug=default; cora_workspace_industry=photography_studio; wordpress_logged_in_a8d6c1a807ecdd90c0e8cabba5d7777f=studio_owner%7C1786944691%7CsyQj81wHE3eF3QLpcyryPvBoQBXZ4HRlu0YlVezDvL0%7C6525f7ca64181c113bdc54c18c3b52cd43bdce90142ace56a235757902d05263
+        )
+
+    [accept_language] => Array
+        (
+            [0] => en-US,en;q=0.9,hy;q=0.8,gu;q=0.7,hi;q=0.6,pt;q=0.5
+        )
+
+    [accept_encoding] => Array
+        (
+            [0] => gzip, deflate
+        )
+
+    [referer] => Array
+        (
+            [0] => http://cora.local/default/forms
+        )
+
+    [accept] => Array
+        (
+            [0] => */*
+        )
+
+    [user_agent] => Array
+        (
+            [0] => Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+        )
+
+    [x_requested_with] => Array
+        (
+            [0] => XMLHttpRequest
+        )
+
+    [x_wp_nonce] => Array
+        (
+            [0] => 33bc2975e9
+        )
+
+    [connection] => Array
+        (
+            [0] => close
+        )
+
+    [x_forwarded_proto] => Array
+        (
+            [0] => http
+        )
+
+    [x_forwarded_host] => Array
+        (
+            [0] => cora.local
+        )
+
+    [x_forwarded_for] => Array
+        (
+            [0] => ::1
+        )
+
+    [x_real_ip] => Array
+        (
+            [0] => ::1
+        )
+
+    [host] => Array
+        (
+            [0] => cora.local
+        )
+
+    [content_length] => Array
+        (
+            [0] => 
+        )
+
+    [content_type] => Array
+        (
+            [0] => 
+        )
+
+)
+

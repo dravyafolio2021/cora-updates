@@ -124,6 +124,7 @@ foreach ($accounts as $acc) {
     update_user_meta($user_id, 'cora_preferred_industry', $acc['industry']);
     update_user_meta($user_id, 'cora_email_verified', 1);
     update_user_meta($user_id, 'cora_user_status', 'active');
+    update_user_meta($user_id, 'cora_onboarding_completed', '1');
 }
 
 echo "✅ Local accounts provisioning complete!\n";
