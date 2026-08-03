@@ -3765,11 +3765,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             <style>
                 /* Scoped Feedback trigger styles */
                 #cora-feedback-trigger {
-                    background-color: #18181b !important;
+                    background-color: #25d366 !important;
                     color: #ffffff !important;
-                    border: 1px solid #27272a !important;
+                    border: 1px solid #128c7e !important;
                     font-weight: 700 !important;
-                    box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+                    box-shadow: 0 1px 3px rgba(37, 211, 102, 0.2), 0 1px 2px rgba(0,0,0,0.05) !important;
                     display: inline-flex !important;
                     align-items: center !important;
                     justify-content: center !important;
@@ -3779,19 +3779,19 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     transition: all 0.2s ease-in-out !important;
                 }
                 #cora-feedback-trigger:hover {
-                    background-color: #27272a !important;
-                    border-color: #3f3f3f !important;
+                    background-color: #128c7e !important;
+                    border-color: #075e54 !important;
                 }
                 
                 /* Dark Theme overrides for the button */
                 .cora-dark-theme #cora-feedback-trigger {
-                    background-color: #f4f4f5 !important;
-                    color: #09090b !important;
-                    border-color: #e4e4e7 !important;
+                    background-color: #25d366 !important;
+                    color: #ffffff !important;
+                    border-color: #128c7e !important;
                 }
                 .cora-dark-theme #cora-feedback-trigger:hover {
-                    background-color: #e4e4e7 !important;
-                    border-color: #d4d4d8 !important;
+                    background-color: #128c7e !important;
+                    border-color: #075e54 !important;
                 }
                 
                 /* Collapsed Sidebar overrides */
@@ -3801,7 +3801,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     transform: translate(-50%, -50%) !important;
                 }
                 .cora-sidebar.collapsed-sidebar .cora-feedback-btn-text,
-                .cora-sidebar.collapsed-sidebar .cora-pulse-green {
+                .cora-sidebar.collapsed-sidebar .cora-pulse-white {
                     display: none !important;
                 }
                 .cora-sidebar.collapsed-sidebar #cora-feedback-trigger {
@@ -3827,11 +3827,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             <div class="cora-user-footer px-4 py-3 flex items-center justify-between border-t border-zinc-200/50 dark:border-zinc-800/40 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/30 transition-colors duration-200 cursor-pointer relative z-[60]" onclick="event.stopPropagation(); $('#cora-profile-popover').toggleClass('hidden'); $('#cora-sidebar-notif-popover').addClass('hidden'); $('#cora-workspace-popover').addClass('hidden');">
                 <!-- Dynamic Feedback Pill (Sticky Arc) inside profile footer -->
                 <button type="button" id="cora-feedback-trigger" class="absolute -top-2.5 right-14 h-5 px-2 flex items-center justify-center gap-1.5 text-[9px] font-bold shadow-2xs hover:scale-[1.02] active:scale-[0.98] cursor-pointer z-[65]" onclick="window.coraOpenFeedbackDrawer(event)">
-                    <span class="cora-pulse-green flex h-1.5 w-1.5 relative shrink-0">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                    <span class="cora-pulse-white flex h-1.5 w-1.5 relative shrink-0">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
                     </span>
-                    <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" class="shrink-0">
+                    <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" class="shrink-0 text-white">
                         <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.5-5.739-1.453L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.97C16.63 2.052 14.155.988 11.99 1.002c-5.43 0-9.855 4.37-9.86 9.8.001 2.012.528 3.979 1.529 5.71l-.337 1.232 1.265-.331 1.06.64zm11.086-7.553c-.3-.15-1.771-.875-2.046-.975-.275-.1-.475-.15-.675.15-.2.3-.775.975-.95 1.175-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.413-1.488-.892-.796-1.493-1.78-1.668-2.08-.175-.3-.018-.462.13-.61.135-.133.3-.313.45-.47.15-.157.2-.27.3-.45.1-.18.05-.338-.025-.488-.075-.15-.675-1.625-.925-2.225-.244-.588-.492-.51-.675-.52-.172-.007-.372-.007-.572-.007-.2 0-.525.075-.8.375-.275.3-1.05 1.025-1.05 2.5s1.075 2.9 1.225 3.1c.15.2 2.11 3.225 5.11 4.525.714.31 1.272.496 1.702.633.715.227 1.365.195 1.88.12.574-.085 1.771-.725 2.021-1.425.25-.7.25-1.3.175-1.425-.075-.125-.275-.2-.575-.35z"/>
                     </svg>
                     <span class="cora-feedback-btn-text">Feedback</span>
@@ -11735,128 +11735,140 @@ if ( cora_is_super_owner() ) :
 })();
 </script>
 
-<!-- Dynamic Feedback Drawer Sheet -->
-<aside id="cora-feedback-drawer" class="cora-feedback-drawer collapsed fixed inset-y-0 right-0 z-[9995] w-full sm:w-[440px] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
-    <!-- Header -->
-    <div class="px-6 py-4 border-b border-zinc-200 flex justify-between items-center bg-zinc-50 shrink-0">
-        <div>
-            <h2 class="text-sm font-bold text-zinc-900">Submit Feedback &amp; Report</h2>
-            <p class="text-[11px] text-zinc-500 mt-0.5">Help us improve by sharing what's on your mind.</p>
+<!-- Dynamic Feedback Modal Pop-up -->
+<div id="cora-feedback-drawer" onclick="window.coraCloseFeedbackDrawer(event)" class="cora-feedback-drawer collapsed fixed inset-0 z-[9995] flex items-center justify-center p-4 bg-zinc-950/40 dark:bg-black/60 backdrop-blur-[2px] transition-all duration-200">
+    <div class="cora-feedback-modal-card w-full max-w-[460px] bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col rounded-2xl overflow-hidden transition-all duration-250 transform scale-95 opacity-0" onclick="event.stopPropagation()">
+        <!-- Header -->
+        <div class="px-5 py-4 border-b border-zinc-200 dark:border-zinc-800 flex justify-between items-center bg-zinc-50/50 dark:bg-zinc-900/50 shrink-0">
+            <div>
+                <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-50">Submit Feedback &amp; Report</h2>
+                <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">Help us improve by sharing what's on your mind.</p>
+            </div>
+            <button onclick="window.coraCloseFeedbackDrawer(event)" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 cursor-pointer p-1.5 rounded-lg hover:bg-zinc-200/50 dark:hover:bg-zinc-800 transition-colors border-none bg-transparent flex items-center justify-center">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
         </div>
-        <button onclick="window.coraCloseFeedbackDrawer(event)" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 rounded-lg hover:bg-zinc-150 transition-colors border-none bg-transparent flex items-center justify-center">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
-    </div>
 
-    <!-- Content -->
-    <div class="flex-1 overflow-y-auto p-6 space-y-5">
-        <!-- Current Screen info -->
-        <div class="space-y-1.5">
-            <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Current Screen</label>
-            <div class="flex items-center gap-2 px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl select-none">
-                <span id="cora-feedback-screen-badge" class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
-                <span id="cora-feedback-screen-name" class="text-xs font-bold text-zinc-800">Dashboard</span>
-                <span id="cora-feedback-screen-id" class="text-[10px] text-zinc-400 font-mono font-medium">(dashboard)</span>
+        <!-- Content -->
+        <div class="flex-1 overflow-y-auto p-5 space-y-4">
+            <!-- Current Screen info -->
+            <div class="space-y-1.5">
+                <label class="block text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Current Screen</label>
+                <div class="flex items-center gap-2 px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl select-none">
+                    <span id="cora-feedback-screen-badge" class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                    <span id="cora-feedback-screen-name" class="text-xs font-bold text-zinc-800 dark:text-zinc-200">Dashboard</span>
+                    <span id="cora-feedback-screen-id" class="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono font-medium">(dashboard)</span>
+                </div>
+            </div>
+
+            <!-- Issue Category -->
+            <div class="space-y-1.5">
+                <label for="cora-feedback-type" class="block text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Type of Issue</label>
+                <select id="cora-feedback-type" class="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-semibold rounded-xl px-3 py-2 outline-none cursor-pointer focus:border-zinc-900 dark:focus:border-zinc-100 transition-colors shadow-3xs">
+                    <option value="feature_broken" selected>Feature not working properly</option>
+                    <option value="tab_inaccessible">Tab / Screen not accessible</option>
+                    <option value="typo_error">Typo / text error</option>
+                    <option value="unexpected_behavior">Behavior is not as expected</option>
+                    <option value="performance_issue">Page loads slowly / laggy</option>
+                    <option value="suggestion">General suggestion / feedback</option>
+                </select>
+            </div>
+
+            <!-- Description -->
+            <div class="space-y-1.5">
+                <label for="cora-feedback-desc" class="block text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Feedback &amp; Description</label>
+                <textarea id="cora-feedback-desc" rows="5" class="w-full bg-white dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-medium rounded-xl px-3 py-2 outline-none resize-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-colors shadow-3xs placeholder-zinc-400" placeholder="Please tell us what is not working, what was expected, or share your general suggestions..."></textarea>
             </div>
         </div>
 
-        <!-- Issue Category -->
-        <div class="space-y-1.5">
-            <label for="cora-feedback-type" class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Type of Issue</label>
-            <select id="cora-feedback-type" class="w-full bg-white border border-zinc-200 text-zinc-800 text-xs font-semibold rounded-xl px-3.5 py-2.5 outline-none cursor-pointer focus:border-zinc-900 transition-colors shadow-3xs">
-                <option value="feature_broken" selected>Feature not working properly</option>
-                <option value="tab_inaccessible">Tab / Screen not accessible</option>
-                <option value="typo_error">Typo / text error</option>
-                <option value="unexpected_behavior">Behavior is not as expected</option>
-                <option value="performance_issue">Page loads slowly / laggy</option>
-                <option value="suggestion">General suggestion / feedback</option>
-            </select>
-        </div>
-
-        <!-- Description -->
-        <div class="space-y-1.5">
-            <label for="cora-feedback-desc" class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Feedback &amp; Description</label>
-            <textarea id="cora-feedback-desc" rows="6" class="w-full bg-white border border-zinc-200 text-zinc-800 text-xs font-medium rounded-xl px-3.5 py-2.5 outline-none resize-none focus:border-zinc-900 transition-colors shadow-3xs placeholder-zinc-400" placeholder="Please tell us what is not working, what was expected, or share your general suggestions..."></textarea>
+        <!-- Actions CTA -->
+        <div class="p-5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 shrink-0 space-y-2">
+            <button type="button" onclick="window.coraSendFeedback('whatsapp')" class="w-full py-2 bg-zinc-950 hover:bg-zinc-900 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-bold rounded-xl transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 shadow-sm border-none">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                </svg>
+                Share on WhatsApp
+            </button>
+            <button type="button" onclick="window.coraSendFeedback('email')" class="w-full py-2 bg-white hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-800 text-xs font-bold rounded-xl transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 shadow-3xs">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                Share on Email
+            </button>
         </div>
     </div>
-
-    <!-- Actions CTA -->
-    <div class="p-6 border-t border-zinc-200 bg-zinc-50 shrink-0 space-y-2.5">
-        <button type="button" onclick="window.coraSendFeedback('whatsapp')" class="w-full py-2.5 bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold rounded-xl transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 shadow-sm border-none">
-            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
-                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-            </svg>
-            Share on WhatsApp
-        </button>
-        <button type="button" onclick="window.coraSendFeedback('email')" class="w-full py-2.5 bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 text-xs font-bold rounded-xl transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 shadow-3xs">
-            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                <polyline points="22,6 12,13 2,6"></polyline>
-            </svg>
-            Share on Email
-        </button>
-    </div>
-</aside>
+</div>
 
 <style>
-    /* Drawer basic positioning overrides */
+    /* Modal basic layout and animations */
     .cora-feedback-drawer {
-        transform: translateX(0);
+        transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+        opacity: 0;
+        visibility: hidden;
     }
     .cora-feedback-drawer.collapsed {
-        transform: translateX(100%) !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+    .cora-feedback-drawer:not(.collapsed) {
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+    .cora-feedback-drawer:not(.collapsed) .cora-feedback-modal-card {
+        transform: scale(1) !important;
+        opacity: 1 !important;
     }
     
-    /* Dark Theme Support */
-    .cora-dark-theme .cora-feedback-drawer {
+    /* Dark Theme Support for Modal */
+    .cora-dark-theme .cora-feedback-modal-card {
         background-color: #09090b !important;
         border-color: #27272a !important;
         color: #f4f4f5 !important;
     }
-    .cora-dark-theme .cora-feedback-drawer div.bg-zinc-50 {
-        background-color: #18181b !important;
-    }
-    .cora-dark-theme .cora-feedback-drawer select,
-    .cora-dark-theme .cora-feedback-drawer textarea {
+    .cora-dark-theme .cora-feedback-modal-card select,
+    .cora-dark-theme .cora-feedback-modal-card textarea {
         background-color: #09090b !important;
         border-color: #27272a !important;
-        color: #e4e4e7 !important;
+        color: #f4f4f5 !important;
     }
-    .cora-dark-theme .cora-feedback-drawer select:focus,
-    .cora-dark-theme .cora-feedback-drawer textarea:focus {
+    .cora-dark-theme .cora-feedback-modal-card select:focus,
+    .cora-dark-theme .cora-feedback-modal-card textarea:focus {
         border-color: #e4e4e7 !important;
     }
-    .cora-dark-theme .cora-feedback-drawer .bg-zinc-50,
-    .cora-dark-theme .cora-feedback-drawer .px-3.5.py-2.5.bg-zinc-50 {
+    .cora-dark-theme .cora-feedback-modal-card .bg-zinc-50,
+    .cora-dark-theme .cora-feedback-modal-card .px-3.py-2.bg-zinc-50 {
         background-color: #18181b !important;
         border-color: #27272a !important;
     }
-    .cora-dark-theme .cora-feedback-drawer .border-b,
-    .cora-dark-theme .cora-feedback-drawer .border-t {
+    .cora-dark-theme .cora-feedback-modal-card .border-b,
+    .cora-dark-theme .cora-feedback-modal-card .border-t {
         border-color: #27272a !important;
     }
-    .cora-dark-theme .cora-feedback-drawer h2 {
+    .cora-dark-theme .cora-feedback-modal-card h2 {
         color: #ffffff !important;
     }
-    .cora-dark-theme .cora-feedback-drawer label {
+    .cora-dark-theme .cora-feedback-modal-card label {
         color: #71717a !important;
     }
     .cora-dark-theme #cora-feedback-screen-name {
         color: #e4e4e7 !important;
     }
-    .cora-dark-theme .cora-feedback-drawer button.bg-white {
+    .cora-dark-theme .cora-feedback-modal-card button.bg-white {
         background-color: #18181b !important;
         border-color: #27272a !important;
         color: #e4e4e7 !important;
     }
-    .cora-dark-theme .cora-feedback-drawer button.bg-white:hover {
+    .cora-dark-theme .cora-feedback-modal-card button.bg-white:hover {
         background-color: #27272a !important;
     }
-    .cora-dark-theme .cora-feedback-drawer button.bg-zinc-950 {
+    .cora-dark-theme .cora-feedback-modal-card button.bg-zinc-950 {
         background-color: #ffffff !important;
         color: #09090b !important;
     }
-    .cora-dark-theme .cora-feedback-drawer button.bg-zinc-950:hover {
+    .cora-dark-theme .cora-feedback-modal-card button.bg-zinc-950:hover {
         background-color: #e4e4e7 !important;
     }
 </style>
