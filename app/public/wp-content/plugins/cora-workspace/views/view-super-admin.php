@@ -425,9 +425,9 @@ jQuery(document).ready(function($) {
                 : '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 select-none">Suspended</span>';
 
             const pendingAppeal = rawAppeals.find(a => a.status === 'pending' && (
-                (ws.owner_email && a.email.toLowerCase() === ws.owner_email.toLowerCase()) ||
-                (ws.name && a.workspace_name.toLowerCase() === ws.name.toLowerCase()) ||
-                (ws.slug && a.workspace_name.toLowerCase() === ws.slug.toLowerCase())
+                (ws.owner_email && a.email && a.email.toLowerCase() === ws.owner_email.toLowerCase()) ||
+                (ws.name && a.workspace_name && a.workspace_name.toLowerCase() === ws.name.toLowerCase()) ||
+                (ws.slug && a.workspace_name && a.workspace_name.toLowerCase() === ws.slug.toLowerCase())
             ));
 
             if (ws.status === 'suspended' && pendingAppeal) {
@@ -686,12 +686,6 @@ jQuery(document).ready(function($) {
         }).fail(function() {
             if (window.coraShowToast) {
                 window.coraShowToast('Network error while changing workspace plan.', 'error');
-            }
-            renderWorkspaces();
-        });
-    }
-            if (window.coraShowToast) {
-                window.coraShowToast('Network error while changing plan.', 'error');
             }
             renderWorkspaces();
         });
