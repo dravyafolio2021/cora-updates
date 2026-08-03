@@ -3,7 +3,7 @@
  * Plugin Name: Cora for Real Estate
  * Plugin URI: https://cora.ai
  * Description: A clean, minimal Notion-style workspace dashboard for real estate agencies in India and globally. Empowered with AI workflows, booking management, and photo helpers.
- * Version: 1.6.2
+ * Version: 1.6.3
  * Author: Cora AI Team
  * Author URI: https://cora.ai
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_REAL_ESTATE_AI_VERSION', '1.6.2' );
+define( 'CORA_REAL_ESTATE_AI_VERSION', '1.6.3' );
 define( 'CORA_REAL_ESTATE_AI_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_REAL_ESTATE_AI_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );

@@ -11497,8 +11497,8 @@ if ( cora_is_super_owner() ) :
             <div>
                 <label class="block text-[10.5px] font-bold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">Industry Profile</label>
                 <select id="cora-edit-ws-industry" class="w-full h-10 px-2.5 bg-zinc-50 border border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-900 dark:focus:border-white transition-colors">
-                    <option value="real_estate">🏡 Real Estate Agency</option>
-                    <option value="photography_studio">📸 Photography Studio</option>
+                    <option value="real_estate">Real Estate Agency</option>
+                    <option value="photography_studio">Photography Studio</option>
                 </select>
             </div>
 

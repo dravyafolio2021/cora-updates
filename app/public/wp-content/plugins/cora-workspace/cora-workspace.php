@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.1.0
+ * Version: 3.1.3
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.1.0' );
+define( 'CORA_WORKSPACE_VERSION', '3.1.3' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -123,6 +123,25 @@ function cora_workspace_admin_init_redirect() {
 }
 }
 add_action( 'admin_init', 'cora_workspace_admin_init_redirect', 1 );
+
+/**
+ * Intercept AJAX/REST calls for suspended workspaces.
+ */
+if ( ! function_exists( 'cora_check_ajax_agency_suspension' ) ) {
+function cora_check_ajax_agency_suspension() {
+    if ( ( ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) && is_user_logged_in() ) {
+        if ( ! cora_is_super_owner() ) {
+            $action = isset( $_REQUEST['action'] ) ? sanitize_text_field( $_REQUEST['action'] ) : '';
+            $allowed = array( 'cora_login_user', 'cora_super_switch_back', 'cora_switch_industry_mode', 'cora_submit_suspension_appeal' );
+            if ( ! in_array( $action, $allowed, true ) && cora_is_agency_suspended() ) {
+                wp_send_json_error( array( 'message' => 'Your workspace account has been suspended by the platform administrator. Please contact support.' ) );
+                exit;
+            }
+        }
+    }
+}
+}
+add_action( 'admin_init', 'cora_check_ajax_agency_suspension' );
 
 /**
  * Render the dashboard page fallback (in case admin_init is bypassed)
@@ -566,6 +585,124 @@ function cora_get_origin_relative_url( $url ) {
         $new_url .= '#' . $parsed_url['fragment'];
     }
     return $new_url;
+}
+}
+
+/**
+ * Helper to check if the current user's workspace is suspended.
+ */
+if ( ! function_exists( 'cora_is_agency_suspended' ) ) {
+function cora_is_agency_suspended( $user_id = 0 ) {
+    if ( ! $user_id ) {
+        $user_id = get_current_user_id();
+    }
+    if ( ! $user_id ) return false;
+
+    $user = get_userdata( $user_id );
+    if ( ! $user ) return false;
+
+    // Super Admin / Shruti is NEVER suspended
+    if ( cora_is_super_owner( $user ) ) {
+        return false;
+    }
+
+    global $wpdb;
+    $agencies_table = $wpdb->prefix . 'cora_agencies';
+
+    // 1. Check if user is owner of a suspended workspace in DB
+    if ( cora_table_exists( $agencies_table ) ) {
+        $status = $wpdb->get_var( $wpdb->prepare( "SELECT status FROM {$agencies_table} WHERE owner_user_id = %d", $user_id ) );
+        if ( $status === 'suspended' ) {
+            return true;
+        }
+    }
+
+    // 2. Check user's assigned agency_id
+    $agency_id = get_user_meta( $user_id, 'cora_agency_id', true );
+    if ( ! empty( $agency_id ) && $agency_id !== 'super' ) {
+        if ( cora_table_exists( $agencies_table ) ) {
+            $status = $wpdb->get_var( $wpdb->prepare( "SELECT status FROM {$agencies_table} WHERE slug = %s OR id = %d", $agency_id, intval( $agency_id ) ) );
+            if ( $status === 'suspended' ) {
+                return true;
+            }
+        }
+        $agencies = get_option( 'cora_agencies', array() );
+        if ( is_array( $agencies ) ) {
+            foreach ( $agencies as $ag ) {
+                if ( ( isset( $ag['slug'] ) && $ag['slug'] === $agency_id ) || ( isset( $ag['id'] ) && (string)$ag['id'] === (string)$agency_id ) ) {
+                    if ( isset( $ag['status'] ) && $ag['status'] === 'suspended' ) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+
+    // 3. Check direct user meta status
+    $meta_status = get_user_meta( $user_id, 'cora_workspace_status', true ) ?: get_user_meta( $user_id, 'cora_agency_status', true );
+    if ( $meta_status === 'suspended' ) {
+        return true;
+    }
+
+    return false;
+}
+}
+
+/**
+ * Helper to get active workspace plan.
+ */
+if ( ! function_exists( 'cora_get_active_workspace_plan' ) ) {
+function cora_get_active_workspace_plan( $user_id = 0 ) {
+    if ( ! $user_id ) {
+        $user_id = get_current_user_id();
+    }
+    if ( ! $user_id ) return 'starter';
+
+    $user = get_userdata( $user_id );
+    if ( $user && cora_is_super_owner( $user ) ) {
+        return 'enterprise';
+    }
+
+    $context = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : null;
+    if ( $context && ! empty( $context['plan'] ) ) {
+        return strtolower( $context['plan'] );
+    }
+
+    $agency_id = get_user_meta( $user_id, 'cora_agency_id', true );
+    if ( ! empty( $agency_id ) ) {
+        global $wpdb;
+        $agencies_table = $wpdb->prefix . 'cora_agencies';
+        if ( cora_table_exists( $agencies_table ) ) {
+            $plan = $wpdb->get_var( $wpdb->prepare( "SELECT plan FROM {$agencies_table} WHERE slug = %s OR id = %d OR owner_user_id = %d", $agency_id, intval( $agency_id ), $user_id ) );
+            if ( $plan ) return strtolower( $plan );
+        }
+    }
+
+    $user_plan = get_user_meta( $user_id, 'cora_workspace_plan', true ) ?: get_user_meta( $user_id, 'cora_agency_plan', true );
+    if ( $user_plan ) return strtolower( $user_plan );
+
+    return 'starter';
+}
+}
+
+/**
+ * Check if active workspace plan satisfies required tier level.
+ */
+if ( ! function_exists( 'cora_workspace_has_plan_access' ) ) {
+function cora_workspace_has_plan_access( $required_plan = 'starter', $user_id = 0 ) {
+    $plan = cora_get_active_workspace_plan( $user_id );
+
+    $levels = array(
+        'starter'    => 1,
+        'pro'        => 2,
+        'enterprise' => 3,
+        'beta'       => 3,
+    );
+
+    $current_level  = isset( $levels[$plan] ) ? $levels[$plan] : 1;
+    $required_level = isset( $levels[$required_plan] ) ? $levels[$required_plan] : 1;
+
+    return $current_level >= $required_level;
 }
 }
 
@@ -1083,14 +1220,10 @@ function cora_real_estate_ai_handle_workspace_route() {
         }
 
         // Agency suspension check (Spec Section 3.4)
-        $agency_id = get_user_meta( $user->ID, 'cora_agency_id', true );
-        if ( ! empty( $agency_id ) && $agency_id !== 'super' ) {
-            $agencies = get_option( 'cora_agencies', array() );
-            if ( isset( $agencies[$agency_id] ) && $agencies[$agency_id]['status'] === 'suspended' ) {
-                wp_logout();
-                wp_redirect( home_url( '/workspace/login?suspended=1' ) );
-                exit;
-            }
+        if ( is_user_logged_in() && cora_is_agency_suspended( $user->ID ) ) {
+            wp_logout();
+            wp_redirect( home_url( '/workspace/login?suspended=1' ) );
+            exit;
         }
 
         $allowed_roles = array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor', 'cora_viewer' );
@@ -27432,48 +27565,253 @@ function cora_ajax_super_update_workspace() {
 
     if ( $owner_id ) {
         update_user_meta( $owner_id, 'cora_workspace_industry', $industry );
+        update_user_meta( $owner_id, 'cora_workspace_status', $status );
+        update_user_meta( $owner_id, 'cora_agency_status', $status );
+        update_user_meta( $owner_id, 'cora_workspace_plan', $plan );
+        update_user_meta( $owner_id, 'cora_agency_plan', $plan );
+        update_user_meta( $owner_id, 'cora_agency_id', $slug );
     }
 
-    // Sync to options array cora_agencies
-    $agencies = get_option( 'cora_agencies', array() );
-    
-    $key = 'agency_' . $workspace_id;
-    if ( ! isset( $agencies[$key] ) ) {
-        foreach ( $agencies as $k => $agency_data ) {
-            if ( isset( $agency_data['id'] ) && ( intval( $agency_data['id'] ) === $workspace_id || $agency_data['id'] === $key ) ) {
-                $key = $k;
-                break;
-            }
-        }
-    }
-
-    if ( ! isset( $agencies[$key] ) ) {
-        $agencies[$key] = array(
-            'id' => $key,
-            'created_at' => $workspace['created_at']
+    // Update cora_users table status if exists
+    $cora_users_table = $wpdb->prefix . 'cora_users';
+    if ( cora_table_exists( $cora_users_table ) ) {
+        $wpdb->update(
+            $cora_users_table,
+            array( 'status' => $status ),
+            array( 'agency_id' => $workspace_id ),
+            array( '%s' ),
+            array( '%d' )
         );
     }
 
-    $agencies[$key]['id'] = $workspace_id;
-    $agencies[$key]['name'] = $name;
-    $agencies[$key]['slug'] = $slug;
-    $agencies[$key]['subdomain'] = $slug;
-    $agencies[$key]['status'] = $status;
-    $agencies[$key]['plan'] = $plan;
-    $agencies[$key]['industry'] = $industry;
-    $agencies[$key]['owner_user_id'] = $owner_id;
+    // Sync to options array cora_agencies under all lookup keys
+    $agencies = get_option( 'cora_agencies', array() );
+    if ( ! is_array( $agencies ) ) {
+        $agencies = array();
+    }
+
+    $agency_entry = array(
+        'id'            => $workspace_id,
+        'name'          => $name,
+        'slug'          => $slug,
+        'subdomain'     => $slug,
+        'status'        => $status,
+        'plan'          => $plan,
+        'industry'      => $industry,
+        'owner_user_id' => $owner_id,
+        'updated_at'    => current_time( 'mysql' )
+    );
+
+    $agencies[$workspace_id]             = $agency_entry;
+    $agencies['agency_' . $workspace_id] = $agency_entry;
+    $agencies[$slug]                     = $agency_entry;
 
     update_option( 'cora_agencies', $agencies );
 
-    cora_log_activity( 'Platform Management', "Workspace ID {$workspace_id} ({$name}) updated: industry={$industry}, plan={$plan}, status={$status}" );
+    cora_log_activity( 'Platform Management', "Workspace ID {$workspace_id} ({$name}) updated: status={$status}, plan={$plan}, industry={$industry}" );
 
     wp_send_json_success( array(
-        'message' => 'Workspace updated successfully.',
+        'message'  => "Workspace '{$name}' updated successfully: Status: " . ucfirst( $status ) . ", Plan: " . ucfirst( $plan ) . ".",
+        'status'   => $status,
+        'plan'     => $plan,
         'industry' => $industry
     ) );
 }
 }
 add_action( 'wp_ajax_cora_super_update_workspace', 'cora_ajax_super_update_workspace' );
+
+/**
+ * AJAX Callback: Submit suspension reactivation appeal (Public & Logged In).
+ */
+if ( ! function_exists( 'cora_ajax_submit_suspension_appeal' ) ) {
+function cora_ajax_submit_suspension_appeal() {
+    $email          = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
+    $workspace_name = isset( $_POST['workspace_name'] ) ? sanitize_text_field( $_POST['workspace_name'] ) : '';
+    $reason         = isset( $_POST['reason'] ) ? sanitize_textarea_field( $_POST['reason'] ) : '';
+    $phone          = isset( $_POST['phone'] ) ? sanitize_text_field( $_POST['phone'] ) : '';
+
+    if ( empty( $email ) || ! is_email( $email ) ) {
+        wp_send_json_error( array( 'message' => 'Please provide a valid account email address.' ) );
+    }
+
+    if ( empty( $reason ) ) {
+        wp_send_json_error( array( 'message' => 'Please provide a reason for your reactivation appeal.' ) );
+    }
+
+    $appeals = get_option( 'cora_suspension_appeals', array() );
+    if ( ! is_array( $appeals ) ) {
+        $appeals = array();
+    }
+
+    $appeal_id = 'appeal_' . uniqid() . '_' . time();
+    $new_appeal = array(
+        'id'             => $appeal_id,
+        'email'          => $email,
+        'workspace_name' => $workspace_name,
+        'reason'         => $reason,
+        'phone'          => $phone,
+        'status'         => 'pending',
+        'created_at'     => current_time( 'mysql' ),
+        'user_ip'        => isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field($_SERVER['REMOTE_ADDR']) : ''
+    );
+
+    $appeals[$appeal_id] = $new_appeal;
+    update_option( 'cora_suspension_appeals', $appeals );
+
+    if ( function_exists( 'cora_log_activity' ) ) {
+        cora_log_activity( 'Governance', "Suspension reactivation appeal submitted by {$email} for workspace '{$workspace_name}'." );
+    }
+
+    $admin_email = get_option( 'admin_email' );
+    $subject     = "[Cora Platform] Workspace Reactivation Appeal: {$workspace_name}";
+    $body        = "A workspace reactivation appeal has been submitted.\n\n"
+                 . "Account Email: {$email}\n"
+                 . "Workspace Name: {$workspace_name}\n"
+                 . "Phone/Contact: {$phone}\n"
+                 . "Submitted At: " . current_time( 'mysql' ) . "\n\n"
+                 . "Reason:\n{$reason}\n\n"
+                 . "Log into the Cora Super Admin Control Centre to review and process this appeal.";
+
+    @wp_mail( $admin_email, $subject, $body );
+
+    wp_send_json_success( array(
+        'message' => 'Your reactivation appeal has been submitted successfully. The platform administrator will review your request shortly.',
+        'appeal_id' => $appeal_id
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_submit_suspension_appeal', 'cora_ajax_submit_suspension_appeal' );
+add_action( 'wp_ajax_nopriv_cora_submit_suspension_appeal', 'cora_ajax_submit_suspension_appeal' );
+
+/**
+ * AJAX Callback: Fetch suspension reactivation appeals (Super Admin only).
+ */
+if ( ! function_exists( 'cora_ajax_super_get_appeals' ) ) {
+function cora_ajax_super_get_appeals() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! cora_is_super_owner() ) {
+        wp_send_json_error( 'Unauthorized access.' );
+    }
+
+    $appeals = get_option( 'cora_suspension_appeals', array() );
+    if ( ! is_array( $appeals ) ) {
+        $appeals = array();
+    }
+
+    $appeal_list = array_values( $appeals );
+    usort( $appeal_list, function( $a, $b ) {
+        return strtotime( $b['created_at'] ?? 0 ) - strtotime( $a['created_at'] ?? 0 );
+    });
+
+    wp_send_json_success( array(
+        'appeals' => $appeal_list
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_super_get_appeals', 'cora_ajax_super_get_appeals' );
+
+/**
+ * AJAX Callback: Handle reactivation appeal approval or decline (Super Admin only).
+ */
+if ( ! function_exists( 'cora_ajax_super_handle_appeal' ) ) {
+function cora_ajax_super_handle_appeal() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    if ( ! cora_is_super_owner() ) {
+        wp_send_json_error( 'Unauthorized access.' );
+    }
+
+    $appeal_id     = isset( $_POST['appeal_id'] ) ? sanitize_text_field( $_POST['appeal_id'] ) : '';
+    $appeal_action = isset( $_POST['appeal_action'] ) ? sanitize_text_field( $_POST['appeal_action'] ) : '';
+    $notes         = isset( $_POST['notes'] ) ? sanitize_textarea_field( $_POST['notes'] ) : '';
+
+    if ( empty( $appeal_id ) || ! in_array( $appeal_action, array( 'approve', 'decline' ), true ) ) {
+        wp_send_json_error( 'Invalid appeal request or action.' );
+    }
+
+    $appeals = get_option( 'cora_suspension_appeals', array() );
+    if ( ! is_array( $appeals ) || ! isset( $appeals[$appeal_id] ) ) {
+        wp_send_json_error( 'Appeal record not found.' );
+    }
+
+    $appeal = $appeals[$appeal_id];
+    $email  = $appeal['email'];
+
+    if ( $appeal_action === 'approve' ) {
+        $appeals[$appeal_id]['status']       = 'approved';
+        $appeals[$appeal_id]['processed_at'] = current_time( 'mysql' );
+        $appeals[$appeal_id]['notes']        = $notes;
+        update_option( 'cora_suspension_appeals', $appeals );
+
+        global $wpdb;
+        $user = get_user_by( 'email', $email );
+        if ( $user ) {
+            $user_id = $user->ID;
+            update_user_meta( $user_id, 'cora_workspace_status', 'active' );
+            update_user_meta( $user_id, 'cora_agency_status', 'active' );
+
+            $agencies_table = $wpdb->prefix . 'cora_agencies';
+            if ( cora_table_exists( $agencies_table ) ) {
+                $wpdb->update(
+                    $agencies_table,
+                    array( 'status' => 'active', 'updated_at' => current_time( 'mysql' ) ),
+                    array( 'owner_user_id' => $user_id ),
+                    array( '%s', '%s' ),
+                    array( '%d' )
+                );
+            }
+
+            $agencies = get_option( 'cora_agencies', array() );
+            if ( is_array( $agencies ) ) {
+                foreach ( $agencies as $k => $ag ) {
+                    if ( isset( $ag['owner_user_id'] ) && intval( $ag['owner_user_id'] ) === $user_id ) {
+                        $agencies[$k]['status'] = 'active';
+                    }
+                }
+                update_option( 'cora_agencies', $agencies );
+            }
+        }
+
+        $subject = "[Cora Platform] Workspace Reactivated Successfully";
+        $body    = "Hello,\n\n"
+                 . "Good news! Your workspace reactivation appeal has been approved by the platform administrator.\n\n"
+                 . "Your account and workspace access have been restored. You can now log back in at:\n"
+                 . home_url( '/workspace/login' ) . "\n\n"
+                 . "Administrator Notes:\n" . ( $notes ?: "None" ) . "\n\n"
+                 . "Best regards,\nCora Platform Support";
+        @wp_mail( $email, $subject, $body );
+
+        if ( function_exists( 'cora_log_activity' ) ) {
+            cora_log_activity( 'Governance', "Reactivation appeal {$appeal_id} approved for {$email}." );
+        }
+
+        wp_send_json_success( array(
+            'message' => "Reactivation appeal approved! Workspace for {$email} is now ACTIVE."
+        ) );
+    } else {
+        $appeals[$appeal_id]['status']       = 'declined';
+        $appeals[$appeal_id]['processed_at'] = current_time( 'mysql' );
+        $appeals[$appeal_id]['notes']        = $notes;
+        update_option( 'cora_suspension_appeals', $appeals );
+
+        $subject = "[Cora Platform] Update regarding your workspace reactivation appeal";
+        $body    = "Hello,\n\n"
+                 . "Your workspace reactivation appeal has been reviewed by the platform administrator.\n\n"
+                 . "Status: Declined\n"
+                 . "Administrator Notes:\n" . ( $notes ?: "Please contact support for further details." ) . "\n\n"
+                 . "Best regards,\nCora Platform Support";
+        @wp_mail( $email, $subject, $body );
+
+        if ( function_exists( 'cora_log_activity' ) ) {
+            cora_log_activity( 'Governance', "Reactivation appeal {$appeal_id} declined for {$email}." );
+        }
+
+        wp_send_json_success( array(
+            'message' => "Reactivation appeal declined for {$email}."
+        ) );
+    }
+}
+}
+add_action( 'wp_ajax_cora_super_handle_appeal', 'cora_ajax_super_handle_appeal' );
 
 /**
  * AJAX Callback: Delete workspace.

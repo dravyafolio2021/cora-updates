@@ -263,6 +263,20 @@
 </head>
 <body>
     <div id="login-card">
+        <!-- Suspended Banner Callout -->
+        <div id="cora-suspended-banner" style="display:none; margin-bottom: 20px; padding: 14px; background: #fafafa; border: 1.5px solid #18181b; border-radius: 10px; text-align: left;">
+            <div style="display:flex; align-items:center; gap: 8px; font-weight: 700; font-size: 13px; color: #09090b; margin-bottom: 4px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Account Suspended
+            </div>
+            <div style="font-size: 12px; color: #71717a; line-height: 1.4; margin-bottom: 10px;">
+                Your workspace account has been suspended by the platform administrator. You can submit an appeal to request reactivation.
+            </div>
+            <button type="button" onclick="openAppealDrawer()" style="width:100%; padding: 9px 12px; background: #09090b; color: #ffffff; border: none; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.15s ease;">
+                Request Reactivation Appeal →
+            </button>
+        </div>
+
         <h2>Cora Portal</h2>
         <p class="subtitle">Enter your credentials to access the workspace.</p>
         
@@ -335,6 +349,47 @@
 
     <div id="cora-toast-container"></div>
 
+    <!-- Right-sliding Side Drawer Sheet for Suspension Appeal -->
+    <div id="cora-appeal-drawer" style="position: fixed; inset: 0; z-index: 9999; display: none;">
+        <!-- Backdrop overlay -->
+        <div onclick="closeAppealDrawer()" style="position: absolute; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px);"></div>
+        <!-- Drawer Panel -->
+        <div style="position: absolute; top: 0; right: 0; bottom: 0; width: 100%; max-width: 420px; background: #ffffff; box-shadow: -4px 0 25px rgba(0,0,0,0.15); display: flex; flex-direction: column; z-index: 10000;">
+            <!-- Header -->
+            <div style="padding: 20px 24px; border-bottom: 1px solid #e4e4e7; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #09090b;">Reactivation Appeal</h3>
+                    <p style="margin: 2px 0 0 0; font-size: 12px; color: #71717a;">Submit a request for workspace reactivation.</p>
+                </div>
+                <button onclick="closeAppealDrawer()" type="button" style="background: transparent; border: none; font-size: 20px; color: #71717a; cursor: pointer; padding: 4px; border-radius: 4px;">&times;</button>
+            </div>
+            <!-- Body -->
+            <div style="padding: 24px; flex: 1; overflow-y: auto;">
+                <form id="appeal-form" onsubmit="submitAppeal(event)">
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: #09090b; margin-bottom: 6px;">Account Email *</label>
+                        <input type="email" id="appeal-email" required placeholder="name@agency.com" style="width: 100%; padding: 10px 12px; border: 1px solid #e4e4e7; border-radius: 8px; font-size: 13px; box-sizing: border-box;">
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: #09090b; margin-bottom: 6px;">Workspace Name / Agency</label>
+                        <input type="text" id="appeal-workspace" placeholder="e.g. Apex Realty" style="width: 100%; padding: 10px 12px; border: 1px solid #e4e4e7; border-radius: 8px; font-size: 13px; box-sizing: border-box;">
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: #09090b; margin-bottom: 6px;">Contact Phone / WhatsApp (Optional)</label>
+                        <input type="text" id="appeal-phone" placeholder="+91 98765 43210" style="width: 100%; padding: 10px 12px; border: 1px solid #e4e4e7; border-radius: 8px; font-size: 13px; box-sizing: border-box;">
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: #09090b; margin-bottom: 6px;">Reason for Appeal *</label>
+                        <textarea id="appeal-reason" required rows="4" placeholder="Explain why your workspace account should be reactivated..." style="width: 100%; padding: 10px 12px; border: 1px solid #e4e4e7; border-radius: 8px; font-size: 13px; font-family: inherit; resize: vertical; box-sizing: border-box;"></textarea>
+                    </div>
+                    <button type="submit" id="appeal-submit-btn" style="width: 100%; padding: 12px; background: #09090b; color: #ffffff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background 0.15s ease;">
+                        Submit Reactivation Appeal
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/jquery.min.js'; ?>"></script>
     <script>
         // Light mode standard
@@ -345,6 +400,7 @@
                 showToast('Your account has been deactivated. Contact your agency admin.');
             }
             if (urlParams.get('suspended')) {
+                $('#cora-suspended-banner').show();
                 showToast('Your agency account has been suspended. Contact Cora support.');
             }
             if (urlParams.get('password_updated')) {
@@ -450,6 +506,9 @@
                     }, 800);
                 } else {
                     showToast(res.data.message);
+                    if (res.data.message && res.data.message.toLowerCase().indexOf('suspended') !== -1) {
+                        $('#cora-suspended-banner').slideDown(200);
+                    }
                     if (res.data.lockout) {
                         lockoutRemaining = res.data.lockout;
                         startLockoutTimer();
@@ -460,6 +519,53 @@
             }).fail(function() {
                 showToast('Network error. Please try again.');
                 $('#login-btn').prop('disabled', false).text('Sign In');
+            });
+        }
+
+        function openAppealDrawer() {
+            var emailVal = $('#login-email').val() || '';
+            if (emailVal) {
+                $('#appeal-email').val(emailVal);
+            }
+            $('#cora-appeal-drawer').fadeIn(150);
+        }
+
+        function closeAppealDrawer() {
+            $('#cora-appeal-drawer').fadeOut(150);
+        }
+
+        function submitAppeal(e) {
+            e.preventDefault();
+            var email = $('#appeal-email').val().trim();
+            var workspace_name = $('#appeal-workspace').val().trim();
+            var phone = $('#appeal-phone').val().trim();
+            var reason = $('#appeal-reason').val().trim();
+
+            if (!email || !reason) {
+                showToast('Please fill in all required fields.');
+                return;
+            }
+
+            $('#appeal-submit-btn').prop('disabled', true).text('Submitting Appeal...');
+
+            $.post('<?php echo esc_url( cora_get_origin_relative_url( admin_url( 'admin-ajax.php' ) ) ); ?>', {
+                action: 'cora_submit_suspension_appeal',
+                email: email,
+                workspace_name: workspace_name,
+                phone: phone,
+                reason: reason
+            }, function(res) {
+                if (res.success) {
+                    showToast(res.data.message);
+                    closeAppealDrawer();
+                    $('#appeal-form')[0].reset();
+                } else {
+                    showToast(res.data.message || 'Error submitting appeal.');
+                }
+                $('#appeal-submit-btn').prop('disabled', false).text('Submit Reactivation Appeal');
+            }).fail(function() {
+                showToast('Network error while submitting appeal. Please try again.');
+                $('#appeal-submit-btn').prop('disabled', false).text('Submit Reactivation Appeal');
             });
         }
 

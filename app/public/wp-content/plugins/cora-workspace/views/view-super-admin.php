@@ -38,6 +38,9 @@ $roles_list = cora_get_all_roles();
         <button class="cora-sub-tab pb-2 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-zinc-200 text-zinc-500 cursor-pointer focus:outline-none" data-target="tab-super-users">
             Users
         </button>
+        <button class="cora-sub-tab pb-2 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-zinc-200 text-zinc-500 cursor-pointer focus:outline-none flex items-center gap-1.5" data-target="tab-super-appeals">
+            Reactivation Appeals <span id="super-appeals-badge" class="px-1.5 py-0.5 rounded-full text-[9.5px] font-bold bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 hidden">0</span>
+        </button>
         <button class="cora-sub-tab pb-2 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-zinc-200 text-zinc-500 cursor-pointer focus:outline-none" data-target="tab-super-governance">
             Attendance & Governance
         </button>
@@ -164,7 +167,41 @@ $roles_list = cora_get_all_roles();
         </div>
     </div>
 
-    <!-- TAB 3: ATTENDANCE & GOVERNANCE -->
+    <!-- TAB 3: REACTIVATION APPEALS -->
+    <div id="tab-super-appeals" class="cora-tab-content hidden space-y-4">
+        <div class="bg-white dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Suspension Reactivation Appeals</h2>
+                <p class="text-xs text-zinc-500 mt-0.5">Review and manage workspace reactivation requests submitted by suspended users.</p>
+            </div>
+            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider" id="appeals-count-badge">0 appeals</span>
+        </div>
+
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/85 dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-xs text-left">
+                    <thead class="bg-zinc-50/50 dark:bg-zinc-900/80">
+                        <tr>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Account Email</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Workspace Name</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Contact Phone</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Reason / Message</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Status</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Submitted Date</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px] text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appeals-table-body" class="divide-y divide-zinc-100 dark:divide-zinc-800/60">
+                        <tr>
+                            <td colspan="7" class="px-5 py-8 text-center text-zinc-450 dark:text-zinc-500">Loading appeals...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 4: ATTENDANCE & GOVERNANCE -->
     <div id="tab-super-governance" class="cora-tab-content hidden space-y-6">
         <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-4">
             <div class="flex items-center justify-between">
@@ -208,6 +245,8 @@ const coraRoleLabels = <?php echo json_encode( $roles_list ); ?>;
 jQuery(document).ready(function($) {
     let rawWorkspaces = [];
     let rawUsers = [];
+    let rawAppeals = [];
+    let activeAppealId = null;
 
     // Tab Navigation Logic
     $('.cora-sub-tabs button').on('click', function() {
@@ -238,7 +277,6 @@ jQuery(document).ready(function($) {
     function formatDate(dateStr) {
         if (!dateStr || dateStr === '0000-00-00 00:00:00') return '—';
         try {
-            // Replace dashes with slashes for unified cross-browser Safari support
             const d = new Date(dateStr.replace(/-/g, "/"));
             if (isNaN(d.getTime())) return dateStr;
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -290,7 +328,63 @@ jQuery(document).ready(function($) {
         }).fail(function() {
             $('#users-table-body').html('<tr><td colspan="6" class="px-5 py-6 text-center text-red-600 font-semibold bg-red-50/20 dark:bg-red-950/10 border-t border-zinc-100 dark:border-zinc-800">Connection error: Could not retrieve users.</td></tr>');
         });
+
+        // Load Appeals list
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_super_get_appeals',
+            security: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                rawAppeals = res.data.appeals || [];
+                renderAppeals();
+                renderWorkspaces();
+            }
+        });
     }
+
+    // Render Appeals Tab Content
+    window.renderAppeals = function() {
+        window.rawAppealsList = rawAppeals;
+        const pendingAppeals = rawAppeals.filter(a => a.status === 'pending');
+        if (pendingAppeals.length > 0) {
+            $('#super-appeals-badge').text(pendingAppeals.length).removeClass('hidden');
+        } else {
+            $('#super-appeals-badge').addClass('hidden');
+        }
+        $('#appeals-count-badge').text(`${rawAppeals.length} appeal${rawAppeals.length === 1 ? '' : 's'}`);
+
+        if (rawAppeals.length === 0) {
+            $('#appeals-table-body').html('<tr><td colspan="7" class="px-5 py-8 text-center text-zinc-400 dark:text-zinc-500 bg-zinc-50/20 dark:bg-zinc-900/10">No reactivation appeals submitted yet.</td></tr>');
+            return;
+        }
+
+        let html = '';
+        rawAppeals.forEach(a => {
+            let statusBadge = '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">Pending</span>';
+            if (a.status === 'approved') {
+                statusBadge = '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">Approved</span>';
+            } else if (a.status === 'declined') {
+                statusBadge = '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">Declined</span>';
+            }
+
+            html += `
+                <tr class="hover:bg-zinc-50/20 dark:hover:bg-zinc-800/15 transition-colors">
+                    <td class="px-5 py-3.5 font-bold text-zinc-900 dark:text-zinc-100">${escapeHtml(a.email)}</td>
+                    <td class="px-5 py-3.5 text-zinc-700 dark:text-zinc-300 font-medium">${escapeHtml(a.workspace_name || '—')}</td>
+                    <td class="px-5 py-3.5 text-zinc-500 dark:text-zinc-400 font-mono text-[11px]">${escapeHtml(a.phone || '—')}</td>
+                    <td class="px-5 py-3.5 text-zinc-600 dark:text-zinc-400 max-w-xs truncate">${escapeHtml(a.reason)}</td>
+                    <td class="px-5 py-3.5">${statusBadge}</td>
+                    <td class="px-5 py-3.5 text-zinc-400 dark:text-zinc-500 font-medium">${formatDate(a.created_at)}</td>
+                    <td class="px-5 py-3.5 text-right">
+                        <button onclick="openAppealReviewDrawer('${a.id}')" class="px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer shadow-xs active:scale-95 transition-all">
+                            Review Appeal →
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        $('#appeals-table-body').html(html);
+    };
 
     // Render Workspaces Tab Content
     window.renderWorkspaces = function() {
@@ -326,9 +420,19 @@ jQuery(document).ready(function($) {
                 ? `<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 uppercase tracking-wide">${escapeHtml(ws.plan)}</span>` 
                 : '<span class="text-zinc-400">—</span>';
             
-            const statusBadge = ws.status === 'active'
+            let statusBadge = ws.status === 'active'
                 ? '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 select-none">Active</span>'
                 : '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 select-none">Suspended</span>';
+
+            const pendingAppeal = rawAppeals.find(a => a.status === 'pending' && (
+                (ws.owner_email && a.email.toLowerCase() === ws.owner_email.toLowerCase()) ||
+                (ws.name && a.workspace_name.toLowerCase() === ws.name.toLowerCase()) ||
+                (ws.slug && a.workspace_name.toLowerCase() === ws.slug.toLowerCase())
+            ));
+
+            if (ws.status === 'suspended' && pendingAppeal) {
+                statusBadge += `<button onclick="openAppealReviewDrawer('${pendingAppeal.id}')" class="ml-1.5 px-2 py-0.5 text-[9px] font-bold rounded-md bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 hover:bg-amber-200 cursor-pointer select-none inline-flex items-center gap-1"><span>📩</span> Appeal Pending</button>`;
+            }
 
             const toggleLabel = ws.status === 'active' ? 'Suspend' : 'Activate';
             const toggleClass = ws.status === 'active'
@@ -337,16 +441,23 @@ jQuery(document).ready(function($) {
 
             const currInd = ws.industry === 'photography' ? 'photography_studio' : (ws.industry || 'real_estate');
 
+            const indIcon = currInd === 'photography_studio'
+                ? `<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+                : `<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`;
+
             html += `
                 <tr class="hover:bg-zinc-50/20 dark:hover:bg-zinc-800/15 transition-colors">
                     <td class="px-5 py-3.5 font-bold text-zinc-900 dark:text-zinc-100">${escapeHtml(ws.name)}</td>
                     <td class="px-5 py-3.5 text-zinc-550 dark:text-zinc-400 font-mono text-[11px]">${escapeHtml(ws.slug)}</td>
                     <td class="px-5 py-3.5">${planBadge}</td>
                     <td class="px-5 py-3.5">
-                        <select onchange="changeWorkspaceIndustry(${ws.id}, this.value)" class="px-2 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 outline-none cursor-pointer shadow-sm">
-                            <option value="real_estate" ${currInd === 'real_estate' ? 'selected' : ''}>🏡 Real Estate</option>
-                            <option value="photography_studio" ${currInd === 'photography_studio' ? 'selected' : ''}>📸 Studio</option>
-                        </select>
+                        <div class="inline-flex items-center gap-1.5 px-2 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 shadow-xs">
+                            <span class="text-zinc-500 dark:text-zinc-400 shrink-0">${indIcon}</span>
+                            <select onchange="changeWorkspaceIndustry(${ws.id}, this.value)" class="text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-transparent outline-none cursor-pointer">
+                                <option value="real_estate" ${currInd === 'real_estate' ? 'selected' : ''}>Real Estate</option>
+                                <option value="photography_studio" ${currInd === 'photography_studio' ? 'selected' : ''}>Studio</option>
+                            </select>
+                        </div>
                     </td>
                     <td class="px-5 py-3.5">${statusBadge}</td>
                     <td class="px-5 py-3.5 text-zinc-500 dark:text-zinc-400 font-medium">${escapeHtml(ws.owner_email || '—')}</td>
@@ -476,25 +587,31 @@ jQuery(document).ready(function($) {
             action: 'cora_super_update_workspace',
             security: coraREData.ajaxNonce,
             workspace_id: workspaceId,
+            name: ws.name,
+            slug: ws.slug,
             status: newStatus,
-            plan: ws.plan
+            plan: ws.plan,
+            industry: ws.industry,
+            owner_email: ws.owner_email
         }, function(res) {
             if (res.success) {
                 ws.status = newStatus;
                 renderWorkspaces();
                 if (window.coraShowToast) {
-                    window.coraShowToast(res.data.message || 'Workspace status updated successfully.', 'success');
+                    window.coraShowToast(res.data.message || `Workspace status updated to ${newStatus.toUpperCase()}.`, 'success');
                 }
             } else {
-                const errorMsg = res.data || 'Failed to toggle workspace status.';
+                const errorMsg = (res.data && res.data.message) ? res.data.message : (res.data || 'Failed to toggle workspace status.');
                 if (window.coraShowToast) {
                     window.coraShowToast(errorMsg, 'error');
                 }
+                renderWorkspaces();
             }
         }).fail(function() {
             if (window.coraShowToast) {
                 window.coraShowToast('Network error while toggling status.', 'error');
             }
+            renderWorkspaces();
         });
     }
 
@@ -507,9 +624,12 @@ jQuery(document).ready(function($) {
             action: 'cora_super_update_workspace',
             security: coraREData.ajaxNonce,
             workspace_id: workspaceId,
+            name: ws.name,
+            slug: ws.slug,
             status: ws.status,
             plan: ws.plan,
-            industry: newIndustry
+            industry: newIndustry,
+            owner_email: ws.owner_email
         }, function(res) {
             if (res.success) {
                 ws.industry = newIndustry;
@@ -519,7 +639,7 @@ jQuery(document).ready(function($) {
                     window.coraShowToast(res.data.message || `Workspace industry updated to ${label}.`, 'success');
                 }
             } else {
-                const errorMsg = res.data || 'Failed to update workspace industry.';
+                const errorMsg = (res.data && res.data.message) ? res.data.message : (res.data || 'Failed to update workspace industry.');
                 if (window.coraShowToast) {
                     window.coraShowToast(errorMsg, 'error');
                 }
@@ -542,25 +662,34 @@ jQuery(document).ready(function($) {
             action: 'cora_super_update_workspace',
             security: coraREData.ajaxNonce,
             workspace_id: workspaceId,
+            name: ws.name,
+            slug: ws.slug,
             status: ws.status,
             plan: newPlan,
-            industry: ws.industry
+            industry: ws.industry,
+            owner_email: ws.owner_email
         }, function(res) {
             if (res.success) {
                 ws.plan = newPlan;
                 renderWorkspaces();
                 if (window.coraShowToast) {
-                    window.coraShowToast(res.data.message || 'Workspace plan changed successfully.', 'success');
+                    const planLabel = newPlan.charAt(0).toUpperCase() + newPlan.slice(1);
+                    window.coraShowToast(res.data.message || `Workspace plan changed to ${planLabel}.`, 'success');
                 }
             } else {
-                const errorMsg = res.data || 'Failed to update workspace plan.';
+                const errorMsg = (res.data && res.data.message) ? res.data.message : (res.data || 'Failed to update workspace plan.');
                 if (window.coraShowToast) {
                     window.coraShowToast(errorMsg, 'error');
                 }
-                // Reset select dropdown value to actual model value
                 renderWorkspaces();
             }
         }).fail(function() {
+            if (window.coraShowToast) {
+                window.coraShowToast('Network error while changing workspace plan.', 'error');
+            }
+            renderWorkspaces();
+        });
+    }
             if (window.coraShowToast) {
                 window.coraShowToast('Network error while changing plan.', 'error');
             }
@@ -666,6 +795,59 @@ jQuery(document).ready(function($) {
     // Run dynamic retrieval on mount
     loadPlatformData();
 });
+
+window.openAppealReviewDrawer = function(appealId) {
+    if (!appealId) return;
+    const appeal = window.rawAppealsList ? window.rawAppealsList.find(a => a.id === appealId) : null;
+    
+    // Fallback search in rawAppeals if attached to window or jQuery scope
+    $('#review-appeal-id').text(appealId);
+    $('#review-appeal-email').text(appeal ? appeal.email : '—');
+    $('#review-appeal-workspace').text(appeal ? (appeal.workspace_name || '—') : '—');
+    $('#review-appeal-phone').text(appeal ? (appeal.phone || '—') : '—');
+    $('#review-appeal-date').text(appeal ? (appeal.created_at || '—') : '—');
+    $('#review-appeal-reason').text(appeal ? (appeal.reason || '—') : '—');
+    $('#review-appeal-notes').val(appeal ? (appeal.notes || '') : '');
+
+    window.activeAppealId = appealId;
+
+    $('#cora-appeal-review-drawer').removeClass('translate-x-full');
+    $('#cora-appeal-review-overlay').removeClass('hidden');
+};
+
+window.closeAppealReviewDrawer = function() {
+    $('#cora-appeal-review-drawer').addClass('translate-x-full');
+    $('#cora-appeal-review-overlay').addClass('hidden');
+    window.activeAppealId = null;
+};
+
+window.processAppealAction = function(action) {
+    if (!window.activeAppealId) {
+        if (window.coraShowToast) window.coraShowToast('No active appeal selected.', 'error');
+        return;
+    }
+    const notes = $('#review-appeal-notes').val().trim();
+
+    $.post(coraREData.ajaxUrl, {
+        action: 'cora_super_handle_appeal',
+        security: coraREData.ajaxNonce,
+        appeal_id: window.activeAppealId,
+        appeal_action: action,
+        notes: notes
+    }, function(res) {
+        if (res.success) {
+            if (window.coraShowToast) window.coraShowToast(res.data.message || 'Appeal processed successfully!', 'success');
+            closeAppealReviewDrawer();
+            if (typeof loadPlatformData === 'function') loadPlatformData();
+            setTimeout(function() { window.location.reload(); }, 600);
+        } else {
+            const errorMsg = (res.data && res.data.message) ? res.data.message : 'Failed to process appeal.';
+            if (window.coraShowToast) window.coraShowToast(errorMsg, 'error');
+        }
+    }).fail(function() {
+        if (window.coraShowToast) window.coraShowToast('Network error while processing appeal.', 'error');
+    });
+};
 
 window.openCreateWorkspaceDrawer = function() {
     $('#new-ws-name').val('');
@@ -785,8 +967,8 @@ window.dispatchSuperDailyReports = function() {
         <div>
             <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Industry Profile *</label>
             <select id="new-ws-industry" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs bg-white dark:bg-zinc-900 outline-none cursor-pointer text-zinc-900 dark:text-zinc-100">
-                <option value="real_estate" selected>🏡 Real Estate Agency</option>
-                <option value="photography_studio">📸 Photography Studio</option>
+                <option value="real_estate" selected>Real Estate Agency</option>
+                <option value="photography_studio">Photography Studio</option>
             </select>
         </div>
 
@@ -804,6 +986,70 @@ window.dispatchSuperDailyReports = function() {
         </button>
         <button onclick="submitNewWorkspace()" class="px-5 py-2.5 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold text-xs rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 active:scale-[0.98] transition-all cursor-pointer shadow-sm">
             Create Workspace
+        </button>
+    </div>
+</div>
+
+<!-- Review Suspension Appeal Right-Sliding Drawer -->
+<div id="cora-appeal-review-overlay" onclick="closeAppealReviewDrawer()" class="hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-[9990] transition-opacity duration-300"></div>
+
+<div id="cora-appeal-review-drawer" class="fixed top-0 right-0 h-full w-full sm:w-120 bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 flex flex-col">
+    <!-- Header -->
+    <div class="px-6 py-4 border-b border-zinc-100 dark:border-zinc-850 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2.5">
+            <span class="p-2 bg-amber-50 dark:bg-amber-950/40 text-amber-600 rounded-lg">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </span>
+            <div>
+                <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-50">Review Reactivation Appeal</h3>
+                <p class="text-xs text-zinc-500 font-mono" id="review-appeal-id">appeal_...</p>
+            </div>
+        </div>
+        <button onclick="closeAppealReviewDrawer()" class="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors cursor-pointer">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <!-- Body -->
+    <div class="flex-1 overflow-y-auto p-6 space-y-4">
+        <div class="p-4 bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800 rounded-xl space-y-3">
+            <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Account Email</span>
+                <p class="text-xs font-bold text-zinc-900 dark:text-zinc-100" id="review-appeal-email">—</p>
+            </div>
+            <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Workspace / Agency</span>
+                <p class="text-xs font-bold text-zinc-900 dark:text-zinc-100" id="review-appeal-workspace">—</p>
+            </div>
+            <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Contact Phone</span>
+                <p class="text-xs font-bold text-zinc-900 dark:text-zinc-100" id="review-appeal-phone">—</p>
+            </div>
+            <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Submitted Date</span>
+                <p class="text-xs text-zinc-600 dark:text-zinc-400 font-mono" id="review-appeal-date">—</p>
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Applicant Reason / Explanation</label>
+            <div class="p-3.5 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed whitespace-pre-wrap" id="review-appeal-reason">—</div>
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Administrator Response Notes (Sent to User)</label>
+            <textarea id="review-appeal-notes" rows="3" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs bg-white dark:bg-zinc-900 outline-none text-zinc-900 dark:text-zinc-100" placeholder="Optional explanation included in the confirmation email..."></textarea>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="p-6 border-t border-zinc-100 dark:border-zinc-850 bg-zinc-50/50 dark:bg-zinc-900/40 flex items-center justify-between gap-3 shrink-0">
+        <button onclick="processAppealAction('decline')" class="px-4 py-2 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 font-bold text-xs rounded-xl hover:bg-red-100 cursor-pointer transition-all">
+            Decline Appeal
+        </button>
+        <button onclick="processAppealAction('approve')" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl active:scale-[0.98] transition-all cursor-pointer shadow-sm flex items-center gap-1.5">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Approve & Reactivate Workspace
         </button>
     </div>
 </div>
