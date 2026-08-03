@@ -2973,9 +2973,31 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
         window.coraSwitchWorkspace = function(slug) {
             if (!slug) return;
+            var ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
+            var nonce = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : '';
+            
             document.cookie = "cora_active_workspace_slug=" + encodeURIComponent(slug) + "; path=/; max-age=31536000";
-            const currentPage = (window.coraAppData && window.coraAppData.currentPage) ? window.coraAppData.currentPage : 'dashboard';
-            window.location.href = '/' + encodeURIComponent(slug) + '/' + encodeURIComponent(currentPage);
+            
+            if (typeof jQuery !== 'undefined') {
+                jQuery.post(ajaxUrl, {
+                    action: 'cora_ajax_switch_workspace',
+                    nonce: nonce,
+                    workspace_slug: slug
+                }, function(res) {
+                    if (res.success && res.data && res.data.redirect_url) {
+                        window.location.href = res.data.redirect_url;
+                    } else {
+                        const currentPage = (window.coraAppData && window.coraAppData.currentPage) ? window.coraAppData.currentPage : 'dashboard';
+                        window.location.href = '/' + encodeURIComponent(slug) + '/' + encodeURIComponent(currentPage);
+                    }
+                }).fail(function() {
+                    const currentPage = (window.coraAppData && window.coraAppData.currentPage) ? window.coraAppData.currentPage : 'dashboard';
+                    window.location.href = '/' + encodeURIComponent(slug) + '/' + encodeURIComponent(currentPage);
+                });
+            } else {
+                const currentPage = (window.coraAppData && window.coraAppData.currentPage) ? window.coraAppData.currentPage : 'dashboard';
+                window.location.href = '/' + encodeURIComponent(slug) + '/' + encodeURIComponent(currentPage);
+            }
         };
 
         window.coraSwitchIndustryMode = function(industry) {
@@ -3794,11 +3816,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         <img src="<?php echo esc_url($current_user_avatar); ?>" class="w-10 h-10 rounded-full object-cover shrink-0 select-none border border-zinc-200/60" alt="<?php echo esc_attr($current_user_display_name); ?>" />
                     <?php else : ?>
                         <div class="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center font-bold text-sm uppercase shrink-0 select-none">
-                            <?php echo esc_html(substr($current_user_display_name, 0, 2)); ?>
+                            <?php 
+                            $pop_initials = ( cora_is_real_shruti() || ( $current_wp_user->exists() && $current_wp_user->user_login === 'cora_admin' ) ) ? 'S' : substr($current_user_display_name, 0, 2);
+                            echo esc_html($pop_initials); 
+                            ?>
                         </div>
                     <?php endif; ?>
                     <div class="flex flex-col min-w-0 leading-tight">
-                        <span class="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate"><?php echo esc_html($current_user_display_name); ?></span>
+                        <span class="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate"><?php echo esc_html(( cora_is_real_shruti() || ( $current_wp_user->exists() && $current_wp_user->user_login === 'cora_admin' ) ) ? 'Shruti' : $current_user_display_name); ?></span>
                         <span class="text-[11px] text-zinc-500 truncate"><?php echo esc_html($current_wp_user->exists() ? $current_wp_user->user_email : 'dravya.shs@gmail.com'); ?></span>
                     </div>
                 </div>
@@ -4024,8 +4049,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             </style>
 
             <!-- Lovable-style user footer row -->
+            <!-- Lovable-style user footer row -->
             <?php
             $current_user_display_name = $current_wp_user->exists() ? $current_wp_user->display_name : 'Dravya Bansal';
+            $is_shruti_user = ( cora_is_real_shruti() || ( $current_wp_user->exists() && $current_wp_user->user_login === 'cora_admin' ) );
+            if ( $is_shruti_user ) {
+                $current_user_display_name = 'Shruti';
+            }
             $current_user_role_label = isset($cora_role_labels[$current_user_role]) ? $cora_role_labels[$current_user_role] : ucfirst($current_user_role);
             if ($current_user_role === 'administrator') {
                 $current_user_role_label = 'Super Admin';
@@ -4045,7 +4075,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         <img src="<?php echo esc_url($current_user_avatar); ?>" class="w-8 h-8 rounded-full object-cover shrink-0 select-none border border-zinc-200/60" alt="<?php echo esc_attr($current_user_display_name); ?>" />
                     <?php else : ?>
                         <div class="w-8 h-8 rounded-full bg-zinc-200 text-zinc-700 flex items-center justify-center font-bold text-xs uppercase shrink-0 select-none">
-                            <?php echo esc_html(substr($current_user_display_name, 0, 2)); ?>
+                            <?php echo esc_html( $is_shruti_user ? 'S' : substr($current_user_display_name, 0, 2) ); ?>
                         </div>
                     <?php endif; ?>
                     <div class="cora-user-info flex flex-col min-w-0">

@@ -1683,6 +1683,7 @@ function cora_real_estate_ai_user_register( $user_id ) {
     $token = bin2hex( random_bytes( 16 ) );
     update_user_meta( $user_id, 'cora_workspace_email_verified', '0' );
     update_user_meta( $user_id, 'cora_workspace_verification_token', $token );
+    update_user_meta( $user_id, 'cora_workspace_verification_token_created', time() );
     
     // 4. Update role to selected studio role
     $role = ( ! empty( $_POST['cora_role'] ) ) ? sanitize_text_field( $_POST['cora_role'] ) : 'cora_manager';
@@ -1712,6 +1713,7 @@ function cora_send_verification_email( $user_id ) {
         // Generate new token if missing
         $token = bin2hex( random_bytes( 16 ) );
         update_user_meta( $user_id, 'cora_workspace_verification_token', $token );
+        update_user_meta( $user_id, 'cora_workspace_verification_token_created', time() );
     }
     
     $verify_url = add_query_arg(
@@ -1765,10 +1767,24 @@ function cora_real_estate_ai_handle_email_verification() {
         $url_token = sanitize_text_field( $_GET['cora_verify_token'] );
         
         $saved_token = get_user_meta( $user_id, 'cora_workspace_verification_token', true );
+        $saved_created = get_user_meta( $user_id, 'cora_workspace_verification_token_created', true );
         
+        $is_valid = false;
         if ( $saved_token && $saved_token === $url_token ) {
+            if ( ! empty( $saved_created ) ) {
+                if ( time() - intval( $saved_created ) <= 24 * HOUR_IN_SECONDS ) {
+                    $is_valid = true;
+                }
+            } else {
+                $is_valid = true;
+            }
+        }
+        
+        if ( $is_valid ) {
             update_user_meta( $user_id, 'cora_workspace_email_verified', '1' );
+            update_user_meta( $user_id, 'cora_email_verified', true );
             delete_user_meta( $user_id, 'cora_workspace_verification_token' );
+            delete_user_meta( $user_id, 'cora_workspace_verification_token_created' );
             
             // Log user in automatically if not logged in
             if ( ! is_user_logged_in() || get_current_user_id() !== $user_id ) {
@@ -20152,7 +20168,7 @@ function cora_ajax_send_invitation() {
         'agency_id'  => $agency_id_raw,
         'branch_id'  => $branch_id,
         'invited_by' => $user->ID,
-        'expires_at' => time() + ( 7 * DAY_IN_SECONDS ), // 7 days
+        'expires_at' => time() + ( 2 * DAY_IN_SECONDS ), // 2 days (48 hours)
         'status'     => 'pending',
         'created_at' => time()
     );
@@ -20170,7 +20186,7 @@ function cora_ajax_send_invitation() {
             'token'      => $token,
             'invited_by' => $user->ID,
             'status'     => 'pending',
-            'expires_at' => date( 'Y-m-d H:i:s', time() + ( 7 * DAY_IN_SECONDS ) ),
+            'expires_at' => date( 'Y-m-d H:i:s', time() + ( 2 * DAY_IN_SECONDS ) ),
             'created_at' => current_time('mysql')
         ),
         array( '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s' )
@@ -30097,6 +30113,58 @@ function cora_ajax_super_switch_back() {
 }
 add_action( 'wp_ajax_cora_super_switch_back', 'cora_ajax_super_switch_back' );
 add_action( 'wp_ajax_nopriv_cora_super_switch_back', 'cora_ajax_super_switch_back' );
+
+/**
+ * AJAX Callback: Switch active workspace context for the current user.
+ */
+if ( ! function_exists( 'cora_ajax_switch_workspace' ) ) {
+function cora_ajax_switch_workspace() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Not authenticated.' ) );
+    }
+
+    $workspace_slug = sanitize_title( $_POST['workspace_slug'] ?? '' );
+    if ( empty( $workspace_slug ) ) {
+        wp_send_json_error( array( 'message' => 'Workspace slug is required.' ) );
+    }
+
+    $user_id = get_current_user_id();
+
+    // Verify user actually belongs to this workspace
+    if ( ! cora_is_super_owner() && ! cora_user_can_access_workspace( $user_id, $workspace_slug ) ) {
+        wp_send_json_error( array( 'message' => 'You do not have access to this workspace.' ) );
+    }
+
+    // Set cookie
+    $cookie_path = defined( 'COOKIEPATH' ) ? COOKIEPATH : '/';
+    $cookie_domain = defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '';
+    
+    setcookie(
+        'cora_active_workspace_slug',
+        $workspace_slug,
+        time() + 86400 * 365,
+        $cookie_path,
+        $cookie_domain,
+        is_ssl(),
+        false
+    );
+
+    // Update meta cora_agency_id to persist active workspace
+    $workspace = cora_get_workspace_by_slug( $workspace_slug );
+    if ( $workspace ) {
+        update_user_meta( $user_id, 'cora_agency_id', 'agency_' . $workspace['id'] );
+        update_user_meta( $user_id, 'cora_active_agency_id', 'agency_' . $workspace['id'] );
+    }
+
+    wp_send_json_success( array(
+        'redirect_url' => home_url( '/' . $workspace_slug . '/dashboard' )
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_switch_workspace', 'cora_ajax_switch_workspace' );
+
 
 /**
  * ══════════════════════════════════════════════════════════════════════════════
