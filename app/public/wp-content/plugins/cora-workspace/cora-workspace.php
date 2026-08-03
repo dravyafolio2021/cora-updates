@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.0.9
+ * Version: 3.1.0
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.0.9' );
+define( 'CORA_WORKSPACE_VERSION', '3.1.0' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -2078,7 +2078,7 @@ function cora_real_estate_ai_seed_data() {
     }
 
     // Seed initial clients
-    if ( ! get_option( 'cora_workspace_clients' ) ) {
+    if ( false === get_option( 'cora_workspace_clients' ) ) {
         $initial_clients = array(
             array(
                 'id' => 'client_1',
@@ -2124,7 +2124,7 @@ function cora_real_estate_ai_seed_data() {
     }
 
     // Seed initial documents
-    if ( ! get_option( 'cora_workspace_vault_docs' ) ) {
+    if ( false === get_option( 'cora_workspace_vault_docs' ) ) {
         $initial_docs = array(
             array(
                 'id' => 'doc_1',
@@ -2142,7 +2142,7 @@ function cora_real_estate_ai_seed_data() {
     }
 
     // Seed initial financials
-    if ( ! get_option( 'cora_workspace_ledger' ) ) {
+    if ( false === get_option( 'cora_workspace_ledger' ) ) {
         $initial_txs = array(
             array(
                 'id' => 'tx_1',
@@ -2159,7 +2159,7 @@ function cora_real_estate_ai_seed_data() {
     }
 
     // Seed initial portfolios
-    if ( ! get_option( 'cora_workspace_portfolios' ) ) {
+    if ( false === get_option( 'cora_workspace_portfolios' ) ) {
         $initial_portfolios = array(
             array(
                 'id' => 'portfolio_sample_1',
@@ -15267,20 +15267,27 @@ function cora_get_current_user_branch_id() {
 }
 
 if ( ! function_exists( 'cora_create_user_workspace' ) ) {
-function cora_create_user_workspace( $user_id, $business_name ) {
+function cora_create_user_workspace( $user_id, $business_name, $industry = 'real_estate' ) {
     global $wpdb;
     
     if ( empty( $business_name ) ) {
         $business_name = 'Custom Workspace';
     }
+    if ( empty( $industry ) ) {
+        $industry = get_user_meta( $user_id, 'cora_workspace_industry', true ) ?: 'real_estate';
+    }
+    if ( $industry === 'photography' ) {
+        $industry = 'photography_studio';
+    }
+    update_user_meta( $user_id, 'cora_workspace_industry', $industry );
     
     // Check if the user already has an assigned agency (other than default placeholders)
     $existing_agency = get_user_meta( $user_id, 'cora_agency_id', true );
     if ( ! empty( $existing_agency ) && $existing_agency !== 'agency_1' && $existing_agency !== 'default' && $existing_agency !== 'super' ) {
-        // Already has a valid workspace, just update the name in case it changed
+        // Already has a valid workspace, just update the name and industry in case it changed
         $wpdb->update(
             $wpdb->prefix . 'cora_agencies',
-            array( 'name' => $business_name, 'updated_at' => current_time( 'mysql' ) ),
+            array( 'name' => $business_name, 'industry' => $industry, 'updated_at' => current_time( 'mysql' ) ),
             array( 'slug' => $existing_agency )
         );
         // Sync option
@@ -15289,6 +15296,7 @@ function cora_create_user_workspace( $user_id, $business_name ) {
             foreach ( $agencies as $k => $ag ) {
                 if ( isset( $ag['slug'] ) && $ag['slug'] === $existing_agency ) {
                     $agencies[$k]['name'] = $business_name;
+                    $agencies[$k]['industry'] = $industry;
                 }
             }
             update_option( 'cora_agencies', $agencies );
@@ -15322,10 +15330,11 @@ function cora_create_user_workspace( $user_id, $business_name ) {
                 'owner_user_id' => $user_id,
                 'plan'          => 'enterprise',
                 'status'        => 'active',
+                'industry'      => $industry,
                 'created_at'    => $now,
                 'updated_at'    => $now
             ),
-            array( '%s', '%s', '%d', '%s', '%s', '%s', '%s' )
+            array( '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s' )
         );
         $agency_db_id = $wpdb->insert_id;
     } else {
@@ -15343,6 +15352,7 @@ function cora_create_user_workspace( $user_id, $business_name ) {
         'slug'          => $slug,
         'plan'          => 'enterprise',
         'status'        => 'active',
+        'industry'      => $industry,
         'owner_user_id' => $user_id,
         'created_at'    => $now
     );
@@ -15428,6 +15438,7 @@ function cora_create_custom_tables() {
       owner_user_id bigint(20) unsigned NOT NULL,
       plan varchar(50) NOT NULL DEFAULT 'beta',
       status varchar(20) NOT NULL DEFAULT 'active',
+      industry varchar(50) NOT NULL DEFAULT 'real_estate',
       settings longtext,
       created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
       updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -27171,6 +27182,23 @@ function cora_is_workspace_owner( $user = null ) {
 }
 
 /**
+ * Ensure industry column exists in cora_agencies table.
+ */
+if ( ! function_exists( 'cora_ensure_agencies_industry_column' ) ) {
+function cora_ensure_agencies_industry_column() {
+    global $wpdb;
+    $agencies_table = $wpdb->prefix . 'cora_agencies';
+    $table_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $agencies_table ) );
+    if ( $table_exists ) {
+        $column_exists = $wpdb->get_results( "SHOW COLUMNS FROM {$agencies_table} LIKE 'industry'" );
+        if ( empty( $column_exists ) ) {
+            $wpdb->query( "ALTER TABLE {$agencies_table} ADD COLUMN industry varchar(50) NOT NULL DEFAULT 'real_estate'" );
+        }
+    }
+}
+}
+
+/**
  * AJAX Callback: Get all workspaces.
  */
 if ( ! function_exists( 'cora_ajax_super_get_workspaces' ) ) {
@@ -27181,6 +27209,8 @@ function cora_ajax_super_get_workspaces() {
     if ( ! cora_is_super_owner() ) {
         wp_send_json_error( 'Unauthorized access.' );
     }
+
+    cora_ensure_agencies_industry_column();
 
     global $wpdb;
     $agencies_table = $wpdb->prefix . 'cora_agencies';
@@ -27194,13 +27224,31 @@ function cora_ajax_super_get_workspaces() {
                   FROM {$agencies_table} a 
                   LEFT JOIN {$users_table} u ON a.owner_user_id = u.ID 
                   ORDER BY a.id DESC";
-        $results = $wpdb->get_results( $query, ARRAY_A );
+        $raw_results = $wpdb->get_results( $query, ARRAY_A );
+        if ( is_array( $raw_results ) ) {
+            foreach ( $raw_results as $row ) {
+                $ind = ! empty( $row['industry'] ) ? $row['industry'] : '';
+                if ( ! $ind && ! empty( $row['owner_user_id'] ) ) {
+                    $ind = get_user_meta( $row['owner_user_id'], 'cora_workspace_industry', true );
+                }
+                if ( ! $ind ) {
+                    $ind = 'real_estate';
+                }
+                $row['industry'] = $ind;
+                $results[] = $row;
+            }
+        }
     }
 
     if ( empty( $results ) ) {
         $agencies = get_option( 'cora_agencies', array() );
         if ( is_array( $agencies ) && ! empty( $agencies ) ) {
-            $results = array_values( $agencies );
+            foreach ( $agencies as $k => $ag ) {
+                if ( empty( $ag['industry'] ) ) {
+                    $ag['industry'] = 'real_estate';
+                }
+                $results[] = $ag;
+            }
         } else {
             $results = array(
                 array(
@@ -27209,6 +27257,7 @@ function cora_ajax_super_get_workspaces() {
                     'slug' => 'apex-realty',
                     'plan' => 'enterprise',
                     'status' => 'active',
+                    'industry' => 'real_estate',
                     'owner_email' => 'shruti@heycora.in',
                     'created_at' => current_time( 'mysql' )
                 )
@@ -27302,7 +27351,7 @@ add_action( 'wp_ajax_cora_switch_industry_mode', 'cora_ajax_switch_industry_mode
 add_action( 'wp_ajax_nopriv_cora_switch_industry_mode', 'cora_ajax_switch_industry_mode' );
 
 /**
- * AJAX Callback: Update workspace status or plan.
+ * AJAX Callback: Update workspace status, plan, or industry.
  */
 if ( ! function_exists( 'cora_ajax_super_update_workspace' ) ) {
 function cora_ajax_super_update_workspace() {
@@ -27310,6 +27359,8 @@ function cora_ajax_super_update_workspace() {
     if ( ! cora_is_super_owner() ) {
         wp_send_json_error( 'Unauthorized access.' );
     }
+
+    cora_ensure_agencies_industry_column();
 
     global $wpdb;
     $workspace_id = isset( $_POST['workspace_id'] ) ? intval( $_POST['workspace_id'] ) : 0;
@@ -27329,6 +27380,13 @@ function cora_ajax_super_update_workspace() {
     $slug = isset( $_POST['slug'] ) ? sanitize_title( $_POST['slug'] ) : $workspace['slug'];
     $status = isset( $_POST['status'] ) ? sanitize_text_field( $_POST['status'] ) : $workspace['status'];
     $plan = isset( $_POST['plan'] ) ? sanitize_text_field( $_POST['plan'] ) : $workspace['plan'];
+
+    $raw_ind = isset( $_POST['industry'] ) ? sanitize_text_field( $_POST['industry'] ) : ( ! empty( $workspace['industry'] ) ? $workspace['industry'] : 'real_estate' );
+    if ( $raw_ind === 'photography' ) {
+        $raw_ind = 'photography_studio';
+    }
+    $industry = in_array( $raw_ind, array( 'real_estate', 'photography_studio' ), true ) ? $raw_ind : 'real_estate';
+
     $owner_email = isset( $_POST['owner_email'] ) ? sanitize_email( $_POST['owner_email'] ) : '';
 
     $owner_id = $workspace['owner_user_id'];
@@ -27359,11 +27417,12 @@ function cora_ajax_super_update_workspace() {
             'slug' => $slug,
             'status' => $status,
             'plan' => $plan,
+            'industry' => $industry,
             'owner_user_id' => $owner_id,
             'updated_at' => current_time( 'mysql' )
         ),
         array( 'id' => $workspace_id ),
-        array( '%s', '%s', '%s', '%s', '%d', '%s' ),
+        array( '%s', '%s', '%s', '%s', '%s', '%d', '%s' ),
         array( '%d' )
     );
 
@@ -27371,12 +27430,14 @@ function cora_ajax_super_update_workspace() {
         wp_send_json_error( 'Failed to update workspace in database.' );
     }
 
+    if ( $owner_id ) {
+        update_user_meta( $owner_id, 'cora_workspace_industry', $industry );
+    }
+
     // Sync to options array cora_agencies
     $agencies = get_option( 'cora_agencies', array() );
     
-    // Check if key is 'agency_' . $workspace_id
     $key = 'agency_' . $workspace_id;
-    
     if ( ! isset( $agencies[$key] ) ) {
         foreach ( $agencies as $k => $agency_data ) {
             if ( isset( $agency_data['id'] ) && ( intval( $agency_data['id'] ) === $workspace_id || $agency_data['id'] === $key ) ) {
@@ -27399,11 +27460,17 @@ function cora_ajax_super_update_workspace() {
     $agencies[$key]['subdomain'] = $slug;
     $agencies[$key]['status'] = $status;
     $agencies[$key]['plan'] = $plan;
+    $agencies[$key]['industry'] = $industry;
     $agencies[$key]['owner_user_id'] = $owner_id;
 
     update_option( 'cora_agencies', $agencies );
 
-    wp_send_json_success( array( 'message' => 'Workspace updated successfully.' ) );
+    cora_log_activity( 'Platform Management', "Workspace ID {$workspace_id} ({$name}) updated: industry={$industry}, plan={$plan}, status={$status}" );
+
+    wp_send_json_success( array(
+        'message' => 'Workspace updated successfully.',
+        'industry' => $industry
+    ) );
 }
 }
 add_action( 'wp_ajax_cora_super_update_workspace', 'cora_ajax_super_update_workspace' );
@@ -27471,9 +27538,16 @@ function cora_ajax_super_create_workspace() {
         wp_send_json_error( array( 'message' => 'Unauthorized access.' ) );
     }
 
+    cora_ensure_agencies_industry_column();
+
     $name = isset( $_POST['name'] ) ? sanitize_text_field( $_POST['name'] ) : '';
     $slug = isset( $_POST['slug'] ) ? sanitize_title( $_POST['slug'] ) : '';
     $plan = isset( $_POST['plan'] ) ? sanitize_text_field( $_POST['plan'] ) : 'starter';
+    $raw_ind = isset( $_POST['industry'] ) ? sanitize_text_field( $_POST['industry'] ) : 'real_estate';
+    if ( $raw_ind === 'photography' ) {
+        $raw_ind = 'photography_studio';
+    }
+    $industry = in_array( $raw_ind, array( 'real_estate', 'photography_studio' ), true ) ? $raw_ind : 'real_estate';
     $owner_email = isset( $_POST['owner_email'] ) ? sanitize_email( $_POST['owner_email'] ) : '';
 
     if ( empty( $name ) || empty( $slug ) ) {
@@ -27507,15 +27581,20 @@ function cora_ajax_super_create_workspace() {
                 'owner_user_id' => $owner_id,
                 'plan' => $plan,
                 'status' => 'active',
+                'industry' => $industry,
                 'created_at' => $now,
                 'updated_at' => $now
             ),
-            array( '%s', '%s', '%d', '%s', '%s', '%s', '%s' )
+            array( '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s' )
         );
 
         if ( $inserted ) {
             $workspace_id = $wpdb->insert_id;
             
+            if ( $owner_id ) {
+                update_user_meta( $owner_id, 'cora_workspace_industry', $industry );
+            }
+
             $agencies = get_option( 'cora_agencies', array() );
             $agencies[$workspace_id] = array(
                 'id' => $workspace_id,
@@ -27523,6 +27602,7 @@ function cora_ajax_super_create_workspace() {
                 'slug' => $slug,
                 'plan' => $plan,
                 'status' => 'active',
+                'industry' => $industry,
                 'owner_user_id' => $owner_id
             );
             update_option( 'cora_agencies', $agencies );
@@ -27534,7 +27614,8 @@ function cora_ajax_super_create_workspace() {
                     'name' => $name,
                     'slug' => $slug,
                     'plan' => $plan,
-                    'status' => 'active'
+                    'status' => 'active',
+                    'industry' => $industry
                 )
             ) );
         }
@@ -27630,6 +27711,21 @@ function cora_ajax_super_impersonate_user() {
     }
 
     $current_user_id = get_current_user_id();
+
+    // Sync active industry to target user's workspace industry
+    $target_ind = get_user_meta( $target_user_id, 'cora_workspace_industry', true );
+    if ( ! $target_ind ) {
+        global $wpdb;
+        $ag_table = $wpdb->prefix . 'cora_agencies';
+        if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $ag_table ) ) ) {
+            $target_ind = $wpdb->get_var( $wpdb->prepare( "SELECT industry FROM {$ag_table} WHERE owner_user_id = %d", $target_user_id ) );
+        }
+    }
+    if ( ! $target_ind ) {
+        $target_ind = 'real_estate';
+    }
+    update_option( 'cora_workspace_industry', $target_ind );
+    setcookie( 'cora_workspace_industry', $target_ind, time() + 86400 * 365, '/' );
 
     // Sign the impersonator ID using auth salt
     $hash = hash_hmac( 'sha256', $current_user_id, wp_salt( 'auth' ) );
@@ -31249,10 +31345,20 @@ function cora_ajax_delete_document() {
     if ( ! is_array($docs) ) $docs = array();
 
     $docs = array_filter($docs, function($d) use ($doc_id) {
-        return ($d['id'] ?? '') !== $doc_id;
+        return (string)($d['id'] ?? '') !== (string)$doc_id;
     });
 
     update_option('cora_documents', array_values($docs));
+
+    // Also remove from cora_workspace_vault_docs option key if present
+    $vault_docs = get_option('cora_workspace_vault_docs', array());
+    if ( is_array($vault_docs) ) {
+        $vault_docs = array_filter($vault_docs, function($d) use ($doc_id) {
+            return (string)($d['id'] ?? '') !== (string)$doc_id;
+        });
+        update_option('cora_workspace_vault_docs', array_values($vault_docs));
+    }
+
     wp_send_json_success('Document deleted.');
 }
 }

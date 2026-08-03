@@ -10680,6 +10680,7 @@ function cora_create_custom_tables() {
       owner_user_id bigint(20) unsigned NOT NULL,
       plan varchar(50) NOT NULL DEFAULT 'beta',
       status varchar(20) NOT NULL DEFAULT 'active',
+      industry varchar(50) NOT NULL DEFAULT 'real_estate',
       settings longtext,
       created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
       updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',

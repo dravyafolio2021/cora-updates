@@ -63,6 +63,12 @@ $roles_list = cora_get_all_roles();
                     <option value="pro">Pro</option>
                     <option value="enterprise">Enterprise</option>
                 </select>
+                <!-- Industry Filter -->
+                <select id="workspace-filter-industry" onchange="filterWorkspaces()" class="border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
+                    <option value="">All Industries</option>
+                    <option value="real_estate">Real Estate</option>
+                    <option value="photography_studio">Photography Studio</option>
+                </select>
                 <!-- Status Filter -->
                 <select id="workspace-filter-status" onchange="filterWorkspaces()" class="border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
                     <option value="">All Statuses</option>
@@ -88,6 +94,7 @@ $roles_list = cora_get_all_roles();
                             <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Workspace Name</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Subdomain/Slug</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Plan</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Industry</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Status</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Owner (email)</th>
                             <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Created Date</th>
@@ -96,7 +103,7 @@ $roles_list = cora_get_all_roles();
                     </thead>
                     <tbody id="workspaces-table-body" class="divide-y divide-zinc-100 dark:divide-zinc-800/60">
                         <tr>
-                            <td colspan="7" class="px-5 py-8 text-center text-zinc-450 dark:text-zinc-500">Loading workspaces...</td>
+                            <td colspan="8" class="px-5 py-8 text-center text-zinc-450 dark:text-zinc-500">Loading workspaces...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -289,6 +296,7 @@ jQuery(document).ready(function($) {
     window.renderWorkspaces = function() {
         const query = $('#workspace-search').val().toLowerCase();
         const planFilter = $('#workspace-filter-plan').val();
+        const industryFilter = $('#workspace-filter-industry').val();
         const statusFilter = $('#workspace-filter-status').val();
 
         const filtered = rawWorkspaces.filter(ws => {
@@ -299,14 +307,16 @@ jQuery(document).ready(function($) {
             
             const matchesPlan = !planFilter || ws.plan === planFilter;
             const matchesStatus = !statusFilter || ws.status === statusFilter;
+            const wsInd = ws.industry === 'photography' ? 'photography_studio' : (ws.industry || 'real_estate');
+            const matchesIndustry = !industryFilter || wsInd === industryFilter;
             
-            return matchesQuery && matchesPlan && matchesStatus;
+            return matchesQuery && matchesPlan && matchesStatus && matchesIndustry;
         });
 
         $('#workspace-count-badge').text(`${filtered.length} workspace${filtered.length === 1 ? '' : 's'}`);
 
         if (filtered.length === 0) {
-            $('#workspaces-table-body').html('<tr><td colspan="7" class="px-5 py-8 text-center text-zinc-400 dark:text-zinc-500 bg-zinc-50/20 dark:bg-zinc-900/10">No workspaces matching filters found.</td></tr>');
+            $('#workspaces-table-body').html('<tr><td colspan="8" class="px-5 py-8 text-center text-zinc-400 dark:text-zinc-500 bg-zinc-50/20 dark:bg-zinc-900/10">No workspaces matching filters found.</td></tr>');
             return;
         }
 
@@ -325,11 +335,19 @@ jQuery(document).ready(function($) {
                 ? 'text-red-600 hover:text-red-700 border-zinc-200 hover:bg-red-50 dark:border-zinc-800 dark:hover:bg-red-950/20'
                 : 'text-emerald-600 hover:text-emerald-700 border-zinc-200 hover:bg-emerald-50 dark:border-zinc-800 dark:hover:bg-emerald-950/20';
 
+            const currInd = ws.industry === 'photography' ? 'photography_studio' : (ws.industry || 'real_estate');
+
             html += `
                 <tr class="hover:bg-zinc-50/20 dark:hover:bg-zinc-800/15 transition-colors">
                     <td class="px-5 py-3.5 font-bold text-zinc-900 dark:text-zinc-100">${escapeHtml(ws.name)}</td>
                     <td class="px-5 py-3.5 text-zinc-550 dark:text-zinc-400 font-mono text-[11px]">${escapeHtml(ws.slug)}</td>
                     <td class="px-5 py-3.5">${planBadge}</td>
+                    <td class="px-5 py-3.5">
+                        <select onchange="changeWorkspaceIndustry(${ws.id}, this.value)" class="px-2 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 outline-none cursor-pointer shadow-sm">
+                            <option value="real_estate" ${currInd === 'real_estate' ? 'selected' : ''}>🏡 Real Estate</option>
+                            <option value="photography_studio" ${currInd === 'photography_studio' ? 'selected' : ''}>📸 Studio</option>
+                        </select>
+                    </td>
                     <td class="px-5 py-3.5">${statusBadge}</td>
                     <td class="px-5 py-3.5 text-zinc-500 dark:text-zinc-400 font-medium">${escapeHtml(ws.owner_email || '—')}</td>
                     <td class="px-5 py-3.5 text-zinc-400 dark:text-zinc-500 font-medium">${formatDate(ws.created_at)}</td>
@@ -480,6 +498,41 @@ jQuery(document).ready(function($) {
         });
     }
 
+    // POST: Update Workspace Industry
+    window.changeWorkspaceIndustry = function(workspaceId, newIndustry) {
+        const ws = rawWorkspaces.find(w => w.id == workspaceId);
+        if (!ws) return;
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_super_update_workspace',
+            security: coraREData.ajaxNonce,
+            workspace_id: workspaceId,
+            status: ws.status,
+            plan: ws.plan,
+            industry: newIndustry
+        }, function(res) {
+            if (res.success) {
+                ws.industry = newIndustry;
+                renderWorkspaces();
+                if (window.coraShowToast) {
+                    const label = newIndustry === 'photography_studio' ? 'Photography Studio' : 'Real Estate';
+                    window.coraShowToast(res.data.message || `Workspace industry updated to ${label}.`, 'success');
+                }
+            } else {
+                const errorMsg = res.data || 'Failed to update workspace industry.';
+                if (window.coraShowToast) {
+                    window.coraShowToast(errorMsg, 'error');
+                }
+                renderWorkspaces();
+            }
+        }).fail(function() {
+            if (window.coraShowToast) {
+                window.coraShowToast('Network error while changing workspace industry.', 'error');
+            }
+            renderWorkspaces();
+        });
+    }
+
     // POST: Update Workspace Plan
     window.changeWorkspacePlan = function(workspaceId, newPlan) {
         const ws = rawWorkspaces.find(w => w.id == workspaceId);
@@ -490,7 +543,8 @@ jQuery(document).ready(function($) {
             security: coraREData.ajaxNonce,
             workspace_id: workspaceId,
             status: ws.status,
-            plan: newPlan
+            plan: newPlan,
+            industry: ws.industry
         }, function(res) {
             if (res.success) {
                 ws.plan = newPlan;
@@ -618,6 +672,7 @@ window.openCreateWorkspaceDrawer = function() {
     $('#new-ws-slug').val('');
     $('#new-ws-owner-email').val('');
     $('#new-ws-plan').val('starter');
+    $('#new-ws-industry').val('real_estate');
     $('#cora-add-workspace-drawer').removeClass('translate-x-full');
     $('#cora-add-workspace-overlay').removeClass('hidden');
 };
@@ -636,6 +691,7 @@ window.submitNewWorkspace = function() {
     const name = $('#new-ws-name').val().trim();
     const slug = $('#new-ws-slug').val().trim();
     const plan = $('#new-ws-plan').val();
+    const industry = $('#new-ws-industry').val();
     const ownerEmail = $('#new-ws-owner-email').val().trim();
 
     if (!name || !slug) {
@@ -649,6 +705,7 @@ window.submitNewWorkspace = function() {
         name: name,
         slug: slug,
         plan: plan,
+        industry: industry,
         owner_email: ownerEmail
     }, function(res) {
         if (res.success) {
@@ -722,6 +779,14 @@ window.dispatchSuperDailyReports = function() {
                 <option value="pro">Pro Plan</option>
                 <option value="enterprise" selected>Enterprise Plan</option>
                 <option value="beta">Beta Plan</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Industry Profile *</label>
+            <select id="new-ws-industry" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs bg-white dark:bg-zinc-900 outline-none cursor-pointer text-zinc-900 dark:text-zinc-100">
+                <option value="real_estate" selected>🏡 Real Estate Agency</option>
+                <option value="photography_studio">📸 Photography Studio</option>
             </select>
         </div>
 

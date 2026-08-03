@@ -11495,6 +11495,14 @@ if ( cora_is_super_owner() ) :
             </div>
 
             <div>
+                <label class="block text-[10.5px] font-bold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">Industry Profile</label>
+                <select id="cora-edit-ws-industry" class="w-full h-10 px-2.5 bg-zinc-50 border border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-900 dark:focus:border-white transition-colors">
+                    <option value="real_estate">🏡 Real Estate Agency</option>
+                    <option value="photography_studio">📸 Photography Studio</option>
+                </select>
+            </div>
+
+            <div>
                 <label class="block text-[10.5px] font-bold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wider">Owner Email Address</label>
                 <input type="email" id="cora-edit-ws-owner-email" required class="w-full h-10 px-3 bg-zinc-50 border border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 rounded-lg text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-white transition-colors">
             </div>
@@ -11576,7 +11584,7 @@ if ( cora_is_super_owner() ) :
         };
 
         // Toggle Edit Drawer
-        window.coraToggleEditWorkspaceDrawer = function(open, wsId, wsName, wsSlug, wsPlan, wsOwnerEmail, wsStatus) {
+        window.coraToggleEditWorkspaceDrawer = function(open, wsId, wsName, wsSlug, wsPlan, wsOwnerEmail, wsStatus, wsIndustry) {
             const drawer = document.getElementById('cora-edit-workspace-drawer');
             const backdrop = document.getElementById('cora-drawer-backdrop');
             if (!drawer) return;
@@ -11587,6 +11595,9 @@ if ( cora_is_super_owner() ) :
                 document.getElementById('cora-edit-ws-plan').value = wsPlan || 'enterprise';
                 document.getElementById('cora-edit-ws-owner-email').value = wsOwnerEmail || 'shruti@heycora.in';
                 document.getElementById('cora-edit-ws-status').value = wsStatus || 'active';
+                if (document.getElementById('cora-edit-ws-industry')) {
+                    document.getElementById('cora-edit-ws-industry').value = (wsIndustry === 'photography' ? 'photography_studio' : (wsIndustry || 'real_estate'));
+                }
                 
                 // Reset danger zone state
                 window.coraCancelDeleteWorkspace();
@@ -11671,6 +11682,7 @@ if ( cora_is_super_owner() ) :
             const plan = document.getElementById('cora-edit-ws-plan').value;
             const ownerEmail = document.getElementById('cora-edit-ws-owner-email').value;
             const status = document.getElementById('cora-edit-ws-status').value;
+            const industry = document.getElementById('cora-edit-ws-industry') ? document.getElementById('cora-edit-ws-industry').value : 'real_estate';
             const btn = document.getElementById('cora-edit-ws-btn');
 
             if (!name || !slug) {
@@ -11688,6 +11700,7 @@ if ( cora_is_super_owner() ) :
                 name: name,
                 slug: slug,
                 plan: plan,
+                industry: industry,
                 owner_email: ownerEmail,
                 status: status
             }, function(res) {

@@ -8,9 +8,9 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 // Fetch documents from WP options or fallback to exact default sample documents from UI mockup
-$cora_documents = get_option( 'cora_documents', array() );
+$cora_documents_raw = get_option( 'cora_documents', false );
 
-if ( empty( $cora_documents ) || ! is_array( $cora_documents ) || count( $cora_documents ) <= 1 ) {
+if ( false === $cora_documents_raw ) {
     $cora_documents = array(
         array(
             'id'             => 'doc_101',
@@ -97,6 +97,9 @@ if ( empty( $cora_documents ) || ! is_array( $cora_documents ) || count( $cora_d
             )
         )
     );
+    update_option( 'cora_documents', $cora_documents );
+} else {
+    $cora_documents = is_array( $cora_documents_raw ) ? $cora_documents_raw : array();
 }
 
 // Ensure every document has a secure share hash for public view
