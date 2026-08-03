@@ -150,25 +150,25 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
 <div class="p-0 m-0 border-0 outline-none md:space-y-6 space-y-4">
     <!-- Desktop Header -->
-    <div class="hidden md:flex items-center justify-between">
-        <div class="cora-page-header flex items-center gap-3">
-            <span class="cora-page-emoji text-zinc-900 flex shrink-0">
-                <svg viewBox="0 0 24 24" width="30" height="30" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <div class="hidden md:flex items-center justify-between border-b border-zinc-200/50 dark:border-zinc-800/40 pb-5 mb-5 select-none">
+        <div class="cora-page-header flex items-center gap-4.5">
+            <div class="w-12 h-12 rounded-[14px] bg-zinc-100/80 dark:bg-zinc-900/60 border border-zinc-200/40 dark:border-zinc-800/40 flex items-center justify-center text-zinc-800 dark:text-zinc-200 shrink-0">
+                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                     <circle cx="9" cy="7" r="4"></circle>
                     <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                 </svg>
-            </span>
-            <div>
-                <h1 class="cora-page-title text-2xl font-bold tracking-tight text-zinc-900">User Management</h1>
-                <p class="cora-section-desc text-xs text-zinc-500 mt-1"><?php echo $is_studio_mode ? 'Add studio crew members, manage active user accounts, and control workspace permissions.' : 'Add brokerage team members, manage active user accounts, and control workspace permissions.'; ?></p>
+            </div>
+            <div class="flex flex-col min-w-0">
+                <h1 class="cora-page-title text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 leading-tight">User Management</h1>
+                <p class="cora-section-desc text-xs text-zinc-400 mt-1 leading-normal"><?php echo $is_studio_mode ? 'Add studio crew members, manage active user accounts, and control workspace permissions.' : 'Add brokerage team members, manage active user accounts, and control workspace permissions.'; ?></p>
             </div>
         </div>
         
         <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager', 'cora_workspace_owner', 'owner' ) ) ) : ?>
-            <button onclick="openInviteDrawer()" class="bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs px-4 py-2 rounded-lg transition-colors cursor-pointer active:scale-95 shadow-sm flex items-center gap-2">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <button onclick="openInviteDrawer()" class="bg-zinc-950 hover:bg-zinc-900 dark:bg-zinc-50 dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer active:scale-98 shadow-sm flex items-center gap-1.5 border border-zinc-950 dark:border-zinc-50">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 Invite User
             </button>
         <?php endif; ?>
