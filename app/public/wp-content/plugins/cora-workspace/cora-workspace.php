@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 2.9.100
+ * Version: 2.9.101
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '2.9.100' );
+define( 'CORA_WORKSPACE_VERSION', '2.9.101' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -19184,7 +19184,7 @@ function cora_ajax_save_branch() {
     }
 
     global $wpdb;
-    $agency_db_id = empty($agency_id) ? 1 : intval(preg_replace('/[^\d]/', '', $agency_id));
+    $agency_db_id = cora_db_get_agency_id();
     $db_branch_id = intval(preg_replace('/[^\d]/', '', $branch_id));
 
     if ( $db_branch_id > 0 ) {
@@ -19221,7 +19221,7 @@ function cora_ajax_save_branch() {
 
     $branches[ $new_id ] = array(
         'id'         => $new_id,
-        'agency_id'  => $agency_id,
+        'agency_id'  => 'agency_' . $agency_db_id,
         'name'       => $branch_name,
         'city'       => $city,
         'address'    => $address,
@@ -19278,8 +19278,7 @@ function cora_ajax_delete_branch() {
     }
 
     global $wpdb;
-    $agency_id = cora_get_current_user_agency_id();
-    $agency_db_id = empty($agency_id) ? 1 : intval(preg_replace('/[^\d]/', '', $agency_id));
+    $agency_db_id = cora_db_get_agency_id();
     $db_branch_id = intval(preg_replace('/[^\d]/', '', $branch_id));
 
     $wpdb->delete(

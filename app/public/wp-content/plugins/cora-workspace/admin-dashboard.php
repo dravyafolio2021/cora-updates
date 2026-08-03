@@ -3774,13 +3774,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     align-items: center !important;
                     justify-content: center !important;
                     height: 20px !important;
-                    padding: 0 8px !important;
+                    padding: 0 10px !important;
                     border-radius: 9999px !important;
                     transition: all 0.2s ease-in-out !important;
                 }
                 #cora-feedback-trigger:hover {
                     background-color: #128c7e !important;
                     border-color: #075e54 !important;
+                    color: #ffffff !important;
                 }
                 
                 /* Dark Theme overrides for the button */
@@ -3792,6 +3793,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 .cora-dark-theme #cora-feedback-trigger:hover {
                     background-color: #128c7e !important;
                     border-color: #075e54 !important;
+                    color: #ffffff !important;
                 }
                 
                 /* Collapsed Sidebar overrides */
@@ -3800,8 +3802,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     left: 50% !important;
                     transform: translate(-50%, -50%) !important;
                 }
-                .cora-sidebar.collapsed-sidebar .cora-feedback-btn-text,
-                .cora-sidebar.collapsed-sidebar .cora-pulse-white {
+                .cora-sidebar.collapsed-sidebar .cora-feedback-btn-text {
                     display: none !important;
                 }
                 .cora-sidebar.collapsed-sidebar #cora-feedback-trigger {
@@ -3827,12 +3828,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             <div class="cora-user-footer px-4 py-3 flex items-center justify-between border-t border-zinc-200/50 dark:border-zinc-800/40 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/30 transition-colors duration-200 cursor-pointer relative z-[60]" onclick="event.stopPropagation(); $('#cora-profile-popover').toggleClass('hidden'); $('#cora-sidebar-notif-popover').addClass('hidden'); $('#cora-workspace-popover').addClass('hidden');">
                 <!-- Dynamic Feedback Pill (Sticky Arc) inside profile footer -->
                 <button type="button" id="cora-feedback-trigger" class="absolute -top-2.5 right-14 h-5 px-2 flex items-center justify-center gap-1.5 text-[9px] font-bold shadow-2xs hover:scale-[1.02] active:scale-[0.98] cursor-pointer z-[65]" onclick="window.coraOpenFeedbackDrawer(event)">
-                    <span class="cora-pulse-white flex h-1.5 w-1.5 relative shrink-0">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
-                    </span>
                     <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" class="shrink-0 text-white">
-                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.5-5.739-1.453L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.97C16.63 2.052 14.155.988 11.99 1.002c-5.43 0-9.855 4.37-9.86 9.8.001 2.012.528 3.979 1.529 5.71l-.337 1.232 1.265-.331 1.06.64zm11.086-7.553c-.3-.15-1.771-.875-2.046-.975-.275-.1-.475-.15-.675.15-.2.3-.775.975-.95 1.175-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.413-1.488-.892-.796-1.493-1.78-1.668-2.08-.175-.3-.018-.462.13-.61.135-.133.3-.313.45-.47.15-.157.2-.27.3-.45.1-.18.05-.338-.025-.488-.075-.15-.675-1.625-.925-2.225-.244-.588-.492-.51-.675-.52-.172-.007-.372-.007-.572-.007-.2 0-.525.075-.8.375-.275.3-1.05 1.025-1.05 2.5s1.075 2.9 1.225 3.1c.15.2 2.11 3.225 5.11 4.525.714.31 1.272.496 1.702.633.715.227 1.365.195 1.88.12.574-.085 1.771-.725 2.021-1.425.25-.7.25-1.3.175-1.425-.075-.125-.275-.2-.575-.35z"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M18.403 5.633A8.919 8.919 0 0 0 12.053 3c-4.948 0-8.976 4.027-8.978 8.977 0 1.58.413 3.125 1.2 4.488l-1.276 4.66 4.77-1.252a8.936 8.936 0 0 0 4.283 1.093h.004c4.947 0 8.975-4.027 8.977-8.977a8.926 8.926 0 0 0-2.63-6.353zM12.053 19.31a7.432 7.432 0 0 1-3.79-1.042l-.272-.162-2.82.74.752-2.748-.177-.282a7.43 7.43 0 0 1-1.139-3.934c.002-4.103 3.342-7.443 7.447-7.443a7.402 7.402 0 0 1 5.263 2.183 7.404 7.404 0 0 1 2.181 5.266c-.002 4.104-3.343 7.444-7.445 7.444zm4.079-5.571c-.223-.112-1.322-.653-1.526-.728-.205-.074-.354-.112-.503.112-.149.224-.577.728-.707.877-.13.15-.26.168-.484.056-.223-.112-.942-.347-1.794-1.108-.663-.592-1.11-1.322-1.24-1.546-.13-.223-.014-.344.098-.456.1-.1.223-.26.335-.392.112-.13.149-.224.223-.373.075-.149.038-.28-.018-.392-.056-.112-.503-1.213-.689-1.66-.182-.439-.366-.38-.503-.387-.13-.007-.28-.007-.429-.007-.15 0-.391.056-.596.28-.205.224-.782.766-.782 1.867 0 1.102.8 2.167.912 2.316.112.15 1.574 2.404 3.814 3.37.533.23 1.012.38 1.397.502.535.17 1.02.146 1.405.089.43-.064 1.322-.54 1.507-1.062.187-.523.187-.972.13-1.062-.056-.09-.205-.149-.43-.262z"/>
                     </svg>
                     <span class="cora-feedback-btn-text">Feedback</span>
                 </button>
@@ -11782,34 +11779,34 @@ if ( cora_is_super_owner() ) :
         </div>
 
         <!-- Actions CTA -->
-        <div class="p-5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 shrink-0 space-y-4">
-            <!-- WhatsApp Feedback -->
-            <div class="space-y-1.5">
-                <button type="button" onclick="window.coraSendFeedback('whatsapp')" class="w-full py-2.5 bg-[#25D366] hover:bg-[#20ba5a] text-white text-xs font-bold rounded-xl transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 shadow-sm border-none">
-                    <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="shrink-0 text-white">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M18.403 5.633A8.919 8.919 0 0 0 12.053 3c-4.948 0-8.976 4.027-8.978 8.977 0 1.58.413 3.125 1.2 4.488l-1.276 4.66 4.77-1.252a8.936 8.936 0 0 0 4.283 1.093h.004c4.947 0 8.975-4.027 8.977-8.977a8.926 8.926 0 0 0-2.63-6.353zM12.053 19.31a7.432 7.432 0 0 1-3.79-1.042l-.272-.162-2.82.74.752-2.748-.177-.282a7.43 7.43 0 0 1-1.139-3.934c.002-4.103 3.342-7.443 7.447-7.443a7.402 7.402 0 0 1 5.263 2.183 7.404 7.404 0 0 1 2.181 5.266c-.002 4.104-3.343 7.444-7.445 7.444zm4.079-5.571c-.223-.112-1.322-.653-1.526-.728-.205-.074-.354-.112-.503.112-.149.224-.577.728-.707.877-.13.15-.26.168-.484.056-.223-.112-.942-.347-1.794-1.108-.663-.592-1.11-1.322-1.24-1.546-.13-.223-.014-.344.098-.456.1-.1.223-.26.335-.392.112-.13.149-.224.223-.373.075-.149.038-.28-.018-.392-.056-.112-.503-1.213-.689-1.66-.182-.439-.366-.38-.503-.387-.13-.007-.28-.007-.429-.007-.15 0-.391.056-.596.28-.205.224-.782.766-.782 1.867 0 1.102.8 2.167.912 2.316.112.15 1.574 2.404 3.814 3.37.533.23 1.012.38 1.397.502.535.17 1.02.146 1.405.089.43-.064 1.322-.54 1.507-1.062.187-.523.187-.972.13-1.062-.056-.09-.205-.149-.43-.262z"/>
-                    </svg>
-                    <span>Share on WhatsApp</span>
-                </button>
-                <div class="flex items-center justify-between px-1">
-                    <span class="text-[9px] font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                        <span class="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span>
-                        Instant reply (usually under 5 mins)
-                    </span>
-                    <span class="text-[8px] uppercase tracking-wider font-bold bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.2 rounded font-mono">Recommended</span>
+        <div class="p-5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 shrink-0">
+            <div class="grid grid-cols-2 gap-3.5">
+                <!-- WhatsApp Feedback -->
+                <div class="space-y-1.5 flex flex-col justify-between">
+                    <button type="button" onclick="window.coraSendFeedback('whatsapp')" class="w-full py-2.5 text-white text-xs font-bold rounded-xl transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer flex items-center justify-center gap-1.5 shadow-sm border-none" style="background-color: #25D366 !important;">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="shrink-0 text-white">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M18.403 5.633A8.919 8.919 0 0 0 12.053 3c-4.948 0-8.976 4.027-8.978 8.977 0 1.58.413 3.125 1.2 4.488l-1.276 4.66 4.77-1.252a8.936 8.936 0 0 0 4.283 1.093h.004c4.947 0 8.975-4.027 8.977-8.977a8.926 8.926 0 0 0-2.63-6.353zM12.053 19.31a7.432 7.432 0 0 1-3.79-1.042l-.272-.162-2.82.74.752-2.748-.177-.282a7.43 7.43 0 0 1-1.139-3.934c.002-4.103 3.342-7.443 7.447-7.443a7.402 7.402 0 0 1 5.263 2.183 7.404 7.404 0 0 1 2.181 5.266c-.002 4.104-3.343 7.444-7.445 7.444zm4.079-5.571c-.223-.112-1.322-.653-1.526-.728-.205-.074-.354-.112-.503.112-.149.224-.577.728-.707.877-.13.15-.26.168-.484.056-.223-.112-.942-.347-1.794-1.108-.663-.592-1.11-1.322-1.24-1.546-.13-.223-.014-.344.098-.456.1-.1.223-.26.335-.392.112-.13.149-.224.223-.373.075-.149.038-.28-.018-.392-.056-.112-.503-1.213-.689-1.66-.182-.439-.366-.38-.503-.387-.13-.007-.28-.007-.429-.007-.15 0-.391.056-.596.28-.205.224-.782.766-.782 1.867 0 1.102.8 2.167.912 2.316.112.15 1.574 2.404 3.814 3.37.533.23 1.012.38 1.397.502.535.17 1.02.146 1.405.089.43-.064 1.322-.54 1.507-1.062.187-.523.187-.972.13-1.062-.056-.09-.205-.149-.43-.262z"/>
+                        </svg>
+                        <span>WhatsApp</span>
+                    </button>
+                    <div class="px-0.5 flex flex-col items-center text-center">
+                        <span class="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 leading-none">Instant Reply</span>
+                        <span class="text-[8px] font-medium text-zinc-400 dark:text-zinc-500 mt-0.5">Under 5 mins</span>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Email Feedback -->
-            <div class="space-y-1.5">
-                <button type="button" onclick="window.coraSendFeedback('email')" class="w-full py-2.5 bg-[#EA4335] hover:bg-[#d63b2f] text-white text-xs font-bold rounded-xl transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 shadow-sm border-none">
-                    <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="shrink-0 text-white">
-                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1-.9 2-2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                    </svg>
-                    <span>Share on Email</span>
-                </button>
-                <div class="px-1">
-                    <span class="text-[9px] font-medium text-zinc-500 dark:text-zinc-400">✉️ Response within 24 hours</span>
+                <!-- Email Feedback -->
+                <div class="space-y-1.5 flex flex-col justify-between">
+                    <button type="button" onclick="window.coraSendFeedback('email')" class="w-full py-2.5 text-white text-xs font-bold rounded-xl transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer flex items-center justify-center gap-1.5 shadow-sm border-none" style="background-color: #EA4335 !important;">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="shrink-0 text-white">
+                            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                        </svg>
+                        <span>Send Email</span>
+                    </button>
+                    <div class="px-0.5 flex flex-col items-center text-center">
+                        <span class="text-[9px] font-bold text-red-550 dark:text-red-400 leading-none">Email Support</span>
+                        <span class="text-[8px] font-medium text-zinc-400 dark:text-zinc-550 mt-0.5">Within 24 hours</span>
+                    </div>
                 </div>
             </div>
         </div>
