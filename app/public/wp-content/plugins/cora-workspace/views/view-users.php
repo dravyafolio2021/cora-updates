@@ -146,37 +146,88 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             color: #a1a1aa !important;
         }
     }
+
+    /* Floating popover for permissions matrix cell */
+    .cora-matrix-popover {
+        animation: coraPopoverFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes coraPopoverFadeIn {
+        from { opacity: 0; transform: translateY(-4px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
 </style>
 
 <div class="p-0 m-0 border-0 outline-none md:space-y-6 space-y-4">
     <!-- Desktop Header -->
     <div class="hidden md:flex items-center justify-between border-b border-zinc-200/50 dark:border-zinc-800/40 pb-5 mb-5 select-none">
         <div class="cora-page-header flex items-center gap-4.5">
-            <div class="w-12 h-12 rounded-[14px] bg-zinc-100/80 dark:bg-zinc-900/60 border border-zinc-200/40 dark:border-zinc-800/40 flex items-center justify-center text-zinc-800 dark:text-zinc-200 shrink-0">
-                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
-            </div>
             <div class="flex flex-col min-w-0">
                 <h1 class="cora-page-title text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 leading-tight">User Management</h1>
                 <p class="cora-section-desc text-xs text-zinc-400 mt-1 leading-normal"><?php echo $is_studio_mode ? 'Add studio crew members, manage active user accounts, and control workspace permissions.' : 'Add brokerage team members, manage active user accounts, and control workspace permissions.'; ?></p>
             </div>
         </div>
         
-        <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager', 'cora_workspace_owner', 'owner' ) ) ) : ?>
-            <button onclick="openInviteDrawer()" class="bg-zinc-950 hover:bg-zinc-900 dark:bg-zinc-50 dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer active:scale-98 shadow-sm flex items-center gap-1.5 border border-zinc-950 dark:border-zinc-50">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Invite User
-            </button>
-        <?php endif; ?>
+        <div class="flex items-center gap-3 shrink-0">
+            <!-- LLM Platforms Stacked Overlapping Shortcuts (Desktop) -->
+            <div class="cora-platform-stack flex items-center -space-x-2.5 select-none mr-1">
+                <!-- ChatGPT Button -->
+                <button onclick="coraAskExternalPlatform('openai')" class="group relative z-[5] w-7 h-7 rounded-full border-0 bg-emerald-50/70 hover:bg-emerald-100/50 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" class="w-3 h-3"><path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432 4.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523z"/></svg>
+                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
+                        Ask ChatGPT
+                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-t-zinc-950"></span>
+                    </span>
+                </button>
+                
+                <!-- Claude Button -->
+                <button onclick="coraAskExternalPlatform('claude')" class="group relative z-[4] w-7 h-7 rounded-full border-0 bg-amber-50/70 hover:bg-amber-100/50 dark:bg-amber-950/20 dark:hover:bg-amber-950/40 flex items-center justify-center text-amber-600 dark:text-amber-500 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" class="w-3 h-3"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>
+                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
+                        Ask Claude
+                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-t-zinc-950"></span>
+                    </span>
+                </button>
+                
+                <!-- Gemini Button -->
+                <button onclick="coraAskExternalPlatform('gemini')" class="group relative z-[3] w-7 h-7 rounded-full border-0 bg-blue-5/70 hover:bg-blue-100/50 dark:bg-blue-950/20 dark:hover:bg-blue-950/40 flex items-center justify-center text-blue-600 dark:text-blue-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" class="w-3 h-3"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
+                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
+                        Ask Gemini
+                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-t-zinc-950"></span>
+                    </span>
+                </button>
+                
+                <!-- Perplexity Button -->
+                <button onclick="coraAskExternalPlatform('perplexity')" class="group relative z-[2] w-7 h-7 rounded-full border-0 bg-zinc-50/50 hover:bg-zinc-100/80 dark:bg-zinc-800/20 dark:hover:bg-zinc-800/40 flex items-center justify-center text-zinc-650 dark:text-zinc-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line><line x1="4.93" y1="19.07" x2="19.07" y2="4.93"></line></svg>
+                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
+                        Ask Perplexity
+                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-t-zinc-950"></span>
+                    </span>
+                </button>
+                
+                <!-- YouTube Button -->
+                <button onclick="openPermissionsVideoDrawer()" class="group relative z-[1] w-7 h-7 rounded-full border-0 bg-red-5/70 hover:bg-red-100/50 dark:bg-red-950/20 dark:hover:bg-red-950/40 flex items-center justify-center text-red-600 dark:text-red-500 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" class="w-3 h-3"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.107C19.518 3.545 12 3.545 12 3.545s-7.518 0-9.388.511a3.002 3.002 0 0 0-2.11 2.107C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.107c1.87.511 9.388.511 9.388.511s7.518 0 9.388-.511a3.003 3.003 0 0 0 2.11-2.107c.502-1.87.502-5.837.502-5.837s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
+                        Tutorial Walkthrough
+                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-t-zinc-950"></span>
+                    </span>
+                </button>
+            </div>
+            
+            <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager', 'cora_workspace_owner', 'owner' ) ) ) : ?>
+                <button onclick="openInviteDrawer()" class="bg-zinc-950 hover:bg-zinc-900 dark:bg-zinc-50 dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer active:scale-98 shadow-sm flex items-center gap-1.5 border border-zinc-950 dark:border-zinc-50 shrink-0">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Invite User
+                </button>
+            <?php endif; ?>
+        </div>
     </div>
 
     <!-- Mobile Header (Visible only on mobile) -->
-    <div class="flex md:hidden items-center justify-between gap-3 mb-2 px-4 py-3 border-b border-zinc-200/60 dark:border-zinc-800 bg-white dark:bg-zinc-900 select-none">
-        <div class="flex items-center gap-2">
+    <div class="flex md:hidden items-center justify-between gap-3 mb-2 px-0 py-3 border-b border-zinc-200/60 dark:border-zinc-800 bg-white dark:bg-zinc-900 select-none">
+        <div class="flex items-center gap-2 min-w-0">
             <span class="text-zinc-900 dark:text-zinc-100 flex shrink-0">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -185,18 +236,68 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                 </svg>
             </span>
-            <div>
-                <h1 class="text-sm font-bold tracking-tight text-zinc-900 dark:text-zinc-100"><?php echo $is_studio_mode ? 'Crew' : 'Team'; ?></h1>
-                <p class="text-[10px] text-zinc-400"><?php echo $is_studio_mode ? 'Add studio crew & manage permissions.' : 'Add brokerage team & manage permissions.'; ?></p>
+            <div class="min-w-0">
+                <h1 class="text-sm font-bold tracking-tight text-zinc-900 dark:text-zinc-100 truncate"><?php echo $is_studio_mode ? 'Crew' : 'Team'; ?></h1>
+                <p class="text-[10px] text-zinc-400 truncate"><?php echo $is_studio_mode ? 'Add studio crew & manage permissions.' : 'Add brokerage team & manage permissions.'; ?></p>
             </div>
         </div>
         
-        <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager', 'cora_workspace_owner', 'owner' ) ) ) : ?>
-            <button onclick="openInviteDrawer()" class="bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-[10px] px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer active:scale-95 shadow-sm flex items-center gap-1">
-                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Invite
-            </button>
-        <?php endif; ?>
+        <div class="flex items-center gap-2.5 shrink-0">
+            <!-- LLM Platforms Stacked Overlapping Shortcuts (Mobile) -->
+            <div class="cora-platform-stack flex items-center -space-x-2.5 select-none mr-0.5">
+                <!-- ChatGPT Button -->
+                <button onclick="coraAskExternalPlatform('openai')" class="group relative z-[5] w-7 h-7 rounded-full border-0 bg-emerald-50/70 hover:bg-emerald-100/50 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" class="w-3 h-3"><path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432 4.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523z"/></svg>
+                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
+                        Ask ChatGPT
+                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-t-zinc-950"></span>
+                    </span>
+                </button>
+                
+                <!-- Claude Button -->
+                <button onclick="coraAskExternalPlatform('claude')" class="group relative z-[4] w-7 h-7 rounded-full border-0 bg-amber-50/70 hover:bg-amber-100/50 dark:bg-amber-950/20 dark:hover:bg-amber-950/40 flex items-center justify-center text-amber-600 dark:text-amber-500 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" class="w-3 h-3"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>
+                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
+                        Ask Claude
+                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-t-zinc-950"></span>
+                    </span>
+                </button>
+                
+                <!-- Gemini Button -->
+                <button onclick="coraAskExternalPlatform('gemini')" class="group relative z-[3] w-7 h-7 rounded-full border-0 bg-blue-5/70 hover:bg-blue-100/50 dark:bg-blue-950/20 dark:hover:bg-blue-950/40 flex items-center justify-center text-blue-600 dark:text-blue-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" class="w-3 h-3"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
+                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
+                        Ask Gemini
+                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-t-zinc-950"></span>
+                    </span>
+                </button>
+                
+                <!-- Perplexity Button -->
+                <button onclick="coraAskExternalPlatform('perplexity')" class="group relative z-[2] w-7 h-7 rounded-full border-0 bg-zinc-50/50 hover:bg-zinc-100/80 dark:bg-zinc-800/20 dark:hover:bg-zinc-800/40 flex items-center justify-center text-zinc-650 dark:text-zinc-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line><line x1="4.93" y1="19.07" x2="19.07" y2="4.93"></line></svg>
+                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
+                        Ask Perplexity
+                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-t-zinc-950"></span>
+                    </span>
+                </button>
+                
+                <!-- YouTube Button -->
+                <button onclick="openPermissionsVideoDrawer()" class="group relative z-[1] w-7 h-7 rounded-full border-0 bg-red-5/70 hover:bg-red-100/50 dark:bg-red-950/20 dark:hover:bg-red-950/40 flex items-center justify-center text-red-600 dark:text-red-500 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" class="w-3 h-3"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.107C19.518 3.545 12 3.545 12 3.545s-7.518 0-9.388.511a3.002 3.002 0 0 0-2.11 2.107C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.107c1.87.511 9.388.511 9.388.511s7.518 0 9.388-.511a3.003 3.003 0 0 0 2.11-2.107c.502-1.87.502-5.837.502-5.837s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
+                        Tutorial Walkthrough
+                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-t-zinc-950"></span>
+                    </span>
+                </button>
+            </div>
+            
+            <?php if ( cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager', 'cora_workspace_owner', 'owner' ) ) ) : ?>
+                <button onclick="openInviteDrawer()" class="bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-[10px] px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer active:scale-95 shadow-sm flex items-center gap-1 shrink-0">
+                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Invite
+                </button>
+            <?php endif; ?>
+        </div>
     </div>
 
     <!-- Desktop Sub Navigation Tabs -->
@@ -232,7 +333,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     </div>
 
     <!-- Mobile Sub Navigation Tabs -->
-    <div class="cora-sub-tabs-container flex md:hidden items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-px mb-4 px-4 bg-white dark:bg-zinc-900 relative select-none">
+    <div class="cora-sub-tabs-container flex md:hidden items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-px mb-4 px-0 bg-white dark:bg-zinc-900 relative select-none">
         <div class="flex items-center gap-1.5">
             <!-- Active Members tab -->
             <button class="cora-sub-tab active flex items-center gap-1.5 px-2.5 pb-2 pt-1 text-[11px] font-semibold border-b-[1.5px] border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 transition-all cursor-pointer whitespace-nowrap focus:outline-none focus:ring-0 outline-none shadow-none" data-target="tab-active-members">
@@ -247,8 +348,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         </div>
 
         <!-- More Button and Floating Dropdown Panel -->
-        <div class="relative pb-2">
-            <button id="mobile-tabs-more-btn" class="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium text-zinc-650 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-all cursor-pointer rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 focus:outline-none focus:ring-0 outline-none shadow-none">
+        <div class="relative">
+            <button id="mobile-tabs-more-btn" class="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium text-zinc-650 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-all cursor-pointer focus:outline-none focus:ring-0 outline-none shadow-none border-0 bg-transparent">
                 <span>More</span>
                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="transition-transform" id="more-chevron-icon"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </button>
@@ -395,7 +496,10 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     'bank'       => $u_bank,
                     'bio'        => $u_bio,
                     'avatar'     => $avatar ? $avatar : '',
-                    'banner'     => $banner ? $banner : ''
+                    'banner'     => $banner ? $banner : '',
+                    'ai_token_limit'    => intval( get_user_meta( $u->ID, 'cora_ai_token_limit', true ) ?: 0 ),
+                    'mcp_allowed_tools' => get_user_meta( $u->ID, 'cora_mcp_allowed_tools', true ) ?: array(),
+                    'stay_logged_in'    => get_user_meta( $u->ID, 'cora_stay_logged_in', true ) ?: 'no'
                 );
                 
                 $name_initials = '';
@@ -499,7 +603,10 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 'bank'       => $u_bank,
                                 'bio'        => $u_bio,
                                 'avatar'     => $avatar ? $avatar : '',
-                                'banner'     => $banner ? $banner : ''
+                                'banner'     => $banner ? $banner : '',
+                                'ai_token_limit'    => intval( get_user_meta( $u->ID, 'cora_ai_token_limit', true ) ?: 0 ),
+                                'mcp_allowed_tools' => get_user_meta( $u->ID, 'cora_mcp_allowed_tools', true ) ?: array(),
+                                'stay_logged_in'    => get_user_meta( $u->ID, 'cora_stay_logged_in', true ) ?: 'no'
                             );
                             
                             $name_initials = '';
@@ -622,24 +729,23 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     <!-- TAB 3: PERMISSIONS MATRIX -->
     <div id="tab-permissions-matrix" class="cora-tab-content space-y-4 hidden">
         <div class="cora-card bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-5 shadow-sm space-y-5">
-            <!-- Header & Toolbar Controls Bar -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-zinc-200/60 dark:border-zinc-800">
-                <div>
-                    <div class="flex items-center gap-2.5">
-                        <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-300"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                            Granular Role Permissions Matrix
-                        </h3>
-                        <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 dark:bg-emerald-950/30 border border-emerald-500/20 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 select-none">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            Live Sync Active
-                        </div>
+            <!-- Header Title Row -->
+            <div class="flex flex-col gap-1 w-full pb-1">
+                <div class="flex items-center gap-2.5">
+                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-300"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        Granular Role Permissions Matrix
+                    </h3>
+                    <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 dark:bg-emerald-950/30 border border-emerald-500/20 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 select-none">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Live Sync Active
                     </div>
-                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">Determine dashboard screen visibilities and feature access controls for each workspace role. Super Admin permissions are locked globally.</p>
                 </div>
+                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">Determine dashboard screen visibilities and feature access controls for each workspace role. Super Admin permissions are locked globally.</p>
+            </div>
 
-                <!-- Action Controls Toolbar -->
-                <div class="flex flex-col md:flex-row items-stretch md:items-center gap-2.5 w-full md:w-auto">
+            <!-- Action Controls Toolbar Row -->
+            <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 pb-4 border-b border-zinc-200/60 dark:border-zinc-800 w-full pt-1.5">
                     <!-- Quick Search input -->
                     <div class="relative w-full md:w-52">
                         <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-zinc-400 dark:text-zinc-500">
@@ -649,7 +755,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     </div>
 
                     <!-- Row Action Buttons Grid (3-columns on mobile, flex row on desktop) -->
-                    <div class="grid grid-cols-3 md:flex items-center gap-2 md:gap-2.5 w-full md:w-auto">
+                    <div class="grid grid-cols-4 md:flex items-center gap-2 md:gap-2.5 w-full md:w-auto">
                         <!-- Reset Defaults Button -->
                         <button type="button" id="matrix-reset-defaults-btn" onclick="coraResetMatrixDefaults()" class="px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-750 transition-colors flex items-center justify-center gap-1 md:gap-1.5 cursor-pointer shadow-2xs whitespace-nowrap">
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
@@ -660,6 +766,12 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         <button type="button" id="matrix-grant-all-btn" onclick="coraGrantAllSelectedRolePermissions()" class="px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-750 transition-colors flex items-center justify-center gap-1 md:gap-1.5 cursor-pointer shadow-2xs whitespace-nowrap">
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
                             <span class="truncate">Grant All</span>
+                        </button>
+
+                        <!-- Configure AI Trainer Button -->
+                        <button type="button" id="matrix-ai-trainer-btn" onclick="openAiTrainerDrawer('gemini')" class="px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-750 transition-colors flex items-center justify-center gap-1 md:gap-1.5 cursor-pointer shadow-2xs whitespace-nowrap">
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0 text-amber-500"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                            <span class="truncate">AI Trainer</span>
                         </button>
 
                         <!-- Save Matrix Button -->
@@ -770,8 +882,11 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 </div>
                             </td>
                             <?php foreach ( $matrix_columns as $col_key => $col_lbl ) : ?>
-                                <td class="text-center py-3 border-r last:border-r-0 border-zinc-100 dark:border-zinc-800/40">
-                                    <input type="checkbox" checked disabled class="accent-zinc-950 dark:accent-zinc-100 rounded cursor-not-allowed opacity-50 w-4 h-4">
+                                <td class="text-center py-2 px-4 border-r last:border-r-0 border-zinc-100 dark:border-zinc-800/40 text-zinc-400 dark:text-zinc-500 relative">
+                                    <div class="flex items-center justify-center" title="Full Access Locked">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                    </div>
+                                    <input type="checkbox" checked disabled data-feature="<?php echo esc_attr($col_key); ?>" class="cora-permission-checkbox absolute opacity-[0.01] w-[1px] h-[1px] cursor-not-allowed pointer-events-none" style="left:0; top:0; z-index:100;">
                                 </td>
                             <?php endforeach; ?>
                         </tr>
@@ -780,6 +895,32 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         $all_roles = cora_get_all_roles();
                         $cora_permissions = get_option( 'cora_role_permissions', array() );
                         $cora_custom_roles = get_option( 'cora_custom_roles', array() );
+                        $cora_permission_levels = get_option( 'cora_role_permission_levels', array() );
+                        if ( ! is_array( $cora_permission_levels ) ) { $cora_permission_levels = array(); }
+                        if ( ! function_exists( 'cora_get_matrix_cell_badge' ) ) {
+                            function cora_get_matrix_cell_badge( $arg1 = '', $arg2 = '', $arg3 = '' ) {
+                                $level = 'none';
+                                if ( ! empty( $arg3 ) ) {
+                                    $level = $arg3;
+                                } elseif ( ! empty( $arg1 ) && empty( $arg2 ) && empty( $arg3 ) ) {
+                                    $level = $arg1;
+                                }
+                                $level = in_array( $level, array( 'view', 'edit', 'none' ), true ) ? $level : 'none';
+
+                                $view_icon = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+                                $edit_icon = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>';
+                                $none_icon = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>';
+                                $caret = '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0 opacity-70"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+
+                                if ( $level === 'view' ) {
+                                    return '<span class="cora-matrix-cell-badge inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-500/20 transition-all cursor-pointer shadow-2xs select-none hover:border-emerald-500/50">' . $view_icon . 'View' . $caret . '</span>';
+                                } elseif ( $level === 'edit' ) {
+                                    return '<span class="cora-matrix-cell-badge inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap bg-purple-50 text-purple-700 dark:bg-purple-950/30 dark:text-purple-400 border border-purple-500/20 transition-all cursor-pointer shadow-2xs select-none hover:border-purple-500/50">' . $edit_icon . 'Edit' . $caret . '</span>';
+                                } else {
+                                    return '<span class="cora-matrix-cell-badge inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap bg-zinc-100 text-zinc-650 dark:bg-zinc-800 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 transition-all cursor-pointer shadow-2xs select-none hover:border-zinc-400/50">' . $none_icon . 'No Access' . $caret . '</span>';
+                                }
+                            }
+                        }
 
                         $active_ind = ! empty( $_COOKIE['cora_workspace_industry'] ) 
                             ? $_COOKIE['cora_workspace_industry'] 
@@ -842,11 +983,15 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 </div>
                             </td>
                             <?php foreach ($matrix_columns as $feature_key => $feature_label): 
-                                $checked = in_array($feature_key, $allowed_features) ? 'checked' : '';
+                                $level = isset( $cora_permission_levels[$role_key][$feature_key] ) 
+                                    ? $cora_permission_levels[$role_key][$feature_key] 
+                                    : ( in_array( $feature_key, $allowed_features, true ) ? 'edit' : 'none' );
+                                $is_checked = ( $level !== 'none' ) ? 'checked' : '';
                             ?>
-                            <td class="text-center py-3 border-r last:border-r-0 border-zinc-100 dark:border-zinc-800/40">
-                                <input type="checkbox" <?php echo $checked; ?> data-feature="<?php echo esc_attr($feature_key); ?>" class="cora-permission-checkbox accent-zinc-950 dark:accent-zinc-100 rounded cursor-pointer w-4 h-4 transition-transform hover:scale-110">
-                            </td>
+                            <td class="text-center py-2 px-4 border-r last:border-r-0 border-zinc-100 dark:border-zinc-800/40 relative" data-role="<?php echo esc_attr($role_key); ?>" data-feature="<?php echo esc_attr($feature_key); ?>" data-level="<?php echo esc_attr($level); ?>">
+                                 <?php echo cora_get_matrix_cell_badge($role_key, $feature_key, $level); ?>
+                                 <input type="checkbox" <?php echo $is_checked; ?> data-feature="<?php echo esc_attr($feature_key); ?>" class="cora-permission-checkbox absolute opacity-[0.01] w-[1px] h-[1px] cursor-pointer" style="left:0; top:0; z-index:100; pointer-events:auto;">
+                             </td>
                             <?php endforeach; ?>
                         </tr>
                         <?php endforeach; ?>
@@ -907,16 +1052,16 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                             </button>
                                             <div id="content-<?php echo $accordion_id; ?>" class="hidden px-3 py-2.5 space-y-2 border-t border-zinc-100 dark:border-zinc-900">
                                                 <?php foreach ( $cat_cols as $feature_key => $feature_label ) : 
-                                                    $checked = in_array($feature_key, $allowed_features) ? 'checked' : '';
+                                                    $m_level = isset( $cora_permission_levels[$role_key][$feature_key] ) 
+                                                        ? $cora_permission_levels[$role_key][$feature_key] 
+                                                        : ( in_array( $feature_key, $allowed_features, true ) ? 'edit' : 'none' );
                                                 ?>
-                                                    <label class="flex items-center justify-between gap-3 text-[11px] text-zinc-700 dark:text-zinc-300 cursor-pointer select-none">
-                                                        <span><?php echo esc_html($feature_label); ?></span>
-                                                        <input type="checkbox" <?php echo $checked; ?> 
-                                                            data-role-key="<?php echo esc_attr($role_key); ?>" 
-                                                            data-feature-key="<?php echo esc_attr($feature_key); ?>" 
-                                                            onchange="coraSyncMobileMatrixCheckbox(this)"
-                                                            class="cora-mobile-permission-checkbox accent-zinc-950 dark:accent-zinc-100 rounded cursor-pointer w-4 h-4">
-                                                    </label>
+                                                    <div class="flex items-center justify-between gap-3 text-[11px] text-zinc-700 dark:text-zinc-300 select-none py-1 border-b border-zinc-100/50 dark:border-zinc-900/50 last:border-b-0">
+                                                         <span><?php echo esc_html($feature_label); ?></span>
+                                                         <div class="mobile-matrix-cell cursor-pointer" data-role="<?php echo esc_attr($role_key); ?>" data-feature="<?php echo esc_attr($feature_key); ?>" data-level="<?php echo esc_attr($m_level); ?>">
+                                                             <?php echo cora_get_matrix_cell_badge($role_key, $feature_key, $m_level); ?>
+                                                         </div>
+                                                     </div>
                                                 <?php endforeach; ?>
                                             </div>
                                         </div>
@@ -1276,24 +1421,47 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         <!-- ANALYTICS CARDS (Admin only) -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-4">
             <!-- Card 1: Total Active Today -->
-            <div class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex items-center justify-between">
-                <div class="space-y-1">
-                    <span class="text-[9px] md:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Active Today</span>
-                    <h3 class="text-lg md:text-xl font-extrabold text-zinc-900 dark:text-zinc-100" id="stat-active-today">0</h3>
+            <div class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex flex-col justify-between">
+                <div class="space-y-1 min-w-0">
+                    <div class="flex items-center justify-between gap-1">
+                        <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate">ACTIVE TODAY</span>
+                        <span class="inline-flex items-center px-1.5 py-0.5 text-[8px] md:text-[9px] font-bold rounded bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 shrink-0">Live</span>
+                    </div>
+                    <div class="flex items-baseline justify-between mt-1">
+                        <h3 class="text-lg md:text-xl font-extrabold text-zinc-900 dark:text-zinc-100" id="stat-active-today">0</h3>
+                        <span class="text-[10px] md:text-xs font-semibold text-zinc-500 dark:text-zinc-400">Team Members</span>
+                    </div>
                 </div>
-                <div class="p-1.5 bg-zinc-50 dark:bg-zinc-950 rounded-lg text-zinc-650 dark:text-zinc-350">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                <div class="mt-2 flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-zinc-800">
+                    <span class="text-[9px] md:text-[10px] font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1">
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                        Attendance Pulse
+                    </span>
+                    <span class="text-[9px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Real-time
+                    </span>
                 </div>
             </div>
             
             <!-- Card 2: Late Check-ins -->
-            <div class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex items-center justify-between">
-                <div class="space-y-1">
-                    <span class="text-[9px] md:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Late Check-ins</span>
-                    <h3 class="text-lg md:text-xl font-extrabold text-zinc-900 dark:text-zinc-100" id="stat-late-punches">0</h3>
+            <div class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex flex-col justify-between">
+                <div class="space-y-1 min-w-0">
+                    <div class="flex items-center justify-between gap-1">
+                        <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate">LATE CHECK-INS</span>
+                        <span class="inline-flex items-center px-1.5 py-0.5 text-[8px] md:text-[9px] font-bold rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60 shrink-0">Punctuality</span>
+                    </div>
+                    <div class="flex items-baseline justify-between mt-1">
+                        <h3 class="text-lg md:text-xl font-extrabold text-zinc-900 dark:text-zinc-100" id="stat-late-punches">0</h3>
+                        <span class="text-[10px] md:text-xs font-semibold text-zinc-500 dark:text-zinc-400">Shift Delays</span>
+                    </div>
                 </div>
-                <div class="p-1.5 bg-zinc-50 dark:bg-zinc-950 rounded-lg text-zinc-650 dark:text-zinc-350">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <div class="mt-2 flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-zinc-800">
+                    <span class="text-[9px] md:text-[10px] font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1">
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        Compliance
+                    </span>
+                    <span class="text-[9px] font-semibold text-zinc-500 dark:text-zinc-400">100% On-Time</span>
                 </div>
             </div>
 
@@ -1339,11 +1507,21 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
             <!-- Card 4: Action / Email Test -->
             <div class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex flex-col justify-between">
-                <div class="space-y-1">
-                    <span class="text-[9px] md:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Cron Automations</span>
-                    <div class="flex flex-wrap items-center gap-1 mt-0.5">
-                        <button onclick="triggerCronAction('admin_report')" class="text-[8px] md:text-[9px] px-1.5 py-0.5 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer">Report</button>
-                        <button onclick="triggerCronAction('morning_reminder')" class="text-[8px] md:text-[9px] px-1.5 py-0.5 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer">Alert</button>
+                <div class="space-y-1 min-w-0">
+                    <div class="flex items-center justify-between gap-1">
+                        <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate">Cron Automations</span>
+                        <span class="inline-flex items-center px-1.5 py-0.5 text-[8px] md:text-[9px] font-bold rounded bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 shrink-0">Active</span>
+                    </div>
+                    <p class="text-[10px] md:text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate mt-1">Daily Reports &amp; Automated Alerts</p>
+                </div>
+                <div class="mt-2 flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-zinc-800">
+                    <span class="text-[9px] md:text-[10px] font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1">
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="13" y2="17"></line></svg>
+                        Test Runner
+                    </span>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="triggerCronAction('admin_report')" class="text-[8px] md:text-[9px] px-1.5 py-0.5 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer transition-colors bg-white dark:bg-zinc-900 shadow-2xs">Report</button>
+                        <button onclick="triggerCronAction('morning_reminder')" class="text-[8px] md:text-[9px] px-1.5 py-0.5 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer transition-colors bg-white dark:bg-zinc-900 shadow-2xs">Alert</button>
                     </div>
                 </div>
             </div>
@@ -1358,7 +1536,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             <div class="flex flex-row items-center gap-2 md:gap-3 w-full justify-between">
                 <div class="flex flex-row items-center gap-2 flex-1 min-w-0">
                     <!-- Search Input -->
-                    <div class="relative flex-1 max-w-full md:max-w-sm">
+                    <div class="relative flex-1 max-w-full md:max-w-[180px]">
                         <input type="text" id="attendance-log-search" oninput="fetchAttendanceLogs()" class="w-full border-0 bg-zinc-100/60 dark:bg-zinc-850/60 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:outline-none rounded-lg h-9 pl-8 pr-3 text-xs text-zinc-900 dark:text-zinc-100 transition-colors" placeholder="Search employee...">
                         <div class="absolute left-2.5 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -1373,7 +1551,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     <!-- Desktop Inline Filters -->
                     <div class="hidden md:flex items-center gap-2.5 flex-1 min-w-0">
                         <!-- Employee Picker Dropdown -->
-                        <select id="attendance-filter-user" onchange="fetchAttendanceLogs()" class="h-9 px-3 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0">
+                        <select id="attendance-filter-user" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0 max-w-[100px]" style="max-width: 100px; text-overflow: ellipsis;">
                             <option value="">All Team Members</option>
                             <?php foreach ( $users as $u ) : ?>
                                 <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
@@ -1381,7 +1559,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         </select>
 
                         <!-- Period Direction Dropdown -->
-                        <select id="attendance-filter-period" onchange="handlePeriodFilterChange()" class="h-9 px-3 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0">
+                        <select id="attendance-filter-period" onchange="handlePeriodFilterChange()" class="h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0 max-w-[100px]" style="max-width: 100px; text-overflow: ellipsis;">
                             <option value="all">All Time</option>
                             <option value="today">Today</option>
                             <option value="yesterday">Yesterday</option>
@@ -1398,7 +1576,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         </div>
 
                         <!-- Event Type Dropdown -->
-                        <select id="attendance-filter-event" onchange="fetchAttendanceLogs()" class="h-9 px-3 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0">
+                        <select id="attendance-filter-event" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0 max-w-[100px]" style="max-width: 100px; text-overflow: ellipsis;">
                             <option value="all">All Event Types</option>
                             <option value="in">Punch In</option>
                             <option value="out">Punch Out</option>
@@ -1912,6 +2090,9 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             <button type="button" class="drawer-edit-tab px-3 py-2 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors cursor-pointer" data-drawer-tab="tab-edit-specializations">Role & Tags</button>
             <button type="button" class="drawer-edit-tab px-3 py-2 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors cursor-pointer" data-drawer-tab="tab-edit-financials">Financials</button>
             <button type="button" class="drawer-edit-tab px-3 py-2 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors cursor-pointer" data-drawer-tab="tab-edit-actions">Actions</button>
+            <button type="button" class="drawer-edit-tab px-3 py-2 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors cursor-pointer" data-drawer-tab="tab-edit-ai-security">
+                <span class="flex items-center gap-1"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v1a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3V6a4 4 0 0 1 4-4z"></path><circle cx="12" cy="14" r="2"></circle><path d="M12 16v2"></path></svg> AI & Security</span>
+            </button>
         </div>
 
         <form onsubmit="handleSaveEditUser(event)" class="flex-1 overflow-y-auto flex flex-col justify-between">
@@ -2066,6 +2247,21 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Internal Bio & Operational Notes</label>
                         <textarea id="edit-bio" rows="4" placeholder="Brief background, certifications, or internal brokerage notes..." class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100"></textarea>
                     </div>
+
+                    <!-- AI Talent Matchmaker -->
+                    <div class="pt-3 border-t border-zinc-200/60 dark:border-zinc-800/60">
+                        <button type="button" onclick="coraAnalyzeProfileSkills()" id="ai-matchmaker-btn" class="w-full py-2.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg text-xs font-bold text-zinc-800 dark:text-zinc-200 transition-colors cursor-pointer flex items-center justify-center gap-2 border border-zinc-200/60 dark:border-zinc-700/60">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l2.09 6.26L20.18 9l-4.91 3.74L16.91 19 12 15.27 7.09 19l1.64-6.26L3.82 9l6.09-.74z"></path></svg>
+                            AI Talent Matchmaker
+                        </button>
+                        <div id="ai-match-results" class="hidden mt-3 p-3 bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">AI Match Score</span>
+                                <span id="ai-match-score" class="text-xs font-bold text-zinc-900 dark:text-zinc-100">—</span>
+                            </div>
+                            <p id="ai-match-summary" class="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed"></p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- TAB 3: FINANCIALS & COMPENSATION -->
@@ -2105,6 +2301,74 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                             </button>
                         </div>
+                    </div>
+                </div>
+
+                <!-- TAB 5: AI & SECURITY -->
+                <div id="tab-edit-ai-security" class="drawer-tab-content space-y-4 hidden">
+                    <!-- AI Monthly Token Budget -->
+                    <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 space-y-3 bg-zinc-50/50 dark:bg-zinc-950/50">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">AI Monthly Token Budget</h4>
+                            <span id="ai-token-display" class="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">0 tokens</span>
+                        </div>
+                        <p class="text-[10px] text-zinc-400">Set the maximum AI tokens this team member can consume per billing cycle.</p>
+                        <div class="pt-1">
+                            <input type="range" id="edit-ai-token-limit" min="0" max="500000" step="10000" value="0" class="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-zinc-200 dark:bg-zinc-700 accent-zinc-900 dark:accent-zinc-200" oninput="document.getElementById('ai-token-display').textContent = (parseInt(this.value) === 0 ? 'Unlimited' : parseInt(this.value).toLocaleString() + ' tokens')">
+                            <div class="flex justify-between text-[9px] text-zinc-400 mt-1">
+                                <span>Unlimited</span>
+                                <span>250K</span>
+                                <span>500K</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MCP Agent Tool Permissions -->
+                    <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 space-y-3 bg-zinc-50/50 dark:bg-zinc-950/50">
+                        <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">MCP Agent Tool Permissions</h4>
+                        <p class="text-[10px] text-zinc-400">Control which AI-agent tools this team member can invoke.</p>
+                        <div class="grid grid-cols-2 gap-2 pt-1">
+                            <?php
+                            $mcp_tools = array(
+                                'read_leads'       => 'Read Leads',
+                                'write_leads'      => 'Write Leads',
+                                'read_properties'  => 'Read Properties',
+                                'write_properties' => 'Write Properties',
+                                'read_vault'       => 'Read Vault',
+                                'send_emails'      => 'Send Emails'
+                            );
+                            foreach ( $mcp_tools as $tool_key => $tool_label ) :
+                            ?>
+                                <label class="flex items-center gap-2 px-2.5 py-2 rounded-lg border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-850 cursor-pointer transition-colors select-none">
+                                    <input type="checkbox" value="<?php echo esc_attr($tool_key); ?>" class="edit-mcp-tool-checkbox accent-zinc-950 dark:accent-zinc-100 rounded w-3.5 h-3.5 cursor-pointer">
+                                    <span class="text-[11px] font-medium text-zinc-700 dark:text-zinc-300"><?php echo esc_html($tool_label); ?></span>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                    <!-- Persistent Login Session -->
+                    <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 space-y-3 bg-zinc-50/50 dark:bg-zinc-950/50">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Persistent Login Session</h4>
+                                <p class="text-[10px] text-zinc-400 mt-0.5">Keep this user signed in across browser sessions.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="edit-stay-logged-in" class="sr-only peer">
+                                <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-zinc-600 peer-checked:bg-zinc-900 dark:peer-checked:bg-zinc-300"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Active Sessions -->
+                    <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 space-y-3 bg-zinc-50/50 dark:bg-zinc-950/50">
+                        <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Active Sessions</h4>
+                        <p class="text-[10px] text-zinc-400">Force logout from all other devices and browsers.</p>
+                        <button type="button" onclick="coraRevokeUserSessions()" class="w-full py-2 px-3 border border-red-200 dark:border-red-900/40 bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-950/40 text-red-700 dark:text-red-400 font-bold rounded-lg text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                            Revoke All Sessions
+                        </button>
                     </div>
                 </div>
             </div>
@@ -2292,6 +2556,209 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             </button>
         </div>
     </form>
+</aside>
+
+<!-- ═══ AI TRAINER & DOUBT ASSISTANT DRAWER SHEET ════════════════════════════════ -->
+<aside id="cora-ai-trainer-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full">
+    <!-- Header -->
+    <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-950/50 shrink-0">
+        <div>
+            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-300"><path d="M12 2c.13 2.9 2.1 4.87 5 5-2.9.13-4.87 2.1-5 5-.13-2.9-2.1-4.87-5-5 2.9-.13 4.87-2.1 5-5Z" /></svg>
+                AI Trainer & Doubts
+            </h3>
+            <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">Ask questions about permissions or train the assistant.</p>
+        </div>
+        <button type="button" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-1" onclick="closeAiTrainerDrawer()">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <!-- Drawer Tabs -->
+    <div class="flex border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/20 dark:bg-zinc-950/20 px-4 shrink-0">
+        <button onclick="switchTrainerTab('chat')" id="tab-btn-trainer-chat" class="flex-1 py-3 text-center text-xs font-semibold border-b-2 border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50 transition-all cursor-pointer focus:outline-none">
+            Ask Doubts
+        </button>
+        <?php if ( current_user_can( 'manage_options' ) || cora_is_workspace_owner() ) : ?>
+        <button onclick="switchTrainerTab('context')" id="tab-btn-trainer-context" class="flex-1 py-3 text-center text-xs font-medium border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all cursor-pointer focus:outline-none">
+            Training Context
+        </button>
+        <?php endif; ?>
+        <button onclick="switchTrainerTab('keys')" id="tab-btn-trainer-keys" class="flex-1 py-3 text-center text-xs font-medium border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all cursor-pointer focus:outline-none">
+            Integration Keys
+        </button>
+    </div>
+
+    <!-- Content Sections -->
+    <div class="flex-1 flex flex-col min-h-0 overflow-y-auto">
+        <!-- 1. ASK DOUBTS (CHAT) -->
+        <div id="trainer-content-chat" class="flex-1 flex flex-col min-h-0">
+            <!-- Messages Container -->
+            <div id="doubts-chat-messages" class="flex-1 p-5 overflow-y-auto space-y-4 text-xs">
+                <!-- Welcome Bubble -->
+                <div class="flex gap-2.5 items-start">
+                    <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-800 dark:text-zinc-200 border border-zinc-200/50 dark:border-zinc-800 shrink-0">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2c.13 2.9 2.1 4.87 5 5-2.9.13-4.87 2.1-5 5-.13-2.9-2.1-4.87-5-5 2.9-.13 4.87-2.1 5-5Z" /></svg>
+                    </div>
+                    <div class="flex-1 bg-zinc-50 dark:bg-zinc-850 rounded-xl p-3 border border-zinc-200/50 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 leading-relaxed max-w-[85%]">
+                        Hello! I am your Cora AI Workspace Assistant. I can explain workspace roles, help configure permissions, or detail how to save changes. What can I help you with?
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick click doubts list -->
+            <div class="px-5 py-2.5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/40 dark:bg-zinc-950/20 shrink-0">
+                <p class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2">Quick Doubts</p>
+                <div class="flex flex-wrap gap-1.5">
+                    <button onclick="sendQuickDoubt('How to save permissions?')" class="px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-[11px] text-zinc-650 dark:text-zinc-400 hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors cursor-pointer text-left">
+                        How to save permissions?
+                    </button>
+                    <button onclick="sendQuickDoubt('Difference between View and Edit?')" class="px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-[11px] text-zinc-650 dark:text-zinc-400 hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors cursor-pointer text-left">
+                        Difference between View and Edit?
+                    </button>
+                </div>
+            </div>
+
+            <!-- Input Box -->
+            <div class="p-4 border-t border-zinc-200 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900">
+                <div class="relative flex items-center">
+                    <input type="text" id="doubts-chat-input" placeholder="Ask a doubt..." onkeydown="handleChatKeyDown(event)" class="w-full pl-3 pr-10 py-2.5 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/80 rounded-xl text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-950 dark:focus:ring-zinc-100 transition-all">
+                    <button onclick="submitChatDoubt()" class="absolute right-1.5 p-2 rounded-lg bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 hover:opacity-90 transition-all cursor-pointer flex items-center justify-center border-none">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2c.13 2.9 2.1 4.87 5 5-2.9.13-4.87 2.1-5 5-.13-2.9-2.1-4.87-5-5 2.9-.13 4.87-2.1 5-5Z" /></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. TRAINING CONTEXT (ADMIN-ONLY) -->
+        <?php if ( current_user_can( 'manage_options' ) || cora_is_workspace_owner() ) : ?>
+        <div id="trainer-content-context" class="hidden p-5 space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Assistant System Training Prompt</label>
+                <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mb-2 leading-relaxed">Customize the background knowledge, role definitions, and guidelines that prime the LLM response algorithm for this workspace.</p>
+                <textarea id="trainer-context-prompt" rows="12" class="w-full p-3 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/80 rounded-xl text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-950 dark:focus:ring-zinc-100 font-mono leading-relaxed" placeholder="Enter custom prompt instructions..."><?php echo esc_textarea( get_option( 'cora_workspace_ai_permissions_training_prompt', '' ) ); ?></textarea>
+            </div>
+            <div class="flex justify-end pt-2">
+                <button type="button" onclick="saveTrainerContext()" class="px-4 py-2 rounded-lg text-xs font-semibold bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 shadow-sm transition-all cursor-pointer flex items-center gap-1.5 border-none">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                    Save Context
+                </button>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- 3. INTEGRATION KEYS -->
+        <div id="trainer-content-keys" class="hidden p-5 space-y-4">
+            <h4 class="text-xs font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider border-b border-zinc-100 dark:border-zinc-800 pb-2">Active API Providers</h4>
+            <p class="text-[11px] text-zinc-400 dark:text-zinc-500 leading-relaxed">Verification indicators showing keys pre-loaded in the parent Cora suite configuration.</p>
+            
+            <div class="space-y-2.5">
+                <?php
+                $has_openai = defined('CORA_PLATFORM_OPENAI_API_KEY') && ! empty(CORA_PLATFORM_OPENAI_API_KEY);
+                $has_gemini = defined('CORA_PLATFORM_GEMINI_API_KEY') && ! empty(CORA_PLATFORM_GEMINI_API_KEY);
+                $has_groq = defined('CORA_PLATFORM_GROQ_API_KEY') && ! empty(CORA_PLATFORM_GROQ_API_KEY);
+                $has_anthropic = defined('CORA_PLATFORM_ANTHROPIC_API_KEY') && ! empty(CORA_PLATFORM_ANTHROPIC_API_KEY);
+                
+                $keys = array(
+                    'OpenAI (ChatGPT)'   => $has_openai,
+                    'Gemini (Google)'    => $has_gemini,
+                    'Groq (Llama)'       => $has_groq,
+                    'Anthropic (Claude)' => $has_anthropic
+                );
+                
+                foreach ($keys as $name => $status) :
+                ?>
+                <div class="flex items-center justify-between p-3 rounded-xl border border-zinc-200/60 dark:border-zinc-850 bg-zinc-50/30 dark:bg-zinc-950/20 text-xs">
+                    <span class="font-semibold text-zinc-800 dark:text-zinc-200"><?php echo esc_html($name); ?></span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full <?php echo $status ? 'bg-emerald-500' : 'bg-zinc-300 dark:bg-zinc-700'; ?>"></span>
+                        <span class="text-[10px] font-bold <?php echo $status ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-400 dark:text-zinc-500'; ?>">
+                            <?php echo $status ? 'Active Key' : 'Not Configured'; ?>
+                        </span>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- ═══ WALKTHROUGH TUTORIAL DRAWER SHEET ══════════════════════════════════════ -->
+<aside id="cora-permissions-video-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full">
+    <!-- Header -->
+    <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-950/50 shrink-0">
+        <div>
+            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-700 dark:text-zinc-300"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                Tutorial Walkthrough
+            </h3>
+            <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">Learn how to manage team permissions and custom roles.</p>
+        </div>
+        <button type="button" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-1" onclick="closePermissionsVideoDrawer()">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <!-- Video & Timeline Content -->
+    <div class="flex-1 overflow-y-auto p-5 space-y-5">
+        <!-- Responsive Iframe Wrapper (16:9) -->
+        <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
+            <iframe id="permissions-walkthrough-player" class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1" title="Cora Workspace Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        </div>
+
+        <!-- Video Walkthrough Timeline -->
+        <div class="space-y-3">
+            <h4 class="text-xs font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider">Video Timeline & Topics</h4>
+            <div class="divide-y divide-zinc-100 dark:divide-zinc-800/80">
+                <!-- Timeline item 1 -->
+                <button onclick="seekWalkthroughVideo(0)" class="w-full flex items-center justify-between py-2.5 text-left text-xs text-zinc-650 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors cursor-pointer group bg-transparent border-none">
+                    <div class="flex items-center gap-2">
+                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">0:00</span>
+                        <span>Introduction to Cora Roles</span>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="opacity-0 group-hover:opacity-100 transition-opacity"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                </button>
+                <!-- Timeline item 2 -->
+                <button onclick="seekWalkthroughVideo(75)" class="w-full flex items-center justify-between py-2.5 text-left text-xs text-zinc-650 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors cursor-pointer group bg-transparent border-none">
+                    <div class="flex items-center gap-2">
+                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">1:15</span>
+                        <span>Core Navigation Access Details</span>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="opacity-0 group-hover:opacity-100 transition-opacity"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                </button>
+                <!-- Timeline item 3 -->
+                <button onclick="seekWalkthroughVideo(165)" class="w-full flex items-center justify-between py-2.5 text-left text-xs text-zinc-650 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors cursor-pointer group bg-transparent border-none">
+                    <div class="flex items-center gap-2">
+                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">2:45</span>
+                        <span>View vs Edit vs No Access Settings</span>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="opacity-0 group-hover:opacity-100 transition-opacity"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                </button>
+                <!-- Timeline item 4 -->
+                <button onclick="seekWalkthroughVideo(250)" class="w-full flex items-center justify-between py-2.5 text-left text-xs text-zinc-650 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors cursor-pointer group bg-transparent border-none">
+                    <div class="flex items-center gap-2">
+                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">4:10</span>
+                        <span>Saving Permissions Matrix & Live Sync</span>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="opacity-0 group-hover:opacity-100 transition-opacity"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Instructions Text Box -->
+        <div class="p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/30 space-y-2 text-xs leading-relaxed">
+            <h5 class="font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                Quick Reference Guides
+            </h5>
+            <ul class="list-disc pl-4 space-y-1 text-zinc-600 dark:text-zinc-400">
+                <li>Choose <strong class="text-zinc-800 dark:text-zinc-200">View</strong> for read-only visibilities on core dashboard features.</li>
+                <li>Choose <strong class="text-zinc-800 dark:text-zinc-200">Edit</strong> to permit editing, deleting, and updating listing/shoot details.</li>
+                <li>Choose <strong class="text-zinc-800 dark:text-zinc-200">No Access</strong> to hide the screen/module entirely from the user role.</li>
+                <li>Super Admin access levels are locked globally and cannot be modified.</li>
+            </ul>
+        </div>
+    </div>
 </aside>
 
 <script>
@@ -2724,6 +3191,25 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             $('#edit-status-toggle').prop('disabled', false);
         }
 
+        // Reset and populate AI & Security settings
+        var tokenLimit = parseInt(user.ai_token_limit) || 0;
+        $('#edit-ai-token-limit').val(tokenLimit);
+        $('#ai-token-display').text(tokenLimit === 0 ? 'Unlimited' : tokenLimit.toLocaleString() + ' tokens');
+
+        $('.edit-mcp-tool-checkbox').prop('checked', false);
+        if (Array.isArray(user.mcp_allowed_tools)) {
+            user.mcp_allowed_tools.forEach(function(t) {
+                $('.edit-mcp-tool-checkbox[value="' + t + '"]').prop('checked', true);
+            });
+        }
+
+        $('#edit-stay-logged-in').prop('checked', user.stay_logged_in === 'yes');
+
+        // Reset AI Talent Matchmaker results
+        $('#ai-match-results').addClass('hidden');
+        $('#ai-match-score').text('—');
+        $('#ai-match-summary').text('');
+
         // Reset to Tab 1
         $('.drawer-edit-tab[data-drawer-tab="tab-edit-general"]').trigger('click');
 
@@ -2889,6 +3375,14 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             specs.push($(this).val());
         });
 
+        // AI & Security Settings
+        var aiTokenLimit = $('#edit-ai-token-limit').val();
+        var mcpAllowedTools = [];
+        $('.edit-mcp-tool-checkbox:checked').each(function() {
+            mcpAllowedTools.push($(this).val());
+        });
+        var stayLoggedIn = $('#edit-stay-logged-in').is(':checked') ? 'yes' : 'no';
+
         $('#save-edit-btn').prop('disabled', true).text('Saving profile...');
 
         $.post(coraREData.ajaxUrl, {
@@ -2905,6 +3399,9 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             commission_split: split,
             hourly_rate: rate,
             bank_upi: bank,
+            ai_token_limit: aiTokenLimit,
+            mcp_allowed_tools: mcpAllowedTools,
+            stay_logged_in: stayLoggedIn,
             avatar_url: $('#edit-avatar-url').val(),
             banner_url: $('#edit-banner-url').val(),
             nonce: coraREData.ajaxNonce
@@ -2932,6 +3429,82 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             $('#save-edit-btn').prop('disabled', false).text('Save Changes');
         });
     }
+
+    window.coraAnalyzeProfileSkills = function() {
+        var bio = $('#edit-bio').val().trim();
+        if (!bio) {
+            window.coraShowToast('Please enter a bio or operational notes first.');
+            return;
+        }
+
+        var $btn = $('#ai-matchmaker-btn');
+        var originalText = $btn.html();
+        $btn.prop('disabled', true).html('Analyzing bio...');
+
+        $('#ai-match-results').addClass('hidden');
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_analyze_profile_skills',
+            bio: bio,
+            industry: coraREData.industry || 'real_estate',
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            $btn.prop('disabled', false).html(originalText);
+            if (res.success && res.data) {
+                // Populate specializations checkboxes
+                $('.edit-spec-checkbox').prop('checked', false);
+                if (Array.isArray(res.data.specs)) {
+                    res.data.specs.forEach(function(spec) {
+                        $('.edit-spec-checkbox[value="' + spec + '"]').prop('checked', true);
+                    });
+                }
+                // Show AI feedback card
+                $('#ai-match-score').text((res.data.match_score || 0) + '%');
+                $('#ai-match-summary').text(res.data.analysis || 'Skills auto-matched successfully.');
+                $('#ai-match-results').removeClass('hidden');
+                window.coraShowToast('Skills profile analysis complete!');
+            } else {
+                window.coraShowToast(res.data && res.data.message ? res.data.message : 'Analysis failed.');
+            }
+        }, 'json').fail(function() {
+            $btn.prop('disabled', false).html(originalText);
+            window.coraShowToast('Network error during AI profile analysis.');
+        });
+    };
+
+    window.coraRevokeUserSessions = function() {
+        if (!currentEditingUser || !currentEditingUser.id) {
+            window.coraShowToast('Invalid user context.');
+            return;
+        }
+
+        var performRevoke = function() {
+            window.coraShowToast('Revoking active sessions...');
+            $.post(coraREData.ajaxUrl, {
+                action: 'cora_ajax_logout_other_sessions',
+                user_id: currentEditingUser.id,
+                nonce: coraREData.ajaxNonce
+            }, function(res) {
+                if (res.success) {
+                    window.coraShowToast(res.data && res.data.message ? res.data.message : 'Successfully revoked all sessions.');
+                } else {
+                    window.coraShowToast(res.data && res.data.message ? res.data.message : 'Revocation failed.');
+                }
+            }).fail(function() {
+                window.coraShowToast('Network error revoking user sessions.');
+            });
+        };
+
+        if (window.coraConfirmAction) {
+            window.coraConfirmAction(
+                'Revoke Active Sessions',
+                'Are you sure you want to force logout this user from all devices?',
+                performRevoke
+            );
+        } else {
+            performRevoke();
+        }
+    };
 
     function triggerPasswordResetForUser() {
         if (!currentEditingUser || !currentEditingUser.email) {
@@ -3000,14 +3573,15 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     // ==========================================
     window.coraSavePermissionsMatrix = function() {
         var matrix = {};
-        $('#cora-permissions-matrix-table tbody tr.cora-matrix-row').each(function() {
+        $('#cora-permissions-matrix-table tbody tr.cora-matrix-row:not([data-locked="true"])').each(function() {
             var role = $(this).data('role');
             if (!role) return;
-            var features = [];
-            $(this).find('.cora-permission-checkbox:checked').each(function() {
-                features.push($(this).data('feature'));
+            matrix[role] = {};
+            $(this).find('td[data-feature]').each(function() {
+                var feature = $(this).data('feature');
+                var level = $(this).data('level') || 'none';
+                matrix[role][feature] = level;
             });
-            matrix[role] = features;
         });
 
         $.post(coraREData.ajaxUrl, {
@@ -3025,6 +3599,97 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         });
     };
 
+    // Cell Selection & Custom Dropdown Badge helpers
+    window.coraGetCellBadgeHtml = function(level) {
+        var view_icon = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+        var edit_icon = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>';
+        var none_icon = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>';
+        var caret = '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0 opacity-70"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+
+        if (level === 'view') {
+            return '<span class="cora-matrix-cell-badge inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-500/20 transition-all cursor-pointer shadow-2xs select-none hover:border-emerald-500/50">' + view_icon + 'View' + caret + '</span>';
+        } else if (level === 'edit') {
+            return '<span class="cora-matrix-cell-badge inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap bg-purple-50 text-purple-700 dark:bg-purple-950/30 dark:text-purple-400 border border-purple-500/20 transition-all cursor-pointer shadow-2xs select-none hover:border-purple-500/50">' + edit_icon + 'Edit' + caret + '</span>';
+        } else {
+            return '<span class="cora-matrix-cell-badge inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap bg-zinc-100 text-zinc-650 dark:bg-zinc-800 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 transition-all cursor-pointer shadow-2xs select-none hover:border-zinc-400/50">' + none_icon + 'No Access' + caret + '</span>';
+        }
+    };
+
+    window.updateCellState = function(role, feature, newLevel) {
+        var $desktopTd = $('#cora-permissions-matrix-table tbody tr[data-role="' + role + '"]')
+            .find('td[data-feature="' + feature + '"]');
+        if ($desktopTd.length) {
+            $desktopTd.data('level', newLevel);
+            $desktopTd.attr('data-level', newLevel);
+            
+            var badgeHtml = window.coraGetCellBadgeHtml(newLevel);
+            var isChecked = (newLevel !== 'none') ? 'checked' : '';
+            var cbHtml = '<input type="checkbox" ' + isChecked + ' data-feature="' + feature + '" class="cora-permission-checkbox absolute opacity-[0.01] w-[1px] h-[1px] cursor-pointer" style="left:0; top:0; z-index:100; pointer-events:auto;">';
+            
+            $desktopTd.html(badgeHtml + cbHtml);
+        }
+
+        var $mobileCell = $('[data-mobile-role="' + role + '"]')
+            .find('.mobile-matrix-cell[data-feature="' + feature + '"]');
+        if ($mobileCell.length) {
+            $mobileCell.data('level', newLevel);
+            $mobileCell.attr('data-level', newLevel);
+            $mobileCell.html(window.coraGetCellBadgeHtml(newLevel));
+        }
+    };
+
+    $(document).on('click', '.cora-matrix-cell-badge', function(e) {
+        e.stopPropagation();
+        $('.cora-matrix-popover').remove();
+
+        var $badge = $(this);
+        var $cell = $badge.parent();
+        var role = $cell.data('role');
+        var feature = $cell.data('feature');
+        var currentLevel = $cell.data('level') || 'none';
+
+        if (!role || !feature) return;
+
+        var $popover = $('<div class="cora-matrix-popover absolute z-[10005] w-36 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-lg p-1.5 space-y-0.5 select-none text-xs"></div>');
+
+        var options = [
+            { level: 'view', label: 'View', class: 'hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>' },
+            { level: 'edit', label: 'Edit', class: 'hover:bg-purple-50 dark:hover:bg-purple-950/20 text-purple-600 dark:text-purple-400', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>' },
+            { level: 'none', label: 'No Access', class: 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-650 dark:text-zinc-400', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>' }
+        ];
+
+        options.forEach(function(opt) {
+            var activeClass = (currentLevel === opt.level) ? 'bg-zinc-100 dark:bg-zinc-800 font-semibold' : '';
+            var $item = $('<button type="button" class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-colors cursor-pointer bg-transparent border-none ' + opt.class + ' ' + activeClass + '">' + opt.icon + '<span>' + opt.label + '</span></button>');
+            $item.on('click', function() {
+                window.updateCellState(role, feature, opt.level);
+                $popover.remove();
+                window.coraSavePermissionsMatrix();
+            });
+            $popover.append($item);
+        });
+
+        $('body').append($popover);
+        var offset = $badge.offset();
+        var popoverWidth = $popover.outerWidth();
+        var top = offset.top + $badge.outerHeight() + 4;
+        var left = offset.left + ($badge.outerWidth() / 2) - (popoverWidth / 2);
+
+        if (left < 10) left = 10;
+        if (left + popoverWidth > $(window).width() - 10) {
+            left = $(window).width() - popoverWidth - 10;
+        }
+
+        $popover.css({
+            top: top + 'px',
+            left: left + 'px'
+        });
+    });
+
+    $(document).on('click', function() {
+        $('.cora-matrix-popover').remove();
+    });
+
     window.coraResetMatrixDefaults = function() {
         var defaultPermsMap = {
             'cora_branch_manager': ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'portfolio', 'leads', 'settings', 'canvas', 'forms', 'emails', 'review_acquisition'],
@@ -3039,11 +3704,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
         $('#cora-permissions-matrix-table tbody tr.cora-matrix-row:not([data-locked="true"])').each(function() {
             var role = $(this).data('role');
+            if (!role) return;
             var defaultList = defaultPermsMap[role] || ['dashboard', 'bookings'];
             
-            $(this).find('.cora-permission-checkbox').each(function() {
+            $(this).find('td[data-feature]').each(function() {
                 var feature = $(this).data('feature');
-                $(this).prop('checked', defaultList.indexOf(feature) !== -1);
+                var level = (defaultList.indexOf(feature) !== -1) ? 'edit' : 'none';
+                window.updateCellState(role, feature, level);
             });
         });
 
@@ -3063,15 +3730,20 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             return;
         }
 
+        var role = selectedRow.data('role');
         var roleName = selectedRow.find('.cora-role-title-text').text().trim();
-        selectedRow.find('.cora-permission-checkbox').prop('checked', true);
+        
+        selectedRow.find('td[data-feature]').each(function() {
+            var feature = $(this).data('feature');
+            window.updateCellState(role, feature, 'edit');
+        });
         
         window.coraSavePermissionsMatrix();
         window.coraShowToast('Granted all permissions for role: ' + roleName);
     };
 
     $(document).on('click', '#cora-permissions-matrix-table tbody tr.cora-matrix-row', function(e) {
-        if ($(e.target).is('input[type="checkbox"]')) return;
+        if ($(e.target).closest('.cora-matrix-cell-badge').length) return;
         if ($(this).data('locked')) return;
         
         $('#cora-permissions-matrix-table tbody tr.cora-matrix-row').removeClass('selected-matrix-role bg-zinc-100/80 dark:bg-zinc-800/80');
@@ -3113,31 +3785,273 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         }
     };
 
-    window.coraSyncMobileMatrixCheckbox = function(cb) {
-        var roleKey = $(cb).data('role-key');
-        var featureKey = $(cb).data('feature-key');
-        var isChecked = cb.checked;
+    $(document).on('change', '.cora-permission-checkbox', function() {
+        var role = $(this).closest('tr').data('role');
+        var feature = $(this).data('feature');
+        if (!role || !feature) return;
+
+        var isChecked = this.checked;
+        var currentLevel = $(this).closest('td').data('level') || 'none';
+        var targetLevel = isChecked ? 'edit' : 'none';
         
-        // Find corresponding desktop checkbox in table
-        var $desktopCb = $('#cora-permissions-matrix-table tbody tr[data-role="' + roleKey + '"]')
-            .find('input[data-feature="' + featureKey + '"]');
-        if ($desktopCb.length) {
-            $desktopCb.prop('checked', isChecked);
+        if (currentLevel !== targetLevel) {
+            window.updateCellState(role, feature, targetLevel);
             window.coraSavePermissionsMatrix();
+        }
+    });
+
+    // Platform Redirection and Clipboard Sync Helpers
+    window.coraGetReferQuery = function() {
+        // Find which tab is currently active (not hidden)
+        var activeTab = $('.cora-tab-content:not(.hidden)').attr('id') || 'tab-active-members';
+        
+        if (activeTab === 'tab-permissions-matrix') {
+            return "How do I configure the granular Permissions Matrix (View, Edit, No Access levels) in the Cora Workspace Platform?";
+        } else if (activeTab === 'tab-custom-roles') {
+            return "How to create custom team roles and manage capabilities inside Cora Workspace?";
+        } else if (activeTab === 'tab-attendance-logs') {
+            return "How to configure geofenced office location attendance logs and GPS check-ins in Cora Workspace?";
+        } else if (activeTab === 'tab-owner-automations') {
+            return "How to setup automated owner digests, security alerts, and SMTP templates in Cora Workspace?";
+        } else if (activeTab === 'tab-pending-invites') {
+            return "How to invite new users, manage pending invitations, and resend links in Cora Workspace?";
+        } else {
+            return "How to manage team members, active accounts, and edit profile details in Cora Workspace?";
         }
     };
 
-    $(document).on('change', '.cora-permission-checkbox', function() {
-        // Sync desktop checkbox changes back to mobile checkbox
-        var roleKey = $(this).closest('tr').data('role');
-        var featureKey = $(this).data('feature');
-        var isChecked = this.checked;
-        var $mobileCb = $('input[data-role-key="' + roleKey + '"][data-feature-key="' + featureKey + '"]');
-        if ($mobileCb.length) {
-            $mobileCb.prop('checked', isChecked);
+    window.coraAskExternalPlatform = function(platform) {
+        var query = window.coraGetReferQuery();
+        
+        // Copy to clipboard dynamically
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(query).then(function() {
+                // Clipboard copy successful
+            }).catch(function() {
+                // Ignore fallback
+            });
         }
-        window.coraSavePermissionsMatrix();
-    });
+        
+        var url = '';
+        var platformName = '';
+        if (platform === 'openai') {
+            platformName = 'ChatGPT';
+            url = 'https://chatgpt.com/?q=' + encodeURIComponent(query);
+        } else if (platform === 'gemini') {
+            platformName = 'Gemini';
+            url = 'https://gemini.google.com/app?q=' + encodeURIComponent(query);
+        } else if (platform === 'claude') {
+            platformName = 'Claude';
+            url = 'https://claude.ai/';
+        } else if (platform === 'perplexity') {
+            platformName = 'Perplexity';
+            url = 'https://www.perplexity.ai/?q=' + encodeURIComponent(query);
+        }
+        
+        if (url) {
+            window.coraShowToast('Opening ' + platformName + '... Query copied to clipboard!');
+            window.open(url, '_blank');
+        }
+    };
+
+    // Drawer Open/Close & Tab Switching helpers
+    window.openAiTrainerDrawer = function(platform) {
+        window.currentLlmPlatform = platform || 'gemini';
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        }
+        $('#cora-ai-trainer-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('translate-x-0').css({
+            'display': 'flex',
+            'pointer-events': 'auto',
+            'transform': 'translateX(0)',
+            'visibility': 'visible'
+        });
+        $('#cora-drawer-backdrop').removeClass('hidden').css({
+            'display': 'block',
+            'pointer-events': 'auto'
+        });
+        window.switchTrainerTab('chat');
+    };
+
+    window.closeAiTrainerDrawer = function() {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        } else {
+            $('#cora-ai-trainer-drawer').addClass('collapsed hidden translate-x-full').removeClass('translate-x-0');
+        }
+        $('#cora-ai-trainer-drawer').removeClass('translate-x-0').addClass('translate-x-full').css({
+            'display': 'none',
+            'pointer-events': 'none',
+            'transform': 'translateX(100%)',
+            'visibility': 'hidden'
+        });
+    };
+
+    window.openPermissionsVideoDrawer = function() {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        }
+        $('#cora-permissions-video-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('translate-x-0').css({
+            'display': 'flex',
+            'pointer-events': 'auto',
+            'transform': 'translateX(0)',
+            'visibility': 'visible'
+        });
+        $('#cora-drawer-backdrop').removeClass('hidden').css({
+            'display': 'block',
+            'pointer-events': 'auto'
+        });
+    };
+
+    window.closePermissionsVideoDrawer = function() {
+        if (typeof window.coraCloseAllDrawers === 'function') {
+            window.coraCloseAllDrawers();
+        } else {
+            $('#cora-permissions-video-drawer').addClass('collapsed hidden translate-x-full').removeClass('translate-x-0');
+        }
+        $('#cora-permissions-video-drawer').removeClass('translate-x-0').addClass('translate-x-full').css({
+            'display': 'none',
+            'pointer-events': 'none',
+            'transform': 'translateX(100%)',
+            'visibility': 'hidden'
+        });
+    };
+
+    window.switchTrainerTab = function(tab) {
+        $('#tab-btn-trainer-chat, #tab-btn-trainer-context, #tab-btn-trainer-keys')
+            .removeClass('border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50 font-semibold')
+            .addClass('border-transparent text-zinc-400 font-medium');
+
+        $('#tab-btn-trainer-' + tab)
+            .addClass('border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50 font-semibold')
+            .removeClass('border-transparent text-zinc-400 font-medium');
+
+        $('#trainer-content-chat, #trainer-content-context, #trainer-content-keys').addClass('hidden');
+        $('#trainer-content-' + tab).removeClass('hidden');
+    };
+
+    // Chat Doubts Box
+    window.submitChatDoubt = function() {
+        var $input = $('#doubts-chat-input');
+        var query = $input.val().trim();
+        if (!query) return;
+
+        $input.val('');
+        window.appendChatMessage('user', query);
+
+        var $thinking = window.appendChatMessage('ai', '<span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-zinc-600 dark:bg-zinc-400 animate-bounce"></span><span class="w-1.5 h-1.5 rounded-full bg-zinc-600 dark:bg-zinc-400 animate-bounce" style="animation-delay:0.2s"></span><span class="w-1.5 h-1.5 rounded-full bg-zinc-600 dark:bg-zinc-400 animate-bounce" style="animation-delay:0.4s"></span></span>');
+
+        var platform = window.currentLlmPlatform || 'gemini';
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_ask_llm_doubt',
+            doubt: query,
+            platform: platform,
+            security: coraREData.ajaxNonce
+        }, function(res) {
+            $thinking.remove();
+            if (res.success && res.data && res.data.reply) {
+                window.appendChatMessage('ai', res.data.reply);
+            } else {
+                var msg = (res.data && res.data.message) ? res.data.message : 'Sorry, I encountered an error processing your query.';
+                window.appendChatMessage('ai', '<span class="text-rose-500 font-semibold">' + msg + '</span>');
+            }
+        }).fail(function() {
+            $thinking.remove();
+            window.appendChatMessage('ai', '<span class="text-rose-500 font-semibold">Network error. Please try again.</span>');
+        });
+    };
+
+    window.handleChatKeyDown = function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            window.submitChatDoubt();
+        }
+    };
+
+    window.sendQuickDoubt = function(text) {
+        $('#doubts-chat-input').val(text);
+        window.submitChatDoubt();
+    };
+
+    window.appendChatMessage = function(sender, text) {
+        var $chat = $('#doubts-chat-messages');
+        var isUser = (sender === 'user');
+        var bubbleHtml = '';
+
+        if (isUser) {
+            bubbleHtml = '<div class="flex gap-2.5 items-start justify-end">' +
+                '<div class="flex-1 bg-zinc-950 dark:bg-zinc-100 rounded-xl p-3 text-white dark:text-zinc-950 leading-relaxed max-w-[85%] text-right">' +
+                window.formatMarkdown(text) +
+                '</div>' +
+                '</div>';
+        } else {
+            bubbleHtml = '<div class="flex gap-2.5 items-start">' +
+                '<div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-800 dark:text-zinc-200 border border-zinc-200/50 dark:border-zinc-800 shrink-0">' +
+                '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2c.13 2.9 2.1 4.87 5 5-2.9.13-4.87 2.1-5 5-.13-2.9-2.1-4.87-5-5 2.9-.13 4.87-2.1 5-5Z" /></svg>' +
+                '</div>' +
+                '<div class="flex-1 bg-zinc-50 dark:bg-zinc-850 rounded-xl p-3 border border-zinc-200/50 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 leading-relaxed max-w-[85%] markdown-body">' +
+                window.formatMarkdown(text) +
+                '</div>' +
+                '</div>';
+        }
+
+        var $bubble = $(bubbleHtml);
+        $chat.append($bubble);
+        $chat.scrollTop($chat[0].scrollHeight);
+        return $bubble;
+    };
+
+    window.formatMarkdown = function(text) {
+        if (!text) return '';
+        var escaped = text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+        
+        escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        escaped = escaped.replace(/`(.*?)`/g, '<code class="bg-zinc-105 dark:bg-zinc-800 px-1 py-0.5 rounded text-[11px] font-mono">$1</code>');
+        escaped = escaped.replace(/^\s*[-*]\s+(.*)$/gm, '<li>$1</li>');
+        escaped = escaped.replace(/(<li>.*<\/li>)/g, '<ul class="list-disc pl-4 space-y-1 my-1">$1</ul>');
+        escaped = escaped.replace(/\n/g, '<br>');
+        return escaped;
+    };
+
+    window.saveTrainerContext = function() {
+        var promptVal = $('#trainer-context-prompt').val();
+        window.coraShowToast('Saving training context...');
+
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_save_training_prompt',
+            prompt: promptVal,
+            security: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast(res.data && res.data.message ? res.data.message : 'Training context saved successfully.');
+            } else {
+                window.coraShowToast((res.data && res.data.message) ? res.data.message : 'Failed to save training context.');
+            }
+        }).fail(function() {
+            window.coraShowToast('Network error saving training context.');
+        });
+    };
+
+    // YouTube Seek walkthrough
+    window.seekWalkthroughVideo = function(seconds) {
+        var player = document.getElementById('permissions-walkthrough-player');
+        if (player) {
+            player.contentWindow.postMessage(JSON.stringify({
+                "event": "command",
+                "func": "seekTo",
+                "args": [seconds, true]
+            }), "*");
+            player.contentWindow.postMessage(JSON.stringify({
+                "event": "command",
+                "func": "playVideo",
+                "args": []
+            }), "*");
+        }
+    };
 
     // Attendance Logs Mobile Filter Toggle & Sync Handlers
     window.toggleAttendanceMobileFilters = function() {

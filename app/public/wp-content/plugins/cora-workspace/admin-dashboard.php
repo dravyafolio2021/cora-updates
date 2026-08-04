@@ -3741,6 +3741,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 'title' => 'Workspaces',
                                 'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>'
                             ),
+                            'super-docs' => array(
+                                'title' => 'Documentation',
+                                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14,2 14,8 20,8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>'
+                            ),
                             'super-users' => array(
                                 'title' => 'Users',
                                 'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
@@ -3772,7 +3776,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase select-none"><?php echo esc_html($group['label']); ?></div>
                     <ul class="cora-nav-list space-y-0.5 mt-1 select-none">
                         <?php foreach ( $group['items'] as $target => $item ) : 
-                            $super_pages = array( 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health' );
+                            $super_pages = array( 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs' );
                             if ( ! in_array( $target, $super_pages ) && function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $target ) ) {
                                 continue;
                             }
@@ -6252,6 +6256,13 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             if ( in_array( $sub_page, $super_pages ) && cora_is_super_owner() ) : ?>
             <section id="cora-page-super-admin" class="cora-page-section cora-active space-y-6">
                 <?php include CORA_WORKSPACE_PATH . 'views/view-super-admin.php'; ?>
+            </section>
+            <?php endif; ?>
+
+            <!-- SECTION: PLATFORM DOCUMENTATION SYSTEM -->
+            <?php if ( $sub_page === 'super-docs' && cora_is_super_owner() ) : ?>
+            <section id="cora-page-super-docs" class="cora-page-section cora-active space-y-6">
+                <?php include CORA_WORKSPACE_PATH . 'views/view-documentation.php'; ?>
             </section>
             <?php endif; ?>
 

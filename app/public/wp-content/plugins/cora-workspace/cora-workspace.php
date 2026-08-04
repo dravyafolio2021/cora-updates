@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.1.26
+ * Version: 3.2.28
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.1.26' );
+define( 'CORA_WORKSPACE_VERSION', '3.2.28' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -98,6 +98,9 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-github-integrati
 
 // ── Auto Updates ────────────────────────────────────────────────────────────
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-workspace-updater.php';
+
+// ── Documentation Engine ───────────────────────────────────────────────────
+require_once plugin_dir_path( __FILE__ ) . 'includes/docs-engine.php';
 
 /**
  * Add the admin menu page
@@ -984,6 +987,14 @@ function cora_real_estate_ai_handle_workspace_route() {
         exit;
     }
     
+    // Intercept Public Documentation
+    if ( isset( $path_parts[0] ) && 'docs' === $path_parts[0] ) {
+        if ( function_exists( 'cora_docs_handle_public_route' ) ) {
+            cora_docs_handle_public_route();
+        }
+        exit;
+    }
+    
     // Intercept PWA Manifest and Service Worker to serve them from the root scope
     if ( $path === 'cora-service-worker.js' ) {
         status_header( 200 );
@@ -1295,7 +1306,7 @@ function cora_real_estate_ai_handle_workspace_route() {
 
         // Role-based access control check (Server-Side)
         $cora_ws_slug = ! empty( $matched_workspace['slug'] ) ? $matched_workspace['slug'] : 'workspace';
-        $super_pages = array( 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health' );
+        $super_pages = array( 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs' );
         if ( in_array( $sub_page, $super_pages ) ) {
             if ( ! cora_is_super_owner() ) {
                 wp_redirect( home_url( '/' . $cora_ws_slug . '/dashboard' ) );
@@ -2209,9 +2220,9 @@ function cora_real_estate_ai_seed_data() {
     }
 
     $all_default_permissions = array(
-        'administrator'              => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'gbp', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'plugins', 'attendance', 'tasks', 'forms', 'ecosystem', 'canvas', 'mcp', 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health' ),
-        'cora_shruti'                => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'gbp', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'plugins', 'attendance', 'tasks', 'forms', 'ecosystem', 'canvas', 'mcp', 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health' ),
-        'cora_super_admin'           => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'gbp', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'plugins', 'attendance', 'tasks', 'forms', 'ecosystem', 'canvas', 'mcp', 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health' ),
+        'administrator'              => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'gbp', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'plugins', 'attendance', 'tasks', 'forms', 'ecosystem', 'canvas', 'mcp', 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs' ),
+        'cora_shruti'                => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'gbp', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'plugins', 'attendance', 'tasks', 'forms', 'ecosystem', 'canvas', 'mcp', 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs' ),
+        'cora_super_admin'           => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'gbp', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'plugins', 'attendance', 'tasks', 'forms', 'ecosystem', 'canvas', 'mcp', 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs' ),
         // Real Estate Roles
         'cora_re_broker_owner'       => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'gbp', 'attendance', 'tasks', 'canvas' ),
         'cora_re_managing_agent'     => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'canvas' ),
@@ -2430,55 +2441,291 @@ function cora_ajax_save_permissions_matrix() {
         wp_send_json_error( array( 'message' => 'Unauthorized access.' ) );
     }
 
-    $existing_permissions = get_option( 'cora_role_permissions', array() );
-    if ( ! is_array( $existing_permissions ) ) {
-        $existing_permissions = array();
+    $existing_levels = get_option( 'cora_role_permission_levels', array() );
+    if ( ! is_array( $existing_levels ) ) {
+        $existing_levels = array();
     }
 
-    if ( isset( $_POST['matrix'] ) && is_array( $_POST['matrix'] ) ) {
-        $matrix = $_POST['matrix'];
-        $sanitized = array();
-        foreach ( $matrix as $role_key => $features ) {
+    $matrix_raw = null;
+    if ( isset( $_POST['matrix'] ) ) {
+        $matrix_raw = $_POST['matrix'];
+    } elseif ( isset( $_POST['permissions'] ) ) {
+        $matrix_raw = $_POST['permissions'];
+    }
+
+    if ( is_string( $matrix_raw ) ) {
+        $decoded = json_decode( wp_unslash( $matrix_raw ), true );
+        if ( is_array( $decoded ) ) {
+            $matrix_raw = $decoded;
+        }
+    }
+
+    $new_levels = $existing_levels;
+
+    if ( is_array( $matrix_raw ) ) {
+        foreach ( $matrix_raw as $role_key => $features ) {
             $role_key = sanitize_key( $role_key );
             if ( is_array( $features ) ) {
-                $sanitized[$role_key] = array_map( 'sanitize_text_field', $features );
-            } else {
-                $sanitized[$role_key] = array();
+                $new_levels[$role_key] = array();
+                foreach ( $features as $feat => $lvl ) {
+                    $feat = sanitize_key( $feat );
+                    $lvl = in_array( $lvl, array( 'view', 'edit', 'none' ), true ) ? $lvl : 'none';
+                    $new_levels[$role_key][$feat] = $lvl;
+                }
             }
         }
-        $merged = array_merge( $existing_permissions, $sanitized );
     } elseif ( isset( $_POST['role_key'] ) ) {
         $role_key = sanitize_key( $_POST['role_key'] );
-        $features = isset( $_POST['features'] ) && is_array( $_POST['features'] ) ? array_map( 'sanitize_text_field', $_POST['features'] ) : array();
-        $merged = $existing_permissions;
-        $merged[$role_key] = $features;
-    } elseif ( isset( $_POST['permissions'] ) && is_array( $_POST['permissions'] ) ) {
-        $matrix = $_POST['permissions'];
-        $sanitized = array();
-        foreach ( $matrix as $role_key => $features ) {
-            $role_key = sanitize_key( $role_key );
-            if ( is_array( $features ) ) {
-                $sanitized[$role_key] = array_map( 'sanitize_text_field', $features );
-            } else {
-                $sanitized[$role_key] = array();
+        $features_raw = isset( $_POST['features'] ) ? $_POST['features'] : array();
+        if ( is_string( $features_raw ) ) {
+            $decoded = json_decode( wp_unslash( $features_raw ), true );
+            if ( is_array( $decoded ) ) {
+                $features_raw = $decoded;
             }
         }
-        $merged = array_merge( $existing_permissions, $sanitized );
-    } else {
-        $merged = $existing_permissions;
+        
+        $new_levels[$role_key] = array();
+        if ( is_array( $features_raw ) ) {
+            // Check if associative (feature => level) or sequential (feature)
+            $is_assoc = ( array_keys( $features_raw ) !== range( 0, count( $features_raw ) - 1 ) );
+            if ( $is_assoc ) {
+                foreach ( $features_raw as $feat => $lvl ) {
+                    $feat = sanitize_key( $feat );
+                    $lvl = in_array( $lvl, array( 'view', 'edit', 'none' ), true ) ? $lvl : 'none';
+                    $new_levels[$role_key][$feat] = $lvl;
+                }
+            } else {
+                foreach ( $features_raw as $feat ) {
+                    $feat = sanitize_key( $feat );
+                    $new_levels[$role_key][$feat] = 'edit';
+                }
+            }
+        }
     }
 
-    $full_access = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'leads', 'clients', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite' );
-    $merged['administrator'] = $full_access;
-    $merged['cora_super_admin'] = $full_access;
+    // Force full access for admins/superadmins
+    $full_access_features = array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'leads', 'clients', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite' );
+    $full_access_levels = array();
+    foreach ( $full_access_features as $feat ) {
+        $full_access_levels[$feat] = 'edit';
+    }
+    $new_levels['administrator'] = $full_access_levels;
+    $new_levels['cora_super_admin'] = $full_access_levels;
 
-    update_option( 'cora_role_permissions', $merged );
+    // Save granular levels
+    update_option( 'cora_role_permission_levels', $new_levels );
+
+    // Synchronize to legacy cora_role_permissions (only 'view' or 'edit' allowed)
+    $legacy_permissions = array();
+    foreach ( $new_levels as $role_key => $features ) {
+        $legacy_permissions[$role_key] = array();
+        if ( is_array( $features ) ) {
+            foreach ( $features as $feat => $lvl ) {
+                if ( in_array( $lvl, array( 'view', 'edit' ), true ) ) {
+                    $legacy_permissions[$role_key][] = $feat;
+                }
+            }
+        }
+    }
+    update_option( 'cora_role_permissions', $legacy_permissions );
+
     wp_send_json_success( array( 'message' => 'Permissions matrix saved successfully.' ) );
 }
 }
 add_action( 'wp_ajax_cora_ajax_save_permissions_matrix', 'cora_ajax_save_permissions_matrix' );
 add_action( 'wp_ajax_cora_save_permissions_matrix', 'cora_ajax_save_permissions_matrix' );
 add_action( 'wp_ajax_cora_save_role_permissions', 'cora_ajax_save_permissions_matrix' );
+
+/**
+ * AJAX Handler: Ask LLM Doubt
+ */
+if ( ! function_exists( 'cora_ajax_ask_llm_doubt' ) ) {
+function cora_ajax_ask_llm_doubt() {
+    $nonce = isset( $_POST['security'] ) ? $_POST['security'] : ( isset( $_POST['nonce'] ) ? $_POST['nonce'] : '' );
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ) );
+    }
+
+    if ( ! current_user_can( 'manage_options' ) && ! cora_is_workspace_owner() && ! cora_user_has_feature_level( 'team-roles', 'view' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized access.' ) );
+    }
+
+    $doubt = isset( $_POST['doubt'] ) ? sanitize_text_field( wp_unslash( $_POST['doubt'] ) ) : '';
+    $platform = isset( $_POST['platform'] ) ? sanitize_text_field( wp_unslash( $_POST['platform'] ) ) : '';
+
+    if ( empty( $doubt ) ) {
+        wp_send_json_error( array( 'message' => 'Doubt parameter is required.' ) );
+    }
+
+    $system_prompt = get_option( 'cora_workspace_ai_permissions_training_prompt', '' );
+    if ( empty( $system_prompt ) ) {
+        $system_prompt = "You are the Cora Platform AI Assistant. Your task is to guide administrators and workspace owners through the User Management and Permissions Matrix. 
+The Cora Workspace supports three levels of capabilities:
+1. 'none': No access. The user cannot see or interact with the feature.
+2. 'view': View-only access. The user can view the feature but cannot make changes or submit edits.
+3. 'edit': Full edit access. The user can view, edit, create, and delete within that feature.
+
+Legacy compatibility:
+The platform supports legacy capabilities via the array 'cora_role_permissions', which only lists features that have either 'view' or 'edit' access. Any custom modules check permissions via 'cora_user_has_feature_access' which maps targets to features and verifies if the user's role has 'view' or 'edit' access.
+
+Features in the matrix include:
+- 'dashboard': Main dashboard metrics, active modules, and quick actions.
+- 'bookings': Booking calendar, scheduler, showings, and reservation management.
+- 'feature-hub': Platform modules, industry mode switching, and onboarding.
+- 'team-roles': Team members list, role assignment, and permissions matrix.
+- 'equipment': Listings/equipment manager, inventory tracking, camera/drone configurations.
+- 'financials': Ledger tracking, SGST/CGST calculations, tax splits, invoicing.
+- 'settings': Brand guidelines, whitelist settings, and integration options.
+
+Please provide concise, professional, and clear guidance for resolving user management and permissions queries.";
+    }
+
+    $message = "User Doubt: " . $doubt;
+    if ( ! empty( $platform ) ) {
+        $message .= "\nPlatform: " . $platform;
+    }
+
+    // Attempt 1: Gemini
+    if ( defined( 'CORA_PLATFORM_GEMINI_API_KEY' ) && ! empty( CORA_PLATFORM_GEMINI_API_KEY ) ) {
+        $api_key  = CORA_PLATFORM_GEMINI_API_KEY;
+        $model_id = 'gemini-3.5-flash-lite';
+        $url      = "https://generativelanguage.googleapis.com/v1beta/models/{$model_id}:generateContent?key=" . urlencode( $api_key );
+
+        $body = json_encode( array(
+            'system_instruction' => array(
+                'parts' => array( array( 'text' => $system_prompt ) )
+            ),
+            'contents' => array(
+                array(
+                    'role'  => 'user',
+                    'parts' => array( array( 'text' => $message ) ),
+                )
+            ),
+            'generationConfig' => array(
+                'maxOutputTokens' => 1024,
+                'temperature'     => 0.7,
+            ),
+        ) );
+
+        $response = wp_remote_post( $url, array(
+            'timeout' => 20,
+            'headers' => array( 'Content-Type' => 'application/json' ),
+            'body'    => $body,
+        ) );
+
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            $data = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( $code === 200 && ! empty( $data['candidates'][0]['content']['parts'][0]['text'] ) ) {
+                wp_send_json_success( array(
+                    'reply'    => $data['candidates'][0]['content']['parts'][0]['text'],
+                    'provider' => 'gemini',
+                ) );
+            }
+        }
+    }
+
+    // Attempt 2: OpenAI
+    if ( defined( 'CORA_PLATFORM_OPENAI_API_KEY' ) && ! empty( CORA_PLATFORM_OPENAI_API_KEY ) ) {
+        $api_key  = CORA_PLATFORM_OPENAI_API_KEY;
+        $model_id = 'gpt-4o-mini';
+        $url      = 'https://api.openai.com/v1/chat/completions';
+
+        $body = json_encode( array(
+            'model'    => $model_id,
+            'messages' => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => $message ),
+            ),
+            'max_tokens'  => 1024,
+            'temperature' => 0.7,
+        ) );
+
+        $response = wp_remote_post( $url, array(
+            'timeout' => 20,
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $api_key,
+                'Content-Type'  => 'application/json',
+            ),
+            'body' => $body,
+        ) );
+
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            $data = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
+                wp_send_json_success( array(
+                    'reply'    => $data['choices'][0]['message']['content'],
+                    'provider' => 'openai',
+                ) );
+            }
+        }
+    }
+
+    // Attempt 3: Groq
+    if ( defined( 'CORA_PLATFORM_GROQ_API_KEY' ) && ! empty( CORA_PLATFORM_GROQ_API_KEY ) ) {
+        $api_key  = CORA_PLATFORM_GROQ_API_KEY;
+        $model_id = 'llama-3.1-8b-instant';
+        $url      = 'https://api.groq.com/openai/v1/chat/completions';
+
+        $body = json_encode( array(
+            'model'    => $model_id,
+            'messages' => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => $message ),
+            ),
+            'max_tokens'  => 1024,
+            'temperature' => 0.7,
+        ) );
+
+        $response = wp_remote_post( $url, array(
+            'timeout' => 20,
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $api_key,
+                'Content-Type'  => 'application/json',
+            ),
+            'body' => $body,
+        ) );
+
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            $data = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
+                wp_send_json_success( array(
+                    'reply'    => $data['choices'][0]['message']['content'],
+                    'provider' => 'groq',
+                ) );
+            }
+        }
+    }
+
+    wp_send_json_error( array( 'message' => 'No AI provider succeeded or API keys are missing.' ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_ask_llm_doubt', 'cora_ajax_ask_llm_doubt' );
+
+/**
+ * AJAX Handler: Save Training Prompt
+ */
+if ( ! function_exists( 'cora_ajax_save_training_prompt' ) ) {
+function cora_ajax_save_training_prompt() {
+    $nonce = isset( $_POST['security'] ) ? $_POST['security'] : ( isset( $_POST['nonce'] ) ? $_POST['nonce'] : '' );
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ) );
+    }
+
+    if ( ! current_user_can( 'manage_options' ) && ! cora_is_workspace_owner() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized access.' ) );
+    }
+
+    $prompt = isset( $_POST['prompt'] ) ? sanitize_textarea_field( wp_unslash( $_POST['prompt'] ) ) : '';
+    update_option( 'cora_workspace_ai_permissions_training_prompt', $prompt );
+
+    wp_send_json_success( array( 'message' => 'Training prompt saved successfully.' ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_save_training_prompt', 'cora_ajax_save_training_prompt' );
+add_action( 'wp_ajax_cora_save_training_prompt', 'cora_ajax_save_training_prompt' );
 
 /**
  * AJAX Handler: Create User
@@ -5007,7 +5254,7 @@ function cora_canvas_theme_frontend_router() {
         'dashboard', 'canvas', 'users', 'financials', 'content-suite', 'content_suite',
         'media', 'file-manager', 'vault', 'leads', 'forms', 'emails', 'settings-suite', 
         'audit-panel', 'super-admin', 'super-users', 'super-appeals', 'super-governance', 
-        'super-announcements', 'super-health', 'profile', 'reviews-feedback', 'reviews_acquisition',
+        'super-announcements', 'super-health', 'super-docs', 'profile', 'reviews-feedback', 'reviews_acquisition',
         'property-listings', 'team-scheduler', 'crew-scheduler', 'client-task-manager', 
         'ecosystem', 'tools', 'mcp', 'onboarding'
     );
@@ -17763,8 +18010,8 @@ function cora_db_get_agency_id_by_slug( $slug ) {
 }
 }
 
-if ( ! function_exists( 'cora_user_has_feature_access' ) ) {
-function cora_user_has_feature_access( $target, $user = null ) {
+if ( ! function_exists( 'cora_user_has_feature_level' ) ) {
+function cora_user_has_feature_level( $target, $level = 'view', $user = null ) {
     if ( ! $user ) {
         $user = wp_get_current_user();
     }
@@ -17791,28 +18038,6 @@ function cora_user_has_feature_access( $target, $user = null ) {
     );
     if ( in_array( $role, $full_access_roles, true ) || user_can( $user->ID, 'manage_options' ) ) {
         return true;
-    }
-
-    // Retrieve permissions matrix
-    $cora_permissions = get_option( 'cora_role_permissions', array() );
-    $allowed = isset( $cora_permissions[$role] ) ? $cora_permissions[$role] : null;
-
-    // If no custom permissions are set for this role, fallback to default capabilities
-    if ( $allowed === null ) {
-        $default_perms = array(
-            'cora_branch_manager'         => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'portfolio', 'leads', 'settings', 'settings-suite', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base' ),
-            'cora_manager'                => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'portfolio', 'leads', 'settings', 'settings-suite', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base' ),
-            'cora_photographer'           => array( 'dashboard', 'bookings', 'equipment', 'portfolio', 'media', 'leads' ),
-            'cora_videographer'           => array( 'dashboard', 'bookings', 'equipment', 'portfolio', 'media' ),
-            'cora_drone_pilot'            => array( 'dashboard', 'bookings', 'equipment', 'portfolio', 'media' ),
-            'cora_editor'                 => array( 'dashboard', 'bookings', 'media-editor', 'vault', 'media' ),
-            'cora_re_showing_assistant'   => array( 'dashboard', 'bookings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks' ),
-            'cora_re_property_valuer'     => array( 'dashboard', 'portfolio', 'vault', 'tasks' ),
-            'cora_re_listing_coordinator' => array( 'dashboard', 'portfolio', 'leads', 'clients', 'tasks' ),
-            'cora_viewer'                 => array( 'dashboard', 'portfolio', 'bookings' ),
-            'subscriber'                  => array( 'dashboard' ),
-        );
-        $allowed = isset( $default_perms[$role] ) ? $default_perms[$role] : array( 'dashboard' );
     }
 
     // Map targets to their corresponding matrix capability keys
@@ -17923,7 +18148,43 @@ function cora_user_has_feature_access( $target, $user = null ) {
         }
     }
 
-    return in_array( $mapped_key, $allowed, true );
+    $role_levels = get_option( 'cora_role_permission_levels', null );
+    if ( is_array( $role_levels ) && isset( $role_levels[$role] ) ) {
+        $user_level = isset( $role_levels[$role][$mapped_key] ) ? $role_levels[$role][$mapped_key] : 'none';
+        $levels_map = array( 'none' => 0, 'view' => 1, 'edit' => 2 );
+        $user_val = isset( $levels_map[$user_level] ) ? $levels_map[$user_level] : 0;
+        $req_val = isset( $levels_map[$level] ) ? $levels_map[$level] : 1;
+        return $user_val >= $req_val;
+    } else {
+        // Fall back to cora_role_permissions or default lists
+        $cora_permissions = get_option( 'cora_role_permissions', array() );
+        $allowed = isset( $cora_permissions[$role] ) ? $cora_permissions[$role] : null;
+
+        // If no custom permissions are set for this role, fallback to default capabilities
+        if ( $allowed === null ) {
+            $default_perms = array(
+                'cora_branch_manager'         => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'portfolio', 'leads', 'settings', 'settings-suite', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base' ),
+                'cora_manager'                => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'portfolio', 'leads', 'settings', 'settings-suite', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base' ),
+                'cora_photographer'           => array( 'dashboard', 'bookings', 'equipment', 'portfolio', 'media', 'leads' ),
+                'cora_videographer'           => array( 'dashboard', 'bookings', 'equipment', 'portfolio', 'media' ),
+                'cora_drone_pilot'            => array( 'dashboard', 'bookings', 'equipment', 'portfolio', 'media' ),
+                'cora_editor'                 => array( 'dashboard', 'bookings', 'media-editor', 'vault', 'media' ),
+                'cora_re_showing_assistant'   => array( 'dashboard', 'bookings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks' ),
+                'cora_re_property_valuer'     => array( 'dashboard', 'portfolio', 'vault', 'tasks' ),
+                'cora_re_listing_coordinator' => array( 'dashboard', 'portfolio', 'leads', 'clients', 'tasks' ),
+                'cora_viewer'                 => array( 'dashboard', 'portfolio', 'bookings' ),
+                'subscriber'                  => array( 'dashboard' ),
+            );
+            $allowed = isset( $default_perms[$role] ) ? $default_perms[$role] : array( 'dashboard' );
+        }
+        return in_array( $mapped_key, $allowed, true );
+    }
+}
+}
+
+if ( ! function_exists( 'cora_user_has_feature_access' ) ) {
+function cora_user_has_feature_access( $target, $user = null ) {
+    return cora_user_has_feature_level( $target, 'view', $user );
 }
 }
 
@@ -20613,6 +20874,29 @@ function cora_ajax_update_leave_status() {
 add_action( 'wp_ajax_cora_ajax_update_leave_status', 'cora_ajax_update_leave_status' );
 
 add_action( 'wp_ajax_cora_ajax_logout_other_sessions', 'cora_ajax_logout_other_sessions' );
+if ( ! function_exists( 'cora_ajax_logout_other_sessions' ) ) {
+    function cora_ajax_logout_other_sessions() {
+        check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+        
+        $user_id = get_current_user_id();
+        
+        if ( isset( $_POST['user_id'] ) && ! empty( $_POST['user_id'] ) ) {
+            $target_id = intval( $_POST['user_id'] );
+            if ( $target_id !== $user_id ) {
+                $user = wp_get_current_user();
+                $role = ! empty( $user->roles ) ? $user->roles[0] : '';
+                if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! in_array( $role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager' ) ) ) {
+                    wp_send_json_error( array( 'message' => 'Unauthorized access.' ) );
+                }
+                $user_id = $target_id;
+            }
+        }
+        
+        wp_destroy_all_sessions( $user_id );
+        cora_log_activity( 'User Management', 'Logged out all active sessions for user ID: ' . $user_id );
+        wp_send_json_success( array( 'message' => 'All active sessions for this user have been successfully revoked.' ) );
+    }
+}
 
 if ( ! function_exists( 'cora_ajax_get_user_leads_count' ) ) {
 function cora_ajax_get_user_leads_count() {
@@ -20710,6 +20994,16 @@ function cora_ajax_save_user_changes() {
     if ( ! empty( $commission_split ) ) update_user_meta( $target_user_id, 'cora_commission_split', $commission_split );
     if ( ! empty( $hourly_rate ) )      update_user_meta( $target_user_id, 'cora_hourly_rate', $hourly_rate );
     if ( ! empty( $bank_upi ) )          update_user_meta( $target_user_id, 'cora_bank_upi', $bank_upi );
+
+    // Advanced AI & Security Settings
+    $ai_token_limit = intval( $_POST['ai_token_limit'] ?? 0 );
+    update_user_meta( $target_user_id, 'cora_ai_token_limit', $ai_token_limit );
+
+    $mcp_allowed_tools = isset( $_POST['mcp_allowed_tools'] ) ? array_map( 'sanitize_text_field', (array) $_POST['mcp_allowed_tools'] ) : array();
+    update_user_meta( $target_user_id, 'cora_mcp_allowed_tools', $mcp_allowed_tools );
+
+    $stay_logged_in = isset( $_POST['stay_logged_in'] ) ? sanitize_text_field( $_POST['stay_logged_in'] ) : '';
+    update_user_meta( $target_user_id, 'cora_stay_logged_in', $stay_logged_in );
 
     // Profile Avatar & Banner
     if ( isset( $_POST['avatar_url'] ) ) {
@@ -28150,6 +28444,68 @@ add_action( 'wp_ajax_cora_ajax_save_custom_role_permissions', 'cora_ajax_save_cu
 add_action( 'wp_ajax_cora_save_custom_role_permissions', 'cora_ajax_save_custom_role_permissions' );
 
 /**
+ * AJAX — Update custom role access level.
+ */
+if ( ! function_exists( 'cora_ajax_update_custom_role_access_level' ) ) {
+    function cora_ajax_update_custom_role_access_level() {
+        if ( ! current_user_can( 'manage_options' ) && ! cora_is_workspace_owner() ) {
+            wp_send_json_error( array( 'message' => 'Insufficient permissions to update custom roles.' ) );
+        }
+
+        $role_key     = sanitize_text_field( $_POST['role_key'] ?? '' );
+        $access_level = sanitize_text_field( $_POST['access_level'] ?? 'contributor' );
+
+        if ( empty( $role_key ) ) {
+            wp_send_json_error( array( 'message' => 'Role identifier key is required.' ) );
+        }
+
+        $agency_id_raw = cora_get_current_user_agency_id();
+        $agency_suffix = ( ! empty( $agency_id_raw ) && $agency_id_raw !== 'super' ) ? '_' . preg_replace( '/[^\w]/', '_', $agency_id_raw ) : '';
+
+        $custom_roles_key = 'cora_custom_roles' . $agency_suffix;
+        $custom_roles = get_option( $custom_roles_key, array() );
+        if ( ! is_array( $custom_roles ) ) {
+            $custom_roles = array();
+        }
+
+        $updated = false;
+        foreach ( $custom_roles as &$cr ) {
+            if ( $cr['role_key'] === $role_key ) {
+                $cr['access_level'] = $access_level;
+                $updated = true;
+                break;
+            }
+        }
+        unset( $cr );
+
+        if ( $updated ) {
+            update_option( $custom_roles_key, $custom_roles );
+
+            if ( ! empty( $agency_suffix ) ) {
+                $global_custom_roles = get_option( 'cora_custom_roles', array() );
+                if ( is_array( $global_custom_roles ) ) {
+                    foreach ( $global_custom_roles as &$gcr ) {
+                        if ( $gcr['role_key'] === $role_key ) {
+                            $gcr['access_level'] = $access_level;
+                            break;
+                        }
+                    }
+                    unset( $gcr );
+                    update_option( 'cora_custom_roles', $global_custom_roles );
+                }
+            }
+            cora_log_activity( 'User Management', "Updated custom role access level to {$access_level} for: {$role_key}." );
+            wp_send_json_success( array( 'message' => 'Access level updated successfully!' ) );
+        } else {
+            wp_send_json_error( array( 'message' => 'Role not found.' ) );
+        }
+    }
+}
+add_action( 'wp_ajax_cora_ajax_update_custom_role_access_level', 'cora_ajax_update_custom_role_access_level' );
+add_action( 'wp_ajax_cora_update_custom_role_access_level', 'cora_ajax_update_custom_role_access_level' );
+
+
+/**
  * AJAX — Duplicate an existing custom role and its permissions matrix.
  */
 if ( ! function_exists( 'cora_ajax_duplicate_custom_role' ) ) {
@@ -30113,6 +30469,128 @@ function cora_ajax_super_switch_back() {
 }
 add_action( 'wp_ajax_cora_super_switch_back', 'cora_ajax_super_switch_back' );
 add_action( 'wp_ajax_nopriv_cora_super_switch_back', 'cora_ajax_super_switch_back' );
+
+/**
+ * AJAX Callback: Analyze user bio with AI to suggest specializations.
+ */
+if ( ! function_exists( 'cora_ajax_analyze_profile_skills' ) ) {
+function cora_ajax_analyze_profile_skills() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Not authenticated.' ) );
+    }
+
+    $bio = sanitize_textarea_field( $_POST['bio'] ?? '' );
+    if ( empty( $bio ) ) {
+        wp_send_json_error( array( 'message' => 'Profile bio is required.' ) );
+    }
+
+    $industry = sanitize_text_field( $_POST['industry'] ?? 'real_estate' );
+    
+    $specs_pool = $industry === 'photography_studio'
+        ? array('Portrait & Fashion', 'Commercial Photography', 'Drone Specialist', 'Post-Production Colorist', 'Wedding Cinematography', 'Event Coverage')
+        : array('Luxury Residential', 'Commercial Sales', 'Land Acquisition', 'Rental Management', 'Auction Specialist', 'Investment Advisory');
+
+    $system_prompt = "You are an AI Profile Analyzer for the Cora platform. Analyze the user's bio and return a JSON object containing:
+1. 'specs': An array of matching specializations from the pool: [" . implode(', ', array_map(function($s){ return "'$s'"; }, $specs_pool)) . "].
+2. 'match_score': An integer match score from 0 to 100 based on how well their background aligns with these specializations.
+3. 'analysis': A short 1-sentence summary explanation of the match.
+
+Do not return any extra markdown format or formatting. Return ONLY pure JSON matching:
+{
+  \"specs\": [],
+  \"match_score\": 75,
+  \"analysis\": \"...\"
+}";
+
+    $ai_response = function_exists('cora_rag_call_ai_api') 
+        ? cora_rag_call_ai_api( $bio, $system_prompt )
+        : '';
+
+    if ( empty( $ai_response ) ) {
+        wp_send_json_success( array(
+            'specs' => array(),
+            'match_score' => 0,
+            'analysis' => 'AI is not configured. Please enter your API key in settings.'
+        ) );
+    }
+
+    // Strip markdown formatting if any
+    $ai_response = preg_replace('/```json/i', '', $ai_response);
+    $ai_response = preg_replace('/```/', '', $ai_response);
+    $ai_response = trim( $ai_response );
+
+    $data = json_decode( $ai_response, true );
+    if ( ! is_array( $data ) ) {
+        $matched = array();
+        foreach ( $specs_pool as $spec ) {
+            if ( stripos( $bio, $spec ) !== false ) {
+                $matched[] = $spec;
+            }
+        }
+        $score = count( $matched ) > 0 ? min( 100, count( $matched ) * 25 ) : 10;
+        $data = array(
+            'specs' => $matched,
+            'match_score' => $score,
+            'analysis' => 'Determined specializations based on matching keyphrases.'
+        );
+    }
+
+    wp_send_json_success( $data );
+}
+}
+add_action( 'wp_ajax_cora_ajax_analyze_profile_skills', 'cora_ajax_analyze_profile_skills' );
+
+/**
+ * AJAX Callback: Write/Improve user bio with AI.
+ */
+if ( ! function_exists( 'cora_ajax_improve_profile_bio' ) ) {
+function cora_ajax_improve_profile_bio() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Not authenticated.' ) );
+    }
+
+    $bio = sanitize_textarea_field( $_POST['bio'] ?? '' );
+    if ( empty( $bio ) ) {
+        wp_send_json_error( array( 'message' => 'Please provide some initial notes or bullet points to write.' ) );
+    }
+
+    $system_prompt = "You are an expert copywriter and professional coworker assistant. 
+Re-write and improve the user's rough bullet points or draft bio into a clean, professional, cohesive biography paragraph.
+Keep it between 2 to 4 sentences. Make it engaging, professional, and highlight the key facts, credentials, and achievements.
+Do not add any greetings, conversational filler, markdown codeblocks, or extra text. Return ONLY the final polished paragraph.";
+
+    $ai_response = function_exists('cora_rag_call_ai_api')
+        ? cora_rag_call_ai_api( $bio, $system_prompt )
+        : '';
+
+    $ai_response = trim( $ai_response );
+    // Clean up typical markdown block markers if returned
+    $ai_response = preg_replace('/^```(text|markdown)?/i', '', $ai_response);
+    $ai_response = preg_replace('/```$/', '', $ai_response);
+    $ai_response = trim( $ai_response );
+
+    if ( empty( $ai_response ) ) {
+        // Fallback enhancement: Make sentences out of notes
+        $notes = explode( ',', $bio );
+        $sentences = array();
+        foreach ( $notes as $n ) {
+            $trimmed = trim( $n );
+            if ( ! empty( $trimmed ) ) {
+                $sentences[] = ucfirst( $trimmed );
+            }
+        }
+        $ai_response = implode( '. ', $sentences ) . '.';
+        $ai_response = "Experienced professional. " . $ai_response;
+    }
+
+    wp_send_json_success( array( 'improved_bio' => $ai_response ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_improve_profile_bio', 'cora_ajax_improve_profile_bio' );
 
 /**
  * AJAX Callback: Switch active workspace context for the current user.

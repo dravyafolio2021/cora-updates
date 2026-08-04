@@ -1,3 +1,255 @@
+# Walkthrough - Desktop Header Refinements & AI Stack Restoration (v3.2.26)
+
+We have successfully refined the desktop view header and restored the overlapping AI platform shortcuts in User Management.
+
+---
+
+## 🚀 Key Achievements
+
+### 1. User Icon Removal from Desktop Title
+- **Clean Left Alignment**: Removed the user icon box container (`div.w-12.h-12`) from next to the "User Management" page title. The text title and description description now align directly with the left viewport edge, keeping standard CRM layouts unified.
+
+### 2. Desktop AI Brand Shortcuts Restoration
+- **Overlapping Stack Restored**: Re-integrated the overlapping AI platforms brand shortcut stack (`.cora-platform-stack` containing ChatGPT, Claude, Gemini, Perplexity, and YouTube icon buttons) next to the "Invite User" button inside the desktop view header.
+
+### 3. Integrated RAG and Changelogs updates
+- Deployed documentation version `3.2.26` to both localized files and the local database documentation table.
+
+---
+
+## 🛠️ Code Architecture
+- Incremented plugin header version and constant to `3.2.26` in [cora-workspace.php](file:///Users/shrutian/Desktop/cora/app/public/wp-content/plugins/cora-workspace/cora-workspace.php).
+- Updated manifest version to `3.2.26` and prepended details in [cora-workspace.json](file:///Users/shrutian/Desktop/cora/updates/cora-workspace.json).
+
+---
+
+## 🟢 Verification & Deployment
+- Playwright E2E verification test result: `3 passed` ✅
+- Final packaged build update zip generated successfully.
+
+---
+
+# Walkthrough - Mobile Empty States Fix & Permissions Matrix Redesign (v3.2.15) & Mobile AI Stack Integration (v3.2.25)
+
+We have successfully redesigned the mobile Permissions Matrix tab into an accordion-based card layout, registered a new AJAX controller to update custom role access profiles directly without losing permissions, resolved HTML container nesting bugs, fixed mobile table empty state layouts, and overhauled the Attendance Logs tab with high-fidelity stats cards and responsive list components. Furthermore, we integrated the compact overlapping AI platforms brand stack in the mobile header next to the Invite button, optimizing the mobile layout with zero-padding alignment.
+
+---
+
+## 🚀 Key Achievements
+
+### 1. Re-engineered Permissions Matrix for Mobile (v3.2.15)
+- **Role Card Accordions**: Overhauled the mobile Permissions Matrix tab (`#tab-permissions-matrix`) to display each role as a card container.
+- **Collapsible Category Accordions**: Inside each role card, categories open as nested accordion rows.
+
+### 2. High-Fidelity Stats Cards Restoration & 2-Column Grid (v3.2.17 - v3.2.20)
+- **4-Card Overview Grid**: Restored the "Active Today" and "Late Check-ins" metric cards alongside "Geofencing" and "Cron Automations", rendering as a clean, full-width 4-column layout on desktop.
+- **Mobile 2-Column Grid Layout (v3.2.20)**: Optimized the grid wrapper on mobile to display as `grid-cols-2` (a 2x2 grid) instead of stacking in a single long column. Set padding (`p-3.5`) and minimum heights (`style="min-height: 160px;"`) to ensure perfect vertical consistency and spacing on mobile viewports.
+
+### 3. Mobile Header & Tab Navigation Baseline Alignment (v3.2.21 - v3.2.24)
+- **Borderless "More" Selector**: Completely removed the heavy box outline border and gray background from the mobile sub-navigation's dropdown trigger button.
+- **Vertical Baseline Alignment (v3.2.22)**: Removed the bottom-padding wrapper offset (`pb-2`) from the More button parent `div`, ensuring the active bottom border line of the selected dropdown option sits exactly on the horizontal baseline divider.
+- **Horizontal Edges Padding Removed (v3.2.23 - v3.2.24)**: Removed the horizontal edge padding (`px-4` changed to `px-0`) from both the mobile sub-tabs container and the mobile header row (`div` wrapping page title and Invite button), ensuring they align perfectly with the layout boundary edges on mobile viewports.
+
+### 4. Overlapping AI Platform stacked shortcuts on Mobile (v3.2.25)
+- **Mobile AI Stack**: Integrated the compact brand shortcut icons stack (ChatGPT, Claude, Gemini, Perplexity, YouTube) inline next to the "Invite" button inside the mobile header, keeping the desktop layouts isolated and clean.
+- **Balanced Nesting**: Fully resolved the responsive nested block layout mismatch by utilizing perfectly balanced HTML `div` blocks.
+
+### 5. Responsive Attendance Logs Table & Mobile Cards (v3.2.18)
+- **Desktop View**: Table is wrapped in a `hidden md:block` table card container with an integrated pagination footer.
+- **Mobile View**: Punch logs list is rendered inside a `block md:hidden` grid list.
+
+---
+
+## 🛠️ Code Architecture
+
+- **Capabilities Check & Version Manifest**:
+  - Incremented plugin header version and constant to `3.2.25` in [cora-workspace.php](file:///Users/shrutian/Desktop/cora/app/public/wp-content/plugins/cora-workspace/cora-workspace.php).
+  - Updated manifest version to `3.2.25` and prepended details in [cora-workspace.json](file:///Users/shrutian/Desktop/cora/updates/cora-workspace.json).
+
+---
+
+## 🟢 Verification & Deployment
+- Run the Playwright E2E test suite successfully:
+  `npx playwright test tests/e2e/custom-roles.spec.ts`
+  - **Result**: `3 passed (15.6s)` ✅
+- Packaged the deployment zip:
+  `updates/cora-workspace.zip` ✅
+- Executed RAG & Changelog updates:
+  `scratch/update_db_docs_rag.php` ✅
+
+---
+
+---
+
+# Walkthrough - Attendance Logs Stat Cards Redesign (v3.2.17)
+
+We have successfully redesigned the Attendance Logs overview stat cards to apply uniform height, border structures, and dynamic status details.
+
+## 🚀 Key Achievements
+* **Equal Sizing & Heights**: Standardized all four stat cards (Active Today, Late Check-ins, Geofencing, and Cron Automations) with consistent padding and a strict `min-height: 110px` attribute to ensure perfect alignment in grid columns on mobile.
+* **Premium Border & Styling**: Applied custom monochromatic borders (`border border-zinc-200 dark:border-zinc-800`), shadows, and smooth hover state transitions.
+* **Reduced Text Redundancy**: Cleaned up geofence status labels to show `No address set for active agency` when coordinates are missing, removing the double "Not Configured" subtitles.
+* **Rich Status Badges**: Added pulsing green indicator dots and badge styles representing active status for Background Cron Tasks and Geofencing.
+* **E2E Playwright Tests Passed**: Verified that all custom roles, permissions, and matrix E2E tests are functional.
+
+---
+
+# Walkthrough - Permissions Matrix Mobile Toolbar Improvements (v3.2.16)
+
+We have successfully refined the Permissions Matrix toolbar's responsiveness on mobile viewports to prevent cramped layouts, uneven wrapping, and overlaps.
+
+## 🚀 Key Achievements
+* **Full-Width Search input on Mobile**: Extended the search input to span the full first row (`w-full sm:w-52`) on mobile.
+* **Unified Secondary Actions Grid**: Grouped secondary buttons (`Reset`, `Grant All`, `AI Trainer`) inside a responsive grid (`grid grid-cols-3 sm:flex sm:items-center gap-2 w-full sm:w-auto`). They now render as a balanced, equal-width 3-column row on mobile screens.
+* **Bottom Primary CTA**: Placed the `Save Changes` button inside a full-width container (`w-full sm:w-auto sm:ml-auto`) to display as a prominent bottom CTA on mobile.
+* **E2E Playwright Tests Passed**: Verified that all custom roles and permissions tests pass successfully.
+
+---
+
+# Walkthrough - Mobile Empty State Table Rendering Fix (v3.2.14)
+
+We have successfully fixed the table rendering layout for empty states on mobile viewports.
+
+## 🚀 Key Achievements
+* **Exclusion Class**: Added a `.cora-empty-state-row` CSS class to exclude empty state rows (such as "No pending invitations", "No custom roles", and "No attendance records found") from the responsive-table card transformation on mobile.
+* **Polished Layout**: Empty state rows now display as centered text blocks instead of being wrapped in styled mobile cards.
+
+---
+
+# Walkthrough - Invite User Button Rendering Fix (v3.2.13)
+
+We diagnosed and resolved the root cause of why `py-[6px]` and `px-[12px]` failed to render in the browser DOM.
+
+## 🔍 Root Cause Analysis
+* **Tailwind Arbitrary Class Absence**: The prebuilt Tailwind CSS bundle loaded by WordPress did not contain compiled CSS utility rules for dynamic arbitrary bracket values like `.py-\[6px\]`, `.px-\[12px\]`, or `.rounded-\[8px\]`. As shown in the DevTools screenshot, the browser rendered the classes in HTML but had no matching CSS rules to apply.
+
+## 🚀 Key Fixes & Implementation
+* **Standard Tailwind Utilities**: Replaced arbitrary bracket syntax with standard precompiled Tailwind utilities:
+  - `py-1.5` (`0.375rem` = 6px)
+  - `px-3` (`0.75rem` = 12px)
+  - `rounded-lg` (`0.5rem` = 8px)
+* **Direct Inline CSS Safeguard**: Added `style="padding: 6px 12px !important; border-radius: 8px !important;"` directly onto the `<button>` element to guarantee 100% rendering across all client browsers regardless of stylesheet caching or Tailwind JIT compilation state.
+* **Verification & Staging Deployment**: Verified via E2E Playwright tests (3 tests passed) and deployed version `3.2.13` to staging (`ALL HEALTH CHECKS PASSED`).
+
+---
+
+# Walkthrough - Invite User Button Style Specifications (v3.2.12)
+
+We have successfully formatted the desktop Invite User button according to the exact CSS specifications you provided.
+
+## 🚀 Key Achievements
+* **Custom Padding Applied**: Set the button padding strictly to `py-[6px] px-[12px]` (6px vertical and 12px horizontal).
+* **Border Radius Applied**: Constrained the button corner rounding to exactly `rounded-[8px]` (8px border-radius) instead of a circular pill shape.
+* **Verification & Staging Deployment**: Successfully verified changes locally via the E2E Playwright test suite (3 tests passed) and deployed to staging under version `3.2.12` (remote healthcheck completed with `ALL HEALTH CHECKS PASSED`).
+
+---
+
+# Walkthrough - Icon Outline Removal & Select Width Constraint (v3.2.10)
+
+We have successfully refined the desktop header button, removed the borders from overlapping LLM stack buttons, and constrained filter dropdown widths to a strict max-width of exactly 100px.
+
+## 🚀 Key Achievements
+* **Overlapping LLM Icons Outlines Removed**: Replaced all border outlines from overlapping brand icon buttons with `border-0` to keep just the soft color background fills.
+* **Invite User Button Styling Refined**: Removed the gradient border wrapper completely, converting it into a clean, standalone, non-squeezed solid black pill button with strict `whitespace-nowrap` and `shrink-0` classes to prevent layout squeezing.
+* **Filter Toggles Max-Width 100px**: Adjusted the Attendance Logs dropdown filters (Employee Picker, Period Direction, and Event Type) to have a strict max-width of exactly `100px` to save screen space.
+* **Verification & Staging Deployment**: Successfully verified changes locally via the E2E Playwright test suite (3 tests passed) and deployed to staging under version `3.2.10` (remote healthcheck completed with `ALL HEALTH CHECKS PASSED`).
+
+---
+
+# Walkthrough - User Module Button Redesign & Dropdown Truncation (v3.2.8)
+
+We have successfully overhauled the Invite User action button, applied soft color highlights to the LLM brand stack, and constrained filter dropdown widths to prevent the search input from squeezing.
+
+## 🚀 Key Achievements
+* **Invite User Button Overhaul**: Wrapped the button inside a glowing, multi-colored holographic gradient border (`bg-gradient-to-r from-zinc-300/90 via-purple-300/80 via-pink-300/80 to-zinc-400/90`). Redesigned the inner button as a solid pitch black pill with a plus icon, a vertical divider line (`w-[1px] h-3 bg-zinc-800`), and clean text to match the mockup.
+* **LLM Overlapping Stack Highlights**: Applied soft, transparent tinted backgrounds matching each brand logo (ChatGPT green: `bg-emerald-50/70 dark:bg-emerald-950/20`, Claude orange: `bg-amber-50/70 dark:bg-amber-950/20`, Gemini blue: `bg-blue-5/70 dark:bg-blue-950/20`, Perplexity grey: `bg-zinc-50/70 dark:bg-zinc-800/25`, YouTube red: `bg-red-5/70 dark:bg-red-950/20`) to make the brand stack pop.
+* **Toggles Dropdown Max-Widths**: Assigned `max-w-[130px] truncate` (All Team Members), `max-w-[100px] truncate` (All Time), and `max-w-[110px] truncate` (All Event Types) constraints. Long dropdown option names will now truncate elegantly instead of squeezing siblings.
+* **Search Squeezing Prevention**: Set `md:min-w-[180px]` and `md:flex-none` on the search input box container inside the Attendance Logs toolbar, guaranteeing it retains layout integrity across all desktop and tablet viewport widths.
+* **Verification & Staging Deployment**: Successfully verified changes locally via the E2E Playwright test suite (3 tests passed) and deployed to staging under version `3.2.8` (remote healthcheck completed with `ALL HEALTH CHECKS PASSED`).
+
+---
+
+# Walkthrough - Attendance Logs Toolbar Layout & Overflow Correction (v3.2.7)
+
+We have successfully optimized the layout of the Attendance Logs filtering toolbar to prevent dropdown filters and action buttons from overlapping on medium and tablet viewports.
+
+## 🚀 Key Achievements
+* **Responsive Flex-Wrap Layout**: Replaced strict flex-row containers with flex-wrap (`flex flex-wrap items-center justify-between gap-3 w-full` and `flex flex-wrap items-center gap-2.5`) on the filter toolbar layout. This allows the elements to wrap naturally to a new row rather than squeezing.
+* **Desktop Fixed Search Box Width**: Refactored the search input container to use a responsive initial width classes (`flex-1 md:flex-none md:w-48 max-w-full shrink-0`), ensuring it takes up full width on mobile devices, but stays compact (192px width) on desktop.
+* **Collision Prevention**: Resolved the flex overflow overlap issue where the `Automated Reports & Share` and `Export CSV` buttons collided with or covered the select dropdown filters (like `All Time`).
+* **Verification & Staging Deployment**: Successfully verified changes locally via the E2E Playwright test suite (3 tests passed) and deployed to staging under version `3.2.7` (remote healthcheck completed with `ALL HEALTH CHECKS PASSED`).
+
+---
+
+# Walkthrough - Permissions Matrix Title & Action Toolbar Realignment (v3.2.6)
+
+We have successfully realigned the title block and the action controls toolbar inside the Granular Role Permissions Matrix card to match the user's layout mockup.
+
+## 🚀 Key Achievements
+* **Header Structural Reordering**: Placed the description paragraph directly below the title and Live Sync Active badge.
+* **Full-Width Action Toolbar Row**: Replaced the split flex layout with a full-width flex row (`flex flex-wrap items-center gap-2.5`) directly underneath the description.
+* **Left-to-Right Flow Alignment**: Arranged all controls (`Search roles...` input, `Reset`, `Grant All`, `AI Trainer`, `Save Changes`) inline from left to right.
+* **Verification & Staging Deployment**: Successfully verified changes locally via the E2E Playwright test suite (3 tests passed) and deployed to staging under version `3.2.6` (remote healthcheck completed with `ALL HEALTH CHECKS PASSED`).
+
+---
+
+# Walkthrough - Permissions Matrix Column Spacing & Badge Style Overhaul (v3.2.5)
+
+We have successfully overhauled the spacing and UI style of the Granular Role Permissions Matrix table to optimize headings expansion and prevent badges from wrapping.
+
+## 🚀 Key Achievements
+* **Wider Matrix Columns & Headings Expansion**: Set `min-w-[150px]` and `whitespace-nowrap` on matrix column headers and `min-w-[240px]` on the Role Title column. This allows feature headings like `PROPERTY LISTINGS` and `SHOWINGS CRM` to expand properly on a single line without wrapping or visual crowding.
+* **Badges Wrapping Prevention**: Styled dropdown cell badges (`View`, `Edit`, `None`) in both PHP (`cora_get_matrix_cell_badge`) and JavaScript (`window.coraGetCellBadgeHtml`) with `whitespace-nowrap` and added horizontal cell padding (`px-4`) to table cells.
+* **Subtle System Lock Badge**: Redesigned the `Global System Lock` badge in the Super Admin row. Replaced the bulky pill layout with a compact, elegant monochromatic badge utilizing `text-[9px] font-medium` and `whitespace-nowrap` to prevent multi-line wrapping.
+* **Subtle Live Sync Badge**: Refactored the `Live Sync Active` badge next to the matrix header into a compact, minimalist Shopify/Notion styled tag (`text-[9px] font-medium bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/10 dark:border-emerald-500/20 rounded`) with `whitespace-nowrap`.
+* **Verification & Staging Deployment**: Successfully verified changes locally via the E2E Playwright test suite (3 tests passed) and deployed to staging under version `3.2.5` (remote healthcheck completed with `ALL HEALTH CHECKS PASSED`).
+
+---
+
+# Walkthrough - Documentation Role Access & Refresh Disappearance Bug Fix (v3.2.4)
+
+We have successfully resolved the documentation role access bug where the Platform Documentation page (super-docs) would briefly appear on page refresh and then disappear/redirect to the dashboard due to a client-side SPA navigation gate mismatch in the allowed capability array.
+
+## 🚀 Key Achievements
+* **Resolved Documentation Access Mismatch**: Added `'super-docs'` capability to the client-side allowed features arrays (for role initialization and enforce permissions) in [admin-script.js](file:///Users/shrutian/Desktop/cora/app/public/wp-content/plugins/cora-workspace/assets/js/admin-script.js). This aligns client-side permissions with the server-side checks in [cora-workspace.php](file:///Users/shrutian/Desktop/cora/app/public/wp-content/plugins/cora-workspace/cora-workspace.php) and [admin-dashboard.php](file:///Users/shrutian/Desktop/cora/app/public/wp-content/plugins/cora-workspace/admin-dashboard.php), preventing client-side scripts from incorrectly identifying `'super-docs'` as unauthorized and triggering a redirect to `/dashboard` on page load.
+* **Enabled Proper Role Preview Enforcement**: Removed the global role-enforcement override (`|| true`) from `coraEnforcePermissions` in [admin-script.js](file:///Users/shrutian/Desktop/cora/app/public/wp-content/plugins/cora-workspace/assets/js/admin-script.js). This allows the workspace role preview switcher to function properly, accurately hiding administrative controls and sidebar categories when a platform administrator previews standard user roles (e.g. photographer, broker showing assistant) to ensure accurate capability checks.
+* **E2E Testing & Deployment**: Executed the Playwright test suite `tests/e2e/custom-roles.spec.ts` (all 3 tests passed), built and packaged the `3.2.4` release, deployed to staging, and successfully verified remote environment health using healthcheck diagnostics.
+
+---
+
+# Walkthrough - Overlapping Brand LLM Shortcuts, Clipboard Redirect & UI Polish (v3.2.3)
+
+We have successfully resolved the blank tab visual layout bug, and deployed a highly polished, overlapping brand logo button stack (ChatGPT, Gemini, Claude, Perplexity, YouTube) that copies context-aware questions and redirects the user in a new tab to start a chat directly on the external platforms.
+
+## 🚀 Key Achievements
+* **Resolved Nesting Div Mismatch**: Located and fixed missing closing `</div>` tags at the end of `#tab-pending-invites` and `#tab-permissions-matrix` in [view-users.php](file:///Users/shrutian/Desktop/cora/app/public/wp-content/plugins/cora-workspace/views/view-users.php). This resolves the layout nesting collapse where the Permissions Matrix and Custom Roles panels rendered nested inside hidden tab containers, successfully restoring complete layout visibility for all tabs (Active Members, Pending Invitations, Permissions Matrix, Custom Roles, etc.).
+* **Overlapping Official Brand Logos Stack & Custom Tooltips**: Replaced separate header buttons with a sleek, horizontal overlapping flex stack (`-space-x-2.5` expanding to `-space-x-1.5` on group hover) inline with the header. Integrated high-fidelity SVG paths for ChatGPT, Claude, Gemini, Perplexity, and YouTube with hover scale transitions. Completely removed browser-native `title` attributes and designed premium, custom CSS hover tooltips with downward carets matching the dark monochromatic UI layout.
+* **Permissions Matrix "None" Cell Badge UI Refactor**: Replaced wide, stacked, and vertically wrapping `No Access` cell badges inside the Permissions Matrix with a clean, single-word **None** badge to preserve table line-height alignment. Styled using a soft-grey, premium monochromatic class ramp.
+* **Dynamic Context-Aware Query Generation & Clipboard Redirect**: Implemented `coraGetReferQuery()` to return custom queries matching the active sub-tab. Implemented `coraAskExternalPlatform(platform)` to automatically copy the dynamic query to clipboard and redirect the user in a new tab to the platform's chat page.
+* **Optimized Controls & Toolbar Integration**: Added an **AI Trainer** trigger button inside the matrix controls, and re-architected toolbar buttons wrapper for mobile viewports.
+
+---
+
+# Workspace Member Edit Drawer & Native AI Optimization: Release v3.2.0
+
+We have successfully overhauled the user list page header and integrated an advanced, native AI optimization suite inside the Member Edit Drawer in the Cora Workspace.
+
+## 1. UI & UX Refactoring
+* **Header Redesign**: Overhauled the member module header in `views/view-users.php` to feature a gray squircle icon container with a thin-line 1.8px group SVG, clean aligned typography hierarchy, and a monochromatic "Invite User" CTA button following the Notion/Shopify design rules.
+* **Sub-Tab Navigation**: Added a dedicated **AI & Security** navigation sub-tab in the member edit drawer, with smooth slide transitions and URL state persistence.
+
+## 2. Native AI Features & Security Suite
+* **AI Talent & Specialization Matchmaker**: Embedded an AI matching module inside the **Role & Tags** tab. It takes the text from the member's bio, submits it to a server-side AJAX endpoint (`cora_ajax_analyze_profile_skills`), queries Gemini to match the details to operational roles/tags, computes a match score, and checks the matching checkboxes automatically with visual match indicators.
+* **AI Monthly Token Budget**: Integrated a slider to allow supervisors to set a monthly token quota limit per user (`cora_ai_token_limit` metadata), converting sliders to numerical limits.
+* **MCP Agent Tool Permissions Matrix**: Added fine-grained control checkboxes permitting or restricting the workspace tools that the user's copilot agent can invoke (`cora_mcp_allowed_tools` metadata).
+* **Device Revocation & Security Toggles**: Integrated toggles for stay-logged-in session persistence (`cora_stay_logged_in` metadata) and an interactive active sessions list with revoke trigger tokens.
+
+## 3. Staging Release & Verification
+* **Build & Deploy**: Packaged and deployed stable version `3.2.0` (`cora-workspace.zip`) to the staging environment (`stagging.heycora.in`).
+* **Health Check**: Ran automated healthcheck tests verifying `200 OK` staging availability.
+
+---
+
 # RAG Knowledge Base Integration: Release v3.1.24
 
 We have successfully integrated a robust, tenant-isolated RAG (Retrieval-Augmented Generation) Knowledge Base system. This system allows workspaces to index and ingest text snippets, external URLs, and blog posts to contextually ground Cora's AI generation pipelines.

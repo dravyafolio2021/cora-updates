@@ -12,6 +12,14 @@ class Cora_Module_Registry {
      */
     public static function register_module(Cora_Module_Interface $module) {
         self::$modules[$module->get_module_id()] = $module;
+        if ( did_action( 'init' ) || doing_action( 'init' ) ) {
+            do_action( 'cora_module_registered', $module->get_module_id(), $module->get_display_name(), '1.0.0' );
+        } else {
+            // If initialized early, queue it on init hook
+            add_action( 'init', function() use ($module) {
+                do_action( 'cora_module_registered', $module->get_module_id(), $module->get_display_name(), '1.0.0' );
+            }, 20 );
+        }
     }
 
     /**
