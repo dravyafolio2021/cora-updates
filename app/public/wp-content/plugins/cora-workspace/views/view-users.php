@@ -1421,47 +1421,24 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         <!-- ANALYTICS CARDS (Admin only) -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-4">
             <!-- Card 1: Total Active Today -->
-            <div class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex flex-col justify-between">
-                <div class="space-y-1 min-w-0">
-                    <div class="flex items-center justify-between gap-1">
-                        <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate">ACTIVE TODAY</span>
-                        <span class="inline-flex items-center px-1.5 py-0.5 text-[8px] md:text-[9px] font-bold rounded bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 shrink-0">Live</span>
-                    </div>
-                    <div class="flex items-baseline justify-between mt-1">
-                        <h3 class="text-lg md:text-xl font-extrabold text-zinc-900 dark:text-zinc-100" id="stat-active-today">0</h3>
-                        <span class="text-[10px] md:text-xs font-semibold text-zinc-500 dark:text-zinc-400">Team Members</span>
-                    </div>
+            <div class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex items-center justify-between min-h-[90px]">
+                <div class="space-y-1">
+                    <span class="text-[9px] md:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">ACTIVE TODAY</span>
+                    <h3 class="text-lg md:text-xl font-extrabold text-zinc-900 dark:text-zinc-100" id="stat-active-today">0</h3>
                 </div>
-                <div class="mt-2 flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-zinc-800">
-                    <span class="text-[9px] md:text-[10px] font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1">
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-                        Attendance Pulse
-                    </span>
-                    <span class="text-[9px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        Real-time
-                    </span>
+                <div class="p-1.5 bg-zinc-50 dark:bg-zinc-950 rounded-lg text-zinc-650 dark:text-zinc-350">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
                 </div>
             </div>
             
             <!-- Card 2: Late Check-ins -->
-            <div class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex flex-col justify-between">
-                <div class="space-y-1 min-w-0">
-                    <div class="flex items-center justify-between gap-1">
-                        <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate">LATE CHECK-INS</span>
-                        <span class="inline-flex items-center px-1.5 py-0.5 text-[8px] md:text-[9px] font-bold rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60 shrink-0">Punctuality</span>
-                    </div>
-                    <div class="flex items-baseline justify-between mt-1">
-                        <h3 class="text-lg md:text-xl font-extrabold text-zinc-900 dark:text-zinc-100" id="stat-late-punches">0</h3>
-                        <span class="text-[10px] md:text-xs font-semibold text-zinc-500 dark:text-zinc-400">Shift Delays</span>
-                    </div>
+            <div class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex items-center justify-between min-h-[90px]">
+                <div class="space-y-1">
+                    <span class="text-[9px] md:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">LATE CHECK-INS</span>
+                    <h3 class="text-lg md:text-xl font-extrabold text-zinc-900 dark:text-zinc-100" id="stat-late-punches">0</h3>
                 </div>
-                <div class="mt-2 flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-zinc-800">
-                    <span class="text-[9px] md:text-[10px] font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1">
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                        Compliance
-                    </span>
-                    <span class="text-[9px] font-semibold text-zinc-500 dark:text-zinc-400">100% On-Time</span>
+                <div class="p-1.5 bg-zinc-50 dark:bg-zinc-950 rounded-lg text-zinc-650 dark:text-zinc-350">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                 </div>
             </div>
 
@@ -1482,7 +1459,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 $current_address_txt = $office_loc['lat'] . ', ' . $office_loc['lng'];
             }
             ?>
-            <div onclick="openGeofenceDrawer()" class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex flex-col justify-between cursor-pointer hover:bg-zinc-50/50 dark:hover:bg-zinc-850/55 transition-colors group">
+            <div onclick="openGeofenceDrawer()" class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex flex-col justify-between min-h-[90px] cursor-pointer hover:bg-zinc-50/50 dark:hover:bg-zinc-850/55 transition-colors group">
                 <div class="space-y-1 min-w-0">
                     <div class="flex items-center justify-between gap-1">
                         <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate">GEOFENCING</span>
@@ -1506,7 +1483,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             </div>
 
             <!-- Card 4: Action / Email Test -->
-            <div class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex flex-col justify-between">
+            <div class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex flex-col justify-between min-h-[90px]">
                 <div class="space-y-1 min-w-0">
                     <div class="flex items-center justify-between gap-1">
                         <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate">Cron Automations</span>
