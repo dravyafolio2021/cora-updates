@@ -1170,32 +1170,32 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         ?>
         <div class="space-y-3">
             <div class="flex items-center justify-between">
-                <h3 class="text-xs font-bold text-zinc-550 dark:text-zinc-400 uppercase tracking-wider">Role Templates & Quick Starts</h3>
-                <span class="text-[11px] text-zinc-400">Click to launch pre-configured role drawer</span>
+                <h3 class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">ROLE TEMPLATES &amp; QUICK STARTS</h3>
+                <span class="text-xs text-zinc-400 font-medium">Click to launch pre-configured role drawer</span>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                 <?php foreach ( $role_templates as $tmpl ) : ?>
-                    <div onclick="openCreateCustomRoleDrawer('<?php echo esc_attr( $tmpl['key'] ); ?>')" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm hover:border-zinc-400 dark:hover:border-zinc-600 transition-all cursor-pointer group flex flex-col justify-between">
-                        <div class="space-y-2">
+                    <div onclick="openCreateCustomRoleDrawer('<?php echo esc_attr( $tmpl['key'] ); ?>')" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 md:p-5 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer group flex flex-col justify-between min-h-[220px]">
+                        <div>
                             <div class="flex items-center justify-between">
-                                <span class="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200">
+                                <div class="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
                                     <?php echo $tmpl['svg']; ?>
-                                </span>
-                                <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"><?php echo esc_html( $tmpl['badge'] ); ?></span>
+                                </div>
+                                <span class="text-[10px] font-semibold px-2.5 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"><?php echo esc_html( $tmpl['badge'] ); ?></span>
                             </div>
-                            <div>
-                                <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-zinc-950 dark:group-hover:text-white"><?php echo esc_html( $tmpl['title'] ); ?></h4>
-                                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-2"><?php echo esc_html( $tmpl['desc'] ); ?></p>
+                            <div class="mt-3">
+                                <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-zinc-950 dark:group-hover:text-white"><?php echo esc_html( $tmpl['title'] ); ?></h4>
+                                <p class="text-xs text-zinc-400 dark:text-zinc-400 mt-1 line-clamp-2 leading-relaxed"><?php echo esc_html( $tmpl['desc'] ); ?></p>
                             </div>
-                            <div class="flex flex-wrap gap-1 pt-1">
+                            <div class="flex flex-wrap gap-1.5 pt-3">
                                 <?php foreach ( $tmpl['tags'] as $tag ) : ?>
-                                    <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800"><?php echo esc_html( $tag ); ?></span>
+                                    <span class="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-zinc-100/70 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400"><?php echo esc_html( $tag ); ?></span>
                                 <?php endforeach; ?>
                             </div>
                         </div>
-                        <div class="mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-zinc-300 group-hover:underline">
+                        <div class="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:underline">
                             <span>Use Template</span>
-                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-800 dark:text-zinc-200"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         </div>
                     </div>
                 <?php endforeach; ?>
