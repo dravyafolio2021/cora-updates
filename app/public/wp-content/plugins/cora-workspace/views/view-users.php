@@ -344,6 +344,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     'banner'     => $banner ? $banner : '',
                     'ai_token_limit'    => intval( get_user_meta( $u->ID, 'cora_ai_token_limit', true ) ?: 0 ),
                     'mcp_allowed_tools' => get_user_meta( $u->ID, 'cora_mcp_allowed_tools', true ) ?: array(),
+                    'mcp_access_token'  => get_user_meta( $u->ID, 'cora_mcp_access_token', true ) ?: '',
                     'stay_logged_in'    => get_user_meta( $u->ID, 'cora_stay_logged_in', true ) ?: 'no'
                 );
                 
@@ -451,6 +452,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 'banner'     => $banner ? $banner : '',
                                 'ai_token_limit'    => intval( get_user_meta( $u->ID, 'cora_ai_token_limit', true ) ?: 0 ),
                                 'mcp_allowed_tools' => get_user_meta( $u->ID, 'cora_mcp_allowed_tools', true ) ?: array(),
+                                'mcp_access_token'  => get_user_meta( $u->ID, 'cora_mcp_access_token', true ) ?: '',
                                 'stay_logged_in'    => get_user_meta( $u->ID, 'cora_stay_logged_in', true ) ?: 'no'
                             );
                             
@@ -2374,6 +2376,27 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         </div>
                     </div>
 
+                    <!-- MCP Access Configuration (AI Employee / Connector) -->
+                    <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 space-y-3 bg-zinc-50/50 dark:bg-zinc-950/50">
+                        <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">MCP Employee / Agent Gateway</h4>
+                        <p class="text-[10px] text-zinc-400">Enable an external AI client (like Claude Desktop) to connect as this user.</p>
+                        <div class="space-y-2 pt-1">
+                            <label class="block text-[9px] font-bold text-zinc-500 uppercase">MCP Employee Token</label>
+                            <div class="flex gap-2">
+                                <input type="password" id="edit-user-mcp-token" readonly class="w-full font-mono bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[11px] px-2.5 py-1.5 outline-none" placeholder="No token generated" autocomplete="off">
+                                <button type="button" class="px-2.5 py-1.5 bg-zinc-100 dark:bg-zinc-850 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-[10px] rounded-lg cursor-pointer shrink-0" onclick="coraToggleUserMcpTokenVisibility()">Show</button>
+                                <button type="button" class="px-2.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 text-white font-bold text-[10px] rounded-lg cursor-pointer shrink-0" onclick="coraRegenerateUserMcpToken()">Generate</button>
+                            </div>
+                        </div>
+                        <div id="user-mcp-config-box" class="space-y-1.5 hidden pt-2 border-t border-zinc-200 dark:border-zinc-800">
+                            <label class="block text-[9px] font-bold text-zinc-500 uppercase">Claude Desktop config</label>
+                            <div class="bg-zinc-900 text-zinc-100 rounded-lg p-3 font-mono text-[9px] leading-relaxed overflow-x-auto shadow-inner relative">
+                                <button type="button" class="absolute top-2 right-2 px-2 py-0.5 bg-zinc-800 hover:bg-zinc-750 text-zinc-300 rounded text-[8px] cursor-pointer" onclick="coraCopyUserClaudeConfig()">Copy</button>
+                                <pre><code id="edit-user-mcp-config"></code></pre>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Persistent Login Session -->
                     <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 space-y-3 bg-zinc-50/50 dark:bg-zinc-950/50">
                         <div class="flex items-center justify-between">
@@ -3232,6 +3255,31 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
         $('#edit-stay-logged-in').prop('checked', user.stay_logged_in === 'yes');
 
+        // Populate user-specific MCP token
+        var userMcpToken = user.mcp_access_token || '';
+        $('#edit-user-mcp-token').val(userMcpToken).attr('type', 'password');
+        if (userMcpToken) {
+            var mcpUrl = '<?php echo home_url( "/wp-json/cora/v1/mcp" ); ?>';
+            var safeName = (user.name || 'agent').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            var configStr = JSON.stringify({
+                "mcpServers": {
+                    ["cora-employee-" + safeName]: {
+                        "command": "python3",
+                        "args": [
+                            "/path/to/cora-bridge.py",
+                            mcpUrl,
+                            userMcpToken
+                        ]
+                    }
+                }
+            }, null, 2);
+            $('#edit-user-mcp-config').text(configStr);
+            $('#user-mcp-config-box').removeClass('hidden');
+        } else {
+            $('#edit-user-mcp-config').text('');
+            $('#user-mcp-config-box').addClass('hidden');
+        }
+
         // Reset AI Talent Matchmaker results
         $('#ai-match-results').addClass('hidden');
         $('#ai-match-score').text('—');
@@ -3254,6 +3302,78 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     window.openEditUserDrawer = openEditUserDrawer;
     window.coraOpenEditUserDrawer = openEditUserDrawer;
     window.closeEditUserDrawer = closeEditUserDrawer;
+
+    window.coraToggleUserMcpTokenVisibility = function() {
+        var input = $('#edit-user-mcp-token');
+        if (input.attr('type') === 'password') {
+            input.attr('type', 'text');
+        } else {
+            input.attr('type', 'password');
+        }
+    };
+
+    window.coraRegenerateUserMcpToken = function() {
+        var userId = $('#edit-user-id').val();
+        if (!userId) return;
+
+        $.post(coraREData.ajaxUrl || ajaxurl, {
+            action: 'cora_regenerate_user_mcp_token',
+            user_id: userId,
+            nonce: coraREData.nonce
+        }, function(response) {
+            if (response.success) {
+                var token = response.data.token;
+                $('#edit-user-mcp-token').val(token);
+                
+                // Update config
+                var userName = $('#edit-display-name').val();
+                var mcpUrl = '<?php echo home_url( "/wp-json/cora/v1/mcp" ); ?>';
+                var safeName = (userName || 'agent').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                var configStr = JSON.stringify({
+                    "mcpServers": {
+                        ["cora-employee-" + safeName]: {
+                            "command": "python3",
+                            "args": [
+                                "/path/to/cora-bridge.py",
+                                mcpUrl,
+                                token
+                            ]
+                        }
+                    }
+                }, null, 2);
+                $('#edit-user-mcp-config').text(configStr);
+                $('#user-mcp-config-box').removeClass('hidden');
+
+                // Update currentEditingUser
+                if (currentEditingUser) {
+                    currentEditingUser.mcp_access_token = token;
+                    // Update payload attributes in active DOM elements
+                    $('[data-user]').each(function() {
+                        try {
+                            var payload = JSON.parse($(this).attr('data-user'));
+                            if (parseInt(payload.id) === parseInt(userId)) {
+                                payload.mcp_access_token = token;
+                                $(this).attr('data-user', JSON.stringify(payload));
+                            }
+                        } catch(e) {}
+                    });
+                }
+                
+                if (window.coraShowToast) window.coraShowToast('MCP employee token generated successfully.', 'success');
+            } else {
+                if (window.coraShowToast) window.coraShowToast(response.data.message || 'Failed to generate token.', 'error');
+            }
+        });
+    };
+
+    window.coraCopyUserClaudeConfig = function() {
+        var temp = $('<textarea>');
+        $('body').append(temp);
+        temp.val($('#edit-user-mcp-config').text()).select();
+        document.execCommand('copy');
+        temp.remove();
+        if (window.coraShowToast) window.coraShowToast('Claude desktop configuration copied to clipboard.', 'success');
+    };
 
     window.toggleUserStatusAction = function() {
         if (!currentEditingUser || !currentEditingUser.id) return;

@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.2.33
+ * Version: 3.2.34
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.2.33' );
+define( 'CORA_WORKSPACE_VERSION', '3.2.34' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -4436,7 +4436,33 @@ function cora_rest_mcp_handler( $request ) {
         $provided_token = $request->get_param( 'token' );
     }
 
-    if ( empty( $provided_token ) || hash_equals( $token, $provided_token ) === false ) {
+    $authorized = false;
+    $mcp_user_id = 0;
+
+    if ( ! empty( $provided_token ) ) {
+        if ( hash_equals( $token, $provided_token ) ) {
+            $authorized = true;
+        } else {
+            // Check user-specific tokens
+            $user_query = new WP_User_Query( array(
+                'meta_key'   => 'cora_mcp_access_token',
+                'meta_value' => $provided_token,
+                'number'     => 1
+            ) );
+            $users = $user_query->get_results();
+            if ( ! empty( $users ) ) {
+                $mcp_user = $users[0];
+                $mcp_user_id = $mcp_user->ID;
+                $u_status = get_user_meta( $mcp_user_id, 'cora_user_status', true ) ?: 'active';
+                if ( $u_status === 'active' ) {
+                    wp_set_current_user( $mcp_user_id );
+                    $authorized = true;
+                }
+            }
+        }
+    }
+
+    if ( ! $authorized ) {
         return new WP_REST_Response( array(
             'jsonrpc' => '2.0',
             'error'   => array(
@@ -4479,6 +4505,64 @@ function cora_rest_mcp_handler( $request ) {
                 'id'      => $id
             ), 404 );
     }
+}
+}
+
+if ( ! function_exists( 'cora_mcp_user_has_tool_permission' ) ) {
+function cora_mcp_user_has_tool_permission( $user_id, $tool_name ) {
+    // If user_id is 0, this is the global server token, which has full access
+    if ( ! $user_id ) {
+        return true;
+    }
+
+    $user = get_userdata( $user_id );
+    if ( ! $user ) {
+        return false;
+    }
+
+    // Administrators/Owners have full access
+    $role = ! empty( $user->roles ) ? $user->roles[0] : '';
+    $always_allowed_roles = array(
+        'administrator',
+        'cora_shruti',
+        'cora_super_admin',
+        'cora_workspace_owner',
+        'owner',
+        'cora_re_broker_owner',
+        'cora_studio_owner'
+    );
+    if ( in_array( $role, $always_allowed_roles, true ) || cora_is_super_owner() || current_user_can( 'manage_options' ) ) {
+        return true;
+    }
+
+    $allowed_permissions = get_user_meta( $user_id, 'cora_mcp_allowed_tools', true );
+    if ( ! is_array( $allowed_permissions ) ) {
+        return false;
+    }
+
+    // Mapping tool names to permission keys
+    $mapping = array(
+        'cora_get_platform_info'   => 'read_properties',
+        'cora_search_listings'     => 'read_properties',
+        'cora_get_leads'           => 'read_leads',
+        'cora_create_lead'         => 'write_leads',
+        'cora_update_lead_status'  => 'write_leads',
+        'cora_get_vault_documents' => 'read_vault',
+        'cora_share_document'      => 'send_emails',
+        'cora_get_attendance_logs' => 'read_properties',
+        'cora_get_bookings'        => 'write_properties',
+        'cora_create_booking'      => 'write_properties',
+        'cora_get_tasks'           => 'write_leads',
+        'cora_create_task'         => 'write_leads',
+        'cora_get_activity_logs'   => 'read_leads',
+    );
+
+    if ( ! isset( $mapping[ $tool_name ] ) ) {
+        return false;
+    }
+
+    $required_permission = $mapping[ $tool_name ];
+    return in_array( $required_permission, $allowed_permissions, true );
 }
 }
 
@@ -4652,6 +4736,17 @@ function cora_mcp_handle_list_tools( $id ) {
         )
     );
 
+    $user_id = get_current_user_id();
+    if ( $user_id ) {
+        $filtered_tools = array();
+        foreach ( $tools as $tool ) {
+            if ( cora_mcp_user_has_tool_permission( $user_id, $tool['name'] ) ) {
+                $filtered_tools[] = $tool;
+            }
+        }
+        $tools = $filtered_tools;
+    }
+
     return new WP_REST_Response( array(
         'jsonrpc' => '2.0',
         'result'  => array(
@@ -4665,6 +4760,18 @@ function cora_mcp_handle_list_tools( $id ) {
 if ( ! function_exists( 'cora_mcp_handle_call_tool' ) ) {
 function cora_mcp_handle_call_tool( $name, $args, $id ) {
     global $wpdb;
+
+    $user_id = get_current_user_id();
+    if ( $user_id && ! cora_mcp_user_has_tool_permission( $user_id, $name ) ) {
+        return new WP_REST_Response( array(
+            'jsonrpc' => '2.0',
+            'error'   => array(
+                'code'    => -32602,
+                'message' => 'Permission denied: User does not have access to tool ' . $name
+            ),
+            'id'      => $id
+        ), 403 );
+    }
 
     switch ( $name ) {
         case 'cora_get_platform_info':
@@ -21453,6 +21560,36 @@ function cora_ajax_save_user_changes() {
 }
 add_action( 'wp_ajax_cora_save_user_changes', 'cora_ajax_save_user_changes' );
 add_action( 'wp_ajax_cora_ajax_save_user_changes', 'cora_ajax_save_user_changes' );
+
+if ( ! function_exists( 'cora_ajax_regenerate_user_mcp_token' ) ) {
+function cora_ajax_regenerate_user_mcp_token() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    $user = wp_get_current_user();
+    $role = ! empty( $user->roles ) ? $user->roles[0] : '';
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! in_array( $role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_re_broker_owner', 'cora_studio_owner' ), true ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized access.' ) );
+    }
+
+    $target_user_id = intval( $_POST['user_id'] ?? 0 );
+    if ( ! $target_user_id ) {
+        wp_send_json_error( array( 'message' => 'User ID is required.' ) );
+    }
+
+    $token = bin2hex( wp_generate_password( 32, false ) );
+    update_user_meta( $target_user_id, 'cora_mcp_access_token', $token );
+
+    $target_user = get_userdata( $target_user_id );
+    $target_name = $target_user ? $target_user->display_name : 'Unknown';
+    cora_log_activity( 'User Management', "Regenerated MCP access token for user '{$target_name}' (ID: {$target_user_id})." );
+
+    wp_send_json_success( array(
+        'token'   => $token,
+        'message' => 'MCP Token generated successfully.'
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_regenerate_user_mcp_token', 'cora_ajax_regenerate_user_mcp_token' );
 
 if ( ! function_exists( 'cora_ajax_sync_role_permissions' ) ) {
 function cora_ajax_sync_role_permissions() {
