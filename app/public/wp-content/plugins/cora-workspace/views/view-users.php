@@ -1580,26 +1580,38 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
     <?php if ( $is_attendance_admin ) : ?>
         <!-- ANALYTICS CARDS (Admin only) -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-4">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             <!-- Card 1: Total Active Today -->
-            <div class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex items-center justify-between min-h-[90px]">
-                <div class="space-y-1">
-                    <span class="text-[9px] md:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">ACTIVE TODAY</span>
-                    <h3 class="text-lg md:text-xl font-extrabold text-zinc-900 dark:text-zinc-100" id="stat-active-today">0</h3>
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 md:p-4 shadow-2xs flex items-center justify-between min-h-[90px]">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">ACTIVE TODAY</span>
+                        <h3 class="text-base md:text-lg font-extrabold text-zinc-900 dark:text-zinc-100 mt-0.5" id="stat-active-today">0</h3>
+                        <p class="text-[9px] text-zinc-400 dark:text-zinc-500 truncate mt-0.5">Employees currently active</p>
+                    </div>
                 </div>
-                <div class="p-1.5 bg-zinc-50 dark:bg-zinc-950 rounded-lg text-zinc-650 dark:text-zinc-350">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                <div class="w-7 h-7 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-250/20 dark:border-zinc-800/80 text-zinc-450 dark:text-zinc-400 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </div>
             </div>
             
             <!-- Card 2: Late Check-ins -->
-            <div class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex items-center justify-between min-h-[90px]">
-                <div class="space-y-1">
-                    <span class="text-[9px] md:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">LATE CHECK-INS</span>
-                    <h3 class="text-lg md:text-xl font-extrabold text-zinc-900 dark:text-zinc-100" id="stat-late-punches">0</h3>
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 md:p-4 shadow-2xs flex items-center justify-between min-h-[90px]">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">LATE CHECK-INS</span>
+                        <h3 class="text-base md:text-lg font-extrabold text-zinc-900 dark:text-zinc-100 mt-0.5" id="stat-late-punches">0</h3>
+                        <p class="text-[9px] text-zinc-400 dark:text-zinc-500 truncate mt-0.5">No late check-ins today</p>
+                    </div>
                 </div>
-                <div class="p-1.5 bg-zinc-50 dark:bg-zinc-950 rounded-lg text-zinc-650 dark:text-zinc-350">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <div class="w-7 h-7 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-250/20 dark:border-zinc-800/80 text-zinc-450 dark:text-zinc-400 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </div>
             </div>
 
@@ -1620,46 +1632,64 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 $current_address_txt = $office_loc['lat'] . ', ' . $office_loc['lng'];
             }
             ?>
-            <div onclick="openGeofenceDrawer()" class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex flex-col justify-between min-h-[90px] cursor-pointer hover:bg-zinc-50/50 dark:hover:bg-zinc-850/55 transition-colors group">
-                <div class="space-y-1 min-w-0">
-                    <div class="flex items-center justify-between gap-1">
-                        <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate">GEOFENCING</span>
-                        <span id="stat-geofence-status" class="inline-flex items-center px-1.5 py-0.5 text-[8px] md:text-[9px] font-bold rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60 shrink-0">
-                            <?php echo esc_html( $geofence_status_txt ); ?>
-                        </span>
+            <div onclick="openGeofenceDrawer()" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 md:p-4 shadow-2xs flex flex-col justify-between min-h-[90px] cursor-pointer hover:bg-zinc-50/50 dark:hover:bg-zinc-850/55 transition-colors group">
+                <div class="flex items-start gap-3 min-w-0">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                     </div>
-                    <p id="cora-geofence-current-address" class="text-[10px] md:text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate" title="<?php echo esc_attr( $current_address_txt ); ?>">
-                        <?php echo esc_html( $current_address_txt ); ?>
-                    </p>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate">GEOFENCING</span>
+                            <span id="stat-geofence-status" class="inline-flex items-center px-1.5 py-0.5 text-[8px] font-bold rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/40 dark:border-zinc-700/40 shrink-0">
+                                <?php echo esc_html( $geofence_status_txt ); ?>
+                            </span>
+                        </div>
+                        <p id="cora-geofence-current-address" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate mt-0.5" title="<?php echo esc_attr( $current_address_txt ); ?>">
+                            <?php echo esc_html( $current_address_txt ); ?>
+                        </p>
+                        <p class="text-[9px] text-zinc-400 dark:text-zinc-500 truncate mt-0.5">Set a location to start tracking</p>
+                    </div>
                 </div>
-                <div class="mt-2 flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-zinc-800">
-                    <span class="text-[9px] md:text-[10px] font-bold text-zinc-900 dark:text-zinc-100 group-hover:underline flex items-center gap-1">
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <div class="mt-2.5 flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                    <span class="text-[9px] font-bold text-zinc-900 dark:text-zinc-100 group-hover:underline flex items-center gap-1">
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                         Settings
                     </span>
-                    <div class="p-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-700 transition-colors">
+                    <div class="p-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-300 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-700 transition-colors">
                         <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </div>
                 </div>
             </div>
 
-            <!-- Card 4: Action / Email Test -->
-            <div class="bg-white dark:bg-zinc-900 border-0 rounded-xl p-3 md:p-4 shadow-2xs flex flex-col justify-between min-h-[90px]">
-                <div class="space-y-1 min-w-0">
-                    <div class="flex items-center justify-between gap-1">
-                        <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate">Cron Automations</span>
-                        <span class="inline-flex items-center px-1.5 py-0.5 text-[8px] md:text-[9px] font-bold rounded bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 shrink-0">Active</span>
+            <!-- Card 4: Cron Automations -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 md:p-4 shadow-2xs flex flex-col justify-between min-h-[90px]">
+                <div class="flex items-start gap-3 min-w-0">
+                    <div class="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     </div>
-                    <p class="text-[10px] md:text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate mt-1">Daily Reports &amp; Automated Alerts</p>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate">CRON AUTOMATIONS</span>
+                            <span class="inline-flex items-center px-1.5 py-0.5 text-[8px] font-bold rounded bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-450 border border-emerald-500/20 shrink-0">Active</span>
+                        </div>
+                        <p class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate mt-0.5">Daily Reports &amp; Automated Alerts</p>
+                        <p class="text-[9px] text-zinc-400 dark:text-zinc-500 truncate mt-0.5">Automated reports and alerts are active</p>
+                    </div>
                 </div>
-                <div class="mt-2 flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-zinc-800">
-                    <span class="text-[9px] md:text-[10px] font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1">
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="13" y2="17"></line></svg>
+                <div class="mt-2.5 flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                    <span class="text-[9px] font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1">
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="13" y2="17"></line></svg>
                         Test Runner
                     </span>
                     <div class="flex items-center gap-1.5">
-                        <button onclick="triggerCronAction('admin_report')" class="text-[8px] md:text-[9px] px-1.5 py-0.5 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer transition-colors bg-white dark:bg-zinc-900 shadow-2xs">Report</button>
-                        <button onclick="triggerCronAction('morning_reminder')" class="text-[8px] md:text-[9px] px-1.5 py-0.5 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer transition-colors bg-white dark:bg-zinc-900 shadow-2xs">Alert</button>
+                        <button onclick="triggerCronAction('admin_report')" class="text-[8px] px-1.5 py-0.5 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer transition-colors bg-white dark:bg-zinc-900 shadow-2xs flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                            Report
+                        </button>
+                        <button onclick="triggerCronAction('morning_reminder')" class="text-[8px] px-1.5 py-0.5 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer transition-colors bg-white dark:bg-zinc-900 shadow-2xs flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                            Alert
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1668,62 +1698,59 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
     <!-- Full-Width Punch Log History Section -->
     <div class="space-y-4 w-full">
-        <!-- Enhanced Attendance Filter Toolbar -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 md:p-4 shadow-sm flex flex-col gap-2.5 md:gap-3">
+        <!-- Enhanced Atte        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 md:p-4 shadow-sm flex flex-col gap-2.5 md:gap-3">
             <!-- Search bar & Mobile Toggle Row -->
-            <div class="flex flex-row items-center gap-2 md:gap-3 w-full justify-between">
-                <div class="flex flex-row items-center gap-2 flex-1 min-w-0">
-                    <!-- Search Input -->
-                    <div class="relative flex-1 max-w-full md:max-w-[180px]">
-                        <input type="text" id="attendance-log-search" oninput="fetchAttendanceLogs()" class="w-full border-0 bg-zinc-100/60 dark:bg-zinc-850/60 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:outline-none rounded-lg h-9 pl-8 pr-3 text-xs text-zinc-900 dark:text-zinc-100 transition-colors" placeholder="Search employee...">
-                        <div class="absolute left-2.5 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        </div>
-                    </div>
-
-                    <!-- Mobile Filter Toggle Button -->
-                    <button type="button" id="attendance-filter-toggle" onclick="toggleAttendanceMobileFilters()" class="md:hidden h-9 w-9 shrink-0 flex items-center justify-center rounded-lg border-0 bg-zinc-100/60 dark:bg-zinc-850/60 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200/50 dark:hover:bg-zinc-700/50 focus:outline-none transition-colors cursor-pointer" title="Toggle Filters">
-                        <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-                    </button>
-
-                    <!-- Desktop Inline Filters -->
-                    <div class="hidden md:flex items-center gap-2.5 flex-1 min-w-0">
-                        <!-- Employee Picker Dropdown -->
-                        <select id="attendance-filter-user" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0 max-w-[100px]" style="max-width: 100px; text-overflow: ellipsis;">
-                            <option value="">All Team Members</option>
-                            <?php foreach ( $users as $u ) : ?>
-                                <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-
-                        <!-- Period Direction Dropdown -->
-                        <select id="attendance-filter-period" onchange="handlePeriodFilterChange()" class="h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0 max-w-[100px]" style="max-width: 100px; text-overflow: ellipsis;">
-                            <option value="all">All Time</option>
-                            <option value="today">Today</option>
-                            <option value="yesterday">Yesterday</option>
-                            <option value="this_week">This Week</option>
-                            <option value="this_month">This Month</option>
-                            <option value="custom">Custom Date Range</option>
-                        </select>
-
-                        <!-- Custom Date Range Inputs -->
-                        <div id="attendance-custom-date-container" class="hidden flex items-center gap-1.5 shrink-0">
-                            <input type="date" id="attendance-date-start" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors">
-                            <span class="text-xs font-medium text-zinc-400">to</span>
-                            <input type="date" id="attendance-date-end" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors">
-                        </div>
-
-                        <!-- Event Type Dropdown -->
-                        <select id="attendance-filter-event" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0 max-w-[100px]" style="max-width: 100px; text-overflow: ellipsis;">
-                            <option value="all">All Event Types</option>
-                            <option value="in">Punch In</option>
-                            <option value="out">Punch Out</option>
-                        </select>
+            <div class="flex flex-row items-center gap-2 md:gap-3 w-full">
+                <!-- Search Input Container -->
+                <div class="relative flex-1 md:flex-initial md:w-48 shrink-0">
+                    <input type="text" id="attendance-log-search" oninput="fetchAttendanceLogs()" class="w-full h-10 pl-9 pr-3 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg bg-zinc-50/50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-450 transition-all placeholder-zinc-400 dark:placeholder-zinc-500" placeholder="Search employee...">
+                    <div class="absolute left-3 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     </div>
                 </div>
 
+                <!-- Mobile Filter Toggle Button -->
+                <button type="button" id="attendance-filter-toggle" onclick="toggleAttendanceMobileFilters()" class="md:hidden h-10 w-10 shrink-0 flex items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-950/20 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 focus:outline-none transition-colors cursor-pointer" title="Toggle Filters">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                </button>
+
+                <!-- Desktop Inline Filters -->
+                <div class="hidden md:flex items-center gap-2.5 flex-1 min-w-0">
+                    <!-- Employee Picker Dropdown -->
+                    <select id="attendance-filter-user" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0 max-w-[100px]" style="max-width: 100px; text-overflow: ellipsis;">
+                        <option value="">All Team Members</option>
+                        <?php foreach ( $users as $u ) : ?>
+                            <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+
+                    <!-- Period Direction Dropdown -->
+                    <select id="attendance-filter-period" onchange="handlePeriodFilterChange()" class="h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0 max-w-[100px]" style="max-width: 100px; text-overflow: ellipsis;">
+                        <option value="all">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="yesterday">Yesterday</option>
+                        <option value="this_week">This Week</option>
+                        <option value="this_month">This Month</option>
+                        <option value="custom">Custom Date Range</option>
+                    </select>
+
+                    <!-- Custom Date Range Inputs -->
+                    <div id="attendance-custom-date-container" class="hidden flex items-center gap-1.5 shrink-0">
+                        <input type="date" id="attendance-date-start" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors">
+                        <span class="text-xs font-medium text-zinc-400">to</span>
+                        <input type="date" id="attendance-date-end" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors">
+                    </div>
+
+                    <!-- Event Type Dropdown -->
+                    <select id="attendance-filter-event" onchange="fetchAttendanceLogs()" class="h-9 px-2.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:border-zinc-400 focus:outline-none transition-colors cursor-pointer shrink-0 max-w-[100px]" style="max-width: 100px; text-overflow: ellipsis;">
+                        <option value="all">All Event Types</option>
+                        <option value="in">Punch In</option>
+                        <option value="out">Punch Out</option>
+                    </select>
+                </div>
+
                 <!-- Desktop CTAs -->
-                <div class="hidden md:flex items-center gap-2 justify-end shrink-0">
+                <div class="hidden md:flex items-center gap-2 justify-end shrink-0 ml-auto">
                     <button type="button" onclick="openAttendanceReportsDrawer()" class="h-9 px-3.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shrink-0 shadow-sm">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                         Automated Reports & Share
@@ -1739,7 +1766,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             <div id="attendance-filter-panel" class="hidden md:hidden border-t border-zinc-200/60 dark:border-zinc-800/60 pt-2.5 space-y-2.5">
                 <div class="grid grid-cols-2 gap-2">
                     <!-- Employee Picker Dropdown (Mobile) -->
-                    <select id="attendance-filter-user-mobile" onchange="syncAttendanceFilterAndRun('user')" class="bg-zinc-100/60 dark:bg-zinc-850/60 border-0 text-xs rounded-lg px-2.5 h-9 w-full cursor-pointer text-zinc-700 dark:text-zinc-300 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors">
+                    <select id="attendance-filter-user-mobile" onchange="syncAttendanceFilterAndRun('user')" class="bg-zinc-150/60 dark:bg-zinc-850/60 border-0 text-xs rounded-lg px-2.5 h-9 w-full cursor-pointer text-zinc-750 dark:text-zinc-300 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors">
                         <option value="">All Team Members</option>
                         <?php foreach ( $users as $u ) : ?>
                             <option value="<?php echo esc_attr( $u->ID ); ?>"><?php echo esc_html( $u->display_name ); ?></option>
@@ -1747,7 +1774,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     </select>
 
                     <!-- Period Direction Dropdown (Mobile) -->
-                    <select id="attendance-filter-period-mobile" onchange="syncAttendanceFilterAndRun('period')" class="bg-zinc-100/60 dark:bg-zinc-850/60 border-0 text-xs rounded-lg px-2.5 h-9 w-full cursor-pointer text-zinc-700 dark:text-zinc-300 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors">
+                    <select id="attendance-filter-period-mobile" onchange="syncAttendanceFilterAndRun('period')" class="bg-zinc-150/60 dark:bg-zinc-850/60 border-0 text-xs rounded-lg px-2.5 h-9 w-full cursor-pointer text-zinc-750 dark:text-zinc-300 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors">
                         <option value="all">All Time</option>
                         <option value="today">Today</option>
                         <option value="yesterday">Yesterday</option>
@@ -1759,13 +1786,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
                 <!-- Custom Date Range Inputs (Mobile) -->
                 <div id="attendance-custom-date-container-mobile" class="hidden flex items-center justify-between gap-1.5">
-                    <input type="date" id="attendance-date-start-mobile" onchange="syncAttendanceFilterAndRun('date-start')" class="h-9 px-2 bg-zinc-100/60 dark:bg-zinc-850/60 border-0 text-xs rounded-lg text-zinc-900 dark:text-zinc-100 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors flex-1">
+                    <input type="date" id="attendance-date-start-mobile" onchange="syncAttendanceFilterAndRun('date-start')" class="h-9 px-2 bg-zinc-150/60 dark:bg-zinc-850/60 border-0 text-xs rounded-lg text-zinc-900 dark:text-zinc-100 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors flex-1">
                     <span class="text-xs font-medium text-zinc-400">to</span>
-                    <input type="date" id="attendance-date-end-mobile" onchange="syncAttendanceFilterAndRun('date-end')" class="h-9 px-2 bg-zinc-100/60 dark:bg-zinc-850/60 border-0 text-xs rounded-lg text-zinc-900 dark:text-zinc-100 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors flex-1">
+                    <input type="date" id="attendance-date-end-mobile" onchange="syncAttendanceFilterAndRun('date-end')" class="h-9 px-2 bg-zinc-150/60 dark:bg-zinc-850/60 border-0 text-xs rounded-lg text-zinc-900 dark:text-zinc-100 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors flex-1">
                 </div>
 
                 <!-- Event Type Dropdown (Mobile) -->
-                <select id="attendance-filter-event-mobile" onchange="syncAttendanceFilterAndRun('event')" class="bg-zinc-100/60 dark:bg-zinc-850/60 border-0 text-xs rounded-lg px-2.5 h-9 w-full cursor-pointer text-zinc-700 dark:text-zinc-300 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors">
+                <select id="attendance-filter-event-mobile" onchange="syncAttendanceFilterAndRun('event')" class="bg-zinc-150/60 dark:bg-zinc-850/60 border-0 text-xs rounded-lg px-2.5 h-9 w-full cursor-pointer text-zinc-750 dark:text-zinc-300 focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:outline-none transition-colors">
                     <option value="all">All Event Types</option>
                     <option value="in">Punch In</option>
                     <option value="out">Punch Out</option>
@@ -1785,9 +1812,10 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             </div>
         </div>
         
-        <!-- Table card wrapper -->
+        <!-- Table & Mobile List Card wrapper -->
         <div class="bg-white dark:bg-zinc-900 border border-zinc-200/85 dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden">
-            <div class="overflow-x-auto">
+            <!-- Desktop Table View -->
+            <div class="hidden md:block overflow-x-auto">
                 <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-xs text-left responsive-table">
                     <thead class="bg-zinc-50/50 dark:bg-zinc-950">
                         <tr>
@@ -1807,7 +1835,22 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     </tbody>
                 </table>
             </div>
+
+            <!-- Mobile Stacked Card View -->
+            <div id="cora-user-attendance-mobile-list" class="md:hidden divide-y divide-zinc-100 dark:divide-zinc-800 bg-white dark:bg-zinc-900">
+                <!-- Mobile card items will be appended here dynamically -->
             </div>
+
+            <!-- Unified Pagination Footer (Desktop & Mobile) -->
+            <div id="cora-attendance-pagination-footer" class="px-5 py-3.5 border-t border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/20 dark:bg-zinc-950/20 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-550 dark:text-zinc-500 select-none">
+                <div>
+                    Showing <span class="font-semibold text-zinc-900 dark:text-zinc-100" id="attendance-range-start">0</span> to <span class="font-semibold text-zinc-900 dark:text-zinc-100" id="attendance-range-end">0</span> of <span class="font-semibold text-zinc-900 dark:text-zinc-100" id="attendance-total-count">0</span> entries
+                </div>
+                <div class="flex items-center gap-1.5" id="attendance-pagination-controls">
+                    <!-- Pagination buttons -->
+                </div>
+            </div>
+        </div>
         </div>
     </div>
 
@@ -4556,6 +4599,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     // ==========================================
     var isAttendanceAdmin = <?php echo $is_attendance_admin ? 'true' : 'false'; ?>;
     var loggedInUserName = <?php echo json_encode( wp_get_current_user()->display_name ); ?>;
+    var attendanceCurrentPage = 1;
+    var attendancePageSize = 10;
 
     function openAttendanceReportsDrawer() {
         if (typeof window.coraCloseAllDrawers === 'function') {
@@ -4614,7 +4659,11 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         }
     }
 
-    function fetchAttendanceLogs() {
+    function fetchAttendanceLogs(keepPage) {
+        if (!keepPage) {
+            attendanceCurrentPage = 1;
+        }
+
         var userId    = $('#attendance-filter-user').val() || '';
         var period    = $('#attendance-filter-period').val() || 'all';
         var startDate = $('#attendance-date-start').val() || '';
@@ -4632,7 +4681,9 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         }, function(res) {
             if (res.success && res.data.logs) {
                 var tbody = $('#cora-user-attendance-table-body');
+                var mobileList = $('#cora-user-attendance-mobile-list');
                 tbody.empty();
+                mobileList.empty();
                 
                 var displayLogs = res.data.logs;
                 if (!isAttendanceAdmin) {
@@ -4648,30 +4699,63 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     });
                 }
 
-                if (displayLogs.length === 0) {
+                // Compute total stats and slice for pagination
+                var totalEntries = displayLogs.length;
+                var totalPages = Math.ceil(totalEntries / attendancePageSize);
+                if (attendanceCurrentPage > totalPages) {
+                    attendanceCurrentPage = Math.max(1, totalPages);
+                }
+                var startIdx = (attendanceCurrentPage - 1) * attendancePageSize;
+                var endIdx = Math.min(startIdx + attendancePageSize, totalEntries);
+
+                // Update pagination footer numbers
+                $('#attendance-range-start').text(totalEntries === 0 ? 0 : startIdx + 1);
+                $('#attendance-range-end').text(endIdx);
+                $('#attendance-total-count').text(totalEntries);
+
+                // Render pagination buttons
+                renderAttendancePagination(totalEntries, totalPages);
+
+                if (totalEntries === 0) {
                     var colCount = isAttendanceAdmin ? 5 : 4;
-                    tbody.append('<tr><td colspan="' + colCount + '" class="px-5 py-8 text-center text-zinc-400 dark:text-zinc-500">No attendance records found for selected filters.</td></tr>');
+                    tbody.append('<tr><td colspan="' + colCount + '" class="px-5 py-8 text-center text-zinc-400 dark:text-zinc-500 font-medium">No attendance records found for selected filters.</td></tr>');
+                    mobileList.append('<div class="p-8 text-center text-zinc-450 dark:text-zinc-500 text-xs font-medium">No attendance records found for selected filters.</div>');
                 } else {
-                    displayLogs.slice().reverse().forEach(function(log) {
+                    var pageLogs = displayLogs.slice().reverse().slice(startIdx, endIdx);
+                    pageLogs.forEach(function(log) {
                         var dateObj = new Date(log.timestamp);
                         var timeStr = dateObj.toLocaleString();
+                        
+                        // Custom mobile date formatting (DD/MM/YYYY, HH:MM:SS)
+                        var pad = function(n) { return (n < 10 ? '0' : '') + n; };
+                        var customMobileTimeStr = pad(dateObj.getDate()) + '/' + pad(dateObj.getMonth() + 1) + '/' + dateObj.getFullYear() + ', ' + pad(dateObj.getHours()) + ':' + pad(dateObj.getMinutes()) + ':' + pad(dateObj.getSeconds());
+
                         var typeLabel = log.type === 'in' 
                             ? '<span class="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 rounded-md text-[9px] font-bold uppercase select-none">Punch In</span>' 
                             : '<span class="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-400 rounded-md text-[9px] font-bold uppercase select-none">Punch Out</span>';
                         
+                        var typeLabelMobile = log.type === 'in'
+                            ? '<span class="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-455 rounded text-[9px] font-bold uppercase select-none">Punch In</span>'
+                            : '<span class="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-400 rounded text-[9px] font-bold uppercase select-none">Punch Out</span>';
+
                         var locLink = 'Unknown';
+                        var locLinkMobile = 'Unknown';
                         if (log.lat && log.lng) {
                             var mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + log.lat + ',' + log.lng;
                             locLink = '<a href="' + mapsUrl + '" target="_blank" class="hover:underline flex items-center gap-1 text-zinc-500 hover:text-zinc-850 dark:hover:text-zinc-100"><svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg> ' + parseFloat(log.lat).toFixed(4) + ', ' + parseFloat(log.lng).toFixed(4) + '</a>';
+                            locLinkMobile = '<a href="' + mapsUrl + '" target="_blank" class="hover:underline text-zinc-700 dark:text-zinc-300 font-semibold">' + parseFloat(log.lat).toFixed(4) + ', ' + parseFloat(log.lng).toFixed(4) + '</a>';
                         }
                         
                         var geofenceCell = '';
+                        var geofenceLabelMobile = '<span class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-850 text-zinc-650 dark:text-zinc-400 rounded text-[9px] font-semibold border border-zinc-200/40 dark:border-zinc-800/80">Standard</span>';
                         if (isAttendanceAdmin) {
                             var geofenceLabel = '—';
                             if (log.geofence === 'verified') {
                                 geofenceLabel = '<span class="px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-450 rounded text-[9px] font-bold">Verified (' + (log.distance || '') + ')</span>';
+                                geofenceLabelMobile = '<span class="px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-450 rounded text-[9px] font-bold">Verified (' + (log.distance || '') + ')</span>';
                             } else if (log.geofence === 'disabled') {
                                 geofenceLabel = '<span class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 rounded text-[9px] font-medium">Standard</span>';
+                                geofenceLabelMobile = '<span class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-850 text-zinc-650 dark:text-zinc-400 rounded text-[9px] font-semibold border border-zinc-200/40 dark:border-zinc-800/80">Standard</span>';
                             }
                             geofenceCell = '<td class="px-5 py-3" data-label="Geofence Status">' + geofenceLabel + '</td>';
                         }
@@ -4684,6 +4768,48 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 <td class="px-5 py-3 font-semibold" data-label="GPS Coordinates">${locLink}</td>
                                 ${geofenceCell}
                             </tr>
+                        `);
+
+                        var avatarBgClass = 'bg-zinc-50 text-zinc-650 dark:bg-zinc-800 dark:text-zinc-350';
+                        var firstChar = (log.user || 'U').charAt(0).toUpperCase();
+                        if (log.user.toLowerCase().indexOf('owner') !== -1) {
+                            avatarBgClass = 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400';
+                        } else if (log.user.toLowerCase().indexOf('cora') !== -1) {
+                            avatarBgClass = 'bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400';
+                        } else {
+                            avatarBgClass = 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300';
+                        }
+
+                        mobileList.append(`
+                            <div class="p-4 flex items-center justify-between gap-4">
+                                <div class="flex items-start gap-4 min-w-0 flex-1">
+                                    <div class="relative shrink-0 mt-0.5">
+                                        <div class="w-10 h-10 rounded-xl ${avatarBgClass} flex items-center justify-center font-bold text-xs select-none">
+                                            ${firstChar}
+                                        </div>
+                                        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-zinc-900"></span>
+                                    </div>
+                                    <div class="min-w-0 flex-1 space-y-1.5">
+                                        <h4 class="font-bold text-xs text-zinc-900 dark:text-zinc-100 truncate">${log.user}</h4>
+                                        <div class="grid grid-cols-[80px_1fr] gap-x-2 gap-y-1 text-[10px] text-zinc-500 dark:text-zinc-400">
+                                            <span class="font-bold text-zinc-400 uppercase tracking-wider">Date & Time</span>
+                                            <span class="text-zinc-650 dark:text-zinc-350 font-medium truncate">${customMobileTimeStr}</span>
+                                            
+                                            <span class="font-bold text-zinc-400 uppercase tracking-wider">Event Type</span>
+                                            <span class="self-start">${typeLabelMobile}</span>
+                                            
+                                            <span class="font-bold text-zinc-400 uppercase tracking-wider">GPS Coord</span>
+                                            <span class="text-zinc-650 dark:text-zinc-350 font-semibold truncate">${locLinkMobile}</span>
+                                            
+                                            <span class="font-bold text-zinc-400 uppercase tracking-wider">Geofence</span>
+                                            <span class="self-start">${geofenceLabelMobile}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-zinc-400 shrink-0">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                </div>
+                            </div>
                         `);
                     });
                 }
@@ -4719,6 +4845,55 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             }
         });
     }
+
+    function renderAttendancePagination(totalEntries, totalPages) {
+        var $pager = $('#attendance-pagination-controls');
+        $pager.empty();
+        if (totalPages <= 1) {
+            $pager.hide();
+            return;
+        }
+        $pager.show();
+        
+        // Prev button
+        var prevDisabled = (attendanceCurrentPage === 1) ? 'disabled opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-850';
+        $pager.append('<button onclick="changeAttendancePage(' + (attendanceCurrentPage - 1) + ')" ' + (attendanceCurrentPage === 1 ? 'disabled' : '') + ' class="w-8 h-8 flex items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 transition-colors ' + prevDisabled + '"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg></button>');
+        
+        // Page buttons
+        var pages = [];
+        if (totalPages <= 5) {
+            for (var i = 1; i <= totalPages; i++) pages.push(i);
+        } else {
+            if (attendanceCurrentPage <= 3) {
+                pages = [1, 2, 3, '...', totalPages];
+            } else if (attendanceCurrentPage >= totalPages - 2) {
+                pages = [1, '...', totalPages - 2, totalPages - 1, totalPages];
+            } else {
+                pages = [1, '...', attendanceCurrentPage, '...', totalPages];
+            }
+        }
+        
+        pages.forEach(function(p) {
+            if (p === '...') {
+                $pager.append('<span class="w-8 text-center text-zinc-400 text-xs">...</span>');
+            } else {
+                var isActive = (p === attendanceCurrentPage);
+                var btnClass = isActive 
+                    ? 'bg-zinc-950 text-white dark:bg-zinc-100 dark:text-zinc-950 font-bold border border-zinc-950 dark:border-zinc-100' 
+                    : 'border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-850 cursor-pointer';
+                $pager.append('<button onclick="changeAttendancePage(' + p + ')" class="w-8 h-8 rounded-lg text-xs font-semibold flex items-center justify-center transition-colors ' + btnClass + '">' + p + '</button>');
+            }
+        });
+        
+        // Next button
+        var nextDisabled = (attendanceCurrentPage === totalPages) ? 'disabled opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-850';
+        $pager.append('<button onclick="changeAttendancePage(' + (attendanceCurrentPage + 1) + ')" ' + (attendanceCurrentPage === totalPages ? 'disabled' : '') + ' class="w-8 h-8 flex items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 transition-colors ' + nextDisabled + '"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg></button>');
+    }
+
+    window.changeAttendancePage = function(page) {
+        attendanceCurrentPage = page;
+        fetchAttendanceLogs(true);
+    };
 
     function logUserPunch(type) {
         var statusDiv = $('#cora-user-punch-status');
