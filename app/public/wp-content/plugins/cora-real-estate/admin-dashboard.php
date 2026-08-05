@@ -1050,6 +1050,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
         /* Bottom Action Toolbar */
         .media-frame-toolbar {
+            position: absolute !important;
             bottom: 0 !important;
             height: 60px !important;
             border-top: 1px solid #e4e4e7 !important;
@@ -1085,6 +1086,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             padding: 0 24px !important;
             visibility: visible !important;
             opacity: 1 !important;
+            position: relative !important;
         }
 
         /* Force primary select buttons in bottom toolbar to always display correctly */
@@ -1093,28 +1095,29 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         .media-frame-toolbar .button-primary,
         .media-frame-toolbar .media-button,
         .media-frame-toolbar .media-button-select {
-            display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
             visibility: visible !important;
             opacity: 1 !important;
             pointer-events: auto !important;
-            position: absolute !important;
-            right: 24px !important;
-            top: 50% !important;
-            transform: translateY(-50%) !important;
+            position: relative !important;
             z-index: 1000000 !important;
             background: #09090b !important;
-            border-color: #09090b !important;
+            border: 1px solid #09090b !important;
             color: #ffffff !important;
             height: 36px !important;
             line-height: 36px !important;
-            padding: 0 16px !important;
+            padding: 0 20px !important;
             border-radius: 8px !important;
             font-weight: 600 !important;
             font-size: 13px !important;
+            font-family: Inter, system-ui, -apple-system, sans-serif !important;
             cursor: pointer !important;
             box-sizing: border-box !important;
+            text-shadow: none !important;
+            text-decoration: none !important;
+            white-space: nowrap !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12) !important;
         }
 
         .media-frame-toolbar button:disabled,
@@ -2651,6 +2654,45 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         }
         .cora-dark-theme.collapsed-sidebar .cora-user-inbox span {
             border-color: #0c0c0e !important;
+        }
+
+        /* Custom injected CTA button - ensure no stylesheet can override */
+        .cora-media-select-btn {
+            position: absolute !important;
+            bottom: 12px !important;
+            right: 24px !important;
+            z-index: 9999999 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 36px !important;
+            padding: 0 20px !important;
+            background: #09090b !important;
+            color: #ffffff !important;
+            border: 1px solid #09090b !important;
+            border-radius: 8px !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            font-family: Inter, system-ui, -apple-system, sans-serif !important;
+            cursor: pointer !important;
+            letter-spacing: -0.01em !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12) !important;
+            line-height: 36px !important;
+            transition: opacity 0.15s ease, background 0.15s ease !important;
+            box-sizing: border-box !important;
+            text-transform: none !important;
+            text-decoration: none !important;
+            white-space: nowrap !important;
+        }
+
+        .cora-media-select-btn:disabled {
+            opacity: 0.4 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+        }
+
+        .cora-media-select-btn:not(:disabled):hover {
+            background: #27272a !important;
         }
     </style>
     

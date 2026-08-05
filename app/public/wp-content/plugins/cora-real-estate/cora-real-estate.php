@@ -664,6 +664,11 @@ function cora_real_estate_ai_handle_workspace_route() {
 }
 add_action( 'template_redirect', 'cora_real_estate_ai_handle_workspace_route' );
 
+$cora_active_plugins = (array) get_option( 'active_plugins', array() );
+$cora_is_workspace_active = in_array( 'cora-workspace/cora-workspace.php', $cora_active_plugins, true ) || ( is_multisite() && array_key_exists( 'cora-workspace/cora-workspace.php', (array) get_site_option( 'active_sitewide_plugins', array() ) ) );
+
+if ( ! $cora_is_workspace_active ) {
+if ( ! function_exists( 'cora_real_estate_ai_admin_assets' ) ) {
 /**
  * Enqueue scripts and styles only on our admin page
  */
@@ -723,11 +728,13 @@ function cora_real_estate_ai_admin_assets( $hook ) {
         'activeAiModel'    => $cora_active_ai_model,
     ) );
 }
+}
 add_action( 'admin_enqueue_scripts', 'cora_real_estate_ai_admin_assets' );
 
 /**
  * Redirect custom studio roles and administrators to our custom dashboard after login
  */
+if ( ! function_exists( 'cora_real_estate_ai_login_redirect' ) ) {
 function cora_real_estate_ai_login_redirect( $redirect_to, $request, $user ) {
     if ( $user instanceof WP_User ) {
         $allowed_roles = array( 'administrator', 'cora_manager', 'cora_branch_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor', 'cora_viewer' );
@@ -750,11 +757,16 @@ function cora_real_estate_ai_login_redirect( $redirect_to, $request, $user ) {
     return $redirect_to;
 }
 add_filter( 'login_redirect', 'cora_real_estate_ai_login_redirect', 10, 3 );
+}
 
 /**
  * Handle direct login event redirect
  */
+if ( ! function_exists( 'cora_real_estate_ai_on_wp_login' ) ) {
 function cora_real_estate_ai_on_wp_login( $user_login, $user ) {
+    if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+        return;
+    }
     if ( $user instanceof WP_User ) {
         $allowed_roles = array( 'administrator', 'cora_manager', 'cora_branch_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor', 'cora_viewer' );
         foreach ( $allowed_roles as $role ) {
@@ -766,10 +778,12 @@ function cora_real_estate_ai_on_wp_login( $user_login, $user ) {
     }
 }
 add_action( 'wp_login', 'cora_real_estate_ai_on_wp_login', 10, 2 );
+}
 
 /**
  * Restrict non-administrators from accessing the default WP Admin backend entirely
  */
+if ( ! function_exists( 'cora_real_estate_ai_restrict_admin_access' ) ) {
 function cora_real_estate_ai_restrict_admin_access() {
     if ( is_admin() && ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
         if ( current_user_can( 'manage_options' ) ) {
@@ -785,18 +799,22 @@ function cora_real_estate_ai_restrict_admin_access() {
     }
 }
 add_action( 'admin_init', 'cora_real_estate_ai_restrict_admin_access' );
+}
 
 /**
  * Force users_can_register option to enable user signups
  */
+if ( ! function_exists( 'cora_real_estate_ai_users_can_register' ) ) {
 function cora_real_estate_ai_users_can_register( $value ) {
     return 1;
 }
 add_filter( 'option_users_can_register', 'cora_real_estate_ai_users_can_register' );
+}
 
 /**
  * Render custom fields on the WordPress registration form
  */
+if ( ! function_exists( 'cora_real_estate_ai_register_form' ) ) {
 function cora_real_estate_ai_register_form() {
     $studio_name = ( ! empty( $_POST['cora_re_agency_name'] ) ) ? sanitize_text_field( $_POST['cora_re_agency_name'] ) : '';
     $phone = ( ! empty( $_POST['cora_phone'] ) ) ? sanitize_text_field( $_POST['cora_phone'] ) : '';
@@ -837,10 +855,12 @@ function cora_real_estate_ai_register_form() {
     <?php
 }
 add_action( 'register_form', 'cora_real_estate_ai_register_form' );
+}
 
 /**
  * Validate custom fields on registration submission
  */
+if ( ! function_exists( 'cora_real_estate_ai_registration_errors' ) ) {
 function cora_real_estate_ai_registration_errors( $errors, $sanitized_user_login, $user_email ) {
     if ( empty( $_POST['cora_password'] ) ) {
         $errors->add( 'cora_password_error', __( '<strong>Error:</strong> Password is required.', 'cora-real-estate' ) );
@@ -859,10 +879,12 @@ function cora_real_estate_ai_registration_errors( $errors, $sanitized_user_login
     return $errors;
 }
 add_filter( 'registration_errors', 'cora_real_estate_ai_registration_errors', 10, 3 );
+}
 
 /**
  * Handle custom user data saving and verification token delivery
  */
+if ( ! function_exists( 'cora_real_estate_ai_user_register' ) ) {
 function cora_real_estate_ai_user_register( $user_id ) {
     // 1. Save password directly (overrides default random password generation)
     if ( ! empty( $_POST['cora_password'] ) ) {
@@ -893,10 +915,12 @@ function cora_real_estate_ai_user_register( $user_id ) {
     cora_send_verification_email( $user_id );
 }
 add_action( 'user_register', 'cora_real_estate_ai_user_register' );
+}
 
 /**
  * Dispatch verification link via wp_mail to the newly registered user
  */
+if ( ! function_exists( 'cora_send_verification_email' ) ) {
 function cora_send_verification_email( $user_id ) {
     $user = get_user_by( 'id', $user_id );
     if ( ! $user ) {
@@ -949,10 +973,12 @@ function cora_send_verification_email( $user_id ) {
     
     return wp_mail( $to, $subject, $message, $headers );
 }
+}
 
 /**
  * Catch verification token from URL
  */
+if ( ! function_exists( 'cora_real_estate_ai_handle_email_verification' ) ) {
 function cora_real_estate_ai_handle_email_verification() {
     if ( ! empty( $_GET['cora_verify_token'] ) && ! empty( $_GET['cora_user_id'] ) ) {
         $user_id = intval( $_GET['cora_user_id'] );
@@ -980,10 +1006,12 @@ function cora_real_estate_ai_handle_email_verification() {
     }
 }
 add_action( 'init', 'cora_real_estate_ai_handle_email_verification' );
+}
 
 /**
  * AJAX handler for resending verification email
  */
+if ( ! function_exists( 'cora_ajax_resend_verification' ) ) {
 function cora_ajax_resend_verification() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
     
@@ -1005,10 +1033,12 @@ function cora_ajax_resend_verification() {
     }
 }
 add_action( 'wp_ajax_cora_re_resend_verification', 'cora_ajax_resend_verification' );
+}
 
 /**
  * Load custom login stylesheet for white-labeled login screen
  */
+if ( ! function_exists( 'cora_real_estate_ai_login_assets' ) ) {
 function cora_real_estate_ai_login_assets() {
     // Load Inter Font on Login page
     wp_enqueue_style(
@@ -1026,26 +1056,32 @@ function cora_real_estate_ai_login_assets() {
     );
 }
 add_action( 'login_enqueue_scripts', 'cora_real_estate_ai_login_assets' );
+}
 
 /**
  * Change the login logo URL to point to home instead of wordpress.org
  */
+if ( ! function_exists( 'cora_real_estate_ai_login_logo_url' ) ) {
 function cora_real_estate_ai_login_logo_url() {
     return home_url();
 }
 add_filter( 'login_headerurl', 'cora_real_estate_ai_login_logo_url' );
+}
 
 /**
  * Change the login logo title attribute (tooltip)
  */
+if ( ! function_exists( 'cora_real_estate_ai_login_logo_title' ) ) {
 function cora_real_estate_ai_login_logo_title() {
     return __( 'Cora for Real Estate', 'cora-real-estate' );
 }
 add_filter( 'login_headertext', 'cora_real_estate_ai_login_logo_title' );
+}
 
 /**
  * Redirect default WP Dashboard index page (wp-admin/index.php) to Cora for Real Estate
  */
+if ( ! function_exists( 'cora_real_estate_ai_dashboard_redirect' ) ) {
 function cora_real_estate_ai_dashboard_redirect() {
     global $pagenow;
     if ( 'index.php' === $pagenow && ! isset( $_GET['page'] ) && ! isset( $_GET['no_cora_redirect'] ) ) {
@@ -1054,10 +1090,12 @@ function cora_real_estate_ai_dashboard_redirect() {
     }
 }
 add_action( 'admin_init', 'cora_real_estate_ai_dashboard_redirect' );
+}
 
 /**
  * Remove WordPress Logo node from global Admin Bar
  */
+if ( ! function_exists( 'cora_real_estate_ai_remove_wp_logo' ) ) {
 function cora_real_estate_ai_remove_wp_logo() {
     global $wp_admin_bar;
     if ( is_object( $wp_admin_bar ) ) {
@@ -1065,26 +1103,32 @@ function cora_real_estate_ai_remove_wp_logo() {
     }
 }
 add_action( 'wp_before_admin_bar_render', 'cora_real_estate_ai_remove_wp_logo', 999 );
+}
 
 /**
  * Replace WordPress admin footer credits with Cora branding
  */
+if ( ! function_exists( 'cora_real_estate_ai_footer_text' ) ) {
 function cora_real_estate_ai_footer_text() {
     return '<span>Cora for Real Estate • Delhi Office</span>';
 }
 add_filter( 'admin_footer_text', 'cora_real_estate_ai_footer_text', 999 );
+}
 
 /**
  * Replace WordPress version in footer with Cora build version
  */
+if ( ! function_exists( 'cora_real_estate_ai_footer_version' ) ) {
 function cora_real_estate_ai_footer_version() {
     return 'v2.0.0';
 }
 add_filter( 'update_footer', 'cora_real_estate_ai_footer_version', 999 );
+}
 
 /**
  * Register custom taxonomies for media
  */
+if ( ! function_exists( 'cora_real_estate_ai_register_taxonomies' ) ) {
 function cora_real_estate_ai_register_taxonomies() {
     register_taxonomy(
         'cora_media_folder',
@@ -1100,10 +1144,12 @@ function cora_real_estate_ai_register_taxonomies() {
     );
 }
 add_action( 'init', 'cora_real_estate_ai_register_taxonomies' );
+}
 
 /**
  * Retrieve all user roles dynamically (standard + custom)
  */
+if ( ! function_exists( 'cora_get_all_roles' ) ) {
 function cora_get_all_roles() {
     $active_industry = get_option( 'cora_workspace_industry', 'real_estate' );
     $module = Cora_Module_Registry::get_module( $active_industry );
@@ -1138,7 +1184,10 @@ function cora_get_all_roles() {
     
     return $roles;
 }
+}
+} // End if !$cora_is_workspace_active
 
+if ( ! function_exists( 'cora_real_estate_ai_register_roles' ) ) {
 /**
  * Register real-estate-specific user roles for Indian/Global studios
  */
@@ -1170,7 +1219,9 @@ function cora_real_estate_ai_register_roles() {
     }
 }
 add_action( 'init', 'cora_real_estate_ai_register_roles' );
+}
 
+if ( ! function_exists( 'cora_real_estate_ai_seed_data' ) ) {
 /**
  * Seed initial dashboard options data: crew users, permissions, and equipment inventory
  */
@@ -1621,6 +1672,7 @@ function cora_real_estate_ai_seed_data() {
     }
 }
 add_action( 'init', 'cora_real_estate_ai_seed_data' );
+}
 
 /**
  * AJAX Handler: Save Role Permissions Matrix
@@ -1628,6 +1680,7 @@ add_action( 'init', 'cora_real_estate_ai_seed_data' );
 /**
  * AJAX Handler: Save Permissions Matrix
  */
+if ( ! function_exists( 'cora_ajax_save_permissions_matrix' ) ) {
 function cora_ajax_save_permissions_matrix() {
     $nonce = isset( $_POST['security'] ) ? $_POST['security'] : ( isset( $_POST['nonce'] ) ? $_POST['nonce'] : '' );
     if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
@@ -1686,10 +1739,12 @@ function cora_ajax_save_permissions_matrix() {
 add_action( 'wp_ajax_cora_ajax_save_permissions_matrix', 'cora_ajax_save_permissions_matrix' );
 add_action( 'wp_ajax_cora_save_permissions_matrix', 'cora_ajax_save_permissions_matrix' );
 add_action( 'wp_ajax_cora_save_role_permissions', 'cora_ajax_save_permissions_matrix' );
+}
 
 /**
  * AJAX Handler: Create User
  */
+if ( ! function_exists( 'cora_ajax_create_team_user' ) ) {
 function cora_ajax_create_team_user() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
     if ( ! current_user_can( 'manage_options' ) ) {
@@ -1759,10 +1814,12 @@ function cora_ajax_create_team_user() {
     ) );
 }
 add_action( 'wp_ajax_cora_create_team_user', 'cora_ajax_create_team_user' );
+}
 
 /**
  * Helper to generate listing SEO (R3)
  */
+if ( ! function_exists( 'cora_generate_listing_seo' ) ) {
 function cora_generate_listing_seo( $name, $category, $rera_id, $link ) {
     $title = "Premium {$category} - {$name} | RERA ID: {$rera_id}";
     $desc = "Explore this luxurious {$category} listing: {$name}. Registered under RERA ID {$rera_id}.";
@@ -1789,10 +1846,12 @@ function cora_generate_listing_seo( $name, $category, $rera_id, $link ) {
         'keywords'    => $keywords,
     );
 }
+}
 
 /**
  * AJAX Handler: Save Listing / Equipment
  */
+if ( ! function_exists( 'cora_ajax_save_equipment' ) ) {
 function cora_ajax_save_equipment() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
     $user = wp_get_current_user();
@@ -1954,10 +2013,12 @@ function cora_ajax_save_equipment() {
     wp_send_json_success( $saved_item );
 }
 add_action( 'wp_ajax_cora_re_save_listing', 'cora_ajax_save_equipment' );
+}
 
 /**
  * AJAX Handler: Assign Equipment
  */
+if ( ! function_exists( 'cora_ajax_assign_equipment' ) ) {
 function cora_ajax_assign_equipment() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
     $user = wp_get_current_user();
@@ -2012,10 +2073,12 @@ function cora_ajax_assign_equipment() {
     }
 }
 add_action( 'wp_ajax_cora_assign_equipment', 'cora_ajax_assign_equipment' );
+}
 
 /**
  * AJAX Handler: Save Crew Assignments
  */
+if ( ! function_exists( 'cora_ajax_save_crew_assignments' ) ) {
 function cora_ajax_save_crew_assignments() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
     $user = wp_get_current_user();
@@ -2047,10 +2110,12 @@ function cora_ajax_save_crew_assignments() {
     wp_send_json_success( 'Crew assignments saved successfully.' );
 }
 add_action( 'wp_ajax_cora_re_save_showing_assignments', 'cora_ajax_save_crew_assignments' );
+}
 
 /**
  * AJAX Handler: Delete User
  */
+if ( ! function_exists( 'cora_ajax_delete_team_user' ) ) {
 function cora_ajax_delete_team_user() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
     if ( ! current_user_can( 'manage_options' ) ) {
@@ -2078,10 +2143,12 @@ function cora_ajax_delete_team_user() {
     }
 }
 add_action( 'wp_ajax_cora_delete_team_user', 'cora_ajax_delete_team_user' );
+}
 
 /**
  * AJAX Handler: Update User
  */
+if ( ! function_exists( 'cora_ajax_update_team_user' ) ) {
 function cora_ajax_update_team_user() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
     if ( ! current_user_can( 'manage_options' ) ) {
@@ -2151,6 +2218,7 @@ function cora_ajax_update_team_user() {
     ) );
 }
 add_action( 'wp_ajax_cora_update_team_user', 'cora_ajax_update_team_user' );
+}
 
 /**
  * AJAX Handler: Delete Equipment
@@ -12629,6 +12697,10 @@ add_filter( 'pre_update_option_cora_re_listings_inventory', 'cora_pre_update_ten
 
 // ── CUSTOM AUTHENTICATION AJAX HANDLERS ──────────────────────────────────────
 
+$cora_active_plugins = (array) get_option( 'active_plugins', array() );
+$cora_is_workspace_active = in_array( 'cora-workspace/cora-workspace.php', $cora_active_plugins, true ) || ( is_multisite() && array_key_exists( 'cora-workspace/cora-workspace.php', (array) get_site_option( 'active_sitewide_plugins', array() ) ) );
+
+if ( ! $cora_is_workspace_active ) {
 function cora_ajax_login() {
     $email    = sanitize_email( $_POST['email'] ?? '' );
     $password = $_POST['password'] ?? '';
@@ -12958,7 +13030,7 @@ function cora_ajax_send_invitation() {
     // Check permission to invite (Agency Owner or Branch Manager)
     $user = wp_get_current_user();
     $role = ! empty( $user->roles ) ? $user->roles[0] : '';
-    if ( ! in_array( $role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) {
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! in_array( $role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager' ) ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
     }
 
@@ -13028,7 +13100,7 @@ function cora_ajax_cancel_invitation() {
     
     $user = wp_get_current_user();
     $role = ! empty( $user->roles ) ? $user->roles[0] : '';
-    if ( ! in_array( $role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) {
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! in_array( $role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager' ) ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
     }
 
@@ -13188,7 +13260,7 @@ function cora_ajax_save_user_changes() {
 
     $user = wp_get_current_user();
     $role = ! empty( $user->roles ) ? $user->roles[0] : '';
-    if ( ! in_array( $role, array( 'administrator', 'cora_manager', 'cora_branch_manager' ) ) ) {
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! in_array( $role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager' ) ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
     }
 
@@ -13326,7 +13398,7 @@ function cora_ajax_save_branch() {
 
     $user = wp_get_current_user();
     $role = ! empty( $user->roles ) ? $user->roles[0] : '';
-    if ( ! in_array( $role, array( 'administrator', 'cora_manager' ) ) ) {
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! in_array( $role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager' ) ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
     }
 
@@ -13421,7 +13493,7 @@ function cora_ajax_delete_branch() {
 
     $user = wp_get_current_user();
     $role = ! empty( $user->roles ) ? $user->roles[0] : '';
-    if ( ! in_array( $role, array( 'administrator', 'cora_manager' ) ) ) {
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! in_array( $role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager' ) ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
     }
 
@@ -17379,6 +17451,8 @@ function cora_ajax_delete_custom_role() {
     wp_send_json_success( array( 'message' => 'Custom role deleted successfully!' ) );
 }
 add_action( 'wp_ajax_cora_delete_custom_role', 'cora_ajax_delete_custom_role' );
+
+} // End if !$cora_is_workspace_active
 
 
 

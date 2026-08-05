@@ -304,6 +304,9 @@ add_filter( 'login_redirect', 'cora_studio_ai_login_redirect', 10, 3 );
  * Handle direct login event redirect
  */
 function cora_studio_ai_on_wp_login( $user_login, $user ) {
+    if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+        return;
+    }
     if ( $user instanceof WP_User ) {
         $allowed_roles = array( 'administrator', 'cora_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor' );
         foreach ( $allowed_roles as $role ) {

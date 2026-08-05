@@ -145,6 +145,27 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         .dark .responsive-table td::before {
             color: #a1a1aa !important;
         }
+        .responsive-table tr.cora-empty-state-row {
+            display: block !important;
+            width: 100% !important;
+            background: transparent !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .responsive-table tr.cora-empty-state-row td {
+            display: block !important;
+            width: 100% !important;
+            text-align: center !important;
+            justify-content: center !important;
+            padding: 32px 16px !important;
+            border: 0 !important;
+        }
+        .responsive-table tr.cora-empty-state-row td::before {
+            display: none !important;
+            content: none !important;
+        }
     }
 
     /* Floating popover for permissions matrix cell */
@@ -157,7 +178,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     }
 </style>
 
-<div class="p-0 m-0 border-0 outline-none md:space-y-6 space-y-4">
+<div id="cora-page-team-roles" class="p-0 m-0 border-0 outline-none md:space-y-6 space-y-4">
 <?php
     $current_role = wp_get_current_user()->roles[0] ?? '';
     $is_super_or_admin = cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager', 'cora_workspace_owner', 'owner' ) ) ;
@@ -318,6 +339,9 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 $u_status = get_user_meta( $u->ID, 'cora_user_status', true ) ?: 'active';
                 $u_joined = date( 'd M Y', strtotime( $u->user_registered ) );
                 $avatar = get_user_meta( $u->ID, 'cora_avatar_url', true );
+                if ( empty( $avatar ) ) {
+                    $avatar = get_avatar_url( $u->ID );
+                }
                 $banner = get_user_meta( $u->ID, 'cora_profile_banner_url', true );
                 
                 $u_phone = get_user_meta( $u->ID, 'cora_phone', true );
@@ -326,6 +350,15 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 $u_rate  = get_user_meta( $u->ID, 'cora_hourly_rate', true ) ?: '2500';
                 $u_bank  = get_user_meta( $u->ID, 'cora_bank_upi', true ) ?: '';
                 $u_bio   = get_user_meta( $u->ID, 'description', true ) ?: '';
+
+                $u_pan = get_user_meta( $u->ID, 'cora_pan', true ) ?: '';
+                $u_gst_type = get_user_meta( $u->ID, 'cora_gst_type', true ) ?: 'none';
+                $u_gstin = get_user_meta( $u->ID, 'cora_gstin', true ) ?: '';
+                $u_payout_method = get_user_meta( $u->ID, 'cora_payout_method', true ) ?: 'upi';
+                $u_bank_name = get_user_meta( $u->ID, 'cora_bank_name', true ) ?: '';
+                $u_bank_ac = get_user_meta( $u->ID, 'cora_bank_ac', true ) ?: '';
+                $u_bank_ifsc = get_user_meta( $u->ID, 'cora_bank_ifsc', true ) ?: '';
+                $u_upi_id = get_user_meta( $u->ID, 'cora_upi_id', true ) ?: '';
 
                 $user_payload = array(
                     'id'         => $u->ID,
@@ -342,6 +375,14 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     'bio'        => $u_bio,
                     'avatar'     => $avatar ? $avatar : '',
                     'banner'     => $banner ? $banner : '',
+                    'pan'        => $u_pan,
+                    'gst_type'   => $u_gst_type,
+                    'gstin'      => $u_gstin,
+                    'payout_method' => $u_payout_method,
+                    'bank_name'  => $u_bank_name,
+                    'bank_ac'    => $u_bank_ac,
+                    'bank_ifsc'  => $u_bank_ifsc,
+                    'upi_id'     => $u_upi_id,
                     'ai_token_limit'    => intval( get_user_meta( $u->ID, 'cora_ai_token_limit', true ) ?: 0 ),
                     'mcp_allowed_tools' => get_user_meta( $u->ID, 'cora_mcp_allowed_tools', true ) ?: array(),
                     'mcp_access_token'  => get_user_meta( $u->ID, 'cora_mcp_access_token', true ) ?: '',
@@ -364,7 +405,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     onclick="openEditUserDrawer(this)">
                     <!-- Avatar -->
                     <?php if ( ! empty($avatar) ) : ?>
-                        <img src="<?php echo esc_url($avatar); ?>" class="w-8 h-8 rounded-full object-cover shrink-0">
+                        <img src="<?php echo ( strpos( $avatar, 'data:' ) === 0 ) ? $avatar : esc_url($avatar); ?>" class="w-8 h-8 rounded-full object-cover shrink-0">
                     <?php else : ?>
                         <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 border border-zinc-100 dark:border-zinc-800/80" style="background-color: <?php echo esc_attr($name_color); ?>"><?php echo esc_html($name_initials); ?></div>
                     <?php endif; ?>
@@ -426,6 +467,9 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             $u_status = get_user_meta( $u->ID, 'cora_user_status', true ) ?: 'active';
                             $u_joined = date( 'd M Y', strtotime( $u->user_registered ) );
                             $avatar = get_user_meta( $u->ID, 'cora_avatar_url', true );
+                            if ( empty( $avatar ) ) {
+                                $avatar = get_avatar_url( $u->ID );
+                            }
                             $banner = get_user_meta( $u->ID, 'cora_profile_banner_url', true );
                             
                             $u_phone = get_user_meta( $u->ID, 'cora_phone', true );
@@ -434,6 +478,15 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             $u_rate  = get_user_meta( $u->ID, 'cora_hourly_rate', true ) ?: '2500';
                             $u_bank  = get_user_meta( $u->ID, 'cora_bank_upi', true ) ?: '';
                             $u_bio   = get_user_meta( $u->ID, 'description', true ) ?: '';
+
+                            $u_pan = get_user_meta( $u->ID, 'cora_pan', true ) ?: '';
+                            $u_gst_type = get_user_meta( $u->ID, 'cora_gst_type', true ) ?: 'none';
+                            $u_gstin = get_user_meta( $u->ID, 'cora_gstin', true ) ?: '';
+                            $u_payout_method = get_user_meta( $u->ID, 'cora_payout_method', true ) ?: 'upi';
+                            $u_bank_name = get_user_meta( $u->ID, 'cora_bank_name', true ) ?: '';
+                            $u_bank_ac = get_user_meta( $u->ID, 'cora_bank_ac', true ) ?: '';
+                            $u_bank_ifsc = get_user_meta( $u->ID, 'cora_bank_ifsc', true ) ?: '';
+                            $u_upi_id = get_user_meta( $u->ID, 'cora_upi_id', true ) ?: '';
 
                             $user_payload = array(
                                 'id'         => $u->ID,
@@ -450,6 +503,14 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 'bio'        => $u_bio,
                                 'avatar'     => $avatar ? $avatar : '',
                                 'banner'     => $banner ? $banner : '',
+                                'pan'        => $u_pan,
+                                'gst_type'   => $u_gst_type,
+                                'gstin'      => $u_gstin,
+                                'payout_method' => $u_payout_method,
+                                'bank_name'  => $u_bank_name,
+                                'bank_ac'    => $u_bank_ac,
+                                'bank_ifsc'  => $u_bank_ifsc,
+                                'upi_id'     => $u_upi_id,
                                 'ai_token_limit'    => intval( get_user_meta( $u->ID, 'cora_ai_token_limit', true ) ?: 0 ),
                                 'mcp_allowed_tools' => get_user_meta( $u->ID, 'cora_mcp_allowed_tools', true ) ?: array(),
                                 'mcp_access_token'  => get_user_meta( $u->ID, 'cora_mcp_access_token', true ) ?: '',
@@ -465,7 +526,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             <tr class="hover:bg-zinc-50/20 active-member-row" data-name="<?php echo esc_attr(strtolower($u->display_name)); ?>" data-email="<?php echo esc_attr(strtolower($u->user_email)); ?>" data-role="<?php echo esc_attr($u_role); ?>" data-branch="<?php echo esc_attr($u_branch_id); ?>" data-status="<?php echo esc_attr($u_status); ?>">
                                 <td class="px-5 py-3 flex items-center gap-3">
                                     <?php if ( ! empty( $avatar ) ) : ?>
-                                        <img src="<?php echo esc_url($avatar); ?>" class="w-8 h-8 rounded-full object-cover border border-zinc-200">
+                                        <img src="<?php echo ( strpos( $avatar, 'data:' ) === 0 ) ? $avatar : esc_url($avatar); ?>" class="w-8 h-8 rounded-full object-cover border border-zinc-200">
                                     <?php else : ?>
                                         <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs border border-zinc-200" style="background-color: <?php echo esc_attr($name_color); ?>">
                                             <?php echo esc_html( $name_initials ); ?>
@@ -499,7 +560,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
     <!-- TAB 2: PENDING INVITATIONS -->
     <div id="tab-pending-invites" class="cora-tab-content space-y-4 hidden">
-        <div class="bg-white border border-zinc-200/85 rounded-xl shadow-sm overflow-hidden">
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/85 dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-xs text-left responsive-table">
                     <thead class="bg-zinc-50/50 dark:bg-zinc-800/40">
@@ -515,7 +576,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     </thead>
                     <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
                         <?php if ( empty( $pending_invites ) ) : ?>
-                            <tr>
+                            <tr class="cora-empty-state-row">
                                 <td colspan="7" class="px-5 py-8 text-center text-zinc-400 dark:text-zinc-500 font-medium">No pending invitations.</td>
                             </tr>
                         <?php else : ?>
@@ -1707,7 +1768,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-300"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path></svg>
                             Autonomous Workspace Owner Automations
                         </h3>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold border border-emerald-500/20">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold border border-emerald-500/20 whitespace-nowrap">
                             5 Active Workflows
                         </span>
                     </div>
@@ -1780,7 +1841,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         <div class="space-y-1 flex-1 min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="font-bold text-xs text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $item['title'] ); ?></span>
-                                <span class="px-1.5 py-0.5 text-[9px] font-bold rounded border <?php echo esc_attr( $item['badge_cls'] ); ?>"><?php echo esc_html( $item['badge'] ); ?></span>
+                                <span class="px-1.5 py-0.5 text-[9px] font-bold rounded border whitespace-nowrap <?php echo esc_attr( $item['badge_cls'] ); ?>"><?php echo esc_html( $item['badge'] ); ?></span>
                                 <span class="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500">• <?php echo esc_html( $item['schedule'] ); ?></span>
                             </div>
                             <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed"><?php echo esc_html( $item['desc'] ); ?></p>
@@ -2396,39 +2457,144 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 
                 <!-- TAB 3: FINANCIALS & COMPENSATION -->
                 <div id="tab-edit-financials" class="drawer-tab-content space-y-4 hidden">
-                    <?php if ($active_industry === 'photography_studio') : ?>
-                        <div>
-                            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Base Shoot Rate (per assignment)</label>
-                            <div class="relative">
-                                <span class="absolute left-3 top-2.5 text-xs text-zinc-400 font-bold">₹</span>
-                                <input type="number" id="edit-hourly-rate" placeholder="2500" class="w-full pl-7 pr-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
+                    <!-- Compensation Card -->
+                    <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 bg-zinc-50/50 dark:bg-zinc-950/30 space-y-3">
+                        <div class="flex items-center gap-1.5 border-b border-zinc-100 dark:border-zinc-800/80 pb-2">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12" y2="18"></line></svg>
+                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Compensation & Commission Settings</h4>
+                        </div>
+                        
+                        <?php if ($active_industry === 'photography_studio') : ?>
+                            <div>
+                                <label class="block text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5">Base Shoot Rate (per assignment)</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-2.5 text-xs text-zinc-400 font-bold">₹</span>
+                                    <input type="number" id="edit-hourly-rate" placeholder="2500" class="w-full pl-7 pr-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
+                                </div>
+                                <p class="text-[10px] text-zinc-400 mt-1">Default payout rate per completed shoot.</p>
                             </div>
-                            <p class="text-[10px] text-zinc-400 mt-1">Default payout rate per completed shoot.</p>
-                        </div>
-                    <?php else : ?>
-                        <div>
-                            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Commission Split Ratio (Agent % / Brokerage %)</label>
-                            <input type="text" id="edit-commission-split" placeholder="e.g. 75/25 or 80/20" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
-                            <p class="text-[10px] text-zinc-400 mt-1">Contractual split percentage applied on closed deals.</p>
-                        </div>
-                    <?php endif; ?>
+                        <?php else : ?>
+                            <div>
+                                <label class="block text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5">Commission Split Ratio (Agent % / Brokerage %)</label>
+                                <input type="text" id="edit-commission-split" placeholder="e.g. 70/30 or 80/20" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100" oninput="coraUpdateCommissionSplitVisuals()">
+                                <p class="text-[10px] text-zinc-400 mt-1">Contractual split percentage applied on closed deals.</p>
+                                
+                                <!-- Commission Split Visual Previewer -->
+                                <div class="cora-split-visual-card p-3.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 space-y-2.5 mt-3 shadow-2xs">
+                                    <div class="flex justify-between items-center text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
+                                        <span>Agent Share</span>
+                                        <span>Brokerage Share</span>
+                                    </div>
+                                    <!-- Progress Bar -->
+                                    <div class="w-full h-2.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden flex border border-zinc-200/40 dark:border-zinc-700/30">
+                                        <div id="visual-split-agent" class="h-full bg-zinc-950 dark:bg-zinc-100 transition-all duration-300" style="width: 70%;"></div>
+                                        <div id="visual-split-broker" class="h-full bg-zinc-350 dark:bg-zinc-650 transition-all duration-300" style="width: 30%;"></div>
+                                    </div>
+                                    <div class="flex justify-between items-center text-xs font-black">
+                                        <span id="label-split-agent" class="text-zinc-950 dark:text-white">70%</span>
+                                        <span id="label-split-broker" class="text-zinc-500 dark:text-zinc-400">30%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Bank Payout / UPI Details</label>
-                        <input type="text" id="edit-bank-upi" placeholder="e.g. name@upi or HDFC0001234 A/C 50100..." class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
+                    <!-- Payout Preference Card -->
+                    <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 bg-zinc-50/50 dark:bg-zinc-950/30 space-y-3.5">
+                        <div class="flex items-center gap-1.5 border-b border-zinc-100 dark:border-zinc-800/80 pb-2">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Payout Preferences</h4>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5">Preferred Payout Destination</label>
+                            <select id="edit-payout-method" onchange="coraSwitchPayoutMethodFields()" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
+                                <option value="upi">UPI (Unified Payments Interface)</option>
+                                <option value="bank">Direct Bank Transfer</option>
+                            </select>
+                        </div>
+
+                        <!-- UPI Fields -->
+                        <div id="payout-upi-fields" class="space-y-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5">UPI ID Address</label>
+                                <input type="text" id="edit-upi-id" placeholder="e.g. name@upi or cellnumber@paytm" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100" oninput="coraSyncLegacyBankUpiInput()">
+                            </div>
+                        </div>
+
+                        <!-- Bank Transfer Fields -->
+                        <div id="payout-bank-fields" class="space-y-3 hidden">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5">Bank Name</label>
+                                    <input type="text" id="edit-bank-name" placeholder="e.g. HDFC Bank" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100" oninput="coraSyncLegacyBankUpiInput()">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5">IFSC / Routing Code</label>
+                                    <input type="text" id="edit-bank-ifsc" placeholder="e.g. HDFC0001234" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100" oninput="coraSyncLegacyBankUpiInput()">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5">Account Number</label>
+                                <input type="text" id="edit-bank-ac" placeholder="e.g. 5010023456789" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100" oninput="coraSyncLegacyBankUpiInput()">
+                            </div>
+                        </div>
+
+                        <!-- Hidden Legacy Field -->
+                        <input type="hidden" id="edit-bank-upi">
+                    </div>
+
+                    <!-- Taxation & Compliance Card -->
+                    <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 bg-zinc-50/50 dark:bg-zinc-950/30 space-y-3.5">
+                        <div class="flex items-center gap-1.5 border-b border-zinc-100 dark:border-zinc-800/80 pb-2">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Taxation & Compliance</h4>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5">PAN Card Number</label>
+                                <input type="text" id="edit-pan" placeholder="e.g. ABCDE1234F" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100 uppercase">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5">GST Registration</label>
+                                <select id="edit-gst-type" onchange="coraSwitchGstinFieldVisibility()" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100">
+                                    <option value="none">Non-GST / Unregistered</option>
+                                    <option value="registered">GST Registered - Regular</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="gstin-container" class="hidden">
+                            <label class="block text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5">GSTIN Number</label>
+                            <input type="text" id="edit-gstin" placeholder="e.g. 27AAAAA1111A1Z1" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100 uppercase">
+                        </div>
                     </div>
                 </div>
 
                 <!-- TAB 4: ACTIONS & SHORTCUTS -->
                 <div id="tab-edit-actions" class="drawer-tab-content space-y-4 hidden">
-                    <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 space-y-3 bg-zinc-50/50 dark:bg-zinc-950/50">
-                        <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Account Utility Actions</h4>
-                        <p class="text-[10px] text-zinc-400">Trigger automated security or credential updates for this crew member.</p>
+                    <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 space-y-3.5 bg-zinc-50/50 dark:bg-zinc-950/50">
+                        <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Account Security & Utility Actions</h4>
+                        <p class="text-[10px] text-zinc-400">Trigger automated security or credential updates for this member.</p>
 
                         <div class="space-y-2 pt-1">
-                            <button type="button" onclick="triggerPasswordResetForUser()" class="w-full py-2 px-3 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold rounded-lg text-xs transition-colors flex items-center justify-between cursor-pointer">
+                            <!-- Reset Password -->
+                            <button type="button" onclick="triggerPasswordResetForUser()" class="w-full py-2.5 px-3.5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold rounded-xl text-xs transition-colors flex items-center justify-between cursor-pointer shadow-2xs hover:shadow-xs">
                                 <span>Send Password Reset Email</span>
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            </button>
+
+                            <!-- Force Logout -->
+                            <button type="button" onclick="coraRevokeUserSessions()" class="w-full py-2.5 px-3.5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold rounded-xl text-xs transition-colors flex items-center justify-between cursor-pointer shadow-2xs hover:shadow-xs">
+                                <span>Revoke Active Sessions (Force Logout)</span>
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            </button>
+
+                            <!-- Force Password Change -->
+                            <button type="button" onclick="coraForcePasswordChangeNextLogin()" class="w-full py-2.5 px-3.5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold rounded-xl text-xs transition-colors flex items-center justify-between cursor-pointer shadow-2xs hover:shadow-xs">
+                                <span>Force Password Change on Next Login</span>
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                             </button>
                         </div>
                     </div>
@@ -2478,9 +2644,33 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                     </div>
 
                     <!-- MCP Access Configuration (AI Employee / Connector) -->
-                    <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 space-y-3 bg-zinc-50/50 dark:bg-zinc-950/50">
+                    <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 space-y-3.5 bg-zinc-50/50 dark:bg-zinc-950/50">
                         <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100">MCP Employee / Agent Gateway</h4>
                         <p class="text-[10px] text-zinc-400">Enable an external AI client (like Claude Desktop) to connect as this user.</p>
+                        
+                        <!-- Supported AI Platforms Logos Row -->
+                        <div class="flex items-center gap-3 py-1.5 border-t border-b border-zinc-200/40 dark:border-zinc-800/30 select-none">
+                            <span class="text-[8px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Compatible AI Gateways:</span>
+                            <div class="flex items-center gap-2">
+                                <!-- Claude Logo -->
+                                <div class="w-6 h-6 rounded-full flex items-center justify-center bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-500 shadow-3xs" title="Claude Desktop Client">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>
+                                </div>
+                                <!-- ChatGPT Logo -->
+                                <div class="w-6 h-6 rounded-full flex items-center justify-center bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-450 shadow-3xs" title="ChatGPT/OpenAI Integration">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432 4.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523z"/></svg>
+                                </div>
+                                <!-- Gemini Logo -->
+                                <div class="w-6 h-6 rounded-full flex items-center justify-center bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 shadow-3xs" title="Google Gemini API Gateway">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
+                                </div>
+                                <!-- Cursor / VS Code Logo -->
+                                <div class="w-6 h-6 rounded-full flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 shadow-3xs" title="Cursor IDE & VS Code Extension">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="space-y-2 pt-1">
                             <label class="block text-[9px] font-bold text-zinc-500 uppercase">MCP Employee Token</label>
                             <div class="flex gap-2">
@@ -3167,7 +3357,7 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         $('#invite-role-preview-card').removeClass('hidden');
         
         var badge = $('#role-preview-badge');
-        badge.removeClass().addClass('inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold tracking-wide uppercase select-none');
+        badge.removeClass().addClass('inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold tracking-wide uppercase select-none whitespace-nowrap');
         if (meta.is_custom) {
             badge.text('Custom Role').addClass('bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-350 border border-zinc-200/85 dark:border-zinc-700');
         } else {
@@ -3226,7 +3416,7 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
             listHtml += iconSvg;
             listHtml += '    <span>' + name + '</span>';
             listHtml += '  </div>';
-            listHtml += '  <span class="inline-flex items-center px-2 py-0.5 rounded text-[9px] ' + levelClass + '">' + levelLabel + '</span>';
+            listHtml += '  <span class="inline-flex items-center px-2 py-0.5 rounded text-[9px] whitespace-nowrap ' + levelClass + '">' + levelLabel + '</span>';
             listHtml += '</div>';
         });
         
@@ -3406,6 +3596,47 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         $('#edit-commission-split').val(user.split || '70/30');
         $('#edit-hourly-rate').val(user.rate || '2500');
         $('#edit-bank-upi').val(user.bank || '');
+
+        $('#edit-pan').val(user.pan || '');
+        $('#edit-gst-type').val(user.gst_type || 'none');
+        $('#edit-gstin').val(user.gstin || '');
+        $('#edit-payout-method').val(user.payout_method || 'upi');
+        $('#edit-bank-name').val(user.bank_name || '');
+        $('#edit-bank-ac').val(user.bank_ac || '');
+        $('#edit-bank-ifsc').val(user.bank_ifsc || '');
+        $('#edit-upi-id').val(user.upi_id || '');
+
+        // Populate fields based on legacy vs structured payout preferences
+        var bankVal = user.bank || '';
+        if (bankVal && (!user.payout_method || user.payout_method === '')) {
+            if (bankVal.includes('Bank:') || bankVal.includes('A/C:') || bankVal.includes('IFSC:')) {
+                $('#edit-payout-method').val('bank');
+                var bankMatch = bankVal.match(/Bank:\s*([^A\n\r]+)/i);
+                var acMatch = bankVal.match(/A\/C:\s*([^I\n\r]+)/i);
+                var ifscMatch = bankVal.match(/IFSC:\s*(.+)/i);
+                
+                $('#edit-bank-name').val(bankMatch ? bankMatch[1].trim() : '');
+                $('#edit-bank-ac').val(acMatch ? acMatch[1].trim() : '');
+                $('#edit-bank-ifsc').val(ifscMatch ? ifscMatch[1].trim() : '');
+                $('#edit-upi-id').val('');
+            } else {
+                $('#edit-payout-method').val('upi');
+                $('#edit-upi-id').val(bankVal);
+                $('#edit-bank-name').val('');
+                $('#edit-bank-ac').val('');
+                $('#edit-bank-ifsc').val('');
+            }
+        }
+
+        if (typeof window.coraSwitchPayoutMethodFields === 'function') {
+            window.coraSwitchPayoutMethodFields();
+        }
+        if (typeof window.coraSwitchGstinFieldVisibility === 'function') {
+            window.coraSwitchGstinFieldVisibility();
+        }
+        if (typeof window.coraUpdateCommissionSplitVisuals === 'function') {
+            window.coraUpdateCommissionSplitVisuals();
+        }
 
         $('#edit-user-title').text('Edit ' + (user.name || 'Team Member'));
 
@@ -3753,6 +3984,14 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
             commission_split: split,
             hourly_rate: rate,
             bank_upi: bank,
+            pan: $('#edit-pan').val().trim(),
+            gst_type: $('#edit-gst-type').val(),
+            gstin: $('#edit-gstin').val().trim(),
+            payout_method: $('#edit-payout-method').val(),
+            bank_name: $('#edit-bank-name').val().trim(),
+            bank_ac: $('#edit-bank-ac').val().trim(),
+            bank_ifsc: $('#edit-bank-ifsc').val().trim(),
+            upi_id: $('#edit-upi-id').val().trim(),
             ai_token_limit: aiTokenLimit,
             mcp_allowed_tools: mcpAllowedTools,
             stay_logged_in: stayLoggedIn,
@@ -5526,6 +5765,133 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
     window.handleSaveGeofence = handleSaveGeofence;
     window.toggleMobileFilters = toggleMobileFilters;
     window.clearFilters = clearFilters;
+
+    window.coraUpdateCommissionSplitVisuals = function() {
+        var val = $('#edit-commission-split').val() || '70/30';
+        var parts = val.split('/');
+        var agent = parseInt(parts[0]) || 70;
+        var broker = parseInt(parts[1]) || (100 - agent);
+        
+        if (agent + broker !== 100) {
+            if (agent > 0 && agent < 100) {
+                broker = 100 - agent;
+            } else {
+                agent = 70;
+                broker = 30;
+            }
+        }
+        
+        $('#visual-split-agent').css('width', agent + '%');
+        $('#visual-split-broker').css('width', broker + '%');
+        $('#label-split-agent').text(agent + '%');
+        $('#label-split-broker').text(broker + '%');
+    };
+
+    window.coraSwitchPayoutMethodFields = function() {
+        var method = $('#edit-payout-method').val();
+        if (method === 'bank') {
+            $('#payout-bank-fields').removeClass('hidden');
+            $('#payout-upi-fields').addClass('hidden');
+        } else {
+            $('#payout-bank-fields').addClass('hidden');
+            $('#payout-upi-fields').removeClass('hidden');
+        }
+        coraSyncLegacyBankUpiInput();
+    };
+
+    window.coraSwitchGstinFieldVisibility = function() {
+        var gstType = $('#edit-gst-type').val();
+        if (gstType === 'registered') {
+            $('#gstin-container').removeClass('hidden');
+        } else {
+            $('#gstin-container').addClass('hidden');
+        }
+    };
+
+    window.coraSyncLegacyBankUpiInput = function() {
+        var method = $('#edit-payout-method').val();
+        if (method === 'upi') {
+            var upi = $('#edit-upi-id').val().trim();
+            $('#edit-bank-upi').val(upi);
+        } else {
+            var bank = $('#edit-bank-name').val().trim();
+            var ac = $('#edit-bank-ac').val().trim();
+            var ifsc = $('#edit-bank-ifsc').val().trim();
+            var combined = '';
+            if (bank || ac || ifsc) {
+                combined = 'Bank: ' + bank + ' A/C: ' + ac + ' IFSC: ' + ifsc;
+            }
+            $('#edit-bank-upi').val(combined);
+        }
+    };
+
+    window.coraRevokeUserSessions = function() {
+        if (!currentEditingUser || !currentEditingUser.id) {
+            window.coraShowToast('Invalid user context.', 'error');
+            return;
+        }
+
+        var performRevocation = function() {
+            window.coraShowToast('Revoking active login sessions...', 'info');
+            $.post(coraREData.ajaxUrl, {
+                action: 'cora_ajax_logout_other_sessions',
+                user_id: currentEditingUser.id,
+                nonce: coraREData.ajaxNonce
+            }, function(res) {
+                if (res.success) {
+                    window.coraShowToast(res.data && res.data.message ? res.data.message : 'Sessions successfully revoked.');
+                } else {
+                    window.coraShowToast(res.data && res.data.message ? res.data.message : 'Failed to revoke sessions.', 'error');
+                }
+            }).fail(function() {
+                window.coraShowToast('Network error during session revocation.', 'error');
+            });
+        };
+
+        if (window.coraConfirmAction) {
+            window.coraConfirmAction(
+                'Revoke Active Sessions',
+                'Are you sure you want to log out this user from all active devices and sessions?',
+                performRevocation
+            );
+        } else {
+            performRevocation();
+        }
+    };
+
+    window.coraForcePasswordChangeNextLogin = function() {
+        if (!currentEditingUser || !currentEditingUser.id) {
+            window.coraShowToast('Invalid user context.', 'error');
+            return;
+        }
+
+        var performForce = function() {
+            window.coraShowToast('Enforcing password change...', 'info');
+            $.post(coraREData.ajaxUrl, {
+                action: 'cora_ajax_force_password_change',
+                user_id: currentEditingUser.id,
+                nonce: coraREData.ajaxNonce
+            }, function(res) {
+                if (res.success) {
+                    window.coraShowToast(res.data && res.data.message ? res.data.message : 'Successfully enforced password change.');
+                } else {
+                    window.coraShowToast(res.data && res.data.message ? res.data.message : 'Failed to enforce password change.', 'error');
+                }
+            }).fail(function() {
+                window.coraShowToast('Network error.', 'error');
+            });
+        };
+
+        if (window.coraConfirmAction) {
+            window.coraConfirmAction(
+                'Force Password Change',
+                'Are you sure you want to force this user to change their password on next login?',
+                performForce
+            );
+        } else {
+            performForce();
+        }
+    };
 
     $('#cora-user-punch-in-btn').on('click', function() { logUserPunch('in'); });
     $('#cora-user-punch-out-btn').on('click', function() { logUserPunch('out'); });

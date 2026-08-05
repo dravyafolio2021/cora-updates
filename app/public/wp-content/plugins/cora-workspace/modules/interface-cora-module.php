@@ -4,6 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+if ( ! interface_exists( 'Cora_Module_Interface' ) ) {
 interface Cora_Module_Interface {
     /**
      * Get the unique string identifier for this module.
@@ -34,4 +35,5 @@ interface Cora_Module_Interface {
      * Trigger module-specific database setup / schema initialization.
      */
     public function setup_database_tables();
+}
 }

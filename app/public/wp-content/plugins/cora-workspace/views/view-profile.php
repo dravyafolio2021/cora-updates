@@ -396,6 +396,27 @@ if ( is_array( $leave_requests ) ) {
         .dark .responsive-table td::before {
             color: #a1a1aa !important;
         }
+        .responsive-table tr.cora-empty-state-row {
+            display: block !important;
+            width: 100% !important;
+            background: transparent !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .responsive-table tr.cora-empty-state-row td {
+            display: block !important;
+            width: 100% !important;
+            text-align: center !important;
+            justify-content: center !important;
+            padding: 32px 16px !important;
+            border: 0 !important;
+        }
+        .responsive-table tr.cora-empty-state-row td::before {
+            display: none !important;
+            content: none !important;
+        }
     }
 </style>
 
@@ -747,7 +768,7 @@ if ( is_array( $leave_requests ) ) {
                             </thead>
                             <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
                                 <?php if ( empty($my_leaves) ) : ?>
-                                    <tr>
+                                    <tr class="cora-empty-state-row">
                                         <td colspan="5" class="p-4 text-center text-zinc-400 dark:text-zinc-500">No leave requests submitted yet.</td>
                                     </tr>
                                 <?php else : ?>
@@ -850,7 +871,7 @@ if ( is_array( $leave_requests ) ) {
                         </thead>
                         <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
                             <?php if ( empty($grouped_attendance) ) : ?>
-                                <tr>
+                                <tr class="cora-empty-state-row">
                                     <td colspan="5" class="p-4 text-center text-zinc-400 dark:text-zinc-500">No punch card records found for this month.</td>
                                 </tr>
                             <?php else : ?>
@@ -986,7 +1007,7 @@ if ( is_array( $leave_requests ) ) {
                     </thead>
                     <tbody id="activity-logs-table-body" class="divide-y divide-zinc-100 dark:divide-zinc-800">
                         <?php if ( empty($user_activity_logs) ) : ?>
-                            <tr>
+                            <tr class="cora-empty-state-row">
                                 <td colspan="5" class="p-4 text-center text-zinc-400 dark:text-zinc-500">No activity events logged for your user profile in the last 7 days.</td>
                             </tr>
                         <?php else : ?>
@@ -1591,4 +1612,18 @@ if ( is_array( $leave_requests ) ) {
             performLogout();
         }
     }
+
+    jQuery(document).ready(function($) {
+        var urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('force_password_change')) {
+            setTimeout(function() {
+                if (window.coraShowToast) {
+                    window.coraShowToast('For security reasons, you must change your password to continue.', 'error');
+                }
+                if (typeof openPasswordDrawer === 'function') {
+                    openPasswordDrawer();
+                }
+            }, 500);
+        }
+    });
 </script>

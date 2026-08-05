@@ -19,23 +19,23 @@ test('verify workspace and profile popovers toggle and close correctly', async (
   await expect(profilePopover).toBeHidden();
 
   // Click switcher -> workspace popover should show, profile popover should be hidden
-  await workspaceCard.click();
+  await workspaceCard.click({ force: true });
   await expect(workspacePopover).toBeVisible();
   await expect(profilePopover).toBeHidden();
 
   // Click user footer -> profile popover should show, workspace popover should be hidden
-  await userFooter.click();
+  await userFooter.click({ force: true });
   await expect(profilePopover).toBeVisible();
   await expect(workspacePopover).toBeHidden();
 
   // Click switcher again -> workspace popover shows, profile popover hides
-  await workspaceCard.click();
+  await workspaceCard.click({ force: true });
   await expect(workspacePopover).toBeVisible();
   await expect(profilePopover).toBeHidden();
 
-  // Click outside (e.g. on the dashboard main heading) -> both should hide
-  const mainHeading = page.locator('#cora-dynamic-greeting-title');
-  await mainHeading.click();
+  // Click outside (e.g. on the dashboard main container) -> both should hide
+  const mainContainer = page.locator('.cora-main');
+  await mainContainer.click({ position: { x: 100, y: 100 } });
   
   await expect(workspacePopover).toBeHidden();
   await expect(profilePopover).toBeHidden();

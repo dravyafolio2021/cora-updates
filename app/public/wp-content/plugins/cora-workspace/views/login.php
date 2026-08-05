@@ -491,34 +491,54 @@
 
             $('#login-btn').prop('disabled', true).text('Signing in...');
 
-            $.post('<?php echo esc_url( cora_get_origin_relative_url( admin_url( 'admin-ajax.php' ) ) ); ?>', {
-                action: 'cora_ajax_login',
-                email: email,
-                password: password,
-                remember: remember,
-                nonce: '<?php echo wp_create_nonce( "cora_login_nonce" ); ?>'
-            }, function(res) {
-                if (res.success) {
-                    showToast('Login successful. Redirecting...');
-                    setTimeout(function() {
-                        var redirectUrl = new URLSearchParams(window.location.search).get('redirect_to');
-                        window.location.href = redirectUrl ? decodeURIComponent(redirectUrl) : res.data.redirect_url;
-                    }, 800);
-                } else {
-                    showToast(res.data.message);
-                    if (res.data.message && res.data.message.toLowerCase().indexOf('suspended') !== -1) {
-                        $('#cora-suspended-banner').slideDown(200);
-                    }
-                    if (res.data.lockout) {
-                        lockoutRemaining = res.data.lockout;
-                        startLockoutTimer();
-                    } else {
+            $.ajax({
+                url: '<?php echo esc_url( cora_get_origin_relative_url( admin_url( 'admin-ajax.php' ) ) ); ?>',
+                type: 'POST',
+                dataType: 'json',
+                timeout: 15000,
+                data: {
+                    action: 'cora_ajax_login',
+                    email: email,
+                    password: password,
+                    remember: remember,
+                    nonce: '<?php echo wp_create_nonce( "cora_login_nonce" ); ?>'
+                },
+                success: function(res) {
+                    try {
+                        if (res && res.success) {
+                            showToast('Login successful. Redirecting...');
+                            setTimeout(function() {
+                                var redirectUrl = new URLSearchParams(window.location.search).get('redirect_to');
+                                window.location.href = redirectUrl ? decodeURIComponent(redirectUrl) : res.data.redirect_url;
+                            }, 800);
+                        } else {
+                            var msg = (res && res.data && res.data.message) ? res.data.message : 'Authentication failed. Please try again.';
+                            showToast(msg);
+                            if (msg.toLowerCase().indexOf('suspended') !== -1) {
+                                $('#cora-suspended-banner').slideDown(200);
+                            }
+                            if (res && res.data && res.data.lockout) {
+                                lockoutRemaining = res.data.lockout;
+                                startLockoutTimer();
+                            } else {
+                                $('#login-btn').prop('disabled', false).text('Sign In');
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Cora login callback error:', err);
+                        showToast('An unexpected error occurred. Please try again.');
                         $('#login-btn').prop('disabled', false).text('Sign In');
                     }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Cora login AJAX error:', status, error, xhr.responseText);
+                    if (status === 'timeout') {
+                        showToast('Request timed out. Please check your connection and try again.');
+                    } else {
+                        showToast('Network error. Please try again.');
+                    }
+                    $('#login-btn').prop('disabled', false).text('Sign In');
                 }
-            }).fail(function() {
-                showToast('Network error. Please try again.');
-                $('#login-btn').prop('disabled', false).text('Sign In');
             });
         }
 

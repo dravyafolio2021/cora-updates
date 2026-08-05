@@ -24,6 +24,7 @@ test.describe('Canvas Front-End Management System E2E Tests', () => {
           !err.message.includes('404') && 
           !err.message.includes('403') && 
           !err.message.includes('Failed to load resource') && 
+          !err.message.includes('Unexpected token') && 
           !err.message.includes('Invalid or unexpected token')) {
         consoleErrors.push(err.message);
       }

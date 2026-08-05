@@ -10,6 +10,50 @@ if (typeof window.coraData === 'undefined') {
 }
 
 jQuery(document).ready(function($) {
+    // Global wp.media Select Button & Toolbar Fix
+    if (typeof wp !== 'undefined' && wp.media) {
+        const originalMedia = wp.media;
+        wp.media = function(options) {
+            const frame = originalMedia(options);
+            frame.on('open', function() {
+                setTimeout(function() {
+                    var modal = frame.$el;
+                    if (!modal || !modal.length) return;
+                    
+                    // Force the bottom action toolbar and its buttons to be visible
+                    var toolbar = modal.find('.media-frame-toolbar');
+                    if (toolbar.length) {
+                        toolbar.show().css({
+                            'display': 'block',
+                            'visibility': 'visible',
+                            'opacity': '1',
+                            'bottom': '0',
+                            'z-index': '100000'
+                        });
+                        var primary = toolbar.find('.media-toolbar-primary');
+                        if (primary.length) {
+                            primary.show().css({
+                                'display': 'flex',
+                                'visibility': 'visible',
+                                'opacity': '1'
+                            });
+                            var nativeBtns = primary.find('button, .button, .button-primary, .media-button');
+                            if (nativeBtns.length) {
+                                nativeBtns.show().css({
+                                    'display': 'inline-flex',
+                                    'visibility': 'visible',
+                                    'opacity': '1',
+                                    'pointer-events': 'auto'
+                                });
+                            }
+                        }
+                    }
+                }, 150);
+            });
+            return frame;
+        };
+    }
+
     // Custom Toast Notification System
     window.coraShowToast = function(message, type = 'info') {
         let toastContainer = $('#cora-toast-container');

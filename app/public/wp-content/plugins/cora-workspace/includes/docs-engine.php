@@ -99,12 +99,24 @@ function cora_seed_docs_data() {
     $t_changelog = $wpdb->prefix . 'cora_docs_changelog';
     $t_api = $wpdb->prefix . 'cora_docs_api_endpoints';
 
+    $author_id = 1; // Default Admin user ID
+
+    $user_mgmt_content = "# Module 01: User Management, Roles & AI Permissions\n\n## 1. Multi-Tenant Role Architecture\nCora manages user authentication and authorization at the tenant workspace level. The platform defines four standard system roles and supports custom role extensions:\n- **Super Admin (`cora_super_admin`)**: Globally locked. Enforces absolute control over backups, system configurations, billing, and plugin installations.\n- **Tenant Owner (`owner`)**: Dedicated manager of the workspace tenant. Can create and modify custom roles, save security permissions matrices, and authorize third-party keys.\n- **Administrator (`administrator`)**: Complete read/write access to operations and data modules (CRM Leads, Showings, Invoices) but restricted from altering core tenant database settings.\n- **Workspace Manager / Crew (`cora_member` / `cora_manager`)**: Scoped access tailored to operational tasks. Can only perform actions allowed by the Active Security Matrix.\n\n## 2. Security & Permissions Matrix\nThe workspace owner can save granular capability permissions across all operational sections:\n- **Core Navigation**: Dashboard, Showings CRM, Portfolio.\n- **Operational Modules**: Team & Roles, Listings/Gear.\n- **Sales Channels**: Canvas Web Creator, Forms & Contracts, SMTP Outbound Drips, Review Acquisition.\n- **Administrative Rights**: Financials, Audit Logs, and Developer Settings.\n\n## 3. AI Native Capabilities & MCP Gateway\nCora integrates a local Model Context Protocol (MCP) gateway to bind external LLM execution contexts:\n- **Bearer Token Authorization**: MCP servers connect securely using cryptographically generated REST tokens.\n- **Dynamic Token Regeneration**: Administrators can rotate security tokens instantly from the User Settings interface to revoke or refresh API access.\n- **Live Sync Indicator**: Visual indicator badge displays the state of dynamic RAG synchronizations and MCP connections in real-time.";
+
     $count = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$t_pages}");
     if ( $count > 0 ) {
+        // Upsert to ensure existing database page is updated to detailed description
+        $existing_page_id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$t_pages} WHERE slug = %s", 'user-management-and-auth' ) );
+        if ( $existing_page_id ) {
+            $wpdb->update( $t_pages, array(
+                'title'      => 'Module 01: User Management & AI Permissions',
+                'content'    => $user_mgmt_content,
+                'category'   => 'modules',
+                'updated_at' => current_time('mysql')
+            ), array( 'id' => $existing_page_id ) );
+        }
         return; // Already seeded
     }
-
-    $author_id = 1; // Default Admin user ID
 
     // Seed 1: Platform Overview Page
     $wpdb->insert( $t_pages, array(
@@ -164,10 +176,10 @@ function cora_seed_docs_data() {
     // Seed 4: Module 01 User Management Documentation Page
     $wpdb->insert( $t_pages, array(
         'slug' => 'user-management-and-auth',
-        'title' => 'Module 01: User Management & Auth',
+        'title' => 'Module 01: User Management & AI Permissions',
         'category' => 'modules',
         'module_key' => 'user-management',
-        'content' => "# Module 01: User Management & Auth\n\n## Overview\nThis module authenticates platform users and enforces role-based permissions across standard and custom roles (Super Owner, Owner, Administrator, Member).\n\n## Features List\n- **Secure Authenticator**: Password hashing with login rate-limiting (DONE).\n- **Magic Links**: Passwordless login sequences (IN PROGRESS).\n- **Dual Theme Support**: Persisting dark/light UI preference across workspace navigation (DONE).\n\n## Mobile-First Optimization Layout Rules\n- **Sub-navigation Tab**: Mobile tab navigation dropdown selection triggers are borderless and clean. Parent layout is padding-free (pb-0) to align the active border indicators flush with the horizontal baseline.\n- **Accordion Permissions Matrix**: On mobile, Permissions are displayed in a clean, vertical card list with nested accordion folders per capability category.\n- **Horizontal Edge Boundaries**: Outer containers of sub-menus and mobile headers must use px-0 layout alignments so content sits flush on narrow viewport boundaries.\n\n## Role & Permission Reference\n- `cora_super_admin`: Full admin access across all workspace environments.\n- `administrator`: Full tenant dashboard read/write rights.\n- `cora_member`: Scoped workspace feature execution (no settings or backups).\n\n## AI Layer Integration\nMonitors authentication logs in real-time, detecting access anomalies and generating notification summaries on security triggers.",
+        'content' => $user_mgmt_content,
         'status' => 'draft',
         'created_by' => $author_id,
         'updated_by' => $author_id,
@@ -945,5 +957,144 @@ function cora_ajax_public_get_page() {
 add_action( 'wp_ajax_cora_public_get_page', 'cora_ajax_public_get_page' );
 add_action( 'wp_ajax_nopriv_cora_public_get_page', 'cora_ajax_public_get_page' );
 
+/**
+ * AJAX: Public search documentation pages
+ */
+if ( ! function_exists( 'cora_ajax_public_search_docs' ) ) {
+function cora_ajax_public_search_docs() {
+    global $wpdb;
+    $t_pages = $wpdb->prefix . 'cora_docs_pages';
+    
+    $term = isset( $_GET['q'] ) ? sanitize_text_field( $_GET['q'] ) : '';
+    if ( strlen( $term ) < 2 ) {
+        wp_send_json_success( array() );
+        exit;
+    }
+    
+    $like = '%' . $wpdb->esc_like( $term ) . '%';
+    $results = $wpdb->get_results( $wpdb->prepare(
+        "SELECT id, slug, title, content, category 
+         FROM {$t_pages} 
+         WHERE title LIKE %s OR content LIKE %s 
+         ORDER BY category, title ASC LIMIT 20",
+        $like, $like
+    ), ARRAY_A );
+    
+    $grouped = array();
+    foreach ( $results as $row ) {
+        $category = $row['category'];
+        if ( ! isset( $grouped[$category] ) ) {
+            $grouped[$category] = array();
+        }
+        
+        // Generate snippet
+        $snippet = '';
+        $content = strip_tags( $row['content'] );
+        $pos = stripos( $content, $term );
+        if ( $pos !== false ) {
+            $start = max( 0, $pos - 30 );
+            $length = 80;
+            $snippet = substr( $content, $start, $length );
+            if ( $start > 0 ) $snippet = '...' . $snippet;
+            if ( strlen( $content ) > $start + $length ) $snippet .= '...';
+        } else {
+            $snippet = substr( $content, 0, 80 );
+            if ( strlen( $content ) > 80 ) $snippet .= '...';
+        }
+        
+        $grouped[$category][] = array(
+            'id' => $row['id'],
+            'slug' => $row['slug'],
+            'title' => $row['title'],
+            'snippet' => esc_html( trim( $snippet ) )
+        );
+    }
+    
+    wp_send_json_success( $grouped );
+    exit;
+}
+}
+add_action( 'wp_ajax_cora_public_search_docs', 'cora_ajax_public_search_docs' );
+add_action( 'wp_ajax_nopriv_cora_public_search_docs', 'cora_ajax_public_search_docs' );
 
+/**
+ * AJAX: Public query RAG knowledge base for Cora AI chatbot
+ */
+if ( ! function_exists( 'cora_ajax_public_query_rag' ) ) {
+function cora_ajax_public_query_rag() {
+    $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( $_POST['nonce'] ) : '';
+    if ( ! wp_verify_nonce( $nonce, 'cora_public_docs_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security validation failed.' ) );
+    }
 
+    $question = isset( $_POST['question'] ) ? sanitize_text_field( wp_unslash( $_POST['question'] ) ) : '';
+    if ( empty( $question ) ) {
+        wp_send_json_error( array( 'message' => 'Question is required.' ) );
+    }
+
+    global $wpdb;
+    $table = $wpdb->prefix . 'cora_rag_knowledge';
+    $agency_id = cora_db_get_agency_id();
+    
+    $context_text = '';
+    
+    if ( cora_table_exists( $table ) ) {
+        $keywords = explode( ' ', $question );
+        $like_conditions = array();
+        $params = array( $agency_id );
+        foreach ( $keywords as $kw ) {
+            $kw = trim( $kw );
+            if ( strlen( $kw ) > 2 ) {
+                $like_conditions[] = "(title LIKE %s OR content LIKE %s)";
+                $params[] = '%' . $wpdb->esc_like( $kw ) . '%';
+                $params[] = '%' . $wpdb->esc_like( $kw ) . '%';
+            }
+        }
+        
+        if ( ! empty( $like_conditions ) ) {
+            $sql = "SELECT title, content FROM {$table} WHERE agency_id = %d AND (" . implode( ' OR ', $like_conditions ) . ") LIMIT 4";
+            $results = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );
+            if ( $results ) {
+                foreach ( $results as $row ) {
+                    $context_text .= "Resource: " . $row['title'] . "\nContent: " . wp_strip_all_tags( $row['content'] ) . "\n\n";
+                }
+            }
+        }
+        
+        if ( empty( $context_text ) ) {
+            $results = $wpdb->get_results( $wpdb->prepare( "SELECT title, content FROM {$table} WHERE agency_id = %d ORDER BY id DESC LIMIT 2", $agency_id ), ARRAY_A );
+            if ( $results ) {
+                foreach ( $results as $row ) {
+                    $context_text .= "Resource: " . $row['title'] . "\nContent: " . wp_strip_all_tags( $row['content'] ) . "\n\n";
+                }
+            }
+        }
+    }
+    
+    $system_prompt = "You are Cora AI, an intelligent, helpful developer assistant for the Cora Platform. 
+Your objective is to answer technical and general questions about the Cora Platform and its workspace modules.
+If you are provided with retrieved knowledge base context below, use it to accurately address the query.
+Otherwise, use your general knowledge of the Cora Platform (which features dynamic bookings, crew schedule boards, lead generation pipelines, CGST/SGST ledger sheets, e-signing vault registry, etc.) to give a clear and professional answer.
+Always respond in short, clear, and bulleted or formatted Markdown. Avoid conversational fluff.
+
+Retrieved Context:
+" . ( $context_text ? $context_text : "No specific documentation context was found in the RAG database." );
+
+    $reply = '';
+    
+    if ( function_exists( 'cora_rag_call_ai_api' ) ) {
+        $reply = cora_rag_call_ai_api( "Question: " . $question, $system_prompt );
+    }
+    
+    if ( empty( $reply ) ) {
+        $reply = "I parsed the context but could not reach the LLM provider. The Cora platform features active modules: Bookings (calendar & client slots), Leads (Kanban board), Financials (CGST/SGST ledger invoice splits), Document Vault (e-sign contracts), and CRM. Please configure your Gemini API Key in the RAG Knowledge base settings to enable full chatbot interactivity.";
+    }
+
+    wp_send_json_success( array(
+        'reply' => $reply
+    ) );
+    exit;
+}
+}
+add_action( 'wp_ajax_cora_public_query_rag', 'cora_ajax_public_query_rag' );
+add_action( 'wp_ajax_nopriv_cora_public_query_rag', 'cora_ajax_public_query_rag' );

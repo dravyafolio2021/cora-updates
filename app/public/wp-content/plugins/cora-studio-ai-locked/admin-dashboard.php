@@ -1050,16 +1050,23 @@ $s2_assignments = isset($cora_shoot_assignments['shoot2']) ? $cora_shoot_assignm
 
         /* Bottom Action Toolbar */
         .media-frame-toolbar {
+            position: absolute !important;
             bottom: 0 !important;
             height: 60px !important;
             border-top: 1px solid #e4e4e7 !important;
             background: #ffffff !important;
-            left: 200px !important;
+            left: 0 !important;
+            right: 0 !important;
             box-shadow: none !important;
+            overflow: visible !important;
+            z-index: 100000 !important;
+            display: block !important;
+            visibility: visible !important;
         }
 
         .media-frame.hide-menu .media-frame-toolbar {
             left: 0 !important;
+            right: 0 !important;
         }
 
         /* Eliminate duplicate borders in bottom toolbar */
@@ -1067,6 +1074,10 @@ $s2_assignments = isset($cora_shoot_assignments['shoot2']) ? $cora_shoot_assignm
             border-top: none !important;
             background: transparent !important;
             box-shadow: none !important;
+            height: 60px !important;
+            line-height: 60px !important;
+            display: block !important;
+            visibility: visible !important;
         }
 
         .media-toolbar-primary {
@@ -1074,6 +1085,53 @@ $s2_assignments = isset($cora_shoot_assignments['shoot2']) ? $cora_shoot_assignm
             float: right !important;
             display: flex !important;
             align-items: center !important;
+            position: relative !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        /* Force primary select buttons in bottom toolbar to always display correctly */
+        .media-frame-toolbar button,
+        .media-frame-toolbar .button,
+        .media-frame-toolbar .button-primary,
+        .media-frame-toolbar .media-button,
+        .media-frame-toolbar .media-button-select {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            position: relative !important;
+            z-index: 1000000 !important;
+            background: #09090b !important;
+            border: 1px solid #09090b !important;
+            color: #ffffff !important;
+            height: 36px !important;
+            line-height: 36px !important;
+            padding: 0 20px !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            font-size: 13px !important;
+            font-family: Inter, system-ui, -apple-system, sans-serif !important;
+            cursor: pointer !important;
+            box-sizing: border-box !important;
+            text-shadow: none !important;
+            text-decoration: none !important;
+            white-space: nowrap !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12) !important;
+        }
+
+        .media-frame-toolbar button:disabled,
+        .media-frame-toolbar .button:disabled,
+        .media-frame-toolbar .button-primary:disabled,
+        .media-frame-toolbar .media-button:disabled,
+        .media-frame-toolbar .media-button-select:disabled {
+            opacity: 0.45 !important;
+            cursor: not-allowed !important;
+            background: #71717a !important;
+            border-color: #71717a !important;
+            pointer-events: none !important;
         }
 
         /* Modern Monochromatic Buttons */
@@ -2419,6 +2477,45 @@ $s2_assignments = isset($cora_shoot_assignments['shoot2']) ? $cora_shoot_assignm
         }
         .cora-dark-theme.collapsed-sidebar .cora-user-inbox span {
             border-color: #0c0c0e !important;
+        }
+
+        /* Custom injected CTA button - ensure no stylesheet can override */
+        .cora-media-select-btn {
+            position: absolute !important;
+            bottom: 12px !important;
+            right: 24px !important;
+            z-index: 9999999 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 36px !important;
+            padding: 0 20px !important;
+            background: #09090b !important;
+            color: #ffffff !important;
+            border: 1px solid #09090b !important;
+            border-radius: 8px !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            font-family: Inter, system-ui, -apple-system, sans-serif !important;
+            cursor: pointer !important;
+            letter-spacing: -0.01em !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12) !important;
+            line-height: 36px !important;
+            transition: opacity 0.15s ease, background 0.15s ease !important;
+            box-sizing: border-box !important;
+            text-transform: none !important;
+            text-decoration: none !important;
+            white-space: nowrap !important;
+        }
+
+        .cora-media-select-btn:disabled {
+            opacity: 0.4 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+        }
+
+        .cora-media-select-btn:not(:disabled):hover {
+            background: #27272a !important;
         }
     </style>
     

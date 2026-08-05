@@ -43,6 +43,99 @@ if (typeof window.ajaxurl === 'undefined') {
 }
 
 jQuery(document).ready(function($) {
+    // Global wp.media Select Button & Toolbar Fix
+    if (typeof wp !== 'undefined' && wp.media) {
+        const originalMedia = wp.media;
+        wp.media = function(options) {
+            const frame = originalMedia.apply(this, arguments);
+            frame.on('open', function() {
+                setTimeout(function() {
+                    var modal = frame.$el;
+                    if (!modal || !modal.length) return;
+                    
+                    var modalContent = modal.closest('.media-modal-content');
+                    if (!modalContent.length) {
+                        modalContent = modal.find('.media-modal-content');
+                    }
+                    if (!modalContent.length) {
+                        modalContent = modal.parent();
+                    }
+                    if (!modalContent.length) return;
+
+                    // Remove any previous custom button to prevent duplicates
+                    modalContent.find('.cora-media-select-btn').remove();
+
+                    // Get native button text (default is "Select")
+                    var btnText = (options && options.button && options.button.text) ? options.button.text : 'Select';
+                    
+                    // Create the custom monochromatic button
+                    var btn = $('<button type="button" class="cora-media-select-btn" disabled>' + btnText + '</button>');
+                    modalContent.css('position', 'relative').append(btn);
+
+                    // Sync logic helper
+                    function syncButton() {
+                        var nativeBtn = modal.find('.media-frame-toolbar .media-toolbar-primary button, .media-frame-toolbar .media-toolbar-primary .button, .media-frame-toolbar .media-toolbar-primary .button-primary, .media-frame-toolbar .media-toolbar-primary .media-button').not('.cora-media-select-btn').first();
+                        
+                        if (nativeBtn.length) {
+                            // Copy text if different
+                            var txt = nativeBtn.text().trim();
+                            if (txt && txt !== btn.text()) {
+                                btn.text(txt);
+                            }
+                            
+                            // Copy disabled state
+                            var isDisabled = nativeBtn.prop('disabled') || nativeBtn.hasClass('disabled');
+                            btn.prop('disabled', isDisabled);
+                            
+                            // Hide the native button visually but keep it functional for clicks
+                            nativeBtn.css({
+                                'opacity': '0',
+                                'pointer-events': 'none',
+                                'position': 'absolute',
+                                'z-index': '-1'
+                            });
+                        } else {
+                            // If no native button is found, keep it disabled
+                            btn.prop('disabled', true);
+                        }
+                    }
+
+                    // Run initial sync
+                    syncButton();
+
+                    // Run sync periodically and on selection changes
+                    var syncInterval = setInterval(syncButton, 100);
+
+                    // Clear interval when frame is closed or removed
+                    frame.on('close', function() {
+                        clearInterval(syncInterval);
+                    });
+
+                    // Click handler
+                    btn.on('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        var nativeBtn = modal.find('.media-frame-toolbar .media-toolbar-primary button, .media-frame-toolbar .media-toolbar-primary .button, .media-frame-toolbar .media-toolbar-primary .button-primary, .media-frame-toolbar .media-toolbar-primary .media-button').not('.cora-media-select-btn').first();
+                        if (nativeBtn.length) {
+                            nativeBtn.click();
+                        }
+                    });
+                    
+                }, 100);
+            });
+            return frame;
+        };
+        // Preserve all static properties from the original wp.media (controller, view, frames, etc.)
+        for (var prop in originalMedia) {
+            if (originalMedia.hasOwnProperty(prop)) {
+                wp.media[prop] = originalMedia[prop];
+            }
+        }
+        // Also copy prototype and non-enumerable properties
+        wp.media.prototype = originalMedia.prototype;
+    }
+
     // Sidebar Scroll Persistence
     const sidebarScrollContainer = document.getElementById('cora-sidebar-scroll-container');
     if (sidebarScrollContainer) {
@@ -8800,84 +8893,6 @@ jQuery(document).ready(function($) {
                 var attachment = frame.state().get('selection').first().toJSON();
                 $('#' + fieldId).val(attachment.url).trigger('change');
             });
-            frame.on('open', function() {
-                // Inject a custom floating CTA button into the modal
-                // because WP's default toolbar button gets hidden by CSS conflicts
-                setTimeout(function() {
-                    var modal = frame.$el;
-                    if (!modal || !modal.length) return;
-                    // Remove any previous injected button
-                    modal.find('.cora-media-select-btn').remove();
-
-                    var btn = $('<button type="button" class="cora-media-select-btn" disabled>Use this asset</button>');
-                    btn.css({
-                        position: 'absolute',
-                        bottom: '12px',
-                        right: '24px',
-                        zIndex: '9999999',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        height: '36px',
-                        padding: '0 20px',
-                        background: '#09090b',
-                        color: '#ffffff',
-                        border: '1px solid #09090b',
-                        borderRadius: '8px',
-                        fontSize: '13px',
-                        fontWeight: '600',
-                        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-                        cursor: 'pointer',
-                        transition: 'opacity 0.15s ease, background 0.15s ease',
-                        opacity: '0.4',
-                        pointerEvents: 'none',
-                        letterSpacing: '-0.01em',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
-                        lineHeight: '36px'
-                    });
-
-                    // Append to the media-modal-content wrapper for absolute positioning
-                    var modalContent = modal.find('.media-modal-content');
-                    if (modalContent.length) {
-                        modalContent.css('position', 'relative');
-                        modalContent.append(btn);
-                    } else {
-                        modal.append(btn);
-                    }
-
-                    // Enable/disable based on selection state
-                    function updateBtnState() {
-                        var selection = frame.state().get('selection');
-                        if (selection && selection.length > 0) {
-                            btn.prop('disabled', false).css({ opacity: '1', pointerEvents: 'auto', cursor: 'pointer' });
-                        } else {
-                            btn.prop('disabled', true).css({ opacity: '0.4', pointerEvents: 'none', cursor: 'not-allowed' });
-                        }
-                    }
-
-                    // Listen to selection changes
-                    frame.state().get('selection').on('add remove reset', updateBtnState);
-                    updateBtnState();
-
-                    // Hover effect
-                    btn.on('mouseenter', function() {
-                        if (!btn.prop('disabled')) $(this).css('background', '#27272a');
-                    }).on('mouseleave', function() {
-                        $(this).css('background', '#09090b');
-                    });
-
-                    // Click handler: trigger the same action as the original WP select button
-                    btn.on('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        var selection = frame.state().get('selection');
-                        if (selection && selection.length > 0) {
-                            frame.trigger('select');
-                            frame.close();
-                        }
-                    });
-                }, 150);
-            });
             frame.open();
         } else {
             window.coraShowToast('Media library not available.');
@@ -9125,76 +9140,6 @@ jQuery(document).ready(function($) {
             });
             frame.on('select', function() {
                 window.location.reload();
-            });
-            frame.on('open', function() {
-                setTimeout(function() {
-                    var modal = frame.$el;
-                    if (!modal || !modal.length) return;
-                    modal.find('.cora-media-select-btn').remove();
-
-                    var btn = $('<button type="button" class="cora-media-select-btn" disabled>Insert Media</button>');
-                    btn.css({
-                        position: 'absolute',
-                        bottom: '12px',
-                        right: '24px',
-                        zIndex: '9999999',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        height: '36px',
-                        padding: '0 20px',
-                        background: '#09090b',
-                        color: '#ffffff',
-                        border: '1px solid #09090b',
-                        borderRadius: '8px',
-                        fontSize: '13px',
-                        fontWeight: '600',
-                        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-                        cursor: 'pointer',
-                        transition: 'opacity 0.15s ease, background 0.15s ease',
-                        opacity: '0.4',
-                        pointerEvents: 'none',
-                        letterSpacing: '-0.01em',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
-                        lineHeight: '36px'
-                    });
-
-                    var modalContent = modal.find('.media-modal-content');
-                    if (modalContent.length) {
-                        modalContent.css('position', 'relative');
-                        modalContent.append(btn);
-                    } else {
-                        modal.append(btn);
-                    }
-
-                    function updateBtnState() {
-                        var selection = frame.state().get('selection');
-                        if (selection && selection.length > 0) {
-                            btn.prop('disabled', false).css({ opacity: '1', pointerEvents: 'auto', cursor: 'pointer' });
-                        } else {
-                            btn.prop('disabled', true).css({ opacity: '0.4', pointerEvents: 'none', cursor: 'not-allowed' });
-                        }
-                    }
-
-                    frame.state().get('selection').on('add remove reset', updateBtnState);
-                    updateBtnState();
-
-                    btn.on('mouseenter', function() {
-                        if (!btn.prop('disabled')) $(this).css('background', '#27272a');
-                    }).on('mouseleave', function() {
-                        $(this).css('background', '#09090b');
-                    });
-
-                    btn.on('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        var selection = frame.state().get('selection');
-                        if (selection && selection.length > 0) {
-                            frame.trigger('select');
-                            frame.close();
-                        }
-                    });
-                }, 150);
             });
             frame.open();
         } else {

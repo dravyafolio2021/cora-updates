@@ -4,6 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+if ( ! class_exists( 'Cora_Module_Registry' ) ) {
 class Cora_Module_Registry {
     private static $modules = array();
 
@@ -43,4 +44,5 @@ class Cora_Module_Registry {
         self::register_module(new Cora_Real_Estate_Module());
         self::register_module(new Cora_Photography_Studio_Module());
     }
+}
 }

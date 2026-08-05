@@ -136,6 +136,7 @@ test.describe('Tier 6: New Refinements E2E Tests', () => {
   test('5. Model Context Protocol (MCP) Server Validation', async ({ page }) => {
     // 1. Retrieve the secure token from workspace mcp tab
     await page.goto('/workspace/mcp');
+    await page.click('text=MCP Developer Gateway');
     await page.waitForSelector('input[name="cora_mcp_access_token_direct"]');
     const validToken = await page.inputValue('input[name="cora_mcp_access_token_direct"]');
     expect(validToken.length).toBeGreaterThan(0);

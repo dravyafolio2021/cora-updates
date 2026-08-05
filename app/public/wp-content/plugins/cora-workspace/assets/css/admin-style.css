@@ -115,8 +115,9 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
    hidden by Cora's Tailwind resets or overflow rules.
    ===================================================================== */
 
-/* Force the media modal toolbar and select button to always be visible and positioned correctly */
+/* Force the media modal toolbar footer to always be visible */
 .media-modal .media-frame-toolbar {
+    position: absolute !important;
     left: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
@@ -127,8 +128,11 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
     pointer-events: auto !important;
     z-index: 100000 !important;
     overflow: visible !important;
+    background: #ffffff !important;
+    border-top: 1px solid #e4e4e7 !important;
 }
 
+/* CRITICAL: position:relative so absolute-positioned children anchor HERE, not to .media-frame */
 .media-modal .media-frame-toolbar .media-toolbar {
     height: 60px !important;
     line-height: 60px !important;
@@ -136,6 +140,8 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
     visibility: visible !important;
     opacity: 1 !important;
     pointer-events: auto !important;
+    position: relative !important;
+    overflow: visible !important;
 }
 
 .media-modal .media-frame-toolbar .media-toolbar-primary {
@@ -147,8 +153,15 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
     visibility: visible !important;
     opacity: 1 !important;
     pointer-events: auto !important;
+    position: relative !important;
 }
 
+/* Style the native WP select/action button to match Cora monochromatic design */
+.media-frame-toolbar button,
+.media-frame-toolbar .button,
+.media-frame-toolbar .button-primary,
+.media-frame-toolbar .media-button,
+.media-frame-toolbar .media-button-select,
 .media-modal .media-frame-toolbar .button.media-button,
 .media-modal .media-frame-toolbar .button.media-button-select,
 .media-modal .media-frame-toolbar .media-button,
@@ -159,15 +172,43 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
     visibility: visible !important;
     opacity: 1 !important;
     pointer-events: auto !important;
-    
-    /* Force absolute placement at the bottom-right of the footer toolbar to bypass any hidden nested parent containers */
-    position: absolute !important;
-    right: 24px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
+    position: relative !important;
     z-index: 1000000 !important;
+    height: 36px !important;
+    padding: 0 20px !important;
+    background: #09090b !important;
+    color: #ffffff !important;
+    border: 1px solid #09090b !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    font-family: Inter, system-ui, -apple-system, sans-serif !important;
+    cursor: pointer !important;
+    letter-spacing: -0.01em !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12) !important;
+    line-height: 36px !important;
+    transition: opacity 0.15s ease, background 0.15s ease !important;
+    text-shadow: none !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
 }
 
+.media-frame-toolbar button:hover,
+.media-frame-toolbar .button:hover,
+.media-frame-toolbar .button-primary:hover,
+.media-frame-toolbar .media-button:hover,
+.media-frame-toolbar .media-button-select:hover,
+.media-modal .media-frame-toolbar .button.media-button:hover,
+.media-modal .media-frame-toolbar .button.media-button-select:hover {
+    background: #27272a !important;
+    border-color: #27272a !important;
+}
+
+.media-frame-toolbar button:disabled,
+.media-frame-toolbar .button:disabled,
+.media-frame-toolbar .button-primary:disabled,
+.media-frame-toolbar .media-button:disabled,
+.media-frame-toolbar .media-button-select:disabled,
 .media-modal .media-frame-toolbar button.button-primary:disabled,
 .media-modal .media-frame-toolbar button.media-button-select:disabled,
 .media-modal .media-frame-toolbar .media-button:disabled,
@@ -176,6 +217,7 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
     cursor: not-allowed !important;
     background: #71717a !important;
     border-color: #71717a !important;
+    color: #ffffff !important;
     pointer-events: none !important;
 }
 
@@ -190,4 +232,30 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
 .media-modal-backdrop,
 .media-modal {
     z-index: 160100 !important;
+}
+
+/* --- KANBAN & CALENDAR PLANNING UTILITIES --- */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.kanban-card-draggable {
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.kanban-card-draggable:hover {
+    transform: translateY(-1.5px);
+}
+
+.kanban-cards-dropzone {
+    transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.kanban-cards-dropzone.bg-zinc-100\/50 {
+    background-color: rgba(244, 244, 245, 0.5) !important;
+    border-radius: 12px;
 }
