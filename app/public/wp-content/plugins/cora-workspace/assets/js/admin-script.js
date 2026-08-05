@@ -937,21 +937,42 @@ jQuery(document).ready(function($) {
     // 8. Collapsible Notion-AI Sidebar Controls
     window.coraToggleSidebar = function(show) {
         const sidebar = $('#cora-ai-sidebar');
+        const quickBtn = $('#cora-quick-ai-btn');
         if (show) {
             sidebar.removeClass('collapsed');
+            quickBtn.addClass('bg-zinc-100 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700');
             $('#cora-sidebar-chat-input').focus();
         } else {
             sidebar.addClass('collapsed');
+            quickBtn.removeClass('bg-zinc-100 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700');
         }
     };
 
-    // Toggle button opens the sidebar (Coming Soon)
+    // Toggle button opens the sidebar (Shopify inline style)
     $('#cora-quick-ai-btn').on('click', function(e) {
         e.preventDefault();
-        if (typeof window.coraShowToast === 'function') {
-            window.coraShowToast("Cora AI feature is coming soon!");
-        }
+        const sidebar = $('#cora-ai-sidebar');
+        const isCollapsed = sidebar.hasClass('collapsed');
+        window.coraToggleSidebar(isCollapsed);
     });
+
+    // Expand/Collapse right-side panel width
+    window.coraToggleSidebarExpand = function() {
+        const sidebar = $('#cora-ai-sidebar');
+        sidebar.toggleClass('cora-ai-sidebar-wide');
+    };
+
+    // Reset/Clear chat history to start a new conversation
+    window.coraClearSidebarChat = function() {
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast("Starting a new conversation...", "info");
+        }
+        $('#cora-sidebar-chat').html(`
+            <div class="chat-bubble ai bg-zinc-100 text-zinc-850 rounded-lg rounded-bl-none p-3 text-xs leading-relaxed self-start border border-zinc-200/50 shadow-sm max-w-[85%]">
+                Hello! I am Cora, your real estate workspace intelligence. Ask me about bookings, client messages, or writing listing descriptions.
+            </div>
+        `);
+    };
 
     // Search bar opens the command palette modal (excluding sidebar search input container)
     $('.cora-sidebar-search').not('.cora-sidebar .cora-sidebar-search').on('click', function(e) {
@@ -1154,12 +1175,12 @@ jQuery(document).ready(function($) {
             }
         }
 
-        // 3. AI Chat Sidebar Toggle shortcut: Cmd + J or Ctrl + J (Coming Soon)
+        // 3. AI Chat Sidebar Toggle shortcut: Cmd + J or Ctrl + J
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'j') {
             e.preventDefault();
-            if (typeof window.coraShowToast === 'function') {
-                window.coraShowToast("Cora AI feature is coming soon!");
-            }
+            const sidebar = $('#cora-ai-sidebar');
+            const isCollapsed = sidebar.hasClass('collapsed');
+            window.coraToggleSidebar(isCollapsed);
         }
 
         // 4. Close popover & drawers: Escape

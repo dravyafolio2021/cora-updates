@@ -2227,6 +2227,27 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             border-left-color: rgba(255, 255, 255, 0.08) !important;
             color: #f4f4f5 !important;
         }
+        /* Shopify Style Resizable Sidebar */
+        #cora-ai-sidebar.cora-ai-sidebar-wide {
+            width: 600px !important;
+        }
+        @media (min-width: 1024px) {
+            #cora-ai-sidebar {
+                position: sticky !important;
+                top: 52px !important;
+                height: calc(100vh - 52px) !important;
+                box-shadow: none !important;
+                transform: none !important;
+                pointer-events: auto !important;
+                z-index: 30 !important;
+                visibility: visible !important;
+            }
+            #cora-ai-sidebar.collapsed {
+                display: none !important;
+                visibility: hidden !important;
+                transform: translateX(100%) !important;
+            }
+        }
         .cora-dark-theme .cora-ai-sidebar-header {
             background-color: #18181b !important;
             border-bottom-color: rgba(255, 255, 255, 0.08) !important;
@@ -3278,14 +3299,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
         <!-- Right Section: Actions, Role Selector, Custom Blocks & User Pill -->
         <div class="cora-topbar-actions flex items-center gap-2 md:gap-3 shrink-0">
-            <button id="cora-quick-ai-btn" class="cora-btn-secondary px-2.5 py-1.5 text-xs font-bold border border-zinc-200 rounded-lg hover:bg-zinc-100 transition-all active:scale-[0.98] inline-flex items-center gap-1.5 text-zinc-900 bg-white shadow-sm cursor-pointer shrink-0" title="Cora AI (Coming Soon)">
-                <span class="cora-btn-icon text-zinc-600 flex shrink-0">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-                    </svg>
+            <button id="cora-quick-ai-btn" class="cora-btn-secondary w-8 h-8 flex items-center justify-center border border-zinc-200 dark:border-zinc-800 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all active:scale-[0.98] text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-900 shadow-sm cursor-pointer shrink-0 p-0" title="Cora AI">
+                <span class="cora-btn-icon text-zinc-650 dark:text-zinc-400 flex shrink-0">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>
                 </span>
-                <span class="hidden sm:inline">Cora AI</span>
-                <span class="px-1 py-0.5 text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 rounded border border-zinc-200 dark:border-zinc-700 leading-none select-none uppercase tracking-wider scale-95 origin-left">Soon</span>
             </button>
 
             <!-- Punch In / Out Header Quick Button -->
@@ -6471,20 +6488,47 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
     </main>
 
     <!-- Collapsible Right-side AI Sidebar (Notion-AI style) -->
-    <aside id="cora-ai-sidebar" class="cora-ai-sidebar collapsed fixed top-0 right-0 z-50 h-full w-[350px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
+    <aside id="cora-ai-sidebar" class="cora-ai-sidebar collapsed fixed lg:sticky top-0 lg:top-[52px] right-0 z-50 lg:z-30 h-full lg:h-[calc(100vh-52px)] w-[350px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl lg:shadow-none flex flex-col transition-all duration-300 ease-in-out shrink-0 lg:transform-none lg:pointer-events-auto">
         <div class="cora-ai-sidebar-header flex justify-between items-center px-4 py-3 border-b border-zinc-200/80 bg-zinc-50 shrink-0">
-            <span class="cora-ai-sidebar-title text-xs font-bold text-zinc-800 flex items-center uppercase tracking-wider gap-1.5">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-550">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+            <div class="cora-ai-sidebar-title text-xs font-bold text-zinc-800 flex items-center gap-1.5 cursor-pointer hover:text-zinc-950 transition-colors select-none" onclick="coraClearSidebarChat()">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-550">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/>
                 </svg>
-                Cora AI Assistant
-            </span>
-            <button class="cora-ai-sidebar-close text-zinc-400 hover:text-zinc-900 transition-colors cursor-pointer" onclick="coraToggleSidebar(false)">
-                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
+                <span>New Conversation</span>
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="flex items-center gap-2">
+                <!-- Settings/Filter Icon -->
+                <button class="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer border-0 bg-transparent p-1" title="AI Settings">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="4" y1="21" x2="4" y2="14"></line>
+                        <line x1="4" y1="10" x2="4" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12" y2="3"></line>
+                        <line x1="20" y1="21" x2="20" y2="16"></line>
+                        <line x1="20" y1="12" x2="20" y2="3"></line>
+                        <line x1="1" y1="14" x2="7" y2="14"></line>
+                        <line x1="9" y1="8" x2="15" y2="8"></line>
+                        <line x1="17" y1="16" x2="23" y2="16"></line>
+                    </svg>
+                </button>
+                <!-- Expand/Resize Icon -->
+                <button class="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer border-0 bg-transparent p-1" title="Toggle Panel Width" onclick="coraToggleSidebarExpand()">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <polyline points="9 21 3 21 3 15"></polyline>
+                        <line x1="21" y1="3" x2="14" y2="10"></line>
+                        <line x1="3" y1="21" x2="10" y2="14"></line>
+                    </svg>
+                </button>
+                <!-- Close Button -->
+                <button class="cora-ai-sidebar-close text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer border-0 bg-transparent p-1" onclick="coraToggleSidebar(false)">
+                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
         </div>
         <div class="cora-ai-sidebar-body flex-1 overflow-y-auto p-4 flex flex-col justify-between gap-6">
             <div class="cora-ai-sidebar-chat-history flex flex-col gap-3" id="cora-sidebar-chat">
