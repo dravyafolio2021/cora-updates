@@ -1543,7 +1543,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
     <!-- Full-Width Punch Log History Section -->
     <div class="space-y-4 w-full">
-        <!-- Enhanced Atte        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 md:p-4 shadow-sm flex flex-col gap-2.5 md:gap-3">
+        <!-- Enhanced Attendance History Logs -->
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 md:p-4 shadow-sm flex flex-col gap-2.5 md:gap-3">
             <!-- Search bar & Mobile Toggle Row -->
             <div class="flex flex-row items-center gap-2 md:gap-3 w-full">
                 <!-- Search Input Container -->
