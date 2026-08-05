@@ -729,12 +729,12 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     <tbody class="divide-y divide-zinc-200/60 dark:divide-zinc-800/60 bg-white dark:bg-zinc-900">
                         <!-- Super Admin / Owner Row (Locked) -->
                         <tr class="group hover:bg-zinc-50/70 dark:hover:bg-zinc-850/50 transition-colors cora-matrix-row border-b border-zinc-100 dark:border-zinc-800/60" data-role="cora_super_admin" data-locked="true">
-                            <td class="px-4 py-3 sticky left-0 z-10 bg-white dark:bg-zinc-900 group-hover:bg-zinc-50/70 dark:group-hover:bg-zinc-850/50 transition-colors shadow-[1px_0_0_0_rgba(0,0,0,0.06)] dark:shadow-[1px_0_0_0_rgba(255,255,255,0.08)]">
-                                <div class="flex items-center gap-2.5">
+                            <td class="px-4 py-3 sticky left-0 z-10 bg-white dark:bg-zinc-900 group-hover:bg-zinc-50/70 dark:group-hover:bg-zinc-850/50 transition-colors shadow-[1px_0_0_0_rgba(0,0,0,0.06)] dark:shadow-[1px_0_0_0_rgba(255,255,255,0.08)] whitespace-nowrap">
+                                <div class="flex items-center gap-2">
                                     <span class="font-bold text-xs text-zinc-900 dark:text-zinc-100 cora-role-title-text">Super Admin</span>
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 shadow-2xs">
-                                        <svg class="w-2.5 h-2.5 text-zinc-500 dark:text-zinc-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                                        Global System Lock
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-wide uppercase bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-zinc-500 border border-zinc-200/80 dark:border-zinc-800/80 whitespace-nowrap select-none">
+                                        <svg class="w-2.5 h-2.5 text-zinc-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                        System Locked
                                     </span>
                                 </div>
                             </td>
